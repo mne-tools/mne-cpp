@@ -27,10 +27,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Linear unit the digitizer reports positions in. */
@@ -57,6 +57,6 @@ struct FastrakRecord
  */
 [[nodiscard]] std::optional<FastrakRecord> parse_fastrak_record(std::string_view line, FastrakUnits units);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_FASTRAK_RECORD_H

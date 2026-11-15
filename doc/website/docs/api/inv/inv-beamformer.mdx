@@ -1,18 +1,18 @@
 ---
 id: inv-beamformer
-title: "INVLIB::InvBeamformer"
+title: "mne::InvBeamformer"
 sidebar_label: InvBeamformer
 sidebar_position: 20
 ---
 
 # InvBeamformer
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_beamformer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_beamformer.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_beamformer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_beamformer.h)
 
 `#include <inv/inv_beamformer.h>`
 
 ```cpp
-class INVLIB::InvBeamformer
+class mne::InvBeamformer
 ```
 
 Stores pre-computed beamformer spatial filter weights and associated metadata.
@@ -104,7 +104,7 @@ Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 126"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 123"
 FiffCov dataCov = noiseCov; // noise plus the two sources
 dataCov.data += g1 * g1.transpose() + g2 * g2.transpose();
 const InvBeamformer lcmv = InvLCMV::makeLCMV(info, fwd, dataCov, 0.05, noiseCov,

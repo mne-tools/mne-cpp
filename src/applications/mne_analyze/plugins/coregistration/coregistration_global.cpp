@@ -24,19 +24,19 @@
 
 const char* COREGISTRATIONPLUGIN::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
 const char* COREGISTRATIONPLUGIN::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
 const char* COREGISTRATIONPLUGIN::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

@@ -39,20 +39,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNEBem;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -105,7 +105,7 @@ public:
      *
      * @return The MNEBem object.
      */
-    inline std::shared_ptr<MNELIB::MNEBem> getBem();
+    inline std::shared_ptr<mne::MNEBem> getBem();
 
     //=========================================================================================================
     /**
@@ -130,9 +130,9 @@ private:
     /**
      * Helper function for initialization
      */
-    void initBemData(std::unique_ptr<FIFFLIB::FiffStream> stream);
+    void initBemData(std::unique_ptr<mne::FiffStream> stream);
 
-    std::shared_ptr<MNELIB::MNEBem> m_pBem; /**< Data. */
+    std::shared_ptr<mne::MNEBem> m_pBem; /**< Data. */
 
 signals:
     //=========================================================================================================
@@ -141,7 +141,7 @@ signals:
      *
      * @param[in] pBem    The new Bem model.
      */
-    void newBemAvailable(const std::shared_ptr<MNELIB::MNEBem> pBem);
+    void newBemAvailable(const std::shared_ptr<mne::MNEBem> pBem);
 };
 
 //=============================================================================================================
@@ -158,11 +158,11 @@ inline bool BemDataModel::isEmpty() const
     return !m_pBem;
 }
 
-inline std::shared_ptr<MNELIB::MNEBem> BemDataModel::getBem()
+inline std::shared_ptr<mne::MNEBem> BemDataModel::getBem()
 {
     return m_pBem;
 }
 
-} // namespace ANSHAREDLIB
+} // namespace mne::analyze
 
 #endif // ANSHAREDLIB_BEMDATAMODEL_H

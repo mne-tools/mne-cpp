@@ -12,7 +12,7 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     June 2015
- * @brief    Implementation of @ref MNELIB::MNEBem.
+ * @brief    Implementation of @ref mne::MNEBem.
  *
  * Implements FIFF read/write of the @c FIFFB_BEM block, dispatching the
  * @c FIFFB_BEM_SURF child blocks to @ref MNEBemSurface::read and
@@ -35,10 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -48,9 +45,9 @@ using namespace Eigen;
 namespace
 {
 
-using BASELIB::ErrorCode;
-using BASELIB::Expected;
-using BASELIB::fail;
+using mne::ErrorCode;
+using mne::Expected;
+using mne::fail;
 
 //=============================================================================================================
 

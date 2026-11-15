@@ -19,9 +19,9 @@
  *
  *           This C++ implementation:
  *             - Calls mri_watershed via QProcess
- *             - Reads surfaces using FSLIB::FsSurface
- *             - Applies voxel-to-RAS transforms from MRI volumes (MRILIB)
- *             - Writes BEM FIFF files using MNELIB::MNEBem/MNEBemSurface
+ *             - Reads surfaces using mne::FsSurface
+ *             - Applies voxel-to-RAS transforms from MRI volumes (mne_mri)
+ *             - Writes BEM FIFF files using mne::MNEBem/MNEBemSurface
  *
  *           Cross-referenced with MNE-Python's mne.bem.make_watershed_bem().
  */

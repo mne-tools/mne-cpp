@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+ * @brief    Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
  *
  * Part 1 emulates one card with a 1024-channel, 30 kHz, int16 recording input and a stimulator output on the
  * same clock (an intracortical array with a stimulator, as in closed-loop neuromodulation). One acquisition
@@ -192,7 +192,7 @@ void operator delete[](void* p, std::align_val_t, const std::nothrow_t&) noexcep
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 using Clock = std::chrono::steady_clock;
 
@@ -1028,8 +1028,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::printf("MNE-CPP acquisition (ACQLIB %s) - standard C++20 only, no Qt, no Eigen on the data path\n",
-                ACQLIB::buildHash());
+    std::printf("MNE-CPP acquisition (mne_acq %s) - standard C++20 only, no Qt, no Eigen on the data path\n",
+                mne::buildHash());
     const bool closedLoopOk = runClosedLoop(closedLoopSeconds);
     const bool throughputOk = runThroughput(rowSeconds);
     return closedLoopOk && throughputOk ? 0 : 1;

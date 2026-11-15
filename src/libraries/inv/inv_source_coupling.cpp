@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Definition of the @ref INVLIB::InvSourceCoupling default constructor.
+ * @brief    Definition of the @ref mne::InvSourceCoupling default constructor.
  *
  * Initialises the empty grid-index and moment vectors plus the time
  * window to zero, so an @ref InvSourceCoupling produced by aggregate
@@ -25,7 +25,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

@@ -40,8 +40,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace std::chrono_literals;
 
 //=============================================================================================================
@@ -69,7 +69,7 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
     ChannelDataView view(QStringLiteral("MNEACQ/view"));
     view.setWindowTitle(QStringLiteral("mne_acq view %1").arg(QString::fromStdString(device.description().uri)));
     view.resize(1200, 700);
-    view.init(std::make_shared<FIFFLIB::FiffInfo>(*fiffInfo));
+    view.init(std::make_shared<mne::FiffInfo>(*fiffInfo));
     view.setOverviewBarVisible(false);
     view.setWindowSize(static_cast<float>(window));
     Eigen::MatrixXd sweep = Eigen::MatrixXd::Zero(channels, width);

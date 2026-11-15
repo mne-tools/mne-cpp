@@ -10,7 +10,7 @@
  * @brief    Endianness swap helpers for the FIFF binary tag I/O layer (FIFF is always written big-endian on disk).
  *
  * FIFF tags are stored in network (big-endian) byte order on disk while
- * all currently supported host platforms are little-endian. @ref FIFFLIB::FiffStream
+ * all currently supported host platforms are little-endian. @ref mne::FiffStream
  * therefore funnels every scalar / array read or write through one of
  * these tiny inline helpers, which gives both the per-value variants
  * (@c swap_short, @c swap_int, @c swap_long, @c swap_float, @c swap_double)
@@ -33,10 +33,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -205,6 +205,6 @@ inline void swap_doublep(double* source)
     csource[3] = c;
 }
 
-} // NAMESPACE FIFFLIB
+} // NAMESPACE mne_fiff
 
 #endif // FIFF_BYTE_SWAP_H

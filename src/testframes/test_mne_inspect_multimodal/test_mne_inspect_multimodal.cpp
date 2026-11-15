@@ -11,7 +11,7 @@
  *
  * @brief    Headless integration tests for MNE Inspect's multimodal scene wiring
  *           wiring: ElectrodesPlugin + MriSlicesPlugin + PickReadoutModel
- *           composed on top of a single DISP3DLIB::MultimodalScene.
+ *           composed on top of a single mne::disp::MultimodalScene.
  *
  *           These tests exercise model state, not widget pixels — the
  *           MainWindow itself is intentionally not constructed so the
@@ -41,7 +41,7 @@
 #include <QTest>
 #include <QVector3D>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 using namespace ELECTRODESPLUGIN;
 using namespace MRISLICESPLUGIN;
 using namespace MNEINSPECT;
@@ -63,7 +63,7 @@ private slots:
     void pickCorticalVertexFormatsReadout();
 
 private:
-    static IEEGLIB::IeegImplantation sampleImplantation();
+    static mne::IeegImplantation sampleImplantation();
 };
 
 //=============================================================================================================
@@ -75,7 +75,7 @@ void TestMneInspectMultimodal::initTestCase()
 
 //=============================================================================================================
 
-IEEGLIB::IeegImplantation TestMneInspectMultimodal::sampleImplantation()
+mne::IeegImplantation TestMneInspectMultimodal::sampleImplantation()
 {
     // Delegate to the shared demo fixture so test scenes and doc-shot
     // renders stay byte-identical.

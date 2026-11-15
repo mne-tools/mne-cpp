@@ -1,13 +1,13 @@
 ---
 id: fs-label
-title: "FSLIB::FsLabel"
+title: "mne::FsLabel"
 sidebar_label: FsLabel
 sidebar_position: 3
 ---
 
 # FsLabel
 
-**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_label.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_label.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_label.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_label.h)
 
 :::info[Python equivalent]
 `mne.read_label` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 3
 `#include <fs/fs_label.h>`
 
 ```cpp
-class FSLIB::FsLabel
+class mne::FsLabel
 ```
 
 A FreeSurfer/MNE surface label: per-vertex indices, Tk-RAS positions and scalar values for one hemisphere.
@@ -171,7 +171,7 @@ ok &= expect(colors.getNames().size() == 36 && regions.size() == 34 && precentra
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 113"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 110"
 FsLabel v1;
 FsLabel::read((data + "/subjects/sample/label/lh.V1.label").toStdU16String(), v1);
 const std::filesystem::path fwdPath = (data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String();
@@ -184,7 +184,7 @@ const FiffEvoked evoked((data + "/MEG/sample/sample_audvis-ave.fif").toStdU16Str
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 113"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 110"
 FsLabel v1;
 FsLabel::read((data + "/subjects/sample/label/lh.V1.label").toStdU16String(), v1);
 MNEForwardSolution fwd = MNEForwardSolution(QString(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String()).pick_regions({v1}).pick_channels(good);

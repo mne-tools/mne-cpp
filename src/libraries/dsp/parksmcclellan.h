@@ -24,8 +24,8 @@
  * width 0.02–0.30 (normalised to π), and odd tap counts for high-pass and
  * notch types so a linear-phase type-I structure is realisable.
  *
- * Used as one of the design back-ends of @ref DSPLIB::FilterKernel and ultimately
- * of @ref DSPLIB::FirFilter; cosine-tapered designs are the alternative when speed
+ * Used as one of the design back-ends of @ref mne::FilterKernel and ultimately
+ * of @ref mne::FirFilter; cosine-tapered designs are the alternative when speed
  * matters more than equiripple optimality.
  */
 
@@ -51,10 +51,10 @@
 #include <QObject>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 /**
@@ -206,6 +206,6 @@ private:
 
     bool InitDone2;
 };
-} // NAMESPACE DSPLIB
+} // NAMESPACE mne_dsp
 
 #endif // PARKSMCCLELLAN_H

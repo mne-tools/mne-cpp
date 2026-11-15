@@ -1,23 +1,23 @@
 ---
 id: coherency
-title: "CONNECTIVITYLIB::Coherency"
+title: "mne::Coherency"
 sidebar_label: Coherency
 sidebar_position: 9
 ---
 
 # Coherency
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/coherency.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/coherency.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/coherency.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/coherency.h)
 
 `#include <connectivity/coherency.h>`
 
 ```cpp
-class CONNECTIVITYLIB::Coherency
+class mne::Coherency
 ```
 
 Shared core of the coherence / imaginary-coherence family.
 
-`CONNECTIVITYLIB::Coherency::compute` "compute" fills the per-trial DPSS spectra and accumulates the cross- and auto-spectral sums in `ConnectivitySettings::IntermediateSumData`. The two public reductions then collapse the complex coherency to a real scalar per channel pair: `calculateAbs` returns |Coh_\{xy\}(f)|^2 (classical magnitude-squared coherence, symmetric, sensitive to zero-lag mixing) and `calculateImag` returns |Im(Coh_\{xy\}(f))|, the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
+`mne::Coherency::compute` "compute" fills the per-trial DPSS spectra and accumulates the cross- and auto-spectral sums in `ConnectivitySettings::IntermediateSumData`. The two public reductions then collapse the complex coherency to a real scalar per channel pair: `calculateAbs` returns |Coh_\{xy\}(f)|^2 (classical magnitude-squared coherence, symmetric, sensitive to zero-lag mixing) and `calculateImag` returns |Im(Coh_\{xy\}(f))|, the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
 
 Complex coherency core; produces magnitude-squared and imaginary-part reductions for downstream metrics.
 

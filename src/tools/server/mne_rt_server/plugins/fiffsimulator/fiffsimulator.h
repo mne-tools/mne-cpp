@@ -153,14 +153,14 @@ private:
 
     QMutex mutex;
 
-    std::optional<ACQLIB::AcqDevice> m_device; /**< The fiff:// replay while running. */
-    std::optional<ACQLIB::AcqReader> m_reader; /**< Reader of the replay's stream. */
-    FIFFLIB::FiffRawData m_RawInfo;            /**< Holds the fiff raw measurement information. */
-    QString m_sResourceDataPath;               /**< Holds the path to the Fiff resource simulation file directory.*/
-    quint32 m_uiBufferSampleSize;              /**< Sample size of the buffer. */
-    float m_AccelerationFactor;                /**< Acceleration factor to simulate different sampling rates. */
-    float m_TrueSamplingRate;                  /**< The true sampling rate of the fif file. */
-    bool m_bIsRunning;                         /**< Flag whether the producer is running.*/
+    std::optional<mne::AcqDevice> m_device; /**< The fiff:// replay while running. */
+    std::optional<mne::AcqReader> m_reader; /**< Reader of the replay's stream. */
+    mne::FiffRawData m_RawInfo;             /**< Holds the fiff raw measurement information. */
+    QString m_sResourceDataPath;            /**< Holds the path to the Fiff resource simulation file directory.*/
+    quint32 m_uiBufferSampleSize;           /**< Sample size of the buffer. */
+    float m_AccelerationFactor;             /**< Acceleration factor to simulate different sampling rates. */
+    float m_TrueSamplingRate;               /**< The true sampling rate of the fif file. */
+    bool m_bIsRunning;                      /**< Flag whether the producer is running.*/
 };
 } // NAMESPACE
 

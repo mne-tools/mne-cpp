@@ -29,8 +29,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
-using namespace LSLLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -118,7 +118,7 @@ QNetworkInterface loopbackInterface()
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector<QHostAddress> LSLLIB::detail::discoveryTargets()
+std::vector<QHostAddress> mne::detail::discoveryTargets()
 {
     return {QHostAddress(QStringLiteral("239.255.172.215")), QHostAddress(QStringLiteral("224.0.0.183")),
             QHostAddress(QHostAddress::Broadcast), QHostAddress(QHostAddress::LocalHost)};
@@ -126,14 +126,14 @@ std::vector<QHostAddress> LSLLIB::detail::discoveryTargets()
 
 //=============================================================================================================
 
-std::vector<QHostAddress> LSLLIB::detail::discoveryGroups()
+std::vector<QHostAddress> mne::detail::discoveryGroups()
 {
     return {QHostAddress(QStringLiteral("239.255.172.215")), QHostAddress(QStringLiteral("224.0.0.183"))};
 }
 
 //=============================================================================================================
 
-void LSLLIB::detail::joinDiscoveryGroups([[maybe_unused]] QUdpSocket& socket)
+void mne::detail::joinDiscoveryGroups([[maybe_unused]] QUdpSocket& socket)
 {
 #ifndef QT_NO_NETWORKINTERFACE // WebAssembly has no multicast
     const auto loopback = loopbackInterface();
@@ -148,7 +148,7 @@ void LSLLIB::detail::joinDiscoveryGroups([[maybe_unused]] QUdpSocket& socket)
 
 //=============================================================================================================
 
-void LSLLIB::detail::sendQuery(QUdpSocket& socket, const QByteArray& query)
+void mne::detail::sendQuery(QUdpSocket& socket, const QByteArray& query)
 {
     for (const auto& target : discoveryTargets()) {
         socket.writeDatagram(query, target, kDiscoveryPort);
@@ -164,7 +164,7 @@ void LSLLIB::detail::sendQuery(QUdpSocket& socket, const QByteArray& query)
 
 //=============================================================================================================
 
-std::size_t LSLLIB::detail::valueSize(ChannelFormat format) noexcept
+std::size_t mne::detail::valueSize(ChannelFormat format) noexcept
 {
     switch (format) {
         case ChannelFormat::Float32:
@@ -184,7 +184,7 @@ std::size_t LSLLIB::detail::valueSize(ChannelFormat format) noexcept
 
 //=============================================================================================================
 
-std::string LSLLIB::detail::formatName(ChannelFormat format)
+std::string mne::detail::formatName(ChannelFormat format)
 {
     switch (format) {
         case ChannelFormat::Float32:
@@ -208,7 +208,7 @@ std::string LSLLIB::detail::formatName(ChannelFormat format)
 
 //=============================================================================================================
 
-ChannelFormat LSLLIB::detail::formatFromName(const std::string& name)
+ChannelFormat mne::detail::formatFromName(const std::string& name)
 {
     for (ChannelFormat format : {ChannelFormat::Float32, ChannelFormat::Double64, ChannelFormat::String, ChannelFormat::Int32,
                                  ChannelFormat::Int16, ChannelFormat::Int8, ChannelFormat::Int64}) {
@@ -221,21 +221,21 @@ ChannelFormat LSLLIB::detail::formatFromName(const std::string& name)
 
 //=============================================================================================================
 
-bool LSLLIB::detail::littleEndian() noexcept
+bool mne::detail::littleEndian() noexcept
 {
     return std::endian::native == std::endian::little;
 }
 
 //=============================================================================================================
 
-const char* LSLLIB::detail::byteOrderName() noexcept
+const char* mne::detail::byteOrderName() noexcept
 {
     return littleEndian() ? "1234" : "4321";
 }
 
 //=============================================================================================================
 
-double LSLLIB::detail::testPatternValue(ChannelFormat format, int k, int offset) noexcept
+double mne::detail::testPatternValue(ChannelFormat format, int k, int offset) noexcept
 {
     const double sign = k % 2 == 0 ? 1.0 : -1.0;
     switch (format) {
@@ -258,8 +258,8 @@ double LSLLIB::detail::testPatternValue(ChannelFormat format, int k, int offset)
 
 //=============================================================================================================
 
-void LSLLIB::detail::appendSample(QByteArray& out, ChannelFormat format, const std::vector<double>& values, double timestamp,
-                                  bool deduced)
+void mne::detail::appendSample(QByteArray& out, ChannelFormat format, const std::vector<double>& values, double timestamp,
+                               bool deduced)
 {
     if (deduced) {
         appendValue(out, kTagDeduced);
@@ -401,7 +401,7 @@ int SampleReader::read(const QByteArray& data, qsizetype& pos, std::uint8_t& tag
 
 //=============================================================================================================
 
-bool LSLLIB::detail::matchesQuery(const stream_info& info, const std::string& predicate)
+bool mne::detail::matchesQuery(const stream_info& info, const std::string& predicate)
 {
     std::string rest = trim(predicate);
     if (rest.empty()) {
@@ -442,7 +442,7 @@ bool LSLLIB::detail::matchesQuery(const stream_info& info, const std::string& pr
 
 //=============================================================================================================
 
-std::string LSLLIB::detail::hostText(const QHostAddress& address)
+std::string mne::detail::hostText(const QHostAddress& address)
 {
     bool mapped = false;
     const quint32 v4 = address.toIPv4Address(&mapped);
@@ -451,7 +451,7 @@ std::string LSLLIB::detail::hostText(const QHostAddress& address)
 
 //=============================================================================================================
 
-bool LSLLIB::detail::bindQuerySocket(QUdpSocket& socket, quint16 port)
+bool mne::detail::bindQuerySocket(QUdpSocket& socket, quint16 port)
 {
     if (!socket.bind(QHostAddress::AnyIPv4, port)) {
         return false;
@@ -465,7 +465,7 @@ bool LSLLIB::detail::bindQuerySocket(QUdpSocket& socket, quint16 port)
 
 //=============================================================================================================
 
-bool LSLLIB::detail::waitForDatagrams(QUdpSocket& socket, quint16 port, int ms)
+bool mne::detail::waitForDatagrams(QUdpSocket& socket, quint16 port, int ms)
 {
     if (socket.state() != QAbstractSocket::BoundState && !bindQuerySocket(socket, port)) {
         return false;

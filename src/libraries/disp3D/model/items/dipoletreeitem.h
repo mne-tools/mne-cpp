@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Tree item wrapping a fitted @ref INVLIB::InvEcdSet of equivalent current dipoles.
+ * @brief    Tree item wrapping a fitted @ref mne::InvEcdSet of equivalent current dipoles.
  *
- * Each dipole becomes one instance in the @ref DISP3DLIB::DipoleObject arrow
+ * Each dipole becomes one instance in the @ref mne::disp::DipoleObject arrow
  * mesh: position drives the instance translation, orientation the
  * rotation, goodness-of-fit the colour mapped through the active
  * dipole colormap. Toggling visibility on this item simply hides
@@ -28,7 +28,7 @@
 #include "abstracttreeitem.h"
 #include <inv/dipole_fit/inv_ecd_set.h>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -37,15 +37,15 @@ namespace DISP3DLIB
 class DISP3DSHARED_EXPORT DipoleTreeItem : public AbstractTreeItem
 {
 public:
-    explicit DipoleTreeItem(const QString& text, const INVLIB::InvEcdSet& set, int type = AbstractTreeItem::DipoleItem);
+    explicit DipoleTreeItem(const QString& text, const mne::InvEcdSet& set, int type = AbstractTreeItem::DipoleItem);
     ~DipoleTreeItem() = default;
 
-    const INVLIB::InvEcdSet& ecdSet() const;
+    const mne::InvEcdSet& ecdSet() const;
 
 private:
-    INVLIB::InvEcdSet m_ecdSet;
+    mne::InvEcdSet m_ecdSet;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DIPOLETREEITEM_H

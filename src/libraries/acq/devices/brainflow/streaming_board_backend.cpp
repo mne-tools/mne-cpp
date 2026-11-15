@@ -43,8 +43,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -233,7 +233,7 @@ public:
         if (description.sampling_rate <= 0 || description.rows == 0) {
             return AcqError(AcqErrorCode::InvalidParameter, std::format("BrainFlow board {} describes no samples", id));
         }
-        auto socket = COMLIB::UdpSocket::bind(config->address, config->port);
+        auto socket = mne::UdpSocket::bind(config->address, config->port);
         if (!socket) {
             const AcqErrorCode code = socket.error() == std::errc::invalid_argument ? AcqErrorCode::InvalidParameter : AcqErrorCode::DeviceIo;
             return AcqError(code, std::format("cannot receive on {}:{}: {}", config->address, config->port, socket.error().message()));
@@ -293,7 +293,7 @@ public:
     }
 
 private:
-    StreamingBoardBackend(Config config, COMLIB::UdpSocket socket, int board, const BrainFlowDescription& description, std::string uri)
+    StreamingBoardBackend(Config config, mne::UdpSocket socket, int board, const BrainFlowDescription& description, std::string uri)
     : m_config(std::move(config))
     , m_socket(std::move(socket))
     , m_board(board)
@@ -334,7 +334,7 @@ private:
     }
 
     Config m_config;
-    COMLIB::UdpSocket m_socket;
+    mne::UdpSocket m_socket;
     int m_board = 0;
     BrainFlowDescription m_description;
     std::string m_uri;
@@ -379,7 +379,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::register_streaming_board_scheme()
+AcqError mne::register_streaming_board_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &StreamingBoardBackend::open);
     return result;

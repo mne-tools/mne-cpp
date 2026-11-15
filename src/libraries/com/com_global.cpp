@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     December, 2012
- * @brief    Translation unit for the @c COMLIB build-info entry points declared in @ref com_global.h.
+ * @brief    Translation unit for the @c mne_com build-info entry points declared in @ref com_global.h.
  *
  * The CMake build re-runs this file whenever any other source under @c src/libraries/com/ changes
  * (@c OBJECT_DEPENDS in the CMakeLists.txt) so the embedded build timestamp tracks the most recent edit.
@@ -30,21 +30,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* COMLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
     return __DATE__ " " __TIME__;
 }
 
 //=============================================================================================================
 
-const char* COMLIB::buildHash()
+const char* mne::buildHash()
 {
     return MNE_GIT_HASH_SHORT;
 }
 
 //=============================================================================================================
 
-const char* COMLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
     return MNE_GIT_HASH_LONG;
 }

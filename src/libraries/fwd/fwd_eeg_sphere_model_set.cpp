@@ -41,7 +41,7 @@ using namespace Eigen;
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -99,19 +99,19 @@ std::unique_ptr<FwdEegSphereModelSet> FwdEegSphereModelSet::fwd_load_eeg_sphere_
     VectorXf rads;
     VectorXf sigmas;
     for (std::string raw; std::getline(file, raw);) {
-        const std::string_view line = BASELIB::trimmed(raw);
+        const std::string_view line = mne::trimmed(raw);
         if (line.empty() || line.starts_with('#'))
             continue;
 
-        const BASELIB::StringList parts = BASELIB::split(line, ':', true);
+        const mne::StringList parts = mne::split(line, ':', true);
         if (parts.empty())
             continue;
 
-        const std::string name(BASELIB::trimmed(parts[0]));
+        const std::string name(mne::trimmed(parts[0]));
         int nlayer = 0;
         for (std::size_t i = 1; i + 1 < parts.size(); i += 2) {
-            const std::optional<double> r = BASELIB::toDouble(parts[i]);
-            const std::optional<double> sg = BASELIB::toDouble(parts[i + 1]);
+            const std::optional<double> r = mne::toDouble(parts[i]);
+            const std::optional<double> sg = mne::toDouble(parts[i + 1]);
             if (!r || !sg) {
                 nlayer = 0;
                 break;
@@ -135,17 +135,17 @@ std::unique_ptr<FwdEegSphereModel> FwdEegSphereModelSet::fwd_select_eeg_sphere_m
     const std::string_view name = p_sName.empty() ? std::string_view("Default") : p_sName;
 
     if (this->nmodel() == 0) {
-        BASELIB::Log::warning("No EEG sphere model definitions available");
+        mne::Log::warning("No EEG sphere model definitions available");
         return nullptr;
     }
 
     for (int k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name == name) {
-            BASELIB::Log::info("Selected model: {}", this->models[k]->name);
+            mne::Log::info("Selected model: {}", this->models[k]->name);
             return std::make_unique<FwdEegSphereModel>(*(this->models[k]));
         }
     }
-    BASELIB::Log::warning("EEG sphere model {} not found.", std::string(name));
+    mne::Log::warning("EEG sphere model {} not found.", std::string(name));
     return nullptr;
 }
 
@@ -155,12 +155,12 @@ void FwdEegSphereModelSet::fwd_list_eeg_sphere_models()
 {
     if (this->nmodel() <= 0)
         return;
-    BASELIB::Log::info("Available EEG sphere models:");
+    mne::Log::info("Available EEG sphere models:");
     for (int k = 0; k < this->nmodel(); k++) {
         FwdEegSphereModel* this_model = this->models[k].get();
         std::string line = std::format("\t{} : {}", this_model->name, this_model->nlayer());
         for (int p = 0; p < this_model->nlayer(); p++)
             std::format_to(std::back_inserter(line), " : {:7.3f} : {:7.3f}", this_model->layers[p].rel_rad, this_model->layers[p].sigma);
-        BASELIB::Log::info("{}", line);
+        mne::Log::info("{}", line);
     }
 }

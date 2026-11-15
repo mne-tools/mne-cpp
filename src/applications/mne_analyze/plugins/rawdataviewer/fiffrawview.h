@@ -44,12 +44,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class FiffRawViewModel;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class FilterKernel;
 }
@@ -74,7 +74,7 @@ class FiffRawViewDelegate;
 /**
  * TableView for Fiff data.
  */
-class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public DISPLIB::AbstractView
+class RAWDATAVIEWERSHARED_EXPORT FiffRawView : public mne::disp::AbstractView
 {
     Q_OBJECT
 
@@ -114,7 +114,7 @@ public:
     /**
      * Returns the currently set model
      */
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> getModel();
+    QSharedPointer<mne::analyze::FiffRawViewModel> getModel();
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      *
      * @param[in] pModel    The new model.
      */
-    void setModel(const QSharedPointer<ANSHAREDLIB::FiffRawViewModel>& pModel);
+    void setModel(const QSharedPointer<mne::analyze::FiffRawViewModel>& pModel);
 
     //=========================================================================================================
     /**
@@ -221,7 +221,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const DSPLIB::FilterKernel& filterData);
+    void setFilter(const mne::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -368,14 +368,14 @@ private:
 
     QPointer<QTableView> m_pTableView; /**< Pointer to table view ui element. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pModel; /**< Pointer to associated Model. */
+    QSharedPointer<mne::analyze::FiffRawViewModel> m_pModel; /**< Pointer to associated Model. */
 
     QSharedPointer<FiffRawViewDelegate> m_pDelegate; /**< Pointer to associated Delegate. */
 
     QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
 
     float m_fDefaultSectionSize;  /**< Default row height */
-    float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (DISPLIB::FiffRawViewSettings default) */
+    float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (mne::disp::FiffRawViewSettings default) */
     int m_iLastClickedSample = 0; /**< Stores last clicked sample on screen */
 
     qint32 m_iT = 10; /**< Display window size in seconds. */

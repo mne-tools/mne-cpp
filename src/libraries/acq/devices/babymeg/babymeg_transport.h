@@ -40,10 +40,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** One channel of the server's description. */
@@ -143,6 +143,6 @@ std::unique_ptr<BabyMegTransport> make_babymeg_simulator(const BabyMegSimulation
 AcqExpected<std::unique_ptr<BabyMegTransport>> connect_babymeg(const std::string& host, std::uint16_t data_port, std::uint16_t command_port,
                                                                std::chrono::milliseconds timeout);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // BABYMEG_TRANSPORT_H

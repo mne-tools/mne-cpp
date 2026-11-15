@@ -44,17 +44,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class Filter;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -76,12 +76,12 @@ namespace NOISEREDUCTIONPLUGIN
  *
  * @brief The NoiseReduction class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
  */
-class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public SCSHAREDLIB::AbstractAlgorithm
+class NOISEREDUCTIONSHARED_EXPORT NoiseReduction : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "noisereduction.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -100,7 +100,7 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
@@ -116,7 +116,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ protected:
     /**
      * Update the SSP projection
      */
-    void updateProjection(const std::vector<FIFFLIB::FiffProj>& projs);
+    void updateProjection(const std::vector<mne::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -179,7 +179,7 @@ protected:
      *
      * @param[in] filterData    currently active filter.
      */
-    void setFilter(const DSPLIB::FilterKernel& filterData);
+    void setFilter(const mne::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -217,7 +217,7 @@ private:
     QString m_sCurrentSystem;     /**< The current acquisition system (EEG, babyMEG, VectorView).*/
     QString m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
-    DSPLIB::FilterKernel m_filterKernel; /**< The currently active filter. */
+    mne::FilterKernel m_filterKernel; /**< The currently active filter. */
 
     Eigen::VectorXi m_vecIndicesFirstVV;       /**< The indices of the channels to pick for the first SPHARA oerpator in case of a VectorView system.*/
     Eigen::VectorXi m_vecIndicesSecondVV;      /**< The indices of the channels to pick for the second SPHARA oerpator in case of a VectorView system.*/
@@ -239,12 +239,12 @@ private:
 
     Eigen::RowVectorXi m_lFilterChannelList; /**< The indices of the channels to be filtered.*/
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionInput;   /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionOutput; /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionInput;   /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pNoiseReductionOutput; /**< The RealTimeMultiSampleArray of the NoiseReduction output.*/
 
 signals:
 };

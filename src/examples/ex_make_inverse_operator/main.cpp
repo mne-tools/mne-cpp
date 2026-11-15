@@ -36,9 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // MAIN
@@ -55,7 +53,7 @@ using namespace INVLIB;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

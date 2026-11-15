@@ -34,8 +34,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -366,7 +366,7 @@ AcqExpected<std::vector<AmplifierInfo>> amplifiers(const Sdk& sdk)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::vector<std::string>> ACQLIB::detail::list_eego_amplifiers(const std::vector<std::string>& library)
+AcqExpected<std::vector<std::string>> mne::detail::list_eego_amplifiers(const std::vector<std::string>& library)
 {
     auto sdk = loadSdk(library);
     if (!sdk) {
@@ -385,7 +385,7 @@ AcqExpected<std::vector<std::string>> ACQLIB::detail::list_eego_amplifiers(const
 
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<EegoTransport>> ACQLIB::detail::open_eego_driver(const std::vector<std::string>& library, const std::string& serial)
+AcqExpected<std::unique_ptr<EegoTransport>> mne::detail::open_eego_driver(const std::vector<std::string>& library, const std::string& serial)
 {
     auto sdk = loadSdk(library);
     if (!sdk) {

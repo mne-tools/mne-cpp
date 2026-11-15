@@ -35,8 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,12 +75,12 @@ static std::vector<int> findAllEegIndices(const FiffInfo& info)
 // FUNCTION IMPLEMENTATIONS
 //=============================================================================================================
 
-void DSPLIB::setEegReference(MatrixXd& data,
-                             FiffInfo& info,
-                             const StringList& refChannels,
-                             bool projection)
+void mne::setEegReference(MatrixXd& data,
+                          FiffInfo& info,
+                          const StringList& refChannels,
+                          bool projection)
 {
-    const bool useAverage = refChannels.empty() || (refChannels.size() == 1 && BASELIB::equalsIgnoreCase(refChannels.front(), "average"));
+    const bool useAverage = refChannels.empty() || (refChannels.size() == 1 && mne::equalsIgnoreCase(refChannels.front(), "average"));
 
     if (projection) {
         if (!useAverage) {
@@ -139,7 +138,7 @@ void DSPLIB::setEegReference(MatrixXd& data,
         // Specific channel(s): mean of named channels
         std::vector<int> refIdx;
         for (const std::string& name : refChannels) {
-            int idx = FIFFLIB::channel_index(info.ch_names, name);
+            int idx = mne::channel_index(info.ch_names, name);
             if (idx < 0) {
                 Log::warning("setEegReference: reference channel '{}' not found.", name);
                 return;
@@ -160,9 +159,9 @@ void DSPLIB::setEegReference(MatrixXd& data,
 
 //=============================================================================================================
 
-void DSPLIB::addReferenceChannels(MatrixXd& data,
-                                  FiffInfo& info,
-                                  const StringList& chNames)
+void mne::addReferenceChannels(MatrixXd& data,
+                               FiffInfo& info,
+                               const StringList& chNames)
 {
     if (chNames.empty()) {
         return;
@@ -209,11 +208,11 @@ void DSPLIB::addReferenceChannels(MatrixXd& data,
 
 //=============================================================================================================
 
-void DSPLIB::setBipolarReference(MatrixXd& data,
-                                 FiffInfo& info,
-                                 const StringList& anodes,
-                                 const StringList& cathodes,
-                                 bool dropOriginals)
+void mne::setBipolarReference(MatrixXd& data,
+                              FiffInfo& info,
+                              const StringList& anodes,
+                              const StringList& cathodes,
+                              bool dropOriginals)
 {
     if (anodes.size() != cathodes.size()) {
         Log::warning("setBipolarReference: anodes and cathodes must have the same length ({} vs {}).", static_cast<long long>(anodes.size()), static_cast<long long>(cathodes.size()));
@@ -235,12 +234,12 @@ void DSPLIB::setBipolarReference(MatrixXd& data,
     // Resolve anode and cathode indices
     std::vector<int> anodeIdx(nPairs), cathodeIdx(nPairs);
     for (int i = 0; i < nPairs; ++i) {
-        anodeIdx[i] = FIFFLIB::channel_index(info.ch_names, anodes[i]);
+        anodeIdx[i] = mne::channel_index(info.ch_names, anodes[i]);
         if (anodeIdx[i] < 0) {
             Log::warning("setBipolarReference: anode channel '{}' not found.", anodes[i]);
             return;
         }
-        cathodeIdx[i] = FIFFLIB::channel_index(info.ch_names, cathodes[i]);
+        cathodeIdx[i] = mne::channel_index(info.ch_names, cathodes[i]);
         if (cathodeIdx[i] < 0) {
             Log::warning("setBipolarReference: cathode channel '{}' not found.", cathodes[i]);
             return;

@@ -11,8 +11,8 @@
  *
  * Every renderable that supports picking (BrainSurface triangles,
  * DipoleObject arrow instances, ElectrodeObject contacts,
- * SliceObject voxels) returns a @ref DISP3DLIB::PickResult so the host GUI can
- * react with a single switch on @ref DISP3DLIB::PickResult::kind "PickResult::kind" regardless of
+ * SliceObject voxels) returns a @ref mne::disp::PickResult so the host GUI can
+ * react with a single switch on @ref mne::disp::PickResult::kind "PickResult::kind" regardless of
  * which primitive was hit.
  */
 
@@ -35,7 +35,7 @@
 
 #include <limits>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -130,6 +130,6 @@ inline bool isHit(const PickResult& r) noexcept
     return r.kind != PickKind::None;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DISP3DLIB_PICKRESULT_H

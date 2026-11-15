@@ -26,7 +26,7 @@
 #ifndef NO_IPC
 #include "eventsharedmemmanager.h"
 #else
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 enum SharedMemoryMode
 {
@@ -47,17 +47,17 @@ enum SharedMemoryMode
 #include <memory>
 
 //=============================================================================================================
-// NAMESPACE EVENTSLIB
+// NAMESPACE mne::analyze::events
 //=============================================================================================================
 
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 
 //=============================================================================================================
-// EVENTSINTERNAL FORWARD DECLARATIONS
+// detail FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 class EventSharedMemManager;
 }
@@ -68,7 +68,7 @@ class EventSharedMemManager;
  *
  * The EventManager class.
  *
- * This class can be understood as an API, for the whole Event system, which is the Events library (EVENTSLIB
+ * This class can be understood as an API, for the whole Event system, which is the Events library (mne::analyze::events
  * namespace).
  */
 class EVENTS_EXPORT EventManager
@@ -440,7 +440,7 @@ private:
      * Insert an event in the internal storage list of events.
      * @param e The event to be inserted.
      */
-    void insertEvent(const EVENTSINTERNAL::EventINT& e);
+    void insertEvent(const detail::EventINT& e);
 
     //=========================================================================================================
     /**
@@ -456,7 +456,7 @@ private:
      * @param id The id of the event to find.
      * @return
      */
-    std::multimap<int, EVENTSINTERNAL::EventINT>::const_iterator findEventINT(idNum id) const;
+    std::multimap<int, detail::EventINT>::const_iterator findEventINT(idNum id) const;
 
     //=========================================================================================================
     /**
@@ -464,13 +464,13 @@ private:
      */
     void createDefaultGroupIfNeeded();
 
-    std::multimap<int, EVENTSINTERNAL::EventINT> m_EventsListBySample; /**< List of events organized by sample.*/
-    std::unordered_map<idNum, int> m_MapIdToSample;                    /**< EventId to sample relationship table.*/
-    std::map<idNum, EVENTSINTERNAL::EventGroupINT> m_GroupsList;       /**< Storage of eventgroups.*/
+    std::multimap<int, detail::EventINT> m_EventsListBySample; /**< List of events organized by sample.*/
+    std::unordered_map<idNum, int> m_MapIdToSample;            /**< EventId to sample relationship table.*/
+    std::map<idNum, detail::EventGroupINT> m_GroupsList;       /**< Storage of eventgroups.*/
 
 #ifndef NO_IPC
-    std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager> m_pSharedMemManager; /**< Pointer to a shared manager object.*/
-    friend class EVENTSINTERNAL::EventSharedMemManager;
+    std::unique_ptr<detail::EventSharedMemManager> m_pSharedMemManager; /**< Pointer to a shared manager object.*/
+    friend class detail::EventSharedMemManager;
 #endif
 
     idNum m_iEventIdCounter;        /**< This counter will serve as an eventId until this get error-prone. However it can be easily updated.*/
@@ -504,5 +504,5 @@ inline std::unique_ptr<std::vector<T>> allocateOutputContainer(size_t size) noex
     return v;
 };
 
-} //namespace EVENTSLIB
+} //namespace mne::analyze::events
 #endif // EVENTS_H

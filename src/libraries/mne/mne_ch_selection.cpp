@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Implementation of @ref MNELIB::MNEChSelection.
+ * @brief    Implementation of @ref mne::MNEChSelection.
  */
 
 //=============================================================================================================
@@ -30,8 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -61,7 +60,7 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
     ch_kind.setConstant(nchan, -1);
 
     const auto matches = [this](int c, std::string_view ch_name) {
-        return BASELIB::equalsIgnoreCase(chspick[c], ch_name) || BASELIB::equalsIgnoreCase(chspick_nospace[c], ch_name);
+        return mne::equalsIgnoreCase(chspick[c], ch_name) || mne::equalsIgnoreCase(chspick_nospace[c], ch_name);
     };
     const auto assign = [this, &chs](int c, std::size_t rc) {
         pick[c] = static_cast<int>(rc);
@@ -85,7 +84,7 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
             if (pick[c] != -1)
                 continue;
             for (std::size_t d = 0; d < deriv_names.size(); d++) {
-                if (BASELIB::equalsIgnoreCase(chspick[c], deriv_names[d]) && d < static_cast<std::size_t>(deriv->valid.size()) && deriv->valid[static_cast<Eigen::Index>(d)]) {
+                if (mne::equalsIgnoreCase(chspick[c], deriv_names[d]) && d < static_cast<std::size_t>(deriv->valid.size()) && deriv->valid[static_cast<Eigen::Index>(d)]) {
                     pick_deriv[c] = static_cast<int>(d);
                     ch_kind[c] = deriv->chs[d].kind;
                     break;
@@ -109,6 +108,6 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
         }
     }
     if (const int matched = nderiv(); matched > 0)
-        BASELIB::Log::info("Selection \"{}\" has {} matched derived channels.", name, matched);
+        mne::Log::info("Selection \"{}\" has {} matched derived channels.", name, matched);
     return static_cast<int>(std::ranges::count_if(pick, [](int p) { return p >= 0; }));
 }

@@ -1,13 +1,13 @@
 ---
 id: fs-annotation
-title: "FSLIB::FsAnnotation"
+title: "mne::FsAnnotation"
 sidebar_label: FsAnnotation
 sidebar_position: 2
 ---
 
 # FsAnnotation
 
-**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_annotation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_annotation.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_annotation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_annotation.h)
 
 :::info[Python equivalent]
 `mne.read_annot` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 2
 `#include <fs/fs_annotation.h>`
 
 ```cpp
-class FSLIB::FsAnnotation
+class mne::FsAnnotation
 ```
 
 Single-hemisphere FreeSurfer parcellation: vertex → region label plus embedded colortable.
@@ -198,7 +198,7 @@ Converts annotation to a label list and colortable, like mne.read_labels_from_an
 - **p_qListLabelRGBAs** : *std::vector&lt; Eigen::RowVector4i &gt; &*
   the converted label RGBAs are appended to a given list. Stored data are not affected.
 
-- **lLabelPicks** : *const BASELIB::StringList &*
+- **lLabelPicks** : *const mne::StringList &*
   the label names which should be picked.
 
 **Returns:**
@@ -311,7 +311,7 @@ Reads an annotation of a file.
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 90"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 86"
 QCommandLineOption invFileOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
 QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
 QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
@@ -325,7 +325,7 @@ QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subj
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 97"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 92"
 QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "inflated");
 QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
@@ -346,7 +346,7 @@ QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to b
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 95"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 91"
 QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
 QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");

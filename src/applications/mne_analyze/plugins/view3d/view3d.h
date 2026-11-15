@@ -36,7 +36,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class BemDataModel;
@@ -44,7 +44,7 @@ class AbstractModel;
 class DipoleFitModel;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class BrainView;
 class BrainTreeModel;
@@ -53,18 +53,18 @@ class DigitizerSetTreeItem;
 class DipoleTreeItem;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class Control3DView;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 class FiffDigPointSet;
 }
 
-namespace INVLIB
+namespace mne
 {
 class InvEcdSet;
 }
@@ -85,12 +85,12 @@ namespace VIEW3DPLUGIN
  *
  * @brief The View3D class provides a plugin for visualizing information in 3D.
  */
-class VIEW3DSHARED_EXPORT View3D : public ANSHAREDLIB::AbstractPlugin
+class VIEW3DSHARED_EXPORT View3D : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "view3d.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -116,33 +116,33 @@ public:
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
 
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
     /**
      * Updates the available Bem Models for the coregistration.
      */
-    void updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel);
+    void updateCoregBem(QSharedPointer<mne::analyze::BemDataModel> pNewModel);
 
     //=========================================================================================================
     /**
      * Updates the digitizer set for the coregistration.
      */
-    void updateCoregDigitizer(const FIFFLIB::FiffDigPointSet& digSet);
+    void updateCoregDigitizer(const mne::FiffDigPointSet& digSet);
 
     //=========================================================================================================
     /**
      * Updates the mri fiducials stored as digitizer set for the coregistration.
      */
-    void updateCoregMriFid(const FIFFLIB::FiffDigPointSet& digSetFid);
+    void updateCoregMriFid(const mne::FiffDigPointSet& digSetFid);
 
     //=========================================================================================================
     /**
      * Transforms the digitizers to mri space with the new transformation.
      */
-    void updateCoregTrans(const FIFFLIB::FiffCoordTrans& headMriTrans);
+    void updateCoregTrans(const mne::FiffCoordTrans& headMriTrans);
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ private:
      *
      * @param[in] pModel   new 3D model to be emitted.
      */
-    void new3DModel(QSharedPointer<DISP3DLIB::BrainTreeModel> pModel);
+    void new3DModel(QSharedPointer<mne::disp::BrainTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -176,14 +176,14 @@ private:
      *
      * @param[in] viewParameters   parameters with changes to bw appied to view.
      */
-    void settingsChanged(ANSHAREDLIB::View3DParameters viewParameters);
+    void settingsChanged(mne::analyze::View3DParameters viewParameters);
 
     //=========================================================================================================
     /**
      * @brief newDipoleFit
      * @param ecdSet.
      */
-    void newDipoleFit(const INVLIB::InvEcdSet& ecdSet);
+    void newDipoleFit(const mne::InvEcdSet& ecdSet);
 
     //=========================================================================================================
     /**
@@ -191,7 +191,7 @@ private:
      *
      * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -199,18 +199,18 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
 
     int m_iFiducial; /**< Currently selected fiducial. */
 
-    QSharedPointer<DISP3DLIB::BrainTreeModel> m_p3DModel;                          /**< The 3D model data. */
-    QHash<const ANSHAREDLIB::AbstractModel*, QPersistentModelIndex> m_dipoleItems; /**< Scene item of each dipole fit model. */
-    DISP3DLIB::BemTreeItem* m_pBemTreeCoreg;                                       /**< TThe BEM head model of the coregistration plugin. */
+    QSharedPointer<mne::disp::BrainTreeModel> m_p3DModel;                           /**< The 3D model data. */
+    QHash<const mne::analyze::AbstractModel*, QPersistentModelIndex> m_dipoleItems; /**< Scene item of each dipole fit model. */
+    mne::disp::BemTreeItem* m_pBemTreeCoreg;                                        /**< TThe BEM head model of the coregistration plugin. */
 
-    DISP3DLIB::BrainView* m_pView3D;          /**< The Disp3D view. */
-    DISPLIB::Control3DView* m_pControl3DView; /**< The 3D Control view. */
+    mne::disp::BrainView* m_pView3D;            /**< The Disp3D view. */
+    mne::disp::Control3DView* m_pControl3DView; /**< The 3D Control view. */
 
     bool m_bPickingActivated; /**< If Picking is activated*/
 

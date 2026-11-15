@@ -10,12 +10,12 @@
  * @brief    Continuous-data annotation of muscle and amplitude artefacts.
  *
  * The detectors in this header scan continuous MEG / EEG data and emit
- * @ref FIFFLIB::FiffAnnotation intervals marking time segments that
+ * @ref mne::FiffAnnotation intervals marking time segments that
  * should be excluded from downstream averaging, ICA fitting or PSD
  * estimation. @c annotateMusclZscore band-pass filters the signal in
  * the 110–140 Hz range (typical EMG band), z-scores the Hilbert envelope
  * of every channel, combines and smooths the scores and marks samples
- * above a threshold as BAD_muscle. @ref DSPLIB::annotateAmplitude "annotateAmplitude" marks
+ * above a threshold as BAD_muscle. @ref mne::annotateAmplitude "annotateAmplitude" marks
  * spans where consecutive samples jump by more than a "peak" threshold or
  * change by less than a "flat" one, and returns channels for which that
  * holds too often as bad.
@@ -63,16 +63,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -122,9 +122,9 @@ struct DSPSHARED_EXPORT AnnotateAmplitudeParams
  * @param[out] scores If not null, receives the smoothed score per sample (mne's scores_muscle).
  * @return FiffAnnotations with "BAD_muscle" entries.
  */
-DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
+DSPSHARED_EXPORT mne::FiffAnnotations annotateMusclZscore(
     const Eigen::MatrixXd& data,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     double sfreq,
     const AnnotateMusclParams& params = AnnotateMusclParams(),
     Eigen::RowVectorXd* scores = nullptr);
@@ -147,12 +147,12 @@ DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
  * @param[out] bads    If not null, receives the channels annotated for too long, in channel order.
  * @return "BAD_flat" and "BAD_peak" annotations.
  */
-DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateAmplitude(
+DSPSHARED_EXPORT mne::FiffAnnotations annotateAmplitude(
     const Eigen::MatrixXd& data,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     double sfreq,
     const AnnotateAmplitudeParams& params,
-    BASELIB::StringList* bads = nullptr);
+    mne::StringList* bads = nullptr);
 
-} // namespace DSPLIB
+} // namespace mne
 #endif // ANNOTATE_ARTIFACT_DSP_H

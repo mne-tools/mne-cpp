@@ -52,7 +52,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {
@@ -155,7 +155,7 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_eximia2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

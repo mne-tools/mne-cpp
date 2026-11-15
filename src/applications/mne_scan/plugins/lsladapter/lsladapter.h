@@ -41,12 +41,12 @@
 
 class QListWidgetItem;
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
@@ -68,12 +68,12 @@ class LSLAdapterProducer;
 /**
  * The LSL class deals with the LSL library (labstreaminglayer)
  */
-class LSLADAPTERSHARED_EXPORT LSLAdapter : public SCSHAREDLIB::AbstractSensor
+class LSLADAPTERSHARED_EXPORT LSLAdapter : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "lsladapter.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
 public:
     //=========================================================================================================
@@ -92,7 +92,7 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const;
 
     virtual void init();
 
@@ -125,7 +125,7 @@ public slots:
     /**
      * This is called by the UI, whenever the user has changed the stream to connect to.
      */
-    void onStreamSelectionChanged(const LSLLIB::stream_info& newStream);
+    void onStreamSelectionChanged(const mne::stream_info& newStream);
 
     //=========================================================================================================
     /**
@@ -155,37 +155,37 @@ private:
     /**
      * Helper function for getting a list of LSL streams that fulfill the current filtering settings.
      */
-    static QVector<LSLLIB::stream_info> scanAvailableLSLStreams();
+    static QVector<mne::stream_info> scanAvailableLSLStreams();
 
     //=========================================================================================================
     /**
      * Helper function that fills the FiffInfo member based on an LSL stream info.
      */
-    void prepareFiffInfo(const LSLLIB::stream_info& stream);
+    void prepareFiffInfo(const mne::stream_info& stream);
 
     //=========================================================================================================
     /**
      * Helper function: apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
      */
-    inline static bool contains(const QVector<LSLLIB::stream_info>& v, const LSLLIB::stream_info& s);
+    inline static bool contains(const QVector<mne::stream_info>& v, const mne::stream_info& s);
 
     //=========================================================================================================
     /**
      * Helper function: simple validity check for stream infos (sometimes the resolved stream infos are empty)
      */
-    inline static bool isValid(const LSLLIB::stream_info& s);
+    inline static bool isValid(const mne::stream_info& s);
 
     // fiff info / data output
     float m_fSamplingFrequency;
     int m_iNumberChannels;
     int m_iOutputBlockSize;
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA;
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA;
 
     // LSL stream management
-    QFutureWatcher<QVector<LSLLIB::stream_info>> m_updateStreamsFutureWatcher;
-    QVector<LSLLIB::stream_info> m_vAvailableStreams;
-    LSLLIB::stream_info m_currentStream;
+    QFutureWatcher<QVector<mne::stream_info>> m_updateStreamsFutureWatcher;
+    QVector<mne::stream_info> m_vAvailableStreams;
+    mne::stream_info m_currentStream;
     bool m_bHasValidStream;
 
     // producer management
@@ -200,14 +200,14 @@ signals:
      * @param[in] vStreamInfos Vector of available LSL streams.
      * @param[in] currentStream The LSL stream that the Adapter would currently connect to (upon start).
      */
-    void updatedAvailableLSLStreams(const QVector<LSLLIB::stream_info>& vStreamInfos, const LSLLIB::stream_info& currentStream);
+    void updatedAvailableLSLStreams(const QVector<mne::stream_info>& vStreamInfos, const mne::stream_info& currentStream);
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline SCSHAREDLIB::AbstractPlugin::PluginType LSLAdapter::getType() const
+inline mne::scan::AbstractPlugin::PluginType LSLAdapter::getType() const
 {
     return _ISensor;
 }
@@ -221,7 +221,7 @@ inline QString LSLAdapter::getName() const
 
 //************************************************************************************************************
 
-inline bool LSLAdapter::contains(const QVector<LSLLIB::stream_info>& v, const LSLLIB::stream_info& s)
+inline bool LSLAdapter::contains(const QVector<mne::stream_info>& v, const mne::stream_info& s)
 {
     bool result = false;
     for (const auto& s2 : v)
@@ -231,7 +231,7 @@ inline bool LSLAdapter::contains(const QVector<LSLLIB::stream_info>& v, const LS
 
 //************************************************************************************************************
 
-inline bool LSLAdapter::isValid(const LSLLIB::stream_info& s)
+inline bool LSLAdapter::isValid(const mne::stream_info& s)
 {
     // stream with nonempty ID and name should be valid
     return (s.uid().empty() == false && s.name().empty() == false);

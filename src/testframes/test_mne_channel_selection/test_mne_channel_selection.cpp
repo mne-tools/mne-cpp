@@ -23,7 +23,7 @@
 #include <mne/mne_filter_def.h>
 #include <mne/mne_process_description.h>
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // TEST CLASS
@@ -105,7 +105,7 @@ private slots:
 
     void testChSelectionAssignChannels()
     {
-        std::vector<FIFFLIB::FiffChInfo> chs(4);
+        std::vector<mne::FiffChInfo> chs(4);
         chs[0].ch_name = "MEG0113";
         chs[0].kind = FIFFV_MEG_CH;
         chs[1].ch_name = "EEG 001-REF";

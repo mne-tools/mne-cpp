@@ -29,8 +29,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -202,7 +202,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<BabyMegTransport> ACQLIB::detail::make_babymeg_simulator(const BabyMegSimulation& simulation)
+std::unique_ptr<BabyMegTransport> mne::detail::make_babymeg_simulator(const BabyMegSimulation& simulation)
 {
     return std::make_unique<BabyMegSimulator>(simulation);
 }

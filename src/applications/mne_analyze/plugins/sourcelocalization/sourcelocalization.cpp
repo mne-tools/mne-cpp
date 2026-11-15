@@ -31,7 +31,7 @@
 //=============================================================================================================
 
 using namespace SOURCELOCALIZATIONPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

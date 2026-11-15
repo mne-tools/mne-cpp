@@ -44,8 +44,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 
 namespace
 {
@@ -71,20 +70,20 @@ static std::string readWord(std::istream& in)
 FwdCoil* FwdCoilSet::fwd_add_coil_to_set(int type, int coil_class, int acc, int np, float size, float base, const std::string& desc)
 {
     if (np <= 0) {
-        BASELIB::Log::warning("Number of integration points should be positive (type = {} acc = {})", type, acc);
+        mne::Log::warning("Number of integration points should be positive (type = {} acc = {})", type, acc);
         return nullptr;
     }
     if (!(acc == FWD_COIL_ACCURACY_POINT ||
           acc == FWD_COIL_ACCURACY_NORMAL ||
           acc == FWD_COIL_ACCURACY_ACCURATE)) {
-        BASELIB::Log::warning("Illegal accuracy (type = {} acc = {})", type, acc);
+        mne::Log::warning("Illegal accuracy (type = {} acc = {})", type, acc);
         return nullptr;
     }
     if (!(coil_class == FWD_COILC_MAG ||
           coil_class == FWD_COILC_AXIAL_GRAD ||
           coil_class == FWD_COILC_PLANAR_GRAD ||
           coil_class == FWD_COILC_AXIAL_GRAD2)) {
-        BASELIB::Log::warning("Illegal coil class (type = {} acc = {} class = {})", type, acc, coil_class);
+        mne::Log::warning("Illegal coil class (type = {} acc = {} class = {})", type, acc, coil_class);
         return nullptr;
     }
 
@@ -122,7 +121,7 @@ FwdCoilSet::~FwdCoilSet()
 std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
 {
     if (ch.kind != FIFFV_MEG_CH && ch.kind != FIFFV_REF_MEG_CH) {
-        BASELIB::Log::warning("{} is not a MEG channel. Cannot create a coil definition.", ch.ch_name);
+        mne::Log::warning("{} is not a MEG channel. Cannot create a coil definition.", ch.ch_name);
         return nullptr;
     }
     /*
@@ -136,7 +135,7 @@ std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int a
         }
     }
     if (!def) {
-        BASELIB::Log::warning("Desired coil definition not found (type = {} acc = {})", ch.chpos.coil_type, acc);
+        mne::Log::warning("Desired coil definition not found (type = {} acc = {})", ch.chpos.coil_type, acc);
         return nullptr;
     }
     /*
@@ -179,7 +178,7 @@ std::unique_ptr<FwdCoil> FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int a
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const std::vector<FIFFLIB::FiffChInfo>& chs,
+std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const std::vector<mne::FiffChInfo>& chs,
                                                          int nch,
                                                          int acc,
                                                          const FiffCoordTrans& t)
@@ -199,7 +198,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::create_meg_coils(const std::vector<FIFFL
 
 //=============================================================================================================
 
-std::unique_ptr<FwdCoilSet> FwdCoilSet::create_eeg_els(const std::vector<FIFFLIB::FiffChInfo>& chs,
+std::unique_ptr<FwdCoilSet> FwdCoilSet::create_eeg_els(const std::vector<mne::FiffChInfo>& chs,
                                                        int nch,
                                                        const FiffCoordTrans& t)
 {
@@ -222,7 +221,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const std::filesystem::pa
 {
     std::ifstream file(name);
     if (!file) {
-        BASELIB::Log::warning("FwdCoilSet::read_coil_defs - Cannot open {}", BASELIB::utf8FromPath(name));
+        mne::Log::warning("FwdCoilSet::read_coil_defs - Cannot open {}", mne::utf8FromPath(name));
         return nullptr;
     }
 
@@ -248,13 +247,13 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const std::filesystem::pa
         float size, base;
 
         if (!(in >> type >> acc >> np >> size >> base)) {
-            BASELIB::Log::warning("FwdCoilSet::read_coil_defs - Error reading coil header");
+            mne::Log::warning("FwdCoilSet::read_coil_defs - Error reading coil header");
             return nullptr;
         }
 
         const std::string desc = readWord(in);
         if (desc.empty()) {
-            BASELIB::Log::warning("FwdCoilSet::read_coil_defs - Missing coil description");
+            mne::Log::warning("FwdCoilSet::read_coil_defs - Missing coil description");
             return nullptr;
         }
 
@@ -267,24 +266,24 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const std::filesystem::pa
              * Read and verify data for each integration point
              */
             if (!(in >> def->w[p] >> def->rmag(p, 0) >> def->rmag(p, 1) >> def->rmag(p, 2) >> def->cosmag(p, 0) >> def->cosmag(p, 1) >> def->cosmag(p, 2))) {
-                BASELIB::Log::warning("FwdCoilSet::read_coil_defs - Error reading integration point {}", p);
+                mne::Log::warning("FwdCoilSet::read_coil_defs - Error reading integration point {}", p);
                 return nullptr;
             }
 
             if (def->pos(p).norm() > BIG) {
-                BASELIB::Log::warning("Unreasonable integration point: {:f} {:f} {:f} mm (coil type = {} acc = {})", 1000 * def->rmag(p, 0), 1000 * def->rmag(p, 1), 1000 * def->rmag(p, 2), def->type, def->accuracy);
+                mne::Log::warning("Unreasonable integration point: {:f} {:f} {:f} mm (coil type = {} acc = {})", 1000 * def->rmag(p, 0), 1000 * def->rmag(p, 1), 1000 * def->rmag(p, 2), def->type, def->accuracy);
                 return nullptr;
             }
             float cosmagNorm = def->dir(p).norm();
             if (cosmagNorm <= 0) {
-                BASELIB::Log::warning("Unreasonable normal: {:f} {:f} {:f} (coil type = {} acc = {})", def->cosmag(p, 0), def->cosmag(p, 1), def->cosmag(p, 2), def->type, def->accuracy);
+                mne::Log::warning("Unreasonable normal: {:f} {:f} {:f} (coil type = {} acc = {})", def->cosmag(p, 0), def->cosmag(p, 1), def->cosmag(p, 2), def->type, def->accuracy);
                 return nullptr;
             }
             def->cosmag.row(p).normalize();
         }
     }
 
-    BASELIB::Log::info("{} coil definitions read", res->ncoil());
+    mne::Log::info("{} coil definitions read", res->ncoil());
     return res;
 }
 
@@ -296,7 +295,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) co
 
     if (!t.empty()) {
         if (this->coord_frame != t.from) {
-            BASELIB::Log::warning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
+            mne::Log::warning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
             return nullptr;
         }
     }

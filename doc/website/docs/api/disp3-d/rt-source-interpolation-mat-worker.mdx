@@ -1,18 +1,18 @@
 ---
 id: rt-source-interpolation-mat-worker
-title: "DISP3DLIB::RtSourceInterpolationMatWorker"
+title: "mne::disp::RtSourceInterpolationMatWorker"
 sidebar_label: RtSourceInterpolationMatWorker
 sidebar_position: 8
 ---
 
 # RtSourceInterpolationMatWorker
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsourceinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsourceinterpolationmatworker.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsourceinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsourceinterpolationmatworker.h)
 
 `#include <disp3D/rtsourceinterpolationmatworker.h>`
 
 ```cpp
-class DISP3DLIB::RtSourceInterpolationMatWorker
+class mne::disp::RtSourceInterpolationMatWorker
 ```
 
 [`RtSourceInterpolationMatWorker`](/docs/api/disp3-d/rt-source-interpolation-mat-worker) computes sparse source-to-vertex interpolation matrices in a background thread.
@@ -21,7 +21,7 @@ This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance
 
 The worker for each hemisphere stores:
 
-- [FsSurface](/docs/api/fs/fs-surface) vertex positions and neighbor topology
+- [`FsSurface`](/docs/api/fs/fs-surface) vertex positions and neighbor topology
 - Source vertex indices (from the STC file)
 - Cancel distance and interpolation function
 

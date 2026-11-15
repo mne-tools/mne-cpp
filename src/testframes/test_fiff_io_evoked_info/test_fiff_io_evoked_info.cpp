@@ -38,8 +38,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -113,7 +112,7 @@ private slots:
 
 void TestFiffIoEvokedInfo::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
@@ -348,7 +347,7 @@ void TestFiffIoEvokedInfo::evokedSet_grandAverage()
     QCOMPARE(g.info.nchan, 374);
     QCOMPARE(grandAvg.info.nchan, 374);
     QVERIFY(g.info.bads.empty());
-    QVERIFY(!BASELIB::contains(g.info.ch_names, "MEG 2443"));
+    QVERIFY(!mne::contains(g.info.ch_names, "MEG 2443"));
     QVERIFY(qAbs(g.data(0, 100) / -9.523296577431598e-12 - 1.0) < 1e-6);
     QVERIFY(qAbs(g.data.norm() / 11.161421411316139 - 1.0) < 1e-6);
 }
@@ -385,8 +384,8 @@ void TestFiffIoEvokedInfo::evoked_combineMatchesMnePython()
         QCOMPARE(c.combined.nave, c.nave);
         QCOMPARE(c.combined.comment, c.comment);
         QCOMPARE(c.combined.info.bads.size(), 2);
-        QVERIFY(BASELIB::contains(c.combined.info.bads, "MEG 2443"));
-        QVERIFY(BASELIB::contains(c.combined.info.bads, "EEG 053"));
+        QVERIFY(mne::contains(c.combined.info.bads, "MEG 2443"));
+        QVERIFY(mne::contains(c.combined.info.bads, "EEG 053"));
         QVERIFY(qAbs(c.combined.data(0, 100) / c.d0 - 1.0) < 1e-6);
         QVERIFY(qAbs(c.combined.data(315, 200) / c.d1 - 1.0) < 1e-6);
         QVERIFY(qAbs(c.combined.data.norm() / c.norm - 1.0) < 1e-6);
@@ -669,7 +668,7 @@ void TestFiffIoEvokedInfo::fileSharer_withDirectory()
     QVERIFY(consumer.new_files().empty());
 
     // A source that is missing leaves nothing behind; clear() empties the directory and starts over
-    QCOMPARE(producer.copy_realtime_file(shared / "missing.fif").error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(producer.copy_realtime_file(shared / "missing.fif").error().code, mne::ErrorCode::Io);
     QVERIFY(consumer.new_files().empty());
     QVERIFY(consumer.clear());
     QVERIFY(std::filesystem::is_empty(shared));

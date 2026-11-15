@@ -1,18 +1,18 @@
 ---
 id: rt-fiff-raw-view
-title: "DISPLIB::RtFiffRawView"
+title: "mne::disp::RtFiffRawView"
 sidebar_label: RtFiffRawView
 sidebar_position: 51
 ---
 
 # RtFiffRawView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/rtfiffrawview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/rtfiffrawview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/rtfiffrawview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/rtfiffrawview.h)
 
 `#include <disp/rtfiffrawview.h>`
 
 ```cpp
-class DISPLIB::RtFiffRawView
+class mne::disp::RtFiffRawView
 ```
 
 QTableView-based real-time FIFF raw-data browser host.
@@ -77,12 +77,12 @@ Note that this will also trigger a reload of the stored settings.
 
 ### init(info)
 
-Initilaizes the [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view) based on a [FiffInfo](/docs/api/fiff/fiff-info).
+Initilaizes the [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view) based on a [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 **Parameters:**
 
 - **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
-  The FiffInfo.
+  The [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 ---
 
@@ -286,7 +286,7 @@ Update the compensator.
 **Parameters:**
 
 - **to** : *int*
-  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+  Compensator to use in fiff constant format `FiffCtfComp.kind` (NOT `FiffCtfComp.ctfkind`).
 
 ---
 

@@ -13,7 +13,7 @@
  * @date     August 2016
  * @brief    Geometric projection of a 3D point onto the closest cortex triangle.
  *
- * @ref MNELIB::MNEProjectToSurface provides the point-to-triangle
+ * @ref mne::MNEProjectToSurface provides the point-to-triangle
  * projection used when associating MRI fiducials with the cortical
  * surface, when mapping discrete dipole sources to the nearest cortical
  * vertex and during head-shape registration. The implementation mirrors
@@ -40,14 +40,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEBemSurface;
@@ -76,7 +76,7 @@ public:
      * @brief Build a projector that snaps points onto the triangulation of @p p_MNEBemSurf.
      * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected.
      */
-    MNEProjectToSurface(const MNELIB::MNEBemSurface& p_MNEBemSurf);
+    MNEProjectToSurface(const mne::MNEBemSurface& p_MNEBemSurf);
 
     //=========================================================================================================
     /**
@@ -156,6 +156,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNELIB_MNEPROJECTTOSURFACE_H

@@ -1,22 +1,22 @@
 ---
 id: acq-expected
-title: "ACQLIB::AcqExpected"
+title: "mne::AcqExpected"
 sidebar_label: AcqExpected
 sidebar_position: 20
 ---
 
 # AcqExpected
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_error.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_error.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_error.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_error.h)
 
 `#include <acq/acq_error.h>`
 
 ```cpp
 template <typename T>
-class ACQLIB::AcqExpected
+class mne::AcqExpected
 ```
 
-Value-or-error result, the subset of C++23 std::expected that `ACQLIB` needs, without exceptions: accessing the wrong alternative is a precondition violation (assert), never a throw.
+Value-or-error result, the subset of C++23 std::expected that mne_acq needs, without exceptions: accessing the wrong alternative is a precondition violation (assert), never a throw.
 
 ```cpp title="src/examples/ex_acq_performance/main.cpp"
 auto view = reader.acquire(kBlock, 100ms);
@@ -154,7 +154,7 @@ Holds an error without context.
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 

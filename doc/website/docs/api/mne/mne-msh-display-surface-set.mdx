@@ -1,25 +1,25 @@
 ---
 id: mne-msh-display-surface-set
-title: "MNELIB::MNEMshDisplaySurfaceSet"
+title: "mne::MNEMshDisplaySurfaceSet"
 sidebar_label: MNEMshDisplaySurfaceSet
 sidebar_position: 34
 ---
 
 # MNEMshDisplaySurfaceSet
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_msh_display_surface_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_msh_display_surface_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_msh_display_surface_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_msh_display_surface_set.h)
 
 `#include <mne/mne_msh_display_surface_set.h>`
 
 ```cpp
-class MNELIB::MNEMshDisplaySurfaceSet
+class mne::MNEMshDisplaySurfaceSet
 ```
 
 Replaces *mshDisplaySurfaceSet, mshDisplaySurfaceSetRec struct (analyze_types.c).
 
 Note that another implementation can be found in movie_types.h
 
-The MNE Msh Display [FsSurface](/docs/api/fs/fs-surface) Set class holds information about a set of surfaces to be rendered.
+The MNE Msh Display [`FsSurface`](/docs/api/fs/fs-surface) Set class holds information about a set of surfaces to be rendered.
 
 ```cpp title="src/examples/ex_mne_api/main.cpp"
 // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
@@ -140,7 +140,7 @@ Load left and right hemisphere FreeSurfer surfaces (with curvature) from the sub
   Subject name.
 
 - **surf** : *const std::string &*
-  FsSurface type name (e.g. "inflated", "white").
+  [`FsSurface`](/docs/api/fs/fs-surface) type name (e.g. "inflated", "white").
 
 - **subjects_dir** : *const std::filesystem::path &*
   Path to the FreeSurfer subjects directory.
@@ -185,7 +185,7 @@ Deep-copy a light set including all individual light entries.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 449"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 447"
 // The same surface as an MNE-C viewer display surface
 MNEMshDisplaySurfaceSet display;
 display.add_bem_surface(bemPath.toStdU16String(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure

@@ -22,7 +22,7 @@
 #include <QVector3D>
 #include <QDebug>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -30,7 +30,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
-                                           std::span<const FIFFLIB::FiffDigPoint> digitizerPoints)
+                                           std::span<const mne::FiffDigPoint> digitizerPoints)
 : QStandardItem(text)
 {
     setCheckable(true);
@@ -152,4 +152,4 @@ int DigitizerSetTreeItem::totalPointCount() const
     return count;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

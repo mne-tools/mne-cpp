@@ -48,10 +48,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using COMLIB::list_serial_ports;
-using COMLIB::SerialPort;
+using namespace mne;
+using namespace mne::detail;
+using mne::list_serial_ports;
+using mne::SerialPort;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -496,7 +496,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::register_polhemus_scheme()
+AcqError mne::register_polhemus_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &PolhemusBackend::open, &discover);
     return result;

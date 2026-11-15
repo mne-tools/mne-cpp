@@ -7,17 +7,17 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    @ref MLLIB::MLTrainer convenience wrapper that drives Python training scripts via @ref PYBRIDGELIB::PythonRunner.
+ * @brief    @ref mne::MLTrainer convenience wrapper that drives Python training scripts via @ref mne::PythonRunner.
  *
  * Inference in mne-cpp goes through ONNX Runtime, but training itself
  * stays in Python where the ecosystem lives (PyTorch, scikit-learn,
- * MNE-Python). @ref MLLIB::MLTrainer is the thin C++ side that
+ * MNE-Python). @ref mne::MLTrainer is the thin C++ side that
  * launches those scripts as child processes, optionally inside a
  * managed virtual environment, without embedding a Python interpreter
  * or linking against @c libpython.
  *
  * The class adds three things on top of the generic
- * @ref PYBRIDGELIB::PythonRunner "PythonRunner": prerequisite checking via
+ * @ref mne::PythonRunner "PythonRunner": prerequisite checking via
  * @c is_package_available so callers can fail fast with a useful message,
  * automatic delegation to @c run_in_venv when a @c venv_dir is configured
  * (which creates and updates the venv before the script runs), and
@@ -49,20 +49,20 @@
 #include <filesystem>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
- * @brief Launches Python training scripts via @ref PYBRIDGELIB::PythonRunner with automatic venv handling and prerequisite checks.
+ * @brief Launches Python training scripts via @ref mne::PythonRunner with automatic venv handling and prerequisite checks.
  *
  * Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely
  * in the @c .py scripts under @c scripts/ml/training/ and runs in a
  * child process; no Python embedding or @c libpython linkage is
- * required. If the configured @ref PYBRIDGELIB::PythonRunnerConfig
+ * required. If the configured @ref mne::PythonRunnerConfig
  * carries a @c venv_dir, the runner creates and updates the venv before
  * each script invocation so dependencies are pinned per training job.
  *
@@ -83,7 +83,7 @@ public:
      *
      * @param[in] config     PythonRunner configuration to use.
      */
-    explicit MLTrainer(const PYBRIDGELIB::PythonRunnerConfig& config);
+    explicit MLTrainer(const mne::PythonRunnerConfig& config);
 
     //=========================================================================================================
     /**
@@ -91,7 +91,7 @@ public:
      *
      * @return Reference to the PythonRunner instance.
      */
-    PYBRIDGELIB::PythonRunner& runner();
+    mne::PythonRunner& runner();
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      *
      * @return PythonRunnerResult with exit code, output, and progress.
      */
-    PYBRIDGELIB::PythonRunnerResult run(const std::filesystem::path& scriptPath, const BASELIB::StringList& args = {});
+    mne::PythonRunnerResult run(const std::filesystem::path& scriptPath, const mne::StringList& args = {});
 
     //=========================================================================================================
     /**
@@ -115,13 +115,13 @@ public:
      *
      * @return List of packages that could NOT be imported (empty = all OK).
      */
-    BASELIB::StringList check_prerequisites(const BASELIB::StringList& packages) const;
+    mne::StringList check_prerequisites(const mne::StringList& packages) const;
 
 private:
-    PYBRIDGELIB::PythonRunner m_runner; /**< Underlying Python process launcher. */
+    mne::PythonRunner m_runner; /**< Underlying Python process launcher. */
 };
 
-} // namespace MLLIB
+} // namespace mne
 
 #endif // WASMBUILD
 

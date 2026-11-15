@@ -55,9 +55,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
+using namespace mne::scan;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -86,7 +85,7 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RealTimeMultiSampleArrayWidget::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (!m_pRTMSA) {
         m_pRTMSA = qSharedPointerDynamicCast<RealTimeMultiSampleArray>(pMeasurement);

@@ -35,7 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -146,7 +146,7 @@ void AverageSceneItem::paintAveragePath(QPainter* painter)
 
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
 
-    float fMaxValue = DISPLIB::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
+    float fMaxValue = mne::disp::getScalingValue(m_scaleMap, m_iChannelKind, m_iChannelUnit);
 
     //Plot averaged data
     QRectF boundingRect = this->boundingRect();

@@ -34,7 +34,7 @@
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("MNE Inspect");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

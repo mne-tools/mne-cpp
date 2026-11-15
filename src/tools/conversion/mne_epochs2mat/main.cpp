@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -206,7 +206,7 @@ static QList<EventEntry> readEvents(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_epochs2mat");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

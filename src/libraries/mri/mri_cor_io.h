@@ -19,7 +19,7 @@
  * mne-cpp must read them to keep round-trip parity with the
  * original MNE C tooling.
  *
- * The reader fans the 256 files into an @ref MRILIB::MriSlice vector
+ * The reader fans the 256 files into an @ref mne::MriSlice vector
  * with the canonical coronal-to-surface-RAS coordinate transform:
  *
  * - Origin offset (mm): (128, -128, 128)
@@ -51,10 +51,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MRILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -64,7 +64,7 @@ namespace MRILIB
  * Walks a @c mri/T1 (or @c mri/orig, @c mri/brain, …) directory, loads
  * the 256 @c COR-001 … @c COR-256 flat 256×256 unsigned-char coronal
  * slice files, and assembles them into an @ref MriVolData with the per-slice
- * coordinate transform (slice→surface RAS) the rest of MRILIB expects.
+ * coordinate transform (slice→surface RAS) the rest of mne_mri expects.
  * The class exposes only @c static methods --- there is no per-instance
  * state, the caller supplies the directory path and an output volume.
  *
@@ -94,6 +94,6 @@ public:
                      bool verbose = false);
 };
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_COR_IO_H

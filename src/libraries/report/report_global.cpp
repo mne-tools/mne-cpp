@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Out-of-line definitions for the REPORTLIB build-info accessors declared in @ref report_global.h.
+ * @brief    Out-of-line definitions for the mne_report build-info accessors declared in @ref report_global.h.
  *
  * Kept as a separate translation unit so the @c __DATE__ and
  * @c __TIME__ macros are expanded when this file is compiled
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* REPORTLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* REPORTLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* REPORTLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

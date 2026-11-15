@@ -19,10 +19,10 @@
 namespace MNEALIGN
 {
 
-using ACQLIB::AcquiredPoints;
-using ACQLIB::DigitizedPoint;
-using ACQLIB::FiducialId;
-using ACQLIB::PointKind;
+using mne::AcquiredPoints;
+using mne::DigitizedPoint;
+using mne::FiducialId;
+using mne::PointKind;
 
 QVector<DigitizedPoint> demoFiducials()
 {

@@ -1,18 +1,18 @@
 ---
 id: mne-morph-map
-title: "MNELIB::MNEMorphMap"
+title: "mne::MNEMorphMap"
 sidebar_label: MNEMorphMap
 sidebar_position: 31
 ---
 
 # MNEMorphMap
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_morph_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_morph_map.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_morph_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_morph_map.h)
 
 `#include <mne/mne_morph_map.h>`
 
 ```cpp
-class MNELIB::MNEMorphMap
+class mne::MNEMorphMap
 ```
 
 Morph map of one hemisphere from one subject to another.
@@ -32,7 +32,7 @@ smallToLarge.hemi = 0;
 const QString mapFile = tmp.filePath("small-large-morph.fif");
 MNEMorphMap::write(mapFile.toStdU16String(), {&smallToLarge});
 const auto reread = MNEMorphMap::read(mapFile.toStdU16String(), "small", "large", 0);
-const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds mne::SourceMorph
 ```
 
 ---
@@ -72,7 +72,7 @@ Returns the map as a matrix that takes source vertex values to destination verti
 
 **Returns:**
 
-- *Eigen::SparseMatrix&lt; double &gt;* — The destination x source sparse matrix in double precision (e.g. for SourceMorph).
+- *Eigen::SparseMatrix&lt; double &gt;* — The destination x source sparse matrix in double precision (e.g. for [`SourceMorph`](/docs/api/inv/source-morph)).
 
 ---
 
@@ -156,7 +156,7 @@ Writes maps as `FIFFB_MNE_MORPH_MAP` blocks (MNE-C `mne_save_morph_map_matrices`
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 515"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 513"
 FsSurface largeSphere;
 FsSurface::read((subjectsDir + "/small/surf/lh.sphere.reg").toStdU16String(), smallSphere, false);
 FsSurface::read((subjectsDir + "/large/surf/lh.sphere.reg").toStdU16String(), largeSphere, false);
@@ -167,7 +167,7 @@ smallToLarge.hemi = 0;
 const QString mapFile = tmp.filePath("small-large-morph.fif");
 MNEMorphMap::write(mapFile.toStdU16String(), {&smallToLarge});
 const auto reread = MNEMorphMap::read(mapFile.toStdU16String(), "small", "large", 0);
-const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds mne::SourceMorph
 // mne.read_morph_map("small", "large"): vertex 0 of "large" = 0.4372 * v0 + 0.3726 * v42 + 0.1902 * v51 of "small"
 ok &= expect(weights.rows() == 642 && weights.cols() == 162 && std::abs(weights.coeff(0, 0) - 0.43720984) < 1e-5 && std::abs(weights.coeff(0, 42) - 0.37262118) < 1e-5 && std::abs(weights.coeff(0, 51) - 0.19016896) < 1e-5,
 ````

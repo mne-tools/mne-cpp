@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Mesh-viewer camera state (position, focal point, up vector, field of view).
  *
- * @ref MNELIB::MNEMshEyes captures the camera parameters that the
+ * @ref mne::MNEMshEyes captures the camera parameters that the
  * @c tksurfer / @c mneAnalyze viewers serialised next to a scene; used
  * by mne-cpp's 3D viewers to reproduce a saved viewpoint exactly.
  */
@@ -26,10 +26,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -64,6 +64,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHEYES_H

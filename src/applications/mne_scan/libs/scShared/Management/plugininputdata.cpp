@@ -23,10 +23,10 @@
 #include <QDebug>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -57,7 +57,7 @@ void PluginInputData<T>::setCallbackMethod(callback_function pFunc)
 //=============================================================================================================
 
 template<class T>
-void PluginInputData<T>::notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement)
+void PluginInputData<T>::notifyCallbackFunction(mne::scan::Measurement::SPtr pMeasurement)
 {
     //qDebug() << "Here in input data.";
     if (m_pFunc) {

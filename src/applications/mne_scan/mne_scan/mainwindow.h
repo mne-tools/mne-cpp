@@ -55,7 +55,7 @@ class QDockWidget;
 class QTextBrowser;
 QT_END_NAMESPACE
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 class AbstractPlugin;
 class PluginManager;
@@ -64,7 +64,7 @@ class PluginConnectorConnection;
 class DisplayManager;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class MultiView;
 class QuickControlView;
@@ -264,13 +264,13 @@ private:
      * Sets the plugin setup widget to central widget of MainWindow class depending on the current plugin
      * selected in m_pDockWidgetPlugins.
      */
-    void updatePluginSetupWidget(QSharedPointer<SCSHAREDLIB::AbstractPlugin> pPlugin);
+    void updatePluginSetupWidget(QSharedPointer<mne::scan::AbstractPlugin> pPlugin);
 
     //=========================================================================================================
     /**
      * Adds the plugin visualization widget to central widget of MainWindow class if the pipeline was started.
      */
-    void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin>> lPlugins);
+    void initMultiViewWidget(QList<QSharedPointer<mne::scan::AbstractPlugin>> lPlugins);
 
     //=========================================================================================================
     /**
@@ -297,7 +297,7 @@ private:
      * Sets the connection widget to central widget of MainWindow class depending on the current arrow selected
      * in m_pDockWidgetPlugins.
      */
-    void updateConnectionWidget(QSharedPointer<SCSHAREDLIB::PluginConnectorConnection> pConnection);
+    void updateConnectionWidget(QSharedPointer<mne::scan::PluginConnectorConnection> pConnection);
 
     //=========================================================================================================
     /**
@@ -420,23 +420,23 @@ private:
 
     QPointer<StartUpWidget> m_pStartUpWidget; /**< holds the StartUpWidget.*/
 
-    QPointer<DISPLIB::MultiView> m_pMultiView; /**< The multi view widget, which is set as central widget as soon as the measurement starts. */
+    QPointer<mne::disp::MultiView> m_pMultiView; /**< The multi view widget, which is set as central widget as soon as the measurement starts. */
 
     LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
 
     QPointer<PluginGui> m_pPluginGui; /**< Holds the plugin GUI.*/
 
-    QPointer<DISPLIB::QuickControlView> m_pQuickControlView; /**< quick control widget. */
+    QPointer<mne::disp::QuickControlView> m_pQuickControlView; /**< quick control widget. */
 
     MainSplashScreenCloser::SPtr m_pSplashScreenHider; /**< Holds the object responsible of hiding the splashscreen. */
     MainSplashScreen::SPtr m_pSplashScreen;            /**< Holds the splash screen. */
 
-    QSharedPointer<QTimer> m_pTimer;                                       /**< timer of the main application*/
-    QSharedPointer<QTime> m_pTime;                                         /**< Holds current time output, updated with timeout of timer.*/
-    QSharedPointer<SCSHAREDLIB::PluginManager> m_pPluginManager;           /**< Holds log dock widget.*/
-    QSharedPointer<SCSHAREDLIB::PluginSceneManager> m_pPluginSceneManager; /**< Plugin scene manager which manages the plugin graph. */
-    QSharedPointer<QWidget> m_pAboutWindow;                                /**< Holds the widget containing the about information.*/
-    QSharedPointer<SCSHAREDLIB::DisplayManager> m_pDisplayManager;         /**< display manager. */
+    QSharedPointer<QTimer> m_pTimer;                                     /**< timer of the main application*/
+    QSharedPointer<QTime> m_pTime;                                       /**< Holds current time output, updated with timeout of timer.*/
+    QSharedPointer<mne::scan::PluginManager> m_pPluginManager;           /**< Holds log dock widget.*/
+    QSharedPointer<mne::scan::PluginSceneManager> m_pPluginSceneManager; /**< Plugin scene manager which manages the plugin graph. */
+    QSharedPointer<QWidget> m_pAboutWindow;                              /**< Holds the widget containing the about information.*/
+    QSharedPointer<mne::scan::DisplayManager> m_pDisplayManager;         /**< display manager. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
     QString m_sCurrentStyle; /**< The currently selected style (dark mode, default mode). */
@@ -448,7 +448,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
 };
 } // NAMESPACE
 

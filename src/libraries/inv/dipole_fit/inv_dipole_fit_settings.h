@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Command-line and programmatic settings struct for the @c mne_dipole_fit driver.
  *
- * @ref INVLIB::InvDipoleFitSettings collects every option that the
+ * @ref mne::InvDipoleFitSettings collects every option that the
  * classic @c mne_dipole_fit command-line tool accepts — BEM file, sphere
  * origin, EEG model, guess-grid parameters, noise-covariance file,
  * measurement file and time window, projection list, regularisation per
@@ -46,10 +46,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -137,7 +137,7 @@ public:
     bool do_baseline;                   /**< Are both baseline limits set? */
     int setno;                          /**< Which data set. */
     bool verbose;                       /**< Verbose output. */
-    MNELIB::MNEFilterDef filter;        /**< Data filter definition. */
+    mne::MNEFilterDef filter;           /**< Data filter definition. */
     std::vector<std::string> projnames; /**< Projection file names. */
     bool omit_data_proj;                /**< Omit the projection in the data file. */
 

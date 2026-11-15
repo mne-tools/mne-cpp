@@ -1,18 +1,18 @@
 ---
 id: annotate-amplitude-params
-title: "DSPLIB::AnnotateAmplitudeParams"
+title: "mne::AnnotateAmplitudeParams"
 sidebar_label: AnnotateAmplitudeParams
 sidebar_position: 44
 ---
 
 # AnnotateAmplitudeParams
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/annotate_artifact.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/annotate_artifact.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/annotate_artifact.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/annotate_artifact.h)
 
 `#include <dsp/annotate_artifact.h>`
 
 ```cpp
-struct DSPLIB::AnnotateAmplitudeParams
+struct mne::AnnotateAmplitudeParams
 ```
 
 Parameters for amplitude-based annotation.
@@ -38,7 +38,7 @@ const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitu
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 223"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 221"
 MatrixXd loose = data;
 loose.row(3).segment(250, 50).setConstant(loose(3, 250));
 AnnotateAmplitudeParams amplitude;
@@ -46,7 +46,7 @@ amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
 StringList flatChannels;
 const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
 ok &= expect(flatSpans.size() == 1 && flatSpans[0].description == "BAD_flat" && std::abs(flatSpans[0].onset - 1.0) < 1e-12 && flatChannels == StringList{"EEG2"},
-             std::format("annotateAmplitude: {} flat span(s), bad {}", flatSpans.size(), BASELIB::join(flatChannels, ", ")));
+             std::format("annotateAmplitude: {} flat span(s), bad {}", flatSpans.size(), mne::join(flatChannels, ", ")));
 ````
 
 ## Authors of this file

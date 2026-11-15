@@ -48,10 +48,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -434,6 +434,6 @@ requires(!std::same_as<T, bool>)
     m_value.template emplace<std::int64_t>(static_cast<std::int64_t>(value));
 }
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_CBOR_H

@@ -18,7 +18,7 @@
 #include <Eigen/Core>
 #include <cmath>
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFineCalibration : public QObject

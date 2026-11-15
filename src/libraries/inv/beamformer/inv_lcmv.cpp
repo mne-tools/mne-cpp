@@ -45,10 +45,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -231,7 +228,7 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked& evoked, const InvBeamform
         const int nTimes = static_cast<int>(evoked.data.cols());
         data.resize(nFilterCh, nTimes);
         for (int i = 0; i < nFilterCh; ++i) {
-            int idx = FIFFLIB::channel_index(evoked.info.ch_names, filters.chNames[i]);
+            int idx = mne::channel_index(evoked.info.ch_names, filters.chNames[i]);
             if (idx < 0) {
                 Log::warning("InvLCMV::applyLCMV - Channel {} not found in evoked!", filters.chNames[i]);
                 return InvSourceEstimate();

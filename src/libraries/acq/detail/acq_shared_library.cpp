@@ -32,8 +32,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -211,7 +211,7 @@ const std::string& AcqSharedLibrary::path() const noexcept
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::string ACQLIB::detail::acqPythonPackageDir(const std::string& package, const std::string& subdirectory)
+std::string mne::detail::acqPythonPackageDir(const std::string& package, const std::string& subdirectory)
 {
     const auto identifier = [](const std::string& text) {
         return !text.empty() && std::all_of(text.begin(), text.end(), [](unsigned char c) { return std::isalnum(c) != 0 || c == '_'; });
@@ -237,7 +237,7 @@ std::string ACQLIB::detail::acqPythonPackageDir(const std::string& package, cons
 
 //=============================================================================================================
 
-std::string ACQLIB::detail::acqSharedLibraryName(const std::string& base)
+std::string mne::detail::acqSharedLibraryName(const std::string& base)
 {
 #if defined(_WIN32)
     return base + ".dll";
@@ -250,7 +250,7 @@ std::string ACQLIB::detail::acqSharedLibraryName(const std::string& base)
 
 //=============================================================================================================
 
-std::string ACQLIB::detail::acqEnvironment(const char* name)
+std::string mne::detail::acqEnvironment(const char* name)
 {
 #if defined(_WIN32)
     char* value = nullptr;

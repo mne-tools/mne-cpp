@@ -32,7 +32,7 @@
  * @brief    "scene_only" shot kind: renders a labelled placeholder PNG.
  *
  *           A real Metal/QRhi readback of a MultimodalScene requires a
- *           dedicated DISP3DLIB renderer which does not yet exist (the
+ *           dedicated mne::disp renderer which does not yet exist (the
  *           current MultimodalScene class is a pure controller).  Until
  *           that renderer lands, this implementation produces a clearly
  *           labelled gradient placeholder so the documentation pipeline
@@ -61,7 +61,8 @@ bool renderSceneOnly(const ShotSpec& spec, const QString& outPath,
     QImage img(spec.size, QImage::Format_ARGB32_Premultiplied);
     if (img.isNull()) {
         err = QStringLiteral("Failed to allocate QImage %1x%2")
-                  .arg(spec.size.width()).arg(spec.size.height());
+                  .arg(spec.size.width())
+                  .arg(spec.size.height());
         return false;
     }
 
@@ -84,8 +85,7 @@ bool renderSceneOnly(const ShotSpec& spec, const QString& outPath,
     p.drawLine(c, c + QPointF(-a * 0.6, a * 0.6));
 
     // Labels.
-    const QString title = spec.setup.value(QStringLiteral("canvas_title")).toString(
-        QStringLiteral("MultimodalScene"));
+    const QString title = spec.setup.value(QStringLiteral("canvas_title")).toString(QStringLiteral("MultimodalScene"));
     p.setPen(QColor(225, 225, 225));
     QFont f = p.font();
     f.setBold(true);
@@ -106,4 +106,4 @@ bool renderSceneOnly(const ShotSpec& spec, const QString& outPath,
     return savePng(img, outPath, err);
 }
 
-}  // namespace DOCSHOTS
+} // namespace DOCSHOTS

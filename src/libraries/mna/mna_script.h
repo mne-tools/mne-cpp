@@ -9,9 +9,9 @@
  * @date     April 2026
  * @brief    Inline source code carried by a Script-mode graph node — language, interpreter command, code body, optional authoring URI and integrity hash.
  *
- * @ref MNALIB::MnaScript is the payload that turns a generic @ref MNALIB::MnaNode
+ * @ref mne::MnaScript is the payload that turns a generic @ref mne::MnaNode
  * into a one-off custom step without forcing every user-written
- * snippet through the @ref MNALIB::MnaOpRegistry. When the host node's
+ * snippet through the @ref mne::MnaOpRegistry. When the host node's
  * @c execMode is @c MnaNodeExecMode::Script the executor writes
  * @c code to a temporary file, launches @c interpreter (auto-
  * detected from @c language when unset) with @c interpreterArgs
@@ -46,10 +46,10 @@
 #include <QCborMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -80,6 +80,6 @@ struct MNASHARED_EXPORT MnaScript
     static MnaScript fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_SCRIPT_H

@@ -46,8 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -386,7 +386,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<NeuromagTransport>> ACQLIB::detail::make_neuromag_client(const NeuromagDacq& dacq)
+AcqExpected<std::unique_ptr<NeuromagTransport>> mne::detail::make_neuromag_client(const NeuromagDacq& dacq)
 {
     if (sizeof(sockaddr_un::sun_path) <= dacq.root.size() + std::string_view("/sockets/dacq_client_000000").size()) {
         return AcqError(AcqErrorCode::InvalidParameter, "root=" + dacq.root + ": too long for a socket path");

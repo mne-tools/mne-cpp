@@ -35,7 +35,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -54,12 +54,12 @@ namespace GUSBAMPPLUGIN
  * @brief EEG connector for up to four synchronised g.tec g.USBamps through the gusbamp:// source of
  *        mne_acq_devices, which can also simulate them.
  */
-class GUSBAMPSHARED_EXPORT GUSBAmp : public SCSHAREDLIB::AbstractSensor
+class GUSBAMPSHARED_EXPORT GUSBAmp : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "gusbamp.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class GUSBAmpSetupWidget;
 
@@ -67,7 +67,7 @@ public:
     GUSBAmp();
     ~GUSBAmp() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -83,7 +83,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -99,10 +99,10 @@ private:
     /** @return The gusbamp:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_GUSBAmp; /**< The EEG data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA_GUSBAmp; /**< The EEG data. */
 
-    ACQLIB::AcqDevice m_device; /**< The amplifiers while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads the amplifiers' stream in run(). */
+    mne::AcqDevice m_device; /**< The amplifiers while streaming. */
+    mne::AcqReader m_reader; /**< Reads the amplifiers' stream in run(). */
 
     std::string m_serials;         /**< Serial numbers separated by commas, master first; empty for the first connected unit. */
     std::string m_inputs = "1-16"; /**< Inputs of every unit, e.g. 1-8,11. */

@@ -51,8 +51,8 @@ LSLAdapterSetup::LSLAdapterSetup(int initialBlockSize, QWidget* parent)
 
 //=============================================================================================================
 
-void LSLAdapterSetup::onLSLScanResults(const QVector<LSLLIB::stream_info>& vStreamInfos,
-                                       const LSLLIB::stream_info& currentStream)
+void LSLAdapterSetup::onLSLScanResults(const QVector<mne::stream_info>& vStreamInfos,
+                                       const mne::stream_info& currentStream)
 {
     // clear UI list
     ui.listLSLStreams->clear();
@@ -60,7 +60,7 @@ void LSLAdapterSetup::onLSLScanResults(const QVector<LSLLIB::stream_info>& vStre
     m_pCurrentSelectedStream = nullptr;
     // clear mapping and create items
     m_mItemToStreamInfo.clear();
-    for (LSLLIB::stream_info streamInfo : vStreamInfos) {
+    for (mne::stream_info streamInfo : vStreamInfos) {
         std::stringstream buildString;
         buildString << streamInfo.name() << ", " << streamInfo.type() << ", " << streamInfo.hostname();
         QListWidgetItem* pItem = new QListWidgetItem;

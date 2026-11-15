@@ -35,14 +35,14 @@
 #include <QWidget>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class ChannelDataModel;
@@ -108,6 +108,6 @@ private:
     bool m_dragging = false;
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // OVERVIEWBARWIDGET_H

@@ -12,9 +12,9 @@
  * Whole-brain parcellation analyses load one annotation file per
  * hemisphere — typically @c lh.aparc.annot and @c rh.aparc.annot — that
  * share an atlas-specific colortable but assign labels independently per
- * hemisphere. @ref FSLIB::FsAnnotationSet bundles both into a single container so
+ * hemisphere. @ref mne::FsAnnotationSet bundles both into a single container so
  * downstream code can iterate over hemispheres uniformly and pair the
- * result with a matching @ref FSLIB::FsSurfaceSet of the same subject.
+ * result with a matching @ref mne::FsSurfaceSet of the same subject.
  *
  * The class accepts the standard FreeSurfer atlas names exposed by
  * @c recon-all (@c aparc, @c aparc.a2009s, @c aparc.DKTatlas40,
@@ -48,10 +48,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -186,7 +186,7 @@ public:
     bool toLabels(const FsSurfaceSet& p_surfSet,
                   std::vector<FsLabel>& p_qListLabels,
                   std::vector<Eigen::RowVector4i>& p_qListLabelRGBAs,
-                  const BASELIB::StringList& lLabelPicks = {}) const;
+                  const mne::StringList& lLabelPicks = {}) const;
 
     //=========================================================================================================
     /**

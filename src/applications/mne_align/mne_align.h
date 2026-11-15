@@ -34,7 +34,7 @@ class QLabel;
 class QAction;
 class QComboBox;
 
-namespace MNELIB
+namespace mne
 {
 class MNEBem;
 }
@@ -85,7 +85,7 @@ public:
     Align3DView* view3d() const;
 
     /** @return The shared digitised-point store (never null after construction). */
-    ACQLIB::AcquiredPoints* points() const
+    mne::AcquiredPoints* points() const
     {
         return m_pPoints;
     }
@@ -118,7 +118,7 @@ private:
     void loadSettings();
     void saveSettings();
 
-    ACQLIB::AcquiredPoints* m_pPoints = nullptr;
+    mne::AcquiredPoints* m_pPoints = nullptr;
     Digitizer* m_pDigitizer = nullptr;
 
     QPointer<QSplitter> m_pSplitter;

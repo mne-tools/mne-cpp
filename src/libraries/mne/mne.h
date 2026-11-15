@@ -12,9 +12,9 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Umbrella include header that exposes the full MNELIB public surface in a single include.
+ * @brief    Umbrella include header that exposes the full mne_mne public surface in a single include.
  *
- * MNELIB holds the MNE data model shared by forward and inverse modelling: source spaces and hemispheres,
+ * mne_mne holds the MNE data model shared by forward and inverse modelling: source spaces and hemispheres,
  * BEM surfaces, forward solutions, inverse operators, measurement and covariance data, epochs, events,
  * projections, morph maps and the viewer surface types.
  */

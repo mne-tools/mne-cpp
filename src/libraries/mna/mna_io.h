@@ -9,9 +9,9 @@
  * @date     April 2026
  * @brief    Reader and writer for MNA project containers — @c .mna (JSON, human-editable) and @c .mnx (CBOR, compact binary with @c "MNX1" magic).
  *
- * @ref MNALIB::MnaIO is the single dispatch point between an on-disk
- * project file and an in-memory @ref MNALIB::MnaProject. The public
- * @ref MNALIB::MnaIO::read "MnaIO::read" and @ref MNALIB::MnaIO::write "MnaIO::write" helpers pick the right
+ * @ref mne::MnaIO is the single dispatch point between an on-disk
+ * project file and an in-memory @ref mne::MnaProject. The public
+ * @ref mne::MnaIO::read "MnaIO::read" and @ref mne::MnaIO::write "MnaIO::write" helpers pick the right
  * codec by extension so callers never have to branch: @c .mna
  * routes to a UTF-8 JSON serialiser intended for diff-friendly
  * version control and hand editing, while @c .mnx routes to a CBOR
@@ -20,9 +20,9 @@
  *
  * Both codecs are lossless and symmetric: a JSON project written,
  * read back, re-serialised as CBOR and read again must yield the
- * same @ref MNALIB::MnaProject, including unknown keys preserved via
+ * same @ref mne::MnaProject, including unknown keys preserved via
  * @c extras on every nested struct. That guarantee is what lets
- * collaborators on different MNALIB versions exchange projects
+ * collaborators on different mne_mna versions exchange projects
  * without silently dropping fields.
  */
 
@@ -43,10 +43,10 @@
 #include <QString>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -86,6 +86,6 @@ private:
     static bool writeCbor(const MnaProject& project, const QString& path);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_IO_H

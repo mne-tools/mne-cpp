@@ -47,10 +47,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
-using namespace DSPLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -112,7 +111,7 @@ void RtFiffRawView::setSettingsPath(const QString& sSettingsPath)
 
 //=============================================================================================================
 
-void RtFiffRawView::init(std::shared_ptr<FIFFLIB::FiffInfo>& info)
+void RtFiffRawView::init(std::shared_ptr<mne::FiffInfo>& info)
 {
     m_pFiffInfo = info;
     m_fSamplingRate = m_pFiffInfo->sfreq;
@@ -483,7 +482,7 @@ void RtFiffRawView::takeScreenshot(const QString& fileName)
 
 //=============================================================================================================
 
-void RtFiffRawView::updateProjection(const std::vector<FIFFLIB::FiffProj>& projs)
+void RtFiffRawView::updateProjection(const std::vector<mne::FiffProj>& projs)
 {
     m_pModel->updateProjection(projs);
 }

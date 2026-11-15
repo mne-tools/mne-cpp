@@ -27,7 +27,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace

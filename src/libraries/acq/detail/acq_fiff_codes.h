@@ -20,10 +20,10 @@
 #include "../acq_stream_info.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** FIFF channel kinds (FIFFV_*_CH). */
@@ -183,6 +183,6 @@ constexpr int fiff_coord_frame_of(int fiff) noexcept
     }
 }
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_FIFF_CODES_H

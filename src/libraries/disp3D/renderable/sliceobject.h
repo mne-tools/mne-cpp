@@ -49,10 +49,10 @@
 #include <QVector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -80,7 +80,7 @@ public:
      * @param[in] voxelToWorld  4×4 voxel-to-RAS transform from the MRI header.
      */
     void setSlice(const QImage& image,
-                  MRILIB::SliceOrientation orientation,
+                  mne::SliceOrientation orientation,
                   int sliceIndex,
                   const Eigen::Matrix4d& voxelToWorld);
 
@@ -94,7 +94,7 @@ public:
      * @param[in] imageToWorld  4x4 transform from image coordinates (column, row, 0) to RAS.
      */
     void setSliceToWorld(const QImage& image,
-                         MRILIB::SliceOrientation orientation,
+                         mne::SliceOrientation orientation,
                          int sliceIndex,
                          const Eigen::Matrix4d& imageToWorld);
 
@@ -102,7 +102,7 @@ public:
     /**
      * @return Current slice orientation.
      */
-    MRILIB::SliceOrientation orientation() const;
+    mne::SliceOrientation orientation() const;
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
 
 private:
     QImage m_image;
-    MRILIB::SliceOrientation m_orientation = MRILIB::SliceOrientation::Axial;
+    mne::SliceOrientation m_orientation = mne::SliceOrientation::Axial;
     int m_sliceIndex = 0;
     Eigen::Matrix4d m_voxelToWorld = Eigen::Matrix4d::Identity();
     float m_windowCenter = 0.5f;
@@ -187,6 +187,6 @@ private:
     Eigen::Vector3d m_corner11; // (1,1) UV corner
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SLICEOBJECT_H

@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::CrossCorrelation - lag-resolved cross-correlation between every channel pair, computed via the inverse FFT of the DPSS-tapered cross-spectrum.
+ * @brief    Implementation of @ref mne::CrossCorrelation - lag-resolved cross-correlation between every channel pair, computed via the inverse FFT of the DPSS-tapered cross-spectrum.
  */
 
 //=============================================================================================================
@@ -43,10 +43,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

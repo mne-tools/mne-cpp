@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::Coherence - magnitude-squared coherence between every channel pair, computed from the shared DPSS-tapered cross-spectral cache.
+ * @brief    Implementation of @ref mne::Coherence - magnitude-squared coherence between every channel pair, computed from the shared DPSS-tapered cross-spectral cache.
  */
 
 //=============================================================================================================
@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -63,7 +63,7 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("COH");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("Coherence::calculate - Input data is empty");
+        mne::Log::debug("Coherence::calculate - Input data is empty");
         return finalNetwork;
     }
 
@@ -82,7 +82,7 @@ Network Coherence::calculate(ConnectivitySettings& connectivitySettings)
         m_iNumberBinStart > iNFreqs ||
         m_iNumberBinAmount > iNFreqs ||
         m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
-        BASELIB::Log::debug("Coherence::calculate - Resetting to full spectrum");
+        mne::Log::debug("Coherence::calculate - Resetting to full spectrum");
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }

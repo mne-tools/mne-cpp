@@ -24,10 +24,10 @@
 #include <system_error>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /**
@@ -59,6 +59,6 @@ inline AcqError transport_error(std::error_code error, AcqErrorCode fallback, st
     return {code, std::format("{} ({})", what, error.message())};
 }
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_DEVICES_TRANSPORT_ERROR_H

@@ -25,10 +25,10 @@
  * @code
  * auto stim = source->findStream("stim");                          // output stream
  * auto writer = stim.writer();                                      // exclusive
- * const auto at = ACQLIB::mapSample(eeg.clock(), stim.clock(), peakSample) + 20 * stimRate / 1000;
+ * const auto at = mne::mapSample(eeg.clock(), stim.clock(), peakSample) + 20 * stimRate / 1000;
  * writer->pushEvent({.sample = at, .duration = 0, .code = 1});      // device fires at exactly 'at'
  * auto view = writer->beginWrite(pulse.cols, std::chrono::milliseconds(1));
- * ACQLIB::encode(pulse, *view);                                     // physical -> DAC counts, saturating
+ * mne::encode(pulse, *view);                                     // physical -> DAC counts, saturating
  * writer->commit(view->sampleCount());
  * @endcode
  */
@@ -57,10 +57,10 @@
 #include <span>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 namespace detail
@@ -386,6 +386,6 @@ private:
 };
 ACQ_STD_MEMBERS_END
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_STREAM_H

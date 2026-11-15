@@ -40,10 +40,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -137,6 +137,6 @@ private:
     static Eigen::VectorXd buildWindow(int iN, WindowType window);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // WELCH_PSD_H

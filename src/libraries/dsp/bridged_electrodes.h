@@ -47,16 +47,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -86,7 +86,7 @@ struct DSPSHARED_EXPORT BridgedElectrodeParams
  *         indices stored in the order they appear in info.
  */
 DSPSHARED_EXPORT Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd& data,
-                                                           const FIFFLIB::FiffInfo& info);
+                                                           const mne::FiffInfo& info);
 
 //=============================================================================================================
 /**
@@ -104,9 +104,9 @@ DSPSHARED_EXPORT Eigen::MatrixXd computeElectricalDistance(const Eigen::MatrixXd
  */
 DSPSHARED_EXPORT std::vector<std::pair<int, int>> computeBridgedElectrodes(
     const Eigen::MatrixXd& data,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     const BridgedElectrodeParams& params = BridgedElectrodeParams());
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // BRIDGED_ELECTRODES_H

@@ -90,7 +90,7 @@ if(NO_IPC)
 endif()
 
 # Map MNE_LOG_LEVEL string to numeric compile definition
-# 0=DEBUG, 1=INFO, 2=WARN, 3=CRIT, the values of BASELIB::Log::Level
+# 0=DEBUG, 1=INFO, 2=WARN, 3=CRIT, the values of mne::Log::Level
 if(MNE_LOG_LEVEL STREQUAL "DEBUG")
     add_compile_definitions(MNE_LOG_LEVEL=0)
 elseif(MNE_LOG_LEVEL STREQUAL "INFO")

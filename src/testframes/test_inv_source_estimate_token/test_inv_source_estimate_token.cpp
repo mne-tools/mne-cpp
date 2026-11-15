@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

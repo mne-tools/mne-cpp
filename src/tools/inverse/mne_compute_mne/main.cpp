@@ -67,11 +67,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FSLIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -204,7 +200,7 @@ static bool readBaselines(const QString& fileName,
             continue;
         QStringList parts = line.split(QRegularExpression("\\s+"));
         if (parts.size() >= 2) {
-            const int idx = FIFFLIB::channel_index(ch_names, parts[0].toStdString());
+            const int idx = mne::channel_index(ch_names, parts[0].toStdString());
             if (idx >= 0) {
                 baselines(idx) = parts[1].toDouble();
                 nFound++;
@@ -505,7 +501,7 @@ static bool writePredictedData(const QString& fileName,
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_compute_mne");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -848,7 +844,7 @@ int main(int argc, char* argv[])
 
         MatrixXd pickedData(invOp.nchan, fwd.sol.data.cols());
         for (int channel = 0; channel < static_cast<int>(invOp.noise_cov.names.size()); ++channel) {
-            const int fwdChannel = FIFFLIB::channel_index(fwd.sol.row_names, invOp.noise_cov.names[channel]);
+            const int fwdChannel = mne::channel_index(fwd.sol.row_names, invOp.noise_cov.names[channel]);
             if (fwdChannel < 0) {
                 qCritical("Error: Forward solution is missing inverse-operator channel %s.",
                           invOp.noise_cov.names[channel].c_str());

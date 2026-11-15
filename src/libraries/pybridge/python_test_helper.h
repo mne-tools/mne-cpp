@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Test convenience layer on top of @ref PYBRIDGELIB::PythonRunner for cross-validating MNE-CPP results against MNE-Python.
+ * @brief    Test convenience layer on top of @ref mne::PythonRunner for cross-validating MNE-CPP results against MNE-Python.
  *
- * Built on @ref PYBRIDGELIB::PythonRunner, this helper adds what test code needs: an @c is_available() probe,
+ * Built on @ref mne::PythonRunner, this helper adds what test code needs: an @c is_available() probe,
  * @c has_package() lookups so a test can announce that it needs e.g. @c sklearn, and @c eval shorthands that run
  * a snippet and parse its stdout into a number, vector or matrix.
  *
@@ -61,7 +61,7 @@
     do {                                                                                 \
         if (!(available)) {                                                              \
             const std::string guardReason_(reason);                                      \
-            if (PYBRIDGELIB::PythonTestHelper::is_python_required())                     \
+            if (mne::PythonTestHelper::is_python_required())                             \
                 QFAIL(("HARD FAIL (MNE_REQUIRE_PYTHON=true): " + guardReason_).c_str()); \
             QSKIP(("SKIP: " + guardReason_).c_str());                                    \
         }                                                                                \
@@ -70,17 +70,17 @@
 /**
  * @brief Skips (or fails) the current QtTest slot if a Python package is missing.
  *
- * @param helper       A @ref PYBRIDGELIB::PythonTestHelper.
+ * @param helper       A @ref mne::PythonTestHelper.
  * @param packageName  Module name, e.g. "sklearn".
  */
 #define GUARD_PYTHON_PACKAGE(helper, packageName) \
     GUARD_PYTHON((helper).has_package(packageName), std::string("Python package '") + (packageName) + "' not available")
 
 //=============================================================================================================
-// DEFINE NAMESPACE PYBRIDGELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace PYBRIDGELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -175,7 +175,7 @@ public:
      * over @ref eval_matrix for large matrices, since nothing is parsed from stdout.
      *
      * @param[in] code       Python source that writes @p file.
-     * @param[in] file       File the code writes; read with MATHLIB::read_matrix.
+     * @param[in] file       File the code writes; read with mne::read_matrix.
      * @param[in] timeout    Wall-clock limit.
      *
      * @return The matrix, or nothing if the run failed or the file is missing, empty or malformed.
@@ -195,7 +195,7 @@ public:
      * @return Exit code and captured output.
      */
     PythonRunnerResult run_script(const std::filesystem::path& script,
-                                  const BASELIB::StringList& args = {},
+                                  const mne::StringList& args = {},
                                   std::chrono::milliseconds timeout = std::chrono::seconds(120)) const;
 
     //=========================================================================================================
@@ -217,6 +217,6 @@ private:
     PythonRunner m_runner; /**< Probes availability; copied with a timeout for each run. */
 };
 
-} // namespace PYBRIDGELIB
+} // namespace mne
 
 #endif // PYBRIDGELIB_PYTHON_TEST_HELPER_H

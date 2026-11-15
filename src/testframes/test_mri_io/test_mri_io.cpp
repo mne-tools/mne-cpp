@@ -65,8 +65,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -251,7 +250,7 @@ QString TestMriIO::findSubjectsDir()
 
 void TestMriIO::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
 

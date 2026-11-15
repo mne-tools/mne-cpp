@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Composite SSP projection operator P = I - U U^T assembled from a list of @ref MNELIB::MNEProjItem.
+ * @brief    Composite SSP projection operator P = I - U U^T assembled from a list of @ref mne::MNEProjItem.
  *
- * @ref MNELIB::MNEProjOp is the operator form of the SSP machinery: it
+ * @ref mne::MNEProjOp is the operator form of the SSP machinery: it
  * stacks the active projection vectors into an orthonormal basis and
  * applies the corresponding rank-one removal to sensor data, leadfields
  * or noise covariances. Used by the raw, evoked and forward paths to
@@ -47,10 +47,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 class MNECovMatrix;
@@ -133,7 +133,7 @@ public:
      *
      * @return A new projection operator, or nullptr if no EEG channels are found.
      */
-    static std::unique_ptr<MNEProjOp> create_average_eeg_ref(std::span<const FIFFLIB::FiffChInfo> chs);
+    static std::unique_ptr<MNEProjOp> create_average_eeg_ref(std::span<const mne::FiffChInfo> chs);
 
     /**
      * Count how many active projection vectors affect a given list of
@@ -153,7 +153,7 @@ public:
      *
      * @return Number of affecting projection vectors (0 if none).
      */
-    int affect_chs(std::span<const FIFFLIB::FiffChInfo> chs) const;
+    int affect_chs(std::span<const mne::FiffChInfo> chs) const;
 
     /**
      * Apply the compiled projection operator to a data vector in-place.
@@ -178,8 +178,8 @@ public:
      * @return A populated projection operator (possibly with zero items),
      *         or NULL on error. Caller takes ownership.
      */
-    static std::unique_ptr<MNEProjOp> read_from_node(FIFFLIB::FiffStream& stream,
-                                                     const std::shared_ptr<FIFFLIB::FiffDirNode>& start);
+    static std::unique_ptr<MNEProjOp> read_from_node(mne::FiffStream& stream,
+                                                     const std::shared_ptr<mne::FiffDirNode>& start);
 
     /**
      * Read a projection operator from a FIFF file by path.
@@ -207,8 +207,8 @@ public:
      * @return The combined projection operator, nullptr when it would not affect
      *         any of @p chs, or the error of a file that cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<std::unique_ptr<MNEProjOp>> make_projection(const std::vector<std::filesystem::path>& projnames,
-                                                                                       std::span<const FIFFLIB::FiffChInfo> chs);
+    [[nodiscard]] static mne::Expected<std::unique_ptr<MNEProjOp>> make_projection(const std::vector<std::filesystem::path>& projnames,
+                                                                                   std::span<const mne::FiffChInfo> chs);
 
     /**
      * Write a formatted summary of all projection items to a text stream,
@@ -276,12 +276,12 @@ public:
     [[nodiscard]] bool apply_cov(MNECovMatrix& c) const;
 
 public:
-    std::vector<MNELIB::MNEProjItem> items;                                          /**< The projection items. */
+    std::vector<mne::MNEProjItem> items;                                             /**< The projection items. */
     StringList names;                                                                /**< Names of the channels in the final compiled projector. */
     int nvec;                                                                        /**< Number of orthogonalized vectors in the final projector. */
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> proj_data; /**< The compiled projector: orthogonalized projection vectors (nvec x names.size()). */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEPROJOP_H

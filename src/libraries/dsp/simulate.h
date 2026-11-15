@@ -35,26 +35,26 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 class InvSourceEstimate;
 }
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvoked;
 class FiffInfo;
 class FiffCov;
 }
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -85,7 +85,7 @@ struct DSPSHARED_EXPORT SimulateStcParams
  *
  * @return Simulated source estimate.
  */
-DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStc(
+DSPSHARED_EXPORT mne::InvSourceEstimate simulateStc(
     const Eigen::VectorXi& activeVertices,
     const Eigen::VectorXi& allVertices,
     const SimulateStcParams& params = SimulateStcParams());
@@ -102,7 +102,7 @@ DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStc(
  *
  * @return Simulated source estimate with zeros at inactive vertices.
  */
-DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStcFromWaveforms(
+DSPSHARED_EXPORT mne::InvSourceEstimate simulateStcFromWaveforms(
     const Eigen::MatrixXd& waveforms,
     const Eigen::VectorXi& activeVertices,
     const Eigen::VectorXi& allVertices,
@@ -113,7 +113,7 @@ DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStcFromWaveforms(
 /**
  * @brief Simulate evoked data from a source estimate and forward model.
  *
- * Projects the source estimate with INVLIB::apply_forward and optionally adds noise from a noise
+ * Projects the source estimate with mne::apply_forward and optionally adds noise from a noise
  * covariance. As in MNE-Python the noise follows the prepared covariance (SSP applied, MEG and EEG
  * decomposed separately), so MEG and EEG noise are independent.
  *
@@ -128,11 +128,11 @@ DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStcFromWaveforms(
  *
  * @return Simulated evoked data.
  */
-DSPSHARED_EXPORT FIFFLIB::FiffEvoked simulateEvoked(
-    const MNELIB::MNEForwardSolution& fwd,
-    const INVLIB::InvSourceEstimate& stc,
-    const FIFFLIB::FiffInfo& info,
-    const FIFFLIB::FiffCov& noiseCov,
+DSPSHARED_EXPORT mne::FiffEvoked simulateEvoked(
+    const mne::MNEForwardSolution& fwd,
+    const mne::InvSourceEstimate& stc,
+    const mne::FiffInfo& info,
+    const mne::FiffCov& noiseCov,
     int nave = 1,
     int seed = 42);
 
@@ -140,7 +140,7 @@ DSPSHARED_EXPORT FIFFLIB::FiffEvoked simulateEvoked(
 /**
  * @brief Simulate evoked data without noise.
  *
- * Projects the source estimate through the forward model (no noise added); INVLIB::apply_forward.
+ * Projects the source estimate through the forward model (no noise added); mne::apply_forward.
  *
  * @param[in] fwd         Forward solution.
  * @param[in] stc         Source time course.
@@ -148,11 +148,11 @@ DSPSHARED_EXPORT FIFFLIB::FiffEvoked simulateEvoked(
  *
  * @return Simulated noiseless evoked data.
  */
-DSPSHARED_EXPORT FIFFLIB::FiffEvoked simulateEvokedNoiseless(
-    const MNELIB::MNEForwardSolution& fwd,
-    const INVLIB::InvSourceEstimate& stc,
-    const FIFFLIB::FiffInfo& info);
+DSPSHARED_EXPORT mne::FiffEvoked simulateEvokedNoiseless(
+    const mne::MNEForwardSolution& fwd,
+    const mne::InvSourceEstimate& stc,
+    const mne::FiffInfo& info);
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // SIMULATE_DSP_H

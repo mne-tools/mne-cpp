@@ -48,7 +48,7 @@ using namespace MNEANONYMIZE;
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer()
-: m_pTag(FIFFLIB::FiffTag{})
+: m_pTag(mne::FiffTag{})
 , m_bFileInSet(false)
 , m_bFileOutSet(false)
 , m_bVerboseMode(false)
@@ -98,7 +98,7 @@ FiffAnonymizer::FiffAnonymizer()
 
 FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 : QObject()
-, m_pTag(FIFFLIB::FiffTag{})
+, m_pTag(mne::FiffTag{})
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
@@ -145,7 +145,7 @@ FiffAnonymizer::FiffAnonymizer(const FiffAnonymizer& obj)
 //=============================================================================================================
 
 FiffAnonymizer::FiffAnonymizer(FiffAnonymizer&& obj)
-: m_pTag(FIFFLIB::FiffTag{})
+: m_pTag(mne::FiffTag{})
 , m_bFileInSet(obj.m_bFileInSet)
 , m_bFileOutSet(obj.m_bFileOutSet)
 , m_bVerboseMode(obj.m_bVerboseMode)
@@ -238,7 +238,7 @@ void FiffAnonymizer::censorTag()
         case FIFF_PARENT_BLOCK_ID:
         case FIFF_REF_FILE_ID:
         case FIFF_REF_BLOCK_ID: {
-            FIFFLIB::FiffId inId = m_pTag->to_fiff_id();
+            mne::FiffId inId = m_pTag->to_fiff_id();
             QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, QTimeZone::LocalTime);
             emit readingIdMeasurementDate(inMeasDate);
 
@@ -250,22 +250,22 @@ void FiffAnonymizer::censorTag()
                 outMeasDate = m_dMeasurementDate;
             }
 
-            FIFFLIB::FiffId outId(inId);
+            mne::FiffId outId(inId);
             outId.machid[0] = m_BDfltMAC[0];
             outId.machid[1] = m_BDfltMAC[1];
             outId.time.secs = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
             outId.time.usecs = 0;
 
-            const int fiffIdSize(sizeof(inId) / sizeof(FIFFLIB::fiff_int_t));
-            FIFFLIB::fiff_int_t outData[fiffIdSize];
+            const int fiffIdSize(sizeof(inId) / sizeof(mne::fiff_int_t));
+            mne::fiff_int_t outData[fiffIdSize];
             outData[0] = outId.version;
             outData[1] = outId.machid[0];
             outData[2] = outId.machid[1];
             outData[3] = outId.time.secs;
             outData[4] = outId.time.usecs;
 
-            m_pTag->resize(fiffIdSize * sizeof(FIFFLIB::fiff_int_t));
-            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), fiffIdSize * sizeof(FIFFLIB::fiff_int_t));
+            m_pTag->resize(fiffIdSize * sizeof(mne::fiff_int_t));
+            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), fiffIdSize * sizeof(mne::fiff_int_t));
             printIfVerbose(QString::fromStdString("MAC address in ID tag changed: " + inId.toMachidString() + " -> " + outId.toMachidString()));
             printIfVerbose("Measurement date in ID tag changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
             break;
@@ -281,9 +281,9 @@ void FiffAnonymizer::censorTag()
                 outMeasDate = m_dMeasurementDate;
             }
 
-            FIFFLIB::fiff_int_t outData[1];
+            mne::fiff_int_t outData[1];
             outData[0] = static_cast<int32_t>(outMeasDate.toSecsSinceEpoch());
-            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(FIFFLIB::fiff_int_t));
+            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(mne::fiff_int_t));
             printIfVerbose("Measurement date changed: " + inMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outMeasDate.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
             break;
         }
@@ -350,9 +350,9 @@ void FiffAnonymizer::censorTag()
                 outBirthday = m_dSubjectBirthday;
             }
 
-            FIFFLIB::fiff_int_t outData[1];
+            mne::fiff_int_t outData[1];
             outData[0] = static_cast<int32_t>(outBirthday.toJulianDay());
-            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(FIFFLIB::fiff_int_t));
+            memcpy(m_pTag->data(), reinterpret_cast<char*>(outData), sizeof(mne::fiff_int_t));
             printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy") + " -> " + outBirthday.toString("dd.MM.yyyy"));
             break;
         }
@@ -571,7 +571,7 @@ void FiffAnonymizer::updateBlockTypeList()
 bool FiffAnonymizer::checkValidFiffFormatVersion()
 {
     if (m_pTag->kind == FIFF_FILE_ID) {
-        FIFFLIB::FiffId fileId = m_pTag->to_fiff_id();
+        mne::FiffId fileId = m_pTag->to_fiff_id();
         int inMayorVersion = (static_cast<uint32_t>(fileId.version) & 0xFFFF0000) >> 16;
         int inMinorVersion = (static_cast<uint32_t>(fileId.version) & 0x0000FFFF);
         double inVersion = inMayorVersion + inMinorVersion / 10.0;
@@ -758,21 +758,21 @@ void FiffAnonymizer::setSubjectHisId(const QString& sSubjectHisId)
 
 int FiffAnonymizer::openInOutStreams()
 {
-    auto in = BASELIB::FileByteStream::open(m_fFileIn.fileName().toStdU16String(), BASELIB::FileByteStream::Mode::Read);
+    auto in = mne::FileByteStream::open(m_fFileIn.fileName().toStdU16String(), mne::FileByteStream::Mode::Read);
     if (!in) {
         qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
         return 1;
     }
     printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
-    m_pInStream = std::make_unique<FIFFLIB::FiffStream>(std::move(in), m_fFileIn.fileName().toStdString());
+    m_pInStream = std::make_unique<mne::FiffStream>(std::move(in), m_fFileIn.fileName().toStdString());
 
-    auto out = BASELIB::FileByteStream::open(m_fFileOut.fileName().toStdU16String(), BASELIB::FileByteStream::Mode::Write);
+    auto out = mne::FileByteStream::open(m_fFileOut.fileName().toStdU16String(), mne::FileByteStream::Mode::Write);
     if (!out) {
         qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
         return 1;
     }
     printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
-    m_pOutStream = std::make_unique<FIFFLIB::FiffStream>(std::move(out), m_fFileOut.fileName().toStdString());
+    m_pOutStream = std::make_unique<mne::FiffStream>(std::move(out), m_fFileOut.fileName().toStdString());
     return 0;
 }
 

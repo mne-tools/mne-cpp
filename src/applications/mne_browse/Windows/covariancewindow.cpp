@@ -54,7 +54,7 @@ QString summarizeChannelNames(const std::vector<std::string>& names, int limit =
 
     const int count = static_cast<int>(names.size());
     const std::vector<std::string> shown(names.begin(), names.begin() + std::min(count, limit));
-    QString joined = QString::fromStdString(BASELIB::join(shown, ", "));
+    QString joined = QString::fromStdString(mne::join(shown, ", "));
     if (count <= limit) {
         return joined;
     }
@@ -62,9 +62,9 @@ QString summarizeChannelNames(const std::vector<std::string>& names, int limit =
     return QStringLiteral("%1, ... (%2 total)").arg(joined).arg(count);
 }
 
-QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
+QString covarianceSummary(const mne::FiffCov& covariance,
                           const QString& sourceDescription,
-                          const std::shared_ptr<FIFFLIB::FiffInfo>& fiffInfo)
+                          const std::shared_ptr<mne::FiffInfo>& fiffInfo)
 {
     if (covariance.empty()) {
         return QStringLiteral("No covariance is currently loaded.\n\nCompute or load a covariance matrix to inspect it here and drive whitening from this manager.");
@@ -77,7 +77,7 @@ QString covarianceSummary(const FIFFLIB::FiffCov& covariance,
 
     if (fiffInfo) {
         for (const std::string& channelName : covariance.names) {
-            const int channelIndex = BASELIB::indexOf(fiffInfo->ch_names, channelName);
+            const int channelIndex = mne::indexOf(fiffInfo->ch_names, channelName);
             if (channelIndex < 0 || channelIndex >= std::ssize(fiffInfo->chs)) {
                 ++otherCount;
                 continue;
@@ -144,9 +144,9 @@ void CovarianceWindow::init()
 
 //=============================================================================================================
 
-void CovarianceWindow::setCovariance(const FIFFLIB::FiffCov& covariance,
+void CovarianceWindow::setCovariance(const mne::FiffCov& covariance,
                                      const QString& sourceDescription,
-                                     std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo)
+                                     std::shared_ptr<mne::FiffInfo> fiffInfo)
 {
     m_covariance = covariance;
     m_sSourceDescription = sourceDescription;
@@ -347,7 +347,7 @@ void CovarianceWindow::updateHeatmap()
         }
 
         if (m_pFiffInfo) {
-            const int chIdx = FIFFLIB::channel_index(m_pFiffInfo->ch_names, m_covariance.names[i]);
+            const int chIdx = mne::channel_index(m_pFiffInfo->ch_names, m_covariance.names[i]);
             if (chIdx < 0 || chIdx >= std::ssize(m_pFiffInfo->chs))
                 continue;
 

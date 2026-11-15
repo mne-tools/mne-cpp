@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 using namespace MNEANALYZE;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // CONST
@@ -207,7 +207,7 @@ void AnalyzeCore::loadandInitPlugins()
 
 //=============================================================================================================
 
-QVector<ANSHAREDLIB::AbstractPlugin*> AnalyzeCore::getLoadedPlugins()
+QVector<mne::analyze::AbstractPlugin*> AnalyzeCore::getLoadedPlugins()
 {
     return m_pPluginManager->getPlugins();
 }

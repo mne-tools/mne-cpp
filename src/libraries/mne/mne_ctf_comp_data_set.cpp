@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNECTFCompDataSet.
+ * @brief    Implementation of @ref mne::MNECTFCompDataSet.
  *
  * Implements set-level FIFF I/O, the search for the currently active
- * compensator in @ref FIFFLIB::FiffInfo and the build of the
+ * compensator in @ref mne::FiffInfo and the build of the
  * compensator that maps the current grade to a requested one.
  */
 
@@ -44,17 +44,16 @@ constexpr int OK = 0;
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //============================= mne_read_forward_solution.c =============================
 
 int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
-                                     std::vector<FIFFLIB::FiffChInfo>& megp, /* MEG channels */
+                                     std::vector<mne::FiffChInfo>& megp, /* MEG channels */
                                      int* nmegp,
-                                     std::vector<FIFFLIB::FiffChInfo>& meg_compp,
+                                     std::vector<mne::FiffChInfo>& meg_compp,
                                      int* nmeg_compp,
-                                     std::vector<FIFFLIB::FiffChInfo>& eegp, /* EEG channels */
+                                     std::vector<mne::FiffChInfo>& eegp, /* EEG channels */
                                      int* neegp,
                                      FiffCoordTrans* meg_head_t)
 /*
@@ -64,18 +63,18 @@ int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
 {
     FiffStream stream(name);
 
-    std::vector<FIFFLIB::FiffChInfo> chs;
+    std::vector<mne::FiffChInfo> chs;
     int nchan = 0;
-    std::vector<FIFFLIB::FiffChInfo> meg;
+    std::vector<mne::FiffChInfo> meg;
     int nmeg = 0;
-    std::vector<FIFFLIB::FiffChInfo> meg_comp;
+    std::vector<mne::FiffChInfo> meg_comp;
     int nmeg_comp = 0;
-    std::vector<FIFFLIB::FiffChInfo> eeg;
+    std::vector<mne::FiffChInfo> eeg;
     int neeg = 0;
     std::vector<std::shared_ptr<FiffDirNode>> nodes;
     std::shared_ptr<FiffDirNode> info;
     std::optional<FiffTag> t_pTag;
-    FIFFLIB::FiffChInfo this_ch;
+    mne::FiffChInfo this_ch;
     FiffCoordTrans t;
     fiff_int_t kind, pos;
     int j, k, to_find;
@@ -90,7 +89,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
     if (nodes.size() == 0) {
         nodes = stream.dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
         if (nodes.size() == 0) {
-            BASELIB::Log::critical("Could not find the channel information.");
+            mne::Log::critical("Could not find the channel information.");
             stream.close();
             return FIFF_FAIL;
         }
@@ -133,7 +132,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
 
                 this_ch = t_pTag->to_ch_info();
                 if (this_ch.scanNo <= 0 || this_ch.scanNo > nchan) {
-                    BASELIB::Log::critical("FIFF_CH_INFO : scan # out of range {} ({})!", this_ch.scanNo, nchan);
+                    mne::Log::critical("FIFF_CH_INFO : scan # out of range {} ({})!", this_ch.scanNo, nchan);
                     stream.close();
                     return FIFF_FAIL;
                 } else
@@ -143,7 +142,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
         }
     }
     if (to_find != 0) {
-        BASELIB::Log::critical("Some of the channel information was missing.");
+        mne::Log::critical("Some of the channel information was missing.");
         stream.close();
         return FIFF_FAIL;
     }
@@ -153,7 +152,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const std::filesystem::path& name,
      */
         t = FiffCoordTrans::read(name, FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD).value_or(FiffCoordTrans());
         if (t.empty()) {
-            BASELIB::Log::critical("MEG -> head coordinate transformation not found.");
+            mne::Log::critical("MEG -> head coordinate transformation not found.");
             stream.close();
             return FIFF_FAIL;
         }
@@ -238,7 +237,7 @@ std::unique_ptr<FiffSparseMatrix> mne_convert_to_sparse(const Eigen::MatrixXf& d
     eigenSparse.makeCompressed();
 
     if (eigenSparse.nonZeros() <= 0) {
-        BASELIB::Log::warning("No nonzero elements found.");
+        mne::Log::warning("No nonzero elements found.");
         return nullptr;
     }
 
@@ -398,14 +397,14 @@ std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const std::filesystem
         one->calibrated = calibrated;
 
         if (one->calibrate(set->chs, set->nch, true) == FAIL) {
-            BASELIB::Log::warning("Warning: Compensation data for '{}' omitted\n", explain_comp(one->kind));
+            mne::Log::warning("Warning: Compensation data for '{}' omitted\n", explain_comp(one->kind));
         } else {
             set->comps.push_back(std::move(one));
             set->ncomp++;
         }
     }
 #ifdef DEBUG
-    BASELIB::Log::info("{} CTF compensation data sets read from {}\n", set->ncomp, name);
+    mne::Log::info("{} CTF compensation data sets read from {}\n", set->ncomp, name);
 #endif
     stream.close();
     return set;
@@ -438,7 +437,7 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
         compchs = chList;
         nCompChan = nChan;
     }
-    BASELIB::Log::info("Setting up compensation data...\n");
+    mne::Log::info("Setting up compensation data...\n");
     if (nChan == 0)
         return OK;
     current.reset();
@@ -451,7 +450,7 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
                     first_comp = compGrades[k];
                 else {
                     if (compGrades[k] != first_comp) {
-                        BASELIB::Log::critical("We do not support nonuniform compensation yet.");
+                        mne::Log::critical("We do not support nonuniform compensation yet.");
                         return FAIL;
                     }
                 }
@@ -461,10 +460,10 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
             compGrades[k] = MNE_CTFV_COMP_NONE;
     }
     if (need_comp == 0) {
-        BASELIB::Log::info("\tNo compensation set. Nothing more to do.\n");
+        mne::Log::info("\tNo compensation set. Nothing more to do.\n");
         return OK;
     }
-    BASELIB::Log::info("\t{} out of {} channels have the compensation set.\n", need_comp, nChan);
+    mne::Log::info("\t{} out of {} channels have the compensation set.\n", need_comp, nChan);
     /*
         * Find the desired compensation data matrix
         */
@@ -475,10 +474,10 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
         }
     }
     if (!this_comp) {
-        BASELIB::Log::critical("Did not find the desired compensation data : {}", explain_comp(map_comp_kind(first_comp)));
+        mne::Log::critical("Did not find the desired compensation data : {}", explain_comp(map_comp_kind(first_comp)));
         return FAIL;
     }
-    BASELIB::Log::info("\tDesired compensation data ({}) found.\n", explain_comp(map_comp_kind(first_comp)));
+    mne::Log::info("\tDesired compensation data ({}) found.\n", explain_comp(map_comp_kind(first_comp)));
     /*
         * Find the compensation channels
         */
@@ -492,11 +491,11 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
                 break;
             }
         if (comp_sel[k] < 0) {
-            BASELIB::Log::critical("Compensation channel {} not found", name);
+            mne::Log::critical("Compensation channel {} not found", name);
             return FAIL;
         }
     }
-    BASELIB::Log::info("\tAll compensation channels found.\n");
+    mne::Log::info("\tAll compensation channels found.\n");
     /*
         * Create the preselector
         */
@@ -507,7 +506,7 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
         presel = mne_convert_to_sparse(sel, 1e-30f);
         if (!presel)
             return FAIL;
-        BASELIB::Log::info("\tPreselector created.\n");
+        mne::Log::info("\tPreselector created.\n");
     }
     /*
      * Pick the desired channels
@@ -523,7 +522,7 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
             return FAIL;
         data = std::move(d);
     }
-    BASELIB::Log::info("\tCompensation data matrix created.\n");
+    mne::Log::info("\tCompensation data matrix created.\n");
     /*
         * Create the postselector
         */
@@ -536,7 +535,7 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
         postsel = mne_convert_to_sparse(sel, 1e-30f);
         if (!postsel)
             return FAIL;
-        BASELIB::Log::info("\tPostselector created.\n");
+        mne::Log::info("\tPostselector created.\n");
     }
     current = std::make_unique<MNECTFCompData>();
     current->kind = this_comp->kind;
@@ -545,13 +544,13 @@ int MNECTFCompDataSet::make_comp(const std::vector<FiffChInfo>& chList,
     current->presel = std::move(presel);
     current->postsel = std::move(postsel);
 
-    BASELIB::Log::info("\tCompensation set up.\n");
+    mne::Log::info("\tCompensation set up.\n");
     return OK;
 }
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::set_comp(std::vector<FIFFLIB::FiffChInfo>& chs,
+int MNECTFCompDataSet::set_comp(std::vector<mne::FiffChInfo>& chs,
                                 int nch,
                                 int comp)
 /*
@@ -566,7 +565,7 @@ int MNECTFCompDataSet::set_comp(std::vector<FIFFLIB::FiffChInfo>& chs,
             nset++;
         }
     }
-    BASELIB::Log::info("A new compensation value ({}) was assigned to {} MEG channels.\n", explain_comp(map_comp_kind(comp)), nset);
+    mne::Log::info("A new compensation value ({}) was assigned to {} MEG channels.\n", explain_comp(map_comp_kind(comp)), nset);
     return nset;
 }
 
@@ -596,20 +595,20 @@ int MNECTFCompDataSet::apply(bool do_it, Eigen::Ref<Eigen::VectorXf> data, Eigen
        */
     if (this_comp->presel) {
         if (this_comp->presel->cols() != ncompdata) {
-            BASELIB::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->presel->cols(), ncompdata);
+            mne::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->presel->cols(), ncompdata);
             return FAIL;
         }
     } else if (this_comp->data->ncol() != ncompdata) {
-        BASELIB::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->data->ncol(), ncompdata);
+        mne::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->data->ncol(), ncompdata);
         return FAIL;
     }
     if (this_comp->postsel) {
         if (this_comp->postsel->rows() != ndata) {
-            BASELIB::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->postsel->rows(), ndata);
+            mne::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->postsel->rows(), ndata);
             return FAIL;
         }
     } else if (this_comp->data->nrow() != ndata) {
-        BASELIB::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->data->nrow(), ndata);
+        mne::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->data->nrow(), ndata);
         return FAIL;
     }
     /*
@@ -677,20 +676,20 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
         */
     if (this_comp->presel) {
         if (this_comp->presel->cols() != ncompdata) {
-            BASELIB::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->presel->cols(), ncompdata);
+            mne::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->presel->cols(), ncompdata);
             return FAIL;
         }
     } else if (this_comp->data->ncol() != ncompdata) {
-        BASELIB::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->data->ncol(), ncompdata);
+        mne::Log::critical("Compensation data dimension mismatch. Expected {}, got {} channels.", this_comp->data->ncol(), ncompdata);
         return FAIL;
     }
     if (this_comp->postsel) {
         if (this_comp->postsel->rows() != ndata) {
-            BASELIB::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->postsel->rows(), ndata);
+            mne::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->postsel->rows(), ndata);
             return FAIL;
         }
     } else if (this_comp->data->nrow() != ndata) {
-        BASELIB::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->data->nrow(), ndata);
+        mne::Log::critical("Data dimension mismatch. Expected {}, got {} channels.", this_comp->data->nrow(), ndata);
         return FAIL;
     }
     /*
@@ -725,7 +724,7 @@ int MNECTFCompDataSet::apply_transpose(bool do_it, Eigen::MatrixXf& data)
 
 //=============================================================================================================
 
-int MNECTFCompDataSet::get_comp(const std::vector<FIFFLIB::FiffChInfo>& chs, int nch)
+int MNECTFCompDataSet::get_comp(const std::vector<mne::FiffChInfo>& chs, int nch)
 {
     int res = MNE_CTFV_NOGRAD;
     int first_comp, comp;
@@ -737,7 +736,7 @@ int MNECTFCompDataSet::get_comp(const std::vector<FIFFLIB::FiffChInfo>& chs, int
             if (first_comp < 0)
                 first_comp = comp;
             else if (first_comp != comp) {
-                BASELIB::Log::critical("Non uniform compensation not supported.");
+                mne::Log::critical("Non uniform compensation not supported.");
                 return FAIL;
             }
         }
@@ -809,7 +808,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
         if (comp_chs[k].kind == FIFFV_REF_MEG_CH)
             have_comp_chs++;
     if (have_comp_chs == 0 && compensate_to != MNE_CTFV_NOGRAD) {
-        BASELIB::Log::warning("No compensation channels in these data.");
+        mne::Log::warning("No compensation channels in these data.");
         return FAIL;
     }
     /*
@@ -821,13 +820,13 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
         * Are we there already?
         */
     if (current && current->mne_kind == compensate_to) {
-        BASELIB::Log::info("No further compensation necessary (comp = {})\n", explain_comp(current->kind));
+        mne::Log::info("No further compensation necessary (comp = {})\n", explain_comp(current->kind));
         current.reset();
         return OK;
     }
     undo = std::move(current);
     if (compensate_to == MNE_CTFV_NOGRAD) {
-        BASELIB::Log::info("No compensation was requested.\n");
+        mne::Log::info("No compensation was requested.\n");
         set_comp(chList, nchan, compensate_to);
         return OK;
     }
@@ -841,7 +840,7 @@ int MNECTFCompDataSet::set_compensation(int compensate_to,
                 set_comp(chList, nchan, comp_was);
             return FAIL;
         }
-        BASELIB::Log::info("Compensation set up as requested ({} -> {}).\n", explain_comp(map_comp_kind(comp_was)), explain_comp(current->kind));
+        mne::Log::info("Compensation set up as requested ({} -> {}).\n", explain_comp(map_comp_kind(comp_was)), explain_comp(current->kind));
     }
     return OK;
 }

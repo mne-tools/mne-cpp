@@ -1,18 +1,18 @@
 ---
 id: channel-data-view
-title: "DISPLIB::ChannelDataView"
+title: "mne::disp::ChannelDataView"
 sidebar_label: ChannelDataView
 sidebar_position: 14
 ---
 
 # ChannelDataView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/channeldataview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/channeldataview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/channeldataview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/channeldataview.h)
 
 `#include <disp/channeldataview.h>`
 
 ```cpp
-class DISPLIB::ChannelDataView
+class mne::disp::ChannelDataView
 ```
 
 Composite real-time multi-channel raw scroller assembling label panel, table view, time ruler and scrollbars.
@@ -54,12 +54,12 @@ Constructs a [`ChannelDataView`](/docs/api/disp/channel-data-view).
 
 ### init(pInfo)
 
-Initialise the view from a [FiffInfo](/docs/api/fiff/fiff-info) (channel names, types, sampling rate).
+Initialise the view from a [`FiffInfo`](/docs/api/fiff/fiff-info) (channel names, types, sampling rate).
 
 **Parameters:**
 
 - **pInfo** : *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
-  Shared pointer to FiffInfo.
+  Shared pointer to [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 ---
 

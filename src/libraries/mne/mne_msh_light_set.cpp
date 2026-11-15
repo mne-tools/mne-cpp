@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMshLightSet.
+ * @brief    Implementation of @ref mne::MNEMshLightSet.
  *
  * Provides list management, the default three-light setup matching
  * @c tksurfer and the broadcast of intensity / on/off changes to every
@@ -24,4 +24,4 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;

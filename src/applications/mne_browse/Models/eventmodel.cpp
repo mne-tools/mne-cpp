@@ -39,8 +39,7 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 

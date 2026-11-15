@@ -46,8 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -116,8 +116,8 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
         if (index.column() == 1) {
             QVariant v;
 
-            QList<DISPLIB::AvrTypeRowVector> lRowDataPerTrigType;
-            DISPLIB::AvrTypeRowVector pairItem;
+            QList<mne::disp::AvrTypeRowVector> lRowDataPerTrigType;
+            mne::disp::AvrTypeRowVector pairItem;
 
             switch (role) {
                 case Qt::DisplayRole: {
@@ -160,8 +160,8 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
         //******** third column (2D layout data plot, this third column is needed because the te data needs to be in another structure for the 2D layout to work) ********
         if (index.column() == 2) {
             QVariant v;
-            QList<DISPLIB::AvrTypeRowVectorPair> lRowDataPerTrigType;
-            DISPLIB::AvrTypeRowVectorPair averagedData;
+            QList<mne::disp::AvrTypeRowVectorPair> lRowDataPerTrigType;
+            mne::disp::AvrTypeRowVectorPair averagedData;
 
             switch (role) {
                 case EvokedSetModelRoles::GetAverageData: {
@@ -439,7 +439,7 @@ bool EvokedSetModel::getIsChannelBad(qint32 row) const
 
     if (row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        bIsBad = BASELIB::contains(m_pEvokedSet->info.bads, m_pEvokedSet->info.chs[chRow].ch_name);
+        bIsBad = mne::contains(m_pEvokedSet->info.bads, m_pEvokedSet->info.chs[chRow].ch_name);
     }
 
     return bIsBad;
@@ -777,7 +777,7 @@ void EvokedSetModel::toggleFreeze()
 
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffEvokedSet> EvokedSetModel::getEvokedSet()
+std::shared_ptr<mne::FiffEvokedSet> EvokedSetModel::getEvokedSet()
 {
     if (!m_pEvokedSet) {
         return nullptr;

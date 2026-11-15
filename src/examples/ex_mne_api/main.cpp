@@ -97,9 +97,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -276,7 +274,7 @@ int main(int argc, char* argv[])
     sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
     sel.pick.resize(sel.nchan());
     for (int c = 0; c < sel.nchan(); ++c) {
-        sel.pick[c] = static_cast<int>(BASELIB::indexOf(mneRaw->ch_names, sel.chspick[c]));
+        sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
     }
 
     const int ns = 25;
@@ -310,7 +308,7 @@ int main(int argc, char* argv[])
     FiffEvoked ave((data + "/MEG/sample/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
     StringList megNames; // the 305 good MEG channels
     for (const std::string& name : ave.info.ch_names) {
-        if (name.starts_with("MEG") && !BASELIB::contains(ave.info.bads, name)) {
+        if (name.starts_with("MEG") && !mne::contains(ave.info.bads, name)) {
             megNames.push_back(name);
         }
     }
@@ -402,7 +400,7 @@ int main(int argc, char* argv[])
     //! [mne_cov_description_usage]
     // mne.compute_covariance(mne.Epochs(event_id=[1, 2], tmin=-0.2, tmax=0, baseline=None, reject=dict(eeg=14.23e-9)),
     // keep_sample_mean=False, rank="full"): 6 of 12 epochs kept, nfree 365, C[EEG001, EEG001] = 8.784207369943824e-18
-    const int eeg001 = BASELIB::indexOf(noiseCov.names, "EEG 001");
+    const int eeg001 = mne::indexOf(noiseCov.names, "EEG 001");
     ok &= expect(preStim.events == std::vector<unsigned int>({1, 2}) && noiseCov.nfree == 365 && near(noiseCov.data(eeg001, eeg001), 8.784207369943824e-18, 1e-6),
                  std::format("MNEDescriptionParser: a .cov description with EEG rejection gives nfree {} like mne.compute_covariance", noiseCov.nfree));
 
@@ -487,7 +485,7 @@ int main(int argc, char* argv[])
     const int usable = mneRaw->attachDerivations(*fromFif); // FRONT needs EEG999 and is dropped
     MNEChSelection bipolar;
     bipolar.chspick = bipolar.chspick_nospace = {"EEG 001-EEG 002", "EEG 001", "EEG 002"};
-    bipolar.pick = (VectorXi(3) << -1, BASELIB::indexOf(mneRaw->ch_names, "EEG 001"), BASELIB::indexOf(mneRaw->ch_names, "EEG 002")).finished();
+    bipolar.pick = (VectorXi(3) << -1, mne::indexOf(mneRaw->ch_names, "EEG 001"), mne::indexOf(mneRaw->ch_names, "EEG 002")).finished();
     bipolar.pick_deriv = (VectorXi(3) << 0, -1, -1).finished();
     mneRaw->proj.reset();
     mneRaw->pick_data(&bipolar, mneRaw->first_samp + 2990, segment);
@@ -522,7 +520,7 @@ int main(int argc, char* argv[])
     const QString mapFile = tmp.filePath("small-large-morph.fif");
     MNEMorphMap::write(mapFile.toStdU16String(), {&smallToLarge});
     const auto reread = MNEMorphMap::read(mapFile.toStdU16String(), "small", "large", 0);
-    const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+    const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds mne::SourceMorph
     //! [mne_morph_map_usage]
     // mne.read_morph_map("small", "large"): vertex 0 of "large" = 0.4372 * v0 + 0.3726 * v42 + 0.1902 * v51 of "small"
     ok &= expect(weights.rows() == 642 && weights.cols() == 162 && std::abs(weights.coeff(0, 0) - 0.43720984) < 1e-5 && std::abs(weights.coeff(0, 42) - 0.37262118) < 1e-5 && std::abs(weights.coeff(0, 51) - 0.19016896) < 1e-5,

@@ -40,23 +40,23 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class AbstractModel;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class CoregSettingsView;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEBem;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffDigPoint;
 class FiffDigPointSet;
@@ -75,12 +75,12 @@ namespace COREGISTRATIONPLUGIN
  *
  * @brief The CoRegistration class provides a view with all currently loaded models.
  */
-class COREGISTRATIONSHARED_EXPORT CoRegistration : public ANSHAREDLIB::AbstractPlugin
+class COREGISTRATIONSHARED_EXPORT CoRegistration : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "coregistration.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -104,15 +104,15 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
     /**
      * Updates the dropdown display for selecting the bem model.
      */
-    void updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void updateBemList(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ private:
      *
      * @return  whether model is removed (true if removed, false if not removed).
      */
-    bool removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    bool removeFromBemList(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
@@ -204,9 +204,9 @@ private:
      *
      * @return The resulting coordinate transformation from head to mri space.
      */
-    FIFFLIB::FiffCoordTrans computeICP(FIFFLIB::FiffCoordTrans transInit,
-                                       FIFFLIB::FiffDigPointSet digSetHSP,
-                                       MNELIB::MNEBem bemHead);
+    mne::FiffCoordTrans computeICP(mne::FiffCoordTrans transInit,
+                                   mne::FiffDigPointSet digSetHSP,
+                                   mne::MNEBem bemHead);
 
     //=========================================================================================================
     /**
@@ -290,7 +290,7 @@ private:
      *
      * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -298,14 +298,14 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
-    QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>> m_vecBemDataModels; /**< Vector with all available Bem Models. */
-    std::shared_ptr<MNELIB::MNEBem> m_pBem;                                 /**< The currently selected Bem model. */
-    QString m_sCurrentSelectedBem;                                          /**< The name of the currently selected Bem. */
-    FIFFLIB::FiffDigPointSet m_digSetHead;                                  /**< The currently selected digitizer set. */
-    FIFFLIB::FiffDigPointSet m_digFidMri;                                   /**< The currently selected mri fiducials. */
-    FIFFLIB::FiffCoordTrans m_transHeadMri;                                 /**< The resulting head-mri transformation. */
+    QVector<QSharedPointer<mne::analyze::AbstractModel>> m_vecBemDataModels; /**< Vector with all available Bem Models. */
+    std::shared_ptr<mne::MNEBem> m_pBem;                                     /**< The currently selected Bem model. */
+    QString m_sCurrentSelectedBem;                                           /**< The name of the currently selected Bem. */
+    mne::FiffDigPointSet m_digSetHead;                                       /**< The currently selected digitizer set. */
+    mne::FiffDigPointSet m_digFidMri;                                        /**< The currently selected mri fiducials. */
+    mne::FiffCoordTrans m_transHeadMri;                                      /**< The resulting head-mri transformation. */
 
     int m_iFiducial;             /**< Currently selected fiducial. */
     bool m_bScale;               /**< Wether to apply automatic scaling. */
@@ -322,12 +322,12 @@ private:
     float m_fRMSE;               /**< RMSE of the last ICP fit, in m. */
     int m_iNDiscarded;           /**< Number of digitizers the last ICP fit discarded as outliers. */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<mne::analyze::Communicator> m_pCommu;
 
-    DISPLIB::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
+    mne::disp::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
 
-    QFutureWatcher<FIFFLIB::FiffCoordTrans> m_FutureWatcher;
-    QFuture<FIFFLIB::FiffCoordTrans> m_Future;
+    QFutureWatcher<mne::FiffCoordTrans> m_FutureWatcher;
+    QFuture<mne::FiffCoordTrans> m_Future;
     QMutex m_ParameterMutex;
 };
 

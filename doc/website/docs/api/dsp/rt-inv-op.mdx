@@ -1,20 +1,20 @@
 ---
 id: rt-inv-op
-title: "DSPLIB::RtInvOp"
+title: "mne::RtInvOp"
 sidebar_label: RtInvOp
 sidebar_position: 37
 ---
 
 # RtInvOp
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_inv_op.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_inv_op.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_inv_op.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_inv_op.h)
 
 `#include <dsp/rt_inv_op.h>`
 
 <Connections topics={["real-time"]} context="api" current="RtInvOp" />
 
 ```cpp
-class DSPLIB::RtInvOp
+class mne::RtInvOp
 ```
 
 Real-time inverse dSPM, sLoreta inverse operator estimation.
@@ -113,7 +113,7 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 319"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 315"
 RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
 MNEInverseOperator inverse;
 bool inverseDone = false;
@@ -124,7 +124,7 @@ QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverse
 rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
 const bool inverseArrived = waitFor(inverseDone, 60000);
 // 306 MEG channels in the forward solution, minus the bad MEG2443
-ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && BASELIB::contains(rawInfo->bads, "MEG 2443"),
+ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && mne::contains(rawInfo->bads, "MEG 2443"),
              std::format("RtInvOp builds a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
 rtInvOp.stop();
 ````

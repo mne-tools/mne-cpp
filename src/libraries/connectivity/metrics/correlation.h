@@ -24,11 +24,11 @@
  * volume-conduction / common-reference mixing, and is dominated by
  * whichever frequency band has the largest amplitude in the broadband
  * signal. For lag-resolved or band-limited interactions use
- * @ref CONNECTIVITYLIB::CrossCorrelation, @ref CONNECTIVITYLIB::Coherence or one of the phase-based
+ * @ref mne::CrossCorrelation, @ref mne::Coherence or one of the phase-based
  * estimators.
  *
  * Trials are processed in parallel through @c QtConcurrent::mappedReduced;
- * the per-trial correlation matrices are summed in @ref CONNECTIVITYLIB::Correlation::reduce "reduce" and divided
+ * the per-trial correlation matrices are summed in @ref mne::Correlation::reduce "reduce" and divided
  * by the number of trials at the end to obtain the trial-averaged result.
  */
 
@@ -55,14 +55,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -126,6 +126,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // CORRELATION_H

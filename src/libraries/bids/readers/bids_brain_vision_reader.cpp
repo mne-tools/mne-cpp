@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BrainVisionReader — parses the BrainVision @c .vhdr / @c .vmrk / @c .eeg triplet behind @ref BIDSLIB::AbstractFormatReader.
+ * @brief    Implementation of @ref mne::BrainVisionReader — parses the BrainVision @c .vhdr / @c .vmrk / @c .eeg triplet behind @ref mne::AbstractFormatReader.
  */
 
 //=============================================================================================================
@@ -40,8 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -58,7 +57,7 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(
 {
     using namespace std::chrono;
     const auto field = [digits](std::size_t pos, std::size_t count) {
-        return BASELIB::toInt(digits.substr(pos, count)).value_or(-1);
+        return mne::toInt(digits.substr(pos, count)).value_or(-1);
     };
     const year_month_day date{year{field(0, 4)}, month(static_cast<unsigned>(field(4, 2))), day(static_cast<unsigned>(field(6, 2)))};
     const int hour = field(8, 2);
@@ -79,11 +78,11 @@ std::string decodeText(std::string bytes)
     static const std::regex codepagePattern("^\\s*Codepage\\s*=\\s*(\\S+)", std::regex::icase | std::regex::multiline);
     std::smatch codepage;
     const bool ansi = std::regex_search(bytes, codepage, codepagePattern) && codepage[1] == "ANSI";
-    if (!ansi && BASELIB::is_utf8(bytes)) {
+    if (!ansi && mne::is_utf8(bytes)) {
         return bytes;
     }
     if (!ansi) {
-        return BASELIB::latin1_to_utf8(bytes);
+        return mne::latin1_to_utf8(bytes);
     }
     // Windows-1252 0x80-0x9F; empty entries are undefined there
     static constexpr std::array<std::string_view, 32> cp1252{
@@ -97,7 +96,7 @@ std::string decodeText(std::string bytes)
         const auto byte = static_cast<unsigned char>(c);
         if (byte >= 0x80 && byte < 0xA0) {
             if (cp1252[byte - 0x80].empty()) {
-                return BASELIB::latin1_to_utf8(bytes);
+                return mne::latin1_to_utf8(bytes);
             }
             utf8 += cp1252[byte - 0x80];
         } else if (byte >= 0x80) {
@@ -129,7 +128,7 @@ std::string decodeCommas(std::string_view text)
 /** @return The integer in @p text, or @p fallback if @p text is not one. */
 long toLong(std::string_view text, long fallback)
 {
-    text = BASELIB::trimmed(text);
+    text = mne::trimmed(text);
     long value = 0;
     const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
     return error == std::errc() && end == text.data() + text.size() ? value : fallback;
@@ -146,21 +145,21 @@ void forEachEntry(std::string_view text, Entry entry)
     bool versionLine = true;
     while (!text.empty()) {
         const std::size_t newline = text.find('\n');
-        const std::string_view line = BASELIB::trimmed(text.substr(0, newline));
+        const std::string_view line = mne::trimmed(text.substr(0, newline));
         text = newline == std::string_view::npos ? std::string_view() : text.substr(newline + 1);
         if (std::exchange(versionLine, false) || line.empty() || line.front() == ';') {
             continue;
         }
         if (line.front() == '[' && line.back() == ']') {
             section = line.substr(1, line.size() - 2);
-            if (BASELIB::equalsIgnoreCase(section, "comment")) {
+            if (mne::equalsIgnoreCase(section, "comment")) {
                 return;
             }
             continue;
         }
         const std::size_t eq = line.find('=');
         if (eq != std::string_view::npos && eq > 0 && !section.empty()) {
-            entry(section, BASELIB::trimmed(line.substr(0, eq)), BASELIB::trimmed(line.substr(eq + 1)));
+            entry(section, mne::trimmed(line.substr(0, eq)), mne::trimmed(line.substr(eq + 1)));
         }
     }
 }
@@ -176,13 +175,13 @@ std::string_view value(const std::map<std::string, std::string, std::less<>>& se
 }
 
 /** @return The little-endian value at @p bytes in host byte order. */
-template<BASELIB::Swappable T>
+template<mne::Swappable T>
 T fromLittleEndian(const unsigned char* bytes)
 {
     T value;
     std::memcpy(&value, bytes, sizeof(T));
     if constexpr (std::endian::native == std::endian::big) {
-        value = BASELIB::byteSwap(value);
+        value = mne::byteSwap(value);
     }
     return value;
 }
@@ -205,7 +204,7 @@ FiffChInfo BrainVisionChannelInfo::to_fiff_ch_info() const
     info.logNo = channelNumber;
 
     // Detect channel type from name
-    const std::string lower = BASELIB::toLower(name);
+    const std::string lower = mne::toLower(name);
     const auto has = [&lower](std::string_view part) {
         return lower.find(part) != std::string::npos;
     };
@@ -266,9 +265,9 @@ bool BrainVisionReader::open(const std::filesystem::path& path)
         return false;
     }
 
-    m_dataFile = BASELIB::FileByteStream::open(m_dataPath, BASELIB::FileByteStream::Mode::Read);
+    m_dataFile = mne::FileByteStream::open(m_dataPath, mne::FileByteStream::Mode::Read);
     if (!m_dataFile) {
-        BASELIB::Log::warning("[BrainVisionReader::open] Could not open data file: {}", BASELIB::utf8FromPath(m_dataPath));
+        mne::Log::warning("[BrainVisionReader::open] Could not open data file: {}", mne::utf8FromPath(m_dataPath));
         return false;
     }
     m_sampleCount = static_cast<long>(m_dataFile->size() / (static_cast<std::uint64_t>(bytesPerValue(m_binaryFormat)) * static_cast<std::uint64_t>(m_numChannels)));
@@ -283,17 +282,17 @@ bool BrainVisionReader::open(const std::filesystem::path& path)
 
 bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 {
-    BASELIB::Expected<std::string> text = BASELIB::read_text_file(vhdrPath);
+    mne::Expected<std::string> text = mne::read_text_file(vhdrPath);
     if (!text) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", BASELIB::utf8FromPath(vhdrPath));
+        mne::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", mne::utf8FromPath(vhdrPath));
         return false;
     }
 
     *text = decodeText(std::move(*text));
-    const std::string_view firstLine = BASELIB::trimmed(std::string_view(*text).substr(0, text->find('\n')));
+    const std::string_view firstLine = mne::trimmed(std::string_view(*text).substr(0, text->find('\n')));
     static const std::regex versionPattern("Brain ?Vision( Core| V-Amp)? Data( Exchange)? Header File,? Version [12]\\.0", std::regex::icase);
     if (!std::regex_search(firstLine.begin(), firstLine.end(), versionPattern)) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] Unrecognized header version: {}", firstLine);
+        mne::Log::warning("[BrainVisionReader::parse_header] Unrecognized header version: {}", firstLine);
         return false;
     }
 
@@ -308,7 +307,7 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
         common = sections.find("Common infos");
     }
     if (common == sections.end() || common->second.empty()) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] Missing [Common Infos] section");
+        mne::Log::warning("[BrainVisionReader::parse_header] Missing [Common Infos] section");
         return false;
     }
     const auto& commonInfos = common->second;
@@ -316,30 +315,30 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
     // Data and marker files are relative to the .vhdr
     const std::string_view dataFile = value(commonInfos, "DataFile");
     if (dataFile.empty()) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] No DataFile specified");
+        mne::Log::warning("[BrainVisionReader::parse_header] No DataFile specified");
         return false;
     }
     const std::filesystem::path dir = std::filesystem::absolute(vhdrPath).parent_path();
-    m_dataPath = dir / BASELIB::pathFromUtf8(dataFile);
+    m_dataPath = dir / mne::pathFromUtf8(dataFile);
     const std::string_view markerFile = value(commonInfos, "MarkerFile");
-    m_markerPath = markerFile.empty() ? std::filesystem::path() : dir / BASELIB::pathFromUtf8(markerFile);
+    m_markerPath = markerFile.empty() ? std::filesystem::path() : dir / mne::pathFromUtf8(markerFile);
 
     const std::string_view dataFormat = value(commonInfos, "DataFormat", "BINARY");
-    if (!BASELIB::equalsIgnoreCase(dataFormat, "BINARY")) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] Only BINARY data is supported, not {}", dataFormat);
+    if (!mne::equalsIgnoreCase(dataFormat, "BINARY")) {
+        mne::Log::warning("[BrainVisionReader::parse_header] Only BINARY data is supported, not {}", dataFormat);
         return false;
     }
 
-    m_orientation = BASELIB::equalsIgnoreCase(value(commonInfos, "DataOrientation", "MULTIPLEXED"), "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
+    m_orientation = mne::equalsIgnoreCase(value(commonInfos, "DataOrientation", "MULTIPLEXED"), "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
 
-    m_numChannels = BASELIB::toInt(value(commonInfos, "NumberOfChannels", "0")).value_or(0);
+    m_numChannels = mne::toInt(value(commonInfos, "NumberOfChannels", "0")).value_or(0);
     if (m_numChannels <= 0) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_header] Invalid channel count: {}", m_numChannels);
+        mne::Log::warning("[BrainVisionReader::parse_header] Invalid channel count: {}", m_numChannels);
         return false;
     }
 
     // Sampling interval in microseconds
-    const double samplingInterval = BASELIB::toDouble(value(commonInfos, "SamplingInterval", "0")).value_or(0.0);
+    const double samplingInterval = mne::toDouble(value(commonInfos, "SamplingInterval", "0")).value_or(0.0);
     m_sfreq = samplingInterval > 0.0 ? static_cast<float>(1.0e6 / samplingInterval) : 0.0f;
 
     static const std::map<std::string, std::string, std::less<>> none;
@@ -349,9 +348,9 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
     };
 
     const std::string_view binaryFormat = value(section("Binary Infos"), "BinaryFormat", "INT_16");
-    if (BASELIB::equalsIgnoreCase(binaryFormat, "INT_32")) {
+    if (mne::equalsIgnoreCase(binaryFormat, "INT_32")) {
         m_binaryFormat = BVBinaryFormat::INT_32;
-    } else if (BASELIB::equalsIgnoreCase(binaryFormat, "IEEE_FLOAT_32")) {
+    } else if (mne::equalsIgnoreCase(binaryFormat, "IEEE_FLOAT_32")) {
         m_binaryFormat = BVBinaryFormat::IEEE_FLOAT_32;
     } else {
         m_binaryFormat = BVBinaryFormat::INT_16;
@@ -369,13 +368,13 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
         if (entry.empty()) {
             ch.name = "Ch" + std::to_string(i);
         } else {
-            const std::vector<std::string> parts = BASELIB::split(entry, ',');
+            const std::vector<std::string> parts = mne::split(entry, ',');
             ch.name = decodeCommas(parts[0]);
             if (parts.size() >= 2) {
                 ch.reference = decodeCommas(parts[1]);
             }
             if (parts.size() >= 3 && !parts[2].empty()) {
-                ch.resolution = static_cast<float>(BASELIB::toDouble(parts[2]).value_or(0.0));
+                ch.resolution = static_cast<float>(mne::toDouble(parts[2]).value_or(0.0));
             }
             if (parts.size() >= 4 && !parts[3].empty()) {
                 ch.unit = parts[3];
@@ -390,9 +389,9 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 
 bool BrainVisionReader::parse_markers(const std::filesystem::path& vmrkPath)
 {
-    BASELIB::Expected<std::string> text = BASELIB::read_text_file(vmrkPath);
+    mne::Expected<std::string> text = mne::read_text_file(vmrkPath);
     if (!text) {
-        BASELIB::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", BASELIB::utf8FromPath(vmrkPath));
+        mne::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", mne::utf8FromPath(vmrkPath));
         return false;
     }
 
@@ -403,7 +402,7 @@ bool BrainVisionReader::parse_markers(const std::filesystem::path& vmrkPath)
         if (section != "Marker Infos") {
             return;
         }
-        const std::vector<std::string> parts = BASELIB::split(entry, ',');
+        const std::vector<std::string> parts = mne::split(entry, ',');
         if (parts.size() < 5) {
             return;
         }
@@ -453,7 +452,7 @@ bool BrainVisionReader::is_voltage_unit(std::string_view unit)
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo BrainVisionReader::info() const
+mne::FiffInfo BrainVisionReader::info() const
 {
     FiffInfo info;
     info.nchan = static_cast<int>(m_channels.size());
@@ -475,11 +474,11 @@ FIFFLIB::FiffInfo BrainVisionReader::info() const
 Eigen::MatrixXf BrainVisionReader::read_raw_segment(long first, long last) const
 {
     if (!m_dataFile) {
-        BASELIB::Log::warning("[BrainVisionReader::read_raw_segment] File not open");
+        mne::Log::warning("[BrainVisionReader::read_raw_segment] File not open");
         return MatrixXf();
     }
     if (first < 0 || first >= m_sampleCount || last < 0 || last > m_sampleCount || last <= first) {
-        BASELIB::Log::warning("[BrainVisionReader::read_raw_segment] Invalid range: {} - {}", first, last);
+        mne::Log::warning("[BrainVisionReader::read_raw_segment] Invalid range: {} - {}", first, last);
         return MatrixXf();
     }
 
@@ -562,5 +561,5 @@ std::string_view BrainVisionReader::format_name() const
 
 bool BrainVisionReader::supports_extension(std::string_view extension) const
 {
-    return BASELIB::equalsIgnoreCase(extension, ".vhdr") || BASELIB::equalsIgnoreCase(extension, ".ahdr");
+    return mne::equalsIgnoreCase(extension, ".vhdr") || mne::equalsIgnoreCase(extension, ".ahdr");
 }

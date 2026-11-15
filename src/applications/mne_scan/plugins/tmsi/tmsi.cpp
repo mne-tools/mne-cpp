@@ -56,9 +56,8 @@
 //=============================================================================================================
 
 using namespace TMSIPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -149,7 +148,7 @@ std::string TMSI::uri() const
 void TMSI::applyElectrodeLayout(FiffInfo& info) const
 {
     // Only works for ANT Neuro Waveguard Duke caps
-    const auto layout = CHANNELSLIB::LayoutLoader::read_elc(BASELIB::pathFromUtf8(m_sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(m_sElcFilePath.toStdString()));
     if (!layout) {
         qWarning() << "[TMSI] Cannot read the electrode positions in" << m_sElcFilePath;
         return;
@@ -224,8 +223,8 @@ void TMSI::applyElectrodeLayout(FiffInfo& info) const
 
 bool TMSI::start()
 {
-    ACQLIB::registerTmsiScheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::registerTmsiScheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[TMSI::start]" << QString::fromStdString(device.error().text());
         return false;
@@ -236,8 +235,8 @@ bool TMSI::start()
         return true;
     }
 
-    auto fiffInfo = ACQLIB::toFiffInfo(*m_device.stream().info());
-    auto reader = m_device.stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
+    auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[TMSI::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         m_device.close();
@@ -255,7 +254,7 @@ bool TMSI::start()
     m_pRMTSA_TMSI->measurementData()->initFromFiffInfo(std::make_shared<FiffInfo>(std::move(*fiffInfo)));
     m_pRMTSA_TMSI->measurementData()->setMultiArraySize(1);
 
-    if (ACQLIB::AcqError e = m_device.start(); !e.ok()) {
+    if (mne::AcqError e = m_device.start(); !e.ok()) {
         qWarning() << "[TMSI::start]" << QString::fromStdString(e.text());
         m_device.close();
         return false;
@@ -282,7 +281,7 @@ bool TMSI::stop()
     requestInterruption();
     wait();
 
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
     m_device.close();
 
     // Clear all data in the buffer connected to displays and other plugins
@@ -343,7 +342,7 @@ void TMSI::run()
             }
             // Electrode i of the cap is ExG input i, and the ExG inputs lead the stream
             VectorXd ohms = VectorXd::Zero(static_cast<Index>(impedances->size()));
-            for (const ACQLIB::AcqImpedance& impedance : *impedances) {
+            for (const mne::AcqImpedance& impedance : *impedances) {
                 if (impedance.channel < impedances->size()) {
                     ohms[static_cast<Index>(impedance.channel)] = impedance.ohms;
                 }
@@ -359,10 +358,10 @@ void TMSI::run()
 
     MatrixXd block(static_cast<Index>(channels), m_iSamplesPerBlock);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (!read) {
-            if (read.error() == ACQLIB::AcqErrorCode::Timeout || read.error() == ACQLIB::AcqErrorCode::Overrun) {
+            if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
             qWarning() << "[TMSI::run]" << QString::fromStdString(read.error().text());

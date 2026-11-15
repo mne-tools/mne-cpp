@@ -9,13 +9,13 @@
  * @date     March 2026
  * @brief    Single off-grid focal dipole result with free position, moment and fit-quality metrics.
  *
- * @ref INVLIB::InvFocalDipole captures one equivalent current dipole that
+ * @ref mne::InvFocalDipole captures one equivalent current dipole that
  * is not constrained to a source-space vertex — typically the output of
  * the ECD dipole-fit pipeline or of a max-power beamformer. Position is in
  * head-coordinate metres, moment is in Am, and the goodness, chi-squared
  * and degrees-of-freedom fields propagate fit diagnostics to downstream
- * viewers and report writers. A list of @ref INVLIB::InvFocalDipole instances is
- * attached to @ref INVLIB::InvSourceEstimate to carry sparse focal results alongside
+ * viewers and report writers. A list of @ref mne::InvFocalDipole instances is
+ * attached to @ref mne::InvSourceEstimate to carry sparse focal results alongside
  * dense grid estimates.
  */
 
@@ -29,10 +29,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -71,6 +71,6 @@ struct InvFocalDipole
     }
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_FOCAL_DIPOLE_H

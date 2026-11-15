@@ -1,20 +1,20 @@
 ---
 id: inv-ecd-set
-title: "INVLIB::InvEcdSet"
+title: "mne::InvEcdSet"
 sidebar_label: InvEcdSet
 sidebar_position: 27
 ---
 
 # InvEcdSet
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_ecd_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_ecd_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_ecd_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_ecd_set.h)
 
 `#include <inv/inv_ecd_set.h>`
 
 <Connections topics={["dipole-fitting"]} context="api" current="InvEcdSet" />
 
 ```cpp
-class INVLIB::InvEcdSet
+class mne::InvEcdSet
 ```
 
 Implements Electric Current Dipole Set (Replaces *ecdSet,ecdSetRec struct of MNE-C fit_types.h).
@@ -170,7 +170,7 @@ Read dipoles from the dip format compatible with mrilab, as written by save_dipo
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 137"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 136"
 settings.dipname = tmp.filePath("fit.dat").toStdString(); // MNE-C .dat dipole file
 settings.checkIntegrity();
 InvDipoleFit fit(&settings);
@@ -187,7 +187,7 @@ ok &= expect(saved && dipoles.size() == 1 && dipoles[0].valid && (posMm - mnePos
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 255"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 253"
 InvEcdSet dipoles;
 InvEcd strong;
 strong.rd = Vector3f(0.0f, 0.0f, 0.05f);

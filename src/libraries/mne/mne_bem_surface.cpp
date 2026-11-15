@@ -11,7 +11,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     June 2015
- * @brief    Implementation of @ref MNELIB::MNEBemSurface.
+ * @brief    Implementation of @ref mne::MNEBemSurface.
  *
  * Reads a single @c FIFFB_BEM_SURF block, recomputing missing per-vertex
  * normals from the triangulation and applying the coordinate-frame
@@ -32,9 +32,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -105,7 +104,7 @@ bool MNEBemSurface::addTriangleData()
     //
     //   Main triangulation
     //
-    BASELIB::Log::info("\tCompleting triangulation info...");
+    mne::Log::info("\tCompleting triangulation info...");
     this->tri_cent = MatrixX3d::Zero(this->ntri, 3);
     this->tri_nn = MatrixX3d::Zero(this->ntri, 3);
     this->tri_area = VectorXd::Zero(this->ntri);
@@ -143,10 +142,10 @@ bool MNEBemSurface::addTriangleData()
         this->tri_nn.row(i) /= size;
     }
 
-    BASELIB::Log::info("Adding additional geometry info\n");
+    mne::Log::info("Adding additional geometry info\n");
     add_geometry_info();
 
-    BASELIB::Log::info("[done]\n");
+    mne::Log::info("[done]\n");
 
     return true;
 }
@@ -276,7 +275,7 @@ std::vector<MNEBemSurface> MNEBemSurface::makeScalpSurfaces(
     std::vector<MNEBemSurface> results;
 
     if (outerSkin.np <= 0 || outerSkin.ntri <= 0) {
-        BASELIB::Log::warning("MNEBemSurface::makeScalpSurfaces - Input surface is empty.");
+        mne::Log::warning("MNEBemSurface::makeScalpSurfaces - Input surface is empty.");
         return results;
     }
 

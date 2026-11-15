@@ -1,13 +1,13 @@
 ---
 id: filter-kernel
-title: "DSPLIB::FilterKernel"
+title: "mne::FilterKernel"
 sidebar_label: FilterKernel
 sidebar_position: 1
 ---
 
 # FilterKernel
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/filterkernel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/filterkernel.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/filterkernel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/filterkernel.h)
 
 :::info[Python equivalent]
 `mne.filter.create_filter` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 1
 <Connections topics={["filtering"]} context="api" current="FilterKernel" />
 
 ```cpp
-class DSPLIB::FilterKernel
+class mne::FilterKernel
 ```
 
 The [`FilterKernel`](/docs/api/dsp/filter-kernel) class provides methods to create/design a FIR filter kernel.
@@ -281,18 +281,18 @@ for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
 
 Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
 
-````cpp title="src/examples/ex_filtering/main.cpp, line 87"
+````cpp title="src/examples/ex_filtering/main.cpp, line 86"
 printf("Filtering...");
-if (DSPLIB::filterFile(parser.value(outputOption).toStdU16String(),
-                       pRaw,
-                       FilterKernel::filterTypeIndex("BPF"),
-                       10,
-                       10,
-                       0.1,
-                       pRaw->info.sfreq,
-                       1024,
-                       DSPLIB::FilterKernel::designMethodIndex("Cosine"),
-                       picks)) {
+if (mne::filterFile(parser.value(outputOption).toStdU16String(),
+                    pRaw,
+                    FilterKernel::filterTypeIndex("BPF"),
+                    10,
+                    10,
+                    0.1,
+                    pRaw->info.sfreq,
+                    1024,
+                    mne::FilterKernel::designMethodIndex("Cosine"),
+                    picks)) {
     printf("[done]\n");
 } else {
     printf("[failed]\n");

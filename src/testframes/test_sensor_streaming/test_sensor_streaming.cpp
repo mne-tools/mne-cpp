@@ -23,7 +23,7 @@
 #include <disp3D/workers/rtsensordataworker.h>
 #include <disp3D/workers/rtsensordatacontroller.h>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 /**

@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel via @c QtConcurrent::mappedReduced.
+ * @brief    Implementation of @ref mne::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel via @c QtConcurrent::mappedReduced.
  */
 
 //=============================================================================================================
@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -66,7 +66,7 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("COR");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("Correlation::calculate - Input data is empty");
+        mne::Log::debug("Correlation::calculate - Input data is empty");
         return finalNetwork;
     }
 

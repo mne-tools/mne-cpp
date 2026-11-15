@@ -26,7 +26,7 @@
 #include <QSet>
 #include <cmath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -363,4 +363,4 @@ const SourceEstimateOverlay* SourceEstimateManager::overlay() const
     return m_overlay.get();
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

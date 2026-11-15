@@ -1,18 +1,18 @@
 ---
 id: fiff-ch-info
-title: "FIFFLIB::FiffChInfo"
+title: "mne::FiffChInfo"
 sidebar_label: FiffChInfo
 sidebar_position: 12
 ---
 
 # FiffChInfo
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_ch_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_ch_info.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_ch_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_ch_info.h)
 
 `#include <fiff/fiff_ch_info.h>`
 
 ```cpp
-class FIFFLIB::FiffChInfo
+class mne::FiffChInfo
 ```
 
 Per-channel FIFF descriptor: identifiers, kind, calibration, coil type, channel-frame coil position and SI unit.
@@ -127,7 +127,7 @@ Formerly mne_check_chinfo (MNE C).
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 95"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 93"
 QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 std::vector<FiffChInfo> meg;
@@ -136,7 +136,7 @@ std::vector<FiffChInfo> eeg;
 for (const FiffChInfo& ch : raw.info.chs) {
     if (ch.kind == FIFFV_MEG_CH) {
         meg.push_back(ch);
-        if (!BASELIB::contains(raw.info.bads, ch.ch_name)) {
+        if (!mne::contains(raw.info.bads, ch.ch_name)) {
             goodMeg.push_back(ch);
         }
     } else if (ch.kind == FIFFV_EEG_CH) {
@@ -148,7 +148,7 @@ for (const FiffChInfo& ch : raw.info.chs) {
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 79"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 78"
         const FiffChInfo& ch = info.chs[meg[k]];
         const Vector3d r = ch.chpos.r0.cast<double>() - pos;
         const double d = r.norm();

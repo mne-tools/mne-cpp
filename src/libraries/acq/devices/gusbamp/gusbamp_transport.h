@@ -35,10 +35,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Bytes before the samples of every transfer. */
@@ -150,6 +150,6 @@ AcqExpected<std::unique_ptr<GusbampTransport>> open_gusbamp_driver(std::span<con
 /** @return The serial numbers of the connected units, or BackendUnavailable. */
 AcqExpected<std::vector<std::string>> list_gusbamp_units();
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // GUSBAMP_TRANSPORT_H

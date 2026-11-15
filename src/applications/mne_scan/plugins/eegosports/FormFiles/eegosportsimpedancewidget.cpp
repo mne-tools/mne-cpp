@@ -153,7 +153,7 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
     m_qGScene->clear();
 
     // Load standard layout file
-    const auto layout = CHANNELSLIB::LayoutLoader::read_elc(BASELIB::pathFromUtf8((layoutDirectory() + "standard_waveguard66.elc").toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8((layoutDirectory() + "standard_waveguard66.elc").toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -174,7 +174,7 @@ void EEGoSportsImpedanceWidget::addElectrodeItem(const QString& electrodeName, c
 
 //=============================================================================================================
 
-void EEGoSportsImpedanceWidget::addElectrodeItems(const CHANNELSLIB::ElectrodeLayout& layout)
+void EEGoSportsImpedanceWidget::addElectrodeItems(const mne::ElectrodeLayout& layout)
 {
     for (std::size_t i = 0; i < layout.positions_2d.size(); ++i)
         m_qmElectrodeNameIndex.insert(QString::fromStdString(layout.names[i]), static_cast<int>(i));
@@ -262,7 +262,7 @@ void EEGoSportsImpedanceWidget::loadLayout()
                                                         tr("ELC layout file (*.elc)"));
 
     // Load standard layout file
-    const auto layout = CHANNELSLIB::LayoutLoader::read_elc(BASELIB::pathFromUtf8(sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(sElcFilePath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

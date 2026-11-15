@@ -22,7 +22,7 @@
 #include <QTimer>
 #include <QDebug>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -33,7 +33,7 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    m_pWorker = new DISP3DLIB::RtSensorDataWorker();
+    m_pWorker = new mne::disp::RtSensorDataWorker();
 
     // Create and configure data thread
     m_pWorkerThread = new QThread(this);
@@ -43,30 +43,30 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
     connect(m_pWorkerThread, &QThread::finished, m_pWorker, &QObject::deleteLater);
 
     // Forward worker signals to controller signals
-    connect(m_pWorker, &DISP3DLIB::RtSensorDataWorker::newRtSensorColors,
+    connect(m_pWorker, &mne::disp::RtSensorDataWorker::newRtSensorColors,
             this, &RtSensorDataController::newSensorColorsAvailable);
-    connect(m_pWorker, &DISP3DLIB::RtSensorDataWorker::newRtRawSensorData,
+    connect(m_pWorker, &mne::disp::RtSensorDataWorker::newRtRawSensorData,
             this, &RtSensorDataController::newRawSensorDataAvailable);
 
     // Create timer for driving the streaming cadence
     m_pTimer = new QTimer(this);
     m_pTimer->setTimerType(Qt::PreciseTimer);
-    connect(m_pTimer, &QTimer::timeout, m_pWorker, &DISP3DLIB::RtSensorDataWorker::streamData);
+    connect(m_pTimer, &QTimer::timeout, m_pWorker, &mne::disp::RtSensorDataWorker::streamData);
 
     // Start the data worker thread
     m_pWorkerThread->start();
 
     // Create interpolation matrix worker
-    m_pInterpWorker = new DISP3DLIB::RtSensorInterpolationMatWorker();
+    m_pInterpWorker = new mne::disp::RtSensorInterpolationMatWorker();
     m_pInterpThread = new QThread(this);
     m_pInterpWorker->moveToThread(m_pInterpThread);
 
     connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
 
     // Forward interpolation results: auto-apply to data worker + re-emit for external listeners
-    connect(m_pInterpWorker, &DISP3DLIB::RtSensorInterpolationMatWorker::newMegMappingAvailable,
+    connect(m_pInterpWorker, &mne::disp::RtSensorInterpolationMatWorker::newMegMappingAvailable,
             this, &RtSensorDataController::onNewMegMapping);
-    connect(m_pInterpWorker, &DISP3DLIB::RtSensorInterpolationMatWorker::newEegMappingAvailable,
+    connect(m_pInterpWorker, &mne::disp::RtSensorInterpolationMatWorker::newEegMappingAvailable,
             this, &RtSensorDataController::onNewEegMapping);
 
     m_pInterpThread->start();
@@ -217,7 +217,7 @@ void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 // ── On-the-fly interpolation matrix computation ────────────────────────
 //=============================================================================================================
 
-void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked& evoked)
+void RtSensorDataController::setEvoked(const mne::FiffEvoked& evoked)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setEvoked(evoked);
@@ -226,7 +226,7 @@ void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked& evoked)
 
 //=============================================================================================================
 
-void RtSensorDataController::setTransform(const FIFFLIB::FiffCoordTrans& trans,
+void RtSensorDataController::setTransform(const mne::FiffCoordTrans& trans,
                                           bool applySensorTrans)
 {
     if (m_pInterpWorker) {
@@ -321,4 +321,4 @@ void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
              << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

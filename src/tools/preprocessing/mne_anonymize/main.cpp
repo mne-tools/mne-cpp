@@ -58,7 +58,7 @@ class SettingsControllerCl;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     MNEANONYMIZE::AppHandler handler;
     const auto qtApp = handler.createApplication(argc, argv);

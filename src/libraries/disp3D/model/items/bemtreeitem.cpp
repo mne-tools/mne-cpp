@@ -16,10 +16,10 @@
 
 #include "bemtreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
-BemTreeItem::BemTreeItem(const QString& text, const MNELIB::MNEBemSurface& bemSurf)
+BemTreeItem::BemTreeItem(const QString& text, const mne::MNEBemSurface& bemSurf)
 : AbstractTreeItem(text, BemItem)
 , m_bemSurface(bemSurf)
 {
@@ -27,9 +27,9 @@ BemTreeItem::BemTreeItem(const QString& text, const MNELIB::MNEBemSurface& bemSu
     // but they might use a specific color or transparency.
 }
 
-const MNELIB::MNEBemSurface& BemTreeItem::bemSurfaceData() const
+const mne::MNEBemSurface& BemTreeItem::bemSurfaceData() const
 {
     return m_bemSurface;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

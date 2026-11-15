@@ -31,10 +31,7 @@
 #include "../../applications/mne_browse/Utils/filteroperator.h"
 #include "../../applications/mne_browse/Utils/sessionfilter.h"
 
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace MNEBROWSE;
 using namespace Eigen;
 
@@ -167,7 +164,7 @@ private:
 private slots:
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
@@ -260,7 +257,7 @@ private slots:
             QSKIP("No test data");
         FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
         std::shared_ptr<FiffInfo> info = std::make_shared<FiffInfo>(raw.info);
-        const int stiIdx = BASELIB::indexOf(info->ch_names, "STI 014");
+        const int stiIdx = mne::indexOf(info->ch_names, "STI 014");
         QVERIFY(stiIdx >= 0);
         MatrixXd data, times;
         QVERIFY(raw.read_raw_segment(data, times));
@@ -596,10 +593,10 @@ private slots:
         // Filtered epochs are the epochs of the filtered recording, sampled like mne.Epochs
         const RowVectorXi picks = RowVectorXi::LinSpaced(raw.info.nchan, 0, raw.info.nchan - 1);
         const FilterKernel kernel("data_bp", 2, 256, 10.0 / raw.info.sfreq, 30.0 / raw.info.sfreq, 1.0 / raw.info.sfreq, raw.info.sfreq, 0);
-        const FiffEvoked filtered = DSPLIB::computeFilteredAverage(raw, events, -0.1f, 0.3f, codes.front(), true, -0.1f, 0.0f, {}, kernel);
+        const FiffEvoked filtered = mne::computeFilteredAverage(raw, events, -0.1f, 0.3f, codes.front(), true, -0.1f, 0.0f, {}, kernel);
         MatrixXd all, allTimes;
         QVERIFY(raw.read_raw_segment(all, allTimes, raw.first_samp, raw.last_samp, picks));
-        const MatrixXd allFiltered = DSPLIB::filterData(all, kernel);
+        const MatrixXd allFiltered = mne::filterData(all, kernel);
         const int delay = kernel.getFilterOrder() / 2;
         MatrixXd sum = MatrixXd::Zero(all.rows(), to - from + 1);
         int nave = 0;
@@ -620,7 +617,7 @@ private slots:
         QVERIFY2((filtered.data - sum / nave).cwiseAbs().maxCoeff() < 1e-6 * sum.cwiseAbs().maxCoeff() / nave,
                  qPrintable(QString::number((filtered.data - sum / nave).cwiseAbs().maxCoeff())));
         QVERIFY(qAbs(filtered.baseline.first + 0.1f) < 1e-6f);
-        QCOMPARE(DSPLIB::computeFilteredAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}, kernel).data.size(), Index(0));
+        QCOMPARE(mne::computeFilteredAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}, kernel).data.size(), Index(0));
     }
 
     //=========================================================================
@@ -718,7 +715,7 @@ private slots:
         const std::vector<int> codes = uniqueEventCodes(events, 4);
         QVERIFY(codes.size() >= 2);
 
-        BASELIB::StringList comments;
+        mne::StringList comments;
         for (int code : codes) {
             comments.push_back(std::format("event_{}", code));
         }
@@ -790,7 +787,7 @@ private slots:
         FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
         MatrixXd data, times;
         QVERIFY(raw.read_raw_segment(data, times));
-        const int stiIdx = BASELIB::indexOf(raw.info.ch_names, "STI 014");
+        const int stiIdx = mne::indexOf(raw.info.ch_names, "STI 014");
         QVERIFY(stiIdx >= 0);
 
         // Rising stim onsets with their codes, as read from the stim channel directly
@@ -802,7 +799,7 @@ private slots:
         }
         QVERIFY(expected.size() > 10);
 
-        const QList<QPair<int, double>> triggers = DSPLIB::detectTriggerFlanksMax(data, stiIdx, 0, 0.5, false, 20);
+        const QList<QPair<int, double>> triggers = mne::detectTriggerFlanksMax(data, stiIdx, 0, 0.5, false, 20);
         QCOMPARE(triggers, expected);
     }
 

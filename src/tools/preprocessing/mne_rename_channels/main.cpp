@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -142,7 +142,7 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_rename_channels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

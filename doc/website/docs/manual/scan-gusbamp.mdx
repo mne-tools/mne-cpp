@@ -32,8 +32,8 @@ The same source is available to every program that links `mne_acq_devices`:
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 
-ACQLIB::register_gusbamp_scheme();
-auto device = ACQLIB::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512&trigger=1");
+mne::register_gusbamp_scheme();
+auto device = mne::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512&trigger=1");
 auto impedances = device->measureImpedances();
 ```
 

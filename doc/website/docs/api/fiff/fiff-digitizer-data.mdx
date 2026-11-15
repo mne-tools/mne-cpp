@@ -1,18 +1,18 @@
 ---
 id: fiff-digitizer-data
-title: "FIFFLIB::FiffDigitizerData"
+title: "mne::FiffDigitizerData"
 sidebar_label: FiffDigitizerData
 sidebar_position: 19
 ---
 
 # FiffDigitizerData
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_digitizer_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_digitizer_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_digitizer_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_digitizer_data.h)
 
 `#include <fiff/fiff_digitizer_data.h>`
 
 ```cpp
-class FIFFLIB::FiffDigitizerData
+class mne::FiffDigitizerData
 ```
 
 Registration-ready digitization data: dig points, device→head transform and HPI fit metadata.
@@ -112,8 +112,8 @@ ok &= expect(digData.nfids() == 3 && (Map<Vector3f>(digData.mri_fids[0].r) - Vec
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 112"
-FIFFLIB::FiffDigitizerData digData;
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 110"
+mne::FiffDigitizerData digData;
 ````
 
 ## Authors of this file

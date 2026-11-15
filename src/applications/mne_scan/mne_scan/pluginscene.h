@@ -89,7 +89,7 @@ public:
      *
      * @return true if successfull.
      */
-    bool insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr& pAddedPlugin);
+    bool insertPlugin(QAction* pActionPluginItem, mne::scan::AbstractPlugin::SPtr& pAddedPlugin);
 
     inline void setMode(Mode mode);
     inline void setActionPluginItem(QAction* pAction);

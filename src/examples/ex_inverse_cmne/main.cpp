@@ -56,11 +56,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

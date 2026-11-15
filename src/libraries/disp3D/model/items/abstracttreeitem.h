@@ -31,7 +31,7 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -88,6 +88,6 @@ protected:
     int m_type;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // ABSTRACTTREEITEM_H

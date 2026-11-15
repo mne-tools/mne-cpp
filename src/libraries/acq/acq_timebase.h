@@ -41,10 +41,10 @@
  *
  * Sample-exact playout of an RF pulse 2 ms after an event detected in a receive stream:
  * @code
- * const ACQLIB::AcqTimebase& rxTb = view.timebase();                // from the input view
- * const ACQLIB::AcqTimebase txTb = tx.timebase();                    // output stream of the same domain
+ * const mne::AcqTimebase& rxTb = view.timebase();                // from the input view
+ * const mne::AcqTimebase txTb = tx.timebase();                    // output stream of the same domain
  * const auto twoMs = static_cast<std::int64_t>(rxTb.ticksPerSecond / 500);
- * auto at = ACQLIB::mapSampleExact(rxTb, txTb, eventSample, twoMs, ACQLIB::AcqRounding::Exact);
+ * auto at = mne::mapSampleExact(rxTb, txTb, eventSample, twoMs, mne::AcqRounding::Exact);
  * if (at && *at >= writer.earliestWritableSample()) {
  *     auto out = writer.beginWriteAt(*at, pulseSamples, std::chrono::microseconds(200));
  *     // encode the pulse and the T/R switch bit into *out, then writer.commit(pulseSamples)
@@ -67,10 +67,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -260,6 +260,6 @@ struct AcqSyncMarker
                                                                std::uint64_t toleranceTicks,
                                                                std::uint64_t minSpanSamples = 1'000'000) noexcept;
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_TIMEBASE_H

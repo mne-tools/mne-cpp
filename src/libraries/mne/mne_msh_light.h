@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Single directional / positional light source for the mesh viewer.
  *
- * @ref MNELIB::MNEMshLight stores direction or position, RGB colour,
+ * @ref mne::MNEMshLight stores direction or position, RGB colour,
  * intensity and on/off state - one record per scene light - matching
  * the @c tksurfer light specification.
  */
@@ -28,14 +28,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -76,6 +76,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHLIGHT_H

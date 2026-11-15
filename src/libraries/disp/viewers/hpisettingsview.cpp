@@ -44,8 +44,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -425,7 +425,7 @@ void HpiSettingsView::onRemoveCoil()
 
 FiffDigPointSet HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 {
-    auto dig = FiffDigPointSet::read(BASELIB::pathFromUtf8(fileName.toStdString()));
+    auto dig = FiffDigPointSet::read(mne::pathFromUtf8(fileName.toStdString()));
     if (!dig || dig->empty()) {
         return {};
     }
@@ -438,7 +438,7 @@ FiffDigPointSet HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 
 //=============================================================================================================
 
-void HpiSettingsView::newDigitizerList(const FIFFLIB::FiffDigPointSet& digitizers)
+void HpiSettingsView::newDigitizerList(const mne::FiffDigPointSet& digitizers)
 {
     clearCoilGUI();
     updateDigitizerInfoGUI(digitizers);

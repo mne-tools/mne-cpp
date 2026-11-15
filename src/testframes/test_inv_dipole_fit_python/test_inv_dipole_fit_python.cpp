@@ -75,10 +75,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

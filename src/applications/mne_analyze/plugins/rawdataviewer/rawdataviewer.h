@@ -38,13 +38,13 @@
 
 class RawDataViewerControl;
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ScalingView;
 class FiffRawViewSettings;
 }
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class FiffRawViewModel;
@@ -66,12 +66,12 @@ class FiffRawViewDelegate;
  *
  * @brief The RawDataViewer class provides a view to display raw fiff data.
  */
-class RAWDATAVIEWERSHARED_EXPORT RawDataViewer : public ANSHAREDLIB::AbstractPlugin
+class RAWDATAVIEWERSHARED_EXPORT RawDataViewer : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "rawdataviewer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -95,8 +95,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     void onModelIsEmpty();
@@ -107,7 +107,7 @@ private:
      *
      * @param[in] pNewModel    The new model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
@@ -131,13 +131,13 @@ private:
      *
      * @param[in] pViewParameters  container for singal viewer display settings with new desired settings.
      */
-    void updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters);
+    void updateViewParameters(mne::analyze::ViewParameters viewParameters);
 
     //=========================================================================================================
     void onNewRealtimeData();
 
     // Control
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< The communicator object to communicate with other plugins. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< The communicator object to communicate with other plugins. */
 
     // Model
     int m_iSamplesPerBlock; /**< The samples per data block. Default is set to sampling frequency. */

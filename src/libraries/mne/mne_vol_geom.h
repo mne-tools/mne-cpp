@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    FreeSurfer volume geometry header carried by surface and tag streams.
  *
- * @ref MNELIB::MNEVolGeom records the original volume's dimensions,
+ * @ref mne::MNEVolGeom records the original volume's dimensions,
  * voxel size, direction cosines and centre RAS - the information needed
  * to convert a surface saved in @c surf/lh.white back into the RAS
  * coordinates of the originating @c mri/orig.mgz. Embedded in MGH tag
@@ -33,10 +33,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -77,6 +77,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEVOLGEOM_H

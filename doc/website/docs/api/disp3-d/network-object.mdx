@@ -1,18 +1,18 @@
 ---
 id: network-object
-title: "DISP3DLIB::NetworkObject"
+title: "mne::disp::NetworkObject"
 sidebar_label: NetworkObject
 sidebar_position: 31
 ---
 
 # NetworkObject
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/networkobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/networkobject.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/networkobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/networkobject.h)
 
 `#include <disp3D/networkobject.h>`
 
 ```cpp
-class DISP3DLIB::NetworkObject
+class mne::disp::NetworkObject
 ```
 
 [`NetworkObject`](/docs/api/disp3-d/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/disp3-d/dipole-object).
@@ -152,7 +152,7 @@ Set the colormap used for edge/node coloring.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 277"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 275"
 graph.add_edge(NetworkEdge(0, 1, MatrixXd::Constant(1, 1, 0.9)));
 graph.add_edge(NetworkEdge(1, 2, MatrixXd::Constant(1, 1, 0.3)));
 NetworkObject networkGlyphs;

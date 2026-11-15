@@ -11,10 +11,10 @@
  *
  * Free functions for the point-to-surface ICP used by mne-cpp's coregistration
  * tools to refine an initial @c head <-> @c MRI transformation:
- * @c MNELIB::fitMatchedPoints aligns matched point pairs (e.g. fiducials),
- * @c MNELIB::discard3DPointOutliers drops points far from the surface, and
- * @c MNELIB::performIcp projects each point onto the nearest triangle of an
- * @ref MNELIB::MNEBemSurface (via @ref MNELIB::MNEProjectToSurface), solves a
+ * @c mne::fitMatchedPoints aligns matched point pairs (e.g. fiducials),
+ * @c mne::discard3DPointOutliers drops points far from the surface, and
+ * @c mne::performIcp projects each point onto the nearest triangle of an
+ * @ref mne::MNEBemSurface (via @ref mne::MNEProjectToSurface), solves a
  * rigid-body least squares with SVD and iterates until convergence.
  *
  * @snippet ex_mne_api/main.cpp mne_icp_usage
@@ -40,20 +40,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEProjectToSurface;
@@ -76,9 +76,9 @@ const Eigen::VectorXf vecDefaultWeights;
  * @return Whether the registration was successful.
  */
 
-MNESHARED_EXPORT bool performIcp(const std::shared_ptr<MNELIB::MNEProjectToSurface>& mneSurfacePoints,
+MNESHARED_EXPORT bool performIcp(const std::shared_ptr<mne::MNEProjectToSurface>& mneSurfacePoints,
                                  const Eigen::MatrixXf& matPointCloud,
-                                 FIFFLIB::FiffCoordTrans& transFromTo,
+                                 mne::FiffCoordTrans& transFromTo,
                                  float& fRMSE,
                                  bool bScale = false,
                                  int iMaxIter = 20,
@@ -122,13 +122,13 @@ MNESHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoint,
  * @return Whether the discarding was successful.
  */
 
-MNESHARED_EXPORT bool discard3DPointOutliers(const std::shared_ptr<MNELIB::MNEProjectToSurface>& mneSurfacePoints,
+MNESHARED_EXPORT bool discard3DPointOutliers(const std::shared_ptr<mne::MNEProjectToSurface>& mneSurfacePoints,
                                              const Eigen::MatrixXf& matPointCloud,
-                                             const FIFFLIB::FiffCoordTrans& transFromTo,
+                                             const mne::FiffCoordTrans& transFromTo,
                                              Eigen::VectorXi& vecTake,
                                              Eigen::MatrixXf& matTakePoint,
                                              float fMaxDist = 0.0);
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_ICP_H

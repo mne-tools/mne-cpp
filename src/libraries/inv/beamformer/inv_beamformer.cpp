@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of the @ref INVLIB::InvBeamformer container.
+ * @brief    Implementation of the @ref mne::InvBeamformer container.
  *
  * Implements the default constructor and the small bookkeeping methods.
  * All non-inline accessors return shape information derived from the
@@ -26,7 +26,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

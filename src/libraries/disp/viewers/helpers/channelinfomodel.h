@@ -48,20 +48,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEOperator;
@@ -98,7 +98,7 @@ class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    ChannelInfoModel(std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo, QObject* parent = 0);
+    ChannelInfoModel(std::shared_ptr<mne::FiffInfo>& pFiffInfo, QObject* parent = 0);
     ChannelInfoModel(QObject* parent = 0);
 
     //=========================================================================================================
@@ -124,7 +124,7 @@ public:
      *
      * @param[in] pFiffInfo fiff info variabel.
      */
-    void setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void setFiffInfo(std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -189,7 +189,7 @@ protected:
      */
     void mapLayoutToChannels();
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The fiff info of the currently loaded fiff file. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The fiff info of the currently loaded fiff file. */
 
     QMultiMap<int, std::shared_ptr<MNEOperator>> m_assignedOperators; /**< Map of MNEOperator types to channels.*/
     QMap<QString, QPointF> m_layoutMap;                               /**< The current layout map with a position for all MEG and EEG channels. */
@@ -205,6 +205,6 @@ signals:
      */
     void channelsMappedToLayout(const QStringList& mappedLayoutChNames);
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // CHANNELINFOMODEL_H

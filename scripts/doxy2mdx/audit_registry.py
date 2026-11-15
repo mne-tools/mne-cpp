@@ -64,9 +64,10 @@ def load_exclusions(path: Path) -> dict:
 
 
 def exclusion_for(name: str, header: str, exclusions: dict) -> str | None:
-    namespace = name.split("::")[0] if "::" in name else ""
-    if namespace in exclusions.get("namespaces", {}):
-        return f"namespace:{namespace}"
+    namespace = name.rpartition("::")[0]
+    for excluded in exclusions.get("namespaces", {}):
+        if namespace == excluded or namespace.startswith(excluded + "::"):
+            return f"namespace:{excluded}"
     if name in exclusions.get("classes", {}):
         return f"class:{name}"
     unnamespaced = exclusions.get("unnamespaced", {})
@@ -142,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.apply:
         module_of_ns = {mod.get("namespace"): key for key, mod in registry["modules"].items()}
         registered = {entry["name"] for entry in registry["classes"]}
-        # Several namespaces span directories (e.g. FIFFLIB is declared in fiff/ and in mne/); siblings in the header decide.
+        # Every library shares the mne namespace; siblings in the header decide the module.
         module_of_header = {entry["header"]: entry["module"] for entry in registry["classes"]}
         last = defaultdict(int)
         for entry in registry["classes"]:

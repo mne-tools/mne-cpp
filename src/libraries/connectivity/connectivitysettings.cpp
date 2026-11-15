@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Implementation of @ref CONNECTIVITYLIB::ConnectivitySettings - the input/parameter container shared by every functional-connectivity metric in @c CONNECTIVITYLIB.
+ * @brief    Implementation of @ref mne::ConnectivitySettings - the input/parameter container shared by every functional-connectivity metric in @c mne_connectivity.
  *
  * Defines the trial append/clear/remove bookkeeping, the lazy invalidation
  * of the cached per-trial DPSS spectra and cross-spectral sums when the
@@ -43,11 +43,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace FSLIB;
 
 namespace
 {
@@ -92,7 +89,7 @@ ConnectivitySettings::ConnectivitySettings()
 , m_fFreqResolution(1.0f)
 {
     m_iNfft = int(m_fSFreq / m_fFreqResolution);
-    qRegisterMetaType<CONNECTIVITYLIB::ConnectivitySettings>("CONNECTIVITYLIB::ConnectivitySettings");
+    qRegisterMetaType<mne::ConnectivitySettings>("mne::ConnectivitySettings");
 }
 
 //*******************************************************************************************************
@@ -179,12 +176,12 @@ bool ConnectivitySettings::empty() const
 void ConnectivitySettings::removeFirst(int iAmount)
 {
     if (m_trialData.empty()) {
-        BASELIB::Log::debug("ConnectivitySettings::removeFirst - No elements to delete. Returning.");
+        mne::Log::debug("ConnectivitySettings::removeFirst - No elements to delete. Returning.");
         return;
     }
 
     if (std::ssize(m_trialData) < iAmount) {
-        BASELIB::Log::debug("ConnectivitySettings::removeFirst - Not enough elements stored in list in order to delete them. Returning.");
+        mne::Log::debug("ConnectivitySettings::removeFirst - Not enough elements stored in list in order to delete them. Returning.");
         return;
     }
 
@@ -199,12 +196,12 @@ void ConnectivitySettings::removeFirst(int iAmount)
 void ConnectivitySettings::removeLast(int iAmount)
 {
     if (m_trialData.empty()) {
-        BASELIB::Log::debug("ConnectivitySettings::removeLast - No elements to delete. Returning.");
+        mne::Log::debug("ConnectivitySettings::removeLast - No elements to delete. Returning.");
         return;
     }
 
     if (std::ssize(m_trialData) < iAmount) {
-        BASELIB::Log::debug("ConnectivitySettings::removeLast - Not enough elements stored in list in order to delete them. Returning.");
+        mne::Log::debug("ConnectivitySettings::removeLast - Not enough elements stored in list in order to delete them. Returning.");
         return;
     }
 

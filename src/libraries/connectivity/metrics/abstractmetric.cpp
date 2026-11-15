@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::AbstractMetric - holds the static control knobs (storage-mode flag and band-averaging window) shared by every CONNECTIVITYLIB estimator.
+ * @brief    Implementation of @ref mne::AbstractMetric - holds the static control knobs (storage-mode flag and band-averaging window) shared by every mne_connectivity estimator.
  */
 
 //=============================================================================================================
@@ -24,7 +24,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

@@ -18,7 +18,7 @@
  * Granger / PDC / DTF …), a windowing function and a number of
  * trials. Changes are forwarded to the connectivity-estimation
  * @c rtprocessing job, and the panel also persists its state through
- * @ref DISPLIB::AbstractView::saveSettings "AbstractView::saveSettings".
+ * @ref mne::disp::AbstractView::saveSettings "AbstractView::saveSettings".
  */
 
 #ifndef CONNECTIVITYSETTINGSVIEW_H
@@ -43,14 +43,14 @@ class ConnectivitySettingsViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

@@ -38,13 +38,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class AbstractModel;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ProgressView;
 }
@@ -68,12 +68,12 @@ class DataLoaderControl;
  *
  * @brief The DataLoader class provides input and output capabilities for the fiff file format.
  */
-class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::AbstractPlugin
+class DATALOADERSHARED_EXPORT DataLoader : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "dataloader.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
     enum FileType
     {
@@ -106,8 +106,8 @@ public:
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
 
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
     //=========================================================================================================
     /**
@@ -194,16 +194,16 @@ private:
      *
      * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;    /**< Used for sending events. */
-    QPointer<DISPLIB::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
-    QPointer<QWidget> m_pProgressViewWidget;         /**< Window for ProgressView. */
+    QPointer<mne::analyze::Communicator> m_pCommu;     /**< Used for sending events. */
+    QPointer<mne::disp::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
+    QPointer<QWidget> m_pProgressViewWidget;           /**< Window for ProgressView. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
-    QSharedPointer<ANSHAREDLIB::AbstractModel> m_pSelectedAverage;  /**< Pointer to the currently selected average. */
-    QString m_sSettingsPath;                                        /**< Variable that stores the key where to store settings for this plugin.*/
-    QString m_sLastDir;                                             /**< Variable to store the last directory from where data were loaded.*/
+    QSharedPointer<mne::analyze::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
+    QSharedPointer<mne::analyze::AbstractModel> m_pSelectedAverage;  /**< Pointer to the currently selected average. */
+    QString m_sSettingsPath;                                         /**< Variable that stores the key where to store settings for this plugin.*/
+    QString m_sLastDir;                                              /**< Variable to store the last directory from where data were loaded.*/
 };
 
 //=============================================================================================================

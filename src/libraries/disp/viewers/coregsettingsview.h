@@ -53,7 +53,7 @@ namespace Ui
 class CoregSettingsViewWidget;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 }
@@ -61,7 +61,7 @@ class FiffCoordTrans;
 // DEFINE NAMESPACE NAMESPACE
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================

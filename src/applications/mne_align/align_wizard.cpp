@@ -33,9 +33,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace MNEALIGN;
-using CHANNELSLIB::StandardMontage;
+using mne::StandardMontage;
 
 namespace
 {
@@ -973,9 +973,9 @@ void AlignWizard::onLoadDigiFiff()
     if (path.isEmpty())
         return;
 
-    FIFFLIB::FiffDigPointSet set;
+    mne::FiffDigPointSet set;
     try {
-        set = FIFFLIB::FiffDigPointSet(path.toStdU16String());
+        set = mne::FiffDigPointSet(path.toStdU16String());
     } catch (const std::exception& e) {
         QMessageBox::warning(this, QStringLiteral("Load digitisation"),
                              QStringLiteral("Failed to read %1:\n%2").arg(path, QString::fromUtf8(e.what())));
@@ -992,7 +992,7 @@ void AlignWizard::onLoadDigiFiff()
     int hspIdent = 1;
     int eegIdent = 1;
     for (qint32 i = 0; i < std::ssize(set); ++i) {
-        const FIFFLIB::FiffDigPoint& dp = set[i];
+        const mne::FiffDigPoint& dp = set[i];
         DigitizedPoint p;
         p.position = Eigen::Vector3f(dp.r[0], dp.r[1], dp.r[2]);
         switch (dp.kind) {

@@ -34,19 +34,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ApplyToView;
 class Control3DView;
 }
 
 #ifdef MNE_DISP3D
-namespace DISP3DLIB
+namespace mne::disp
 {
 class BrainTreeModel;
 }
@@ -65,12 +65,12 @@ namespace CONTROLMANAGERPLUGIN
  *
  * @brief The ControlManager class provides a view with all currently loaded models.
  */
-class CONTROLMANAGERSHARED_EXPORT ControlManager : public ANSHAREDLIB::AbstractPlugin
+class CONTROLMANAGERSHARED_EXPORT ControlManager : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "controlmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -94,8 +94,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
@@ -161,7 +161,7 @@ private:
      * @param[in] pModel   new 3D Model.
      */
 #ifdef MNE_DISP3D
-    void init3DGui(QSharedPointer<DISP3DLIB::BrainTreeModel> pModel);
+    void init3DGui(QSharedPointer<mne::disp::BrainTreeModel> pModel);
 #endif
 
     //=========================================================================================================
@@ -218,14 +218,14 @@ private:
      */
     void onTakeScreenshotChanged();
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Communicator to send events trhoug hevent manager. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< Communicator to send events trhoug hevent manager. */
 
-    QPointer<DISPLIB::Control3DView> m_pControl3DView; /**< Controls for 3d View. */
+    QPointer<mne::disp::Control3DView> m_pControl3DView; /**< Controls for 3d View. */
 
-    QPointer<DISPLIB::ApplyToView> m_pApplyToView;      /**< Controls for selecting views to apply settings; null until getControl() and after the dock is closed. */
-    ANSHAREDLIB::ScalingParameters m_ScalingParameters; /**< Controls for scaling. */
-    ANSHAREDLIB::ViewParameters m_ViewParameters;       /**< Struct for 2D view settings. */
-    ANSHAREDLIB::View3DParameters m_View3DParameters;   /**< Struct for 3D view settings. */
+    QPointer<mne::disp::ApplyToView> m_pApplyToView;     /**< Controls for selecting views to apply settings; null until getControl() and after the dock is closed. */
+    mne::analyze::ScalingParameters m_ScalingParameters; /**< Controls for scaling. */
+    mne::analyze::ViewParameters m_ViewParameters;       /**< Struct for 2D view settings. */
+    mne::analyze::View3DParameters m_View3DParameters;   /**< Struct for 3D view settings. */
 };
 
 //=============================================================================================================

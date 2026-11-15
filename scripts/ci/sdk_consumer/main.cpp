@@ -27,12 +27,12 @@ int main()
 {
     using namespace std::chrono_literals;
 
-    auto device = ACQLIB::AcqDevice::open("synthetic://?eeg=4&sfreq=250&duration=1&realtime=0&seed=3");
+    auto device = mne::AcqDevice::open("synthetic://?eeg=4&sfreq=250&duration=1&realtime=0&seed=3");
     if (!device) {
         std::fprintf(stderr, "open: %s\n", device.error().text().c_str());
         return EXIT_FAILURE;
     }
-    auto reader = device->stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto reader = device->stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!reader || !device->start().ok()) {
         std::fprintf(stderr, "cannot start the source\n");
         return EXIT_FAILURE;
@@ -40,17 +40,17 @@ int main()
     const auto info = reader->stream().info();
     Eigen::MatrixXd data(static_cast<Eigen::Index>(info->channels.size()), 250);
     auto view = reader->acquire(250, 5s, 250);
-    if (!view || !ACQLIB::decode(*view, ACQLIB::ref(data)).ok()) {
+    if (!view || !mne::decode(*view, mne::ref(data)).ok()) {
         std::fprintf(stderr, "cannot read one second\n");
         return EXIT_FAILURE;
     }
     static_cast<void>(reader->release(*view));
     device->close();
 
-    const auto sos = DSPLIB::IirFilter::designButterworth(4, DSPLIB::IirFilter::LowPass, 30.0, 0.0, info->sfreq);
-    const Eigen::MatrixXd filtered = DSPLIB::IirFilter::applyZeroPhaseMatrix(data, sos);
+    const auto sos = mne::IirFilter::designButterworth(4, mne::IirFilter::LowPass, 30.0, 0.0, info->sfreq);
+    const Eigen::MatrixXd filtered = mne::IirFilter::applyZeroPhaseMatrix(data, sos);
 
-    FIFFLIB::FiffInfo fiffInfo;
+    mne::FiffInfo fiffInfo;
     fiffInfo.sfreq = static_cast<float>(info->sfreq);
     fiffInfo.nchan = static_cast<int>(info->channels.size());
 

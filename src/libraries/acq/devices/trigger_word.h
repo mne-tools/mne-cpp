@@ -21,10 +21,10 @@
 #include <optional>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /**
@@ -61,6 +61,6 @@ private:
     std::int32_t m_word = 0;
 };
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // TRIGGER_WORD_H

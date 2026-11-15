@@ -10,7 +10,7 @@
  * @brief    Qt-RHI scene renderer: shader pipelines, lighting, dual render targets and per-frame draw orchestration for disp3D.
  *
  * BrainRenderer is the only object in disp3D that talks directly to
- * QRhi. It creates the shader pipelines for every @ref DISP3DLIB::ShaderMode
+ * QRhi. It creates the shader pipelines for every @ref mne::disp::ShaderMode
  * (Standard Phong, Holographic, Anatomical, Dipole arrows, XRay,
  * ShowNormals), allocates the dual @c rtClear / @c rtPreserve render
  * targets needed for the multi-pass cortex + overlay composition, and
@@ -18,12 +18,12 @@
  * visible scene object.
  *
  * The renderer packs camera matrices, light direction and the active
- * overlay mode (@ref DISP3DLIB::BrainRenderer::SceneData) into one uniform
+ * overlay mode (@ref mne::disp::BrainRenderer::SceneData) into one uniform
  * slot per draw. All slots and uploads of a frame are prepared before its
  * render pass, which then only binds and draws.
  *
- * All scene objects (@ref DISP3DLIB::BrainSurface, @ref DISP3DLIB::DipoleObject,
- * @ref DISP3DLIB::NetworkObject, @ref DISP3DLIB::VideoOverlay) are accepted through opaque
+ * All scene objects (@ref mne::disp::BrainSurface, @ref mne::disp::DipoleObject,
+ * @ref mne::disp::NetworkObject, @ref mne::disp::VideoOverlay) are accepted through opaque
  * pointers so the renderer never pulls in the heavy headers of the
  * modalities it draws.
  */
@@ -56,7 +56,7 @@ class QRhiTexture;
 class QRhiRenderBuffer;
 class QRhiTextureRenderTarget;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -292,7 +292,7 @@ public:
      */
     void prepareVideoOverlay(QRhi* rhi,
                              QRhiResourceUpdateBatch* u,
-                             DISP3DLIB::VideoOverlay* overlay);
+                             mne::disp::VideoOverlay* overlay);
 
     //=========================================================================================================
     /**
@@ -307,7 +307,7 @@ public:
      */
     int prepareVideoOverlayDraw(QRhiResourceUpdateBatch* u,
                                 const SceneData& data,
-                                DISP3DLIB::VideoOverlay* overlay,
+                                mne::disp::VideoOverlay* overlay,
                                 BrainSurface* surface);
 
     /**
@@ -319,7 +319,7 @@ public:
      * @param[in] uniformOffset  Offset returned by prepareVideoOverlayDraw().
      */
     void issueVideoOverlayDraw(QRhiCommandBuffer* cb,
-                               DISP3DLIB::VideoOverlay* overlay,
+                               mne::disp::VideoOverlay* overlay,
                                BrainSurface* surface,
                                int uniformOffset);
 
@@ -337,7 +337,7 @@ public:
      */
     void prepareSlice(QRhi* rhi,
                       QRhiResourceUpdateBatch* u,
-                      DISP3DLIB::SliceObject* slice,
+                      mne::disp::SliceObject* slice,
                       int slotIndex);
 
     //=========================================================================================================
@@ -379,6 +379,6 @@ private:
     std::unique_ptr<Impl> d;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINRENDERER_H

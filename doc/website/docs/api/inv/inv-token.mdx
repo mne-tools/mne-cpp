@@ -1,18 +1,18 @@
 ---
 id: inv-token
-title: "INVLIB::InvToken"
+title: "mne::InvToken"
 sidebar_label: InvToken
 sidebar_position: 51
 ---
 
 # InvToken
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_token.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_token.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_token.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_token.h)
 
 `#include <inv/inv_token.h>`
 
 ```cpp
-struct INVLIB::InvToken
+struct mne::InvToken
 ```
 
 A single token in the serialised representation of an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate).
@@ -76,7 +76,7 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 286"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 283"
 InvTokenizeOptions options; // at most 5 sources and 10 samples; values travel as float
 options.maxSources = 5;
 options.maxTimePoints = 10;

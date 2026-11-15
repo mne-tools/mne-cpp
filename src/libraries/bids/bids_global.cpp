@@ -20,21 +20,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* BIDSLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* BIDSLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* BIDSLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

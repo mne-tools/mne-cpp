@@ -9,7 +9,7 @@
  * @date     November 2026
  * @brief    Optional, header-only DLPack export of acquisition views (zero copy to NumPy, PyTorch, CuPy, ...).
  *
- * ACQLIB itself depends only on the C++20 standard library. Code that exchanges views through DLPack includes
+ * mne_acq itself depends only on the C++20 standard library. Code that exchanges views through DLPack includes
  * this header and provides DLPack 1.x (dlpack/dlpack.h); nothing here is compiled into the library.
  */
 
@@ -32,10 +32,10 @@
 static_assert(DLPACK_MAJOR_VERSION >= 1, "acq_dlpack.h needs DLPack 1.0 or newer (DLManagedTensorVersioned)");
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -138,6 +138,6 @@ namespace ACQLIB
     return &m;
 }
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_DLPACK_H

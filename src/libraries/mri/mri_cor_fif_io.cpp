@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Implementation of @ref MRILIB::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
+ * @brief    Implementation of @ref mne::MriCorFifIO: block-and-tag serialiser that emits a FIFF MRI set from an in-memory @ref MriVolData.
  *
- * Drives a @ref FIFFLIB::FiffStream through the nested
+ * Drives a @ref mne::FiffStream through the nested
  * @c FIFFB_MRI / @c FIFFB_MRI_SET / @c FIFFB_MRI_SLICE block
  * hierarchy declared in the header. For each slice it writes
  * the geometry tags (@c FIFF_MRI_WIDTH / @c FIFF_MRI_HEIGHT and
@@ -53,8 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -91,7 +90,7 @@ bool MriCorFifIO::write(const std::string& fileName,
     auto stream = FiffStream::start_file(fileName);
 
     if (!stream) {
-        BASELIB::Log::critical("MriCorFifIO::write - Could not open file for writing: {}", fileName);
+        mne::Log::critical("MriCorFifIO::write - Could not open file for writing: {}", fileName);
         return false;
     }
 

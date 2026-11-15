@@ -12,16 +12,16 @@
  * @date     November 2014
  * @brief    Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout.
  *
- * @ref CHANNELSLIB::LayoutMaker is the counterpart of
- * @ref CHANNELSLIB::LayoutLoader "LayoutLoader": given the 3-D coordinates of an
+ * @ref mne::LayoutMaker is the counterpart of
+ * @ref mne::LayoutLoader "LayoutLoader": given the 3-D coordinates of an
  * EEG cap (typically captured with the Polhemus digitizer or
  * loaded from a vendor @c .elc file) it produces the 2-D
  * channel layout used by every topographic widget in
  * mne-cpp — butterfly plots, sensor maps, time-frequency
- * heatmaps in DISPLIB and DISP3DLIB.
+ * heatmaps in mne_disp and mne_disp3D.
  *
  * As in MNE-C @c mne_make_eeg_layout, a sphere is fitted to the
- * points (@ref MATHLIB::Sphere::fit_sphere_simplex) and every
+ * points (@ref mne::Sphere::fit_sphere_simplex) and every
  * electrode is mapped by an azimuthal equidistant projection
  * around the sphere apex. Optional mirroring flags exist for
  * caps whose left/right convention differs from MNE's defaults.
@@ -50,10 +50,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CHANNELSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CHANNELSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -108,10 +108,10 @@ public:
      */
     static bool write_lout(const std::filesystem::path& path,
                            std::span<const Eigen::Vector2d> corners,
-                           const BASELIB::StringList& names,
+                           const mne::StringList& names,
                            const LayoutOptions& options = {});
 };
 
-} // namespace CHANNELSLIB
+} // namespace mne
 
 #endif // CHANNELS_LAYOUTMAKER_H

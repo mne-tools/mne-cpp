@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref MLLIB::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
+ * @brief    Implementation of @ref mne::MlOnnxModel including session creation, IO-binding cache and zero-copy predict.
  *
  * The translation unit isolates every direct dependency on the ONNX
  * Runtime C++ API behind @c \#ifdef @c MNE_USE_ONNXRUNTIME, so the
  * library object is buildable even when ORT is absent. The single
- * static @c Ort::Env returned by @ref MLLIB::MlOnnxModel::ortEnv is
+ * static @c Ort::Env returned by @ref mne::MlOnnxModel::ortEnv is
  * shared by all sessions in the process; per-instance @c Ort::Session
  * and @c Ort::MemoryInfo are held in @c std::unique_ptr so the
  * destructor must live in this TU (the forward-declared Ort types are
@@ -23,7 +23,7 @@
  * memory patterns to keep peak RSS small, and caches input/output node
  * names and shapes once so @c predict only pays for the actual
  * @c Session::Run call. @c predict builds a zero-copy @c Ort::Value over
- * the @ref MLLIB::MlTensor buffer, runs the session, and copies the
+ * the @ref mne::MlTensor buffer, runs the session, and copies the
  * first output back into an owning tensor. @c save is intentionally a
  * no-op: ONNX graphs are produced by their training framework, not by
  * this thin inference wrapper.
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MLLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -143,7 +143,7 @@ MlTensor MlOnnxModel::predict(const MlTensor& input) const
 
 bool MlOnnxModel::save(const std::string& /*path*/) const
 {
-    BASELIB::Log::warning("MlOnnxModel::save – ONNX models cannot be saved from this interface.");
+    mne::Log::warning("MlOnnxModel::save – ONNX models cannot be saved from this interface.");
     return false;
 }
 
@@ -154,10 +154,10 @@ bool MlOnnxModel::load(const std::string& path)
 #ifdef MNE_USE_ONNXRUNTIME
     m_modelPath = path;
 
-    const std::filesystem::path file = BASELIB::pathFromUtf8(path);
+    const std::filesystem::path file = mne::pathFromUtf8(path);
     std::error_code ec;
     if (!std::filesystem::exists(file, ec)) {
-        BASELIB::Log::warning("MlOnnxModel::load – File does not exist: {}", path);
+        mne::Log::warning("MlOnnxModel::load – File does not exist: {}", path);
         return false;
     }
 
@@ -203,17 +203,17 @@ bool MlOnnxModel::load(const std::string& path)
             m_outputNames.emplace_back(namePtr.get());
         }
 
-        BASELIB::Log::debug("MlOnnxModel::load – Session created for {} ({} inputs, {} outputs)", path, numInputs, numOutputs);
+        mne::Log::debug("MlOnnxModel::load – Session created for {} ({} inputs, {} outputs)", path, numInputs, numOutputs);
         return true;
 
     } catch (const Ort::Exception& e) {
-        BASELIB::Log::warning("MlOnnxModel::load – ORT error: {}", e.what());
+        mne::Log::warning("MlOnnxModel::load – ORT error: {}", e.what());
         m_session.reset();
         return false;
     }
 #else
     m_modelPath = path;
-    BASELIB::Log::warning("MlOnnxModel::load – Path stored but no ONNX Runtime session created (build with -DUSE_ONNXRUNTIME=ON).");
+    mne::Log::warning("MlOnnxModel::load – Path stored but no ONNX Runtime session created (build with -DUSE_ONNXRUNTIME=ON).");
     return false;
 #endif
 }

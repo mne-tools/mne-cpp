@@ -36,18 +36,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeEvokedSet;
 class RealTimeSampleArrayChInfo;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class EvokedSetModel;
 class ButterflyView;
@@ -61,14 +61,14 @@ class QLabel;
 class QToolBox;
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -115,7 +115,7 @@ public:
      *
      * @param[in] pMeasurement  pointer to measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -152,13 +152,13 @@ private:
      */
     bool virtual eventFilter(QObject* object, QEvent* event);
 
-    std::shared_ptr<DISPLIB::EvokedSetModel> m_pEvokedSetModel;             /**< RTE data model. */
-    QSharedPointer<SCMEASLIB::RealTimeEvokedSet> m_pRTESet;                 /**< The real-time evoked measurement. */
-    std::shared_ptr<DISPLIB::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
-    std::shared_ptr<DISPLIB::ChannelInfoModel> m_pChannelInfoModel;         /**< Channel info model. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;                         /**< FiffInfo, which is used instead of ListChInfo*/
-    QPointer<DISPLIB::AverageLayoutView> m_pAverageLayoutView;              /**< 2D layout view for plotting averages*/
-    QPointer<DISPLIB::ButterflyView> m_pButterflyView;                      /**< Butterfly plot. */
+    std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedSetModel;             /**< RTE data model. */
+    QSharedPointer<mne::scan::RealTimeEvokedSet> m_pRTESet;                   /**< The real-time evoked measurement. */
+    std::shared_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
+    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< Channel info model. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                               /**< FiffInfo, which is used instead of ListChInfo*/
+    QPointer<mne::disp::AverageLayoutView> m_pAverageLayoutView;              /**< 2D layout view for plotting averages*/
+    QPointer<mne::disp::ButterflyView> m_pButterflyView;                      /**< Butterfly plot. */
 
     QList<qint32> m_qListCurrentSelection; /**< Current selection list -> hack around C++11 lambda . */
 
@@ -172,6 +172,6 @@ private:
 signals:
     void windowSizeChanged(int iWindowSize);
 };
-} // NAMESPACE SCDISPLIB
+} // NAMESPACE mne::scan
 
 #endif // REALTIMEEVOKEDSETWIDGET_H

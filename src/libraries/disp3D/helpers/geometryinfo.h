@@ -10,22 +10,22 @@
  * @brief    Surface-constrained geodesic distance and sensor-to-mesh projection helpers.
  *
  * GeometryInfo provides the geometric kernels that drive every
- * smooth source / sensor overlay in disp3D. @ref DISP3DLIB::GeometryInfo::scdc "scdc" runs a
+ * smooth source / sensor overlay in disp3D. @ref mne::disp::GeometryInfo::scdc "scdc" runs a
  * multi-source Dijkstra on the surface adjacency graph to compute
  * geodesic (surface-constrained) distances from a set of seed
  * vertices to all vertices on the mesh; the result is used by
- * @ref DISP3DLIB::Interpolation to build a sparse weight matrix that propagates
+ * @ref mne::disp::Interpolation to build a sparse weight matrix that propagates
  * source / sensor values across the cortex without crossing sulci.
  *
- * @ref DISP3DLIB::GeometryInfo::scdcInterpolationMat "scdcInterpolationMat" fuses the Dijkstra pass and the
+ * @ref mne::disp::GeometryInfo::scdcInterpolationMat "scdcInterpolationMat" fuses the Dijkstra pass and the
  * weight-matrix construction so the dense distance table is never
  * materialised &mdash; essential for high-resolution ico-5 source spaces
  * where the dense table would exceed several gigabytes.
  *
- * @ref DISP3DLIB::GeometryInfo::projectSensors "projectSensors" performs Euclidean nearest-vertex projection
+ * @ref mne::disp::GeometryInfo::projectSensors "projectSensors" performs Euclidean nearest-vertex projection
  * for MEG / EEG sensors onto the head or helmet mesh; @ref
- * DISP3DLIB::GeometryInfo::filterBadChannels "filterBadChannels" prunes columns of the distance table for
- * channels marked bad in the @ref FIFFLIB::FiffInfo.
+ * mne::disp::GeometryInfo::filterBadChannels "filterBadChannels" prunes columns of the distance table for
+ * channels marked bad in the @ref mne::FiffInfo.
  */
 
 #ifndef GEOMETRYINFO_H
@@ -66,7 +66,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 #define FLOAT_INFINITY std::numeric_limits<float>::infinity()
@@ -146,7 +146,7 @@ public:
      * @return Column indices of the bad channels that were found.
      */
     static Eigen::VectorXi filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                             const FIFFLIB::FiffInfo& fiffInfo,
+                                             const mne::FiffInfo& fiffInfo,
                                              qint32 iSensorType);
 
 protected:
@@ -175,6 +175,6 @@ double GeometryInfo::squared(double dBase)
     return dBase * dBase;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // GEOMETRYINFO_H

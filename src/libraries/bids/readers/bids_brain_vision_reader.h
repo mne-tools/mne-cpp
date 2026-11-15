@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    @ref BIDSLIB::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
+ * @brief    @ref mne::AbstractFormatReader implementation for the BrainVision ``.vhdr / .vmrk / .eeg`` triplet.
  *
  * BrainVision is the de-facto wire format for sEEG / ECoG / scalp-EEG
  * recordings shared as BIDS datasets: an ASCII @c .vhdr describing
@@ -18,12 +18,12 @@
  * out either @c MULTIPLEXED (channels interleaved at every time point)
  * or @c VECTORIZED (one contiguous channel after another).
  *
- * @ref BIDSLIB::BrainVisionReader parses the @c .vhdr / @c .vmrk once
- * on @ref BIDSLIB::BrainVisionReader::open, then services arbitrary
+ * @ref mne::BrainVisionReader parses the @c .vhdr / @c .vmrk once
+ * on @ref mne::BrainVisionReader::open, then services arbitrary
  * segment reads by seeking into the still-open @c .eeg file and
  * applying the per-channel @c resolution / unit scaling so callers
  * always see physical-unit values. The auxiliary @ref
- * BIDSLIB::BrainVisionMarker and @ref BIDSLIB::BrainVisionChannelInfo
+ * mne::BrainVisionMarker and @ref mne::BrainVisionChannelInfo
  * structs expose the parsed header data unchanged for callers that
  * want to convert markers into BIDS events or channels into
  * @c _channels.tsv rows.
@@ -57,16 +57,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 class FileByteStream;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -100,7 +100,7 @@ struct BIDSSHARED_EXPORT BrainVisionChannelInfo
     std::string unit;       /**< Physical unit in UTF-8 (e.g. "µV", "V"). */
 
     /** @return The FIFF channel description: kind from the name and unit, calibration from the resolution. */
-    FIFFLIB::FiffChInfo to_fiff_ch_info() const;
+    mne::FiffChInfo to_fiff_ch_info() const;
 };
 
 //=============================================================================================================
@@ -142,7 +142,7 @@ public:
     ~BrainVisionReader() override;
 
     bool open(const std::filesystem::path& path) override;
-    FIFFLIB::FiffInfo info() const override;
+    mne::FiffInfo info() const override;
     Eigen::MatrixXf read_raw_segment(long first, long last) const override;
     long sample_count() const override;
     float sfreq() const override;
@@ -193,9 +193,9 @@ private:
     std::vector<BrainVisionMarker> m_markers;
     std::optional<std::chrono::sys_time<std::chrono::microseconds>> m_measDate; /**< Date of the first dated New Segment marker. */
 
-    std::unique_ptr<BASELIB::FileByteStream> m_dataFile;
+    std::unique_ptr<mne::FileByteStream> m_dataFile;
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_BRAIN_VISION_READER_H

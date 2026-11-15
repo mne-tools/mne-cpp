@@ -12,7 +12,7 @@
  * @brief    Labelled QProgressBar with an automatic show / hide behaviour.
  *
  * ProgressView combines a description label and a @c QProgressBar in a
- * single small widget and is the standard way DISPLIB plugins report
+ * single small widget and is the standard way mne_disp plugins report
  * the state of long-running jobs (recording write-out, BEM solving,
  * filter design …). It auto-hides when the value reaches 100 % unless
  * the caller opts out.
@@ -40,17 +40,17 @@ class ProgressViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
 /**
  * @brief Labelled @c QProgressBar with optional auto-hide on completion.
  *
- * Standard progress widget used by DISPLIB plugins to report
+ * Standard progress widget used by mne_disp plugins to report
  * long-running jobs (BEM solving, recording write-out, …).
  */
 class DISPSHARED_EXPORT ProgressView : public AbstractView

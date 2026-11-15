@@ -13,7 +13,7 @@
  * disp3D &mdash; subdivided icosahedron spheres for source-space and
  * digitizer points, oriented plates for MEG magnetometers, barbell
  * shapes for gradiometers, cylinders for sensor leads and connectivity
- * edges. Each primitive is returned as a fully populated @ref DISP3DLIB::BrainSurface
+ * edges. Each primitive is returned as a fully populated @ref mne::disp::BrainSurface
  * with interleaved position / normal / colour vertex data so it
  * drops straight into the standard render pipeline.
  *
@@ -39,7 +39,7 @@
 #include <Eigen/Core>
 #include <memory>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -161,6 +161,6 @@ private:
                                int subdivisions);
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // MESHFACTORY_H

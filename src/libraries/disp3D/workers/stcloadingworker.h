@@ -11,14 +11,14 @@
  *
  * StcLoadingWorker pulls the LH and RH @c .stc files from disk in a
  * background thread, parses them into an @ref
- * INVLIB::InvSourceEstimate per hemisphere and builds the sparse
+ * mne::InvSourceEstimate per hemisphere and builds the sparse
  * vertex-to-source interpolation matrix using
- * @ref DISP3DLIB::GeometryInfo::scdc "GeometryInfo::scdc" / @ref DISP3DLIB::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
+ * @ref mne::disp::GeometryInfo::scdc "GeometryInfo::scdc" / @ref mne::disp::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * with a configurable geodesic cancel distance.
  *
  * On completion the controller signals the GUI to attach the data
  * to the cortical surfaces, after which scrubbing and playback are
- * served by @ref DISP3DLIB::SourceEstimateOverlay without any further I/O.
+ * served by @ref mne::disp::SourceEstimateOverlay without any further I/O.
  */
 
 #ifndef STCLOADINGWORKER_H
@@ -41,7 +41,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -88,7 +88,7 @@ public:
      *
      * @return The left hemisphere source estimate.
      */
-    const INVLIB::InvSourceEstimate& stcLh() const
+    const mne::InvSourceEstimate& stcLh() const
     {
         return m_stcLh;
     }
@@ -99,7 +99,7 @@ public:
      *
      * @return The right hemisphere source estimate.
      */
-    const INVLIB::InvSourceEstimate& stcRh() const
+    const mne::InvSourceEstimate& stcRh() const
     {
         return m_stcRh;
     }
@@ -213,16 +213,16 @@ private:
     BrainSurface* m_rhSurface; /**< Pointer to RH surface. */
     double m_cancelDist;       /**< Cancel distance for interpolation. */
 
-    INVLIB::InvSourceEstimate m_stcLh; /**< Loaded LH source estimate. */
-    INVLIB::InvSourceEstimate m_stcRh; /**< Loaded RH source estimate. */
-    bool m_hasLh = false;              /**< Flag indicating LH data loaded. */
-    bool m_hasRh = false;              /**< Flag indicating RH data loaded. */
+    mne::InvSourceEstimate m_stcLh; /**< Loaded LH source estimate. */
+    mne::InvSourceEstimate m_stcRh; /**< Loaded RH source estimate. */
+    bool m_hasLh = false;           /**< Flag indicating LH data loaded. */
+    bool m_hasRh = false;           /**< Flag indicating RH data loaded. */
 
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
     QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
     std::atomic<bool> m_cancelled{false};                     /**< Cancellation flag. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // STCLOADINGWORKER_H

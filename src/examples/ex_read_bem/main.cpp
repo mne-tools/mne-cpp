@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // MAIN
@@ -52,7 +52,7 @@ using namespace MNELIB;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

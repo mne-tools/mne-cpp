@@ -16,7 +16,7 @@
  * DraggableFramelessWidget removes the native window frame and
  * implements the mouse-press / mouse-move handlers needed to move
  * the window with the cursor. It is the base class of
- * @ref DISPLIB::QuickControlView and any other floating popup that wants to
+ * @ref mne::disp::QuickControlView and any other floating popup that wants to
  * look like an in-app palette rather than a system window.
  */
 
@@ -40,14 +40,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -142,6 +142,6 @@ private:
     bool m_bDraggable;     /**< Flag specifying whether this widget is draggable. */
     bool m_bMousePressed;  /**< Flag specifying whether this widget is draggable. */
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // DRAGGABLEFRAMELESSWIDGET_H

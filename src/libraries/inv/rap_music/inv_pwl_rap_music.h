@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
  *
- * @ref INVLIB::InvPwlRapMusic derives from @ref INVLIB::InvRapMusic and
+ * @ref mne::InvPwlRapMusic derives from @ref mne::InvRapMusic and
  * overrides the pair-scanning step with a Powell direction-set
  * optimiser, drastically reducing the number of leadfield evaluations
  * per iteration on dense grids. All other behaviour — signal-subspace
@@ -45,10 +45,10 @@
 #include <Eigen/LU>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    InvPwlRapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    InvPwlRapMusic(mne::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~InvPwlRapMusic();
 
@@ -93,7 +93,7 @@ public:
      *
      * @return
      */
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const mne::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
     //=========================================================================================================
     /**

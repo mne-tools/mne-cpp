@@ -17,7 +17,7 @@
  * giving a denoising / smoothing projector that is the spatial-domain analogue
  * of a low-pass filter.
  *
- * @ref DSPLIB::makeSpharaProjector "makeSpharaProjector" assembles the dense @c (iOperatorDim × iOperatorDim)
+ * @ref mne::makeSpharaProjector "makeSpharaProjector" assembles the dense @c (iOperatorDim × iOperatorDim)
  * projection matrix from a stack of pre-computed basis functions. The
  * @c vecIndices argument maps the rows of the basis-function matrix back to
  * channel indices in the full data matrix, and @c iSkip lets a single basis
@@ -45,10 +45,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -73,6 +73,6 @@ DSPSHARED_EXPORT Eigen::MatrixXd makeSpharaProjector(const Eigen::MatrixXd& matB
                                                      int iNBaseFct,
                                                      int iSkip = 0);
 
-} // NAMESPACE DSPLIB
+} // NAMESPACE mne_dsp
 
 #endif // SPHARA_UTILS_H

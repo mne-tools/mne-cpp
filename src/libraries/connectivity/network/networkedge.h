@@ -10,11 +10,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Weighted edge between two nodes of a @ref CONNECTIVITYLIB::Network; stores the full per-frequency weight matrix and the scalar band-averaged weight.
+ * @brief    Weighted edge between two nodes of a @ref mne::Network; stores the full per-frequency weight matrix and the scalar band-averaged weight.
  *
- * Every functional-connectivity estimator in @c CONNECTIVITYLIB produces one
- * @ref CONNECTIVITYLIB::NetworkEdge per ordered channel pair (or per unordered pair for
- * symmetric metrics) and adds it to the @ref CONNECTIVITYLIB::Network. The edge owns
+ * Every functional-connectivity estimator in @c mne_connectivity produces one
+ * @ref mne::NetworkEdge per ordered channel pair (or per unordered pair for
+ * symmetric metrics) and adds it to the @ref mne::Network. The edge owns
  * the full weight matrix returned by the metric - one row per frequency bin -
  * and an inclusive @c [first, last] frequency-bin window that reduces the
  * matrix to the single scalar @c weight used by thresholding and display.
@@ -38,10 +38,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -169,6 +169,6 @@ private:
     bool m_active = true;       /**< Whether the edge passes the network threshold. */
 };
 
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // NETWORKEDGE_H

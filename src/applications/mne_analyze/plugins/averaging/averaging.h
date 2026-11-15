@@ -36,7 +36,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class FiffRawViewModel;
 class AbstractModel;
@@ -44,7 +44,7 @@ class AveragingDataModel;
 class Communicator;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class AveragingSettingsView;
 class ChannelSelectionView;
@@ -55,7 +55,7 @@ class ButterflyView;
 class SelectionItem;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvokedSet;
 class FiffEvoked;
@@ -80,12 +80,12 @@ namespace AVERAGINGPLUGIN
  *
  * @brief The averaging class provides a plugin for computing averages.
  */
-class AVERAGINGSHARED_EXPORT Averaging : public ANSHAREDLIB::AbstractPlugin
+class AVERAGINGSHARED_EXPORT Averaging : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "averaging.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -111,8 +111,8 @@ public:
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
 
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 signals:
     //=========================================================================================================
@@ -128,7 +128,7 @@ private:
      *
      * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -136,14 +136,14 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
      * @brief onNewAveragingModel
      * @param pAveragingModel.
      */
-    void onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAveragingModel);
+    void onNewAveragingModel(QSharedPointer<mne::analyze::AveragingDataModel> pAveragingModel);
 
     //=========================================================================================================
     /**
@@ -221,10 +221,10 @@ private:
      *
      * @return Retruns FiffEvoked setwith averaged data.
      */
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> averageCalculation(const FIFFLIB::FiffRawData& pFiffRaw,
-                                                               MatrixXi matEvents,
-                                                               DSPLIB::FilterKernel filterKernel,
-                                                               FIFFLIB::FiffInfo fiffInfo);
+    std::shared_ptr<mne::FiffEvokedSet> averageCalculation(const mne::FiffRawData& pFiffRaw,
+                                                           MatrixXi matEvents,
+                                                           mne::FilterKernel filterKernel,
+                                                           mne::FiffInfo fiffInfo);
 
     //=========================================================================================================
     /**
@@ -242,7 +242,7 @@ private:
     /**
      *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
      */
-    void loadFullGui(std::shared_ptr<FIFFLIB::FiffInfo> pInfo);
+    void loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo);
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ private:
      *
      * @param pViewParams.
      */
-    void setViewSettings(ANSHAREDLIB::ViewParameters viewParams);
+    void setViewSettings(mne::analyze::ViewParameters viewParams);
 
     //=========================================================================================================
     /**
@@ -294,17 +294,17 @@ private:
 
     void updateEvokedSetModel();
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pFiffRawModel;  /**< Pointer to currently loaded FiffRawView Model. */
-    QSharedPointer<QList<QPair<int, double>>> m_pTriggerList;       /**< Pointer to list of stim triggers. */
-    std::shared_ptr<DISPLIB::EvokedSetModel> m_pEvokedModel;        /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
-    std::shared_ptr<DISPLIB::ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to model that holds channel info data. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;                 /**< Pointer to info about loaded fiff data. */
+    QSharedPointer<mne::analyze::FiffRawViewModel> m_pFiffRawModel;   /**< Pointer to currently loaded FiffRawView Model. */
+    QSharedPointer<QList<QPair<int, double>>> m_pTriggerList;         /**< Pointer to list of stim triggers. */
+    std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedModel;        /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
+    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to model that holds channel info data. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                       /**< Pointer to info about loaded fiff data. */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;              /**< To broadcst signals. */
-    QPointer<DISPLIB::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
-    QPointer<DISPLIB::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
+    QPointer<mne::analyze::Communicator> m_pCommu;               /**< To broadcst signals. */
+    QPointer<mne::disp::ButterflyView> m_pButterflyView;         /**< The butterfly plot view. */
+    QPointer<mne::disp::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
 
-    DISPLIB::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
+    mne::disp::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
 
     float m_fBaselineFromS;    /**< Baseline start - in seconds relative to stim(0) - can be negative*/
     float m_fBaselineToS;      /**< Baseline end - in seconds relative to stim(0) - can be negative*/
@@ -322,10 +322,10 @@ private:
     bool m_bAutoRecompute;    /**< Whether to auto recompute averages */
     bool m_bSavingAverage;    /**< Whether to save average */
 
-    DSPLIB::FilterKernel m_filterKernel; /**< List of currently active filters. */
+    mne::FilterKernel m_filterKernel; /**< List of currently active filters. */
 
-    QFutureWatcher<std::shared_ptr<FIFFLIB::FiffEvokedSet>> m_FutureWatcher; /**< Future watcher for notifing of completed average calculations. */
-    QFuture<std::shared_ptr<FIFFLIB::FiffEvokedSet>> m_Future;               /**< Future for performing average calculations of separate thread. */
+    QFutureWatcher<std::shared_ptr<mne::FiffEvokedSet>> m_FutureWatcher; /**< Future watcher for notifing of completed average calculations. */
+    QFuture<std::shared_ptr<mne::FiffEvokedSet>> m_Future;               /**< Future for performing average calculations of separate thread. */
 
     QMutex m_ParameterMutex; /**< Mutex for thread-safing. */
 };

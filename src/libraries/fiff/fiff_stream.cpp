@@ -18,7 +18,7 @@
  * @brief    Implementation of @ref FiffStream: FIFF tag I/O, directory and block-tree construction, and the typed read_* / write_* methods.
  *
  * Owns one byte stream. Builds the directory and @ref FiffDirNode tree
- * on open; trades tag streams for typed FIFFLIB objects on read; emits
+ * on open; trades tag streams for typed mne_fiff objects on read; emits
  * spec-compliant FIFF on write. Files emitted here round-trip through
  * @c mne.io.fiff unchanged.
  */
@@ -79,11 +79,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using BASELIB::ErrorCode;
-using BASELIB::fail;
-using namespace MATHLIB;
-using namespace BASELIB;
+using namespace mne;
+using mne::ErrorCode;
+using mne::fail;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -92,13 +90,13 @@ using namespace Eigen;
 
 FiffStream::FiffStream(const std::filesystem::path& path)
 : m_path(path)
-, m_name(BASELIB::utf8FromPath(path))
+, m_name(mne::utf8FromPath(path))
 {
 }
 
 //=============================================================================================================
 
-FiffStream::FiffStream(std::unique_ptr<BASELIB::ByteStream> bytes, std::string name)
+FiffStream::FiffStream(std::unique_ptr<mne::ByteStream> bytes, std::string name)
 : m_bytes(std::move(bytes))
 , m_name(std::move(name))
 {
@@ -106,10 +104,10 @@ FiffStream::FiffStream(std::unique_ptr<BASELIB::ByteStream> bytes, std::string n
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffStream> FiffStream::open(const std::filesystem::path& path)
+mne::Expected<FiffStream> FiffStream::open(const std::filesystem::path& path)
 {
-    const std::string name = BASELIB::utf8FromPath(path);
-    auto bytes = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Read);
+    const std::string name = mne::utf8FromPath(path);
+    auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!bytes) {
         return fail(ErrorCode::Io, "Cannot open {}", name);
     }
@@ -124,12 +122,12 @@ BASELIB::Expected<FiffStream> FiffStream::open(const std::filesystem::path& path
 
 std::unique_ptr<FiffStream> FiffStream::start_file(const std::filesystem::path& path)
 {
-    auto bytes = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Write);
+    auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Write);
     if (!bytes) {
-        Log::warning("Cannot write to {}", BASELIB::utf8FromPath(path));
+        Log::warning("Cannot write to {}", mne::utf8FromPath(path));
         return {};
     }
-    return start_file(std::make_unique<FiffStream>(std::move(bytes), BASELIB::utf8FromPath(path)));
+    return start_file(std::make_unique<FiffStream>(std::move(bytes), mne::utf8FromPath(path)));
 }
 
 //=============================================================================================================
@@ -153,7 +151,7 @@ FiffStream& FiffStream::operator=(FiffStream&&) noexcept = default;
 
 //=============================================================================================================
 
-BASELIB::ByteStream& FiffStream::byte_stream() const
+mne::ByteStream& FiffStream::byte_stream() const
 {
     return *m_bytes;
 }
@@ -172,7 +170,7 @@ bool FiffStream::reopen()
     if (is_open())
         return true;
     if (!m_bytes && !m_path.empty()) {
-        m_bytes = BASELIB::FileByteStream::open(m_path, BASELIB::FileByteStream::Mode::Read);
+        m_bytes = mne::FileByteStream::open(m_path, mne::FileByteStream::Mode::Read);
         return m_bytes != nullptr;
     }
     return m_bytes && m_bytes->reopen();
@@ -536,8 +534,8 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
     std::vector<float> onsets;
     std::vector<float> ends;
     std::vector<std::string> descriptions;
-    BASELIB::JsonDocument channelNames;
-    BASELIB::JsonDocument extras;
+    mne::JsonDocument channelNames;
+    mne::JsonDocument extras;
     std::optional<FiffTag> tag;
     for (const FiffDirEntry& entry : blocks.front()->dir) {
         if (tag = this->read_tag(entry.pos); !tag) {
@@ -553,7 +551,7 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
             case FIFF_COMMENT:
                 // Unlike channel name lists, descriptions keep spaces; colons inside them are stored as {COLON}.
                 if (!tag->to_string().empty()) {
-                    for (std::string& name : BASELIB::split(tag->to_string(), ':')) {
+                    for (std::string& name : mne::split(tag->to_string(), ':')) {
                         for (std::size_t at = name.find("{COLON}"); at != std::string::npos; at = name.find("{COLON}", at + 1)) {
                             name.replace(at, 7, ":");
                         }
@@ -572,10 +570,10 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
                 }
                 break;
             case FIFF_MNE_EPOCHS_DROP_LOG:
-                channelNames = BASELIB::JsonDocument::from_json(tag->to_string());
+                channelNames = mne::JsonDocument::from_json(tag->to_string());
                 break;
             case FIFF_FREE_LIST:
-                extras = BASELIB::JsonDocument::from_json(tag->to_string());
+                extras = mne::JsonDocument::from_json(tag->to_string());
                 break;
             default:
                 break;
@@ -602,8 +600,8 @@ fiff_long_t FiffStream::write_annotations(const FiffAnnotations& annotations, co
     std::vector<float> onsets;
     std::vector<float> ends;
     std::string descriptions;
-    BASELIB::JsonArray channelNames;
-    BASELIB::JsonArray extras;
+    mne::JsonArray channelNames;
+    mne::JsonArray extras;
     channelNames.reserve(annotations.size());
     extras.reserve(annotations.size());
     bool anyChannels = false;
@@ -630,10 +628,10 @@ fiff_long_t FiffStream::write_annotations(const FiffAnnotations& annotations, co
         write_double(FIFF_MEAS_DATE, stamp, 2);
     }
     if (anyChannels) {
-        write_string(FIFF_MNE_EPOCHS_DROP_LOG, BASELIB::JsonDocument(std::move(channelNames)).to_json(BASELIB::JsonDocument::Compact));
+        write_string(FIFF_MNE_EPOCHS_DROP_LOG, mne::JsonDocument(std::move(channelNames)).to_json(mne::JsonDocument::Compact));
     }
     if (anyExtras) {
-        write_string(FIFF_FREE_LIST, BASELIB::JsonDocument(std::move(extras)).to_json(BASELIB::JsonDocument::Compact));
+        write_string(FIFF_FREE_LIST, mne::JsonDocument(std::move(extras)).to_json(mne::JsonDocument::Compact));
     }
     end_block(FIFFB_MNE_ANNOTATIONS);
     return pos;
@@ -1016,7 +1014,7 @@ std::vector<FiffCtfComp> FiffStream::read_ctf_comp(const std::shared_ptr<FiffDir
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffDigitizerData> FiffStream::read_digitizer_data(const std::shared_ptr<FiffDirNode>& node)
+mne::Expected<FiffDigitizerData> FiffStream::read_digitizer_data(const std::shared_ptr<FiffDirNode>& node)
 {
     FiffDigitizerData dig;
     std::vector<std::shared_ptr<FiffDirNode>> blocks = node->dir_tree_find(FIFFB_ISOTRAK);
@@ -1032,7 +1030,7 @@ BASELIB::Expected<FiffDigitizerData> FiffStream::read_digitizer_data(const std::
             }
             const std::optional<FiffTag> tag = this->read_tag(entry.pos);
             if (!tag) {
-                return BASELIB::fail(BASELIB::ErrorCode::Format, "cannot read the digitizer tag at {} of {}", entry.pos, this->stream_name());
+                return mne::fail(mne::ErrorCode::Format, "cannot read the digitizer tag at {} of {}", entry.pos, this->stream_name());
             }
             if (entry.kind == FIFF_DIG_POINT) {
                 dig.points.push_back(tag->to_dig_point());
@@ -1042,12 +1040,12 @@ BASELIB::Expected<FiffDigitizerData> FiffStream::read_digitizer_data(const std::
         }
     }
     if (dig.points.empty()) {
-        return BASELIB::fail(BASELIB::ErrorCode::NotFound, "no digitizer points in {}", this->stream_name());
+        return mne::fail(mne::ErrorCode::NotFound, "no digitizer points in {}", this->stream_name());
     }
     for (FiffDigPoint& point : dig.points) {
         point.coord_frame = dig.coord_frame;
     }
-    dig.filename = BASELIB::pathFromUtf8(this->stream_name());
+    dig.filename = mne::pathFromUtf8(this->stream_name());
     dig.active.assign(dig.points.size(), true);
     dig.discard.assign(dig.points.size(), false);
     return dig;
@@ -1782,7 +1780,7 @@ std::optional<FiffTag> FiffStream::read_tag(fiff_long_t pos)
 
 StringList FiffStream::split_name_list(std::string_view p_sNameList)
 {
-    return BASELIB::split(p_sNameList, ':', true);
+    return mne::split(p_sNameList, ':', true);
 }
 
 //=============================================================================================================
@@ -1794,7 +1792,7 @@ fiff_long_t FiffStream::start_block(fiff_int_t kind)
 
 //=============================================================================================================
 
-std::unique_ptr<FiffStream> FiffStream::start_file(std::unique_ptr<BASELIB::ByteStream> bytes)
+std::unique_ptr<FiffStream> FiffStream::start_file(std::unique_ptr<mne::ByteStream> bytes)
 {
     return bytes ? start_file(std::make_unique<FiffStream>(std::move(bytes))) : nullptr;
 }
@@ -1803,13 +1801,13 @@ std::unique_ptr<FiffStream> FiffStream::start_file(std::unique_ptr<BASELIB::Byte
 
 std::unique_ptr<FiffStream> FiffStream::open_update(const std::filesystem::path& path)
 {
-    const std::string name = BASELIB::utf8FromPath(path);
-    auto bytes = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::ReadWrite);
+    const std::string name = mne::utf8FromPath(path);
+    auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::ReadWrite);
     if (!bytes) {
         Log::critical("Cannot open {} for update", name);
         return nullptr;
     }
-    BASELIB::FileByteStream& file = *bytes;
+    mne::FileByteStream& file = *bytes;
     auto stream = std::make_unique<FiffStream>(std::move(bytes), name);
     if (!stream->open()) {
         return nullptr;
@@ -1858,7 +1856,7 @@ std::unique_ptr<FiffStream> FiffStream::start_writing_raw(const std::filesystem:
 
 //=============================================================================================================
 
-std::unique_ptr<FiffStream> FiffStream::start_writing_raw(std::unique_ptr<BASELIB::ByteStream> bytes,
+std::unique_ptr<FiffStream> FiffStream::start_writing_raw(std::unique_ptr<mne::ByteStream> bytes,
                                                           const FiffInfo& info,
                                                           RowVectorXd& cals,
                                                           MatrixXi sel,
@@ -1918,7 +1916,7 @@ std::unique_ptr<FiffStream> FiffStream::start_writing_raw(std::unique_ptr<FiffSt
     bool have_hpi_result = false;
     bool have_isotrak = false;
     if (blocks.size() > 0 && !info.filename.empty()) {
-        FiffStream source(BASELIB::pathFromUtf8(info.filename));
+        FiffStream source(mne::pathFromUtf8(info.filename));
 
         if (!source.open()) {
             Log::warning("Cannot copy the measurement blocks of {} ; writing the info without them", info.filename);
@@ -2848,7 +2846,7 @@ fiff_long_t FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
 
 fiff_long_t FiffStream::write_name_list(fiff_int_t kind, const StringList& data)
 {
-    return this->write_string(kind, BASELIB::join(data, ":"));
+    return this->write_string(kind, mne::join(data, ":"));
 }
 
 //=============================================================================================================

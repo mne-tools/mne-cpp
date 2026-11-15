@@ -37,8 +37,8 @@
 #include <QTextStream>
 
 using namespace ELECTRODESPLUGIN;
-using namespace DISP3DLIB;
-using namespace IEEGLIB;
+using namespace mne::disp;
+using namespace mne;
 
 namespace
 {
@@ -59,11 +59,11 @@ bool writeMgh(const QString& path, const Eigen::Vector3f& cRas)
     QDataStream stream(&data, QIODevice::WriteOnly);
     stream.setByteOrder(QDataStream::BigEndian);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-    stream << qint32(MRILIB::MRI_MGH_VERSION) << qint32(2) << qint32(2) << qint32(2) << qint32(1) << qint32(MRILIB::MRI_UCHAR) << qint32(0);
+    stream << qint32(mne::MRI_MGH_VERSION) << qint32(2) << qint32(2) << qint32(2) << qint32(1) << qint32(mne::MRI_UCHAR) << qint32(0);
     stream << qint16(1) << 1.0f << 1.0f << 1.0f;
     stream << -1.0f << 0.0f << 0.0f << 0.0f << 0.0f << -1.0f << 0.0f << 1.0f << 0.0f;
     stream << cRas.x() << cRas.y() << cRas.z();
-    data.append(QByteArray(MRILIB::MRI_MGH_DATA_OFFSET - data.size() + 8, '\0'));
+    data.append(QByteArray(mne::MRI_MGH_DATA_OFFSET - data.size() + 8, '\0'));
     QFile file(path);
     return file.open(QIODevice::WriteOnly) && file.write(data) == data.size();
 }

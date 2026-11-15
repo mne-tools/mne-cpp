@@ -1,18 +1,18 @@
 ---
 id: figure-exporter
-title: "DISPLIB::FigureExporter"
+title: "mne::disp::FigureExporter"
 sidebar_label: FigureExporter
 sidebar_position: 70
 ---
 
 # FigureExporter
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/helpers/figureexporter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/helpers/figureexporter.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/helpers/figureexporter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/helpers/figureexporter.h)
 
 `#include <disp/figureexporter.h>`
 
 ```cpp
-class DISPLIB::FigureExporter
+class mne::disp::FigureExporter
 ```
 
 Writes captioned figures to `MNE_CPP_FIGURE_DIR`.
@@ -106,7 +106,7 @@ FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz 
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
-````cpp title="src/examples/ex_disp/main.cpp, line 193"
+````cpp title="src/examples/ex_disp/main.cpp, line 190"
 FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
 FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
 FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));

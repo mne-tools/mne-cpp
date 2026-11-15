@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Row/column-labelled dense matrix used wherever FIFF stores per-channel data.
  *
- * @ref MNELIB::MNENamedMatrix is the C++ port of @c fiff_named_matrix:
+ * @ref mne::MNENamedMatrix is the C++ port of @c fiff_named_matrix:
  * an Eigen dense matrix carrying explicit @c StringList row and column
  * names. Leadfields, SSP vectors, CTF compensators and many derived
  * matrices are stored in this form so callers can re-order or subset by
@@ -45,17 +45,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffStream;
 class FiffDirNode;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -74,7 +74,7 @@ namespace MNELIB
  *
  * All factory methods return @c std::unique_ptr<MNENamedMatrix> for clear ownership.
  *
- * @note This class is functionally similar to FIFFLIB::FiffNamedMatrix.
+ * @note This class is functionally similar to mne::FiffNamedMatrix.
  *       A future consolidation of both types is planned.
  *
  * @snippet ex_mne_api/main.cpp mne_ctf_comp_data_set_usage
@@ -111,8 +111,8 @@ public:
      *
      * @return A unique pointer to the read matrix, or @c nullptr on failure.
      */
-    static std::unique_ptr<MNENamedMatrix> read(FIFFLIB::FiffStream& stream,
-                                                const std::shared_ptr<FIFFLIB::FiffDirNode>& node,
+    static std::unique_ptr<MNENamedMatrix> read(mne::FiffStream& stream,
+                                                const std::shared_ptr<mne::FiffDirNode>& node,
                                                 int kind);
 
     //=========================================================================================================
@@ -155,6 +155,6 @@ public:
     Eigen::MatrixXf data; /**< Dense data matrix. */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNENAMEDMATRIX_H

@@ -40,8 +40,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
-using namespace LSLLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -310,7 +310,7 @@ stream_info stream_info::from_string(const std::string& data)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-double LSLLIB::local_clock()
+double mne::local_clock()
 {
     return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }

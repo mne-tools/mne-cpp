@@ -9,12 +9,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Common static knobs shared by every functional-connectivity estimator in @c CONNECTIVITYLIB.
+ * @brief    Common static knobs shared by every functional-connectivity estimator in @c mne_connectivity.
  *
- * Every metric in @c CONNECTIVITYLIB (Coherence, Imaginary Coherence, PLI, wPLI,
+ * Every metric in @c mne_connectivity (Coherence, Imaginary Coherence, PLI, wPLI,
  * dwPLI, USPLI, PLV, cross-correlation, Granger Causality, DTF, PDC) reads
- * the same global control flags from @ref CONNECTIVITYLIB::AbstractMetric so that the
- * dispatcher in @ref CONNECTIVITYLIB::compute_connectivity can decide once - before any FFT runs -
+ * the same global control flags from @ref mne::AbstractMetric so that the
+ * dispatcher in @ref mne::compute_connectivity can decide once - before any FFT runs -
  * whether intermediate per-trial spectra should be cached for reuse
  * (storage mode) and which frequency-bin window the metrics should
  * average over.
@@ -47,31 +47,31 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
 
 //=============================================================================================================
 /**
- * Static base for every estimator in @c CONNECTIVITYLIB. Holds the two pieces of
+ * Static base for every estimator in @c mne_connectivity. Holds the two pieces of
  * global state that the dispatcher (@ref compute_connectivity) must set
  * before any metric runs:
- *  - @c CONNECTIVITYLIB::AbstractMetric::m_bStorageModeIsActive "m_bStorageModeIsActive" enables caching of per-trial tapered
+ *  - @c mne::AbstractMetric::m_bStorageModeIsActive "m_bStorageModeIsActive" enables caching of per-trial tapered
  *    spectra and CSDs in @ref ConnectivitySettings::IntermediateTrialData,
  *    which lets a second metric reuse the FFT work done by the first.
- *  - @c CONNECTIVITYLIB::AbstractMetric::m_iNumberBinStart "m_iNumberBinStart" and @c CONNECTIVITYLIB::AbstractMetric::m_iNumberBinAmount "m_iNumberBinAmount" define the
+ *  - @c mne::AbstractMetric::m_iNumberBinStart "m_iNumberBinStart" and @c mne::AbstractMetric::m_iNumberBinAmount "m_iNumberBinAmount" define the
  *    frequency-bin window over which each metric averages its spectral
  *    output into the single scalar weight stored on each network edge.
  *
- * @brief Static control knobs (storage mode, frequency band) shared by all CONNECTIVITYLIB metrics.
+ * @brief Static control knobs (storage mode, frequency band) shared by all mne_connectivity metrics.
  *
  * @snippet ex_connectivity_metrics/main.cpp abstract_metric_band
  */
@@ -104,6 +104,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // ABSTRACTMETRIC_H

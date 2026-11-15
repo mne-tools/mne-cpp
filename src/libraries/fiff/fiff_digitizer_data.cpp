@@ -27,7 +27,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -40,7 +40,7 @@ FiffDigitizerData::FiffDigitizerData(const std::filesystem::path& path)
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffDigitizerData> FiffDigitizerData::read(const std::filesystem::path& path)
+mne::Expected<FiffDigitizerData> FiffDigitizerData::read(const std::filesystem::path& path)
 {
     auto stream = FiffStream::open(path);
     if (!stream) {
@@ -53,24 +53,24 @@ BASELIB::Expected<FiffDigitizerData> FiffDigitizerData::read(const std::filesyst
 
 void FiffDigitizerData::print() const
 {
-    BASELIB::Log::info("Number of digitizer points: {}", points.size());
+    mne::Log::info("Number of digitizer points: {}", points.size());
 
     switch (coord_frame) {
         case FIFFV_COORD_MRI:
-            BASELIB::Log::info("Coord. Frame: FIFFV_COORD_MRI");
+            mne::Log::info("Coord. Frame: FIFFV_COORD_MRI");
             break;
         case FIFFV_COORD_HEAD:
-            BASELIB::Log::info("Coord. Frame: FIFFV_COORD_HEAD");
+            mne::Log::info("Coord. Frame: FIFFV_COORD_HEAD");
             break;
     }
 
     for (auto& point : points) {
         if (point.kind == FIFFV_POINT_HPI) {
-            BASELIB::Log::info("HPI Point {} - {}, {}, {}", point.ident, point.r[0], point.r[1], point.r[2]);
+            mne::Log::info("HPI Point {} - {}, {}, {}", point.ident, point.r[0], point.r[1], point.r[2]);
         }
     }
 
-    BASELIB::Log::info("Number of MRI fiducials: {}", nfids());
+    mne::Log::info("Number of MRI fiducials: {}", nfids());
 }
 
 //=============================================================================================================

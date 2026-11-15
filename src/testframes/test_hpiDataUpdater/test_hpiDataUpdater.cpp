@@ -42,8 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -81,8 +80,8 @@ private:
     std::shared_ptr<FiffInfo> m_pFiffInfo;
     MatrixXd m_matData;
     MatrixXd m_matProjectors;
-    std::vector<FIFFLIB::FiffChInfo> m_lChannelsWithoutBads;
-    std::vector<FIFFLIB::FiffChInfo> m_lChannelsWithBads;
+    std::vector<mne::FiffChInfo> m_lChannelsWithoutBads;
+    std::vector<mne::FiffChInfo> m_lChannelsWithBads;
     QVector<int> m_vecInnerindWithBads;    /**< index of inner channels . */
     QVector<int> m_vecInnerindWithoutBads; /**< index of inner channels . */
 };
@@ -97,7 +96,7 @@ TestHpiDataUpdater::TestHpiDataUpdater()
 
 void TestHpiDataUpdater::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
@@ -124,7 +123,7 @@ void TestHpiDataUpdater::initTestCase()
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(BASELIB::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
+            if (!(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
                 m_lChannelsWithoutBads.push_back(m_pFiffInfo->chs[i]);
                 m_vecInnerindWithoutBads.append(i);
             }
@@ -140,7 +139,7 @@ void TestHpiDataUpdater::initTestCase()
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(BASELIB::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
+            if (!(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
                 m_lChannelsWithBads.push_back(m_pFiffInfo->chs[i]);
                 m_vecInnerindWithBads.append(i);
             }

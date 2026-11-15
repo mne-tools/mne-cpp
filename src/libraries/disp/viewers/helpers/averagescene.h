@@ -10,12 +10,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QGraphicsScene that lays @ref DISPLIB::AverageSceneItem mini-traces on the active sensor layout.
+ * @brief    QGraphicsScene that lays @ref mne::disp::AverageSceneItem mini-traces on the active sensor layout.
  *
- * AverageScene extends @ref DISPLIB::LayoutScene with the per-condition colour
+ * AverageScene extends @ref mne::disp::LayoutScene with the per-condition colour
  * table, the cached @c FiffInfo channel map and the dispatcher that
- * creates / refreshes one @ref DISPLIB::AverageSceneItem per visible sensor.
- * It is the data backbone of @ref DISPLIB::AverageLayoutView.
+ * creates / refreshes one @ref mne::disp::AverageSceneItem per visible sensor.
+ * It is the data backbone of @ref mne::disp::AverageLayoutView.
  */
 
 #ifndef AVERAGESCENE_H
@@ -38,10 +38,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ public:
      *
      * @param[in] selectedChannelItems     data about items which are to be painted.
      */
-    void repaintSelectionItems(const DISPLIB::SelectionItem& selectedChannelItems);
+    void repaintSelectionItems(const mne::disp::SelectionItem& selectedChannelItems);
 
     //=========================================================================================================
     /**
@@ -141,6 +141,6 @@ private:
 
     QList<SelectionSceneItem*> m_lSelectedChannelItems; /**< Holds the selected channels from the selection manager.*/
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // AverageScene_H

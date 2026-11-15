@@ -33,10 +33,10 @@
  * raw-1.fif, ...; split-01, split-02 for BIDS); annotations are written into the first part on stop().
  *
  * @code
- * auto device = ACQLIB::AcqDevice::open("synthetic://?eeg=32&sfreq=1000");
- * ACQLIB::AcqRecorderOptions options;
+ * auto device = mne::AcqDevice::open("synthetic://?eeg=32&sfreq=1000");
+ * mne::AcqRecorderOptions options;
  * options.device = device->description();
- * auto recorder = ACQLIB::AcqRecorder::start(device->stream(), "/data/session_raw.fif", options);
+ * auto recorder = mne::AcqRecorder::start(device->stream(), "/data/session_raw.fif", options);
  * device->start();
  * // ... acquire ...
  * device->stop();
@@ -64,10 +64,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -194,6 +194,6 @@ private:
 };
 ACQ_STD_MEMBERS_END
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_RECORDER_H

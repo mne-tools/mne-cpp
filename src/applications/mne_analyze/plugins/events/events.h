@@ -37,7 +37,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class FiffRawViewModel;
@@ -60,12 +60,12 @@ namespace EVENTSPLUGIN
  *
  * @brief The events class provides input and output capabilities for the fiff file format.
  */
-class EVENTSSHARED_EXPORT Events : public ANSHAREDLIB::AbstractPlugin
+class EVENTSSHARED_EXPORT Events : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "events.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -91,8 +91,8 @@ public:
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
 
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
@@ -101,7 +101,7 @@ private:
      *
      * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -109,7 +109,7 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
@@ -151,14 +151,14 @@ private:
      */
     void triggerLoadingEnd(const QString& sMessage);
 
-    QSharedPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
+    QSharedPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
 
 signals:
     void newEventAvailable(int iEvent);
     void disconnectFromModel();
-    void newEventModelAvailable(QSharedPointer<ANSHAREDLIB::EventModel> pAnnotModel);
-    void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
-    void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void newEventModelAvailable(QSharedPointer<mne::analyze::EventModel> pAnnotModel);
+    void newFiffRawViewModel(QSharedPointer<mne::analyze::FiffRawViewModel> pFiffRawModel);
+    void clearView(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 };
 
 } // NAMESPACE

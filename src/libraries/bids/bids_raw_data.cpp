@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsRawData — end-to-end BIDS raw-dataset read / write orchestration including all electrophysiology sidecars.
+ * @brief    Implementation of @ref mne::BidsRawData — end-to-end BIDS raw-dataset read / write orchestration including all electrophysiology sidecars.
  */
 
 //=============================================================================================================
@@ -41,8 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -81,7 +80,7 @@ constexpr BidsUnit bidsUnits[] = {
 /** FIFF unit of a channels.tsv unit as mne-bids UNITS_BIDS_TO_FIFF_MAP (unknown units are left alone); the multiplier keeps the stored unit for writing. */
 void bidsUnitToFiff(std::string_view sUnit, int& unit, int& unitMul)
 {
-    const std::string_view u = BASELIB::trimmed(sUnit);
+    const std::string_view u = mne::trimmed(sUnit);
     for (const BidsUnit& e : bidsUnits) {
         if (u == e.bids) {
             unit = e.unit;
@@ -122,7 +121,7 @@ void applyChannelsTsv(FiffInfo& info, const std::vector<BidsChannel>& channels)
 
         bidsUnitToFiff(rec->units, fiffCh.unit, fiffCh.unit_mul);
 
-        if (BASELIB::equalsIgnoreCase(rec->status, "bad"))
+        if (mne::equalsIgnoreCase(rec->status, "bad"))
             info.bads.push_back(fiffCh.ch_name);
     }
 }
@@ -139,9 +138,9 @@ void applyElectrodePositions(FiffInfo& info,
     const int coordFrame = bids_lookup(BIDS_COORD_TO_FIFF_FRAME, coordSystemName).value_or(FIFFV_COORD_UNKNOWN);
 
     float scaleFactor = 1.0f;
-    if (BASELIB::equalsIgnoreCase(coordUnits, "mm"))
+    if (mne::equalsIgnoreCase(coordUnits, "mm"))
         scaleFactor = 0.001f;
-    else if (BASELIB::equalsIgnoreCase(coordUnits, "cm"))
+    else if (mne::equalsIgnoreCase(coordUnits, "cm"))
         scaleFactor = 0.01f;
 
     // Ident = 1-based ordinal among electrode channels, the order buildElectrodeRecords() reads them back in
@@ -161,9 +160,9 @@ void applyElectrodePositions(FiffInfo& info,
         const auto ordinal = chOrdinal.find(elec.name);
         dp.kind = ordinal != chOrdinal.end() ? FIFFV_POINT_EEG : FIFFV_POINT_EXTRA;
         dp.ident = ordinal != chOrdinal.end() ? ordinal->second : extraIdent++;
-        dp.r[0] = static_cast<float>(BASELIB::toDouble(elec.x).value_or(0.0)) * scaleFactor;
-        dp.r[1] = static_cast<float>(BASELIB::toDouble(elec.y).value_or(0.0)) * scaleFactor;
-        dp.r[2] = static_cast<float>(BASELIB::toDouble(elec.z).value_or(0.0)) * scaleFactor;
+        dp.r[0] = static_cast<float>(mne::toDouble(elec.x).value_or(0.0)) * scaleFactor;
+        dp.r[1] = static_cast<float>(mne::toDouble(elec.y).value_or(0.0)) * scaleFactor;
+        dp.r[2] = static_cast<float>(mne::toDouble(elec.z).value_or(0.0)) * scaleFactor;
         dp.coord_frame = coordFrame;
 
         info.dig.push_back(dp);
@@ -171,10 +170,10 @@ void applyElectrodePositions(FiffInfo& info,
 }
 
 //=========================================================================================================
-BASELIB::JsonDocument readJsonFile(const std::filesystem::path& path)
+mne::JsonDocument readJsonFile(const std::filesystem::path& path)
 {
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
-    return text ? BASELIB::JsonDocument::from_json(*text) : BASELIB::JsonDocument();
+    const mne::Expected<std::string> text = mne::read_text_file(path);
+    return text ? mne::JsonDocument::from_json(*text) : mne::JsonDocument();
 }
 
 //=========================================================================================================
@@ -182,8 +181,8 @@ void readSidecarJson(const std::filesystem::path& path,
                      FiffInfo& info,
                      BidsRawData& data)
 {
-    const BASELIB::JsonDocument doc = readJsonFile(path);
-    const BASELIB::JsonObject& json = doc.object();
+    const mne::JsonDocument doc = readJsonFile(path);
+    const mne::JsonObject& json = doc.object();
     if (json.empty())
         return;
 
@@ -194,7 +193,7 @@ void readSidecarJson(const std::filesystem::path& path,
 
     const double sf = json.value("SamplingFrequency").to_double();
     if (sf > 0.0 && std::abs(info.sfreq - static_cast<float>(sf)) > 0.5f)
-        BASELIB::Log::warning("[BidsRawData::read] Sampling frequency mismatch: raw = {} sidecar = {}", info.sfreq, sf);
+        mne::Log::warning("[BidsRawData::read] Sampling frequency mismatch: raw = {} sidecar = {}", info.sfreq, sf);
 
     // Store independent metadata fields on BidsRawData
     data.ieegReference = json.value("iEEGReference").to_string();
@@ -339,10 +338,10 @@ std::vector<BidsElectrode> buildElectrodeRecords(const FiffInfo& info)
 }
 
 //=========================================================================================================
-BASELIB::JsonObject buildSidecarJson(const BidsRawData& data,
-                                     const BIDSPath& bidsPath)
+mne::JsonObject buildSidecarJson(const BidsRawData& data,
+                                 const BIDSPath& bidsPath)
 {
-    BASELIB::JsonObject json;
+    mne::JsonObject json;
     const FiffInfo& info = data.raw.info;
     const std::string& datatype = bidsPath.datatype();
 
@@ -464,11 +463,11 @@ bool fileExists(const std::filesystem::path& path)
 bool copyFile(const std::filesystem::path& src, const std::filesystem::path& dst, bool overwrite)
 {
     if (!fileExists(src)) {
-        BASELIB::Log::warning("[BidsRawData::write] Source file does not exist: {}", BASELIB::utf8FromPath(src));
+        mne::Log::warning("[BidsRawData::write] Source file does not exist: {}", mne::utf8FromPath(src));
         return false;
     }
     if (fileExists(dst) && !overwrite) {
-        BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", BASELIB::utf8FromPath(dst));
+        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8FromPath(dst));
         return false;
     }
     std::error_code error;
@@ -489,24 +488,24 @@ void replaceAll(std::string& text, std::string_view from, std::string_view to)
 /** The value after "key=" if @p line (trimmed) starts with it, compared case-insensitively. */
 std::optional<std::string_view> headerValue(std::string_view line, std::string_view key)
 {
-    line = BASELIB::trimmed(line);
-    if (line.size() < key.size() || !BASELIB::equalsIgnoreCase(line.substr(0, key.size()), key))
+    line = mne::trimmed(line);
+    if (line.size() < key.size() || !mne::equalsIgnoreCase(line.substr(0, key.size()), key))
         return std::nullopt;
-    return BASELIB::trimmed(line.substr(key.size()));
+    return mne::trimmed(line.substr(key.size()));
 }
 
 //=========================================================================================================
 bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& bidsPath, bool overwrite)
 {
-    const BASELIB::Expected<std::string> vhdrContent = BASELIB::read_text_file(srcVhdr);
+    const mne::Expected<std::string> vhdrContent = mne::read_text_file(srcVhdr);
     if (!vhdrContent) {
-        BASELIB::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", BASELIB::utf8FromPath(srcVhdr));
+        mne::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", mne::utf8FromPath(srcVhdr));
         return false;
     }
 
     std::string dataFileName;
     std::string markerFileName;
-    for (const std::string& line : BASELIB::split(*vhdrContent, '\n')) {
+    for (const std::string& line : mne::split(*vhdrContent, '\n')) {
         if (const auto value = headerValue(line, "DataFile="))
             dataFileName = *value;
         else if (const auto value = headerValue(line, "MarkerFile="))
@@ -529,35 +528,35 @@ bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& 
         replaceAll(vhdr, "MarkerFile=" + markerFileName, "MarkerFile=" + newMarkerFile);
 
     if (fileExists(dstVhdr) && !overwrite) {
-        BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", BASELIB::utf8FromPath(dstVhdr));
+        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8FromPath(dstVhdr));
         return false;
     }
-    if (!BASELIB::write_text_file(dstVhdr, vhdr)) {
-        BASELIB::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", BASELIB::utf8FromPath(dstVhdr));
+    if (!mne::write_text_file(dstVhdr, vhdr)) {
+        mne::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", mne::utf8FromPath(dstVhdr));
         return false;
     }
 
     if (!dataFileName.empty()) {
-        const std::filesystem::path srcData = srcDir / BASELIB::pathFromUtf8(dataFileName);
-        if (!copyFile(srcData, dstDir / BASELIB::pathFromUtf8(newDataFile), overwrite)) {
-            BASELIB::Log::warning("[BidsRawData::write] Failed to copy data file: {}", BASELIB::utf8FromPath(srcData));
+        const std::filesystem::path srcData = srcDir / mne::pathFromUtf8(dataFileName);
+        if (!copyFile(srcData, dstDir / mne::pathFromUtf8(newDataFile), overwrite)) {
+            mne::Log::warning("[BidsRawData::write] Failed to copy data file: {}", mne::utf8FromPath(srcData));
             return false;
         }
     }
 
     if (!markerFileName.empty()) {
-        const std::filesystem::path srcMarker = srcDir / BASELIB::pathFromUtf8(markerFileName);
-        const std::filesystem::path dstMarker = dstDir / BASELIB::pathFromUtf8(newMarkerFile);
+        const std::filesystem::path srcMarker = srcDir / mne::pathFromUtf8(markerFileName);
+        const std::filesystem::path dstMarker = dstDir / mne::pathFromUtf8(newMarkerFile);
 
-        if (BASELIB::Expected<std::string> marker = BASELIB::read_text_file(srcMarker)) {
+        if (mne::Expected<std::string> marker = mne::read_text_file(srcMarker)) {
             replaceAll(*marker, "DataFile=" + dataFileName, "DataFile=" + newDataFile);
 
             if (fileExists(dstMarker) && !overwrite) {
-                BASELIB::Log::warning("[BidsRawData::write] Target marker file already exists: {}", BASELIB::utf8FromPath(dstMarker));
+                mne::Log::warning("[BidsRawData::write] Target marker file already exists: {}", mne::utf8FromPath(dstMarker));
                 return false;
             }
-            if (!BASELIB::write_text_file(dstMarker, *marker))
-                BASELIB::Log::warning("[BidsRawData::write] Cannot write marker file: {}", BASELIB::utf8FromPath(dstMarker));
+            if (!mne::write_text_file(dstMarker, *marker))
+                mne::Log::warning("[BidsRawData::write] Cannot write marker file: {}", mne::utf8FromPath(dstMarker));
         }
     }
 
@@ -570,7 +569,7 @@ bool copyRawDataFile(const std::filesystem::path& sourcePath, const BIDSPath& bi
     if (sourcePath.empty())
         return true;
 
-    const std::string ext = BASELIB::toLower(bidsPath.extension());
+    const std::string ext = mne::toLower(bidsPath.extension());
     if (ext == ".vhdr" || ext == ".ahdr")
         return copyBrainVisionFiles(sourcePath, bidsPath, overwrite);
 
@@ -671,15 +670,15 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     // Step 1 — Validate BIDSPath
     //=========================================================================================================
     if (bidsPath.root().empty()) {
-        BASELIB::Log::warning("[BidsRawData::read] BIDSPath root is not set");
+        mne::Log::warning("[BidsRawData::read] BIDSPath root is not set");
         return result;
     }
     if (bidsPath.subject().empty()) {
-        BASELIB::Log::warning("[BidsRawData::read] BIDSPath subject is not set");
+        mne::Log::warning("[BidsRawData::read] BIDSPath subject is not set");
         return result;
     }
     if (bidsPath.extension().empty()) {
-        BASELIB::Log::warning("[BidsRawData::read] BIDSPath extension is not set");
+        mne::Log::warning("[BidsRawData::read] BIDSPath extension is not set");
         return result;
     }
 
@@ -688,7 +687,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     std::filesystem::path rawFilePath = bidsPath.file_path();
 
-    if (!fileExists(rawFilePath) && BASELIB::toLower(bidsPath.extension()) == ".edf") {
+    if (!fileExists(rawFilePath) && mne::toLower(bidsPath.extension()) == ".edf") {
         BIDSPath altPath(bidsPath);
         altPath.set_extension(".EDF");
         if (fileExists(altPath.file_path()))
@@ -696,7 +695,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     }
 
     if (!fileExists(rawFilePath)) {
-        BASELIB::Log::warning("[BidsRawData::read] Raw data file not found: {}", BASELIB::utf8FromPath(rawFilePath));
+        mne::Log::warning("[BidsRawData::read] Raw data file not found: {}", mne::utf8FromPath(rawFilePath));
         return result;
     }
 
@@ -705,12 +704,12 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     result.reader = create_reader(bidsPath.extension());
     if (!result.reader) {
-        BASELIB::Log::warning("[BidsRawData::read] Unsupported file extension: {}", bidsPath.extension());
+        mne::Log::warning("[BidsRawData::read] Unsupported file extension: {}", bidsPath.extension());
         return result;
     }
 
     if (!result.reader->open(rawFilePath)) {
-        BASELIB::Log::warning("[BidsRawData::read] Failed to open raw file: {}", BASELIB::utf8FromPath(rawFilePath));
+        mne::Log::warning("[BidsRawData::read] Failed to open raw file: {}", mne::utf8FromPath(rawFilePath));
         return result;
     }
 
@@ -787,23 +786,23 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 1 — Validate
     //=========================================================================================================
     if (bidsPath.root().empty()) {
-        BASELIB::Log::warning("[BidsRawData::write] BIDSPath root is not set");
+        mne::Log::warning("[BidsRawData::write] BIDSPath root is not set");
         return result;
     }
     if (bidsPath.subject().empty()) {
-        BASELIB::Log::warning("[BidsRawData::write] BIDSPath subject is not set");
+        mne::Log::warning("[BidsRawData::write] BIDSPath subject is not set");
         return result;
     }
     if (bidsPath.task().empty()) {
-        BASELIB::Log::warning("[BidsRawData::write] BIDSPath task is not set");
+        mne::Log::warning("[BidsRawData::write] BIDSPath task is not set");
         return result;
     }
     if (bidsPath.datatype().empty()) {
-        BASELIB::Log::warning("[BidsRawData::write] BIDSPath datatype is not set");
+        mne::Log::warning("[BidsRawData::write] BIDSPath datatype is not set");
         return result;
     }
     if (raw.info.empty()) {
-        BASELIB::Log::warning("[BidsRawData::write] FiffRawData info is empty");
+        mne::Log::warning("[BidsRawData::write] FiffRawData info is empty");
         return result;
     }
 
@@ -811,7 +810,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 2 — Create directory structure
     //=========================================================================================================
     if (!bidsPath.mkdirs()) {
-        BASELIB::Log::warning("[BidsRawData::write] Failed to create directory: {}", BASELIB::utf8FromPath(bidsPath.directory()));
+        mne::Log::warning("[BidsRawData::write] Failed to create directory: {}", mne::utf8FromPath(bidsPath.directory()));
         return result;
     }
 
@@ -820,7 +819,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     //=========================================================================================================
     if (options.copyData && !sourcePath.empty()) {
         if (!copyRawDataFile(sourcePath, bidsPath, options.overwrite)) {
-            BASELIB::Log::warning("[BidsRawData::write] Failed to copy raw data file");
+            mne::Log::warning("[BidsRawData::write] Failed to copy raw data file");
             return result;
         }
     }
@@ -831,12 +830,12 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     {
         const std::filesystem::path channelsPath = bidsPath.channels_tsv_path().file_path();
         if (!options.overwrite && fileExists(channelsPath)) {
-            BASELIB::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", BASELIB::utf8FromPath(channelsPath));
+            mne::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", mne::utf8FromPath(channelsPath));
             return result;
         }
 
         if (!BidsChannel::write_tsv(channelsPath, buildChannelRecords(raw.info))) {
-            BASELIB::Log::warning("[BidsRawData::write] Failed to write channels.tsv");
+            mne::Log::warning("[BidsRawData::write] Failed to write channels.tsv");
             return result;
         }
     }
@@ -854,7 +853,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
             const std::filesystem::path electrodesPath = bidsPath.electrodes_tsv_path().file_path();
             if (options.overwrite || !fileExists(electrodesPath)) {
                 if (!BidsElectrode::write_tsv(electrodesPath, electrodeRecords))
-                    BASELIB::Log::warning("[BidsRawData::write] Failed to write electrodes.tsv");
+                    mne::Log::warning("[BidsRawData::write] Failed to write electrodes.tsv");
             }
         }
 
@@ -884,7 +883,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
             const std::string_view modality = isMeg ? "MEG" : datatype == "eeg" ? "EEG"
                                                                                 : "iEEG";
             if (!BidsCoordinateSystem::write_json(coordsysPath, cs, modality))
-                BASELIB::Log::warning("[BidsRawData::write] Failed to write coordsystem.json");
+                mne::Log::warning("[BidsRawData::write] Failed to write coordsystem.json");
         }
     }
 
@@ -894,7 +893,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     if (!events.empty()) {
         const std::filesystem::path eventsPath = bidsPath.events_tsv_path().file_path();
         if (!options.overwrite && fileExists(eventsPath)) {
-            BASELIB::Log::warning("[BidsRawData::write] events.tsv already exists: {}", BASELIB::utf8FromPath(eventsPath));
+            mne::Log::warning("[BidsRawData::write] events.tsv already exists: {}", mne::utf8FromPath(eventsPath));
             return result;
         }
 
@@ -912,7 +911,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
         }
 
         if (!BidsEvent::write_tsv(eventsPath, eventsToWrite))
-            BASELIB::Log::warning("[BidsRawData::write] Failed to write events.tsv");
+            mne::Log::warning("[BidsRawData::write] Failed to write events.tsv");
     }
 
     //=========================================================================================================
@@ -921,12 +920,12 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     {
         const std::filesystem::path sidecarPath = bidsPath.sidecar_json_path().file_path();
         if (!options.overwrite && fileExists(sidecarPath)) {
-            BASELIB::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", BASELIB::utf8FromPath(sidecarPath));
+            mne::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", mne::utf8FromPath(sidecarPath));
             return result;
         }
 
-        if (!BASELIB::write_text_file(sidecarPath, BASELIB::JsonDocument(buildSidecarJson(*this, bidsPath)).to_json())) {
-            BASELIB::Log::warning("[BidsRawData::write] Failed to write sidecar JSON");
+        if (!mne::write_text_file(sidecarPath, mne::JsonDocument(buildSidecarJson(*this, bidsPath)).to_json())) {
+            mne::Log::warning("[BidsRawData::write] Failed to write sidecar JSON");
             return result;
         }
     }
@@ -944,7 +943,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
             desc.datasetType = "raw";
 
             if (!BidsDatasetDescription::write(descPath, desc))
-                BASELIB::Log::warning("[BidsRawData::write] Failed to write dataset_description.json");
+                mne::Log::warning("[BidsRawData::write] Failed to write dataset_description.json");
         }
     }
 

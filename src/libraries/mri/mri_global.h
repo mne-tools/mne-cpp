@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Export/import macros and build-info accessors for MRILIB.
+ * @brief    Export/import macros and build-info accessors for mne_mri.
  *
  * Provides the @c MRISHARED_EXPORT decorator used by every public
  * symbol in the MRI library so that the same headers can be
@@ -52,18 +52,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace MRILIB
- * @brief Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp.
- *
- * Hosts every public type that participates in loading a 3D MRI volume
- * (MGH/MGZ, NIfTI-1, FreeSurfer COR), describing it in memory
- * (@ref MriVolData, @ref MriSlice), resampling it onto an orthogonal viewing
- * plane (@ref MriSlicer, @ref MriSliceImage) and re-serialising it through
- * the FIFF MRI block hierarchy (@ref MriCorFifIO).
- */
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -90,6 +79,6 @@ MRISHARED_EXPORT const char* buildHash();
  */
 MRISHARED_EXPORT const char* buildHashLong();
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_GLOBAL_H

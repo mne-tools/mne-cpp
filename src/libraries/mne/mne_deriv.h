@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    One channel derivation: a sparse matrix whose rows define virtual channels as weighted sums of recorded ones.
  *
- * @ref MNELIB::MNEDeriv holds the derivation matrix of one file or montage
+ * @ref mne::MNEDeriv holds the derivation matrix of one file or montage
  * (rows = derived channels, columns = input channels) together with the
  * state of matching it to a recording. Derivations expose bipolar montages
- * or re-referenced channels without modifying the raw data; @ref MNELIB::MNERawData
+ * or re-referenced channels without modifying the raw data; @ref mne::MNERawData
  * applies the matched derivation while reading.
  */
 
@@ -40,10 +40,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -89,7 +89,7 @@ public:
      *
      * @return The number of valid derived channels.
      */
-    int validate(const std::vector<FIFFLIB::FiffChInfo>& chInfo);
+    int validate(const std::vector<mne::FiffChInfo>& chInfo);
 
 public:
     std::string filename;                             /**< Source file name the derivation was loaded from. */
@@ -97,12 +97,12 @@ public:
     std::unique_ptr<MNESparseNamedMatrix> deriv_data; /**< The derivation data itself (sparse named matrix). */
     Eigen::VectorXi in_use;                           /**< Per-column count of non-zero elements in the derivation data. */
     Eigen::VectorXi valid;                            /**< Per-derivation validity flags considering input channel units. */
-    std::vector<FIFFLIB::FiffChInfo> chs;             /**< First matching channel info for each derivation. */
+    std::vector<mne::FiffChInfo> chs;                 /**< First matching channel info for each derivation. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEDERIV_H

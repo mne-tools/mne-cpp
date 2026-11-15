@@ -25,10 +25,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 ACQ_STD_MEMBERS_BEGIN
@@ -78,6 +78,6 @@ ACQSHARED_EXPORT std::string acqSharedLibraryName(const std::string& base);
 /** @return The value of environment variable @p name, empty if it is not set. */
 ACQSHARED_EXPORT std::string acqEnvironment(const char* name);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_SHARED_LIBRARY_H

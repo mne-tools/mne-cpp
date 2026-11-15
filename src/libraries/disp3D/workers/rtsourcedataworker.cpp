@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <cmath>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -316,7 +316,7 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
 
 uint32_t RtSourceDataWorker::valueToColor(double value, uint8_t alpha) const
 {
-    QRgb rgb = DISPLIB::ColorMap::valueToColor(value, m_sColormapType);
+    QRgb rgb = mne::disp::ColorMap::valueToColor(value, m_sColormapType);
 
     uint32_t r = qRed(rgb);
     uint32_t g = qGreen(rgb);

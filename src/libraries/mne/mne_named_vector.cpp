@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNENamedVector.
+ * @brief    Implementation of @ref mne::MNENamedVector.
  *
  * Implements constructors and the name-based lookup helpers; FIFF I/O is
  * handled by the surrounding matrix readers because named vectors are
@@ -29,7 +29,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -38,11 +38,11 @@ using namespace MNELIB;
 bool MNENamedVector::pick(std::span<const std::string> pick_names, bool require_all, Eigen::Ref<Eigen::VectorXf> res) const
 {
     if (names.empty()) {
-        BASELIB::Log::critical("No names present in vector. Cannot pick.");
+        mne::Log::critical("No names present in vector. Cannot pick.");
         return false;
     }
     if (static_cast<std::size_t>(res.size()) != pick_names.size()) {
-        BASELIB::Log::critical("Cannot pick {} names into a vector of {} values.", pick_names.size(), res.size());
+        mne::Log::critical("Cannot pick {} names into a vector of {} values.", pick_names.size(), res.size());
         return false;
     }
 
@@ -52,7 +52,7 @@ bool MNENamedVector::pick(std::span<const std::string> pick_names, bool require_
         if (it != names.end())
             res[static_cast<Eigen::Index>(k)] = data[std::distance(names.begin(), it)];
         else if (require_all) {
-            BASELIB::Log::critical("All required elements not found in named vector.");
+            mne::Log::critical("All required elements not found in named vector.");
             return false;
         }
     }

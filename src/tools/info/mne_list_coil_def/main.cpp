@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -82,7 +82,7 @@ static QString accuracyName(int acc)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_coil_def");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

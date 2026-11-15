@@ -33,7 +33,7 @@
 #include <memory>
 
 using namespace CHANNELSELECTIONPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 
@@ -83,15 +83,15 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
     QList<QStringList> names;
     QList<QList<int>> indices;
     connect(&listener, &Communicator::receivedEvent, this, [&](const QSharedPointer<Event> e) {
-        const auto* item = e->getData().value<DISPLIB::SelectionItem*>();
+        const auto* item = e->getData().value<mne::disp::SelectionItem*>();
         names << item->m_sChannelName;
         indices << item->m_iChannelNumber;
     });
 
-    auto* selection = view->findChild<DISPLIB::ChannelSelectionView*>();
+    auto* selection = view->findChild<mne::disp::ChannelSelectionView*>();
     if (!selection) {
         for (QWidget* w : QApplication::topLevelWidgets()) {
-            if (auto* v = qobject_cast<DISPLIB::ChannelSelectionView*>(w))
+            if (auto* v = qobject_cast<mne::disp::ChannelSelectionView*>(w))
                 selection = v;
         }
     }
@@ -109,8 +109,8 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
         QCOMPARE(got, expected);
         QList<int> idx = indices.last();
         std::sort(idx.begin(), idx.end());
-        QList<int> expectedIdx{static_cast<int>(BASELIB::indexOf(raw->getFiffInfo()->ch_names, "MEG 0112")),
-                               static_cast<int>(BASELIB::indexOf(raw->getFiffInfo()->ch_names, "MEG 0113"))};
+        QList<int> expectedIdx{static_cast<int>(mne::indexOf(raw->getFiffInfo()->ch_names, "MEG 0112")),
+                               static_cast<int>(mne::indexOf(raw->getFiffInfo()->ch_names, "MEG 0113"))};
         std::sort(expectedIdx.begin(), expectedIdx.end());
         QCOMPARE(idx, expectedIdx);
     }

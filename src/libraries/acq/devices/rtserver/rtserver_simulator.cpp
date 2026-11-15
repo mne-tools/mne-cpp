@@ -29,8 +29,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -200,7 +200,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<RtServerTransport> ACQLIB::detail::make_rtserver_simulator(const RtServerSimulation& simulation)
+std::unique_ptr<RtServerTransport> mne::detail::make_rtserver_simulator(const RtServerSimulation& simulation)
 {
     return std::make_unique<RtServerSimulator>(simulation);
 }

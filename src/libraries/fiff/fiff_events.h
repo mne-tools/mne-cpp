@@ -12,9 +12,9 @@
  * FIFF events are the standard integer representation of trigger / stim
  * information: each event is a @c (sample, previous_value, new_value)
  * triple, and a list of them is stored under @c FIFFB_MNE_EVENTS. The
- * @ref FIFFLIB::FiffEvents class owns one such list and exposes the operations the
- * rest of FIFFLIB needs: read / write FIFF event files, detect events on
- * a stim channel of a @ref FIFFLIB::FiffRawData (parity with
+ * @ref mne::FiffEvents class owns one such list and exposes the operations the
+ * rest of mne_fiff needs: read / write FIFF event files, detect events on
+ * a stim channel of a @ref mne::FiffRawData (parity with
  * @c mne.find_events), filter by code, and clip to a sample range.
  */
 
@@ -38,10 +38,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 // Forward declaration
@@ -78,7 +78,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads an event file like read(); throws BASELIB::Error if it cannot.
+     * Reads an event file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The event file.
      */
@@ -92,7 +92,7 @@ public:
      *
      * @return The events, or why the file cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvents> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffEvents> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
      * @return The events, or why the file cannot be read: Io if it cannot be opened, NotFound if it
      *         holds no event list.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvents> read_fif(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffEvents> read_fif(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -115,7 +115,7 @@ public:
      * @return The events, or why the file cannot be read: Io if it cannot be opened, Format if a line
      *         does not start with a sample number.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvents> read_ascii(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffEvents> read_ascii(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path, float sfreq = 0.0f) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path, float sfreq = 0.0f) const;
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written: Format if there are no events, Io otherwise.
      */
-    [[nodiscard]] BASELIB::Expected<void> write_fif(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write_fif(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write_ascii(const std::filesystem::path& path, float sfreq = 0.0f) const;
+    [[nodiscard]] mne::Expected<void> write_ascii(const std::filesystem::path& path, float sfreq = 0.0f) const;
 
     //=========================================================================================================
     /**
@@ -161,10 +161,10 @@ public:
      * @return The events, which may be none, or why there are none: NotFound if the channel is
      *         missing, Io if its data cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvents> find_events(const FiffRawData& raw,
-                                                                   std::string_view stim_channel = "STI 014",
-                                                                   unsigned int mask = 0xFFFFFFFF,
-                                                                   bool leading_edge = true);
+    [[nodiscard]] static mne::Expected<FiffEvents> find_events(const FiffRawData& raw,
+                                                               std::string_view stim_channel = "STI 014",
+                                                               unsigned int mask = 0xFFFFFFFF,
+                                                               bool leading_edge = true);
 
     /** @return The number of events. */
     int num_events() const

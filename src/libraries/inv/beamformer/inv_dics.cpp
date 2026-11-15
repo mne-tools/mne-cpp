@@ -42,9 +42,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,11 +65,11 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
 
     const int nFreqs = static_cast<int>(csdMatrices.size());
     if (nFreqs == 0) {
-        BASELIB::Log::warning("InvDICS::makeDICS - No CSD matrices provided!");
+        mne::Log::warning("InvDICS::makeDICS - No CSD matrices provided!");
         return result;
     }
     if (frequencies.size() != nFreqs) {
-        BASELIB::Log::warning("InvDICS::makeDICS - Frequency vector size mismatch with CSD count!");
+        mne::Log::warning("InvDICS::makeDICS - Frequency vector size mismatch with CSD count!");
         return result;
     }
 
@@ -79,7 +77,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
     // Extract leadfield
     // -----------------------------------------------------------------------
     if (forward.sol.data.size() == 0) {
-        BASELIB::Log::warning("InvDICS::makeDICS - Forward solution has no gain matrix!");
+        mne::Log::warning("InvDICS::makeDICS - Forward solution has no gain matrix!");
         return result;
     }
 
@@ -88,7 +86,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
     const int nOrient = (forward.source_ori == FIFFV_MNE_FREE_ORI) ? 3 : 1;
     const int nSources = static_cast<int>(G.cols()) / nOrient;
 
-    BASELIB::Log::info("InvDICS::makeDICS - Leadfield: {} channels x {} sources (n_orient={}), {} frequencies", nChannels, nSources, nOrient, nFreqs);
+    mne::Log::info("InvDICS::makeDICS - Leadfield: {} channels x {} sources (n_orient={}), {} frequencies", nChannels, nSources, nOrient, nFreqs);
 
     // -----------------------------------------------------------------------
     // Whitening matrix
@@ -129,7 +127,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
         MatrixXd Cm = csdMatrices[fi];
 
         if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
-            BASELIB::Log::warning("InvDICS::makeDICS - CSD[{}] dimension mismatch!", fi);
+            mne::Log::warning("InvDICS::makeDICS - CSD[{}] dimension mismatch!", fi);
             return InvBeamformer();
         }
 
@@ -154,7 +152,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
             nn, W, mpOri);
 
         if (!ok) {
-            BASELIB::Log::warning("InvDICS::makeDICS - Filter computation failed at frequency {} ({:.1f} Hz)!", fi, frequencies(fi));
+            mne::Log::warning("InvDICS::makeDICS - Filter computation failed at frequency {} ({:.1f} Hz)!", fi, frequencies(fi));
             return InvBeamformer();
         }
 
@@ -196,7 +194,7 @@ InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
     }
     result.vertices = verts;
 
-    BASELIB::Log::info("InvDICS::makeDICS - Done. {} frequency filters computed.", nFreqs);
+    mne::Log::info("InvDICS::makeDICS - Done. {} frequency filters computed.", nFreqs);
 
     return result;
 }
@@ -208,7 +206,7 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd>& csdMatrices
                                         const InvBeamformer& filters)
 {
     if (!filters.isValid() || filters.kind != "DICS") {
-        BASELIB::Log::warning("InvDICS::applyDICSCsd - Invalid or non-DICS filters!");
+        mne::Log::warning("InvDICS::applyDICSCsd - Invalid or non-DICS filters!");
         return InvSourceEstimate();
     }
 
@@ -216,7 +214,7 @@ InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd>& csdMatrices
     const int nFilterFreqs = filters.nFreqs();
 
     if (nFreqs != nFilterFreqs) {
-        BASELIB::Log::warning("InvDICS::applyDICSCsd - CSD count ({}) does not match filter count ({})!", nFreqs, nFilterFreqs);
+        mne::Log::warning("InvDICS::applyDICSCsd - CSD count ({}) does not match filter count ({})!", nFreqs, nFilterFreqs);
         return InvSourceEstimate();
     }
 
@@ -263,11 +261,11 @@ InvSourceEstimate InvDICS::applyDICS(const MatrixXd& data,
                                      int freqIdx)
 {
     if (!filters.isValid() || filters.kind != "DICS") {
-        BASELIB::Log::warning("InvDICS::applyDICS - Invalid or non-DICS filters!");
+        mne::Log::warning("InvDICS::applyDICS - Invalid or non-DICS filters!");
         return InvSourceEstimate();
     }
     if (freqIdx < 0 || freqIdx >= filters.nFreqs()) {
-        BASELIB::Log::warning("InvDICS::applyDICS - freqIdx {} out of range (0..{})!", freqIdx, filters.nFreqs() - 1);
+        mne::Log::warning("InvDICS::applyDICS - freqIdx {} out of range (0..{})!", freqIdx, filters.nFreqs() - 1);
         return InvSourceEstimate();
     }
 
@@ -314,11 +312,11 @@ std::vector<InvSourceEstimate> InvDICS::applyDICSEpochs(const std::vector<Matrix
     std::vector<InvSourceEstimate> results;
 
     if (epochs.empty()) {
-        BASELIB::Log::warning("InvDICS::applyDICSEpochs - No epochs provided.");
+        mne::Log::warning("InvDICS::applyDICSEpochs - No epochs provided.");
         return results;
     }
     if (!filters.isValid() || filters.kind != "DICS") {
-        BASELIB::Log::warning("InvDICS::applyDICSEpochs - Invalid or non-DICS filters!");
+        mne::Log::warning("InvDICS::applyDICSEpochs - Invalid or non-DICS filters!");
         return results;
     }
 
@@ -326,7 +324,7 @@ std::vector<InvSourceEstimate> InvDICS::applyDICSEpochs(const std::vector<Matrix
     for (const MatrixXd& epoch : epochs) {
         results.push_back(applyDICS(epoch, tmin, tstep, filters, freqIdx));
         if (results.back().empty()) {
-            BASELIB::Log::warning("InvDICS::applyDICSEpochs - Epoch {} produced empty source estimate.", results.size() - 1);
+            mne::Log::warning("InvDICS::applyDICSEpochs - Epoch {} produced empty source estimate.", results.size() - 1);
         }
     }
 

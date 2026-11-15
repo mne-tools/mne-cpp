@@ -22,8 +22,8 @@
  * speed (pacing), start (seconds into the file), block (samples per commit), events, stim, cpus, priority.
  *
  * @code
- * ACQLIB::registerFiffScheme(); // once; needed only where static linking drops the library's initialiser
- * auto device = ACQLIB::AcqDevice::open("fiff:///data/sample_audvis_raw.fif?loop=1&speed=2");
+ * mne::registerFiffScheme(); // once; needed only where static linking drops the library's initialiser
+ * auto device = mne::AcqDevice::open("fiff:///data/sample_audvis_raw.fif?loop=1&speed=2");
  * @endcode
  */
 
@@ -38,10 +38,10 @@
 #include "../acq_error.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -53,6 +53,6 @@ namespace ACQLIB
  */
 ACQFIFFSHARED_EXPORT AcqError registerFiffScheme();
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_FIFF_REPLAY_H

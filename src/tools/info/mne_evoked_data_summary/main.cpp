@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -96,7 +96,7 @@ static QString coilTypeName(fiff_int_t kind, fiff_int_t coilType)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_evoked_data_summary");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

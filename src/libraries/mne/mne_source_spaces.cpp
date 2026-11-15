@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNESourceSpaces.
+ * @brief    Implementation of @ref mne::MNESourceSpaces.
  *
  * Defines whole-file FIFF readers that iterate every
  * @c FIFFB_MNE_SOURCE_SPACE block under the root @c FIFFB_MNE block and
@@ -35,12 +35,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace FSLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -49,9 +45,9 @@ using namespace FIFFLIB;
 namespace
 {
 
-using BASELIB::ErrorCode;
-using BASELIB::Expected;
-using BASELIB::fail;
+using mne::ErrorCode;
+using mne::Expected;
+using mne::fail;
 
 Expected<MNEHemisphere> read_source_space(FiffStream& stream, const std::shared_ptr<FiffDirNode>& p_Tree, const std::string& name)
 {

@@ -1,18 +1,18 @@
 ---
 id: derivation-rule
-title: "DSPLIB::DerivationRule"
+title: "mne::DerivationRule"
 sidebar_label: DerivationRule
 sidebar_position: 83
 ---
 
 # DerivationRule
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/channel_derivation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/channel_derivation.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/channel_derivation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/channel_derivation.h)
 
 `#include <dsp/channel_derivation.h>`
 
 ```cpp
-struct DSPLIB::DerivationRule
+struct mne::DerivationRule
 ```
 
 A single derivation rule mapping input channels (with weights) to one output channel.
@@ -39,7 +39,7 @@ const auto [averageData, averageNames] = ChannelDerivation::apply(raw, names, av
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 195"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 193"
 const StringList names = {"LH1", "LH2", "LH3", "RA1"};
 const std::vector<DerivationRule> bipolar = ChannelDerivation::buildBipolar(names); // LH1-LH2, LH2-LH3
 const std::vector<DerivationRule> average = ChannelDerivation::buildCommonAverage(names);

@@ -1,18 +1,18 @@
 ---
 id: acq-block-view
-title: "ACQLIB::AcqBlockView"
+title: "mne::AcqBlockView"
 sidebar_label: AcqBlockView
 sidebar_position: 5
 ---
 
 # AcqBlockView
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
 
 `#include <acq/acq_block_view.h>`
 
 ```cpp
-class ACQLIB::AcqBlockView
+class mne::AcqBlockView
 ```
 
 Read view returned by `AcqReader::acquire()`.
@@ -102,7 +102,7 @@ classDiagram
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -112,7 +112,7 @@ classDiagram
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 297"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 296"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();

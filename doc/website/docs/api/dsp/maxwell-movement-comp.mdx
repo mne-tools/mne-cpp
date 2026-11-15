@@ -1,13 +1,13 @@
 ---
 id: maxwell-movement-comp
-title: "DSPLIB::MaxwellMovementComp"
+title: "mne::MaxwellMovementComp"
 sidebar_label: MaxwellMovementComp
 sidebar_position: 17
 ---
 
 # MaxwellMovementComp
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/maxwell_movement_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/maxwell_movement_comp.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/maxwell_movement_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/maxwell_movement_comp.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.maxwell_filter (head_pos)` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 17
 `#include <dsp/maxwell_movement_comp.h>`
 
 ```cpp
-class DSPLIB::MaxwellMovementComp
+class mne::MaxwellMovementComp
 ```
 
 Maxwell movement compensation using [`SSS`](/docs/api/dsp/sss).
@@ -118,7 +118,7 @@ Write head positions to a file.
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 158"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 157"
 std::vector<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
 MaxwellMoveCompParams moveParams;
 moveParams.origin = params.origin;

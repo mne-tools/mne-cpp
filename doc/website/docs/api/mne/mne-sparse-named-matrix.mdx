@@ -1,18 +1,18 @@
 ---
 id: mne-sparse-named-matrix
-title: "MNELIB::MNESparseNamedMatrix"
+title: "mne::MNESparseNamedMatrix"
 sidebar_label: MNESparseNamedMatrix
 sidebar_position: 51
 ---
 
 # MNESparseNamedMatrix
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_sparse_named_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_sparse_named_matrix.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_sparse_named_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_sparse_named_matrix.h)
 
 `#include <mne/mne_sparse_named_matrix.h>`
 
 ```cpp
-class MNELIB::MNESparseNamedMatrix
+class mne::MNESparseNamedMatrix
 ```
 
 Sparse named matrix - matrix specification with row/column name lists.
@@ -30,7 +30,7 @@ const auto fromFif = MNEDerivSet::read(tmp.filePath("montage-deriv.fif").toStdU1
 const int usable = mneRaw->attachDerivations(*fromFif); // FRONT needs EEG999 and is dropped
 MNEChSelection bipolar;
 bipolar.chspick = bipolar.chspick_nospace = {"EEG 001-EEG 002", "EEG 001", "EEG 002"};
-bipolar.pick = (VectorXi(3) << -1, BASELIB::indexOf(mneRaw->ch_names, "EEG 001"), BASELIB::indexOf(mneRaw->ch_names, "EEG 002")).finished();
+bipolar.pick = (VectorXi(3) << -1, mne::indexOf(mneRaw->ch_names, "EEG 001"), mne::indexOf(mneRaw->ch_names, "EEG 002")).finished();
 bipolar.pick_deriv = (VectorXi(3) << 0, -1, -1).finished();
 mneRaw->proj.reset();
 mneRaw->pick_data(&bipolar, mneRaw->first_samp + 2990, segment);
@@ -114,7 +114,7 @@ Reads a sparse named matrix (MNE-C `mne_read_sparse_named_matrix`).
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 495"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 493"
 // The derived channel is the difference of its inputs, read in one pass
 ok &= expect(derivations->count() == 2 && fromFif->count() == 2 && usable == 1 && mneRaw->deriv_matched->deriv_data->nrow() == 1 && segment.row(0).isApprox(segment.row(1) - segment.row(2), 1e-6f),
              "MNEDerivSet/MNEDeriv/MNESparseNamedMatrix: MNE-C montage file, matched to the recording and read by MNERawData");

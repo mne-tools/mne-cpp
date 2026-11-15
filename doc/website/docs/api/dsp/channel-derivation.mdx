@@ -1,18 +1,18 @@
 ---
 id: channel-derivation
-title: "DSPLIB::ChannelDerivation"
+title: "mne::ChannelDerivation"
 sidebar_label: ChannelDerivation
 sidebar_position: 69
 ---
 
 # ChannelDerivation
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/channel_derivation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/channel_derivation.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/channel_derivation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/channel_derivation.h)
 
 `#include <dsp/channel_derivation.h>`
 
 ```cpp
-class DSPLIB::ChannelDerivation
+class mne::ChannelDerivation
 ```
 
 Channel derivation and re-referencing utilities.
@@ -39,7 +39,7 @@ Channels are grouped by shaft prefix (all leading alphabetic characters and apos
 
 **Parameters:**
 
-- **channelNames** : *const BASELIB::StringList &*
+- **channelNames** : *const mne::StringList &*
   List of channel names, e.g. \{"LH1","LH2","LH3","RA1","RA2"\}.
 
 **Returns:**
@@ -56,7 +56,7 @@ Each output channel equals the original channel minus the mean of all channels: 
 
 **Parameters:**
 
-- **channelNames** : *const BASELIB::StringList &*
+- **channelNames** : *const mne::StringList &*
   List of channel names.
 
 **Returns:**
@@ -74,7 +74,7 @@ Apply derivation rules to a data matrix.
 - **matData** : *const Eigen::MatrixXd &*
   Input data matrix (n_channels × n_times).
 
-- **channelNames** : *const BASELIB::StringList &*
+- **channelNames** : *const mne::StringList &*
   Channel names corresponding to rows of matData.
 
 - **rules** : *const std::vector&lt; [DerivationRule](/docs/api/dsp/derivation-rule) &gt; &*
@@ -82,13 +82,13 @@ Apply derivation rules to a data matrix.
 
 **Returns:**
 
-- *std::pair&lt; Eigen::MatrixXd, BASELIB::StringList &gt;* — A pair of (derived data matrix, derived channel names). The output matrix has n_rules rows × n_times columns.
+- *std::pair&lt; Eigen::MatrixXd, mne::StringList &gt;* — A pair of (derived data matrix, derived channel names). The output matrix has n_rules rows × n_times columns.
 
 ---
 
 ### readDefinitionFile(path)
 
-Read derivation rules from an MNE-C derivation text file (`MNELIB::MNEDerivSet::readText`).
+Read derivation rules from an MNE-C derivation text file (`mne::MNEDerivSet::readText`).
 
 ```cpp
 # comment
@@ -137,7 +137,7 @@ Write derivation rules in MNE-C derivation text syntax, readable by readDefiniti
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 195"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 193"
 const StringList names = {"LH1", "LH2", "LH3", "RA1"};
 const std::vector<DerivationRule> bipolar = ChannelDerivation::buildBipolar(names); // LH1-LH2, LH2-LH3
 const std::vector<DerivationRule> average = ChannelDerivation::buildCommonAverage(names);

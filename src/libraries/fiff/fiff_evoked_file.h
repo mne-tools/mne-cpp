@@ -33,10 +33,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -50,7 +50,7 @@ public:
      * @param[in] path   The file.
      * @return The opened file, or why it holds no evoked data.
      */
-    static BASELIB::Expected<FiffEvokedFile> open(const std::filesystem::path& path);
+    static mne::Expected<FiffEvokedFile> open(const std::filesystem::path& path);
 
     /** @return The number of evoked data sets. */
     qsizetype size() const
@@ -63,7 +63,7 @@ public:
      * @param[in] kind        FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.
      * @return The index of the selected data set, or why there is none.
      */
-    BASELIB::Expected<int> find(const FiffEvoked::Condition& condition, fiff_int_t kind) const;
+    mne::Expected<int> find(const FiffEvoked::Condition& condition, fiff_int_t kind) const;
 
     /**
      * @param[in] set        Index of the data set.
@@ -71,7 +71,7 @@ public:
      * @param[in] proj       Apply the SSP projectors of the file.
      * @return The data set, calibrated, projected and baseline corrected as requested.
      */
-    BASELIB::Expected<FiffEvoked> read(int set, const FiffEvoked::Baseline& baseline, bool proj);
+    mne::Expected<FiffEvoked> read(int set, const FiffEvoked::Baseline& baseline, bool proj);
 
     FiffInfo info; /**< The measurement info shared by all data sets. */
 
@@ -85,10 +85,10 @@ private:
     FiffStream m_stream;
     std::string m_file;
     std::vector<std::shared_ptr<FiffDirNode>> m_sets;
-    BASELIB::StringList m_comments;
+    mne::StringList m_comments;
     std::vector<fiff_int_t> m_kinds;
 };
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_EVOKED_FILE_H

@@ -12,7 +12,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Symbolic FIFF tag, block, value, unit and channel-type constants shared across FIFFLIB.
+ * @brief    Symbolic FIFF tag, block, value, unit and channel-type constants shared across mne_fiff.
  *
  * Mirrors the @c fiff_constants.h header shipped with the original MNE-C
  * toolchain and the matching tables in @c mne.io.constants in MNE-Python,
@@ -37,7 +37,7 @@
 #define FIFF_CONSTANTS_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
 

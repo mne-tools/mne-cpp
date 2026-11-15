@@ -1,13 +1,13 @@
 ---
 id: fir-filter
-title: "DSPLIB::FirFilter"
+title: "mne::FirFilter"
 sidebar_label: FirFilter
 sidebar_position: 2
 ---
 
 # FirFilter
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/firfilter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/firfilter.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/firfilter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/firfilter.h)
 
 :::info[Python equivalent]
 `mne.filter.filter_data` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 2
 <Connections topics={["filtering"]} context="api" current="FirFilter" />
 
 ```cpp
-class DSPLIB::FirFilter
+class mne::FirFilter
 ```
 
 Discoverable façade over the [`FilterKernel`](/docs/api/dsp/filter-kernel) FIR-filter engine.
@@ -258,7 +258,7 @@ ok &= expect(smooth.size() == tones.size() && std::fabs(kept - 1.0) < 0.02 && re
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 268"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 267"
 // ERPs live below 30 Hz: low-pass like mne.filter.filter_data, then correct the baseline.
 const Eigen::MatrixXd filtered = FirFilter::filterData(raw, info->sfreq, -1.0, kLowPassHz);
 for (std::size_t e = 0; e < eeg.size(); ++e) {

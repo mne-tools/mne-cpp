@@ -23,15 +23,15 @@
 #include <mna/mna_types.h>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
 
-using MNALIB::MnaDataKind;
+using mne::MnaDataKind;
 
 //=============================================================================================================
 /**
@@ -89,6 +89,6 @@ inline ConnectorDataType mnaDataKindToConnectorDataType(MnaDataKind k)
     }
 }
 
-} // namespace SCSHAREDLIB
+} // namespace mne::scan
 
 #endif // MNA_SCAN_TYPES_H

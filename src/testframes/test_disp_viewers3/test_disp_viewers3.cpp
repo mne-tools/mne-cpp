@@ -66,7 +66,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 /**
@@ -203,7 +203,7 @@ void TestDispViewers3::construct_artifactSettingsView()
     // An empty channel list is the interesting case: it is what the view gets
     // before any data is loaded, and it is where an unguarded index would fault.
     ArtifactSettingsView* pView = new ArtifactSettingsView(settingsPath(),
-                                                           std::vector<FIFFLIB::FiffChInfo>(),
+                                                           std::vector<mne::FiffChInfo>(),
                                                            m_pHolder.data());
     QVERIFY(pView != nullptr);
 
@@ -286,12 +286,12 @@ namespace
 // Six channels: MEG0..MEG2 (one bad), EEG0, EEG1, STI; 1000 Hz, samples 0..1999.
 std::unique_ptr<ChannelDataModel> labelTestModel()
 {
-    std::shared_ptr<FIFFLIB::FiffInfo> info(new FIFFLIB::FiffInfo);
+    std::shared_ptr<mne::FiffInfo> info(new mne::FiffInfo);
     info->sfreq = 1000.0f;
     const QVector<std::pair<int, int>> kinds = {{FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_EEG_CH, FIFF_UNIT_V}, {FIFFV_EEG_CH, FIFF_UNIT_V}, {FIFFV_STIM_CH, FIFF_UNIT_NONE}};
     const StringList names = {"MEG0", "MEG1", "MEG2", "EEG0", "EEG1", "STI"};
     for (int i = 0; i < kinds.size(); ++i) {
-        FIFFLIB::FiffChInfo ch;
+        mne::FiffChInfo ch;
         ch.ch_name = names[i];
         ch.kind = kinds[i].first;
         ch.unit = kinds[i].second;

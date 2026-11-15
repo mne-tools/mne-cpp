@@ -30,10 +30,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -132,6 +132,6 @@ inline bool operator!=(const FiffTime& a, const FiffTime& b)
     return !(a == b);
 }
 
-} // NAMESPACE FIFFLIB
+} // NAMESPACE mne_fiff
 
 #endif // FIFF_TIME_H

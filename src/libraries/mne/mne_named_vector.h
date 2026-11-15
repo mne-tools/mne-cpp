@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Named one-dimensional counterpart of @ref MNELIB::MNENamedMatrix.
+ * @brief    Named one-dimensional counterpart of @ref mne::MNENamedMatrix.
  *
  * Stores a vector whose entries are tagged with a @c StringList of
  * labels, used for example for SSP weights or for one-sensor mappings.
@@ -32,10 +32,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 /**
@@ -64,6 +64,6 @@ public:
     Eigen::VectorXf data; /**< The data itself. */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_NAMED_VECTOR_H

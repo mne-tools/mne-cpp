@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Picked vertices / triangles on a mesh display surface.
  *
- * @ref MNELIB::MNEMshPicked stores the indices selected by the user in
+ * @ref mne::MNEMshPicked stores the indices selected by the user in
  * the legacy mesh viewer together with the kind of selection (vertex,
  * label, ROI). Used to round-trip @c tksurfer selection state into
  * mne-cpp.
@@ -25,10 +25,10 @@
 #include "mne_global.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -51,6 +51,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHPICKED_H

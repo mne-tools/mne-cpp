@@ -1,13 +1,13 @@
 ---
 id: ieeg-implantation
-title: "IEEGLIB::IeegImplantation"
+title: "mne::IeegImplantation"
 sidebar_label: IeegImplantation
 sidebar_position: 1
 ---
 
 # IeegImplantation
 
-**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library &nbsp;·&nbsp; **Source:** [`ieeg/ieeg_implantation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ieeg/ieeg_implantation.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** iEEG Library &nbsp;·&nbsp; **Source:** [`ieeg/ieeg_implantation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ieeg/ieeg_implantation.h)
 
 :::info[Python equivalent]
 `mne.channels.DigMontage (iEEG)` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 1
 `#include <ieeg/ieeg_implantation.h>`
 
 ```cpp
-class IEEGLIB::IeegImplantation
+class mne::IeegImplantation
 ```
 
 Contacts of an sEEG / ECoG implantation and the leads they belong to.
@@ -206,7 +206,7 @@ ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type 
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 139"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 137"
 ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");

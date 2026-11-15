@@ -25,8 +25,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
-using namespace MNELIB;
+using namespace mne::analyze;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -51,10 +51,10 @@ BemDataModel::BemDataModel(const QString& sFilePath,
 , m_pBem(std::make_shared<MNEBem>())
 {
     if (byteLoadedData.isEmpty()) {
-        initBemData(std::make_unique<FIFFLIB::FiffStream>(sFilePath.toStdU16String()));
+        initBemData(std::make_unique<mne::FiffStream>(sFilePath.toStdU16String()));
     } else {
         const auto* begin = reinterpret_cast<const std::byte*>(byteLoadedData.constData());
-        initBemData(std::make_unique<FIFFLIB::FiffStream>(std::make_unique<BASELIB::MemoryByteStream>(std::vector<std::byte>(begin, begin + byteLoadedData.size()))));
+        initBemData(std::make_unique<mne::FiffStream>(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + byteLoadedData.size()))));
     }
 }
 
@@ -66,7 +66,7 @@ BemDataModel::~BemDataModel()
 
 //=============================================================================================================
 
-void BemDataModel::initBemData(std::unique_ptr<FIFFLIB::FiffStream> stream)
+void BemDataModel::initBemData(std::unique_ptr<mne::FiffStream> stream)
 {
     auto bem = MNEBem::read(*stream);
     if (!bem) {

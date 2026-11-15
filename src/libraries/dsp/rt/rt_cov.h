@@ -17,9 +17,9 @@
  * samples minus one. Computation is offloaded to a worker @c QThread so
  * the acquisition pipeline never blocks on the dense matrix multiply.
  *
- * The @ref DSPLIB::RtCovComputeResult bundle carries both the matrix and the
+ * The @ref mne::RtCovComputeResult bundle carries both the matrix and the
  * sample count, which lets downstream consumers combine partial estimates,
- * apply rank-corrections, or convert to a @ref FIFFLIB::FiffCov for
+ * apply rank-corrections, or convert to a @ref mne::FiffCov for
  * persistence and inverse-operator construction.
  */
 
@@ -40,6 +40,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QList>
+#include <QObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -51,20 +53,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
-// DSPLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 /**
@@ -89,7 +91,7 @@ class DSPSHARED_EXPORT RtCov : public QObject
     Q_OBJECT
 
 public:
-    RtCov(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    RtCov(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -100,8 +102,8 @@ public:
      *
      * @return Noise covariance of the MEG/EEG channels, or an empty FiffCov while fewer than iNewMaxSamples samples are accumulated or if no FiffInfo was set.
      */
-    FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
-                                        int iNewMaxSamples);
+    mne::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
+                                    int iNewMaxSamples);
 
 protected:
     //=========================================================================================================
@@ -127,7 +129,7 @@ protected:
 
     QList<Eigen::MatrixXd> m_lData; /**< The stored data blocks. */
 
-    FIFFLIB::FiffInfo m_fiffInfo; /**< Holds the fiff measurement information. */
+    mne::FiffInfo m_fiffInfo; /**< Holds the fiff measurement information. */
 
     QVector<int> m_picks; /**< Indices of MEG/EEG channels to include. */
     bool m_bPicksReady;   /**< Whether picks have been computed. */

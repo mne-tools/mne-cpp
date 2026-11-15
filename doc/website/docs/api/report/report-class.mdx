@@ -1,13 +1,13 @@
 ---
 id: report-class
-title: "REPORTLIB::Report"
+title: "mne::Report"
 sidebar_label: Report
 sidebar_position: 2
 ---
 
 # Report
 
-**Namespace:** `REPORTLIB` &nbsp;·&nbsp; **Library:** Report Library &nbsp;·&nbsp; **Source:** [`report/report.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/report/report.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Report Library &nbsp;·&nbsp; **Source:** [`report/report.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/report/report.h)
 
 :::info[Python equivalent]
 `mne.Report` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 2
 `#include <report/report.h>`
 
 ```cpp
-class REPORTLIB::Report
+class mne::Report
 ```
 
 Simple HTML report builder for MEG/EEG analysis results.
@@ -70,10 +70,10 @@ Adds a table.
 - **title** : *std::string_view*
   Section heading.
 
-- **headers** : *const BASELIB::StringList &*
+- **headers** : *const mne::StringList &*
   Column headers.
 
-- **rows** : *const std::vector&lt; BASELIB::StringList &gt; &*
+- **rows** : *const std::vector&lt; mne::StringList &gt; &*
   Cells, one list per row.
 
 ---

@@ -32,9 +32,7 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_cov.h>
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestInverseRapDipole : public QObject
@@ -52,7 +50,7 @@ private:
 private slots:
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
@@ -405,7 +403,7 @@ private slots:
     //=========================================================================
     void mneInverseOp_defaultCtor()
     {
-        MNELIB::MNEInverseOperator mio;
+        mne::MNEInverseOperator mio;
         QCOMPARE(mio.nchan, -1);
         QCOMPARE(mio.nsource, -1);
     }
@@ -438,7 +436,7 @@ private slots:
         if (fwd.empty() || noiseCov.empty())
             QSKIP("Data load failed");
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        mne::MNEInverseOperator invOp = mne::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
 
         QVERIFY(invOp.nchan > 0);
@@ -468,7 +466,7 @@ private slots:
         FiffCov noiseCov(covFile.fileName().toStdString());
         FiffRawData raw(rawPath.toStdString());
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        mne::MNEInverseOperator invOp = mne::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0)
             QSKIP("Inverse operator build failed");
@@ -511,7 +509,7 @@ private slots:
         FiffCov noiseCov(covFile.fileName().toStdString());
         FiffRawData raw(rawPath.toStdString());
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        mne::MNEInverseOperator invOp = mne::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0)
             QSKIP("Inverse operator build failed");
@@ -553,7 +551,7 @@ private slots:
         FiffCov noiseCov(covFile.fileName().toStdString());
         FiffRawData raw(rawPath.toStdString());
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        mne::MNEInverseOperator invOp = mne::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0)
             QSKIP("Inverse operator build failed");
@@ -594,7 +592,7 @@ private slots:
         FiffCov noiseCov(covFile.fileName().toStdString());
         FiffRawData raw(rawPath.toStdString());
 
-        MNELIB::MNEInverseOperator invOp = MNELIB::MNEInverseOperator::make_inverse_operator(
+        mne::MNEInverseOperator invOp = mne::MNEInverseOperator::make_inverse_operator(
             raw.info, fwd, noiseCov, 0.2f, 0.8f, false, true);
         if (invOp.nchan == 0)
             QSKIP("Inverse operator build failed");
@@ -606,7 +604,7 @@ private slots:
         QVERIFY(invOp.write(tmpPath.toStdU16String()));
         QVERIFY(QFile::exists(tmpPath));
 
-        MNELIB::MNEInverseOperator invOp2(tmpPath.toStdU16String());
+        mne::MNEInverseOperator invOp2(tmpPath.toStdU16String());
         QVERIFY(invOp2.nchan > 0);
         QCOMPARE(invOp2.nsource, invOp.nsource);
         QCOMPARE(invOp2.nchan, invOp.nchan);

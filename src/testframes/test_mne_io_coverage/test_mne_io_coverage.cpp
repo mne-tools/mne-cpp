@@ -31,9 +31,7 @@
 #include <inv/inv_source_estimate_token.h>
 #include <inv/inv_token.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 
@@ -256,15 +254,15 @@ private slots:
         InvSourceEstimate stc(sol, vertices, 0.0f, 0.001f);
 
         // Tokenize with default options
-        std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+        std::vector<InvToken> tokens = mne::tokenize(stc);
         QVERIFY(!tokens.empty());
 
         // Extract IDs
-        std::vector<int32_t> ids = INVLIB::tokenIds(tokens);
+        std::vector<int32_t> ids = mne::tokenIds(tokens);
         QCOMPARE(ids.size(), tokens.size());
 
         // Extract values
-        std::vector<float> vals = INVLIB::tokenValues(tokens);
+        std::vector<float> vals = mne::tokenValues(tokens);
         QCOMPARE(vals.size(), tokens.size());
     }
 
@@ -285,12 +283,12 @@ private slots:
         opts.includeConnectivity = false;
         opts.includePositions = false;
 
-        std::vector<InvToken> minTokens = INVLIB::tokenize(stc, opts);
+        std::vector<InvToken> minTokens = mne::tokenize(stc, opts);
         QVERIFY(!minTokens.empty());
 
         // Full tokenization should be larger
         InvTokenizeOptions fullOpts;
-        std::vector<InvToken> fullTokens = INVLIB::tokenize(stc, fullOpts);
+        std::vector<InvToken> fullTokens = mne::tokenize(stc, fullOpts);
         QVERIFY(fullTokens.size() >= minTokens.size());
     }
 
@@ -307,7 +305,7 @@ private slots:
         opts.maxSources = 10;
         opts.maxTimePoints = 5;
 
-        std::vector<InvToken> tokens = INVLIB::tokenize(stc, opts);
+        std::vector<InvToken> tokens = mne::tokenize(stc, opts);
         QVERIFY(!tokens.empty());
     }
 
@@ -321,8 +319,8 @@ private slots:
         InvSourceEstimate stc(sol, vertices, 0.0f, 0.001f);
 
         // Tokenize and reconstruct
-        std::vector<InvToken> tokens = INVLIB::tokenize(stc);
-        InvSourceEstimate reconstructed = INVLIB::fromTokens(tokens);
+        std::vector<InvToken> tokens = mne::tokenize(stc);
+        InvSourceEstimate reconstructed = mne::fromTokens(tokens);
 
         // Verify basic properties match
         QVERIFY(!reconstructed.empty());

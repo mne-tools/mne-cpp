@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of the ICP rigid alignment in @ref MNELIB::performIcp and @ref MNELIB::fitMatchedPoints.
+ * @brief    Implementation of the ICP rigid alignment in @ref mne::performIcp and @ref mne::fitMatchedPoints.
  *
  * Implements the per-iteration nearest-triangle search, the Horn / SVD
  * rigid solve, the convergence criterion (mean / max residual) and the
@@ -39,22 +39,21 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-bool MNELIB::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePoints,
-                        const Eigen::MatrixXf& matPointCloud,
-                        FiffCoordTrans& transFromTo,
-                        float& fRMSE,
-                        bool bScale,
-                        int iMaxIter,
-                        float fTol,
-                        const VectorXf& vecWeights)
+bool mne::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePoints,
+                     const Eigen::MatrixXf& matPointCloud,
+                     FiffCoordTrans& transFromTo,
+                     float& fRMSE,
+                     bool bScale,
+                     int iMaxIter,
+                     float fTol,
+                     const VectorXf& vecWeights)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -62,7 +61,7 @@ bool MNELIB::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePo
  */
 {
     if (matPointCloud.rows() == 0) {
-        BASELIB::Log::warning("[MNELIB::icp] Passed point cloud is empty.");
+        mne::Log::warning("[mne::icp] Passed point cloud is empty.");
         return false;
     }
 
@@ -88,13 +87,13 @@ bool MNELIB::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePo
     for (int iIter = 0; iIter < iMaxIter; ++iIter) {
         // Step a: compute the closest point on the surface; eq 29
         if (!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
-            BASELIB::Log::warning("[MNELIB::icp] find_closest_on_surface was not successful.");
+            mne::Log::warning("[mne::icp] find_closest_on_surface was not successful.");
             return false;
         }
 
         // Step b: compute the registration; eq 30
         if (!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeights)) {
-            BASELIB::Log::warning("[MNELIB::icp] point cloud registration not successful");
+            mne::Log::warning("[mne::icp] point cloud registration not successful");
         }
 
         // Step c: apply registration
@@ -108,26 +107,26 @@ bool MNELIB::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePo
 
         if (std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
             transFromTo = transICP;
-            BASELIB::Log::info("[MNELIB::icp] ICP was successful and converged after {} iterations with RMSE dist: {} mm.", iIter + 1, fRMSE * 1000);
+            mne::Log::info("[mne::icp] ICP was successful and converged after {} iterations with RMSE dist: {} mm.", iIter + 1, fRMSE * 1000);
             return true;
         }
         fMSEPrev = fMSE;
-        BASELIB::Log::info("[MNELIB::icp] ICP iteration {} with RMSE: {} mm.", iIter + 1, fRMSE * 1000);
+        mne::Log::info("[mne::icp] ICP iteration {} with RMSE: {} mm.", iIter + 1, fRMSE * 1000);
     }
     transFromTo = transICP;
 
-    BASELIB::Log::warning("[MNELIB::icp] Maximum number of {} iterations exceeded with RMSE: {} mm.", iMaxIter, fRMSE * 1000);
+    mne::Log::warning("[mne::icp] Maximum number of {} iterations exceeded with RMSE: {} mm.", iMaxIter, fRMSE * 1000);
     return true;
 }
 
 //=============================================================================================================
 
-bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
-                              const MatrixXf& matDstPoint,
-                              Eigen::Matrix4f& matTrans,
-                              float fScale,
-                              bool bScale,
-                              const VectorXf& vecWeights)
+bool mne::fitMatchedPoints(const MatrixXf& matSrcPoint,
+                           const MatrixXf& matDstPoint,
+                           Eigen::Matrix4f& matTrans,
+                           float fScale,
+                           bool bScale,
+                           const VectorXf& vecWeights)
 /**
  * Follow notation of P.J. Besl and N.D. McKay, A Method for
  * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
@@ -155,7 +154,7 @@ bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
 
     // test size of point clouds
     if (matSrcPoint.size() != matDstPoint.size()) {
-        BASELIB::Log::warning("[MNELIB::fitMatchedPoints] Point clouds do not match.");
+        mne::Log::warning("[mne::fitMatchedPoints] Point clouds do not match.");
         return false;
     }
 
@@ -229,12 +228,12 @@ bool MNELIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
 
 //=========================================================================================================
 
-bool MNELIB::discard3DPointOutliers(const std::shared_ptr<MNELIB::MNEProjectToSurface>& mneSurfacePoints,
-                                    const MatrixXf& matPointCloud,
-                                    const FiffCoordTrans& transFromTo,
-                                    VectorXi& vecTake,
-                                    MatrixXf& matTakePoint,
-                                    float fMaxDist)
+bool mne::discard3DPointOutliers(const std::shared_ptr<mne::MNEProjectToSurface>& mneSurfacePoints,
+                                 const MatrixXf& matPointCloud,
+                                 const FiffCoordTrans& transFromTo,
+                                 VectorXi& vecTake,
+                                 MatrixXf& matTakePoint,
+                                 float fMaxDist)
 {
     // Initialization
     int iNP = matPointCloud.rows();                             // The number of points
@@ -251,7 +250,7 @@ bool MNELIB::discard3DPointOutliers(const std::shared_ptr<MNELIB::MNEProjectToSu
     // discard outliers if necessary
     if (fMaxDist > 0.0) {
         if (!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
-            BASELIB::Log::warning("[MNELIB::icp] find_closest_on_surface was not successful.");
+            mne::Log::warning("[mne::icp] find_closest_on_surface was not successful.");
             return false;
         }
 
@@ -266,7 +265,7 @@ bool MNELIB::discard3DPointOutliers(const std::shared_ptr<MNELIB::MNEProjectToSu
             }
         }
     }
-    BASELIB::Log::info("[MNELIB::discardOutliers] {} digitizers discarded.", iDiscarded);
+    mne::Log::info("[mne::discardOutliers] {} digitizers discarded.", iDiscarded);
     return true;
 }
 

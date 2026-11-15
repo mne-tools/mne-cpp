@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -375,16 +375,16 @@ void TestFiffAnnotations::testCropEmpty()
 
 void TestFiffAnnotations::testReadersReportWhyTheyFail()
 {
-    QCOMPARE(FiffAnnotations::read(file("missing.json")).error().code, BASELIB::ErrorCode::Io);
-    QCOMPARE(FiffAnnotations::read_csv(file("missing.csv")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffAnnotations::read(file("missing.json")).error().code, mne::ErrorCode::Io);
+    QCOMPARE(FiffAnnotations::read_csv(file("missing.csv")).error().code, mne::ErrorCode::Io);
 
     const std::filesystem::path broken = file("broken.json");
     std::ofstream(broken) << "{\"annotations\": [";
-    QCOMPARE(FiffAnnotations::read_json(broken).error().code, BASELIB::ErrorCode::Format);
+    QCOMPARE(FiffAnnotations::read_json(broken).error().code, mne::ErrorCode::Format);
 
     FiffAnnotations annot;
     annot.append(0.0, 1.0, "x");
-    QCOMPARE(annot.write(file("no/such/dir/annot.json")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(annot.write(file("no/such/dir/annot.json")).error().code, mne::ErrorCode::Io);
 
     // An unknown extension is read as JSON when it is JSON, otherwise as CSV
     const std::filesystem::path text = file("annot.txt");

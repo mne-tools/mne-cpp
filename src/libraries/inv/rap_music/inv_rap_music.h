@@ -9,15 +9,15 @@
  * @date     March 2026
  * @brief    Recursively Applied and Projected MUSIC (RAP-MUSIC) source-localisation algorithm.
  *
- * @ref INVLIB::InvRapMusic implements the RAP-MUSIC scanning algorithm
+ * @ref mne::InvRapMusic implements the RAP-MUSIC scanning algorithm
  * of Mosher &amp; Leahy, IEEE Trans. Signal Process. 47(2), 332-340
  * (1999). The algorithm decomposes the measurement covariance to obtain
  * the signal subspace, scans the leadfield for the grid-point pair with
  * the largest subspace-correlation, projects that pair out of the
  * signal subspace, and repeats until the desired number of sources is
  * found or the correlation drops below the user-supplied threshold.
- * Outputs are returned as both an @ref INVLIB::InvSourceEstimate (dense grid
- * with active vertices populated) and a list of @ref INVLIB::InvDipolePair
+ * Outputs are returned as both an @ref mne::InvSourceEstimate (dense grid
+ * with active vertices populated) and a list of @ref mne::InvDipolePair
  * records carrying per-iteration orientation and correlation diagnostics.
  */
 
@@ -47,10 +47,10 @@
 #include <Eigen/LU>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -123,7 +123,7 @@ public:
      *                           the strongest.
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      */
-    InvRapMusic(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    InvRapMusic(mne::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
     virtual ~InvRapMusic();
 
@@ -138,9 +138,9 @@ public:
      * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
      * @return   true if successful initialized, false otherwise.
      */
-    bool init(MNELIB::MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
+    bool init(mne::MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const mne::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
     virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
 
@@ -148,7 +148,7 @@ public:
 
     virtual const char* getName() const;
 
-    virtual const MNELIB::MNESourceSpaces& getSourceSpace() const;
+    virtual const mne::MNESourceSpaces& getSourceSpace() const;
 
     //=========================================================================================================
     /**
@@ -289,7 +289,7 @@ protected:
                              double p_valCor,
                              std::vector<InvDipolePair<double>>& p_RapDipoles);
 
-    MNELIB::MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
+    mne::MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
     int m_iN;            /**< Number of Sources to find*/
     double m_dThreshold; /**< Threshold which defines the minimal correlation. Is the correlation of

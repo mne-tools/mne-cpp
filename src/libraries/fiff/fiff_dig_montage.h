@@ -31,10 +31,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -68,9 +68,9 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The montage, or why the file cannot be read: Io if it cannot be opened, Format if the
      *         extension, unit or content is wrong or the number of names does not match the points.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigMontage> read_polhemus_isotrak(const std::filesystem::path& path,
-                                                                                 std::span<const std::string> ch_names = {},
-                                                                                 std::string_view unit = "m");
+    [[nodiscard]] static mne::Expected<FiffDigMontage> read_polhemus_isotrak(const std::filesystem::path& path,
+                                                                             std::span<const std::string> ch_names = {},
+                                                                             std::string_view unit = "m");
 
     //=========================================================================================================
     /**
@@ -83,9 +83,9 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The points in metres, one per row, or why the file cannot be read: Io if it cannot be
      *         opened, Format if the extension, unit or header is wrong or a row is not three numbers.
      */
-    [[nodiscard]] static BASELIB::Expected<Eigen::MatrixX3d> read_polhemus_fastscan(const std::filesystem::path& path,
-                                                                                    std::string_view unit = "mm",
-                                                                                    bool require_header = true);
+    [[nodiscard]] static mne::Expected<Eigen::MatrixX3d> read_polhemus_fastscan(const std::filesystem::path& path,
+                                                                                std::string_view unit = "mm",
+                                                                                bool require_header = true);
 
     //=========================================================================================================
     /**
@@ -97,7 +97,7 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The montage, or why the file cannot be read: Io if it cannot be opened, Format if it
      *         cannot be parsed, an electrode has no position or a fiducial is missing.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigMontage> read_captrak(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffDigMontage> read_captrak(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The montage, or why the file cannot be read: Io if it cannot be opened, Format if it
      *         cannot be parsed, a sensor has no number or position or a fiducial is missing.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigMontage> read_egi(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffDigMontage> read_egi(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -128,10 +128,10 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The montage, or why the file cannot be read: Io if it cannot be opened, Format if a row
      *         is malformed, NotFound if a named fiducial is missing.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigMontage> read_localite(const std::filesystem::path& path,
-                                                                         std::string_view nasion = {},
-                                                                         std::string_view lpa = {},
-                                                                         std::string_view rpa = {});
+    [[nodiscard]] static mne::Expected<FiffDigMontage> read_localite(const std::filesystem::path& path,
+                                                                     std::string_view nasion = {},
+                                                                     std::string_view lpa = {},
+                                                                     std::string_view rpa = {});
 
     //=========================================================================================================
     /**
@@ -144,9 +144,9 @@ struct FIFFSHARED_EXPORT FiffDigMontage
      * @return The montage, or why the file cannot be read: Io if it cannot be opened, Format if a line
      *         does not hold five entries.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigMontage> read_neuroscan_dat(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffDigMontage> read_neuroscan_dat(const std::filesystem::path& path);
 };
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFFLIB_FIFF_DIG_MONTAGE_H

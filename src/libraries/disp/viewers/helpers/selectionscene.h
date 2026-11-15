@@ -10,9 +10,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QGraphicsScene of the sensor-layout dots used by @ref DISPLIB::ChannelSelectionView for interactive channel picking.
+ * @brief    QGraphicsScene of the sensor-layout dots used by @ref mne::disp::ChannelSelectionView for interactive channel picking.
  *
- * SelectionScene places one @ref DISPLIB::SelectionSceneItem per sensor at the
+ * SelectionScene places one @ref mne::disp::SelectionSceneItem per sensor at the
  * 2-D position read from the active layout and supports rubber-band
  * selection and lasso-style grouping. Selection changes are emitted
  * as channel-name lists so the host view can store them as named
@@ -34,14 +34,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -86,6 +86,6 @@ public:
 
     int m_iChannelTypeMode; /**< The channel type mode. */
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // SelectionScene_H

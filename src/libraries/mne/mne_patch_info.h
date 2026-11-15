@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Patch information (cluster of cortex vertices around each decimated source) used by orientation priors.
  *
- * @ref MNELIB::MNEPatchInfo stores, for every decimated source vertex,
+ * @ref mne::MNEPatchInfo stores, for every decimated source vertex,
  * the list of dense-cortex vertices that map to it (the @c patch) and a
  * summary triangle normal used as the patch-averaged surface normal.
  * Required for the loose-orientation MNE prior and for patch-based
@@ -32,10 +32,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -108,6 +108,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEPATCHINFO_H

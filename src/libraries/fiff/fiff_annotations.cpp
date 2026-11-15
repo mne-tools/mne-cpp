@@ -37,18 +37,18 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using BASELIB::ErrorCode;
-using BASELIB::Expected;
-using BASELIB::fail;
+using namespace mne;
+using mne::ErrorCode;
+using mne::Expected;
+using mne::fail;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-BASELIB::JsonArray FIFFLIB::names_to_json(const std::vector<std::string>& names)
+mne::JsonArray mne::names_to_json(const std::vector<std::string>& names)
 {
-    BASELIB::JsonArray array;
+    mne::JsonArray array;
     array.reserve(names.size());
     for (const std::string& name : names) {
         array.push_back(name);
@@ -58,11 +58,11 @@ BASELIB::JsonArray FIFFLIB::names_to_json(const std::vector<std::string>& names)
 
 //=============================================================================================================
 
-std::vector<std::string> FIFFLIB::names_from_json(const BASELIB::JsonArray& array)
+std::vector<std::string> mne::names_from_json(const mne::JsonArray& array)
 {
     std::vector<std::string> names;
     names.reserve(array.size());
-    for (const BASELIB::JsonValue& name : array) {
+    for (const mne::JsonValue& name : array) {
         names.push_back(name.to_std_string());
     }
     return names;
@@ -70,12 +70,12 @@ std::vector<std::string> FIFFLIB::names_from_json(const BASELIB::JsonArray& arra
 
 //=============================================================================================================
 
-BASELIB::JsonObject FIFFLIB::extras_to_json(const FiffAnnotation::Extras& extras)
+mne::JsonObject mne::extras_to_json(const FiffAnnotation::Extras& extras)
 {
-    BASELIB::JsonObject object;
+    mne::JsonObject object;
     object.reserve(extras.size());
     for (const auto& [key, value] : extras) {
-        object.insert(key, std::visit([](const auto& v) -> BASELIB::JsonValue {
+        object.insert(key, std::visit([](const auto& v) -> mne::JsonValue {
                           if constexpr (std::is_same_v<std::decay_t<decltype(v)>, std::monostate>) {
                               return nullptr;
                           } else {
@@ -89,7 +89,7 @@ BASELIB::JsonObject FIFFLIB::extras_to_json(const FiffAnnotation::Extras& extras
 
 //=============================================================================================================
 
-FiffAnnotation::Extras FIFFLIB::extras_from_json(const BASELIB::JsonObject& object)
+FiffAnnotation::Extras mne::extras_from_json(const mne::JsonObject& object)
 {
     FiffAnnotation::Extras extras;
     for (const auto& [key, value] : object) {
@@ -123,7 +123,7 @@ namespace
 
 std::string lowerExtension(const std::filesystem::path& path)
 {
-    return BASELIB::toLower(BASELIB::utf8FromPath(path.extension()));
+    return mne::toLower(mne::utf8FromPath(path.extension()));
 }
 
 } // namespace
@@ -198,19 +198,19 @@ FiffAnnotations FiffAnnotations::crop(double tmin, double tmax) const
 
 Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path& path)
 {
-    const Expected<std::string> bytes = BASELIB::read_text_file(path);
+    const Expected<std::string> bytes = mne::read_text_file(path);
     if (!bytes) {
         return std::unexpected(bytes.error());
     }
-    BASELIB::JsonParseError parseError;
-    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*bytes, &parseError);
-    if (parseError.error != BASELIB::JsonParseError::NoError || !doc.is_object()) {
-        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", BASELIB::utf8FromPath(path), parseError.error_string());
+    mne::JsonParseError parseError;
+    const mne::JsonDocument doc = mne::JsonDocument::from_json(*bytes, &parseError);
+    if (parseError.error != mne::JsonParseError::NoError || !doc.is_object()) {
+        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", mne::utf8FromPath(path), parseError.error_string());
     }
 
     FiffAnnotations annot;
-    for (const BASELIB::JsonValue& entry : doc.object().value("annotations").to_array()) {
-        const BASELIB::JsonObject& obj = entry.to_object();
+    for (const mne::JsonValue& entry : doc.object().value("annotations").to_array()) {
+        const mne::JsonObject& obj = entry.to_object();
         annot.m_annotations.push_back({obj.value("onset").to_double(0.0),
                                        obj.value("duration").to_double(0.0),
                                        obj.value("description").to_std_string(),
@@ -225,39 +225,39 @@ Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path
 
 Expected<void> FiffAnnotations::write_json(const std::filesystem::path& path) const
 {
-    BASELIB::JsonArray arr;
+    mne::JsonArray arr;
     arr.reserve(m_annotations.size());
     for (const FiffAnnotation& a : m_annotations) {
-        arr.push_back(BASELIB::JsonObject{{"onset", a.onset},
-                                          {"duration", a.duration},
-                                          {"description", a.description},
-                                          {"channel_names", names_to_json(a.ch_names)},
-                                          {"comment", a.comment},
-                                          {"extras", extras_to_json(a.extras)}});
+        arr.push_back(mne::JsonObject{{"onset", a.onset},
+                                      {"duration", a.duration},
+                                      {"description", a.description},
+                                      {"channel_names", names_to_json(a.ch_names)},
+                                      {"comment", a.comment},
+                                      {"extras", extras_to_json(a.extras)}});
     }
-    return BASELIB::write_text_file(path, BASELIB::JsonDocument(BASELIB::JsonObject{{"annotations", std::move(arr)}}).to_json());
+    return mne::write_text_file(path, mne::JsonDocument(mne::JsonObject{{"annotations", std::move(arr)}}).to_json());
 }
 
 //=============================================================================================================
 
 Expected<FiffAnnotations> FiffAnnotations::read_csv(const std::filesystem::path& path)
 {
-    const Expected<std::string> bytes = BASELIB::read_text_file(path);
+    const Expected<std::string> bytes = mne::read_text_file(path);
     if (!bytes) {
         return std::unexpected(bytes.error());
     }
     FiffAnnotations annot;
-    const BASELIB::StringList lines = BASELIB::split(*bytes, '\n');
+    const mne::StringList lines = mne::split(*bytes, '\n');
     for (std::size_t i = 1; i < lines.size(); ++i) {
-        const std::string_view line = BASELIB::trimmed(lines[i]);
+        const std::string_view line = mne::trimmed(lines[i]);
         // The description may hold commas, so only the first two separate fields
         const std::size_t first = line.find(',');
         const std::size_t second = first == std::string_view::npos ? first : line.find(',', first + 1);
         if (second == std::string_view::npos) {
             continue;
         }
-        const std::optional<double> onset = BASELIB::toDouble(line.substr(0, first));
-        const std::optional<double> duration = BASELIB::toDouble(line.substr(first + 1, second - first - 1));
+        const std::optional<double> onset = mne::toDouble(line.substr(0, first));
+        const std::optional<double> duration = mne::toDouble(line.substr(first + 1, second - first - 1));
         if (onset && duration) {
             annot.append(*onset, *duration, std::string(line.substr(second + 1)));
         }
@@ -274,7 +274,7 @@ Expected<void> FiffAnnotations::write_csv(const std::filesystem::path& path) con
     for (const FiffAnnotation& a : m_annotations) {
         std::format_to(std::back_inserter(text), "{},{},{}\n", a.onset, a.duration, a.description);
     }
-    return BASELIB::write_text_file(path, text);
+    return mne::write_text_file(path, text);
 }
 
 //=============================================================================================================

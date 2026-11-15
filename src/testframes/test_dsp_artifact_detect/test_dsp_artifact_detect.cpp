@@ -24,8 +24,7 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -407,11 +406,11 @@ private slots:
         params.dTmin = -0.5;
         params.dTmax = 0.5;
         params.bApplyBaseline = false;
-        const std::vector<MNELIB::MNEEpochData> epochs = EpochExtractor::extract(data, found, sf, params);
+        const std::vector<mne::MNEEpochData> epochs = EpochExtractor::extract(data, found, sf, params);
         QCOMPARE(epochs.size(), events.size());
         QCOMPARE(epochs.front().epoch.cols(), 301);
         double sumSq = 0.0;
-        for (const MNELIB::MNEEpochData& e : epochs) {
+        for (const mne::MNEEpochData& e : epochs) {
             sumSq += e.epoch.topRows(306).squaredNorm();
         }
         QVERIFY(qAbs(epochs.front().epoch(0, 0) / first - 1.0) < 1e-5);
@@ -475,7 +474,7 @@ private slots:
             const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
             QCOMPARE(p.data.col_names.at(static_cast<int>(peakIdx)), peakNames[i]);
             QVERIFY2(qAbs(peak / peaks[i] - 1.0) < 1e-5, qPrintable(QString("%1 peak %2").arg(p.desc).arg(peak, 0, 'g', 12)));
-            const double first = std::fabs(v(BASELIB::indexOf(p.data.col_names, firstNames[i].toStdString())));
+            const double first = std::fabs(v(mne::indexOf(p.data.col_names, firstNames[i].toStdString())));
             QVERIFY2(qAbs(first / firsts[i] - 1.0) < 1e-4, qPrintable(QString("%1 first %2").arg(p.desc).arg(first, 0, 'g', 12)));
         }
     }

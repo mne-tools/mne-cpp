@@ -1,18 +1,18 @@
 ---
 id: mnectf-comp-data
-title: "MNELIB::MNECTFCompData"
+title: "mne::MNECTFCompData"
 sidebar_label: MNECTFCompData
 sidebar_position: 9
 ---
 
 # MNECTFCompData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_ctf_comp_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_ctf_comp_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_ctf_comp_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_ctf_comp_data.h)
 
 `#include <mne/mne_ctf_comp_data.h>`
 
 ```cpp
-class MNELIB::MNECTFCompData
+class mne::MNECTFCompData
 ```
 
 Represents a single CTF compensation data element.
@@ -95,7 +95,7 @@ Apply or remove channel calibration to/from the compensation matrix by scaling e
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 338"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 336"
 // Open a third-order gradiometer recording and read it uncompensated (grade 0)
 std::unique_ptr<MNERawData> ctfRaw(MNERawData::open_file_comp(ctfPath.toStdU16String(), false, false, MNEFilterDef(), 0));
 const MNECTFCompDataSet& comp = *ctfRaw->comp; // grades 1, 2, 3 and two 4D kinds

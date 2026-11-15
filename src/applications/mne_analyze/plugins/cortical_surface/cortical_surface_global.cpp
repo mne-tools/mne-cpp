@@ -19,15 +19,15 @@ namespace CORTICALSURFACEPLUGIN
 
 const char* buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 const char* buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 const char* buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }
 
 } // namespace CORTICALSURFACEPLUGIN

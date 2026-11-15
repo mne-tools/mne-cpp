@@ -1,18 +1,18 @@
 ---
 id: acq-error
-title: "ACQLIB::AcqError"
+title: "mne::AcqError"
 sidebar_label: AcqError
 sidebar_position: 4
 ---
 
 # AcqError
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_error.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_error.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_error.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_error.h)
 
 `#include <acq/acq_error.h>`
 
 ```cpp
-class ACQLIB::AcqError
+class mne::AcqError
 ```
 
 An error value: a catalogue code plus an optional context string.
@@ -102,7 +102,7 @@ Creates an error with context (control path, allocates).
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -133,7 +133,7 @@ setMode(mode);
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 297"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 296"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();
@@ -154,7 +154,7 @@ for (std::size_t e = 0; e < samples.events().size(); ++e) {
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 87"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 86"
 device->close();
 if (const AcqError error = recorder->stop(); !error.ok()) {
     std::fprintf(stderr, "%s\n", error.text().c_str());

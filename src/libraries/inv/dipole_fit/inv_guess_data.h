@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Initial-guess grid for the dipole-fit optimiser, with per-guess forward fields pre-computed.
  *
- * @ref INVLIB::InvGuessData generates and stores the regular grid of
+ * @ref mne::InvGuessData generates and stores the regular grid of
  * candidate dipole positions that seeds the Nelder-Mead optimiser used
- * by @ref INVLIB::InvDipoleFit. For every guess location the corresponding
- * forward-field SVD is pre-computed into an @ref INVLIB::InvDipoleForward, so
+ * by @ref mne::InvDipoleFit. For every guess location the corresponding
+ * forward-field SVD is pre-computed into an @ref mne::InvDipoleForward, so
  * the per-iteration evaluation cost reduces to a dense matmul. Replaces
  * the @c guessDataRec record of MNE-C and is built either from a
  * user-supplied guess source space or directly from an inner-skull BEM
@@ -45,10 +45,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -122,6 +122,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_GUESS_DATA_H

@@ -24,19 +24,19 @@
 
 const char* CONTROLMANAGERPLUGIN::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
 const char* CONTROLMANAGERPLUGIN::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
 const char* CONTROLMANAGERPLUGIN::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

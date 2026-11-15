@@ -37,10 +37,10 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
@@ -246,7 +246,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
 
     //=========================================================================================================
     /**
@@ -254,7 +254,7 @@ signals:
      *
      * @param[in] style       the new gui style.
      */
-    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
 
 protected:
     QSharedPointer<AnalyzeData> m_pAnalyzeData; /**< Pointer to the global data base */
@@ -267,6 +267,6 @@ protected:
 
 } //Namespace
 
-Q_DECLARE_INTERFACE(ANSHAREDLIB::AbstractPlugin, "ansharedlib/1.0")
+Q_DECLARE_INTERFACE(mne::analyze::AbstractPlugin, "ansharedlib/1.0")
 
 #endif //ABSTRACTPLUGIN_H

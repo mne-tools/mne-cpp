@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -98,7 +98,7 @@ void InvBeamformerCompute::regPinv(const MatrixXd& C,
     }
 
     if (rankOut == 0) {
-        BASELIB::Log::warning("InvBeamformerCompute::regPinv - Covariance matrix has zero rank!");
+        mne::Log::warning("InvBeamformerCompute::regPinv - Covariance matrix has zero rank!");
         CInv = MatrixXd::Zero(n, n);
         loadingFactor = 0.0;
         return;
@@ -183,11 +183,11 @@ bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
     const int nSources = nDipoles / nOrient;
 
     if (nSources * nOrient != nDipoles) {
-        BASELIB::Log::warning("InvBeamformerCompute::computeBeamformer - G.cols() not divisible by nOrient!");
+        mne::Log::warning("InvBeamformerCompute::computeBeamformer - G.cols() not divisible by nOrient!");
         return false;
     }
     if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
-        BASELIB::Log::warning("InvBeamformerCompute::computeBeamformer - Cm dimension mismatch with leadfield!");
+        mne::Log::warning("InvBeamformerCompute::computeBeamformer - Cm dimension mismatch with leadfield!");
         return false;
     }
 

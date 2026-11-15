@@ -1,18 +1,18 @@
 ---
 id: electrode-object
-title: "DISP3DLIB::ElectrodeObject"
+title: "mne::disp::ElectrodeObject"
 sidebar_label: ElectrodeObject
 sidebar_position: 1
 ---
 
 # ElectrodeObject
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/electrodeobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/electrodeobject.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/electrodeobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/electrodeobject.h)
 
 `#include <disp3D/electrodeobject.h>`
 
 ```cpp
-class DISP3DLIB::ElectrodeObject
+class mne::disp::ElectrodeObject
 ```
 
 Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
@@ -289,7 +289,7 @@ Intersect a ray with the contact spheres.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 139"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 137"
 ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");

@@ -30,7 +30,7 @@
 #include <memory>
 
 using namespace DATAMANAGERPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 

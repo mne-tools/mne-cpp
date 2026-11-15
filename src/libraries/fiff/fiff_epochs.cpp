@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -50,12 +50,12 @@ std::vector<FiffEpochData> FiffEpochs::makeFixedLengthEpochs(const MatrixXd& mat
     std::vector<FiffEpochData> epochs;
 
     if (matData.size() == 0 || dSFreq <= 0.0 || dDuration <= 0.0) {
-        BASELIB::Log::warning("[FiffEpochs::makeFixedLengthEpochs] Invalid input parameters.");
+        mne::Log::warning("[FiffEpochs::makeFixedLengthEpochs] Invalid input parameters.");
         return epochs;
     }
 
     if (dOverlap >= dDuration) {
-        BASELIB::Log::warning("[FiffEpochs::makeFixedLengthEpochs] Overlap must be less than duration.");
+        mne::Log::warning("[FiffEpochs::makeFixedLengthEpochs] Overlap must be less than duration.");
         return epochs;
     }
 
@@ -115,7 +115,7 @@ FiffEvoked FiffEpochs::averageEpochs(const std::vector<FiffEpochData>& epochs,
     FiffEvoked evoked;
 
     if (epochs.empty()) {
-        BASELIB::Log::warning("[FiffEpochs::averageEpochs] Empty epoch list.");
+        mne::Log::warning("[FiffEpochs::averageEpochs] Empty epoch list.");
         return evoked;
     }
 
@@ -127,7 +127,7 @@ FiffEvoked FiffEpochs::averageEpochs(const std::vector<FiffEpochData>& epochs,
 
     for (const auto& epoch : epochs) {
         if (epoch.data.rows() != nCh || epoch.data.cols() != nTimes) {
-            BASELIB::Log::warning("[FiffEpochs::averageEpochs] Inconsistent epoch dimensions; skipping.");
+            mne::Log::warning("[FiffEpochs::averageEpochs] Inconsistent epoch dimensions; skipping.");
             continue;
         }
         avg += epoch.data;

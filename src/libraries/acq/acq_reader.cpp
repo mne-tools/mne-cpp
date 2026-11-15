@@ -28,8 +28,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 namespace
 {
@@ -347,7 +347,7 @@ AcqExpected<AcqViewLease> AcqReader::lease(std::size_t minSamples, std::chrono::
     return AcqViewLease(m_core.get(), m_slot, *view);
 }
 
-AcqError ACQLIB::detail::releaseView(AcqStreamCore& c, std::uint32_t index, AcqBlockView& view) noexcept
+AcqError mne::detail::releaseView(AcqStreamCore& c, std::uint32_t index, AcqBlockView& view) noexcept
 {
     ReaderSlot& slot = c.slots[index];
     if (!slot.holding || ViewAccess::ticket(view) != slot.ticket) {

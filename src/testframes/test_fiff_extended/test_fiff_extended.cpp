@@ -22,7 +22,7 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_coord_trans.h>
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFiffExtended : public QObject
@@ -216,7 +216,7 @@ private slots:
         RowVectorXi picks = raw.info.pick_types(true, true, false, {}, raw.info.bads);
         StringList chNames;
         for (int i = 0; i < picks.size(); ++i) {
-            if (BASELIB::contains(cov.names, raw.info.ch_names[picks(i)]))
+            if (mne::contains(cov.names, raw.info.ch_names[picks(i)]))
                 chNames.push_back(raw.info.ch_names[picks(i)]);
         }
         FiffCov prepared = cov.prepare_noise_cov(raw.info, chNames);
@@ -340,7 +340,7 @@ private slots:
     {
         FiffInfo info = createSyntheticInfo(5);
         RowVectorXd cals;
-        auto pStream = FiffStream::start_writing_raw(std::make_unique<BASELIB::MemoryByteStream>(), info, cals);
+        auto pStream = FiffStream::start_writing_raw(std::make_unique<mne::MemoryByteStream>(), info, cals);
         QVERIFY(pStream);
         pStream->finish_writing_raw();
     }

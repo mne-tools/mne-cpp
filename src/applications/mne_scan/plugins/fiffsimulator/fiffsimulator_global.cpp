@@ -24,19 +24,19 @@
 
 const char* FIFFSIMULATORPLUGIN::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
 const char* FIFFSIMULATORPLUGIN::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
 const char* FIFFSIMULATORPLUGIN::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

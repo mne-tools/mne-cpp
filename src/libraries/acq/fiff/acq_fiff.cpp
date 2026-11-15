@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Conversion between AcqStreamInfo and FIFFLIB::FiffInfo.
+ * @brief    Conversion between AcqStreamInfo and mne::FiffInfo.
  */
 
 //=============================================================================================================
@@ -43,8 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE LOCAL
@@ -93,8 +92,8 @@ QByteArray serialize(const FiffInfo& info)
     // The blocks of the source file are not copied: the payload must not depend on files elsewhere.
     FiffInfo copy = info;
     copy.filename.clear();
-    auto memory = std::make_unique<BASELIB::MemoryByteStream>();
-    const BASELIB::MemoryByteStream& written = *memory;
+    auto memory = std::make_unique<mne::MemoryByteStream>();
+    const mne::MemoryByteStream& written = *memory;
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(std::move(memory), copy, cals, defaultMatrixXi, false);
     stream->finish_writing_raw();
@@ -103,7 +102,7 @@ QByteArray serialize(const FiffInfo& info)
 
 bool deserialize(const std::vector<std::byte>& data, FiffInfo& info)
 {
-    FiffStream stream(std::make_unique<BASELIB::MemoryByteStream>(data));
+    FiffStream stream(std::make_unique<mne::MemoryByteStream>(data));
     if (!stream.open()) {
         return false;
     }
@@ -117,7 +116,7 @@ bool deserialize(const std::vector<std::byte>& data, FiffInfo& info)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqStreamInfo ACQLIB::fromFiffInfo(const FiffInfo& info, AcqSampleFormat format)
+AcqStreamInfo mne::fromFiffInfo(const FiffInfo& info, AcqSampleFormat format)
 {
     AcqStreamInfo stream;
     stream.name = "raw";
@@ -164,7 +163,7 @@ AcqStreamInfo ACQLIB::fromFiffInfo(const FiffInfo& info, AcqSampleFormat format)
 
 //=============================================================================================================
 
-AcqExpected<FiffInfo> ACQLIB::toFiffInfo(const AcqStreamInfo& info)
+AcqExpected<FiffInfo> mne::toFiffInfo(const AcqStreamInfo& info)
 {
     if (isComplex(info.format) || info.segmentation.mode != AcqSegmentation::Mode::Continuous) {
         return AcqError(AcqErrorCode::UnsupportedFormat, "FIFF raw data holds continuous real samples only");

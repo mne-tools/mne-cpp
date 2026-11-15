@@ -29,9 +29,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using COMLIB::UdpSocket;
+using namespace mne;
+using namespace mne::detail;
+using mne::UdpSocket;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -163,14 +163,14 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<NatusTransport> ACQLIB::detail::make_natus_simulator(const NatusSimulation& simulation)
+std::unique_ptr<NatusTransport> mne::detail::make_natus_simulator(const NatusSimulation& simulation)
 {
     return std::make_unique<NatusSimulator>(simulation);
 }
 
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<NatusTransport>> ACQLIB::detail::open_natus_receiver(const std::string& address, std::uint16_t port)
+AcqExpected<std::unique_ptr<NatusTransport>> mne::detail::open_natus_receiver(const std::string& address, std::uint16_t port)
 {
     auto socket = UdpSocket::bind(address, port);
     if (!socket) {

@@ -31,7 +31,7 @@
 #include <QVector3D>
 
 using namespace MRISLICESPLUGIN;
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 

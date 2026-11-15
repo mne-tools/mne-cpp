@@ -43,8 +43,7 @@
 //=============================================================================================================
 
 using namespace NATUSPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -88,9 +87,9 @@ void Natus::unload()
 
 std::string Natus::uri() const
 {
-    ACQLIB::AcqUri uri{.scheme = "natus",
-                       .target = {},
-                       .params = {{"channels", std::to_string(m_iNumberChannels)}, {"rate", std::to_string(m_iSamplingFreq)}}};
+    mne::AcqUri uri{.scheme = "natus",
+                    .target = {},
+                    .params = {{"channels", std::to_string(m_iNumberChannels)}, {"rate", std::to_string(m_iSamplingFreq)}}};
     if (m_bSimulate) {
         uri.params.emplace_back("simulate", "1");
     } else {
@@ -104,15 +103,15 @@ std::string Natus::uri() const
 
 bool Natus::start()
 {
-    ACQLIB::register_natus_scheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::register_natus_scheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[Natus::start]" << QString::fromStdString(device.error().text());
         return false;
     }
     m_device = std::move(*device);
-    auto fiffInfo = ACQLIB::toFiffInfo(*m_device.stream().info());
-    auto reader = m_device.stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
+    auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[Natus::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         m_device.close();
@@ -120,11 +119,11 @@ bool Natus::start()
     }
 
     //The channels and rate can change on every start, so the output is set up here and not in init()
-    m_pRMTSA_Natus->measurementData()->initFromFiffInfo(std::make_shared<FIFFLIB::FiffInfo>(std::move(*fiffInfo)));
+    m_pRMTSA_Natus->measurementData()->initFromFiffInfo(std::make_shared<mne::FiffInfo>(std::move(*fiffInfo)));
     m_pRMTSA_Natus->measurementData()->setMultiArraySize(1);
     m_pRMTSA_Natus->measurementData()->setVisibility(true);
 
-    if (ACQLIB::AcqError e = m_device.start(); !e.ok()) {
+    if (mne::AcqError e = m_device.start(); !e.ok()) {
         qWarning() << "[Natus::start]" << QString::fromStdString(e.text());
         m_device.close();
         return false;
@@ -140,7 +139,7 @@ bool Natus::stop()
 {
     requestInterruption();
     wait();
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
     m_device.close();
 
     // Clear all data in the buffer connected to displays and other plugins
@@ -176,10 +175,10 @@ void Natus::run()
     const std::size_t channels = m_device.stream().info()->channelCount();
     MatrixXd block(static_cast<Index>(channels), m_iSamplesPerBlock);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (!read) {
-            if (read.error() == ACQLIB::AcqErrorCode::Timeout || read.error() == ACQLIB::AcqErrorCode::Overrun) {
+            if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
             qWarning() << "[Natus::run]" << QString::fromStdString(read.error().text());

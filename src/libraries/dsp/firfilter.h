@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Discoverable design / apply façade over the @ref DSPLIB::FilterKernel FIR engine.
+ * @brief    Discoverable design / apply façade over the @ref mne::FilterKernel FIR engine.
  *
- * FirFilter mirrors the @ref DSPLIB::IirFilter API surface (design, apply,
+ * FirFilter mirrors the @ref mne::IirFilter API surface (design, apply,
  * applyZeroPhase, applyZeroPhaseMatrix) so callers see one consistent
  * way of building and running FIR or IIR filters in mne-cpp. Internally
- * every call delegates to @ref DSPLIB::FilterKernel, which executes the actual
+ * every call delegates to @ref mne::FilterKernel, which executes the actual
  * frequency-domain overlap-add convolution against the precomputed FFT
  * of the impulse response.
  *
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -231,6 +231,6 @@ private:
     static Eigen::MatrixXd overlapAddZeroPhase(const Eigen::MatrixXd& matData, const Eigen::RowVectorXd& h, Eigen::Index nEdge);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // FIRFILTER_DSP_H

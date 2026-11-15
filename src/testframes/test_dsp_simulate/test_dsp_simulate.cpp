@@ -46,11 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

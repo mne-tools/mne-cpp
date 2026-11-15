@@ -15,7 +15,7 @@
  * human-readable name and an RGBA tuple used by @c tkmedit, @c freeview
  * and downstream tooling. The same table is also embedded directly inside
  * @c .annot files via the @c TAG_OLD_COLORTABLE and @c TAG_NEW_COLORTABLE
- * blocks parsed by @ref FSLIB::FsAnnotation.
+ * blocks parsed by @ref mne::FsAnnotation.
  *
  * This class is the binary-friendly in-memory form of either source:
  * - @c struct_names — region name per entry, indexed by row
@@ -49,10 +49,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -97,7 +97,7 @@ public:
      *
      * @return ids.
      */
-    inline const BASELIB::StringList& getNames() const;
+    inline const mne::StringList& getNames() const;
 
     //=========================================================================================================
     /**
@@ -108,10 +108,10 @@ public:
     inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
-    std::string orig_tab;             /**< FsColortable raw data. */
-    std::int32_t numEntries;          /**< Number of entries. */
-    BASELIB::StringList struct_names; /**< Anatomical ROI description. */
-    Eigen::MatrixXi table;            /**< labels and corresponing colorcode. */
+    std::string orig_tab;         /**< FsColortable raw data. */
+    std::int32_t numEntries;      /**< Number of entries. */
+    mne::StringList struct_names; /**< Anatomical ROI description. */
+    Eigen::MatrixXi table;        /**< labels and corresponing colorcode. */
 };
 
 //=============================================================================================================
@@ -129,7 +129,7 @@ inline Eigen::VectorXi FsColortable::getLabelIds() const
 
 //=============================================================================================================
 
-inline const BASELIB::StringList& FsColortable::getNames() const
+inline const mne::StringList& FsColortable::getNames() const
 {
     return struct_names;
 }

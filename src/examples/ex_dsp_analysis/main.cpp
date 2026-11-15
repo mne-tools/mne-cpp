@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -188,12 +188,12 @@ int main(int argc, char* argv[])
     MatrixXd waveforms(2, 4);
     waveforms << 1.0, 2.0, 3.0, 4.0,
         -1.0, 0.0, 1.0, 0.0;
-    const INVLIB::InvSourceEstimate stc = simulateStcFromWaveforms(waveforms, (VectorXi(2) << 101, 104).finished(), vertices, 0.0f, 0.01f);
+    const mne::InvSourceEstimate stc = simulateStcFromWaveforms(waveforms, (VectorXi(2) << 101, 104).finished(), vertices, 0.0f, 0.01f);
 
     SimulateStcParams gaussians; // one Gaussian bump per active vertex, seeded
     gaussians.sfreq = 200.0f;
     gaussians.duration = 0.5f;
-    const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
+    const mne::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
     //! [simulate_stc_usage]
     ok &= expect(stc.data.rows() == 5 && stc.data.row(1) == waveforms.row(0) && stc.data.row(4) == waveforms.row(1) && stc.data.row(0).isZero() && std::fabs(stc.tstep - 0.01f) < 1e-7f && random.data.cols() == 100 && std::fabs(random.data.row(2).maxCoeff() - 1.0) < 0.01 && random.data.row(0).isZero(),
                  "simulateStcFromWaveforms places rows on their vertices; simulateStc draws a unit Gaussian bump");

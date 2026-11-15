@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

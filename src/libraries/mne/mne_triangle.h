@@ -9,8 +9,8 @@
  * @date     March 2026
  * @brief    Triangle descriptor with cached centroid, area and normal vectors.
  *
- * @ref MNELIB::MNETriangle is the per-face record produced by
- * @ref MNELIB::MNESourceSpace and @ref MNELIB::MNEBemSurface readers so downstream code
+ * @ref mne::MNETriangle is the per-face record produced by
+ * @ref mne::MNESourceSpace and @ref mne::MNEBemSurface readers so downstream code
  * (forward solver, projection-to-surface, rendering) does not have to
  * recompute these quantities. Carries the three vertex indices, the
  * centroid, the un-normalised and normalised triangle normals and the
@@ -33,10 +33,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -88,6 +88,6 @@ public:
     Eigen::Vector3f ey = Eigen::Vector3f::Zero();   /**< In-plane unit vector (normalized r13; used by BEM). */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNETRIANGLE_H

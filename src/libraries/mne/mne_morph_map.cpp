@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMorphMap (MNE-C mne_morph_maps.c).
+ * @brief    Implementation of @ref mne::MNEMorphMap (MNE-C mne_morph_maps.c).
  */
 
 //=============================================================================================================
@@ -39,8 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -305,7 +304,7 @@ std::optional<MNEMorphMap> MNEMorphMap::read(const std::filesystem::path& path, 
         result.to_subj = toSubj;
         return result;
     }
-    BASELIB::Log::warning("MNEMorphMap::read - {} hemisphere morph map from {} to {} not found in {}", hemi == 0 ? "left" : "right", fromSubj, toSubj, BASELIB::utf8FromPath(path));
+    mne::Log::warning("MNEMorphMap::read - {} hemisphere morph map from {} to {} not found in {}", hemi == 0 ? "left" : "right", fromSubj, toSubj, mne::utf8FromPath(path));
     return std::nullopt;
 }
 
@@ -319,7 +318,7 @@ bool MNEMorphMap::write(const std::filesystem::path& path, const std::vector<con
     }
     for (const MNEMorphMap* morph : maps) {
         if (!morph || !morph->map || morph->hemi < 0 || morph->hemi > 1) {
-            BASELIB::Log::warning("MNEMorphMap::write - Incomplete morph map");
+            mne::Log::warning("MNEMorphMap::write - Incomplete morph map");
             return false;
         }
         stream->start_block(FIFFB_MNE_MORPH_MAP);

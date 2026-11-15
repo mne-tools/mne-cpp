@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Collection of @ref MNELIB::MNEMshLight sources making up the viewer lighting rig.
+ * @brief    Collection of @ref mne::MNEMshLight sources making up the viewer lighting rig.
  *
- * @ref MNELIB::MNEMshLightSet aggregates the lights (typically a key /
- * fill / rim trio) and is consumed by @ref MNELIB::MNEMshDisplaySurfaceSet when
+ * @ref mne::MNEMshLightSet aggregates the lights (typically a key /
+ * fill / rim trio) and is consumed by @ref mne::MNEMshDisplaySurfaceSet when
  * saving or restoring a viewer scene.
  */
 
@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -99,6 +99,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHLIGHTSET_H

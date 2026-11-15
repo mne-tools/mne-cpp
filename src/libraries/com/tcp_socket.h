@@ -28,10 +28,10 @@
 #include <system_error>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace COMLIB
+namespace mne
 {
 
 /**
@@ -87,6 +87,6 @@ private:
 #endif
 };
 
-} // namespace COMLIB
+} // namespace mne
 
 #endif // COM_TCP_SOCKET_H

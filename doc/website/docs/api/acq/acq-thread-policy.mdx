@@ -1,18 +1,18 @@
 ---
 id: acq-thread-policy
-title: "ACQLIB::AcqThreadPolicy"
+title: "mne::AcqThreadPolicy"
 sidebar_label: AcqThreadPolicy
 sidebar_position: 46
 ---
 
 # AcqThreadPolicy
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_thread.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_thread.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_thread.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_thread.h)
 
 `#include <acq/acq_thread.h>`
 
 ```cpp
-struct ACQLIB::AcqThreadPolicy
+struct mne::AcqThreadPolicy
 ```
 
 Where and how an acquisition thread runs, e.g.
@@ -34,7 +34,7 @@ std::thread loop = startGated(go, [&] { runController(*controller, *stimulator, 
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -42,7 +42,7 @@ std::thread loop = startGated(go, [&] { runController(*controller, *stimulator, 
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 214"
  * (macOS) or the right to raise the priority (Linux without CAP_SYS_NICE) the thread still runs.

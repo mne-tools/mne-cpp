@@ -1,18 +1,18 @@
 ---
 id: mne-cluster-info
-title: "MNELIB::MNEClusterInfo"
+title: "mne::MNEClusterInfo"
 sidebar_label: MNEClusterInfo
 sidebar_position: 12
 ---
 
 # MNEClusterInfo
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cluster_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cluster_info.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cluster_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cluster_info.h)
 
 `#include <mne/mne_cluster_info.h>`
 
 ```cpp
-class MNELIB::MNEClusterInfo
+class mne::MNEClusterInfo
 ```
 
 Per-cluster bookkeeping for a label-restricted clustering of a forward solution: contained vertices, representative dipole and mean orientation.
@@ -97,7 +97,7 @@ Writes the cluster info as text, and the centroid vertex numbers to `centroids_<
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 168"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 165"
 const FsAnnotationSet aparc((data + "/subjects/sample/label/lh.aparc.annot").toStdU16String(), (data + "/subjects/sample/label/rh.aparc.annot").toStdU16String());
 MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
 const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");

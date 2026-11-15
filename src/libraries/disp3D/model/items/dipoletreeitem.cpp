@@ -16,18 +16,18 @@
 
 #include "dipoletreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
-DipoleTreeItem::DipoleTreeItem(const QString& text, const INVLIB::InvEcdSet& set, int type)
+DipoleTreeItem::DipoleTreeItem(const QString& text, const mne::InvEcdSet& set, int type)
 : AbstractTreeItem(text, type)
 , m_ecdSet(set)
 {
 }
 
-const INVLIB::InvEcdSet& DipoleTreeItem::ecdSet() const
+const mne::InvEcdSet& DipoleTreeItem::ecdSet() const
 {
     return m_ecdSet;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

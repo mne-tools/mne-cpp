@@ -40,7 +40,7 @@
 
 #include <cmath>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 /**
@@ -367,12 +367,12 @@ void TestDisp3dBrainSurface::testHighlightTouchesNoStream()
     createQuadSurface(surf);
 
     // Two regions: vertices 0, 1 in "a" (red), 2, 3 in "b" (green); FreeSurfer ids are R + G*256 + B*65536
-    FSLIB::FsAnnotation annotation;
+    mne::FsAnnotation annotation;
     annotation.getVertices() = (Eigen::VectorXi(4) << 0, 1, 2, 3).finished();
     const int idA = 200;
     const int idB = 100 * 256;
     annotation.getLabelIds() = (Eigen::VectorXi(4) << idA, idA, idB, idB).finished();
-    FSLIB::FsColortable& ct = annotation.getColortable();
+    mne::FsColortable& ct = annotation.getColortable();
     ct.numEntries = 2;
     ct.struct_names = {"a", "b"};
     ct.table = (Eigen::MatrixXi(2, 5) << 200, 0, 0, 0, idA, 0, 100, 0, 0, idB).finished();

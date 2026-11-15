@@ -1,18 +1,18 @@
 ---
 id: average-description
-title: "FIFFLIB::AverageDescription"
+title: "mne::AverageDescription"
 sidebar_label: AverageDescription
 sidebar_position: 34
 ---
 
 # AverageDescription
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
 
 `#include <fiff/fiff_evoked_set.h>`
 
 ```cpp
-struct FIFFLIB::AverageDescription
+struct mne::AverageDescription
 ```
 
 Top-level MNE-C ave-description record: comment, category list, shared rejection limits and output file paths.
@@ -57,7 +57,7 @@ const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, *averaging, e
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 368"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 366"
                "    }\n"
                "}\n");
 descFile.close();

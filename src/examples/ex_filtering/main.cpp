@@ -41,8 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -60,7 +59,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser
@@ -85,16 +84,16 @@ int main(int argc, char* argv[])
 
     // Filtering
     printf("Filtering...");
-    if (DSPLIB::filterFile(parser.value(outputOption).toStdU16String(),
-                           pRaw,
-                           FilterKernel::filterTypeIndex("BPF"),
-                           10,
-                           10,
-                           0.1,
-                           pRaw->info.sfreq,
-                           1024,
-                           DSPLIB::FilterKernel::designMethodIndex("Cosine"),
-                           picks)) {
+    if (mne::filterFile(parser.value(outputOption).toStdU16String(),
+                        pRaw,
+                        FilterKernel::filterTypeIndex("BPF"),
+                        10,
+                        10,
+                        0.1,
+                        pRaw->info.sfreq,
+                        1024,
+                        mne::FilterKernel::designMethodIndex("Cosine"),
+                        picks)) {
         printf("[done]\n");
     } else {
         printf("[failed]\n");

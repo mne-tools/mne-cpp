@@ -5,7 +5,7 @@ sidebar_label: "iEEG"
 
 # iEEG Library API
 
-The `mne_ieeg` library (`IEEGLIB` namespace) holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and grids: the implantation (contacts grouped into leads), bipolar re-referencing along the leads, and the mapping of contact values onto the cortical surface.
+The `mne_ieeg` library (`mne_ieeg` namespace) holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and grids: the implantation (contacts grouped into leads), bipolar re-referencing along the leads, and the mapping of contact values onto the cortical surface.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_ieeg)
@@ -33,7 +33,7 @@ Dependencies: `mne_bids`, `mne_base`, Qt6::Core, Eigen3. Rendering lives in disp
 
 ## MNE-Python Cross-Reference
 
-| MNE-CPP (IEEGLIB) | MNE-Python Equivalent |
+| MNE-CPP (mne_ieeg) | MNE-Python Equivalent |
 |---|---|
 | `IeegImplantation::readBids` | `mne_bids.read_raw_bids` (montage from `*_electrodes.tsv`; lead grouping is not part of MNE-BIDS) |
 | `IeegReference::bipolarPairs` + `bipolarMatrix` | `mne.set_bipolar_reference` |

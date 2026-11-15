@@ -65,9 +65,9 @@
 #include <fiff/fiff_constants.h>
 #include <connectivity/network/network.h>
 
-using namespace FIFFLIB;
+using namespace mne;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 namespace
@@ -213,7 +213,7 @@ BrainView::BrainView(QWidget* parent)
 
     // Video overlay starts disabled with a default focus point near the
     // top of a typical FreeSurfer head; the application toggles it on.
-    m_videoOverlay = std::make_unique<DISP3DLIB::VideoOverlay>();
+    m_videoOverlay = std::make_unique<mne::disp::VideoOverlay>();
 }
 
 //=============================================================================================================
@@ -331,7 +331,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
         // Check for BEM Item (using dynamic_cast for safety)
         BemTreeItem* bemItem = dynamic_cast<BemTreeItem*>(absItem);
         if (bemItem) {
-            const MNELIB::MNEBemSurface& bemSurfData = bemItem->bemSurfaceData();
+            const mne::MNEBemSurface& bemSurfData = bemItem->bemSurfaceData();
 
             auto brainSurf = std::make_shared<BrainSurface>();
 
@@ -387,7 +387,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
 
 
             // Legacy map support
-            const QString keyPrefix = SURFACEKEYS::sensorParentToKeyPrefix(parentText);
+            const QString keyPrefix = mne::disp::surface_keys::sensorParentToKeyPrefix(parentText);
 
             QString key = keyPrefix + sensItem->text() + "_" + QString::number((quintptr)sensItem);
             m_surfaces[key] = brainSurf;
@@ -605,7 +605,7 @@ void BrainView::updateSceneBounds()
 
 void BrainView::setShaderMode(const QString& modeName)
 {
-    const DISP3DLIB::ShaderMode mode = shaderModeFromName(modeName);
+    const mne::disp::ShaderMode mode = shaderModeFromName(modeName);
     subViewForTarget(m_visualizationEditTarget).brainShader = mode;
 
     m_brainShaderMode = mode;
@@ -777,7 +777,7 @@ void BrainView::updateInflatedSurfaceTransforms()
 
 void BrainView::setBemShaderMode(const QString& modeName)
 {
-    const DISP3DLIB::ShaderMode mode = shaderModeFromName(modeName);
+    const mne::disp::ShaderMode mode = shaderModeFromName(modeName);
 
     subViewForTarget(m_visualizationEditTarget).bemShader = mode;
 
@@ -805,7 +805,7 @@ void BrainView::syncBemShadersToBrainShaders()
 
 void BrainView::setSensorVisible(const QString& type, bool visible)
 {
-    const QString object = SURFACEKEYS::sensorTypeToObjectKey(type);
+    const QString object = mne::disp::surface_keys::sensorTypeToObjectKey(type);
     if (object.isEmpty())
         return;
 
@@ -863,7 +863,7 @@ void BrainView::setDipoleVisible(bool visible)
 
 void BrainView::setVisualizationMode(const QString& modeName)
 {
-    const DISP3DLIB::VisualizationMode mode = visualizationModeFromName(modeName);
+    const mne::disp::VisualizationMode mode = visualizationModeFromName(modeName);
     SubView& sv = subViewForTarget(m_visualizationEditTarget);
     sv.overlayMode = mode;
 
@@ -1729,7 +1729,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
     struct DrawItem
     {
         BrainSurface* surface;
-        DISP3DLIB::ShaderMode mode;
+        mne::disp::ShaderMode mode;
         float overlayMode;
         float distSq;      // for transparent back-to-front sort
         int uniformOffset; // filled by prepareSurfaceDraw
@@ -1832,7 +1832,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
 
         // Pass 1: Opaque Surfaces (Brain surfaces)
         // Use viewport-specific shader from subview
-        DISP3DLIB::ShaderMode currentShader = sv.brainShader;
+        mne::disp::ShaderMode currentShader = sv.brainShader;
         const QString overlayName = visualizationModeName(sv.overlayMode);
 
         // Collect matched brain surface keys for this pane's info panel
@@ -1865,7 +1865,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         // Determine per-viewport field-map visibility
         const bool megFieldVisible = sv.visibility.megFieldMap;
         const bool eegFieldVisible = sv.visibility.eegFieldMap;
-        const DISP3DLIB::ShaderMode currentBemShader = sv.bemShader;
+        const mne::disp::ShaderMode currentBemShader = sv.bemShader;
         const QString& megFieldKey = m_fieldMapper.megSurfaceKey();
         const QString& eegFieldKey = m_fieldMapper.eegSurfaceKey();
 
@@ -1890,12 +1890,12 @@ void BrainView::render(QRhiCommandBuffer* cb)
                     surf->boundingBox(bmin, bmax);
                     QVector3D ctr = (bmin + bmax) * 0.5f;
                     float dist = (sceneData.cameraPos - ctr).lengthSquared();
-                    transparentDraws.append({surf, DISP3DLIB::Holographic,
-                                             static_cast<float>(DISP3DLIB::ModeScientific),
+                    transparentDraws.append({surf, mne::disp::Holographic,
+                                             static_cast<float>(mne::disp::ModeScientific),
                                              dist, -1});
                 } else {
                     opaqueDraws.append({surf, currentShader,
-                                        static_cast<float>(DISP3DLIB::ModeScientific),
+                                        static_cast<float>(mne::disp::ModeScientific),
                                         0.0f, -1});
                 }
             } else {
@@ -1913,12 +1913,12 @@ void BrainView::render(QRhiCommandBuffer* cb)
                 QVector3D center = (bmin + bmax) * 0.5f;
                 float dist = (sceneData.cameraPos - center).lengthSquared();
 
-                auto mode = isBem ? currentBemShader : DISP3DLIB::Holographic;
-                float itemOverlay = static_cast<float>(DISP3DLIB::ModeScientific);
+                auto mode = isBem ? currentBemShader : mne::disp::Holographic;
+                float itemOverlay = static_cast<float>(mne::disp::ModeScientific);
                 if (key == megFieldKey && !megFieldVisible)
-                    itemOverlay = static_cast<float>(DISP3DLIB::ModeSurface);
+                    itemOverlay = static_cast<float>(mne::disp::ModeSurface);
                 else if (key == eegFieldKey && !eegFieldVisible)
-                    itemOverlay = static_cast<float>(DISP3DLIB::ModeSurface);
+                    itemOverlay = static_cast<float>(mne::disp::ModeSurface);
 
                 transparentDraws.append({surf, mode, itemOverlay, dist, -1});
             }
@@ -2022,7 +2022,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         m_renderer->issueNetworkDraw(cb, m_network.get(), pane.networkOffset);
         m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.headPathOffset);
 
-        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), DISP3DLIB::Holographic, pane.pointerOffset);
+        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), mne::disp::Holographic, pane.pointerOffset);
     }
 
     m_renderer->endPass(cb);
@@ -2164,7 +2164,7 @@ void BrainView::mouseReleaseEvent(QMouseEvent* event)
     // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
     if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
         castRay(event->pos());
-        if (const IEEGLIB::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
+        if (const mne::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
             emit electrodeContactClicked(QString::fromStdString(contact->name), QVector3D(contact->position.x(), contact->position.y(), contact->position.z()));
         } else if (m_hasIntersection) {
             emit surfacePointClicked(m_lastIntersectionPoint);
@@ -2361,7 +2361,7 @@ bool BrainView::loadSensorField(const QString& evokedPath, int aveIndex)
     if (!canReuse) {
         // Sensor config changed — full rebuild required (also precomputes global range)
         if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
-            m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked()); // Clear state on failure
+            m_fieldMapper.setEvoked(mne::FiffEvoked()); // Clear state on failure
             return false;
         }
     } else {
@@ -2662,7 +2662,7 @@ QMap<int, QVector3D> BrainView::cardinalFiducialsInMri() const
     QMatrix4x4 headToMri;
     headToMri.setToIdentity();
     if (haveTrans)
-        headToMri = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
+        headToMri = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
 
     for (const auto& dp : m_cardinalDigPoints) {
         const QVector3D posHead(dp.r[0], dp.r[1], dp.r[2]);
@@ -2724,7 +2724,7 @@ bool BrainView::loadDipoles(const QString& dipPath)
 
 //=============================================================================================================
 
-bool BrainView::loadNetwork(const CONNECTIVITYLIB::Network& network, const QString& name)
+bool BrainView::loadNetwork(const mne::Network& network, const QString& name)
 {
     if (network.nodes().empty())
         return false;
@@ -2828,7 +2828,7 @@ QMatrix4x4 BrainView::itemTransform(const QStandardItem* item) const
     const int type = absItem->type();
     const bool inHead = type == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem);
     if (inHead && m_applySensorTrans && !m_headToMriTrans.empty())
-        trans = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans) * trans;
+        trans = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans) * trans;
     return trans;
 }
 
@@ -2838,7 +2838,7 @@ void BrainView::refreshSensorTransforms()
 {
     QMatrix4x4 qmat;
     if (m_applySensorTrans && !m_headToMriTrans.empty()) {
-        qmat = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
+        qmat = mne::disp::surface_keys::toQMatrix4x4(m_headToMriTrans.trans);
     }
 
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
@@ -3510,7 +3510,7 @@ void BrainView::clearSensors()
 
 void BrainView::clearEvoked()
 {
-    m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());
+    m_fieldMapper.setEvoked(mne::FiffEvoked());
     m_sensorStreamManager.stopStreaming();
     m_sceneDirty = true;
     update();
@@ -3520,7 +3520,7 @@ void BrainView::clearEvoked()
 
 void BrainView::clearTransformation()
 {
-    m_headToMriTrans = FIFFLIB::FiffCoordTrans();
+    m_headToMriTrans = mne::FiffCoordTrans();
     refreshSensorTransforms();
     m_sceneDirty = true;
     update();
@@ -3718,7 +3718,7 @@ bool BrainView::intersectWorldRay(const QVector3D& origin, const QVector3D& dire
 // MRI slice rendering
 //=============================================================================================================
 
-void BrainView::setSlice(int slotIndex, DISP3DLIB::SliceObject* slice)
+void BrainView::setSlice(int slotIndex, mne::disp::SliceObject* slice)
 {
     if (slotIndex < 0 || slotIndex >= kMaxSliceSlots)
         return;
@@ -3727,7 +3727,7 @@ void BrainView::setSlice(int slotIndex, DISP3DLIB::SliceObject* slice)
     update();
 }
 
-void BrainView::setElectrodes(DISP3DLIB::ElectrodeObject* electrodes)
+void BrainView::setElectrodes(mne::disp::ElectrodeObject* electrodes)
 {
     if (m_electrodes)
         m_electrodes->setHoveredContact(-1);
@@ -3757,4 +3757,4 @@ void BrainView::setMriSlicesVisible(bool visible)
     update();
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

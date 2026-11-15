@@ -1,23 +1,23 @@
 ---
 id: rt-fiff-raw-view-model
-title: "DISPLIB::RtFiffRawViewModel"
+title: "mne::disp::RtFiffRawViewModel"
 sidebar_label: RtFiffRawViewModel
 sidebar_position: 53
 ---
 
 # RtFiffRawViewModel
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/rtfiffrawviewmodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/rtfiffrawviewmodel.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/rtfiffrawviewmodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/rtfiffrawviewmodel.h)
 
 `#include <disp/rtfiffrawviewmodel.h>`
 
 ```cpp
-class DISPLIB::RtFiffRawViewModel
+class mne::disp::RtFiffRawViewModel
 ```
 
 Circular-buffer QAbstractTableModel feeding the real-time FIFF raw browser.
 
-Keeps the last few seconds of streaming FIFF data in a per-channel ring buffer and forwards bad-channel flips, trigger detections and annotation edits back to the underlying `FiffInfo` / event list.
+Keeps the last few seconds of streaming FIFF data in a per-channel ring buffer and forwards bad-channel flips, trigger detections and annotation edits back to the underlying [`FiffInfo`](/docs/api/fiff/fiff-info) / event list.
 
 ### Inheritance
 
@@ -178,7 +178,7 @@ Returns the kind of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — kind of given channel number.
+- *mne::fiff_int_t* — kind of given channel number.
 
 ---
 
@@ -193,7 +193,7 @@ Returns the unit of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — unit of given channel number.
+- *mne::fiff_int_t* — unit of given channel number.
 
 ---
 
@@ -208,7 +208,7 @@ Returns the coil type of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — coil type of given channel number.
+- *mne::fiff_int_t* — coil type of given channel number.
 
 ---
 
@@ -325,7 +325,7 @@ Update the compensator.
 **Parameters:**
 
 - **to** : *int*
-  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+  Compensator to use in fiff constant format `FiffCtfComp.kind` (NOT `FiffCtfComp.ctfkind`).
 
 ---
 
@@ -635,7 +635,7 @@ after projectors, compensators and filters.
 
 Get maximum range of respective channel type.
 
-range value in [FiffChInfo](/docs/api/fiff/fiff-ch-info) does not seem to contain a reasonable value
+range value in [`FiffChInfo`](/docs/api/fiff/fiff-ch-info) does not seem to contain a reasonable value
 
 **Parameters:**
 

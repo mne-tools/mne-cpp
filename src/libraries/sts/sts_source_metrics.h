@@ -46,10 +46,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -108,6 +108,6 @@ public:
     static int findPeakIndex(const Eigen::VectorXd& sourceAmplitudes);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_SOURCE_METRICS_H

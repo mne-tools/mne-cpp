@@ -55,16 +55,16 @@ namespace Ui
 class HpiSettingsViewWidget;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffDigPointSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -187,7 +187,7 @@ public:
      *
      * @param[in] digitizers   The digitizer points.
      */
-    void newDigitizerList(const FIFFLIB::FiffDigPointSet& digitizers);
+    void newDigitizerList(const mne::FiffDigPointSet& digitizers);
 
     //=========================================================================================================
     /**
@@ -268,7 +268,7 @@ protected:
      *
      * @return Digitizer points read from the file; empty if none could be read.
      */
-    FIFFLIB::FiffDigPointSet readDigitizersFromFile(const QString& fileName);
+    mne::FiffDigPointSet readDigitizersFromFile(const QString& fileName);
 
     //=========================================================================================================
     /**
@@ -326,7 +326,7 @@ protected:
      *
      * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
      */
-    void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
+    void updateDigitizerInfoGUI(const mne::FiffDigPointSet& digSet);
 
     std::unique_ptr<Ui::HpiSettingsViewWidget> m_pUi; /**< The HPI dialog. */
 
@@ -352,7 +352,7 @@ signals:
      * @param[in] digitizers   The new digitizers.
      * @param[in] sFilePath    The file path to the new digitizers.
      */
-    void digitizersChanged(const FIFFLIB::FiffDigPointSet& digitizers,
+    void digitizersChanged(const mne::FiffDigPointSet& digitizers,
                            const QString& sFilePath);
 
     //=========================================================================================================

@@ -69,10 +69,10 @@ using namespace MNEBROWSE;
 #ifdef WASMBUILD
 static QByteArray s_wasmByteArray;
 
-static std::unique_ptr<BASELIB::ByteStream> wasmRawBytes()
+static std::unique_ptr<mne::ByteStream> wasmRawBytes()
 {
     const auto* begin = reinterpret_cast<const std::byte*>(s_wasmByteArray.constData());
-    return std::make_unique<BASELIB::MemoryByteStream>(std::vector<std::byte>(begin, begin + s_wasmByteArray.size()));
+    return std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + s_wasmByteArray.size()));
 }
 #endif
 namespace
@@ -184,9 +184,9 @@ QString defaultVirtualChannelFilePath(const QString& rawFilePath)
     return rawFilePath + "-virtchan.json";
 }
 
-void applySessionFilterToEpochList(MNELIB::MNEEpochDataList& epochList,
+void applySessionFilterToEpochList(mne::MNEEpochDataList& epochList,
                                    const MNEBROWSE::SessionFilter& filter,
-                                   const FIFFLIB::FiffInfo& info,
+                                   const mne::FiffInfo& info,
                                    const std::map<std::string, double>& rejectMap)
 {
     for (const auto& epoch : epochList) {
@@ -196,20 +196,20 @@ void applySessionFilterToEpochList(MNELIB::MNEEpochDataList& epochList,
 
         epoch->epoch = filter.applyToMatrix(epoch->epoch, info);
         if (!rejectMap.empty()) {
-            epoch->bReject = MNELIB::MNEEpochDataList::checkForArtifact(epoch->epoch,
-                                                                        info,
-                                                                        rejectMap);
+            epoch->bReject = mne::MNEEpochDataList::checkForArtifact(epoch->epoch,
+                                                                     info,
+                                                                     rejectMap);
         }
     }
 }
 
-FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDataList>& epochLists,
-                                                 const FIFFLIB::FiffInfo& info,
-                                                 bool removeMean)
+mne::FiffCov computeCovarianceFromEpochLists(const QList<mne::MNEEpochDataList>& epochLists,
+                                             const mne::FiffInfo& info,
+                                             bool removeMean)
 {
     std::vector<std::vector<Eigen::MatrixXd>> epochs;
     epochs.reserve(static_cast<std::size_t>(epochLists.size()));
-    for (const MNELIB::MNEEpochDataList& epochList : epochLists) {
+    for (const mne::MNEEpochDataList& epochList : epochLists) {
         std::vector<Eigen::MatrixXd>& codeEpochs = epochs.emplace_back();
         codeEpochs.reserve(static_cast<std::size_t>(epochList.size()));
         for (const auto& epoch : epochList) {
@@ -217,14 +217,14 @@ FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDat
                 codeEpochs.push_back(epoch->epoch);
         }
     }
-    return FIFFLIB::FiffCov::compute_from_epochs(epochs, info, removeMean);
+    return mne::FiffCov::compute_from_epochs(epochs, info, removeMean);
 }
 
 bool writeFilteredRawFile(const QString& rawFilePath,
                           const QString& outputPath,
                           const MNEBROWSE::SessionFilter& filter)
 {
-    FIFFLIB::FiffRawData raw(rawFilePath.toStdU16String());
+    mne::FiffRawData raw(rawFilePath.toStdU16String());
     if (raw.empty()) {
         qWarning() << "[MainWindow] Could not reopen raw data for filtered write" << rawFilePath;
         return false;
@@ -232,22 +232,22 @@ bool writeFilteredRawFile(const QString& rawFilePath,
 
     Eigen::RowVectorXd cals;
 
-    auto outfid = FIFFLIB::FiffStream::start_writing_raw(outputPath.toStdU16String(), raw.info, cals);
+    auto outfid = mne::FiffStream::start_writing_raw(outputPath.toStdU16String(), raw.info, cals);
     if (!outfid) {
         qWarning() << "[MainWindow] Could not open output stream for filtered write.";
         return false;
     }
 
     const int padSamples = filter.recommendedPaddingSamples();
-    const FIFFLIB::fiff_int_t from = raw.first_samp;
-    const FIFFLIB::fiff_int_t to = raw.last_samp;
-    const FIFFLIB::fiff_int_t quantum = static_cast<FIFFLIB::fiff_int_t>(std::ceil(10.0 * raw.info.sfreq));
+    const mne::fiff_int_t from = raw.first_samp;
+    const mne::fiff_int_t to = raw.last_samp;
+    const mne::fiff_int_t quantum = static_cast<mne::fiff_int_t>(std::ceil(10.0 * raw.info.sfreq));
 
     bool firstBuffer = true;
-    for (FIFFLIB::fiff_int_t first = from; first <= to; first += quantum) {
-        const FIFFLIB::fiff_int_t last = std::min(first + quantum - 1, to);
-        const FIFFLIB::fiff_int_t paddedFirst = std::max(from, first - padSamples);
-        const FIFFLIB::fiff_int_t paddedLast = std::min(to, last + padSamples);
+    for (mne::fiff_int_t first = from; first <= to; first += quantum) {
+        const mne::fiff_int_t last = std::min(first + quantum - 1, to);
+        const mne::fiff_int_t paddedFirst = std::max(from, first - padSamples);
+        const mne::fiff_int_t paddedLast = std::min(to, last + padSamples);
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
@@ -297,7 +297,7 @@ QMap<int, int> countEventsByType(const MatrixXi& events)
     return counts;
 }
 
-bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
+bool detectFallbackStimEvents(const mne::FiffRawData& raw,
                               MatrixXi& events,
                               QString& sourceDescription)
 {
@@ -312,7 +312,7 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
         const std::string& name = raw.info.ch_names[channelIndex];
         const QString stimChannel = QString::fromStdString(name);
 
-        if (FIFFLIB::same_channel(name, "STI 014") || FIFFLIB::same_channel(name, "STI 101")) {
+        if (mne::same_channel(name, "STI 014") || mne::same_channel(name, "STI 101")) {
             preferredStimChannels.append(stimChannel);
         } else {
             fallbackStimChannels.append(stimChannel);
@@ -321,7 +321,7 @@ bool detectFallbackStimEvents(const FIFFLIB::FiffRawData& raw,
 
     const QStringList stimChannels = preferredStimChannels + fallbackStimChannels;
     for (const QString& stimChannel : stimChannels) {
-        if (auto detected = FIFFLIB::FiffEvents::find_events(raw, stimChannel.toStdString()); detected && !detected->empty()) {
+        if (auto detected = mne::FiffEvents::find_events(raw, stimChannel.toStdString()); detected && !detected->empty()) {
             events = std::move(detected->events);
             sourceDescription = QString("Using trigger events detected from %1.").arg(stimChannel);
             return true;
@@ -339,7 +339,7 @@ bool populateEventModelFromRaw(const QString& rawFilePath,
         return false;
     }
 
-    FIFFLIB::FiffRawData raw(rawFilePath.toStdU16String());
+    mne::FiffRawData raw(rawFilePath.toStdU16String());
     if (raw.empty()) {
         return false;
     }
@@ -465,29 +465,29 @@ QString uniqueStem(const QString& stem, QSet<QString>& usedStems)
     return candidateStem;
 }
 
-INVLIB::InvEstimateMethod estimateMethodFromString(const QString& method)
+mne::InvEstimateMethod estimateMethodFromString(const QString& method)
 {
     if (method.compare(QStringLiteral("MNE"), Qt::CaseInsensitive) == 0) {
-        return INVLIB::InvEstimateMethod::MNE;
+        return mne::InvEstimateMethod::MNE;
     }
     if (method.compare(QStringLiteral("sLORETA"), Qt::CaseInsensitive) == 0) {
-        return INVLIB::InvEstimateMethod::sLORETA;
+        return mne::InvEstimateMethod::sLORETA;
     }
     if (method.compare(QStringLiteral("eLORETA"), Qt::CaseInsensitive) == 0) {
-        return INVLIB::InvEstimateMethod::eLORETA;
+        return mne::InvEstimateMethod::eLORETA;
     }
-    return INVLIB::InvEstimateMethod::dSPM;
+    return mne::InvEstimateMethod::dSPM;
 }
 
-INVLIB::InvOrientationType orientationTypeFromInverse(const MNELIB::MNEInverseOperator& inverseOperator)
+mne::InvOrientationType orientationTypeFromInverse(const mne::MNEInverseOperator& inverseOperator)
 {
     if (inverseOperator.source_ori == FIFFV_MNE_FREE_ORI) {
-        return INVLIB::InvOrientationType::Free;
+        return mne::InvOrientationType::Free;
     }
     if (inverseOperator.source_ori == FIFFV_MNE_FIXED_ORI) {
-        return INVLIB::InvOrientationType::Fixed;
+        return mne::InvOrientationType::Fixed;
     }
-    return INVLIB::InvOrientationType::Unknown;
+    return mne::InvOrientationType::Unknown;
 }
 
 QString summarizeSelectedEvokeds(const QStringList& comments)
@@ -516,8 +516,8 @@ QString summarizeSelectedEvokeds(const QStringList& comments)
         .arg(preview);
 }
 
-int sourceEstimateSplitIndex(const INVLIB::InvSourceEstimate& sourceEstimate,
-                             const MNELIB::MNEInverseOperator& inverseOperator)
+int sourceEstimateSplitIndex(const mne::InvSourceEstimate& sourceEstimate,
+                             const mne::MNEInverseOperator& inverseOperator)
 {
     if (inverseOperator.src.size() >= 2) {
         int leftSourceCount = 0;
@@ -541,10 +541,10 @@ int sourceEstimateSplitIndex(const INVLIB::InvSourceEstimate& sourceEstimate,
     return -1;
 }
 
-bool splitSourceEstimateByHemisphere(const INVLIB::InvSourceEstimate& sourceEstimate,
-                                     const MNELIB::MNEInverseOperator& inverseOperator,
-                                     INVLIB::InvSourceEstimate& leftHemisphere,
-                                     INVLIB::InvSourceEstimate& rightHemisphere)
+bool splitSourceEstimateByHemisphere(const mne::InvSourceEstimate& sourceEstimate,
+                                     const mne::MNEInverseOperator& inverseOperator,
+                                     mne::InvSourceEstimate& leftHemisphere,
+                                     mne::InvSourceEstimate& rightHemisphere)
 {
     const int splitIndex = sourceEstimateSplitIndex(sourceEstimate, inverseOperator);
     if (splitIndex <= 0 || splitIndex >= sourceEstimate.data.rows() || splitIndex >= sourceEstimate.vertices.size()) {
@@ -581,7 +581,7 @@ void saveWhiteningSettings(QSettings& settings, const WhiteningSettings& whiteni
     settings.setValue("MainWindow/Covariance/whitenUseProj", whiteningSettings.useProj);
 }
 
-Eigen::VectorXi reviewedEpochSelection(const MNELIB::MNEEpochDataList& epochList,
+Eigen::VectorXi reviewedEpochSelection(const mne::MNEEpochDataList& epochList,
                                        bool respectAutoRejects)
 {
     QList<int> selectedIndices;
@@ -1133,7 +1133,7 @@ bool MainWindow::ensureLegacyRawModelLoaded(const QString& featureName)
 
 //*************************************************************************************************************
 
-bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featureName)
+bool MainWindow::openFiffRawData(mne::FiffRawData& raw, const QString& featureName)
 {
     const QString label = featureName.isEmpty() ? QStringLiteral("mne_browse") : featureName;
 
@@ -1142,7 +1142,7 @@ bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featu
         statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
         return false;
     }
-    raw = FIFFLIB::FiffRawData(wasmRawBytes());
+    raw = mne::FiffRawData(wasmRawBytes());
 #else
     if (m_qFileRaw.fileName().isEmpty() || !QFile::exists(m_qFileRaw.fileName())) {
         statusBar()->showMessage(tr("Load a raw FIF file before using %1.").arg(label), 5000);
@@ -1152,7 +1152,7 @@ bool MainWindow::openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featu
     // valid QIODevice* that outlives this function call.
     if (m_qFileRaw.isOpen())
         m_qFileRaw.close();
-    raw = FIFFLIB::FiffRawData(m_qFileRaw.fileName().toStdU16String());
+    raw = mne::FiffRawData(m_qFileRaw.fileName().toStdU16String());
 #endif
 
     if (raw.empty()) {
@@ -1326,14 +1326,14 @@ void MainWindow::setupWindowWidgets()
             this, &MainWindow::recomputeEvoked);
 
     auto refreshAnnotationOverlay = [this]() {
-        QVector<DISPLIB::ChannelRhiView::AnnotationSpan> spans;
+        QVector<mne::disp::ChannelRhiView::AnnotationSpan> spans;
         const QVector<AnnotationSpanData> modelSpans =
             m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
         spans.reserve(modelSpans.size());
         for (const AnnotationSpanData& modelSpan : modelSpans) {
             if (!m_pAnnotationWindow->isDescriptionVisible(modelSpan.label))
                 continue;
-            DISPLIB::ChannelRhiView::AnnotationSpan span;
+            mne::disp::ChannelRhiView::AnnotationSpan span;
             span.startSample = modelSpan.startSample;
             span.endSample = modelSpan.endSample;
             span.color = modelSpan.color;
@@ -1403,7 +1403,7 @@ void MainWindow::setupWindowWidgets()
     // Connect crosshair cursor data to status bar
     // The signal is forwarded: ChannelRhiView → ChannelDataView → here
     if (m_pDataWindow->getChannelDataView()) {
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::cursorDataChanged,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::cursorDataChanged,
                 this, [this](float timeSec, float amplitude, const QString& channelName, const QString& unitLabel) {
                     auto fmtAmp = [](float amp, const QString& unit) -> QString {
                         float absAmp = qAbs(amp);
@@ -1439,25 +1439,25 @@ void MainWindow::setupWindowWidgets()
                 });
 
         // Sync toolbar action checked states when toggled via keyboard shortcuts
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::crosshairToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::crosshairToggled,
                 m_pCrosshairAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::butterflyToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::butterflyToggled,
                 m_pButterflyAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scalebarsToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::scalebarsToggled,
                 m_pScalebarsAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::eventsVisibleToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::eventsVisibleToggled,
                 m_pEventsVisibleAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::annotationsVisibleToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::annotationsVisibleToggled,
                 m_pAnnotationsVisibleAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::overviewBarToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::overviewBarToggled,
                 m_pOverviewBarAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::epochMarkersToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::epochMarkersToggled,
                 m_pEpochMarkersAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::clippingToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::clippingToggled,
                 m_pClippingAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::zScoreModeToggled,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::zScoreModeToggled,
                 m_pZScoreAction, &QAction::setChecked);
-        connect(m_pDataWindow->getChannelDataView(), &DISPLIB::ChannelDataView::scrollSpeedChanged,
+        connect(m_pDataWindow->getChannelDataView(), &mne::disp::ChannelDataView::scrollSpeedChanged,
                 this, [this](float factor) {
                     statusBar()->showMessage(QString("Scroll speed: %1x").arg(factor, 0, 'f', 2), 2000);
                 });
@@ -2376,7 +2376,7 @@ void MainWindow::updateRecentFilesMenu()
         action->setData(path);
         action->setToolTip(path);
         connect(action, &QAction::triggered, this, [this, path]() {
-            m_mnxProject = MNALIB::MnaProject();
+            m_mnxProject = mne::MnaProject();
             loadRawFile(path);
         });
     }
@@ -2660,7 +2660,7 @@ void MainWindow::openFile()
     auto fileContentReady = [&](const QString& fileName, const QByteArray& fileContent) {
         if (!fileName.isEmpty()) {
             // Reset loaded project so standalone files don't contaminate next save
-            m_mnxProject = MNALIB::MnaProject();
+            m_mnxProject = mne::MnaProject();
 
             if (m_qFileRaw.isOpen())
                 m_qFileRaw.close();
@@ -2673,7 +2673,7 @@ void MainWindow::openFile()
             if (m_qInverseOperatorFile.isOpen())
                 m_qInverseOperatorFile.close();
             m_qInverseOperatorFile.setFileName(QString());
-            m_inverseOperator = MNELIB::MNEInverseOperator();
+            m_inverseOperator = mne::MNEInverseOperator();
             if (m_qAnnotationFile.isOpen())
                 m_qAnnotationFile.close();
             m_qAnnotationFile.setFileName(QString());
@@ -2713,7 +2713,7 @@ void MainWindow::openFile()
                                          m_pDataWindow->firstSample(),
                                          m_pDataWindow->lastSample());
 
-                FIFFLIB::FiffRawData raw(wasmRawBytes());
+                mne::FiffRawData raw(wasmRawBytes());
                 MatrixXi events;
                 QString detectedEventSource;
                 if (!raw.isEmpty() && detectFallbackStimEvents(raw, events, detectedEventSource) && events.rows() > 0) {
@@ -2739,7 +2739,7 @@ void MainWindow::openFile()
         return;
 
     // Reset loaded project so standalone files don't contaminate next save
-    m_mnxProject = MNALIB::MnaProject();
+    m_mnxProject = mne::MnaProject();
     loadRawFile(filename);
 #endif
 }
@@ -2757,7 +2757,7 @@ void MainWindow::openProject()
         return;
 
     // Read project via MNA library (handles both .mna JSON and .mnx CBOR)
-    MNALIB::MnaProject proj = MNALIB::MnaIO::read(filename);
+    mne::MnaProject proj = mne::MnaIO::read(filename);
     if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
         QMessageBox::warning(this, tr("Open Project"), tr("Failed to open project:\n%1").arg(filename));
         return;
@@ -2801,25 +2801,25 @@ void MainWindow::openProject()
                         continue;
 
                     switch (ref.role) {
-                        case MNALIB::MnaFileRole::Raw:
+                        case mne::MnaFileRole::Raw:
                             rawPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::Event:
+                        case mne::MnaFileRole::Event:
                             eventPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::Annotation:
+                        case mne::MnaFileRole::Annotation:
                             annotPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::VirtualChannel:
+                        case mne::MnaFileRole::VirtualChannel:
                             virtChanPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::Evoked:
+                        case mne::MnaFileRole::Evoked:
                             evokedPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::Covariance:
+                        case mne::MnaFileRole::Covariance:
                             covPath = filePath;
                             break;
-                        case MNALIB::MnaFileRole::Inverse:
+                        case mne::MnaFileRole::Inverse:
                             invPath = filePath;
                             break;
                         default:
@@ -2844,7 +2844,7 @@ void MainWindow::openProject()
 
     // Load additional files that auto-discovery might miss
     if (!covPath.isEmpty() && QFileInfo::exists(covPath)) {
-        const auto cov = FIFFLIB::FiffCov::read(covPath.toStdU16String());
+        const auto cov = mne::FiffCov::read(covPath.toStdU16String());
         if (cov && !cov->empty()) {
             m_qCovFile.setFileName(covPath);
             m_covariance = *cov;
@@ -2941,16 +2941,16 @@ void MainWindow::saveProject()
 
     // ── Enriching mode: start from loaded project to preserve foreign data ──
     // Roles that mne_browse owns and will replace with current state
-    static const QSet<MNALIB::MnaFileRole> ownedRoles = {
-        MNALIB::MnaFileRole::Raw,
-        MNALIB::MnaFileRole::Event,
-        MNALIB::MnaFileRole::Annotation,
-        MNALIB::MnaFileRole::VirtualChannel,
-        MNALIB::MnaFileRole::Evoked,
-        MNALIB::MnaFileRole::Covariance,
-        MNALIB::MnaFileRole::Inverse};
+    static const QSet<mne::MnaFileRole> ownedRoles = {
+        mne::MnaFileRole::Raw,
+        mne::MnaFileRole::Event,
+        mne::MnaFileRole::Annotation,
+        mne::MnaFileRole::VirtualChannel,
+        mne::MnaFileRole::Evoked,
+        mne::MnaFileRole::Covariance,
+        mne::MnaFileRole::Inverse};
 
-    MNALIB::MnaProject proj;
+    mne::MnaProject proj;
     const bool hasBase = !m_mnxProject.subjects.isEmpty();
 
     if (hasBase) {
@@ -2962,7 +2962,7 @@ void MainWindow::saveProject()
         if (!proj.subjects.isEmpty() && !proj.subjects[0].sessions.isEmpty() && !proj.subjects[0].sessions[0].recordings.isEmpty()) {
             auto& files = proj.subjects[0].sessions[0].recordings[0].files;
             files.erase(std::remove_if(files.begin(), files.end(),
-                                       [](const MNALIB::MnaFileRef& r) { return ownedRoles.contains(r.role); }),
+                                       [](const mne::MnaFileRef& r) { return ownedRoles.contains(r.role); }),
                         files.end());
 
             // Re-serialize foreign embedded/external refs for the target format
@@ -3001,15 +3001,15 @@ void MainWindow::saveProject()
         // Brand-new project — create minimal structure
         proj.name = QFileInfo(m_qFileRaw.fileName()).completeBaseName();
         proj.description = QStringLiteral("MNE Browse project");
-        proj.mnaVersion = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+        proj.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
         proj.created = QDateTime::currentDateTimeUtc();
         proj.modified = QDateTime::currentDateTimeUtc();
 
-        MNALIB::MnaSubject subj;
+        mne::MnaSubject subj;
         subj.id = QStringLiteral("sub-01");
-        MNALIB::MnaSession sess;
+        mne::MnaSession sess;
         sess.id = QStringLiteral("ses-browse");
-        MNALIB::MnaRecording rec;
+        mne::MnaRecording rec;
         rec.id = QStringLiteral("rec-01");
         sess.recordings.append(rec);
         subj.sessions.append(sess);
@@ -3020,10 +3020,10 @@ void MainWindow::saveProject()
     auto& rec = proj.subjects[0].sessions[0].recordings[0];
 
     // Helper: add a file ref for an owned role
-    auto addFileRef = [&](const QString& filePath, MNALIB::MnaFileRole role) {
+    auto addFileRef = [&](const QString& filePath, mne::MnaFileRole role) {
         if (filePath.isEmpty() || !QFileInfo::exists(filePath))
             return;
-        MNALIB::MnaFileRef ref;
+        mne::MnaFileRef ref;
         ref.role = role;
         ref.format = QFileInfo(filePath).suffix();
         ref.sizeBytes = QFileInfo(filePath).size();
@@ -3049,15 +3049,15 @@ void MainWindow::saveProject()
         rec.files.append(ref);
     };
 
-    addFileRef(m_qFileRaw.fileName(), MNALIB::MnaFileRole::Raw);
-    addFileRef(m_qEventFile.fileName(), MNALIB::MnaFileRole::Event);
-    addFileRef(m_qAnnotationFile.fileName(), MNALIB::MnaFileRole::Annotation);
-    addFileRef(m_qVirtualChannelFile.fileName(), MNALIB::MnaFileRole::VirtualChannel);
-    addFileRef(m_qEvokedFile.fileName(), MNALIB::MnaFileRole::Evoked);
-    addFileRef(m_qCovFile.fileName(), MNALIB::MnaFileRole::Covariance);
-    addFileRef(m_qInverseOperatorFile.fileName(), MNALIB::MnaFileRole::Inverse);
+    addFileRef(m_qFileRaw.fileName(), mne::MnaFileRole::Raw);
+    addFileRef(m_qEventFile.fileName(), mne::MnaFileRole::Event);
+    addFileRef(m_qAnnotationFile.fileName(), mne::MnaFileRole::Annotation);
+    addFileRef(m_qVirtualChannelFile.fileName(), mne::MnaFileRole::VirtualChannel);
+    addFileRef(m_qEvokedFile.fileName(), mne::MnaFileRole::Evoked);
+    addFileRef(m_qCovFile.fileName(), mne::MnaFileRole::Covariance);
+    addFileRef(m_qInverseOperatorFile.fileName(), mne::MnaFileRole::Inverse);
 
-    if (!MNALIB::MnaIO::write(proj, filename)) {
+    if (!mne::MnaIO::write(proj, filename)) {
         QMessageBox::warning(this, tr("Save Project"), tr("Failed to write project to:\n%1").arg(filename));
         return;
     }
@@ -3313,7 +3313,7 @@ bool MainWindow::loadRawFile(const QString& filename)
     if (m_qInverseOperatorFile.isOpen())
         m_qInverseOperatorFile.close();
     m_qInverseOperatorFile.setFileName(QString());
-    m_inverseOperator = MNELIB::MNEInverseOperator();
+    m_inverseOperator = mne::MNEInverseOperator();
     if (m_qAnnotationFile.isOpen())
         m_qAnnotationFile.close();
     m_qAnnotationFile.setFileName(QString());
@@ -3465,14 +3465,14 @@ bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindo
 
 bool MainWindow::loadInverseOperatorFile(const QString& filename)
 {
-    auto read = MNELIB::MNEInverseOperator::read(filename.toStdU16String());
+    auto read = mne::MNEInverseOperator::read(filename.toStdU16String());
     if (!read || read->nsource <= 0 || read->src.empty()) {
         QMessageBox::warning(this,
                              QStringLiteral("Load Inverse Operator"),
                              read ? QStringLiteral("%1 holds no source space.").arg(filename) : QString::fromStdString(read.error().what()));
         return false;
     }
-    MNELIB::MNEInverseOperator& inverseOperator = *read;
+    mne::MNEInverseOperator& inverseOperator = *read;
 
     if (m_qInverseOperatorFile.isOpen()) {
         m_qInverseOperatorFile.close();
@@ -3597,14 +3597,14 @@ bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
         return false;
     }
 
-    FIFFLIB::FiffEvokedSet evokedSet;
+    mne::FiffEvokedSet evokedSet;
     evokedSet.info = *m_pEpochReviewInfo;
 
     const bool respectAutoRejects =
         m_pEpochWindow && m_pEpochWindow->getEpochModel()->respectAutoRejects();
 
     for (int index = 0; index < m_epochReviewLists.size(); ++index) {
-        const MNELIB::MNEEpochDataList& epochList = m_epochReviewLists.at(index);
+        const mne::MNEEpochDataList& epochList = m_epochReviewLists.at(index);
         if (epochList.empty()) {
             continue;
         }
@@ -3622,10 +3622,10 @@ bool MainWindow::refreshReviewedEvokedSet(const QString& statusMessage)
         const int minSamp = static_cast<int>(std::round(firstEpoch->tmin * m_pEpochReviewInfo->sfreq));
         const int maxSamp = static_cast<int>(std::round(firstEpoch->tmax * m_pEpochReviewInfo->sfreq));
 
-        FIFFLIB::FiffEvoked evoked = epochList.average(*m_pEpochReviewInfo,
-                                                       minSamp,
-                                                       maxSamp,
-                                                       selection);
+        mne::FiffEvoked evoked = epochList.average(*m_pEpochReviewInfo,
+                                                   minSamp,
+                                                   maxSamp,
+                                                   selection);
         evoked.comment = (index < m_epochReviewComments.size()
                               ? m_epochReviewComments.at(index)
                               : QString::number(index < m_epochReviewEventCodes.size() ? m_epochReviewEventCodes.at(index) : index))
@@ -3685,7 +3685,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
         ? QStringLiteral("Compute Evoked")
         : QStringLiteral("Recompute Evoked");
 
-    FIFFLIB::FiffRawData raw;
+    mne::FiffRawData raw;
     if (!openFiffRawData(raw, title))
         return false;
 
@@ -3781,7 +3781,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     QApplication::setOverrideCursor(Qt::BusyCursor);
     qApp->processEvents();
 
-    QList<MNELIB::MNEEpochDataList> epochLists;
+    QList<mne::MNEEpochDataList> epochLists;
     QList<int> epochEventCodes;
     QStringList epochComments;
     const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
@@ -3789,12 +3789,12 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     const std::map<std::string, double> epochRejectMap = useSessionFilter ? std::map<std::string, double>() : rejectMap;
 
     for (int eventCode : selectedEventCodes) {
-        MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
-                                                                                  events,
-                                                                                  tmin,
-                                                                                  tmax,
-                                                                                  eventCode,
-                                                                                  epochRejectMap);
+        mne::MNEEpochDataList epochList = mne::MNEEpochDataList::readEpochs(raw,
+                                                                            events,
+                                                                            tmin,
+                                                                            tmax,
+                                                                            eventCode,
+                                                                            epochRejectMap);
 
         if (epochList.empty()) {
             continue;
@@ -3829,7 +3829,7 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     m_epochReviewLists = epochLists;
     m_epochReviewEventCodes = epochEventCodes;
     m_epochReviewComments = epochComments;
-    m_pEpochReviewInfo = std::make_shared<FIFFLIB::FiffInfo>(raw.info);
+    m_pEpochReviewInfo = std::make_shared<mne::FiffInfo>(raw.info);
     m_epochReviewBaseline = applyBaseline ? baseline : QPair<float, float>(0.0f, 0.0f);
     {
         QSignalBlocker blocker(m_pEpochWindow->getEpochModel());
@@ -3949,7 +3949,7 @@ void MainWindow::computeSourceEstimate()
 
     QStringList selectedComments;
     for (int row : selectedRows) {
-        const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
+        const mne::FiffEvoked* evoked = averageModel->getEvoked(row);
         if (!evoked) {
             continue;
         }
@@ -4017,7 +4017,7 @@ void MainWindow::computeSourceEstimate()
     qApp->processEvents();
 
     for (int row : selectedRows) {
-        const FIFFLIB::FiffEvoked* evoked = averageModel->getEvoked(row);
+        const mne::FiffEvoked* evoked = averageModel->getEvoked(row);
         if (!evoked) {
             continue;
         }
@@ -4027,8 +4027,8 @@ void MainWindow::computeSourceEstimate()
             ? QStringLiteral("set_%1").arg(row + 1)
             : trimmedComment;
 
-        INVLIB::InvMinimumNorm minimumNorm(m_inverseOperator, lambda2, method.toStdString());
-        INVLIB::InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(*evoked, pickNormal);
+        mne::InvMinimumNorm minimumNorm(m_inverseOperator, lambda2, method.toStdString());
+        mne::InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(*evoked, pickNormal);
 
         if (sourceEstimate.empty()) {
             failedSets.append(comment);
@@ -4046,8 +4046,8 @@ void MainWindow::computeSourceEstimate()
                                             .arg(methodToken),
                                         usedStems);
 
-        INVLIB::InvSourceEstimate leftHemisphere;
-        INVLIB::InvSourceEstimate rightHemisphere;
+        mne::InvSourceEstimate leftHemisphere;
+        mne::InvSourceEstimate rightHemisphere;
         if (splitSourceEstimateByHemisphere(sourceEstimate,
                                             m_inverseOperator,
                                             leftHemisphere,
@@ -4115,7 +4115,7 @@ void MainWindow::computeSourceEstimate()
 
 void MainWindow::computeCovariance()
 {
-    FIFFLIB::FiffRawData raw;
+    mne::FiffRawData raw;
     if (!openFiffRawData(raw, tr("Compute Covariance")))
         return;
 
@@ -4167,16 +4167,16 @@ void MainWindow::computeCovariance()
 
     const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
     const bool useSessionFilter = activeFilter && activeFilter->isValid();
-    FIFFLIB::FiffCov covariance;
+    mne::FiffCov covariance;
     if (useSessionFilter) {
-        QList<MNELIB::MNEEpochDataList> epochLists;
+        QList<mne::MNEEpochDataList> epochLists;
         for (int eventCode : selectedEventCodes) {
-            MNELIB::MNEEpochDataList epochList = MNELIB::MNEEpochDataList::readEpochs(raw,
-                                                                                      events,
-                                                                                      tmin,
-                                                                                      tmax,
-                                                                                      eventCode,
-                                                                                      {});
+            mne::MNEEpochDataList epochList = mne::MNEEpochDataList::readEpochs(raw,
+                                                                                events,
+                                                                                tmin,
+                                                                                tmax,
+                                                                                eventCode,
+                                                                                {});
             if (epochList.empty()) {
                 continue;
             }
@@ -4197,15 +4197,15 @@ void MainWindow::computeCovariance()
                                                      raw.info,
                                                      removeMean);
     } else {
-        covariance = FIFFLIB::FiffCov::compute_from_epochs(raw,
-                                                           events,
-                                                           std::vector<int>(selectedEventCodes.begin(), selectedEventCodes.end()),
-                                                           tmin,
-                                                           tmax,
-                                                           baselineFrom,
-                                                           baselineTo,
-                                                           applyBaseline,
-                                                           removeMean);
+        covariance = mne::FiffCov::compute_from_epochs(raw,
+                                                       events,
+                                                       std::vector<int>(selectedEventCodes.begin(), selectedEventCodes.end()),
+                                                       tmin,
+                                                       tmax,
+                                                       baselineFrom,
+                                                       baselineTo,
+                                                       applyBaseline,
+                                                       removeMean);
     }
 
     QApplication::restoreOverrideCursor();
@@ -4225,7 +4225,7 @@ void MainWindow::computeCovariance()
     m_pAverageWindow->setNoiseCovariance(m_covariance);
     m_pCovarianceWindow->setCovariance(m_covariance,
                                        QStringLiteral("Computed from %1").arg(QFileInfo(m_qFileRaw.fileName()).fileName()),
-                                       std::make_shared<FIFFLIB::FiffInfo>(raw.info));
+                                       std::make_shared<mne::FiffInfo>(raw.info));
 
     // Update raw-trace whitener
     if (m_pDataWindow) {
@@ -4251,7 +4251,7 @@ void MainWindow::computeCovariance()
 
 void MainWindow::computeIca()
 {
-    FIFFLIB::FiffRawData raw;
+    mne::FiffRawData raw;
     if (!openFiffRawData(raw, tr("Compute ICA")))
         return;
 
@@ -4267,7 +4267,7 @@ void MainWindow::computeIca()
         return;
     }
 
-    std::shared_ptr<FIFFLIB::FiffInfo> pInfo(new FIFFLIB::FiffInfo(raw.info));
+    std::shared_ptr<mne::FiffInfo> pInfo(new mne::FiffInfo(raw.info));
     m_pIcaWindow->setRawData(matData, pInfo, raw.first_samp);
 
     if (!m_pIcaWindow->isVisible()) {
@@ -4290,7 +4290,7 @@ void MainWindow::loadCovariance()
         return;
     }
 
-    const auto read = FIFFLIB::FiffCov::read(filename.toStdU16String());
+    const auto read = mne::FiffCov::read(filename.toStdU16String());
     if (!read || read->empty()) {
         QMessageBox::warning(this,
                              "Load Covariance",
@@ -4298,7 +4298,7 @@ void MainWindow::loadCovariance()
                                  .arg(filename, read ? QStringLiteral("the covariance is empty") : QString::fromUtf8(read.error().what())));
         return;
     }
-    const FIFFLIB::FiffCov& covariance = *read;
+    const mne::FiffCov& covariance = *read;
 
     if (m_qCovFile.isOpen()) {
         m_qCovFile.close();
@@ -4377,7 +4377,7 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
         if (!QFile::exists(rawFile)) {
             qWarning() << "[mne_browse] --raw: file not found:" << rawFile;
         } else {
-            m_mnxProject = MNALIB::MnaProject();
+            m_mnxProject = mne::MnaProject();
             loadRawFile(rawFile);
         }
     }
@@ -4517,7 +4517,7 @@ void MainWindow::dropEvent(QDropEvent* event)
         const QString path = url.toLocalFile();
         if (path.endsWith(".fif", Qt::CaseInsensitive) ||
             path.endsWith(".fiff", Qt::CaseInsensitive)) {
-            m_mnxProject = MNALIB::MnaProject();
+            m_mnxProject = mne::MnaProject();
             loadRawFile(path);
             return;
         }

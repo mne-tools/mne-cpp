@@ -1,21 +1,21 @@
 ---
 id: fiff-io
-title: "FIFFLIB::FiffIO"
+title: "mne::FiffIO"
 sidebar_label: FiffIO
 sidebar_position: 32
 ---
 
 # FiffIO
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_io.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_io.h)
 
 `#include <fiff/fiff_io.h>`
 
 ```cpp
-class FIFFLIB::FiffIO
+class mne::FiffIO
 ```
 
-One-call FIFF reader/writer: opens a file, dispatches to the right specialized loader and returns ready-to-use `FIFFLIB` containers.
+One-call FIFF reader/writer: opens a file, dispatches to the right specialized loader and returns ready-to-use mne_fiff containers.
 
 Sniffs the FIFF block tree, dispatches [`FiffRawData`](/docs/api/fiff/fiff-raw-data) / [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) loaders as appropriate, and returns shared pointers so the resulting objects can be freely passed across the rest of the pipeline. Front-end parity with `mne.io.read_raw_fif` and `mne.read_evokeds`.
 
@@ -167,7 +167,7 @@ ok &= expect(io.evoked.size() == 4 && io.raw.empty(), "FiffIO finds the 4 evoked
 
 Read the data sets of a FIFF file through the generic FiffIO interface and write its raw data back to disk.
 
-````cpp title="src/examples/ex_fiff_io/main.cpp, line 68"
+````cpp title="src/examples/ex_fiff_io/main.cpp, line 67"
 FiffIO p_fiffIO(files);
 ````
 
@@ -175,8 +175,8 @@ FiffIO p_fiffIO(files);
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 115"
-FIFFLIB::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 113"
+mne::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
 ````
 
 ## Authors of this file

@@ -87,7 +87,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -579,7 +579,7 @@ void TestFiffCorePython::computeFromRaw_matchesPython()
 
         // Bad channels must not take part in the projection.
         for (const std::string& bad : m_raw->info.bads) {
-            QCOMPARE(v(BASELIB::indexOf(m_raw->info.ch_names, bad)), 0.0);
+            QCOMPARE(v(mne::indexOf(m_raw->info.ch_names, bad)), 0.0);
         }
     }
 
@@ -652,10 +652,10 @@ void TestFiffCorePython::computeFromEvoked_matchesPython()
         const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
         QCOMPARE(evoked.info.ch_names.at(static_cast<int>(peakIdx)), QString(expected[i].peakName));
         QVERIFY2(relClose(peak, expected[i].peak, 1e-6), qPrintable(mismatch(p.desc + " peak", peak, expected[i].peak)));
-        const double first = std::fabs(v(BASELIB::indexOf(evoked.info.ch_names, expected[i].firstName)));
+        const double first = std::fabs(v(mne::indexOf(evoked.info.ch_names, expected[i].firstName)));
         QVERIFY2(relClose(first, expected[i].first, 1e-6), qPrintable(mismatch(p.desc + " first", first, expected[i].first)));
         for (const std::string& bad : evoked.info.bads) {
-            QCOMPARE(v(BASELIB::indexOf(evoked.info.ch_names, bad)), 0.0);
+            QCOMPARE(v(mne::indexOf(evoked.info.ch_names, bad)), 0.0);
         }
     }
 }
@@ -814,7 +814,7 @@ void TestFiffCorePython::readEvoked_invalidSelector()
 
     const auto e = FiffEvoked::read(dataPath("sample_audvis-ave.fif").toStdU16String(), condition(setno), {}, false, aspectKind);
     QVERIFY(!e);
-    QCOMPARE(e.error().code, BASELIB::ErrorCode::NotFound);
+    QCOMPARE(e.error().code, mne::ErrorCode::NotFound);
 }
 
 //=============================================================================================================
@@ -852,7 +852,7 @@ void TestFiffCorePython::readTransformFromNode()
 
     QCOMPARE(read.has_value(), found);
     if (!found) {
-        QCOMPARE(read.error().code, BASELIB::ErrorCode::NotFound);
+        QCOMPARE(read.error().code, mne::ErrorCode::NotFound);
         return;
     }
     const FiffCoordTrans& t = *read;
@@ -1058,7 +1058,7 @@ void TestFiffCorePython::events_matchPython()
     for (int k = 0; k < maskedCodes.size(); ++k)
         QCOMPARE(masked.events(k, 2), maskedCodes[k]);
 
-    QCOMPARE(FiffEvents::find_events(*m_raw, "STI 999").error().code, BASELIB::ErrorCode::NotFound);
+    QCOMPARE(FiffEvents::find_events(*m_raw, "STI 999").error().code, mne::ErrorCode::NotFound);
 
     // FIF and ASCII round trips; read() picks the format by the ".fif" in the name, as mne.read_events.
     QTemporaryDir dir;
@@ -1066,13 +1066,13 @@ void TestFiffCorePython::events_matchPython()
         return dir.filePath(name).toStdString();
     };
     QVERIFY(found.write(path("run-eve.fif")).has_value());
-    QCOMPARE(FiffEvents().write_fif(path("empty-eve.fif")).error().code, BASELIB::ErrorCode::Format);
+    QCOMPARE(FiffEvents().write_fif(path("empty-eve.fif")).error().code, mne::ErrorCode::Format);
     QVERIFY(!QFile::exists(dir.filePath("empty-eve.fif")));
     QVERIFY(FiffEvents::read(path("run-eve.fif")).value().events == onsets);
     QVERIFY(FiffEvents(path("run-eve.fif")).events == onsets);
-    QCOMPARE(FiffEvents::read(path("missing-eve.fif")).error().code, BASELIB::ErrorCode::Io);
-    QVERIFY_THROWS_EXCEPTION(BASELIB::Error, FiffEvents{path("missing-eve.fif")});
-    QCOMPARE(FiffEvents::read_fif(dataPath("sample_audvis_trunc_raw.fif").toStdString()).error().code, BASELIB::ErrorCode::NotFound);
+    QCOMPARE(FiffEvents::read(path("missing-eve.fif")).error().code, mne::ErrorCode::Io);
+    QVERIFY_THROWS_EXCEPTION(mne::Error, FiffEvents{path("missing-eve.fif")});
+    QCOMPARE(FiffEvents::read_fif(dataPath("sample_audvis_trunc_raw.fif").toStdString()).error().code, mne::ErrorCode::NotFound);
 
     // The text file keeps the layout MNE-C writes, also under a locale with a decimal comma.
     const float sfreq = static_cast<float>(m_raw->info.sfreq);
@@ -1086,17 +1086,17 @@ void TestFiffCorePython::events_matchPython()
     QVERIFY(eveFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QCOMPARE(QString::fromUtf8(eveFile.readAll()), expected);
     qInfo("decimal comma locale %s", comma ? "tested" : "not installed");
-    QCOMPARE(found.write_ascii(path("no/dir/run.eve"), sfreq).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(found.write_ascii(path("no/dir/run.eve"), sfreq).error().code, mne::ErrorCode::Io);
     const FiffEvents ascii(path("run.eve"));
     QVERIFY(ascii.events == onsets);
     QVERIFY(FiffEvents::read_ascii(path("run.eve")).value().events == onsets);
-    QCOMPARE(FiffEvents::read_ascii(path("missing.eve")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffEvents::read_ascii(path("missing.eve")).error().code, mne::ErrorCode::Io);
 
     // Comment lines are skipped; a line that does not start with a sample is an error rather than event 0
     std::ofstream(path("commented.eve")) << "% sample time before after\n  100 0.166 0 5\n# trailer\n";
     QVERIFY(FiffEvents::read_ascii(path("commented.eve")).value().events == (Eigen::RowVector3i(100, 0, 5)));
     std::ofstream(path("broken.eve")) << "100 0 5\nonset 0 5\n";
-    QCOMPARE(FiffEvents::read_ascii(path("broken.eve")).error().code, BASELIB::ErrorCode::Format);
+    QCOMPARE(FiffEvents::read_ascii(path("broken.eve")).error().code, mne::ErrorCode::Format);
 }
 
 //=============================================================================================================

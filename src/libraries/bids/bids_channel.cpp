@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsChannel — TSV read/write for the BIDS ``_channels.tsv`` sidecar.
+ * @brief    Implementation of @ref mne::BidsChannel — TSV read/write for the BIDS ``_channels.tsv`` sidecar.
  */
 
 //=============================================================================================================
@@ -21,7 +21,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // LOCAL HELPERS

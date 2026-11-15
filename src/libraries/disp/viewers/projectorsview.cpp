@@ -34,8 +34,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -65,14 +65,14 @@ ProjectorsView::~ProjectorsView()
 
 //=============================================================================================================
 
-std::vector<FIFFLIB::FiffProj> ProjectorsView::getProjectors() const
+std::vector<mne::FiffProj> ProjectorsView::getProjectors() const
 {
     return m_pProjs;
 }
 
 //=============================================================================================================
 
-void ProjectorsView::setProjectors(const std::vector<FIFFLIB::FiffProj>& projs)
+void ProjectorsView::setProjectors(const std::vector<mne::FiffProj>& projs)
 {
     m_pProjs = projs;
 

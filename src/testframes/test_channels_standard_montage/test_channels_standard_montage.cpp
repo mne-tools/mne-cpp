@@ -19,8 +19,7 @@
 #include <cmath>
 #include <set>
 
-using namespace CHANNELSLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestStandardMontage : public QObject

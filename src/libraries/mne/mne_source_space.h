@@ -9,14 +9,14 @@
  * @date     March 2026
  * @brief    Single-hemisphere source space (cortical surface or volume grid) loaded from FIFF.
  *
- * @ref MNELIB::MNESourceSpace replaces the @c mneSourceSpace typedef of
+ * @ref mne::MNESourceSpace replaces the @c mneSourceSpace typedef of
  * @c mne_types.h and is the C++ representation of one decimated source
  * space stored under the @c FIFFB_MNE_SOURCE_SPACE block in a forward /
  * inverse FIFF file. It holds the dense surface (vertices, triangles,
  * normals, neighbouring relations) plus the subset selected by the MNE
  * decimation (@c inuse / @c nuse / @c vertno) used to index the leadfield
- * columns of @ref MNELIB::MNEForwardSolution. The structure is consumed by
- * @ref MNELIB::MNESourceSpaces (left+right pair), @ref MNELIB::MNEHemisphere, the BEM
+ * columns of @ref mne::MNEForwardSolution. The structure is consumed by
+ * @ref mne::MNESourceSpaces (left+right pair), @ref mne::MNEHemisphere, the BEM
  * tools and every clustering or morphing step in the inverse pipeline.
  */
 
@@ -49,10 +49,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -135,7 +135,7 @@ public:
      * @param[in] t   The coordinate transformation to apply.
      * @return OK on success, FAIL on error.
      */
-    int transform_source_space(const FIFFLIB::FiffCoordTrans& t);
+    int transform_source_space(const mne::FiffCoordTrans& t);
 
     //=========================================================================================================
     /**
@@ -213,7 +213,7 @@ public:
 
     static int filter_source_spaces(const MNESurface& surf,
                                     float limit,
-                                    const FIFFLIB::FiffCoordTrans& mri_head_t,
+                                    const mne::FiffCoordTrans& mri_head_t,
                                     std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
                                     std::ostream* filtered);
 
@@ -221,7 +221,7 @@ public:
 
     static int filter_source_spaces(float limit,
                                     const std::filesystem::path& bemfile,
-                                    const FIFFLIB::FiffCoordTrans& mri_head_t,
+                                    const mne::FiffCoordTrans& mri_head_t,
                                     std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
                                     std::ostream* filtered,
                                     bool use_threads);
@@ -230,7 +230,7 @@ public:
                                   std::vector<std::unique_ptr<MNESourceSpace>>& spaces);
 
     static int transform_source_spaces_to(int coord_frame,
-                                          const FIFFLIB::FiffCoordTrans& t,
+                                          const mne::FiffCoordTrans& t,
                                           std::vector<std::unique_ptr<MNESourceSpace>>& spaces);
 
     static int restrict_sources_to_labels(std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
@@ -256,7 +256,7 @@ public:
      *
      * @return FIFF_OK on success, FIFF_FAIL on error.
      */
-    int writeToStream(FIFFLIB::FiffStream& stream, bool selected_only) const;
+    int writeToStream(mne::FiffStream& stream, bool selected_only) const;
 
     //=========================================================================================================
     /**
@@ -298,12 +298,12 @@ private:
      *
      * @return OK on success, FAIL on error.
      */
-    int writeVolumeInfo(FIFFLIB::FiffStream& stream, bool selected_only) const;
+    int writeVolumeInfo(mne::FiffStream& stream, bool selected_only) const;
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNESOURCESPACE_H

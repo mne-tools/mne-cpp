@@ -33,7 +33,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {
@@ -947,48 +947,48 @@ std::uint32_t fieldMask(const AcqBitField& field) noexcept
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::decode(const AcqBlockView& view, const AcqMatrixRef<float>& out,
-                        const AcqConvertOptions& options) noexcept
+AcqError mne::decode(const AcqBlockView& view, const AcqMatrixRef<float>& out,
+                     const AcqConvertOptions& options) noexcept
 {
     return decodeView(view, out, options);
 }
 
-AcqError ACQLIB::decode(const AcqBlockView& view, const AcqMatrixRef<double>& out,
-                        const AcqConvertOptions& options) noexcept
+AcqError mne::decode(const AcqBlockView& view, const AcqMatrixRef<double>& out,
+                     const AcqConvertOptions& options) noexcept
 {
     return decodeView(view, out, options);
 }
 
-AcqError ACQLIB::decode(const AcqBlockView& view, const AcqMatrixRef<std::complex<float>>& out,
-                        const AcqConvertOptions& options) noexcept
+AcqError mne::decode(const AcqBlockView& view, const AcqMatrixRef<std::complex<float>>& out,
+                     const AcqConvertOptions& options) noexcept
 {
     return decodeView(view, out, options);
 }
 
 //=============================================================================================================
 
-AcqExpected<AcqEncodeResult> ACQLIB::encode(const AcqMatrixRef<const float>& in, const AcqWriteView& view,
-                                            const AcqConvertOptions& options) noexcept
+AcqExpected<AcqEncodeResult> mne::encode(const AcqMatrixRef<const float>& in, const AcqWriteView& view,
+                                         const AcqConvertOptions& options) noexcept
 {
     return encodeView(in, view, options);
 }
 
-AcqExpected<AcqEncodeResult> ACQLIB::encode(const AcqMatrixRef<const double>& in, const AcqWriteView& view,
-                                            const AcqConvertOptions& options) noexcept
+AcqExpected<AcqEncodeResult> mne::encode(const AcqMatrixRef<const double>& in, const AcqWriteView& view,
+                                         const AcqConvertOptions& options) noexcept
 {
     return encodeView(in, view, options);
 }
 
-AcqExpected<AcqEncodeResult> ACQLIB::encode(const AcqMatrixRef<const std::complex<float>>& in,
-                                            const AcqWriteView& view, const AcqConvertOptions& options) noexcept
+AcqExpected<AcqEncodeResult> mne::encode(const AcqMatrixRef<const std::complex<float>>& in,
+                                         const AcqWriteView& view, const AcqConvertOptions& options) noexcept
 {
     return encodeView(in, view, options);
 }
 
 //=============================================================================================================
 
-AcqError ACQLIB::decodeBits(const AcqBlockView& view, std::span<const AcqBitField> fields,
-                            const AcqMatrixRef<std::uint32_t>& out, std::size_t firstColumn) noexcept
+AcqError mne::decodeBits(const AcqBlockView& view, std::span<const AcqBitField> fields,
+                         const AcqMatrixRef<std::uint32_t>& out, std::size_t firstColumn) noexcept
 {
     if (!view.memory().hostAccessible()) {
         return AcqErrorCode::DeviceMemory;
@@ -1017,9 +1017,9 @@ AcqError ACQLIB::decodeBits(const AcqBlockView& view, std::span<const AcqBitFiel
 
 //=============================================================================================================
 
-AcqExpected<AcqEncodeResult> ACQLIB::encodeBits(const AcqMatrixRef<const std::uint32_t>& in,
-                                                std::span<const AcqBitField> fields, const AcqWriteView& view,
-                                                std::size_t firstColumn) noexcept
+AcqExpected<AcqEncodeResult> mne::encodeBits(const AcqMatrixRef<const std::uint32_t>& in,
+                                             std::span<const AcqBitField> fields, const AcqWriteView& view,
+                                             std::size_t firstColumn) noexcept
 {
     if (!view.memory().hostAccessible()) {
         return AcqErrorCode::DeviceMemory;
@@ -1053,9 +1053,9 @@ AcqExpected<AcqEncodeResult> ACQLIB::encodeBits(const AcqMatrixRef<const std::ui
 
 //=============================================================================================================
 
-AcqError ACQLIB::decodePart(const AcqBlockPart& part, AcqSampleFormat format, std::span<const double> scales,
-                            std::span<const double> offsets, const AcqMatrixRef<float>& out,
-                            AcqScaling scaling) noexcept
+AcqError mne::decodePart(const AcqBlockPart& part, AcqSampleFormat format, std::span<const double> scales,
+                         std::span<const double> offsets, const AcqMatrixRef<float>& out,
+                         AcqScaling scaling) noexcept
 {
     if (out.data == nullptr || out.cols < part.samples ||
         (scaling == AcqScaling::Physical && (scales.size() != out.rows || offsets.size() != out.rows))) {

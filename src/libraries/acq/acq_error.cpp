@@ -22,7 +22,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {
@@ -89,7 +89,7 @@ constexpr std::array<AcqErrorInfo, 29> kCatalogue{{
     {C::PermissionDenied, "PermissionDenied", "The operating system refused the request",
      "Grant the right (Linux: CAP_SYS_NICE or rtprio/nice limits in limits.conf) or use a lower priority",
      "acq-errors#permission-denied"},
-    {C::Internal, "Internal", "An internal invariant of ACQLIB was violated",
+    {C::Internal, "Internal", "An internal invariant of mne_acq was violated",
      "Please report this with the steps that led to it", "acq-errors#internal"},
 }};
 } // namespace
@@ -98,7 +98,7 @@ constexpr std::array<AcqErrorInfo, 29> kCatalogue{{
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-const AcqErrorInfo& ACQLIB::acqErrorInfo(AcqErrorCode code) noexcept
+const AcqErrorInfo& mne::acqErrorInfo(AcqErrorCode code) noexcept
 {
     for (const AcqErrorInfo& info : kCatalogue) {
         if (info.code == code) {

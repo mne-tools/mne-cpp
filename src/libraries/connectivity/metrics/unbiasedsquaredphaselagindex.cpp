@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::UnbiasedSquaredPhaseLagIndex - the small-sample-bias-corrected estimator of squared PLI.
+ * @brief    Implementation of @ref mne::UnbiasedSquaredPhaseLagIndex - the small-sample-bias-corrected estimator of squared PLI.
  */
 
 //=============================================================================================================
@@ -45,10 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

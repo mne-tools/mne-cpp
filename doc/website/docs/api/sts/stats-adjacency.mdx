@@ -1,13 +1,13 @@
 ---
 id: stats-adjacency
-title: "STSLIB::StatsAdjacency"
+title: "mne::StatsAdjacency"
 sidebar_label: StatsAdjacency
 sidebar_position: 3
 ---
 
 # StatsAdjacency
 
-**Namespace:** `STSLIB` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Source:** [`sts/sts_adjacency.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/sts/sts_adjacency.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Source:** [`sts/sts_adjacency.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/sts/sts_adjacency.h)
 
 :::info[Python equivalent]
 `mne.stats.combine_adjacency` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 3
 `#include <sts/sts_adjacency.h>`
 
 ```cpp
-class STSLIB::StatsAdjacency
+class mne::StatsAdjacency
 ```
 
 Adjacency matrix construction for spatial clustering.
@@ -37,14 +37,14 @@ const SparseMatrix<int> spatioTemporal = StatsAdjacency::fromSourceSpaceTemporal
 
 ### fromChannelPositions(info, picks)
 
-Build a spatial adjacency matrix from channel positions in [FiffInfo](/docs/api/fiff/fiff-info).
+Build a spatial adjacency matrix from channel positions in [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 Uses a distance threshold of 3x the median nearest-neighbor distance.
 
 **Parameters:**
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo with channel positions.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) with channel positions.
 
 - **picks** : *const std::vector&lt; std::string &gt; &*
   Optional list of channel names to include. If empty, all channels are used.

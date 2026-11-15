@@ -48,13 +48,13 @@
 
 class TestWriteToFileStatus;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffStream;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -78,12 +78,12 @@ namespace WRITETOFILEPLUGIN
  *
  * @brief The WriteToFile class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
  */
-class WRITETOFILESHARED_EXPORT WriteToFile : public SCSHAREDLIB::AbstractAlgorithm
+class WRITETOFILESHARED_EXPORT WriteToFile : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "writetofile.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
     friend class ::TestWriteToFileStatus;
 
@@ -104,7 +104,7 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual bool start() override;
@@ -145,7 +145,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -299,8 +299,8 @@ private:
 
     QMutex m_mutex; /**< The threads mutex.*/
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
-    std::unique_ptr<FIFFLIB::FiffStream> m_pOutfid; /**< FiffStream to write to.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::unique_ptr<mne::FiffStream> m_pOutfid; /**< FiffStream to write to.*/
 
     QSharedPointer<QTimer> m_pUpdateTimeInfoTimer;       /**< timer to control remaining time. */
     QSharedPointer<QTimer> m_pBlinkingRecordButtonTimer; /**< timer to control blinking recording button. */
@@ -334,13 +334,13 @@ private:
     QPointer<QAction> m_pActionRecordFile; /**< start recording action. */
     QPointer<QAction> m_pActionClipRecording;
 
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pWriteToFileInput; /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pWriteToFileInput; /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 
     Eigen::RowVectorXd m_mCals; /**< Row vector with channel calibration values. */
 
-    FIFFLIB::FiffFileSharer m_FileSharer; /**< Handles copying recording file and saving copy to shared directory. */
+    mne::FiffFileSharer m_FileSharer; /**< Handles copying recording file and saving copy to shared directory. */
 
     QStringList m_lFileNames; /**< List of file names of latest recording */
 };

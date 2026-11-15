@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -160,7 +160,7 @@ static bool writeMriDescription(const QString& filename,
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_cor_set");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

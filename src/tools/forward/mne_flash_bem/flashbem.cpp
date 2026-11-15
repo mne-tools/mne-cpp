@@ -52,10 +52,7 @@
 //=============================================================================================================
 
 using namespace MNEFLASHBEM;
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

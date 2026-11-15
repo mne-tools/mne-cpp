@@ -44,10 +44,10 @@
 #include <span>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -228,6 +228,6 @@ ACQSHARED_EXPORT AcqError decodePart(const AcqBlockPart& part, AcqSampleFormat f
                                      std::span<const double> offsets, const AcqMatrixRef<float>& out,
                                      AcqScaling scaling) noexcept;
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_CONVERT_H

@@ -101,7 +101,7 @@ TestToolExitCodes::TestToolExitCodes()
 
 void TestToolExitCodes::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     // Scoped to a directory that is created and removed per run. Some tools open
     // their input read-write and so leave an empty file behind on failure, which

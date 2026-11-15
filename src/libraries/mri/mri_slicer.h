@@ -7,19 +7,19 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Orthogonal-plane resampler that turns a 3D @ref MRILIB::MriVolData into the 2D textures consumed by the slice viewer.
+ * @brief    Orthogonal-plane resampler that turns a 3D @ref mne::MriVolData into the 2D textures consumed by the slice viewer.
  *
  * The slicer is the bridge between the format-specific MRI
- * readers (@ref MRILIB::MriMghIO, @ref MRILIB::MriNiftiIO, @ref MRILIB::MriCorIO) and
+ * readers (@ref mne::MriMghIO, @ref mne::MriNiftiIO, @ref mne::MriCorIO) and
  * the @c MriSlicesPlugin / @c MriSlicesView widgets that
  * render axial / coronal / sagittal cross-sections in
  * @c mne_analyze_studio. Two cooperating types live here:
  *
- * - @ref MRILIB::SliceOrientation "SliceOrientation" --- a strong enum picking the slicing
+ * - @ref mne::SliceOrientation "SliceOrientation" --- a strong enum picking the slicing
  * axis (Axial / Coronal / Sagittal); used both as the user-
  * facing radio-button value in the slice viewer and as the
  * index-permutation key inside the slicer itself.
- * - @ref MRILIB::MriSliceImage --- the result type: a normalised
+ * - @ref mne::MriSliceImage --- the result type: a normalised
  * (0..1) @c Eigen::MatrixXf pixel buffer ready to upload
  * as an OpenGL texture, paired with its own slice-to-RAS
  * 4×4 transform so the viewer can overlay surface meshes,
@@ -58,10 +58,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MRILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -305,6 +305,6 @@ public:
                                       const Eigen::Vector3i& voxel);
 };
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_SLICER_H

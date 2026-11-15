@@ -93,11 +93,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace MNALIB;
-using namespace MRILIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // OVERLAY COLOR BAR
@@ -949,8 +946,8 @@ void MainWindow::setupConnections()
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::valuesChanged, m_brainView,
             [this]() { m_brainView->setElectrodeValues(m_electrodesPlugin.values()); });
     connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
-        DISP3DLIB::PickResult pick;
-        pick.kind = DISP3DLIB::PickKind::ElectrodeContact;
+        mne::disp::PickResult pick;
+        pick.kind = mne::disp::PickKind::ElectrodeContact;
         pick.world = position;
         pick.label = name;
         pick.sourceId = m_electrodesPlugin.sceneLayerId();
@@ -2031,7 +2028,7 @@ void MainWindow::setupConnections()
 
     // Volume loaded → enable controls
     connect(&m_mriSlicesPlugin, &MRISLICESPLUGIN::MriSlicesPlugin::volumeChanged, this, [this]() {
-        const MRILIB::MriVolData* vol = m_mriSlicesPlugin.volume();
+        const mne::MriVolData* vol = m_mriSlicesPlugin.volume();
         if (!vol)
             return;
         m_mriGroup->setEnabled(true);
@@ -2043,9 +2040,9 @@ void MainWindow::setupConnections()
             const QSignalBlocker bA(m_mriAxialSlider);
             const QSignalBlocker bC(m_mriCoronalSlider);
             const QSignalBlocker bS(m_mriSagittalSlider);
-            m_mriAxialSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Axial) - 1);
-            m_mriCoronalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Coronal) - 1);
-            m_mriSagittalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Sagittal) - 1);
+            m_mriAxialSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Axial) - 1);
+            m_mriCoronalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Coronal) - 1);
+            m_mriSagittalSlider->setMaximum(MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Sagittal) - 1);
         }
         syncMriSlidersFromCrosshair();
 
@@ -3223,7 +3220,7 @@ void MainWindow::createLayersDock()
     lay->addStretch(1);
 
     // Toggling a kind-checkbox flips visibility on every layer of that kind.
-    auto toggleKind = [this](DISP3DLIB::SceneLayerKind kind, bool visible) {
+    auto toggleKind = [this](mne::disp::SceneLayerKind kind, bool visible) {
         const auto layers = m_scene.layers();
         for (const auto& layer : layers) {
             if (layer.kind == kind) {
@@ -3232,21 +3229,21 @@ void MainWindow::createLayersDock()
         }
     };
     connect(m_layerBrainCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(DISP3DLIB::SceneLayerKind::BrainSurface, v);
+        toggleKind(mne::disp::SceneLayerKind::BrainSurface, v);
     });
     connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [this, toggleKind](bool v) {
-        toggleKind(DISP3DLIB::SceneLayerKind::Electrode, v);
+        toggleKind(mne::disp::SceneLayerKind::Electrode, v);
         m_electrodesPlugin.electrodeObject()->setVisible(v);
         m_brainView->update();
     });
     connect(m_layerMriCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(DISP3DLIB::SceneLayerKind::MriSlice, v);
+        toggleKind(mne::disp::SceneLayerKind::MriSlice, v);
     });
     connect(m_layerSensorsCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(DISP3DLIB::SceneLayerKind::Sensor, v);
+        toggleKind(mne::disp::SceneLayerKind::Sensor, v);
     });
     connect(m_layerSourceOverlayCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
-        toggleKind(DISP3DLIB::SceneLayerKind::SourceOverlay, v);
+        toggleKind(mne::disp::SceneLayerKind::SourceOverlay, v);
     });
 
     m_layersDock->setWidget(body);
@@ -3344,7 +3341,7 @@ void MainWindow::createOverlayDock()
 
     // Bidirectional sync: external setTimeCursor / setOverlayThresholds
     // updates should reflect in the dock without firing a feedback loop.
-    connect(&m_scene, &DISP3DLIB::MultimodalScene::overlayThresholdsChanged,
+    connect(&m_scene, &mne::disp::MultimodalScene::overlayThresholdsChanged,
             this, [this](float fmin, float fmid, float fmax) {
                 QSignalBlocker b1(m_overlayFminSpin);
                 QSignalBlocker b2(m_overlayFmidSpin);
@@ -3356,7 +3353,7 @@ void MainWindow::createOverlayDock()
                     m_overlayColorBar->setRange(fmin, fmid, fmax);
                 }
             });
-    connect(&m_scene, &DISP3DLIB::MultimodalScene::timeCursorChanged,
+    connect(&m_scene, &mne::disp::MultimodalScene::timeCursorChanged,
             this, [this](double seconds) {
                 QSignalBlocker b(m_overlayTimeSlider);
                 const int v = qBound(0, static_cast<int>(std::lround(seconds * 1000.0)), 1000);
@@ -3529,14 +3526,14 @@ void MainWindow::syncMriSlidersFromCrosshair()
     const Eigen::Vector3i voxel = MriSlicer::rasToVoxel(*vol, m_mriSlicesPlugin.crosshair());
 
     const int sx = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Sagittal, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Sagittal) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, mne::SliceOrientation::Sagittal, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Sagittal) - 1);
     const int sy = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Coronal, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Coronal) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, mne::SliceOrientation::Coronal, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Coronal) - 1);
     const int sz = qBound(0,
-                          MriSlicer::sliceIndexForOrientation(*vol, MRILIB::SliceOrientation::Axial, voxel),
-                          MriSlicer::dimensionForOrientation(*vol, MRILIB::SliceOrientation::Axial) - 1);
+                          MriSlicer::sliceIndexForOrientation(*vol, mne::SliceOrientation::Axial, voxel),
+                          MriSlicer::dimensionForOrientation(*vol, mne::SliceOrientation::Axial) - 1);
 
     {
         const QSignalBlocker bA(m_mriAxialSlider);
@@ -3575,9 +3572,9 @@ void MainWindow::onMriSliderChanged()
 
     // Convert voxel to RAS and move crosshair
     Eigen::Vector3i voxel = MriSlicer::rasToVoxel(*vol, m_mriSlicesPlugin.crosshair());
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Sagittal)) = sx;
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Coronal)) = sy;
-    voxel(MriSlicer::voxelAxisForOrientation(*vol, MRILIB::SliceOrientation::Axial)) = sz;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, mne::SliceOrientation::Sagittal)) = sx;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, mne::SliceOrientation::Coronal)) = sy;
+    voxel(MriSlicer::voxelAxisForOrientation(*vol, mne::SliceOrientation::Axial)) = sz;
     const Eigen::Vector3f ras = MriSlicer::voxelToRas(*vol, voxel);
     m_mriSlicesPlugin.setCrosshair(ras);
 
@@ -3599,7 +3596,7 @@ void MainWindow::applyMriDisplayPreferences()
     m_mriOpacityLabel->setText(QString("%1%").arg(qRound(opacity * 100)));
 
     for (int i = 0; i < 3; ++i) {
-        DISP3DLIB::SliceObject* slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
+        mne::disp::SliceObject* slice = (i == 0) ? m_mriSlicesPlugin.axialSlice()
             : (i == 1)                           ? m_mriSlicesPlugin.coronalSlice()
                                                  : m_mriSlicesPlugin.sagittalSlice();
         if (slice) {

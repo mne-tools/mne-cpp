@@ -43,10 +43,9 @@
 //=============================================================================================================
 
 using namespace COVARIANCEPLUGIN;
-using namespace DISPLIB;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne::scan;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -55,7 +54,7 @@ using namespace Eigen;
 
 Covariance::Covariance()
 : m_iEstimationSamples(2000)
-, m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
+, m_pCircularBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
 {
 }
 
@@ -179,7 +178,7 @@ QWidget* Covariance::setupWidget()
 
 //=============================================================================================================
 
-void Covariance::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void Covariance::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
@@ -234,7 +233,7 @@ void Covariance::run()
     m_mutex.lock();
     int iEstimationSamples = m_iEstimationSamples;
     m_mutex.unlock();
-    DSPLIB::RtCov rtCov(m_pFiffInfo);
+    mne::RtCov rtCov(m_pFiffInfo);
 
     // Start processing data
     while (!isInterruptionRequested()) {

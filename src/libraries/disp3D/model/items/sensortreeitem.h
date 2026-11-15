@@ -30,7 +30,7 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -76,6 +76,6 @@ private:
     bool m_hasOrientation = false;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SENSORTREEITEM_H

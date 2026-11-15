@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    One renderable surface (cortex / pial / inflated / BEM) inside an MSH display set.
  *
- * @ref MNELIB::MNEMshDisplaySurface attaches an @ref MNELIB::MNESurface to a
+ * @ref mne::MNEMshDisplaySurface attaches an @ref mne::MNESurface to a
  * shading state - per-vertex colours, scalar overlays, current
- * @ref MNELIB::MNEMshColorScaleDef and visibility flags - producing the
+ * @ref mne::MNEMshColorScaleDef and visibility flags - producing the
  * self-contained record that the MSH renderer (and its mne-cpp DISP3D
  * successor) draws.
  */
@@ -41,10 +41,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -55,14 +55,14 @@ class MNEMorphMap;
 class MNEMshPicked;
 class MNEMshColorScaleDef;
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffDigitizerData;
 }
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -105,7 +105,7 @@ public:
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();     /**< Extra 4x4 transformation matrix for this surface. */
     bool sketch = false;                                     /**< Non-zero to use sketch mode with decimated triangulation. */
 
-    std::vector<std::unique_ptr<MNELIB::MNEMorphMap>> maps; /**< Morphing maps from other surfaces to this one. */
+    std::vector<std::unique_ptr<mne::MNEMorphMap>> maps; /**< Morphing maps from other surfaces to this one. */
 
     int overlay_type = 0;               /**< Type identifier for the overlay values. */
     Eigen::VectorXf overlay_values;     /**< Per-vertex overlay value array. */
@@ -114,7 +114,7 @@ public:
     Eigen::VectorXf marker_values;      /**< Per-vertex marker values (shown in shades of marker color). */
 
     Eigen::VectorXf vertex_colors;                               /**< Per-vertex RGBA color array. */
-    std::unique_ptr<MNELIB::MNEMshColorScaleDef> color_scale;    /**< Color scale used to compute vertex colors. */
+    std::unique_ptr<mne::MNEMshColorScaleDef> color_scale;       /**< Color scale used to compute vertex colors. */
     int nvertex_colors = 3;                                      /**< Number of color components per vertex. */
     Eigen::Vector4f even_vertex_color = Eigen::Vector4f::Zero(); /**< Uniform RGBA color for non-data-driven coloring. */
 
@@ -131,7 +131,7 @@ public:
 
     bool show_aux_data = false; /**< Non-zero to show auxiliary data related to this surface. */
 
-    std::vector<MNELIB::MNEMshPicked> picked; /**< Picked locations in world coordinates. */
+    std::vector<mne::MNEMshPicked> picked; /**< Picked locations in world coordinates. */
 
     //=========================================================================================================
     // Alignment functions (moved from MNESurfaceOrVolume)
@@ -149,8 +149,8 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int align_fiducials(FIFFLIB::FiffDigitizerData& head_dig,
-                        const FIFFLIB::FiffDigitizerData& mri_dig,
+    int align_fiducials(mne::FiffDigitizerData& head_dig,
+                        const mne::FiffDigitizerData& mri_dig,
                         int niter,
                         int scale_head,
                         float omit_dist,
@@ -163,7 +163,7 @@ public:
      * @param[in]  mri_fid  MRI fiducial locations (LPA, nasion, RPA rows), in m.
      * @param[out] scales   Receives the per-axis scale factors (all set to 1 if a sphere fit fails).
      */
-    void get_head_scale(FIFFLIB::FiffDigitizerData& dig,
+    void get_head_scale(mne::FiffDigitizerData& dig,
                         const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
                         Eigen::Vector3f& scales);
 
@@ -175,7 +175,7 @@ public:
      *
      * @return Number of points discarded.
      */
-    int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
+    int discard_outlier_digitizer_points(mne::FiffDigitizerData& d,
                                          float maxdist) const;
 
     /**
@@ -185,7 +185,7 @@ public:
      * @param[in]      do_all     If true, include inactive and discarded points.
      * @param[in]      do_approx  If true, start the closest-point search from the previously found triangles.
      */
-    void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
+    void calculate_digitizer_distances(mne::FiffDigitizerData& dig,
                                        bool do_all, bool do_approx) const;
 
     /**
@@ -198,7 +198,7 @@ public:
      *
      * @return OK on success, FAIL if no adjustable transform exists, fewer than 3 points are active, or the fit fails.
      */
-    int iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,
+    int iterate_alignment_once(mne::FiffDigitizerData& dig,
                                int nasion_weight,
                                const std::optional<Eigen::Vector3f>& nasion_mri,
                                int last_step) const;
@@ -210,7 +210,7 @@ public:
      *
      * @return RMS distance of the active, non-discarded points, in m.
      */
-    float rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig) const;
+    float rms_digitizer_distance(mne::FiffDigitizerData& dig) const;
 
     /**
      * Scale a display surface's bounding box and all vertex positions.
@@ -245,6 +245,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHDISPLAYSURFACE_H

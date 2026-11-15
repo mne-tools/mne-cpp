@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,19 +65,19 @@ FiffIO::FiffIO(const std::vector<std::filesystem::path>& paths)
 
 bool FiffIO::setup_read(const std::filesystem::path& path, FiffInfo& info, std::shared_ptr<FiffDirNode>& dirTree)
 {
-    BASELIB::Log::info("Opening fiff data {}...\n", BASELIB::utf8FromPath(path));
+    mne::Log::info("Opening fiff data {}...\n", mne::utf8FromPath(path));
     FiffStream stream(path);
     return stream.open() && stream.read_meas_info(stream.dirtree(), info, dirTree);
 }
 
 //=============================================================================================================
 
-std::shared_ptr<FiffDirNode> FiffIO::readRaw(FiffStream& stream, std::unique_ptr<BASELIB::ByteStream> rawBytes)
+std::shared_ptr<FiffDirNode> FiffIO::readRaw(FiffStream& stream, std::unique_ptr<mne::ByteStream> rawBytes)
 {
     FiffInfo info;
     std::shared_ptr<FiffDirNode> infoNode;
     if (!stream.open() || !stream.read_meas_info(stream.dirtree(), info, infoNode) || !infoNode) {
-        BASELIB::Log::warning("[FiffIO::read] Dir tree could not be read");
+        mne::Log::warning("[FiffIO::read] Dir tree could not be read");
         return nullptr;
     }
     const std::shared_ptr<FiffDirNode>& tree = stream.dirtree();
@@ -85,9 +85,9 @@ std::shared_ptr<FiffDirNode> FiffIO::readRaw(FiffStream& stream, std::unique_ptr
         tree->has_kind(FIFFB_SMSH_RAW_DATA)) {
         try {
             raw.push_back(std::make_shared<FiffRawData>(std::move(rawBytes)));
-            BASELIB::Log::info("Finished reading raw data!\n");
+            mne::Log::info("Finished reading raw data!\n");
         } catch (const std::exception& e) {
-            BASELIB::Log::warning("[FiffIO::read] Could not read raw data: {}", e.what());
+            mne::Log::warning("[FiffIO::read] Could not read raw data: {}", e.what());
         }
     }
     return tree;
@@ -98,7 +98,7 @@ std::shared_ptr<FiffDirNode> FiffIO::readRaw(FiffStream& stream, std::unique_ptr
 bool FiffIO::read(const std::filesystem::path& path)
 {
     FiffStream stream(path);
-    const std::shared_ptr<FiffDirNode> tree = readRaw(stream, BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Read));
+    const std::shared_ptr<FiffDirNode> tree = readRaw(stream, mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read));
     if (!tree) {
         return false;
     }
@@ -108,7 +108,7 @@ bool FiffIO::read(const std::filesystem::path& path)
                 evoked.push_back(std::make_shared<FiffEvoked>(one));
             }
         } else {
-            BASELIB::Log::warning("[FiffIO::read] {}", set.error().what());
+            mne::Log::warning("[FiffIO::read] {}", set.error().what());
         }
     }
     return true;
@@ -118,10 +118,10 @@ bool FiffIO::read(const std::filesystem::path& path)
 
 bool FiffIO::read(std::vector<std::byte> bytes)
 {
-    FiffStream stream(std::make_unique<BASELIB::MemoryByteStream>(bytes));
-    const std::shared_ptr<FiffDirNode> tree = readRaw(stream, std::make_unique<BASELIB::MemoryByteStream>(std::move(bytes)));
+    FiffStream stream(std::make_unique<mne::MemoryByteStream>(bytes));
+    const std::shared_ptr<FiffDirNode> tree = readRaw(stream, std::make_unique<mne::MemoryByteStream>(std::move(bytes)));
     if (tree && tree->has_kind(FIFFB_EVOKED)) {
-        BASELIB::Log::warning("[FiffIO::read] Evoked data can only be read from a file.");
+        mne::Log::warning("[FiffIO::read] Evoked data can only be read from a file.");
     }
     return tree != nullptr;
 }
@@ -138,8 +138,8 @@ bool FiffIO::write(const std::filesystem::path& path, fiff_int_t type, fiff_int_
             bool ok = true;
             for (fiff_int_t i = 0; i < static_cast<fiff_int_t>(raw.size()); ++i) {
                 std::filesystem::path one = path;
-                one.replace_filename(std::format("{}_raw-{}{}", BASELIB::utf8FromPath(path.stem()), i, BASELIB::utf8FromPath(path.extension())));
-                BASELIB::Log::info("Writing raw data set {} to {} ...", i, BASELIB::utf8FromPath(one));
+                one.replace_filename(std::format("{}_raw-{}{}", mne::utf8FromPath(path.stem()), i, mne::utf8FromPath(path.extension())));
+                mne::Log::info("Writing raw data set {} to {} ...", i, mne::utf8FromPath(one));
                 ok &= write_raw(one, i);
             }
             return ok;
@@ -156,7 +156,7 @@ bool FiffIO::write(const std::filesystem::path& path, fiff_int_t type, fiff_int_
                 }
             }
             if (auto saved = set.save(path); !saved) {
-                BASELIB::Log::warning("[FiffIO::write] {}", saved.error().what());
+                mne::Log::warning("[FiffIO::write] {}", saved.error().what());
                 return false;
             }
             return true;
@@ -189,7 +189,7 @@ bool FiffIO::write_raw(const std::filesystem::path& path, fiff_int_t idx) const
     for (fiff_int_t first = data.first_samp; first < data.last_samp; first += quantum) {
         const fiff_int_t last = std::min(first + quantum - 1, data.last_samp);
         if (!data.read_raw_segment(buffer, times, mult, first, last, sel)) {
-            BASELIB::Log::warning("error during read_raw_segment\n");
+            mne::Log::warning("error during read_raw_segment\n");
             return false;
         }
         if (first == data.first_samp && first > 0) {

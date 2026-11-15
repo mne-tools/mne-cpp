@@ -12,13 +12,13 @@
  * @date     August 2012
  * @brief    Primitive scalar typedefs and forward-compatible aliases backing the FIFF type system.
  *
- * Defines the fixed-width FIFFLIB primitives (@c fiff_int_t,
+ * Defines the fixed-width mne_fiff primitives (@c fiff_int_t,
  * @c fiff_float_t, @c fiff_byte_t, @c fiff_double_t, the DAU packed
  * half-precision integer aliases, the Julian-day type, etc.) so that
  * on-disk records preserve the exact byte layout documented by the FIFF
  * specification regardless of host platform. It also publishes a handful
  * of Eigen typedefs (@c MatrixDau16, @c MatrixShort) used by the matrix
- * tag readers in @ref FIFFLIB::FiffStream and a small set of empty-default
+ * tag readers in @ref mne::FiffStream and a small set of empty-default
  * sentinel objects (@c defaultMatrixXd, ...) that
  * let callers express "no value provided" on optional arguments without
  * relying on @c std::optional, matching the historical MATLAB-style
@@ -27,7 +27,7 @@
  * Note: the leftover "Old fiff_type declarations - replace them"
  * heading on the previous header line reflects an in-progress cleanup
  * toward strongly typed C++ replacements; new code should prefer the
- * class wrappers (@ref FIFFLIB::FiffId, @ref FIFFLIB::FiffChInfo, ...) over the legacy
+ * class wrappers (@ref mne::FiffId, @ref mne::FiffChInfo, ...) over the legacy
  * "Rec" struct aliases re-exported for backwards compatibility.
  */
 
@@ -59,10 +59,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 static Eigen::MatrixXd defaultMatrixXd = Eigen::MatrixXd::Constant(1, 1, -1);

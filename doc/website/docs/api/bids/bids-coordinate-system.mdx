@@ -1,18 +1,18 @@
 ---
 id: bids-coordinate-system
-title: "BIDSLIB::BidsCoordinateSystem"
+title: "mne::BidsCoordinateSystem"
 sidebar_label: BidsCoordinateSystem
 sidebar_position: 8
 ---
 
 # BidsCoordinateSystem
 
-**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_coordinate_system.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_coordinate_system.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_coordinate_system.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_coordinate_system.h)
 
 `#include <bids/bids_coordinate_system.h>`
 
 ```cpp
-struct BIDSLIB::BidsCoordinateSystem
+struct mne::BidsCoordinateSystem
 ```
 
 Coordinate system metadata from *_coordsystem.json.
@@ -33,7 +33,7 @@ const BidsCoordinateSystem coords = BidsCoordinateSystem::read_json(ieeg.coordsy
 
 ### to_fiff_coord_trans(fromFrame, toFrame)
 
-Convert parsed transform to a [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans).
+Convert parsed transform to a [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans).
 
 **Parameters:**
 
@@ -45,7 +45,7 @@ Convert parsed transform to a [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans).
 
 **Returns:**
 
-- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — FiffCoordTrans populated with the parsed 4x4 matrix.
+- *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans)* — [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) populated with the parsed 4x4 matrix.
 
 ---
 

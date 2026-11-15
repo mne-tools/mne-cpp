@@ -17,7 +17,7 @@
 #include <Eigen/Core>
 #include <cmath>
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestTfMxne : public QObject

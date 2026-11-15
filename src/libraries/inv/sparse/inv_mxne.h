@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Mixed-Norm Estimate (MxNE) sparse inverse solver — block-sparse L21 minimisation for focal source recovery.
  *
- * @ref INVLIB::InvMxne implements the MxNE solver of Gramfort et al.,
+ * @ref mne::InvMxne implements the MxNE solver of Gramfort et al.,
  * @em Mixed-norm estimates for the M/EEG inverse problem using
  * accelerated gradient methods, Phys. Med. Biol. 57(7), 1937-1961
  * (2012). It minimises
@@ -17,8 +17,8 @@
  * using iteratively-reweighted least squares; the @c L21 group penalty
  * zeros out entire source rows that do not contribute to the residual,
  * producing a focal solution with a small list of active vertices.
- * Outputs the sparse @ref INVLIB::InvSourceEstimate, the active-vertex list,
- * iteration count and final residual norm in an @ref INVLIB::InvMxneResult.
+ * Outputs the sparse @ref mne::InvSourceEstimate, the active-vertex list,
+ * iteration count and final residual norm in an @ref mne::InvMxneResult.
  */
 
 #ifndef INV_MXNE_H
@@ -45,10 +45,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -100,6 +100,6 @@ public:
         double tolerance = 1e-6);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_MXNE_H

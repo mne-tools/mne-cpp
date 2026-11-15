@@ -56,7 +56,7 @@
 #endif
 
 using namespace MNEANALYZESTUDIO;
-using namespace INVLIB;
+using namespace mne;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers

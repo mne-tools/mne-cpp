@@ -44,9 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace INVLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -115,7 +113,7 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_volume_data2mri");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

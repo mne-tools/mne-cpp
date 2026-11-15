@@ -54,10 +54,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace CHANNELSLIB;
-using namespace BASELIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -338,7 +336,7 @@ void ChannelSelectionView::updateBadChannels()
             digIndex = m_pChannelInfoModel->index(i, 1);
             QString origChName = m_pChannelInfoModel->data(digIndex, ChannelInfoModelRoles::GetOrigChName).toString();
 
-            if (BASELIB::contains(badChannelList, origChName.toStdString())) {
+            if (mne::contains(badChannelList, origChName.toStdString())) {
                 badChannelMappedNames << mappedChName;
             }
         }
@@ -467,7 +465,7 @@ void ChannelSelectionView::updateProcessingMode(ProcessingMode mode)
 bool ChannelSelectionView::loadLayout(const QString& path)
 {
     qDebug() << "loadLayout:" << path;
-    const std::optional<MNELIB::MNELayout> layout = MNELIB::MNELayout::read(path.toStdU16String());
+    const std::optional<mne::MNELayout> layout = mne::MNELayout::read(path.toStdU16String());
     const bool state = layout.has_value();
     m_layoutMap.clear();
     if (state) {
@@ -497,7 +495,7 @@ bool ChannelSelectionView::loadLayout(const QString& path)
 
     //Add new EEG points to Layout Map
     if (!positions.empty()) {
-        const auto corners = CHANNELSLIB::LayoutMaker::make_layout(positions, {.radius = 60.0, .box_width = 5.0, .box_height = 4.0, .mirror_y = true});
+        const auto corners = mne::LayoutMaker::make_layout(positions, {.radius = 60.0, .box_width = 5.0, .box_height = 4.0, .mirror_y = true});
         if (corners) {
             for (std::size_t i = 0; i < corners->size(); ++i) {
                 const QString& name = names.at(static_cast<qsizetype>(i));
@@ -559,7 +557,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     // and must report failure rather than an indeterminate value.
     std::optional<std::vector<ChannelSelection>> groups;
     if (!path.isEmpty()) {
-        const std::filesystem::path file = BASELIB::pathFromUtf8(newPath.toStdString());
+        const std::filesystem::path file = mne::pathFromUtf8(newPath.toStdString());
         if (path.contains(".sel"))
             groups = SelectionIO::read_sel(file);
         if (path.contains(".mon")) {
@@ -742,7 +740,7 @@ void ChannelSelectionView::onBtnSaveUserSelection()
                 group.channels.push_back(channel.toStdString());
             groups.push_back(std::move(group));
         }
-        const std::filesystem::path file = BASELIB::pathFromUtf8(path.toStdString());
+        const std::filesystem::path file = mne::pathFromUtf8(path.toStdString());
         if (path.contains(".sel"))
             SelectionIO::write_sel(file, groups);
         if (path.contains(".mon"))

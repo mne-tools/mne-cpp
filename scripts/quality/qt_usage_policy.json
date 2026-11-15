@@ -117,7 +117,7 @@
     },
     "dsp": {
       "tokens": 430,
-      "public_header_includes": 17,
+      "public_header_includes": 19,
       "modules": [
         "Concurrent",
         "Core"

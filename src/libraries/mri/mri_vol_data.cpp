@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Implementation of @ref MRILIB::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
+ * @brief    Implementation of @ref mne::MriVolData: header-driven geometry computations and the suffix-dispatch loader.
  *
  * Houses the non-trivial methods @ref MriVolData declares:
  *
@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -88,11 +88,11 @@ bool MriVolData::isValid() const
 bool MriVolData::read(const std::string& path)
 {
     // One loader for FreeSurfer MGH/MGZ and NIfTI-1 (.nii / .nii.gz), chosen by suffix
-    const std::string lower = BASELIB::toLower(path);
+    const std::string lower = mne::toLower(path);
     if (lower.ends_with(".nii") || lower.ends_with(".nii.gz")) {
         return MriNiftiIO::read(path, *this);
     }
-    std::vector<FIFFLIB::FiffCoordTrans> additionalTrans;
+    std::vector<mne::FiffCoordTrans> additionalTrans;
     return MriMghIO::read(path, *this, additionalTrans);
 }
 

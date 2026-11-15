@@ -43,9 +43,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
+using namespace mne::scan;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -101,7 +100,7 @@ RealTimeSpectrumWidget::~RealTimeSpectrumWidget()
 
 //=============================================================================================================
 
-void RealTimeSpectrumWidget::update(SCMEASLIB::Measurement::SPtr)
+void RealTimeSpectrumWidget::update(mne::scan::Measurement::SPtr)
 {
     getData();
 }

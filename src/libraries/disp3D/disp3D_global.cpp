@@ -26,15 +26,15 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DISP3DLIB::buildDateTime()
+const char* mne::disp::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
-const char* DISP3DLIB::buildHash()
+const char* mne::disp::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
-const char* DISP3DLIB::buildHashLong()
+const char* mne::disp::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

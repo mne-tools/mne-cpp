@@ -30,10 +30,10 @@
 #include <QVector3D>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -219,6 +219,6 @@ private:
     int m_depthSteps = 32;      //!< POM ray-march steps
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // VIDEOOVERLAY_H

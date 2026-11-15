@@ -10,7 +10,7 @@
 #include <dsp/filterkernel.h>
 #include <dsp/rt/rt_filter.h>
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestRtProcessingExtended : public QObject

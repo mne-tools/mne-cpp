@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEProjOp.
+ * @brief    Implementation of @ref mne::MNEProjOp.
  *
  * Implements list management, the orthonormalisation that turns the
  * user-supplied SSP vectors into a projector and the in-place application
- * to dense matrices or @ref MNELIB::MNENamedMatrix instances.
+ * to dense matrices or @ref mne::MNENamedMatrix instances.
  */
 
 //=============================================================================================================
@@ -45,8 +45,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -144,7 +143,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::create_average_eeg_ref(std::span<const Fif
             names.push_back(ch.ch_name);
     const auto eegcount = static_cast<int>(names.size());
     if (eegcount == 0) {
-        BASELIB::Log::critical("No EEG channels specified for average reference.");
+        mne::Log::critical("No EEG channels specified for average reference.");
         return nullptr;
     }
 
@@ -189,7 +188,7 @@ bool MNEProjOp::project_vector(Eigen::Ref<Eigen::VectorXf> vec, bool do_compleme
         return true;
 
     if (names.size() != static_cast<std::size_t>(vec.size())) {
-        BASELIB::Log::critical("Data vector size does not match projection operator");
+        mne::Log::critical("Data vector size does not match projection operator");
         return false;
     }
 
@@ -277,7 +276,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream& stream, const s
             item_nchan = *t_pTag->to_int();
         }
         if (item_nchan <= 0) {
-            BASELIB::Log::critical("Number of channels incorrectly specified for one of the projection items.");
+            mne::Log::critical("Number of channels incorrectly specified for one of the projection items.");
             return nullptr;
         }
         /*
@@ -290,7 +289,7 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream& stream, const s
         item_names = FiffStream::split_name_list(t_pTag->to_string());
 
         if (static_cast<int>(item_names.size()) != item_nchan) {
-            BASELIB::Log::critical("Channel name list incorrectly specified for proj item # {}", k + 1);
+            mne::Log::critical("Channel name list incorrectly specified for proj item # {}", k + 1);
             item_names.clear();
             return nullptr;
         }
@@ -317,8 +316,8 @@ std::unique_ptr<MNEProjOp> MNEProjOp::read_from_node(FiffStream& stream, const s
 
         MatrixXf item_vectors = t_pTag->to_float_matrix().transpose();
         if (item_vectors.rows() != item_nvec || item_vectors.cols() != item_nchan) {
-            BASELIB::Log::critical("Projection item # {} stores a {} x {} matrix for {} vectors of {} channels",
-                                   k + 1, item_vectors.rows(), item_vectors.cols(), item_nvec, item_nchan);
+            mne::Log::critical("Projection item # {} stores a {} x {} matrix for {} vectors of {} channels",
+                               k + 1, item_vectors.rows(), item_vectors.cols(), item_nvec, item_nchan);
             return nullptr;
         }
 
@@ -394,7 +393,7 @@ void MNEProjOp::report_data(std::ostream& out, const std::string& tag, bool list
             }
             for (p = 0; p < vecs->nrow(); p++)
                 for (q = 0; q < vecs->ncol(); q++) {
-                    found = FIFFLIB::has_channel(exclude, vecs->collist[q]);
+                    found = mne::has_channel(exclude, vecs->collist[q]);
                     out << std::format("{:10.5g} ", found ? 0.0 : static_cast<double>(vecs->data(p, q)));
                     out << (q < vecs->ncol() - 1 ? " " : "\n");
                 }
@@ -523,7 +522,7 @@ bool MNEProjOp::make_proj(const StringList& bad)
         nvec_eeg = 0;
     }
     if (nvec_meg + nvec_eeg == 0) {
-        BASELIB::Log::warning("No projection remains after excluding bad channels. Omitting projection.");
+        mne::Log::warning("No projection remains after excluding bad channels. Omitting projection.");
         return true;
     }
     /*
@@ -591,7 +590,7 @@ bool MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, bool do_complem
         return true;
 
     if (names.size() != static_cast<std::size_t>(vec.size())) {
-        BASELIB::Log::critical("Data vector size does not match projection operator");
+        mne::Log::critical("Data vector size does not match projection operator");
         return false;
     }
 
@@ -606,8 +605,8 @@ bool MNEProjOp::project_dvector(Eigen::Ref<Eigen::VectorXd> vec, bool do_complem
 
 //=============================================================================================================
 
-BASELIB::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const std::vector<std::filesystem::path>& projnames,
-                                                                         std::span<const FiffChInfo> chs)
+mne::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const std::vector<std::filesystem::path>& projnames,
+                                                                     std::span<const FiffChInfo> chs)
 {
     const bool has_eeg = std::ranges::any_of(chs, [](const FiffChInfo& ch) { return ch.kind == FIFFV_EEG_CH; });
 
@@ -619,15 +618,15 @@ BASELIB::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const s
     for (const auto& projname : projnames) {
         std::unique_ptr<MNEProjOp> one(MNEProjOp::read(projname));
         if (!one)
-            return BASELIB::fail(BASELIB::ErrorCode::Io, "cannot read the projection in {}", BASELIB::utf8FromPath(projname));
+            return mne::fail(mne::ErrorCode::Io, "cannot read the projection in {}", mne::utf8FromPath(projname));
         if (one->items.empty()) {
-            BASELIB::Log::info("No linear projection information in {}.", BASELIB::utf8FromPath(projname));
+            mne::Log::info("No linear projection information in {}.", mne::utf8FromPath(projname));
         } else {
-            BASELIB::Log::info("Loaded projection from {}:", BASELIB::utf8FromPath(projname));
+            mne::Log::info("Loaded projection from {}:", mne::utf8FromPath(projname));
             {
                 std::ostringstream report;
                 one->report(report, "\t");
-                BASELIB::Log::info("{}", report.str());
+                mne::Log::info("{}", report.str());
             }
             if (!all)
                 all = std::make_unique<MNEProjOp>();
@@ -640,11 +639,11 @@ BASELIB::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const s
         if (!found) {
             std::unique_ptr<MNEProjOp> one(MNEProjOp::create_average_eeg_ref(chs));
             if (one) {
-                BASELIB::Log::info("Average EEG reference projection added:");
+                mne::Log::info("Average EEG reference projection added:");
                 {
                     std::ostringstream report;
                     one->report(report, "\t");
-                    BASELIB::Log::info("{}", report.str());
+                    mne::Log::info("{}", report.str());
                 }
                 if (!all)
                     all = std::make_unique<MNEProjOp>();
@@ -653,7 +652,7 @@ BASELIB::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const s
         }
     }
     if (all && all->affect_chs(chs) == 0) {
-        BASELIB::Log::info("Projection will not have any effect on selected channels. Projection omitted.");
+        mne::Log::info("Projection will not have any effect on selected channels. Projection omitted.");
         all.reset();
     }
     return all;
@@ -672,7 +671,7 @@ bool MNEProjOp::apply_cov(MNECovMatrix& c) const
         return true;
 
     if (static_cast<int>(names.size()) != c.ncov || names != c.names) {
-        BASELIB::Log::critical("Incompatible data in apply_cov");
+        mne::Log::critical("Incompatible data in apply_cov");
         return false;
     }
 

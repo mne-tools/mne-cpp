@@ -27,7 +27,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 extern "C" DLManagedTensorVersioned* acq_dlpack_probe_export(int format, int planar, int channels, int samples);

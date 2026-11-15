@@ -45,7 +45,7 @@
 //=============================================================================================================
 
 using namespace RTSERVER;
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {
@@ -54,8 +54,8 @@ namespace
 template<typename Write>
 void appendTags(QByteArray& block, Write&& write)
 {
-    auto bytes = std::make_unique<BASELIB::MemoryByteStream>();
-    const BASELIB::MemoryByteStream& written = *bytes;
+    auto bytes = std::make_unique<mne::MemoryByteStream>();
+    const mne::MemoryByteStream& written = *bytes;
     FiffStream stream(std::move(bytes));
     write(stream);
     block.append(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
@@ -126,7 +126,7 @@ void FiffStreamThread::parseCommand(const FiffTag& p_pTag)
     if (p_pTag.size() >= 4) {
         qint32 t_iCmd = 0;
         std::memcpy(&t_iCmd, p_pTag.data(), sizeof(t_iCmd));
-        t_iCmd = FIFFLIB::swap_int(t_iCmd);
+        t_iCmd = mne::swap_int(t_iCmd);
 
         if (t_iCmd == MNE_RT_SET_CLIENT_ALIAS) {
             //
@@ -232,7 +232,7 @@ void FiffStreamThread::run()
         }
         tagBytes += t_qTcpSocket.read(size);
         const auto* begin = reinterpret_cast<const std::byte*>(tagBytes.constData());
-        FiffStream in(std::make_unique<BASELIB::MemoryByteStream>(std::vector<std::byte>(begin, begin + tagBytes.size())));
+        FiffStream in(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + tagBytes.size())));
         if (const std::optional<FiffTag> tag = in.read_tag(); tag && tag->kind == FIFF_MNE_RT_COMMAND) {
             parseCommand(*tag);
         }

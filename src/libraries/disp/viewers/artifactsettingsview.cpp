@@ -40,8 +40,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,7 +73,7 @@ ArtifactSettingsView::~ArtifactSettingsView()
 
 //=============================================================================================================
 
-void ArtifactSettingsView::setChInfo(const std::vector<FIFFLIB::FiffChInfo>& fiffChInfoList)
+void ArtifactSettingsView::setChInfo(const std::vector<mne::FiffChInfo>& fiffChInfoList)
 {
     m_fiffChInfoList = fiffChInfoList;
 

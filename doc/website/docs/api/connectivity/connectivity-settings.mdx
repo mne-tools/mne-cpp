@@ -1,27 +1,27 @@
 ---
 id: connectivity-settings
-title: "CONNECTIVITYLIB::ConnectivitySettings"
+title: "mne::ConnectivitySettings"
 sidebar_label: ConnectivitySettings
 sidebar_position: 10
 ---
 
 # ConnectivitySettings
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/connectivitysettings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/connectivitysettings.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/connectivitysettings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/connectivitysettings.h)
 
 `#include <connectivity/connectivitysettings.h>`
 
 <Connections topics={["connectivity"]} context="api" current="ConnectivitySettings" />
 
 ```cpp
-class CONNECTIVITYLIB::ConnectivitySettings
+class mne::ConnectivitySettings
 ```
 
-Mutable container that aggregates the inputs and intermediate spectral results required by every metric implementation in ``CONNECTIVITYLIB``.
+Mutable container that aggregates the inputs and intermediate spectral results required by every metric implementation in `mne_connectivity`.
 
-Each call to `CONNECTIVITYLIB::ConnectivitySettings::append` "append" adds one trial; the trial matrices live in `m_trialData`, while DPSS tapered spectra, cross-spectral densities and their imaginary-part derivatives are filled in lazily by whichever metric runs first. Cross-trial sums accumulate in `m_intermediateSumData` so that a second metric run on the same data set reuses those sums and skips the FFT pass entirely. Node positions can be derived from a `FiffInfo` (sensor space) or from a forward solution + `FsSurfaceSet` (source space) and are propagated into the resulting [`Network`](/docs/api/connectivity/network) nodes.
+Each call to `mne::ConnectivitySettings::append` "append" adds one trial; the trial matrices live in `m_trialData`, while DPSS tapered spectra, cross-spectral densities and their imaginary-part derivatives are filled in lazily by whichever metric runs first. Cross-trial sums accumulate in `m_intermediateSumData` so that a second metric run on the same data set reuses those sums and skips the FFT pass entirely. Node positions can be derived from a [`FiffInfo`](/docs/api/fiff/fiff-info) (sensor space) or from a forward solution + [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) (source space) and are propagated into the resulting [`Network`](/docs/api/connectivity/network) nodes.
 
-Aggregates trial data, spectral cache and node geometry shared by all ``CONNECTIVITYLIB`` metrics.
+Aggregates trial data, spectral cache and node geometry shared by all `mne_connectivity` metrics.
 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
 ConnectivitySettings settings;
@@ -164,7 +164,7 @@ Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settin
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 93"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 92"
 ConnectivitySettings m_settings;
 std::shared_ptr<RtConnectivity> m_pRtConnectivity;
 std::vector<Network> m_rawNetworkData; /**< Results as computed. */
@@ -176,7 +176,7 @@ std::map<std::string, Eigen::Vector4i> mColor;
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 243"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 239"
 // ---------------------------------------------------------------------------------------------------------
 // Connectivity: the same network as compute_connectivity, computed on a worker thread
 ConnectivitySettings settings;
@@ -197,7 +197,7 @@ settings.setFFTSize(256);
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 199"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 192"
 ConnectivitySettings conSettings;
 ````
 

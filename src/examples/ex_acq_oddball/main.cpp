@@ -55,9 +55,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace std::chrono_literals;
 
 namespace

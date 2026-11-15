@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref FSLIB::FsAnnotationSet: pairs lh and rh @ref FSLIB::FsAnnotation for whole-brain parcellations.
+ * @brief    Implementation of @ref mne::FsAnnotationSet: pairs lh and rh @ref mne::FsAnnotation for whole-brain parcellations.
  */
 
 //=============================================================================================================
@@ -23,7 +23,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -73,12 +73,12 @@ FsAnnotationSet::FsAnnotationSet(const FsAnnotation& p_LHAnnotation, const FsAnn
     if (p_LHAnnotation.hemi() == 0)
         m_annots.insert_or_assign(0, p_LHAnnotation);
     else
-        BASELIB::Log::warning("Left hemisphere id is not 0. LH annotation not assigned!");
+        mne::Log::warning("Left hemisphere id is not 0. LH annotation not assigned!");
 
     if (p_RHAnnotation.hemi() == 1)
         m_annots.insert_or_assign(1, p_RHAnnotation);
     else
-        BASELIB::Log::warning("Right hemisphere id is not 1. RH annotation not assigned!");
+        mne::Log::warning("Right hemisphere id is not 1. RH annotation not assigned!");
 }
 
 //=============================================================================================================
@@ -130,7 +130,7 @@ bool FsAnnotationSet::read(const std::filesystem::path& p_sLHFileName, const std
 bool FsAnnotationSet::toLabels(const FsSurfaceSet& p_surfSet,
                                std::vector<FsLabel>& p_qListLabels,
                                std::vector<RowVector4i>& p_qListLabelRGBAs,
-                               const BASELIB::StringList& lLabelPicks) const
+                               const mne::StringList& lLabelPicks) const
 {
     if (!(*this)[0].toLabels(p_surfSet[0], p_qListLabels, p_qListLabelRGBAs, lLabelPicks))
         return false;
@@ -148,7 +148,7 @@ namespace
 int hemiIndex(std::int32_t idx)
 {
     if (idx != 0 && idx != 1) {
-        BASELIB::Log::warning("Warning: Index is not '0' or '1'! Returning '0'.");
+        mne::Log::warning("Warning: Index is not '0' or '1'! Returning '0'.");
         return 0;
     }
     return idx;
@@ -159,7 +159,7 @@ int hemiIndex(std::string_view idt)
     if (idt == "rh")
         return 1;
     if (idt != "lh")
-        BASELIB::Log::warning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        mne::Log::warning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
     return 0;
 }
 

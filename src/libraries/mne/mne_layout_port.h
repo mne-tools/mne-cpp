@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    One viewport of an @ref MNELIB::MNELayout, i.e. a box in layout coordinates and the channels drawn in it.
+ * @brief    One viewport of an @ref mne::MNELayout, i.e. a box in layout coordinates and the channels drawn in it.
  */
 
 #ifndef MNE_LAYOUT_PORT_H
@@ -27,10 +27,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -77,17 +77,17 @@ public:
         return Eigen::AlignedBox2d(Eigen::Vector2d(xmin, ymin), Eigen::Vector2d(xmax, ymax));
     }
 
-    int portno = 0;            /**< Running number of this viewport. */
-    bool invert = false;       /**< Draw the signal upside down (negative height in the file). */
-    float xmin = 0;            /**< Viewport left bound. */
-    float xmax = 0;            /**< Viewport right bound. */
-    float ymin = 0;            /**< Viewport bottom bound. */
-    float ymax = 0;            /**< Viewport top bound. */
-    std::string label;         /**< Channel names as written in the file (e.g. "MEG 0113"). */
-    BASELIB::StringList names; /**< Channel names in matching form (see cleanName()). */
-    bool matched = false;      /**< Set by the last MNELayout::matchPorts call. */
+    int portno = 0;        /**< Running number of this viewport. */
+    bool invert = false;   /**< Draw the signal upside down (negative height in the file). */
+    float xmin = 0;        /**< Viewport left bound. */
+    float xmax = 0;        /**< Viewport right bound. */
+    float ymin = 0;        /**< Viewport bottom bound. */
+    float ymax = 0;        /**< Viewport top bound. */
+    std::string label;     /**< Channel names as written in the file (e.g. "MEG 0113"). */
+    mne::StringList names; /**< Channel names in matching form (see cleanName()). */
+    bool matched = false;  /**< Set by the last MNELayout::matchPorts call. */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_LAYOUT_PORT_H

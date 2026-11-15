@@ -24,7 +24,7 @@
 #include <QTimer>
 #include <QDebug>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -35,7 +35,7 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    m_pWorker = new DISP3DLIB::RtSourceDataWorker();
+    m_pWorker = new mne::disp::RtSourceDataWorker();
 
     // Create and configure data thread
     m_pWorkerThread = new QThread(this);
@@ -45,30 +45,30 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
     connect(m_pWorkerThread, &QThread::finished, m_pWorker, &QObject::deleteLater);
 
     // Forward worker signals to controller signals
-    connect(m_pWorker, &DISP3DLIB::RtSourceDataWorker::newRtSmoothedData,
+    connect(m_pWorker, &mne::disp::RtSourceDataWorker::newRtSmoothedData,
             this, &RtSourceDataController::newSmoothedDataAvailable);
-    connect(m_pWorker, &DISP3DLIB::RtSourceDataWorker::newRtRawData,
+    connect(m_pWorker, &mne::disp::RtSourceDataWorker::newRtRawData,
             this, &RtSourceDataController::newRawDataAvailable);
 
     // Create timer for driving the streaming cadence
     m_pTimer = new QTimer(this);
     m_pTimer->setTimerType(Qt::PreciseTimer);
-    connect(m_pTimer, &QTimer::timeout, m_pWorker, &DISP3DLIB::RtSourceDataWorker::streamData);
+    connect(m_pTimer, &QTimer::timeout, m_pWorker, &mne::disp::RtSourceDataWorker::streamData);
 
     // Start the data worker thread
     m_pWorkerThread->start();
 
     // Create interpolation matrix worker
-    m_pInterpWorker = new DISP3DLIB::RtSourceInterpolationMatWorker();
+    m_pInterpWorker = new mne::disp::RtSourceInterpolationMatWorker();
     m_pInterpThread = new QThread(this);
     m_pInterpWorker->moveToThread(m_pInterpThread);
 
     connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
 
     // Forward interpolation results: auto-apply to data worker + re-emit
-    connect(m_pInterpWorker, &DISP3DLIB::RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
+    connect(m_pInterpWorker, &mne::disp::RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
             this, &RtSourceDataController::onNewInterpolationMatrixLeft);
-    connect(m_pInterpWorker, &DISP3DLIB::RtSourceInterpolationMatWorker::newInterpolationMatrixRightAvailable,
+    connect(m_pInterpWorker, &mne::disp::RtSourceInterpolationMatWorker::newInterpolationMatrixRightAvailable,
             this, &RtSourceDataController::onNewInterpolationMatrixRight);
 
     m_pInterpThread->start();
@@ -319,7 +319,7 @@ void RtSourceDataController::setVisualizationType(int iVisType)
 //=============================================================================================================
 
 void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
-                                                   const std::vector<FSLIB::FsLabel>& lLabels,
+                                                   const std::vector<mne::FsLabel>& lLabels,
                                                    const Eigen::VectorXi& vecVertNo)
 {
     if (m_pInterpWorker) {
@@ -330,7 +330,7 @@ void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi& vecLab
 //=============================================================================================================
 
 void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
-                                                    const std::vector<FSLIB::FsLabel>& lLabels,
+                                                    const std::vector<mne::FsLabel>& lLabels,
                                                     const Eigen::VectorXi& vecVertNo)
 {
     if (m_pInterpWorker) {
@@ -338,4 +338,4 @@ void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi& vecLa
     }
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

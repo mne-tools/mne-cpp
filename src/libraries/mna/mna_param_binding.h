@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
  *
- * @ref MNALIB::MnaParamBinding turns the otherwise static @ref MNALIB::MnaParamTree
+ * @ref mne::MnaParamBinding turns the otherwise static @ref mne::MnaParamTree
  * into a reactive system. Each binding links a @c targetPath
  * (typically @c nodeId/attrKey) to an @c expression that references
  * upstream results or other parameters through the @c ref("…")
@@ -44,10 +44,10 @@
 #include <QCborMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -73,6 +73,6 @@ struct MNASHARED_EXPORT MnaParamBinding
     static MnaParamBinding fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_PARAM_BINDING_H

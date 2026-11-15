@@ -16,7 +16,7 @@
 
 #include "abstracttreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 AbstractTreeItem::AbstractTreeItem(const QString& text, int type)
@@ -75,4 +75,4 @@ float AbstractTreeItem::alpha() const
     return data(AlphaRole).toFloat();
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

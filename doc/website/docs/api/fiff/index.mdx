@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # FIFF Library
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Source:** `src/libraries/fiff`
-The Fiff library implements the **FIFF (Functional Image File Format)** used throughout the MNE ecosystem for MEG/EEG data. It provides file I/O, in-memory data containers, channel and sensor metadata, digitisation points, coordinate transforms, SSP projections, and CTF compensation — everything required to read, manipulate, and write neurophysiological recordings. All classes reside in the `FIFFLIB` namespace and depend only on Qt and Eigen.
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/fiff`
+The Fiff library implements the **FIFF (Functional Image File Format)** used throughout the MNE ecosystem for MEG/EEG data. It provides file I/O, in-memory data containers, channel and sensor metadata, digitisation points, coordinate transforms, SSP projections, and CTF compensation — everything required to read, manipulate, and write neurophysiological recordings. All classes reside in the `mne_fiff` namespace and depend only on Qt and Eigen.
 
 ## Architecture
 
@@ -116,7 +116,7 @@ flowchart TD
 ```cpp
 #include <fiff/fiff.h>
 
-using namespace FIFFLIB;
+using namespace mne;
 
 // Open a raw FIFF file
 QFile file("sample_audvis_raw.fif");
@@ -143,13 +143,13 @@ data = proj * data;
 // Read one condition of evoked data, baseline-corrected over -200 to 0 ms
 const FiffEvoked evoked("sample_audvis-ave.fif", "Left Auditory", {{-0.2f, 0.0f}});
 
-// Read noise covariance; throws BASELIB::Error if the file holds none
+// Read noise covariance; throws mne::Error if the file holds none
 const FiffCov cov("sample_audvis-cov.fif");
 ```
 
 ## Doxygen Reference
 
-For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**FIFFLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFIFFLIB.html) in the Doxygen API reference.
+For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**mne_fiff namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFIFFLIB.html) in the Doxygen API reference.
 
 ## See Also
 

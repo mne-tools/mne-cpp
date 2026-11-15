@@ -42,8 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -211,7 +210,7 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_lspcov");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

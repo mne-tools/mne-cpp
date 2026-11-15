@@ -1,18 +1,18 @@
 ---
 id: head-pos-entry
-title: "DSPLIB::HeadPosEntry"
+title: "mne::HeadPosEntry"
 sidebar_label: HeadPosEntry
 sidebar_position: 51
 ---
 
 # HeadPosEntry
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/maxwell_movement_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/maxwell_movement_comp.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/maxwell_movement_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/maxwell_movement_comp.h)
 
 `#include <dsp/maxwell_movement_comp.h>`
 
 ```cpp
-struct DSPLIB::HeadPosEntry
+struct mne::HeadPosEntry
 ```
 
 A head position entry (time, translation, rotation quaternion).
@@ -44,7 +44,7 @@ const std::vector<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPa
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 158"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 157"
 std::vector<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
 MaxwellMoveCompParams moveParams;
 moveParams.origin = params.origin;

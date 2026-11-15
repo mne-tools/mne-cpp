@@ -36,10 +36,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MNELIB;
 
 //=============================================================================================================
 // STATIC HELPERS

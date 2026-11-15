@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -187,7 +187,7 @@ void TestMneSurf2Bem::setupProcess(QProcess& proc)
 
 void TestMneSurf2Bem::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
 

@@ -41,8 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -89,7 +88,7 @@ TestFiltering::TestFiltering()
 
 void TestFiltering::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qDebug() << "Epsilon" << dEpsilon;
 
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
@@ -142,15 +141,15 @@ void TestFiltering::initTestCase()
 
     // Filtering
     printf("Filtering...");
-    mFirstFiltered = DSPLIB::filterData(mFirstInData,
-                                        type,
-                                        dCenterfreq,
-                                        dBandwidth,
-                                        dTransition,
-                                        dSFreq,
-                                        1024,
-                                        DSPLIB::FilterKernel::designMethodIndex("Cosine"),
-                                        vPicks);
+    mFirstFiltered = mne::filterData(mFirstInData,
+                                     type,
+                                     dCenterfreq,
+                                     dBandwidth,
+                                     dTransition,
+                                     dSFreq,
+                                     1024,
+                                     mne::FilterKernel::designMethodIndex("Cosine"),
+                                     vPicks);
     printf("[done]\n");
 
     // Writing

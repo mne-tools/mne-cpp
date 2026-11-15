@@ -1,18 +1,18 @@
 ---
 id: mnectf-comp-data-set
-title: "MNELIB::MNECTFCompDataSet"
+title: "mne::MNECTFCompDataSet"
 sidebar_label: MNECTFCompDataSet
 sidebar_position: 10
 ---
 
 # MNECTFCompDataSet
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_ctf_comp_data_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_ctf_comp_data_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_ctf_comp_data_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_ctf_comp_data_set.h)
 
 `#include <mne/mne_ctf_comp_data_set.h>`
 
 ```cpp
-class MNELIB::MNECTFCompDataSet
+class mne::MNECTFCompDataSet
 ```
 
 Collection of CTF third-order gradient compensation operators.
@@ -270,7 +270,7 @@ Return a human-readable description string for a compensation kind constant.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 338"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 336"
 // Open a third-order gradiometer recording and read it uncompensated (grade 0)
 std::unique_ptr<MNERawData> ctfRaw(MNERawData::open_file_comp(ctfPath.toStdU16String(), false, false, MNEFilterDef(), 0));
 const MNECTFCompDataSet& comp = *ctfRaw->comp; // grades 1, 2, 3 and two 4D kinds

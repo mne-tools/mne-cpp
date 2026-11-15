@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Implementation of @ref MNELIB::MNEEventList (MNE-C mne_events.c).
+ * @brief    Implementation of @ref mne::MNEEventList (MNE-C mne_events.c).
  */
 
 //=============================================================================================================
@@ -41,8 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATIC FUNCTIONS
@@ -52,15 +51,6 @@ namespace
 {
 
 constexpr std::string_view whitespace = " \t\r";
-
-std::string_view trimmed(std::string_view text)
-{
-    const std::size_t begin = text.find_first_not_of(whitespace);
-    if (begin == std::string_view::npos) {
-        return {};
-    }
-    return text.substr(begin, text.find_last_not_of(whitespace) - begin + 1);
-}
 
 //=============================================================================================================
 /**
@@ -138,7 +128,7 @@ std::optional<MNEEventList> MNEEventList::read_fif(const std::filesystem::path& 
     const std::vector<std::shared_ptr<FiffDirNode>> blocks = stream.dirtree()->dir_tree_find(FIFFB_MNE_EVENTS);
     const auto tag = blocks.empty() ? std::nullopt : blocks.front()->find_tag(stream, FIFF_MNE_EVENT_LIST);
     if (!tag) {
-        BASELIB::Log::warning("MNEEventList::read_fif - No event data in {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEEventList::read_fif - No event data in {}", mne::utf8FromPath(path));
         return std::nullopt;
     }
     // Written as signed or unsigned integers; both have the same bit pattern.
@@ -171,7 +161,7 @@ std::optional<MNEEventList> MNEEventList::read_text(const std::filesystem::path&
 {
     std::ifstream in(path);
     if (!in) {
-        BASELIB::Log::warning("MNEEventList::read_text - Cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEEventList::read_text - Cannot open {}", mne::utf8FromPath(path));
         return std::nullopt;
     }
     MNEEventList list;
@@ -196,7 +186,7 @@ std::optional<MNEEventList> MNEEventList::read_text(const std::filesystem::path&
             first = false;
             if (from == 0 && to == 0) {
                 if (offset != sample) {
-                    BASELIB::Log::warning("MNEEventList::read_text - First sample of the data ({}) and of {} ({}) differ", offset, BASELIB::utf8FromPath(path), sample);
+                    mne::Log::warning("MNEEventList::read_text - First sample of the data ({}) and of {} ({}) differ", offset, mne::utf8FromPath(path), sample);
                 }
                 continue;
             }
@@ -205,7 +195,7 @@ std::optional<MNEEventList> MNEEventList::read_text(const std::filesystem::path&
         list.events.push_back(MNEEvent{sample - offset, from, to, false, false, std::string(trimmed(rest))});
     }
     if (list.events.empty()) {
-        BASELIB::Log::warning("MNEEventList::read_text - No events read from {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEEventList::read_text - No events read from {}", mne::utf8FromPath(path));
         return std::nullopt;
     }
     return list;

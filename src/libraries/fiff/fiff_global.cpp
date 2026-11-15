@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    Definitions for the FIFFLIB build-info accessors declared in @ref fiff_global.h.
+ * @brief    Definitions for the mne_fiff build-info accessors declared in @ref fiff_global.h.
  *
  * Each accessor forwards to the matching macro defined by
  * @c utils/buildinfo.h so the FIFF build identity (timestamp, short hash,
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FIFFLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* FIFFLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* FIFFLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

@@ -1,13 +1,13 @@
 ---
 id: inv-dipole-fit
-title: "INVLIB::InvDipoleFit"
+title: "mne::InvDipoleFit"
 sidebar_label: InvDipoleFit
 sidebar_position: 7
 ---
 
 # InvDipoleFit
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit.h)
 
 :::info[Python equivalent]
 `mne.fit_dipole` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 7
 <Connections topics={["dipole-fitting"]} context="api" current="InvDipoleFit" />
 
 ```cpp
-class INVLIB::InvDipoleFit
+class mne::InvDipoleFit
 ```
 
 High-level driver for sequential dipole fitting.
@@ -226,7 +226,7 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 136"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 135"
 settings.tmin = 0.0f;
 settings.dipname = tmp.filePath("fit.dat").toStdString(); // MNE-C .dat dipole file
 settings.checkIntegrity();

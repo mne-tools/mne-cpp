@@ -14,7 +14,7 @@
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_id.h>
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFiffCoordTransform : public QObject

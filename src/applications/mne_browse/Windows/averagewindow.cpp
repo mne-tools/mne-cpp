@@ -57,7 +57,7 @@ using namespace MNEBROWSE;
 namespace
 {
 
-bool matchesButterflySelection(const FIFFLIB::FiffChInfo& channelInfo,
+bool matchesButterflySelection(const mne::FiffChInfo& channelInfo,
                                const QString& selectionText)
 {
     if (selectionText == QLatin1String("EEG")) {
@@ -75,13 +75,13 @@ bool matchesButterflySelection(const FIFFLIB::FiffChInfo& channelInfo,
     return channelInfo.unit == FIFF_UNIT_T_M;
 }
 
-std::vector<std::string> selectedButterflyChannels(const FIFFLIB::FiffInfo& info,
+std::vector<std::string> selectedButterflyChannels(const mne::FiffInfo& info,
                                                    const QString& selectionText)
 {
     std::vector<std::string> channelNames;
 
     for (const auto& channelInfo : info.chs) {
-        if (BASELIB::contains(info.bads, channelInfo.ch_name)) {
+        if (mne::contains(info.bads, channelInfo.ch_name)) {
             continue;
         }
 
@@ -93,7 +93,7 @@ std::vector<std::string> selectedButterflyChannels(const FIFFLIB::FiffInfo& info
     return channelNames;
 }
 
-Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
+Eigen::MatrixXd createWhitener(const mne::FiffCov& covariance)
 {
     if (covariance.dim <= 0) {
         return Eigen::MatrixXd();
@@ -126,22 +126,22 @@ Eigen::MatrixXd createWhitener(const FIFFLIB::FiffCov& covariance)
     return whitener;
 }
 
-bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
-                           const FIFFLIB::FiffCov& covariance,
+bool whitenButterflyEvoked(mne::FiffEvoked& evoked,
+                           const mne::FiffCov& covariance,
                            const WhiteningSettings& settings)
 {
     if (covariance.empty() || evoked.empty() || evoked.data.rows() == 0) {
         return false;
     }
 
-    const FIFFLIB::FiffCov regularizedCov =
+    const mne::FiffCov regularizedCov =
         covariance.regularize(evoked.info,
                               settings.regMag,
                               settings.regGrad,
                               settings.regEeg,
                               settings.useProj);
 
-    const FIFFLIB::FiffCov preparedCov =
+    const mne::FiffCov preparedCov =
         regularizedCov.prepare_noise_cov(evoked.info, evoked.info.ch_names);
 
     if (preparedCov.empty() || preparedCov.dim != evoked.data.rows()) {
@@ -157,16 +157,16 @@ bool whitenButterflyEvoked(FIFFLIB::FiffEvoked& evoked,
     return true;
 }
 
-FIFFLIB::FiffEvoked buildButterflyEvoked(const FIFFLIB::FiffEvoked& sourceEvoked,
-                                         const QString& selectionText,
-                                         const FIFFLIB::FiffCov& covariance,
-                                         const WhiteningSettings& settings,
-                                         bool whiten,
-                                         bool* whiteningApplied)
+mne::FiffEvoked buildButterflyEvoked(const mne::FiffEvoked& sourceEvoked,
+                                     const QString& selectionText,
+                                     const mne::FiffCov& covariance,
+                                     const WhiteningSettings& settings,
+                                     bool whiten,
+                                     bool* whiteningApplied)
 {
     const std::vector<std::string> includeChannels = selectedButterflyChannels(sourceEvoked.info, selectionText);
 
-    FIFFLIB::FiffEvoked displayEvoked =
+    mne::FiffEvoked displayEvoked =
         sourceEvoked.pick_channels(includeChannels, sourceEvoked.info.bads);
 
     bool didApplyWhitening = false;
@@ -289,7 +289,7 @@ void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
 
 //*************************************************************************************************************
 
-void AverageWindow::setNoiseCovariance(const FIFFLIB::FiffCov& covariance)
+void AverageWindow::setNoiseCovariance(const mne::FiffCov& covariance)
 {
     m_noiseCovariance = covariance;
     refreshPlots();
@@ -671,14 +671,14 @@ void AverageWindow::refreshPlots()
 
     for (int rowIndex = 0; rowIndex < selectedRows.size(); ++rowIndex) {
         const QModelIndex index = selectedRows.at(rowIndex);
-        const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
+        const mne::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
 
         if (!sourceEvoked) {
-            m_layoutDisplayEvokeds.push_back(FIFFLIB::FiffEvoked());
+            m_layoutDisplayEvokeds.push_back(mne::FiffEvoked());
             continue;
         }
 
-        FIFFLIB::FiffEvoked displayEvoked(*sourceEvoked);
+        mne::FiffEvoked displayEvoked(*sourceEvoked);
         if (m_whiteningSettings.enableLayout) {
             whitenButterflyEvoked(displayEvoked, m_noiseCovariance, m_whiteningSettings);
         }
@@ -707,7 +707,7 @@ void AverageWindow::refreshPlots()
             }
 
             const QModelIndex index = selectedRows.at(u);
-            const FIFFLIB::FiffEvoked& displayEvoked = m_layoutDisplayEvokeds.at(u);
+            const mne::FiffEvoked& displayEvoked = m_layoutDisplayEvokeds.at(u);
             if (displayEvoked.empty() || displayEvoked.data.rows() == 0) {
                 continue;
             }
@@ -720,7 +720,7 @@ void AverageWindow::refreshPlots()
             const int last = displayEvoked.last;
 
             //Get the averageScenItem specific data row
-            int channelNumber = BASELIB::indexOf(fiffInfo->ch_names, averageSceneItemTemp->m_sChannelName.toStdString());
+            int channelNumber = mne::indexOf(fiffInfo->ch_names, averageSceneItemTemp->m_sChannelName.toStdString());
 
             if (channelNumber != -1) {
                 averageSceneItemTemp->m_firstLastSample.first = first;
@@ -745,7 +745,7 @@ void AverageWindow::refreshPlots()
                 continue;
             const auto& info = evoked.info;
             for (int ch = 0; ch < std::ssize(info.chs) && ch < evoked.data.rows(); ++ch) {
-                if (BASELIB::contains(info.bads, info.chs[ch].ch_name))
+                if (mne::contains(info.bads, info.chs[ch].ch_name))
                     continue;
                 double maxVal = evoked.data.row(ch).cwiseAbs().maxCoeff();
                 if (info.chs[ch].kind == FIFFV_MEG_CH) {
@@ -798,7 +798,7 @@ void AverageWindow::refreshPlots()
     for (int i = 0; i < selectedRows.size(); ++i) {
         QModelIndex index = selectedRows.at(i);
         QString setName = m_pAverageModel->data(m_pAverageModel->index(index.row(), 0), Qt::DisplayRole).toString();
-        const FIFFLIB::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
+        const mne::FiffEvoked* sourceEvoked = m_pAverageModel->getEvoked(index.row());
 
         if (!sourceEvoked) {
             continue;
@@ -816,12 +816,12 @@ void AverageWindow::refreshPlots()
             setKind = FIFFV_MEG_CH;
 
         bool whiteningApplied = false;
-        FIFFLIB::FiffEvoked displayEvoked = buildButterflyEvoked(*sourceEvoked,
-                                                                 ui->m_comboBox_channelKind->currentText(),
-                                                                 m_noiseCovariance,
-                                                                 m_whiteningSettings,
-                                                                 m_whiteningSettings.enableButterfly,
-                                                                 &whiteningApplied);
+        mne::FiffEvoked displayEvoked = buildButterflyEvoked(*sourceEvoked,
+                                                             ui->m_comboBox_channelKind->currentText(),
+                                                             m_noiseCovariance,
+                                                             m_whiteningSettings,
+                                                             m_whiteningSettings.enableButterfly,
+                                                             &whiteningApplied);
 
         if (displayEvoked.data.rows() == 0 || displayEvoked.data.cols() == 0) {
             continue;
@@ -831,7 +831,7 @@ void AverageWindow::refreshPlots()
         if (!m_bButterflyAutoScaled) {
             const auto& info = displayEvoked.info;
             for (int ch = 0; ch < std::ssize(info.chs) && ch < displayEvoked.data.rows(); ++ch) {
-                if (BASELIB::contains(info.bads, info.chs[ch].ch_name))
+                if (mne::contains(info.bads, info.chs[ch].ch_name))
                     continue;
                 double maxVal = displayEvoked.data.row(ch).cwiseAbs().maxCoeff();
                 if (info.chs[ch].kind == FIFFV_MEG_CH) {
@@ -908,7 +908,7 @@ void AverageWindow::selectLoadedSets()
 
 bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows)
 {
-    const FIFFLIB::FiffEvoked* firstEvoked = nullptr;
+    const mne::FiffEvoked* firstEvoked = nullptr;
     for (int i = 0; i < selectedRows.size(); ++i) {
         firstEvoked = m_pAverageModel->getEvoked(selectedRows.at(i).row());
         if (firstEvoked && !firstEvoked->empty())
@@ -932,9 +932,9 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     }
 
     SelectionItem selItem;
-    const FIFFLIB::FiffInfo& info = firstEvoked->info;
+    const mne::FiffInfo& info = firstEvoked->info;
     for (int ch = 0; ch < std::ssize(info.chs); ++ch) {
-        const FIFFLIB::FiffChInfo& chInfo = info.chs[ch];
+        const mne::FiffChInfo& chInfo = info.chs[ch];
 
         if (!showAll) {
             if (chInfo.kind != filterKind)

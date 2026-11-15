@@ -1,18 +1,18 @@
 ---
 id: pick-result
-title: "DISP3DLIB::PickResult"
+title: "mne::disp::PickResult"
 sidebar_label: PickResult
 sidebar_position: 13
 ---
 
 # PickResult
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/pickresult.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/pickresult.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/pickresult.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/pickresult.h)
 
 `#include <disp3D/pickresult.h>`
 
 ```cpp
-struct DISP3DLIB::PickResult
+struct mne::disp::PickResult
 ```
 
 Uniform payload for object-id picking across the multimodal scene.
@@ -48,7 +48,7 @@ const PickResult& lastPick = scene.lastPick();
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 205"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 203"
 // A picker reports the contact under the cursor; the host reads the most recent pick back
 const bool hitBefore = isHit(scene.lastPick());
 PickResult contactPick;

@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     February 2020
- * @brief    QDockWidget wrapper used as the building block of @ref DISPLIB::MultiView layouts.
+ * @brief    QDockWidget wrapper used as the building block of @ref mne::disp::MultiView layouts.
  *
- * MultiViewWindow exposes the small amount of state @ref DISPLIB::MultiView
+ * MultiViewWindow exposes the small amount of state @ref mne::disp::MultiView
  * needs to manage its docks (the wrapped widget, a stable name, a
  * tabbed/floating flag) and applies the disp-library default dock
  * styling (title-bar buttons, movable / floatable features) so all
@@ -39,14 +39,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

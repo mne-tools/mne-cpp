@@ -41,7 +41,7 @@ using namespace MNEBROWSE;
 namespace
 {
 
-int resolveStimChannelIndex(const FIFFLIB::FiffInfo& info)
+int resolveStimChannelIndex(const mne::FiffInfo& info)
 {
     int fallbackStim = -1;
 
@@ -52,7 +52,7 @@ int resolveStimChannelIndex(const FIFFLIB::FiffInfo& info)
         if (fallbackStim < 0)
             fallbackStim = ch;
 
-        if (FIFFLIB::same_channel(info.ch_names[ch], "STI 014") || FIFFLIB::same_channel(info.ch_names[ch], "STI 101")) {
+        if (mne::same_channel(info.ch_names[ch], "STI 014") || mne::same_channel(info.ch_names[ch], "STI 101")) {
             return ch;
         }
     }
@@ -82,7 +82,7 @@ QColor markerColorForIndex(int index)
     return kMarkerColors.at(index % kMarkerColors.size());
 }
 
-QMultiMap<int, std::shared_ptr<MNEOperator>> browserAssignedOperators(const std::shared_ptr<FIFFLIB::FiffInfo>& info,
+QMultiMap<int, std::shared_ptr<MNEOperator>> browserAssignedOperators(const std::shared_ptr<mne::FiffInfo>& info,
                                                                       const QSharedPointer<SessionFilter>& filterDefinition)
 {
     QMultiMap<int, std::shared_ptr<MNEOperator>> assignedOperators;
@@ -223,7 +223,7 @@ void DataWindow::computeAutoScale()
     QMap<qint32, TypeStats> typeStats;
 
     for (int ch = 0; ch < fiffInfo->nchan && ch < block.rows(); ++ch) {
-        if (BASELIB::contains(fiffInfo->bads, fiffInfo->ch_names[ch]))
+        if (mne::contains(fiffInfo->bads, fiffInfo->ch_names[ch]))
             continue;
 
         const auto& chInfo = fiffInfo->chs[ch];
@@ -274,7 +274,7 @@ void DataWindow::updateDataTableViews()
 
     // Event type colours may have been changed in the event window
     bool colorsChanged = false;
-    for (DISPLIB::ChannelRhiView::EventMarker& ev : m_stimEvents) {
+    for (mne::disp::ChannelRhiView::EventMarker& ev : m_stimEvents) {
         const QColor color = eventTypeColor(ev.type);
         colorsChanged = colorsChanged || ev.color != color;
         ev.color = color;
@@ -286,7 +286,7 @@ void DataWindow::updateDataTableViews()
 
 //=============================================================================================================
 
-const QVector<DISPLIB::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
+const QVector<mne::disp::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
 {
     return m_stimEvents;
 }
@@ -387,7 +387,7 @@ void DataWindow::hideBadChannels(bool hideChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::setAnnotations(const QVector<DISPLIB::ChannelRhiView::AnnotationSpan>& annotations)
+void DataWindow::setAnnotations(const QVector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations)
 {
     if (m_pChannelDataView) {
         m_pChannelDataView->setAnnotations(annotations);
@@ -607,7 +607,7 @@ void DataWindow::updateTimeRulerMarkers()
         return;
     }
 
-    QVector<DISPLIB::TimeRulerReferenceMark> marks;
+    QVector<mne::disp::TimeRulerReferenceMark> marks;
     marks.reserve(m_dataMarkers.size());
     for (const PersistentMarker& marker : std::as_const(m_dataMarkers)) {
         QString label = QStringLiteral("M%1").arg(marker.id);
@@ -730,7 +730,7 @@ void DataWindow::setRawWhiteningEnabled(bool enabled)
 
 //*************************************************************************************************************
 
-void DataWindow::updateRawWhitener(const FIFFLIB::FiffCov& cov, const WhiteningSettings& settings)
+void DataWindow::updateRawWhitener(const mne::FiffCov& cov, const WhiteningSettings& settings)
 {
     m_rawWhitener = Eigen::MatrixXd(); // clear old
 
@@ -740,14 +740,14 @@ void DataWindow::updateRawWhitener(const FIFFLIB::FiffCov& cov, const WhiteningS
     }
 
     // Regularize and prepare (eigen-decompose) restricted to the raw ch_names
-    const FIFFLIB::FiffCov regularizedCov =
+    const mne::FiffCov regularizedCov =
         cov.regularize(*info,
                        settings.regMag,
                        settings.regGrad,
                        settings.regEeg,
                        settings.useProj);
 
-    const FIFFLIB::FiffCov preparedCov =
+    const mne::FiffCov preparedCov =
         regularizedCov.prepare_noise_cov(*info, info->ch_names);
 
     if (preparedCov.empty() || preparedCov.dim <= 0) {
@@ -840,17 +840,17 @@ void DataWindow::initMVCSettings()
 
     m_pChannelDataView = new RawView("DataWindow", this);
     m_pChannelDataView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
             this, &DataWindow::onChannelViewScrollChanged);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::sampleRangeSelected,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::sampleRangeSelected,
             this, &DataWindow::annotationRangeSelected);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::annotationBoundaryMoved,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::annotationBoundaryMoved,
             this, &DataWindow::annotationBoundaryMoved);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerAddRequested,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkerAddRequested,
             this, &DataWindow::addMarkerAtSample);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkerRemoveRequested,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkerRemoveRequested,
             this, &DataWindow::removeMarkerNearSample);
-    connect(m_pChannelDataView, &DISPLIB::ChannelDataView::referenceMarkersClearRequested,
+    connect(m_pChannelDataView, &mne::disp::ChannelDataView::referenceMarkersClearRequested,
             this, &DataWindow::clearMarkers);
 
     // Insert ChannelDataView into the grid at the same slot as the legacy QTableView
@@ -901,10 +901,10 @@ double DataWindow::fiffFileDurationSeconds() const
 
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffInfo> DataWindow::fiffInfo() const
+std::shared_ptr<mne::FiffInfo> DataWindow::fiffInfo() const
 {
     return (m_pFiffReader && m_pFiffReader->isOpen()) ? m_pFiffReader->fiffInfo()
-                                                      : std::shared_ptr<FIFFLIB::FiffInfo>();
+                                                      : std::shared_ptr<mne::FiffInfo>();
 }
 
 //=============================================================================================================
@@ -1034,7 +1034,7 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
                     const quint64 key = makeStimEventKey(absSample, type);
 
                     if (!m_seenStimEventKeys.contains(key)) {
-                        DISPLIB::ChannelRhiView::EventMarker ev;
+                        mne::disp::ChannelRhiView::EventMarker ev;
                         ev.sample = absSample;
                         ev.type = type;
                         ev.color = eventTypeColor(type);
@@ -1054,8 +1054,8 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
 
             if (eventsChanged && m_pChannelDataView) {
                 std::sort(m_stimEvents.begin(), m_stimEvents.end(),
-                          [](const DISPLIB::ChannelRhiView::EventMarker& a,
-                             const DISPLIB::ChannelRhiView::EventMarker& b) {
+                          [](const mne::disp::ChannelRhiView::EventMarker& a,
+                             const mne::disp::ChannelRhiView::EventMarker& b) {
                               return a.sample < b.sample;
                           });
                 m_pChannelDataView->setEvents(m_stimEvents);
@@ -1093,7 +1093,7 @@ void DataWindow::rebuildVirtualChannels()
         channelIndexByName.insert(QString::fromStdString(fiffInfo->ch_names.at(channelIndex)).trimmed(), channelIndex);
     }
 
-    QVector<DISPLIB::ChannelDisplayInfo> virtualDisplayInfo;
+    QVector<mne::disp::ChannelDisplayInfo> virtualDisplayInfo;
     virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
 
     for (const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
@@ -1126,7 +1126,7 @@ void DataWindow::rebuildVirtualChannels()
 
         const auto& primaryChannelInfo = fiffInfo->chs.at(primaryChannel);
 
-        const auto amplitudeForChannel = [](const FIFFLIB::FiffChInfo& channelInfo) -> float {
+        const auto amplitudeForChannel = [](const mne::FiffChInfo& channelInfo) -> float {
             switch (channelInfo.kind) {
                 case FIFFV_MEG_CH:
                     return channelInfo.unit == FIFF_UNIT_T_M ? 400e-13f : 1.2e-12f;
@@ -1402,9 +1402,9 @@ void DataWindow::initLabels()
 {
     //Setup range samples
     if (m_pChannelDataView) {
-        connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+        connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setRangeSampleLabels);
-        connect(m_pChannelDataView, &DISPLIB::ChannelDataView::scrollPositionChanged,
+        connect(m_pChannelDataView, &mne::disp::ChannelDataView::scrollPositionChanged,
                 this, &DataWindow::setMarkerSampleLabel);
     }
 }
@@ -1474,14 +1474,14 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
                     // Cycle detrending: None → Mean → Linear → None
                     auto mode = m_pChannelDataView->detrendMode();
                     switch (mode) {
-                        case DISPLIB::DetrendMode::None:
-                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Mean);
+                        case mne::disp::DetrendMode::None:
+                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::Mean);
                             break;
-                        case DISPLIB::DetrendMode::Mean:
-                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::Linear);
+                        case mne::disp::DetrendMode::Mean:
+                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::Linear);
                             break;
-                        case DISPLIB::DetrendMode::Linear:
-                            m_pChannelDataView->setDetrendMode(DISPLIB::DetrendMode::None);
+                        case mne::disp::DetrendMode::Linear:
+                            m_pChannelDataView->setDetrendMode(mne::disp::DetrendMode::None);
                             break;
                     }
                 }
@@ -1774,7 +1774,7 @@ void DataWindow::setRangeSampleLabels()
     const int maxSampleRange = minSampleRange + (m_pChannelDataView ? m_pChannelDataView->visibleSampleCount() : 0);
 
     //Set values as string
-    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : std::shared_ptr<FIFFLIB::FiffInfo>();
+    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : std::shared_ptr<mne::FiffInfo>();
     if (!fiffInfo)
         return;
     QString stringTemp;
@@ -1794,7 +1794,7 @@ void DataWindow::setMarkerSampleLabel()
         return;
     }
 
-    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : std::shared_ptr<FIFFLIB::FiffInfo>();
+    auto fiffInfo = m_pFiffReader ? m_pFiffReader->fiffInfo() : std::shared_ptr<mne::FiffInfo>();
     if (!fiffInfo)
         return;
 

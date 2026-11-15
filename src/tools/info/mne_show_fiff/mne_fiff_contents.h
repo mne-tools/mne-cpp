@@ -39,7 +39,7 @@ class MNEShowFiffSettings;
 
 //=============================================================================================================
 /**
- * Prints the tags of a FIFF file, named by @ref FIFFLIB::FiffExplain (MNE-C mne_show_fiff.c).
+ * Prints the tags of a FIFF file, named by @ref mne::FiffExplain (MNE-C mne_show_fiff.c).
  *
  * @brief Listing of the contents of a FIFF file.
  */
@@ -73,15 +73,15 @@ public:
     static bool show_fiff_contents(QTextStream& out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
-    static void print_file_id(QTextStream& out, const FIFFLIB::FiffTag& tag);
+    static void print_file_id(QTextStream& out, const mne::FiffTag& tag);
 
-    static void print_ch_info(QTextStream& out, const FIFFLIB::FiffTag& tag);
+    static void print_ch_info(QTextStream& out, const mne::FiffTag& tag);
 
-    static void print_transform(QTextStream& out, const FIFFLIB::FiffTag& tag);
+    static void print_transform(QTextStream& out, const mne::FiffTag& tag);
 
-    static void print_dig_point(QTextStream& out, const FIFFLIB::FiffTag& tag);
+    static void print_dig_point(QTextStream& out, const mne::FiffTag& tag);
 
-    static void print_matrix(QTextStream& out, FIFFLIB::FiffStream& stream, FIFFLIB::FiffDirEntry this_ent);
+    static void print_matrix(QTextStream& out, mne::FiffStream& stream, mne::FiffDirEntry this_ent);
 };
 
 } // NAMESPACE SHOWFIFF

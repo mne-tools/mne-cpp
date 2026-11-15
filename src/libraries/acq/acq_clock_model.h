@@ -30,10 +30,10 @@
 #include <limits>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -114,6 +114,6 @@ struct AcqClockModel
     return to.sampleAt(from.physicalNs(sample));
 }
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_CLOCK_MODEL_H

@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Implementation of @ref CONNECTIVITYLIB::NetworkEdge - directional weighted edge with per-frequency weight matrix and configurable band-averaging window.
+ * @brief    Implementation of @ref mne::NetworkEdge - directional weighted edge with per-frequency weight matrix and configurable band-averaging window.
  */
 
 //=============================================================================================================
@@ -22,7 +22,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

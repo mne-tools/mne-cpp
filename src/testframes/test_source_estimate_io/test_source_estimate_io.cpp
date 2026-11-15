@@ -25,8 +25,7 @@
 #include <iterator>
 #include <string>
 
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestSourceEstimateIO : public QObject
@@ -240,7 +239,7 @@ private slots:
             return f.open(QIODevice::ReadOnly) ? f.readAll() : QByteArray();
         };
         InvSourceEstimate both(ref, verts, -0.1f, 0.004f);
-        QCOMPARE(both.write_hemisphere_pair(tmp.filePath("cpp").toStdU16String()).error().code, BASELIB::ErrorCode::Format);
+        QCOMPARE(both.write_hemisphere_pair(tmp.filePath("cpp").toStdU16String()).error().code, mne::ErrorCode::Format);
         both.nVerticesLh = 4;
         QVERIFY(both.write_hemisphere_pair(tmp.filePath("cpp-rh.stc").toStdU16String()));
         QCOMPARE(bytes(tmp.filePath("cpp-lh.stc")), bytes(dir + "/py-lh.stc"));
@@ -250,18 +249,18 @@ private slots:
 
         InvSourceEstimate bad(ref, verts.head(4), 0.0f, 1.0f);
         bad.nVerticesLh = 2;
-        QCOMPARE(bad.write_hemisphere_pair(tmp.filePath("bad").toStdU16String()).error().code, BASELIB::ErrorCode::Format);
-        QCOMPARE(InvSourceEstimate::read_w(tmp.filePath("missing.w").toStdU16String()).error().code, BASELIB::ErrorCode::Io);
-        QCOMPARE(InvSourceEstimate().write_w(tmp.filePath("empty.w").toStdU16String()).error().code, BASELIB::ErrorCode::Format);
+        QCOMPARE(bad.write_hemisphere_pair(tmp.filePath("bad").toStdU16String()).error().code, mne::ErrorCode::Format);
+        QCOMPARE(InvSourceEstimate::read_w(tmp.filePath("missing.w").toStdU16String()).error().code, mne::ErrorCode::Io);
+        QCOMPARE(InvSourceEstimate().write_w(tmp.filePath("empty.w").toStdU16String()).error().code, mne::ErrorCode::Format);
         QVERIFY(!QFile::exists(tmp.filePath("empty.w")));
-        QCOMPARE(InvSourceEstimate::read(tmp.filePath("missing.stc").toStdU16String()).error().code, BASELIB::ErrorCode::Io);
+        QCOMPARE(InvSourceEstimate::read(tmp.filePath("missing.stc").toStdU16String()).error().code, mne::ErrorCode::Io);
 
         // A file shorter than its header announces is rejected, not padded
         QFile cut(tmp.filePath("cut-lh.stc"));
         QVERIFY(cut.open(QIODevice::WriteOnly));
         cut.write(bytes(dir + "/py-lh.stc").chopped(4));
         cut.close();
-        QCOMPARE(InvSourceEstimate::read(cut.fileName().toStdU16String()).error().code, BASELIB::ErrorCode::Format);
+        QCOMPARE(InvSourceEstimate::read(cut.fileName().toStdU16String()).error().code, mne::ErrorCode::Format);
 
         // Label lookup: by vertex and hemisphere (rh starts where vertex numbers drop), or by cluster id.
         FsLabel lhLabel;

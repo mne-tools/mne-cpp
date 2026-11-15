@@ -13,7 +13,7 @@
  * @date     July 2018
  * @brief    Histogram widget with a cubic spline overlay and click-driven threshold markers.
  *
- * Spline draws the same class-limit / frequency data as @ref DISPLIB::Bar but
+ * Spline draws the same class-limit / frequency data as @ref mne::disp::Bar but
  * overlays a smoothed cubic-spline curve that follows the bin midpoints
  * and offers an interactive workflow: mouse clicks drop three vertical
  * threshold lines (left / middle / right) and emit signals carrying
@@ -51,14 +51,14 @@
 class QMouseEvent;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

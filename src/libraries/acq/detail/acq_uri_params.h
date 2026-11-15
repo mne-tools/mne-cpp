@@ -24,10 +24,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** @return The integer value of key in [min, max], fallback if absent, or InvalidParameter naming the key. */
@@ -48,6 +48,6 @@ ACQSHARED_EXPORT AcqExpected<bool> paramBool(const AcqUri& uri, std::string_view
  */
 ACQSHARED_EXPORT AcqExpected<AcqThreadPolicy> paramThreadPolicy(const AcqUri& uri);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_URI_PARAMS_H

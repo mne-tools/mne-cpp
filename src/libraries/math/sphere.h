@@ -9,22 +9,22 @@
  * @date     March 2026
  * @brief    Best-fit sphere from a 3-D point cloud with closed-form and Nelder–Mead solvers.
  *
- * @ref MATHLIB::Sphere fits a single sphere
+ * @ref mne::Sphere fits a single sphere
  * @f$(\mathbf{c}, r)@f$ to an @c n×3 point cloud and is the geometric
  * primitive used to build the spherical head models consumed by
- * FWDLIB's BEM solvers and by INVERSELIB's depth weighting. Two solvers
+ * mne_fwd's BEM solvers and by mne_inv's depth weighting. Two solvers
  * are provided: a closed-form algebraic fit due to Alan Jennings
  * (University of Dayton) that solves a single linear system in
  * @c O(n) and returns the algebraic best fit in one shot, and a
- * Nelder–Mead refinement (@ref MATHLIB::Sphere::fit_sphere_simplex "fit_sphere_simplex") that minimises the
+ * Nelder–Mead refinement (@ref mne::Sphere::fit_sphere_simplex "fit_sphere_simplex") that minimises the
  * geometric residual @f$\sum_i (\|\mathbf{p}_i - \mathbf{c}\| - r)^2@f$
- * via @ref MATHLIB::SimplexAlgorithm and is more robust on noisy
+ * via @ref mne::SimplexAlgorithm and is more robust on noisy
  * digitiser data where the algebraic fit is biased toward outliers.
  *
  * The class itself is a lightweight value type carrying @c (center, radius);
  * the fit routines are static factories so the same object layout is
  * shared between MRI head-shape extraction, HPI coil fitting and the
- * spherical-shell BEM construction in FWDLIB.
+ * spherical-shell BEM construction in mne_fwd.
  */
 
 #ifndef SPHERE_H
@@ -43,17 +43,17 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================
 // TYPEDEFS
 //=============================================================================================================
 
-/** @brief Cost-function workspace for @ref MATHLIB::Sphere::fit_sphere_simplex "Sphere::fit_sphere_simplex": holds the @c nx3 point cloud and a verbose-report flag. */
+/** @brief Cost-function workspace for @ref mne::Sphere::fit_sphere_simplex "Sphere::fit_sphere_simplex": holds the @c nx3 point cloud and a verbose-report flag. */
 struct FitUser
 {
     Eigen::MatrixXf rr;

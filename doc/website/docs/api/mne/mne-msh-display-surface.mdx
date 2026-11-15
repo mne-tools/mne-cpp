@@ -1,23 +1,23 @@
 ---
 id: mne-msh-display-surface
-title: "MNELIB::MNEMshDisplaySurface"
+title: "mne::MNEMshDisplaySurface"
 sidebar_label: MNEMshDisplaySurface
 sidebar_position: 33
 ---
 
 # MNEMshDisplaySurface
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_msh_display_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_msh_display_surface.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_msh_display_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_msh_display_surface.h)
 
 `#include <mne/mne_msh_display_surface.h>`
 
 ```cpp
-class MNELIB::MNEMshDisplaySurface
+class mne::MNEMshDisplaySurface
 ```
 
 Replaces *mshDisplaySurface, mshDisplaySurfaceRec struct (analyze_types.c).
 
-The MNE Msh Display [FsSurface](/docs/api/fs/fs-surface) class holds information about a surface to be rendered.
+The MNE Msh Display [`FsSurface`](/docs/api/fs/fs-surface) class holds information about a surface to be rendered.
 
 ```cpp title="src/examples/ex_mne_api/main.cpp"
 // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
@@ -195,7 +195,7 @@ Compute and store the axis-aligned bounding box and field-of-view radius by iter
 **Parameters:**
 
 - **tag** : *const std::string &*
-  FsSurface name tag (used for debug logging).
+  [`FsSurface`](/docs/api/fs/fs-surface) name tag (used for debug logging).
 
 ---
 
@@ -208,7 +208,7 @@ Inflated, sphere, and white surfaces use overlay mode; others use none.
 **Parameters:**
 
 - **name** : *const std::string &*
-  FsSurface type name.
+  [`FsSurface`](/docs/api/fs/fs-surface) type name.
 
 ---
 
@@ -231,7 +231,7 @@ Allocate and fill per-vertex color arrays using positive/negative curvature colo
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 449"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 447"
 // The same surface as an MNE-C viewer display surface
 MNEMshDisplaySurfaceSet display;
 display.add_bem_surface(bemPath.toStdU16String(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure

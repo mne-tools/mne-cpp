@@ -78,10 +78,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -129,7 +126,7 @@ void TestInvLcmvPython::initTestCase()
     FiffEvoked sampleEvoked((base + "/MEG/sample/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
     StringList good;
     for (const std::string& name : sampleEvoked.info.ch_names) {
-        if (name.starts_with("MEG") && !BASELIB::contains(sampleEvoked.info.bads, name))
+        if (name.starts_with("MEG") && !mne::contains(sampleEvoked.info.bads, name))
             good.push_back(name);
     }
     QCOMPARE(good.size(), 305);
@@ -138,7 +135,7 @@ void TestInvLcmvPython::initTestCase()
     MNEForwardSolution fullFwd((base + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String());
     StringList fwdGood;
     for (const std::string& name : fullFwd.sol.row_names) {
-        if (name.starts_with("MEG") && !FIFFLIB::same_channel(name, "MEG 2443"))
+        if (name.starts_with("MEG") && !mne::same_channel(name, "MEG 2443"))
             fwdGood.push_back(name);
     }
     m_fwd = fullFwd.pick_channels(fwdGood);

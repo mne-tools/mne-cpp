@@ -6,7 +6,7 @@
 #include <QColor>
 #include <disp/plots/helpers/colormap.h>
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 class TestDispColormap : public QObject
 {

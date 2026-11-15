@@ -11,14 +11,14 @@
  *
  * BrainView is the public face of disp3D &mdash; the QWidget that
  * any host application embeds to get an interactive cortical /
- * sensor / source scene. It connects @ref DISP3DLIB::BrainTreeModel data
- * changes to scene rebuilds, drives @ref DISP3DLIB::CameraController from the
+ * sensor / source scene. It connects @ref mne::disp::BrainTreeModel data
+ * changes to scene rebuilds, drives @ref mne::disp::CameraController from the
  * Qt mouse / wheel events, switches between single- and multi-view
- * layouts through @ref DISP3DLIB::MultiViewLayout and delegates the actual
- * drawing to @ref DISP3DLIB::BrainRenderer.
+ * layouts through @ref mne::disp::MultiViewLayout and delegates the actual
+ * drawing to @ref mne::disp::BrainRenderer.
  *
  * Live overlays such as digitizer tracker markers or AR avatars are
- * exposed through the lightweight @ref DISP3DLIB::LiveMarker struct so the host
+ * exposed through the lightweight @ref mne::disp::LiveMarker struct so the host
  * GUI can spray transient annotations on the scene without going
  * through the tree model.
  */
@@ -59,12 +59,12 @@ class QLabel;
 class QStandardItem;
 class QFrame;
 class QTimer;
-namespace CONNECTIVITYLIB
+namespace mne
 {
 class Network;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainTreeModel;
@@ -270,7 +270,7 @@ public slots:
      * @param[in] name       Display name for the network.
      * @return True if successful.
      */
-    bool loadNetwork(const CONNECTIVITYLIB::Network& network, const QString& name = "Network");
+    bool loadNetwork(const mne::Network& network, const QString& name = "Network");
 
     //=========================================================================================================
     /**
@@ -1074,7 +1074,7 @@ public slots:
      * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
      * @param[in] slice      Pointer to SliceObject, or nullptr to hide.
      */
-    void setSlice(int slotIndex, DISP3DLIB::SliceObject* slice);
+    void setSlice(int slotIndex, mne::disp::SliceObject* slice);
 
     /**
      * Toggle visibility of an MRI slice slot.
@@ -1096,7 +1096,7 @@ public slots:
      *
      * @param[in] electrodes  Non-owning pointer; it must outlive this view or be reset to nullptr.
      */
-    void setElectrodes(DISP3DLIB::ElectrodeObject* electrodes);
+    void setElectrodes(mne::disp::ElectrodeObject* electrodes);
 
     /**
      * Show one value per contact (e.g. high-gamma power) on the contacts and the cortex around
@@ -1346,26 +1346,26 @@ private:
     std::unique_ptr<DipoleObject> m_dipoles;                 /**< Standalone dipole set (loaded via file). */
     std::unique_ptr<NetworkObject> m_network;                /**< Connectivity network visualization. */
     std::unique_ptr<PolylineObject> m_headPath;              /**< Head movement path over the course of a measurement. */
-    std::unique_ptr<DISP3DLIB::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
+    std::unique_ptr<mne::disp::VideoOverlay> m_videoOverlay; /**< Live RGB video overlay decal. */
 
     // ── MRI slices ─────────────────────────────────────────────────────
     static constexpr int kMaxSliceSlots = 3;
-    DISP3DLIB::ElectrodeObject* m_electrodes = nullptr;       /**< Non-owning. */
-    DISP3DLIB::SliceObject* m_slices[kMaxSliceSlots] = {};    /**< Non-owning pointers to slice data. */
+    mne::disp::ElectrodeObject* m_electrodes = nullptr;       /**< Non-owning. */
+    mne::disp::SliceObject* m_slices[kMaxSliceSlots] = {};    /**< Non-owning pointers to slice data. */
     bool m_sliceVisible[kMaxSliceSlots] = {true, true, true}; /**< Per-slot visibility flags. */
 
     /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();
 
     // ── Coordinate transforms ──────────────────────────────────────────
-    FIFFLIB::FiffCoordTrans m_headToMriTrans;     /**< Head-to-MRI coordinate transform. */
-    FIFFLIB::FiffDigPointSet m_cardinalDigPoints; /**< Cardinal dig points from last sensor load. */
-    bool m_applySensorTrans = true;               /**< Whether to apply the transform to sensors/digitizers. */
-    QString m_megHelmetOverridePath;              /**< Optional override path for MEG helmet surface. */
-    QMatrix4x4 m_devHeadTrans;                    /**< Device→Head transformation from last sensor load. */
-    bool m_hasDevHead = false;                    /**< Whether a valid Device→Head transform is available. */
-    bool m_dipolesVisible = true;                 /**< Whether dipoles are rendered. */
-    bool m_networkVisible = false;                /**< Whether the connectivity network is rendered. */
+    mne::FiffCoordTrans m_headToMriTrans;     /**< Head-to-MRI coordinate transform. */
+    mne::FiffDigPointSet m_cardinalDigPoints; /**< Cardinal dig points from last sensor load. */
+    bool m_applySensorTrans = true;           /**< Whether to apply the transform to sensors/digitizers. */
+    QString m_megHelmetOverridePath;          /**< Optional override path for MEG helmet surface. */
+    QMatrix4x4 m_devHeadTrans;                /**< Device→Head transformation from last sensor load. */
+    bool m_hasDevHead = false;                /**< Whether a valid Device→Head transform is available. */
+    bool m_dipolesVisible = true;             /**< Whether dipoles are rendered. */
+    bool m_networkVisible = false;            /**< Whether the connectivity network is rendered. */
 
     // ── Ray-pick hover state ───────────────────────────────────────────
     QStandardItem* m_hoveredItem = nullptr; /**< Model item currently under the cursor. */
@@ -1398,6 +1398,6 @@ private:
     bool m_draggedSincePress = false;                 /**< True if the left-button drag rotated or panned. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_H

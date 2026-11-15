@@ -13,12 +13,12 @@
  * @date     August 2013
  * @brief    Lightweight triangulated surface (vertices, triangles, normals) used by surface-based routines.
  *
- * @ref MNELIB::MNESurface is the minimal geometric surface object that
- * the cortex-based algorithms in MNELIB and INVERSELIB share: it carries
+ * @ref mne::MNESurface is the minimal geometric surface object that
+ * the cortex-based algorithms in mne_mne and mne_inv share: it carries
  * no decimation or patch information and is used wherever only the
  * topology is needed (projection to surface, distance maps, head-shape
- * fitting). Heavier flavours - @ref MNELIB::MNESourceSpace and
- * @ref MNELIB::MNEBemSurface - subclass or wrap it.
+ * fitting). Heavier flavours - @ref mne::MNESourceSpace and
+ * @ref mne::MNEBemSurface - subclass or wrap it.
  */
 
 #ifndef MNE_SURFACE_H
@@ -44,10 +44,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -86,7 +86,7 @@ public:
      *
      * @param[in] stream  The stream to write to; the caller opens and closes the block.
      */
-    void write_to_stream(FIFFLIB::FiffStream& stream) const;
+    void write_to_stream(mne::FiffStream& stream) const;
 
     //=========================================================================================================
     // FsSurface geometry const methods
@@ -271,6 +271,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNE_SURFACE_H

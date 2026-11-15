@@ -13,14 +13,14 @@
  * @date     October 2012
  * @brief    Noise / data covariance matrix as stored under FIFFB_MNE_COV, with channel names, kind, projector list and rank info.
  *
- * @ref FIFFLIB::FiffCov is the C++ counterpart of MNE-Python's @c mne.Covariance.
+ * @ref mne::FiffCov is the C++ counterpart of MNE-Python's @c mne.Covariance.
  * It holds the (typically channel × channel) covariance matrix, the
  * channel-name list it is indexed by, the kind tag
  * (@c FIFFV_MNE_NOISE_COV / @c FIFFV_MNE_SOURCE_COV / ...), the diagonal
  * flag, the projector list that was active when the covariance was
- * estimated (@ref FIFFLIB::FiffProj), the bad-channel list, the nfree degrees of
+ * estimated (@ref mne::FiffProj), the bad-channel list, the nfree degrees of
  * freedom and an optional pre-whitening eigendecomposition. The class is
- * what @ref FIFFLIB::FiffStream reads from / writes to ``*-cov.fif`` files and
+ * what @ref mne::FiffStream reads from / writes to ``*-cov.fif`` files and
  * what the source-localization pipeline consumes to whiten the forward
  * gain matrix and the measurement data.
  */
@@ -62,10 +62,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -97,7 +97,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the noise covariance of a FIFF file, like read(); throws BASELIB::Error if it cannot.
+     * Reads the noise covariance of a FIFF file, like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The file.
      */
@@ -111,7 +111,7 @@ public:
      *
      * @return The covariance, or why the file holds none.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffCov> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffCov> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -224,7 +224,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> save(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> save(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -245,7 +245,7 @@ public:
      *
      * @return the stream with the attached fiff covariance matrix.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov& p_FiffCov);
+    friend std::ostream& operator<<(std::ostream& out, const mne::FiffCov& p_FiffCov);
 
 public:
     fiff_int_t kind;             /**< Covariance kind -> fiff_constants.h. */
@@ -272,7 +272,7 @@ inline bool FiffCov::empty() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov& p_FiffCov)
+inline std::ostream& operator<<(std::ostream& out, const mne::FiffCov& p_FiffCov)
 {
     bool t_bIsShort = true;
     out << "#### Fiff Covariance ####\n";

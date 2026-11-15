@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNESssData.
+ * @brief    Implementation of @ref mne::MNESssData.
  *
  * Implements FIFF read of the @c FIFFB_SSS_INFO sub-blocks, parsing the
  * @c FIFF_SSS_FRAME, @c FIFF_SSS_JOB, @c FIFF_SSS_ORD_IN /
@@ -35,8 +35,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -151,7 +150,7 @@ std::unique_ptr<MNESssData> MNESssData::read_from_node(FiffStream& stream, const
             s->comp_info = Eigen::VectorXi::Map(raw, ncomp);
 
             if (ncomp != (s->in_order * (2 + s->in_order) + s->out_order * (2 + s->out_order))) {
-                BASELIB::Log::critical("Number of SSS components does not match the expansion orders listed in the file");
+                mne::Log::critical("Number of SSS components does not match the expansion orders listed in the file");
                 return nullptr;
             }
         }
@@ -175,7 +174,7 @@ std::unique_ptr<MNESssData> MNESssData::read_from_node(FiffStream& stream, const
 }
 
 //=============================================================================================================
-namespace MNELIB
+namespace mne
 {
 
 /** @brief Lookup record mapping a FIFF coordinate frame integer code to its human-readable name. */

@@ -47,12 +47,10 @@
 //=============================================================================================================
 
 using namespace HPIPLUGIN;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace SCSHAREDLIB;
+using namespace mne::scan;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
-using namespace INVLIB;
 
 //=============================================================================================================
 // DEFINE LOCAL CONSTANTS
@@ -75,7 +73,7 @@ Hpi::Hpi()
 , m_bDoContinousHpi(false)
 , m_bUseSSP(false)
 , m_bUseComp(false)
-, m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
+, m_pCircularBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
 {
     connect(this, &Hpi::devHeadTransAvailable,
             this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);
@@ -173,7 +171,7 @@ QWidget* Hpi::setupWidget()
 
 //=============================================================================================================
 
-void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void Hpi::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
@@ -212,7 +210,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA)
+void Hpi::manageInitialization(QSharedPointer<mne::scan::RealTimeMultiSampleArray> pRTMSA)
 {
     if (!m_pFiffInfo) {
         initFiffInfo(pRTMSA->info());
@@ -227,7 +225,7 @@ void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArra
 
 //=============================================================================================================
 
-void Hpi::initFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> info)
+void Hpi::initFiffInfo(std::shared_ptr<mne::FiffInfo> info)
 {
     m_mutex.lock();
     m_pFiffInfo = std::move(info);
@@ -250,7 +248,7 @@ void Hpi::initFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> info)
 
 //=============================================================================================================
 
-void Hpi::initFiffDigitizers(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& fiffDig)
+void Hpi::initFiffDigitizers(const std::shared_ptr<mne::FiffDigitizerData>& fiffDig)
 {
     if (fiffDig) {
         m_mutex.lock();
@@ -337,7 +335,7 @@ void Hpi::initPluginControlWidgets()
         // connected to it. Push the current list so they show up right away.
         m_mutex.lock();
         const bool bHaveDigitizers = !!m_pFiffDigitizerData;
-        const FIFFLIB::FiffDigPointSet digitizers = bHaveDigitizers ? m_pFiffDigitizerData->points : FIFFLIB::FiffDigPointSet();
+        const mne::FiffDigPointSet digitizers = bHaveDigitizers ? m_pFiffDigitizerData->points : mne::FiffDigPointSet();
         m_mutex.unlock();
 
         if (bHaveDigitizers) {
@@ -383,7 +381,7 @@ void Hpi::updateProjections()
             infoTemp.make_projector(matProjectors);
             //set columns of matrix to zero depending on bad channels indexes
             for (qint32 j = 0; j < static_cast<int>(infoTemp.bads.size()); ++j) {
-                matProjectors.col(BASELIB::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
+                matProjectors.col(mne::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
             }
         }
 
@@ -431,7 +429,7 @@ void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 
 //=============================================================================================================
 
-void Hpi::onDigitizersChanged(const FIFFLIB::FiffDigPointSet& digitizers,
+void Hpi::onDigitizersChanged(const mne::FiffDigPointSet& digitizers,
                               const QString& sFilePath)
 {
     m_mutex.lock();
@@ -518,7 +516,7 @@ void Hpi::setFittingWindowSize(int winSize)
 
 //=============================================================================================================
 
-void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
+void Hpi::onDevHeadTransAvailable(const mne::FiffCoordTrans& devHeadTrans)
 {
     m_pFiffInfo->dev_head_t = devHeadTrans;
 }
@@ -601,7 +599,7 @@ void Hpi::run()
                     m_bDoSingleHpi = false;
                     fitResult = HpiFitResult();
                 }
-                fitResult.digitizerFile = BASELIB::pathFromUtf8(m_sFilePathDigitzers.toStdString());
+                fitResult.digitizerFile = mne::pathFromUtf8(m_sFilePathDigitzers.toStdString());
                 m_mutex.unlock();
 
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols() - iDataIndexCounter) =

@@ -1,18 +1,18 @@
 ---
 id: live-marker
-title: "DISP3DLIB::LiveMarker"
+title: "mne::disp::LiveMarker"
 sidebar_label: LiveMarker
 sidebar_position: 28
 ---
 
 # LiveMarker
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/brainview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/brainview.h)
 
 `#include <disp3D/brainview.h>`
 
 ```cpp
-struct DISP3DLIB::LiveMarker
+struct mne::disp::LiveMarker
 ```
 
 Lightweight live overlay marker rendered as a single sphere.
@@ -45,7 +45,7 @@ view.setViewCount(1);
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 318"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 316"
 BrainView view; // QRhi widget; nothing is rendered until it is shown
 view.setViewCount(2);
 const bool twoPanes = view.viewCount() == 2 && view.viewMode() == BrainView::MultiView;

@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Legacy MNE-C measurement-data container assembling raw/evoked sets and their projection state.
  *
- * @ref MNELIB::MNEMeasData mirrors @c mneMeasDataRec from the original
- * MNE C tooling. It bundles an @ref FIFFLIB::FiffInfo with a list of
- * @ref MNELIB::MNEMeasDataSet entries (one per averaging condition) and the
+ * @ref mne::MNEMeasData mirrors @c mneMeasDataRec from the original
+ * MNE C tooling. It bundles an @ref mne::FiffInfo with a list of
+ * @ref mne::MNEMeasDataSet entries (one per averaging condition) and the
  * active projection / CTF compensation state. Kept verbatim so ported
  * C utilities (@c mne_inverse_operator, @c mne_compute_raw_inverse,
  * ...) continue to operate against the same in-memory schema.
@@ -49,20 +49,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEInverseOperator;
@@ -169,23 +169,23 @@ private:
                                 bool fresh);
 
 public:
-    std::string filename;                                /**< Path to the source FIFF file. */
-    FIFFLIB::FiffId meas_id;                             /**< Measurement block ID from the FIFF file. */
-    FIFFLIB::FiffTime meas_date;                         /**< Measurement date / time stamp. */
-    std::vector<FIFFLIB::FiffChInfo> chs;                /**< Channel information list. */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t; /**< MEG device ↔ head coordinate transform. */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI ↔ head coordinate transform. */
-    float sfreq;                                         /**< Sampling frequency (Hz). */
-    int nchan;                                           /**< Number of channels. */
-    float highpass;                                      /**< High-pass filter setting (Hz). */
-    float lowpass;                                       /**< Low-pass filter setting (Hz). */
-    std::unique_ptr<MNEProjOp> proj;                     /**< SSP projection operator (may be @c nullptr). */
-    std::unique_ptr<MNECTFCompDataSet> comp;             /**< Software gradient compensation data. */
-    MNEInverseOperator* op;                              /**< Associated inverse operator (not owned). */
-    MNENamedMatrix* fwd;                                 /**< Forward operator for dipole fitting (not owned). */
-    std::unique_ptr<MNERawData> raw;                     /**< Raw-data handle when data originates from a raw file. */
-    StringList badlist;                                  /**< List of bad channel names. */
-    Eigen::VectorXi bad;                                 /**< Per-channel bad flag array (0 = good, 1 = bad). */
+    std::string filename;                            /**< Path to the source FIFF file. */
+    mne::FiffId meas_id;                             /**< Measurement block ID from the FIFF file. */
+    mne::FiffTime meas_date;                         /**< Measurement date / time stamp. */
+    std::vector<mne::FiffChInfo> chs;                /**< Channel information list. */
+    std::unique_ptr<mne::FiffCoordTrans> meg_head_t; /**< MEG device ↔ head coordinate transform. */
+    std::unique_ptr<mne::FiffCoordTrans> mri_head_t; /**< MRI ↔ head coordinate transform. */
+    float sfreq;                                     /**< Sampling frequency (Hz). */
+    int nchan;                                       /**< Number of channels. */
+    float highpass;                                  /**< High-pass filter setting (Hz). */
+    float lowpass;                                   /**< Low-pass filter setting (Hz). */
+    std::unique_ptr<MNEProjOp> proj;                 /**< SSP projection operator (may be @c nullptr). */
+    std::unique_ptr<MNECTFCompDataSet> comp;         /**< Software gradient compensation data. */
+    MNEInverseOperator* op;                          /**< Associated inverse operator (not owned). */
+    MNENamedMatrix* fwd;                             /**< Forward operator for dipole fitting (not owned). */
+    std::unique_ptr<MNERawData> raw;                 /**< Raw-data handle when data originates from a raw file. */
+    StringList badlist;                              /**< List of bad channel names. */
+    Eigen::VectorXi bad;                             /**< Per-channel bad flag array (0 = good, 1 = bad). */
 
     bool ch_major;                                     /**< If true, data rows are channels (not times). */
     std::vector<std::unique_ptr<MNEMeasDataSet>> sets; /**< All loaded data-set epochs. */
@@ -196,6 +196,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNE_MEAS_DATA_H

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Tests for IEEGLIB: lead grouping, BIDS iEEG reading, bipolar montages and surface mapping.
+ * @brief    Tests for mne_ieeg: lead grouping, BIDS iEEG reading, bipolar montages and surface mapping.
  */
 
 //=============================================================================================================
@@ -35,8 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IEEGLIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {
@@ -300,7 +299,7 @@ void TestIeeg::bipolarPairsFollowLeads()
     }
     Eigen::MatrixXd derived = Eigen::MatrixXd::Random(contacts.size(), 5);
     const Eigen::MatrixXd expected = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * derived;
-    DSPLIB::setBipolarReference(derived, info, anodes, cathodes);
+    mne::setBipolarReference(derived, info, anodes, cathodes);
     QCOMPARE(derived.bottomRows(pairs.size()), expected);
     QCOMPARE(StringList(info.ch_names.begin() + info.nchan - int(pairs.size()), info.ch_names.end()), names);
 }

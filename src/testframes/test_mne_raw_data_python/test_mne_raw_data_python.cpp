@@ -60,8 +60,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace
@@ -141,7 +140,7 @@ MNEChSelection TestMneRawDataPython::makeSelection() const
     sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
     for (int c = 0; c < sel.nchan(); ++c) {
         std::erase(sel.chspick_nospace[c], ' ');
-        sel.pick[c] = static_cast<int>(BASELIB::indexOf(m_raw->ch_names, sel.chspick[c]));
+        sel.pick[c] = static_cast<int>(mne::indexOf(m_raw->ch_names, sel.chspick[c]));
     }
     return sel;
 }
@@ -157,10 +156,10 @@ void TestMneRawDataPython::readsLayout()
     QCOMPARE(m_raw->badlist, (StringList{"MEG 2443", "EEG 053"}));
     QCOMPARE(m_raw->bad.sum(), 2);
     {
-        BASELIB::LogCapture log;
+        mne::LogCapture log;
         std::unique_ptr<MNERawData> again(MNERawData::open_file(m_rawPath.toStdU16String(), false, false, MNEFilterDef()));
         QVERIFY(again);
-        QCOMPARE(log.count(BASELIB::Log::Level::Info, ": MEG 2443 EEG 053"), 1);
+        QCOMPARE(log.count(mne::Log::Level::Info, ": MEG 2443 EEG 053"), 1);
     }
     QCOMPARE(makeSelection().pick.minCoeff() >= 0, true);
 
@@ -243,9 +242,9 @@ void TestMneRawDataPython::padsOutsideData()
     // A buffer whose row count does not match the selection is refused, not overrun
     for (const int nrow : {sel.nchan() - 1, sel.nchan() + 1}) {
         PickBuffer wrong(nrow, 4);
-        BASELIB::LogCapture log;
+        mne::LogCapture log;
         QCOMPARE(m_raw->pick_data(&sel, m_raw->first_samp, wrong.values), -1);
-        QCOMPARE(log.count(BASELIB::Log::Level::Warning, "rows"), 1);
+        QCOMPARE(log.count(mne::Log::Level::Warning, "rows"), 1);
         QVERIFY((wrong.values.array() == 12345.0f).all());
     }
 
@@ -345,7 +344,7 @@ void TestMneRawDataPython::projectsSegment()
     QVERIFY(made && !*made);
     made = MNEProjOp::make_projection({(m_rawPath + QStringLiteral(".missing")).toStdU16String()}, meg);
     QVERIFY(!made);
-    QCOMPARE(made.error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(made.error().code, mne::ErrorCode::Io);
 
     // Bad channels are left out of the vectors before orthogonalisation (mne make_projector(projs, ch_names, bads)):
     // the average EEG reference then spans 59 channels, and with every EEG channel bad it disappears
@@ -356,8 +355,8 @@ void TestMneRawDataPython::projectsSegment()
         const Eigen::MatrixXd u = op->proj_data.cast<double>();
         return Eigen::MatrixXd(Eigen::MatrixXd::Identity(u.cols(), u.cols()) - u.transpose() * u);
     };
-    const int eeg1 = BASELIB::indexOf(m_raw->ch_names, "EEG 001");
-    const int meg2443 = BASELIB::indexOf(m_raw->ch_names, "MEG 2443");
+    const int eeg1 = mne::indexOf(m_raw->ch_names, "EEG 001");
+    const int meg2443 = mne::indexOf(m_raw->ch_names, "MEG 2443");
     QVERIFY(eeg1 >= 0 && meg2443 >= 0);
     int nvec = 0;
     Eigen::MatrixXd p = projector({}, nvec);
@@ -496,8 +495,8 @@ void TestMneRawDataPython::picksDerivedChannel()
     filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
     std::unique_ptr<MNERawData> raw(MNERawData::open_file(m_rawPath.toStdU16String(), false, false, filter));
     QVERIFY(raw);
-    const int a = static_cast<int>(BASELIB::indexOf(raw->ch_names, "MEG 0111"));
-    const int b = static_cast<int>(BASELIB::indexOf(raw->ch_names, "MEG 0121"));
+    const int a = static_cast<int>(mne::indexOf(raw->ch_names, "MEG 0111"));
+    const int b = static_cast<int>(mne::indexOf(raw->ch_names, "MEG 0121"));
     // A derivation set with one usable row and one whose input is not recorded.
     const MNEDerivSet set = MNEDerivSet::fromDefinitions({{"BIP", {{"MEG 0111", 1.0}, {"MEG 0121", -1.0}}}, {"MISSING", {{"MEG 0111", 1.0}, {"EEG 999", -1.0}}}});
     std::unique_ptr<MNEDeriv> deriv = set.match(raw->ch_names);

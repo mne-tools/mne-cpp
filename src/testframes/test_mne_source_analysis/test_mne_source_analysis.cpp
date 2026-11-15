@@ -34,9 +34,7 @@
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/inv_source_estimate.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 
 class TestMneSourceAnalysis : public QObject
 {
@@ -308,7 +306,7 @@ private slots:
         StringList chNames;
         for (int i = 0; i < sel.size(); ++i) {
             const std::string& name = raw.info.ch_names[sel(i)];
-            if (BASELIB::contains(cov.names, name))
+            if (mne::contains(cov.names, name))
                 chNames.push_back(name);
         }
         QVERIFY2(!chNames.empty(), "No intersecting channels between cov and info");

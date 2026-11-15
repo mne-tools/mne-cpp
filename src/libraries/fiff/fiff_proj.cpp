@@ -58,9 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

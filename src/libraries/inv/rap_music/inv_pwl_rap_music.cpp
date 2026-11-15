@@ -34,9 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -117,9 +115,9 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
     int t_iMaxSearch = m_iN < t_r ? m_iN : t_r; //The smallest of Rank and Iterations
 
     if (t_r < m_iN) {
-        BASELIB::Log::debug("Warning: Rank {} of the measurement data is smaller than the {}", t_r, m_iN);
-        BASELIB::Log::debug(" sources to find.");
-        BASELIB::Log::debug("         Searching now for {} correlated sources.", t_iMaxSearch);
+        mne::Log::debug("Warning: Rank {} of the measurement data is smaller than the {}", t_r, m_iN);
+        mne::Log::debug(" sources to find.");
+        mne::Log::debug("         Searching now for {} correlated sources.", t_iMaxSearch);
     }
 
     //Create Orthogonal Projector
@@ -147,7 +145,7 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
     //    }
     p_RapDipoles.clear();
 
-    BASELIB::Log::debug("##### Calculation of PWL RAP MUSIC started ######\n\n");
+    mne::Log::debug("##### Calculation of PWL RAP MUSIC started ######\n\n");
 
     MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_matPhi_s.cols());
     //new Version: Calculate projection before
@@ -263,10 +261,10 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         end_subcorr = clock();
 
         float t_fSubcorrElapsedTime = (static_cast<float>(end_subcorr - start_subcorr) / static_cast<float>(CLOCKS_PER_SEC)) * 1000.0f;
-        BASELIB::Log::debug("Time Elapsed: {} ms", t_fSubcorrElapsedTime);
+        mne::Log::debug("Time Elapsed: {} ms", t_fSubcorrElapsedTime);
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
-        BASELIB::Log::debug("Iteration: {} of {} ; Correlation: {} ; Position (Idx+1): {} - {}\n\n", r + 1, t_iMaxSearch, t_val_roh_k, t_iIdx1 + 1, t_iIdx2 + 1);
+        mne::Log::debug("Iteration: {} of {} ; Correlation: {} ; Position (Idx+1): {} - {}\n\n", r + 1, t_iMaxSearch, t_val_roh_k, t_iIdx1 + 1, t_iIdx2 + 1);
 
         //Calculations with the max correlated dipole pair G_k_1
         MatrixX6T t_matG_k_1(m_ForwardSolution.sol.data.rows(), 6);
@@ -287,8 +285,8 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold) {
-            BASELIB::Log::debug("Searching stopped, last correlation {}", t_val_roh_k);
-            BASELIB::Log::debug(" is smaller then the given threshold {}", m_dThreshold);
+            mne::Log::debug("Searching stopped, last correlation {}", t_val_roh_k);
+            mne::Log::debug(" is smaller then the given threshold {}", m_dThreshold);
             break;
         }
 
@@ -302,12 +300,12 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
         //ToDo
     }
 
-    BASELIB::Log::debug("##### Calculation of PWL RAP MUSIC completed ######");
+    mne::Log::debug("##### Calculation of PWL RAP MUSIC completed ######");
 
     end = clock();
 
     float t_fElapsedTime = (static_cast<float>(end - start) / static_cast<float>(CLOCKS_PER_SEC)) * 1000.0f;
-    BASELIB::Log::debug("Total Time Elapsed: {} ms", t_fElapsedTime);
+    mne::Log::debug("Total Time Elapsed: {} ms", t_fElapsedTime);
 
     return p_SourceEstimate;
 }

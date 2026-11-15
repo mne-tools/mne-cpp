@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Set of @ref MNELIB::MNEMshDisplaySurface objects sharing a camera, lights and selection.
+ * @brief    Set of @ref mne::MNEMshDisplaySurface objects sharing a camera, lights and selection.
  *
- * @ref MNELIB::MNEMshDisplaySurfaceSet aggregates one or more renderable
- * surfaces with the @ref MNELIB::MNEMshEyes camera, the
- * @ref MNELIB::MNEMshLightSet lighting rig and the @ref MNELIB::MNEMshPicked vertex
+ * @ref mne::MNEMshDisplaySurfaceSet aggregates one or more renderable
+ * surfaces with the @ref mne::MNEMshEyes camera, the
+ * @ref mne::MNEMshLightSet lighting rig and the @ref mne::MNEMshPicked vertex
  * selection so the legacy viewer state can be saved and restored as a
  * single object.
  */
@@ -41,14 +41,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEMshDisplaySurface;
@@ -187,6 +187,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHDISPLAYSURFACESET_H

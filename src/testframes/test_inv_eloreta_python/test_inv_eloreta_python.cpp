@@ -69,10 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -303,7 +300,7 @@ void TestInvEloretaPython::estimateSnr_matchesPython()
         const RowVectorXd ramp = RowVectorXd::LinSpaced(evoked.data.cols(), 1.0, static_cast<double>(evoked.data.cols())) * amplitude;
         evoked.data.setZero();
         for (int i = 0; i < g.size(); ++i)
-            evoked.data.row(FIFFLIB::channel_index(evoked.info.ch_names, m_freeFwd.sol.row_names[i])) = g(i) * ramp;
+            evoked.data.row(mne::channel_index(evoked.info.ch_names, m_freeFwd.sol.row_names[i])) = g(i) * ramp;
     } else {
         QTest::ignoreMessage(QtWarningMsg, "[estimate_snr] SNR estimation did not converge.");
     }
@@ -363,7 +360,7 @@ void TestInvEloretaPython::mneData_matchesPython()
         const RowVectorXd ramp = RowVectorXd::LinSpaced(evoked.data.cols(), 1.0, static_cast<double>(evoked.data.cols())) * amplitude;
         evoked.data.setZero();
         for (int i = 0; i < g.size(); ++i)
-            evoked.data.row(FIFFLIB::channel_index(evoked.info.ch_names, m_freeFwd.sol.row_names[i])) = g(i) * ramp;
+            evoked.data.row(mne::channel_index(evoked.info.ch_names, m_freeFwd.sol.row_names[i])) = g(i) * ramp;
     }
 
     InvMinimumNorm mn(m_loose, 1.0f / 9.0f, "MNE");

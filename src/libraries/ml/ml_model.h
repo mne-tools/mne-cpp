@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Pure-virtual @ref MLLIB::MlModel interface that every MLLIB inference backend implements.
+ * @brief    Pure-virtual @ref mne::MlModel interface that every mne_ml inference backend implements.
  *
- * @ref MLLIB::MlModel is the polymorphic seam between mne-cpp
+ * @ref mne::MlModel is the polymorphic seam between mne-cpp
  * application code and the underlying runtime that actually executes a
  * graph (ONNX Runtime today, potentially LibTorch or a native kernel
  * tomorrow). The interface intentionally exposes only four operations
@@ -17,7 +17,7 @@
  * descriptors - so any backend can be slotted in without leaking
  * runtime-specific types into the public API.
  *
- * Inputs and outputs flow through @ref MLLIB::MlTensor, the shared
+ * Inputs and outputs flow through @ref mne::MlTensor, the shared
  * N-dimensional float32 carrier, which gives ONNX Runtime a zero-copy
  * path into its own tensor representation while keeping Eigen-based
  * pre/post-processing in mne-cpp idiomatic. Implementations are
@@ -45,10 +45,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -106,6 +106,6 @@ public:
     virtual MlTaskType taskType() const = 0;
 };
 
-} // namespace MLLIB
+} // namespace mne
 
 #endif // ML_MODEL_H

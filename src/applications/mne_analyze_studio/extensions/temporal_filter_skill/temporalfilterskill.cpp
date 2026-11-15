@@ -29,8 +29,7 @@
 #include <QJsonArray>
 
 using namespace MNEANALYZESTUDIO;
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

@@ -95,7 +95,7 @@ private:
      *
      * @return true on success, false on failure. Result stored in the surfs vector.
      */
-    bool readFreeSurferSurface(const SurfaceInput& input, MNELIB::MNEBemSurface& bemSurf);
+    bool readFreeSurferSurface(const SurfaceInput& input, mne::MNEBemSurface& bemSurf);
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ private:
      *
      * @return true on success, false on failure. Result stored in the surfs vector.
      */
-    bool readAsciiTriSurface(const SurfaceInput& input, MNELIB::MNEBemSurface& bemSurf);
+    bool readAsciiTriSurface(const SurfaceInput& input, mne::MNEBemSurface& bemSurf);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ private:
      *
      * @return true on success.
      */
-    bool shiftVertices(MNELIB::MNEBemSurface& surf, float shift);
+    bool shiftVertices(mne::MNEBemSurface& surf, float shift);
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ private:
      *
      * @param[in,out] surfs  Vector of BEM surfaces to reorder.
      */
-    void orderSurfaces(QVector<MNELIB::MNEBemSurface>& surfs);
+    void orderSurfaces(QVector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
 

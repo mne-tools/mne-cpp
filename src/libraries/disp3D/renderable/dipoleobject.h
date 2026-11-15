@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Instanced-arrow renderable for fitted equivalent current dipoles.
  *
- * DipoleObject converts an @ref INVLIB::InvEcdSet into a single
+ * DipoleObject converts an @ref mne::InvEcdSet into a single
  * arrow mesh (cone + shaft) plus a per-dipole @c DipoleObject::InstanceData
  * stream that carries the 4x4 model matrix (translation + dipole
  * orientation), the RGBA colour (mapped from goodness-of-fit by the
@@ -40,7 +40,7 @@
 #include <memory>
 #include <inv/dipole_fit/inv_ecd_set.h>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -58,7 +58,7 @@ public:
     DipoleObject();
     ~DipoleObject();
 
-    void load(const INVLIB::InvEcdSet& ecdSet);
+    void load(const mne::InvEcdSet& ecdSet);
 
     // Place all loaded dipoles with this transform (replaces any previous one)
     void applyTransform(const QMatrix4x4& trans);
@@ -153,6 +153,6 @@ private:
     std::vector<QVector4D> m_originalColors;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DIPOLEOBJECT_H

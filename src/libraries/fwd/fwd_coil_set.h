@@ -50,10 +50,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 class FwdBemSolution;
 //=============================================================================================================
@@ -90,7 +90,7 @@ public:
      *
      * @return   The created meg coil.
      */
-    std::unique_ptr<FwdCoil> create_meg_coil(const FIFFLIB::FiffChInfo& ch, int acc, const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    std::unique_ptr<FwdCoil> create_meg_coil(const mne::FiffChInfo& ch, int acc, const mne::FiffCoordTrans& t = mne::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -104,10 +104,10 @@ public:
      *
      * @return   The created meg coil set.
      */
-    std::unique_ptr<FwdCoilSet> create_meg_coils(const std::vector<FIFFLIB::FiffChInfo>& chs,
+    std::unique_ptr<FwdCoilSet> create_meg_coils(const std::vector<mne::FiffChInfo>& chs,
                                                  int nch,
                                                  int acc,
-                                                 const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+                                                 const mne::FiffCoordTrans& t = mne::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -120,9 +120,9 @@ public:
      *
      * @return   The created meg coil set.
      */
-    static std::unique_ptr<FwdCoilSet> create_eeg_els(const std::vector<FIFFLIB::FiffChInfo>& chs,
+    static std::unique_ptr<FwdCoilSet> create_eeg_els(const std::vector<mne::FiffChInfo>& chs,
                                                       int nch,
-                                                      const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+                                                      const mne::FiffCoordTrans& t = mne::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -142,7 +142,7 @@ public:
      *
      * @return   The duplicated coil set.
      */
-    std::unique_ptr<FwdCoilSet> dup_coil_set(const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans()) const;
+    std::unique_ptr<FwdCoilSet> dup_coil_set(const mne::FiffCoordTrans& t = mne::FiffCoordTrans()) const;
 
     //=========================================================================================================
     /**
@@ -220,6 +220,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE FWDLIB
+} // NAMESPACE mne_fwd
 
 #endif // FWD_COIL_SET_H

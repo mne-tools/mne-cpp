@@ -9,7 +9,7 @@
 #include <dsp/parksmcclellan.h>
 #include <dsp/cosinefilter.h>
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFilterKernel : public QObject

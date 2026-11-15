@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -343,21 +343,21 @@ bool FiffInfoBase::readBadChannelsFromFile(const std::string& name, StringList& 
         listOut.clear();
         return true;
     }
-    std::ifstream file(BASELIB::pathFromUtf8(name));
+    std::ifstream file(mne::pathFromUtf8(name));
     if (!file) {
-        BASELIB::Log::critical("Cannot open bad channel file: {}", name);
+        mne::Log::critical("Cannot open bad channel file: {}", name);
         return false;
     }
     StringList list;
     std::string line;
     while (std::getline(file, line)) {
-        const std::string_view trimmed = BASELIB::trimmed(line);
+        const std::string_view trimmed = mne::trimmed(line);
         if (trimmed.empty() || trimmed.front() == '#')
             continue;
         list.emplace_back(trimmed);
     }
     if (file.bad()) {
-        BASELIB::Log::critical("Error reading bad channel file: {}", name);
+        mne::Log::critical("Error reading bad channel file: {}", name);
         return false;
     }
     listOut = std::move(list);

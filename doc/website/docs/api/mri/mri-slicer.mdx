@@ -1,18 +1,18 @@
 ---
 id: mri-slicer
-title: "MRILIB::MriSlicer"
+title: "mne::MriSlicer"
 sidebar_label: MriSlicer
 sidebar_position: 5
 ---
 
 # MriSlicer
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_slicer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_slicer.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_slicer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_slicer.h)
 
 `#include <mri/mri_slicer.h>`
 
 ```cpp
-class MRILIB::MriSlicer
+class mne::MriSlicer
 ```
 
 Orthogonal-plane resampler (axial / coronal / sagittal) from [`MriVolData`](/docs/api/mri/mri-vol-data) to [`MriSliceImage`](/docs/api/mri/mri-slice-image).
@@ -322,7 +322,7 @@ Convert voxel index to RAS coordinate using a volume's transform.
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 121"
+````cpp title="src/examples/ex_mri/main.cpp, line 120"
 const Vector3f ras(0.001f, -0.0005f, -0.002f); // metres; voxel (2,3,1)
 const Vector3i voxel = MriSlicer::rasToVoxel(vox2ras, ras);
 const std::vector<MriSliceImage> planes = MriSlicer::extractOrthogonal(voxels, mgh.dims(), vox2ras, ras); // axial, coronal, sagittal

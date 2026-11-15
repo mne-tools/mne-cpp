@@ -25,19 +25,19 @@
 
 const char* SAMPLEPLUGINPLUGIN::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 };
 
 //=============================================================================================================
 
 const char* SAMPLEPLUGINPLUGIN::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 };
 
 //=============================================================================================================
 
 const char* SAMPLEPLUGINPLUGIN::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 };

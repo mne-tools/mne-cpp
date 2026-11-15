@@ -57,10 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -107,7 +104,7 @@ int main(int argc, char* argv[])
     const FiffEvoked sample((data + "/MEG/sample/sample_audvis-ave.fif").toStdU16String(), 0);
     StringList good;
     for (const std::string& name : sample.info.ch_names) {
-        if (name.starts_with("MEG") && !BASELIB::contains(sample.info.bads, name))
+        if (name.starts_with("MEG") && !mne::contains(sample.info.bads, name))
             good.push_back(name);
     }
     FsLabel v1;

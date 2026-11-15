@@ -22,8 +22,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
 
-using namespace FWDLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFwdSphereSettings : public QObject
@@ -366,7 +365,7 @@ private slots:
     void fwdBem_findSurfaceEmpty()
     {
         FwdBemModel bem;
-        MNELIB::MNESurface* surf = bem.fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN);
+        mne::MNESurface* surf = bem.fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN);
         QVERIFY(surf == nullptr);
     }
 

@@ -37,10 +37,10 @@
 #include <span>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 namespace detail
@@ -359,6 +359,6 @@ private:
     std::uint64_t m_underrun = 0;
 };
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_BLOCK_VIEW_H

@@ -67,7 +67,7 @@ Here you execute and declare everything that is necessary for setting up your te
 #include <pybridge/python_test_helper.h>
 
 Eigen::MatrixXd mDataFromFile;
-QVERIFY(MATHLIB::read_matrix(mDataFromFile, PYBRIDGELIB::PythonTestHelper::test_data_path() / "Result" / "<yourFile>.txt"));
+QVERIFY(mne::read_matrix(mDataFromFile, mne::PythonTestHelper::test_data_path() / "Result" / "<yourFile>.txt"));
 ```
 
 All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data). In case you need to add new data open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data first.

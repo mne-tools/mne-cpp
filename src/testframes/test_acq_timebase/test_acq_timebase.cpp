@@ -33,7 +33,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {

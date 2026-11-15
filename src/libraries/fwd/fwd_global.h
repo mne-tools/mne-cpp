@@ -10,9 +10,9 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2012
- * @brief    Symbol-visibility macro and build-info entry points for the FWDLIB (MEG/EEG forward-modelling) library.
+ * @brief    Symbol-visibility macro and build-info entry points for the mne_fwd (MEG/EEG forward-modelling) library.
  *
- * FWDLIB implements the forward problem of bioelectromagnetism: given a
+ * mne_fwd implements the forward problem of bioelectromagnetism: given a
  * current dipole at a known source location, compute the magnetic field
  * sampled by each MEG coil and the electric potential sampled by each
  * EEG electrode. Because Maxwell's equations are evaluated in the
@@ -58,15 +58,10 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace FWDLIB
- * @brief Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings.
- */
-namespace FWDLIB
+namespace mne
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

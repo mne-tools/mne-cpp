@@ -1,18 +1,18 @@
 ---
 id: acq-bids-path
-title: "ACQLIB::AcqBidsPath"
+title: "mne::AcqBidsPath"
 sidebar_label: AcqBidsPath
 sidebar_position: 50
 ---
 
 # AcqBidsPath
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
 
 `#include <acq/acq_recorder.h>`
 
 ```cpp
-struct ACQLIB::AcqBidsPath
+struct mne::AcqBidsPath
 ```
 
 Where a BIDS recording goes: root/sub-&lt;subject&gt;[/ses-&lt;session&gt;]/meg/..._meg.fif with its sidecars.
@@ -58,7 +58,7 @@ std::printf("BIDS: %s\n", bidsRecorder->files().front().c_str());
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 134"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 133"
 AcqBidsPath bids;
 bids.root = QDir(directory).filePath("bids").toStdString();
 bids.subject = "01";

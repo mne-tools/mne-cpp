@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Plain-text serialisation of @ref DSPLIB::FilterKernel coefficient sets.
+ * @brief    Plain-text serialisation of @ref mne::FilterKernel coefficient sets.
  *
  * FilterIO reads and writes the simple human-readable text format used by
  * mne-cpp tooling to persist designed FIR / IIR coefficient sets: header
@@ -38,10 +38,10 @@
 #include <QString>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -95,6 +95,6 @@ public:
 
 private:
 };
-} // NAMESPACE DSPLIB
+} // NAMESPACE mne_dsp
 
 #endif // FILTERIO_H

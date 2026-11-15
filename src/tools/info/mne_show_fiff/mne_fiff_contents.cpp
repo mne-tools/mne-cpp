@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 using namespace SHOWFIFF;
-using namespace FIFFLIB;
+using namespace mne;
 
 
 //*************************************************************************************************************
@@ -123,7 +123,7 @@ void MNEFiffContents::print_transform(QTextStream& out, const FiffTag& tag)
     int frame;
     out << "\t";
     for (frame = t.from, k = 0; k < 2; k++) {
-        out << QString::fromStdString(std::string(FIFFLIB::FiffCoordTrans::frame_name(frame)));
+        out << QString::fromStdString(std::string(mne::FiffCoordTrans::frame_name(frame)));
         if (k == 0) {
             out << " -> ";
             frame = t.to;

@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -174,7 +174,7 @@ static bool computeHeadTransform(const DigPoint& nasion, const DigPoint& lpa, co
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf_dig2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

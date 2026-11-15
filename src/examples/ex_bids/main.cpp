@@ -53,7 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
                                   QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/BIDS");
     parser.addOption(rootOption);
     parser.process(app);
-    const std::filesystem::path root = BASELIB::pathFromUtf8(parser.value(rootOption).toStdString());
+    const std::filesystem::path root = mne::pathFromUtf8(parser.value(rootOption).toStdString());
     bool ok = true;
 
     //! [bids_path_usage]
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     //! [edf_reader_usage]
     std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
     const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
-    const FIFFLIB::FiffInfo edfInfo = edf->info();
+    const mne::FiffInfo edfInfo = edf->info();
     const MatrixXf edfHead = edf->read_raw_segment(0, 201);
     //! [edf_reader_usage]
     // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
@@ -161,14 +161,14 @@ int main(int argc, char* argv[])
     QTemporaryDir out;
     BidsRawData::WriteOptions options;
     options.datasetName = "ex_bids";
-    const BIDSPath written = data.write(BIDSPath(BASELIB::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+    const BIDSPath written = data.write(BIDSPath(mne::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
     const BidsRawData readBack = BidsRawData::read(written);
     //! [bids_raw_data_write]
     // every EEG channel gets an electrodes.tsv row; the 10 measured positions must come back under the same names
     int samePositions = 0;
     for (const BidsElectrode& before : data.electrodes) {
         for (const BidsElectrode& after : readBack.electrodes) {
-            samePositions += after.name == before.name && std::fabs(*BASELIB::toDouble(after.x) - *BASELIB::toDouble(before.x)) + std::fabs(*BASELIB::toDouble(after.y) - *BASELIB::toDouble(before.y)) + std::fabs(*BASELIB::toDouble(after.z) - *BASELIB::toDouble(before.z)) < 1e-6;
+            samePositions += after.name == before.name && std::fabs(*mne::toDouble(after.x) - *mne::toDouble(before.x)) + std::fabs(*mne::toDouble(after.y) - *mne::toDouble(before.y)) + std::fabs(*mne::toDouble(after.z) - *mne::toDouble(before.z)) < 1e-6;
         }
     }
     ok &= expect(out.isValid() && written.exists() && readBack.is_valid() && readBack.raw.info.bads == data.raw.info.bads && readBack.events.size() == 4 && samePositions == 10,

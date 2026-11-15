@@ -33,9 +33,9 @@
 //=============================================================================================================
 
 using namespace FILTERINGPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

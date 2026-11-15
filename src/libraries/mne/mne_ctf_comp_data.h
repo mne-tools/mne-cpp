@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Single CTF reference-sensor compensation matrix labelled by kind.
  *
- * @ref MNELIB::MNECTFCompData stores one entry of the CTF software
+ * @ref mne::MNECTFCompData stores one entry of the CTF software
  * compensation chain (1st / 2nd / 3rd gradient) as a labelled matrix
  * operating from reference to primary channels. FIFF tags:
  * @c FIFFB_MNE_CTF_COMP_DATA, @c FIFF_MNE_CTF_COMP_KIND,
@@ -37,10 +37,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -90,25 +90,25 @@ public:
      *
      * @return OK on success, FAIL if a channel is not found.
      */
-    int calibrate(const std::vector<FIFFLIB::FiffChInfo>& chs,
+    int calibrate(const std::vector<mne::FiffChInfo>& chs,
                   int nch,
                   bool do_it);
 
 public:
-    int kind;                                           /**< The CTF compensation kind constant. */
-    int mne_kind;                                       /**< MNE-internal compensation kind. */
-    bool calibrated;                                    /**< Whether the coefficients are already calibrated. */
-    std::unique_ptr<MNENamedMatrix> data;               /**< The compensation matrix. */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> presel;  /**< Sparse selector applied before compensation. */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> postsel; /**< Sparse selector applied after compensation. */
-    Eigen::VectorXf presel_data;                        /**< Intermediate buffer for pre-selection results. */
-    Eigen::VectorXf comp_data;                          /**< Intermediate buffer for compensation results. */
-    Eigen::VectorXf postsel_data;                       /**< Intermediate buffer for post-selection results. */
+    int kind;                                       /**< The CTF compensation kind constant. */
+    int mne_kind;                                   /**< MNE-internal compensation kind. */
+    bool calibrated;                                /**< Whether the coefficients are already calibrated. */
+    std::unique_ptr<MNENamedMatrix> data;           /**< The compensation matrix. */
+    std::unique_ptr<mne::FiffSparseMatrix> presel;  /**< Sparse selector applied before compensation. */
+    std::unique_ptr<mne::FiffSparseMatrix> postsel; /**< Sparse selector applied after compensation. */
+    Eigen::VectorXf presel_data;                    /**< Intermediate buffer for pre-selection results. */
+    Eigen::VectorXf comp_data;                      /**< Intermediate buffer for compensation results. */
+    Eigen::VectorXf postsel_data;                   /**< Intermediate buffer for post-selection results. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNECTFCOMPDATA_H

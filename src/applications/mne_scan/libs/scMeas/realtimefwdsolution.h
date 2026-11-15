@@ -40,21 +40,21 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -89,7 +89,7 @@ public:
      *
      * @param[in] pFiffInfo     The new fiff info.
      */
-    void setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo);
+    void setFiffInfo(std::shared_ptr<mne::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -97,7 +97,7 @@ public:
      *
      * @return     The current fiff info.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo();
+    std::shared_ptr<mne::FiffInfo> getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -105,7 +105,7 @@ public:
      *
      * @param[in] fwdSolution     The forward solution which should be distributed.
      */
-    virtual void setValue(const std::shared_ptr<MNELIB::MNEForwardSolution>& pFwdSolution);
+    virtual void setValue(const std::shared_ptr<mne::MNEForwardSolution>& pFwdSolution);
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @return The last attached value.
      */
-    virtual std::shared_ptr<MNELIB::MNEForwardSolution> getValue();
+    virtual std::shared_ptr<mne::MNEForwardSolution> getValue();
 
     //=========================================================================================================
     /**
@@ -137,8 +137,8 @@ private:
     bool m_bInitialized;     /**< If values are stored.*/
     bool m_bClustered;       /**< If fwd is clustered.*/
 
-    std::shared_ptr<MNELIB::MNEForwardSolution> m_pFwdSolution; /**< The Mne Forward Solution. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;             /**< The Fiff Info. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwdSolution; /**< The Mne Forward Solution. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;              /**< The Fiff Info. */
 };
 
 //=============================================================================================================

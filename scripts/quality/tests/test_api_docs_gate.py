@@ -38,13 +38,13 @@ audit = _load("audit_registry")
 generated = _load("check_generated")
 
 REGISTRY = {
-    "modules": {"fiff": {"namespace": "FIFFLIB", "dir_slug": "fiff"}},
+    "modules": {"fiff": {"namespace": "mne", "dir_slug": "fiff"}},
     "classes": [{"name": "FiffInfo", "module": "fiff", "header": "fiff/fiff_info.h", "documented": True}],
 }
 EXCLUSIONS = {
     "namespaces": {"std": "Standard library."},
     "unnamespaced": {"reason": "Renderer internals.", "header_prefixes": ["disp3D/"]},
-    "classes": {"FIFFLIB::FiffTool": "Command-line helper."},
+    "classes": {"mne::FiffTool": "Command-line helper."},
 }
 
 
@@ -53,8 +53,8 @@ class AuditTestCase(unittest.TestCase):
         self.xml = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.xml)
         self.compounds: dict[str, tuple[str, str]] = {}
-        self.add("FIFFLIB::FiffInfo", "fiff/fiff_info.h")
-        self.add("FIFFLIB::FiffTool", "fiff/fiff_tool.h")
+        self.add("mne::FiffInfo", "fiff/fiff_info.h")
+        self.add("mne::FiffTool", "fiff/fiff_tool.h")
         self.add("std::vector", "vector")
         self.add("BrainView", "disp3D/view/brainview.h")
 
@@ -63,7 +63,7 @@ class AuditTestCase(unittest.TestCase):
 
     def problems(self, registry: dict | None = None, exclusions: dict | None = None) -> list[str]:
         index = ["<doxygenindex>",
-                 '<compound kind="namespace" refid="ns_f"><name>FIFFLIB</name></compound>',
+                 '<compound kind="namespace" refid="ns_f"><name>mne</name></compound>',
                  '<compound kind="namespace" refid="ns_s"><name>std</name></compound>']
         for i, (name, (header, kind)) in enumerate(self.compounds.items()):
             index.append(f'<compound kind="{kind}" refid="c{i}"><name>{name}</name></compound>')
@@ -81,13 +81,13 @@ class TestRegistryAudit(AuditTestCase):
 
     def test_unregistered_xml_class_fails(self) -> None:
         """A public class in the XML that is neither registered nor excluded."""
-        self.add("FIFFLIB::FiffNew", "fiff/fiff_new.h")
-        self.assertEqual(["class 'FIFFLIB::FiffNew' (fiff/fiff_new.h) is in the Doxygen XML but not in the registry"],
+        self.add("mne::FiffNew", "fiff/fiff_new.h")
+        self.assertEqual(["class 'mne::FiffNew' (fiff/fiff_new.h) is in the Doxygen XML but not in the registry"],
                          self.problems())
 
     def test_documented_class_missing_from_xml_fails(self) -> None:
         """A documented registry class that Doxygen did not extract."""
-        del self.compounds["FIFFLIB::FiffInfo"]
+        del self.compounds["mne::FiffInfo"]
         self.assertIn("registry class 'FiffInfo' is documented but not in the Doxygen XML", self.problems())
 
     def test_module_namespace_must_exist(self) -> None:
@@ -97,18 +97,18 @@ class TestRegistryAudit(AuditTestCase):
                       self.problems(registry))
 
     def test_nested_classes_are_not_public_units(self) -> None:
-        self.add("FIFFLIB::FiffInfo::Entry", "fiff/fiff_info.h")
-        self.add("FIFFLIB::FiffInfo::Item", "fiff/fiff_info.h", "struct")
+        self.add("mne::FiffInfo::Entry", "fiff/fiff_info.h")
+        self.add("mne::FiffInfo::Item", "fiff/fiff_info.h", "struct")
         self.assertEqual([], self.problems())
 
     def test_unregistered_struct_fails(self) -> None:
         """Exported structs (parameter and result records) are public API like classes."""
-        self.add("FIFFLIB::FiffParams", "fiff/fiff_params.h", "struct")
-        self.assertEqual(["class 'FIFFLIB::FiffParams' (fiff/fiff_params.h) is in the Doxygen XML but not in the registry"],
+        self.add("mne::FiffParams", "fiff/fiff_params.h", "struct")
+        self.assertEqual(["class 'mne::FiffParams' (fiff/fiff_params.h) is in the Doxygen XML but not in the registry"],
                          self.problems())
 
     def test_documented_struct_passes(self) -> None:
-        self.add("FIFFLIB::FiffParams", "fiff/fiff_params.h", "struct")
+        self.add("mne::FiffParams", "fiff/fiff_params.h", "struct")
         registry = json.loads(json.dumps(REGISTRY))
         registry["classes"].append({"name": "FiffParams", "module": "fiff", "header": "fiff/fiff_params.h",
                                     "documented": True})
@@ -118,7 +118,7 @@ class TestRegistryAudit(AuditTestCase):
 class TestExclusions(AuditTestCase):
     def test_each_exclusion_kind_applies(self) -> None:
         """Namespace, class and unnamespaced-header exclusions each hide one class."""
-        for key, fragment in (("namespaces", "std::vector"), ("classes", "FIFFLIB::FiffTool"),
+        for key, fragment in (("namespaces", "std::vector"), ("classes", "mne::FiffTool"),
                               ("unnamespaced", "BrainView")):
             with self.subTest(kind=key):
                 reduced = json.loads(json.dumps(EXCLUSIONS))
@@ -126,12 +126,12 @@ class TestExclusions(AuditTestCase):
                 self.assertTrue(any(fragment in problem for problem in self.problems(exclusions=reduced)))
 
     def test_unused_exclusion_fails(self) -> None:
-        self.assertIn("exclusion: class 'FIFFLIB::FiffGone' matches nothing", self.problems(exclusions={
-            **EXCLUSIONS, "classes": {**EXCLUSIONS["classes"], "FIFFLIB::FiffGone": "Removed."}}))
+        self.assertIn("exclusion: class 'mne::FiffGone' matches nothing", self.problems(exclusions={
+            **EXCLUSIONS, "classes": {**EXCLUSIONS["classes"], "mne::FiffGone": "Removed."}}))
 
     def test_exclusion_needs_a_reason(self) -> None:
         path = self.xml / "exclusions.json"
-        for broken in ({"classes": {"FIFFLIB::FiffTool": " "}},
+        for broken in ({"classes": {"mne::FiffTool": " "}},
                        {"unnamespaced": {"header_prefixes": ["disp3D/"]}}):
             with self.subTest(broken=broken):
                 path.write_text(json.dumps(broken), encoding="utf-8")

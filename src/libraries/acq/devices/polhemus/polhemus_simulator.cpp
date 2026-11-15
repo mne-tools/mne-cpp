@@ -27,8 +27,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -163,7 +163,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<PolhemusTransport> ACQLIB::detail::make_polhemus_simulator(const PolhemusSimulation& simulation)
+std::unique_ptr<PolhemusTransport> mne::detail::make_polhemus_simulator(const PolhemusSimulation& simulation)
 {
     return std::make_unique<PolhemusSimulator>(simulation);
 }

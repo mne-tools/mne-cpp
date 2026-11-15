@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Resolution matrix K G of an inverse operator and its forward solution.
  *
- * @ref MNELIB::MNECorticalMap::makeCorticalMap multiplies the prepared inverse
+ * @ref mne::MNECorticalMap::makeCorticalMap multiplies the prepared inverse
  * kernel K by the forward gain G of the kernel's channels, giving the map from
  * true to estimated source activity (mne-python make_inverse_resolution_matrix).
  */
@@ -33,16 +33,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -81,11 +81,11 @@ public:
     static Eigen::MatrixXd makeCorticalMap(
         const MNEForwardSolution& fwd,
         const MNEInverseOperator& inv,
-        const FIFFLIB::FiffInfo& info);
+        const mne::FiffInfo& info);
 
     MNECorticalMap() = delete;
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_CORTICAL_MAP_H

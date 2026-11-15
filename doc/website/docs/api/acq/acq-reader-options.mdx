@@ -1,18 +1,18 @@
 ---
 id: acq-reader-options
-title: "ACQLIB::AcqReaderOptions"
+title: "mne::AcqReaderOptions"
 sidebar_label: AcqReaderOptions
 sidebar_position: 18
 ---
 
 # AcqReaderOptions
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_reader.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_reader.h)
 
 `#include <acq/acq_reader.h>`
 
 ```cpp
-struct ACQLIB::AcqReaderOptions
+struct mne::AcqReaderOptions
 ```
 
 Per-reader options.
@@ -36,7 +36,7 @@ auto controller = input->stream().reader(AcqReader::ReadMode::LowLatency);
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -44,7 +44,7 @@ auto controller = input->stream().reader(AcqReader::ReadMode::LowLatency);
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 690"
 AcqReaderOptions gating;
@@ -59,7 +59,7 @@ auto controller = input->stream().reader(AcqReader::ReadMode::LowLatency);
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 108"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 107"
 // fiff:// replays a raw file as a source in its native format, with the trigger channel's changes as events.
 registerFiffScheme();                                                                // keeps a static link from dropping the backend
 auto replay = AcqDevice::open(AcqUri{"fiff", path, {{"realtime", "0"}}}.toString()); // as fast as possible

@@ -36,7 +36,7 @@
 // NAMESPACE SPEC
 //=============================================================================================================
 
-using namespace EVENTSLIB;
+using namespace mne::analyze::events;
 
 //=============================================================================================================
 // LOCAL DEFINITIONS
@@ -49,7 +49,7 @@ using namespace EVENTSLIB;
 static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER_V2");
 static const std::string defaultGroupName("external");
 
-int EVENTSINTERNAL::EventSharedMemManager::m_iLastUpdateIndex(0);
+int detail::EventSharedMemManager::m_iLastUpdateIndex(0);
 
 // The limiting factor in the bandwitdh of the shared memory capabilities of this library
 // is measured in terms of buffer length divided by the time interval between checks for updates.
@@ -60,21 +60,21 @@ static long long defatult_timerBufferWatch(200);
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventUpdate::EventUpdate()
+detail::EventUpdate::EventUpdate()
 : EventUpdate(0, 0, EventUpdateType::NULL_EVENT)
 {
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventUpdate::EventUpdate(int sample, int creator, EventUpdateType t)
+detail::EventUpdate::EventUpdate(int sample, int creator, EventUpdateType t)
 : EventUpdate(sample, 0, 1, creator, t)
 {
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventUpdate::EventUpdate(int sample, int duration, int eventCode, int creator, EventUpdateType t)
+detail::EventUpdate::EventUpdate(int sample, int duration, int eventCode, int creator, EventUpdateType t)
 : m_EventSample(sample)
 , m_EventDuration(duration < 0 ? 0 : duration)
 , m_EventCode(eventCode)
@@ -86,63 +86,63 @@ EVENTSINTERNAL::EventUpdate::EventUpdate(int sample, int duration, int eventCode
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventUpdate::getDuration() const
+int detail::EventUpdate::getDuration() const
 {
     return m_EventDuration;
 }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventUpdate::getEventCode() const
+int detail::EventUpdate::getEventCode() const
 {
     return m_EventCode;
 }
 
 //=============================================================================================================
 
-long long EVENTSINTERNAL::EventUpdate::getCreationTime() const
+long long detail::EventUpdate::getCreationTime() const
 {
     return m_CreationTime;
 }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventUpdate::getSample() const
+int detail::EventUpdate::getSample() const
 {
     return m_EventSample;
 }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventUpdate::getCreatorId() const
+int detail::EventUpdate::getCreatorId() const
 {
     return m_CreatorId;
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventUpdateType EVENTSINTERNAL::EventUpdate::getType() const
+detail::EventUpdateType detail::EventUpdate::getType() const
 {
     return m_TypeOfUpdate;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventUpdate::setType(EventUpdateType t)
+void detail::EventUpdate::setType(EventUpdateType t)
 {
     m_TypeOfUpdate = t;
 }
 
 //=============================================================================================================
 
-std::string EVENTSINTERNAL::EventUpdate::eventTypeToText()
+std::string detail::EventUpdate::eventTypeToText()
 {
-    return EVENTSINTERNAL::EventUpdateTypeString[m_TypeOfUpdate];
+    return detail::EventUpdateTypeString[m_TypeOfUpdate];
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
+detail::EventSharedMemManager::EventSharedMemManager(mne::analyze::events::EventManager* parent)
 : m_pEventManager(parent)
 , m_SharedMemory(QString::fromStdString(defaultSharedMemoryBufferKey))
 , m_IsInit(false)
@@ -157,20 +157,20 @@ EVENTSINTERNAL::EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventMan
 , m_LocalBuffer(bufferLength)
 , m_SharedBuffer(nullptr)
 , m_Id(generateId())
-, m_Mode(EVENTSLIB::SharedMemoryMode::READ)
+, m_Mode(mne::analyze::events::SharedMemoryMode::READ)
 {
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventSharedMemManager::~EventSharedMemManager()
+detail::EventSharedMemManager::~EventSharedMemManager()
 {
     detachFromSharedMemory();
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
+void detail::EventSharedMemManager::init(mne::analyze::events::SharedMemoryMode mode)
 {
     //    qDebug() << " ========================================================";
     //    qDebug() << "Init started!\n";
@@ -179,13 +179,13 @@ void EVENTSINTERNAL::EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mod
         detachFromSharedMemory();
 
         m_Mode = mode;
-        if (m_Mode == EVENTSLIB::SharedMemoryMode::READ) {
+        if (m_Mode == mne::analyze::events::SharedMemoryMode::READ) {
             attachToSharedSegment(QSharedMemory::AccessMode::ReadOnly);
             launchSharedMemoryWatcherThread();
 
-        } else if (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE) {
+        } else if (m_Mode == mne::analyze::events::SharedMemoryMode::WRITE) {
             attachToOrCreateSharedSegment(QSharedMemory::AccessMode::ReadWrite);
-        } else if (m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE) {
+        } else if (m_Mode == mne::analyze::events::SharedMemoryMode::READWRITE) {
             attachToOrCreateSharedSegment(QSharedMemory::AccessMode::ReadWrite);
             launchSharedMemoryWatcherThread();
         }
@@ -194,7 +194,7 @@ void EVENTSINTERNAL::EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mod
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode)
+void detail::EventSharedMemManager::attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode)
 {
     attachToSharedSegment(mode);
     if (!m_IsInit) {
@@ -204,7 +204,7 @@ void EVENTSINTERNAL::EventSharedMemManager::attachToOrCreateSharedSegment(QShare
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode)
+void detail::EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode)
 {
     m_IsInit = m_SharedMemory.attach(mode);
     if (m_IsInit) {
@@ -214,7 +214,7 @@ void EVENTSINTERNAL::EventSharedMemManager::attachToSharedSegment(QSharedMemory:
 
 //=============================================================================================================
 
-bool EVENTSINTERNAL::EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode)
+bool detail::EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode)
 {
     bool output = m_SharedMemory.create(bufferSize, mode);
     if (output) {
@@ -226,14 +226,14 @@ bool EVENTSINTERNAL::EventSharedMemManager::createSharedSegment(int bufferSize, 
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::launchSharedMemoryWatcherThread()
+void detail::EventSharedMemManager::launchSharedMemoryWatcherThread()
 {
     m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::detachFromSharedMemory()
+void detail::EventSharedMemManager::detachFromSharedMemory()
 {
     stopSharedMemoryWatcherThread();
     if (!m_BufferWatcherThreadRunning && !m_WritingToSharedMemory) {
@@ -245,7 +245,7 @@ void EVENTSINTERNAL::EventSharedMemManager::detachFromSharedMemory()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::stopSharedMemoryWatcherThread()
+void detail::EventSharedMemManager::stopSharedMemoryWatcherThread()
 {
     if (m_BufferWatcherThreadRunning) {
         m_IsInit = false;
@@ -255,7 +255,7 @@ void EVENTSINTERNAL::EventSharedMemManager::stopSharedMemoryWatcherThread()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::stop()
+void detail::EventSharedMemManager::stop()
 {
     detachFromSharedMemory();
     m_IsInit = false;
@@ -263,25 +263,25 @@ void EVENTSINTERNAL::EventSharedMemManager::stop()
 
 //=============================================================================================================
 
-bool EVENTSINTERNAL::EventSharedMemManager::isInit() const
+bool detail::EventSharedMemManager::isInit() const
 {
     return m_IsInit;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::addEvent(int sample)
+void detail::EventSharedMemManager::addEvent(int sample)
 {
     addEvent(sample, 0, 1);
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::addEvent(int sample, int duration, int eventCode)
+void detail::EventSharedMemManager::addEvent(int sample, int duration, int eventCode)
 {
     if (m_IsInit &&
-        (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE ||
-         m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE)) {
+        (m_Mode == mne::analyze::events::SharedMemoryMode::WRITE ||
+         m_Mode == mne::analyze::events::SharedMemoryMode::READWRITE)) {
         EventUpdate newUpdate(sample, duration, eventCode, m_Id, EventUpdateType::NEW_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
@@ -289,11 +289,11 @@ void EVENTSINTERNAL::EventSharedMemManager::addEvent(int sample, int duration, i
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::deleteEvent(int sample)
+void detail::EventSharedMemManager::deleteEvent(int sample)
 {
     if (m_IsInit &&
-        (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE ||
-         m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE)) {
+        (m_Mode == mne::analyze::events::SharedMemoryMode::WRITE ||
+         m_Mode == mne::analyze::events::SharedMemoryMode::READWRITE)) {
         EventUpdate newUpdate(sample, m_Id, EventUpdateType::DELETE_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
@@ -301,7 +301,7 @@ void EVENTSINTERNAL::EventSharedMemManager::deleteEvent(int sample)
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::initializeSharedMemory()
+void detail::EventSharedMemManager::initializeSharedMemory()
 {
     //    qDebug() << "Initializing Shared Memory Buffer ========  id: " << m_Id;
     //    printLocalBuffer();
@@ -320,7 +320,7 @@ void EVENTSINTERNAL::EventSharedMemManager::initializeSharedMemory()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
+void detail::EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
 {
     //    qDebug() << "Sending Buffer ========  id: " << m_Id;
 
@@ -340,7 +340,7 @@ void EVENTSINTERNAL::EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpd
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::copySharedMemoryToLocalBuffer()
+void detail::EventSharedMemManager::copySharedMemoryToLocalBuffer()
 {
     void* localBuffer = static_cast<void*>(m_LocalBuffer.data());
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
@@ -355,7 +355,7 @@ void EVENTSINTERNAL::EventSharedMemManager::copySharedMemoryToLocalBuffer()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::bufferWatcher()
+void detail::EventSharedMemManager::bufferWatcher()
 {
     m_BufferWatcherThreadRunning = true;
     //    qDebug() << "buffer Watcher thread launched";
@@ -372,7 +372,7 @@ void EVENTSINTERNAL::EventSharedMemManager::bufferWatcher()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::processLocalBuffer()
+void detail::EventSharedMemManager::processLocalBuffer()
 {
     for (int i = 0; i < bufferLength; ++i) {
         //        qDebug() << "Checking update: " << i;
@@ -386,7 +386,7 @@ void EVENTSINTERNAL::EventSharedMemManager::processLocalBuffer()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::processEvent(const EventUpdate& ne)
+void detail::EventSharedMemManager::processEvent(const EventUpdate& ne)
 {
     //    qDebug() << "process new update";
     switch (ne.getType()) {
@@ -405,9 +405,9 @@ void EVENTSINTERNAL::EventSharedMemManager::processEvent(const EventUpdate& ne)
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::processNewEvent(const EventUpdate& ne)
+void detail::EventSharedMemManager::processNewEvent(const EventUpdate& ne)
 {
-    EVENTSINTERNAL::EventINT newEvent(
+    detail::EventINT newEvent(
         m_pEventManager->generateNewEventId(), ne.getSample(), m_GroupId);
 
     // Carry the range and the condition across as well, otherwise an
@@ -421,7 +421,7 @@ void EVENTSINTERNAL::EventSharedMemManager::processNewEvent(const EventUpdate& n
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::processDeleteEvent(const EventUpdate& ne)
+void detail::EventSharedMemManager::processDeleteEvent(const EventUpdate& ne)
 {
     auto eventsInSample = m_pEventManager->getEventsInSample(ne.getSample());
     for (auto& e : *eventsInSample) {
@@ -434,7 +434,7 @@ void EVENTSINTERNAL::EventSharedMemManager::processDeleteEvent(const EventUpdate
 
 //=============================================================================================================
 
-long long EVENTSINTERNAL::EventSharedMemManager::getTimeNow()
+long long detail::EventSharedMemManager::getTimeNow()
 {
     const auto tNow = std::chrono::system_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -444,10 +444,10 @@ long long EVENTSINTERNAL::EventSharedMemManager::getTimeNow()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::createGroupIfNeeded()
+void detail::EventSharedMemManager::createGroupIfNeeded()
 {
     if (!m_bGroupCreated) {
-        EVENTSLIB::EventGroup g = m_pEventManager->addGroup(m_sGroupName);
+        mne::analyze::events::EventGroup g = m_pEventManager->addGroup(m_sGroupName);
         m_GroupId = g.id;
         m_bGroupCreated = true;
     }
@@ -455,7 +455,7 @@ void EVENTSINTERNAL::EventSharedMemManager::createGroupIfNeeded()
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventSharedMemManager::printLocalBuffer()
+void detail::EventSharedMemManager::printLocalBuffer()
 {
     for (int i = 0; i < bufferLength; ++i) {
         qDebug() << "[" << i << "] -" << m_LocalBuffer[i].eventTypeToText().c_str()

@@ -1,18 +1,18 @@
 ---
 id: fiff-device-info
-title: "FIFFLIB::FiffDeviceInfo"
+title: "mne::FiffDeviceInfo"
 sidebar_label: FiffDeviceInfo
 sidebar_position: 39
 ---
 
 # FiffDeviceInfo
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_info.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_info.h)
 
 `#include <fiff/fiff_info.h>`
 
 ```cpp
-struct FIFFLIB::FiffDeviceInfo
+struct mne::FiffDeviceInfo
 ```
 
 The acquisition device of a measurement (FIFFB_DEVICE), the counterpart of info["device_info"] in MNE-Python.
@@ -50,7 +50,7 @@ std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_s
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 100"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 99"
 FiffRawData raw(QString::fromStdString(path).toStdString());
 const FiffDeviceInfo& recorded = raw.info.device_info; // backend, device and source id of the recording
 std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_str(), raw.info.nchan,

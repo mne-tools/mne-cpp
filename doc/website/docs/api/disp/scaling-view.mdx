@@ -1,23 +1,23 @@
 ---
 id: scaling-view
-title: "DISPLIB::ScalingView"
+title: "mne::disp::ScalingView"
 sidebar_label: ScalingView
 sidebar_position: 55
 ---
 
 # ScalingView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/scalingview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/scalingview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/scalingview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/scalingview.h)
 
 `#include <disp/scalingview.h>`
 
 ```cpp
-class DISPLIB::ScalingView
+class mne::disp::ScalingView
 ```
 
 Per-modality y-scale spinbox panel built from [`ScaleControl`](/docs/api/disp/scale-control) widgets.
 
-One [`ScaleControl`](/docs/api/disp/scale-control) per channel modality in the active `FiffInfo`; edits are emitted as `scalingChanged` maps consumed by [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view), [`ChannelDataView`](/docs/api/disp/channel-data-view) and [`ButterflyView`](/docs/api/disp/butterfly-view).
+One [`ScaleControl`](/docs/api/disp/scale-control) per channel modality in the active [`FiffInfo`](/docs/api/fiff/fiff-info); edits are emitted as `scalingChanged` maps consumed by [`RtFiffRawView`](/docs/api/disp/rt-fiff-raw-view), [`ChannelDataView`](/docs/api/disp/channel-data-view) and [`ButterflyView`](/docs/api/disp/butterfly-view).
 
 ### Inheritance
 

@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Hands finished FIFF recordings from one application to another through a shared directory.
  *
- * The producer (e.g. MNE Scan's file writer) calls @ref FIFFLIB::FiffFileSharer::copy_realtime_file, which copies
+ * The producer (e.g. MNE Scan's file writer) calls @ref mne::FiffFileSharer::copy_realtime_file, which copies
  * a recording into the shared directory as @c realtime_file<N>_raw.fif and closes its raw block so it is a complete
- * FIFF file. The consumer (e.g. MNE Analyze) calls @ref FIFFLIB::FiffFileSharer::new_files whenever it is told the
+ * FIFF file. The consumer (e.g. MNE Analyze) calls @ref mne::FiffFileSharer::new_files whenever it is told the
  * directory changed, for instance by a file system watcher.
  */
 
@@ -30,10 +30,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -63,7 +63,7 @@ public:
      *
      * @return The shared file, or an Io error if the directory cannot be made or the source cannot be copied.
      */
-    [[nodiscard]] BASELIB::Expected<std::filesystem::path> copy_realtime_file(const std::filesystem::path& source);
+    [[nodiscard]] mne::Expected<std::filesystem::path> copy_realtime_file(const std::filesystem::path& source);
 
     //=========================================================================================================
     /**
@@ -89,6 +89,6 @@ private:
     std::filesystem::path m_directory;
     int m_next = 0; /**< Index of the next file to share (producer) or to report (consumer). */
 };
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_FILE_SHARER_H

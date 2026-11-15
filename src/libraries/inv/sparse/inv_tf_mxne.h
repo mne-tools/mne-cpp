@@ -9,7 +9,7 @@
  * @date     May 2026
  * @brief    Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver — joint L21 + L1 sparsity in a Gabor time-frequency dictionary.
  *
- * @ref INVLIB::InvTfMxne implements the TF-MxNE solver of Gramfort
+ * @ref mne::InvTfMxne implements the TF-MxNE solver of Gramfort
  * et al., @em Time-Frequency Mixed-Norm Estimates: Sparse M/EEG imaging
  * with non-stationary source activations, NeuroImage 70, 410-422
  * (2013). It solves
@@ -20,7 +20,7 @@
  * enforces temporal sparsity (focal activations in time-frequency).
  * Equivalent to mne-python's
  * @c mne.inverse_sparse.tf_mixed_norm. The accompanying
- * @ref INVLIB::InvTfMxneParams struct exposes the Gabor frequency range,
+ * @ref mne::InvTfMxneParams struct exposes the Gabor frequency range,
  * spatial / temporal regularisation, debias flag and convergence
  * controls.
  */
@@ -49,10 +49,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -136,6 +136,6 @@ public:
                                                 double dSFreq);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_TF_MXNE_H

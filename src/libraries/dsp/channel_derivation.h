@@ -46,10 +46,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -88,7 +88,7 @@ public:
      *
      * @return Vector of DerivationRule, e.g. LH1-LH2 (+1·LH1, −1·LH2), LH2-LH3, RA1-RA2.
      */
-    static std::vector<DerivationRule> buildBipolar(const BASELIB::StringList& channelNames);
+    static std::vector<DerivationRule> buildBipolar(const mne::StringList& channelNames);
 
     /**
      * @brief Build common-average reference derivation rules.
@@ -100,7 +100,7 @@ public:
      *
      * @return Vector of DerivationRule, one per input channel.
      */
-    static std::vector<DerivationRule> buildCommonAverage(const BASELIB::StringList& channelNames);
+    static std::vector<DerivationRule> buildCommonAverage(const mne::StringList& channelNames);
 
     /**
      * @brief Apply derivation rules to a data matrix.
@@ -112,13 +112,13 @@ public:
      * @return A pair of (derived data matrix, derived channel names).
      *         The output matrix has n_rules rows × n_times columns.
      */
-    static std::pair<Eigen::MatrixXd, BASELIB::StringList> apply(
+    static std::pair<Eigen::MatrixXd, mne::StringList> apply(
         const Eigen::MatrixXd& matData,
-        const BASELIB::StringList& channelNames,
+        const mne::StringList& channelNames,
         const std::vector<DerivationRule>& rules);
 
     /**
-     * @brief Read derivation rules from an MNE-C derivation text file (MNELIB::MNEDerivSet::readText).
+     * @brief Read derivation rules from an MNE-C derivation text file (mne::MNEDerivSet::readText).
      *
      * @code
      * # comment
@@ -143,6 +143,6 @@ public:
     static bool writeDefinitionFile(const std::filesystem::path& path, const std::vector<DerivationRule>& rules);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // CHANNEL_DERIVATION_H

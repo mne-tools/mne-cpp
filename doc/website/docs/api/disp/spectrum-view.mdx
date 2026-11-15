@@ -1,18 +1,18 @@
 ---
 id: spectrum-view
-title: "DISPLIB::SpectrumView"
+title: "mne::disp::SpectrumView"
 sidebar_label: SpectrumView
 sidebar_position: 60
 ---
 
 # SpectrumView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/spectrumview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/spectrumview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/spectrumview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/spectrumview.h)
 
 `#include <disp/spectrumview.h>`
 
 ```cpp
-class DISPLIB::SpectrumView
+class mne::disp::SpectrumView
 ```
 
 Per-channel frequency-spectrum heat-map QTableView (rows = channels, columns = freq bins).
@@ -56,12 +56,12 @@ Destroys the [`ArtifactSettingsView`](/docs/api/disp/artifact-settings-view).
 
 ### init(info, iScaleType)
 
-Initializes the view based on the [FiffInfo](/docs/api/fiff/fiff-info) and scale type.
+Initializes the view based on the [`FiffInfo`](/docs/api/fiff/fiff-info) and scale type.
 
 **Parameters:**
 
 - **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
-  The FiffInfo.
+  The [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 - **iScaleType** : *int*
   The scale type.

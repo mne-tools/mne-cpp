@@ -46,9 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -66,7 +64,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     QElapsedTimer timer0, timer1, timer2, timer3, timer4;
@@ -120,7 +118,7 @@ int main(int argc, char* argv[])
 
     // store calculated forward solution
     timer2.start();
-    if (auto written = pFwdSolution->write(BASELIB::pathFromUtf8(pSettings->solname)); !written) {
+    if (auto written = pFwdSolution->write(mne::pathFromUtf8(pSettings->solname)); !written) {
         qCritical() << written.error().what();
         return 1;
     }
@@ -128,7 +126,7 @@ int main(int argc, char* argv[])
 
     // read back to verify round-trip
     timer3.start();
-    auto pFwdRead = std::make_shared<MNEForwardSolution>(BASELIB::pathFromUtf8(pSettings->solname));
+    auto pFwdRead = std::make_shared<MNEForwardSolution>(mne::pathFromUtf8(pSettings->solname));
     fTime3 = timer3.elapsed();
 
     // update head position and recompute

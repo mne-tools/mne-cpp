@@ -9,9 +9,9 @@
  * @date     February 2026
  * @brief    High-level digitization data: dig points plus the device→head transform and fitting metadata that together define a coregistration source.
  *
- * Where @ref FIFFLIB::FiffDigPointSet is a flat point list, @ref FIFFLIB::FiffDigitizerData
+ * Where @ref mne::FiffDigPointSet is a flat point list, @ref mne::FiffDigitizerData
  * is the registration-ready view: the dig points themselves, the
- * device→head @ref FIFFLIB::FiffCoordTrans recovered from HPI fits, the per-coil
+ * device→head @ref mne::FiffCoordTrans recovered from HPI fits, the per-coil
  * goodness of fit, and any comments that travelled with the block. It is
  * the structure the coregistration tooling persists into
  * ``-dig.fif`` / ``-fiducials.fif`` files and the structure that the
@@ -41,10 +41,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -67,7 +67,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the digitizer data of a FIFF file like read(); throws BASELIB::Error if it cannot.
+     * Reads the digitizer data of a FIFF file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The FIFF file.
      */
@@ -83,7 +83,7 @@ public:
      * @return The data, or why the file cannot be read: Io if it cannot be opened, NotFound if it
      *         holds no digitizer points.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigitizerData> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffDigitizerData> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**

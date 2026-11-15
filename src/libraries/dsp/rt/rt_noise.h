@@ -19,7 +19,7 @@
  * emits the PSD result back on the GUI thread.
  *
  * This estimate is what feeds the live noise-spectrum display and provides
- * a sanity-check companion to @ref DSPLIB::RtCov whenever a quick frequency-domain
+ * a sanity-check companion to @ref mne::RtCov whenever a quick frequency-domain
  * view of the noise floor is more informative than the full channel–channel
  * covariance matrix.
  */
@@ -49,10 +49,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -75,7 +75,7 @@ public:
      * @param[in] iDataLength   Number of blocks to accumulate before computing the spectrum.
      */
     explicit RtNoiseWorker(qint32 iFftLength,
-                           const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo,
+                           const std::shared_ptr<mne::FiffInfo>& pFiffInfo,
                            qint32 iDataLength);
 
     //=========================================================================================================
@@ -131,7 +131,7 @@ public:
      * @param[in] parent        Parent QObject (optional).
      */
     explicit RtNoise(qint32 iFftLength,
-                     const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo,
+                     const std::shared_ptr<mne::FiffInfo>& pFiffInfo,
                      qint32 iDataLength,
                      QObject* parent = nullptr);
 

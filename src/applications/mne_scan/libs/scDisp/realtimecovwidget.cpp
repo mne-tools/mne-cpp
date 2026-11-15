@@ -46,10 +46,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -94,7 +93,7 @@ RealTimeCovWidget::~RealTimeCovWidget()
 
 //=============================================================================================================
 
-void RealTimeCovWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RealTimeCovWidget::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     m_pRTC = qSharedPointerDynamicCast<RealTimeCov>(pMeasurement);
 
@@ -132,8 +131,8 @@ void RealTimeCovWidget::initDisplayControllWidgets()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        DISPLIB::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
-                                                                                             QString("MNESCAN/RTCW"));
+        mne::disp::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
+                                                                                               QString("MNESCAN/RTCW"));
         pModalitySelectionWidget->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionWidget);
 
@@ -157,7 +156,7 @@ void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool>& modali
         m_qListSelChannel.clear();
 
         for (qint32 i = 0; i < static_cast<qint32>(chNames.size()); ++i) {
-            int unit = m_pFiffInfo->chs.at(BASELIB::indexOf(m_pFiffInfo->ch_names, chNames.at(i))).unit;
+            int unit = m_pFiffInfo->chs.at(mne::indexOf(m_pFiffInfo->ch_names, chNames.at(i))).unit;
 
             if (unit == FIFF_UNIT_T && modalityMap["MAG"]) {
                 m_qListSelChannel.append(i);

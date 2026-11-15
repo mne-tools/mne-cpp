@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Sparse variant of @ref MNELIB::MNENamedMatrix, i.e. a sparse matrix with row and column name lists.
+ * @brief    Sparse variant of @ref mne::MNENamedMatrix, i.e. a sparse matrix with row and column name lists.
  *
  * Stored in a @c FIFFB_MNE_NAMED_MATRIX block like its dense counterpart;
- * MNE-C uses it for channel derivations (@ref MNELIB::MNEDerivSet).
+ * MNE-C uses it for channel derivations (@ref mne::MNEDerivSet).
  */
 
 #ifndef MNE_SPARSE_NAMED_MATRIX_H
@@ -32,10 +32,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 /**
@@ -59,8 +59,8 @@ public:
      *
      * @return The matrix, or nullptr if it is missing or its name lists do not fit.
      */
-    static std::unique_ptr<MNESparseNamedMatrix> read(FIFFLIB::FiffStream& stream,
-                                                      const std::shared_ptr<FIFFLIB::FiffDirNode>& node,
+    static std::unique_ptr<MNESparseNamedMatrix> read(mne::FiffStream& stream,
+                                                      const std::shared_ptr<mne::FiffDirNode>& node,
                                                       int kind);
 
     //=========================================================================================================
@@ -70,7 +70,7 @@ public:
      * @param[in] stream   A FIFF stream open for writing.
      * @param[in] kind     The tag for the sparse matrix.
      */
-    void write(FIFFLIB::FiffStream& stream, int kind) const;
+    void write(mne::FiffStream& stream, int kind) const;
 
     //=========================================================================================================
     /**
@@ -90,11 +90,11 @@ public:
         return data.cols();
     }
 
-    StringList rowlist;             /**< Name list for the rows. */
-    StringList collist;             /**< Name list for the columns. */
-    FIFFLIB::FiffSparseMatrix data; /**< The data itself (sparse). */
+    StringList rowlist;         /**< Name list for the rows. */
+    StringList collist;         /**< Name list for the columns. */
+    mne::FiffSparseMatrix data; /**< The data itself (sparse). */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_SPARSE_NAMED_MATRIX_H

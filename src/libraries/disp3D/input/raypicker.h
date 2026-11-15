@@ -12,11 +12,11 @@
  * RayPicker unprojects the current mouse position through the
  * active camera into a world-space ray and tests it against every
  * selectable scene primitive: per-triangle Moller-Trumbore against
- * @ref DISP3DLIB::BrainSurface meshes, per-arrow segment / cylinder for
- * @ref DISP3DLIB::DipoleObject and ECoG electrodes, and per-sphere for
+ * @ref mne::disp::BrainSurface meshes, per-arrow segment / cylinder for
+ * @ref mne::disp::DipoleObject and ECoG electrodes, and per-sphere for
  * source-space points and digitizer fiducials.
  *
- * The closest hit is returned as a @ref DISP3DLIB::RayHit that names the
+ * The closest hit is returned as a @ref mne::disp::RayHit that names the
  * object, the triangle / instance index and the world-space
  * intersection point &mdash; enough for the surrounding GUI to
  * highlight a region, show a tooltip, or seed an interactive label.
@@ -42,7 +42,7 @@
 
 #include <memory>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -148,6 +148,6 @@ public:
                               const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // RAYPICKER_H

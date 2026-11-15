@@ -49,10 +49,8 @@
 //=============================================================================================================
 
 using namespace MNEPROCESSRAWAPP;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

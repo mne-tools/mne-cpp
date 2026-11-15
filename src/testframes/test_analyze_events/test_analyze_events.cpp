@@ -39,7 +39,7 @@
 #include <vector>
 
 using namespace EVENTSPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 
@@ -86,9 +86,9 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     QVERIFY(events);
 
     // The trigger panel: STI014, threshold 1, Detect
-    DISPLIB::TriggerDetectionView* view = nullptr;
+    mne::disp::TriggerDetectionView* view = nullptr;
     for (QWidget* w : QApplication::topLevelWidgets()) {
-        if (auto* v = qobject_cast<DISPLIB::TriggerDetectionView*>(w))
+        if (auto* v = qobject_cast<mne::disp::TriggerDetectionView*>(w))
             view = v;
     }
     QVERIFY(view);

@@ -38,17 +38,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffDigitizerData;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -97,7 +97,7 @@ public:
      *
      * @param[in] pFiffInfo     Info to init from.
      */
-    void initFromFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void initFromFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ public:
      *
      * @return the reference to the orig FiffInfo.
      */
-    inline std::shared_ptr<FIFFLIB::FiffInfo> info();
+    inline std::shared_ptr<mne::FiffInfo> info();
 
     //=========================================================================================================
     /**
@@ -169,7 +169,7 @@ public:
      *
      * @return the current set digitizer data
      */
-    inline std::shared_ptr<FIFFLIB::FiffDigitizerData> digitizerData();
+    inline std::shared_ptr<mne::FiffDigitizerData> digitizerData();
 
     //=========================================================================================================
     /**
@@ -209,13 +209,13 @@ public:
      *
      * @param[in] digData   digitizer data from measurment
      */
-    void setDigitizerData(std::shared_ptr<FIFFLIB::FiffDigitizerData> digData);
+    void setDigitizerData(std::shared_ptr<mne::FiffDigitizerData> digData);
 
 private:
     mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo_orig;                   /**< Original Fiff Info if initialized by fiff info. */
-    std::shared_ptr<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData_orig; /**< Original Fiff Digitizer Data */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo_orig;                   /**< Original Fiff Info if initialized by fiff info. */
+    std::shared_ptr<mne::FiffDigitizerData> m_pFiffDigitizerData_orig; /**< Original Fiff Digitizer Data */
 
     QString m_sXMLLayoutFile;            /**< Layout file name. */
     float m_fSamplingRate;               /**< Sampling rate of the RealTimeSampleArray.*/
@@ -294,13 +294,13 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
 
 //=============================================================================================================
 
-inline std::shared_ptr<FIFFLIB::FiffInfo> RealTimeMultiSampleArray::info()
+inline std::shared_ptr<mne::FiffInfo> RealTimeMultiSampleArray::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
 }
 
-inline std::shared_ptr<FIFFLIB::FiffDigitizerData> RealTimeMultiSampleArray::digitizerData()
+inline std::shared_ptr<mne::FiffDigitizerData> RealTimeMultiSampleArray::digitizerData()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffDigitizerData_orig;

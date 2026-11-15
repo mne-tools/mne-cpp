@@ -1,18 +1,18 @@
 ---
 id: lof-bad-channel-params
-title: "DSPLIB::LofBadChannelParams"
+title: "mne::LofBadChannelParams"
 sidebar_label: LofBadChannelParams
 sidebar_position: 55
 ---
 
 # LofBadChannelParams
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channels_lof.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channels_lof.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channels_lof.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channels_lof.h)
 
 `#include <dsp/bad_channels_lof.h>`
 
 ```cpp
-struct DSPLIB::LofBadChannelParams
+struct mne::LofBadChannelParams
 ```
 
 Parameters for LOF bad channel detection.
@@ -42,7 +42,7 @@ const VectorXd lofScores = computeLofScores(features, 3);
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 161"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 159"
 LofBadChannelParams lofParams;
 lofParams.iNNeighbors = 4;
 lofParams.bEegOnly = true;

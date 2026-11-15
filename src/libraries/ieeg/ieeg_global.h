@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    IEEGLIB shared-library export macro and build-info accessors for the intracranial EEG library.
+ * @brief    mne_ieeg shared-library export macro and build-info accessors for the intracranial EEG library.
  *
- * IEEGLIB holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and
+ * mne_ieeg holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and
  * grids: the implantation (contacts grouped into leads), bipolar re-referencing along the leads,
  * and the mapping of contact values onto the cortical surface.
  */
@@ -45,12 +45,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace IEEGLIB
- * @brief     Intracranial EEG (sEEG, ECoG): implantation, bipolar referencing, cortical mapping.
- */
-namespace IEEGLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -77,6 +72,6 @@ IEEGSHARED_EXPORT const char* buildHash();
  */
 IEEGSHARED_EXPORT const char* buildHashLong();
 
-} // namespace IEEGLIB
+} // namespace mne
 
 #endif // IEEG_GLOBAL_H

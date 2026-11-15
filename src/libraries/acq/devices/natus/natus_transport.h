@@ -32,10 +32,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Floats before the samples of a datagram. */
@@ -89,6 +89,6 @@ std::unique_ptr<NatusTransport> make_natus_simulator(const NatusSimulation& simu
  */
 AcqExpected<std::unique_ptr<NatusTransport>> open_natus_receiver(const std::string& address, std::uint16_t port);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // NATUS_TRANSPORT_H

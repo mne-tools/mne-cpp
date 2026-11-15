@@ -40,7 +40,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ChannelSelectionView;
 class ChannelInfoModel;
@@ -48,25 +48,25 @@ class RtFiffRawView;
 class ChannelDataViewNew;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ public:
      *
      * @param[in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -147,19 +147,19 @@ private:
     void onHideBadChannels();
 
 private:
-    QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> m_pRTMSA; /**< The real-time sample array measurement. */
+    QSharedPointer<mne::scan::RealTimeMultiSampleArray> m_pRTMSA; /**< The real-time sample array measurement. */
 
-    std::shared_ptr<DISPLIB::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
-    std::shared_ptr<DISPLIB::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
-    std::shared_ptr<DISPLIB::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
-    QPointer<DISPLIB::RtFiffRawView> m_pChannelDataView;                    /**< the QTableView being part of the model/view framework of Qt. */
+    std::shared_ptr<mne::disp::QuickControlView> m_pQuickControlView;         /**< quick control widget. */
+    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< channel info model. */
+    std::shared_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< ChannelSelectionView. */
+    QPointer<mne::disp::RtFiffRawView> m_pChannelDataView;                    /**< the QTableView being part of the model/view framework of Qt. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
 
     QPointer<QAction> m_pActionHideBad; /**< Hide bad channels. */
 
     qint32 m_iMaxFilterTapSize; /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 };
-} // NAMESPACE SCDISPLIB
+} // NAMESPACE mne::scan
 
 #endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

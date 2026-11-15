@@ -41,7 +41,7 @@
 #include <vector>
 
 using namespace MNEBROWSE;
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {
@@ -378,7 +378,7 @@ QString formatTimestampFromUsecs(qint64 usecsSinceEpoch)
 
 AnnotationModel::AnnotationModel(QObject* parent)
 : QAbstractTableModel(parent)
-, m_pFiffInfo(new FIFFLIB::FiffInfo)
+, m_pFiffInfo(new mne::FiffInfo)
 {
 }
 
@@ -578,7 +578,7 @@ bool AnnotationModel::removeRows(int position, int rows, const QModelIndex& pare
 
 //=============================================================================================================
 
-void AnnotationModel::setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo)
+void AnnotationModel::setFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }
@@ -845,13 +845,13 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
 
 bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 {
-    FIFFLIB::FiffStream stream(qFile.fileName().toStdU16String());
+    mne::FiffStream stream(qFile.fileName().toStdU16String());
     if (!stream.open()) {
         qWarning() << "AnnotationModel: could not open annotation fif" << qFile.fileName();
         return false;
     }
 
-    const std::vector<std::shared_ptr<FIFFLIB::FiffDirNode>> annotationBlocks =
+    const std::vector<std::shared_ptr<mne::FiffDirNode>> annotationBlocks =
         stream.dirtree()->dir_tree_find(FiffBlockMneAnnotations);
 
     if (annotationBlocks.empty()) {
@@ -869,7 +869,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 
     for (int entryIndex = 0; entryIndex < annotationBlocks.front()->nent(); ++entryIndex) {
         const auto& directoryEntry = annotationBlocks.front()->dir.at(entryIndex);
-        std::optional<FIFFLIB::FiffTag> tag;
+        std::optional<mne::FiffTag> tag;
         if (tag = stream.read_tag(directoryEntry.pos); !tag) {
             continue;
         }
@@ -1244,7 +1244,7 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
 
 bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 {
-    auto stream = FIFFLIB::FiffStream::start_file(std::filesystem::path(qFile.fileName().toStdU16String()));
+    auto stream = mne::FiffStream::start_file(std::filesystem::path(qFile.fileName().toStdU16String()));
     if (!stream) {
         qWarning() << "AnnotationModel: could not write annotation fif" << qFile.fileName();
         return false;

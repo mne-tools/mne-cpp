@@ -9,13 +9,13 @@
  * @date     March 2026
  * @brief    Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
  *
- * @ref INVLIB::InvMinimumNorm wraps an @c MNELIB::MNEInverseOperator
+ * @ref mne::InvMinimumNorm wraps an @c mne::MNEInverseOperator
  * and turns it into a runnable inverse pipeline. The class can compute
  * the regularised L2 minimum-norm estimate, the dSPM noise-normalised
  * estimate (Dale et al., Neuron 26, 55-67, 2000), the sLORETA estimate
  * (Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12,
  * 2002) and the iterative eLORETA estimate (Pascual-Marqui, 2007) from
- * either an @c FiffEvoked or a raw data matrix. @ref INVLIB::InvMinimumNorm::doInverseSetup "doInverseSetup"
+ * either an @c FiffEvoked or a raw data matrix. @ref mne::InvMinimumNorm::doInverseSetup "doInverseSetup"
  * re-prepares the operator for a given number of averages and assembles
  * the kernel matrix once, after which @c calculateInverse becomes a
  * single dense matmul per input epoch.
@@ -45,10 +45,10 @@
 
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -82,7 +82,7 @@ public:
      * @param[in] lambda             The regularization factor.
      * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA").
      */
-    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator& p_inverseOperator, float lambda, std::string_view method);
+    explicit InvMinimumNorm(const mne::MNEInverseOperator& p_inverseOperator, float lambda, std::string_view method);
 
     //=========================================================================================================
     /**
@@ -93,7 +93,7 @@ public:
      * @param[in] dSPM               Compute the noise-normalization factors for dSPM?.
      * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?.
      */
-    explicit InvMinimumNorm(const MNELIB::MNEInverseOperator& p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
+    explicit InvMinimumNorm(const mne::MNEInverseOperator& p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
 
     virtual ~InvMinimumNorm()
     {
@@ -110,7 +110,7 @@ public:
      *
      * @return the calculated source estimation.
      */
-    virtual InvSourceEstimate calculateInverse(const FIFFLIB::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
+    virtual InvSourceEstimate calculateInverse(const mne::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
 
     virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
 
@@ -118,14 +118,14 @@ public:
     /**
      * Sets the inverse up for the evoked data and computes their MNE data: eigenfield projections,
      * SNR and lambda2 per time point and the predicted data (MNE-C @c mne_analyze; see
-     * @ref MNELIB::MNEMneData::compute).
+     * @ref mne::MNEMneData::compute).
      *
      * @param[in] p_fiffEvoked   Evoked data.
      * @param[in] snr            Power SNR for a fixed lambda2, <= 0 to use the estimated lambda2 per time point.
      *
      * @return The MNE data; empty if the channels do not match the inverse operator.
      */
-    MNELIB::MNEMneData mneData(const FIFFLIB::FiffEvoked& p_fiffEvoked, double snr = 0.0);
+    mne::MNEMneData mneData(const mne::FiffEvoked& p_fiffEvoked, double snr = 0.0);
 
     //=========================================================================================================
     /**
@@ -151,7 +151,7 @@ public:
      *
      * @return the source space corresponding to this inverse operator.
      */
-    virtual const MNELIB::MNESourceSpaces& getSourceSpace() const;
+    virtual const mne::MNESourceSpaces& getSourceSpace() const;
 
     //=========================================================================================================
     /**
@@ -159,7 +159,7 @@ public:
      *
      * @return the prepared inverse operator.
      */
-    inline MNELIB::MNEInverseOperator& getPreparedInverseOperator();
+    inline mne::MNEInverseOperator& getPreparedInverseOperator();
 
     //=========================================================================================================
     /**
@@ -218,12 +218,12 @@ private:
      */
     void computeELoreta();
 
-    MNELIB::MNEInverseOperator m_inverseOperator; /**< The inverse operator. */
-    float m_fLambda;                              /**< Regularization parameter. */
-    std::string m_sMethod;                        /**< Selected method. */
-    bool m_bsLORETA;                              /**< Do sLORETA method. */
-    bool m_bdSPM;                                 /**< Do dSPM method. */
-    bool m_beLoreta;                              /**< Do eLORETA method. */
+    mne::MNEInverseOperator m_inverseOperator; /**< The inverse operator. */
+    float m_fLambda;                           /**< Regularization parameter. */
+    std::string m_sMethod;                     /**< Selected method. */
+    bool m_bsLORETA;                           /**< Do sLORETA method. */
+    bool m_bdSPM;                              /**< Do dSPM method. */
+    bool m_beLoreta;                           /**< Do eLORETA method. */
 
     // eLORETA parameters
     int m_iELoretaMaxIter;     /**< eLORETA max iterations. */
@@ -231,10 +231,10 @@ private:
     bool m_bELoretaForceEqual; /**< eLORETA uniform orientation weights. */
 
     bool inverseSetup;                      /**< Inverse Setup Calculated. */
-    MNELIB::MNEInverseOperator inv;         /**< The setup inverse operator. */
+    mne::MNEInverseOperator inv;            /**< The setup inverse operator. */
     Eigen::SparseMatrix<double> noise_norm; /**< The noise normalization. */
     std::vector<Eigen::VectorXi> vertno;    /**< The vertices numbers. */
-    FSLIB::FsLabel label;                   /**< The corresponding labels. */
+    mne::FsLabel label;                     /**< The corresponding labels. */
     Eigen::MatrixXd K;                      /**< Imaging kernel. */
 };
 
@@ -249,7 +249,7 @@ inline Eigen::MatrixXd& InvMinimumNorm::getKernel()
 
 //=============================================================================================================
 
-inline MNELIB::MNEInverseOperator& InvMinimumNorm::getPreparedInverseOperator()
+inline mne::MNEInverseOperator& InvMinimumNorm::getPreparedInverseOperator()
 {
     return inv;
 }

@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -457,7 +457,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = m_pEvokedSetModel->getKind(row);
-    float fMaxValue = DISPLIB::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(row));
+    float fMaxValue = mne::disp::getScalingValue(m_scaleMap, kind, m_pEvokedSetModel->getUnit(row));
     bool bIsBad = m_pEvokedSetModel->getIsChannelBad(row);
 
     if (bIsBad) {
@@ -480,7 +480,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     float fDx = static_cast<float>(this->width() - 2) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()) - 1.0f); //((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
 
-    QList<DISPLIB::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<QList<DISPLIB::AvrTypeRowVector>>();
+    QList<mne::disp::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<QList<mne::disp::AvrTypeRowVector>>();
 
     //Do for all average types
     for (int j = 0; j < rowVec.size(); ++j) {

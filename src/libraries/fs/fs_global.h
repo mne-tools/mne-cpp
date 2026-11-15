@@ -10,10 +10,10 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2012
- * @brief    Export/import macros and build-info accessors for the FSLIB FreeSurfer I/O library.
+ * @brief    Export/import macros and build-info accessors for the mne_fs FreeSurfer I/O library.
  *
  * Defines the @c FSSHARED_EXPORT visibility macro used by every public
- * class in FSLIB so the library can be built either as a shared
+ * class in mne_fs so the library can be built either as a shared
  * library (default) or as a static archive under @c STATICBUILD without
  * source changes. Also exposes the small set of build-info accessors
  * (date/time, abbreviated git hash, full git hash) that downstream
@@ -47,20 +47,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace FSLIB
- * @brief     FreeSurfer surface, annotation and parcellation I/O for mne-cpp.
- *
- * Houses the readers and in-memory containers for the on-surface side of
- * a FreeSurfer @c recon-all output tree: triangular cortical surfaces
- * (@c lh.pial, @c rh.white, @c lh.inflated, …), per-vertex annotation
- * files (@c lh.aparc.annot, …), the FreeSurferColorLUT-style colour
- * lookup tables they embed, surface labels (@c .label) and the
- * companion lookup against volumetric parcellations
- * (@c aparc+aseg.mgz). The volumetric MRI side lives in MRILIB.
- */
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================

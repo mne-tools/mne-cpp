@@ -1,18 +1,18 @@
 ---
 id: mri-vol-data
-title: "MRILIB::MriVolData"
+title: "mne::MriVolData"
 sidebar_label: MriVolData
 sidebar_position: 6
 ---
 
 # MriVolData
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_vol_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_vol_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_vol_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_vol_data.h)
 
 `#include <mri/mri_vol_data.h>`
 
 ```cpp
-class MRILIB::MriVolData
+class mne::MriVolData
 ```
 
 Format-agnostic 3D MRI volume: header geometry, voxel buffer (as a vector of [`MriSlice`](/docs/api/mri/mri-slice)), scan parameters and provenance.
@@ -147,7 +147,7 @@ Identical to `computeVox2Ras()` but forces c_ras = (0,0,0), producing the coordi
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 94"
+````cpp title="src/examples/ex_mri/main.cpp, line 93"
 MriVolData mgh;
 std::vector<FiffCoordTrans> extraTransforms; // e.g. Talairach, if the footer names one
 MriMghIO::read((dataDir + "/gradient.mgz").toStdString(), mgh, extraTransforms);

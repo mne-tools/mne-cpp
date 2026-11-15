@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Commands and constants of the FieldTrip buffer protocol. */
@@ -131,6 +131,6 @@ std::unique_ptr<FtBufferTransport> make_ftbuffer_simulator(const FtBufferSimulat
  */
 AcqExpected<std::unique_ptr<FtBufferTransport>> connect_ftbuffer(const std::string& host, std::uint16_t port, std::chrono::milliseconds timeout);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // FTBUFFER_TRANSPORT_H

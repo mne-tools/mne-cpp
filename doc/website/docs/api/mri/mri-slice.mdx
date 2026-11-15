@@ -1,18 +1,18 @@
 ---
 id: mri-slice
-title: "MRILIB::MriSlice"
+title: "mne::MriSlice"
 sidebar_label: MriSlice
 sidebar_position: 7
 ---
 
 # MriSlice
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_vol_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_vol_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_vol_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_vol_data.h)
 
 `#include <mri/mri_vol_data.h>`
 
 ```cpp
-struct MRILIB::MriSlice
+struct mne::MriSlice
 ```
 
 Single 2D MRI slice (pixels + slice→RAS transform) used as the volume's storage unit.
@@ -48,7 +48,7 @@ Default constructor.
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 141"
+````cpp title="src/examples/ex_mri/main.cpp, line 140"
 std::vector<MriSlice> corSlices;
 MriCorIO::read(corDir.toStdString(), corSlices);
 ok &= expect(corSlices.size() == 256 && corSlices[7].pixels.size() == 256 * 256 && corSlices[7].pixels[0] == 7,

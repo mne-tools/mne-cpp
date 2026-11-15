@@ -30,10 +30,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -182,6 +182,6 @@ struct AcqSampleTraits<std::complex<float>>
 };
 /// @endcond
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_SAMPLE_FORMAT_H

@@ -30,8 +30,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -387,7 +387,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::vector<std::string>> ACQLIB::detail::list_gusbamp_units()
+AcqExpected<std::vector<std::string>> mne::detail::list_gusbamp_units()
 {
     auto api = loadApi();
     if (!api) {
@@ -410,7 +410,7 @@ AcqExpected<std::vector<std::string>> ACQLIB::detail::list_gusbamp_units()
 
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<GusbampTransport>> ACQLIB::detail::open_gusbamp_driver(std::span<const std::string> serials)
+AcqExpected<std::unique_ptr<GusbampTransport>> mne::detail::open_gusbamp_driver(std::span<const std::string> serials)
 {
     auto api = loadApi();
     if (!api) {

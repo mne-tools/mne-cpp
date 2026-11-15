@@ -1,18 +1,18 @@
 ---
 id: mri-nifti-io
-title: "MRILIB::MriNiftiIO"
+title: "mne::MriNiftiIO"
 sidebar_label: MriNiftiIO
 sidebar_position: 4
 ---
 
 # MriNiftiIO
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_nifti_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_nifti_io.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_nifti_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_nifti_io.h)
 
 `#include <mri/mri_nifti_io.h>`
 
 ```cpp
-class MRILIB::MriNiftiIO
+class mne::MriNiftiIO
 ```
 
 Stateless decoder for NIfTI-1 single-file volumes (.nii and .nii.gz).
@@ -83,7 +83,7 @@ Exposed for direct use by tests; `read` calls it transparently when the input pa
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 115"
+````cpp title="src/examples/ex_mri/main.cpp, line 114"
 MriVolData direct;
 MriNiftiIO::read((dataDir + "/gradient.nii.gz").toStdString(), direct);
 ok &= expect(direct.voxelDataAsFloat() == voxels, "MriNiftiIO::read equals MriVolData::read");

@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Legacy MNE-C raw-recording container with per-file buffer descriptors.
  *
- * @ref MNELIB::MNERawData mirrors @c mneRawDataRec: it pairs an
- * @ref FIFFLIB::FiffInfo with the list of @ref MNELIB::MNERawBufDef entries that
+ * @ref mne::MNERawData mirrors @c mneRawDataRec: it pairs an
+ * @ref mne::FiffInfo with the list of @ref mne::MNERawBufDef entries that
  * describe the on-disk layout of @c FIFF_DATA_BUFFER blocks of a @c
  * -raw.fif file. It is the data source used by the C-ported routines in
  * @c mne_browse_raw / @c mne_make_movie. New code should prefer
- * @ref FIFFLIB::FiffRawData; this class exists for round-trip parity.
+ * @ref mne::FiffRawData; this class exists for round-trip parity.
  */
 
 #ifndef MNERAWDATA_H
@@ -56,10 +56,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -237,41 +237,41 @@ public:
     int attachDerivations(const MNEDerivSet& derivations, bool keepPrevious = false);
 
 public:
-    std::string filename;                            /**< Path to the raw FIFF file. */
-    std::unique_ptr<FIFFLIB::FiffStream> stream;     /**< Open FIFF stream for reading. */
-    std::unique_ptr<MNELIB::MNERawInfo> info;        /**< Raw data information loaded using MNE routines. */
-    StringList ch_names;                             /**< Channel names as a flat list. */
-    StringList badlist;                              /**< Bad channel names. */
-    Eigen::VectorXi bad;                             /**< Boolean array marking bad channels (0 = good, 1 = bad). */
-    std::vector<MNELIB::MNERawBufDef> bufs;          /**< Raw data buffer definitions. */
-    std::vector<MNELIB::MNERawBufDef> filt_bufs;     /**< Filtered data buffer definitions. */
-    int first_samp;                                  /**< First sample index in the file. */
-    int omit_samp;                                   /**< Number of skip samples omitted from the beginning. */
-    int first_samp_old;                              /**< First sample index (old-version compatible value). */
-    int omit_samp_old;                               /**< Omitted samples (old-version compatible value). */
-    int nsamp;                                       /**< Total number of samples in the file. */
-    Eigen::VectorXf first_sample_val;                /**< Values at the first sample (for DC offset correction before filtering). */
-    std::unique_ptr<MNELIB::MNEProjOp> proj;         /**< SSP projection operator. */
-    std::unique_ptr<MNELIB::MNESssData> sss;         /**< SSS data found in this file. */
-    std::unique_ptr<MNELIB::MNECTFCompDataSet> comp; /**< CTF compensation data. */
-    int comp_file;                                   /**< Compensation grade stored in the file. */
-    int comp_now;                                    /**< Current compensation grade applied to data. */
-    std::unique_ptr<MNEFilterDef> filter;            /**< Filter definition (highpass/lowpass). */
-    std::unique_ptr<FilterData> filter_data;         /**< Pre-computed frequency-domain filter state. */
-    std::unique_ptr<MNEEventList> event_list;        /**< Trigger event list. */
-    unsigned int max_event;                          /**< Maximum event number in use. */
-    std::string dig_trigger;                         /**< Name of the digital trigger channel. */
-    unsigned int dig_trigger_mask;                   /**< Bit mask applied to digital trigger channel. */
-    Eigen::VectorXf offsets;                         /**< DC offset corrections for display. */
-    std::unique_ptr<RingBuffer> ring;                /**< Ring buffer for raw data. */
-    std::unique_ptr<RingBuffer> filt_ring;           /**< Ring buffer for filtered data. */
-    std::unique_ptr<MNELIB::MNEDerivSet> deriv;      /**< Derivation data definitions. */
-    std::unique_ptr<MNELIB::MNEDeriv> deriv_matched; /**< Derivation data matched to this raw data. */
+    std::string filename;                         /**< Path to the raw FIFF file. */
+    std::unique_ptr<mne::FiffStream> stream;      /**< Open FIFF stream for reading. */
+    std::unique_ptr<mne::MNERawInfo> info;        /**< Raw data information loaded using MNE routines. */
+    StringList ch_names;                          /**< Channel names as a flat list. */
+    StringList badlist;                           /**< Bad channel names. */
+    Eigen::VectorXi bad;                          /**< Boolean array marking bad channels (0 = good, 1 = bad). */
+    std::vector<mne::MNERawBufDef> bufs;          /**< Raw data buffer definitions. */
+    std::vector<mne::MNERawBufDef> filt_bufs;     /**< Filtered data buffer definitions. */
+    int first_samp;                               /**< First sample index in the file. */
+    int omit_samp;                                /**< Number of skip samples omitted from the beginning. */
+    int first_samp_old;                           /**< First sample index (old-version compatible value). */
+    int omit_samp_old;                            /**< Omitted samples (old-version compatible value). */
+    int nsamp;                                    /**< Total number of samples in the file. */
+    Eigen::VectorXf first_sample_val;             /**< Values at the first sample (for DC offset correction before filtering). */
+    std::unique_ptr<mne::MNEProjOp> proj;         /**< SSP projection operator. */
+    std::unique_ptr<mne::MNESssData> sss;         /**< SSS data found in this file. */
+    std::unique_ptr<mne::MNECTFCompDataSet> comp; /**< CTF compensation data. */
+    int comp_file;                                /**< Compensation grade stored in the file. */
+    int comp_now;                                 /**< Current compensation grade applied to data. */
+    std::unique_ptr<MNEFilterDef> filter;         /**< Filter definition (highpass/lowpass). */
+    std::unique_ptr<FilterData> filter_data;      /**< Pre-computed frequency-domain filter state. */
+    std::unique_ptr<MNEEventList> event_list;     /**< Trigger event list. */
+    unsigned int max_event;                       /**< Maximum event number in use. */
+    std::string dig_trigger;                      /**< Name of the digital trigger channel. */
+    unsigned int dig_trigger_mask;                /**< Bit mask applied to digital trigger channel. */
+    Eigen::VectorXf offsets;                      /**< DC offset corrections for display. */
+    std::unique_ptr<RingBuffer> ring;             /**< Ring buffer for raw data. */
+    std::unique_ptr<RingBuffer> filt_ring;        /**< Ring buffer for filtered data. */
+    std::unique_ptr<mne::MNEDerivSet> deriv;      /**< Derivation data definitions. */
+    std::unique_ptr<mne::MNEDeriv> deriv_matched; /**< Derivation data matched to this raw data. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNERAWDATA_H

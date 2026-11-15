@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COMLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace

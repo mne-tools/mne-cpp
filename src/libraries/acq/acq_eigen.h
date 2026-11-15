@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Optional header-only Eigen adapters for ACQLIB: zero-copy maps, read() and write() with Eigen matrices.
+ * @brief    Optional header-only Eigen adapters for mne_acq: zero-copy maps, read() and write() with Eigen matrices.
  *
- * ACQLIB itself depends only on the C++20 standard library. Code that uses Eigen includes this header
+ * mne_acq itself depends only on the C++20 standard library. Code that uses Eigen includes this header
  * (and provides Eigen's include path); nothing here is compiled into the library.
  */
 
@@ -31,10 +31,10 @@
 #include <type_traits>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 /** Strided read-only channels x samples map of one part of a view. */
@@ -144,6 +144,6 @@ template<typename T>
     return result;
 }
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_EIGEN_H

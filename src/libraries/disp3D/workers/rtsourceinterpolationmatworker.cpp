@@ -22,7 +22,7 @@
 
 #include <QDebug>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // MEMBER METHODS
@@ -88,7 +88,7 @@ void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
-                                                           const std::vector<FSLIB::FsLabel>& lLabels,
+                                                           const std::vector<mne::FsLabel>& lLabels,
                                                            const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.empty()) {
@@ -113,7 +113,7 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
-                                                            const std::vector<FSLIB::FsLabel>& lLabels,
+                                                            const std::vector<mne::FsLabel>& lLabels,
                                                             const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.empty()) {
@@ -201,7 +201,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     int visType;
 
     // FsAnnotation data snapshots
-    std::vector<FSLIB::FsLabel> labelsLh, labelsRh;
+    std::vector<mne::FsLabel> labelsLh, labelsRh;
     QMap<qint32, qint32> mapLabelIdSrcLh, mapLabelIdSrcRh;
     QList<int> vertNosLh, vertNosRh;
     bool annotLhInit, annotRhInit;
@@ -308,7 +308,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 //=============================================================================================================
 
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
-    const std::vector<FSLIB::FsLabel>& lLabels,
+    const std::vector<mne::FsLabel>& lLabels,
     const QMap<qint32, qint32>& mapLabelIdSrc,
     const QList<int>& vertNos,
     int nVertices)
@@ -322,7 +322,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < std::ssize(lLabels); ++i) {
-        const FSLIB::FsLabel& label = lLabels.at(i);
+        const mne::FsLabel& label = lLabels.at(i);
         QList<qint32> listSourcesVertNoLabel = mapLabelIdSrc.keys(label.label_id);
 
         for (int j = 0; j < label.vertices.rows(); ++j) {

@@ -50,8 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -142,7 +141,7 @@ void TestHpiFit::initTestCase()
 
     //set columns of matrix to zero depending on bad channels indexes
     for (qint32 j = 0; j < static_cast<int>(infoTemp.bads.size()); ++j) {
-        m_matProjectors.col(BASELIB::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
+        m_matProjectors.col(mne::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
     }
 }
 

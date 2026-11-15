@@ -48,25 +48,25 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 namespace
 {
 
 QString qpath(const std::filesystem::path& path)
 {
-    return QString::fromStdString(BASELIB::utf8FromPath(path));
+    return QString::fromStdString(mne::utf8FromPath(path));
 }
 
 std::filesystem::path stdpath(const QString& path)
 {
-    return BASELIB::pathFromUtf8(path.toStdString());
+    return mne::pathFromUtf8(path.toStdString());
 }
 
-BASELIB::JsonObject readJsonObject(const std::filesystem::path& path)
+mne::JsonObject readJsonObject(const std::filesystem::path& path)
 {
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
-    return text ? BASELIB::JsonDocument::from_json(*text).object() : BASELIB::JsonObject();
+    const mne::Expected<std::string> text = mne::read_text_file(path);
+    return text ? mne::JsonDocument::from_json(*text).object() : mne::JsonObject();
 }
 
 } // namespace
@@ -149,7 +149,7 @@ private slots:
 
 std::filesystem::path TestBids::dataPath() const
 {
-    return BASELIB::executable_dir().parent_path() / "resources" / "data" / "mne-cpp-test-data";
+    return mne::executable_dir().parent_path() / "resources" / "data" / "mne-cpp-test-data";
 }
 
 std::filesystem::path TestBids::bidsRoot() const
@@ -165,7 +165,7 @@ void TestBids::initTestCase()
 {
     // Verify fixture data exists
     QVERIFY2(std::filesystem::is_directory(bidsRoot()),
-             qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + BASELIB::utf8FromPath(bidsRoot()))));
+             qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + mne::utf8FromPath(bidsRoot()))));
     QVERIFY(std::filesystem::exists(bidsRoot() / "dataset_description.json"));
 }
 
@@ -190,7 +190,7 @@ void TestBids::testPathConstruction()
 
     // filePath should exist on disk
     QVERIFY2(path.exists(),
-             qPrintable(QString::fromStdString("Expected file not found: " + BASELIB::utf8FromPath(path.file_path()))));
+             qPrintable(QString::fromStdString("Expected file not found: " + mne::utf8FromPath(path.file_path()))));
 }
 
 void TestBids::testPathSidecarDerivation()
@@ -287,23 +287,23 @@ void TestBids::testElectrodesReadTsv()
     QVERIFY(electrodes[0].x != "n/a");
 
     // Check a known position
-    float x = static_cast<float>(*BASELIB::toDouble(electrodes[0].x));
+    float x = static_cast<float>(*mne::toDouble(electrodes[0].x));
     QVERIFY(std::abs(x - (-0.0254f)) < 0.001f);
 
     // As digitizer points: n/a positions are skipped; without a transform the frame is unknown,
     // with one the points are moved into its target frame
     electrodes[1].y = "n/a";
-    const FIFFLIB::FiffDigPointSet plain = BidsElectrode::to_fiff_dig_points(electrodes);
+    const mne::FiffDigPointSet plain = BidsElectrode::to_fiff_dig_points(electrodes);
     QCOMPARE(plain.size(), std::size_t{9});
     QCOMPARE(plain[1].ident, 2);
     QCOMPARE(plain[0].kind, FIFFV_POINT_EEG);
     QCOMPARE(plain[0].coord_frame, FIFFV_COORD_UNKNOWN);
     QCOMPARE(plain[0].r[0], x);
-    FIFFLIB::FiffCoordTrans shift;
+    mne::FiffCoordTrans shift;
     shift.from = FIFFV_COORD_MRI;
     shift.to = FIFFV_COORD_HEAD;
     shift.trans(0, 3) = 0.5f;
-    const FIFFLIB::FiffDigPointSet moved = BidsElectrode::to_fiff_dig_points(electrodes, shift);
+    const mne::FiffDigPointSet moved = BidsElectrode::to_fiff_dig_points(electrodes, shift);
     QCOMPARE(moved[0].coord_frame, FIFFV_COORD_HEAD);
     QCOMPARE(moved[0].r[0], x + 0.5f);
 }
@@ -454,7 +454,7 @@ void TestBids::testReadBrainVision()
     QVERIFY(std::abs(data.raw.info.sfreq - 1000.0f) < 1.0f);
 
     // Bad channels: P4 marked bad in channels.tsv
-    QVERIFY(BASELIB::contains(data.raw.info.bads, "P4"));
+    QVERIFY(mne::contains(data.raw.info.bads, "P4"));
     QCOMPARE(data.raw.info.bads.size(), 1);
 
     // mne.io.read_raw_brainvision: meas_date 2013-11-13 16:14:03.794232 UTC from the New Segment marker
@@ -514,7 +514,7 @@ void TestBids::testReadEdf()
     QVERIFY(std::abs(data.raw.info.sfreq - 128.0f) < 1.0f);
 
     // Bad channels: EEG O1 marked bad in channels.tsv (EDF uses full label)
-    QVERIFY(BASELIB::contains(data.raw.info.bads, "EEG O1"));
+    QVERIFY(mne::contains(data.raw.info.bads, "EEG O1"));
 
     // As mne_bids.read_raw_bids: 25 channels, 128 Hz, bads ['EEG O1'], annotations start, stimulus, response
     QCOMPARE(data.events.size(), std::size_t{3});
@@ -580,11 +580,11 @@ void TestBids::testReadEdf()
     // Like mne read_raw_edf: unrecognised labels are EEG; "Status" is an unscaled stim channel
     EDFReader reduced;
     QVERIFY(reduced.open(dataPath() / "EEG/test_reduced.edf"));
-    const FIFFLIB::FiffInfo reducedInfo = reduced.info();
-    const int a4 = BASELIB::indexOf(reducedInfo.ch_names, "A4");
-    const int status = BASELIB::indexOf(reducedInfo.ch_names, "Status");
+    const mne::FiffInfo reducedInfo = reduced.info();
+    const int a4 = mne::indexOf(reducedInfo.ch_names, "A4");
+    const int status = mne::indexOf(reducedInfo.ch_names, "Status");
     QVERIFY(a4 < 0 && status >= 0); // A4 is sampled below the highest rate
-    const int a10 = BASELIB::indexOf(reducedInfo.ch_names, "A10");
+    const int a10 = mne::indexOf(reducedInfo.ch_names, "A10");
     QCOMPARE(reducedInfo.chs[a10].kind, FIFFV_EEG_CH);
     QCOMPARE(reducedInfo.chs[a10].unit, FIFF_UNIT_V);
     QCOMPARE(reducedInfo.chs[status].kind, FIFFV_STIM_CH);
@@ -683,7 +683,7 @@ void TestBids::testWriteRoundTrip()
     for (const BidsElectrode& before : original.electrodes) {
         auto after = std::find_if(readBack.electrodes.cbegin(), readBack.electrodes.cend(),
                                   [&](const BidsElectrode& e) { return e.name == before.name; });
-        QVERIFY2(after != readBack.electrodes.cend() && std::abs(*BASELIB::toDouble(after->z) - *BASELIB::toDouble(before.z)) < 1e-6, before.name.c_str());
+        QVERIFY2(after != readBack.electrodes.cend() && std::abs(*mne::toDouble(after->z) - *mne::toDouble(before.z)) < 1e-6, before.name.c_str());
     }
 
     // Without overwrite, existing sidecars are left alone and the write is refused
@@ -718,7 +718,7 @@ void TestBids::testWriteRoundTrip()
     QCOMPARE(edfBack.events.size(), std::size_t{3});
     QCOMPARE(edfBack.events[1].trialType, std::string("visual"));
     QCOMPARE(edfBack.events[2].trialType, std::string("response"));
-    QVERIFY(BASELIB::contains(edfBack.raw.info.bads, "EEG O1"));
+    QVERIFY(mne::contains(edfBack.raw.info.bads, "EEG O1"));
 
     // channels.tsv units other than volts, as mne_bids.read_raw_bids: known ones set the unit, unknown ones keep it
     QFile channelsTsv(qpath(edfDst.channels_tsv_path().file_path()));
@@ -816,7 +816,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
         QCOMPARE(reader.sfreq(), 500.0f);
         QCOMPARE(reader.sample_count(), 4L);
         QCOMPARE(reader.to_fiff_raw_data().last_samp, 3);
-        const FIFFLIB::FiffInfo info = reader.info();
+        const mne::FiffInfo info = reader.info();
         QCOMPARE(info.ch_names.back(), std::string("A,B"));
         for (int k = 0; k < 6; ++k) {
             QVERIFY2(info.chs[k].kind == kinds[k], info.ch_names[k].c_str());
@@ -867,7 +867,7 @@ void TestBids::testBrainVisionReaderVariants()
         BrainVisionChannelInfo ch;
         ch.name = name.toStdString();
         ch.unit = unit.toStdString();
-        const FIFFLIB::FiffChInfo info = ch.to_fiff_ch_info();
+        const mne::FiffChInfo info = ch.to_fiff_ch_info();
         QVERIFY2(info.kind == kind && info.unit_mul == mul, qPrintable(name));
         QCOMPARE(info.unit, unit == "C" ? FIFF_UNIT_NONE : FIFF_UNIT_V);
     }
@@ -949,7 +949,7 @@ void TestBids::testBrainVisionReaderVariants()
         eeg.close();
         BrainVisionReader reader;
         QVERIFY(reader.open(stdpath(vhdr.fileName())));
-        const FIFFLIB::FiffInfo info = reader.info();
+        const mne::FiffInfo info = reader.info();
         QCOMPARE(info.ch_names, (std::vector<std::string>{"Fp\xC3\xBC", expected}));
         QCOMPARE(info.chs[0].kind, FIFFV_EEG_CH);
         QCOMPARE(reader.channel_infos()[0].unit, std::string("\xC2\xB5V"));
@@ -989,13 +989,13 @@ void TestBids::testWriteSidecarsPerDatatype()
 {
     // MEG, EEG and iEEG sidecars carry their own REQUIRED keys (BIDS 1.9; mne-bids writes the same for MEG).
     BidsRawData data;
-    FIFFLIB::FiffInfo& info = data.raw.info;
+    mne::FiffInfo& info = data.raw.info;
     info.sfreq = 1000.0f;
     info.linefreq = -1.0f; // unknown
     for (const auto& [name, kind, unit] : {std::tuple{"MEG 001", FIFFV_MEG_CH, FIFF_UNIT_T},
                                            std::tuple{"EEG 001", FIFFV_EEG_CH, FIFF_UNIT_V},
                                            std::tuple{"STI 101", FIFFV_STIM_CH, FIFF_UNIT_NONE}}) {
-        FIFFLIB::FiffChInfo ch;
+        mne::FiffChInfo ch;
         ch.ch_name = name;
         ch.kind = kind;
         ch.unit = unit;
@@ -1015,7 +1015,7 @@ void TestBids::testWriteSidecarsPerDatatype()
 
     const BIDSPath meg(stdpath(dir.path()), "01", {}, "rest", "meg", "meg", ".fif");
     QVERIFY(data.write(meg, {}, opts) == meg);
-    const BASELIB::JsonObject megJson = sidecar(meg.sidecar_json_path());
+    const mne::JsonObject megJson = sidecar(meg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "DewarPosition", "SoftwareFilters",
                             "DigitizedLandmarks", "DigitizedHeadPoints"}) {
         QVERIFY2(megJson.contains(key), key);
@@ -1028,7 +1028,7 @@ void TestBids::testWriteSidecarsPerDatatype()
     QVERIFY(!megJson.contains("ECOGChannelCount"));
     // An EEG channel without a position gives no electrodes.tsv; MEG always has its coordinate system.
     QVERIFY(!meg.electrodes_tsv_path().exists());
-    const BASELIB::JsonObject megCoords = sidecar(meg.coordsystem_json_path());
+    const mne::JsonObject megCoords = sidecar(meg.coordsystem_json_path());
     QCOMPARE(megCoords.value("MEGCoordinateSystem").to_std_string(), std::string("Other"));
     QCOMPARE(megCoords.value("MEGCoordinateUnits").to_std_string(), std::string("m"));
     QVERIFY(megCoords.contains("MEGCoordinateSystemDescription"));
@@ -1036,7 +1036,7 @@ void TestBids::testWriteSidecarsPerDatatype()
     const BIDSPath eeg(stdpath(dir.path()), "02", {}, "rest", "eeg", "eeg", ".edf");
     info.chs[1].chpos.r0 = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
     QVERIFY(data.write(eeg, {}, opts) == eeg);
-    const BASELIB::JsonObject eegJson = sidecar(eeg.sidecar_json_path());
+    const mne::JsonObject eegJson = sidecar(eeg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "SoftwareFilters", "EEGReference"}) {
         QVERIFY2(eegJson.contains(key), key);
     }
@@ -1047,7 +1047,7 @@ void TestBids::testWriteSidecarsPerDatatype()
 
     const BIDSPath ieeg(stdpath(dir.path()), "03", {}, "rest", "ieeg", "ieeg", ".edf");
     QVERIFY(data.write(ieeg, {}, opts) == ieeg);
-    const BASELIB::JsonObject ieegJson = sidecar(ieeg.sidecar_json_path());
+    const mne::JsonObject ieegJson = sidecar(ieeg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "SoftwareFilters", "iEEGReference"}) {
         QVERIFY2(ieegJson.contains(key), key);
     }
@@ -1060,14 +1060,14 @@ void TestBids::testWriteFromInfoAndReadRejects()
 {
     // Sidecars written from an in-memory recording: one channel of every BIDS type, filters and metadata
     BidsRawData data;
-    FIFFLIB::FiffInfo& info = data.raw.info;
+    mne::FiffInfo& info = data.raw.info;
     info.sfreq = 256.0f;
     info.highpass = 0.5f;
     info.lowpass = 100.0f;
     info.linefreq = 60.0f;
     const QList<std::pair<QString, int>> chans = {{"E1", FIFFV_EEG_CH}, {"G1", FIFFV_ECOG_CH}, {"S1", FIFFV_SEEG_CH}, {"D1", FIFFV_DBS_CH}, {"EOG", FIFFV_EOG_CH}, {"ECG", FIFFV_ECG_CH}, {"EMG", FIFFV_EMG_CH}, {"MISC", FIFFV_MISC_CH}, {"RESP", FIFFV_RESP_CH}, {"TRG", FIFFV_STIM_CH}, {"MEG", FIFFV_MEG_CH}, {"ODD", 9999}};
     for (const auto& [name, kind] : chans) {
-        FIFFLIB::FiffChInfo ch;
+        mne::FiffChInfo ch;
         ch.ch_name = name.toStdString();
         ch.kind = kind;
         ch.unit = FIFF_UNIT_V;
@@ -1080,7 +1080,7 @@ void TestBids::testWriteFromInfoAndReadRejects()
     // S1 and D1 have no position at all
     info.chs[1].chpos.r0 = Eigen::Vector3f(0.25f, 0.5f, 0.125f);
     for (const auto& [ident, r] : {std::pair{1, Eigen::Vector3f(0.1f, 0.2f, 0.3f)}, std::pair{2, Eigen::Vector3f(NAN, 0.0f, 0.0f)}}) {
-        FIFFLIB::FiffDigPoint dp;
+        mne::FiffDigPoint dp;
         dp.kind = FIFFV_POINT_EEG;
         dp.ident = ident;
         dp.coord_frame = FIFFV_COORD_HEAD;
@@ -1117,7 +1117,7 @@ void TestBids::testWriteFromInfoAndReadRejects()
     QCOMPARE(electrodes[2].x, std::string("n/a"));
     QCOMPARE(BidsCoordinateSystem::read_json(path.coordsystem_json_path().file_path()).system, std::string("CapTrak"));
 
-    const BASELIB::JsonObject json = readJsonObject(path.sidecar_json_path().file_path());
+    const mne::JsonObject json = readJsonObject(path.sidecar_json_path().file_path());
     for (const char* key : {"ECOGChannelCount", "SEEGChannelCount", "DBSChannelCount", "EEGChannelCount", "EOGChannelCount",
                             "ECGChannelCount", "EMGChannelCount", "MiscChannelCount", "TriggerChannelCount"})
         QVERIFY2(json.value(key).to_int() == 1, key);
@@ -1133,9 +1133,9 @@ void TestBids::testWriteFromInfoAndReadRejects()
     QVERIFY(!BidsRawData::read(BIDSPath(stdpath(dir.path()), "05", "01", "rest", "ieeg", "ieeg", {})).is_valid());
     QVERIFY(!BidsRawData::read(path).is_valid());
     const BIDSPath odd(stdpath(dir.path()), "05", "01", "rest", "ieeg", "ieeg", ".xyz");
-    QVERIFY(BASELIB::write_text_file(odd.file_path(), {}).has_value());
+    QVERIFY(mne::write_text_file(odd.file_path(), {}).has_value());
     QVERIFY(!BidsRawData::read(odd).is_valid());
-    QVERIFY(BASELIB::write_text_file(path.file_path(), {}).has_value());
+    QVERIFY(mne::write_text_file(path.file_path(), {}).has_value());
     QVERIFY(!BidsRawData::read(path).is_valid());
 
     // An EDF stored with an upper-case extension is found from the lower-case path
@@ -1210,7 +1210,7 @@ void TestBids::testPathSettersGetters()
         std::vector<std::string> out;
         out.reserve(paths.size());
         for (const BIDSPath& p : paths) {
-            out.push_back(BASELIB::join({p.subject(), p.session(), p.task(), p.run(), p.datatype(), p.suffix(), p.extension()}, "|"));
+            out.push_back(mne::join({p.subject(), p.session(), p.task(), p.run(), p.datatype(), p.suffix(), p.extension()}, "|"));
         }
         return out;
     };
@@ -1280,11 +1280,11 @@ void TestBids::testPathEquality()
 
 void TestBids::testBidsGlobalBuildInfo()
 {
-    const char* dt = BIDSLIB::buildDateTime();
+    const char* dt = mne::buildDateTime();
     QVERIFY(dt != nullptr);
-    const char* h = BIDSLIB::buildHash();
+    const char* h = mne::buildHash();
     QVERIFY(h != nullptr);
-    const char* hl = BIDSLIB::buildHashLong();
+    const char* hl = mne::buildHashLong();
     QVERIFY(hl != nullptr);
 }
 

@@ -42,10 +42,7 @@
 #include <fwd/fwd_eeg_sphere_model_set.h>
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FWDLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -67,7 +64,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;

@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    Out-of-line definitions for the BASELIB build-info accessors declared in @ref base_global.h.
+ * @brief    Out-of-line definitions for the mne_base build-info accessors declared in @ref base_global.h.
  *
  * Kept as a separate translation unit so the @c __DATE__ and
  * @c __TIME__ macros are expanded when this file is compiled
@@ -29,21 +29,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* BASELIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* BASELIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* BASELIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

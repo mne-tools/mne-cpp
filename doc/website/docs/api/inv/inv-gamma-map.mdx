@@ -1,13 +1,13 @@
 ---
 id: inv-gamma-map
-title: "INVLIB::InvGammaMap"
+title: "mne::InvGammaMap"
 sidebar_label: InvGammaMap
 sidebar_position: 9
 ---
 
 # InvGammaMap
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_gamma_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_gamma_map.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_gamma_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_gamma_map.h)
 
 :::info[Python equivalent]
 `mne.inverse_sparse.gamma_map` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 9
 <Connections topics={["sparse-inverse"]} context="api" current="InvGammaMap" />
 
 ```cpp
-class INVLIB::InvGammaMap
+class mne::InvGammaMap
 ```
 
 Gamma-MAP sparse inverse solver (Sparse Bayesian Learning).
@@ -79,7 +79,7 @@ Compute the Gamma-MAP inverse solution.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 248"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 245"
 // Gamma-MAP: sparse Bayesian learning with unit (whitened) noise, MacKay updates as in mne.inverse_sparse.gamma_map.
 const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd::Identity(gain.rows(), gain.rows()), 1000, 1e-8);
 ok &= expect(!gammaMap.activeVertices.empty() && gammaMap.activeVertices.size() < 70 && gammaMap.vecGamma.size() == 70,

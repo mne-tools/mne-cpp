@@ -42,8 +42,7 @@
 //=============================================================================================================
 
 using namespace BRAINFLOWBOARDPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -88,7 +87,7 @@ void BrainFlowBoard::unload()
 std::string BrainFlowBoard::uri() const
 {
     // Only the parameters that are set: BrainFlow's defaults stand for the others
-    ACQLIB::AcqUri uri{.scheme = "brainflow", .target = m_board, .params = {}};
+    mne::AcqUri uri{.scheme = "brainflow", .target = m_board, .params = {}};
     const auto add = [&uri](const char* key, const std::string& value) {
         if (!value.empty()) {
             uri.params.emplace_back(key, value);
@@ -110,15 +109,15 @@ std::string BrainFlowBoard::uri() const
 
 bool BrainFlowBoard::start()
 {
-    ACQLIB::register_brainflow_scheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::register_brainflow_scheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString(device.error().text());
         return false;
     }
     m_device = std::move(*device);
-    auto fiffInfo = ACQLIB::toFiffInfo(*m_device.stream().info());
-    auto reader = m_device.stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
+    auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         m_device.close();
@@ -126,11 +125,11 @@ bool BrainFlowBoard::start()
     }
 
     //Every board has its own rows, so the output is set up here and not in init()
-    m_pOutput->measurementData()->initFromFiffInfo(std::make_shared<FIFFLIB::FiffInfo>(std::move(*fiffInfo)));
+    m_pOutput->measurementData()->initFromFiffInfo(std::make_shared<mne::FiffInfo>(std::move(*fiffInfo)));
     m_pOutput->measurementData()->setMultiArraySize(1);
     m_pOutput->measurementData()->setVisibility(true);
 
-    if (ACQLIB::AcqError e = m_device.start(); !e.ok()) {
+    if (mne::AcqError e = m_device.start(); !e.ok()) {
         qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString(e.text());
         m_device.close();
         return false;
@@ -146,7 +145,7 @@ bool BrainFlowBoard::stop()
 {
     requestInterruption();
     wait();
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
     m_device.close();
 
     // Clear all data in the buffer connected to displays and other plugins
@@ -182,10 +181,10 @@ void BrainFlowBoard::run()
     const std::size_t channels = m_device.stream().info()->channelCount();
     MatrixXd block(static_cast<Index>(channels), m_samples_per_block);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (!read) {
-            if (read.error() == ACQLIB::AcqErrorCode::Timeout || read.error() == ACQLIB::AcqErrorCode::Overrun) {
+            if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
             qWarning() << "[BrainFlowBoard::run]" << QString::fromStdString(read.error().text());

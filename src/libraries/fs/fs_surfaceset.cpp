@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref FSLIB::FsSurfaceSet: bundles the lh + rh @ref FSLIB::FsSurface for one subject and surface kind.
+ * @brief    Implementation of @ref mne::FsSurfaceSet: bundles the lh + rh @ref mne::FsSurface for one subject and surface kind.
  */
 
 //=============================================================================================================
@@ -22,7 +22,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,12 +76,12 @@ FsSurfaceSet::FsSurfaceSet(const FsSurface& p_LHSurface, const FsSurface& p_RHSu
     if (p_LHSurface.hemi() == 0)
         m_surfs.insert_or_assign(0, p_LHSurface);
     else
-        BASELIB::Log::warning("Left hemisphere id is not 0. LH surface not assigned!");
+        mne::Log::warning("Left hemisphere id is not 0. LH surface not assigned!");
 
     if (p_RHSurface.hemi() == 1)
         m_surfs.insert_or_assign(1, p_RHSurface);
     else
-        BASELIB::Log::warning("Right hemisphere id is not 1. RH surface not assigned!");
+        mne::Log::warning("Right hemisphere id is not 1. RH surface not assigned!");
 
     calcOffset();
 }
@@ -146,7 +146,7 @@ namespace
 std::int32_t hemiIndex(std::int32_t idx)
 {
     if (idx != 0 && idx != 1) {
-        BASELIB::Log::warning("Warning: Index is not '0' or '1'! Returning '0'.");
+        mne::Log::warning("Warning: Index is not '0' or '1'! Returning '0'.");
         return 0;
     }
     return idx;
@@ -157,7 +157,7 @@ std::int32_t hemiIndex(std::string_view idt)
     if (idt == "rh")
         return 1;
     if (idt != "lh")
-        BASELIB::Log::warning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        mne::Log::warning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
     return 0;
 }
 

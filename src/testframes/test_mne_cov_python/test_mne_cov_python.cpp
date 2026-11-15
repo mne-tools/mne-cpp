@@ -63,8 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace
@@ -120,7 +119,7 @@ void TestMneCovPython::initTestCase()
 
     FiffEvoked evoked((base + "/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
     for (const std::string& name : evoked.info.ch_names) {
-        if (name.starts_with("MEG") && !BASELIB::contains(evoked.info.bads, name))
+        if (name.starts_with("MEG") && !mne::contains(evoked.info.bads, name))
             m_names.push_back(name);
     }
     QCOMPARE(m_names.size(), 305);

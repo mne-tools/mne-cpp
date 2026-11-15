@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro and build-info accessors of REPORTLIB.
+ * @brief    Export macro and build-info accessors of mne_report.
  *
- * REPORTLIB builds self-contained HTML reports of analysis results, the counterpart of
+ * mne_report builds self-contained HTML reports of analysis results, the counterpart of
  * mne.Report.
  */
 
@@ -40,12 +40,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace REPORTLIB
- * @brief     HTML reports of analysis results.
- */
-namespace REPORTLIB
+namespace mne
 {
 
 //=============================================================================================================

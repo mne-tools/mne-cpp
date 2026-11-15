@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Settings record for the @ref INVLIB::InvCMNE solver (model path, sliding-window length, regularisation, base method).
+ * @brief    Settings record for the @ref mne::InvCMNE solver (model path, sliding-window length, regularisation, base method).
  *
- * @ref INVLIB::InvCMNESettings collects every knob that
- * @ref INVLIB::InvCMNE::compute "InvCMNE::compute" and @ref INVLIB::InvCMNE::train_lstm "InvCMNE::train_lstm" need: the path to
+ * @ref mne::InvCMNESettings collects every knob that
+ * @ref mne::InvCMNE::compute "InvCMNE::compute" and @ref mne::InvCMNE::train_lstm "InvCMNE::train_lstm" need: the path to
  * the trained ONNX LSTM, the look-back window length @c k that defines
  * the temporal context fed into the network, the source-space size
  * (which must match the LSTM's input dimension), the Tikhonov
@@ -34,10 +34,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -58,6 +58,6 @@ struct INVSHARED_EXPORT InvCMNESettings
     double looseOriConstraint = 0.2; /**< Orientation constraint. */
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_CMNE_SETTINGS_H

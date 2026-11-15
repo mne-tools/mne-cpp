@@ -37,7 +37,7 @@ namespace MNEINSPECT
  *
  * @return One depth lead "LA" with four contacts at z = 0, 0.01, 0.02, 0.03 m.
  */
-IEEGLIB::IeegImplantation demoOneDepthStrip();
+mne::IeegImplantation demoOneDepthStrip();
 
 //=============================================================================================================
 /**
@@ -50,7 +50,7 @@ IEEGLIB::IeegImplantation demoOneDepthStrip();
  * @return Four leads: "LA" (depth), "RA" (depth), "LG" (strip of 6),
  *         "RG" (4×4 grid).
  */
-IEEGLIB::IeegImplantation demoFourArrayMontage();
+mne::IeegImplantation demoFourArrayMontage();
 
 //=============================================================================================================
 /**
@@ -64,7 +64,7 @@ IEEGLIB::IeegImplantation demoFourArrayMontage();
  * @return         A freshly populated `MriVolData` ready to be handed to
  *                 `MRISLICESPLUGIN::MriSlicesPlugin::setVolume`.
  */
-std::unique_ptr<MRILIB::MriVolData> demoMriSlab(int dim = 32);
+std::unique_ptr<mne::MriVolData> demoMriSlab(int dim = 32);
 
 } // namespace MNEINSPECT
 

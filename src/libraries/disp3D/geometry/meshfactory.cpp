@@ -21,7 +21,7 @@
 #include <QPair>
 #include <cmath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -464,4 +464,4 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QV
     return surf;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

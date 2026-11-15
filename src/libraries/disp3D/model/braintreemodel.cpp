@@ -25,7 +25,7 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 BrainTreeModel::BrainTreeModel(QObject* parent)
@@ -35,7 +35,7 @@ BrainTreeModel::BrainTreeModel(QObject* parent)
     setHorizontalHeaderLabels(QStringList() << "Data" << "Description");
 }
 
-SurfaceTreeItem* BrainTreeModel::addSurface(const QString& subject, const QString& hemi, const QString& surfType, const FSLIB::FsSurface& surface)
+SurfaceTreeItem* BrainTreeModel::addSurface(const QString& subject, const QString& hemi, const QString& surfType, const mne::FsSurface& surface)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
 
@@ -61,7 +61,7 @@ SurfaceTreeItem* BrainTreeModel::addSurface(const QString& subject, const QStrin
     return surfItem;
 }
 
-bool BrainTreeModel::addAnnotation(const QString& subject, const QString& hemi, const FSLIB::FsAnnotation& annotation)
+bool BrainTreeModel::addAnnotation(const QString& subject, const QString& hemi, const mne::FsAnnotation& annotation)
 {
     QStandardItem* subjectItem = getSubjectItem(subject);
     if (!subjectItem)
@@ -106,7 +106,7 @@ QStandardItem* BrainTreeModel::getSubjectItem(const QString& subject)
     return item;
 }
 
-BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString& bemName, const MNELIB::MNEBemSurface& bemSurf)
+BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString& bemName, const mne::MNEBemSurface& bemSurf)
 {
     QStandardItem* subjItem = getSubjectItem(subject);
 
@@ -151,7 +151,7 @@ void BrainTreeModel::addSensors(const QString& type, const QList<QStandardItem*>
 
 //=============================================================================================================
 
-void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet& set)
+void BrainTreeModel::addDipoles(const mne::InvEcdSet& set)
 {
     DipoleTreeItem* item = new DipoleTreeItem("Dipoles", set);
     item->setCheckable(true);
@@ -161,7 +161,7 @@ void BrainTreeModel::addDipoles(const INVLIB::InvEcdSet& set)
 
 //=============================================================================================================
 
-void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces& srcSpace)
+void BrainTreeModel::addSourceSpace(const mne::MNESourceSpaces& srcSpace)
 {
     QStandardItem* parentItem = new QStandardItem("Source Space");
     parentItem->setCheckable(true);
@@ -200,7 +200,7 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces& srcSpace)
 
 //=============================================================================================================
 
-void BrainTreeModel::addDigitizerData(std::span<const FIFFLIB::FiffDigPoint> digitizerPoints)
+void BrainTreeModel::addDigitizerData(std::span<const mne::FiffDigPoint> digitizerPoints)
 {
     if (digitizerPoints.empty())
         return;
@@ -215,7 +215,7 @@ void BrainTreeModel::addDigitizerData(std::span<const FIFFLIB::FiffDigPoint> dig
 
 //=============================================================================================================
 
-NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network& network, const QString& name)
+NetworkTreeItem* BrainTreeModel::addNetwork(const mne::Network& network, const QString& name)
 {
     QString displayName = name;
     if (displayName.isEmpty()) {
@@ -235,4 +235,4 @@ NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network& netw
     return item;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

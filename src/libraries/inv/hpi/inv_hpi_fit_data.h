@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Per-coil magnetic-dipole fitting workspace — Nelder-Mead optimiser plus leadfield computation for HPI coil localisation.
  *
- * @ref INVLIB::InvHpiFitData implements the inner loop of
- * @ref INVLIB::InvHpiFit "InvHpiFit": for every HPI coil it computes the magnetic-dipole
+ * @ref mne::InvHpiFitData implements the inner loop of
+ * @ref mne::InvHpiFit "InvHpiFit": for every HPI coil it computes the magnetic-dipole
  * leadfield in an infinite homogeneous medium, evaluates the residual
  * between the model field and the measured projection, and runs a
  * Nelder-Mead simplex search (@c fminsearch) to refine the coil
- * position. Helper structs @ref INVLIB::DipFitError and @ref INVLIB::HPISortStruct
+ * position. Helper structs @ref mne::DipFitError and @ref mne::HPISortStruct
  * carry per-iteration diagnostics and the post-fit coil-ordering
  * metadata. The leadfield and fit-error routines are validated against
  * the FieldTrip @c magnetic_dipole / @c ft_compute_leadfield reference
@@ -42,7 +42,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffCoordTrans;
@@ -50,10 +50,10 @@ class FiffDigPointSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE HPILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================

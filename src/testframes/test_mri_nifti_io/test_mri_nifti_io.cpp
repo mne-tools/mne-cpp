@@ -46,7 +46,7 @@
 #include <algorithm>
 #include <cstring>
 
-using namespace MRILIB;
+using namespace mne;
 
 namespace
 {

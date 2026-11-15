@@ -52,10 +52,9 @@
 //=============================================================================================================
 
 using namespace COREGISTRATIONPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace MNELIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::analyze;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +65,7 @@ CoRegistration::CoRegistration()
 , m_iNDiscarded(0)
 , m_pCoregSettingsView(nullptr)
 {
-    m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
+    m_vecBemDataModels = QVector<QSharedPointer<mne::analyze::AbstractModel>>();
 
     // init fiducial dig point set with three FiffDigPoints
     m_digFidMri = FiffDigPointSet();
@@ -193,10 +192,10 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
             onSetFiducial(e->getData().value<QVector3D>());
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         case EVENT_TYPE::MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
@@ -217,7 +216,7 @@ QVector<EVENT_TYPE> CoRegistration::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void CoRegistration::updateBemList(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     // check first if model was already added and if the passed model is actually a BemDataModel
     if (!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
@@ -233,7 +232,7 @@ void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
 
 void CoRegistration::onChangeSelectedBem(const QString& sText)
 {
-    QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
+    QSharedPointer<mne::analyze::BemDataModel> pBemDataModel;
 
     for (auto& bemDataModel : m_vecBemDataModels) {
         if (bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem) {
@@ -461,7 +460,7 @@ void CoRegistration::onFitFiducials()
     }
 
     // align fiducials
-    if (!MNELIB::fitMatchedPoints(matHead, matMri, matTrans, fScale, bScale, vecWeights)) {
+    if (!mne::fitMatchedPoints(matHead, matMri, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -615,12 +614,12 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     MatrixXf matHspClean;
     VectorXi vecTake;
 
-    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints,
-                                        matHsp,
-                                        transInit,
-                                        vecTake,
-                                        matHspClean,
-                                        fMaxDist)) {
+    if (!mne::discard3DPointOutliers(mneSurfacePoints,
+                                     matHsp,
+                                     transInit,
+                                     vecTake,
+                                     matHspClean,
+                                     fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     const int iNDiscarded = static_cast<int>(vecWeightsICP.size() - vecTake.size());
@@ -631,14 +630,14 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     }
 
     // icp
-    MNELIB::performIcp(mneSurfacePoints,
-                       matHspClean,
-                       transInit,
-                       fRMSE,
-                       bScale,
-                       iMaxIter,
-                       fTol,
-                       vecWeightsICPClean);
+    mne::performIcp(mneSurfacePoints,
+                    matHspClean,
+                    transInit,
+                    fRMSE,
+                    bScale,
+                    iMaxIter,
+                    fTol,
+                    vecWeightsICPClean);
 
     // The panel is updated on the GUI thread, in createNewTrans
     m_ParameterMutex.lock();
@@ -774,7 +773,7 @@ void CoRegistration::deleteModels()
 
 //=============================================================================================================
 
-void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void CoRegistration::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         updateBemList(pNewModel);
@@ -783,7 +782,7 @@ void CoRegistration::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> p
 
 //=============================================================================================================
 
-void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void CoRegistration::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
     if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL) {
         removeFromBemList(pRemovedModel);
@@ -792,7 +791,7 @@ void CoRegistration::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> p
 
 //=============================================================================================================
 
-bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+bool CoRegistration::removeFromBemList(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     while (m_vecBemDataModels.contains(pNewModel)) {
         int iIndex = m_vecBemDataModels.indexOf(pNewModel);

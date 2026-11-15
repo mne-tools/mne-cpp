@@ -28,7 +28,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EVENTSLIB;
+using namespace mne::analyze::events;
 
 //=============================================================================================================
 // local and static declarations
@@ -46,7 +46,7 @@ EventManager::EventManager()
 , m_DefaultGroupId(invalidID)
 {
 #ifndef NO_IPC
-    m_pSharedMemManager = std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this);
+    m_pSharedMemManager = std::make_unique<detail::EventSharedMemManager>(this);
 #endif
 }
 
@@ -63,7 +63,7 @@ Event EventManager::getEvent(idNum eventId) const
 
 //=============================================================================================================
 
-std::multimap<int, EVENTSINTERNAL::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
+std::multimap<int, detail::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
 {
     auto it = m_MapIdToSample.find(eventId);
     if (it == m_MapIdToSample.end())
@@ -246,7 +246,7 @@ size_t EventManager::getNumEvents() const
 
 Event EventManager::addEvent(int sample, idNum groupId)
 {
-    EVENTSINTERNAL::EventINT newEvent(generateNewEventId(), sample, groupId);
+    detail::EventINT newEvent(generateNewEventId(), sample, groupId);
     insertEvent(newEvent);
 
 #ifndef NO_IPC
@@ -262,7 +262,7 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
 Event EventManager::addRangedEvent(int sample, int duration, idNum groupId)
 {
-    EVENTSINTERNAL::EventINT newEvent(generateNewEventId(), sample, groupId);
+    detail::EventINT newEvent(generateNewEventId(), sample, groupId);
     newEvent.setDuration(duration);
     insertEvent(newEvent);
 
@@ -291,7 +291,7 @@ bool EventManager::moveEvent(idNum eventId, int newSample)
     bool status(false);
     auto event = findEventINT(eventId);
     if (event != m_EventsListBySample.end()) {
-        EVENTSINTERNAL::EventINT newEvent(event->second);
+        detail::EventINT newEvent(event->second);
         newEvent.setSample(newSample);
         deleteEvent(eventId);
         insertEvent(newEvent);
@@ -311,7 +311,7 @@ bool EventManager::setEventDuration(idNum eventId, int newDuration)
 
     // The stored event is const because the container is keyed by sample, so
     // replace it the same way moveEvent does.
-    EVENTSINTERNAL::EventINT newEvent(event->second);
+    detail::EventINT newEvent(event->second);
     newEvent.setDuration(newDuration);
     deleteEvent(eventId);
     insertEvent(newEvent);
@@ -327,7 +327,7 @@ bool EventManager::setEventCode(idNum eventId, int newEventCode)
         return false;
     }
 
-    EVENTSINTERNAL::EventINT newEvent(event->second);
+    detail::EventINT newEvent(event->second);
     newEvent.setEventCode(newEventCode);
     deleteEvent(eventId);
     insertEvent(newEvent);
@@ -409,7 +409,7 @@ bool EventManager::deleteEventsInGroup(idNum groupId)
 
 //=============================================================================================================
 
-void EventManager::insertEvent(const EVENTSINTERNAL::EventINT& e)
+void EventManager::insertEvent(const detail::EventINT& e)
 {
     m_EventsListBySample.emplace(std::make_pair(e.getSample(), e));
     m_MapIdToSample[e.getId()] = e.getSample();
@@ -465,7 +465,7 @@ EventManager::getGroups(const std::vector<idNum>& groupIds) const
 
 EventGroup EventManager::addGroup(const std::string& sGroupName)
 {
-    EVENTSINTERNAL::EventGroupINT newGroup(generateNewGroupId(), sGroupName);
+    detail::EventGroupINT newGroup(generateNewGroupId(), sGroupName);
     m_GroupsList.emplace(newGroup.getId(), newGroup);
     return EventGroup(newGroup);
 }
@@ -474,7 +474,7 @@ EventGroup EventManager::addGroup(const std::string& sGroupName)
 
 EventGroup EventManager::addGroup(const std::string& sGroupName, const RgbColor& color)
 {
-    EVENTSINTERNAL::EventGroupINT newGroup(generateNewGroupId(), sGroupName, color);
+    detail::EventGroupINT newGroup(generateNewGroupId(), sGroupName, color);
     m_GroupsList.emplace(newGroup.getId(), newGroup);
     return EventGroup(newGroup);
 }
@@ -534,7 +534,7 @@ void EventManager::setGroupColor(const idNum groupId, const RgbColor& color)
 
 EventGroup EventManager::mergeGroups(const std::vector<idNum>& groupIds, const std::string& newName)
 {
-    EVENTSLIB::EventGroup newGroup = addGroup(newName);
+    mne::analyze::events::EventGroup newGroup = addGroup(newName);
     auto eventsAll = getAllEvents();
     bool state(true);
     for (const auto& ev : *eventsAll) {
@@ -552,7 +552,7 @@ EventGroup EventManager::mergeGroups(const std::vector<idNum>& groupIds, const s
 
 EventGroup EventManager::duplicateGroup(const idNum groupId, const std::string& newName)
 {
-    EVENTSLIB::EventGroup newGroup = addGroup(newName);
+    mne::analyze::events::EventGroup newGroup = addGroup(newName);
     auto eventsToDuplicate = getEventsInGroup(groupId);
     for (const auto& e : *eventsToDuplicate) {
         addEvent(e.sample, newGroup.id);
@@ -569,7 +569,7 @@ bool EventManager::addEventToGroup(const idNum eventId, const idNum groupId)
     if (m_MapIdToSample.count(eventId)) {
         sample = m_MapIdToSample.at(eventId);
         auto eventsRange = m_EventsListBySample.equal_range(sample);
-        std::multimap<int, EVENTSINTERNAL::EventINT>::iterator e = eventsRange.first;
+        std::multimap<int, detail::EventINT>::iterator e = eventsRange.first;
         for (; e != eventsRange.second; ++e) {
             if (e->second.getId() == eventId) {
                 e->second.setGroupId(groupId);

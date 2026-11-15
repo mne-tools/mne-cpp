@@ -69,9 +69,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -458,7 +456,7 @@ void TestMneLabelPython::assembleKernel_label()
         surfFwd.convert_to_surf_ori();
         MatrixXd G(364, fwd.sol.data.cols());
         for (int c = 0; c < 364; ++c)
-            G.row(c) = surfFwd.sol.data.row(FIFFLIB::channel_index(surfFwd.sol.row_names, prepared.eigen_fields.col_names[c]));
+            G.row(c) = surfFwd.sol.data.row(mne::channel_index(surfFwd.sol.row_names, prepared.eigen_fields.col_names[c]));
         QVERIFY((R - kFull * G).norm() <= 1e-12 * R.norm());
         QVERIFY2(std::abs(R.trace() - 43.488585536748346) <= 1e-5 * 43.488585536748346, qPrintable(QString::number(R.trace(), 'g', 17)));
         QVERIFY2(std::abs(R.norm() - 7.8792209245077) <= 1e-5 * 7.8792209245077, qPrintable(QString::number(R.norm(), 'g', 17)));

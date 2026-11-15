@@ -59,9 +59,8 @@
 //=============================================================================================================
 
 using namespace MNESCAN;
-using namespace SCSHAREDLIB;
-using namespace SCDISPLIB;
-using namespace DISPLIB;
+using namespace mne::scan;
+using namespace mne::disp;
 
 //=============================================================================================================
 // CONST
@@ -88,9 +87,9 @@ MainWindow::MainWindow(QWidget* parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_eLogLevelCurrent(_LogLvMax)
 , m_pTime(new QTime(0, 0))
-, m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
-, m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
-, m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
+, m_pPluginManager(new mne::scan::PluginManager(this))
+, m_pPluginSceneManager(new mne::scan::PluginSceneManager(this))
+, m_pDisplayManager(new mne::scan::DisplayManager(this))
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
 {
@@ -245,9 +244,9 @@ void MainWindow::onStyleChanged(const QString& sStyle)
 void MainWindow::onGuiModeChanged()
 {
     if (m_pActionResearchMode->isChecked()) {
-        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
+        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Research);
     } else if (m_pActionClinicalMode->isChecked()) {
-        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
+        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Clinical);
     }
 }
 
@@ -425,7 +424,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(BASELIB::dateTimeNow()) + " - " + QString(BASELIB::gitHash()));
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::dateTimeNow()) + " - " + QString(mne::gitHash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
         gridLayout->addWidget(m_textEdit_aboutText, 2, 0, 1, 1);
@@ -768,7 +767,7 @@ void MainWindow::refreshPluginStatusWidgets()
         return;
     }
 
-    for (const SCSHAREDLIB::AbstractPlugin::SPtr& pPlugin : m_pPluginSceneManager->getPlugins()) {
+    for (const mne::scan::AbstractPlugin::SPtr& pPlugin : m_pPluginSceneManager->getPlugins()) {
         if (!pPlugin)
             continue;
         if (QWidget* pStatus = pPlugin->getStatusWidget()) {
@@ -824,7 +823,7 @@ void MainWindow::createLogDockWindow()
 
 //=============================================================================================================
 
-void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
+void MainWindow::updatePluginSetupWidget(mne::scan::AbstractPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
 
@@ -848,7 +847,7 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::AbstractPlugin::SPtr pPlug
 
 //=============================================================================================================
 
-void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin>> lPlugins)
+void MainWindow::initMultiViewWidget(QList<QSharedPointer<mne::scan::AbstractPlugin>> lPlugins)
 {
     for (int i = 0; i < lPlugins.size(); ++i) {
         if (!lPlugins.at(i).isNull()) {
@@ -967,7 +966,7 @@ void MainWindow::onDisplayControlWidgetsChanged(QList<QWidget*>& lControlWidgets
 
 //=============================================================================================================
 
-void MainWindow::updateConnectionWidget(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection)
+void MainWindow::updateConnectionWidget(mne::scan::PluginConnectorConnection::SPtr pConnection)
 {
     QWidget* pWidget = pConnection->setupWidget();
     setCentralWidget(pWidget);

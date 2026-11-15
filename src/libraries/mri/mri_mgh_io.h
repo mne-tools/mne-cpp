@@ -17,7 +17,7 @@
  * the @c .mgz suffix and routing the file through zlib's
  * @c MAX_WBITS+16 inflate mode before parsing.
  *
- * Output is materialised into an @ref MRILIB::MriVolData (slice-of-slices
+ * Output is materialised into an @ref mne::MriVolData (slice-of-slices
  * representation) using the same per-slice pixel formats the
  * COR.fif writer expects, so the volume can be re-serialised
  * round-trip without a second conversion pass.
@@ -76,10 +76,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MRILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -116,7 +116,7 @@ public:
      *
      * @param[in]  mgzFile         Path to the .mgz or .mgh file.
      * @param[out] volData          MriVolData structure to populate.
-     * @param[out] additionalTrans  Surface RAS -> RAS and, if the footer names a talairach.xfm, the Talairach chain of @ref FIFFLIB::FiffCoordTransSet.
+     * @param[out] additionalTrans  Surface RAS -> RAS and, if the footer names a talairach.xfm, the Talairach chain of @ref mne::FiffCoordTransSet.
      * @param[in]  subjectMriDir   Path to subject's mri/ directory (for resolving relative .xfm paths).
      * @param[in]  verbose         If true, print progress information.
      *
@@ -124,7 +124,7 @@ public:
      */
     static bool read(const std::string& mgzFile,
                      MriVolData& volData,
-                     std::vector<FIFFLIB::FiffCoordTrans>& additionalTrans,
+                     std::vector<mne::FiffCoordTrans>& additionalTrans,
                      const std::string& subjectMriDir = {},
                      bool verbose = false);
 
@@ -166,7 +166,7 @@ private:
      */
     static bool parseFooter(const std::vector<std::byte>& data,
                             MriVolData& volData,
-                            std::vector<FIFFLIB::FiffCoordTrans>& additionalTrans,
+                            std::vector<mne::FiffCoordTrans>& additionalTrans,
                             const std::string& subjectMriDir,
                             bool verbose);
 
@@ -181,6 +181,6 @@ private:
     static int bytesPerVoxel(int type);
 };
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_MGH_IO_H

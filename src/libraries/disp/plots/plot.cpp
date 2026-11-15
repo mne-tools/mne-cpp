@@ -31,8 +31,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace DISPLIB::detail;
+using namespace mne::disp;
+using namespace mne::disp::detail;
 using namespace Eigen;
 
 //=============================================================================================================

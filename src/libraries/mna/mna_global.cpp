@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Definitions for the MNALIB build-info accessors declared in @ref mna_global.h.
+ * @brief    Definitions for the mne_mna build-info accessors declared in @ref mna_global.h.
  *
  * The two functions implemented here simply forward to the
  * @c utils/buildinfo.h helpers, which embed the build date/time
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* MNALIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* MNALIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* MNALIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

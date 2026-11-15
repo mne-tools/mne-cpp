@@ -59,9 +59,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using BASELIB::ErrorCode;
-using BASELIB::fail;
+using namespace mne;
+using mne::ErrorCode;
+using mne::fail;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -72,7 +72,7 @@ namespace
 {
 
 // The first transform among entries from @p from to @p to, inverted if stored the other way round.
-BASELIB::Expected<FiffCoordTrans> find_transform(FiffStream& stream, const std::vector<FiffDirEntry>& entries, int from, int to)
+mne::Expected<FiffCoordTrans> find_transform(FiffStream& stream, const std::vector<FiffDirEntry>& entries, int from, int to)
 {
     for (const FiffDirEntry& entry : entries) {
         if (entry.kind != FIFF_COORD_TRANS)
@@ -160,7 +160,7 @@ bool FiffCoordTrans::invert_transform()
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& path)
+mne::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& path)
 {
     auto stream = FiffStream::open(path);
     if (!stream) {
@@ -174,29 +174,29 @@ BASELIB::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::pa
             return from_tag(*tag);
         }
     }
-    return fail(ErrorCode::NotFound, "No coordinate transform in {}", BASELIB::utf8FromPath(path));
+    return fail(ErrorCode::NotFound, "No coordinate transform in {}", mne::utf8FromPath(path));
 }
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& path, int from, int to)
+mne::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& path, int from, int to)
 {
     auto stream = FiffStream::open(path);
     if (!stream) {
         return std::unexpected(stream.error());
     }
-    return find_transform(*stream, stream->dir(), from, to).transform_error([&path](const BASELIB::Error& error) {
-        return BASELIB::Error(error.code, std::format("{} in {}", error.what(), BASELIB::utf8FromPath(path)));
+    return find_transform(*stream, stream->dir(), from, to).transform_error([&path](const mne::Error& error) {
+        return mne::Error(error.code, std::format("{} in {}", error.what(), mne::utf8FromPath(path)));
     });
 }
 
 //=============================================================================================================
 
-BASELIB::Expected<void> FiffCoordTrans::write(const std::filesystem::path& path) const
+mne::Expected<void> FiffCoordTrans::write(const std::filesystem::path& path) const
 {
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return fail(ErrorCode::Io, "Cannot write {}", BASELIB::utf8FromPath(path));
+        return fail(ErrorCode::Io, "Cannot write {}", mne::utf8FromPath(path));
     }
     write_to_stream(*stream);
     stream->end_file();
@@ -323,10 +323,10 @@ bool FiffCoordTrans::add_inverse(FiffCoordTrans& t)
 
 void FiffCoordTrans::print() const
 {
-    BASELIB::Log::info("Coordinate transformation: {} -> {}", frame_name(from), frame_name(to));
+    mne::Log::info("Coordinate transformation: {} -> {}", frame_name(from), frame_name(to));
     for (int p = 0; p < 3; p++)
-        BASELIB::Log::info("\t{: 8.6f} {: 8.6f} {: 8.6f}\t{: 7.2f} mm", trans(p, 0), trans(p, 1), trans(p, 2), 1000 * trans(p, 3));
-    BASELIB::Log::info("\t{: 8.6f} {: 8.6f} {: 8.6f}   {: 7.2f}", trans(3, 0), trans(3, 1), trans(3, 2), trans(3, 3));
+        mne::Log::info("\t{: 8.6f} {: 8.6f} {: 8.6f}\t{: 7.2f} mm", trans(p, 0), trans(p, 1), trans(p, 2), 1000 * trans(p, 3));
+    mne::Log::info("\t{: 8.6f} {: 8.6f} {: 8.6f}   {: 7.2f}", trans(3, 0), trans(3, 1), trans(3, 2), trans(3, 3));
 }
 
 //=============================================================================================================
@@ -445,7 +445,7 @@ FiffCoordTrans FiffCoordTrans::combine(int from, int to, const FiffCoordTrans& t
     }
 
     if (!found || a.from != b.to) {
-        BASELIB::Log::critical("Cannot combine coordinate transforms");
+        mne::Log::critical("Cannot combine coordinate transforms");
         return FiffCoordTrans();
     }
 
@@ -492,9 +492,9 @@ FiffCoordTrans FiffCoordTrans::from_cardinal_points(int from, int to,
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffCoordTrans> FiffCoordTrans::read_ascii(const std::filesystem::path& path, int from, int to)
+mne::Expected<FiffCoordTrans> FiffCoordTrans::read_ascii(const std::filesystem::path& path, int from, int to)
 {
-    const std::string name = BASELIB::utf8FromPath(path);
+    const std::string name = mne::utf8FromPath(path);
     std::ifstream in(path);
     if (!in) {
         return fail(ErrorCode::Io, "Cannot open {}", name);
@@ -568,9 +568,9 @@ FiffCoordTrans FiffCoordTrans::from_tag(const FiffTag& tag)
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffCoordTrans> FiffCoordTrans::read_from_node(FiffStream& stream,
-                                                                 const std::shared_ptr<FiffDirNode>& node,
-                                                                 int from, int to)
+mne::Expected<FiffCoordTrans> FiffCoordTrans::read_from_node(FiffStream& stream,
+                                                             const std::shared_ptr<FiffDirNode>& node,
+                                                             int from, int to)
 {
     return find_transform(stream, node->dir, from, to);
 }
@@ -613,7 +613,7 @@ FiffCoordTrans FiffCoordTrans::procrustes_align(int from_frame,
         Eigen::Vector3f rr = R * fromPts.row(p).transpose() + moveVec;
         float diff = (toPts.row(p).transpose() - rr).norm();
         if (diff > max_diff) {
-            BASELIB::Log::warning("Too large difference in matching : {:7.1f} > {:7.1f} mm", 1000.0f * diff, 1000.0f * max_diff);
+            mne::Log::warning("Too large difference in matching : {:7.1f} > {:7.1f} mm", 1000.0f * diff, 1000.0f * max_diff);
             return FiffCoordTrans();
         }
     }

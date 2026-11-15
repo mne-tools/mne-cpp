@@ -46,8 +46,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -405,12 +405,12 @@ const Registrar kRegistrar;
 //=============================================================================================================
 
 #if !defined(_WIN32)
-AcqExpected<std::unique_ptr<GusbampTransport>> ACQLIB::detail::open_gusbamp_driver(std::span<const std::string> /*serials*/)
+AcqExpected<std::unique_ptr<GusbampTransport>> mne::detail::open_gusbamp_driver(std::span<const std::string> /*serials*/)
 {
     return AcqError(AcqErrorCode::BackendUnavailable, "the g.USBamp API is only available on Windows; use simulate=1 for the simulator");
 }
 
-AcqExpected<std::vector<std::string>> ACQLIB::detail::list_gusbamp_units()
+AcqExpected<std::vector<std::string>> mne::detail::list_gusbamp_units()
 {
     return AcqError(AcqErrorCode::BackendUnavailable, "the g.USBamp API is only available on Windows");
 }
@@ -418,7 +418,7 @@ AcqExpected<std::vector<std::string>> ACQLIB::detail::list_gusbamp_units()
 
 //=============================================================================================================
 
-AcqError ACQLIB::register_gusbamp_scheme()
+AcqError mne::register_gusbamp_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &GusbampBackend::open, &discover);
     return result;

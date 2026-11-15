@@ -7,15 +7,15 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Tokeniser and de-tokeniser that turn an @ref INVLIB::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
+ * @brief    Tokeniser and de-tokeniser that turn an @ref mne::InvSourceEstimate into a flat sequence consumable by foundation-model architectures.
  *
- * Declares the free functions @ref INVLIB::tokenize and
- * @ref INVLIB::fromTokens that round-trip an @ref INVLIB::InvSourceEstimate
- * through the @ref INVLIB::InvToken vocabulary defined in @c inv_token.h. The
+ * Declares the free functions @ref mne::tokenize and
+ * @ref mne::fromTokens that round-trip an @ref mne::InvSourceEstimate
+ * through the @ref mne::InvToken vocabulary defined in @c inv_token.h. The
  * tokeniser walks the estimate's metadata, dense grid, vertex list,
  * focal dipoles, coupling groups and connectivity layers and emits a
  * self-describing sequence framed by @c BOS / @c EOS markers. The
- * @ref INVLIB::InvTokenizeOptions struct enables sub-sampling or layer omission
+ * @ref mne::InvTokenizeOptions struct enables sub-sampling or layer omission
  * for context-limited transformer windows, while the inverse parser
  * silently skips unknown tokens to keep the format forward-compatible.
  */
@@ -36,16 +36,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 class InvSourceEstimate;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -85,6 +85,6 @@ INVSHARED_EXPORT std::vector<InvToken> tokenize(const InvSourceEstimate& estimat
  */
 INVSHARED_EXPORT InvSourceEstimate fromTokens(const std::vector<InvToken>& tokens);
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_SOURCE_ESTIMATE_TOKEN_H

@@ -95,12 +95,9 @@
 //=============================================================================================================
 
 using namespace CORTICALSURFACEPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISP3DLIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
-using namespace INVLIB;
-using namespace MNELIB;
+using namespace mne::analyze;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // Inner widget: TimeCoursePlotter

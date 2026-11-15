@@ -9,16 +9,16 @@
  * @date     May 2026
  * @brief    Top-level convenience entry points that mirror MNE-Python's @c apply_inverse_* / @c compute_source_psd helpers.
  *
- * Free functions in this header glue together the lower-level INVLIB
+ * Free functions in this header glue together the lower-level mne_inv
  * classes so users can match the MNE-Python ergonomics:
- * @ref INVLIB::apply_inverse_epochs applies a precomputed inverse operator
- * across an epoch list, @ref INVLIB::apply_inverse_raw "apply_inverse_raw" streams raw data through
- * the kernel, @ref INVLIB::estimate_snr "estimate_snr" returns the whitened-data SNR
- * trace from an evoked + inverse pair, @ref INVLIB::compute_whitener "compute_whitener" produces the
+ * @ref mne::apply_inverse_epochs applies a precomputed inverse operator
+ * across an epoch list, @ref mne::apply_inverse_raw "apply_inverse_raw" streams raw data through
+ * the kernel, @ref mne::estimate_snr "estimate_snr" returns the whitened-data SNR
+ * trace from an evoked + inverse pair, @ref mne::compute_whitener "compute_whitener" produces the
  * diagonal whitener from a noise covariance, and
- * @ref INVLIB::compute_source_psd "compute_source_psd" / @ref INVLIB::compute_source_band_power "compute_source_band_power" run Welch-based
- * spectral analysis directly on @ref INVLIB::InvSourceEstimate output. All
- * methods are headers-only orchestration on top of @ref INVLIB::InvMinimumNorm
+ * @ref mne::compute_source_psd "compute_source_psd" / @ref mne::compute_source_band_power "compute_source_band_power" run Welch-based
+ * spectral analysis directly on @ref mne::InvSourceEstimate output. All
+ * methods are headers-only orchestration on top of @ref mne::InvMinimumNorm
  * and the underlying FIFF / MNE primitives.
  *
  * @snippet ex_inv_api/main.cpp inv_sparse_usage
@@ -54,12 +54,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNEInverseOperator;
 class MNEForwardSolution;
 }
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvoked;
 class FiffRawData;
@@ -68,10 +68,10 @@ class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -94,7 +94,7 @@ namespace INVLIB
  */
 INVSHARED_EXPORT std::vector<InvSourceEstimate> apply_inverse_epochs(
     const std::vector<Eigen::MatrixXd>& epochs,
-    const MNELIB::MNEInverseOperator& inverse,
+    const mne::MNEInverseOperator& inverse,
     float lambda2,
     std::string_view method = "dSPM",
     float tmin = 0.0f,
@@ -121,8 +121,8 @@ INVSHARED_EXPORT std::vector<InvSourceEstimate> apply_inverse_epochs(
  * @return Source estimate spanning the requested time range.
  */
 INVSHARED_EXPORT InvSourceEstimate apply_inverse_raw(
-    const FIFFLIB::FiffRawData& raw,
-    const MNELIB::MNEInverseOperator& inverse,
+    const mne::FiffRawData& raw,
+    const mne::MNEInverseOperator& inverse,
     float lambda2,
     std::string_view method = "dSPM",
     int from = -1,
@@ -144,10 +144,10 @@ INVSHARED_EXPORT InvSourceEstimate apply_inverse_raw(
  *
  * @return Simulated evoked data, empty on error.
  */
-INVSHARED_EXPORT FIFFLIB::FiffEvoked apply_forward(
-    const MNELIB::MNEForwardSolution& fwd,
+INVSHARED_EXPORT mne::FiffEvoked apply_forward(
+    const mne::MNEForwardSolution& fwd,
     const InvSourceEstimate& stc,
-    const FIFFLIB::FiffInfo& info);
+    const mne::FiffInfo& info);
 
 //=============================================================================================================
 /**
@@ -164,8 +164,8 @@ INVSHARED_EXPORT FIFFLIB::FiffEvoked apply_forward(
  * @return Pair of (snr, snrEst), one value per time point.
  */
 INVSHARED_EXPORT std::pair<Eigen::VectorXd, Eigen::VectorXd> estimate_snr(
-    const FIFFLIB::FiffEvoked& evoked,
-    const MNELIB::MNEInverseOperator& inverse);
+    const mne::FiffEvoked& evoked,
+    const mne::MNEInverseOperator& inverse);
 
 //=============================================================================================================
 /**
@@ -180,7 +180,7 @@ INVSHARED_EXPORT std::pair<Eigen::VectorXd, Eigen::VectorXd> estimate_snr(
  * @return Pair of (whitener matrix, effective rank).
  */
 INVSHARED_EXPORT std::pair<Eigen::MatrixXd, int> compute_whitener(
-    const FIFFLIB::FiffCov& noiseCov,
+    const mne::FiffCov& noiseCov,
     int rank = 0);
 
 //=============================================================================================================
@@ -223,6 +223,6 @@ INVSHARED_EXPORT std::map<std::string, Eigen::VectorXd> compute_source_band_powe
     float sfreq,
     const std::map<std::string, std::pair<float, float>>& bands);
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_CONVENIENCE_H

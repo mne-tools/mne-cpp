@@ -20,7 +20,7 @@
  * - @c num_vertices × (@c int32 vertex_index, @c int32 packed_rgba_label)
  * - optional @c TAG_OLD_COLORTABLE / @c TAG_NEW_COLORTABLE block carrying the
  *   embedded colortable (struct names + RGBA), parsed into an
- *   @ref FSLIB::FsColortable
+ *   @ref mne::FsColortable
  *
  * The per-vertex label is the @c int32 obtained by packing
  * @c R + (G ≪ 8) + (B ≪ 16) + (A ≪ 24) of the assigned region’s
@@ -29,7 +29,7 @@
  * in FreeSurfer.
  *
  * This class loads one hemisphere; combine two instances via
- * @ref FSLIB::FsAnnotationSet for whole-brain parcellations.
+ * @ref mne::FsAnnotationSet for whole-brain parcellations.
  */
 
 #ifndef FS_ANNOTATION_H
@@ -57,10 +57,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -251,7 +251,7 @@ public:
     bool toLabels(const FsSurface& p_surf,
                   std::vector<FsLabel>& p_qListLabels,
                   std::vector<Eigen::RowVector4i>& p_qListLabelRGBAs,
-                  const BASELIB::StringList& lLabelPicks = {}) const;
+                  const mne::StringList& lLabelPicks = {}) const;
 
     //=========================================================================================================
     /**

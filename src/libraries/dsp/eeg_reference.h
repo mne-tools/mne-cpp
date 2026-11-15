@@ -52,16 +52,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -82,8 +82,8 @@ namespace DSPLIB
  *                              the data unchanged. Nothing is added if one is already present.
  */
 DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
-                                      FIFFLIB::FiffInfo& info,
-                                      const BASELIB::StringList& refChannels = {},
+                                      mne::FiffInfo& info,
+                                      const mne::StringList& refChannels = {},
                                       bool projection = false);
 
 //=============================================================================================================
@@ -99,8 +99,8 @@ DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
  * @param[in]     chNames   Names of the reference channel(s) to add.
  */
 DSPSHARED_EXPORT void addReferenceChannels(Eigen::MatrixXd& data,
-                                           FIFFLIB::FiffInfo& info,
-                                           const BASELIB::StringList& chNames);
+                                           mne::FiffInfo& info,
+                                           const mne::StringList& chNames);
 
 //=============================================================================================================
 /**
@@ -117,11 +117,11 @@ DSPSHARED_EXPORT void addReferenceChannels(Eigen::MatrixXd& data,
  *                               from the output (default: true).
  */
 DSPSHARED_EXPORT void setBipolarReference(Eigen::MatrixXd& data,
-                                          FIFFLIB::FiffInfo& info,
-                                          const BASELIB::StringList& anodes,
-                                          const BASELIB::StringList& cathodes,
+                                          mne::FiffInfo& info,
+                                          const mne::StringList& anodes,
+                                          const mne::StringList& cathodes,
                                           bool dropOriginals = true);
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // EEG_REFERENCE_H

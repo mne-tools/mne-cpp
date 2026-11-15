@@ -36,8 +36,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -67,14 +67,14 @@ CompensatorView::~CompensatorView()
 
 //=============================================================================================================
 
-std::vector<FIFFLIB::FiffCtfComp> CompensatorView::getCompensators() const
+std::vector<mne::FiffCtfComp> CompensatorView::getCompensators() const
 {
     return m_pComps;
 }
 
 //=============================================================================================================
 
-void CompensatorView::setCompensators(const std::vector<FIFFLIB::FiffCtfComp>& comps)
+void CompensatorView::setCompensators(const std::vector<mne::FiffCtfComp>& comps)
 {
     m_pComps = comps;
 

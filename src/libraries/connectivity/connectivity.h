@@ -9,10 +9,10 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Umbrella include header that exposes the full CONNECTIVITYLIB public surface in a single include.
+ * @brief    Umbrella include header that exposes the full mne_connectivity public surface in a single include.
  *
- * CONNECTIVITYLIB computes functional connectivity (coherence, phase-lag and phase-locking measures,
- * correlation, Granger causality, DTF, PDC) and represents the result as a @ref CONNECTIVITYLIB::Network.
+ * mne_connectivity computes functional connectivity (coherence, phase-lag and phase-locking measures,
+ * correlation, Granger causality, DTF, PDC) and represents the result as a @ref mne::Network.
  */
 
 #ifndef CONNECTIVITY_H

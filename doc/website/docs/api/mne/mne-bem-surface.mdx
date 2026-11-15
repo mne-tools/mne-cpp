@@ -1,18 +1,18 @@
 ---
 id: mne-bem-surface
-title: "MNELIB::MNEBemSurface"
+title: "mne::MNEBemSurface"
 sidebar_label: MNEBemSurface
 sidebar_position: 8
 ---
 
 # MNEBemSurface
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_bem_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_bem_surface.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_bem_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_bem_surface.h)
 
 `#include <mne/mne_bem_surface.h>`
 
 ```cpp
-class MNELIB::MNEBemSurface
+class mne::MNEBemSurface
 ```
 
 BEM surface geometry information.
@@ -167,7 +167,7 @@ Decimate the outer skin surface to the target vertex counts using iterative edge
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 149"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 147"
 const QString bemPath = data + "/subjects/sample/bem/sample-5120-bem.fif";
 MNEBem bem(bemPath.toStdU16String()); // one MNEBemSurface per BEM layer
 const MNEBemSurface& innerSkull = bem[0];

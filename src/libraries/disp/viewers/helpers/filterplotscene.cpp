@@ -31,9 +31,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 using namespace Eigen;
-using namespace DSPLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

@@ -10,10 +10,10 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Export macros and build-info hooks for the DISPLIB shared library.
+ * @brief    Export macros and build-info hooks for the mne_disp shared library.
  *
  * Defines @c DISPSHARED_EXPORT / @c DISPSHARED_IMPORT for Windows DLL
- * visibility and exposes a single @c DISPLIB::buildDateTime() entry
+ * visibility and exposes a single @c mne::disp::buildDateTime() entry
  * point so any of the disp viewers / plots / models can stamp the same
  * MNE-CPP build date into status bars or log files. Every public class
  * in this library declares itself with @c DISPSHARED_EXPORT to be
@@ -45,13 +45,13 @@
 
 //=============================================================================================================
 /**
- * @namespace DISPLIB
- * @brief     2-D display widgets and visualisation helpers (charts, topography, colour maps).
+ * @namespace mne::disp
+ * @brief     Qt-based 2D and 3D display: plots, viewers and the 3D brain view (mne_disp and mne_disp3D).
  */
-namespace DISPLIB
+namespace mne::disp
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

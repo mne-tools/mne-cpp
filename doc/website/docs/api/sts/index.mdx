@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # Statistics Library
 
-**Namespace:** `STSLIB` &nbsp;·&nbsp; **Source:** `src/libraries/sts`
-The `mne_sts` library (`STSLIB` namespace) provides statistical testing and evaluation tools for MEG/EEG analysis: parametric tests (t-tests, F-tests), non-parametric cluster permutation testing, multiple comparison correction, covariance estimation with shrinkage methods, spatial adjacency construction, and source-level evaluation metrics.
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/sts`
+The `mne_sts` library (`mne_sts` namespace) provides statistical testing and evaluation tools for MEG/EEG analysis: parametric tests (t-tests, F-tests), non-parametric cluster permutation testing, multiple comparison correction, covariance estimation with shrinkage methods, spatial adjacency construction, and source-level evaluation metrics.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_sts)
@@ -49,14 +49,14 @@ Parametric t-tests: one-sample, paired, and independent two-sample.
 
 // One-sample t-test (each column tested against mu=0)
 Eigen::MatrixXd data(30, 100);  // 30 subjects × 100 time points
-auto result = STSLIB::StatsTtest::oneSample(data, 0.0, STSLIB::StatsTailType::Both);
+auto result = mne::StatsTtest::oneSample(data, 0.0, mne::StatsTailType::Both);
 // result.matTstat: 1 × 100 t-statistics
 // result.matPval:  1 × 100 p-values
 // result.degreesOfFreedom: 29
 
 // Paired t-test
 Eigen::MatrixXd condA(30, 100), condB(30, 100);
-auto paired = STSLIB::StatsTtest::paired(condA, condB);
+auto paired = mne::StatsTtest::paired(condA, condB);
 ```
 
 ### Methods
@@ -89,7 +89,7 @@ groups.append(group1);  // n_obs × n_variables
 groups.append(group2);
 groups.append(group3);
 
-auto result = STSLIB::StatsFtest::oneWay(groups);
+auto result = mne::StatsFtest::oneWay(groups);
 // result.matFstat: F-statistics
 // result.matPval:  p-values
 // result.dfBetween, result.dfWithin: degrees of freedom
@@ -122,7 +122,7 @@ Cluster-based permutation test for comparing two conditions while controlling fo
 #include <sts/sts_adjacency.h>
 
 // Build adjacency matrix from channel positions
-auto adjacency = STSLIB::StatsAdjacency::fromChannelPositions(fiffInfo);
+auto adjacency = mne::StatsAdjacency::fromChannelPositions(fiffInfo);
 
 // Per-subject data: each matrix is nChannels × nTimes
 QVector<Eigen::MatrixXd> condA, condB;
@@ -132,7 +132,7 @@ for (int s = 0; s < nSubjects; ++s) {
 }
 
 // Run cluster permutation test
-auto result = STSLIB::StatsCluster::permutationTest(
+auto result = mne::StatsCluster::permutationTest(
     condA, condB, adjacency,
     1024,    // nPermutations
     0.05,    // clusterAlpha (initial threshold)
@@ -186,13 +186,13 @@ Build spatial adjacency matrices for cluster permutation testing:
 #include <sts/sts_adjacency.h>
 
 // From channel positions (distance threshold = 3× median nearest-neighbor distance)
-auto chAdj = STSLIB::StatsAdjacency::fromChannelPositions(info);
+auto chAdj = mne::StatsAdjacency::fromChannelPositions(info);
 
 // From channel positions with channel selection
-auto chAdj2 = STSLIB::StatsAdjacency::fromChannelPositions(info, {"MEG 0111", "MEG 0121"});
+auto chAdj2 = mne::StatsAdjacency::fromChannelPositions(info, {"MEG 0111", "MEG 0121"});
 
 // From a triangulated source space
-auto srcAdj = STSLIB::StatsAdjacency::fromSourceSpace(tris, nVertices);
+auto srcAdj = mne::StatsAdjacency::fromSourceSpace(tris, nVertices);
 ```
 
 ### Methods
@@ -215,7 +215,7 @@ Covariance matrix estimators with shrinkage methods:
 Eigen::MatrixXd data(306, 10000);
 
 // Ledoit-Wolf optimal shrinkage estimator
-auto [cov, alpha] = STSLIB::StsCovEstimators::ledoitWolf(data);
+auto [cov, alpha] = mne::StsCovEstimators::ledoitWolf(data);
 qDebug() << "Shrinkage coefficient:" << alpha;
 // cov: 306 × 306 shrunk covariance matrix
 ```
@@ -240,13 +240,13 @@ Multiple comparison correction methods:
 Eigen::MatrixXd pvals = result.matPval;
 
 // Bonferroni: corrected_p = min(p × n, 1.0)
-auto bonf = STSLIB::StatsMcCorrection::bonferroni(pvals);
+auto bonf = mne::StatsMcCorrection::bonferroni(pvals);
 
 // Holm-Bonferroni step-down
-auto holm = STSLIB::StatsMcCorrection::holmBonferroni(pvals);
+auto holm = mne::StatsMcCorrection::holmBonferroni(pvals);
 
 // FDR (Benjamini-Hochberg)
-auto fdr = STSLIB::StatsMcCorrection::fdr(pvals, 0.05);
+auto fdr = mne::StatsMcCorrection::fdr(pvals, 0.05);
 ```
 
 ### Methods
@@ -269,14 +269,14 @@ Source-space evaluation metrics for inverse solutions, as used in CMNE evaluatio
 // Peak localization error
 Eigen::Vector3d truePos(0.03, -0.02, 0.06);
 Eigen::Vector3d estPos(0.032, -0.019, 0.058);
-double pe = STSLIB::StatsSourceMetrics::peakLocalizationError(truePos, estPos);
+double pe = mne::StatsSourceMetrics::peakLocalizationError(truePos, estPos);
 qDebug() << "PE:" << pe << "m";
 
 // Spatial dispersion
 Eigen::VectorXd amplitudes(7498);
 Eigen::MatrixXd positions(7498, 3);
-int peakIdx = STSLIB::StatsSourceMetrics::findPeakIndex(amplitudes);
-double sd = STSLIB::StatsSourceMetrics::spatialDispersion(amplitudes, positions, peakIdx);
+int peakIdx = mne::StatsSourceMetrics::findPeakIndex(amplitudes);
+double sd = mne::StatsSourceMetrics::spatialDispersion(amplitudes, positions, peakIdx);
 qDebug() << "SD:" << sd << "m";
 ```
 
@@ -300,10 +300,10 @@ qDebug() << "SD:" << sd << "m";
 #include <sts/sts_correction.h>
 
 // Load measurement info for channel positions
-FIFFLIB::FiffInfo info = ...;
+mne::FiffInfo info = ...;
 
 // Build spatial adjacency
-auto adjacency = STSLIB::StatsAdjacency::fromChannelPositions(info);
+auto adjacency = mne::StatsAdjacency::fromChannelPositions(info);
 
 // Collect per-subject evoked data for two conditions
 QVector<Eigen::MatrixXd> auditory, visual;
@@ -313,7 +313,7 @@ for (int s = 0; s < 20; ++s) {
 }
 
 // Run cluster permutation test
-auto clusterResult = STSLIB::StatsCluster::permutationTest(
+auto clusterResult = mne::StatsCluster::permutationTest(
     auditory, visual, adjacency, 2048, 0.05, 0.05);
 
 // Report significant clusters
@@ -329,7 +329,7 @@ for (int c = 0; c < clusterResult.vecClusterPvals.size(); ++c) {
 
 ## MNE-Python Cross-Reference
 
-| MNE-CPP (STSLIB) | MNE-Python Equivalent |
+| MNE-CPP (mne_sts) | MNE-Python Equivalent |
 |---|---|
 | `StatsTtest::oneSample` | `scipy.stats.ttest_1samp` |
 | `StatsTtest::paired` | `scipy.stats.ttest_rel` |

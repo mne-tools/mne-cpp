@@ -1,18 +1,18 @@
 ---
 id: edf-reader
-title: "BIDSLIB::EDFReader"
+title: "mne::EDFReader"
 sidebar_label: EDFReader
 sidebar_position: 6
 ---
 
 # EDFReader
 
-**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/readers/bids_edf_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/readers/bids_edf_reader.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/readers/bids_edf_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/readers/bids_edf_reader.h)
 
 `#include <bids/bids_edf_reader.h>`
 
 ```cpp
-class BIDSLIB::EDFReader
+class mne::EDFReader
 ```
 
 The [`EDFReader`](/docs/api/bids/edf-reader) reads European Data Format (EDF/EDF+) files and exposes them through the [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) interface.
@@ -22,7 +22,7 @@ EDF stores data as 16-bit (BDF: 24-bit) little-endian integers in fixed-duration
 ```cpp title="src/examples/ex_bids/main.cpp"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
 const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
-const FIFFLIB::FiffInfo edfInfo = edf->info();
+const mne::FiffInfo edfInfo = edf->info();
 const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 ```
 
@@ -166,7 +166,7 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
 const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
-const FIFFLIB::FiffInfo edfInfo = edf->info();
+const mne::FiffInfo edfInfo = edf->info();
 const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
 ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->format_name() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->sample_count() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),

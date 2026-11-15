@@ -9,9 +9,9 @@
  * @date     May 2026
  * @brief    ROI-level aggregation of vertex-wise source estimates — the C++ peer of MNE-Python's @c extract_label_time_course.
  *
- * @ref INVLIB::InvLabelTimeCourse provides the five standard aggregation
+ * @ref mne::InvLabelTimeCourse provides the five standard aggregation
  * modes used by mne-python — @c mean, @c mean_flip, @c pca_flip, @c max
- * and @c auto — to collapse a per-vertex @ref INVLIB::InvSourceEstimate into one
+ * and @c auto — to collapse a per-vertex @ref mne::InvSourceEstimate into one
  * time-course per FreeSurfer label. Sign-flip vectors are derived from
  * the dominant orientation of the vertices in the label so that
  * phase-locked averaging works on signed surface data without
@@ -44,10 +44,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -78,7 +78,7 @@ public:
      * @return                     Matrix of shape (n_labels × n_times).
      */
     static Eigen::MatrixXd extract(const InvSourceEstimate& stc,
-                                   const std::vector<FSLIB::FsLabel>& labels,
+                                   const std::vector<mne::FsLabel>& labels,
                                    std::string_view sMode = "mean_flip",
                                    bool bAllowEmpty = false);
 
@@ -96,6 +96,6 @@ public:
     static Eigen::VectorXd computeSignFlip(const Eigen::MatrixXd& stcData);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_LABEL_TIME_COURSE_H

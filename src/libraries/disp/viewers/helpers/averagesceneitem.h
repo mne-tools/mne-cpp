@@ -14,7 +14,7 @@
  * @brief    QGraphicsObject painting one channel's averaged evoked trace at its sensor position.
  *
  * AverageSceneItem is a fixed-size mini-plot drawn for every channel
- * by @ref DISPLIB::AverageScene. It stores the per-condition data vectors,
+ * by @ref mne::disp::AverageScene. It stores the per-condition data vectors,
  * their @c QColor mapping and the y-scale settings, then paints the
  * overlaid traces, the t = 0 marker and the baseline inside its
  * bounding rect during @c paint().
@@ -37,14 +37,14 @@
 #include <QGraphicsObject>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -151,6 +151,6 @@ signals:
      */
     void sceneUpdateRequested();
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // AVERAGESCENEITEM_H

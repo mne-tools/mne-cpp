@@ -66,11 +66,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FSLIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -341,7 +337,7 @@ static InvSourceEstimate processLabelDir(const QString& labelDir,
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_compute_raw_inverse");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

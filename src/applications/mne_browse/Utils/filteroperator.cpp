@@ -61,14 +61,14 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 , m_sName(unique_name)
 {
     // Frequencies are relative to Nyquist. The kernel is linear phase with a delay of half its length.
-    const DSPLIB::FilterKernel kernel(unique_name,
-                                      type,
-                                      order,
-                                      centerfreq,
-                                      bandwidth,
-                                      parkswidth,
-                                      sFreq,
-                                      designMethod == Cosine ? 0 : 1);
+    const mne::FilterKernel kernel(unique_name,
+                                   type,
+                                   order,
+                                   centerfreq,
+                                   bandwidth,
+                                   parkswidth,
+                                   sFreq,
+                                   designMethod == Cosine ? 0 : 1);
     m_dCoeffA = kernel.getCoefficients();
     m_iFilterOrder = static_cast<int>(m_dCoeffA.cols());
 

@@ -52,9 +52,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -136,7 +134,7 @@ private:
 
 void TestMneInvCoverage::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
@@ -301,15 +299,15 @@ void TestMneInvCoverage::testReadBemRejectsDamagedSurfaces()
         QTemporaryDir dir;
         const std::filesystem::path path = dir.filePath("bem.fif").toStdU16String();
         if (!source.write(path))
-            return std::optional<BASELIB::ErrorCode>(BASELIB::ErrorCode::Io);
+            return std::optional<mne::ErrorCode>(mne::ErrorCode::Io);
         auto bem = MNEBem::read(path);
-        return bem ? (bem->size() == 2 ? std::optional<BASELIB::ErrorCode>() : std::optional(BASELIB::ErrorCode::NotFound)) : std::optional(bem.error().code);
+        return bem ? (bem->size() == 2 ? std::optional<mne::ErrorCode>() : std::optional(mne::ErrorCode::NotFound)) : std::optional(bem.error().code);
     };
     QCOMPARE(damaged([](MNEBemSurface&) {}), std::nullopt);
-    QCOMPARE(damaged([](MNEBemSurface& s) { s.np = 4; }), BASELIB::ErrorCode::Format);
-    QCOMPARE(damaged([](MNEBemSurface& s) { s.ntri = 2; }), BASELIB::ErrorCode::Format);
-    QCOMPARE(damaged([](MNEBemSurface& s) { s.nn = Eigen::MatrixX3f::Zero(2, 3); }), BASELIB::ErrorCode::Format);
-    QCOMPARE(MNEBem::read(std::filesystem::path("no-such-bem.fif")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.np = 4; }), mne::ErrorCode::Format);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.ntri = 2; }), mne::ErrorCode::Format);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.nn = Eigen::MatrixX3f::Zero(2, 3); }), mne::ErrorCode::Format);
+    QCOMPARE(MNEBem::read(std::filesystem::path("no-such-bem.fif")).error().code, mne::ErrorCode::Io);
 }
 
 //=============================================================================================================

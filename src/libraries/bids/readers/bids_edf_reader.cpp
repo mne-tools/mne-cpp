@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::EDFReader — European Data Format (EDF / EDF+) parser behind @ref BIDSLIB::AbstractFormatReader.
+ * @brief    Implementation of @ref mne::EDFReader — European Data Format (EDF / EDF+) parser behind @ref mne::AbstractFormatReader.
  */
 
 //=============================================================================================================
@@ -35,8 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +55,7 @@ std::optional<std::array<std::string, 3>> splitTriple(std::string_view text, cha
         if (end == std::string_view::npos) {
             return std::nullopt;
         }
-        fields[k] = std::string(BASELIB::trimmed(text.substr(start, end - start)));
+        fields[k] = std::string(mne::trimmed(text.substr(start, end - start)));
         start = end + 1;
     }
     return fields;
@@ -84,25 +83,25 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parse
     using namespace std::chrono;
     // EDF+ "Startdate dd-MMM-yyyy ..." carries all four digits of the year and wins over the header date
     std::optional<sys_days> date;
-    const std::vector<std::string> recording = BASELIB::split(BASELIB::trimmed(recordingId), ' ');
+    const std::vector<std::string> recording = mne::split(mne::trimmed(recordingId), ' ');
     if (recording.size() == 5) {
         if (const auto fields = splitTriple(recording[1], '-')) {
             static constexpr std::array<std::string_view, 12> months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN",
                                                                      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
-            const auto month = std::ranges::find_if(months, [&](std::string_view name) { return BASELIB::equalsIgnoreCase(name, (*fields)[1]); });
+            const auto month = std::ranges::find_if(months, [&](std::string_view name) { return mne::equalsIgnoreCase(name, (*fields)[1]); });
             if (month != months.end()) {
-                date = civilDate(BASELIB::toInt((*fields)[0]), static_cast<int>(month - months.begin()) + 1, BASELIB::toInt((*fields)[2]));
+                date = civilDate(mne::toInt((*fields)[0]), static_cast<int>(month - months.begin()) + 1, mne::toInt((*fields)[2]));
             }
         }
     }
     // Otherwise the two-digit header year: 85-99 is 1985-1999, 00-84 is 2000-2084
     if (!date) {
         if (const auto fields = splitTriple(startDate, '.')) {
-            std::optional<int> year = BASELIB::toInt((*fields)[2]);
+            std::optional<int> year = mne::toInt((*fields)[2]);
             if (year) {
                 *year += *year < 85 ? 2000 : 1900;
             }
-            date = civilDate(BASELIB::toInt((*fields)[0]), BASELIB::toInt((*fields)[1]), year);
+            date = civilDate(mne::toInt((*fields)[0]), mne::toInt((*fields)[1]), year);
         }
     }
     if (!date) {
@@ -110,9 +109,9 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parse
     }
     sys_time<microseconds> time = *date;
     if (const auto fields = splitTriple(startTime, '.')) {
-        const auto hour = BASELIB::toInt((*fields)[0]);
-        const auto minute = BASELIB::toInt((*fields)[1]);
-        const auto second = BASELIB::toInt((*fields)[2]);
+        const auto hour = mne::toInt((*fields)[0]);
+        const auto minute = mne::toInt((*fields)[1]);
+        const auto second = mne::toInt((*fields)[2]);
         if (hour && minute && second) {
             time += hours(*hour) + minutes(*minute) + seconds(*second);
         }
@@ -130,13 +129,13 @@ namespace
 // mne read_raw_edf stim_channel="auto"
 bool isAutoStimLabel(std::string_view label)
 {
-    return BASELIB::equalsIgnoreCase(label, "status") || BASELIB::equalsIgnoreCase(label, "trigger");
+    return mne::equalsIgnoreCase(label, "status") || mne::equalsIgnoreCase(label, "trigger");
 }
 
 // EDF header fields are space-padded Latin-1
 std::string headerText(std::string_view field)
 {
-    return BASELIB::latin1_to_utf8(BASELIB::trimmed(field));
+    return mne::latin1_to_utf8(mne::trimmed(field));
 }
 
 } // namespace
@@ -150,7 +149,7 @@ FiffChInfo EDFChannelInfo::to_fiff_ch_info() const
     info.scanNo = channelNumber;
     info.logNo = channelNumber;
 
-    const std::string lower = BASELIB::toLower(label);
+    const std::string lower = mne::toLower(label);
     const auto has = [&lower](std::string_view part) {
         return lower.find(part) != std::string::npos;
     };
@@ -217,16 +216,16 @@ EDFReader::~EDFReader() = default;
 
 bool EDFReader::open(const std::filesystem::path& path)
 {
-    m_file = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Read);
+    m_file = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!m_file) {
-        BASELIB::Log::warning("[EDFReader::open] Could not open file: {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[EDFReader::open] Could not open file: {}", mne::utf8FromPath(path));
         return false;
     }
 
     // Like mne, the extension decides between EDF (16 bit) and BDF (24 bit)
-    m_bytesPerSample = BASELIB::equalsIgnoreCase(BASELIB::utf8FromPath(path.extension()), ".bdf") ? 3 : 2;
+    m_bytesPerSample = mne::equalsIgnoreCase(mne::utf8FromPath(path.extension()), ".bdf") ? 3 : 2;
     if (!parse_header()) {
-        BASELIB::Log::warning("[EDFReader::open] Not an EDF/BDF header: {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[EDFReader::open] Not an EDF/BDF header: {}", mne::utf8FromPath(path));
         m_file.reset();
         return false;
     }
@@ -258,11 +257,11 @@ bool EDFReader::parse_header()
     const std::string_view startDate = field(8);
     const std::string_view startTime = field(8);
     m_measDate = parse_start_date(recordingId, startDate, startTime);
-    m_numBytesInHeader = BASELIB::toInt(field(8)).value_or(0);
+    m_numBytesInHeader = mne::toInt(field(8)).value_or(0);
     field(44); // reserved
-    m_numDataRecords = BASELIB::toInt(field(8)).value_or(0);
-    const auto recordDuration = static_cast<float>(BASELIB::toDouble(field(8)).value_or(0.0));
-    const int numChannels = BASELIB::toInt(field(4)).value_or(0);
+    m_numDataRecords = mne::toInt(field(8)).value_or(0);
+    const auto recordDuration = static_cast<float>(mne::toDouble(field(8)).value_or(0.0));
+    const int numChannels = mne::toInt(field(4)).value_or(0);
     if (numChannels <= 0 || static_cast<std::uint64_t>(numChannels) * bytesPerSignal + fixedBytes > m_file->size()) {
         return false;
     }
@@ -284,15 +283,15 @@ bool EDFReader::parse_header()
     column(16, [](EDFChannelInfo& ch, std::string_view v) { ch.label = headerText(v); });
     column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.transducerType = headerText(v); });
     column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalDimension = headerText(v); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMin = static_cast<float>(BASELIB::toDouble(v).value_or(0.0)); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMax = static_cast<float>(BASELIB::toDouble(v).value_or(0.0)); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMin = BASELIB::toInt(v).value_or(0); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMax = BASELIB::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMin = static_cast<float>(mne::toDouble(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMax = static_cast<float>(mne::toDouble(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMin = mne::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMax = mne::toInt(v).value_or(0); });
     column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.prefiltering = headerText(v); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.samplesPerRecord = BASELIB::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.samplesPerRecord = mne::toInt(v).value_or(0); });
 
     if (m_numBytesInHeader != static_cast<long>(fixedBytes + count * bytesPerSignal)) {
-        BASELIB::Log::warning("[EDFReader::parse_header] Header byte count mismatch: read {} expected {}", fixedBytes + count * bytesPerSignal, m_numBytesInHeader);
+        mne::Log::warning("[EDFReader::parse_header] Header byte count mismatch: read {} expected {}", fixedBytes + count * bytesPerSignal, m_numBytesInHeader);
     }
 
     m_numBytesPerDataRecord = 0;
@@ -341,13 +340,13 @@ FiffInfo EDFReader::info() const
 MatrixXf EDFReader::read_raw_segment(long first, long last) const
 {
     if (!m_file) {
-        BASELIB::Log::warning("[EDFReader::read_raw_segment] File not open");
+        mne::Log::warning("[EDFReader::read_raw_segment] File not open");
         return MatrixXf();
     }
 
     const long total = sample_count();
     if (first < 0 || first >= total || last < 0 || last > total) {
-        BASELIB::Log::warning("[EDFReader::read_raw_segment] Index out of bounds: {} - {}", first, last);
+        mne::Log::warning("[EDFReader::read_raw_segment] Index out of bounds: {} - {}", first, last);
         return MatrixXf();
     }
     const long numSamples = last - first;
@@ -364,7 +363,7 @@ MatrixXf EDFReader::read_raw_segment(long first, long last) const
     std::vector<unsigned char> records(static_cast<std::size_t>(numRecords) * recordBytes);
     m_file->seek(static_cast<std::uint64_t>(m_numBytesInHeader) + static_cast<std::uint64_t>(firstRecord) * recordBytes);
     if (m_file->read(records.data(), records.size()) != records.size()) {
-        BASELIB::Log::warning("[EDFReader::read_raw_segment] File ends before sample {}", last);
+        mne::Log::warning("[EDFReader::read_raw_segment] File ends before sample {}", last);
     }
 
     // Channels are interleaved per record; demultiplex and scale the measurement channels
@@ -435,5 +434,5 @@ std::string_view EDFReader::format_name() const
 
 bool EDFReader::supports_extension(std::string_view extension) const
 {
-    return BASELIB::equalsIgnoreCase(extension, ".edf") || BASELIB::equalsIgnoreCase(extension, ".bdf");
+    return mne::equalsIgnoreCase(extension, ".edf") || mne::equalsIgnoreCase(extension, ".bdf");
 }

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Implementation of @ref MRILIB::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
+ * @brief    Implementation of @ref mne::MriCorIO: per-file COR-NNN reader with coronal-orientation slice transform synthesis.
  *
  * Walks the 256 @c COR-001 \u2026 @c COR-256 files in the supplied
  * directory, mmap-friendly reads the 65\u202f536-byte flat slice
@@ -53,8 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -84,14 +83,14 @@ bool MriCorIO::read(const std::string& dir,
         char name[16];
         std::snprintf(name, sizeof(name), "/COR-%03d", k + 1);
         const std::string fileName = dir + name;
-        const auto data = BASELIB::read_file_bytes(BASELIB::pathFromUtf8(fileName));
+        const auto data = mne::read_file_bytes(mne::pathFromUtf8(fileName));
         if (!data) {
-            BASELIB::Log::critical("MriCorIO::read - Could not open COR file {}", fileName);
+            mne::Log::critical("MriCorIO::read - Could not open COR file {}", fileName);
             return false;
         }
 
         if (data->size() < nPixels) {
-            BASELIB::Log::critical("MriCorIO::read - COR file {} is too small: {} bytes (expected {})", fileName, data->size(), nPixels);
+            mne::Log::critical("MriCorIO::read - COR file {} is too small: {} bytes (expected {})", fileName, data->size(), nPixels);
             return false;
         }
 
@@ -124,7 +123,7 @@ bool MriCorIO::read(const std::string& dir,
     }
 
     if (verbose) {
-        BASELIB::Log::info("Read {} COR slices from {}", COR_NSLICE, dir);
+        mne::Log::info("Read {} COR slices from {}", COR_NSLICE, dir);
     }
 
     return true;

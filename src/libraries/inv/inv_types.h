@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Strongly-typed enumerations that tag a source estimate with the inverse method, source-space type, and orientation constraint that produced it.
  *
- * Defines @ref INVLIB::InvEstimateMethod (MNE, dSPM, sLORETA, eLORETA,
+ * Defines @ref mne::InvEstimateMethod (MNE, dSPM, sLORETA, eLORETA,
  * LCMV, DICS, SAM, MixedNorm, GammaMAP, DipoleFit, RapMusic, PwlRapMusic),
- * @ref INVLIB::InvSourceSpaceType (surface, volume, mixed, discrete) and
- * @ref INVLIB::InvOrientationType (fixed, free, loose). These tags travel
- * on every @ref INVLIB::InvSourceEstimate so downstream consumers
+ * @ref mne::InvSourceSpaceType (surface, volume, mixed, discrete) and
+ * @ref mne::InvOrientationType (fixed, free, loose). These tags travel
+ * on every @ref mne::InvSourceEstimate so downstream consumers
  * (visualisation, ROI extraction, tokenisation, CSV export) can branch on
  * the algorithm and geometry that produced the data without re-inspecting
  * matrix shapes.
@@ -23,10 +23,10 @@
 #define INV_TYPES_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -75,6 +75,6 @@ enum class InvOrientationType
     Loose
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_TYPES_H

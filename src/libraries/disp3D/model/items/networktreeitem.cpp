@@ -16,7 +16,7 @@
 
 #include "networktreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -29,4 +29,4 @@ NetworkTreeItem::NetworkTreeItem(const QString& text, const QString& objectKey)
 {
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 using namespace DATALOADERPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE STATIC HELPERS
@@ -62,7 +62,7 @@ namespace
  */
 bool containsBemSurfaces(const QString& sFilePath)
 {
-    FIFFLIB::FiffStream pStream(sFilePath.toStdU16String());
+    mne::FiffStream pStream(sFilePath.toStdU16String());
 
     if (!pStream.open()) {
         return false;
@@ -82,7 +82,7 @@ bool containsBemSurfaces(const QString& sFilePath)
 //=============================================================================================================
 
 DataLoader::DataLoader()
-: m_pProgressView(new DISPLIB::ProgressView(false))
+: m_pProgressView(new mne::disp::ProgressView(false))
 , m_pProgressViewWidget(new QWidget())
 , m_sSettingsPath("MNEANALYZE/DataLoader")
 , m_sLastDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation))
@@ -211,7 +211,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
@@ -245,7 +245,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     startProgress("Loading " + fileInfo.fileName());
 
     // Event lists belong to the selected recording, whichever format they are stored in
-    const auto attachToRecording = [this](const QSharedPointer<ANSHAREDLIB::EventModel>& pModel) {
+    const auto attachToRecording = [this](const QSharedPointer<mne::analyze::EventModel>& pModel) {
         if (!pModel || !m_pSelectedModel || !m_pSelectedModel->getFiffInfo())
             return;
         pModel->setFiffModel(m_pSelectedModel);
@@ -254,22 +254,22 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     };
 
     if (fileInfo.exists() && (fileInfo.completeSuffix() == "eve")) {
-        attachToRecording(m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath));
+        attachToRecording(m_pAnalyzeData->loadModel<mne::analyze::EventModel>(sFilePath));
     } else if (fileInfo.exists() && fileInfo.suffix() == "dip") {
-        m_pAnalyzeData->loadModel<ANSHAREDLIB::DipoleFitModel>(sFilePath);
+        m_pAnalyzeData->loadModel<mne::analyze::DipoleFitModel>(sFilePath);
     } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if (fileInfo.completeBaseName().endsWith("eve")) {
-            attachToRecording(m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath));
+            attachToRecording(m_pAnalyzeData->loadModel<mne::analyze::EventModel>(sFilePath));
         } else if (fileInfo.completeBaseName().endsWith("bem")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::BemDataModel>(sFilePath);
         } else if (fileInfo.completeBaseName().endsWith("raw")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::FiffRawViewModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::FiffRawViewModel>(sFilePath);
         } else if (fileInfo.completeBaseName().endsWith("ave")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::AveragingDataModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::AveragingDataModel>(sFilePath);
         } else if (fileInfo.completeBaseName().endsWith("cov")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::CovarianceModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::CovarianceModel>(sFilePath);
         } else if (fileInfo.completeBaseName().endsWith("trans")) {
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::MriCoordModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::MriCoordModel>(sFilePath);
         } else if (containsBemSurfaces(sFilePath)) {
             //
             // The naming conventions above miss perfectly valid files: the
@@ -278,7 +278,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
             // so neither reaches the "bem" branch. Fall back to looking at
             // what the file actually contains.
             //
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
+            m_pAnalyzeData->loadModel<mne::analyze::BemDataModel>(sFilePath);
         } else {
             qWarning() << "[DataLoader::loadFilePath] Cannot determine the type of"
                        << sFilePath << "- no model was loaded.";
@@ -326,7 +326,7 @@ void DataLoader::onLoadScanSessionPressed()
 {
     QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create("");
     pModel->setRealtime(true);
-    m_pAnalyzeData->addModel<ANSHAREDLIB::FiffRawViewModel>(pModel, "MNE Scan Session");
+    m_pAnalyzeData->addModel<mne::analyze::FiffRawViewModel>(pModel, "MNE Scan Session");
 }
 
 //=============================================================================================================
@@ -516,7 +516,7 @@ void DataLoader::endProgress()
 
 //=============================================================================================================
 
-void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void DataLoader::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if (m_pSelectedModel) {

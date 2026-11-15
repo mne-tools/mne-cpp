@@ -35,15 +35,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCov::RtCov(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo)
+RtCov::RtCov(const std::shared_ptr<mne::FiffInfo>& pFiffInfo)
 : m_iSamples(0)
 , m_fiffInfo(*pFiffInfo)
 , m_bPicksReady(false)
@@ -56,7 +55,7 @@ FiffCov RtCov::estimateCovariance(const Eigen::MatrixXd& matData,
                                   int iNewMaxSamples)
 {
     if (m_fiffInfo.chs.empty()) {
-        BASELIB::Log::warning("[RtCov::estimateCovariance] FiffInfo was not set. Returning empty covariance estimation.");
+        mne::Log::warning("[RtCov::estimateCovariance] FiffInfo was not set. Returning empty covariance estimation.");
         return FiffCov();
     }
 
@@ -143,7 +142,7 @@ FiffCov RtCov::estimateCovariance(const Eigen::MatrixXd& matData,
 
         return computedCov;
     } else {
-        BASELIB::Log::warning("[RtCov::estimateCovariance] Number of samples equals zero. Regularization not possible. Returning empty covariance estimation.");
+        mne::Log::warning("[RtCov::estimateCovariance] Number of samples equals zero. Regularization not possible. Returning empty covariance estimation.");
         return FiffCov();
     }
 }

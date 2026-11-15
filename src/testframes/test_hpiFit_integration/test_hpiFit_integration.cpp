@@ -50,8 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -107,7 +106,7 @@ TestHpiFitIntegration::TestHpiFitIntegration()
 
 void TestHpiFitIntegration::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qInfo() << "Error Translation" << dErrorTrans;
     qInfo() << "Error Quaternion" << dErrorQuat;
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
@@ -140,8 +139,8 @@ void TestHpiFitIntegration::initTestCase()
     fiff_int_t quantum = ceil(quantum_sec * pFiffInfo->sfreq);
 
     // Read Quaternion File from maxfilter and calculated movements/rotations with python
-    MATHLIB::read_matrix(mRefPos, (QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_hpiFit_pos.txt").toStdString());
-    MATHLIB::read_matrix(mRefResult, (QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_angle_move.txt").toStdString());
+    mne::read_matrix(mRefPos, (QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_hpiFit_pos.txt").toStdString());
+    mne::read_matrix(mRefResult, (QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_angle_move.txt").toStdString());
 
     mHpiResult = mRefResult;
 
@@ -214,7 +213,7 @@ void TestHpiFitIntegration::initTestCase()
         mHpiResult(i, 1) = devHeadT.angle_to(hpiFitResult.devHeadTrans.trans);
     }
     // For debug: position file for InvHpiFit
-    //    MATHLIB::write_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/mHpiPos.txt");
+    //    mne::write_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/mHpiPos.txt");
 }
 
 //=============================================================================================================

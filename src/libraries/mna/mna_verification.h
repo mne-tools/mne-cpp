@@ -7,20 +7,20 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref MNALIB::MnaNode for reproducible execution.
+ * @brief    Verification, declarative checks, evaluation results and provenance snapshot attached to every @ref mne::MnaNode for reproducible execution.
  *
  * This header carries the four structs that turn an MNA graph from
- * a black-box runner into a self-auditing pipeline. @ref MNALIB::MnaVerificationCheck
+ * a black-box runner into a self-auditing pipeline. @ref mne::MnaVerificationCheck
  * is a declarative pre- or post-condition (e.g. @c rank(covariance)
- * @c > @c 0) authored alongside the node; @ref MNALIB::MnaVerificationResult
+ * @c > @c 0) authored alongside the node; @ref mne::MnaVerificationResult
  * records each evaluation outcome with the actual value, severity
- * and timestamp; and the parent @ref MNALIB::MnaVerification aggregates an
+ * and timestamp; and the parent @ref mne::MnaVerification aggregates an
  * explanation string, the check list, both result lists and the
- * full @ref MNALIB::MnaProvenance snapshot.
+ * full @ref mne::MnaProvenance snapshot.
  *
- * @ref MNALIB::MnaProvenance captures everything needed to re-run a node
+ * @ref mne::MnaProvenance captures everything needed to re-run a node
  * bit-for-bit later: SHA-256 of every input, the resolved parameter
- * map after @ref MNALIB::MnaParamTree evaluation, MNE-CPP / Qt / compiler /
+ * map after @ref mne::MnaParamTree evaluation, MNE-CPP / Qt / compiler /
  * OS versions, external tool versions for IPC and Script nodes,
  * wall-clock and peak-RSS measurements, and the random seed when
  * stochastic ops are involved. Together these structs are what
@@ -53,10 +53,10 @@
 #include <QCborMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -185,6 +185,6 @@ struct MNASHARED_EXPORT MnaVerification
     static MnaVerification fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_VERIFICATION_H

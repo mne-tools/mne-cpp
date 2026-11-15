@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of MLLIB build-stamp accessors that forward to BASELIB, which owns the build stamp.
+ * @brief    Implementation of mne_ml build-stamp accessors that forward to mne_base, which owns the build stamp.
  *
- * Each of @ref MLLIB::buildDateTime, @ref MLLIB::buildHash and
- * @ref MLLIB::buildHashLong is a one-line delegate to the matching
- *  BASELIB helper; centralising the call here lets every library in
+ * Each of @ref mne::buildDateTime, @ref mne::buildHash and
+ * @ref mne::buildHashLong is a one-line delegate to the matching
+ *  mne_base helper; centralising the call here lets every library in
  * mne-cpp report identical build metadata (filled in once by
  * @c buildinfo.h.in at CMake configure time) without each library
  * having to depend on the generation rules directly.
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* MLLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* MLLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* MLLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

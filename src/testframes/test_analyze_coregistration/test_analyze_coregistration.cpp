@@ -39,9 +39,9 @@
 #include <memory>
 
 using namespace COREGISTRATIONPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 

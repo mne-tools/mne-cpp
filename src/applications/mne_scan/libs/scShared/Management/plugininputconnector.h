@@ -31,10 +31,10 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -88,10 +88,10 @@ public:
     virtual bool isOutputConnector() const;
 
 signals:
-    void notify(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void notify(mne::scan::Measurement::SPtr pMeasurement);
 
 public slots:
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 };
 } // NAMESPACE
 

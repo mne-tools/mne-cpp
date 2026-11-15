@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.3
  * @date     June 2020
- * @brief    Common base widget for every dockable Quick-Control settings panel in DISPLIB.
+ * @brief    Common base widget for every dockable Quick-Control settings panel in mne_disp.
  *
  * AbstractView is the shared QWidget super-class used by all the
  * viewers in this directory. It standardises the three runtime modes
@@ -43,19 +43,19 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * @brief Base widget for every dockable settings panel in DISPLIB; centralises GUI / processing mode and settings persistence.
+ * @brief Base widget for every dockable settings panel in mne_disp; centralises GUI / processing mode and settings persistence.
  *
  * Subclasses override @c updateGuiMode, @c updateProcessingMode and
  * @c saveSettings / @c loadSettings to react to mode changes and to
@@ -150,7 +150,7 @@ signals:
     /**
      * Signal emited whenever the gui style mode changes.
      */
-    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
 
 protected:
     bool m_bResearchModeIsActive; /**< The flag describing whether the research mode of the view is active or not. */

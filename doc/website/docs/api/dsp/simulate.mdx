@@ -7,7 +7,7 @@ sidebar_position: 28
 
 # Simulate
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -33,12 +33,12 @@ const VectorXi vertices = VectorXi::LinSpaced(5, 100, 104);
 MatrixXd waveforms(2, 4);
 waveforms << 1.0, 2.0, 3.0, 4.0,
     -1.0, 0.0, 1.0, 0.0;
-const INVLIB::InvSourceEstimate stc = simulateStcFromWaveforms(waveforms, (VectorXi(2) << 101, 104).finished(), vertices, 0.0f, 0.01f);
+const mne::InvSourceEstimate stc = simulateStcFromWaveforms(waveforms, (VectorXi(2) << 101, 104).finished(), vertices, 0.0f, 0.01f);
 
 SimulateStcParams gaussians; // one Gaussian bump per active vertex, seeded
 gaussians.sfreq = 200.0f;
 gaussians.duration = 0.5f;
-const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
+const mne::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
 ```
 
 ---
@@ -53,7 +53,7 @@ const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finish
 
 Create a synthetic source time course.
 
-Generates an [InvSourceEstimate](/docs/api/inv/inv-source-estimate) with Gaussian-envelope waveforms at specified source vertices. Each active source has a Gaussian temporal profile centered at different times.
+Generates an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) with Gaussian-envelope waveforms at specified source vertices. Each active source has a Gaussian temporal profile centered at different times.
 
 **Parameters:**
 
@@ -111,7 +111,7 @@ Create a synthetic source time course from custom waveforms.
 
 [Simulate](/docs/api/dsp/simulate) evoked data from a source estimate and forward model.
 
-Projects the source estimate with `INVLIB::apply_forward` and optionally adds noise from a noise covariance. As in MNE-Python the noise follows the prepared covariance (SSP applied, MEG and EEG decomposed separately), so MEG and EEG noise are independent.
+Projects the source estimate with `mne::apply_forward` and optionally adds noise from a noise covariance. As in MNE-Python the noise follows the prepared covariance (SSP applied, MEG and EEG decomposed separately), so MEG and EEG noise are independent.
 
 Equivalent to MNE-Python's mne.simulation.simulate_evoked().
 
@@ -149,7 +149,7 @@ Equivalent to MNE-Python's mne.simulation.simulate_evoked().
 
 [Simulate](/docs/api/dsp/simulate) evoked data without noise.
 
-Projects the source estimate through the forward model (no noise added); `INVLIB::apply_forward`.
+Projects the source estimate through the forward model (no noise added); `mne::apply_forward`.
 
 **Parameters:**
 

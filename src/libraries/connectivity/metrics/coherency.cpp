@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::Coherency - shared cross/auto-spectral core for magnitude-squared coherence and the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
+ * @brief    Implementation of @ref mne::Coherency - shared cross/auto-spectral core for magnitude-squared coherence and the volume-conduction-robust imaginary coherence of Nolte et al. (2004).
  */
 
 //=============================================================================================================
@@ -45,10 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

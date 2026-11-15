@@ -9,14 +9,14 @@
  * @date     March 2026
  * @brief    Shared math kernels (filter derivation, source power, regularised pseudo-inverse) used by both the LCMV and DICS beamformers.
  *
- * @ref INVLIB::InvBeamformerCompute is a stateless helper that holds
- * the numerical core of every beamformer in INVLIB. It implements the
+ * @ref mne::InvBeamformerCompute is a stateless helper that holds
+ * the numerical core of every beamformer in mne_inv. It implements the
  * unit-gain filter @f$W_{ug} = (G^{T} C_m^{-1} G)^{-1} G^{T} C_m^{-1}@f$,
  * the Sekihara unit-noise-gain normalisation, the NAI variant, the
  * per-source max-power orientation search, the regularised symmetric
  * pseudo-inverse used to invert the data covariance / CSD, and the
  * rank-reduction step for radially-deficient MEG sphere models. Pulling
- * this code out keeps @ref INVLIB::InvLCMV and @ref INVLIB::InvDICS as thin
+ * this code out keeps @ref mne::InvLCMV and @ref mne::InvDICS as thin
  * orchestration layers and ensures both algorithms share the same
  * numerically-robust kernel.
  *
@@ -43,10 +43,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -158,6 +158,6 @@ private:
     static void reduceLeadfieldRank(Eigen::MatrixXd& Gk);
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_BEAMFORMER_COMPUTE_H

@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
+using namespace mne;
 
 
 //*************************************************************************************************************
@@ -95,7 +95,7 @@ public:
      *
      * @param evoked the evoked data to draw.
      */
-    void setEvokedData(const FIFFLIB::FiffEvoked& evoked);
+    void setEvokedData(const mne::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -115,11 +115,11 @@ public:
      */
     double yToAmplitude(double sceneY) const;
 
-    QString m_sSetName;                  /**< The set name.*/
-    fiff_int_t m_iSetKind;               /**< The set kind which is to be plotted (MEG or EEG).*/
-    fiff_int_t m_iSetUnit;               /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
-    const FiffInfo* m_pFiffInfo;         /**< The fiff info.*/
-    FIFFLIB::FiffEvoked m_displayEvoked; /**< Owned evoked data for stable plotting pointers. */
+    QString m_sSetName;              /**< The set name.*/
+    fiff_int_t m_iSetKind;           /**< The set kind which is to be plotted (MEG or EEG).*/
+    fiff_int_t m_iSetUnit;           /**< The set unit. Used to determine whether mag or grad channels are to be plotted.*/
+    const FiffInfo* m_pFiffInfo;     /**< The fiff info.*/
+    mne::FiffEvoked m_displayEvoked; /**< Owned evoked data for stable plotting pointers. */
 
     QList<QColor> m_cAverageColors;    /**< The current average color.*/
     RowVectorPair m_lAverageData;      /**< The channels average data which is to be plotted.*/

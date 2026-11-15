@@ -7,7 +7,7 @@ doxy2mdx.py — Convert Doxygen XML output to Docusaurus MDX pages for
 MNE-CPP's public API reference.
 
 Ported from src/external/skigen/doc/doxygen2mdx.py and adapted to:
-  * MNE-CPP's FIFFLIB::, MNELIB::, ... namespaced compound names.
+  * MNE-CPP's mne:: and mne::disp:: namespaced compound names.
   * Qt-specific Q_SIGNALS: / Q_SLOTS: sections.
   * SPDX-style author headers.
   * Math passthrough for KaTeX (remark-math) in the Docusaurus site.
@@ -21,7 +21,7 @@ CLI
         --out-dir   doc/website/docs/api \\
         --registry  doc/api_registry.json \\
         --generate-sidebars \\
-        [--classes FIFFLIB::FiffInfo,...] \\
+        [--classes mne::FiffInfo,...] \\
         [--sidebar-out doc/website/sidebars.api.generated.ts] \\
         [--strict]
 """
@@ -100,7 +100,7 @@ def _build_xref_map(xml_dir: Optional[Path] = None) -> None:
     **and** the Doxygen XML output directory.
 
     Phase 1 — registry: every documented class gets its short name
-    (``FiffInfo``) and its qualified name (``FIFFLIB::FiffInfo``) mapped
+    (``FiffInfo``) and its qualified name (``mne::FiffInfo``) mapped
     to the Docusaurus page path.
 
     Phase 2 — Doxygen XML: scan all ``class_*.xml`` / ``struct_*.xml``
@@ -123,7 +123,7 @@ def _build_xref_map(xml_dir: Optional[Path] = None) -> None:
         slug = page_slug(name, dir_slug)
         link = f"/docs/api/{dir_slug}/{slug}"
         _XREF_MAP[name] = link
-        # Also register the qualified name (e.g. "FIFFLIB::FiffInfo")
+        # Also register the qualified name (e.g. "mne::FiffInfo")
         qname = entry.get("qualified_name", "")
         if qname and qname != name:
             _XREF_MAP[qname] = link
@@ -154,7 +154,7 @@ def _build_xref_map(xml_dir: Optional[Path] = None) -> None:
 
     if _XREF_MAP:
         # Sort by length descending so longer names match first
-        # (e.g. "FIFFLIB::FiffChInfo" before "FiffChInfo").
+        # (e.g. "mne::FiffChInfo" before "FiffChInfo").
         sorted_names = sorted(_XREF_MAP.keys(), key=len, reverse=True)
         escaped = [re.escape(n) for n in sorted_names]
         # Negative lookahead (?!-) prevents matching "MNE" in "MNE-Python"
@@ -207,26 +207,12 @@ def linkify_type(type_str: str, *, self_name: str = "") -> str:
 
 
 def module_for(qualified: str) -> Optional[dict]:
-    """Resolve a qualified class name (``FIFFLIB::FiffInfo``) to a
-    registry entry.  When the short-name has multiple matches we
-    disambiguate by lowercased-namespace ↔ ``module`` key.
+    """Resolve a qualified class name (``mne::FiffInfo``) to its registry
+    entry by the leaf name, which is unique across the registry.
     Returns ``None`` if no match is registered.
     """
-    parts = qualified.split("::")
-    short = parts[-1]
-    candidates = _CLASS_INDEX.get(short, [])
-    if not candidates:
-        return None
-    if len(candidates) == 1:
-        return candidates[0]
-    if len(parts) >= 2:
-        ns_lower = parts[-2].lower()
-        # FIFFLIB -> "fiff"; strip trailing "lib"
-        ns_key = ns_lower[:-3] if ns_lower.endswith("lib") else ns_lower
-        for c in candidates:
-            if c.get("module") == ns_key or c.get("module") == ns_lower:
-                return c
-    return candidates[0]
+    candidates = _CLASS_INDEX.get(qualified.split("::")[-1], [])
+    return candidates[0] if candidates else None
 
 
 # ---------------------------------------------------------------------------
@@ -234,7 +220,7 @@ def module_for(qualified: str) -> Optional[dict]:
 # ---------------------------------------------------------------------------
 
 def class_slug(qualified: str) -> str:
-    """``FIFFLIB::FiffInfo`` -> ``fiff-info`` (kebab-case of leaf)."""
+    """``mne::FiffInfo`` -> ``fiff-info`` (kebab-case of leaf)."""
     short = qualified.split("::")[-1]
     slug = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "-", short)
     slug = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", "-", slug)
@@ -245,7 +231,7 @@ def page_slug(qualified: str, dir_slug: str) -> str:
     """Return the on-disk/URL slug for a class or module page.
 
     Identical to :func:`class_slug` except that a facade class whose slug
-    would equal the library folder name (e.g. ``FIFFLIB::Fiff`` under the
+    would equal the library folder name (e.g. ``mne::Fiff`` under the
     ``fiff`` library) is disambiguated with a ``-class`` suffix.  Without
     this, Docusaurus treats the file as the folder's index page and it
     collides with the generated ``index.mdx`` overview, producing a
@@ -1295,7 +1281,7 @@ def generate_module_mdx(xml_dir: Path,
     lines.append("")
     lines.append(f"# {short_name}")
     lines.append("")
-    ns = mod.get("namespace") or module_key.upper() + "LIB"
+    ns = mod.get("namespace") or "mne"
     mod_label = mod.get("sidebar_label", module_key)
     lines.append(
         f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
@@ -1375,7 +1361,7 @@ def generate_module_mdx(xml_dir: Path,
 def _short_module_label(mod: dict, fallback: str) -> str:
     """Return the human-readable sidebar label for a module. The label
     is taken verbatim from the registry (e.g. ``"FIFF Library"``); the
-    namespace (``FIFFLIB``) is exposed separately in the page header so
+    namespace (``mne``) is exposed separately in the page header so
     the sidebar can read like ``FIFF Library > FiffStream``."""
     return mod.get("sidebar_label", fallback)
 
@@ -1410,7 +1396,7 @@ def generate_library_overview(module_key: str,
     source exists for this library."""
     dev_name = _LIBRARY_OVERVIEW_DEV_FILES.get(module_key)
     label = mod.get("sidebar_label", module_key)
-    namespace = mod.get("namespace") or module_key.upper() + "LIB"
+    namespace = mod.get("namespace") or "mne"
     dir_slug = mod.get("dir_slug", module_key)
     out_path = out_dir / dir_slug
     out_path.mkdir(parents=True, exist_ok=True)
@@ -1969,7 +1955,7 @@ def generate_sidebar_fragment(sidebar_out: Path,
         overview_path = generate_library_overview(mod_name, mod, out_dir, repo_root)
         for entry in groups[mod_name]:
             # Facade classes whose bare slug matches the library folder
-            # (e.g. ``FIFFLIB::Fiff`` under ``fiff``) are disambiguated
+            # (e.g. ``mne::Fiff`` under ``fiff``) are disambiguated
             # with a ``-class`` suffix so they get their own route and
             # do not collide with the library ``index.mdx`` overview.
             slug = page_slug(entry["name"], dir_slug)
@@ -2047,10 +2033,8 @@ def generate_sidebar_fragment(sidebar_out: Path,
 # ---------------------------------------------------------------------------
 
 def _is_excluded_namespace(qualified: str) -> bool:
-    parts = qualified.split("::")
-    if len(parts) <= 1:
-        return False
-    return parts[0] in _EXCLUDED_NAMESPACES
+    namespace = qualified.rpartition("::")[0]
+    return any(namespace == ns or namespace.startswith(ns + "::") for ns in _EXCLUDED_NAMESPACES)
 
 
 def main(argv: Optional[List[str]] = None) -> int:

@@ -34,10 +34,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** A digitizer's command and record stream. */
@@ -85,6 +85,6 @@ struct PolhemusSimulation
  */
 std::unique_ptr<PolhemusTransport> make_polhemus_simulator(const PolhemusSimulation& simulation);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // POLHEMUS_TRANSPORT_H

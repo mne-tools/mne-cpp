@@ -35,7 +35,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 
 //=============================================================================================================
 // HELPERS
@@ -147,7 +147,7 @@ TestNetworkVisualization::TestNetworkVisualization()
 
 void TestNetworkVisualization::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     m_fullNet4 = buildTestNetwork(4);
     m_fullNet10 = buildTestNetwork(10);

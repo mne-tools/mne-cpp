@@ -1,18 +1,18 @@
 ---
 id: inv-dipole-fit-settings
-title: "INVLIB::InvDipoleFitSettings"
+title: "mne::InvDipoleFitSettings"
 sidebar_label: InvDipoleFitSettings
 sidebar_position: 24
 ---
 
 # InvDipoleFitSettings
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit_settings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit_settings.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit_settings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit_settings.h)
 
 `#include <inv/inv_dipole_fit_settings.h>`
 
 ```cpp
-class INVLIB::InvDipoleFitSettings
+class mne::InvDipoleFitSettings
 ```
 
 Command-line and programmatic settings for the `mne_dipole_fit` driver: BEM / sphere model, EEG model, guess-grid parameters, noise-covariance file, measurement file + time window, projection list, per-channel-type regularisation and output dip/bdip file names.
@@ -67,7 +67,7 @@ Check whether Dipole Fit Settings are correctly set and report them.
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 131"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 130"
 InvDipoleFitSettings settings; // the options of the MNE-C mne_dipole_fit tool
 settings.measname = tmp.filePath("synthetic-ave.fif").toStdString();
 settings.include_meg = true;

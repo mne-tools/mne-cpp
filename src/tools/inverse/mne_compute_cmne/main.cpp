@@ -69,12 +69,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace PYBRIDGELIB;
-using namespace BASELIB;
-using namespace MLLIB;
+using namespace mne;
 
 //=============================================================================================================
 // HELPERS
@@ -352,7 +347,7 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
     const QString pythonExe = parser.value(QStringLiteral("python"));
 
     // ── Build Python script arguments ──────────────────────────────────
-    BASELIB::StringList args = {
+    mne::StringList args = {
         "--fwd", fwdPath.toStdString(),
         "--cov", covPath.toStdString(),
         "--epochs", epochsPath.toStdString(),
@@ -455,7 +450,7 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("mne_compute_cmne"));
     QCoreApplication::setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));

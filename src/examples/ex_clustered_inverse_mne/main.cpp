@@ -48,13 +48,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace INVLIB;
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // MAIN
@@ -74,7 +70,7 @@ int main(int argc, char* argv[])
 #ifdef STATICBUILD
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication app(argc, argv);
 
     // Command Line Parser

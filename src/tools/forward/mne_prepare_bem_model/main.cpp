@@ -36,8 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -49,7 +48,7 @@ using namespace FIFFLIB;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_prepare_bem_model");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

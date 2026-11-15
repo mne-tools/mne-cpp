@@ -12,7 +12,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2019
- * @brief    Definition of @ref BASELIB::Log and @ref BASELIB::LogCapture.
+ * @brief    Definition of @ref mne::Log and @ref mne::LogCapture.
  *
  * The console writer serialises its writes through one mutex, so lines from different threads never
  * interleave inside one record.
@@ -52,7 +52,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS

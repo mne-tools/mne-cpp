@@ -1,18 +1,18 @@
 ---
 id: multi-view-layout
-title: "DISP3DLIB::MultiViewLayout"
+title: "mne::disp::MultiViewLayout"
 sidebar_label: MultiViewLayout
 sidebar_position: 30
 ---
 
 # MultiViewLayout
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/multiviewlayout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/multiviewlayout.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/multiviewlayout.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/multiviewlayout.h)
 
 `#include <disp3D/multiviewlayout.h>`
 
 ```cpp
-class DISP3DLIB::MultiViewLayout
+class mne::disp::MultiViewLayout
 ```
 
 Pure-geometry class for multi-view viewport layout.
@@ -231,7 +231,7 @@ Return the Qt::CursorShape appropriate for a splitter hit.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 297"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 295"
 MultiViewLayout layout;
 layout.setSplitX(0.25f);
 const QSize canvas(800, 600);

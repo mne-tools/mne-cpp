@@ -118,7 +118,7 @@ Command::Command(const QString& p_sCommand, const QString& p_sDescription,
             m_qListParamDescriptions = p_vecParameterDescriptions;
         }
     } else {
-        BASELIB::Log::critical("error: description vector hasn't the same size like parameter map.\n");
+        mne::Log::critical("error: description vector hasn't the same size like parameter map.\n");
         return;
     }
 }

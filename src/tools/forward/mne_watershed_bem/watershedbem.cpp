@@ -55,10 +55,7 @@
 //=============================================================================================================
 
 using namespace MNEWATERSHEDBEM;
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -294,7 +291,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
     // geometry metadata is consistent with the source MRI volume.
     //
     // For the head surface FIFF BEM file creation step that follows,
-    // we read the surfaces via FSLIB::FsSurface which handles the coordinate
+    // we read the surfaces via mne::FsSurface which handles the coordinate
     // system correctly, so this step primarily ensures consistency for
     // other tools that may read these surface files.
     //
@@ -350,7 +347,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     // Equivalent to: mne_surf2bem --surf $surfFile --id 4 --fif $fifFile
     //
     // Steps:
-    //   1. Read FreeSurfer surface via FSLIB::FsSurface
+    //   1. Read FreeSurfer surface via mne::FsSurface
     //   2. Create MNEBemSurface with head surface ID (4)
     //   3. Write BEM FIFF file via MNEBem::write()
     //
@@ -369,7 +366,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
 
     //
     // Create BEM surface
-    //   FSLIB::FsSurface stores vertices in meters (divided by 1000 during read).
+    //   mne::FsSurface stores vertices in meters (divided by 1000 during read).
     //   MNEBemSurface expects vertices in meters as well.
     //
     MNEBemSurface bemSurface;

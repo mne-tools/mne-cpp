@@ -33,7 +33,7 @@
 #include <QJsonObject>
 
 using namespace MNEANALYZESTUDIO;
-using namespace MNALIB;
+using namespace mne;
 
 namespace
 {

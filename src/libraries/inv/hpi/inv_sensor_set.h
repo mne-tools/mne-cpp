@@ -9,14 +9,14 @@
  * @date     March 2026
  * @brief    Compact MEG sensor-geometry container (positions, orientations, integration weights) used by the HPI fitter.
  *
- * @ref INVLIB::InvSensorSet replaces the verbose
- * @ref FWDLIB::FwdCoilSet for read-only use by the HPI fit loop: it
+ * @ref mne::InvSensorSet replaces the verbose
+ * @ref mne::FwdCoilSet for read-only use by the HPI fit loop: it
  * stores per-channel integration-point positions @c rmag, surface
  * normals @c cosmag, channel transforms @c tra and integration weights
  * @c w in dense Eigen matrices, plus the linear-combination matrix
  * that maps coil integration points back to channels. The
- * @ref INVLIB::InvSensorSetCreator helper builds an @ref INVLIB::InvSensorSet from an
- * @ref FWDLIB::FwdCoilSet, picking the requested integration accuracy
+ * @ref mne::InvSensorSetCreator helper builds an @ref mne::InvSensorSet from an
+ * @ref mne::FwdCoilSet, picking the requested integration accuracy
  * (high / medium / low) so the HPI cost function can run on a small
  * hot-loop-friendly data structure.
  */
@@ -43,13 +43,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 class FwdCoil;
 class FwdCoilSet;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 class FiffDigPointSet;
@@ -57,10 +57,10 @@ class FiffChInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE HPILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 enum class Accuracy : int
 {
@@ -90,7 +90,7 @@ public:
      * @param[in] pFwdCoilSet   The FwdCoilSet to extract the data from.
      *
      */
-    explicit InvSensorSet(const std::shared_ptr<FWDLIB::FwdCoilSet>& pFwdCoilSet);
+    explicit InvSensorSet(const std::shared_ptr<mne::FwdCoilSet>& pFwdCoilSet);
 
     inline int np() const;
     inline int ncoils() const;
@@ -123,7 +123,7 @@ private:
      * @param[in] pFwdCoilSet Coil set to convert.
      *
      */
-    void initFromFwdCoilSet(const std::shared_ptr<FWDLIB::FwdCoilSet>& pFwdCoilSet);
+    void initFromFwdCoilSet(const std::shared_ptr<mne::FwdCoilSet>& pFwdCoilSet);
 
     //=========================================================================================================
     /**
@@ -259,17 +259,17 @@ public:
      *
      * @return Sensor set built from the MEG coil definitions, or an empty set if channelList is empty or holds a channel without a MEG coil.
      */
-    InvSensorSet updateSensorSet(const std::vector<FIFFLIB::FiffChInfo>& channelList,
+    InvSensorSet updateSensorSet(const std::vector<mne::FiffChInfo>& channelList,
                                  const Accuracy& accuracy);
 
 private:
-    std::shared_ptr<FWDLIB::FwdCoilSet> m_pCoilDefinitions{nullptr}; // the coil definitions as template
+    std::shared_ptr<mne::FwdCoilSet> m_pCoilDefinitions{nullptr}; // the coil definitions as template
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_SENSOR_SET_H

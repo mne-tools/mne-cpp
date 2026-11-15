@@ -1,23 +1,23 @@
 ---
 id: modality-selection-view
-title: "DISPLIB::ModalitySelectionView"
+title: "mne::disp::ModalitySelectionView"
 sidebar_label: ModalitySelectionView
 sidebar_position: 42
 ---
 
 # ModalitySelectionView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/modalityselectionview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/modalityselectionview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/modalityselectionview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/modalityselectionview.h)
 
 `#include <disp/modalityselectionview.h>`
 
 ```cpp
-class DISPLIB::ModalitySelectionView
+class mne::disp::ModalitySelectionView
 ```
 
 Per-modality visibility toggle panel (one `QCheckBox` per channel modality).
 
-Builds itself from the active `FiffInfo` modalities and emits `modalitiesChanged` so [`ButterflyView`](/docs/api/disp/butterfly-view) and [`AverageLayoutView`](/docs/api/disp/average-layout-view) can hide entire modalities at once.
+Builds itself from the active [`FiffInfo`](/docs/api/fiff/fiff-info) modalities and emits `modalitiesChanged` so [`ButterflyView`](/docs/api/disp/butterfly-view) and [`AverageLayoutView`](/docs/api/disp/average-layout-view) can hide entire modalities at once.
 
 ### Inheritance
 

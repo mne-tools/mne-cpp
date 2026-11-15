@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref FSLIB::FsColortable: in-memory FreeSurferColorLUT-style colour and structure lookup table.
+ * @brief    Implementation of @ref mne::FsColortable: in-memory FreeSurferColorLUT-style colour and structure lookup table.
  */
 
 //=============================================================================================================
@@ -20,7 +20,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

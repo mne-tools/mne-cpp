@@ -1,18 +1,18 @@
 ---
 id: fwd-field-map
-title: "FWDLIB::FwdFieldMap"
+title: "mne::FwdFieldMap"
 sidebar_label: FwdFieldMap
 sidebar_position: 12
 ---
 
 # FwdFieldMap
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_field_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_field_map.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_field_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_field_map.h)
 
 `#include <fwd/fwd_field_map.h>`
 
 ```cpp
-class FWDLIB::FwdFieldMap
+class mne::FwdFieldMap
 ```
 
 Computes the per-vertex sensor-to-surface mapping matrix used to render a continuous scalp/cortex field that exactly reproduces the recorded MEG/EEG values.
@@ -44,13 +44,13 @@ Compute MEG sensor-to-surface mapping matrix.
   MEG coils (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
-  FsSurface vertex positions (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex positions (nvert × 3).
 
 - **normals** : *const Eigen::MatrixX3f &*
-  FsSurface vertex normals (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex normals (nvert × 3).
 
 - **origin** : *const Eigen::Vector3f &*
-  Sphere origin in the target coordinate frame.
+  [`Sphere`](/docs/api/math/sphere) origin in the target coordinate frame.
 
 - **intrad** : *float*
   Integration radius (default 0.06, matching MNE-Python _setup_dots).
@@ -74,16 +74,16 @@ Compute MEG sensor-to-surface mapping matrix with SSP projection.
   MEG coils (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
-  FsSurface vertex positions (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex positions (nvert × 3).
 
 - **normals** : *const Eigen::MatrixX3f &*
-  FsSurface vertex normals (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex normals (nvert × 3).
 
 - **origin** : *const Eigen::Vector3f &*
-  Sphere origin in the target coordinate frame.
+  [`Sphere`](/docs/api/math/sphere) origin in the target coordinate frame.
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo with SSP projectors and channel names.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) with SSP projectors and channel names.
 
 - **chNames** : *const StringList &*
   Channel names corresponding to the coils (for projector matching).
@@ -112,10 +112,10 @@ The effective integration radius is intrad * 0.7, matching MNE-Python's internal
   EEG electrodes (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
-  FsSurface vertex positions (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex positions (nvert × 3).
 
 - **origin** : *const Eigen::Vector3f &*
-  Sphere origin in the target coordinate frame.
+  [`Sphere`](/docs/api/math/sphere) origin in the target coordinate frame.
 
 - **intrad** : *float*
   Base integration radius (default 0.06, matching MNE-Python _setup_dots).
@@ -139,13 +139,13 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
   EEG electrodes (already transformed to target coordinate frame).
 
 - **vertices** : *const Eigen::MatrixX3f &*
-  FsSurface vertex positions (nvert × 3).
+  [`FsSurface`](/docs/api/fs/fs-surface) vertex positions (nvert × 3).
 
 - **origin** : *const Eigen::Vector3f &*
-  Sphere origin in the target coordinate frame.
+  [`Sphere`](/docs/api/math/sphere) origin in the target coordinate frame.
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo with SSP projectors and channel names.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) with SSP projectors and channel names.
 
 - **chNames** : *const StringList &*
   Channel names corresponding to the coils (for projector matching).
@@ -175,7 +175,7 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 153"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 151"
 MatrixX3f surfRr(3, 3);
 surfRr << 0.0f, 0.0f, 0.12f, 0.08f, 0.0f, 0.08f, 0.0f, -0.09f, 0.07f;
 const MatrixX3f surfNn = (surfRr.rowwise() - origin.transpose()).rowwise().normalized();

@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    Implementation of the build-info hook for the DISPLIB shared library.
+ * @brief    Implementation of the build-info hook for the mne_disp shared library.
  *
- * Delegates @c DISPLIB::buildDateTime() to @c BASELIB::dateTimeNow() so
+ * Delegates @c mne::disp::buildDateTime() to @c mne::dateTimeNow() so
  * every consumer of the disp library reports the same MNE-CPP build
  * timestamp.
  */
@@ -26,21 +26,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DISPLIB::buildDateTime()
+const char* mne::disp::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* DISPLIB::buildHash()
+const char* mne::disp::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* DISPLIB::buildHashLong()
+const char* mne::disp::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

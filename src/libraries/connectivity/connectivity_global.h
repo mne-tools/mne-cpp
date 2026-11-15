@@ -10,9 +10,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2016
- * @brief    Export/import macros for the @c CONNECTIVITYLIB functional-connectivity library.
+ * @brief    Export/import macros for the @c mne_connectivity functional-connectivity library.
  *
- * @c CONNECTIVITYLIB implements the spectral and time-domain functional-connectivity
+ * @c mne_connectivity implements the spectral and time-domain functional-connectivity
  * estimators used by mne-cpp's source-space and sensor-space analysis
  * pipelines: magnitude-squared coherence and complex coherency, the
  * imaginary part of coherency (Nolte et al., 2004), the phase-locking value
@@ -57,12 +57,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace CONNECTIVITYLIB
- * @brief     Functional connectivity metrics (coherence, PLV, cross-correlation, etc.).
- */
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================

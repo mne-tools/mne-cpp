@@ -1,18 +1,18 @@
 ---
 id: inv-signal-model
-title: "INVLIB::InvSignalModel"
+title: "mne::InvSignalModel"
 sidebar_label: InvSignalModel
 sidebar_position: 35
 ---
 
 # InvSignalModel
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_signal_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_signal_model.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_signal_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_signal_model.h)
 
 `#include <inv/inv_signal_model.h>`
 
 ```cpp
-class INVLIB::InvSignalModel
+class mne::InvSignalModel
 ```
 
 Description of what this class is intended to do (in detail).
@@ -67,7 +67,7 @@ Fit the data to the model constructed from given model parameters.
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 127"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 126"
 // Sine and cosine amplitudes of every coil frequency in every channel, least-squares fitted.
 InvSignalModel signalModel;
 const InvHpiModelParameters ordered(fit.hpiFreqs, info->sfreq, info->linefreq, false);

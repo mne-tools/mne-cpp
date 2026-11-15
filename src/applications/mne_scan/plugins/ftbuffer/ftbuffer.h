@@ -35,7 +35,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -54,12 +54,12 @@ namespace FTBUFFERPLUGIN
  * @brief Reads a FieldTrip buffer server, e.g. the one neuromag2ft fills on a Neuromag acquisition computer,
  *        through the ftbuffer:// source of mne_acq_devices, which can also simulate it.
  */
-class FTBUFFER_EXPORT FtBuffer : public SCSHAREDLIB::AbstractSensor
+class FTBUFFER_EXPORT FtBuffer : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "ftbuffer.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class FtBufferSetupWidget;
 
@@ -67,7 +67,7 @@ public:
     FtBuffer();
     ~FtBuffer() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -83,7 +83,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -99,10 +99,10 @@ private:
     /** @return The ftbuffer:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput; /**< The data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA_BufferOutput; /**< The data. */
 
-    ACQLIB::AcqDevice m_device; /**< The buffer while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads the buffer's stream in run(). */
+    mne::AcqDevice m_device; /**< The buffer while streaming. */
+    mne::AcqReader m_reader; /**< Reads the buffer's stream in run(). */
 
     std::string m_host = "localhost"; /**< Host of the buffer server. */
     std::uint16_t m_port = 1972;      /**< Port of the buffer server. */

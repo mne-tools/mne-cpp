@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Builds the dense sensor-to-surface mapping matrix and the iso-contour overlay for MEG / EEG evoked data.
  *
- * SensorFieldMapper holds the loaded @ref FIFFLIB::FiffEvoked, the
+ * SensorFieldMapper holds the loaded @ref mne::FiffEvoked, the
  * channel picks, the SSP projectors and the per-modality (MEG on
  * head or helmet, EEG on scalp) target surface keys. On demand it
  * calls into the @c fwd library's field-map kernel to produce a
@@ -44,7 +44,7 @@
 #include <memory>
 #include <vector>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -83,7 +83,7 @@ public:
      *
      * @param[in] evoked    The evoked dataset (contains info + data matrix).
      */
-    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
+    void setEvoked(const mne::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -150,7 +150,7 @@ public:
     /**
      * @return Const reference to the loaded evoked data.
      */
-    const FIFFLIB::FiffEvoked& evoked() const
+    const mne::FiffEvoked& evoked() const
     {
         return m_evoked;
     }
@@ -164,7 +164,7 @@ public:
      * @param[in] newEvoked     The candidate new evoked data.
      * @return @c true if the existing mapping is compatible, @c false if rebuild is needed.
      */
-    bool hasMappingFor(const FIFFLIB::FiffEvoked& newEvoked) const;
+    bool hasMappingFor(const mne::FiffEvoked& newEvoked) const;
 
     /**
      * @return Const reference to the MEG channel pick indices.
@@ -212,7 +212,7 @@ public:
      * @return @c true on success (at least one mapping built).
      */
     bool buildMapping(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                      const FIFFLIB::FiffCoordTrans& headToMriTrans,
+                      const mne::FiffCoordTrans& headToMriTrans,
                       bool applySensorTrans);
 
     //=========================================================================================================
@@ -292,7 +292,7 @@ public:
      * @return The sphere centre in head coordinates (metres).
      *         Returns (0, 0, 0.04) if the fit cannot be performed.
      */
-    static Eigen::Vector3f fitSphereOrigin(const FIFFLIB::FiffInfo& info,
+    static Eigen::Vector3f fitSphereOrigin(const mne::FiffInfo& info,
                                            float* radius = nullptr);
 
     /**
@@ -339,7 +339,7 @@ private:
     //=========================================================================================================
     // ── Internal data ──────────────────────────────────────────────────
 
-    FIFFLIB::FiffEvoked m_evoked;
+    mne::FiffEvoked m_evoked;
     bool m_loaded = false;
     int m_timePoint = 0;
     bool m_megOnHead = false;
@@ -361,6 +361,6 @@ private:
     float m_eegVmax = 0.0f; /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SENSORFIELDMAPPER_H

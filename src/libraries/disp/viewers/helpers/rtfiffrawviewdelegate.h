@@ -11,13 +11,13 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     November 2019
- * @brief    QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref DISPLIB::RtFiffRawView.
+ * @brief    QAbstractItemDelegate painting one FIFF channel's signal trace inside @ref mne::disp::RtFiffRawView.
  *
  * RtFiffRawViewDelegate transforms each visible row of the
- * @ref DISPLIB::RtFiffRawViewModel into a polyline drawn inside the cell
+ * @ref mne::disp::RtFiffRawViewModel into a polyline drawn inside the cell
  * rectangle. It applies the active y-scaling, the SSP / compensation
  * operators, the trigger overlays and the bad-channel greying, and
- * is shared by @ref DISPLIB::ChannelDataView and the rolling raw browser.
+ * is shared by @ref mne::disp::ChannelDataView and the rolling raw browser.
  */
 
 #ifndef RTFIFFRAWVIEWDELEGATE_H
@@ -42,20 +42,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 class EventList;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class RtFiffRawView;
@@ -166,7 +166,7 @@ private:
     void createPlotPath(const QModelIndex& index,
                         const QStyleOptionViewItem& option,
                         QPainterPath& path,
-                        const DISPLIB::RowVectorPair& data) const;
+                        const mne::disp::RowVectorPair& data) const;
 
     //=========================================================================================================
     /**
@@ -255,7 +255,7 @@ private:
      * @param[in] option     Describes the cell being painted.
      * @param[in] data       Data of the row.
      */
-    void paintCrosshair(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option, const DISPLIB::RowVectorPair& data) const;
+    void paintCrosshair(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option, const mne::disp::RowVectorPair& data) const;
 
     //=========================================================================================================
     /**

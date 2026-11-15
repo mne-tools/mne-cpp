@@ -41,8 +41,8 @@
 //=============================================================================================================
 
 using namespace CONTROLMANAGERPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISP3DLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -109,31 +109,31 @@ QDockWidget* ControlManager::getControl()
     slControlFlags << "Data" << "View" << "Light";
 
     //Scaling
-    DISPLIB::ScalingView* pScalingWidget = new DISPLIB::ScalingView("MNEANALYZE", wrappedScrollArea);
+    mne::disp::ScalingView* pScalingWidget = new mne::disp::ScalingView("MNEANALYZE", wrappedScrollArea);
     pTabWidget->addTab(pScalingWidget, "Scaling");
 
-    connect(pScalingWidget, &DISPLIB::ScalingView::scalingChanged,
+    connect(pScalingWidget, &mne::disp::ScalingView::scalingChanged,
             this, &ControlManager::onScalingChanged, Qt::UniqueConnection);
 
     m_ScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
     m_ScalingParameters.m_mScalingMap.detach();
 
     //View Settings
-    DISPLIB::FiffRawViewSettings* pFiffViewSettings = new DISPLIB::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
+    mne::disp::FiffRawViewSettings* pFiffViewSettings = new mne::disp::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
 
     pTabWidget->addTab(pFiffViewSettings, "Controls");
 
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::signalColorChanged,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::signalColorChanged,
             this, &ControlManager::onSignalColorChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::backgroundColorChanged,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::backgroundColorChanged,
             this, &ControlManager::onBackgroundColorChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::zoomChanged,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::zoomChanged,
             this, &ControlManager::onZoomChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::timeWindowChanged,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::timeWindowChanged,
             this, &ControlManager::onTimeWindowChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::distanceTimeSpacerChanged,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::distanceTimeSpacerChanged,
             this, &ControlManager::onDistanceTimeSpacerChanged, Qt::UniqueConnection);
-    connect(pFiffViewSettings, &DISPLIB::FiffRawViewSettings::makeScreenshot,
+    connect(pFiffViewSettings, &mne::disp::FiffRawViewSettings::makeScreenshot,
             this, &ControlManager::onMakeScreenshot, Qt::UniqueConnection);
 
     m_ViewParameters.m_colorSignal = pFiffViewSettings->getSignalColor();
@@ -144,26 +144,26 @@ QDockWidget* ControlManager::getControl()
     m_ViewParameters.m_sImageType = "";
 
     //View3D Settings
-    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), nullptr, slControlFlags);
+    m_pControl3DView = new mne::disp::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), nullptr, slControlFlags);
 
     pTabWidget->addTab(m_pControl3DView, "3D");
 
-    connect(m_pControl3DView, &DISPLIB::Control3DView::sceneColorChanged,
+    connect(m_pControl3DView, &mne::disp::Control3DView::sceneColorChanged,
             this, &ControlManager::onSceneColorChange);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::rotationChanged,
+    connect(m_pControl3DView, &mne::disp::Control3DView::rotationChanged,
             this, &ControlManager::onRotationChanged);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::showCoordAxis,
+    connect(m_pControl3DView, &mne::disp::Control3DView::showCoordAxis,
             this, &ControlManager::onShowCoordAxis);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::showFullScreen,
+    connect(m_pControl3DView, &mne::disp::Control3DView::showFullScreen,
             this, &ControlManager::onShowFullScreen);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::lightColorChanged,
+    connect(m_pControl3DView, &mne::disp::Control3DView::lightColorChanged,
             this, &ControlManager::onLightColorChanged);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::lightIntensityChanged,
+    connect(m_pControl3DView, &mne::disp::Control3DView::lightIntensityChanged,
             this, &ControlManager::onLightIntensityChanged);
-    connect(m_pControl3DView, &DISPLIB::Control3DView::takeScreenshotChanged,
+    connect(m_pControl3DView, &mne::disp::Control3DView::takeScreenshotChanged,
             this, &ControlManager::onTakeScreenshotChanged);
 
-    m_pApplyToView = new DISPLIB::ApplyToView();
+    m_pApplyToView = new mne::disp::ApplyToView();
     pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
     pLayout->addStretch();
@@ -186,10 +186,10 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            if (m_pApplyToView && e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+            if (m_pApplyToView && e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
                 onScalingChanged(m_ScalingParameters.m_mScalingMap);
                 m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-                m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
+                m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::all;
                 m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
             }
             break;
@@ -235,7 +235,7 @@ void ControlManager::onScalingChanged(const QMap<qint32, float>& scalingMap)
 void ControlManager::onSignalColorChanged(const QColor& signalColor)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::signal;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::signal;
     m_ViewParameters.m_colorSignal = signalColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -246,7 +246,7 @@ void ControlManager::onSignalColorChanged(const QColor& signalColor)
 void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::background;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::background;
     m_ViewParameters.m_colorBackground = backgroundColor;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -257,7 +257,7 @@ void ControlManager::onBackgroundColorChanged(const QColor& backgroundColor)
 void ControlManager::onZoomChanged(double dZoomValue)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::zoom;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::zoom;
     m_ViewParameters.m_dZoomValue = dZoomValue;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -268,7 +268,7 @@ void ControlManager::onZoomChanged(double dZoomValue)
 void ControlManager::onTimeWindowChanged(int iTimeWindow)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::window;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::window;
     m_ViewParameters.m_iTimeWindow = iTimeWindow;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -279,7 +279,7 @@ void ControlManager::onTimeWindowChanged(int iTimeWindow)
 void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::spacer;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::spacer;
     m_ViewParameters.m_iTimeSpacers = iSpacerDistance;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -290,7 +290,7 @@ void ControlManager::onDistanceTimeSpacerChanged(int iSpacerDistance)
 void ControlManager::onMakeScreenshot(const QString& imageType)
 {
     m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
-    m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::screenshot;
+    m_ViewParameters.m_sSettingsToApply = mne::analyze::ViewParameters::ViewSetting::screenshot;
     m_ViewParameters.m_sImageType = imageType;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW_SETTINGS_CHANGED, QVariant::fromValue(m_ViewParameters));
@@ -310,7 +310,7 @@ void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 
 void ControlManager::onSceneColorChange(const QColor& color)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::sceneColor;
     m_View3DParameters.m_sceneColor = color;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -320,7 +320,7 @@ void ControlManager::onSceneColorChange(const QColor& color)
 
 void ControlManager::onRotationChanged(bool bRotationChanged)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::rotation;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::rotation;
     m_View3DParameters.m_bToggleRotation = bRotationChanged;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -330,7 +330,7 @@ void ControlManager::onRotationChanged(bool bRotationChanged)
 
 void ControlManager::onShowCoordAxis(bool bShowCoordAxis)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::coordAxis;
     m_View3DParameters.m_bToogleCoordAxis = bShowCoordAxis;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -340,7 +340,7 @@ void ControlManager::onShowCoordAxis(bool bShowCoordAxis)
 
 void ControlManager::onShowFullScreen(bool bShowFullScreen)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::fullscreen;
     m_View3DParameters.m_bToggleFullscreen = bShowFullScreen;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -350,7 +350,7 @@ void ControlManager::onShowFullScreen(bool bShowFullScreen)
 
 void ControlManager::onLightColorChanged(const QColor& color)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightColor;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::lightColor;
     m_View3DParameters.m_lightColor = color;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -360,7 +360,7 @@ void ControlManager::onLightColorChanged(const QColor& color)
 
 void ControlManager::onLightIntensityChanged(double value)
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::lightIntensity;
     m_View3DParameters.m_dLightIntensity = value;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
@@ -370,7 +370,7 @@ void ControlManager::onLightIntensityChanged(double value)
 
 void ControlManager::onTakeScreenshotChanged()
 {
-    m_View3DParameters.m_settingsToApply = ANSHAREDLIB::View3DParameters::View3DSetting::screenshot;
+    m_View3DParameters.m_settingsToApply = mne::analyze::View3DParameters::View3DSetting::screenshot;
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref FSLIB::FsAtlasLookup: RAS → region-name resolver over a FreeSurfer volumetric parcellation.
+ * @brief    Implementation of @ref mne::FsAtlasLookup: RAS → region-name resolver over a FreeSurfer volumetric parcellation.
  */
 
 //=============================================================================================================
@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -177,12 +177,12 @@ const std::unordered_map<int, std::string>& lookupTable()
     return table;
 }
 
-template<BASELIB::Swappable T>
+template<mne::Swappable T>
 T readBigEndian(const std::byte* data)
 {
     T value;
     std::memcpy(&value, data, sizeof(T));
-    return BASELIB::fromBigEndian(value);
+    return mne::fromBigEndian(value);
 }
 
 } // namespace
@@ -195,10 +195,10 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
 {
     m_loaded = false;
 
-    const bool gzip = BASELIB::toLower(BASELIB::utf8FromPath(parcellation.extension())) == ".mgz";
-    const auto bytes = BASELIB::read_file_bytes(parcellation, gzip ? BASELIB::Compression::Gzip : BASELIB::Compression::None);
+    const bool gzip = mne::toLower(mne::utf8FromPath(parcellation.extension())) == ".mgz";
+    const auto bytes = mne::read_file_bytes(parcellation, gzip ? mne::Compression::Gzip : mne::Compression::None);
     if (!bytes) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] {}", bytes.error().what());
+        mne::Log::warning("[FsAtlasLookup::load] {}", bytes.error().what());
         return false;
     }
 
@@ -206,12 +206,12 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
     // (int16), voxel sizes, x/y/z direction cosines and centre RAS (float32); the voxels start at byte 284.
     constexpr std::size_t kHeaderSize = 284;
     if (bytes->size() < kHeaderSize) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] File too small: {}", BASELIB::utf8FromPath(parcellation));
+        mne::Log::warning("[FsAtlasLookup::load] File too small: {}", mne::utf8FromPath(parcellation));
         return false;
     }
     const std::byte* raw = bytes->data();
     if (readBigEndian<std::int32_t>(raw) != 1) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] Unsupported MGH version: {}", readBigEndian<std::int32_t>(raw));
+        mne::Log::warning("[FsAtlasLookup::load] Unsupported MGH version: {}", readBigEndian<std::int32_t>(raw));
         return false;
     }
     m_dimX = readBigEndian<std::int32_t>(raw + 4);
@@ -219,7 +219,7 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
     m_dimZ = readBigEndian<std::int32_t>(raw + 12);
     const std::int32_t type = readBigEndian<std::int32_t>(raw + 20);
     if (m_dimX <= 0 || m_dimY <= 0 || m_dimZ <= 0 || readBigEndian<std::int32_t>(raw + 16) <= 0) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] Invalid dimensions: {} {} {}", m_dimX, m_dimY, m_dimZ);
+        mne::Log::warning("[FsAtlasLookup::load] Invalid dimensions: {} {} {}", m_dimX, m_dimY, m_dimZ);
         return false;
     }
 
@@ -247,11 +247,11 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
         : (type == 1 || type == 3)                      ? 4
                                                         : 0;
     if (width == 0) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] Unsupported MGH data type: {}", type);
+        mne::Log::warning("[FsAtlasLookup::load] Unsupported MGH data type: {}", type);
         return false;
     }
     if ((bytes->size() - kHeaderSize) / width < nVoxels) {
-        BASELIB::Log::warning("[FsAtlasLookup::load] Truncated voxel data in {}", BASELIB::utf8FromPath(parcellation));
+        mne::Log::warning("[FsAtlasLookup::load] Truncated voxel data in {}", mne::utf8FromPath(parcellation));
         return false;
     }
     const std::byte* voxels = raw + kHeaderSize;

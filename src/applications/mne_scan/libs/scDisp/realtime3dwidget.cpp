@@ -65,14 +65,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace CONNECTIVITYLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace DISP3DLIB;
+using namespace mne::scan;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -114,7 +109,7 @@ void RealTime3DWidget::createGUI()
 
 //=============================================================================================================
 
-void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (!m_bDisplayWidgetsInitialized) {
         initDisplayControllWidgets();
@@ -132,7 +127,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
             if (pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
                 for (int i = 0; i < pRTCE->getSurfSet()->size(); ++i) {
-                    const FSLIB::FsSurface& surf = (*pRTCE->getSurfSet())[i];
+                    const mne::FsSurface& surf = (*pRTCE->getSurfSet())[i];
                     QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
                     QString surfType = QString::fromStdString(surf.surf().empty() ? "inflated" : surf.surf());
                     m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
@@ -166,7 +161,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             if (!m_bRtSourceActive && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
                 // Add surfaces first
                 for (int i = 0; i < pRTSE->getSurfSet()->size(); ++i) {
-                    const FSLIB::FsSurface& surf = (*pRTSE->getSurfSet())[i];
+                    const mne::FsSurface& surf = (*pRTSE->getSurfSet())[i];
                     QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
                     QString surfType = QString::fromStdString(surf.surf().empty() ? "inflated" : surf.surf());
                     m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
@@ -200,7 +195,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if (QSharedPointer<HpiFitResult> pHpiFitResult = pRTHR->getValue()) {
-            const QString digitizerFile = QString::fromStdString(BASELIB::utf8FromPath(pHpiFitResult->digitizerFile));
+            const QString digitizerFile = QString::fromStdString(mne::utf8FromPath(pHpiFitResult->digitizerFile));
             if (m_sFilePathDigitizers != digitizerFile && m_pBemHeadAvr) {
                 //Add all digitizer but additional points to the 3D view
                 FiffDigPointSet digSet(pHpiFitResult->digitizerFile);
@@ -232,7 +227,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RealTime3DWidget::addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet)
+void RealTime3DWidget::addDigSetToView(const mne::FiffDigPointSet& digSet)
 {
     const FiffDigPointSet digSetWithoutAdditional = digSet.pick_types({FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_EXTRA});
     m_pData3DModel->addDigitizerData(digSetWithoutAdditional.points());
@@ -244,14 +239,14 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 {
     m_sFilePathDigitizers = sFilePath;
 
-    std::shared_ptr<FIFFLIB::FiffDigitizerData> t_digData = std::make_shared<FIFFLIB::FiffDigitizerData>(sFilePath.toStdU16String());
+    std::shared_ptr<mne::FiffDigitizerData> t_digData = std::make_shared<mne::FiffDigitizerData>(sFilePath.toStdU16String());
 
     alignFiducials(t_digData);
 }
 
 //=============================================================================================================
 
-void RealTime3DWidget::alignFiducials(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& pDigData)
+void RealTime3DWidget::alignFiducials(const std::shared_ptr<mne::FiffDigitizerData>& pDigData)
 {
     std::unique_ptr<MNEMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MNEMshDisplaySurfaceSet>();
     pMneMshDisplaySurfaceSet->add_bem_surface((QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif").toStdU16String(),
@@ -291,7 +286,7 @@ void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4& invMat)
 
 //=============================================================================================================
 
-QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& pDigData,
+QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const std::shared_ptr<mne::FiffDigitizerData>& pDigData,
                                                     float scale) const
 {
     QMatrix4x4 invMat;

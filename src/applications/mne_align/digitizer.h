@@ -87,8 +87,8 @@ signals:
 private:
     void poll();
 
-    ACQLIB::AcqDevice m_device;
-    ACQLIB::AcqReader m_reader;
+    mne::AcqDevice m_device;
+    mne::AcqReader m_reader;
     QTimer m_timer;
     std::vector<float> m_frames; // decoded frames, one column per update
     QString m_description;

@@ -40,10 +40,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FWDLIB;
-using namespace INVLIB;
+using namespace mne;
 
 constexpr int OK = 0;
 
@@ -71,10 +68,10 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
         if (MNESourceSpace::read_source_spaces(guessname, sp) == FIFF_FAIL)
             return;
         if (static_cast<int>(sp.size()) != 1) {
-            BASELIB::Log::critical("Incorrect number of source spaces in guess file");
+            mne::Log::critical("Incorrect number of source spaces in guess file");
             return;
         }
-        BASELIB::Log::info("Read guesses from {}\n", BASELIB::utf8FromPath(guessname));
+        mne::Log::info("Read guesses from {}\n", mne::utf8FromPath(guessname));
         guesses = std::move(sp[0]);
     } else {
         MNESurface* inner_skull = nullptr;
@@ -84,11 +81,11 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
         assert(f->mri_head_t);
         FiffCoordTrans::apply_inverse_trans(r0.data(), *f->mri_head_t, true);
         if (f->bem_model) {
-            BASELIB::Log::info("Using inner skull surface from the BEM ({})...\n", f->bemname);
+            mne::Log::info("Using inner skull surface from the BEM ({})...\n", f->bemname);
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 return;
         } else if (!guess_surfname.empty()) {
-            BASELIB::Log::info("Reading inner skull surface from {}...\n", BASELIB::utf8FromPath(guess_surfname));
+            mne::Log::info("Reading inner skull surface from {}...\n", mne::utf8FromPath(guess_surfname));
             inner_skull_owned = MNESurface::read_bem_surface(guess_surfname, FIFFV_BEM_SURF_ID_BRAIN, true);
             if (!inner_skull_owned)
                 return;
@@ -99,7 +96,7 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
             return;
     }
     if (guesses->nuse == 0) {
-        BASELIB::Log::critical("No active guess locations remaining.");
+        mne::Log::critical("No active guess locations remaining.");
         return;
     }
     /*
@@ -112,7 +109,7 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
             return;
         guesses = std::move(guesses_vec[0]);
     }
-    BASELIB::Log::info("Guess locations are now in {} coordinates.\n", std::string(FiffCoordTrans::frame_name(f->coord_frame)));
+    mne::Log::info("Guess locations are now in {} coordinates.\n", std::string(FiffCoordTrans::frame_name(f->coord_frame)));
 
     this->nguess = guesses->nuse;
     this->rr.resize(guesses->nuse, 3);
@@ -144,14 +141,14 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     dipoleFitFuncs orig = nullptr;
 
     if (!f) {
-        BASELIB::Log::critical("Data missing in compute_guess_fields");
+        mne::Log::critical("Data missing in compute_guess_fields");
         return false;
     }
     if (!f->noise) {
-        BASELIB::Log::critical("Noise covariance missing in compute_guess_fields");
+        mne::Log::critical("Noise covariance missing in compute_guess_fields");
         return false;
     }
-    BASELIB::Log::info("Go through all guess source locations...");
+    mne::Log::info("Go through all guess source locations...");
     orig = f->funcs;
     if (f->fit_mag_dipoles)
         f->funcs = f->mag_dipole_funcs.get();
@@ -166,11 +163,11 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
         }
 #ifdef DEBUG
         sing = this->guess_fwd[k]->sing;
-        BASELIB::Log::info("{:f} {:f} {:f}\n", sing[0], sing[1], sing[2]);
+        mne::Log::info("{:f} {:f} {:f}\n", sing[0], sing[1], sing[2]);
 #endif
     }
     f->funcs = orig;
-    BASELIB::Log::info("[done {} sources]\n", this->nguess);
+    mne::Log::info("[done {} sources]\n", this->nguess);
 
     return true;
 }

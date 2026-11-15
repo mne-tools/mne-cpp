@@ -47,22 +47,22 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ConnectivitySettingsView;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class RtConnectivity;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeSourceEstimate;
 class RealTimeMultiSampleArray;
@@ -89,12 +89,12 @@ class NeuronalConnectivityYourWidget;
  *
  * @brief The NeuronalConnectivity class provides a NeuronalConnectivity plugin for online processing.
  */
-class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public SCSHAREDLIB::AbstractAlgorithm
+class NEURONALCONNECTIVITYSHARED_EXPORT NeuronalConnectivity : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuronalconnectivity.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -113,7 +113,7 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const;
     virtual void init();
 
     //=========================================================================================================
@@ -125,7 +125,7 @@ public:
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     virtual QString getBuildInfo();
@@ -136,7 +136,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateSource(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTMSA(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
      *
      * @param[in] pMeasurement   The evoked to be appended.
      */
-    void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTEV(mne::scan::Measurement::SPtr pMeasurement);
 
 signals:
     void responsibleTriggerTypesChaged(const QStringList& lResponsibleTriggerTypes);
@@ -177,8 +177,8 @@ protected:
      * @param[in] connectivityResults     The new connectivity estimates.
      * @param[in] connectivitySettings    The settings they were computed from, taken over by this plugin.
      */
-    void onNewConnectivityResultAvailable(const std::vector<CONNECTIVITYLIB::Network>& connectivityResults,
-                                          const std::shared_ptr<CONNECTIVITYLIB::ConnectivitySettings>& connectivitySettings);
+    void onNewConnectivityResultAvailable(const std::vector<mne::Network>& connectivityResults,
+                                          const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -236,27 +236,27 @@ private:
 
     QElapsedTimer m_timer; /**< The timer to evaluate performance. */
 
-    CONNECTIVITYLIB::ConnectivitySettings m_connectivitySettings; /**< The connectivity settings.*/
+    mne::ConnectivitySettings m_connectivitySettings; /**< The connectivity settings.*/
 
-    std::shared_ptr<BASELIB::CircularBuffer<CONNECTIVITYLIB::Network>> m_pCircularBuffer; /**< The circular buffer holding the connectivity estimates.*/
-    std::shared_ptr<DSPLIB::RtConnectivity> m_pRtConnectivity;                            /**< The real-time connectivity estimation object.*/
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;                                       /**< Fiff measurement info.*/
-    std::shared_ptr<DISPLIB::ConnectivitySettingsView> m_pConnectivitySettingsView;       /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
-    QAction* m_pActionShowYourWidget;                                                     /**< flag whether thread is running.*/
+    std::shared_ptr<mne::CircularBuffer<mne::Network>> m_pCircularBuffer;             /**< The circular buffer holding the connectivity estimates.*/
+    std::shared_ptr<mne::RtConnectivity> m_pRtConnectivity;                           /**< The real-time connectivity estimation object.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                       /**< Fiff measurement info.*/
+    std::shared_ptr<mne::disp::ConnectivitySettingsView> m_pConnectivitySettingsView; /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
+    QAction* m_pActionShowYourWidget;                                                 /**< flag whether thread is running.*/
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeSourceEstimate>::SPtr m_pRTSEInput;    /**< The RealTimeSourceEstimate input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr m_pRTEVSInput;        /**< The RealTimeEvoked input.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeSourceEstimate>::SPtr m_pRTSEInput;    /**< The RealTimeSourceEstimate input.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>::SPtr m_pRTEVSInput;        /**< The RealTimeEvoked input.*/
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeConnectivityEstimate>::SPtr m_pRTCEOutput; /**< The RealTimeSourceEstimate output.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeConnectivityEstimate>::SPtr m_pRTCEOutput; /**< The RealTimeSourceEstimate output.*/
 
-    CONNECTIVITYLIB::Network m_connectivityEstimate; /**< The current connectivity estimate.*/
-    Eigen::MatrixX3f m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::RowVectorXi m_vecPicks;                   /**< The picked data channels. */
+    mne::Network m_connectivityEstimate; /**< The current connectivity estimate.*/
+    Eigen::MatrixX3f m_matNodeVertLeft;  /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f m_matNodeVertRight; /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::MatrixX3f m_matNodeVertComb;  /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
+    Eigen::RowVectorXi m_vecPicks;       /**< The picked data channels. */
 
-    CONNECTIVITYLIB::Network m_currentConnectivityResult; /**< The current connectivity result.*/
+    mne::Network m_currentConnectivityResult; /**< The current connectivity result.*/
 };
 } // NAMESPACE
 

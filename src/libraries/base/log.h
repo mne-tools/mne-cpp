@@ -15,10 +15,10 @@
  * @date     July 2019
  * @brief    Logging: a std::format facade with a replaceable sink, the console and file writer, and a capture sink for tests.
  *
- * Libraries report through @ref BASELIB::Log, whose interface is standard C++ only. By default every
+ * Libraries report through @ref mne::Log, whose interface is standard C++ only. By default every
  * message is forwarded to Qt's message handler, so Qt widgets and QtTest see it too; applications install
- * @ref BASELIB::Log::install_qt_message_handler to print it, results to stdout and diagnostics to stderr,
- * optionally mirrored to a log file. @ref BASELIB::LogCapture records messages for the lifetime of a scope.
+ * @ref mne::Log::install_qt_message_handler to print it, results to stdout and diagnostics to stderr,
+ * optionally mirrored to a log file. @ref mne::LogCapture records messages for the lifetime of a scope.
  */
 
 #ifndef BASE_LOG_H
@@ -44,10 +44,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -238,6 +238,6 @@ private:
     Log::Level m_previousLevel;
 };
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_LOG_H

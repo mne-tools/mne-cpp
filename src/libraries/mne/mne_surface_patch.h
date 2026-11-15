@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Local surface patch (neighbours-of-neighbours) used by patch-based source priors.
  *
- * @ref MNELIB::MNESurfacePatch stores the vertex set, triangle subset
+ * @ref mne::MNESurfacePatch stores the vertex set, triangle subset
  * and geodesic distances of a cortical patch grown from a seed vertex.
  * Patches feed the cortical-orientation prior of the inverse operator
- * (@ref MNELIB::MNEPatchInfo) and are also used for source-space decimation
+ * (@ref mne::MNEPatchInfo) and are also used for source-space decimation
  * quality checks.
  */
 
@@ -41,11 +41,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNESourceSpace;
@@ -85,6 +85,6 @@ public:
     int flat = 0;                      /**< Non-zero if the patch has been flattened. */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNESURFACEPATCH_H

@@ -49,20 +49,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNECTFCompDataSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
-// FWDLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FwdCoilSet;
@@ -112,7 +112,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int fwd_make_ctf_comp_coils(MNELIB::MNECTFCompDataSet* set,
+    static int fwd_make_ctf_comp_coils(mne::MNECTFCompDataSet* set,
                                        FwdCoilSet* coils,
                                        FwdCoilSet* comp_coils);
 
@@ -130,7 +130,7 @@ public:
      *
      * @return The created FwdCompData, or nullptr on error.
      */
-    static std::unique_ptr<FwdCompData> fwd_make_comp_data(MNELIB::MNECTFCompDataSet* set,
+    static std::unique_ptr<FwdCompData> fwd_make_comp_data(mne::MNECTFCompDataSet* set,
                                                            FwdCoilSet* coils,
                                                            FwdCoilSet* comp_coils,
                                                            fwdFieldFunc field,
@@ -171,19 +171,19 @@ public:
                                    void* client);
 
 public:
-    std::shared_ptr<MNELIB::MNECTFCompDataSet> set; /**< The compensation data set. */
-    std::shared_ptr<FwdCoilSet> comp_coils;         /**< The compensation coil definitions, shared by per-thread copies. */
-    fwdFieldFunc field;                             /**< Computes the field of given direction dipole. */
-    fwdVecFieldFunc vec_field;                      /**< Computes the fields of all three dipole components. */
-    fwdFieldGradFunc field_grad;                    /**< Computes the field and gradient of one dipole direction. */
-    void* client;                                   /**< Client data to pass to the above functions. */
-    Eigen::VectorXf work;                           /**< The work area. */
-    Eigen::MatrixXf vec_work;                       /**< The vector work area (3 x ncoil). */
+    std::shared_ptr<mne::MNECTFCompDataSet> set; /**< The compensation data set. */
+    std::shared_ptr<FwdCoilSet> comp_coils;      /**< The compensation coil definitions, shared by per-thread copies. */
+    fwdFieldFunc field;                          /**< Computes the field of given direction dipole. */
+    fwdVecFieldFunc vec_field;                   /**< Computes the fields of all three dipole components. */
+    fwdFieldGradFunc field_grad;                 /**< Computes the field and gradient of one dipole direction. */
+    void* client;                                /**< Client data to pass to the above functions. */
+    Eigen::VectorXf work;                        /**< The work area. */
+    Eigen::MatrixXf vec_work;                    /**< The vector work area (3 x ncoil). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE FWDLIB
+} // NAMESPACE mne_fwd
 
 #endif // FWD_COMP_DATA_H

@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Signal Space Separation (Maxwell filter) basis metadata stored alongside MEG raw data.
  *
- * @ref MNELIB::MNESssData captures the inside/outside basis orders
+ * @ref mne::MNESssData captures the inside/outside basis orders
  * (@c LIn, @c LOut), the device-to-head transformation in effect at
  * the time of Maxwell filtering and the multipole moments computed by
  * MaxFilter. The information lives in @c FIFFB_SSS_INFO /
@@ -44,17 +44,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffStream;
 class FiffDirNode;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static std::unique_ptr<MNESssData> read_from_node(FIFFLIB::FiffStream& stream, const std::shared_ptr<FIFFLIB::FiffDirNode>& start);
+    static std::unique_ptr<MNESssData> read_from_node(mne::FiffStream& stream, const std::shared_ptr<mne::FiffDirNode>& start);
 
     //=========================================================================================================
     /**
@@ -136,6 +136,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNESSSDATA_H

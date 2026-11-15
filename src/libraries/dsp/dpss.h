@@ -16,7 +16,7 @@
  * taper basis (Slepian, 1978; Thomson, 1982); their direct eigen-
  * concentrations λ_k determine the leakage of every taper.
  *
- * Used by @ref DSPLIB::MultitaperPsd and @ref DSPLIB::MultitaperTfr to suppress spectral
+ * Used by @ref mne::MultitaperPsd and @ref mne::MultitaperTfr to suppress spectral
  * bias while keeping the variance penalty of windowing under control. The
  * implementation diagonalises the tri-diagonal Slepian matrix — numerically
  * far better-behaved than working with the sinc kernel directly — and
@@ -40,10 +40,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -86,6 +86,6 @@ public:
     static DpssResult compute(int nSamples, double halfBandwidth, int nTapers = -1, bool sym = true, bool lowBias = false);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // DPSS_H

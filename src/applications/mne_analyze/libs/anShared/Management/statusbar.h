@@ -41,20 +41,20 @@
 class QLabel;
 class QProgressBar;
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ProgressView;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Communicator;
@@ -101,7 +101,7 @@ private:
      *
      * @param[in] pEvent        The received event.
      */
-    void onNewMessageReceived(const QSharedPointer<ANSHAREDLIB::Event> pEvent);
+    void onNewMessageReceived(const QSharedPointer<mne::analyze::Event> pEvent);
 
     //=========================================================================================================
     /**
@@ -123,20 +123,20 @@ private:
      */
     void leaveEvent(QEvent* event) override;
 
-    std::unique_ptr<ANSHAREDLIB::Communicator> m_pCommunicator; /**< Receives the loading events shown in the status bar. */
+    std::unique_ptr<mne::analyze::Communicator> m_pCommunicator; /**< Receives the loading events shown in the status bar. */
 
     int m_iMsgTimeout; /**< Timeout of one message in milliseconds. */
 
     QStack<QString> m_LoadingStack; /** Keeps the currently loading messages */
 
-    QPointer<QWidget> m_pHoverWidget;                /** Widget for showing all current loading messageswhen hovering over the loading bar */
-    QPointer<DISPLIB::ProgressView> m_pProgressView; /** Widget for showiung loading bar and loadoing message */
+    QPointer<QWidget> m_pHoverWidget;                  /** Widget for showing all current loading messageswhen hovering over the loading bar */
+    QPointer<mne::disp::ProgressView> m_pProgressView; /** Widget for showiung loading bar and loadoing message */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // namespace ANSHAREDLIB
+} // namespace mne::analyze
 
 #endif // ANSHAREDLIB_STATUSBAR_H

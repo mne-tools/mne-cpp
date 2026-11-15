@@ -12,7 +12,7 @@
  * @date     July 2018
  * @brief    QGraphicsScene that draws the magnitude (and optional phase) response of a designed FIR / IIR filter.
  *
- * FilterPlotScene is the canvas used by @ref DISPLIB::FilterDesignView to
+ * FilterPlotScene is the canvas used by @ref mne::disp::FilterDesignView to
  * preview the currently designed filter. It paints axis grids,
  * interpolated magnitude / phase curves and the cut-off frequency
  * markers, and re-renders itself every time the host view edits a
@@ -39,14 +39,14 @@ class QGraphicsPathItem;
 class QGraphicsView;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -81,7 +81,7 @@ public:
      * @param[in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass.
      * @param[in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass.
      */
-    void updateFilter(const DSPLIB::FilterKernel& operatorFilter,
+    void updateFilter(const mne::FilterKernel& operatorFilter,
                       int samplingFreq,
                       int cutOffLow,
                       int cutOffHigh);
@@ -104,7 +104,7 @@ protected:
      */
     void plotFilterFrequencyResponse();
 
-    DSPLIB::FilterKernel m_pCurrentFilter; /**< Pointer to the filter operator. */
+    mne::FilterKernel m_pCurrentFilter; /**< Pointer to the filter operator. */
 
     QGraphicsPathItem* m_pGraphicsItemPath; /**< Pointer to the graphics path item in the filterplotscene. */
 
@@ -121,6 +121,6 @@ protected:
     int m_iPlotLength;            /**< Length of current filter impulse response plot. */
     QColor m_cPenColor;           /**< Color of the text and plot of the filter freq response plot. */
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // FILTERPLOTSCENE_H

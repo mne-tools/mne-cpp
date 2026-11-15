@@ -36,10 +36,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
-// DEFINE GLOBAL DISPLIB METHODS
+// DEFINE GLOBAL mne_disp METHODS
 //=============================================================================================================
 
 /**
@@ -55,8 +55,8 @@ const static float m_fScaleMISC = 1e-3f;  /**< Default scale for channel kind an
 const static float m_fScaleEMG = 1e-3f;   /**< Default scale for channel kind and unit of EMG */
 const static int MAG_TO_GRAD_LINK = 31337;
 
-float DISPLIB::getDefaultScalingValue(int iChannelKind,
-                                      int iChannelUnit)
+float mne::disp::getDefaultScalingValue(int iChannelKind,
+                                        int iChannelUnit)
 {
     float fMaxScale(1e-9f);
 
@@ -109,9 +109,9 @@ float DISPLIB::getDefaultScalingValue(int iChannelKind,
 
 //=============================================================================================================
 
-float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
-                               int iChannelKind,
-                               int iChannelUnit)
+float mne::disp::getScalingValue(const QMap<qint32, float>& qMapChScaling,
+                                 int iChannelKind,
+                                 int iChannelUnit)
 {
     float fMaxScale = qMapChScaling.value(iChannelKind);
 
@@ -120,7 +120,7 @@ float DISPLIB::getScalingValue(const QMap<qint32, float>& qMapChScaling,
     }
 
     if (qIsNaN(fMaxScale) || fMaxScale == 0) {
-        fMaxScale = DISPLIB::getDefaultScalingValue(iChannelKind, iChannelUnit);
+        fMaxScale = mne::disp::getDefaultScalingValue(iChannelKind, iChannelUnit);
     }
     return fMaxScale;
 }

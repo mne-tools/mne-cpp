@@ -1,18 +1,18 @@
 ---
 id: cross-correlation
-title: "CONNECTIVITYLIB::CrossCorrelation"
+title: "mne::CrossCorrelation"
 sidebar_label: CrossCorrelation
 sidebar_position: 12
 ---
 
 # CrossCorrelation
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/crosscorrelation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/crosscorrelation.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/crosscorrelation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/crosscorrelation.h)
 
 `#include <connectivity/crosscorrelation.h>`
 
 ```cpp
-class CONNECTIVITYLIB::CrossCorrelation
+class mne::CrossCorrelation
 ```
 
 Computes the time-lagged cross-correlation between every channel pair via the inverse FFT of the DPSS-tapered cross-spectrum, and reduces it to the maximum absolute correlation over the lag axis.

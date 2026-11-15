@@ -34,12 +34,11 @@
 #include <inv/inv_convenience.h>
 #include <inv/inv_source_estimate.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using Eigen::VectorXi;
-using INVLIB::InvSourceEstimate;
+using mne::InvSourceEstimate;
 
 //=============================================================================================================
 
@@ -229,7 +228,7 @@ private slots:
         InvSourceEstimate stc(data, (VectorXi(3) << 841, 3046, 713).finished(), 0.1f, 0.002f);
         stc.nVerticesLh = 2;
 
-        const FiffEvoked evoked = INVLIB::apply_forward(m_fwd, stc, ave.info);
+        const FiffEvoked evoked = mne::apply_forward(m_fwd, stc, ave.info);
         QCOMPARE(evoked.info.ch_names.size(), 366);
         QCOMPARE(evoked.info.ch_names.front(), QString("MEG 0113"));
         QVERIFY(std::abs(evoked.times(0) - 0.1f) < 1e-7f);
@@ -239,7 +238,7 @@ private slots:
             {"EEG 001", {-3.50052778352e-07, 1.34513634827e-08, 4.92685045566e-07}},
             {"EEG 060", {5.92750625114e-09, -2.18851835027e-07, -4.00659174832e-07}}};
         for (const auto& [name, values] : expected) {
-            const int row = static_cast<int>(BASELIB::indexOf(evoked.info.ch_names, name.toStdString()));
+            const int row = static_cast<int>(mne::indexOf(evoked.info.ch_names, name.toStdString()));
             QVERIFY2(row >= 0, qPrintable(name));
             for (int k = 0; k < 3; ++k) {
                 const double got = evoked.data(row, 2 * k);
@@ -253,7 +252,7 @@ private slots:
         InvSourceEstimate missing(data.topRows(1), (VectorXi(1) << 842).finished(), 0.1f, 0.002f);
         missing.nVerticesLh = 1;
         QTest::ignoreMessage(QtWarningMsg, QRegularExpression("apply_forward.*842"));
-        QCOMPARE(INVLIB::apply_forward(m_fwd, missing, ave.info).data.size(), Eigen::Index(0));
+        QCOMPARE(mne::apply_forward(m_fwd, missing, ave.info).data.size(), Eigen::Index(0));
     }
 
     // ── compute_orient_prior ────────────────────────────────────────────────
@@ -342,7 +341,7 @@ private slots:
         const FiffRawData raw(m_sRawFile.toStdString());
         Eigen::RowVectorXi sel(fwd.info.ch_names.size());
         for (int i = 0; i < sel.size(); ++i) {
-            sel(i) = static_cast<int>(FIFFLIB::channel_index(raw.info.ch_names, fwd.info.ch_names[i]));
+            sel(i) = static_cast<int>(mne::channel_index(raw.info.ch_names, fwd.info.ch_names[i]));
             QVERIFY(sel(i) >= 0);
         }
         const FiffInfo info = raw.info.pick_info(sel);

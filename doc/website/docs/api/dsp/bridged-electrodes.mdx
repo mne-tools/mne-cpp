@@ -7,7 +7,7 @@ sidebar_position: 15
 
 # BridgedElectrodes
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -52,7 +52,7 @@ Electrical distance is defined as the standard deviation of the difference signa
   Data matrix (n_channels x n_times).
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo with channel types.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) with channel types.
 
 **Returns:**
 
@@ -76,7 +76,7 @@ Finds pairs of EEG channels whose electrical distance falls below the threshold,
   Data matrix (n_channels x n_times).
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo with channel types.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) with channel types.
 
 - **params** : *const [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params) &*
   Detection parameters.

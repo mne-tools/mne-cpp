@@ -27,12 +27,12 @@
 
 #include <QVBoxLayout>
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace MNEALIGN;
-using namespace DISP3DLIB;
-using DISP3DLIB::MultimodalScene;
-using DISP3DLIB::SceneLayer;
-using DISP3DLIB::SceneLayerKind;
+using namespace mne::disp;
+using mne::disp::MultimodalScene;
+using mne::disp::SceneLayer;
+using mne::disp::SceneLayerKind;
 
 namespace
 {
@@ -132,7 +132,7 @@ void Align3DView::setPenStation(int station)
 
 //=============================================================================================================
 
-void Align3DView::setBem(std::shared_ptr<MNELIB::MNEBem> bem)
+void Align3DView::setBem(std::shared_ptr<mne::MNEBem> bem)
 {
     m_pBem = std::move(bem);
     m_pScene->removeLayer(QString::fromLatin1(kBemLayerId));
@@ -357,13 +357,13 @@ void Align3DView::rebuildDigitizerLayer()
         return;
     }
 
-    std::vector<FIFFLIB::FiffDigPoint> fiffPts;
+    std::vector<mne::FiffDigPoint> fiffPts;
     fiffPts.reserve(m_pPoints->points().size());
 
     const QMatrix4x4 devToMri = trackerToMri();
 
     for (const auto& pt : m_pPoints->points()) {
-        FIFFLIB::FiffDigPoint dig;
+        mne::FiffDigPoint dig;
         dig.coord_frame = FIFFV_COORD_HEAD;
         const QVector3D pos = devToMri.map(toQt(pt.position));
         dig.r[0] = pos.x();
@@ -475,7 +475,7 @@ void Align3DView::recomputeAlignment()
         const float rL[3] = {cL.x(), cL.y(), cL.z()};
         const float rN[3] = {cN.x(), cN.y(), cN.z()};
         const float rR[3] = {cR.x(), cR.y(), cR.z()};
-        auto fct = FIFFLIB::FiffCoordTrans::from_cardinal_points(
+        auto fct = mne::FiffCoordTrans::from_cardinal_points(
             FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD, rL, rN, rR);
         // Copy the 4×4 inverse (device→head = invtrans of the "from device, to head" result)
         // fromCardinalPoints stores the axes in `trans` columns with origin in move(),
@@ -525,7 +525,7 @@ void Align3DView::recomputeAlignment()
             dst(i, 2) = mriPts[i].z();
         }
         Eigen::Matrix4f matTrans;
-        if (MNELIB::fitMatchedPoints(src, dst, matTrans)) {
+        if (mne::fitMatchedPoints(src, dst, matTrans)) {
             for (int r = 0; r < 4; ++r)
                 for (int c = 0; c < 4; ++c)
                     m_headToMri(r, c) = matTrans(r, c);

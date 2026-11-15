@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref INVLIB::InvVolumeSourceEstimate.
+ * @brief    Implementation of @ref mne::InvVolumeSourceEstimate.
  *
  * Implements the shape setter, the inactive-voxel-zero-fill volume
  * reconstruction at a given time index, and the activity-weighted
@@ -25,7 +25,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

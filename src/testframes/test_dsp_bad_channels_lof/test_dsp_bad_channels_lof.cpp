@@ -43,9 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -162,8 +160,8 @@ private slots:
         params.dThreshold = 2.0;
 
         StringList bads = findBadChannelsLof(data, info, params);
-        QVERIFY2(BASELIB::contains(bads, "EEG6"),
-                 qPrintable(QString("Expected EEG6 in bads, got: %1").arg(QString::fromStdString(BASELIB::join(bads, ", ")))));
+        QVERIFY2(mne::contains(bads, "EEG6"),
+                 qPrintable(QString("Expected EEG6 in bads, got: %1").arg(QString::fromStdString(mne::join(bads, ", ")))));
     }
 
     void testCleanDataNoBads()
@@ -265,8 +263,8 @@ private slots:
         params.dThreshold = 2.0;
 
         StringList bads = findBadChannelsLof(data, info, params);
-        QVERIFY2(BASELIB::contains(bads, "EEG4"),
-                 qPrintable(QString("Expected flat EEG4 in bads, got: %1").arg(QString::fromStdString(BASELIB::join(bads, ", ")))));
+        QVERIFY2(mne::contains(bads, "EEG4"),
+                 qPrintable(QString("Expected flat EEG4 in bads, got: %1").arg(QString::fromStdString(mne::join(bads, ", ")))));
     }
 
     void cleanupTestCase()

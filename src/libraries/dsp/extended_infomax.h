@@ -43,10 +43,10 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -109,6 +109,6 @@ private:
     static Eigen::VectorXd estimateSignVector(const Eigen::MatrixXd& matSources);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // EXTENDED_INFOMAX_H

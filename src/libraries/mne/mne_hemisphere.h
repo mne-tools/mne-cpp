@@ -13,12 +13,12 @@
  * @date     August 2012
  * @brief    Per-hemisphere cortical surface bundle with decimation, patch info and rendering buffers.
  *
- * @ref MNELIB::MNEHemisphere is the visualisation-friendly counterpart
- * of @ref MNELIB::MNESourceSpace "MNESourceSpace": in addition to vertices, triangles and the MNE
+ * @ref mne::MNEHemisphere is the visualisation-friendly counterpart
+ * of @ref mne::MNESourceSpace "MNESourceSpace": in addition to vertices, triangles and the MNE
  * decimation it carries pre-computed vertex normals, triangle centroids,
  * tri-areas, the patch information used by surface-oriented inverse
  * solvers and a colour table sourced from a FreeSurfer annotation. It is
- * the unit DISP3D draws from and that morphing (@ref MNELIB::MNEMorphMap),
+ * the unit DISP3D draws from and that morphing (@ref mne::MNEMorphMap),
  * labelling and cluster operations operate on.
  */
 
@@ -50,10 +50,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -153,7 +153,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool transform_hemisphere_to(FIFFLIB::fiff_int_t dest, const FIFFLIB::FiffCoordTrans& p_Trans);
+    bool transform_hemisphere_to(mne::fiff_int_t dest, const mne::FiffCoordTrans& p_Trans);
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
      *
      * @param[in] stream  The stream to write to.
      */
-    void writeToStream(FIFFLIB::FiffStream& stream) const;
+    void writeToStream(mne::FiffStream& stream) const;
 
     //=========================================================================================================
     /**

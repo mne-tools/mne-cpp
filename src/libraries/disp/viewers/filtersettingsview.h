@@ -10,12 +10,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Compact filter on/off + bandwidth panel that pops up the full @ref DISPLIB::FilterDesignView on demand.
+ * @brief    Compact filter on/off + bandwidth panel that pops up the full @ref mne::disp::FilterDesignView on demand.
  *
  * FilterSettingsView is the small, always-visible front-end of the
  * filtering subsystem: an activation @c QCheckBox, a from / to
  * frequency display and an @c Edit button that brings up the heavier
- * @ref DISPLIB::FilterDesignView. The two widgets are kept in sync through
+ * @ref mne::disp::FilterDesignView. The two widgets are kept in sync through
  * @c filterChannelTypeChanged and @c filterChanged signals.
  */
 
@@ -49,14 +49,14 @@ class FilterSettingsViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FilterDesignView;

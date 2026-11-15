@@ -7,14 +7,14 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Legacy MNE-C constants and shared typedefs used across MNELIB structures.
+ * @brief    Legacy MNE-C constants and shared typedefs used across mne_mne structures.
  *
  * Mirrors a curated subset of the @c mne_types.h shipped with the
  * original MNE C tooling so ported code can continue to refer to the
  * familiar constants (source-space types, channel-selection origins, CTF
  * compensation grades, the default trigger channel) without dragging the
  * full C header tree into every consumer. It holds constants only and
- * includes no other MNELIB header.
+ * includes no other mne_mne header.
  */
 
 #ifndef MNE_TYPES_H
@@ -27,10 +27,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -107,6 +107,6 @@ inline constexpr std::string_view MNE_DEFAULT_TRIGGER_CH = "STI 014";
 /** @brief Environment variable overriding the trigger channel name; a C string for getenv(). */
 inline constexpr const char* MNE_ENV_TRIGGER_CH = "MNE_TRIGGER_CH_NAME";
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_TYPES_H

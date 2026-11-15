@@ -7,482 +7,361 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 477 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 356 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
-- **Accuracy** `[enum]` in [INVLIB](/docs/api/inv/)
-- **acqApplyThreadPolicy** `[fn]` in [ACQLIB](/docs/api/acq/) — Applies `policy` to the calling thread: CPUs first, then priority.
-- **AcqBlockPart** `[type]` in [ACQLIB](/docs/api/acq/) — Read-only run.
-- **AcqChannelKind** `[enum]` in [ACQLIB](/docs/api/acq/) — Signal kind of a channel.
-- **acqClockDomainId** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **AcqClockSource** `[enum]` in [ACQLIB](/docs/api/acq/) — What the anchor of the clock model is derived from.
-- **acqCurrentCpu** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **AcqDeviceState** `[enum]` in [ACQLIB](/docs/api/acq/) — State of a source.
-- **AcqDirection** `[enum]` in [ACQLIB](/docs/api/acq/) — Direction of a stream as seen from the host.
-- **AcqEigenMap** `[type]` in [ACQLIB](/docs/api/acq/) — Strided read-only channels x samples map of one part of a view.
-- **AcqErrorCode** `[enum]` in [ACQLIB](/docs/api/acq/) — Stable error codes.
-- **acqErrorInfo** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **AcqLayout** `[enum]` in [ACQLIB](/docs/api/acq/) — Memory layout of a ring.
-- **AcqLockState** `[enum]` in [ACQLIB](/docs/api/acq/) — How far a stream's timebase is known relative to its domain.
-- **AcqMemoryKind** `[enum]` in [ACQLIB](/docs/api/acq/) — Kind of memory that holds the samples of a ring.
-- **acqNumaNodeCpus** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **acqPinThisThread** `[fn]` in [ACQLIB](/docs/api/acq/) — Restricts the calling thread to `cpus`.
-- **AcqRounding** `[enum]` in [ACQLIB](/docs/api/acq/) — What `mapSampleExact()` does with an instant that is not on the target's schedulable grid.
-- **AcqSampleFormat** `[enum]` in [ACQLIB](/docs/api/acq/) — Native sample format of a stream.
-- **AcqScaling** `[enum]` in [ACQLIB](/docs/api/acq/) — Whether converters apply the per-channel scale and offset.
-- **acqSetThisThreadPriority** `[fn]` in [ACQLIB](/docs/api/acq/) — Sets the scheduling class of the calling thread.
-- **AcqThreadPriority** `[enum]` in [ACQLIB](/docs/api/acq/) — Scheduling class of an acquisition thread.
-- **AcqUnderrunFill** `[enum]` in [ACQLIB](/docs/api/acq/) — What an output device emits when the writer has not committed the sample it has to play.
-- **AcqUnit** `[enum]` in [ACQLIB](/docs/api/acq/) — SI unit of the physical value of a channel (value = raw * scale + offset, times 10^unitExponent).
-- **AcqWait** `[enum]` in [ACQLIB](/docs/api/acq/) — How a waiting reader or writer is woken.
-- **AcqWritePart** `[type]` in [ACQLIB](/docs/api/acq/) — Writable run.
-- **addReferenceChannels** `[fn]` in [DSPLIB](/docs/api/dsp/) — Add reference channel(s) back as zero-filled rows.
-- **annotateAmplitude** `[fn]` in [DSPLIB](/docs/api/dsp/) — Annotate spans where consecutive samples jump or stay flat, as mne.preprocessing.annotate_amplitude.
-- **annotateMusclZscore** `[fn]` in [DSPLIB](/docs/api/dsp/) — Detect muscle artifacts via high-frequency z-score and annotate bad segments.
-- **annotations_from_events** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Converts events to annotations, like mne.annotations_from_events.
-- **apply_forward** `[fn]` in [INVLIB](/docs/api/inv/) — Project a source estimate to the sensors, as mne.apply_forward.
-- **apply_inverse_epochs** `[fn]` in [INVLIB](/docs/api/inv/) — Apply inverse operator to each epoch in a list.
-- **apply_inverse_raw** `[fn]` in [INVLIB](/docs/api/inv/) — Apply inverse operator to raw data.
-- **AvrTypeRowVector** `[type]` in [DISPLIB](/docs/api/disp/)
-- **AvrTypeRowVectorPair** `[type]` in [DISPLIB](/docs/api/disp/)
-- **base64_encode** `[fn]` in [REPORTLIB](/docs/api/report/) — Encodes bytes as base64 (RFC 4648, with padding), as used in data URIs.
-- **BeamformerInversion** `[enum]` in [INVLIB](/docs/api/inv/) — Method for inverting the beamformer denominator matrix G^H Cm^\{-1\} G.
-- **BeamformerPickOri** `[enum]` in [INVLIB](/docs/api/inv/) — Orientation picking mode for beamformer filters.
-- **BeamformerWeightNorm** `[enum]` in [INVLIB](/docs/api/inv/) — Weight normalization strategy for beamformer spatial filters.
-- **BIDS_COORD_TO_FIFF_FRAME** `[var]` in [BIDSLIB](/docs/api/bids/) — FIFF coordinate frame of each BIDS coordinate system name read from electrodes.tsv / coordsystem.json.
-- **BIDS_DATATYPE_ANAT** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_BEH** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_DWI** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_EEG** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_FUNC** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_IEEG** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPE_MEG** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS datatype strings used in directory and filename construction.
-- **BIDS_DATATYPE_PERF** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **BIDS_DATATYPES** `[var]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS datatypes (electrophysiology, imaging and behavioral).
-- **BIDS_EEG_EXTENSIONS** `[var]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for EEG in BIDS, lowercase with the leading dot.
-- **BIDS_ELECTROPHYSIOLOGY_DATATYPES** `[var]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS electrophysiology datatypes: "meg", "eeg" and "ieeg".
-- **BIDS_ENTITY_ORDER** `[var]` in [BIDSLIB](/docs/api/bids/) — Entity keys in the order they must appear in a BIDS filename (per specification).
-- **BIDS_IEEG_COORD_SYSTEMS** `[var]` in [BIDSLIB](/docs/api/bids/) — Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
-- **BIDS_IEEG_EXTENSIONS** `[var]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for iEEG in BIDS, lowercase with the leading dot.
-- **bids_lookup** `[fn]` in [BIDSLIB](/docs/api/bids/) — Looks a key up in one of the mapping tables above.
-- **BIDS_TYPE_TO_FIFF_KIND** `[var]` in [BIDSLIB](/docs/api/bids/) — FIFF channel kind of each BIDS channel type read from channels.tsv.
-- **BidsTsvRow** `[type]` in [BIDSLIB](/docs/api/bids/) — Represents a single row of a BIDS TSV file as a column-name → value map.
-- **BIG_TIME** `[var]` in [INVLIB](/docs/api/inv/)
-- **buildDateTime** `[fn]` in [ACQLIB](/docs/api/acq/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [BASELIB](/docs/api/base/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [CHANNELSLIB](/docs/api/channels/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [COMLIB](/docs/api/com/) — Compile-time date/time stamp baked into the ``COMLIB`` binary.
-- **buildDateTime** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [DISPLIB](/docs/api/disp/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [DSPLIB](/docs/api/dsp/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [FSLIB](/docs/api/fs/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [IEEGLIB](/docs/api/ieeg/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [INVLIB](/docs/api/inv/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [MATHLIB](/docs/api/math/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [MLLIB](/docs/api/ml/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [MNALIB](/docs/api/mna/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [MNELIB](/docs/api/mne/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the build date and time.
-- **buildDateTime** `[fn]` in [PYBRIDGELIB](/docs/api/pybridge/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [REPORTLIB](/docs/api/report/) — Returns build date and time.
-- **buildDateTime** `[fn]` in [STSLIB](/docs/api/sts/) — Returns build date and time.
-- **buildHash** `[fn]` in [ACQLIB](/docs/api/acq/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [BASELIB](/docs/api/base/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [CHANNELSLIB](/docs/api/channels/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [COMLIB](/docs/api/com/) — Abbreviated git commit hash (typically 7 hex chars) of the source tree this library was built from.
-- **buildHash** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [DISPLIB](/docs/api/disp/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [DSPLIB](/docs/api/dsp/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [FSLIB](/docs/api/fs/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [IEEGLIB](/docs/api/ieeg/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [INVLIB](/docs/api/inv/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [MATHLIB](/docs/api/math/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [MLLIB](/docs/api/ml/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [MNALIB](/docs/api/mna/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [MNELIB](/docs/api/mne/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the short git hash.
-- **buildHash** `[fn]` in [PYBRIDGELIB](/docs/api/pybridge/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [REPORTLIB](/docs/api/report/) — Returns abbreviated build git hash.
-- **buildHash** `[fn]` in [STSLIB](/docs/api/sts/) — Returns abbreviated build git hash.
-- **buildHashLong** `[fn]` in [ACQLIB](/docs/api/acq/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [BASELIB](/docs/api/base/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [BIDSLIB](/docs/api/bids/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [CHANNELSLIB](/docs/api/channels/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [COMLIB](/docs/api/com/) — Full-length git commit hash (40 hex chars) of the source tree this library was built from.
-- **buildHashLong** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [DECODINGLIB](/docs/api/decoding/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [DISPLIB](/docs/api/disp/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [DSPLIB](/docs/api/dsp/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [FSLIB](/docs/api/fs/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [FWDLIB](/docs/api/fwd/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [IEEGLIB](/docs/api/ieeg/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [INVLIB](/docs/api/inv/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [LSLLIB](/docs/api/lsl/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [MATHLIB](/docs/api/math/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [MLLIB](/docs/api/ml/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [MNALIB](/docs/api/mna/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [MNELIB](/docs/api/mne/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [MRILIB](/docs/api/mri/) — Returns the long git hash.
-- **buildHashLong** `[fn]` in [PYBRIDGELIB](/docs/api/pybridge/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [REPORTLIB](/docs/api/report/) — Returns full build git hash.
-- **buildHashLong** `[fn]` in [STSLIB](/docs/api/sts/) — Returns full build git hash.
-- **BVBinaryFormat** `[enum]` in [BIDSLIB](/docs/api/bids/) — Binary format enumeration for BrainVision data files.
-- **BVOrientation** `[enum]` in [BIDSLIB](/docs/api/bids/) — Data orientation enumeration.
-- **bytesPerSample** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **byteSwap** `[fn]` in [BASELIB](/docs/api/base/)
-- **byteSwapInPlace** `[fn]` in [BASELIB](/docs/api/base/) — Reverses the bytes of every element of `data`.
-- **CborByteArray** `[type]` in [BASELIB](/docs/api/base/) — A CBOR byte string.
-- **channel_index** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **ChannelFormat** `[enum]` in [LSLLIB](/docs/api/lsl/) — Data format of a channel (mirroring the values used in the original LSL protocol).
-- **ColorMaps** `[enum]` in [DISPLIB](/docs/api/disp/)
-- **Compression** `[enum]` in [BASELIB](/docs/api/base/) — How the bytes of a file are stored.
-- **compute_connectivity** `[fn]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Computes every connectivity method the settings ask for, as mne_connectivity.spectral_connectivity_epochs does for its spectral methods.
-- **compute_source_band_power** `[fn]` in [INVLIB](/docs/api/inv/) — Compute band power for source estimate.
-- **compute_source_psd** `[fn]` in [INVLIB](/docs/api/inv/) — Compute PSD for a source estimate using Welch's method.
-- **compute_whitener** `[fn]` in [INVLIB](/docs/api/inv/) — Compute whitening matrix from a noise covariance.
-- **computeBridgedElectrodes** `[fn]` in [DSPLIB](/docs/api/dsp/) — Detect bridged EEG electrodes.
-- **computeElectricalDistance** `[fn]` in [DSPLIB](/docs/api/dsp/) — Compute electrical distance matrix between EEG channels.
-- **computeFilteredAverage** `[fn]` in [DSPLIB](/docs/api/dsp/) — Computes the filtered average for given fiff raw data.
-- **computeLofScores** `[fn]` in [DSPLIB](/docs/api/dsp/) — Compute LOF scores for a feature matrix.
-- **contains** `[fn]` in [BASELIB](/docs/api/base/)
-- **COR_HEIGHT** `[var]` in [MRILIB](/docs/api/mri/) — Height of each COR slice in pixels.
-- **COR_NSLICE** `[var]` in [MRILIB](/docs/api/mri/) — Number of COR slices.
-- **COR_PIXEL_SIZE** `[var]` in [MRILIB](/docs/api/mri/) — Pixel size for COR slices (1mm in meters).
-- **COR_WIDTH** `[var]` in [MRILIB](/docs/api/mri/) — Width of each COR slice in pixels.
-- **count_annotations** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Counts annotations by description, like mne.count_annotations.
-- **DATA_TYPE** `[var]` in [FIFFLIB](/docs/api/fiff/) — DATA_TYPE encoding 0000ffff.
-- **dateTimeNow** `[fn]` in [BASELIB](/docs/api/base/) — Returns build date and time (time preprocessor was run).
-- **dateToday** `[fn]` in [BASELIB](/docs/api/base/) — Returns build date (time preprocessor was run).
-- **decode** `[fn]` in [ACQLIB](/docs/api/acq/) — Decodes all samples of `view` into `out`.
-- **decode** `[fn]` in [ACQLIB](/docs/api/acq/) — Decodes all samples of `view` into `out`.
-- **decode** `[fn]` in [ACQLIB](/docs/api/acq/) — Decodes all samples of `view` into `out`.    Real formats yield a zero imaginary part.
-- **decodeBits** `[fn]` in [ACQLIB](/docs/api/acq/) — Extracts the `AcqStreamInfo::bitFields` of `view`; row f of `out` holds field f for every sample.
-- **decodePart** `[fn]` in [ACQLIB](/docs/api/acq/) — Decodes one raw run, for adopted device buffers that are not read through an [`AcqReader`](/docs/api/acq/acq-reader).
-- **defaultConstMatrixXd** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **defaultCov** `[var]` in [MNELIB](/docs/api/mne/)
-- **defaultD** `[var]` in [MNELIB](/docs/api/mne/)
-- **defaultInfo** `[var]` in [MNELIB](/docs/api/mne/)
-- **defaultMatrixXd** `[var]` in [FIFFLIB](/docs/api/fiff/)
-- **defaultMatrixXi** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **defaultRowVectorXi** `[var]` in [FIFFLIB](/docs/api/fiff/)
-- **defaultTris** `[fn]` in [FSLIB](/docs/api/fs/)
-- **defaultVectorXi** `[var]` in [FIFFLIB](/docs/api/fiff/)
-- **detectTriggerFlanksGrad** `[fn]` in [DSPLIB](/docs/api/dsp/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksGrad** `[fn]` in [DSPLIB](/docs/api/dsp/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksMax** `[fn]` in [DSPLIB](/docs/api/dsp/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksMax** `[fn]` in [DSPLIB](/docs/api/dsp/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
-- **DetrendMode** `[enum]` in [DISPLIB](/docs/api/disp/) — Channel display metadata (read-only from the renderer's perspective).
-- **dipoleFitFuncs** `[type]` in [INVLIB](/docs/api/inv/) — Pointer alias for [`dipoleFitFuncsRec`](/docs/api/inv/dipole-fit-funcs-rec), used throughout the dipole fitting module.
-- **Direction** `[enum]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Selects which incident edges of a node count.
-- **discard3DPointOutliers** `[fn]` in [MNELIB](/docs/api/mne/) — Discard outliers compared to a given 3D surface.
-- **EdgeSet** `[enum]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Selects all edges or only those passing the threshold.
-- **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
-- **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
-- **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).    For real formats the imaginary part must be 0, otherwise the element counts as clipped.
-- **encodeBits** `[fn]` in [ACQLIB](/docs/api/acq/) — Writes bit fields into the reserved samples of `view`, leaving the analog bits untouched; call before or after `encode()` of the same view.
-- **equalsIgnoreCase** `[fn]` in [BASELIB](/docs/api/base/)
-- **ErrorCode** `[enum]` in [BASELIB](/docs/api/base/) — What went wrong, so callers can react without parsing the message.
-- **estimate_snr** `[fn]` in [INVLIB](/docs/api/inv/) — Estimate the SNR of evoked data as a function of time.
-- **events_from_annotations** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Converts annotations to events, like mne.events_from_annotations.
-- **executable_dir** `[fn]` in [BASELIB](/docs/api/base/)
-- **extras_from_json** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **extras_to_json** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **fail** `[fn]` in [BASELIB](/docs/api/base/)
-- **FiducialId** `[enum]` in [ACQLIB](/docs/api/acq/) — Identifier for the three cardinal fiducials.
-- **fiff_byte_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_char_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_data_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_dau_pack13_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_dau_pack14_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_dau_pack16_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_double_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_float_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **FIFF_FRAME_TO_BIDS_COORD** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS coordinate system name written for each FIFF coordinate frame.
-- **fiff_int_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_julian_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **FIFF_KIND_TO_BIDS_TYPE** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS channel type of each FIFF channel kind written to channels.tsv.
-- **fiff_long_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_short_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_uint_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_ulong_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiff_ushort_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **filterChannel** `[fn]` in [DSPLIB](/docs/api/dsp/) — This function is used to filter row-wise in parallel threads.
-- **filterChpi** `[fn]` in [DSPLIB](/docs/api/dsp/) — Remove cHPI excitation signals from MEG data by notch filtering.
-- **filterChpi** `[fn]` in [DSPLIB](/docs/api/dsp/) — Overload that attempts to extract cHPI frequencies from FiffInfo.
-- **filterData** `[fn]` in [DSPLIB](/docs/api/dsp/) — Creates a user designed filter kernel and filters the raw input data.
-- **filterData** `[fn]` in [DSPLIB](/docs/api/dsp/) — Calculates the filtered version of the raw input data based on a given list filters.
-- **filterDataBlock** `[fn]` in [DSPLIB](/docs/api/dsp/) — Calculates the filtered version of the raw input data block.
-- **filterFile** `[fn]` in [DSPLIB](/docs/api/dsp/) — Creates a user designed filter kernel, filters data from an input file and writes the filtered data to a file.
-- **filterFile** `[fn]` in [DSPLIB](/docs/api/dsp/) — Filters data from an input file based on an existing filter kernel and writes the filtered data to a file.
-- **findBadChannelsLof** `[fn]` in [DSPLIB](/docs/api/dsp/) — Detect bad channels using Local Outlier Factor (LOF).
-- **findBadChannelsMaxwell** `[fn]` in [DSPLIB](/docs/api/dsp/) — Detect bad MEG channels using [`SSS`](/docs/api/dsp/sss) reconstruction residuals.
-- **fitMatchedPoints** `[fn]` in [MNELIB](/docs/api/mne/) — Corresponding point set registration using quaternions.
-- **fitUser** `[type]` in [FWDLIB](/docs/api/fwd/)
-- **fixStimArtifact** `[fn]` in [DSPLIB](/docs/api/dsp/) — Repair stimulus artifacts by interpolating or zeroing data around events.
-- **fromBigEndian** `[fn]` in [BASELIB](/docs/api/base/)
-- **fromFiffInfo** `[fn]` in [ACQLIB](/docs/api/acq/) — Describes a FIFF measurement as a stream.
-- **fromTokens** `[fn]` in [INVLIB](/docs/api/inv/) — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
-- **FWD_BEM_CONSTANT_COLL** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_IP_APPROACH_LIMIT** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_LIN_FIELD_FERGUSON** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_LIN_FIELD_SIMPLE** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_LIN_FIELD_URANKAR** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_LINEAR_COLL** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_BEM_UNKNOWN** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COIL_ACCURACY_ACCURATE** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COIL_ACCURACY_NORMAL** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COIL_ACCURACY_POINT** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COIL_UNKNOWN** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_AXIAL_GRAD** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_AXIAL_GRAD2** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_EEG** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_MAG** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_PLANAR_GRAD** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_COILC_UNKNOWN** `[var]` in [FWDLIB](/docs/api/fwd/)
-- **FWD_IS_MEG_COIL** `[fn]` in [FWDLIB](/docs/api/fwd/)
-- **getDefaultScalingValue** `[fn]` in [DISPLIB](/docs/api/disp/) — Get the default scaling values by channel type.
-- **getScalingValue** `[fn]` in [DISPLIB](/docs/api/disp/) — Get the scaling value from suplied scale map, and check if there is a float asigned to the scale.
-- **gitHash** `[fn]` in [BASELIB](/docs/api/base/) — Returns short version of the hash of the current git commit.
-- **gitHashLong** `[fn]` in [BASELIB](/docs/api/base/) — Returns entire hash of the current git commit.
-- **has_channel** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **html_escape** `[fn]` in [REPORTLIB](/docs/api/report/) — Escapes the characters that are special in HTML text and attribute values: & &lt; &gt; " '.
-- **IcaComponentLabel** `[enum]` in [DECODINGLIB](/docs/api/decoding/) — Categorical label assigned to a single ICA component.
-- **IeegLeadType** `[enum]` in [IEEGLIB](/docs/api/ieeg/) — Kind of lead a contact sits on.
-- **IeegSurfaceMapMode** `[enum]` in [IEEGLIB](/docs/api/ieeg/) — How the weights of contacts near one vertex combine; the modes of MNE-Python's stc_near_sensors.
-- **ImageFormat** `[enum]` in [REPORTLIB](/docs/api/report/) — Encoding of an embedded figure.
-- **indexOf** `[fn]` in [BASELIB](/docs/api/base/)
-- **InvEstimateMethod** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the inverse estimation method that produced a source estimate.
-- **InvOrientationType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the orientation constraint used during source estimation.
-- **InvSourceSpaceType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the source space type underlying a source estimate.
-- **InvTokenId** `[enum]` in [INVLIB](/docs/api/inv/) — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
-- **IS_MATRIX** `[var]` in [FIFFLIB](/docs/api/fiff/) — Is Matrix encoding.
-- **IS_TRANSPOSED** `[var]` in [INVLIB](/docs/api/inv/) — Defines IS_TRANSPOSED.
-- **is_utf8** `[fn]` in [BASELIB](/docs/api/base/)
-- **isComplex** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **isHit** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/)
-- **isTrue** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Read a boolean from QSettings with a default fallback.
-- **join** `[fn]` in [BASELIB](/docs/api/base/)
-- **kBemHead** `[var]` in `SURFACEKEYS`
-- **kBemPrefix** `[var]` in `SURFACEKEYS`
-- **kContourEeg** `[var]` in `SURFACEKEYS`
-- **kContourMeg** `[var]` in `SURFACEKEYS`
-- **kDigCardinal** `[var]` in `SURFACEKEYS`
-- **kDigEeg** `[var]` in `SURFACEKEYS`
-- **kDigExtra** `[var]` in `SURFACEKEYS`
-- **kDigHpi** `[var]` in `SURFACEKEYS`
-- **kDigPrefix** `[var]` in `SURFACEKEYS`
-- **kHelmet** `[var]` in `SURFACEKEYS`
-- **kLhInflated** `[var]` in `SURFACEKEYS`
-- **kLhPrefix** `[var]` in `SURFACEKEYS`
-- **KMeansDistance** `[enum]` in [MATHLIB](/docs/api/math/) — Distance metric for K-Means clustering.
-- **KMeansEmptyAction** `[enum]` in [MATHLIB](/docs/api/math/) — Action to take when a K-Means cluster becomes empty.
-- **KMeansStart** `[enum]` in [MATHLIB](/docs/api/math/) — Initialization strategy for K-Means clustering.
-- **kRhInflated** `[var]` in `SURFACEKEYS`
-- **kRhPrefix** `[var]` in `SURFACEKEYS`
-- **kSensDig** `[var]` in `SURFACEKEYS`
-- **kSensEeg** `[var]` in `SURFACEKEYS`
-- **kSensMeg** `[var]` in `SURFACEKEYS`
-- **kSensMegGrad** `[var]` in `SURFACEKEYS`
-- **kSensMegMag** `[var]` in `SURFACEKEYS`
-- **kSensPrefix** `[var]` in `SURFACEKEYS`
-- **kSrcSpPrefix** `[var]` in `SURFACEKEYS`
-- **latin1_to_utf8** `[fn]` in [BASELIB](/docs/api/base/)
-- **list_serial_ports** `[fn]` in [COMLIB](/docs/api/com/)
-- **local_clock** `[fn]` in [LSLLIB](/docs/api/lsl/) — Seconds of the monotonic clock LSL timestamps refer to, as liblsl's lsl_local_clock().
-- **lslRuntime** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **m_matViridrisData** `[var]` in [DISPLIB](/docs/api/disp/)
-- **makeSpharaProjector** `[fn]` in [DSPLIB](/docs/api/dsp/) — Constructs a SPHARA operator.
-- **map** `[fn]` in [ACQLIB](/docs/api/acq/) — Maps part `i` of `view` as a channels x samples matrix of the native type, without copy.
-- **mapRangeExact** `[fn]` in [ACQLIB](/docs/api/acq/) — The samples of `to` whose instants lie in the time span of samples [`first`, `end`) of `from`, e.g.
-- **mapSample** `[fn]` in [ACQLIB](/docs/api/acq/) — Maps a sample of one stream to the sample of another stream at the same physical time through host time, so the result carries both clocks' uncertainty.
-- **mapSampleExact** `[fn]` in [ACQLIB](/docs/api/acq/) — Maps `sample` of stream `from`, shifted by `offsetTicks`, to the stream `to` of the same domain.
-- **MATRIX_CODING_CCS** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_CCS encoding.
-- **MATRIX_CODING_DENSE** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_DENSE encoding.
-- **MATRIX_CODING_RCS** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_RCS encoding.
-- **MatrixDau16** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **MatrixShort** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **MatrixXdR** `[type]` in [DISPLIB](/docs/api/disp/)
-- **MGH_TAG_MGH_XFORM** `[var]` in [MRILIB](/docs/api/mri/) — MGH Talairach transform tag (contains path to .xfm file).
-- **MGH_TAG_OLD_MGH_XFORM** `[var]` in [MRILIB](/docs/api/mri/) — Old MGH transform tag.
-- **MGH_TAG_OLD_SURF_GEOM** `[var]` in [MRILIB](/docs/api/mri/) — Old surface geometry tag.
-- **MlBackend** `[enum]` in [MLLIB](/docs/api/ml/) — Available ML back-end engines.
-- **MlDataType** `[enum]` in [MLLIB](/docs/api/ml/) — Supported data types for tensors.
-- **MlTaskType** `[enum]` in [MLLIB](/docs/api/ml/) — ML task categories.
-- **MnaContainerFormat** `[enum]` in [MNALIB](/docs/api/mna/) — Supported container formats.
-- **MnaDataKind** `[enum]` in [MNALIB](/docs/api/mna/) — Describes the kind of data flowing through a graph port.
-- **mnaDataKindFromString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert a string to `MnaDataKind`.
-- **mnaDataKindToString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert `MnaDataKind` to its string representation.
-- **MnaFileRole** `[enum]` in [MNALIB](/docs/api/mna/) — Describes the role a file plays within an MNA project.
-- **mnaFileRoleFromString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert a string to `MnaFileRole`.
-- **mnaFileRoleToString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert `MnaFileRole` to its string representation.
-- **MnaNodeExecMode** `[enum]` in [MNALIB](/docs/api/mna/) — Execution mode for a graph node.
-- **MnaPortDir** `[enum]` in [MNALIB](/docs/api/mna/) — Direction of a port on a graph node.
-- **MNE_4DV_COMP1** `[var]` in [MNELIB](/docs/api/mne/) — 4D Neuroimaging 1st-order compensation.
-- **MNE_CH_SELECTION_FILE** `[var]` in [MNELIB](/docs/api/mne/) — Loaded from file.
-- **MNE_CH_SELECTION_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Unknown origin.
-- **MNE_CH_SELECTION_USER** `[var]` in [MNELIB](/docs/api/mne/) — Created interactively.
-- **MNE_CTFV_COMP_G1BR** `[var]` in [MNELIB](/docs/api/mne/) — 1st-order gradient, balanced reference.
-- **MNE_CTFV_COMP_G2BR** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient, balanced reference.
-- **MNE_CTFV_COMP_G2OI** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient, off-diagonal.
-- **MNE_CTFV_COMP_G3BR** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient, balanced reference.
-- **MNE_CTFV_COMP_G3OI** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient, off-diagonal.
-- **MNE_CTFV_COMP_NONE** `[var]` in [MNELIB](/docs/api/mne/) — No compensation.
-- **MNE_CTFV_COMP_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Grade not recognized.
-- **MNE_CTFV_GRAD1** `[var]` in [MNELIB](/docs/api/mne/) — 1st-order gradient compensation.
-- **MNE_CTFV_GRAD2** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient compensation.
-- **MNE_CTFV_GRAD3** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient compensation.
-- **MNE_CTFV_NOGRAD** `[var]` in [MNELIB](/docs/api/mne/) — No gradient compensation.
-- **MNE_DEFAULT_TRIGGER_CH** `[var]` in [MNELIB](/docs/api/mne/) — Default digital trigger channel name.
-- **MNE_ENV_TRIGGER_CH** `[var]` in [MNELIB](/docs/api/mne/) — Environment variable overriding the trigger channel name; a C string for getenv().
-- **MNE_SOURCE_SPACE_DISCRETE** `[var]` in [MNELIB](/docs/api/mne/) — Discrete point set.
-- **MNE_SOURCE_SPACE_SURFACE** `[var]` in [MNELIB](/docs/api/mne/) — FsSurface-based source space.
-- **MNE_SOURCE_SPACE_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Type not yet determined.
-- **MNE_SOURCE_SPACE_VOLUME** `[var]` in [MNELIB](/docs/api/mne/) — Volumetric (3-D grid) source space.
-- **mneAnalyzeColor** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — MNE analyze colormap: teal → blue → gray → red → yellow.
-- **MRI_ALL_FRAMES** `[var]` in [MRILIB](/docs/api/mri/) — Load all frames.
-- **MRI_BITMAP** `[var]` in [MRILIB](/docs/api/mri/) — Bitmap (unused in practice).
-- **MRI_FLOAT** `[var]` in [MRILIB](/docs/api/mri/) — 32-bit float.
-- **MRI_INT** `[var]` in [MRILIB](/docs/api/mri/) — Signed 32-bit integer.
-- **MRI_LONG** `[var]` in [MRILIB](/docs/api/mri/) — Long integer (unused in practice).
-- **MRI_MGH_DATA_OFFSET** `[var]` in [MRILIB](/docs/api/mri/) — Fixed byte offset where image data begins (bytes 0-283 are header).
-- **MRI_MGH_HEADER_FIXED_SIZE** `[var]` in [MRILIB](/docs/api/mri/) — Size of the fixed portion of the header (before RAS info).
-- **MRI_MGH_VERSION** `[var]` in [MRILIB](/docs/api/mri/) — Current MGH file format version.
-- **MRI_NO_FRAMES** `[var]` in [MRILIB](/docs/api/mri/) — Do not load data at all.
-- **MRI_SHORT** `[var]` in [MRILIB](/docs/api/mri/) — Signed 16-bit short.
-- **MRI_TENSOR** `[var]` in [MRILIB](/docs/api/mri/) — Tensor (unused in practice).
-- **MRI_UCHAR** `[var]` in [MRILIB](/docs/api/mri/) — Unsigned char (8-bit).
-- **multiViewPresetIsPerspective** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Whether a preset is a perspective (free-rotate) camera rather than an orthographic-style fixed camera.
-- **multiViewPresetName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Human-readable name for a multi-view preset index (0–6).
-- **multiViewPresetOffset** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Camera rotation quaternion for a multi-view preset index (0–6).
-- **names_from_json** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **names_to_json** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **normalizedVisualizationTarget** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Clamp a visualization target index to [-1, maxIndex].
-- **NOT_TRANSPOSED** `[var]` in [INVLIB](/docs/api/inv/) — Defines NOT_TRANSPOSED.
-- **operator!=** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for inequality.
-- **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator&lt;&lt;** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator&lt;&lt;** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for equality.
-- **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator==** `[fn]` in [MNELIB](/docs/api/mne/)
-- **packABGR** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Pack RGBA colour components into a single ABGR uint32_t suitable for GPU vertex attributes declared as UNormByte4.
-- **parse_progress_line** `[fn]` in [PYBRIDGELIB](/docs/api/pybridge/) — Parses a progress line of the form `"[progress] 42.5%"` or `"[progress] 42.5% message"` (case-insensitive tag, surrounding whitespace ignored).
-- **pathFromUtf8** `[fn]` in [BASELIB](/docs/api/base/)
-- **peakFinder** `[fn]` in [DSPLIB](/docs/api/dsp/) — Find peaks in a 1D signal.
-- **peakFinderMne** `[fn]` in [DSPLIB](/docs/api/dsp/) — Noise-tolerant extrema search of `mne.preprocessing.peak_finder`.
-- **peakProminences** `[fn]` in [DSPLIB](/docs/api/dsp/) — Compute prominence of each peak.
-- **performIcp** `[fn]` in [MNELIB](/docs/api/mne/) — The ICP algorithm to register a point cloud with a surface.
-- **perspectivePresetRotation** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Default perspective rotation quaternion used for the "Perspective" camera.
-- **PickKind** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Kind of object that produced a 3-D pick.
-- **PointKind** `[enum]` in [ACQLIB](/docs/api/acq/) — Logical category of a captured point.
-- **PythonChannel** `[enum]` in [PYBRIDGELIB](/docs/api/pybridge/) — Output stream of the child process a line came from.
-- **PythonLineCallback** `[type]` in [PYBRIDGELIB](/docs/api/pybridge/) — Called for every output line (without the trailing newline).
-- **PythonProgressCallback** `[type]` in [PYBRIDGELIB](/docs/api/pybridge/) — Called for every `"[progress] &lt;pct&gt;% [message]"` line, with pct in 0 to 100.
-- **read** `[fn]` in [ACQLIB](/docs/api/acq/) — Reads samples into an Eigen matrix, resizing it only when its shape differs (so a reused matrix does not allocate).
-- **read_file_bytes** `[fn]` in [BASELIB](/docs/api/base/) — Reads a whole file, decompressing it if asked to.
-- **read_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Reads a matrix written by `write_matrix` (or `numpy.savetxt`).
-- **read_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Reads a matrix in the same text layout from a stream, e.g.
-- **read_text_file** `[fn]` in [BASELIB](/docs/api/base/) — Reads a whole file as text, byte for byte (no line-ending or encoding conversion).
-- **ref** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **ref** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **register_babymeg_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the babymeg:// scheme (the acquisition server of a BabyMEG system) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_brainflow_file_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the brainflow_file:// scheme (a file BrainFlow wrote, replayed without BrainFlow) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_brainflow_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the brainflow:// scheme (any board BrainFlow supports, through BrainFlow's library loaded at run time) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_device_schemes** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers every scheme of this library, as the functions above do one by one; for programs that offer all sources, such as mne_acq.
-- **register_eego_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the eego:// scheme (ANT Neuro eego) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_ftbuffer_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the ftbuffer:// scheme (a FieldTrip buffer server, e.g.
-- **register_gusbamp_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the gusbamp:// scheme (g.tec g.USBamp, up to four synchronised) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_natus_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the natus:// scheme (a Natus Quantum amplifier through the datagrams of its streaming machine) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_neuromag_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the neuromag:// scheme (the data acquisition of Neuromag/MEGIN MEG systems) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_polhemus_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the polhemus:// scheme (Polhemus Fastrak and FastSCAN digitizers on a serial port) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_rtserver_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the rtserver:// scheme (the active connector of an mne_rt_server) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **register_streaming_board_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the streaming_board:// scheme (what a BrainFlow session streams with add_streamer, received without BrainFlow) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **registerBrainAmpScheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the brainamp:// scheme (Brain Products BrainAmp) with `AcqDeviceRegistry::instance()`.
-- **registerFiffScheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the fiff:// scheme with `AcqDeviceRegistry::instance()`.
-- **registerLslScheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the lsl:// scheme with `AcqDeviceRegistry::instance()`.
-- **registerTmsiScheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the tmsi:// scheme (TMSi Refa and Porti) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
-- **resolve_stream** `[fn]` in [LSLLIB](/docs/api/lsl/) — Resolve streams by a specific property value.
-- **resolve_streams** `[fn]` in [LSLLIB](/docs/api/lsl/) — Resolve all streams currently available on the network.
-- **resource_path** `[fn]` in [BASELIB](/docs/api/base/)
-- **RowVectorPair** `[type]` in [DISPLIB](/docs/api/disp/)
-- **same_channel** `[fn]` in [FIFFLIB](/docs/api/fiff/)
-- **sampleFormatName** `[fn]` in [ACQLIB](/docs/api/acq/)
-- **SceneLayerKind** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Modality of a layer in the multimodal scene.
-- **sensorParentToKeyPrefix** `[fn]` in `SURFACEKEYS` — Map a parent-item display text (e.g.
-- **sensorTypeToObjectKey** `[fn]` in `SURFACEKEYS` — Map from user-facing sensor type name (e.g.
-- **setBipolarReference** `[fn]` in [DSPLIB](/docs/api/dsp/) — Create bipolar derivations from EEG channels.
-- **setEegReference** `[fn]` in [DSPLIB](/docs/api/dsp/) — Re-reference EEG channels to average, specific channel(s), or REST.
-- **ShaderMode** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Shader pipeline modes supported by the renderer.
-- **shaderModeFromName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a shader name ("Standard", "Holographic", "Anatomical") to enum.
-- **shaderModeName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a `ShaderMode` enum to display string.
-- **simulateEvoked** `[fn]` in [DSPLIB](/docs/api/dsp/) — Simulate evoked data from a source estimate and forward model.
-- **simulateEvokedNoiseless** `[fn]` in [DSPLIB](/docs/api/dsp/) — Simulate evoked data without noise.
-- **simulateStc** `[fn]` in [DSPLIB](/docs/api/dsp/) — Create a synthetic source time course.
-- **simulateStcFromWaveforms** `[fn]` in [DSPLIB](/docs/api/dsp/) — Create a synthetic source time course from custom waveforms.
-- **SliceOrientation** `[enum]` in [MRILIB](/docs/api/mri/) — Slice orientation for orthogonal MRI volume slicing; the values are the slice slots of a three-slice view.
-- **split** `[fn]` in [BASELIB](/docs/api/base/)
-- **SplitterHit** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Identifies which splitter(s) are hit by a cursor position.
-- **start_thread** `[fn]` in [ACQLIB](/docs/api/acq/) — Starts a thread that applies `policy` and then runs `body`, e.g.
-- **StatsCorrection** `[enum]` in [STSLIB](/docs/api/sts/) — Multiple comparison correction method.
-- **StatsTailType** `[enum]` in [STSLIB](/docs/api/sts/) — Tail type for statistical tests.
-- **StimArtifactMode** `[enum]` in [DSPLIB](/docs/api/dsp/) — Mode for stimulus artifact repair.
-- **StringList** `[type]` in [BASELIB](/docs/api/base/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [DISPLIB](/docs/api/disp/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [DSPLIB](/docs/api/dsp/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [FIFFLIB](/docs/api/fiff/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [FWDLIB](/docs/api/fwd/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [INVLIB](/docs/api/inv/) — Ordered list of names, e.g.
-- **StringList** `[type]` in [MNELIB](/docs/api/mne/) — Ordered list of names, e.g.
-- **swap_doublep** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 64-bit double in place.
-- **swap_float** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 32-bit float.
-- **swap_floatp** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 32-bit float in place.
-- **swap_int** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 32-bit integer.
-- **swap_intp** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 32-bit integer in place.
-- **swap_long** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 64-bit long.
-- **swap_longp** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 64-bit long in place.
-- **swap_short** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Swap a 16-bit short.
-- **timeNowNow** `[fn]` in [BASELIB](/docs/api/base/) — Returns build time (time preprocessor was run).
-- **toBigEndian** `[fn]` in [BASELIB](/docs/api/base/)
-- **toDLPack** `[fn]` in [ACQLIB](/docs/api/acq/) — Exports one part of `view` as a read-only DLPack tensor of shape channels x samples, without a copy.
-- **toDouble** `[fn]` in [BASELIB](/docs/api/base/)
-- **toEventMatrix** `[fn]` in [DSPLIB](/docs/api/dsp/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
-- **toFiffInfo** `[fn]` in [ACQLIB](/docs/api/acq/) — Builds FIFF measurement info for a stream, e.g.
-- **toInt** `[fn]` in [BASELIB](/docs/api/base/)
-- **tokenIds** `[fn]` in [INVLIB](/docs/api/inv/) — Extract just the integer token IDs from a token sequence (discarding continuous values).
-- **tokenize** `[fn]` in [INVLIB](/docs/api/inv/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
-- **tokenValues** `[fn]` in [INVLIB](/docs/api/inv/) — Extract just the continuous values from a token sequence (discarding IDs).
-- **toLower** `[fn]` in [BASELIB](/docs/api/base/)
-- **toQMatrix4x4** `[fn]` in `SURFACEKEYS` — Convert an Eigen 4x4 matrix to a QMatrix4x4.
-- **trimmed** `[fn]` in [BASELIB](/docs/api/base/)
-- **utf8FromPath** `[fn]` in [BASELIB](/docs/api/base/)
-- **vecDefaultWeights** `[var]` in [MNELIB](/docs/api/mne/)
-- **verify** `[fn]` in [ACQLIB](/docs/api/acq/) — Determines the origin of `target` from loop-back markers against `reference` and verifies the declared clock relation: every marker must imply the same origin within `toleranceTicks`, so drift (a missing or wrong clock connection) is detected instead of producing wrong samples.
-- **VisualizationMode** `[enum]` in [DISP3DLIB](/docs/api/disp3-d/) — Overlay visualisation modes for brain surfaces.
-- **visualizationModeFromName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a visualization mode name to enum.
-- **visualizationModeName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a `VisualizationMode` enum to display string.
-- **write** `[fn]` in [ACQLIB](/docs/api/acq/) — Writes all columns of an Eigen matrix to an output stream: reserves, encodes, commits.
-- **write_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Writes a dense matrix as whitespace-separated text, one row per line.
-- **write_text_file** `[fn]` in [BASELIB](/docs/api/base/) — Replaces a file with the given text, byte for byte, so "\n" stays LF on every platform.
+- **Accuracy** `[enum]` in [mne](/docs/api/fiff/)
+- **acqApplyThreadPolicy** `[fn]` in [mne](/docs/api/fiff/) — Applies `policy` to the calling thread: CPUs first, then priority.
+- **AcqBlockPart** `[type]` in [mne](/docs/api/fiff/) — Read-only run.
+- **AcqChannelKind** `[enum]` in [mne](/docs/api/fiff/) — Signal kind of a channel.
+- **acqClockDomainId** `[fn]` in [mne](/docs/api/fiff/)
+- **AcqClockSource** `[enum]` in [mne](/docs/api/fiff/) — What the anchor of the clock model is derived from.
+- **acqCurrentCpu** `[fn]` in [mne](/docs/api/fiff/)
+- **AcqDeviceState** `[enum]` in [mne](/docs/api/fiff/) — State of a source.
+- **AcqDirection** `[enum]` in [mne](/docs/api/fiff/) — `Direction` of a stream as seen from the host.
+- **AcqEigenMap** `[type]` in [mne](/docs/api/fiff/) — Strided read-only channels x samples map of one part of a view.
+- **AcqErrorCode** `[enum]` in [mne](/docs/api/fiff/) — Stable error codes.
+- **acqErrorInfo** `[fn]` in [mne](/docs/api/fiff/)
+- **AcqLayout** `[enum]` in [mne](/docs/api/fiff/) — Memory layout of a ring.
+- **AcqLockState** `[enum]` in [mne](/docs/api/fiff/) — How far a stream's timebase is known relative to its domain.
+- **AcqMemoryKind** `[enum]` in [mne](/docs/api/fiff/) — Kind of memory that holds the samples of a ring.
+- **acqNumaNodeCpus** `[fn]` in [mne](/docs/api/fiff/)
+- **acqPinThisThread** `[fn]` in [mne](/docs/api/fiff/) — Restricts the calling thread to `cpus`.
+- **AcqRounding** `[enum]` in [mne](/docs/api/fiff/) — What `mapSampleExact()` does with an instant that is not on the target's schedulable grid.
+- **AcqSampleFormat** `[enum]` in [mne](/docs/api/fiff/) — Native sample format of a stream.
+- **AcqScaling** `[enum]` in [mne](/docs/api/fiff/) — Whether converters apply the per-channel scale and offset.
+- **acqSetThisThreadPriority** `[fn]` in [mne](/docs/api/fiff/) — Sets the scheduling class of the calling thread.
+- **AcqThreadPriority** `[enum]` in [mne](/docs/api/fiff/) — Scheduling class of an acquisition thread.
+- **AcqUnderrunFill** `[enum]` in [mne](/docs/api/fiff/) — What an output device emits when the writer has not committed the sample it has to play.
+- **AcqUnit** `[enum]` in [mne](/docs/api/fiff/) — SI unit of the physical value of a channel (value = raw * scale + offset, times 10^unitExponent).
+- **AcqWait** `[enum]` in [mne](/docs/api/fiff/) — How a waiting reader or writer is woken.
+- **AcqWritePart** `[type]` in [mne](/docs/api/fiff/) — Writable run.
+- **addReferenceChannels** `[fn]` in [mne](/docs/api/fiff/) — Add reference channel(s) back as zero-filled rows.
+- **annotateAmplitude** `[fn]` in [mne](/docs/api/fiff/) — Annotate spans where consecutive samples jump or stay flat, as mne.preprocessing.annotate_amplitude.
+- **annotateMusclZscore** `[fn]` in [mne](/docs/api/fiff/) — Detect muscle artifacts via high-frequency z-score and annotate bad segments.
+- **annotations_from_events** `[fn]` in [mne](/docs/api/fiff/) — Converts events to annotations, like `mne.annotations_from_events`.
+- **apply_forward** `[fn]` in [mne](/docs/api/fiff/) — Project a source estimate to the sensors, as `mne.apply_forward`.
+- **apply_inverse_epochs** `[fn]` in [mne](/docs/api/fiff/) — Apply inverse operator to each epoch in a list.
+- **apply_inverse_raw** `[fn]` in [mne](/docs/api/fiff/) — Apply inverse operator to raw data.
+- **base64_encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes bytes as base64 (RFC 4648, with padding), as used in data URIs.
+- **BeamformerInversion** `[enum]` in [mne](/docs/api/fiff/) — Method for inverting the beamformer denominator matrix G^H Cm^\{-1\} G.
+- **BeamformerPickOri** `[enum]` in [mne](/docs/api/fiff/) — Orientation picking mode for beamformer filters.
+- **BeamformerWeightNorm** `[enum]` in [mne](/docs/api/fiff/) — Weight normalization strategy for beamformer spatial filters.
+- **BIDS_COORD_TO_FIFF_FRAME** `[var]` in [mne](/docs/api/fiff/) — FIFF coordinate frame of each BIDS coordinate system name read from electrodes.tsv / coordsystem.json.
+- **BIDS_DATATYPE_ANAT** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_BEH** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_DWI** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_EEG** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_FUNC** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_IEEG** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPE_MEG** `[var]` in [mne](/docs/api/fiff/) — BIDS datatype strings used in directory and filename construction.
+- **BIDS_DATATYPE_PERF** `[var]` in [mne](/docs/api/fiff/)
+- **BIDS_DATATYPES** `[var]` in [mne](/docs/api/fiff/) — All allowed BIDS datatypes (electrophysiology, imaging and behavioral).
+- **BIDS_EEG_EXTENSIONS** `[var]` in [mne](/docs/api/fiff/) — Supported raw data file extensions for EEG in BIDS, lowercase with the leading dot.
+- **BIDS_ELECTROPHYSIOLOGY_DATATYPES** `[var]` in [mne](/docs/api/fiff/) — All allowed BIDS electrophysiology datatypes: "meg", "eeg" and "ieeg".
+- **BIDS_ENTITY_ORDER** `[var]` in [mne](/docs/api/fiff/) — Entity keys in the order they must appear in a BIDS filename (per specification).
+- **BIDS_IEEG_COORD_SYSTEMS** `[var]` in [mne](/docs/api/fiff/) — Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
+- **BIDS_IEEG_EXTENSIONS** `[var]` in [mne](/docs/api/fiff/) — Supported raw data file extensions for iEEG in BIDS, lowercase with the leading dot.
+- **bids_lookup** `[fn]` in [mne](/docs/api/fiff/) — Looks a key up in one of the mapping tables above.
+- **BIDS_TYPE_TO_FIFF_KIND** `[var]` in [mne](/docs/api/fiff/) — FIFF channel kind of each BIDS channel type read from channels.tsv.
+- **BidsTsvRow** `[type]` in [mne](/docs/api/fiff/) — Represents a single row of a BIDS TSV file as a column-name → value map.
+- **BIG_TIME** `[var]` in [mne](/docs/api/fiff/)
+- **buildDateTime** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time.
+- **buildHash** `[fn]` in [mne](/docs/api/fiff/) — Returns abbreviated build git hash.
+- **buildHashLong** `[fn]` in [mne](/docs/api/fiff/) — Returns full build git hash.
+- **BVBinaryFormat** `[enum]` in [mne](/docs/api/fiff/) — Binary format enumeration for BrainVision data files.
+- **BVOrientation** `[enum]` in [mne](/docs/api/fiff/) — Data orientation enumeration.
+- **bytesPerSample** `[fn]` in [mne](/docs/api/fiff/)
+- **byteSwap** `[fn]` in [mne](/docs/api/fiff/)
+- **byteSwapInPlace** `[fn]` in [mne](/docs/api/fiff/) — Reverses the bytes of every element of `data`.
+- **CborByteArray** `[type]` in [mne](/docs/api/fiff/) — A CBOR byte string.
+- **channel_index** `[fn]` in [mne](/docs/api/fiff/)
+- **ChannelFormat** `[enum]` in [mne](/docs/api/fiff/) — Data format of a channel (mirroring the values used in the original LSL protocol).
+- **Compression** `[enum]` in [mne](/docs/api/fiff/) — How the bytes of a file are stored.
+- **compute_connectivity** `[fn]` in [mne](/docs/api/fiff/) — Computes every connectivity method the settings ask for, as mne_connectivity.spectral_connectivity_epochs does for its spectral methods.
+- **compute_source_band_power** `[fn]` in [mne](/docs/api/fiff/) — Compute band power for source estimate.
+- **compute_source_psd** `[fn]` in [mne](/docs/api/fiff/) — Compute PSD for a source estimate using Welch's method.
+- **compute_whitener** `[fn]` in [mne](/docs/api/fiff/) — Compute whitening matrix from a noise covariance.
+- **computeBridgedElectrodes** `[fn]` in [mne](/docs/api/fiff/) — Detect bridged EEG electrodes.
+- **computeElectricalDistance** `[fn]` in [mne](/docs/api/fiff/) — Compute electrical distance matrix between EEG channels.
+- **computeFilteredAverage** `[fn]` in [mne](/docs/api/fiff/) — Computes the filtered average for given fiff raw data.
+- **computeLofScores** `[fn]` in [mne](/docs/api/fiff/) — Compute LOF scores for a feature matrix.
+- **contains** `[fn]` in [mne](/docs/api/fiff/)
+- **COR_HEIGHT** `[var]` in [mne](/docs/api/fiff/) — Height of each COR slice in pixels.
+- **COR_NSLICE** `[var]` in [mne](/docs/api/fiff/) — Number of COR slices.
+- **COR_PIXEL_SIZE** `[var]` in [mne](/docs/api/fiff/) — Pixel size for COR slices (1mm in meters).
+- **COR_WIDTH** `[var]` in [mne](/docs/api/fiff/) — Width of each COR slice in pixels.
+- **count_annotations** `[fn]` in [mne](/docs/api/fiff/) — Counts annotations by description, like `mne.count_annotations`.
+- **DATA_TYPE** `[var]` in [mne](/docs/api/fiff/) — DATA_TYPE encoding 0000ffff.
+- **dateTimeNow** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time (time preprocessor was run).
+- **dateToday** `[fn]` in [mne](/docs/api/fiff/) — Returns build date (time preprocessor was run).
+- **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
+- **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
+- **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.    Real formats yield a zero imaginary part.
+- **decodeBits** `[fn]` in [mne](/docs/api/fiff/) — Extracts the `AcqStreamInfo::bitFields` of `view`; row f of `out` holds field f for every sample.
+- **decodePart** `[fn]` in [mne](/docs/api/fiff/) — Decodes one raw run, for adopted device buffers that are not read through an [`AcqReader`](/docs/api/acq/acq-reader).
+- **defaultConstMatrixXd** `[fn]` in [mne](/docs/api/fiff/)
+- **defaultCov** `[var]` in [mne](/docs/api/fiff/)
+- **defaultD** `[var]` in [mne](/docs/api/fiff/)
+- **defaultInfo** `[var]` in [mne](/docs/api/fiff/)
+- **defaultMatrixXd** `[var]` in [mne](/docs/api/fiff/)
+- **defaultMatrixXi** `[fn]` in [mne](/docs/api/fiff/)
+- **defaultRowVectorXi** `[var]` in [mne](/docs/api/fiff/)
+- **defaultTris** `[fn]` in [mne](/docs/api/fiff/)
+- **defaultVectorXi** `[var]` in [mne](/docs/api/fiff/)
+- **detectTriggerFlanksGrad** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
+- **detectTriggerFlanksGrad** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
+- **detectTriggerFlanksMax** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
+- **detectTriggerFlanksMax** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
+- **dipoleFitFuncs** `[type]` in [mne](/docs/api/fiff/) — Pointer alias for [`dipoleFitFuncsRec`](/docs/api/inv/dipole-fit-funcs-rec), used throughout the dipole fitting module.
+- **Direction** `[enum]` in [mne](/docs/api/fiff/) — Selects which incident edges of a node count.
+- **discard3DPointOutliers** `[fn]` in [mne](/docs/api/fiff/) — Discard outliers compared to a given 3D surface.
+- **EdgeSet** `[enum]` in [mne](/docs/api/fiff/) — Selects all edges or only those passing the threshold.
+- **encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
+- **encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
+- **encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).    For real formats the imaginary part must be 0, otherwise the element counts as clipped.
+- **encodeBits** `[fn]` in [mne](/docs/api/fiff/) — Writes bit fields into the reserved samples of `view`, leaving the analog bits untouched; call before or after `encode()` of the same view.
+- **equalsIgnoreCase** `[fn]` in [mne](/docs/api/fiff/)
+- **ErrorCode** `[enum]` in [mne](/docs/api/fiff/) — What went wrong, so callers can react without parsing the message.
+- **estimate_snr** `[fn]` in [mne](/docs/api/fiff/) — Estimate the SNR of evoked data as a function of time.
+- **events_from_annotations** `[fn]` in [mne](/docs/api/fiff/) — Converts annotations to events, like `mne.events_from_annotations`.
+- **executable_dir** `[fn]` in [mne](/docs/api/fiff/)
+- **extras_from_json** `[fn]` in [mne](/docs/api/fiff/)
+- **extras_to_json** `[fn]` in [mne](/docs/api/fiff/)
+- **fail** `[fn]` in [mne](/docs/api/fiff/)
+- **FiducialId** `[enum]` in [mne](/docs/api/fiff/) — Identifier for the three cardinal fiducials.
+- **fiff_byte_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_char_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_data_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_dau_pack13_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_dau_pack14_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_dau_pack16_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_double_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_float_t** `[type]` in [mne](/docs/api/fiff/)
+- **FIFF_FRAME_TO_BIDS_COORD** `[var]` in [mne](/docs/api/fiff/) — BIDS coordinate system name written for each FIFF coordinate frame.
+- **fiff_int_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_julian_t** `[type]` in [mne](/docs/api/fiff/)
+- **FIFF_KIND_TO_BIDS_TYPE** `[var]` in [mne](/docs/api/fiff/) — BIDS channel type of each FIFF channel kind written to channels.tsv.
+- **fiff_long_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_short_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_uint_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_ulong_t** `[type]` in [mne](/docs/api/fiff/)
+- **fiff_ushort_t** `[type]` in [mne](/docs/api/fiff/)
+- **filterChannel** `[fn]` in [mne](/docs/api/fiff/) — This function is used to filter row-wise in parallel threads.
+- **filterChpi** `[fn]` in [mne](/docs/api/fiff/) — Remove cHPI excitation signals from MEG data by notch filtering.
+- **filterChpi** `[fn]` in [mne](/docs/api/fiff/) — Overload that attempts to extract cHPI frequencies from [`FiffInfo`](/docs/api/fiff/fiff-info).
+- **filterData** `[fn]` in [mne](/docs/api/fiff/) — Creates a user designed filter kernel and filters the raw input data.
+- **filterData** `[fn]` in [mne](/docs/api/fiff/) — Calculates the filtered version of the raw input data based on a given list filters.
+- **filterDataBlock** `[fn]` in [mne](/docs/api/fiff/) — Calculates the filtered version of the raw input data block.
+- **filterFile** `[fn]` in [mne](/docs/api/fiff/) — Creates a user designed filter kernel, filters data from an input file and writes the filtered data to a file.
+- **filterFile** `[fn]` in [mne](/docs/api/fiff/) — Filters data from an input file based on an existing filter kernel and writes the filtered data to a file.
+- **findBadChannelsLof** `[fn]` in [mne](/docs/api/fiff/) — Detect bad channels using Local Outlier Factor (LOF).
+- **findBadChannelsMaxwell** `[fn]` in [mne](/docs/api/fiff/) — Detect bad MEG channels using [`SSS`](/docs/api/dsp/sss) reconstruction residuals.
+- **fitMatchedPoints** `[fn]` in [mne](/docs/api/fiff/) — Corresponding point set registration using quaternions.
+- **fitUser** `[type]` in [mne](/docs/api/fiff/)
+- **fixStimArtifact** `[fn]` in [mne](/docs/api/fiff/) — Repair stimulus artifacts by interpolating or zeroing data around events.
+- **fromBigEndian** `[fn]` in [mne](/docs/api/fiff/)
+- **fromFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Describes a FIFF measurement as a stream.
+- **fromTokens** `[fn]` in [mne](/docs/api/fiff/) — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
+- **FWD_BEM_CONSTANT_COLL** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_IP_APPROACH_LIMIT** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_LIN_FIELD_FERGUSON** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_LIN_FIELD_SIMPLE** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_LIN_FIELD_URANKAR** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_LINEAR_COLL** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_BEM_UNKNOWN** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COIL_ACCURACY_ACCURATE** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COIL_ACCURACY_NORMAL** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COIL_ACCURACY_POINT** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COIL_UNKNOWN** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_AXIAL_GRAD** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_AXIAL_GRAD2** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_EEG** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_MAG** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_PLANAR_GRAD** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_COILC_UNKNOWN** `[var]` in [mne](/docs/api/fiff/)
+- **FWD_IS_MEG_COIL** `[fn]` in [mne](/docs/api/fiff/)
+- **gitHash** `[fn]` in [mne](/docs/api/fiff/) — Returns short version of the hash of the current git commit.
+- **gitHashLong** `[fn]` in [mne](/docs/api/fiff/) — Returns entire hash of the current git commit.
+- **has_channel** `[fn]` in [mne](/docs/api/fiff/)
+- **html_escape** `[fn]` in [mne](/docs/api/fiff/) — Escapes the characters that are special in HTML text and attribute values: & &lt; &gt; " '.
+- **IcaComponentLabel** `[enum]` in [mne](/docs/api/fiff/) — Categorical label assigned to a single [`ICA`](/docs/api/dsp/ica) component.
+- **IeegLeadType** `[enum]` in [mne](/docs/api/fiff/) — Kind of lead a contact sits on.
+- **IeegSurfaceMapMode** `[enum]` in [mne](/docs/api/fiff/) — How the weights of contacts near one vertex combine; the modes of MNE-Python's stc_near_sensors.
+- **ImageFormat** `[enum]` in [mne](/docs/api/fiff/) — Encoding of an embedded figure.
+- **indexOf** `[fn]` in [mne](/docs/api/fiff/)
+- **InvEstimateMethod** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the inverse estimation method that produced a source estimate.
+- **InvOrientationType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the orientation constraint used during source estimation.
+- **InvSourceSpaceType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the source space type underlying a source estimate.
+- **InvTokenId** `[enum]` in [mne](/docs/api/fiff/) — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
+- **IS_MATRIX** `[var]` in [mne](/docs/api/fiff/) — Is Matrix encoding.
+- **IS_TRANSPOSED** `[var]` in [mne](/docs/api/fiff/) — Defines IS_TRANSPOSED.
+- **is_utf8** `[fn]` in [mne](/docs/api/fiff/)
+- **isComplex** `[fn]` in [mne](/docs/api/fiff/)
+- **join** `[fn]` in [mne](/docs/api/fiff/)
+- **KMeansDistance** `[enum]` in [mne](/docs/api/fiff/) — Distance metric for K-Means clustering.
+- **KMeansEmptyAction** `[enum]` in [mne](/docs/api/fiff/) — Action to take when a K-Means cluster becomes empty.
+- **KMeansStart** `[enum]` in [mne](/docs/api/fiff/) — Initialization strategy for K-Means clustering.
+- **latin1_to_utf8** `[fn]` in [mne](/docs/api/fiff/)
+- **list_serial_ports** `[fn]` in [mne](/docs/api/fiff/)
+- **local_clock** `[fn]` in [mne](/docs/api/fiff/) — Seconds of the monotonic clock LSL timestamps refer to, as liblsl's lsl_local_clock().
+- **lslRuntime** `[fn]` in [mne](/docs/api/fiff/)
+- **makeSpharaProjector** `[fn]` in [mne](/docs/api/fiff/) — Constructs a SPHARA operator.
+- **map** `[fn]` in [mne](/docs/api/fiff/) — Maps part `i` of `view` as a channels x samples matrix of the native type, without copy.
+- **mapRangeExact** `[fn]` in [mne](/docs/api/fiff/) — The samples of `to` whose instants lie in the time span of samples [`first`, `end`) of `from`, e.g.
+- **mapSample** `[fn]` in [mne](/docs/api/fiff/) — Maps a sample of one stream to the sample of another stream at the same physical time through host time, so the result carries both clocks' uncertainty.
+- **mapSampleExact** `[fn]` in [mne](/docs/api/fiff/) — Maps `sample` of stream `from`, shifted by `offsetTicks`, to the stream `to` of the same domain.
+- **MATRIX_CODING_CCS** `[var]` in [mne](/docs/api/fiff/) — MATRIX_CODING_CCS encoding.
+- **MATRIX_CODING_DENSE** `[var]` in [mne](/docs/api/fiff/) — MATRIX_CODING_DENSE encoding.
+- **MATRIX_CODING_RCS** `[var]` in [mne](/docs/api/fiff/) — MATRIX_CODING_RCS encoding.
+- **MatrixDau16** `[type]` in [mne](/docs/api/fiff/)
+- **MatrixShort** `[type]` in [mne](/docs/api/fiff/)
+- **MGH_TAG_MGH_XFORM** `[var]` in [mne](/docs/api/fiff/) — MGH Talairach transform tag (contains path to .xfm file).
+- **MGH_TAG_OLD_MGH_XFORM** `[var]` in [mne](/docs/api/fiff/) — Old MGH transform tag.
+- **MGH_TAG_OLD_SURF_GEOM** `[var]` in [mne](/docs/api/fiff/) — Old surface geometry tag.
+- **MlBackend** `[enum]` in [mne](/docs/api/fiff/) — Available ML back-end engines.
+- **MlDataType** `[enum]` in [mne](/docs/api/fiff/) — Supported data types for tensors.
+- **MlTaskType** `[enum]` in [mne](/docs/api/fiff/) — ML task categories.
+- **MnaContainerFormat** `[enum]` in [mne](/docs/api/fiff/) — Supported container formats.
+- **MnaDataKind** `[enum]` in [mne](/docs/api/fiff/) — Describes the kind of data flowing through a graph port.
+- **mnaDataKindFromString** `[fn]` in [mne](/docs/api/fiff/) — Convert a string to `MnaDataKind`.
+- **mnaDataKindToString** `[fn]` in [mne](/docs/api/fiff/) — Convert `MnaDataKind` to its string representation.
+- **MnaFileRole** `[enum]` in [mne](/docs/api/fiff/) — Describes the role a file plays within an MNA project.
+- **mnaFileRoleFromString** `[fn]` in [mne](/docs/api/fiff/) — Convert a string to `MnaFileRole`.
+- **mnaFileRoleToString** `[fn]` in [mne](/docs/api/fiff/) — Convert `MnaFileRole` to its string representation.
+- **MnaNodeExecMode** `[enum]` in [mne](/docs/api/fiff/) — Execution mode for a graph node.
+- **MnaPortDir** `[enum]` in [mne](/docs/api/fiff/) — `Direction` of a port on a graph node.
+- **MNE_4DV_COMP1** `[var]` in [mne](/docs/api/fiff/) — 4D Neuroimaging 1st-order compensation.
+- **MNE_CH_SELECTION_FILE** `[var]` in [mne](/docs/api/fiff/) — Loaded from file.
+- **MNE_CH_SELECTION_UNKNOWN** `[var]` in [mne](/docs/api/fiff/) — Unknown origin.
+- **MNE_CH_SELECTION_USER** `[var]` in [mne](/docs/api/fiff/) — Created interactively.
+- **MNE_CTFV_COMP_G1BR** `[var]` in [mne](/docs/api/fiff/) — 1st-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G2BR** `[var]` in [mne](/docs/api/fiff/) — 2nd-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G2OI** `[var]` in [mne](/docs/api/fiff/) — 2nd-order gradient, off-diagonal.
+- **MNE_CTFV_COMP_G3BR** `[var]` in [mne](/docs/api/fiff/) — 3rd-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G3OI** `[var]` in [mne](/docs/api/fiff/) — 3rd-order gradient, off-diagonal.
+- **MNE_CTFV_COMP_NONE** `[var]` in [mne](/docs/api/fiff/) — No compensation.
+- **MNE_CTFV_COMP_UNKNOWN** `[var]` in [mne](/docs/api/fiff/) — Grade not recognized.
+- **MNE_CTFV_GRAD1** `[var]` in [mne](/docs/api/fiff/) — 1st-order gradient compensation.
+- **MNE_CTFV_GRAD2** `[var]` in [mne](/docs/api/fiff/) — 2nd-order gradient compensation.
+- **MNE_CTFV_GRAD3** `[var]` in [mne](/docs/api/fiff/) — 3rd-order gradient compensation.
+- **MNE_CTFV_NOGRAD** `[var]` in [mne](/docs/api/fiff/) — No gradient compensation.
+- **MNE_DEFAULT_TRIGGER_CH** `[var]` in [mne](/docs/api/fiff/) — Default digital trigger channel name.
+- **MNE_ENV_TRIGGER_CH** `[var]` in [mne](/docs/api/fiff/) — Environment variable overriding the trigger channel name; a C string for getenv().
+- **MNE_SOURCE_SPACE_DISCRETE** `[var]` in [mne](/docs/api/fiff/) — Discrete point set.
+- **MNE_SOURCE_SPACE_SURFACE** `[var]` in [mne](/docs/api/fiff/) — FsSurface-based source space.
+- **MNE_SOURCE_SPACE_UNKNOWN** `[var]` in [mne](/docs/api/fiff/) — Type not yet determined.
+- **MNE_SOURCE_SPACE_VOLUME** `[var]` in [mne](/docs/api/fiff/) — Volumetric (3-D grid) source space.
+- **MRI_ALL_FRAMES** `[var]` in [mne](/docs/api/fiff/) — Load all frames.
+- **MRI_BITMAP** `[var]` in [mne](/docs/api/fiff/) — Bitmap (unused in practice).
+- **MRI_FLOAT** `[var]` in [mne](/docs/api/fiff/) — 32-bit float.
+- **MRI_INT** `[var]` in [mne](/docs/api/fiff/) — Signed 32-bit integer.
+- **MRI_LONG** `[var]` in [mne](/docs/api/fiff/) — Long integer (unused in practice).
+- **MRI_MGH_DATA_OFFSET** `[var]` in [mne](/docs/api/fiff/) — Fixed byte offset where image data begins (bytes 0-283 are header).
+- **MRI_MGH_HEADER_FIXED_SIZE** `[var]` in [mne](/docs/api/fiff/) — Size of the fixed portion of the header (before RAS info).
+- **MRI_MGH_VERSION** `[var]` in [mne](/docs/api/fiff/) — Current MGH file format version.
+- **MRI_NO_FRAMES** `[var]` in [mne](/docs/api/fiff/) — Do not load data at all.
+- **MRI_SHORT** `[var]` in [mne](/docs/api/fiff/) — Signed 16-bit short.
+- **MRI_TENSOR** `[var]` in [mne](/docs/api/fiff/) — Tensor (unused in practice).
+- **MRI_UCHAR** `[var]` in [mne](/docs/api/fiff/) — Unsigned char (8-bit).
+- **names_from_json** `[fn]` in [mne](/docs/api/fiff/)
+- **names_to_json** `[fn]` in [mne](/docs/api/fiff/)
+- **NOT_TRANSPOSED** `[var]` in [mne](/docs/api/fiff/) — Defines NOT_TRANSPOSED.
+- **operator!=** `[fn]` in [mne](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for inequality.
+- **operator&lt;&lt;** `[fn]` in [mne](/docs/api/fiff/)
+- **operator&lt;&lt;** `[fn]` in [mne](/docs/api/fiff/)
+- **operator&lt;&lt;** `[fn]` in [mne](/docs/api/fiff/)
+- **operator&lt;&lt;** `[fn]` in [mne](/docs/api/fiff/)
+- **operator&lt;&lt;** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for equality.
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **operator==** `[fn]` in [mne](/docs/api/fiff/)
+- **parse_progress_line** `[fn]` in [mne](/docs/api/fiff/) — Parses a progress line of the form `"[progress] 42.5%"` or `"[progress] 42.5% message"` (case-insensitive tag, surrounding whitespace ignored).
+- **pathFromUtf8** `[fn]` in [mne](/docs/api/fiff/)
+- **peakFinder** `[fn]` in [mne](/docs/api/fiff/) — Find peaks in a 1D signal.
+- **peakFinderMne** `[fn]` in [mne](/docs/api/fiff/) — Noise-tolerant extrema search of `mne.preprocessing.peak_finder`.
+- **peakProminences** `[fn]` in [mne](/docs/api/fiff/) — Compute prominence of each peak.
+- **performIcp** `[fn]` in [mne](/docs/api/fiff/) — The ICP algorithm to register a point cloud with a surface.
+- **PointKind** `[enum]` in [mne](/docs/api/fiff/) — Logical category of a captured point.
+- **PythonChannel** `[enum]` in [mne](/docs/api/fiff/) — Output stream of the child process a line came from.
+- **PythonLineCallback** `[type]` in [mne](/docs/api/fiff/) — Called for every output line (without the trailing newline).
+- **PythonProgressCallback** `[type]` in [mne](/docs/api/fiff/) — Called for every `"[progress] &lt;pct&gt;% [message]"` line, with pct in 0 to 100.
+- **read** `[fn]` in [mne](/docs/api/fiff/) — Reads samples into an Eigen matrix, resizing it only when its shape differs (so a reused matrix does not allocate).
+- **read_file_bytes** `[fn]` in [mne](/docs/api/fiff/) — Reads a whole file, decompressing it if asked to.
+- **read_matrix** `[fn]` in [mne](/docs/api/fiff/) — Reads a matrix written by `write_matrix` (or `numpy.savetxt`).
+- **read_matrix** `[fn]` in [mne](/docs/api/fiff/) — Reads a matrix in the same text layout from a stream, e.g.
+- **read_text_file** `[fn]` in [mne](/docs/api/fiff/) — Reads a whole file as text, byte for byte (no line-ending or encoding conversion).
+- **ref** `[fn]` in [mne](/docs/api/fiff/)
+- **ref** `[fn]` in [mne](/docs/api/fiff/)
+- **register_babymeg_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the babymeg:// scheme (the acquisition server of a BabyMEG system) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_brainflow_file_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the brainflow_file:// scheme (a file BrainFlow wrote, replayed without BrainFlow) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_brainflow_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the brainflow:// scheme (any board BrainFlow supports, through BrainFlow's library loaded at run time) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_device_schemes** `[fn]` in [mne](/docs/api/fiff/) — Registers every scheme of this library, as the functions above do one by one; for programs that offer all sources, such as mne_acq.
+- **register_eego_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the eego:// scheme (ANT Neuro eego) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_ftbuffer_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the ftbuffer:// scheme (a FieldTrip buffer server, e.g.
+- **register_gusbamp_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the gusbamp:// scheme (g.tec g.USBamp, up to four synchronised) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_natus_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the natus:// scheme (a Natus Quantum amplifier through the datagrams of its streaming machine) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_neuromag_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the neuromag:// scheme (the data acquisition of Neuromag/MEGIN MEG systems) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_polhemus_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the polhemus:// scheme (Polhemus Fastrak and FastSCAN digitizers on a serial port) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_rtserver_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the rtserver:// scheme (the active connector of an mne_rt_server) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **register_streaming_board_scheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the streaming_board:// scheme (what a BrainFlow session streams with add_streamer, received without BrainFlow) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **registerBrainAmpScheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the brainamp:// scheme (Brain Products BrainAmp) with `AcqDeviceRegistry::instance()`.
+- **registerFiffScheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the fiff:// scheme with `AcqDeviceRegistry::instance()`.
+- **registerLslScheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the lsl:// scheme with `AcqDeviceRegistry::instance()`.
+- **registerTmsiScheme** `[fn]` in [mne](/docs/api/fiff/) — Registers the tmsi:// scheme (TMSi Refa and Porti) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
+- **resolve_stream** `[fn]` in [mne](/docs/api/fiff/) — Resolve streams by a specific property value.
+- **resolve_streams** `[fn]` in [mne](/docs/api/fiff/) — Resolve all streams currently available on the network.
+- **resource_path** `[fn]` in [mne](/docs/api/fiff/)
+- **same_channel** `[fn]` in [mne](/docs/api/fiff/)
+- **sampleFormatName** `[fn]` in [mne](/docs/api/fiff/)
+- **setBipolarReference** `[fn]` in [mne](/docs/api/fiff/) — Create bipolar derivations from EEG channels.
+- **setEegReference** `[fn]` in [mne](/docs/api/fiff/) — Re-reference EEG channels to average, specific channel(s), or REST.
+- **simulateEvoked** `[fn]` in [mne](/docs/api/fiff/) — Simulate evoked data from a source estimate and forward model.
+- **simulateEvokedNoiseless** `[fn]` in [mne](/docs/api/fiff/) — Simulate evoked data without noise.
+- **simulateStc** `[fn]` in [mne](/docs/api/fiff/) — Create a synthetic source time course.
+- **simulateStcFromWaveforms** `[fn]` in [mne](/docs/api/fiff/) — Create a synthetic source time course from custom waveforms.
+- **SliceOrientation** `[enum]` in [mne](/docs/api/fiff/) — Slice orientation for orthogonal MRI volume slicing; the values are the slice slots of a three-slice view.
+- **split** `[fn]` in [mne](/docs/api/fiff/)
+- **start_thread** `[fn]` in [mne](/docs/api/fiff/) — Starts a thread that applies `policy` and then runs `body`, e.g.
+- **StatsCorrection** `[enum]` in [mne](/docs/api/fiff/) — Multiple comparison correction method.
+- **StatsTailType** `[enum]` in [mne](/docs/api/fiff/) — Tail type for statistical tests.
+- **StimArtifactMode** `[enum]` in [mne](/docs/api/fiff/) — Mode for stimulus artifact repair.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **StringList** `[type]` in [mne](/docs/api/fiff/) — Ordered list of names, e.g.
+- **swap_doublep** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit double in place.
+- **swap_float** `[fn]` in [mne](/docs/api/fiff/) — Swap a 32-bit float.
+- **swap_floatp** `[fn]` in [mne](/docs/api/fiff/) — Swap a 32-bit float in place.
+- **swap_int** `[fn]` in [mne](/docs/api/fiff/) — Swap a 32-bit integer.
+- **swap_intp** `[fn]` in [mne](/docs/api/fiff/) — Swap a 32-bit integer in place.
+- **swap_long** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long.
+- **swap_longp** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long in place.
+- **swap_short** `[fn]` in [mne](/docs/api/fiff/) — Swap a 16-bit short.
+- **timeNowNow** `[fn]` in [mne](/docs/api/fiff/) — Returns build time (time preprocessor was run).
+- **toBigEndian** `[fn]` in [mne](/docs/api/fiff/)
+- **toDLPack** `[fn]` in [mne](/docs/api/fiff/) — Exports one part of `view` as a read-only DLPack tensor of shape channels x samples, without a copy.
+- **toDouble** `[fn]` in [mne](/docs/api/fiff/)
+- **toEventMatrix** `[fn]` in [mne](/docs/api/fiff/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
+- **toFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Builds FIFF measurement info for a stream, e.g.
+- **toInt** `[fn]` in [mne](/docs/api/fiff/)
+- **tokenIds** `[fn]` in [mne](/docs/api/fiff/) — Extract just the integer token IDs from a token sequence (discarding continuous values).
+- **tokenize** `[fn]` in [mne](/docs/api/fiff/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
+- **tokenValues** `[fn]` in [mne](/docs/api/fiff/) — Extract just the continuous values from a token sequence (discarding IDs).
+- **toLower** `[fn]` in [mne](/docs/api/fiff/)
+- **trimmed** `[fn]` in [mne](/docs/api/fiff/)
+- **utf8FromPath** `[fn]` in [mne](/docs/api/fiff/)
+- **vecDefaultWeights** `[var]` in [mne](/docs/api/fiff/)
+- **verify** `[fn]` in [mne](/docs/api/fiff/) — Determines the origin of `target` from loop-back markers against `reference` and verifies the declared clock relation: every marker must imply the same origin within `toleranceTicks`, so drift (a missing or wrong clock connection) is detected instead of producing wrong samples.
+- **write** `[fn]` in [mne](/docs/api/fiff/) — Writes all columns of an Eigen matrix to an output stream: reserves, encodes, commits.
+- **write_matrix** `[fn]` in [mne](/docs/api/fiff/) — Writes a dense matrix as whitespace-separated text, one row per line.
+- **write_text_file** `[fn]` in [mne](/docs/api/fiff/) — Replaces a file with the given text, byte for byte, so "\n" stays LF on every platform.

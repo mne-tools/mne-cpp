@@ -127,7 +127,7 @@ public:
      *
      * @return Shared measurement info pointer.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo() const
+    std::shared_ptr<mne::FiffInfo> fiffInfo() const
     {
         return m_fiffInfo;
     }
@@ -217,11 +217,11 @@ private:
      */
     Eigen::MatrixXd doRead(int from, int to);
 
-    QFile* m_file = nullptr;                       /**< File-backed source device for desktop paths. */
-    std::shared_ptr<FIFFLIB::FiffRawData> m_raw;   /**< Raw FIFF reader used for header and block access. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_fiffInfo; /**< Cached measurement information of the open file. */
-    int m_firstSample = 0;                         /**< First sample index of the open raw file. */
-    int m_lastSample = 0;                          /**< Last sample index of the open raw file. */
+    QFile* m_file = nullptr;                   /**< File-backed source device for desktop paths. */
+    std::shared_ptr<mne::FiffRawData> m_raw;   /**< Raw FIFF reader used for header and block access. */
+    std::shared_ptr<mne::FiffInfo> m_fiffInfo; /**< Cached measurement information of the open file. */
+    int m_firstSample = 0;                     /**< First sample index of the open raw file. */
+    int m_lastSample = 0;                      /**< Last sample index of the open raw file. */
 
     QFutureWatcher<Eigen::MatrixXd> m_watcher; /**< Watcher for the currently running async block read. */
     int m_inFlightFrom = 0;                    /**< First sample of the currently running async read. */

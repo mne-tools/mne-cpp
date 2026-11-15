@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    FWDLIB build-info implementation — returns the embedded build timestamp and short/long git hashes used in the library banner.
+ * @brief    mne_fwd build-info implementation — returns the embedded build timestamp and short/long git hashes used in the library banner.
  */
 
 //=============================================================================================================
@@ -22,21 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FWDLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* FWDLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* FWDLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

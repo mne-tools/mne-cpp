@@ -9,14 +9,14 @@
  * @date     March 2026
  * @brief    HPI (Head Position Indicator) fitting — estimates the MEG dewar-to-head transform from coil-current signals.
  *
- * @ref INVLIB::InvHpiFit fits a magnetic dipole to each HPI coil from
+ * @ref mne::InvHpiFit fits a magnetic dipole to each HPI coil from
  * the projected MEG data, matches the fitted coils to the digitised coil
  * locations and returns the resulting dewar↔head coordinate transform.
  * The class drives the same pipeline used by Elekta/MEGIN MaxFilter and
  * mne-python's @c mne.chpi: per-coil dipole localisation, frequency
  * ordering, large-movement detection and quaternion-formatted position
  * storage. Inputs are the projected sensor data, the SSP projector and
- * an @ref INVLIB::InvHpiModelParameters spec; output is an @ref INVLIB::HpiFitResult
+ * an @ref mne::InvHpiModelParameters spec; output is an @ref mne::HpiFitResult
  * that downstream stages can feed to head-movement-corrected averaging
  * or continuous co-registration.
  */
@@ -50,13 +50,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 class FwdCoil;
 class FwdCoilSet;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffCoordTrans;
@@ -64,10 +64,10 @@ class FiffDigPointSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE HPILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 class InvSensorSet;
 class InvSignalModel;
@@ -107,8 +107,8 @@ struct CoilParam
 struct HpiFitResult
 {
     std::vector<int> hpiFreqs;
-    FIFFLIB::FiffDigPointSet fittedCoils;
-    FIFFLIB::FiffCoordTrans devHeadTrans;
+    mne::FiffDigPointSet fittedCoils;
+    mne::FiffCoordTrans devHeadTrans;
     std::vector<double> errorDistances;
     Eigen::VectorXd GoF;
     std::filesystem::path digitizerFile;
@@ -118,7 +118,7 @@ struct HpiFitResult
 };
 
 //=============================================================================================================
-// HPILIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -241,7 +241,7 @@ private:
      * @return Returns the seed points.
      */
     Eigen::MatrixXd computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
-                                      const FIFFLIB::FiffCoordTrans& transDevHead,
+                                      const mne::FiffCoordTrans& transDevHead,
                                       const std::vector<double>& vecError,
                                       const Eigen::MatrixXd& matCoilsHead);
 
@@ -285,8 +285,8 @@ private:
      * @return  Returns the dev head transformation matrix.
      *
      */
-    FIFFLIB::FiffCoordTrans computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
-                                                            const Eigen::MatrixXd& matCoilsHead);
+    mne::FiffCoordTrans computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+                                                        const Eigen::MatrixXd& matCoilsHead);
 
     //=========================================================================================================
     /**
@@ -299,7 +299,7 @@ private:
      */
     std::vector<double> computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
                                                const Eigen::MatrixXd& matCoilsHead,
-                                               const FIFFLIB::FiffCoordTrans& transDevHead);
+                                               const mne::FiffCoordTrans& transDevHead);
 
     //=========================================================================================================
     /**
@@ -309,7 +309,7 @@ private:
      * @return The final fitted positions in form of a digitizer set.
      *
      */
-    FIFFLIB::FiffDigPointSet getFittedPointSet(const Eigen::MatrixXd& matCoilsDev);
+    mne::FiffDigPointSet getFittedPointSet(const Eigen::MatrixXd& matCoilsDev);
 
     //=========================================================================================================
     /**

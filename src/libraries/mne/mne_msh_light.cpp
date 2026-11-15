@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMshLight.
+ * @brief    Implementation of @ref mne::MNEMshLight.
  *
  * Implements constructors and the small helpers used by
  * @ref MNEMshLightSet to apply the light to a renderer.
@@ -23,7 +23,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

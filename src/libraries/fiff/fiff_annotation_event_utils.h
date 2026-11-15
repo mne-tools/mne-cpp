@@ -10,7 +10,7 @@
  * @brief    Conversion helpers between FIFF annotations and the integer stim-channel event list used by epoching / averaging.
  *
  * Two representations coexist in MNE workflows: free-text @ref
- * FIFFLIB::FiffAnnotation entries (onset / duration / description) and integer
+ * mne::FiffAnnotation entries (onset / duration / description) and integer
  * (sample, prev, code) event triples extracted from a stim channel or
  * fed to @c mne.Epochs. These free functions translate between the two:
  * mapping annotation descriptions to event codes via a description→code
@@ -43,10 +43,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -97,6 +97,6 @@ FIFFSHARED_EXPORT Eigen::MatrixXi events_from_annotations(const FiffAnnotations&
  */
 FIFFSHARED_EXPORT std::map<std::string, int, std::less<>> count_annotations(const FiffAnnotations& annotations);
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_ANNOTATION_EVENT_UTILS_H

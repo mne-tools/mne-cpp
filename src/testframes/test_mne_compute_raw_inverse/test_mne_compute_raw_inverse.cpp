@@ -47,7 +47,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -285,7 +285,7 @@ bool TestMneComputeRawInverse::readStc(const QString& path, InvSourceEstimate& s
 
 void TestMneComputeRawInverse::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> mne_compute_raw_inverse Integration Test Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 

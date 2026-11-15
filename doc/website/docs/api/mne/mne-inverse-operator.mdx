@@ -1,13 +1,13 @@
 ---
 id: mne-inverse-operator
-title: "MNELIB::MNEInverseOperator"
+title: "mne::MNEInverseOperator"
 sidebar_label: MNEInverseOperator
 sidebar_position: 2
 ---
 
 # MNEInverseOperator
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_inverse_operator.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_inverse_operator.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_inverse_operator.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_inverse_operator.h)
 
 :::info[Python equivalent]
 `mne.InverseOperator` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 2
 <Connections topics={["minimum-norm"]} context="api" current="MNEInverseOperator" />
 
 ```cpp
-class MNELIB::MNEInverseOperator
+class mne::MNEInverseOperator
 ```
 
 MNE-style inverse operator.
@@ -148,7 +148,7 @@ Verify that inverse-operator channels are present in the measurement info.
 
 Cluster the inverse kernel by cortical parcellation.
 
-Groups source-space points within each parcellation label using [KMeans](/docs/api/math/k-means) and returns a reduced kernel together with the cluster operator.
+Groups source-space points within each parcellation label using [`KMeans`](/docs/api/math/k-means) and returns a reduced kernel together with the cluster operator.
 
 **Parameters:**
 
@@ -317,7 +317,7 @@ Reads an inverse operator file, as mne.minimum_norm.read_inverse_operator does.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 120"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 117"
 const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
 const float lambda2 = 1.0f / 9.0f; // SNR 3
 InvMinimumNorm dspm(inverse, lambda2, "dSPM");
@@ -331,7 +331,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 319"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 315"
 RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
 MNEInverseOperator inverse;
 bool inverseDone = false;
@@ -342,7 +342,7 @@ QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverse
 rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
 const bool inverseArrived = waitFor(inverseDone, 60000);
 // 306 MEG channels in the forward solution, minus the bad MEG2443
-ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && BASELIB::contains(rawInfo->bads, "MEG 2443"),
+ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && mne::contains(rawInfo->bads, "MEG 2443"),
              std::format("RtInvOp builds a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
 rtInvOp.stop();
 ````
@@ -351,7 +351,7 @@ rtInvOp.stop();
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 410"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 405"
 MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 ````
 

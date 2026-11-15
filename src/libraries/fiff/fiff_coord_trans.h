@@ -18,7 +18,7 @@
  * The FIFF coordinate-frame world is a small zoo (@c FIFFV_COORD_DEVICE,
  * @c FIFFV_COORD_HEAD, @c FIFFV_COORD_MRI, @c FIFFV_COORD_HPI,
  * @c FIFFV_COORD_RAS, ...) and any forward / inverse computation must
- * move points and orientations between them. @ref FIFFLIB::FiffCoordTrans wraps one
+ * move points and orientations between them. @ref mne::FiffCoordTrans wraps one
  * labelled affine: the 3x3 rotation @c rot, the 3-vector translation
  * @c move, the precomputed inverse, and the integer @c from / @c to frame
  * identifiers from @ref fiff_constants.h.
@@ -66,10 +66,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 // Forward declaration
@@ -99,7 +99,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the first coordinate transform of a FIFF file, like read(); throws BASELIB::Error if it cannot.
+     * Reads the first coordinate transform of a FIFF file, like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The file.
      */
@@ -107,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the transform between two frames, like read(path, from, to); throws BASELIB::Error if there is none.
+     * Reads the transform between two frames, like read(path, from, to); throws mne::Error if there is none.
      *
      * @param[in] path   The file.
      * @param[in] from   Source coordinate frame.
@@ -284,7 +284,7 @@ public:
      *
      * @return The transform, or why the file holds none.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffCoordTrans> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffCoordTrans> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -297,7 +297,7 @@ public:
      *
      * @return The transform, or why the file holds none between these frames.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffCoordTrans> read(const std::filesystem::path& path, int from, int to);
+    [[nodiscard]] static mne::Expected<FiffCoordTrans> read(const std::filesystem::path& path, int from, int to);
 
     //=========================================================================================================
     /**
@@ -309,7 +309,7 @@ public:
      *
      * @return The transform with its translation in m, or why the file cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffCoordTrans> read_ascii(const std::filesystem::path& path, int from, int to);
+    [[nodiscard]] static mne::Expected<FiffCoordTrans> read_ascii(const std::filesystem::path& path, int from, int to);
 
     //=========================================================================================================
     /**
@@ -432,7 +432,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -502,9 +502,9 @@ public:
      *
      * @return The coordinate transform, inverted if stored the other way round, or NotFound.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffCoordTrans> read_from_node(FiffStream& stream,
-                                                                          const std::shared_ptr<FiffDirNode>& node,
-                                                                          int from, int to);
+    [[nodiscard]] static mne::Expected<FiffCoordTrans> read_from_node(FiffStream& stream,
+                                                                      const std::shared_ptr<FiffDirNode>& node,
+                                                                      int from, int to);
 
     //========================================================================================================
     /**

@@ -7,13 +7,13 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Ordered set of @ref INVLIB::InvEcd records — the result of a sequential dipole-fit run.
+ * @brief    Ordered set of @ref mne::InvEcd records — the result of a sequential dipole-fit run.
  *
- * @ref INVLIB::InvEcdSet collects one @ref INVLIB::InvEcd per fitted time bin
+ * @ref mne::InvEcdSet collects one @ref mne::InvEcd per fitted time bin
  * and exposes append, index access and stream-insertion as well as
  * read/write support for the canonical @c .dip text format (mrilab) and
  * the @c .bdip binary format (xfit). It is the value type returned by
- * @ref INVLIB::InvDipoleFit::calculateFit "InvDipoleFit::calculateFit" and serialised by the
+ * @ref mne::InvDipoleFit::calculateFit "InvDipoleFit::calculateFit" and serialised by the
  * @c mne_dipole_fit driver.
  */
 
@@ -41,14 +41,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -159,6 +159,6 @@ private:
     std::vector<InvEcd> m_dipoles; /**< The fitted dipoles. */
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_ECD_SET_H

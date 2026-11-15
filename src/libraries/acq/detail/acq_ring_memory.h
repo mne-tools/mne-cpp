@@ -20,10 +20,10 @@
 #include <cstddef>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Huge page size the ring is aligned and sized to when huge pages are requested. */
@@ -65,6 +65,6 @@ void lockRingMemory(RingMemory& memory) noexcept;
 /** Unlocks and unmaps @p memory. */
 void releaseRingMemory(RingMemory& memory) noexcept;
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_RING_MEMORY_H

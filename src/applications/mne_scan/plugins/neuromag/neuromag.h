@@ -34,7 +34,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -53,12 +53,12 @@ namespace NEUROMAGPLUGIN
  * @brief MEG connector for the data acquisition of Neuromag (MEGIN) Vectorview and TRIUX systems through the
  *        neuromag:// source of mne_acq_devices, which can also simulate it.
  */
-class NEUROMAGSHARED_EXPORT Neuromag : public SCSHAREDLIB::AbstractSensor
+class NEUROMAGSHARED_EXPORT Neuromag : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "neuromag.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class NeuromagSetupWidget;
 
@@ -66,7 +66,7 @@ public:
     Neuromag();
     ~Neuromag() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -82,7 +82,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -98,10 +98,10 @@ private:
     /** @return The neuromag:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_Neuromag; /**< The MEG data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA_Neuromag; /**< The MEG data. */
 
-    ACQLIB::AcqDevice m_device; /**< The acquisition while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads the acquisition's stream in run(). */
+    mne::AcqDevice m_device; /**< The acquisition while streaming. */
+    mne::AcqReader m_reader; /**< Reads the acquisition's stream in run(). */
 
     std::string m_root = "/neuro/dacq"; /**< Directory of the acquisition's sockets, shared memory and files. */
     int m_iBufferSize = 0;              /**< Samples per data buffer to set; 0 keeps the acquisition's setting. */

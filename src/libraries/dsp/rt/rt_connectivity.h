@@ -9,16 +9,16 @@
  * @date     March 2026
  * @brief    Real-time worker that re-estimates a connectivity network from incoming data epochs.
  *
- * RtConnectivity drives the CONNECTIVITYLIB connectivity estimators (coherence,
+ * RtConnectivity drives the mne_connectivity connectivity estimators (coherence,
  * imaginary coherence, phase-locking value, weighted phase-lag index,
  * amplitude envelope correlation, …) from a background @c QThread. Each
  * arriving data block is forwarded to the worker, which updates the
- * windowed connectivity estimate and emits a @ref CONNECTIVITYLIB::Network result
+ * windowed connectivity estimate and emits a @ref mne::Network result
  * carrying the current edge weights and node positions ready for
  * visualisation.
  *
  * The actual estimator and its parameters — frequency band, window length,
- * connectivity measure — are configured through a @ref CONNECTIVITYLIB::ConnectivitySettings
+ * connectivity measure — are configured through a @ref mne::ConnectivitySettings
  * instance, so this header only adds the threading, lifecycle and signal
  * plumbing on top of the existing batch implementation.
  */
@@ -47,20 +47,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -82,10 +82,10 @@ public:
      *
      * @param[in] connectivitySettings    The trials to estimate from; their spectra are cached in place.
      */
-    void doWork(const std::shared_ptr<CONNECTIVITYLIB::ConnectivitySettings>& connectivitySettings);
+    void doWork(const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 
 signals:
-    void resultReady(const std::vector<CONNECTIVITYLIB::Network>& connectivityResults, const std::shared_ptr<CONNECTIVITYLIB::ConnectivitySettings>& connectivitySettings);
+    void resultReady(const std::vector<mne::Network>& connectivityResults, const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 };
 
 //=============================================================================================================
@@ -124,7 +124,7 @@ public:
      *
      * @param[in] connectivitySettings  Data to estimate the connectivity from.
      */
-    void append(CONNECTIVITYLIB::ConnectivitySettings connectivitySettings);
+    void append(mne::ConnectivitySettings connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -147,9 +147,9 @@ signals:
      * spectra cached during the computation. The worker no longer uses the settings, so a
      * receiver may move from them instead of copying.
      */
-    void newConnectivityResultAvailable(const std::vector<CONNECTIVITYLIB::Network>& connectivityResults, const std::shared_ptr<CONNECTIVITYLIB::ConnectivitySettings>& connectivitySettings);
+    void newConnectivityResultAvailable(const std::vector<mne::Network>& connectivityResults, const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 
-    void operate(const std::shared_ptr<CONNECTIVITYLIB::ConnectivitySettings>& connectivitySettings);
+    void operate(const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 };
 
 //=============================================================================================================

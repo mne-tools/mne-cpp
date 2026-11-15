@@ -63,7 +63,7 @@ class PluginGui : public QMainWindow
     friend class PluginScene;
 
 public:
-    PluginGui(SCSHAREDLIB::PluginManager* pPluginManager, SCSHAREDLIB::PluginSceneManager* pPluginSceneManager);
+    PluginGui(mne::scan::PluginManager* pPluginManager, mne::scan::PluginSceneManager* pPluginSceneManager);
 
     ~PluginGui();
 
@@ -109,20 +109,20 @@ public:
      */
     void setUiLayoutBlob(const QString& sWindowKey, const QByteArray& blob);
 
-    inline SCSHAREDLIB::AbstractPlugin::SPtr getCurrentPlugin();
+    inline mne::scan::AbstractPlugin::SPtr getCurrentPlugin();
 
     void uiSetupRunningState(bool state);
 
 signals:
-    void selectedPluginChanged(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
+    void selectedPluginChanged(mne::scan::AbstractPlugin::SPtr pPlugin);
 
-    void selectedConnectionChanged(SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection);
+    void selectedConnectionChanged(mne::scan::PluginConnectorConnection::SPtr pConnection);
 
 private:
     void pointerGroupClicked();
     void actionGroupTriggered(QAction* action);
 
-    bool removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);
+    bool removePlugin(mne::scan::AbstractPlugin::SPtr pPlugin);
 
     void itemInserted(PluginItem* item);
     void newItemSelected();
@@ -159,11 +159,11 @@ private:
      */
     void saveConfigMna(const QString& fullPath);
 
-    SCSHAREDLIB::PluginManager* m_pPluginManager;           /**< Corresponding plugin manager. */
-    SCSHAREDLIB::PluginSceneManager* m_pPluginSceneManager; /**< Corresponding plugin scene manager. */
+    mne::scan::PluginManager* m_pPluginManager;           /**< Corresponding plugin manager. */
+    mne::scan::PluginSceneManager* m_pPluginSceneManager; /**< Corresponding plugin scene manager. */
 
-    SCSHAREDLIB::AbstractPlugin::SPtr m_pCurrentPlugin;
-    SCSHAREDLIB::PluginConnectorConnection::SPtr m_pCurrentConnection;
+    mne::scan::AbstractPlugin::SPtr m_pCurrentPlugin;
+    mne::scan::PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene* m_pPluginScene;    /**< Plugin graph. */
     QGraphicsView* m_pGraphicsView; /**< View to show graph. */
@@ -184,14 +184,14 @@ private:
     QAction* toFrontAction;
     QAction* sendBackAction;
 
-    MNALIB::MnaProject m_loadedMnaProject; /**< Loaded project preserved for enriching round-trip saves. */
+    mne::MnaProject m_loadedMnaProject; /**< Loaded project preserved for enriching round-trip saves. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline SCSHAREDLIB::AbstractPlugin::SPtr PluginGui::getCurrentPlugin()
+inline mne::scan::AbstractPlugin::SPtr PluginGui::getCurrentPlugin()
 {
     return m_pCurrentPlugin;
 }

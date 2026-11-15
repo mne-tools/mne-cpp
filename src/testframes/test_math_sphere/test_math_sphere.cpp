@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -100,7 +100,7 @@ TestSphere::TestSphere()
 
 void TestSphere::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 }
 
 //=============================================================================================================

@@ -1,13 +1,13 @@
 ---
 id: xdawn
-title: "DSPLIB::Xdawn"
+title: "mne::Xdawn"
 sidebar_label: Xdawn
 sidebar_position: 25
 ---
 
 # Xdawn
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/xdawn.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/xdawn.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/xdawn.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/xdawn.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.Xdawn` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 25
 `#include <dsp/xdawn.h>`
 
 ```cpp
-class DSPLIB::Xdawn
+class mne::Xdawn
 ```
 
 Event-related response enhancement with xDAWN spatial filtering.
@@ -34,7 +34,7 @@ const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 
 Fit xDAWN spatial filters for a target event code.
 
-Uses non-rejected epochs only. The target signal covariance is estimated from the average of epochs whose [MNEEpochData](/docs/api/mne/mne-epoch-data)::event equals `iTargetEvent`. The noise covariance is estimated from residuals around the class-wise average for each event type.
+Uses non-rejected epochs only. The target signal covariance is estimated from the average of epochs whose `MNEEpochData::event` equals `iTargetEvent`. The noise covariance is estimated from residuals around the class-wise average for each event type.
 
 **Parameters:**
 
@@ -130,7 +130,7 @@ Apply `denoise()` to all epochs in the vector, preserving metadata.
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 187"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 185"
 const XdawnResult xdawn = Xdawn::fit(epochs, 1, 1); // enhance the response to event code 1
 const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 const VectorXd pattern = xdawn.matPatterns.col(0) / xdawn.matPatterns.col(0).cwiseAbs().maxCoeff();

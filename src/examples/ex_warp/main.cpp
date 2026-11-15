@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     May 2026
- * @brief    Example demonstrating thin-plate-spline (TPS) warping with MATHLIB::Warp.
+ * @brief    Example demonstrating thin-plate-spline (TPS) warping with mne::Warp.
  *
  * This example shows how to non-rigidly register one 3-D geometry onto another
  * using a set of landmark correspondences. It defines a small set of source
@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

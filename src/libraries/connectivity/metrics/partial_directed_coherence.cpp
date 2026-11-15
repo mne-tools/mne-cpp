@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref CONNECTIVITYLIB::PartialDirectedCoherence - column-normalised |A(f)| directional connectivity (Baccala & Sameshima 2001), direct paths only.
+ * @brief    Implementation of @ref mne::PartialDirectedCoherence - column-normalised |A(f)| directional connectivity (Baccala & Sameshima 2001), direct paths only.
  */
 
 //=============================================================================================================
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +56,7 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
     Network finalNetwork("PDC");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("PartialDirectedCoherence::calculate - Input data is empty");
+        mne::Log::debug("PartialDirectedCoherence::calculate - Input data is empty");
         return finalNetwork;
     }
 

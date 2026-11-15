@@ -7,19 +7,19 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    ONNX Runtime backed @ref MLLIB::MlModel implementation for loading and evaluating @c .onnx graphs.
+ * @brief    ONNX Runtime backed @ref mne::MlModel implementation for loading and evaluating @c .onnx graphs.
  *
- * @ref MLLIB::MlOnnxModel is the default inference backend in MLLIB:
+ * @ref mne::MlOnnxModel is the default inference backend in mne_ml:
  * load any model exported to the ONNX format - from PyTorch,
  * scikit-learn (via @c skl2onnx), TensorFlow, or hand-crafted - and
- * predict on @ref MLLIB::MlTensor inputs without any framework runtime
+ * predict on @ref mne::MlTensor inputs without any framework runtime
  * other than ONNX Runtime itself. The class owns the @c Ort::Session,
  * a reusable CPU @c Ort::MemoryInfo, and the cached input/output node
  * names and shapes so per-call overhead stays minimal.
  *
  * Each @c predict wraps the input tensor's row-major float buffer in
  * an @c Ort::Value zero-copy, dispatches @c Session::Run, and copies
- * the first output tensor into a fresh @ref MLLIB::MlTensor; multi-IO
+ * the first output tensor into a fresh @ref mne::MlTensor; multi-IO
  * graphs are supported by the cached name arrays but the public API
  * intentionally exposes a single-in / single-out shape until a use
  * case requires more. When mne-cpp is built without
@@ -61,10 +61,10 @@ class RunOptions;
 #endif
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -131,6 +131,6 @@ private:
 #endif
 };
 
-} // namespace MLLIB
+} // namespace mne
 
 #endif // ML_ONNX_MODEL_H

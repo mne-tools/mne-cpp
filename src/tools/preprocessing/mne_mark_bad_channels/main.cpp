@@ -44,8 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -76,7 +75,7 @@ static StringList readBadChannelList(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_mark_bad_channels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

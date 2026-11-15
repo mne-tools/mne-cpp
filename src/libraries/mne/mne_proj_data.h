@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Legacy MNE-C aggregator for SSP projections plus the channel list they apply to.
  *
- * @ref MNELIB::MNEProjData ports @c mneProjDataRec - the cached state
+ * @ref mne::MNEProjData ports @c mneProjDataRec - the cached state
  * kept by the C raw-data path so projection vectors do not have to be
- * rebuilt for every buffer. It owns the active @ref MNELIB::MNEProjOp, the
+ * rebuilt for every buffer. It owns the active @ref mne::MNEProjOp, the
  * channel-name list it was assembled against and the dirty flag the C
  * tools used to invalidate the cache when the channel selection changed.
  */
@@ -32,10 +32,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -59,7 +59,7 @@ public:
      *
      * @param[in] s  Surface whose triangles are precomputed (non-owning, must not be null); all triangles start active.
      */
-    MNEProjData(const MNELIB::MNESurface* s);
+    MNEProjData(const mne::MNESurface* s);
 
     //=========================================================================================================
     /**
@@ -78,6 +78,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEPROJDATA_H

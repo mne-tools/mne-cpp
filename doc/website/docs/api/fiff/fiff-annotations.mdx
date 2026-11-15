@@ -1,13 +1,13 @@
 ---
 id: fiff-annotations
-title: "FIFFLIB::FiffAnnotations"
+title: "mne::FiffAnnotations"
 sidebar_label: FiffAnnotations
 sidebar_position: 9
 ---
 
 # FiffAnnotations
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_annotations.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_annotations.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_annotations.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_annotations.h)
 
 :::info[Python equivalent]
 `mne.Annotations` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 9
 `#include <fiff/fiff_annotations.h>`
 
 ```cpp
-class FIFFLIB::FiffAnnotations
+class mne::FiffAnnotations
 ```
 
 Container for [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) entries with FIFF, JSON and CSV serializers.
@@ -29,7 +29,7 @@ FiffAnnotations annotations = annotations_from_events(firstThree, info.sfreq, {{
 annotations.append(0.5, 1.0, "BAD_blink"); // onset s, duration s, description
 const std::filesystem::path csv = tmp.filePath("annot.csv").toStdString();
 const bool annotationsWritten = annotations.write(csv).has_value();
-const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws BASELIB::Error
+const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws mne::Error
 const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
 ```
 
@@ -372,7 +372,7 @@ FiffAnnotations annotations = annotations_from_events(firstThree, info.sfreq, {{
 annotations.append(0.5, 1.0, "BAD_blink"); // onset s, duration s, description
 const std::filesystem::path csv = tmp.filePath("annot.csv").toStdString();
 const bool annotationsWritten = annotations.write(csv).has_value();
-const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws BASELIB::Error
+const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws mne::Error
 const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
 // Event 13988 (code 2) is (13988 - 12900) / 300.307 s = 3.6230 s after the first sample; code 3 has no description and stays "3"; the CSV keeps onsets to well within half a sample
 ok &= expect(annotationsWritten && annotationsBack.size() == 4 && std::fabs(annotationsBack.select("auditory/right")[0].onset - (13988 - 12900) / info.sfreq) < 0.5 / info.sfreq && eventsAgain.rows() == 2 && eventsAgain(0, 0) == 13988 && eventsAgain(1, 0) == 14385 && eventsAgain(1, 2) == 1 && annotationsBack.select("3").size() == 1,
@@ -383,13 +383,13 @@ ok &= expect(annotationsWritten && annotationsBack.size() == 4 && std::fabs(anno
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 226"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 224"
 AnnotateAmplitudeParams amplitude;
 amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
 StringList flatChannels;
 const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
 ok &= expect(flatSpans.size() == 1 && flatSpans[0].description == "BAD_flat" && std::abs(flatSpans[0].onset - 1.0) < 1e-12 && flatChannels == StringList{"EEG2"},
-             std::format("annotateAmplitude: {} flat span(s), bad {}", flatSpans.size(), BASELIB::join(flatChannels, ", ")));
+             std::format("annotateAmplitude: {} flat span(s), bad {}", flatSpans.size(), mne::join(flatChannels, ", ")));
 ````
 
 ## Authors of this file

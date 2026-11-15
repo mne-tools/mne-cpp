@@ -35,7 +35,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -52,12 +52,12 @@ namespace NATUSPLUGIN
  * @brief Receives a Natus Quantum amplifier from the datagrams of its streaming machine through the natus:// source
  *        of mne_acq_devices, which can also simulate it.
  */
-class NATUSSHARED_EXPORT Natus : public SCSHAREDLIB::AbstractSensor
+class NATUSSHARED_EXPORT Natus : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "natus.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class NatusSetup;
 
@@ -65,7 +65,7 @@ public:
     Natus();
     ~Natus() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -81,7 +81,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -97,10 +97,10 @@ private:
     /** @return The natus:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_Natus; /**< The data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRMTSA_Natus; /**< The data. */
 
-    ACQLIB::AcqDevice m_device; /**< The amplifier while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads its stream in run(). */
+    mne::AcqDevice m_device; /**< The amplifier while streaming. */
+    mne::AcqReader m_reader; /**< Reads its stream in run(). */
 
     std::string m_address = "0.0.0.0"; /**< Local address the datagrams arrive on. */
     std::uint16_t m_port = 50000;      /**< Port the streaming machine sends to. */

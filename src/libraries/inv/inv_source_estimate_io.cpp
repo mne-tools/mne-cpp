@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of the CSV / matrix exporters and importer in @ref INVLIB::InvSourceEstimateIO.
+ * @brief    Implementation of the CSV / matrix exporters and importer in @ref mne::InvSourceEstimateIO.
  *
  * Numbers are written in the shortest form that reads back to the same
  * value, so a CSV round trip is exact. The reader refuses a file whose rows
@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -96,13 +96,13 @@ bool InvSourceEstimateIO::write_csv(const InvSourceEstimate& stc,
                                     char delim)
 {
     if (stc.empty()) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::write_csv] Source estimate is empty.");
+        mne::Log::warning("[InvSourceEstimateIO::write_csv] Source estimate is empty.");
         return false;
     }
 
     std::ofstream out(path);
     if (!out) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::write_csv] Cannot open: {}", path.string());
+        mne::Log::warning("[InvSourceEstimateIO::write_csv] Cannot open: {}", path.string());
         return false;
     }
 
@@ -133,7 +133,7 @@ InvSourceEstimate InvSourceEstimateIO::read_csv(const std::filesystem::path& pat
 {
     std::ifstream in(path);
     if (!in) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::read_csv] Cannot open: {}", path.string());
+        mne::Log::warning("[InvSourceEstimateIO::read_csv] Cannot open: {}", path.string());
         return {};
     }
 
@@ -144,7 +144,7 @@ InvSourceEstimate InvSourceEstimateIO::read_csv(const std::filesystem::path& pat
     const std::size_t first = header.find(delim);
     std::vector<int> header_vertices;
     if (first == std::string_view::npos || !parse_fields(header.substr(first + 1), delim, header_vertices) || header_vertices.empty()) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::read_csv] Invalid header.");
+        mne::Log::warning("[InvSourceEstimateIO::read_csv] Invalid header.");
         return {};
     }
     const auto n_vertices = static_cast<Index>(header_vertices.size());
@@ -155,15 +155,15 @@ InvSourceEstimate InvSourceEstimateIO::read_csv(const std::filesystem::path& pat
     std::vector<double> times;
     while (std::getline(in, line)) {
         if (!parse_fields(std::string_view(line), delim, fields)) {
-            BASELIB::Log::warning("[InvSourceEstimateIO::read_csv] Malformed row {}.", times.size() + 1);
+            mne::Log::warning("[InvSourceEstimateIO::read_csv] Malformed row {}.", times.size() + 1);
             return {};
         }
         if (fields.empty()) {
             continue;
         }
         if (static_cast<Index>(fields.size()) != n_vertices + 1) {
-            BASELIB::Log::warning("[InvSourceEstimateIO::read_csv] Row {} has {} values, expected {}.",
-                                  times.size() + 1, fields.size(), n_vertices + 1);
+            mne::Log::warning("[InvSourceEstimateIO::read_csv] Row {} has {} values, expected {}.",
+                              times.size() + 1, fields.size(), n_vertices + 1);
             return {};
         }
         times.push_back(fields.front());
@@ -187,13 +187,13 @@ bool InvSourceEstimateIO::write_matrix(const InvSourceEstimate& stc,
                                        const std::filesystem::path& path)
 {
     if (stc.empty()) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::write_matrix] Source estimate is empty.");
+        mne::Log::warning("[InvSourceEstimateIO::write_matrix] Source estimate is empty.");
         return false;
     }
 
     std::ofstream out(path);
     if (!out) {
-        BASELIB::Log::warning("[InvSourceEstimateIO::write_matrix] Cannot open: {}", path.string());
+        mne::Log::warning("[InvSourceEstimateIO::write_matrix] Cannot open: {}", path.string());
         return false;
     }
 

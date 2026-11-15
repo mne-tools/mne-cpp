@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Declares the resolve_streams / resolve_stream free functions used to enumerate LSL outlets currently visible on the LAN.
  *
- * Stream discovery is the entry point of every LSLLIB consumer: an
+ * Stream discovery is the entry point of every mne_lsl consumer: an
  * acquisition plug-in or analysis tool first calls
- * @ref LSLLIB::resolve_streams to obtain the set of @ref LSLLIB::stream_info
+ * @ref mne::resolve_streams to obtain the set of @ref mne::stream_info
  * descriptors currently being advertised on the network, then
- * constructs a @ref LSLLIB::stream_inlet from the one it is
- * interested in. @ref LSLLIB::resolve_stream layers a property
+ * constructs a @ref mne::stream_inlet from the one it is
+ * interested in. @ref mne::resolve_stream layers a property
  * filter on top so that callers who already know the @c name,
  * @c type, @c source_id, @c uid or @c hostname they expect can wait
  * only for that match.
@@ -44,10 +44,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace LSLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -79,6 +79,6 @@ LSLSHARED_EXPORT std::vector<stream_info> resolve_stream(const std::string& prop
                                                          double timeout = 1.0,
                                                          int minimum = 0);
 
-} // namespace LSLLIB
+} // namespace mne
 
 #endif // LSL_STREAM_DISCOVERY_H

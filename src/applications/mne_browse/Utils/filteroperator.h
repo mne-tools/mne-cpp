@@ -62,10 +62,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 
 //*************************************************************************************************************

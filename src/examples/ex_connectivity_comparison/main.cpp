@@ -65,16 +65,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace INVLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-using namespace BASELIB;
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace DISP3DLIB;
 
 //=============================================================================================================
 // MAIN
@@ -95,7 +88,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
     AbstractMetric::m_bStorageModeIsActive = false;
@@ -248,7 +241,7 @@ int main(int argc, char* argv[])
             picks.resize(0);
 
             for (int i = 0; i < picksTmp.cols() - 1; i += 2) {
-                if (!BASELIB::contains(raw.info.bads, raw.info.ch_names.at(picksTmp(i)))) {
+                if (!mne::contains(raw.info.bads, raw.info.ch_names.at(picksTmp(i)))) {
                     picks.conservativeResize(picks.cols() + 1);
                     picks(picks.cols() - 1) = picksTmp(i);
                 }

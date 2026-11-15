@@ -52,10 +52,7 @@
 #include <fs/fs_annotation.h>
 #include <fs/fs_annotationset.h>
 
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMneDataTypes : public QObject
@@ -978,10 +975,10 @@ private slots:
 
     void mneGlobal_buildInfo()
     {
-        const char* dt = MNELIB::buildDateTime();
+        const char* dt = mne::buildDateTime();
         QVERIFY(dt != nullptr && dt[0] != '\0');
 
-        const char* hash = MNELIB::buildHash();
+        const char* hash = mne::buildHash();
         QVERIFY(hash != nullptr);
     }
 
@@ -1020,7 +1017,7 @@ private slots:
 
         // Neuromag data has no CTF compensation: grade 0 is a no-op, another grade cannot be made
         QVERIFY(raw.apply_gradient_compensation(0));
-        QCOMPARE(raw.apply_gradient_compensation(1).error().code, BASELIB::ErrorCode::Format);
+        QCOMPARE(raw.apply_gradient_compensation(1).error().code, mne::ErrorCode::Format);
     }
 
     void mne_combineXyz()
@@ -1029,7 +1026,7 @@ private slots:
         // It computes x^2 + y^2 + z^2 for each triplet (NOT sqrt)
         VectorXd vec(6);
         vec << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
-        VectorXd result = MATHLIB::Linalg::combine_xyz(vec);
+        VectorXd result = mne::Linalg::combine_xyz(vec);
         QCOMPARE(result.size(), static_cast<Eigen::Index>(2));
         double exp0 = 1.0 + 4.0 + 9.0;    // 14
         double exp1 = 16.0 + 25.0 + 36.0; // 77
@@ -1043,7 +1040,7 @@ private slots:
         MatrixXd A(2, 4);
         A << 1, 2, 5, 6,
             3, 4, 7, 8;
-        SparseMatrix<double> S = MATHLIB::Linalg::make_block_diag(A, 2);
+        SparseMatrix<double> S = mne::Linalg::make_block_diag(A, 2);
         // A has 4 cols with block size 2 → 2 blocks, each 2x2
         // Result should be 4x4 sparse block diagonal
         QCOMPARE(S.rows(), static_cast<Eigen::Index>(4));
@@ -1242,7 +1239,7 @@ private slots:
         QCOMPARE(back.size(), fwd.src.size());
         QCOMPARE(back[0].nuse, fwd.src[0].nuse);
         QCOMPARE(back.get_vertno()[1], fwd.src.get_vertno()[1]);
-        QCOMPARE(MNESourceSpaces::read(path.parent_path() / "missing-src.fif").error().code, BASELIB::ErrorCode::Io);
+        QCOMPARE(MNESourceSpaces::read(path.parent_path() / "missing-src.fif").error().code, mne::ErrorCode::Io);
     }
 
     void sourceSpaces_getVertno()
@@ -1520,7 +1517,7 @@ private slots:
             QSKIP("Sample evoked file not found");
         const auto evoked = FiffEvoked::read(avePath.toStdU16String(), 0, {}, false);
         QVERIFY(evoked.has_value());
-        const int stim = FIFFLIB::channel_index(evoked->info.ch_names, "STI 014");
+        const int stim = mne::channel_index(evoked->info.ch_names, "STI 014");
         if (stim < 0)
             QSKIP("Sample evoked file has no STI 014");
 
@@ -1572,9 +1569,9 @@ private slots:
         QCOMPARE(ds.getValuesAtTime(0.2f, 0.0f, false, first), 0);
         QCOMPARE(first, Eigen::Vector2f(3.0f, 30.0f));
         VectorXf longer = VectorXf::Constant(4, -7.0f);
-        BASELIB::LogCapture log;
+        mne::LogCapture log;
         QCOMPARE(ds.getValuesAtTime(0.2f, 0.0f, false, longer), -1);
-        QCOMPARE(log.count(BASELIB::Log::Level::Warning, "values"), 1);
+        QCOMPARE(log.count(mne::Log::Level::Warning, "values"), 1);
         QVERIFY((longer.array() == -7.0f).all());
     }
 
@@ -1622,9 +1619,9 @@ private slots:
         // An output vector that does not hold one value per channel is refused, not overrun
         for (const int size : {nch - 1, nch + 1}) {
             Eigen::VectorXf wrong = Eigen::VectorXf::Constant(size, -7.0f);
-            BASELIB::LogCapture log;
+            mne::LogCapture log;
             QCOMPARE(MNEMeasDataSet::getValuesFromChannelData(0.2f, 0.0f, data, tmin, sfreq, false, wrong), -1);
-            QCOMPARE(log.count(BASELIB::Log::Level::Warning, "values"), 1);
+            QCOMPARE(log.count(mne::Log::Level::Warning, "values"), 1);
             QVERIFY((wrong.array() == -7.0f).all());
         }
     }

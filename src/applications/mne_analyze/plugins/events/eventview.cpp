@@ -78,10 +78,10 @@ EventView::EventView()
     onDataChanged();
     createContextMenu();
 
-    m_pTriggerDetectView = std::make_shared<DISPLIB::TriggerDetectionView>("MNEANALYZE/EVENTS",
-                                                                           nullptr,
-                                                                           Qt::Window);
-    m_pTriggerDetectView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
+    m_pTriggerDetectView = std::make_shared<mne::disp::TriggerDetectionView>("MNEANALYZE/EVENTS",
+                                                                             nullptr,
+                                                                             Qt::Window);
+    m_pTriggerDetectView->setProcessingMode(mne::disp::AbstractView::ProcessingMode::Offline);
     m_pTriggerDetectView->setWindowFlag(Qt::WindowStaysOnTopHint);
 }
 
@@ -93,7 +93,7 @@ EventView::~EventView() = default;
 
 void EventView::reset()
 {
-    setModel(QSharedPointer<ANSHAREDLIB::EventModel>::create());
+    setModel(QSharedPointer<mne::analyze::EventModel>::create());
 }
 
 //=============================================================================================================
@@ -102,7 +102,7 @@ void EventView::initMVCSettings()
 {
     //Model
     m_pUi->m_tableView_eventTableView->setModel(m_pEventModel.data());
-    connect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
+    connect(m_pEventModel.data(), &mne::analyze::EventModel::dataChanged,
             this, &EventView::onDataChanged, Qt::UniqueConnection);
 
     //Delegate
@@ -112,7 +112,7 @@ void EventView::initMVCSettings()
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    connect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+    connect(m_pEventModel.data(), &mne::analyze::EventModel::eventGroupsUpdated,
             this, &EventView::redrawGroups, Qt::UniqueConnection);
 }
 
@@ -163,7 +163,7 @@ void EventView::initGUIFunctionality()
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
 
-    connect(m_pTriggerDetectView.get(), &DISPLIB::TriggerDetectionView::detectTriggers,
+    connect(m_pTriggerDetectView.get(), &mne::disp::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers, Qt::UniqueConnection);
 
     connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
@@ -199,7 +199,7 @@ void EventView::addEventToModel(int iSamplePos)
 
 //=============================================================================================================
 
-void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pEventModel)
+void EventView::setModel(QSharedPointer<mne::analyze::EventModel> pEventModel)
 {
     m_pEventModel = pEventModel;
 
@@ -278,9 +278,9 @@ void EventView::onSelectedEventsChecked(int iCheckBoxState)
 void EventView::disconnectFromModel()
 {
     if (m_pEventModel) {
-        disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
+        disconnect(m_pEventModel.data(), &mne::analyze::EventModel::dataChanged,
                    this, &EventView::onDataChanged);
-        disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+        disconnect(m_pEventModel.data(), &mne::analyze::EventModel::eventGroupsUpdated,
                    this, &EventView::redrawGroups);
     }
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
@@ -299,7 +299,7 @@ void EventView::disconnectFromModel()
                this, &EventView::customGroupContextMenuRequested);
     disconnect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
                this, &EventView::onStimButtonClicked);
-    disconnect(m_pTriggerDetectView.get(), &DISPLIB::TriggerDetectionView::detectTriggers,
+    disconnect(m_pTriggerDetectView.get(), &mne::disp::TriggerDetectionView::detectTriggers,
                this, &EventView::onDetectTriggers);
 }
 
@@ -454,7 +454,7 @@ void EventView::onStimButtonClicked()
 
 //=============================================================================================================
 
-void EventView::initTriggerDetect(const std::shared_ptr<FIFFLIB::FiffInfo> info)
+void EventView::initTriggerDetect(const std::shared_ptr<mne::FiffInfo> info)
 {
     m_pTriggerDetectView->init(info);
 }
@@ -477,7 +477,7 @@ void EventView::onDetectTriggers(const QString& sChannelName,
 
     // The arguments are temporaries of the emitting call, so the worker gets copies
     m_sDetectedStimChannel = sChannelName;
-    std::shared_ptr<FIFFLIB::FiffRawData> raw = m_pFiffRawModel->getFiffIO()->raw.front();
+    std::shared_ptr<mne::FiffRawData> raw = m_pFiffRawModel->getFiffIO()->raw.front();
     m_Future = QtConcurrent::run([sChannelName = QString(sChannelName), dThreshold, raw] {
         return detectTriggerCalculations(sChannelName, dThreshold, *raw);
     });
@@ -488,10 +488,10 @@ void EventView::onDetectTriggers(const QString& sChannelName,
 
 QMap<double, QList<int>> EventView::detectTriggerCalculations(const QString& sChannelName,
                                                               double dThreshold,
-                                                              const FIFFLIB::FiffRawData& fiffRaw)
+                                                              const mne::FiffRawData& fiffRaw)
 {
     QMap<double, QList<int>> mEventsinTypes;
-    const auto found = FIFFLIB::FiffEvents::find_events(fiffRaw, sChannelName.toStdString());
+    const auto found = mne::FiffEvents::find_events(fiffRaw, sChannelName.toStdString());
     if (!found) {
         return mEventsinTypes;
     }
@@ -506,7 +506,7 @@ QMap<double, QList<int>> EventView::detectTriggerCalculations(const QString& sCh
 
 //=============================================================================================================
 
-void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
+void EventView::onNewFiffRawViewModel(QSharedPointer<mne::analyze::FiffRawViewModel> pFiffRawModel)
 {
     m_pFiffRawModel = pFiffRawModel;
 
@@ -561,12 +561,12 @@ void EventView::createGroupsFromTriggers()
 
 //=============================================================================================================
 
-void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void EventView::clearView(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
-    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pEventModel) == pRemovedModel) {
+    if (qSharedPointerCast<mne::analyze::AbstractModel>(m_pEventModel) == pRemovedModel) {
         disconnectFromModel();
         reset();
-    } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel) {
+    } else if (qSharedPointerCast<mne::analyze::AbstractModel>(m_pFiffRawModel) == pRemovedModel) {
         m_pFiffRawModel = nullptr;
     }
 }

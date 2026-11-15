@@ -14,17 +14,17 @@
  * nearest centroid under the selected metric) with an update step
  * (centroid ← mean of its members) until the total within-cluster
  * distortion stops decreasing or the iteration cap is hit. Per-iteration
- * cost is @c O(n*k*p), which dominates everything else in MATHLIB and
+ * cost is @c O(n*k*p), which dominates everything else in mne_math and
  * makes the algorithm suitable for the cortical-patch decimation and
- * dipole-cluster prior workflows that consume it inside INVERSELIB.
+ * dipole-cluster prior workflows that consume it inside mne_inv.
  *
  * The implementation mirrors MATLAB's @c kmeans/@c kmeans2 in feature
  * set: five distance metrics (squared Euclidean, city-block, cosine,
- * correlation, Hamming) selectable via @ref MATHLIB::KMeansDistance "KMeansDistance", three
+ * correlation, Hamming) selectable via @ref mne::KMeansDistance "KMeansDistance", three
  * seeding strategies (random sample, uniform within data range,
- * subsample-then-cluster) via @ref MATHLIB::KMeansStart "KMeansStart", multiple replicates
+ * subsample-then-cluster) via @ref mne::KMeansStart "KMeansStart", multiple replicates
  * with best-of selection, and three empty-cluster policies (error,
- * drop, singleton-from-farthest-point) via @ref MATHLIB::KMeansEmptyAction "KMeansEmptyAction". An
+ * drop, singleton-from-farthest-point) via @ref mne::KMeansEmptyAction "KMeansEmptyAction". An
  * optional online update phase performs single-point Lloyd moves after
  * the batch loop converges and is enabled by default to escape shallow
  * local minima.
@@ -64,10 +64,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================

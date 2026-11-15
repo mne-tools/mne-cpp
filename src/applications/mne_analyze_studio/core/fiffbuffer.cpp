@@ -58,7 +58,7 @@ bool FiffBuffer::open()
     }
 
     try {
-        m_rawData = FIFFLIB::FiffRawData(m_file.fileName().toStdU16String());
+        m_rawData = mne::FiffRawData(m_file.fileName().toStdU16String());
     } catch (const std::exception& e) {
         // FiffRawData reports a bad file by throwing. A buffer that cannot be
         // read is an ordinary outcome for a caller handed an arbitrary path,
@@ -92,14 +92,14 @@ QIODevice* FiffBuffer::device() const
     return const_cast<QFile*>(&m_file);
 }
 
-const FIFFLIB::FiffRawData& FiffBuffer::rawData() const
+const mne::FiffRawData& FiffBuffer::rawData() const
 {
     return m_rawData;
 }
 
 void FiffBuffer::loadHeaderMetadata()
 {
-    const FIFFLIB::FiffInfo& info = m_rawData.info;
+    const mne::FiffInfo& info = m_rawData.info;
 
     QJsonArray channels;
     for (const std::string& channelName : info.ch_names) {

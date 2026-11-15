@@ -1,19 +1,19 @@
 ---
 id: inv-dipole-pair
-title: "INVLIB::InvDipolePair"
+title: "mne::InvDipolePair"
 sidebar_label: InvDipolePair
 sidebar_position: 44
 ---
 
 # InvDipolePair
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_dipole.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_dipole.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_dipole.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_dipole.h)
 
 `#include <inv/inv_dipole.h>`
 
 ```cpp
 template <typename T>
-struct INVLIB::InvDipolePair
+struct mne::InvDipolePair
 ```
 
 Declares a [`InvDipolePair`](/docs/api/inv/inv-dipole-pair) structure consisting of two correlated dipoles which are the result of the RAP MUSIC searching algorithm.
@@ -49,7 +49,7 @@ pwlRap.calculateInverse(measured, powellPairs);
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 84"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 81"
 bool isPair(const InvDipolePair<double>& pair, int a, int b)
 {
     return std::min(pair.m_iIdx1, pair.m_iIdx2) == std::min(a, b) && std::max(pair.m_iIdx1, pair.m_iIdx2) == std::max(a, b);

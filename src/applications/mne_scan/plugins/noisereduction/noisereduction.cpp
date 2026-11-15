@@ -44,11 +44,9 @@
 //=============================================================================================================
 
 using namespace NOISEREDUCTIONPLUGIN;
-using namespace SCMEASLIB;
-using namespace DSPLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace SCSHAREDLIB;
+using namespace mne::scan;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -63,7 +61,7 @@ NoiseReduction::NoiseReduction()
 , m_iMaxFilterLength(1)
 , m_iMaxFilterTapSize(-1)
 , m_sCurrentSystem("VectorView")
-, m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
+, m_pCircularBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
 , m_pNoiseReductionInput(nullptr)
 , m_pNoiseReductionOutput(nullptr)
 {
@@ -166,7 +164,7 @@ QWidget* NoiseReduction::setupWidget()
 
 //=============================================================================================================
 
-void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void NoiseReduction::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
@@ -316,7 +314,7 @@ void NoiseReduction::run()
 
     // Init
     MatrixXd matData;
-    QScopedPointer<DSPLIB::FilterOverlapAdd> pRtFilter(new DSPLIB::FilterOverlapAdd());
+    QScopedPointer<mne::FilterOverlapAdd> pRtFilter(new mne::FilterOverlapAdd());
 
     while (!isInterruptionRequested()) {
         // Get the current data
@@ -351,7 +349,7 @@ void NoiseReduction::run()
             if (m_bSpharaActive) {
                 //Set bad channels to zero so they do not get smeared into
                 for (int i = 0; i < static_cast<int>(m_pFiffInfo->bads.size()); ++i) {
-                    matData.row(BASELIB::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(i))).setZero();
+                    matData.row(mne::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(i))).setZero();
                 }
 
                 matData = m_matSparseSpharaMult * matData;
@@ -377,7 +375,7 @@ void NoiseReduction::run()
             //            }
             //        }
 
-            //        MATHLIB::write_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
+            //        mne::write_matrix(commonAvr, "commonAvr.txt", "common vaergae matrix");
 
             m_mutex.unlock();
 
@@ -391,7 +389,7 @@ void NoiseReduction::run()
 
 //=============================================================================================================
 
-void NoiseReduction::updateProjection(const std::vector<FIFFLIB::FiffProj>& projs)
+void NoiseReduction::updateProjection(const std::vector<mne::FiffProj>& projs)
 {
     //  Update the SSP projector
     if (m_pFiffInfo) {
@@ -410,7 +408,7 @@ void NoiseReduction::updateProjection(const std::vector<FIFFLIB::FiffProj>& proj
 
         //set columns of matrix to zero depending on bad channels indexes
         for (qint32 j = 0; j < static_cast<int>(m_pFiffInfo->bads.size()); ++j) {
-            int index = BASELIB::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(j));
+            int index = mne::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(j));
             if (index >= 0 && index < static_cast<int>(m_pFiffInfo->ch_names.size())) {
                 matProj.col(index).setZero();
             }
@@ -553,13 +551,13 @@ void NoiseReduction::setFilterActive(bool state)
 void NoiseReduction::initSphara()
 {
     //Load SPHARA matrix
-    MATHLIB::read_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt").toStdString());
-    MATHLIB::read_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt").toStdString());
+    mne::read_matrix(m_matSpharaVVGradLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt").toStdString());
+    mne::read_matrix(m_matSpharaVVMagLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt").toStdString());
 
-    MATHLIB::read_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt").toStdString());
-    MATHLIB::read_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt").toStdString());
+    mne::read_matrix(m_matSpharaBabyMEGInnerLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt").toStdString());
+    mne::read_matrix(m_matSpharaBabyMEGOuterLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt").toStdString());
 
-    MATHLIB::read_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt").toStdString());
+    mne::read_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt").toStdString());
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -621,21 +619,21 @@ void NoiseReduction::createSpharaOperator()
     MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     if (m_sCurrentSystem == "VectorView") {
-        matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1);   //GRADIOMETERS
-        matSpharaMultSecond = DSPLIB::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
+        matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 1);   //GRADIOMETERS
+        matSpharaMultSecond = mne::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, m_iNBaseFctsSecond, 0); //Magnetometers
     }
 
     if (m_sCurrentSystem == "BabyMEG") {
-        matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
+        matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
     }
 
     if (m_sCurrentSystem == "EEG") {
-        matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
+        matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, m_iNBaseFctsFirst, 0); //InnerLayer
     }
 
     //Write final operator matrices to file
-    //    MATHLIB::write_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-    //    MATHLIB::write_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+    //    mne::write_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+    //    mne::write_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
     //
     // Make operators sparse

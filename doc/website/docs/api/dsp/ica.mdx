@@ -1,13 +1,13 @@
 ---
 id: ica
-title: "DSPLIB::ICA"
+title: "mne::ICA"
 sidebar_label: ICA
 sidebar_position: 4
 ---
 
 # ICA
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/ica.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/ica.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.ICA (fastica)` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 4
 `#include <dsp/ica.h>`
 
 ```cpp
-class DSPLIB::ICA
+class mne::ICA
 ```
 
 Independent Component Analysis using the FastICA algorithm (deflationary, logcosh nonlinearity).
@@ -112,7 +112,7 @@ The excluded component(s) are zeroed in source space before back-projection.
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 125"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 123"
 const IcaResult ica = ICA::run(mixed, 3);                         // FastICA, logcosh, fixed seed
 const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop component 0, back-project the rest
 ok &= expect(worstRecovery(ica.matSources, sources) > 0.99, std::format("FastICA recovers all sources (worst |r| {:g})", worstRecovery(ica.matSources, sources)));

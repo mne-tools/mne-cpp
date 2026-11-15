@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsDatasetDescription — JSON I/O for the root ``dataset_description.json`` sidecar.
+ * @brief    Implementation of @ref mne::BidsDatasetDescription — JSON I/O for the root ``dataset_description.json`` sidecar.
  */
 
 //=============================================================================================================
@@ -25,7 +25,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC METHODS
@@ -35,20 +35,20 @@ BidsDatasetDescription BidsDatasetDescription::read(const std::filesystem::path&
 {
     BidsDatasetDescription desc;
 
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    const mne::Expected<std::string> text = mne::read_text_file(path);
     if (!text) {
-        BASELIB::Log::warning("[BidsDatasetDescription::read] Cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[BidsDatasetDescription::read] Cannot open {}", mne::utf8FromPath(path));
         return desc;
     }
 
-    BASELIB::JsonParseError error;
-    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*text, &error);
-    if (error.error != BASELIB::JsonParseError::NoError) {
-        BASELIB::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", BASELIB::utf8FromPath(path), error.error_string());
+    mne::JsonParseError error;
+    const mne::JsonDocument doc = mne::JsonDocument::from_json(*text, &error);
+    if (error.error != mne::JsonParseError::NoError) {
+        mne::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", mne::utf8FromPath(path), error.error_string());
         return desc;
     }
 
-    const BASELIB::JsonObject& json = doc.object();
+    const mne::JsonObject& json = doc.object();
     desc.name = json.value("Name").to_string();
     desc.bidsVersion = json.value("BIDSVersion").to_string();
     desc.datasetType = json.value("DatasetType").to_string();
@@ -62,14 +62,14 @@ BidsDatasetDescription BidsDatasetDescription::read(const std::filesystem::path&
 bool BidsDatasetDescription::write(const std::filesystem::path& path,
                                    const BidsDatasetDescription& desc)
 {
-    BASELIB::JsonObject json{{"Name", desc.name}, {"BIDSVersion", desc.bidsVersion}};
+    mne::JsonObject json{{"Name", desc.name}, {"BIDSVersion", desc.bidsVersion}};
     if (!desc.datasetType.empty())
         json.insert("DatasetType", desc.datasetType);
     if (!desc.license.empty())
         json.insert("License", desc.license);
 
-    if (!BASELIB::write_text_file(path, BASELIB::JsonDocument(std::move(json)).to_json())) {
-        BASELIB::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", BASELIB::utf8FromPath(path));
+    if (!mne::write_text_file(path, mne::JsonDocument(std::move(json)).to_json())) {
+        mne::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", mne::utf8FromPath(path));
         return false;
     }
     return true;

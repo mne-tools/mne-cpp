@@ -1,18 +1,18 @@
 ---
 id: artifact-detect
-title: "DSPLIB::ArtifactDetect"
+title: "mne::ArtifactDetect"
 sidebar_label: ArtifactDetect
 sidebar_position: 67
 ---
 
 # ArtifactDetect
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/artifact_detect.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/artifact_detect.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/artifact_detect.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/artifact_detect.h)
 
 `#include <dsp/artifact_detect.h>`
 
 ```cpp
-class DSPLIB::ArtifactDetect
+class mne::ArtifactDetect
 ```
 
 ECG and EOG physiological artifact event detection.
@@ -82,7 +82,7 @@ Of the good channels with kind == FIFFV_EOG_CH, the one with the most 2-45 Hz en
 
 ### computeProjEcg(matData, fiffInfo, dSFreq, proj, detect)
 
-SSP projectors for heartbeat artifacts as mne.preprocessing.compute_proj_ecg does: ECG events, band-passed data with the info projectors applied, peak-to-peak rejection, average, then [FiffProj](/docs/api/fiff/fiff-proj)::compute_from_evoked.
+SSP projectors for heartbeat artifacts as mne.preprocessing.compute_proj_ecg does: ECG events, band-passed data with the info projectors applied, peak-to-peak rejection, average, then `FiffProj::compute_from_evoked`.
 
 Returns the info projectors followed by the new ones ("ECG-...").
 
@@ -148,7 +148,7 @@ SSP projectors for blink artifacts as mne.preprocessing.compute_proj_eog does (s
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 141"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 139"
 ArtifactDetect::EcgParams ecg;                                                      // mne find_ecg_events defaults: 5-35 Hz, automatic QRS threshold
 ArtifactDetect::EogParams eog;                                                      // mne find_eog_events defaults: 1-10 Hz, automatic peak threshold
 const std::vector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel

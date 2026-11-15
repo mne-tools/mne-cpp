@@ -35,10 +35,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -321,6 +321,6 @@ BASESHARED_EXPORT Expected<std::string> read_text_file(const std::filesystem::pa
  */
 BASESHARED_EXPORT Expected<void> write_text_file(const std::filesystem::path& path, std::string_view text);
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_BYTE_STREAM_H

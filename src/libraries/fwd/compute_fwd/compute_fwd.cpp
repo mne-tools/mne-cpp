@@ -30,9 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -100,20 +98,20 @@ void ComputeFwd::initFwd()
     m_bemModel.reset();
 
     // Report the setup
-    BASELIB::Log::info("Source space                 : {}", m_pSettings->srcname);
+    mne::Log::info("Source space                 : {}", m_pSettings->srcname);
     if (!(m_pSettings->transname.empty()) || !(m_pSettings->mriname.empty())) {
-        BASELIB::Log::info("MRI -> head transform source : {}", m_pSettings->mriname.empty() ? m_pSettings->transname : m_pSettings->mriname);
+        mne::Log::info("MRI -> head transform source : {}", m_pSettings->mriname.empty() ? m_pSettings->transname : m_pSettings->mriname);
     } else {
-        BASELIB::Log::info("MRI and head coordinates are assumed to be identical.");
+        mne::Log::info("MRI and head coordinates are assumed to be identical.");
     }
-    BASELIB::Log::info("Measurement data             : {}", m_pSettings->measname);
+    mne::Log::info("Measurement data             : {}", m_pSettings->measname);
     if (!m_pSettings->bemname.empty()) {
-        BASELIB::Log::info("BEM model                    : {}", m_pSettings->bemname);
+        mne::Log::info("BEM model                    : {}", m_pSettings->bemname);
     } else {
-        BASELIB::Log::info("Sphere model                 : origin at ({: 7.2f} {: 7.2f} {: 7.2f}) mm", 1000.0f * m_pSettings->r0[X], 1000.0f * m_pSettings->r0[Y], 1000.0f * m_pSettings->r0[Z]);
+        mne::Log::info("Sphere model                 : origin at ({: 7.2f} {: 7.2f} {: 7.2f}) mm", 1000.0f * m_pSettings->r0[X], 1000.0f * m_pSettings->r0[Y], 1000.0f * m_pSettings->r0[Z]);
         if (m_pSettings->include_eeg) {
             if (m_pSettings->eeg_model_file.empty()) {
-                BASELIB::Log::warning("EEG model file not specified; using default.");
+                mne::Log::warning("EEG model file not specified; using default.");
             }
             m_eegModels = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file, std::move(m_eegModels));
             m_eegModels->fwd_list_eeg_sphere_models();
@@ -130,30 +128,30 @@ void ComputeFwd::initFwd()
                 return;
             }
 
-            BASELIB::Log::info("Using EEG sphere model \"{}\" with scalp radius {:7.1f} mm", m_pSettings->eeg_model_name, 1000 * m_pSettings->eeg_sphere_rad);
-            BASELIB::Log::info("{} the electrode locations to scalp", m_pSettings->scale_eeg_pos ? "Scale" : "Do not scale");
+            mne::Log::info("Using EEG sphere model \"{}\" with scalp radius {:7.1f} mm", m_pSettings->eeg_model_name, 1000 * m_pSettings->eeg_sphere_rad);
+            mne::Log::info("{} the electrode locations to scalp", m_pSettings->scale_eeg_pos ? "Scale" : "Do not scale");
 
             m_eegModel->scale_pos = m_pSettings->scale_eeg_pos;
             m_eegModel->r0 = m_pSettings->r0;
         }
     }
-    BASELIB::Log::info("{} field computations", m_pSettings->accurate ? "Accurate" : "Standard");
-    BASELIB::Log::info("Do computations in {} coordinates.", std::string(FiffCoordTrans::frame_name(m_pSettings->coord_frame)));
-    BASELIB::Log::info("{} source orientations", m_pSettings->fixed_ori ? "Fixed" : "Free");
+    mne::Log::info("{} field computations", m_pSettings->accurate ? "Accurate" : "Standard");
+    mne::Log::info("Do computations in {} coordinates.", std::string(FiffCoordTrans::frame_name(m_pSettings->coord_frame)));
+    mne::Log::info("{} source orientations", m_pSettings->fixed_ori ? "Fixed" : "Free");
     if (m_pSettings->compute_grad) {
-        BASELIB::Log::info("Compute derivatives with respect to source location coordinates");
+        mne::Log::info("Compute derivatives with respect to source location coordinates");
     }
-    BASELIB::Log::info("Destination for the solution : {}", m_pSettings->solname);
+    mne::Log::info("Destination for the solution : {}", m_pSettings->solname);
     if (m_pSettings->do_all) {
-        BASELIB::Log::info("Calculate solution for all source locations.");
+        mne::Log::info("Calculate solution for all source locations.");
     }
     if (m_pSettings->nlabel > 0) {
-        BASELIB::Log::info("Source space will be restricted to sources in {} labels", m_pSettings->nlabel);
+        mne::Log::info("Source space will be restricted to sources in {} labels", m_pSettings->nlabel);
     }
 
     // Read the source locations
-    BASELIB::Log::info("Reading {}...", m_pSettings->srcname);
-    if (MNESourceSpace::read_source_spaces(BASELIB::pathFromUtf8(m_pSettings->srcname), m_spaces) != OK) {
+    mne::Log::info("Reading {}...", m_pSettings->srcname);
+    if (MNESourceSpace::read_source_spaces(mne::pathFromUtf8(m_pSettings->srcname), m_spaces) != OK) {
         return;
     }
     for (k = 0, m_iNSource = 0; k < static_cast<int>(m_spaces.size()); k++) {
@@ -163,32 +161,32 @@ void ComputeFwd::initFwd()
         m_iNSource += m_spaces[k]->nuse;
     }
     if (m_iNSource == 0) {
-        BASELIB::Log::critical("No sources are active in these source spaces. --all option should be used.");
+        mne::Log::critical("No sources are active in these source spaces. --all option should be used.");
         return;
     }
-    BASELIB::Log::info("Read {} source spaces a total of {} active source locations", static_cast<int>(m_spaces.size()), m_iNSource);
+    mne::Log::info("Read {} source spaces a total of {} active source locations", static_cast<int>(m_spaces.size()), m_iNSource);
     if (MNESourceSpace::restrict_sources_to_labels(m_spaces, m_pSettings->labels, m_pSettings->nlabel) == FAIL) {
         return;
     }
 
     // Read the MRI -> head coordinate transformation
     if (!m_pSettings->mriname.empty()) {
-        const auto mriHead = FiffCoordTrans::read(BASELIB::pathFromUtf8(m_pSettings->mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+        const auto mriHead = FiffCoordTrans::read(mne::pathFromUtf8(m_pSettings->mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
         if (!mriHead) {
-            BASELIB::Log::critical("{}", mriHead.error().what());
+            mne::Log::critical("{}", mriHead.error().what());
             return;
         }
         m_mri_head_t = *mriHead;
-        auto mriStream = FiffStream::open(BASELIB::pathFromUtf8(m_pSettings->mriname));
+        auto mriStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->mriname));
         m_mri_id = mriStream ? mriStream->id() : FiffId();
         if (m_mri_id.empty()) {
-            BASELIB::Log::critical("Couldn't read MRI file id (How come?)");
+            mne::Log::critical("Couldn't read MRI file id (How come?)");
             return;
         }
     } else if (!m_pSettings->transname.empty()) {
-        const auto headMri = FiffCoordTrans::read_ascii(BASELIB::pathFromUtf8(m_pSettings->transname), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+        const auto headMri = FiffCoordTrans::read_ascii(mne::pathFromUtf8(m_pSettings->transname), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
         if (!headMri) {
-            BASELIB::Log::critical("{}", headMri.error().what());
+            mne::Log::critical("{}", headMri.error().what());
             return;
         }
         m_mri_head_t = headMri->inverted();
@@ -200,15 +198,15 @@ void ComputeFwd::initFwd()
     // Read the channel information and the MEG device -> head coordinate transformation
 
     if (!m_pSettings->pFiffInfo) {
-        auto pStream = FiffStream::open(BASELIB::pathFromUtf8(m_pSettings->measname));
+        auto pStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->measname));
         if (!pStream) {
-            BASELIB::Log::critical("{}", pStream.error().what());
+            mne::Log::critical("{}", pStream.error().what());
             return;
         }
-        std::shared_ptr<FIFFLIB::FiffDirNode> DirNode;
-        FIFFLIB::FiffInfo fiffInfo;
+        std::shared_ptr<mne::FiffDirNode> DirNode;
+        mne::FiffInfo fiffInfo;
         if (!pStream->read_meas_info(pStream->dirtree(), fiffInfo, DirNode)) {
-            BASELIB::Log::critical("Could not find the channel information.");
+            mne::Log::critical("Could not find the channel information.");
             return;
         }
         m_pInfoBase = std::make_shared<FiffInfo>(fiffInfo);
@@ -216,7 +214,7 @@ void ComputeFwd::initFwd()
         m_pInfoBase = m_pSettings->pFiffInfo;
     }
     if (!m_pInfoBase) {
-        BASELIB::Log::critical("ComputeFwd::initFwd(): no FiffInfo");
+        mne::Log::critical("ComputeFwd::initFwd(): no FiffInfo");
         return;
     }
     m_pInfoBase->mne_read_meg_comp_eeg_ch_info(m_listMegChs,
@@ -231,23 +229,23 @@ void ComputeFwd::initFwd()
         m_meg_head_t = m_pSettings->meg_head_t;
     }
     if (m_meg_head_t.empty()) {
-        BASELIB::Log::critical("MEG -> head coordinate transformation not found.");
+        mne::Log::critical("MEG -> head coordinate transformation not found.");
         return;
     }
 
     m_iNChan = iNMeg + iNEeg;
 
     if (iNMeg > 0) {
-        BASELIB::Log::info("Read {:3} MEG channels from {}", iNMeg, m_pSettings->measname);
+        mne::Log::info("Read {:3} MEG channels from {}", iNMeg, m_pSettings->measname);
     }
     if (iNComp > 0) {
-        BASELIB::Log::info("Read {:3} MEG compensation channels from {}", iNComp, m_pSettings->measname);
+        mne::Log::info("Read {:3} MEG compensation channels from {}", iNComp, m_pSettings->measname);
     }
     if (iNEeg > 0) {
-        BASELIB::Log::info("Read {:3} EEG channels from {}", iNEeg, m_pSettings->measname);
+        mne::Log::info("Read {:3} EEG channels from {}", iNEeg, m_pSettings->measname);
     }
     if (!m_pSettings->include_meg) {
-        BASELIB::Log::info("MEG not requested. MEG channels omitted.");
+        mne::Log::info("MEG not requested. MEG channels omitted.");
         m_listMegChs.clear();
         m_listCompChs.clear();
         iNMeg = 0;
@@ -255,7 +253,7 @@ void ComputeFwd::initFwd()
     } else
         m_meg_head_t.print();
     if (!m_pSettings->include_eeg) {
-        BASELIB::Log::info("EEG not requested. EEG channels omitted.");
+        mne::Log::info("EEG not requested. EEG channels omitted.");
         m_listEegChs.clear();
         iNEeg = 0;
     } else {
@@ -267,7 +265,7 @@ void ComputeFwd::initFwd()
     // Create coil descriptions with transformation to head or MRI frame
 
     if (m_pSettings->include_meg) {
-        m_qPath = BASELIB::resource_path("general/coilDefinitions/coil_def.dat");
+        m_qPath = mne::resource_path("general/coilDefinitions/coil_def.dat");
 
         m_templates = FwdCoilSet::read_coil_defs(m_qPath);
         if (!m_templates) {
@@ -276,12 +274,12 @@ void ComputeFwd::initFwd()
 
         // Compensation data
 
-        m_compData = MNECTFCompDataSet::read(BASELIB::pathFromUtf8(m_pSettings->measname));
+        m_compData = MNECTFCompDataSet::read(mne::pathFromUtf8(m_pSettings->measname));
         if (!m_compData) {
             return;
         }
         if (m_compData->ncomp > 0) {
-            BASELIB::Log::info("{} compensation data sets in {}", m_compData->ncomp, m_pSettings->measname);
+            mne::Log::info("{} compensation data sets in {}", m_compData->ncomp, m_pSettings->measname);
         } else {
             m_listCompChs.clear();
             iNComp = 0;
@@ -318,7 +316,7 @@ void ComputeFwd::initFwd()
             return;
         }
 
-        BASELIB::Log::info("MRI coordinate coil definitions created.");
+        mne::Log::info("MRI coordinate coil definitions created.");
     } else {
         m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                    iNMeg,
@@ -341,7 +339,7 @@ void ComputeFwd::initFwd()
         if (!m_eegels) {
             return;
         }
-        BASELIB::Log::info("Head coordinate coil definitions created.");
+        mne::Log::info("Head coordinate coil definitions created.");
     }
 
     // Transform the source spaces into the appropriate coordinates
@@ -350,43 +348,43 @@ void ComputeFwd::initFwd()
             return;
         }
     }
-    BASELIB::Log::info("Source spaces are now in {} coordinates.", std::string(FiffCoordTrans::frame_name(m_pSettings->coord_frame)));
+    mne::Log::info("Source spaces are now in {} coordinates.", std::string(FiffCoordTrans::frame_name(m_pSettings->coord_frame)));
 
     // Prepare the BEM model if necessary
 
     if (!m_pSettings->bemname.empty()) {
-        m_pSettings->bemname = BASELIB::utf8FromPath(FwdBemModel::fwd_bem_make_bem_sol_name(BASELIB::pathFromUtf8(m_pSettings->bemname)));
+        m_pSettings->bemname = mne::utf8FromPath(FwdBemModel::fwd_bem_make_bem_sol_name(mne::pathFromUtf8(m_pSettings->bemname)));
 
-        BASELIB::Log::info("Setting up the BEM model using {}...", m_pSettings->bemname);
-        BASELIB::Log::info("Loading surfaces...");
+        mne::Log::info("Setting up the BEM model using {}...", m_pSettings->bemname);
+        mne::Log::info("Loading surfaces...");
         m_bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(m_pSettings->bemname);
 
         if (m_bemModel) {
-            BASELIB::Log::info("Three-layer model surfaces loaded.");
+            mne::Log::info("Three-layer model surfaces loaded.");
         } else {
             m_bemModel = FwdBemModel::fwd_bem_load_homog_surface(m_pSettings->bemname);
             if (!m_bemModel) {
                 return;
             }
-            BASELIB::Log::info("Homogeneous model surface loaded.");
+            mne::Log::info("Homogeneous model surface loaded.");
         }
         if (iNEeg > 0 && m_bemModel->nsurf == 1) {
-            BASELIB::Log::critical("Cannot use a homogeneous model in EEG calculations.");
+            mne::Log::critical("Cannot use a homogeneous model in EEG calculations.");
             return;
         }
-        BASELIB::Log::info("Loading the solution matrix...");
+        mne::Log::info("Loading the solution matrix...");
         if (m_bemModel->fwd_bem_load_recompute_solution(m_pSettings->bemname.c_str(), FWD_BEM_UNKNOWN, false) == FAIL) {
             return;
         }
         if (m_pSettings->coord_frame == FIFFV_COORD_HEAD) {
-            BASELIB::Log::info("Employing the head->MRI coordinate transform with the BEM model.");
+            mne::Log::info("Employing the head->MRI coordinate transform with the BEM model.");
             if (m_bemModel->fwd_bem_set_head_mri_t(m_mri_head_t) == FAIL) {
                 return;
             }
         }
-        BASELIB::Log::info("BEM model {} is now set up", m_bemModel->sol_name);
+        mne::Log::info("BEM model {} is now set up", m_bemModel->sol_name);
     } else {
-        BASELIB::Log::info("Using the sphere model.");
+        mne::Log::info("Using the sphere model.");
         m_bemModel = std::make_unique<FwdBemModel>(); // no surfaces selects the sphere branch
     }
 
@@ -394,15 +392,15 @@ void ComputeFwd::initFwd()
 
     if (m_pSettings->filter_spaces) {
         if (!m_pSettings->mindistoutname.empty()) {
-            filteredFile.open(BASELIB::pathFromUtf8(m_pSettings->mindistoutname));
+            filteredFile.open(mne::pathFromUtf8(m_pSettings->mindistoutname));
             if (!filteredFile) {
-                BASELIB::Log::critical("{}", m_pSettings->mindistoutname);
+                mne::Log::critical("{}", m_pSettings->mindistoutname);
                 return;
             }
-            BASELIB::Log::info("Omitted source space points will be output to : {}", m_pSettings->mindistoutname);
+            mne::Log::info("Omitted source space points will be output to : {}", m_pSettings->mindistoutname);
         }
         MNESourceSpace::filter_source_spaces(m_pSettings->mindist,
-                                             BASELIB::pathFromUtf8(m_pSettings->bemname),
+                                             mne::pathFromUtf8(m_pSettings->bemname),
                                              m_mri_head_t,
                                              m_spaces,
                                              filteredFile.is_open() ? &filteredFile : nullptr, m_pSettings->use_threads);
@@ -477,7 +475,7 @@ void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
 
     // Bad channels
     if (!m_pSettings->measname.empty()) {
-        if (auto badStream = FiffStream::open(BASELIB::pathFromUtf8(m_pSettings->measname)))
+        if (auto badStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->measname)))
             fwd.info.bads = badStream->read_bad_channels(badStream->dirtree());
     }
 }
@@ -487,7 +485,7 @@ void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
 std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
 {
     if (!m_bInitialized) {
-        BASELIB::Log::critical("ComputeFwd::calculateFwd - the forward computation could not be set up.");
+        mne::Log::critical("ComputeFwd::calculateFwd - the forward computation could not be set up.");
         return nullptr;
     }
     auto fwdSolution = std::make_unique<MNEForwardSolution>();
@@ -543,7 +541,7 @@ std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
     // Assemble combined sol
     if (iNMeg > 0 && iNEeg > 0) {
         if (m_meg_forward.data.cols() != m_eeg_forward.data.cols()) {
-            BASELIB::Log::warning("The MEG and EEG forward solutions do not match");
+            mne::Log::warning("The MEG and EEG forward solutions do not match");
             return nullptr;
         }
         fwdSolution->sol.clear();
@@ -564,7 +562,7 @@ std::unique_ptr<MNEForwardSolution> ComputeFwd::calculateFwd()
     if (m_pSettings->compute_grad) {
         if (iNMeg > 0 && iNEeg > 0) {
             if (m_meg_forward_grad.data.cols() != m_eeg_forward_grad.data.cols()) {
-                BASELIB::Log::warning("The MEG and EEG forward solutions do not match");
+                mne::Log::warning("The MEG and EEG forward solutions do not match");
                 return nullptr;
             }
             fwdSolution->sol_grad.clear();

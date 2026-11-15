@@ -33,7 +33,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {

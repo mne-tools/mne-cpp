@@ -220,13 +220,13 @@ void TestMneBrowseApp::recomputesEvokedLikePython()
     const Expected expected[2] = {{5.0567231986985656e-14, -6.734846534962558e-08, -4.282182180774749e-09},
                                   {-6.863652119640187e-14, 3.3627187038465186e-08, -2.481697357232196e-11}};
     for (int row = 0; row < 2; ++row) {
-        const FIFFLIB::FiffEvoked* evoked = model->getEvoked(row);
+        const mne::FiffEvoked* evoked = model->getEvoked(row);
         QVERIFY(evoked);
         QCOMPARE(evoked->nave, 6);
         QCOMPARE(evoked->data.cols(), Eigen::Index(121));
         QVERIFY(std::abs(evoked->times(0) + 0.09989760657919393) < 1e-6);
-        const int meg = static_cast<int>(BASELIB::indexOf(evoked->info.ch_names, "MEG 1332"));
-        const int eeg = static_cast<int>(BASELIB::indexOf(evoked->info.ch_names, "EEG 021"));
+        const int meg = static_cast<int>(mne::indexOf(evoked->info.ch_names, "MEG 1332"));
+        const int eeg = static_cast<int>(mne::indexOf(evoked->info.ch_names, "EEG 021"));
         QVERIFY(meg >= 0 && eeg >= 0);
         QVERIFY2(std::abs(evoked->data.row(meg).sum() - expected[row].megSum) < 1e-5 * std::abs(expected[row].megSum),
                  qPrintable(QString::number(evoked->data.row(meg).sum(), 'g', 17)));
@@ -245,7 +245,7 @@ void TestMneBrowseApp::recomputesEvokedLikePython()
         static_cast<QDialog*>(dialog)->accept();
     });
     findAction(window, QStringLiteral("Save Evoked (fif)..."))->trigger();
-    const FIFFLIB::FiffEvokedSet saved(avePath.toStdU16String());
+    const mne::FiffEvokedSet saved(avePath.toStdU16String());
     QCOMPARE(saved.evoked.size(), 2);
     for (int row = 0; row < 2; ++row) {
         QCOMPARE(saved.evoked[row].nave, 6);
@@ -337,11 +337,11 @@ void TestMneBrowseApp::computesAndSavesCovarianceLikePython()
 
     // Reference values produced by mne.compute_covariance(mne.Epochs(raw, find_events(raw, "STI 014"), all codes,
     // -0.2, 0.0, baseline=None, proj=False), keep_sample_mean=False, method="empirical", rank="full") (mne 1.11.0)
-    const FIFFLIB::FiffCov cov(covPath.toStdString());
+    const mne::FiffCov cov(covPath.toStdString());
     QVERIFY(!cov.empty());
     QCOMPARE(cov.nfree, 1524);
-    const int meg = static_cast<int>(BASELIB::indexOf(cov.names, "MEG 1332"));
-    const int eeg = static_cast<int>(BASELIB::indexOf(cov.names, "EEG 021"));
+    const int meg = static_cast<int>(mne::indexOf(cov.names, "MEG 1332"));
+    const int eeg = static_cast<int>(mne::indexOf(cov.names, "EEG 021"));
     QVERIFY(meg >= 0 && eeg >= 0);
     const double expected[3] = {4.770659745331084e-30, 3.182089184120055e-17, 1.7621560460231146e-24};
     const double got[3] = {cov.data(meg, meg), cov.data(eeg, eeg), cov.data(meg, eeg)};
@@ -465,15 +465,15 @@ void TestMneBrowseApp::writesRawCopyButNotOverItsSource()
     window->hide();
     QCoreApplication::processEvents();
 
-    FIFFLIB::FiffRawData source(sourcePath.toStdString());
+    mne::FiffRawData source(sourcePath.toStdString());
     Eigen::MatrixXd sourceData, times;
     QVERIFY(source.read_raw_segment(sourceData, times));
-    const int meg = static_cast<int>(BASELIB::indexOf(source.info.ch_names, "MEG 1332"));
-    const int eeg = static_cast<int>(BASELIB::indexOf(source.info.ch_names, "EEG 021"));
-    const int eog = static_cast<int>(BASELIB::indexOf(source.info.ch_names, "EOG 061"));
+    const int meg = static_cast<int>(mne::indexOf(source.info.ch_names, "MEG 1332"));
+    const int eeg = static_cast<int>(mne::indexOf(source.info.ch_names, "EEG 021"));
+    const int eog = static_cast<int>(mne::indexOf(source.info.ch_names, "EOG 061"));
     QVERIFY(meg >= 0 && eeg >= 0 && eog >= 0);
     for (const QString& path : {copyPath, filteredPath}) {
-        FIFFLIB::FiffRawData written(path.toStdString());
+        mne::FiffRawData written(path.toStdString());
         QCOMPARE(written.info.nchan, source.info.nchan);
         QCOMPARE(written.first_samp, source.first_samp);
         QCOMPARE(written.last_samp, source.last_samp);
@@ -525,9 +525,9 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     // Reference values produced by t = raw.times[[600, 900]]; raw.set_annotations(mne.Annotations([t[0]],
     // [t[1] - t[0]], ["BAD_drag"])) (mne 1.11.0): onsets count from orig_time = meas_date
     QFile annotFile(annotPath);
-    FIFFLIB::FiffStream stream(annotPath.toStdU16String());
+    mne::FiffStream stream(annotPath.toStdU16String());
     QVERIFY(stream.open());
-    const std::vector<std::shared_ptr<FIFFLIB::FiffDirNode>> blocks = stream.dirtree()->dir_tree_find(3810);
+    const std::vector<std::shared_ptr<mne::FiffDirNode>> blocks = stream.dirtree()->dir_tree_find(3810);
     QCOMPARE(blocks.size(), 1);
     QMap<int, QVector<float>> times;
     for (const auto& entry : blocks.front()->dir) {
@@ -570,9 +570,9 @@ void TestMneBrowseApp::exportsSourceEstimatesLikePython()
     QTemporaryDir dir;
     const QString invPath = dir.filePath("sample-inv.fif");
     {
-        const MNELIB::MNEForwardSolution fwd(fwdPath.toStdU16String());
-        MNELIB::MNEInverseOperator inv = MNELIB::MNEInverseOperator::make_inverse_operator(
-            FIFFLIB::FiffRawData(rawPath.toStdString()).info, fwd, FIFFLIB::FiffCov(covPath.toStdString()), 0.2f, 0.8f);
+        const mne::MNEForwardSolution fwd(fwdPath.toStdU16String());
+        mne::MNEInverseOperator inv = mne::MNEInverseOperator::make_inverse_operator(
+            mne::FiffRawData(rawPath.toStdString()).info, fwd, mne::FiffCov(covPath.toStdString()), 0.2f, 0.8f);
         QVERIFY(inv.write(invPath.toStdU16String()));
     }
 
@@ -620,8 +620,8 @@ void TestMneBrowseApp::exportsSourceEstimatesLikePython()
     QCoreApplication::processEvents();
     QVERIFY2(result.startsWith("Exported 8 source-estimate file(s)"), qPrintable(result));
 
-    const INVLIB::InvSourceEstimate lh(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-lh.stc").toStdU16String());
-    const INVLIB::InvSourceEstimate rh(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-rh.stc").toStdU16String());
+    const mne::InvSourceEstimate lh(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-lh.stc").toStdU16String());
+    const mne::InvSourceEstimate rh(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-rh.stc").toStdU16String());
     // Reference values produced by mne.minimum_norm.apply_inverse(evoked["Left Auditory"], inv, 1 / 9, "dSPM")
     // with the inverse above (mne 1.11.0, channel names without spaces like the forward's)
     QCOMPARE(lh.data.rows(), Eigen::Index(3956));
@@ -782,7 +782,7 @@ void TestMneBrowseApp::savesAndOpensProjects()
         window->show();
         return window;
     };
-    const int nchan = FIFFLIB::FiffRawData(rawPath.toStdString()).info.nchan;
+    const int nchan = mne::FiffRawData(rawPath.toStdString()).info.nchan;
 
     // A binary project embeds the recording
     auto* first = openWindow();
@@ -791,22 +791,22 @@ void TestMneBrowseApp::savesAndOpensProjects()
     const QString mnxPath = dir.filePath("study.mnx");
     chooseFile(mnxPath);
     findAction(first, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
-    const MNALIB::MnaProject mnx = MNALIB::MnaIO::read(mnxPath);
+    const mne::MnaProject mnx = mne::MnaIO::read(mnxPath);
     QCOMPARE(mnx.subjects.size(), 1);
-    const MNALIB::MnaFileRef rawRef = mnx.subjects[0].sessions[0].recordings[0].files.first();
-    QCOMPARE(rawRef.role, MNALIB::MnaFileRole::Raw);
+    const mne::MnaFileRef rawRef = mnx.subjects[0].sessions[0].recordings[0].files.first();
+    QCOMPARE(rawRef.role, mne::MnaFileRole::Raw);
     QVERIFY(rawRef.embedded);
     QCOMPARE(rawRef.data.size(), QFileInfo(rawPath).size());
     // The events detected on load travel with it, like mne.find_events(raw, "STI 014") (mne 1.11.0)
     QByteArray eventData;
-    for (const MNALIB::MnaFileRef& ref : mnx.subjects[0].sessions[0].recordings[0].files) {
-        if (ref.role == MNALIB::MnaFileRole::Event)
+    for (const mne::MnaFileRef& ref : mnx.subjects[0].sessions[0].recordings[0].files) {
+        if (ref.role == mne::MnaFileRole::Event)
             eventData = ref.data;
     }
     QFile eventFile(dir.filePath("embedded-eve.fif"));
     QVERIFY(eventFile.open(QIODevice::WriteOnly) && eventFile.write(eventData) == eventData.size());
     eventFile.close();
-    const FIFFLIB::FiffEvents events = FIFFLIB::FiffEvents::read_fif(eventFile.fileName().toStdString()).value();
+    const mne::FiffEvents events = mne::FiffEvents::read_fif(eventFile.fileName().toStdString()).value();
     QCOMPARE(events.num_events(), 25);
     QCOMPARE(events.events.row(0), Eigen::RowVector3i(13988, 0, 2));
     first->hide();
@@ -824,8 +824,8 @@ void TestMneBrowseApp::savesAndOpensProjects()
     chooseFile(mnaPath);
     findAction(second, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
     second->hide();
-    const MNALIB::MnaProject mna = MNALIB::MnaIO::read(mnaPath);
-    const MNALIB::MnaFileRef mnaRaw = mna.subjects[0].sessions[0].recordings[0].files.first();
+    const mne::MnaProject mna = mne::MnaIO::read(mnaPath);
+    const mne::MnaFileRef mnaRaw = mna.subjects[0].sessions[0].recordings[0].files.first();
     QVERIFY(!mnaRaw.embedded);
     const QString referenced = QDir(dir.path()).absoluteFilePath(mnaRaw.path);
     QVERIFY2(QFileInfo(referenced).absolutePath() == QFileInfo(mnaPath).absolutePath(), qPrintable(mnaRaw.path));

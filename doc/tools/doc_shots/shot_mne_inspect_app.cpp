@@ -58,20 +58,24 @@
 #include <QString>
 #include <QVector3D>
 
-using DISP3DLIB::PickKind;
-using DISP3DLIB::PickResult;
+using mne::disp::PickKind;
+using mne::disp::PickResult;
 
 namespace DOCSHOTS
 {
 
-namespace {
+namespace
+{
 
 QDockWidget* dockByName(MainWindow& mw, const QString& name)
 {
     const QString lower = name.toLower();
-    if (lower == QLatin1String("pick"))    return mw.pickDock();
-    if (lower == QLatin1String("layers"))  return mw.layersDock();
-    if (lower == QLatin1String("overlay")) return mw.overlayDock();
+    if (lower == QLatin1String("pick"))
+        return mw.pickDock();
+    if (lower == QLatin1String("layers"))
+        return mw.layersDock();
+    if (lower == QLatin1String("overlay"))
+        return mw.overlayDock();
     return nullptr;
 }
 
@@ -85,30 +89,30 @@ void injectPick(MainWindow& mw, const QJsonObject& spec)
         const QJsonArray target = spec.value(QStringLiteral("target")).toArray();
         if (target.size() >= 2) {
             pick.sourceId = QStringLiteral("seeg_%1").arg(target.at(0).toString());
-            pick.label    = target.at(1).toString();
+            pick.label = target.at(1).toString();
         } else if (target.size() == 1) {
-            pick.label    = target.at(0).toString();
+            pick.label = target.at(0).toString();
         }
         pick.world = QVector3D(0.0f, 0.01f, 0.02f);
     } else if (kindStr == QLatin1String("voxel")) {
-        pick.kind  = PickKind::MriVoxel;
+        pick.kind = PickKind::MriVoxel;
         pick.label = QStringLiteral("voxel(16,16,16)");
         pick.voxel = QVector3D(16, 16, 16);
         pick.world = QVector3D(0.0f, 0.0f, 0.0f);
         pick.sliceOrientation = 0;
     } else if (kindStr == QLatin1String("vertex")) {
-        pick.kind        = PickKind::CorticalVertex;
-        pick.hemisphere  = 0;
-        pick.label       = QStringLiteral("LH vertex 0");
-        pick.objectId    = 0;
+        pick.kind = PickKind::CorticalVertex;
+        pick.hemisphere = 0;
+        pick.label = QStringLiteral("LH vertex 0");
+        pick.objectId = 0;
     } else {
-        return;  // unknown pick kind — silently ignored
+        return; // unknown pick kind — silently ignored
     }
 
     mw.scene().reportPick(pick);
 }
 
-}  // namespace
+} // namespace
 
 bool renderMneInspectApp(const ShotSpec& spec,
                          const QString& outPath,
@@ -172,4 +176,4 @@ bool renderMneInspectApp(const ShotSpec& spec,
     return captureWindow(mw, spec.size, outPath, err);
 }
 
-}  // namespace DOCSHOTS
+} // namespace DOCSHOTS

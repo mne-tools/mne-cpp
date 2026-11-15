@@ -1,13 +1,13 @@
 ---
 id: standard-montage
-title: "CHANNELSLIB::StandardMontage"
+title: "mne::StandardMontage"
 sidebar_label: StandardMontage
 sidebar_position: 1
 ---
 
 # StandardMontage
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/standard_montage.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/standard_montage.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/standard_montage.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/standard_montage.h)
 
 :::info[Python equivalent]
 `mne.channels.make_standard_montage` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 1
 `#include <channels/standard_montage.h>`
 
 ```cpp
-class CHANNELSLIB::StandardMontage
+class mne::StandardMontage
 ```
 
 Standard EEG montage with named electrode positions.
@@ -56,7 +56,7 @@ The electrode names of a montage system.
 
 **Returns:**
 
-- *BASELIB::StringList* — The electrode names, in montage order.
+- *mne::StringList* — The electrode names, in montage order.
 
 ---
 
@@ -102,7 +102,7 @@ The number of electrodes of a montage system.
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 85"
+````cpp title="src/examples/ex_channels/main.cpp, line 84"
 const std::vector<ElectrodePosition> montage1020 = StandardMontage::montage(StandardMontage::System::Standard_1020);
 const std::optional<Vector3d> cz = StandardMontage::find_electrode("Cz"); // mne's standard_1005 positions, metres, MNI frame
 ok &= expect(montage1020.size() == StandardMontage::electrode_count(StandardMontage::System::Standard_1020) && cz && (*cz - Vector3d(0.0004009, -0.009167, 0.100244)).norm() < 1e-12,

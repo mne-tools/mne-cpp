@@ -39,10 +39,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE IEEGLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace IEEGLIB
+namespace mne
 {
 
 class IeegImplantation;
@@ -95,6 +95,6 @@ public:
     static Eigen::SparseMatrix<double> bipolarMatrix(const std::vector<IeegBipolarPair>& pairs, int contactCount);
 };
 
-} // namespace IEEGLIB
+} // namespace mne
 
 #endif // IEEG_REFERENCE_H

@@ -13,7 +13,7 @@
  * @date     July 2018
  * @brief    Interactive 2-D sensor-layout picker for building and saving channel groups.
  *
- * ChannelSelectionView shows a @ref DISPLIB::SelectionScene of the active sensor
+ * ChannelSelectionView shows a @ref mne::disp::SelectionScene of the active sensor
  * layout together with a list of named selection groups (loaded from
  * or saved to MNE @c .sel files). The user lassoes sensors on the
  * scene to define a group; emitted @c showSelectedChannelsOnly /
@@ -50,22 +50,22 @@ class QListWidgetItem;
 namespace Ui
 {
 class ChannelSelectionViewWidget;
-} //This must be defined outside of the DISPLIB namespace
+} //This must be defined outside of the mne_disp namespace
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class ChannelInfoModel;
@@ -167,7 +167,7 @@ public:
      *
      * @param[in] pFiffInfo  Measurement info of the new file (currently unused; the layout is reloaded).
      */
-    void newFiffFileLoaded(std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void newFiffFileLoaded(std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -429,6 +429,6 @@ signals:
      */
     void loadedLayoutMap(const QMap<QString, QPointF>& layoutMap);
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // CHANNELSELECTIONVIEW_H

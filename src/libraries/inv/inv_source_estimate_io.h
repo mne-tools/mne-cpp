@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Text-based and FIFF-based export/import for @ref INVLIB::InvSourceEstimate that complement the binary STC / W format.
+ * @brief    Text-based and FIFF-based export/import for @ref mne::InvSourceEstimate that complement the binary STC / W format.
  *
- * @ref INVLIB::InvSourceEstimateIO adds CSV and tab-separated matrix
+ * @ref mne::InvSourceEstimateIO adds CSV and tab-separated matrix
  * export (and matching CSV import) on top of the built-in STC / W binary
- * I/O of @ref INVLIB::InvSourceEstimate. CSV output is intended for downstream
+ * I/O of @ref mne::InvSourceEstimate. CSV output is intended for downstream
  * spreadsheet, Python or R analysis where consumers cannot read the
  * FreeSurfer-style STC blob, while the bare-matrix variant feeds plotting
  * tools that only need the numeric grid. The file-row layout is one time
@@ -36,10 +36,10 @@
 #include <filesystem>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -97,6 +97,6 @@ public:
                                            const std::filesystem::path& path);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_SOURCE_ESTIMATE_IO_H

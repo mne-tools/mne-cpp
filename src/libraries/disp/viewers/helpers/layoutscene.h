@@ -14,8 +14,8 @@
  *
  * LayoutScene installs gesture recognisers on the active view and
  * translates pan / pinch / swipe events into the same view-zoom /
- * view-pan operations regardless of input device. @ref DISPLIB::SelectionScene,
- * @ref DISPLIB::AverageScene and @ref DISPLIB::FilterPlotScene derive from it to
+ * view-pan operations regardless of input device. @ref mne::disp::SelectionScene,
+ * @ref mne::disp::AverageScene and @ref mne::disp::FilterPlotScene derive from it to
  * inherit the gesture-driven navigation behaviour.
  */
 
@@ -44,14 +44,14 @@ class QPinchGesture;
 class QSwipeGesture;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -190,6 +190,6 @@ protected:
     //bool                            m_bExtendedSelectionMode;       /**< Flag whether the extended selection mode.*/
     QPointF m_mousePressPosition; /**< The current mouse press location.*/
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // LAYOUTSCENE_H

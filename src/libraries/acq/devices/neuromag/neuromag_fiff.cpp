@@ -31,7 +31,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB::detail;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -225,7 +225,7 @@ std::vector<std::byte> NeuromagChannel::serialize() const
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-void ACQLIB::detail::swap_tag_bytes(int type, std::span<std::byte> data, bool from_big) noexcept
+void mne::detail::swap_tag_bytes(int type, std::span<std::byte> data, bool from_big) noexcept
 {
     const int base = type & kBaseMask;
     if ((type & kMatrix) != 0) {
@@ -275,7 +275,7 @@ void ACQLIB::detail::swap_tag_bytes(int type, std::span<std::byte> data, bool fr
 
 //=============================================================================================================
 
-void ACQLIB::detail::big_to_native(int type, std::span<std::byte> data) noexcept
+void mne::detail::big_to_native(int type, std::span<std::byte> data) noexcept
 {
     if constexpr (std::endian::native == std::endian::little) {
         swap_tag_bytes(type, data, true);
@@ -284,7 +284,7 @@ void ACQLIB::detail::big_to_native(int type, std::span<std::byte> data) noexcept
 
 //=============================================================================================================
 
-std::vector<std::byte> ACQLIB::detail::meas_info_file(std::span<const NeuromagTag> meas_info)
+std::vector<std::byte> mne::detail::meas_info_file(std::span<const NeuromagTag> meas_info)
 {
     std::vector<std::byte> file;
     append_tag(file, fiff::kFileId, fiff::kTypeId, file_id());
@@ -300,7 +300,7 @@ std::vector<std::byte> ACQLIB::detail::meas_info_file(std::span<const NeuromagTa
 
 //=============================================================================================================
 
-std::vector<NeuromagTag> ACQLIB::detail::parse_tags(std::span<const std::byte> file, bool big_endian)
+std::vector<NeuromagTag> mne::detail::parse_tags(std::span<const std::byte> file, bool big_endian)
 {
     constexpr std::size_t kHeader = 4 * sizeof(std::int32_t);
     const bool swap = big_endian != kNativeBig;
@@ -328,7 +328,7 @@ std::vector<NeuromagTag> ACQLIB::detail::parse_tags(std::span<const std::byte> f
 
 //=============================================================================================================
 
-std::vector<std::byte> ACQLIB::detail::tag_file(std::span<const NeuromagTag> tags, bool big_endian)
+std::vector<std::byte> mne::detail::tag_file(std::span<const NeuromagTag> tags, bool big_endian)
 {
     std::vector<std::byte> file;
     append_tag(file, fiff::kFileId, fiff::kTypeId, file_id(), 0, big_endian);
@@ -341,7 +341,7 @@ std::vector<std::byte> ACQLIB::detail::tag_file(std::span<const NeuromagTag> tag
 
 //=============================================================================================================
 
-std::vector<NeuromagTag> ACQLIB::detail::block_of(std::span<const NeuromagTag> tags, int block)
+std::vector<NeuromagTag> mne::detail::block_of(std::span<const NeuromagTag> tags, int block)
 {
     const auto is = [block](const NeuromagTag& tag, int edge) {
         return tag.kind == edge && tag.as_int() == block;
@@ -356,8 +356,8 @@ std::vector<NeuromagTag> ACQLIB::detail::block_of(std::span<const NeuromagTag> t
 
 //=============================================================================================================
 
-ACQLIB::AcqExpected<ACQLIB::AcqStreamInfo> ACQLIB::detail::stream_info(std::span<const NeuromagTag> meas_info, const std::string& source,
-                                                                       AcqSampleFormat format)
+mne::AcqExpected<mne::AcqStreamInfo> mne::detail::stream_info(std::span<const NeuromagTag> meas_info, const std::string& source,
+                                                              AcqSampleFormat format)
 {
     AcqStreamInfo info;
     info.name = "raw";
@@ -414,7 +414,7 @@ ACQLIB::AcqExpected<ACQLIB::AcqStreamInfo> ACQLIB::detail::stream_info(std::span
 
 //=============================================================================================================
 
-std::optional<std::size_t> ACQLIB::detail::trigger_channel(const AcqStreamInfo& info)
+std::optional<std::size_t> mne::detail::trigger_channel(const AcqStreamInfo& info)
 {
     for (const char* name : {"STI 014", "STI101"}) {
         const auto it = std::find_if(info.channels.begin(), info.channels.end(), [&](const AcqChannelInfo& c) { return c.name == name; });

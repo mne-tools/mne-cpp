@@ -11,7 +11,7 @@
 #include <cmath>
 #include <vector>
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMathKMeans : public QObject

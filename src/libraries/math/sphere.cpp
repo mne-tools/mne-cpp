@@ -18,7 +18,7 @@
  * The Nelder–Mead path builds a 4-vertex simplex in @c (cx, cy, cz, r)
  * space, hands the geometric residual
  * @f$\sum_i (\|\mathbf{p}_i - \mathbf{c}\| - r)^2@f$ to
- * @ref MATHLIB::SimplexAlgorithm::simplex_minimize and returns the
+ * @ref mne::SimplexAlgorithm::simplex_minimize and returns the
  * refined sphere. It is more robust than the algebraic fit on noisy
  * digitiser data because it minimises the geometric (not algebraic)
  * residual, at the cost of a few hundred function evaluations.
@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -129,7 +129,7 @@ bool Sphere::fit_sphere_to_points(float** rr, int np, float simplex_size, float*
     r0_eigen(1) = r0[1];
     r0_eigen(2) = r0[2];
 
-    bool state = MATHLIB::Sphere::fit_sphere_to_points(rr_eigen, simplex_size, r0_eigen, *R);
+    bool state = mne::Sphere::fit_sphere_to_points(rr_eigen, simplex_size, r0_eigen, *R);
 
     r0[0] = r0_eigen(0);
     r0[1] = r0_eigen(1);

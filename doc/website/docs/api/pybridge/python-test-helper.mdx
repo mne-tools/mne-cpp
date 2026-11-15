@@ -1,18 +1,18 @@
 ---
 id: python-test-helper
-title: "PYBRIDGELIB::PythonTestHelper"
+title: "mne::PythonTestHelper"
 sidebar_label: PythonTestHelper
 sidebar_position: 41
 ---
 
 # PythonTestHelper
 
-**Namespace:** `PYBRIDGELIB` &nbsp;·&nbsp; **Library:** Python Bridge Library &nbsp;·&nbsp; **Source:** [`pybridge/python_test_helper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/pybridge/python_test_helper.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Python Bridge Library &nbsp;·&nbsp; **Source:** [`pybridge/python_test_helper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/pybridge/python_test_helper.h)
 
 `#include <pybridge/python_test_helper.h>`
 
 ```cpp
-class PYBRIDGELIB::PythonTestHelper
+class mne::PythonTestHelper
 ```
 
 Test-frame convenience class for cross-validating MNE-CPP outputs against MNE-Python reference implementations.
@@ -152,7 +152,7 @@ with `numpy.savetxt`) and reads it back. Preferred over `eval_matrix` for large 
   Python source that writes `file`.
 
 - **file** : *const std::filesystem::path &*
-  File the code writes; read with `MATHLIB::read_matrix`.
+  File the code writes; read with `mne::read_matrix`.
 
 - **timeout** : *std::chrono::milliseconds*
   Wall-clock limit.
@@ -172,7 +172,7 @@ Runs a Python script.
 - **script** : *const std::filesystem::path &*
   Path of the .py file.
 
-- **args** : *const BASELIB::StringList &*
+- **args** : *const mne::StringList &*
   Arguments passed to the script.
 
 - **timeout** : *std::chrono::milliseconds*

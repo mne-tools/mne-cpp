@@ -10,11 +10,11 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     December 2012
- * @brief    Umbrella include header that exposes the full FWDLIB public surface in a single include.
+ * @brief    Umbrella include header that exposes the full mne_fwd public surface in a single include.
  *
- * Pulls in forward-solution computation (@ref FWDLIB::ComputeFwd and its settings), the BEM and
+ * Pulls in forward-solution computation (@ref mne::ComputeFwd and its settings), the BEM and
  * spherical head models, the coil definitions and field mapping, together with
- * @ref MNELIB::MNEForwardSolution, the solution they produce and read back from -fwd.fif files.
+ * @ref mne::MNEForwardSolution, the solution they produce and read back from -fwd.fif files.
  */
 
 #ifndef FWD_H

@@ -1,13 +1,13 @@
 ---
 id: iir-stream-filter
-title: "DSPLIB::IirStreamFilter"
+title: "mne::IirStreamFilter"
 sidebar_label: IirStreamFilter
 sidebar_position: 66
 ---
 
 # IirStreamFilter
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/iirfilter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/iirfilter.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/iirfilter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/iirfilter.h)
 
 :::info[Python equivalent]
 [`scipy.signal.sosfilt with zi`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.sosfilt.html) in MNE-Python.
@@ -16,12 +16,12 @@ sidebar_position: 66
 `#include <dsp/iirfilter.h>`
 
 ```cpp
-class DSPLIB::IirStreamFilter
+class mne::IirStreamFilter
 ```
 
 Causal second-order-section filter that keeps its state between blocks.
 
-For filtering acquired data block by block (e.g. decoded from an `ACQLIB` view): the output over any split into blocks is bit-identical to `IirFilter::applySos()` over the whole recording, so online and offline results agree exactly. One state per channel and section, allocated once.
+For filtering acquired data block by block (e.g. decoded from an mne_acq view): the output over any split into blocks is bit-identical to `IirFilter::applySos()` over the whole recording, so online and offline results agree exactly. One state per channel and section, allocated once.
 
 ```cpp title="src/examples/ex_dsp_spectral/main.cpp"
 // Online: the same low-pass, causal, applied to blocks as they arrive (e.g. from an acquisition stream).

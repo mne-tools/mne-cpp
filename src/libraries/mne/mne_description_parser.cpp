@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Implementation of @ref MNELIB::MNEDescriptionParser.
+ * @brief    Implementation of @ref mne::MNEDescriptionParser.
  *
  * Implements the tokeniser, the @c { ... } stanza state machine and the
  * per-keyword field assignment used to populate one
- * @c FIFFLIB::AverageDescription or @c MNELIB::CovDescription per stanza.
+ * @c mne::AverageDescription or @c mne::CovDescription per stanza.
  */
 
 //=============================================================================================================
@@ -35,7 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -92,12 +92,12 @@ bool MNEDescriptionParser::get_int(std::istream& in, int& val)
 {
     const std::string word = next_word(in);
     if (word.empty()) {
-        BASELIB::Log::warning("MNEDescriptionParser: expected integer, got EOF");
+        mne::Log::warning("MNEDescriptionParser: expected integer, got EOF");
         return false;
     }
-    const std::optional<int> parsed = BASELIB::toInt(word);
+    const std::optional<int> parsed = mne::toInt(word);
     if (!parsed) {
-        BASELIB::Log::warning("MNEDescriptionParser: bad integer: {}", word);
+        mne::Log::warning("MNEDescriptionParser: bad integer: {}", word);
         return false;
     }
     val = *parsed;
@@ -110,12 +110,12 @@ bool MNEDescriptionParser::get_float(std::istream& in, float& val)
 {
     const std::string word = next_word(in);
     if (word.empty()) {
-        BASELIB::Log::warning("MNEDescriptionParser: expected float, got EOF");
+        mne::Log::warning("MNEDescriptionParser: expected float, got EOF");
         return false;
     }
-    const std::optional<double> parsed = BASELIB::toDouble(word);
+    const std::optional<double> parsed = mne::toDouble(word);
     if (!parsed) {
-        BASELIB::Log::warning("MNEDescriptionParser: bad float: {}", word);
+        mne::Log::warning("MNEDescriptionParser: bad float: {}", word);
         return false;
     }
     val = static_cast<float>(*parsed);
@@ -125,52 +125,52 @@ bool MNEDescriptionParser::get_float(std::istream& in, float& val)
 //=============================================================================================================
 
 bool MNEDescriptionParser::parse_rejection_param(std::string_view keyword, std::istream& in,
-                                                 FIFFLIB::RejectionParams& rej, bool& ok)
+                                                 mne::RejectionParams& rej, bool& ok)
 {
     ok = true;
     float fval;
 
-    if (BASELIB::equalsIgnoreCase(keyword, "gradReject")) {
+    if (mne::equalsIgnoreCase(keyword, "gradReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megGradReject = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "magReject")) {
+    } else if (mne::equalsIgnoreCase(keyword, "magReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megMagReject = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "eegReject")) {
+    } else if (mne::equalsIgnoreCase(keyword, "eegReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eegReject = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "eogReject")) {
+    } else if (mne::equalsIgnoreCase(keyword, "eogReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eogReject = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "ecgReject")) {
+    } else if (mne::equalsIgnoreCase(keyword, "ecgReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.ecgReject = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "gradFlat")) {
+    } else if (mne::equalsIgnoreCase(keyword, "gradFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megGradFlat = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "magFlat")) {
+    } else if (mne::equalsIgnoreCase(keyword, "magFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megMagFlat = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "eegFlat")) {
+    } else if (mne::equalsIgnoreCase(keyword, "eegFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eegFlat = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "eogFlat")) {
+    } else if (mne::equalsIgnoreCase(keyword, "eogFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eogFlat = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "ecgFlat")) {
+    } else if (mne::equalsIgnoreCase(keyword, "ecgFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.ecgFlat = fval;
-    } else if (BASELIB::equalsIgnoreCase(keyword, "stimIgnore")) {
+    } else if (mne::equalsIgnoreCase(keyword, "stimIgnore")) {
         ok = get_float(in, fval);
         if (ok)
             rej.stimIgnore = std::fabs(fval);
@@ -184,14 +184,14 @@ bool MNEDescriptionParser::parse_rejection_param(std::string_view keyword, std::
 // AVERAGE DESCRIPTION PARSER
 //=============================================================================================================
 
-std::optional<FIFFLIB::AverageDescription> MNEDescriptionParser::read_average(const std::filesystem::path& path)
+std::optional<mne::AverageDescription> MNEDescriptionParser::read_average(const std::filesystem::path& path)
 {
     std::ifstream in(path);
     if (!in) {
-        BASELIB::Log::warning("MNEDescriptionParser: cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8FromPath(path));
         return std::nullopt;
     }
-    FIFFLIB::AverageDescription desc;
+    mne::AverageDescription desc;
     if (!parse_average(in, path, desc)) {
         return std::nullopt;
     }
@@ -200,13 +200,13 @@ std::optional<FIFFLIB::AverageDescription> MNEDescriptionParser::read_average(co
 
 //=============================================================================================================
 
-bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem::path& path, FIFFLIB::AverageDescription& desc)
+bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem::path& path, mne::AverageDescription& desc)
 {
     bool expectBrace = false;
     bool bminSet = false, bmaxSet = false;
     bool inAverage = false;
     bool inCategory = false;
-    FIFFLIB::AverageCategory currentCat;
+    mne::AverageCategory currentCat;
 
     std::string word;
     while (!(word = next_word(in)).empty()) {
@@ -214,14 +214,14 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             if (word == "{") {
                 expectBrace = false;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: expected '{{', got {}", word);
+                mne::Log::warning("MNEDescriptionParser: expected '{{', got {}", word);
                 return false;
             }
             continue;
         }
 
         if (word == "{") {
-            BASELIB::Log::warning("MNEDescriptionParser: unexpected '{{'");
+            mne::Log::warning("MNEDescriptionParser: unexpected '{{'");
             return false;
         }
 
@@ -230,19 +230,19 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
                 currentCat.doBaseline = bminSet && bmaxSet;
                 // Validate category
                 if (currentCat.comment.empty()) {
-                    BASELIB::Log::warning("MNEDescriptionParser: category name missing");
+                    mne::Log::warning("MNEDescriptionParser: category name missing");
                     return false;
                 }
                 if (currentCat.tmin >= currentCat.tmax) {
-                    BASELIB::Log::warning("MNEDescriptionParser: illegal time range for {}", currentCat.comment);
+                    mne::Log::warning("MNEDescriptionParser: illegal time range for {}", currentCat.comment);
                     return false;
                 }
                 if (currentCat.events.empty()) {
-                    BASELIB::Log::warning("MNEDescriptionParser: no events for {}", currentCat.comment);
+                    mne::Log::warning("MNEDescriptionParser: no events for {}", currentCat.comment);
                     return false;
                 }
                 if (currentCat.doBaseline && currentCat.bmin > currentCat.bmax) {
-                    BASELIB::Log::warning("MNEDescriptionParser: illegal baseline for {}", currentCat.comment);
+                    mne::Log::warning("MNEDescriptionParser: illegal baseline for {}", currentCat.comment);
                     return false;
                 }
                 if (!currentCat.prevIgnore)
@@ -250,7 +250,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
                 if (!currentCat.nextIgnore)
                     currentCat.nextIgnore = currentCat.ignore;
                 desc.categories.push_back(currentCat);
-                currentCat = FIFFLIB::AverageCategory();
+                currentCat = mne::AverageCategory();
                 inCategory = false;
                 bminSet = bmaxSet = false;
             } else if (inAverage) {
@@ -263,9 +263,9 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // Top-level: "average" keyword
-        if (BASELIB::equalsIgnoreCase(word, "average")) {
+        if (mne::equalsIgnoreCase(word, "average")) {
             if (inAverage || inCategory) {
-                BASELIB::Log::warning("MNEDescriptionParser: nested average");
+                mne::Log::warning("MNEDescriptionParser: nested average");
                 return false;
             }
             inAverage = true;
@@ -274,10 +274,10 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // Category start
-        if (BASELIB::equalsIgnoreCase(word, "category") ||
-            BASELIB::equalsIgnoreCase(word, "condition")) {
+        if (mne::equalsIgnoreCase(word, "category") ||
+            mne::equalsIgnoreCase(word, "condition")) {
             if (!inAverage || inCategory) {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced category");
+                mne::Log::warning("MNEDescriptionParser: misplaced category");
                 return false;
             }
             inCategory = true;
@@ -287,10 +287,10 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "name" keyword
-        if (BASELIB::equalsIgnoreCase(word, "name")) {
+        if (mne::equalsIgnoreCase(word, "name")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: name requires a value");
+                mne::Log::warning("MNEDescriptionParser: name requires a value");
                 return false;
             }
             if (inCategory)
@@ -298,98 +298,98 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             else if (inAverage)
                 desc.comment = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced name");
+                mne::Log::warning("MNEDescriptionParser: misplaced name");
                 return false;
             }
             continue;
         }
 
         // "outfile" keyword
-        if (BASELIB::equalsIgnoreCase(word, "outfile")) {
+        if (mne::equalsIgnoreCase(word, "outfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: outfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: outfile requires a value");
                 return false;
             }
             if (inAverage && !inCategory)
                 desc.filename = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced outfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced outfile");
                 return false;
             }
             continue;
         }
 
         // "eventfile" keyword
-        if (BASELIB::equalsIgnoreCase(word, "eventfile")) {
+        if (mne::equalsIgnoreCase(word, "eventfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: eventfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: eventfile requires a value");
                 return false;
             }
             if (inAverage && !inCategory)
                 desc.eventFile = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced eventfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced eventfile");
                 return false;
             }
             continue;
         }
 
         // "logfile" keyword
-        if (BASELIB::equalsIgnoreCase(word, "logfile")) {
+        if (mne::equalsIgnoreCase(word, "logfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: logfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: logfile requires a value");
                 return false;
             }
             if (inAverage && !inCategory)
                 desc.logFile = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced logfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced logfile");
                 return false;
             }
             continue;
         }
 
         // "fixskew" keyword
-        if (BASELIB::equalsIgnoreCase(word, "fixskew")) {
+        if (mne::equalsIgnoreCase(word, "fixskew")) {
             if (inAverage && !inCategory)
                 desc.fixSkew = true;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced fixskew");
+                mne::Log::warning("MNEDescriptionParser: misplaced fixskew");
                 return false;
             }
             continue;
         }
 
         // --- Category-level keywords ---
-        if (BASELIB::equalsIgnoreCase(word, "tmin")) {
+        if (mne::equalsIgnoreCase(word, "tmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inCategory)
                 currentCat.tmin = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced tmin");
+                mne::Log::warning("MNEDescriptionParser: misplaced tmin");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "tmax")) {
+        if (mne::equalsIgnoreCase(word, "tmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inCategory)
                 currentCat.tmax = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced tmax");
+                mne::Log::warning("MNEDescriptionParser: misplaced tmax");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "basemin") ||
-            BASELIB::equalsIgnoreCase(word, "bmin")) {
+        if (mne::equalsIgnoreCase(word, "basemin") ||
+            mne::equalsIgnoreCase(word, "bmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -397,13 +397,13 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
                 currentCat.bmin = fval;
                 bminSet = true;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced basemin");
+                mne::Log::warning("MNEDescriptionParser: misplaced basemin");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "basemax") ||
-            BASELIB::equalsIgnoreCase(word, "bmax")) {
+        if (mne::equalsIgnoreCase(word, "basemax") ||
+            mne::equalsIgnoreCase(word, "bmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -411,194 +411,194 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
                 currentCat.bmax = fval;
                 bmaxSet = true;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced basemax");
+                mne::Log::warning("MNEDescriptionParser: misplaced basemax");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "event")) {
+        if (mne::equalsIgnoreCase(word, "event")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: event numbers must be positive");
+                mne::Log::warning("MNEDescriptionParser: event numbers must be positive");
                 return false;
             }
             if (inCategory)
                 currentCat.events.push_back(static_cast<unsigned int>(ival));
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced event");
+                mne::Log::warning("MNEDescriptionParser: misplaced event");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "nextevent")) {
+        if (mne::equalsIgnoreCase(word, "nextevent")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: nextevent must be positive");
+                mne::Log::warning("MNEDescriptionParser: nextevent must be positive");
                 return false;
             }
             if (inCategory)
                 currentCat.nextEvent = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced nextevent");
+                mne::Log::warning("MNEDescriptionParser: misplaced nextevent");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "prevevent")) {
+        if (mne::equalsIgnoreCase(word, "prevevent")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: prevevent must be positive");
+                mne::Log::warning("MNEDescriptionParser: prevevent must be positive");
                 return false;
             }
             if (inCategory)
                 currentCat.prevEvent = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced prevevent");
+                mne::Log::warning("MNEDescriptionParser: misplaced prevevent");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "ignore")) {
+        if (mne::equalsIgnoreCase(word, "ignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival < 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
+                mne::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
                 return false;
             }
             if (inCategory)
                 currentCat.ignore = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced ignore");
+                mne::Log::warning("MNEDescriptionParser: misplaced ignore");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "prevignore")) {
+        if (mne::equalsIgnoreCase(word, "prevignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival < 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
+                mne::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
                 return false;
             }
             if (inCategory)
                 currentCat.prevIgnore = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced prevignore");
+                mne::Log::warning("MNEDescriptionParser: misplaced prevignore");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "nextignore")) {
+        if (mne::equalsIgnoreCase(word, "nextignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival < 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
+                mne::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
                 return false;
             }
             if (inCategory)
                 currentCat.nextIgnore = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced nextignore");
+                mne::Log::warning("MNEDescriptionParser: misplaced nextignore");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "mask")) {
+        if (mne::equalsIgnoreCase(word, "mask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: mask must be positive");
+                mne::Log::warning("MNEDescriptionParser: mask must be positive");
                 return false;
             }
             if (inCategory) {
                 currentCat.ignore = static_cast<unsigned int>(ival);
                 currentCat.ignore = ~currentCat.ignore;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced mask");
+                mne::Log::warning("MNEDescriptionParser: misplaced mask");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "prevmask")) {
+        if (mne::equalsIgnoreCase(word, "prevmask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: mask numbers must be positive");
+                mne::Log::warning("MNEDescriptionParser: mask numbers must be positive");
                 return false;
             }
             if (inCategory) {
                 currentCat.prevIgnore = static_cast<unsigned int>(ival);
                 currentCat.prevIgnore = ~currentCat.prevIgnore;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced prevmask");
+                mne::Log::warning("MNEDescriptionParser: misplaced prevmask");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "nextmask")) {
+        if (mne::equalsIgnoreCase(word, "nextmask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: mask numbers must be positive");
+                mne::Log::warning("MNEDescriptionParser: mask numbers must be positive");
                 return false;
             }
             if (inCategory) {
                 currentCat.nextIgnore = static_cast<unsigned int>(ival);
                 currentCat.nextIgnore = ~currentCat.nextIgnore;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced nextmask");
+                mne::Log::warning("MNEDescriptionParser: misplaced nextmask");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "delay")) {
+        if (mne::equalsIgnoreCase(word, "delay")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inCategory)
                 currentCat.delay = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced delay");
+                mne::Log::warning("MNEDescriptionParser: misplaced delay");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "stderr")) {
+        if (mne::equalsIgnoreCase(word, "stderr")) {
             if (inCategory)
                 currentCat.doStdErr = true;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced stderr");
+                mne::Log::warning("MNEDescriptionParser: misplaced stderr");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "abs")) {
+        if (mne::equalsIgnoreCase(word, "abs")) {
             if (inCategory)
                 currentCat.doAbs = true;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced abs");
+                mne::Log::warning("MNEDescriptionParser: misplaced abs");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "color")) {
+        if (mne::equalsIgnoreCase(word, "color")) {
             float r, g, b;
             if (!get_float(in, r) || !get_float(in, g) || !get_float(in, b))
                 return false;
             if (r < 0.0f || r > 1.0f || g < 0.0f || g > 1.0f || b < 0.0f || b > 1.0f) {
-                BASELIB::Log::warning("MNEDescriptionParser: color components must be within 0 ... 1");
+                mne::Log::warning("MNEDescriptionParser: color components must be within 0 ... 1");
                 return false;
             }
             if (inCategory) {
@@ -606,7 +606,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
                 currentCat.color[1] = g;
                 currentCat.color[2] = b;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced color");
+                mne::Log::warning("MNEDescriptionParser: misplaced color");
                 return false;
             }
             continue;
@@ -616,7 +616,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         bool parseOk;
         if (parse_rejection_param(word, in, desc.rej, parseOk)) {
             if (!(inAverage && !inCategory)) {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced {}", word);
+                mne::Log::warning("MNEDescriptionParser: misplaced {}", word);
                 return false;
             }
             if (!parseOk)
@@ -624,11 +624,11 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             continue;
         }
 
-        BASELIB::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8FromPath(path));
     }
 
     if (desc.categories.empty()) {
-        BASELIB::Log::warning("MNEDescriptionParser: no categories found in {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: no categories found in {}", mne::utf8FromPath(path));
         return false;
     }
 
@@ -643,7 +643,7 @@ std::optional<CovDescription> MNEDescriptionParser::read_covariance(const std::f
 {
     std::ifstream in(path);
     if (!in) {
-        BASELIB::Log::warning("MNEDescriptionParser: cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8FromPath(path));
         return std::nullopt;
     }
     CovDescription desc;
@@ -670,14 +670,14 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             if (word == "{") {
                 expectBrace = false;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: expected '{{', got {}", word);
+                mne::Log::warning("MNEDescriptionParser: expected '{{', got {}", word);
                 return false;
             }
             continue;
         }
 
         if (word == "{") {
-            BASELIB::Log::warning("MNEDescriptionParser: unexpected '{{'");
+            mne::Log::warning("MNEDescriptionParser: unexpected '{{'");
             return false;
         }
 
@@ -685,11 +685,11 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             if (inDef) {
                 currentDef.doBaseline = bminSet && bmaxSet;
                 if (currentDef.tmin >= currentDef.tmax) {
-                    BASELIB::Log::warning("MNEDescriptionParser: illegal time range in def");
+                    mne::Log::warning("MNEDescriptionParser: illegal time range in def");
                     return false;
                 }
                 if (currentDef.doBaseline && currentDef.bmin > currentDef.bmax) {
-                    BASELIB::Log::warning("MNEDescriptionParser: illegal baseline in def");
+                    mne::Log::warning("MNEDescriptionParser: illegal baseline in def");
                     return false;
                 }
                 desc.defs.push_back(currentDef);
@@ -703,9 +703,9 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        if (BASELIB::equalsIgnoreCase(word, "cov")) {
+        if (mne::equalsIgnoreCase(word, "cov")) {
             if (inCov || inDef) {
-                BASELIB::Log::warning("MNEDescriptionParser: nested cov");
+                mne::Log::warning("MNEDescriptionParser: nested cov");
                 return false;
             }
             inCov = true;
@@ -714,9 +714,9 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        if (BASELIB::equalsIgnoreCase(word, "def")) {
+        if (mne::equalsIgnoreCase(word, "def")) {
             if (!inCov || inDef) {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced def");
+                mne::Log::warning("MNEDescriptionParser: misplaced def");
                 return false;
             }
             inDef = true;
@@ -726,94 +726,94 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
         }
 
         // Cov-level keywords
-        if (BASELIB::equalsIgnoreCase(word, "outfile")) {
+        if (mne::equalsIgnoreCase(word, "outfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: outfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: outfile requires a value");
                 return false;
             }
             if (inCov && !inDef)
                 desc.filename = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced outfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced outfile");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "eventfile")) {
+        if (mne::equalsIgnoreCase(word, "eventfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: eventfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: eventfile requires a value");
                 return false;
             }
             if (inCov && !inDef)
                 desc.eventFile = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced eventfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced eventfile");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "logfile")) {
+        if (mne::equalsIgnoreCase(word, "logfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
-                BASELIB::Log::warning("MNEDescriptionParser: logfile requires a value");
+                mne::Log::warning("MNEDescriptionParser: logfile requires a value");
                 return false;
             }
             if (inCov && !inDef)
                 desc.logFile = val;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced logfile");
+                mne::Log::warning("MNEDescriptionParser: misplaced logfile");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "keepsamplemean")) {
+        if (mne::equalsIgnoreCase(word, "keepsamplemean")) {
             if (inCov && !inDef)
                 desc.removeSampleMean = false;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced keepsamplemean");
+                mne::Log::warning("MNEDescriptionParser: misplaced keepsamplemean");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "fixskew")) {
+        if (mne::equalsIgnoreCase(word, "fixskew")) {
             if (inCov && !inDef)
                 desc.fixSkew = true;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced fixskew");
+                mne::Log::warning("MNEDescriptionParser: misplaced fixskew");
                 return false;
             }
             continue;
         }
 
         // Def-level keywords
-        if (BASELIB::equalsIgnoreCase(word, "tmin")) {
+        if (mne::equalsIgnoreCase(word, "tmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inDef)
                 currentDef.tmin = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced tmin");
+                mne::Log::warning("MNEDescriptionParser: misplaced tmin");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "tmax")) {
+        if (mne::equalsIgnoreCase(word, "tmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inDef)
                 currentDef.tmax = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced tmax");
+                mne::Log::warning("MNEDescriptionParser: misplaced tmax");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "basemin") ||
-            BASELIB::equalsIgnoreCase(word, "bmin")) {
+        if (mne::equalsIgnoreCase(word, "basemin") ||
+            mne::equalsIgnoreCase(word, "bmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -821,13 +821,13 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
                 currentDef.bmin = fval;
                 bminSet = true;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced basemin");
+                mne::Log::warning("MNEDescriptionParser: misplaced basemin");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "basemax") ||
-            BASELIB::equalsIgnoreCase(word, "bmax")) {
+        if (mne::equalsIgnoreCase(word, "basemax") ||
+            mne::equalsIgnoreCase(word, "bmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -835,68 +835,68 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
                 currentDef.bmax = fval;
                 bmaxSet = true;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced basemax");
+                mne::Log::warning("MNEDescriptionParser: misplaced basemax");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "event")) {
+        if (mne::equalsIgnoreCase(word, "event")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: event must be positive");
+                mne::Log::warning("MNEDescriptionParser: event must be positive");
                 return false;
             }
             if (inDef)
                 currentDef.events.push_back(static_cast<unsigned int>(ival));
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced event");
+                mne::Log::warning("MNEDescriptionParser: misplaced event");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "ignore")) {
+        if (mne::equalsIgnoreCase(word, "ignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival < 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
+                mne::Log::warning("MNEDescriptionParser: ignore numbers must be positive or zero");
                 return false;
             }
             if (inDef)
                 currentDef.ignore = static_cast<unsigned int>(ival);
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced ignore");
+                mne::Log::warning("MNEDescriptionParser: misplaced ignore");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "mask")) {
+        if (mne::equalsIgnoreCase(word, "mask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
             if (ival <= 0) {
-                BASELIB::Log::warning("MNEDescriptionParser: mask numbers must be positive");
+                mne::Log::warning("MNEDescriptionParser: mask numbers must be positive");
                 return false;
             }
             if (inDef) {
                 currentDef.ignore = static_cast<unsigned int>(ival);
                 currentDef.ignore = ~currentDef.ignore;
             } else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced mask");
+                mne::Log::warning("MNEDescriptionParser: misplaced mask");
                 return false;
             }
             continue;
         }
-        if (BASELIB::equalsIgnoreCase(word, "delay")) {
+        if (mne::equalsIgnoreCase(word, "delay")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
             if (inDef)
                 currentDef.delay = fval;
             else {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced delay");
+                mne::Log::warning("MNEDescriptionParser: misplaced delay");
                 return false;
             }
             continue;
@@ -906,7 +906,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
         bool parseOk;
         if (parse_rejection_param(word, in, desc.rej, parseOk)) {
             if (!(inCov && !inDef)) {
-                BASELIB::Log::warning("MNEDescriptionParser: misplaced {}", word);
+                mne::Log::warning("MNEDescriptionParser: misplaced {}", word);
                 return false;
             }
             if (!parseOk)
@@ -914,11 +914,11 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        BASELIB::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8FromPath(path));
     }
 
     if (!seenCov) {
-        BASELIB::Log::warning("MNEDescriptionParser: nothing useful read from {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: nothing useful read from {}", mne::utf8FromPath(path));
         return false;
     }
 

@@ -9,14 +9,14 @@
  * @date     April 2026
  * @brief    Gamma-MAP sparse Bayesian inverse solver — automatic-relevance-determination prior on per-source variance hyperparameters.
  *
- * @ref INVLIB::InvGammaMap implements the Gamma-MAP / sparse Bayesian
+ * @ref mne::InvGammaMap implements the Gamma-MAP / sparse Bayesian
  * learning (SBL) solver of Wipf &amp; Rao, NeuroImage 44(3), 947-966
  * (2009). The algorithm models source amplitudes as Gaussians with
  * per-source variance hyperparameters @f$\gamma_{i}@f$ and uses an
  * MacKay fixed-point update (as in @c mne.inverse_sparse.gamma_map) to re-estimate the @f$\gamma@f$
  * vector from the data; sources whose @f$\gamma_{i}@f$ collapses below
  * threshold are pruned, leaving a sparse active set. Output is an
- * @ref INVLIB::InvGammaMapResult carrying the @ref INVLIB::InvSourceEstimate, the
+ * @ref mne::InvGammaMapResult carrying the @ref mne::InvSourceEstimate, the
  * surviving active-vertex list, the final @f$\gamma@f$ vector,
  * iteration count and residual norm.
  */
@@ -45,10 +45,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -102,6 +102,6 @@ public:
         double gammaThreshold = 1e-10);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_GAMMA_MAP_H

@@ -10,16 +10,16 @@
  * @brief    Strongly typed enumerations describing the ML backend, tensor element type and inference task.
  *
  * The three @c enum @c class definitions in this header are the shared
- * vocabulary used across every MLLIB interface: @ref MLLIB::MlBackend
+ * vocabulary used across every mne_ml interface: @ref mne::MlBackend
  * selects which runtime executes a model (currently ONNX Runtime, with
  * a placeholder @c BuiltIn entry reserved for native fallbacks),
- * @ref MLLIB::MlDataType names the scalar element of @ref MLLIB::MlTensor,
- * and @ref MLLIB::MlTaskType labels what a loaded model is meant to do
+ * @ref mne::MlDataType names the scalar element of @ref mne::MlTensor,
+ * and @ref mne::MlTaskType labels what a loaded model is meant to do
  * so calling code can route the output tensor without inspecting the
  * graph (classification logits, regression scalars, embedding vectors).
  *
  * Keeping these as scoped enums avoids the usual implicit-int hazards
- * and lets the header stay dependency-free so any other MLLIB header
+ * and lets the header stay dependency-free so any other mne_ml header
  * can pull it in without dragging Eigen or ONNX along.
  */
 
@@ -27,10 +27,10 @@
 #define ML_TYPES_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -65,6 +65,6 @@ enum class MlTaskType
     FeatureExtraction
 };
 
-} // namespace MLLIB
+} // namespace mne
 
 #endif // ML_TYPES_H

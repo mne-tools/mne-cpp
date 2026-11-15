@@ -12,13 +12,13 @@
  * @date     December 2018
  * @brief    Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
  *
- * FilterDesignView is the largest settings panel in DISPLIB: it lets
+ * FilterDesignView is the largest settings panel in mne_disp: it lets
  * the user pick a filter type (low-, high-, band-pass or band-stop),
  * a design family (cosine, Hamming, Blackman …), the cutoff
  * frequencies, the transition bandwidth and the number of taps,
  * preserves the resulting @c FilterKernel in a @c QSettings path and
  * renders the magnitude (and optional group-delay / phase) response
- * in a @ref DISPLIB::FilterPlotScene that updates while the user drags the
+ * in a @ref mne::disp::FilterPlotScene that updates while the user drags the
  * spinboxes. Designed filters are emitted as @c filterChanged signals
  * consumed by the @c rtprocessing filter chain.
  */
@@ -55,14 +55,14 @@ class FilterDesignViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FilterPlotScene;
@@ -165,7 +165,7 @@ public:
      *
      * @return returns the current filter.
      */
-    DSPLIB::FilterKernel getCurrentFilter();
+    mne::FilterKernel getCurrentFilter();
 
     //=========================================================================================================
     /**
@@ -213,7 +213,7 @@ public:
      *
      * @param[in] style  New style mode (unused; the filter plot is simply redrawn).
      */
-    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
 
 protected:
     //=========================================================================================================
@@ -318,13 +318,13 @@ protected:
      *
      * @param[in] filter   filter which parameters will be used to update gui and stored filter.
      */
-    void updateGuiFromFilter(const DSPLIB::FilterKernel& filter);
+    void updateGuiFromFilter(const mne::FilterKernel& filter);
 
     std::unique_ptr<Ui::FilterDesignViewWidget> m_pUi; /**< Pointer to the qt designer generated ui class.*/
 
     QPointer<FilterPlotScene> m_pFilterPlotScene; /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 
-    DSPLIB::FilterKernel m_filterKernel; /**< The current filter operator.*/
+    mne::FilterKernel m_filterKernel; /**< The current filter operator.*/
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -338,7 +338,7 @@ signals:
      *
      * @param[in] activeFilter  The currently active filters.
      */
-    void filterChanged(const DSPLIB::FilterKernel& activeFilter);
+    void filterChanged(const mne::FilterKernel& activeFilter);
 
     //=========================================================================================================
     /**
@@ -364,6 +364,6 @@ signals:
      */
     void updateFilterTo(double dTo);
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // FILTERDESIGNVIEW_H

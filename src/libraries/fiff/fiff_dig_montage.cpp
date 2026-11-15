@@ -39,11 +39,11 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
-using BASELIB::ErrorCode;
-using BASELIB::Expected;
-using BASELIB::fail;
+using mne::ErrorCode;
+using mne::Expected;
+using mne::fail;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -82,7 +82,7 @@ std::optional<std::vector<double>> numbers(std::string_view text)
 {
     std::vector<double> values;
     for (const std::string_view word : words(text)) {
-        const std::optional<double> value = BASELIB::toDouble(word);
+        const std::optional<double> value = mne::toDouble(word);
         if (!value)
             return std::nullopt;
         values.push_back(*value);
@@ -95,7 +95,7 @@ Expected<std::string> readText(const std::filesystem::path& path)
 {
     std::ifstream file(path, std::ios::binary);
     if (!file)
-        return fail(ErrorCode::Io, "cannot read {}", BASELIB::utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot read {}", mne::utf8FromPath(path));
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
@@ -104,11 +104,11 @@ std::vector<Vector3d> readIsotrakElp(const std::string& text)
 {
     static const std::regex coordinates(R"((-?\d+\.?\d*e?-?\d*)\s+(-?\d+\.?\d*e?-?\d*)\s+(-?\d+\.?\d*e?-?\d*)\s*$)");
     std::vector<Vector3d> points;
-    for (const std::string& line : BASELIB::split(text, '\n')) {
+    for (const std::string& line : mne::split(text, '\n')) {
         std::smatch match;
         if (!std::regex_search(line, match, coordinates))
             continue;
-        const std::optional<double> x = BASELIB::toDouble(match.str(1)), y = BASELIB::toDouble(match.str(2)), z = BASELIB::toDouble(match.str(3));
+        const std::optional<double> x = mne::toDouble(match.str(1)), y = mne::toDouble(match.str(2)), z = mne::toDouble(match.str(3));
         if (x && y && z)
             points.emplace_back(*x, *y, *z);
     }
@@ -118,9 +118,9 @@ std::vector<Vector3d> readIsotrakElp(const std::string& text)
 // The same for an .hsp/.eeg file, as mne's _read_isotrak_hsp_points; empty on a malformed file.
 std::vector<Vector3d> readIsotrakHsp(const std::string& text)
 {
-    const BASELIB::StringList lines = BASELIB::split(text, '\n');
+    const mne::StringList lines = mne::split(text, '\n');
     const auto fiducials = std::ranges::find_if(lines, [](const std::string& line) {
-        return BASELIB::toLower(line).find("position of fiducials") != std::string::npos;
+        return mne::toLower(line).find("position of fiducials") != std::string::npos;
     });
     const std::size_t line = static_cast<std::size_t>(fiducials - lines.begin());
     std::vector<Vector3d> points;
@@ -165,7 +165,7 @@ struct Montage
     void addElectrode(std::string name, const Vector3d& r)
     {
         if (const auto it = std::ranges::find(chNames, name); it != chNames.end()) {
-            BASELIB::Log::warning("[FiffDigMontage] duplicate electrode {} - the last position is used", name);
+            mne::Log::warning("[FiffDigMontage] duplicate electrode {} - the last position is used", name);
             chPos[static_cast<std::size_t>(it - chNames.begin())] = r;
             return;
         }
@@ -216,7 +216,7 @@ FiffDigMontage makeDigMontage(Montage montage)
 
     std::vector<int> idents;
     for (const std::string& name : montage.chNames) {
-        const std::optional<int> ident = BASELIB::toInt(std::string_view(name).substr(name.size() - std::min<std::size_t>(name.size(), 3)));
+        const std::optional<int> ident = mne::toInt(std::string_view(name).substr(name.size() - std::min<std::size_t>(name.size(), 3)));
         if (!ident) {
             idents.clear();
             break;
@@ -235,7 +235,7 @@ Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& pat
 {
     QFile file(QString::fromStdU16String(path.u16string()));
     if (!file.open(QIODevice::ReadOnly))
-        return fail(ErrorCode::Io, "cannot read {}", BASELIB::utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot read {}", mne::utf8FromPath(path));
     QXmlStreamReader xml(&file);
     std::vector<XmlRecord> records;
     while (!xml.atEnd()) {
@@ -249,7 +249,7 @@ Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& pat
         records.push_back(std::move(record));
     }
     if (xml.hasError())
-        return fail(ErrorCode::Format, "{}: {}", BASELIB::utf8FromPath(path), xml.errorString().toStdString());
+        return fail(ErrorCode::Format, "{}: {}", mne::utf8FromPath(path), xml.errorString().toStdString());
     return records;
 }
 
@@ -265,7 +265,7 @@ std::optional<Vector3d> recordPosition(const XmlRecord& record, const std::array
 {
     Vector3d r;
     for (int c = 0; c < 3; ++c) {
-        const std::optional<double> value = BASELIB::toDouble(field(record, keys[static_cast<std::size_t>(c)]));
+        const std::optional<double> value = mne::toDouble(field(record, keys[static_cast<std::size_t>(c)]));
         if (!value)
             return std::nullopt;
         r[c] = scale * *value;
@@ -283,7 +283,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_polhemus_isotrak(const std::filesy
                                                                std::span<const std::string> ch_names,
                                                                std::string_view unit)
 {
-    const std::string file = BASELIB::utf8FromPath(path);
+    const std::string file = mne::utf8FromPath(path);
     const std::optional<double> scale = unitScale(unit);
     if (!scale)
         return fail(ErrorCode::Format, "unknown unit {} (use m, cm or mm)", unit);
@@ -322,7 +322,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_polhemus_isotrak(const std::filesy
 
 Expected<MatrixX3d> FiffDigMontage::read_polhemus_fastscan(const std::filesystem::path& path, std::string_view unit, bool require_header)
 {
-    const std::string file = BASELIB::utf8FromPath(path);
+    const std::string file = mne::utf8FromPath(path);
     const std::optional<double> scale = unitScale(unit);
     if (!scale)
         return fail(ErrorCode::Format, "unknown unit {} (use m, cm or mm)", unit);
@@ -331,7 +331,7 @@ Expected<MatrixX3d> FiffDigMontage::read_polhemus_fastscan(const std::filesystem
     const Expected<std::string> text = readText(path);
     if (!text)
         return std::unexpected(text.error());
-    const BASELIB::StringList lines = BASELIB::split(*text, '\n');
+    const mne::StringList lines = mne::split(*text, '\n');
 
     std::string header;
     for (auto line = lines.begin(); line != lines.end() && line->starts_with('%'); ++line)
@@ -363,7 +363,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::pat
     for (const XmlRecord& electrode : *electrodes) {
         const std::optional<Vector3d> r = recordPosition(electrode, {"X", "Y", "Z"}, 1e-3);
         if (!r)
-            return fail(ErrorCode::Format, "electrode without a position in {}", BASELIB::utf8FromPath(path));
+            return fail(ErrorCode::Format, "electrode without a position in {}", mne::utf8FromPath(path));
         const std::string_view name = field(electrode, "Name");
         if (name == "Nasion")
             montage.nasion = r;
@@ -375,7 +375,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::pat
             montage.addElectrode(std::string(name), *r);
     }
     if (!montage.nasion || !montage.lpa || !montage.rpa)
-        return fail(ErrorCode::Format, "{} lacks the Nasion, LPA or RPA electrode", BASELIB::utf8FromPath(path));
+        return fail(ErrorCode::Format, "{} lacks the Nasion, LPA or RPA electrode", mne::utf8FromPath(path));
     return makeDigMontage(std::move(montage));
 }
 
@@ -388,12 +388,12 @@ Expected<FiffDigMontage> FiffDigMontage::read_egi(const std::filesystem::path& p
         return std::unexpected(sensors.error());
     Montage montage;
     for (const XmlRecord& sensor : *sensors) {
-        const std::optional<int> number = BASELIB::toInt(field(sensor, "number"));
+        const std::optional<int> number = mne::toInt(field(sensor, "number"));
         const std::optional<Vector3d> r = recordPosition(sensor, {"x", "y", "z"}, 1e-2);
         if (!number || !r)
-            return fail(ErrorCode::Format, "sensor without a number or position in {}", BASELIB::utf8FromPath(path));
+            return fail(ErrorCode::Format, "sensor without a number or position in {}", mne::utf8FromPath(path));
         const std::string_view name = field(sensor, "name");
-        switch (BASELIB::toInt(field(sensor, "type")).value_or(-1)) {
+        switch (mne::toInt(field(sensor, "type")).value_or(-1)) {
             case 0: // EEG
                 montage.addElectrode(std::format("EEG {:03}", *number), *r);
                 break;
@@ -409,11 +409,11 @@ Expected<FiffDigMontage> FiffDigMontage::read_egi(const std::filesystem::path& p
                     montage.rpa = r;
                 break;
             default:
-                BASELIB::Log::warning("[FiffDigMontage::read_egi] skipping sensor {} of unknown type", *number);
+                mne::Log::warning("[FiffDigMontage::read_egi] skipping sensor {} of unknown type", *number);
         }
     }
     if (!montage.nasion || !montage.lpa || !montage.rpa)
-        return fail(ErrorCode::Format, "{} lacks the nasion or a periauricular point", BASELIB::utf8FromPath(path));
+        return fail(ErrorCode::Format, "{} lacks the nasion or a periauricular point", mne::utf8FromPath(path));
     return makeDigMontage(std::move(montage));
 }
 
@@ -424,20 +424,20 @@ Expected<FiffDigMontage> FiffDigMontage::read_localite(const std::filesystem::pa
                                                        std::string_view lpa,
                                                        std::string_view rpa)
 {
-    const std::string file = BASELIB::utf8FromPath(path);
+    const std::string file = mne::utf8FromPath(path);
     const Expected<std::string> text = readText(path);
     if (!text)
         return std::unexpected(text.error());
-    const BASELIB::StringList lines = BASELIB::split(*text, '\n');
+    const mne::StringList lines = mne::split(*text, '\n');
     Montage montage;
     for (std::size_t i = 1; i < lines.size(); ++i) {
-        if (BASELIB::trimmed(lines[i]).empty())
+        if (mne::trimmed(lines[i]).empty())
             continue;
-        BASELIB::StringList fields = BASELIB::split(lines[i], ',');
+        mne::StringList fields = mne::split(lines[i], ',');
         Vector3d r;
         bool ok = fields.size() == 5;
         for (int c = 0; ok && c < 3; ++c) {
-            const std::optional<double> value = BASELIB::toDouble(fields[static_cast<std::size_t>(c) + 2]);
+            const std::optional<double> value = mne::toDouble(fields[static_cast<std::size_t>(c) + 2]);
             ok = value.has_value();
             r[c] = value.value_or(0.0) / 1000.0;
         }
@@ -454,11 +454,11 @@ Expected<FiffDigMontage> FiffDigMontage::read_localite(const std::filesystem::pa
 
 Expected<FiffDigMontage> FiffDigMontage::read_neuroscan_dat(const std::filesystem::path& path)
 {
-    const std::string file = BASELIB::utf8FromPath(path);
+    const std::string file = mne::utf8FromPath(path);
     const Expected<std::string> text = readText(path);
     if (!text)
         return std::unexpected(text.error());
-    const BASELIB::StringList lines = BASELIB::split(*text, '\n');
+    const mne::StringList lines = mne::split(*text, '\n');
     Montage montage;
     for (std::size_t i = 0; i < lines.size(); ++i) {
         const std::vector<std::string_view> items = words(lines[i]);
@@ -467,7 +467,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_neuroscan_dat(const std::filesyste
         Vector3d r;
         bool ok = items.size() == 5;
         for (int c = 0; ok && c < 3; ++c) {
-            const std::optional<double> value = BASELIB::toDouble(items[static_cast<std::size_t>(c) + 2]);
+            const std::optional<double> value = mne::toDouble(items[static_cast<std::size_t>(c) + 2]);
             ok = value.has_value();
             r[c] = value.value_or(0.0);
         }

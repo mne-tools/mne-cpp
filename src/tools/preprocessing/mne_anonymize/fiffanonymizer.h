@@ -766,11 +766,11 @@ private:
 
     //=========================================================================================================
 
-    std::unique_ptr<FIFFLIB::FiffStream> m_pInStream;  /**< Pointer to FiffStream object for reading.*/
-    std::unique_ptr<FIFFLIB::FiffStream> m_pOutStream; /**< Pointer to FiffStream object for writing the result.*/
-    std::optional<FIFFLIB::FiffTag> m_pTag;            /**< Pointer to FiffTag used for reading and writing each tag.*/
+    std::unique_ptr<mne::FiffStream> m_pInStream;  /**< Pointer to FiffStream object for reading.*/
+    std::unique_ptr<mne::FiffStream> m_pOutStream; /**< Pointer to FiffStream object for writing the result.*/
+    std::optional<mne::FiffTag> m_pTag;            /**< Pointer to FiffTag used for reading and writing each tag.*/
 
-    FIFFLIB::fiff_int_t m_BDfltMAC[2]; /**< MAC addresss substitutor.*/
+    mne::fiff_int_t m_BDfltMAC[2]; /**< MAC addresss substitutor.*/
 
     QSharedPointer<QStack<int32_t>> m_pBlockTypeList; /**< Pointer to Stack storing info related to the blocks of tags in the file.*/
 

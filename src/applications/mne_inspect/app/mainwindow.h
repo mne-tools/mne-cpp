@@ -49,7 +49,7 @@ class QProgressBar;
 class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
-namespace DISP3DLIB
+namespace mne::disp
 {
 class BrainView;
 class BrainTreeModel;
@@ -115,7 +115,7 @@ public:
      * not go through these — they exist solely so we can drive the real
      * widget tree from a documentation / test harness.
      */
-    DISP3DLIB::MultimodalScene& scene()
+    mne::disp::MultimodalScene& scene()
     {
         return m_scene;
     }
@@ -175,7 +175,7 @@ private:
     /**
      * Unload data of the given role from the 3D scene.
      */
-    void unloadFileFromScene(MNALIB::MnaFileRole role, const QString& path = QString());
+    void unloadFileFromScene(mne::MnaFileRole role, const QString& path = QString());
 
     /**
      * Handle close event — save settings before closing.
@@ -269,8 +269,8 @@ private:
 
 private:
     // Core components
-    DISP3DLIB::BrainView* m_brainView = nullptr;
-    DISP3DLIB::BrainTreeModel* m_model = nullptr;
+    mne::disp::BrainView* m_brainView = nullptr;
+    mne::disp::BrainTreeModel* m_model = nullptr;
 
     // Group boxes (disabled until data is loaded)
     QGroupBox* m_surfGroup = nullptr;
@@ -402,7 +402,7 @@ private:
     QList<QPair<QString, int>> m_loadedFiles;
 
     // Loaded MNA project preserved for enriching round-trip saves
-    MNALIB::MnaProject m_loadedMnaProject;
+    mne::MnaProject m_loadedMnaProject;
 
     // Sync state
     bool m_isSyncing = false;
@@ -455,7 +455,7 @@ private:
     //=========================================================================================================
     // Multimodal scene + co-located inspection plugins (electrodes, MRI slices)
     //=========================================================================================================
-    DISP3DLIB::MultimodalScene m_scene;
+    mne::disp::MultimodalScene m_scene;
     ELECTRODESPLUGIN::ElectrodesPlugin m_electrodesPlugin;
     QString m_subjectDir; /**< FreeSurfer subject directory of the loaded surfaces, for its T1. */
     MRISLICESPLUGIN::MriSlicesPlugin m_mriSlicesPlugin;

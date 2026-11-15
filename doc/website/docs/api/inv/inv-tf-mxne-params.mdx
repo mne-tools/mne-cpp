@@ -1,18 +1,18 @@
 ---
 id: inv-tf-mxne-params
-title: "INVLIB::InvTfMxneParams"
+title: "mne::InvTfMxneParams"
 sidebar_label: InvTfMxneParams
 sidebar_position: 49
 ---
 
 # InvTfMxneParams
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
 
 `#include <inv/inv_tf_mxne.h>`
 
 ```cpp
-struct INVLIB::InvTfMxneParams
+struct mne::InvTfMxneParams
 ```
 
 Parameters for the TF-MxNE solver.
@@ -44,7 +44,7 @@ const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 255"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 252"
 // TF-MxNE: sparse in space and in a Gabor time-frequency dictionary; 40 samples at 150 Hz.
 InvTfMxneParams tfParams;
 tfParams.dAlphaSpace = 0.5 * alphaMax;

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Implementation of @ref MNELIB::MNELayout and @ref MNELIB::MNELayoutPort (MNE-C mne_layout.c).
+ * @brief    Implementation of @ref mne::MNELayout and @ref mne::MNELayoutPort (MNE-C mne_layout.c).
  */
 
 //=============================================================================================================
@@ -32,8 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -69,7 +68,7 @@ std::string MNELayoutPort::cleanName(std::string_view name)
 
 bool MNELayoutPort::contains(std::string_view channel) const
 {
-    return BASELIB::contains(names, cleanName(channel));
+    return mne::contains(names, cleanName(channel));
 }
 
 //=============================================================================================================

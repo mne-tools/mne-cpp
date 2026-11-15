@@ -10,9 +10,9 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Export/import macros and build-info accessors for the FIFFLIB shared library.
+ * @brief    Export/import macros and build-info accessors for the mne_fiff shared library.
  *
- * This header is included first by every public FIFFLIB symbol and is the
+ * This header is included first by every public mne_fiff symbol and is the
  * only place where the export / import visibility decoration
  * is chosen. STATICBUILD strips the decoration entirely so the same
  * sources can be linked into a monolithic static archive (used for the
@@ -58,23 +58,10 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @brief FIFF file I/O, in-memory data structures and high-level readers/writers.
- *
- * Houses every class that round-trips an Elekta/Neuromag FIFF file:
- * the stream layer (@ref FiffStream, @ref FiffTag, @ref FiffDirNode,
- * @ref FiffDirEntry), the measurement metadata (@ref FiffInfo,
- * @ref FiffChInfo, @ref FiffCoordTrans, @ref FiffId, @ref FiffDigPoint),
- * the data containers (@ref FiffRawData, @ref FiffEvoked,
- * @ref FiffEvokedSet, @ref FiffCov, @ref FiffProj, @ref FiffCtfComp,
- * @ref FiffNamedMatrix, @ref FiffSparseMatrix) and the convenience facade
- * @c FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
- */
-namespace FIFFLIB
+namespace mne
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

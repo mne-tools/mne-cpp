@@ -7,22 +7,22 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Process-wide singleton catalog mapping @c opType strings to their @ref MNALIB::MnaOpSchema and (for built-in ops) executable implementation.
+ * @brief    Process-wide singleton catalog mapping @c opType strings to their @ref mne::MnaOpSchema and (for built-in ops) executable implementation.
  *
- * @ref MNALIB::MnaOpRegistry is the lookup table that the rest of the
+ * @ref mne::MnaOpRegistry is the lookup table that the rest of the
  * library hits whenever an @c opType string needs to be resolved
  * into something runnable. It stores two parallel maps: one from
- * op type to @ref MNALIB::MnaOpSchema (used by @ref MNALIB::MnaGraph::validate "MnaGraph::validate" and
+ * op type to @ref mne::MnaOpSchema (used by @ref mne::MnaGraph::validate "MnaGraph::validate" and
  * by GUI editors to render attribute forms), and one from op type
- * to an @ref MNALIB::MnaOpRegistry::OpFunc "OpFunc" lambda (used by @ref MNALIB::MnaGraphExecutor to run
+ * to an @ref mne::MnaOpRegistry::OpFunc "OpFunc" lambda (used by @ref mne::MnaGraphExecutor to run
  * the node). External / CLI / Script ops typically only register a
  * schema; in-process ops register both.
  *
- * @ref MNALIB::MnaOpRegistry::loadRegistryFiles "loadRegistryFiles" searches upward from the application
- * directory for @c resources/mna/ and asks @ref MNALIB::MnaRegistryLoader
+ * @ref mne::MnaOpRegistry::loadRegistryFiles "loadRegistryFiles" searches upward from the application
+ * directory for @c resources/mna/ and asks @ref mne::MnaRegistryLoader
  * to ingest @c mna-registry.json plus every drop-in under
  * @c mna-registry.d/, so new operations can be added without
- * rebuilding the library. @ref MNALIB::MnaOpRegistry::missingOps "missingOps" reports the op types
+ * rebuilding the library. @ref mne::MnaOpRegistry::missingOps "missingOps" reports the op types
  * referenced by a loaded project that the current process cannot
  * resolve — the simplest way to detect a stale or partial install.
  */
@@ -48,10 +48,10 @@
 #include <functional>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -150,6 +150,6 @@ private:
     QMap<QString, OpFunc> m_funcs;
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_OP_REGISTRY_H

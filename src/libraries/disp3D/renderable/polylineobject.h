@@ -15,7 +15,7 @@
  * This exists as its own renderable rather than reusing NetworkObject, which
  * can also express a chain but is built for connectivity graphs: it draws a
  * sphere at every point, it prunes segments by weight in @ref
- * DISP3DLIB::NetworkObject::setThreshold, and its node ids are qint16, which silently
+ * mne::disp::NetworkObject::setThreshold, and its node ids are qint16, which silently
  * wraps past 32767 points. None of that suits an ordered path, so a polyline
  * of N points here costs N-1 segment instances and nothing else.
  */
@@ -60,7 +60,7 @@
 // Deliberately at global scope, matching DipoleObject and NetworkObject. The
 // other renderables in this directory are not namespaced either.
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -236,6 +236,6 @@ private:
     RenderKey m_renderKey;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DISP3DLIB_POLYLINEOBJECT_H

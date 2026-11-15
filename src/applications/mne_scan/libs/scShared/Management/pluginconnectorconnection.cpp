@@ -31,8 +31,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -172,38 +171,38 @@ bool PluginConnectorConnection::createConnection()
 
 ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginConnector> pPluginConnector)
 {
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeEvokedSet>> RTES_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeEvokedSet>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeEvokedSet>> RTES_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeEvokedSet>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeEvokedSet>> RTES_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeEvokedSet>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeEvokedSet>> RTES_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeEvokedSet>>();
     if (RTES_Out || RTES_In)
         return ConnectorDataType::_RTES;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> RTMSA_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> RTMSA_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeMultiSampleArray>> RTMSA_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeMultiSampleArray>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeMultiSampleArray>> RTMSA_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeMultiSampleArray>>();
     if (RTMSA_Out || RTMSA_In)
         return ConnectorDataType::_RTMSA;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeCov>> RTC_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeCov>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeCov>> RTC_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeCov>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeCov>> RTC_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeCov>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeCov>> RTC_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeCov>>();
     if (RTC_Out || RTC_In)
         return ConnectorDataType::_RTC;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>> RTSE_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeSourceEstimate>> RTSE_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeSourceEstimate>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeSourceEstimate>> RTSE_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeSourceEstimate>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeSourceEstimate>> RTSE_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeSourceEstimate>>();
     if (RTSE_Out || RTSE_In)
         return ConnectorDataType::_RTSE;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeHpiResult>> RTHR_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeHpiResult>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeHpiResult>> RTHR_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeHpiResult>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeHpiResult>> RTHR_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeHpiResult>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeHpiResult>> RTHR_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeHpiResult>>();
     if (RTHR_Out || RTHR_In)
         return ConnectorDataType::_RTHR;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::RealTimeFwdSolution>> RTFS_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::RealTimeFwdSolution>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::RealTimeFwdSolution>> RTFS_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::RealTimeFwdSolution>>();
+    QSharedPointer<PluginOutputData<mne::scan::RealTimeFwdSolution>> RTFS_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::RealTimeFwdSolution>>();
+    QSharedPointer<PluginInputData<mne::scan::RealTimeFwdSolution>> RTFS_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::RealTimeFwdSolution>>();
     if (RTHR_Out || RTHR_In)
         return ConnectorDataType::_RTFS;
 
-    QSharedPointer<PluginOutputData<SCMEASLIB::Numeric>> Num_Out = pPluginConnector.dynamicCast<PluginOutputData<SCMEASLIB::Numeric>>();
-    QSharedPointer<PluginInputData<SCMEASLIB::Numeric>> Num_In = pPluginConnector.dynamicCast<PluginInputData<SCMEASLIB::Numeric>>();
+    QSharedPointer<PluginOutputData<mne::scan::Numeric>> Num_Out = pPluginConnector.dynamicCast<PluginOutputData<mne::scan::Numeric>>();
+    QSharedPointer<PluginInputData<mne::scan::Numeric>> Num_In = pPluginConnector.dynamicCast<PluginInputData<mne::scan::Numeric>>();
     if (Num_Out || Num_In)
         return ConnectorDataType::_N;
 

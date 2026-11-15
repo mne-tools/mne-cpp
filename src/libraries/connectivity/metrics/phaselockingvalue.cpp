@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::PhaseLockingValue - resultant length of the unit-modulus cross-spectrum (Lachaux et al. HBM 1999).
+ * @brief    Implementation of @ref mne::PhaseLockingValue - resultant length of the unit-modulus cross-spectrum (Lachaux et al. HBM 1999).
  */
 
 //=============================================================================================================
@@ -45,10 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

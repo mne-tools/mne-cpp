@@ -9,22 +9,22 @@
  * @date     April 2026
  * @brief    Construction of the sensor- and source-space neighbourhood graphs that define the cluster support for permutation testing.
  *
- * Cluster-based inference (@ref STSLIB::StatsCluster) reduces the
+ * Cluster-based inference (@ref mne::StatsCluster) reduces the
  * multiple-comparison problem by grouping supra-threshold samples into
  * spatially - and optionally temporally - connected clusters before
  * computing a max-statistic null. Doing this rigorously requires an
  * explicit adjacency graph whose edges encode which (channel, time) or
  * (vertex, time) pairs are allowed to merge.
  *
- * @ref STSLIB::StatsAdjacency provides three constructors that cover the
+ * @ref mne::StatsAdjacency provides three constructors that cover the
  * standard M/EEG analysis cases: a sensor graph built from the 3D
- * channel positions in a @ref FIFFLIB::FiffInfo using a heuristic of
+ * channel positions in a @ref mne::FiffInfo using a heuristic of
  * three times the median nearest-neighbour distance, a cortical graph
  * built from the triangulation of a source space, and a spatio-temporal
  * extension of the cortical graph that links each vertex to itself at
  * the previous and next time sample (linear index @c vertex*nTimes+time).
  * The output is always a symmetric sparse integer matrix consumed
- * unchanged by @ref STSLIB::StatsCluster.
+ * unchanged by @ref mne::StatsCluster.
  *
  * Reference: Maris & Oostenveld (2007), J. Neurosci. Methods 164(1).
  */
@@ -59,10 +59,10 @@
 #include <Eigen/SparseCore>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -87,7 +87,7 @@ public:
      * @return Sparse adjacency matrix (symmetric, nChannels x nChannels).
      */
     static Eigen::SparseMatrix<int> fromChannelPositions(
-        const FIFFLIB::FiffInfo& info,
+        const mne::FiffInfo& info,
         const std::vector<std::string>& picks = {});
 
     //=========================================================================================================
@@ -148,6 +148,6 @@ public:
     static Eigen::SparseMatrix<int> combine(const std::vector<Eigen::SparseMatrix<int>>& dims);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_ADJACENCY_H

@@ -52,10 +52,10 @@
 
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -219,7 +219,7 @@ private:
 /**
  * @brief Causal second-order-section filter that keeps its state between blocks.
  *
- * For filtering acquired data block by block (e.g. decoded from an ACQLIB view): the output over any split
+ * For filtering acquired data block by block (e.g. decoded from an mne_acq view): the output over any split
  * into blocks is bit-identical to IirFilter::applySos() over the whole recording, so online and offline
  * results agree exactly. One state per channel and section, allocated once.
  *
@@ -254,6 +254,6 @@ private:
     Eigen::MatrixXd m_state; /**< channels x (2 * sections): s1, s2 of each section. */
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // IIRFILTER_DSP_H

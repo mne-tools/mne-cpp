@@ -1,18 +1,18 @@
 ---
 id: rt-noise-worker
-title: "DSPLIB::RtNoiseWorker"
+title: "mne::RtNoiseWorker"
 sidebar_label: RtNoiseWorker
 sidebar_position: 40
 ---
 
 # RtNoiseWorker
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_noise.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_noise.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_noise.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_noise.h)
 
 `#include <dsp/rt_noise.h>`
 
 ```cpp
-class DSPLIB::RtNoiseWorker
+class mne::RtNoiseWorker
 ```
 
 Background worker that computes a noise power spectral density estimate from accumulated data blocks.
@@ -78,7 +78,7 @@ Process one data block, accumulate, and emit the spectrum when enough blocks are
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 221"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 217"
 RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
 MatrixXd spectrum;
 QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });

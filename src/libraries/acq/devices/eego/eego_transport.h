@@ -34,10 +34,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Channel types, as the SDK reports them. */
@@ -156,6 +156,6 @@ AcqExpected<std::unique_ptr<EegoTransport>> open_eego_driver(const std::vector<s
  */
 AcqExpected<std::vector<std::string>> list_eego_amplifiers(const std::vector<std::string>& library);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // EEGO_TRANSPORT_H

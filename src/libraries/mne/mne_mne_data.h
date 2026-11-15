@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Per-data-set results of a minimum-norm computation: eigenfield projections, SNR, lambda2 and predicted data.
  *
- * @ref MNELIB::MNEMneData ports MNE-C's @c mneMneDataRec together with the
+ * @ref mne::MNEMneData ports MNE-C's @c mneMneDataRec together with the
  * code that fills it (@c mne_project_to_eigen_fields, @c mne_analyze's
  * @c compute_regularization / @c select_regularization and
- * @c compute_predicted_data). @ref INVLIB::InvMinimumNorm::mneData fills it
+ * @c compute_predicted_data). @ref mne::InvMinimumNorm::mneData fills it
  * from its prepared inverse operator.
  */
 
@@ -32,10 +32,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 class MNEInverseOperator;
@@ -122,6 +122,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMNEDATA_H

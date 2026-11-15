@@ -9,7 +9,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
- * @brief    Implementation of @ref MNELIB::MNEHemisphere.
+ * @brief    Implementation of @ref mne::MNEHemisphere.
  *
  * Implements FIFF read of one @c FIFFB_MNE_SOURCE_SPACE block into the
  * rendering-ready hemisphere representation, recomputing triangle normals
@@ -34,11 +34,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace MATHLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

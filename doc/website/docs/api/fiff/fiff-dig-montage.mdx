@@ -1,18 +1,18 @@
 ---
 id: fiff-dig-montage
-title: "FIFFLIB::FiffDigMontage"
+title: "mne::FiffDigMontage"
 sidebar_label: FiffDigMontage
 sidebar_position: 40
 ---
 
 # FiffDigMontage
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_dig_montage.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_dig_montage.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_dig_montage.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_dig_montage.h)
 
 `#include <fiff/fiff_dig_montage.h>`
 
 ```cpp
-struct FIFFLIB::FiffDigMontage
+struct mne::FiffDigMontage
 ```
 
 Digitizer points with the names of their EEG electrodes, like mne.channels.DigMontage.
@@ -20,7 +20,7 @@ Digitizer points with the names of their EEG electrodes, like mne.channels.DigMo
 The points come in the order of mne.channels.make_dig_montage: the cardinal points (LPA, nasion, RPA), HPI coils, head shape points, then the EEG electrodes. Electrodes are numbered by the last three characters of their names when all of those are numbers, and 1..n otherwise; a repeated name keeps its first place and its last position. All points are in digitizer coordinates (FIFFV_COORD_UNKNOWN) and in metres.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
-const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // BASELIB::Expected, like mne.channels.read_dig_dat
+const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // mne::Expected, like mne.channels.read_dig_dat
 ```
 
 ---
@@ -158,7 +158,7 @@ FIFF library: measurement info, channels, digitizer, transforms, projectors, cov
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 135"
 const std::filesystem::path datPath = tmp.filePath("electrodes.dat").toStdString();
 std::ofstream(datPath) << "Nz 78 0 0.1 0\nLPA 76 -0.08 0 0\nRPA 82 0.08 0 0\nFz 1 0 0.06 0.08\nCz 2 0 0 0.1\n";
-const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // BASELIB::Expected, like mne.channels.read_dig_dat
+const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // mne::Expected, like mne.channels.read_dig_dat
 ok &= expect(montage && montage->ch_names == std::vector<std::string>{"Fz", "Cz"} && montage->dig.size() == 5 && montage->dig[0].ident == FIFFV_POINT_LPA &&
                  montage->dig[4].kind == FIFFV_POINT_EEG,
              "FiffDigMontage: the Neuroscan .dat file holds Fz and Cz after LPA, nasion and RPA");

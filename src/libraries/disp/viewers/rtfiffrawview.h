@@ -10,14 +10,14 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     November 2019
- * @brief    Real-time FIFF raw-data table browser backed by @ref DISPLIB::RtFiffRawViewModel + @ref DISPLIB::RtFiffRawViewDelegate.
+ * @brief    Real-time FIFF raw-data table browser backed by @ref mne::disp::RtFiffRawViewModel + @ref mne::disp::RtFiffRawViewDelegate.
  *
  * RtFiffRawView is the @c QTableView host that displays a rolling
  * window of the live @c FiffStream through the model / delegate pair
  * in @c helpers/. It owns the scrollbars, the marker / annotation
  * machinery, the trigger-channel overlay and forwards mouse-driven
  * channel selection / re-ordering events to the parent
- * @ref DISPLIB::ChannelDataView.
+ * @ref mne::disp::ChannelDataView.
  */
 
 #ifndef RTFIFFRAWVIEW_H
@@ -54,30 +54,30 @@
 
 class QTableView;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class FilterKernel;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class EventList;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class RtFiffRawViewModel;
@@ -137,7 +137,7 @@ public:
      *
      * @param[in] info    The FiffInfo.
      */
-    void init(std::shared_ptr<FIFFLIB::FiffInfo>& info);
+    void init(std::shared_ptr<mne::FiffInfo>& info);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
      *
      * @param[in] projs    The new projectors.
      */
-    void updateProjection(const std::vector<FIFFLIB::FiffProj>& projs);
+    void updateProjection(const std::vector<mne::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -319,7 +319,7 @@ public:
      *
      * @param[in] filterData   the currently active filter.
      */
-    void setFilter(const DSPLIB::FilterKernel& filterData);
+    void setFilter(const mne::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -504,22 +504,22 @@ protected:
      */
     void updateCrosshair(const QPoint& position);
 
-    QPointer<QTableView> m_pTableView;                    /**< The QTableView being part of the model/view framework of Qt. */
-    QPointer<DISPLIB::RtFiffRawViewDelegate> m_pDelegate; /**< The channel data delegate. */
-    QPointer<DISPLIB::RtFiffRawViewModel> m_pModel;       /**< The channel data model. */
+    QPointer<QTableView> m_pTableView;                      /**< The QTableView being part of the model/view framework of Qt. */
+    QPointer<mne::disp::RtFiffRawViewDelegate> m_pDelegate; /**< The channel data delegate. */
+    QPointer<mne::disp::RtFiffRawViewModel> m_pModel;       /**< The channel data model. */
 
     QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
 
-    qint32 m_iT;                                    /**< Display window size in seconds. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
-    float m_fSamplingRate;                          /**< Sampling rate. */
-    float m_fZoomFactor;                            /**< Zoom factor. */
-    QList<qint32> m_qListBadChannels;               /**< Current list of bad channels . */
-    QList<qint32> m_qListCurrentSelection;          /**< Current selection list -> hack around C++11 lambda . */
-    bool m_bHideBadChannels;                        /**< hide bad channels flag. */
-    QStringList m_slSelectedChannels;               /**< the currently selected channels from the selection manager window. */
-    QColor m_backgroundColor;                       /**< Current background color. */
-    int m_iDistanceTimeSpacer;                      /**< Current distance between time spacer. */
+    qint32 m_iT;                                /**< Display window size in seconds. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
+    float m_fSamplingRate;                      /**< Sampling rate. */
+    float m_fZoomFactor;                        /**< Zoom factor. */
+    QList<qint32> m_qListBadChannels;           /**< Current list of bad channels . */
+    QList<qint32> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda . */
+    bool m_bHideBadChannels;                    /**< hide bad channels flag. */
+    QStringList m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
+    QColor m_backgroundColor;                   /**< Current background color. */
+    int m_iDistanceTimeSpacer;                  /**< Current distance between time spacer. */
     int m_iClickPosX;
     bool m_bCrosshairEnabled; /**< Whether the crosshair follows the mouse. */
 

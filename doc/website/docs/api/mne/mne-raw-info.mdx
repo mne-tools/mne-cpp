@@ -1,18 +1,18 @@
 ---
 id: mne-raw-info
-title: "MNELIB::MNERawInfo"
+title: "mne::MNERawInfo"
 sidebar_label: MNERawInfo
 sidebar_position: 49
 ---
 
 # MNERawInfo
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_raw_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_raw_info.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_raw_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_raw_info.h)
 
 `#include <mne/mne_raw_info.h>`
 
 ```cpp
-class MNELIB::MNERawInfo
+class mne::MNERawInfo
 ```
 
 Information about raw data in a FIFF file.
@@ -34,7 +34,7 @@ sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
 sel.pick.resize(sel.nchan());
 for (int c = 0; c < sel.nchan(); ++c) {
-    sel.pick[c] = static_cast<int>(BASELIB::indexOf(mneRaw->ch_names, sel.chspick[c]));
+    sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
 }
 
 const int ns = 25;
@@ -235,7 +235,7 @@ Opens the specified FIFF file, locates the raw data block (or MaxShield data blo
   Path to the FIFF file to load.
 
 - **allow_maxshield** : *int*
-  If non-zero, fall back to MaxShield (SSS) data when no standard raw data block is found.
+  If non-zero, fall back to MaxShield ([`SSS`](/docs/api/dsp/sss)) data when no standard raw data block is found.
 
 - **infop** : *std::unique_ptr&lt; [MNERawInfo](/docs/api/mne/mne-raw-info) &gt; &*
   Pointer to receive the newly allocated [`MNERawInfo`](/docs/api/mne/mne-raw-info) structure. Only valid on success.
@@ -259,7 +259,7 @@ Opens the specified FIFF file, locates the raw data block (or MaxShield data blo
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 268"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 266"
 filter.lowpass = filter.eog_lowpass = 40.0f;
 filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
 std::unique_ptr<MNERawData> mneRaw(MNERawData::open_file(rawFile.fileName().toStdU16String(), false, false, filter));

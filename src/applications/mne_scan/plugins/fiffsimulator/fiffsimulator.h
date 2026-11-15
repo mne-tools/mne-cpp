@@ -35,7 +35,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -52,12 +52,12 @@ namespace FIFFSIMULATORPLUGIN
  * @brief Streams the FIFF file simulator of an mne_rt_server through the rtserver:// source of mne_acq_devices,
  *        which can also simulate the server.
  */
-class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public SCSHAREDLIB::AbstractSensor
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fiffsimulator.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class FiffSimulatorSetupWidget;
 
@@ -65,7 +65,7 @@ public:
     FiffSimulator();
     ~FiffSimulator() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -81,7 +81,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -97,10 +97,10 @@ private:
     /** @return The rtserver:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSA_FiffSimulator; /**< The data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA_FiffSimulator; /**< The data. */
 
-    ACQLIB::AcqDevice m_device; /**< The server while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads the server's stream in run(). */
+    mne::AcqDevice m_device; /**< The server while streaming. */
+    mne::AcqReader m_reader; /**< Reads the server's stream in run(). */
 
     std::string m_host = "127.0.0.1"; /**< Host of mne_rt_server. */
     std::uint16_t m_port = 4217;      /**< Its command port; the data port is the next one. */

@@ -41,10 +41,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
-using namespace MNELIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 /**
@@ -87,7 +86,7 @@ TestInterpolation::TestInterpolation()
 
 void TestInterpolation::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     //acquire real data
     MNEBem t_sensorSurfaceVV((QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif").toStdU16String());
     realSurface = t_sensorSurfaceVV[0];

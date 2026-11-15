@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -73,10 +73,10 @@ struct DSPSHARED_EXPORT BadChannelsMaxwellParams
  */
 struct DSPSHARED_EXPORT BadChannelsMaxwellResult
 {
-    BASELIB::StringList badChannels; /**< Names of detected bad channels. */
-    std::vector<int> badIndices;     /**< Indices in the MEG channel list. */
-    Eigen::VectorXd residuals;       /**< Per-channel reconstruction residuals. */
-    Eigen::VectorXd zScores;         /**< Per-channel z-scores of residuals. */
+    mne::StringList badChannels; /**< Names of detected bad channels. */
+    std::vector<int> badIndices; /**< Indices in the MEG channel list. */
+    Eigen::VectorXd residuals;   /**< Per-channel reconstruction residuals. */
+    Eigen::VectorXd zScores;     /**< Per-channel z-scores of residuals. */
 };
 
 //=============================================================================================================
@@ -96,9 +96,9 @@ struct DSPSHARED_EXPORT BadChannelsMaxwellResult
  */
 DSPSHARED_EXPORT BadChannelsMaxwellResult findBadChannelsMaxwell(
     const Eigen::MatrixXd& matData,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     const BadChannelsMaxwellParams& params = BadChannelsMaxwellParams());
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // BAD_CHANNELS_MAXWELL_H

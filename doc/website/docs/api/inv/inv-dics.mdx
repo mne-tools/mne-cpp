@@ -1,13 +1,13 @@
 ---
 id: inv-dics
-title: "INVLIB::InvDICS"
+title: "mne::InvDICS"
 sidebar_label: InvDICS
 sidebar_position: 4
 ---
 
 # InvDICS
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_dics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_dics.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_dics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_dics.h)
 
 :::info[Python equivalent]
 `mne.beamformer.make_dics / apply_dics` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 4
 <Connections topics={["beamformers"]} context="api" current="InvDICS" />
 
 ```cpp
-class INVLIB::InvDICS
+class mne::InvDICS
 ```
 
 Dynamic Imaging of Coherent Sources (DICS) beamformer for frequency-domain source localization using cross-spectral density (CSD) matrices.
@@ -176,7 +176,7 @@ Apply DICS beamformer to each epoch in a list.
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 140"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 137"
 // A single real cross-spectral density at 10 Hz equal to the data covariance gives the LCMV power.
 const VectorXd frequencies = VectorXd::Constant(1, 10.0);
 const InvBeamformer dics = InvDICS::makeDICS(info, fwd, {dataCov.data}, frequencies, 0.05, true, noiseCov,

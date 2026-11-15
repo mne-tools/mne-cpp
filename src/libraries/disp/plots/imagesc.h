@@ -14,11 +14,11 @@
  *
  * ImageSc visualises an @c Eigen::MatrixXd / @c MatrixXf / @c MatrixXi as
  * a 2-D image, mapping the data range linearly into a selectable
- * colour map (Jet, Hot, Bone, ...) through @ref DISPLIB::ColorMap. It inherits
- * the title / axis-label scaffolding from @ref DISPLIB::Graph and is the canvas
+ * colour map (Jet, Hot, Bone, ...) through @ref mne::disp::ColorMap. It inherits
+ * the title / axis-label scaffolding from @ref mne::disp::Graph and is the canvas
  * of choice for sensor-by-sample heat maps, covariance matrices and
  * any other rectangular numeric field that benefits from a glance-able
- * false-colour rendering. Calling @ref DISPLIB::ImageSc::updateData "ImageSc::updateData" repaints the
+ * false-colour rendering. Calling @ref mne::disp::ImageSc::updateData "ImageSc::updateData" repaints the
  * scaled view with new contents.
  */
 
@@ -49,14 +49,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

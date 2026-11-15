@@ -1,21 +1,21 @@
 ---
 id: abstract-view
-title: "DISPLIB::AbstractView"
+title: "mne::disp::AbstractView"
 sidebar_label: AbstractView
 sidebar_position: 1
 ---
 
 # AbstractView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/abstractview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/abstractview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/abstractview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/abstractview.h)
 
 `#include <disp/abstractview.h>`
 
 ```cpp
-class DISPLIB::AbstractView
+class mne::disp::AbstractView
 ```
 
-Base widget for every dockable settings panel in `DISPLIB`; centralises GUI / processing mode and settings persistence.
+Base widget for every dockable settings panel in mne_disp; centralises GUI / processing mode and settings persistence.
 
 Subclasses override `updateGuiMode`, `updateProcessingMode` and `saveSettings` / `loadSettings` to react to mode changes and to round-trip their state through `QSettings`. The class deliberately exposes no domain-specific API.
 

@@ -40,14 +40,14 @@
 #include <QCheckBox>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -129,6 +129,6 @@ private:
     QSpinBox* m_pSpinBoxNumSamples;
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // COVARIANCESETTINGSVIEW_H

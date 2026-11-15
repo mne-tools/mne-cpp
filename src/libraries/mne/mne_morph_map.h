@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Sphere-registration morph map of one hemisphere: the sparse matrix taking vertex values from one subject to another.
  *
- * @ref MNELIB::MNEMorphMap is the C++ counterpart of MNE-C's morph maps
+ * @ref mne::MNEMorphMap is the C++ counterpart of MNE-C's morph maps
  * (@c mne_morph_maps.c) and of @c mne.read_morph_map. Each vertex of the
  * destination @c sphere.reg is located on the source @c sphere.reg: the source
  * triangle it falls into gives three linear interpolation weights. Maps are
@@ -50,14 +50,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -132,16 +132,16 @@ public:
     Eigen::SparseMatrix<double> toEigen() const;
 
 public:
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> map; /**< Destination x source interpolation weights. */
-    Eigen::VectorXi best;                           /**< Nearest source vertex of every destination vertex (computed maps only). */
-    int hemi = -1;                                  /**< 0 for the left, 1 for the right hemisphere, -1 if unknown. */
-    std::string from_subj;                          /**< Source subject. */
-    std::string to_subj;                            /**< Destination subject. */
+    std::unique_ptr<mne::FiffSparseMatrix> map; /**< Destination x source interpolation weights. */
+    Eigen::VectorXi best;                       /**< Nearest source vertex of every destination vertex (computed maps only). */
+    int hemi = -1;                              /**< 0 for the left, 1 for the right hemisphere, -1 if unknown. */
+    std::string from_subj;                      /**< Source subject. */
+    std::string to_subj;                        /**< Destination subject. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMORPHMAP_H

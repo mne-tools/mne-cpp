@@ -38,7 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -130,7 +130,7 @@ TestMNEMath::TestMNEMath()
 
 void TestMNEMath::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qInfo() << "TestMNEMath: Starting MNEMath unit tests";
 }
 

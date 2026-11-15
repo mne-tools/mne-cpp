@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Real-time source-estimate streaming controller that owns the data worker and the per-hemisphere interpolation workers.
  *
- * RtSourceDataController bundles a @ref DISP3DLIB::RtSourceDataWorker (queue,
+ * RtSourceDataController bundles a @ref mne::disp::RtSourceDataWorker (queue,
  * averaging, sparse mat-vec per hemisphere, colormap packing) with
- * two @ref DISP3DLIB::RtSourceInterpolationMatWorker instances (one per
+ * two @ref mne::disp::RtSourceInterpolationMatWorker instances (one per
  * hemisphere) that recompute the sparse vertex-to-source weight
  * matrix when surfaces, source vertices or the interpolation
  * function change.
@@ -46,12 +46,12 @@
 class QThread;
 class QTimer;
 
-namespace FSLIB
+namespace mne
 {
 class FsLabel;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class RtSourceDataWorker;
@@ -295,7 +295,7 @@ public:
      * @param[in] vecVertNo     Source vertex numbers.
      */
     void setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
-                               const std::vector<FSLIB::FsLabel>& lLabels,
+                               const std::vector<mne::FsLabel>& lLabels,
                                const Eigen::VectorXi& vecVertNo);
 
     //=========================================================================================================
@@ -307,7 +307,7 @@ public:
      * @param[in] vecVertNo     Source vertex numbers.
      */
     void setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
-                                const std::vector<FSLIB::FsLabel>& lLabels,
+                                const std::vector<mne::FsLabel>& lLabels,
                                 const Eigen::VectorXi& vecVertNo);
 
 signals:
@@ -353,15 +353,15 @@ private slots:
 
 private:
     QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
-    DISP3DLIB::RtSourceDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
+    mne::disp::RtSourceDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
     QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
     bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
     QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
-    DISP3DLIB::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    mne::disp::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_RTSOURCEDATACONTROLLER_H

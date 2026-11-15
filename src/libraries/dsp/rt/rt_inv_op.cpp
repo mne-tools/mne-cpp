@@ -39,10 +39,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MNELIB;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtInvOpWorker
@@ -78,7 +76,7 @@ RtInvOp::RtInvOp(std::shared_ptr<FiffInfo>& p_pFiffInfo,
 , m_pFwd(p_pFwd)
 {
     // The operator crosses from the worker thread to this one in a queued connection
-    qRegisterMetaType<MNELIB::MNEInverseOperator>();
+    qRegisterMetaType<mne::MNEInverseOperator>();
     qRegisterMetaType<RtInvOpInput>("RtInvOpInput");
 
     RtInvOpWorker* worker = new RtInvOpWorker;
@@ -105,7 +103,7 @@ RtInvOp::~RtInvOp()
 
 //=============================================================================================================
 
-void RtInvOp::append(const FIFFLIB::FiffCov& noiseCov)
+void RtInvOp::append(const mne::FiffCov& noiseCov)
 {
     RtInvOpInput inputData;
     inputData.noiseCov = noiseCov;
@@ -117,14 +115,14 @@ void RtInvOp::append(const FIFFLIB::FiffCov& noiseCov)
 
 //=============================================================================================================
 
-void RtInvOp::setFwdSolution(std::shared_ptr<MNELIB::MNEForwardSolution> pFwd)
+void RtInvOp::setFwdSolution(std::shared_ptr<mne::MNEForwardSolution> pFwd)
 {
     m_pFwd = std::move(pFwd);
 }
 
 //=============================================================================================================
 
-void RtInvOp::handleResults(const MNELIB::MNEInverseOperator& invOp)
+void RtInvOp::handleResults(const mne::MNEInverseOperator& invOp)
 {
     emit invOperatorCalculated(invOp);
 }

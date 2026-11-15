@@ -1,18 +1,18 @@
 ---
 id: hpi-fit-result
-title: "INVLIB::HpiFitResult"
+title: "mne::HpiFitResult"
 sidebar_label: HpiFitResult
 sidebar_position: 40
 ---
 
 # HpiFitResult
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit.h)
 
 `#include <inv/inv_hpi_fit.h>`
 
 ```cpp
-struct INVLIB::HpiFitResult
+struct mne::HpiFitResult
 ```
 
 The struct specifing all data needed to perform coil-wise fitting.
@@ -44,7 +44,7 @@ hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getH
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 297"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 293"
 RtHpiWorker hpiWorker(updater.getSensors());
 HpiFitResult workerFit;
 QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });
@@ -59,7 +59,7 @@ ok &= expect(workerFit.GoF.size() == 4 && workerFit.GoF.minCoeff() > 0.98 && wor
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 207"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 206"
 HpiFitResult hpiFitResult;
 HPI.fit(matProjectedData, matPreparedProjectors, hpiModelParameters, matCoilsHead, true, hpiFitResult);
 hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
@@ -72,7 +72,7 @@ hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 111"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 110"
 // The coil frequencies are known but not their order; the first fit with bOrderFrequencies finds it.
 const InvHpiModelParameters model(std::vector<int>({154, 158, 161, 166}), info->sfreq, info->linefreq, true);
 InvHpiFit hpi(updater.getSensors());
@@ -81,7 +81,7 @@ hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getH
 // MaxFilter head position at t = 0: translation (-0.814, -11.046, 53.572) mm. One 200 ms window, so allow 1 mm
 // (test_hpiFit_integration holds the mean over the whole recording to 0.3 mm).
 MatrixXd maxfilter;
-MATHLIB::read_matrix(maxfilter, (data + "/Result/ref_hpiFit_pos.txt").toStdString());
+mne::read_matrix(maxfilter, (data + "/Result/ref_hpiFit_pos.txt").toStdString());
 const Vector3d translation = fit.devHeadTrans.trans.block<3, 1>(0, 3).cast<double>();
 const Vector3d reference = maxfilter.block<1, 3>(0, 4).transpose();
 ok &= expect(fit.hpiFreqs == std::vector<int>({166, 154, 161, 158}) && fit.GoF.minCoeff() > 0.98 && (translation - reference).norm() < 0.001,

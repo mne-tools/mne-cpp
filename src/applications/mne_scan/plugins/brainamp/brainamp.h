@@ -31,7 +31,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -57,12 +57,12 @@ class BrainAMPSetupProjectWidget;
  * @brief EEG connector for Brain Products BrainAmp amplifiers through the brainamp:// source of mne_acq_devices,
  *        which can also simulate the amplifier.
  */
-class BRAINAMPSHARED_EXPORT BrainAMP : public SCSHAREDLIB::AbstractSensor
+class BRAINAMPSHARED_EXPORT BrainAMP : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainamp.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class BrainAMPSetupWidget;
     friend class BrainAMPSetupProjectWidget;
@@ -84,7 +84,7 @@ public:
     /**
      * Clone the plugin
      */
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
 
     //=========================================================================================================
     /**
@@ -148,11 +148,11 @@ private:
     /** @return The brainamp:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_BrainAMP; /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<BrainAMPSetupProjectWidget> m_pBrainAMPSetupProjectWidget;                             /**< Widget for checking the impedances*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRMTSA_BrainAMP; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<BrainAMPSetupProjectWidget> m_pBrainAMPSetupProjectWidget;                           /**< Widget for checking the impedances*/
 
-    ACQLIB::AcqDevice m_device; /**< The amplifier while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
+    mne::AcqDevice m_device; /**< The amplifier while streaming. */
+    mne::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
 
     int m_iChannels = 32;            /**< EEG channels, 32 per amplifier.*/
     QString m_sResolution = "100nV"; /**< Step of one bit.*/

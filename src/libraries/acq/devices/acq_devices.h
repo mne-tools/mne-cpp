@@ -20,8 +20,8 @@
  * simulate=1 fails with BackendUnavailable.
  *
  * @code
- * ACQLIB::registerBrainAmpScheme(); // needed only where static linking drops the library's initialiser
- * auto device = ACQLIB::AcqDevice::open("brainamp://?simulate=1&channels=32");
+ * mne::registerBrainAmpScheme(); // needed only where static linking drops the library's initialiser
+ * auto device = mne::AcqDevice::open("brainamp://?simulate=1&channels=32");
  * @endcode
  */
 
@@ -36,10 +36,10 @@
 #include "../acq_error.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 /**
@@ -155,6 +155,6 @@ ACQDEVICESSHARED_EXPORT AcqError register_brainflow_file_scheme();
  */
 ACQDEVICESSHARED_EXPORT AcqError register_device_schemes();
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_DEVICES_H

@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Umbrella include header that exposes the full LSLLIB public surface in a single import.
+ * @brief    Umbrella include header that exposes the full mne_lsl public surface in a single import.
  *
- * LSLLIB is mne-cpp's in-tree, Qt-based reimplementation of the Lab
+ * mne_lsl is mne-cpp's in-tree, Qt-based reimplementation of the Lab
  * Streaming Layer (LSL) client API. It is designed as an ABI- and
  * source-compatible drop-in replacement for the public subset of liblsl's
  * @c lsl_cpp.h header, so acquisition plug-ins and analysis tools can
@@ -17,10 +17,10 @@
  * external @c liblsl dependency into the build.
  *
  * Including this header transitively pulls in the four public components
- * that together cover the round-trip data path: @ref LSLLIB::stream_info
+ * that together cover the round-trip data path: @ref mne::stream_info
  * for describing a stream's content type, channel layout and sampling
- * rate; @ref LSLLIB::stream_outlet for publishing samples over TCP while
- * advertising the stream via UDP multicast; @ref LSLLIB::stream_inlet for
+ * rate; @ref mne::stream_outlet for publishing samples over TCP while
+ * advertising the stream via UDP multicast; @ref mne::stream_inlet for
  * connecting to a resolved outlet and pulling chunks of multichannel
  * float samples; and the @c resolve_streams / @c resolve_stream free
  * functions in @ref lsl_stream_discovery.h for enumerating outlets

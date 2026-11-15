@@ -66,7 +66,7 @@
 // BEM METHOD CONSTANTS
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 constexpr int FWD_BEM_UNKNOWN = -1;
@@ -79,13 +79,13 @@ constexpr int FWD_BEM_LIN_FIELD_SIMPLE = 1;
 constexpr int FWD_BEM_LIN_FIELD_FERGUSON = 2;
 constexpr int FWD_BEM_LIN_FIELD_URANKAR = 3;
 
-} // namespace FWDLIB
+} // namespace mne
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNETriangle;
 class MNESurface;
@@ -94,19 +94,19 @@ class MNECTFCompDataSet;
 class MNENamedMatrix;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffNamedMatrix;
 }
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
-// FWDLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FwdEegSphereModel;
@@ -193,7 +193,7 @@ public:
      * @param[out] res    Receives the integer value on success.
      * @return OK if the tag was found and is of type FIFFT_INT, FAIL otherwise.
      */
-    static int get_int(FIFFLIB::FiffStream& stream, const std::shared_ptr<FIFFLIB::FiffDirNode>& node, int what, int* res);
+    static int get_int(mne::FiffStream& stream, const std::shared_ptr<mne::FiffDirNode>& node, int what, int* res);
 
     /**
      * @brief Find a surface of the given kind in this BEM model.
@@ -201,7 +201,7 @@ public:
      * @param[in] kind  FsSurface ID to look for.
      * @return Non-owning pointer to the surface, or nullptr if not found.
      */
-    MNELIB::MNESurface* fwd_bem_find_surface(int kind);
+    mne::MNESurface* fwd_bem_find_surface(int kind);
 
     //=========================================================================================================
     /**
@@ -254,7 +254,7 @@ public:
      * @param[in] t  The head-to-MRI coordinate transformation.
      * @return OK on success, FAIL on error.
      */
-    int fwd_bem_set_head_mri_t(const FIFFLIB::FiffCoordTrans& t);
+    int fwd_bem_set_head_mri_t(const mne::FiffCoordTrans& t);
 
     //============================= dipole_fit_guesses.c =============================
 
@@ -273,12 +273,12 @@ public:
      * @param[in] mindist     Minimum distance from the boundary surface.
      * @return Source space holding the guess locations, or nullptr on failure.
      */
-    static std::unique_ptr<MNELIB::MNESourceSpace> make_guesses(MNELIB::MNESurface* guess_surf,
-                                                                float guessrad,
-                                                                const Eigen::Vector3f& guess_r0,
-                                                                float grid,
-                                                                float exclude,
-                                                                float mindist);
+    static std::unique_ptr<mne::MNESourceSpace> make_guesses(mne::MNESurface* guess_surf,
+                                                             float guessrad,
+                                                             const Eigen::Vector3f& guess_r0,
+                                                             float grid,
+                                                             float exclude,
+                                                             float mindist);
 
     //============================= fwd_bem_linear_collocation.c =============================
 
@@ -309,7 +309,7 @@ public:
      * @param[out] omega  Output coefficients for the three triangle vertices.
      */
     static void lin_pot_coeff(const Eigen::Vector3f& from,
-                              MNELIB::MNETriangle& to,
+                              mne::MNETriangle& to,
                               Eigen::Vector3d& omega);
 
     //=========================================================================================================
@@ -319,7 +319,7 @@ public:
      * @param[in]     surf  The BEM surface.
      * @param[in,out] mat   The coefficient matrix to correct (modified in-place).
      */
-    static void correct_auto_elements(MNELIB::MNESurface& surf,
+    static void correct_auto_elements(mne::MNESurface& surf,
                                       Eigen::MatrixXf& mat);
 
     //=========================================================================================================
@@ -329,7 +329,7 @@ public:
      * @param[in] surfs  Vector of BEM surfaces.
      * @return Coefficient matrix (rows = nodes, columns = nodes).
      */
-    static Eigen::MatrixXf fwd_bem_lin_pot_coeff(const std::vector<MNELIB::MNESurface*>& surfs);
+    static Eigen::MatrixXf fwd_bem_lin_pot_coeff(const std::vector<mne::MNESurface*>& surfs);
 
     //=========================================================================================================
     /**
@@ -409,7 +409,7 @@ public:
      * @param[in] surfs  Vector of BEM surfaces.
      * @return Solid-angle matrix, or empty matrix on error.
      */
-    static Eigen::MatrixXf fwd_bem_solid_angles(const std::vector<MNELIB::MNESurface*>& surfs);
+    static Eigen::MatrixXf fwd_bem_solid_angles(const std::vector<mne::MNESurface*>& surfs);
 
     //=========================================================================================================
     /**
@@ -651,7 +651,7 @@ public:
      * @param[out] fy    Integral fy.
      */
     static void field_integrals(const Eigen::Vector3f& from,
-                                MNELIB::MNETriangle& to,
+                                mne::MNETriangle& to,
                                 double& I1p,
                                 Eigen::Vector2d& T, Eigen::Vector2d& S1, Eigen::Vector2d& S2,
                                 Eigen::Vector3d& f0, Eigen::Vector3d& fx, Eigen::Vector3d& fy);
@@ -666,7 +666,7 @@ public:
      * @return The field coefficient.
      */
     static double one_field_coeff(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal,
-                                  MNELIB::MNETriangle& tri);
+                                  mne::MNETriangle& tri);
 
     //=========================================================================================================
     /**
@@ -704,7 +704,7 @@ public:
      * @param[out] res   Output coefficients for the three triangle vertices.
      */
     static void fwd_bem_one_lin_field_coeff_ferg(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
-                                                 MNELIB::MNETriangle& tri,
+                                                 mne::MNETriangle& tri,
                                                  Eigen::Vector3d& res);
 
     //=========================================================================================================
@@ -717,7 +717,7 @@ public:
      * @param[out] res   Output coefficients for the three triangle vertices.
      */
     static void fwd_bem_one_lin_field_coeff_uran(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
-                                                 MNELIB::MNETriangle& tri,
+                                                 mne::MNETriangle& tri,
                                                  Eigen::Vector3d& res);
 
     //=========================================================================================================
@@ -730,7 +730,7 @@ public:
      * @param[out] res     Output coefficients for the three triangle vertices.
      */
     static void fwd_bem_one_lin_field_coeff_simple(const Eigen::Vector3f& dest, const Eigen::Vector3f& normal,
-                                                   MNELIB::MNETriangle& source,
+                                                   mne::MNETriangle& source,
                                                    Eigen::Vector3d& res);
 
     //=========================================================================================================
@@ -738,7 +738,7 @@ public:
      * @brief Function pointer type for linear field coefficient integration methods.
      */
     typedef void (*linFieldIntFunc)(const Eigen::Vector3f& dest, const Eigen::Vector3f& dir,
-                                    MNELIB::MNETriangle& tri, Eigen::Vector3d& res);
+                                    mne::MNETriangle& tri, Eigen::Vector3d& res);
 
     //=========================================================================================================
     /**
@@ -915,15 +915,15 @@ public:
      * @param[in]     bDoGRad     If true, also compute the gradient solution.
      * @return OK on success, FAIL on error.
      */
-    int compute_forward_meg(std::vector<std::unique_ptr<MNELIB::MNESourceSpace>>& spaces,
+    int compute_forward_meg(std::vector<std::unique_ptr<mne::MNESourceSpace>>& spaces,
                             FwdCoilSet* coils,
                             FwdCoilSet* comp_coils,
-                            MNELIB::MNECTFCompDataSet* comp_data,
+                            mne::MNECTFCompDataSet* comp_data,
                             bool fixed_ori,
                             const Eigen::Vector3f& r0,
                             bool use_threads,
-                            FIFFLIB::FiffNamedMatrix& resp,
-                            FIFFLIB::FiffNamedMatrix& resp_grad,
+                            mne::FiffNamedMatrix& resp,
+                            mne::FiffNamedMatrix& resp_grad,
                             bool bDoGRad);
 
     //=========================================================================================================
@@ -940,13 +940,13 @@ public:
      * @param[in]     bDoGrad     If true, also compute the gradient solution.
      * @return OK on success, FAIL on error.
      */
-    int compute_forward_eeg(std::vector<std::unique_ptr<MNELIB::MNESourceSpace>>& spaces,
+    int compute_forward_eeg(std::vector<std::unique_ptr<mne::MNESourceSpace>>& spaces,
                             FwdCoilSet* els,
                             bool fixed_ori,
                             FwdEegSphereModel* eeg_model,
                             bool use_threads,
-                            FIFFLIB::FiffNamedMatrix& resp,
-                            FIFFLIB::FiffNamedMatrix& resp_grad,
+                            mne::FiffNamedMatrix& resp,
+                            mne::FiffNamedMatrix& resp_grad,
                             bool bDoGrad);
 
     //============================= fwd_spherefield.c =============================
@@ -1042,7 +1042,7 @@ public:
 public:
     std::string surf_name; /**< File from which surfaces were loaded. */
 
-    std::vector<std::shared_ptr<MNELIB::MNESurface>> surfs; /**< Interface surfaces, outermost first. */
+    std::vector<std::shared_ptr<mne::MNESurface>> surfs; /**< Interface surfaces, outermost first. */
 
     Eigen::VectorXi ntri; /**< Triangle count per surface (length nsurf). */
     Eigen::VectorXi np;   /**< Vertex count per surface (length nsurf). */
@@ -1060,7 +1060,7 @@ public:
     Eigen::VectorXf v0;       /**< Workspace for infinite-medium potentials (length nsol). */
     int nsol;                 /**< Dimension of the solution matrix. */
 
-    FIFFLIB::FiffCoordTrans head_mri_t; /**< Head-to-MRI coordinate transform. */
+    mne::FiffCoordTrans head_mri_t; /**< Head-to-MRI coordinate transform. */
 
     float ip_approach_limit; /**< Threshold for isolated-problem approach. */
     bool use_ip_approach;    /**< Whether the isolated-problem approach is active. */
@@ -1069,6 +1069,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE FWDLIB
+} // NAMESPACE mne_fwd
 
 #endif // FWD_BEM_MODEL_H

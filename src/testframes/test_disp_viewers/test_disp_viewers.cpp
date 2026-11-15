@@ -58,8 +58,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -217,9 +217,9 @@ void TestDispViewers::cleanupTestCase()
 void TestDispViewers::scalingView_constructAndGetSet()
 {
     // Free function: getDefaultScalingValue(kind, unit)
-    float megMagDefault = DISPLIB::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T);
-    float megGradDefault = DISPLIB::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T_M);
-    float eegDefault = DISPLIB::getDefaultScalingValue(FIFFV_EEG_CH, FIFF_UNIT_V);
+    float megMagDefault = mne::disp::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T);
+    float megGradDefault = mne::disp::getDefaultScalingValue(FIFFV_MEG_CH, FIFF_UNIT_T_M);
+    float eegDefault = mne::disp::getDefaultScalingValue(FIFFV_EEG_CH, FIFF_UNIT_V);
     QVERIFY(megMagDefault > 0.0f);
     QVERIFY(megGradDefault > 0.0f);
     QVERIFY(eegDefault > 0.0f);

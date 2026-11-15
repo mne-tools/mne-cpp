@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Out-of-line definitions for the PYBRIDGELIB build-info accessors declared in @ref pybridge_global.h.
+ * @brief    Out-of-line definitions for the mne_pybridge build-info accessors declared in @ref pybridge_global.h.
  *
  * Kept as a separate translation unit so the @c __DATE__ and
  * @c __TIME__ macros are expanded when this file is compiled
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* PYBRIDGELIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* PYBRIDGELIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* PYBRIDGELIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

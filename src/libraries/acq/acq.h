@@ -7,14 +7,14 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Umbrella header of ACQLIB, the headless acquisition and stimulation library (C++20 standard library only).
+ * @brief    Umbrella header of mne_acq, the headless acquisition and stimulation library (C++20 standard library only).
  *
  * Quick start (the complete program; Eigen via the optional acq_eigen.h):
  * @code
  * #include <acq/acq_eigen.h>
  * #include <cstdio>
  *
- * using namespace ACQLIB;
+ * using namespace mne;
  * using namespace std::chrono_literals;
  *
  * int main()

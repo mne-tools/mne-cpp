@@ -11,7 +11,7 @@
  *
  * Equivalent of @c mne.make_fixed_length_epochs (duration, overlap, optional short last epoch),
  * @c mne.concatenate_epochs and @c Epochs.average on plain data matrices. Event-locked epochs with
- * rejection are averaged by @ref FIFFLIB::FiffEvokedSet::computeAverages.
+ * rejection are averaged by @ref mne::FiffEvokedSet::computeAverages.
  */
 
 #ifndef FIFF_EPOCHS_H
@@ -34,10 +34,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -131,6 +131,6 @@ public:
     static std::vector<Eigen::MatrixXd> toMatrixList(const std::vector<FiffEpochData>& epochs);
 };
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_EPOCHS_H

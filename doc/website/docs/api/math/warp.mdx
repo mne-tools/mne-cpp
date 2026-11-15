@@ -1,18 +1,18 @@
 ---
 id: warp
-title: "MATHLIB::Warp"
+title: "mne::Warp"
 sidebar_label: Warp
 sidebar_position: 4
 ---
 
 # Warp
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/warp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/warp.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/warp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/warp.h)
 
 `#include <math/warp.h>`
 
 ```cpp
-class MATHLIB::Warp
+class mne::Warp
 ```
 
 Thin-plate-spline (Bookstein) 3-D warp that maps source landmarks exactly onto destination landmarks and extends smoothly to the rest of `R^3`.
@@ -113,7 +113,7 @@ ok &= expect(warpErr < 1e-4f, std::format("TPS warp reproduces the translation (
 
 ### [ex_warp](../../examples/math/ex_warp.mdx)
 
-Example demonstrating thin-plate-spline (TPS) warping with MATHLIB::Warp.
+Example demonstrating thin-plate-spline (TPS) warping with mne::Warp.
 
 ````cpp title="src/examples/ex_warp/main.cpp, line 109"
 // Fit the thin-plate spline from the landmark correspondences and apply it to

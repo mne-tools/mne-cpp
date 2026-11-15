@@ -111,7 +111,7 @@ std::string_view stripPlus(std::string_view text)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::string_view BASELIB::trimmed(std::string_view text)
+std::string_view mne::trimmed(std::string_view text)
 {
     while (!text.empty() && isSpace(text.front())) {
         text.remove_prefix(1);
@@ -124,7 +124,7 @@ std::string_view BASELIB::trimmed(std::string_view text)
 
 //=============================================================================================================
 
-BASELIB::StringList BASELIB::split(std::string_view text, char separator, bool skipEmpty)
+mne::StringList mne::split(std::string_view text, char separator, bool skipEmpty)
 {
     StringList fields;
     for (std::size_t start = 0;;) {
@@ -142,7 +142,7 @@ BASELIB::StringList BASELIB::split(std::string_view text, char separator, bool s
 
 //=============================================================================================================
 
-int BASELIB::indexOf(const StringList& list, std::string_view name)
+int mne::indexOf(const StringList& list, std::string_view name)
 {
     const auto it = std::find(list.begin(), list.end(), name);
     return it == list.end() ? -1 : static_cast<int>(it - list.begin());
@@ -150,14 +150,14 @@ int BASELIB::indexOf(const StringList& list, std::string_view name)
 
 //=============================================================================================================
 
-bool BASELIB::contains(const StringList& list, std::string_view name)
+bool mne::contains(const StringList& list, std::string_view name)
 {
     return std::find(list.begin(), list.end(), name) != list.end();
 }
 
 //=============================================================================================================
 
-std::string BASELIB::join(const StringList& list, std::string_view separator)
+std::string mne::join(const StringList& list, std::string_view separator)
 {
     std::string out;
     for (std::size_t i = 0; i < list.size(); ++i) {
@@ -170,7 +170,7 @@ std::string BASELIB::join(const StringList& list, std::string_view separator)
 
 //=============================================================================================================
 
-std::string BASELIB::toLower(std::string_view text)
+std::string mne::toLower(std::string_view text)
 {
     std::string out(text);
     std::transform(out.begin(), out.end(), out.begin(), lower);
@@ -179,14 +179,14 @@ std::string BASELIB::toLower(std::string_view text)
 
 //=============================================================================================================
 
-bool BASELIB::equalsIgnoreCase(std::string_view a, std::string_view b)
+bool mne::equalsIgnoreCase(std::string_view a, std::string_view b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](char x, char y) { return lower(x) == lower(y); });
 }
 
 //=============================================================================================================
 
-std::optional<double> BASELIB::toDouble(std::string_view text)
+std::optional<double> mne::toDouble(std::string_view text)
 {
     text = stripPlus(trimmed(text));
     const std::string lowered = toLower(text);
@@ -215,7 +215,7 @@ std::optional<double> BASELIB::toDouble(std::string_view text)
 
 //=============================================================================================================
 
-std::optional<int> BASELIB::toInt(std::string_view text)
+std::optional<int> mne::toInt(std::string_view text)
 {
     text = stripPlus(trimmed(text));
     int value = 0;
@@ -228,14 +228,14 @@ std::optional<int> BASELIB::toInt(std::string_view text)
 
 //=============================================================================================================
 
-std::filesystem::path BASELIB::pathFromUtf8(std::string_view utf8)
+std::filesystem::path mne::pathFromUtf8(std::string_view utf8)
 {
     return std::filesystem::path(std::u8string(utf8.begin(), utf8.end()));
 }
 
 //=============================================================================================================
 
-std::string BASELIB::utf8FromPath(const std::filesystem::path& path)
+std::string mne::utf8FromPath(const std::filesystem::path& path)
 {
     const std::u8string utf8 = path.u8string();
     return std::string(utf8.begin(), utf8.end());
@@ -243,7 +243,7 @@ std::string BASELIB::utf8FromPath(const std::filesystem::path& path)
 
 //=============================================================================================================
 
-std::string BASELIB::latin1_to_utf8(std::string_view latin1)
+std::string mne::latin1_to_utf8(std::string_view latin1)
 {
     std::string utf8;
     utf8.reserve(latin1.size() + static_cast<std::size_t>(std::ranges::count_if(latin1, [](char c) { return static_cast<unsigned char>(c) >= 0x80; })));
@@ -261,7 +261,7 @@ std::string BASELIB::latin1_to_utf8(std::string_view latin1)
 
 //=============================================================================================================
 
-bool BASELIB::is_utf8(std::string_view text)
+bool mne::is_utf8(std::string_view text)
 {
     const auto byte = [&](std::size_t i) {
         return static_cast<unsigned char>(text[i]);
@@ -304,7 +304,7 @@ bool BASELIB::is_utf8(std::string_view text)
 
 //=============================================================================================================
 
-std::filesystem::path BASELIB::executable_dir()
+std::filesystem::path mne::executable_dir()
 {
     static const std::filesystem::path dir = [] {
         std::error_code error;
@@ -336,7 +336,7 @@ std::filesystem::path BASELIB::executable_dir()
 
 //=============================================================================================================
 
-std::filesystem::path BASELIB::resource_path(std::string_view relative)
+std::filesystem::path mne::resource_path(std::string_view relative)
 {
     const std::filesystem::path name = pathFromUtf8(relative);
     std::filesystem::path installed = executable_dir().parent_path() / "resources" / name;

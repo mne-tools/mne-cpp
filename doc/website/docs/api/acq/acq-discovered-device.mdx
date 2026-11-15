@@ -1,18 +1,18 @@
 ---
 id: acq-discovered-device
-title: "ACQLIB::AcqDiscoveredDevice"
+title: "mne::AcqDiscoveredDevice"
 sidebar_label: AcqDiscoveredDevice
 sidebar_position: 32
 ---
 
 # AcqDiscoveredDevice
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
 
 `#include <acq/acq_device_registry.h>`
 
 ```cpp
-struct ACQLIB::AcqDiscoveredDevice
+struct mne::AcqDiscoveredDevice
 ```
 
 A source found by discovery, with a URI that opens it.
@@ -48,7 +48,7 @@ if (uri == "--list") {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 190"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 189"
     for (const AcqDiscoveredDevice& found : registry.discover(1s)) {
         std::printf("found %s  %s (%s)\n", found.uri.c_str(), found.label.c_str(), found.detail.c_str());
     }

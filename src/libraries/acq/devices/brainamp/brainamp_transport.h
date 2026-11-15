@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Sampling rate of every BrainAmp in Hz. */
@@ -150,6 +150,6 @@ std::unique_ptr<BrainAmpTransport> makeBrainAmpSimulator(const BrainAmpSimulatio
 /** @return The Windows driver of a connected adapter, or BackendUnavailable / DeviceNotFound. */
 AcqExpected<std::unique_ptr<BrainAmpTransport>> openBrainAmpDriver();
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // BRAINAMP_TRANSPORT_H

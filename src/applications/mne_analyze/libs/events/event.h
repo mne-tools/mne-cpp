@@ -29,17 +29,17 @@
 #include <string>
 
 //=============================================================================================================
-// NAMESPACE EVENTSLIB
+// NAMESPACE mne::analyze::events
 //=============================================================================================================
 
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 
 //=============================================================================================================
-// EVENTSINTERNAL FORWARD DECLARATIONS
+// detail FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 class EventINT;
 }
@@ -75,7 +75,7 @@ struct EVENTS_EXPORT Event
      *
      * @param[in] e An event object.
      */
-    Event(const EVENTSINTERNAL::EventINT& e);
+    Event(const detail::EventINT& e);
 
     idNum id;      /**< Unique key of this event object. Not the trigger code, see eventCode. */
     int sample;    /**< First sample covered by the event. */
@@ -84,7 +84,7 @@ struct EVENTS_EXPORT Event
     idNum groupId; /**< GroupId of this event. */
 };
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 // The fact that we go with int for sample is a fundamental limitation of this
 // whole architecture. With a Fs = 1kHz, we could have a maximum of aprox. 25 days.
@@ -323,8 +323,8 @@ inline EventINT EventINT::fromSample(int sample)
     return EventINT(0, sample, 0);
 }
 
-} //namespace EVENTSINTERNAL
-} //namespace EVENTSLIB
+} //namespace detail
+} //namespace mne::analyze::events
 
 //=========================================================================================================
 
@@ -334,9 +334,9 @@ inline EventINT EventINT::fromSample(int sample)
 namespace std
 {
 template<>
-struct hash<EVENTSLIB::EVENTSINTERNAL::EventINT>
+struct hash<mne::analyze::events::detail::EventINT>
 {
-    size_t operator()(const EVENTSLIB::EVENTSINTERNAL::EventINT& rhs) const
+    size_t operator()(const mne::analyze::events::detail::EventINT& rhs) const
     {
         return hash<int>()(rhs.getId());
     }

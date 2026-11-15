@@ -41,9 +41,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 using namespace Eigen;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -485,7 +485,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 //=============================================================================================================
 
 VectorXi GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                         const FIFFLIB::FiffInfo& fiffInfo,
+                                         const mne::FiffInfo& fiffInfo,
                                          qint32 iSensorType)
 {
     std::vector<int> vecBadColumns;

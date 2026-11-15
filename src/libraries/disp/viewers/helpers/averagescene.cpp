@@ -25,7 +25,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -84,7 +84,7 @@ void AverageScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelItem
 
 //=============================================================================================================
 
-void AverageScene::repaintSelectionItems(const DISPLIB::SelectionItem& selectedChannelItems)
+void AverageScene::repaintSelectionItems(const mne::disp::SelectionItem& selectedChannelItems)
 {
     this->clear();
 

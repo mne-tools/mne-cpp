@@ -53,8 +53,8 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(SCSHAREDLIB::PluginManager* pPluginManager,
-                     SCSHAREDLIB::PluginSceneManager* pPluginSceneManager)
+PluginGui::PluginGui(mne::scan::PluginManager* pPluginManager,
+                     mne::scan::PluginSceneManager* pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
@@ -195,7 +195,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
 void PluginGui::loadConfigMna(const QString& fullPath)
 {
-    MNALIB::MnaProject project = MNALIB::MnaIO::read(fullPath);
+    mne::MnaProject project = mne::MnaIO::read(fullPath);
     if (project.pipeline.isEmpty()) {
         qWarning() << "Empty or invalid MNA pipeline in" << fullPath;
         return;
@@ -205,7 +205,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
 
     // Phase 1: Create plugins from pipeline nodes
     QMap<QString, PluginItem*> itemMap;
-    for (const MNALIB::MnaNode& node : project.pipeline) {
+    for (const mne::MnaNode& node : project.pipeline) {
         QAction* pCurrentAction = nullptr;
         for (int i = 0; i < m_pActionGroupPlugins->actions().size(); ++i) {
             if (m_pActionGroupPlugins->actions()[i]->text() == node.opType) {
@@ -228,7 +228,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
         qreal posY = node.attributes.value(QStringLiteral("gui_y"), 0).toReal();
         QPointF pos(posX, posY);
 
-        SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
+        mne::scan::AbstractPlugin::SPtr pPlugin;
         pCurrentAction->setChecked(true);
         m_pPluginScene->setActionPluginItem(pCurrentAction);
         m_pPluginScene->setMode(PluginScene::InsertPluginItem);
@@ -259,8 +259,8 @@ void PluginGui::loadConfigMna(const QString& fullPath)
     }
 
     // Phase 2: Create connections from port links
-    for (const MNALIB::MnaNode& node : project.pipeline) {
-        for (const MNALIB::MnaPort& inPort : node.inputs) {
+    for (const mne::MnaNode& node : project.pipeline) {
+        for (const mne::MnaPort& inPort : node.inputs) {
             if (inPort.sourceNodeId.isEmpty())
                 continue;
 
@@ -269,8 +269,8 @@ void PluginGui::loadConfigMna(const QString& fullPath)
             if (!startItem || !endItem)
                 continue;
 
-            SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection =
-                SCSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+            mne::scan::PluginConnectorConnection::SPtr pConnection =
+                mne::scan::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
 
             if (pConnection->isConnected()) {
                 Arrow* arrow = new Arrow(startItem, endItem, pConnection);
@@ -353,13 +353,13 @@ void PluginGui::saveConfigMna(const QString& fullPath)
     m_pPluginSceneManager->refreshGraphNodeAttributes();
 
     // ── Enriching mode: start from loaded project to preserve foreign data ──
-    MNALIB::MnaProject project;
+    mne::MnaProject project;
     if (!m_loadedMnaProject.subjects.isEmpty() || !m_loadedMnaProject.pipeline.isEmpty()) {
         project = m_loadedMnaProject;
     } else {
         project.name = QStringLiteral("MNE Scan Pipeline");
         project.description = QStringLiteral("MNE Scan plugin configuration");
-        project.mnaVersion = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+        project.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
         project.created = QDateTime::currentDateTimeUtc();
     }
     project.pipeline = m_pPluginSceneManager->pipelineGraph().nodes();
@@ -372,7 +372,7 @@ void PluginGui::saveConfigMna(const QString& fullPath)
         if (!dir.mkpath(fi.path()))
             return;
 
-    MNALIB::MnaIO::write(project, fullPath);
+    mne::MnaIO::write(project, fullPath);
     m_loadedMnaProject = project;
 }
 
@@ -393,7 +393,7 @@ void PluginGui::uiSetupRunningState(bool state)
 
 //=============================================================================================================
 
-bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
+bool PluginGui::removePlugin(mne::scan::AbstractPlugin::SPtr pPlugin)
 {
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
@@ -457,8 +457,8 @@ void PluginGui::itemInserted(PluginItem* item)
 
 void PluginGui::newItemSelected()
 {
-    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
-    SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
+    mne::scan::AbstractPlugin::SPtr pPlugin;
+    mne::scan::PluginConnectorConnection::SPtr pConnection;
 
     foreach (QGraphicsItem* item, m_pPluginScene->selectedItems()) {
         if (item->type() == PluginItem::Type)
@@ -469,11 +469,11 @@ void PluginGui::newItemSelected()
 
     if (!pPlugin.isNull() && pPlugin != m_pCurrentPlugin) {
         m_pCurrentPlugin = pPlugin;
-        m_pCurrentConnection = SCSHAREDLIB::PluginConnectorConnection::SPtr();
+        m_pCurrentConnection = mne::scan::PluginConnectorConnection::SPtr();
         emit selectedPluginChanged(m_pCurrentPlugin);
     } else if (!pConnection.isNull() && pConnection != m_pCurrentConnection) {
         m_pCurrentConnection = pConnection;
-        m_pCurrentPlugin = SCSHAREDLIB::AbstractPlugin::SPtr();
+        m_pCurrentPlugin = mne::scan::AbstractPlugin::SPtr();
         emit selectedConnectionChanged(m_pCurrentConnection);
     }
 }

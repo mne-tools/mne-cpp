@@ -9,17 +9,17 @@
  * @date     March 2026
  * @brief    Instanced connectivity-graph renderable: node spheres and edge cylinders coloured by weight through a named colormap.
  *
- * NetworkObject mirrors the @ref DISP3DLIB::DipoleObject instancing pattern
+ * NetworkObject mirrors the @ref mne::disp::DipoleObject instancing pattern
  * but splits the scene into two meshes &mdash; nodes (spheres) and
  * edges (cylinders) &mdash; each with its own vertex / index / instance
  * buffer triple. The node mesh re-uses the dipole instance layout
  * for shader compatibility (model + colour + isSelected), so a
  * single pipeline serves both renderables.
  *
- * @ref DISP3DLIB::NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
- * to map edge weight to RGBA; @ref DISP3DLIB::NetworkObject::setThreshold "setThreshold" prunes edges and
+ * @ref mne::disp::NetworkObject::setColormap "setColormap" selects the palette (Viridis, Hot, Jet, ...) used
+ * to map edge weight to RGBA; @ref mne::disp::NetworkObject::setThreshold "setThreshold" prunes edges and
  * nodes below a normalised cut-off and regenerates the instance
- * stream without touching the underlying @ref CONNECTIVITYLIB::Network.
+ * stream without touching the underlying @ref mne::Network.
  */
 
 #ifndef NETWORKOBJECT_H
@@ -42,7 +42,7 @@
 #include <connectivity/network/network.h>
 
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ public:
      * @param[in] network       The connectivity network to visualize.
      * @param[in] sColormap     Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
      */
-    void load(const CONNECTIVITYLIB::Network& network, const QString& sColormap = "Viridis");
+    void load(const mne::Network& network, const QString& sColormap = "Viridis");
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ private:
     void buildEdgeInstances();
 
     // ── Network data ────────────────────────────────────────────────────
-    CONNECTIVITYLIB::Network m_network;
+    mne::Network m_network;
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
@@ -199,6 +199,6 @@ private:
     bool m_visible = true;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // NETWORKOBJECT_H

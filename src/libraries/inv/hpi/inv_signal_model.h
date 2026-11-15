@@ -9,13 +9,13 @@
  * @date     March 2026
  * @brief    Sinusoidal HPI signal model — builds and inverts the regressor matrix that extracts coil amplitudes from MEG data.
  *
- * @ref INVLIB::InvSignalModel builds the model matrix that pairs the
+ * @ref mne::InvSignalModel builds the model matrix that pairs the
  * HPI coil drive frequencies (and, optionally, the line-frequency
  * harmonics) with the sample window length defined by the input data.
  * Inverting the model with a pseudo-inverse projects the MEG buffer
- * onto the per-coil amplitudes that @ref INVLIB::InvHpiFit feeds into the
+ * onto the per-coil amplitudes that @ref mne::InvHpiFit feeds into the
  * dipole search. The model matrix is cached and re-derived only when
- * the @ref INVLIB::InvHpiModelParameters change or the number of samples in
+ * the @ref mne::InvHpiModelParameters change or the number of samples in
  * the buffer changes.
  */
 
@@ -39,7 +39,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 //=============================================================================================================
 // Declare all structures to be used
@@ -109,6 +109,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // SignalModel_H

@@ -22,7 +22,7 @@
  * Filters for Robust EEG Single-Trial Analysis*, IEEE Signal Processing
  * Magazine 25(1), 2008.
  *
- * @ref DECODINGLIB::DecodingCsp mirrors the public surface of @c mne.decoding.CSP
+ * @ref mne::DecodingCsp mirrors the public surface of @c mne.decoding.CSP
  * but implements the GED inline with Eigen so no LAPACK dependency is
  * required, which matters for the WebAssembly target. Beyond the
  * upstream algorithm it provides the @c TransformMode switch
@@ -57,10 +57,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DECODINGLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DECODINGLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -91,7 +91,7 @@ namespace DECODINGLIB
  * into sensor space, which is what the application layer uses to render
  * CSP topographies side-by-side with the discriminative scores.
  *
- * @see DECODINGLIB, @c mne.decoding.CSP
+ * @see mne_decoding, @c mne.decoding.CSP
  *
  * @snippet ex_decoding/main.cpp decoding_csp_fit_transform
  */
@@ -218,6 +218,6 @@ private:
         const std::vector<Eigen::MatrixXd>& epochs) const;
 };
 
-} // namespace DECODINGLIB
+} // namespace mne
 
 #endif // DECODING_CSP_H

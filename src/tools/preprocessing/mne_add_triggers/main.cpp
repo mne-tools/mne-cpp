@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -91,7 +91,7 @@ static QList<TriggerEvent> readTriggerFile(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_triggers");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

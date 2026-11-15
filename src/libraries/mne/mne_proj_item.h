@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Single SSP projection vector with kind/active flag and channel labels.
  *
- * @ref MNELIB::MNEProjItem corresponds to one @c FIFFB_PROJ_ITEM block:
+ * @ref mne::MNEProjItem corresponds to one @c FIFFB_PROJ_ITEM block:
  * the labelled vector that gets removed from the data when the
- * projection is active. Used both by @ref FIFFLIB::FiffInfo's SSP list
- * and by @ref MNELIB::MNEProjOp when assembling the full projector.
+ * projection is active. Used both by @ref mne::FiffInfo's SSP list
+ * and by @ref mne::MNEProjOp when assembling the full projector.
  */
 
 #ifndef MNEPROJITEM_H
@@ -40,10 +40,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -96,6 +96,6 @@ public:
     bool has_eeg = false;     /**< Whether the projection covers EEG channels. */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEPROJITEM_H

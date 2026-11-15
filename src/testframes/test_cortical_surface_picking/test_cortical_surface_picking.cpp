@@ -25,8 +25,7 @@
 #include <inv/inv_source_estimate.h>
 
 using namespace CORTICALSURFACEPLUGIN;
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne;
 
 namespace
 {

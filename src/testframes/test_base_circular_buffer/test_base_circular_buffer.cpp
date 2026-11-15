@@ -8,7 +8,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.9
  * @date     August, 2022
- * @brief    Tests the bounded blocking queue BASELIB::CircularBuffer.
+ * @brief    Tests the bounded blocking queue mne::CircularBuffer.
  */
 
 //=============================================================================================================
@@ -35,12 +35,12 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 //=============================================================================================================
 /**
- * @brief Tests BASELIB::CircularBuffer.
+ * @brief Tests mne::CircularBuffer.
  */
 class TestCircularBuffer : public QObject
 {

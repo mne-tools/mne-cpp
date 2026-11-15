@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COMLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -210,7 +210,7 @@ std::expected<std::size_t, std::error_code> SerialPort::read(std::span<char> buf
 
 //=============================================================================================================
 
-std::vector<std::string> COMLIB::list_serial_ports()
+std::vector<std::string> mne::list_serial_ports()
 {
     std::vector<std::string> ports;
     std::array<char, 65536> devices{};
@@ -321,7 +321,7 @@ std::expected<std::size_t, std::error_code> SerialPort::read(std::span<char> buf
 
 //=============================================================================================================
 
-std::vector<std::string> COMLIB::list_serial_ports()
+std::vector<std::string> mne::list_serial_ports()
 {
     std::vector<std::string> usb;
     std::vector<std::string> other;

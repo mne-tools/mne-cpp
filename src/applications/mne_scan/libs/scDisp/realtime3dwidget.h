@@ -42,7 +42,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class BrainView;
 class BrainTreeModel;
@@ -51,27 +51,27 @@ class BemTreeItem;
 class DigitizerSetTreeItem;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeConnectivityEstimate;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class QuickControlView;
 class Control3DView;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffDigPointSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -121,7 +121,7 @@ public:
      *
      * @param[in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -138,7 +138,7 @@ protected:
      *
      * @param[in] pDigData      New digitizer data
      */
-    void alignFiducials(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& pDigData);
+    void alignFiducials(const std::shared_ptr<mne::FiffDigitizerData>& pDigData);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ protected:
      *
      * @param[in] digSet    set of digitizer points
      */
-    void addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet);
+    void addDigSetToView(const mne::FiffDigPointSet& digSet);
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ protected:
      *
      * @return
      */
-    QMatrix4x4 calculateInverseMatrix(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& pDigData,
+    QMatrix4x4 calculateInverseMatrix(const std::shared_ptr<mne::FiffDigitizerData>& pDigData,
                                       float scale) const;
 
     //=========================================================================================================
@@ -180,24 +180,24 @@ protected:
      */
     void createGUI();
 
-    QString m_sFilePathDigitizers;                                    /**< Path to loaded fiff file with digitizer data. */
-    std::shared_ptr<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData; /**< Fiff digitizer data for current measurement. */
+    QString m_sFilePathDigitizers;                                /**< Path to loaded fiff file with digitizer data. */
+    std::shared_ptr<mne::FiffDigitizerData> m_pFiffDigitizerData; /**< Fiff digitizer data for current measurement. */
 
     int m_iNumberBadChannels; /**< The last received number of bad channels. */
 
-    FSLIB::FsAnnotationSet m_annotationSet; /**< The current annotation set. */
-    FSLIB::FsSurfaceSet m_surfSet;          /**< The current surface set. */
+    mne::FsAnnotationSet m_annotationSet; /**< The current annotation set. */
+    mne::FsSurfaceSet m_surfSet;          /**< The current surface set. */
 
-    QMatrix4x4 m_tAlignment;                /**< Transformation matrix alignment fiducials/tracked in head space. */
-    FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< The mri to head transformation. */
+    QMatrix4x4 m_tAlignment;            /**< Transformation matrix alignment fiducials/tracked in head space. */
+    mne::FiffCoordTrans m_mriHeadTrans; /**< The mri to head transformation. */
 
-    QSharedPointer<DISP3DLIB::BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
+    QSharedPointer<mne::disp::BrainTreeModel> m_pData3DModel; /**< The Disp3D model. */
 
-    DISP3DLIB::DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
-    QPointer<DISP3DLIB::BrainView> m_p3DView;             /**< The Disp3D view. */
-    DISP3DLIB::NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
+    mne::disp::DigitizerSetTreeItem* m_pTrackedDigitizer; /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<mne::disp::BrainView> m_p3DView;             /**< The Disp3D view. */
+    mne::disp::NetworkTreeItem* m_pRtConnectivityItem;    /**< The Disp3D real time item. */
     bool m_bRtSourceActive;                               /**< Whether realtime source is active. */
-    DISP3DLIB::BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
+    mne::disp::BemTreeItem* m_pBemHeadAvr;                /**< The fsaverage BEM head model. */
     QPointer<QAction> m_pActionQuickControl;              /**< Show quick control widget. */
 };
 } // NAMESPACE

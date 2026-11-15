@@ -50,8 +50,7 @@
 //=============================================================================================================
 
 using namespace FIFFSIMULATORRTSERVERPLUGIN;
-using namespace ACQLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace RTSERVER;
 
 //=============================================================================================================
@@ -356,7 +355,7 @@ void FiffSimulator::run()
     // The replay paces itself at sfreq * acceleration; buffers go out calibrated, as read_raw_segment returns them.
     Eigen::MatrixXd data;
     while (m_bIsRunning) {
-        const auto block = ACQLIB::read(*m_reader, m_uiBufferSampleSize, data, std::chrono::milliseconds(100));
+        const auto block = mne::read(*m_reader, m_uiBufferSampleSize, data, std::chrono::milliseconds(100));
         if (!block) {
             if (block.error().code() != AcqErrorCode::Timeout) {
                 qWarning("[FiffSimulator::run] %s", block.error().text().c_str());

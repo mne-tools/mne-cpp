@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEProjItem.
+ * @brief    Implementation of @ref mne::MNEProjItem.
  *
  * Implements FIFF read/write of the @c FIFFB_PROJ_ITEM block including
  * the @c FIFF_PROJ_ITEM_VECTORS, @c FIFF_PROJ_ITEM_CH_NAME_LIST and the
@@ -27,7 +27,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

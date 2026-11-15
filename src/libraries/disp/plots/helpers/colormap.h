@@ -12,7 +12,7 @@
  * @date     July 2018
  * @brief    Static scalar-to-colour lookup helpers (Jet, Hot, Bone, Viridis, Cool, RedBlue, MNE) used by every plot widget.
  *
- * ColorMap stores the 256-row RGB tables that back all DISPLIB heat
+ * ColorMap stores the 256-row RGB tables that back all mne_disp heat
  * maps and 3-D overlays as constant @c Eigen::MatrixX3i arrays and
  * exposes pure-function @c valueToXxx(double v) accessors that map a
  * value in @f$[0,1]@f$ to a @c QRgb / @c QColor through fast linear
@@ -49,10 +49,10 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256, 3) << 68, 1, 84,
@@ -314,12 +314,12 @@ const Eigen::MatrixX3i m_matViridrisData = (Eigen::MatrixX3i(256, 3) << 68, 1, 8
                                                .finished();
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * @brief Static lookup helpers mapping scalar values to @c QRgb / @c QColor across all DISPLIB palettes.
+ * @brief Static lookup helpers mapping scalar values to @c QRgb / @c QColor across all mne_disp palettes.
  *
  * Each palette exists as a 256-row @c Eigen::MatrixX3i RGB table; the
  * @c valueToXxx accessors interpolate between rows so callers can map

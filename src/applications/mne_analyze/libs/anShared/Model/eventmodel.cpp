@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -539,7 +539,7 @@ void EventModel::setGroupColor(const QColor& groupColor)
     for (int group : m_selectedEventGroups) {
         int red, green, blue;
         groupColor.getRgb(&red, &green, &blue);
-        m_EventManager.setGroupColor(group, EVENTSLIB::RgbColor(red, green, blue));
+        m_EventManager.setGroupColor(group, mne::analyze::events::RgbColor(red, green, blue));
     }
     emit eventGroupsUpdated();
 }
@@ -590,11 +590,11 @@ void EventModel::initFromFile(const QString& sFilePath)
     Eigen::MatrixXi eventList;
 
     if (fileInfo.exists() && (fileInfo.completeSuffix() == "eve")) {
-        if (auto read = FIFFLIB::FiffEvents::read_ascii(sFilePath.toStdU16String())) {
+        if (auto read = mne::FiffEvents::read_ascii(sFilePath.toStdU16String())) {
             eventList = std::move(read->events);
         }
     } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
-        if (auto read = FIFFLIB::FiffEvents::read_fif(sFilePath.toStdU16String())) {
+        if (auto read = mne::FiffEvents::read_fif(sFilePath.toStdU16String())) {
             eventList = std::move(read->events);
         }
     } else {
@@ -633,7 +633,7 @@ void EventModel::addEventWithCode(int iSample, int iEventCode)
     // row and then leaves no handle on the new event. The container is a
     // multimap keyed by sample, so the most recently inserted event is not
     // necessarily the last one in it.
-    EVENTSLIB::Event newEvent = m_EventManager.addEvent(iSample, m_selectedEventGroups.front());
+    mne::analyze::events::Event newEvent = m_EventManager.addEvent(iSample, m_selectedEventGroups.front());
     m_EventManager.setEventCode(newEvent.id, iEventCode);
 
     beginInsertRows(QModelIndex(), 0, 0);
@@ -650,7 +650,7 @@ void EventModel::addGroup(QString sName,
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
-    auto newGroup = m_EventManager.addGroup(sName.toStdString(), EVENTSLIB::RgbColor(red, green, blue));
+    auto newGroup = m_EventManager.addGroup(sName.toStdString(), mne::analyze::events::RgbColor(red, green, blue));
 
     m_selectedEventGroups.clear();
     m_selectedEventGroups.push_back(newGroup.id);
@@ -661,8 +661,8 @@ void EventModel::addGroup(QString sName,
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event>> EventModel::getEventsToDisplay(int iBegin,
-                                                                              int iEnd) const
+std::unique_ptr<std::vector<mne::analyze::events::Event>> EventModel::getEventsToDisplay(int iBegin,
+                                                                                         int iEnd) const
 {
     // Events are keyed by their first sample, so asking for exactly the
     // visible range would miss one that starts earlier and reaches into it.
@@ -685,7 +685,7 @@ void EventModel::eventsUpdated()
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::EventGroup>> EventModel::getGroupsToDisplay() const
+std::unique_ptr<std::vector<mne::analyze::events::EventGroup>> EventModel::getGroupsToDisplay() const
 {
     return m_EventManager.getAllGroups();
 }
@@ -743,7 +743,7 @@ void EventModel::deleteSelectedGroups()
 void EventModel::setSharedMemory(bool bState)
 {
     if (bState) {
-        m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
+        m_EventManager.initSharedMemory(mne::analyze::events::SharedMemoryMode::READWRITE);
     } else {
         m_EventManager.stopSharedMemory();
     }
@@ -816,11 +816,11 @@ void EventModel::getEventsFromNewData()
     }
 
     for (int iChannelIndex : stimChannelIndexList) {
-        QList<QPair<int, double>> detectedTriggerSamples = DSPLIB::detectTriggerFlanksMax(mSampleData,
-                                                                                          iChannelIndex,
-                                                                                          0,
-                                                                                          m_dThreshold,
-                                                                                          0);
+        QList<QPair<int, double>> detectedTriggerSamples = mne::detectTriggerFlanksMax(mSampleData,
+                                                                                       iChannelIndex,
+                                                                                       0,
+                                                                                       m_dThreshold,
+                                                                                       0);
 
         QMap<double, QList<int>> mEventsinTypes;
 

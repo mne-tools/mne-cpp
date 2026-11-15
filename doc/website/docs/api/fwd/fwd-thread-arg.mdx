@@ -1,18 +1,18 @@
 ---
 id: fwd-thread-arg
-title: "FWDLIB::FwdThreadArg"
+title: "mne::FwdThreadArg"
 sidebar_label: FwdThreadArg
 sidebar_position: 13
 ---
 
 # FwdThreadArg
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_thread_arg.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_thread_arg.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_thread_arg.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_thread_arg.h)
 
 `#include <fwd/fwd_thread_arg.h>`
 
 ```cpp
-class FWDLIB::FwdThreadArg
+class mne::FwdThreadArg
 ```
 
 Implements a Forward Thread Argument (replaces `fwdThreadArg` / `fwdThreadArgRec` from MNE-C `compute_forward.c`).
@@ -100,7 +100,7 @@ settings->solname = tmp.filePath("V1-fwd.fif").toStdString();
 settings->pFiffInfo = std::make_shared<FiffInfo>(raw.info);
 settings->checkIntegrity();
 auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
-const std::filesystem::path solPath = BASELIB::pathFromUtf8(settings->solname);
+const std::filesystem::path solPath = mne::pathFromUtf8(settings->solname);
 const bool written = fwd->write(solPath).has_value();
 ````
 

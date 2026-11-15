@@ -1,18 +1,18 @@
 ---
 id: inv-cmne-settings
-title: "INVLIB::InvCMNESettings"
+title: "mne::InvCMNESettings"
 sidebar_label: InvCMNESettings
 sidebar_position: 42
 ---
 
 # InvCMNESettings
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_cmne_settings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_cmne_settings.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_cmne_settings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_cmne_settings.h)
 
 `#include <inv/inv_cmne_settings.h>`
 
 ```cpp
-struct INVLIB::InvCMNESettings
+struct mne::InvCMNESettings
 ```
 
 Settings for the Contextual MNE (CMNE) inverse solver (Dinh et al.
@@ -44,7 +44,7 @@ settings.onnxModelPath = parser.value(onnxOption).toStdString(); // empty: the p
 
 Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices.
 
-````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 129"
+````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 126"
 InvCMNESettings settings;
 settings.lambda2 = 1.0 / 9.0;                             // SNR 3
 settings.lookBack = parser.value(lookBackOption).toInt(); // k = 20 samples = 133 ms at 150 Hz

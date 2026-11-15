@@ -9,7 +9,7 @@
  * @date     May 2026
  * @brief    Truncated RAP-MUSIC (TRAP-MUSIC) source-localisation algorithm — sub-space truncation per iteration for robust correlated-source resolution.
  *
- * @ref INVLIB::InvTrapMusic implements the TRAP-MUSIC algorithm of
+ * @ref mne::InvTrapMusic implements the TRAP-MUSIC algorithm of
  * Mäkelä et al., NeuroImage 197, 616-626 (2019). It extends classic
  * RAP-MUSIC by truncating the signal subspace by one dimension after
  * each found source, which removes the rank-collapse failure mode that
@@ -17,7 +17,7 @@
  * scans the leadfield for the grid point with the largest subspace
  * correlation, projects it out, truncates the subspace and repeats
  * until the requested source count is reached or the correlation drops
- * below the user threshold. Returns a list of @ref INVLIB::TrapMusicDipole
+ * below the user threshold. Returns a list of @ref mne::TrapMusicDipole
  * records carrying grid index, correlation, 3-D position and
  * orientation per found dipole.
  */
@@ -44,10 +44,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -125,6 +125,6 @@ private:
     double m_dThreshold;
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_TRAP_MUSIC_H

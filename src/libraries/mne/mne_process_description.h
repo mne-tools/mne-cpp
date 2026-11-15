@@ -30,10 +30,10 @@
 #include <fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -65,7 +65,7 @@ struct MNESHARED_EXPORT CovDefinition
 struct MNESHARED_EXPORT CovDescription
 {
     std::vector<CovDefinition> defs; /**< Definition sections. */
-    FIFFLIB::RejectionParams rej;    /**< Rejection limits. */
+    mne::RejectionParams rej;        /**< Rejection limits. */
     bool removeSampleMean = true;    /**< Remove the mean at each sample. */
     bool fixSkew = false;            /**< Fix skew on trigger lines. */
     std::string filename;            /**< Output file. */
@@ -104,22 +104,22 @@ struct MNESHARED_EXPORT ProcessingSettings
     std::string workingDir;
 
     // Input
-    BASELIB::StringList rawFiles;   /**< Raw data file(s). */
-    BASELIB::StringList eventFiles; /**< Event file(s) to read. */
-    int compensateTo = -1;          /**< Desired software gradient compensation (-1 = from file). */
-    bool allowMaxShield = false;    /**< Allow unprocessed MaxShield data. */
+    mne::StringList rawFiles;    /**< Raw data file(s). */
+    mne::StringList eventFiles;  /**< Event file(s) to read. */
+    int compensateTo = -1;       /**< Desired software gradient compensation (-1 = from file). */
+    bool allowMaxShield = false; /**< Allow unprocessed MaxShield data. */
 
     // Filter
     FilterSettings filter;
 
     // Events output
-    BASELIB::StringList eventsOutFiles; /**< Save events to these files. */
-    bool saveAllEvents = false;         /**< Save all transitions (not just leading edge). */
-    std::string digTrigger;             /**< Digital trigger channel name. */
-    unsigned int digTriggerMask = 0;    /**< Mask for digital trigger channel. */
+    mne::StringList eventsOutFiles;  /**< Save events to these files. */
+    bool saveAllEvents = false;      /**< Save all transitions (not just leading edge). */
+    std::string digTrigger;          /**< Digital trigger channel name. */
+    unsigned int digTriggerMask = 0; /**< Mask for digital trigger channel. */
 
     // Projection
-    BASELIB::StringList projFiles;    /**< SSP data files. */
+    mne::StringList projFiles;        /**< SSP data files. */
     int projOn = -1;                  /**< -1=unspecified, 0=off, 1=on. */
     bool makeProj = false;            /**< Create a new projection operator. */
     int projEvent = -1;               /**< Which event for projector creation. */
@@ -135,25 +135,25 @@ struct MNESHARED_EXPORT ProcessingSettings
     bool saveProjAugmented = false;   /**< Output in augmented format for graph. */
 
     // Save
-    BASELIB::StringList saveFiles; /**< Destination(s) for saving filtered raw data. */
-    bool omitSubjectInfo = false;  /**< Omit subject info from output. */
-    int decimation = 1;            /**< Decimation factor. */
-    long splitSize = -1;           /**< Split output into chunks of this many bytes (-1=no split). */
+    mne::StringList saveFiles;    /**< Destination(s) for saving filtered raw data. */
+    bool omitSubjectInfo = false; /**< Omit subject info from output. */
+    int decimation = 1;           /**< Decimation factor. */
+    long splitSize = -1;          /**< Split output into chunks of this many bytes (-1=no split). */
 
     // Averaging
-    BASELIB::StringList aveFiles; /**< Averaging description file(s). */
-    std::string saveAveTag;       /**< Tag for average output files. */
-    std::string grandAveFile;     /**< Grand average output file. */
+    mne::StringList aveFiles; /**< Averaging description file(s). */
+    std::string saveAveTag;   /**< Tag for average output files. */
+    std::string grandAveFile; /**< Grand average output file. */
 
     // Covariance
-    BASELIB::StringList covFiles; /**< Covariance description file(s). */
-    std::string saveCovTag;       /**< Tag for covariance output files. */
-    std::string grandCovFile;     /**< Grand covariance output file. */
+    mne::StringList covFiles; /**< Covariance description file(s). */
+    std::string saveCovTag;   /**< Tag for covariance output files. */
+    std::string grandCovFile; /**< Grand covariance output file. */
 
     // Misc
     bool saveHere = false; /**< Save auto-generated files in CWD instead of raw data dir. */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_PROCESS_DESCRIPTION_H

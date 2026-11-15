@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref CONNECTIVITYLIB::DirectedTransferFunction - row-normalised |H(f)|^2 directional connectivity (Kaminski & Blinowska 1991), driven by the shared @ref CONNECTIVITYLIB::MvarModel fit.
+ * @brief    Implementation of @ref mne::DirectedTransferFunction - row-normalised |H(f)|^2 directional connectivity (Kaminski & Blinowska 1991), driven by the shared @ref mne::MvarModel fit.
  */
 
 //=============================================================================================================
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +56,7 @@ Network DirectedTransferFunction::calculate(ConnectivitySettings& connectivitySe
     Network finalNetwork("DTF");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("DirectedTransferFunction::calculate - Input data is empty");
+        mne::Log::debug("DirectedTransferFunction::calculate - Input data is empty");
         return finalNetwork;
     }
 

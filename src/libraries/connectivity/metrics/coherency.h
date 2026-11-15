@@ -26,13 +26,13 @@
  * imaginary axis, while instantaneous common-reference / volume-conduction
  * mixing contributes only to the real axis and is rejected.
  *
- * The per-trial workhorse @c CONNECTIVITYLIB::Coherency::compute "Coherency::compute" computes DPSS tapered
+ * The per-trial workhorse @c mne::Coherency::compute "Coherency::compute" computes DPSS tapered
  * spectra and accumulates the cross-spectral and auto-spectral sums into
- * the shared @ref CONNECTIVITYLIB::ConnectivitySettings::IntermediateSumData. The two
- * public reductions, @ref CONNECTIVITYLIB::Coherency::calculateAbs "calculateAbs" and @ref CONNECTIVITYLIB::Coherency::calculateImag "calculateImag", then divide
+ * the shared @ref mne::ConnectivitySettings::IntermediateSumData. The two
+ * public reductions, @ref mne::Coherency::calculateAbs "calculateAbs" and @ref mne::Coherency::calculateImag "calculateImag", then divide
  * by the running auto-spectral norms and average over the frequency window
- * defined on @ref CONNECTIVITYLIB::AbstractMetric to produce the scalar edge weights of the
- * returned @ref CONNECTIVITYLIB::Network.
+ * defined on @ref mne::AbstractMetric to produce the scalar edge weights of the
+ * returned @ref mne::Network.
  */
 
 #ifndef COHERENCY_H
@@ -67,14 +67,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -83,7 +83,7 @@ class Network;
 /**
  * Shared core of the coherence / imaginary-coherence family.
  *
- * @c CONNECTIVITYLIB::Coherency::compute "compute" fills the per-trial DPSS spectra and accumulates the cross-
+ * @c mne::Coherency::compute "compute" fills the per-trial DPSS spectra and accumulates the cross-
  * and auto-spectral sums in @ref ConnectivitySettings::IntermediateSumData.
  * The two public reductions then collapse the complex coherency to a real
  * scalar per channel pair: @ref calculateAbs returns |Coh_{xy}(f)|^2
@@ -164,6 +164,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // COHERENCY_H

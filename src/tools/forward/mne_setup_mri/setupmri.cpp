@@ -47,8 +47,7 @@
 //=============================================================================================================
 
 using namespace MNESETUPMRI;
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -174,7 +173,7 @@ bool SetupMri::processMriSet(const QString& mriName)
     std::vector<FiffCoordTrans> additionalTrans;
 
     if (mgzInfo.exists()) {
-        // MGZ/MGH path — use MRILIB::MriMghIO
+        // MGZ/MGH path — use mne::MriMghIO
         qInfo("Reading %s...", qPrintable(thisMgz));
 
         MriVolData volData;
@@ -186,7 +185,7 @@ bool SetupMri::processMriSet(const QString& mriName)
         }
         slices = volData.slices;
     } else {
-        // COR slices path — use MRILIB::MriCorIO
+        // COR slices path — use mne::MriCorIO
         qInfo("Reading COR files from %s...", qPrintable(thisDir));
 
         // Create symbolic links (like the shell script does)
@@ -207,7 +206,7 @@ bool SetupMri::processMriSet(const QString& mriName)
         }
     }
 
-    // Write COR.fif — use MRILIB::MriCorFifIO
+    // Write COR.fif — use mne::MriCorFifIO
     QString corFifPath = setsDir + "/COR.fif";
     QFile::remove(corFifPath);
 

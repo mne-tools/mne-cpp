@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -912,13 +912,13 @@ void TestLsl::testWaitForDatagramsKeepsSocketBound()
 
 void TestLsl::testBuildInfo()
 {
-    const char* dt = LSLLIB::buildDateTime();
+    const char* dt = mne::buildDateTime();
     QVERIFY(dt != nullptr && std::strlen(dt) > 0);
 
-    const char* hash = LSLLIB::buildHash();
+    const char* hash = mne::buildHash();
     QVERIFY(hash != nullptr);
 
-    const char* hashLong = LSLLIB::buildHashLong();
+    const char* hashLong = mne::buildHashLong();
     QVERIFY(hashLong != nullptr);
 }
 

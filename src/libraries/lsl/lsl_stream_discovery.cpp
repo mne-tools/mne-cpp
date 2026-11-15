@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Implements the liblsl discovery query: UDP "LSL:shortinfo" requests and the outlets' XML answers.
  *
- * @ref LSLLIB::resolve_stream puts the property into the query's predicate, so outlets that do not match stay
+ * @ref mne::resolve_stream puts the property into the query's predicate, so outlets that do not match stay
  * silent; it also filters locally. Each result's @c data_host is the sender of the answer, which copes with
  * hosts that have several interfaces or resolve their own name to a loopback address.
  */
@@ -44,8 +44,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
-using namespace LSLLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -106,17 +106,17 @@ std::vector<stream_info> resolve(const std::string& predicate, double timeout, s
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector<LSLLIB::stream_info> LSLLIB::resolve_streams(double timeout)
+std::vector<mne::stream_info> mne::resolve_streams(double timeout)
 {
     return resolve("session_id='default'", timeout);
 }
 
 //=============================================================================================================
 
-std::vector<LSLLIB::stream_info> LSLLIB::resolve_stream(const std::string& prop,
-                                                        const std::string& value,
-                                                        double timeout,
-                                                        int minimum)
+std::vector<mne::stream_info> mne::resolve_stream(const std::string& prop,
+                                                  const std::string& value,
+                                                  double timeout,
+                                                  int minimum)
 {
     std::vector<stream_info> filtered;
     if (value.find('\'') != std::string::npos) {

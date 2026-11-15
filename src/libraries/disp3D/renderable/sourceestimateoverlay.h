@@ -11,15 +11,15 @@
  *
  * SourceEstimateOverlay loads a pair of @c .stc files (one per
  * hemisphere), holds the source-time-course matrix and the sparse
- * vertex interpolation matrix produced by @ref DISP3DLIB::GeometryInfo /
- * @ref DISP3DLIB::Interpolation, and for any given time index multiplies the
+ * vertex interpolation matrix produced by @ref mne::disp::GeometryInfo /
+ * @ref mne::disp::Interpolation, and for any given time index multiplies the
  * two to obtain a per-vertex activation vector.
  *
  * The vector is then mapped through a configurable colormap (Hot,
  * Jet, MNE) with adjustable normalisation thresholds (fmin, fmid,
  * fmax) and the resulting ABGR bytes are written into the
- * secondary colour slot of the target @ref DISP3DLIB::BrainSurface &mdash; the
- * renderer simply switches @ref DISP3DLIB::VisualizationMode to
+ * secondary colour slot of the target @ref mne::disp::BrainSurface &mdash; the
+ * renderer simply switches @ref mne::disp::VisualizationMode to
  * @c ModeSourceEstimate and the cortex lights up without any
  * geometry change.
  */
@@ -45,7 +45,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -210,7 +210,7 @@ public:
      * @param[in] stc        The source estimate data.
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      */
-    void setStcData(const INVLIB::InvSourceEstimate& stc, int hemi);
+    void setStcData(const mne::InvSourceEstimate& stc, int hemi);
 
     //=========================================================================================================
     /**
@@ -270,10 +270,10 @@ private:
      */
     uint32_t valueToColor(double value, uint8_t alpha = 255) const;
 
-    INVLIB::InvSourceEstimate m_stcLh; /**< Left hemisphere source estimate. */
-    INVLIB::InvSourceEstimate m_stcRh; /**< Right hemisphere source estimate. */
-    bool m_hasLh = false;              /**< Flag indicating LH data loaded. */
-    bool m_hasRh = false;              /**< Flag indicating RH data loaded. */
+    mne::InvSourceEstimate m_stcLh; /**< Left hemisphere source estimate. */
+    mne::InvSourceEstimate m_stcRh; /**< Right hemisphere source estimate. */
+    bool m_hasLh = false;           /**< Flag indicating LH data loaded. */
+    bool m_hasRh = false;           /**< Flag indicating RH data loaded. */
 
     QString m_colormap = "Hot"; /**< Current colormap name. */
     float m_threshMin = 0.0f;   /**< Minimum threshold. */
@@ -299,6 +299,6 @@ private:
     }
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SOURCEESTIMATEOVERLAY_H

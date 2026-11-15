@@ -26,7 +26,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 class MnaGraph;
 }
@@ -41,10 +41,10 @@ class MnaGraph;
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -140,12 +140,12 @@ public:
      * Returns a reference to the pipeline MnaGraph.
      * The graph mirrors the current plugin/connection state.
      */
-    MNALIB::MnaGraph& pipelineGraph();
+    mne::MnaGraph& pipelineGraph();
 
     /**
      * Returns a const reference to the pipeline MnaGraph.
      */
-    const MNALIB::MnaGraph& pipelineGraph() const;
+    const mne::MnaGraph& pipelineGraph() const;
 
     //=========================================================================================================
     /**
@@ -197,8 +197,8 @@ private:
      */
     void stopNonSensorPlugins();
 
-    PluginList m_pluginList;                            /**< List of plugins associated with this set. */
-    std::unique_ptr<MNALIB::MnaGraph> m_pPipelineGraph; /**< MNA graph mirroring the plugin scene. */
+    PluginList m_pluginList;                         /**< List of plugins associated with this set. */
+    std::unique_ptr<mne::MnaGraph> m_pPipelineGraph; /**< MNA graph mirroring the plugin scene. */
 };
 
 //=============================================================================================================

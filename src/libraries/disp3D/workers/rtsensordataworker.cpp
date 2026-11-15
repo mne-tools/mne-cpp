@@ -22,7 +22,7 @@
 #include <QDebug>
 #include <cmath>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -241,7 +241,7 @@ QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf
         double norm = static_cast<double>(mapped(i) - normMin) / static_cast<double>(range);
         norm = qBound(0.0, norm, 1.0);
 
-        QRgb rgb = DISPLIB::ColorMap::valueToColor(norm, m_sColormapType);
+        QRgb rgb = mne::disp::ColorMap::valueToColor(norm, m_sColormapType);
 
         uint32_t r = qRed(rgb);
         uint32_t g = qGreen(rgb);

@@ -18,7 +18,7 @@
  * forward gain matrices, MNE noise-covariance whiteners, ...). The
  * on-disk representation is a @c FIFF_MNE_NROW + @c FIFF_MNE_NCOL pair
  * plus a dense or sparse matrix tag plus two string-list tags with the
- * row and column names. @ref FIFFLIB::FiffNamedMatrix bundles all of that into a
+ * row and column names. @ref mne::FiffNamedMatrix bundles all of that into a
  * single object: the Eigen matrix and the two @c StringList name
  * vectors, with the same default-construction semantics as
  * @c numpy.zeros + name lists in @c mne.SourceEstimate / @c mne.Forward.
@@ -50,10 +50,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -124,7 +124,7 @@ public:
      *
      * @return the stream with the attached fiff named matrix.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix& p_FiffNamedMatrix);
+    friend std::ostream& operator<<(std::ostream& out, const mne::FiffNamedMatrix& p_FiffNamedMatrix);
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -155,7 +155,7 @@ inline bool FiffNamedMatrix::empty() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatrix& p_FiffNamedMatrix)
+inline std::ostream& operator<<(std::ostream& out, const mne::FiffNamedMatrix& p_FiffNamedMatrix)
 {
     bool t_bIsShort = true;
     out << "#### Fiff Named Matrix ####\n";

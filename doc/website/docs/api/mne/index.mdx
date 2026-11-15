@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # MNE Library
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Source:** `src/libraries/mne`
-The Mne library contains the core neuroscience data structures used throughout MNE-CPP — source spaces, source estimates, forward solutions, inverse operators, hemispheres, BEM surfaces, covariance matrices, epochs, projections, and many supporting geometry types. It is the C++ counterpart of the structures defined in the original MNE-C `libmne` and the core `mne` Python package. All classes reside in the `MNELIB` namespace.
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/mne`
+The Mne library contains the core neuroscience data structures used throughout MNE-CPP — source spaces, source estimates, forward solutions, inverse operators, hemispheres, BEM surfaces, covariance matrices, epochs, projections, and many supporting geometry types. It is the C++ counterpart of the structures defined in the original MNE-C `libmne` and the core `mne` Python package. All classes reside in the `mne_mne` namespace.
 
 ## Architecture
 
@@ -179,8 +179,7 @@ flowchart TD
 ```cpp
 #include <mne/mne.h>
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 // Read source spaces
 MNESourceSpaces srcSpaces;
@@ -210,7 +209,7 @@ epochs = MNEEpochDataList::readEpochs(raw, events,
 
 ## Doxygen Reference
 
-For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**MNELIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceMNELIB.html) in the Doxygen API reference.
+For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**mne_mne namespace**](https://mne-cpp.github.io/doxygen-api/namespaceMNELIB.html) in the Doxygen API reference.
 
 ## See Also
 

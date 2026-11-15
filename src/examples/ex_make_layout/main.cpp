@@ -38,9 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
-using namespace CHANNELSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

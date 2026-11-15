@@ -1,18 +1,18 @@
 ---
 id: rt-cov
-title: "DSPLIB::RtCov"
+title: "mne::RtCov"
 sidebar_label: RtCov
 sidebar_position: 34
 ---
 
 # RtCov
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_cov.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_cov.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_cov.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_cov.h)
 
 `#include <dsp/rt_cov.h>`
 
 ```cpp
-class DSPLIB::RtCov
+class mne::RtCov
 ```
 
 Real-time covariance worker.
@@ -56,7 +56,7 @@ Perform actual covariance estimation.
 
 **Returns:**
 
-- *[FiffCov](/docs/api/fiff/fiff-cov)* — Noise covariance of the MEG/EEG channels, or an empty FiffCov while fewer than iNewMaxSamples samples are accumulated or if no FiffInfo was set.
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — Noise covariance of the MEG/EEG channels, or an empty [`FiffCov`](/docs/api/fiff/fiff-cov) while fewer than iNewMaxSamples samples are accumulated or if no [`FiffInfo`](/docs/api/fiff/fiff-info) was set.
 
 ---
 
@@ -73,7 +73,7 @@ Perform actual covariance estimation.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 200"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 196"
 RtCov rtCov(info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {

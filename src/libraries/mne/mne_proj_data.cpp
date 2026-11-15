@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEProjData.
+ * @brief    Implementation of @ref mne::MNEProjData.
  *
  * Implements lifecycle, channel-list assembly and the on-demand rebuild
  * of the active projection operator against the current sensor set.
@@ -25,13 +25,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNEProjData::MNEProjData(const MNELIB::MNESurface* s)
+MNEProjData::MNEProjData(const mne::MNESurface* s)
 {
     a.resize(s->ntri);
     b.resize(s->ntri);

@@ -290,7 +290,7 @@ public:
      * @param [in]  featureName User-facing feature name shown on failure (status bar).
      * @return true when the raw data was opened successfully.
      */
-    bool openFiffRawData(FIFFLIB::FiffRawData& raw, const QString& featureName = QString());
+    bool openFiffRawData(mne::FiffRawData& raw, const QString& featureName = QString());
 
     //=========================================================================================================
     /**
@@ -516,19 +516,19 @@ protected:
      * This keeps selection/layout-driven UI responsive directly from the fast
      * FiffBlockReader session state.
      */
-    void syncAuxWindowsToFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo,
+    void syncAuxWindowsToFiffInfo(std::shared_ptr<mne::FiffInfo> fiffInfo,
                                   int firstSample,
                                   int lastSample);
 
-    QFile m_qFileRaw;                             /**< Fiff data file to read (set for convenience). */
-    QFile m_qEventFile;                           /**< Fiff event data file to read (set for convenience). */
-    QFile m_qAnnotationFile;                      /**< Browser annotation sidecar file. */
-    QFile m_qVirtualChannelFile;                  /**< Browser virtual-channel sidecar file. */
-    QFile m_qEvokedFile;                          /**< Fiff event data file to read (set for convenience). */
-    QFile m_qCovFile;                             /**< Fiff covariance file to write (set for convenience). */
-    QFile m_qInverseOperatorFile;                 /**< Inverse-operator fif file used for source-estimate export. */
-    FIFFLIB::FiffCov m_covariance;                /**< Last computed covariance matrix. */
-    MNELIB::MNEInverseOperator m_inverseOperator; /**< Last loaded inverse operator. */
+    QFile m_qFileRaw;                          /**< Fiff data file to read (set for convenience). */
+    QFile m_qEventFile;                        /**< Fiff event data file to read (set for convenience). */
+    QFile m_qAnnotationFile;                   /**< Browser annotation sidecar file. */
+    QFile m_qVirtualChannelFile;               /**< Browser virtual-channel sidecar file. */
+    QFile m_qEvokedFile;                       /**< Fiff event data file to read (set for convenience). */
+    QFile m_qCovFile;                          /**< Fiff covariance file to write (set for convenience). */
+    QFile m_qInverseOperatorFile;              /**< Inverse-operator fif file used for source-estimate export. */
+    mne::FiffCov m_covariance;                 /**< Last computed covariance matrix. */
+    mne::MNEInverseOperator m_inverseOperator; /**< Last loaded inverse operator. */
 
     //Window widgets
     EventWindow* m_pEventWindow;                   /**< Event widget which display the event view. */
@@ -554,31 +554,31 @@ protected:
 
     std::unique_ptr<Ui::MainWindowWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 
-    QLabel* m_pStatusLabel;                                /**< Persistent status bar label, updated in place to avoid repeated allocation. */
-    QAction* m_pRemoveDCAction;                            /**< The action which is used to control DC removal. */
-    QAction* m_pHideBadAction;                             /**< The action which is used to control hide bad channel functionality. */
-    QAction* m_pCrosshairAction;                           /**< Toggle crosshair cursor overlay. */
-    QAction* m_pButterflyAction;                           /**< Toggle butterfly mode. */
-    QAction* m_pScalebarsAction;                           /**< Toggle scalebars. */
-    QAction* m_pEventsVisibleAction;                       /**< Toggle event marker visibility (E). */
-    QAction* m_pAnnotationsVisibleAction;                  /**< Toggle annotation span visibility (Shift+A). */
-    QAction* m_pOverviewBarAction;                         /**< Toggle overview bar visibility (O). */
-    QAction* m_pEpochMarkersAction;                        /**< Toggle epoch grid lines (G). */
-    QAction* m_pClippingAction;                            /**< Toggle clipping detection (C). */
-    QAction* m_pZScoreAction;                              /**< Toggle z-score normalization (Z). */
-    QAction* m_pWhitenButterflyAction;                     /**< Toggle whitening in the average butterfly plot. */
-    QAction* m_pGFPAction;                                 /**< Toggle GFP overlay in the butterfly plot. */
-    QAction* m_pDarkModeAction;                            /**< Toggle dark mode palette. */
-    QAction* m_pAnnotationModeAction;                      /**< Toggle right-drag annotation selection in the raw browser. */
-    QMenu* m_pRecentFilesMenu = nullptr;                   /**< "Open Recent" submenu. */
-    QStringList m_recentFiles;                             /**< Most-recently-used file paths (newest first). */
-    QList<MNELIB::MNEEpochDataList> m_epochReviewLists;    /**< Reviewed epochs grouped by event code. */
-    QList<int> m_epochReviewEventCodes;                    /**< Event codes for the current review session. */
-    QStringList m_epochReviewComments;                     /**< Display comments for the current review session. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pEpochReviewInfo; /**< Raw info used to rebuild evoked responses from reviewed epochs. */
-    QPair<float, float> m_epochReviewBaseline;             /**< Baseline metadata of the current review session. */
+    QLabel* m_pStatusLabel;                            /**< Persistent status bar label, updated in place to avoid repeated allocation. */
+    QAction* m_pRemoveDCAction;                        /**< The action which is used to control DC removal. */
+    QAction* m_pHideBadAction;                         /**< The action which is used to control hide bad channel functionality. */
+    QAction* m_pCrosshairAction;                       /**< Toggle crosshair cursor overlay. */
+    QAction* m_pButterflyAction;                       /**< Toggle butterfly mode. */
+    QAction* m_pScalebarsAction;                       /**< Toggle scalebars. */
+    QAction* m_pEventsVisibleAction;                   /**< Toggle event marker visibility (E). */
+    QAction* m_pAnnotationsVisibleAction;              /**< Toggle annotation span visibility (Shift+A). */
+    QAction* m_pOverviewBarAction;                     /**< Toggle overview bar visibility (O). */
+    QAction* m_pEpochMarkersAction;                    /**< Toggle epoch grid lines (G). */
+    QAction* m_pClippingAction;                        /**< Toggle clipping detection (C). */
+    QAction* m_pZScoreAction;                          /**< Toggle z-score normalization (Z). */
+    QAction* m_pWhitenButterflyAction;                 /**< Toggle whitening in the average butterfly plot. */
+    QAction* m_pGFPAction;                             /**< Toggle GFP overlay in the butterfly plot. */
+    QAction* m_pDarkModeAction;                        /**< Toggle dark mode palette. */
+    QAction* m_pAnnotationModeAction;                  /**< Toggle right-drag annotation selection in the raw browser. */
+    QMenu* m_pRecentFilesMenu = nullptr;               /**< "Open Recent" submenu. */
+    QStringList m_recentFiles;                         /**< Most-recently-used file paths (newest first). */
+    QList<mne::MNEEpochDataList> m_epochReviewLists;   /**< Reviewed epochs grouped by event code. */
+    QList<int> m_epochReviewEventCodes;                /**< Event codes for the current review session. */
+    QStringList m_epochReviewComments;                 /**< Display comments for the current review session. */
+    std::shared_ptr<mne::FiffInfo> m_pEpochReviewInfo; /**< Raw info used to rebuild evoked responses from reviewed epochs. */
+    QPair<float, float> m_epochReviewBaseline;         /**< Baseline metadata of the current review session. */
 
-    MNALIB::MnaProject m_mnxProject;             /**< Currently open MNA/MNX project (empty if loading standalone files). */
+    mne::MnaProject m_mnxProject;                /**< Currently open MNA/MNX project (empty if loading standalone files). */
     std::unique_ptr<QTemporaryDir> m_mnxTempDir; /**< Temp dir for extracted .mnx embedded files. */
     QString m_mnxFilePath;                       /**< Path to the currently open .mnx/.mna file. */
 };

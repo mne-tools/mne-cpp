@@ -31,13 +31,13 @@ namespace MNEBROWSE
 
 //=============================================================================================================
 /**
- * @brief Thin application-level wrapper around DISPLIB::ChannelDataView.
+ * @brief Thin application-level wrapper around mne::disp::ChannelDataView.
  *
  * RawView intentionally adds no browser-specific behavior yet. It exists as the stable seam where
- * mne_browse-specific adaptations can live later without pushing those changes into the generic DISPLIB
+ * mne_browse-specific adaptations can live later without pushing those changes into the generic mne_disp
  * viewer stack too early.
  */
-class RawView : public DISPLIB::ChannelDataView
+class RawView : public mne::disp::ChannelDataView
 {
     Q_OBJECT
 

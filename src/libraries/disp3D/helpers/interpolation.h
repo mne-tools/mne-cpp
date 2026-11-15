@@ -9,19 +9,19 @@
  * @date     March 2026
  * @brief    Distance-based sparse interpolation weights and per-frame signal smoothing on triangulated meshes.
  *
- * Given the geodesic distance table produced by @ref DISP3DLIB::GeometryInfo,
+ * Given the geodesic distance table produced by @ref mne::disp::GeometryInfo,
  * Interpolation builds a sparse <em>n_vertices x n_sources</em>
  * weight matrix in which each vertex's row contains only those
  * sources within @c cancelDist metres. Weights fall off through one
  * of four radial basis functions selectable at runtime:
- * @ref DISP3DLIB::Interpolation::linear "linear", @ref DISP3DLIB::Interpolation::gaussian "gaussian", @ref DISP3DLIB::Interpolation::square "square" (negative parabola) and
- * @ref DISP3DLIB::Interpolation::cubic "cubic" (cubic hyperbola).
+ * @ref mne::disp::Interpolation::linear "linear", @ref mne::disp::Interpolation::gaussian "gaussian", @ref mne::disp::Interpolation::square "square" (negative parabola) and
+ * @ref mne::disp::Interpolation::cubic "cubic" (cubic hyperbola).
  *
- * @ref DISP3DLIB::Interpolation::interpolateSignal "interpolateSignal" multiplies the precomputed matrix by a
+ * @ref mne::disp::Interpolation::interpolateSignal "interpolateSignal" multiplies the precomputed matrix by a
  * per-frame source / sensor vector to produce smoothed per-vertex
  * values; the matrix is built once per scene and reused on every
- * real-time frame in @ref DISP3DLIB::RtSourceDataWorker and
- * @ref DISP3DLIB::RtSensorDataWorker, keeping per-frame cost at one sparse mat-vec.
+ * real-time frame in @ref mne::disp::RtSourceDataWorker and
+ * @ref mne::disp::RtSensorDataWorker, keeping per-frame cost at one sparse mat-vec.
  */
 
 #ifndef INTERPOLATION_H
@@ -53,7 +53,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 #ifndef FLOAT_INFINITY
@@ -150,6 +150,6 @@ public:
     static double cubic(const double dIn);
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // INTERPOLATION_H

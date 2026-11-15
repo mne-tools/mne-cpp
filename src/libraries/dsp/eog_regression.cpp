@@ -35,9 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -71,12 +69,12 @@ void EogRegression::fit(const MatrixXd& data,
 
     if (eogChannels.empty()) {
         for (int i = 0; i < std::ssize(info.chs); ++i) {
-            if (info.chs[i].kind == FIFFV_EOG_CH && !FIFFLIB::has_channel(info.bads, info.ch_names[i]))
+            if (info.chs[i].kind == FIFFV_EOG_CH && !mne::has_channel(info.bads, info.ch_names[i]))
                 m_vecEogIndices.push_back(i);
         }
     } else {
         for (const std::string& name : eogChannels) {
-            const int idx = static_cast<int>(FIFFLIB::channel_index(info.ch_names, name));
+            const int idx = static_cast<int>(mne::channel_index(info.ch_names, name));
             if (idx >= 0)
                 m_vecEogIndices.push_back(idx);
             else

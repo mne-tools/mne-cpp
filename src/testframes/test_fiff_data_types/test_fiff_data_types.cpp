@@ -20,7 +20,7 @@
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dir_node.h>
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFiffDataTypes : public QObject
@@ -160,11 +160,11 @@ private slots:
         const std::filesystem::path missing = dir.filePath("missing.fif").toStdString();
         const auto read = FiffDigPointSet::read(missing);
         QVERIFY(!read.has_value());
-        QVERIFY_THROWS_EXCEPTION(BASELIB::Error, FiffDigPointSet{missing});
+        QVERIFY_THROWS_EXCEPTION(mne::Error, FiffDigPointSet{missing});
 
         const auto write = fiducialsAndEeg().write(dir.filePath("no/such/dir/dig.fif").toStdString());
         QVERIFY(!write.has_value());
-        QCOMPARE(write.error().code, BASELIB::ErrorCode::NotFound);
+        QCOMPARE(write.error().code, mne::ErrorCode::NotFound);
         QVERIFY(!fiducialsAndEeg().write({}).has_value());
     }
 

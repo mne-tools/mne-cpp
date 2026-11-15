@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC INITIALIZATION
@@ -423,7 +423,7 @@ MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
     // 1. Validate the graph
     QStringList errors;
     if (!graph.validate(&errors)) {
-        BASELIB::Log::warning("MnaGraphExecutor::startStream - graph validation failed: {}", errors.join(", ").toStdString());
+        mne::Log::warning("MnaGraphExecutor::startStream - graph validation failed: {}", errors.join(", ").toStdString());
         return ctx;
     }
 
@@ -438,7 +438,7 @@ MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
         const MnaNode& n = graph.node(nodeId);
         std::unique_ptr<QObject> plugin = factory(n.opType);
         if (!plugin) {
-            BASELIB::Log::warning("MnaGraphExecutor::startStream - factory returned nullptr for opType: {}", n.opType.toStdString());
+            mne::Log::warning("MnaGraphExecutor::startStream - factory returned nullptr for opType: {}", n.opType.toStdString());
             ctx.livePlugins.clear();
             return ctx;
         }

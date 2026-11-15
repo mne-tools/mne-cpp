@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref FSLIB::FsSurface: reads FreeSurfer triangle / quad surface files into vertex+face matrices.
+ * @brief    Implementation of @ref mne::FsSurface: reads FreeSurfer triangle / quad surface files into vertex+face matrices.
  */
 
 //=============================================================================================================
@@ -31,9 +31,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

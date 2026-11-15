@@ -10,12 +10,12 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
- * @brief    Ordered list of @ref MNELIB::MNEEpochData objects sharing a common @ref FIFFLIB::FiffInfo.
+ * @brief    Ordered list of @ref mne::MNEEpochData objects sharing a common @ref mne::FiffInfo.
  *
- * @ref MNELIB::MNEEpochDataList is the C++ counterpart of MNE-Python's
+ * @ref mne::MNEEpochDataList is the C++ counterpart of MNE-Python's
  * @c mne.Epochs: a vector of trials cut from a continuous raw recording
  * with common pre/post-stimulus boundaries, optional artifact rejection
- * and convenience helpers to average into a @ref FIFFLIB::FiffEvoked or
+ * and convenience helpers to average into a @ref mne::FiffEvoked or
  * to dump back to FIFF.
  */
 
@@ -42,10 +42,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 /**
@@ -99,13 +99,13 @@ public:
      *
      * @return List of epochs with rejection flags set; empty if no matching events are found.
      */
-    static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
+    static MNEEpochDataList readEpochs(const mne::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,
                                        float tmin,
                                        float tmax,
                                        qint32 event,
                                        const std::map<std::string, double>& mapReject,
-                                       const BASELIB::StringList& lExcludeChs = {},
+                                       const mne::StringList& lExcludeChs = {},
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
 
     //=========================================================================================================
@@ -120,11 +120,11 @@ public:
      *
      * @return Averaged evoked response; aspect_kind is FIFFV_ASPECT_STD_ERR with no data if the list is empty.
      */
-    FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo& p_info,
-                                FIFFLIB::fiff_int_t first,
-                                FIFFLIB::fiff_int_t last,
-                                Eigen::VectorXi sel = FIFFLIB::defaultVectorXi,
-                                bool proj = false) const;
+    mne::FiffEvoked average(const mne::FiffInfo& p_info,
+                            mne::fiff_int_t first,
+                            mne::fiff_int_t last,
+                            Eigen::VectorXi sel = mne::defaultVectorXi,
+                            bool proj = false) const;
 
     //=========================================================================================================
     /**
@@ -160,9 +160,9 @@ public:
      * @return   Whether a threshold artifact was detected.
      */
     static bool checkForArtifact(const Eigen::MatrixXd& data,
-                                 const FIFFLIB::FiffInfo& pFiffInfo,
+                                 const mne::FiffInfo& pFiffInfo,
                                  const std::map<std::string, double>& mapReject,
-                                 const BASELIB::StringList& lExcludeChs = {});
+                                 const mne::StringList& lExcludeChs = {});
 
     //=========================================================================================================
     /**
@@ -184,15 +184,15 @@ public:
      *
      * @return FiffEvokedSet containing one FiffEvoked per category.
      */
-    static FIFFLIB::FiffEvokedSet averageCategories(const FIFFLIB::FiffRawData& raw,
-                                                    const Eigen::MatrixXi& events,
-                                                    const std::vector<int>& eventCodes,
-                                                    const BASELIB::StringList& comments,
-                                                    float tmin,
-                                                    float tmax,
-                                                    const std::map<std::string, double>& mapReject = {},
-                                                    const std::pair<float, float>& baseline = std::pair<float, float>(0.0f, 0.0f),
-                                                    bool proj = false);
+    static mne::FiffEvokedSet averageCategories(const mne::FiffRawData& raw,
+                                                const Eigen::MatrixXi& events,
+                                                const std::vector<int>& eventCodes,
+                                                const mne::StringList& comments,
+                                                float tmin,
+                                                float tmax,
+                                                const std::map<std::string, double>& mapReject = {},
+                                                const std::pair<float, float>& baseline = std::pair<float, float>(0.0f, 0.0f),
+                                                bool proj = false);
 
     //=========================================================================================================
     /**
@@ -213,17 +213,17 @@ public:
      *
      * @return The averaged evoked data.
      */
-    static FIFFLIB::FiffEvoked computeAverage(const FIFFLIB::FiffRawData& raw,
-                                              const Eigen::MatrixXi& matEvents,
-                                              float fTMinS,
-                                              float fTMaxS,
-                                              qint32 eventType,
-                                              bool bApplyBaseline,
-                                              float fTBaselineFromS,
-                                              float fTBaselineToS,
-                                              const std::map<std::string, double>& mapReject,
-                                              const BASELIB::StringList& lExcludeChs = {},
-                                              const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+    static mne::FiffEvoked computeAverage(const mne::FiffRawData& raw,
+                                          const Eigen::MatrixXi& matEvents,
+                                          float fTMinS,
+                                          float fTMaxS,
+                                          qint32 eventType,
+                                          bool bApplyBaseline,
+                                          float fTBaselineFromS,
+                                          float fTBaselineToS,
+                                          const std::map<std::string, double>& mapReject,
+                                          const mne::StringList& lExcludeChs = {},
+                                          const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
 private:
     //=========================================================================================================

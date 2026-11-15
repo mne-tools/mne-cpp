@@ -28,8 +28,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -160,7 +160,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<BrainAmpTransport> ACQLIB::detail::makeBrainAmpSimulator(const BrainAmpSimulation& simulation)
+std::unique_ptr<BrainAmpTransport> mne::detail::makeBrainAmpSimulator(const BrainAmpSimulation& simulation)
 {
     return std::make_unique<BrainAmpSimulator>(simulation);
 }

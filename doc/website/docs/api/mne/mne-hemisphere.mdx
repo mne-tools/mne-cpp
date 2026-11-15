@@ -1,18 +1,18 @@
 ---
 id: mne-hemisphere
-title: "MNELIB::MNEHemisphere"
+title: "mne::MNEHemisphere"
 sidebar_label: MNEHemisphere
 sidebar_position: 23
 ---
 
 # MNEHemisphere
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_hemisphere.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_hemisphere.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_hemisphere.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_hemisphere.h)
 
 `#include <mne/mne_hemisphere.h>`
 
 ```cpp
-class MNELIB::MNEHemisphere
+class mne::MNEHemisphere
 ```
 
 Hemisphere source space geometry information.
@@ -125,7 +125,7 @@ mne_transform_source_space_to
 
 **Parameters:**
 
-- **dest** : *FIFFLIB::fiff_int_t*
+- **dest** : *mne::fiff_int_t*
   The id of the destination coordinate system (FIFFV_COORD_...).
 
 - **p_Trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -176,7 +176,7 @@ Copy assignment operator.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 200"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 198"
 const QString srcPath = data + "/subjects/sample/bem/sample-oct-6-src.fif";
 const MNESourceSpaces src(srcPath.toStdU16String()); // with normals, triangle data and patches
 const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);

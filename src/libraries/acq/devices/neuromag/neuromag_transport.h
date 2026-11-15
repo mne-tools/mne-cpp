@@ -34,10 +34,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** The acquisition server tags as seen by the backend. */
@@ -106,6 +106,6 @@ std::unique_ptr<NeuromagTransport> make_neuromag_simulator(const NeuromagSimulat
  */
 AcqExpected<std::unique_ptr<NeuromagTransport>> make_neuromag_client(const NeuromagDacq& dacq);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // NEUROMAG_TRANSPORT_H

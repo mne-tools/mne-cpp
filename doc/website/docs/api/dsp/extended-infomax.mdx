@@ -1,13 +1,13 @@
 ---
 id: extended-infomax
-title: "DSPLIB::ExtendedInfomax"
+title: "mne::ExtendedInfomax"
 sidebar_label: ExtendedInfomax
 sidebar_position: 6
 ---
 
 # ExtendedInfomax
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/extended_infomax.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/extended_infomax.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/extended_infomax.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/extended_infomax.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.ICA (infomax)` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 6
 `#include <dsp/extended_infomax.h>`
 
 ```cpp
-class DSPLIB::ExtendedInfomax
+class mne::ExtendedInfomax
 ```
 
 Extended Infomax [`ICA`](/docs/api/dsp/ica) (Lee et al., 1999).
@@ -77,7 +77,7 @@ Compute [`ICA`](/docs/api/dsp/ica) decomposition using the extended infomax algo
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 138"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 136"
 const MatrixXd centered = mixed.colwise() - mixed.rowwise().mean();                            // infomax expects zero-mean data
 const InfomaxResult infomax = ExtendedInfomax::compute(centered, 3, 500, 0.1, 1e-7, true, 42); // the 0.001 default is too slow here
 ok &= expect(infomax.converged && worstRecovery(infomax.matSources, sources) > 0.99,

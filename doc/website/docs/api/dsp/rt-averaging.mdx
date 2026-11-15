@@ -1,20 +1,20 @@
 ---
 id: rt-averaging
-title: "DSPLIB::RtAveraging"
+title: "mne::RtAveraging"
 sidebar_label: RtAveraging
 sidebar_position: 30
 ---
 
 # RtAveraging
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_averaging.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_averaging.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_averaging.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_averaging.h)
 
 `#include <dsp/rt_averaging.h>`
 
 <Connections topics={["real-time"]} context="api" current="RtAveraging" />
 
 ```cpp
-class DSPLIB::RtAveraging
+class mne::RtAveraging
 ```
 
 Real-time averaging.
@@ -245,7 +245,7 @@ Reset the data processing in the real-time worker.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 164"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 160"
     averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
 }
 // Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2

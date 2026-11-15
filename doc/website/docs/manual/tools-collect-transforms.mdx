@@ -33,7 +33,7 @@ At least one of `--meas`, `--mri` or `--mgh` must be specified.
 
 ## Description
 
-The device→head transform comes from the measurement file and the MRI (surface RAS)→head transform from the coregistration. The remaining links follow MNE-C: surface RAS→RAS is a shift by the centre of the MRI volume, RAS→MNI Talairach is read from the subject's `talairach.xfm`, and MNI→FreeSurfer Talairach uses M. Brett's two fixed approximations, one above and one below the AC–PC plane. Composed, the chain maps head coordinates to MNI coordinates exactly as `mne.head_to_mni` does (`FIFFLIB::FiffCoordTransSet`).
+The device→head transform comes from the measurement file and the MRI (surface RAS)→head transform from the coregistration. The remaining links follow MNE-C: surface RAS→RAS is a shift by the centre of the MRI volume, RAS→MNI Talairach is read from the subject's `talairach.xfm`, and MNI→FreeSurfer Talairach uses M. Brett's two fixed approximations, one above and one below the AC–PC plane. Composed, the chain maps head coordinates to MNI coordinates exactly as `mne.head_to_mni` does (`mne::FiffCoordTransSet`).
 
 ### Workflow Context
 

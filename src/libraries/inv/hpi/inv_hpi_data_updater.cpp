@@ -42,8 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -87,7 +86,7 @@ void InvHpiDataUpdater::updateChannels(const std::shared_ptr<FiffInfo>& pFiffInf
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
 
-            if (!(FIFFLIB::has_channel(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
+            if (!(mne::has_channel(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
                 m_vecInnerind.push_back(i);
                 m_lChannels.push_back(pFiffInfo->chs[i]);
             }
@@ -97,7 +96,7 @@ void InvHpiDataUpdater::updateChannels(const std::shared_ptr<FiffInfo>& pFiffInf
 
 //=============================================================================================================
 
-void InvHpiDataUpdater::updateSensors(const std::vector<FIFFLIB::FiffChInfo>& lChannels)
+void InvHpiDataUpdater::updateSensors(const std::vector<mne::FiffChInfo>& lChannels)
 {
     const Accuracy accuracy = Accuracy::high;
     m_sensors = m_sensorSetCreator.updateSensorSet(lChannels, accuracy);
@@ -109,7 +108,7 @@ void InvHpiDataUpdater::updateHpiDigitizer(const FiffDigPointSet& dig)
 {
     const FiffDigPointSet coils = dig.pick_types({FIFFV_POINT_HPI});
     if (coils.empty()) {
-        BASELIB::Log::warning("InvHpiFit::updateHpiDigitizer - No HPI coils digitized. Returning.");
+        mne::Log::warning("InvHpiFit::updateHpiDigitizer - No HPI coils digitized. Returning.");
         return;
     }
     m_matHpiDigitizer = MatrixXd(static_cast<Eigen::Index>(coils.size()), 3);
@@ -133,7 +132,7 @@ void InvHpiDataUpdater::checkForUpdate(const std::shared_ptr<FiffInfo>& pFiffInf
 
 //=============================================================================================================
 
-bool InvHpiDataUpdater::checkIfChanged(const StringList& lBads, const std::vector<FIFFLIB::FiffChInfo>& lChannels)
+bool InvHpiDataUpdater::checkIfChanged(const StringList& lBads, const std::vector<mne::FiffChInfo>& lChannels)
 {
     bool bUpdate = false;
     if (!(m_lBads == lBads) || !(m_lChannels == lChannels)) {
@@ -169,7 +168,7 @@ void InvHpiDataUpdater::prepareProjectors(const Eigen::MatrixXd& matProjectors)
 {
     // check if m_vecInnerInd is alreadz initialized
     if (m_vecInnerind.empty()) {
-        BASELIB::Log::warning("InvHpiFit::updateProjectors - No channels. Returning.");
+        mne::Log::warning("InvHpiFit::updateProjectors - No channels. Returning.");
         return;
     }
 

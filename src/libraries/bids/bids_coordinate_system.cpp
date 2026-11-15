@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsCoordinateSystem — JSON I/O and @c FiffCoordTrans bridge for ``_coordsystem.json``.
+ * @brief    Implementation of @ref mne::BidsCoordinateSystem — JSON I/O and @c FiffCoordTrans bridge for ``_coordsystem.json``.
  */
 
 //=============================================================================================================
@@ -31,7 +31,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC METHODS
@@ -42,20 +42,20 @@ BidsCoordinateSystem BidsCoordinateSystem::read_json(const std::filesystem::path
     BidsCoordinateSystem cs;
     cs.transform = Eigen::Matrix4d::Identity();
 
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    const mne::Expected<std::string> text = mne::read_text_file(path);
     if (!text) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::read_json] Cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[BidsCoordinateSystem::read_json] Cannot open {}", mne::utf8FromPath(path));
         return cs;
     }
 
-    BASELIB::JsonParseError error;
-    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*text, &error);
-    if (error.error != BASELIB::JsonParseError::NoError) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::read_json] Parse error in {} : {}", BASELIB::utf8FromPath(path), error.error_string());
+    mne::JsonParseError error;
+    const mne::JsonDocument doc = mne::JsonDocument::from_json(*text, &error);
+    if (error.error != mne::JsonParseError::NoError) {
+        mne::Log::warning("[BidsCoordinateSystem::read_json] Parse error in {} : {}", mne::utf8FromPath(path), error.error_string());
         return cs;
     }
 
-    const BASELIB::JsonObject& json = doc.object();
+    const mne::JsonObject& json = doc.object();
 
     // iEEG fields first, then EEG, then MEG
     const auto field = [&json](std::string_view name) {
@@ -81,10 +81,10 @@ BidsCoordinateSystem BidsCoordinateSystem::read_json(const std::filesystem::path
         : json.contains("Transform")                                                         ? "Transform"
                                                                                              : "";
     if (!transformKey.empty()) {
-        const BASELIB::JsonArray& rows = json.value(transformKey).to_array();
+        const mne::JsonArray& rows = json.value(transformKey).to_array();
         if (rows.size() == 4) {
             for (int r = 0; r < 4; ++r) {
-                const BASELIB::JsonArray& cols = rows[static_cast<std::size_t>(r)].to_array();
+                const mne::JsonArray& cols = rows[static_cast<std::size_t>(r)].to_array();
                 if (cols.size() == 4) {
                     for (int c = 0; c < 4; ++c)
                         cs.transform(r, c) = cols[static_cast<std::size_t>(c)].to_double();
@@ -103,8 +103,8 @@ bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
                                       std::string_view sModality)
 {
     const std::string modality(sModality);
-    BASELIB::JsonObject json{{modality + "CoordinateSystem", cs.system},
-                             {modality + "CoordinateUnits", cs.units}};
+    mne::JsonObject json{{modality + "CoordinateSystem", cs.system},
+                         {modality + "CoordinateUnits", cs.units}};
 
     if (!cs.description.empty())
         json.insert(modality + "CoordinateSystemDescription", cs.description);
@@ -115,10 +115,10 @@ bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
 
     // Serialize the 4x4 transform matrix
     if (!cs.transform.isIdentity(1e-15) && sModality == "iEEG") {
-        BASELIB::JsonArray rows;
+        mne::JsonArray rows;
         rows.reserve(4);
         for (int r = 0; r < 4; ++r) {
-            BASELIB::JsonArray cols;
+            mne::JsonArray cols;
             cols.reserve(4);
             for (int c = 0; c < 4; ++c)
                 cols.push_back(cs.transform(r, c));
@@ -127,8 +127,8 @@ bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
         json.insert("iEEGCoordinateProcessingTransform", std::move(rows));
     }
 
-    if (!BASELIB::write_text_file(path, BASELIB::JsonDocument(std::move(json)).to_json())) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::write_json] Cannot open {} for writing", BASELIB::utf8FromPath(path));
+    if (!mne::write_text_file(path, mne::JsonDocument(std::move(json)).to_json())) {
+        mne::Log::warning("[BidsCoordinateSystem::write_json] Cannot open {} for writing", mne::utf8FromPath(path));
         return false;
     }
     return true;
@@ -136,8 +136,8 @@ bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
 
 //=============================================================================================================
 
-FIFFLIB::FiffCoordTrans BidsCoordinateSystem::to_fiff_coord_trans(int fromFrame, int toFrame) const
+mne::FiffCoordTrans BidsCoordinateSystem::to_fiff_coord_trans(int fromFrame, int toFrame) const
 {
     Eigen::Matrix4f matTrans = transform.cast<float>();
-    return FIFFLIB::FiffCoordTrans(fromFrame, toFrame, matTrans);
+    return mne::FiffCoordTrans(fromFrame, toFrame, matTrans);
 }

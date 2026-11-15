@@ -10,9 +10,9 @@
  * @brief    Frequentist Student's t-tests with exact p-values via the regularised incomplete beta function.
  *
  * Provides the three single-sample / paired / two-sample independent
- * variants of Student's t-test that the rest of STSLIB needs. All three
+ * variants of Student's t-test that the rest of mne_sts needs. All three
  * test the null hypothesis that the mean (or mean difference) equals
- * @c mu, with the alternative selected via @ref STSLIB::StatsTailType
+ * @c mu, with the alternative selected via @ref mne::StatsTailType
  * (left, right, both). The statistic is the textbook
  * @f$t = (\bar{x}-\mu) / (s/\sqrt{n})@f$ with @c n-1 / @c n-1 / @c n_A+n_B-2
  * degrees of freedom; columns of the input matrix are tested in parallel
@@ -23,7 +23,7 @@
  * the regularised incomplete beta function @f$I_x(a,b)@f$ with the
  * Lentz continued-fraction recursion of Numerical Recipes 6.4; no
  * normal-approximation fallback is used. The CDF and incomplete-beta
- * routines are exposed as @c public so @ref STSLIB::StatsFtest can reuse
+ * routines are exposed as @c public so @ref mne::StatsFtest can reuse
  * them for its F-distribution implementation.
  *
  * References: Student (1908), Biometrika 6(1); Press et al., Numerical
@@ -47,10 +47,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -183,6 +183,6 @@ private:
     static double tToPval(double t, int df, StatsTailType tail);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_TTEST_H

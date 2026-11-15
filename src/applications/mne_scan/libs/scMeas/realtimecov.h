@@ -38,10 +38,10 @@
 #include <QMutexLocker>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -76,7 +76,7 @@ public:
      *
      * @param[in] pFiffInfo     the new fiff info.
      */
-    void setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo);
+    void setFiffInfo(std::shared_ptr<mne::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -84,7 +84,7 @@ public:
      *
      * @return     the current fiff info.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo();
+    std::shared_ptr<mne::FiffInfo> getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      *
      * @param[in] v     the covariance which should be distributed.
      */
-    virtual void setValue(const FIFFLIB::FiffCov& v);
+    virtual void setValue(const mne::FiffCov& v);
 
     //=========================================================================================================
     /**
@@ -101,7 +101,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual std::shared_ptr<FIFFLIB::FiffCov>& getValue();
+    virtual std::shared_ptr<mne::FiffCov>& getValue();
 
     //=========================================================================================================
     /**
@@ -114,8 +114,8 @@ public:
 private:
     mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    std::shared_ptr<FIFFLIB::FiffCov> m_pFiffCov;   /**< Covariance data set. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
+    std::shared_ptr<mne::FiffCov> m_pFiffCov;   /**< Covariance data set. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
 
     bool m_bInitialized; /**< If values are stored.*/
 };

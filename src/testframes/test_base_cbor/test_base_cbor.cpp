@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS
@@ -62,7 +62,7 @@ QByteArray qbytes(const CborByteArray& data)
     return QByteArray(reinterpret_cast<const char*>(data.data()), qsizetype(data.size()));
 }
 
-/** The same tree built with Qt and with BASELIB. */
+/** The same tree built with Qt and with mne_base. */
 struct Pair
 {
     QCborValue qt;
@@ -117,7 +117,7 @@ std::vector<Pair> samples()
 
 //=============================================================================================================
 /**
- * @brief Tests BASELIB::CborValue, CborArray and CborMap against QCborValue, QCborArray and QCborMap.
+ * @brief Tests mne::CborValue, CborArray and CborMap against QCborValue, QCborArray and QCborMap.
  */
 class TestBaseCbor : public QObject
 {

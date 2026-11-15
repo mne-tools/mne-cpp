@@ -1,18 +1,18 @@
 ---
 id: fiff-sparse-matrix
-title: "FIFFLIB::FiffSparseMatrix"
+title: "mne::FiffSparseMatrix"
 sidebar_label: FiffSparseMatrix
 sidebar_position: 28
 ---
 
 # FiffSparseMatrix
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_sparse_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_sparse_matrix.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_sparse_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_sparse_matrix.h)
 
 `#include <fiff/fiff_sparse_matrix.h>`
 
 ```cpp
-class FIFFLIB::FiffSparseMatrix
+class mne::FiffSparseMatrix
 ```
 
 Sparse FIFF matrix: CCS or RCS storage with the value / index / pointer triple as written by [FiffStream](/docs/api/fiff/fiff-stream)::write_float_sparse_*.
@@ -47,7 +47,7 @@ Constructs a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) wrapping an
 - **mat** : *Eigen::SparseMatrix&lt; float &gt; &&*
   Eigen sparse matrix to wrap (moved in).
 
-- **coding** : *FIFFLIB::fiff_int_t*
+- **coding** : *mne::fiff_int_t*
   FIFF storage coding (FIFFTS_MC_RCS or FIFFTS_MC_CCS).
 
 ---

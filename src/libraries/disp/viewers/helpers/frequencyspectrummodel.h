@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QAbstractTableModel storing per-channel FFT magnitudes for @ref DISPLIB::SpectrumView.
+ * @brief    QAbstractTableModel storing per-channel FFT magnitudes for @ref mne::disp::SpectrumView.
  *
  * FrequencySpectrumModel maintains an @c Eigen::MatrixXd of channels
  * × frequency bins together with the active @c FiffInfo. New blocks
@@ -47,20 +47,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -135,7 +135,7 @@ public:
      *
      * @param[in] info       The corresponding fiff information object.
      */
-    void setInfo(std::shared_ptr<FIFFLIB::FiffInfo>& info);
+    void setInfo(std::shared_ptr<mne::FiffInfo>& info);
 
     //=========================================================================================================
     /**
@@ -159,7 +159,7 @@ public:
      *
      * @return the fiff info.
      */
-    inline std::shared_ptr<FIFFLIB::FiffInfo> getInfo() const;
+    inline std::shared_ptr<mne::FiffInfo> getInfo() const;
 
     //=========================================================================================================
     /**
@@ -258,7 +258,7 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff Information.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff Information.*/
 
     QMap<qint32, qint32> m_qMapIdxRowSelection; /**< Selection mapping.*/
 
@@ -280,7 +280,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffInfo> FrequencySpectrumModel::getInfo() const
+std::shared_ptr<mne::FiffInfo> FrequencySpectrumModel::getInfo() const
 {
     return m_pFiffInfo;
 }

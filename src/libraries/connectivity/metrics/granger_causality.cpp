@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref CONNECTIVITYLIB::GrangerCausality - spectral Granger Causality (Geweke 1982 formulation) between every ordered channel pair, computed from the shared @ref CONNECTIVITYLIB::MvarModel fit.
+ * @brief    Implementation of @ref mne::GrangerCausality - spectral Granger Causality (Geweke 1982 formulation) between every ordered channel pair, computed from the shared @ref mne::MvarModel fit.
  */
 
 //=============================================================================================================
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +56,7 @@ Network GrangerCausality::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("GC");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("GrangerCausality::calculate - Input data is empty");
+        mne::Log::debug("GrangerCausality::calculate - Input data is empty");
         return finalNetwork;
     }
 

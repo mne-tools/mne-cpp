@@ -18,7 +18,7 @@
  * the destination file for the resulting forward solution. Centralising
  * these fields keeps ComputeFwd's constructor signature short and lets
  * GUI front-ends (@c mne_forward_gui) and batch scripts share the same
- * validation logic via @ref FWDLIB::ComputeFwdSettings::checkIntegrity "checkIntegrity".
+ * validation logic via @ref mne::ComputeFwdSettings::checkIntegrity "checkIntegrity".
  */
 
 #ifndef COMPUTE_FWD_SETTINGS_H
@@ -44,10 +44,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -114,8 +114,8 @@ public:
     bool use_equiv_eeg;         /**< Use the equivalent source approach for the EEG sphere model. */
     bool use_threads;           /**< Parallelize? */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo; /**< The FiffInfo file from the measurement.*/
-    FIFFLIB::FiffCoordTrans meg_head_t;           /**< The meg <-> head transformation.*/
+    std::shared_ptr<mne::FiffInfo> pFiffInfo; /**< The FiffInfo file from the measurement.*/
+    mne::FiffCoordTrans meg_head_t;           /**< The meg <-> head transformation.*/
 
 private:
     void initMembers();

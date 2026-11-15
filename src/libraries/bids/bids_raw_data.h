@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Central container for a BIDS raw recording — the BIDS-side analogue of @c FIFFLIB::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
+ * @brief    Central container for a BIDS raw recording — the BIDS-side analogue of @c mne::FiffRawData, bundling raw signal I/O with every electrophysiology sidecar.
  *
- * @ref BIDSLIB::BidsRawData is the top-level object exposed by BIDSLIB: a single
- * @ref BIDSLIB::BidsRawData::read "BidsRawData::read" call walks a @ref BIDSLIB::BIDSPath, picks the right
- * format reader via @ref BIDSLIB::BidsRawData::create_reader "BidsRawData::create_reader", parses the raw data
- * into a fully-populated @c FIFFLIB::FiffRawData, and then merges every
+ * @ref mne::BidsRawData is the top-level object exposed by mne_bids: a single
+ * @ref mne::BidsRawData::read "BidsRawData::read" call walks a @ref mne::BIDSPath, picks the right
+ * format reader via @ref mne::BidsRawData::create_reader "BidsRawData::create_reader", parses the raw data
+ * into a fully-populated @c mne::FiffRawData, and then merges every
  * sidecar BIDS defines for an electrophysiology recording —
  * @c _channels.tsv (channel types, units, bad-channel marking),
  * @c _electrodes.tsv plus @c _coordsystem.json (digitizer points and
@@ -20,7 +20,7 @@
  * `_<datatype>.json` sidecar (line frequency, manufacturer, reference
  * electrode, recording type) — into the resulting in-memory record.
  *
- * @ref BIDSLIB::BidsRawData::write "BidsRawData::write" reverses the process: it materialises the
+ * @ref mne::BidsRawData::write "BidsRawData::write" reverses the process: it materialises the
  * `sub-XX/[ses-YY/]<datatype>/` tree, optionally copies the source
  * raw file in, regenerates every TSV/JSON sidecar from the in-memory
  * state, and emits the mandatory @c dataset_description.json at the
@@ -60,10 +60,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -228,7 +228,7 @@ public:
     // Core data members (public, following mne-cpp convention)
     //=========================================================================================================
 
-    FIFFLIB::FiffRawData raw;                     /**< Raw data with fully populated FiffInfo. */
+    mne::FiffRawData raw;                         /**< Raw data with fully populated FiffInfo. */
     std::vector<BidsEvent> events;                /**< Events from *_events.tsv. */
     std::map<std::string, int> eventIdMap;        /**< trial_type string → numeric value mapping. */
     std::vector<BidsElectrode> electrodes;        /**< Electrode positions from *_electrodes.tsv. */
@@ -252,6 +252,6 @@ private:
     bool m_bIsValid{false}; /**< True if the data was loaded successfully. */
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_RAW_DATA_H

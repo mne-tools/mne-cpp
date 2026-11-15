@@ -10,7 +10,7 @@
  * @brief    Implementation of the regularised covariance estimators declared in sts_cov_estimators.h.
  *
  * Ledoit-Wolf and OAS forward to @c Skigen::LedoitWolf and @c Skigen::OAS
- * after transposing the input so the @c (n_channels, n_samples) STSLIB
+ * after transposing the input so the @c (n_channels, n_samples) mne_sts
  * convention is mapped onto the @c (n_samples, n_features) layout that
  * Skigen expects; the analytic shrinkage coefficients are returned
  * alongside the resulting covariance.
@@ -63,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

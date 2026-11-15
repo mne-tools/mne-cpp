@@ -11,10 +11,10 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Implementation of @ref CONNECTIVITYLIB::compute_connectivity, the dispatcher that runs the requested functional-connectivity metrics over a @ref CONNECTIVITYLIB::ConnectivitySettings batch.
+ * @brief    Implementation of @ref mne::compute_connectivity, the dispatcher that runs the requested functional-connectivity metrics over a @ref mne::ConnectivitySettings batch.
  *
- * The single entry point @ref CONNECTIVITYLIB::compute_connectivity inspects the
- * list of method names on @ref CONNECTIVITYLIB::ConnectivitySettings and routes
+ * The single entry point @ref mne::compute_connectivity inspects the
+ * list of method names on @ref mne::ConnectivitySettings and routes
  * each request to the corresponding estimator (Coherence, Imaginary
  * Coherence, PLI / wPLI / dwPLI / USPLI, PLV, Pearson and cross
  * correlation, Granger Causality, DTF, PDC). All spectral metrics share
@@ -52,14 +52,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector<Network> CONNECTIVITYLIB::compute_connectivity(ConnectivitySettings& settings)
+std::vector<Network> mne::compute_connectivity(ConnectivitySettings& settings)
 {
     using Method = Network (*)(ConnectivitySettings&);
     static constexpr std::pair<std::string_view, Method> methods[] = {

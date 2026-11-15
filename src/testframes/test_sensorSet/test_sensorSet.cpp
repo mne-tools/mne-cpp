@@ -40,9 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace INVLIB;
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -74,8 +72,8 @@ private slots:
 
 private:
     // declare your thresholds, variables and error values here
-    std::vector<FIFFLIB::FiffChInfo> m_lChannels;
-    std::shared_ptr<FWDLIB::FwdCoilSet> m_pCoilDefinitions{nullptr};
+    std::vector<mne::FiffChInfo> m_lChannels;
+    std::shared_ptr<mne::FwdCoilSet> m_pCoilDefinitions{nullptr};
 };
 
 //=============================================================================================================
@@ -88,7 +86,7 @@ TestSensorSet::TestSensorSet()
 
 void TestSensorSet::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = std::shared_ptr<FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath.toStdU16String()).release());
@@ -105,7 +103,7 @@ void TestSensorSet::initTestCase()
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(BASELIB::contains(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
+            if (!(mne::contains(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
                 m_lChannels.push_back(pFiffInfo->chs[i]);
             }
         }
@@ -265,7 +263,7 @@ void TestSensorSet::testSensorSetCreator_channelList_empty()
 {
     // act
     InvSensorSetCreator sensorSetCreator;
-    std::vector<FIFFLIB::FiffChInfo> lChannels;
+    std::vector<mne::FiffChInfo> lChannels;
     Accuracy accuracy = Accuracy::medium;
 
     InvSensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels, accuracy);

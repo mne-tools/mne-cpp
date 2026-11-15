@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsElectrode — TSV I/O and FIFF digitizer-point conversion for ``_electrodes.tsv``.
+ * @brief    Implementation of @ref mne::BidsElectrode — TSV I/O and FIFF digitizer-point conversion for ``_electrodes.tsv``.
  */
 
 //=============================================================================================================
@@ -25,7 +25,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // LOCAL HELPERS
@@ -100,12 +100,10 @@ bool BidsElectrode::write_tsv(const std::filesystem::path& path,
 
 //=============================================================================================================
 
-FIFFLIB::FiffDigPointSet BidsElectrode::to_fiff_dig_points(
+mne::FiffDigPointSet BidsElectrode::to_fiff_dig_points(
     std::span<const BidsElectrode> electrodes,
-    const FIFFLIB::FiffCoordTrans& trans)
+    const mne::FiffCoordTrans& trans)
 {
-    using namespace FIFFLIB;
-
     FiffDigPointSet digSet;
     int ident = 1;
 
@@ -113,9 +111,9 @@ FIFFLIB::FiffDigPointSet BidsElectrode::to_fiff_dig_points(
 
     for (const BidsElectrode& elec : electrodes) {
         // Skip electrodes with "n/a" coordinates
-        const std::optional<double> x = BASELIB::toDouble(elec.x);
-        const std::optional<double> y = BASELIB::toDouble(elec.y);
-        const std::optional<double> z = BASELIB::toDouble(elec.z);
+        const std::optional<double> x = mne::toDouble(elec.x);
+        const std::optional<double> y = mne::toDouble(elec.y);
+        const std::optional<double> z = mne::toDouble(elec.z);
         if (!x || !y || !z) {
             continue;
         }

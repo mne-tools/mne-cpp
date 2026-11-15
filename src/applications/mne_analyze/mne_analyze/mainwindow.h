@@ -48,7 +48,7 @@ class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
 
-namespace DISPLIB
+namespace mne::disp
 {
 class MultiView;
 }
@@ -148,7 +148,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ signals:
      *
      * @param[in] style       the new gui style.
      */
-    void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
+    void guiStyleChanged(mne::disp::AbstractView::StyleMode style);
 
     //=========================================================================================================
     /**
@@ -270,7 +270,7 @@ private:
      */
     void deleteMenus();
 
-    QPointer<DISPLIB::MultiView> m_pMultiView;      /**< The central View.*/
+    QPointer<mne::disp::MultiView> m_pMultiView;    /**< The central View.*/
     QPointer<AnalyzeCore> m_pAnalyzeCoreController; /**< Pointer to the application controller Obj.*/
     QPointer<QGridLayout> m_pGridLayout;            /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 

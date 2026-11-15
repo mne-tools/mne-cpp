@@ -14,14 +14,14 @@
  * @brief    Recursive node of the parsed FIFF block tree (FIFFB_* hierarchy with directory entries and children).
  *
  * A FIFF file is a flat tag stream bracketed by @c FIFFB_BLOCK_START /
- * @c FIFFB_BLOCK_END markers. @ref FIFFLIB::FiffDirNode is the tree the stream
+ * @c FIFFB_BLOCK_END markers. @ref mne::FiffDirNode is the tree the stream
  * parser produces from those brackets: each node owns its block kind,
- * its @ref FIFFLIB::FiffId, the list of @ref FIFFLIB::FiffDirEntry records that live
- * directly inside its block, and a list of child @ref FIFFLIB::FiffDirNode
+ * its @ref mne::FiffId, the list of @ref mne::FiffDirEntry records that live
+ * directly inside its block, and a list of child @ref mne::FiffDirNode
  * sub-blocks. Together with the random-access directory at the tail of
- * the file this lets every downstream reader (@ref FIFFLIB::FiffRawData,
- * @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffInfo, @ref FIFFLIB::FiffCov, ...) navigate to its
- * block of interest with one call to @ref FIFFLIB::FiffDirNode::dir_tree_find "FiffDirNode::dir_tree_find"
+ * the file this lets every downstream reader (@ref mne::FiffRawData,
+ * @ref mne::FiffEvoked, @ref mne::FiffInfo, @ref mne::FiffCov, ...) navigate to its
+ * block of interest with one call to @ref mne::FiffDirNode::dir_tree_find "FiffDirNode::dir_tree_find"
  * rather than rescanning the tag stream.
  *
  * Mirrors the @c dir_tree object returned by
@@ -54,10 +54,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 class FiffStream;

@@ -9,16 +9,16 @@
  * @date     March 2026
  * @brief    Real-time continuous Head-Position-Indicator (cHPI) coil-localisation worker.
  *
- * RtHpi runs the inverse-library HPI fitter (@ref INVLIB::InvHpiFit) on each
+ * RtHpi runs the inverse-library HPI fitter (@ref mne::InvHpiFit) on each
  * incoming data window from a background @c QThread. For every window the
  * worker extracts the narrow-band cHPI carriers at the configured coil
  * frequencies, fits a single-dipole model to each carrier amplitude /
- * phase pattern and emits an @ref INVLIB::HpiFitResult containing the
+ * phase pattern and emits an @ref mne::HpiFitResult containing the
  * estimated coil positions, the head-to-device transform and per-coil
  * goodness-of-fit values.
  *
  * The continuously updated head-to-device transform is the input to
- * Maxwell movement compensation (@ref DSPLIB::MaxwellMovementComp), to the live
+ * Maxwell movement compensation (@ref mne::MaxwellMovementComp), to the live
  * coordinate-frame display, and to dynamic forward-solution updates. The
  * threaded design keeps the GUI responsive even when the HPI fit is run
  * at the full block rate of a multi-channel acquisition.
@@ -52,12 +52,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace INVLIB
+namespace mne
 {
 class InvSensorSet;
 class InvHpiFit;
@@ -66,10 +66,10 @@ class InvHpiModelParameters;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -91,7 +91,7 @@ public:
      *
      * @param[in] sensorSet        Associated Fiff Information.
      */
-    explicit RtHpiWorker(const INVLIB::InvSensorSet sensorSet);
+    explicit RtHpiWorker(const mne::InvSensorSet sensorSet);
 
     //=========================================================================================================
     /**
@@ -104,15 +104,15 @@ public:
      */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
-                const INVLIB::InvHpiModelParameters& hpiModelParameters,
+                const mne::InvHpiModelParameters& hpiModelParameters,
                 const Eigen::MatrixXd& matCoilsHead);
 
 protected:
     //=========================================================================================================
-    std::shared_ptr<INVLIB::InvHpiFit> m_pHpiFit; /**< Holds the HpiFit object. */
+    std::shared_ptr<mne::InvHpiFit> m_pHpiFit; /**< Holds the HpiFit object. */
 
 signals:
-    void resultReady(const INVLIB::HpiFitResult& fitResult);
+    void resultReady(const mne::HpiFitResult& fitResult);
 };
 
 //=============================================================================================================
@@ -135,7 +135,7 @@ public:
      * @param[in] sensorSet        Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtHpi(const INVLIB::InvSensorSet sensorSet,
+    explicit RtHpi(const mne::InvSensorSet sensorSet,
                    QObject* parent = 0);
 
     //=========================================================================================================
@@ -158,7 +158,7 @@ public:
      *
      * @param[in] hpiModelParameters  The coil frequencies.
      */
-    void setModelParameters(INVLIB::InvHpiModelParameters hpiModelParameters);
+    void setModelParameters(mne::InvHpiModelParameters hpiModelParameters);
 
     //=========================================================================================================
     /**
@@ -195,19 +195,19 @@ protected:
      *
      * @param[in] fitResult  HPI fit result from the worker, re-emitted via newHpiFitResultAvailable().
      */
-    void handleResults(const INVLIB::HpiFitResult& fitResult);
+    void handleResults(const mne::HpiFitResult& fitResult);
 
     QThread m_workerThread;          /**< The worker thread. */
     Eigen::MatrixXd m_matCoilsHead;  /**< Vector contains the HPI coil frequencies. */
     Eigen::MatrixXd m_matProjectors; /**< Holds the matrix with the SSP and compensator projectors.*/
-    INVLIB::InvSensorSet m_sensorSet;
-    INVLIB::InvHpiModelParameters m_modelParameters;
+    mne::InvSensorSet m_sensorSet;
+    mne::InvHpiModelParameters m_modelParameters;
 
 signals:
-    void newHpiFitResultAvailable(const INVLIB::HpiFitResult& fitResult);
+    void newHpiFitResultAvailable(const mne::HpiFitResult& fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
-                 const INVLIB::InvHpiModelParameters& hpiModelParameters,
+                 const mne::InvHpiModelParameters& hpiModelParameters,
                  const Eigen::MatrixXd& matCoilsHead);
 };
 

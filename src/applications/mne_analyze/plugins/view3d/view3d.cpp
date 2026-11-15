@@ -45,10 +45,9 @@
 //=============================================================================================================
 
 using namespace VIEW3DPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace DISP3DLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
+using namespace mne;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -140,7 +139,7 @@ void View3D::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_BEM_CHANGED:
-            updateCoregBem(e->getData().value<QSharedPointer<ANSHAREDLIB::BemDataModel>>());
+            updateCoregBem(e->getData().value<QSharedPointer<mne::analyze::BemDataModel>>());
             break;
         case EVENT_TYPE::NEW_DIGITIZER_ADDED:
             updateCoregDigitizer(e->getData().value<FiffDigPointSet>());
@@ -158,13 +157,13 @@ void View3D::handleEvent(QSharedPointer<Event> e)
             onFiducialChanged(e->getData().value<int>());
             break;
         case EVENT_TYPE::VIEW3D_SETTINGS_CHANGED:
-            settingsChanged(e->getData().value<ANSHAREDLIB::View3DParameters>());
+            settingsChanged(e->getData().value<mne::analyze::View3DParameters>());
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         case EVENT_TYPE::MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
@@ -190,7 +189,7 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
+void View3D::updateCoregBem(QSharedPointer<mne::analyze::BemDataModel> pNewModel)
 {
     if (!pNewModel) {
         qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
@@ -272,28 +271,28 @@ void View3D::new3DModel(QSharedPointer<BrainTreeModel> pModel)
 
 //=============================================================================================================
 
-void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
+void View3D::settingsChanged(mne::analyze::View3DParameters viewParameters)
 {
     switch (viewParameters.m_settingsToApply) {
-        case ANSHAREDLIB::View3DParameters::View3DSetting::sceneColor:
+        case mne::analyze::View3DParameters::View3DSetting::sceneColor:
             emit sceneColorChanged(viewParameters.m_sceneColor);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::rotation:
+        case mne::analyze::View3DParameters::View3DSetting::rotation:
             emit rotationChanged(viewParameters.m_bToggleRotation);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::coordAxis:
+        case mne::analyze::View3DParameters::View3DSetting::coordAxis:
             emit showCoordAxis(viewParameters.m_bToogleCoordAxis);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::fullscreen:
+        case mne::analyze::View3DParameters::View3DSetting::fullscreen:
             emit showFullScreen(viewParameters.m_bToggleFullscreen);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::lightColor:
+        case mne::analyze::View3DParameters::View3DSetting::lightColor:
             emit lightColorChanged(viewParameters.m_lightColor);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::lightIntensity:
+        case mne::analyze::View3DParameters::View3DSetting::lightIntensity:
             emit lightIntensityChanged(viewParameters.m_dLightIntensity);
             break;
-        case ANSHAREDLIB::View3DParameters::View3DSetting::screenshot:
+        case mne::analyze::View3DParameters::View3DSetting::screenshot:
             emit takeScreenshotChanged();
             break;
         default:
@@ -303,24 +302,24 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 //=============================================================================================================
 
-void View3D::newDipoleFit(const INVLIB::InvEcdSet& ecdSet)
+void View3D::newDipoleFit(const mne::InvEcdSet& ecdSet)
 {
     m_p3DModel->addDipoles(ecdSet);
 }
 
 //=============================================================================================================
 
-void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void View3D::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL && !m_dipoleItems.contains(pNewModel.data())) {
-        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::InvEcdSet>());
+        newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<mne::InvEcdSet>());
         m_dipoleItems.insert(pNewModel.data(), QPersistentModelIndex(m_p3DModel->index(m_p3DModel->rowCount() - 1, 0)));
     }
 }
 
 //=============================================================================================================
 
-void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void View3D::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
     if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
         const QPersistentModelIndex index = m_dipoleItems.take(pRemovedModel.data());
@@ -365,5 +364,5 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
 
 QString View3D::getBuildInfo()
 {
-    return QString(BASELIB::dateTimeNow());
+    return QString(mne::dateTimeNow());
 }

@@ -26,9 +26,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using BASELIB::ErrorCode;
-using BASELIB::fail;
+using namespace mne;
+using mne::ErrorCode;
+using mne::fail;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -55,7 +55,7 @@ std::filesystem::path FiffFileSharer::fileAt(int index) const
 
 //=============================================================================================================
 
-BASELIB::Expected<std::filesystem::path> FiffFileSharer::copy_realtime_file(const std::filesystem::path& source)
+mne::Expected<std::filesystem::path> FiffFileSharer::copy_realtime_file(const std::filesystem::path& source)
 {
     std::error_code ec;
     std::filesystem::create_directories(m_directory, ec);
@@ -64,17 +64,17 @@ BASELIB::Expected<std::filesystem::path> FiffFileSharer::copy_realtime_file(cons
     std::filesystem::path part = target;
     part += ".part";
     if (ec || !std::filesystem::copy_file(source, part, std::filesystem::copy_options::overwrite_existing, ec)) {
-        return fail(ErrorCode::Io, "cannot copy {} to {}: {}", BASELIB::utf8FromPath(source), BASELIB::utf8FromPath(part), ec.message());
+        return fail(ErrorCode::Io, "cannot copy {} to {}: {}", mne::utf8FromPath(source), mne::utf8FromPath(part), ec.message());
     }
     // The copy is cut mid-recording: close its raw data blocks so it reads as a complete file
-    if (auto bytes = BASELIB::FileByteStream::open(part, BASELIB::FileByteStream::Mode::ReadWrite)) {
+    if (auto bytes = mne::FileByteStream::open(part, mne::FileByteStream::Mode::ReadWrite)) {
         bytes->seek(bytes->size());
         FiffStream(std::move(bytes)).finish_writing_raw();
     }
     std::filesystem::rename(part, target, ec);
     if (ec) {
         std::filesystem::remove(part, ec);
-        return fail(ErrorCode::Io, "cannot share {}", BASELIB::utf8FromPath(target));
+        return fail(ErrorCode::Io, "cannot share {}", mne::utf8FromPath(target));
     }
     ++m_next;
     return target;

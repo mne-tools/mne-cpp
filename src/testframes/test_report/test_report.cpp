@@ -38,7 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REPORTLIB;
+using namespace mne;
 
 namespace
 {

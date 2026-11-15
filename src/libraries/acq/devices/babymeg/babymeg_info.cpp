@@ -26,8 +26,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -65,7 +65,7 @@ bool number(std::string_view text, T& value)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<BabyMegInfo> ACQLIB::detail::parse_babymeg_info(std::string_view text)
+AcqExpected<BabyMegInfo> mne::detail::parse_babymeg_info(std::string_view text)
 {
     if (!text.starts_with("INFO:")) {
         return broken("does not start with INFO:");
@@ -105,7 +105,7 @@ AcqExpected<BabyMegInfo> ACQLIB::detail::parse_babymeg_info(std::string_view tex
 
 //=============================================================================================================
 
-std::string ACQLIB::detail::babymeg_info_text(const BabyMegInfo& info)
+std::string mne::detail::babymeg_info_text(const BabyMegInfo& info)
 {
     std::string text = std::format("INFO:{}:{}:{}:", info.channels.size(), info.samples, info.rate);
     for (const BabyMegChannel& channel : info.channels) {

@@ -9,7 +9,7 @@
  * @date     May 2026
  * @brief    HTML report builder, mne-cpp's counterpart of @c mne.Report for summarising analysis pipelines.
  *
- * @ref REPORTLIB::Report collects titled sections (free text, tables, key-value pairs, preformatted code and figures)
+ * @ref mne::Report collects titled sections (free text, tables, key-value pairs, preformatted code and figures)
  * and emits a single self-contained HTML document that opens directly in a browser or can be attached to an email.
  * Figures are embedded as base64 data, so the page needs no files next to it; CSS is inline and there is no
  * JavaScript, so it stays readable in restricted environments where MEG/EEG processing reports are typically
@@ -39,10 +39,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE REPORTLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace REPORTLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -90,7 +90,7 @@ public:
      * @param[in] headers  Column headers.
      * @param[in] rows     Cells, one list per row.
      */
-    void add_table(std::string_view title, const BASELIB::StringList& headers, const std::vector<BASELIB::StringList>& rows);
+    void add_table(std::string_view title, const mne::StringList& headers, const std::vector<mne::StringList>& rows);
 
     //=========================================================================================================
     /**
@@ -196,6 +196,6 @@ REPORTSHARED_EXPORT std::string html_escape(std::string_view text);
  */
 REPORTSHARED_EXPORT std::string base64_encode(std::string_view data);
 
-} // namespace REPORTLIB
+} // namespace mne
 
 #endif // REPORTLIB_REPORT_H

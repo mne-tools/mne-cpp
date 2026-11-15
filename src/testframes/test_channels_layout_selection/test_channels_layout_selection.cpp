@@ -43,8 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CHANNELSLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace fs = std::filesystem;
@@ -118,7 +117,7 @@ private:
 
 void TestChannelsLayoutSelection::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QVERIFY(m_tempDir.isValid());
 }
 

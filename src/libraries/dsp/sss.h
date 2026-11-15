@@ -65,10 +65,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -131,7 +131,7 @@ public:
      *
      * @return Basis struct containing all projectors needed for SSS and tSSS.
      */
-    static Basis computeBasis(const FIFFLIB::FiffInfo& fiffInfo,
+    static Basis computeBasis(const mne::FiffInfo& fiffInfo,
                               const Params& params = Params());
 
     //=========================================================================================================
@@ -223,6 +223,6 @@ private:
                                          double sinPhi);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // SSS_DSP_H

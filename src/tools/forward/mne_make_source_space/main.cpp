@@ -55,9 +55,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -330,7 +328,7 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

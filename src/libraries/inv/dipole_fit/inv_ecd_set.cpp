@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref INVLIB::InvEcdSet including the @c .dip and @c .bdip readers/writers.
+ * @brief    Implementation of @ref mne::InvEcdSet including the @c .dip and @c .bdip readers/writers.
  *
  * Implements the dipole list management plus the file-format
  * serialisation that keeps round-trip compatibility with mrilab
@@ -40,8 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -51,7 +50,7 @@ constexpr int X = 0;
 constexpr int Y = 1;
 constexpr int Z = 2;
 
-namespace INVLIB
+namespace mne
 {
 
 /**
@@ -123,7 +122,7 @@ InvEcdSet InvEcdSet::read_dipoles_dip(const std::filesystem::path& path)
 {
     std::ifstream in(path);
     if (!in) {
-        BASELIB::Log::critical("Not able to read from: {}", path.string());
+        mne::Log::critical("Not able to read from: {}", path.string());
         return {};
     }
 
@@ -157,7 +156,7 @@ InvEcdSet InvEcdSet::read_dipoles_dip(const std::filesystem::path& path)
         }
         data_seen = true;
         if (!parse_floats(line, values) || values.size() < n_fixed) {
-            BASELIB::Log::critical("Malformed dipole line in {}: {}", path.string(), line);
+            mne::Log::critical("Malformed dipole line in {}: {}", path.string(), line);
             return {};
         }
         InvEcd one;
@@ -176,7 +175,7 @@ InvEcdSet InvEcdSet::read_dipoles_dip(const std::filesystem::path& path)
         set.push_back(one);
     }
 
-    BASELIB::Log::info("Read {} dipoles in dip format from {}", set.size(), path.string());
+    mne::Log::info("Read {} dipoles in dip format from {}", set.size(), path.string());
     return set;
 }
 
@@ -190,7 +189,7 @@ bool InvEcdSet::save_dipoles_bdip(const std::filesystem::path& path) const
 
     std::ofstream out(path, std::ios::binary);
     if (!out) {
-        BASELIB::Log::critical("Not able to write to: {}", path.string());
+        mne::Log::critical("Not able to write to: {}", path.string());
         return false;
     }
 
@@ -201,28 +200,28 @@ bool InvEcdSet::save_dipoles_bdip(const std::filesystem::path& path) const
         }
         // Fields xfit fills from an error analysis stay zero.
         bdipEcdRec one_out{};
-        one_out.dipole = FIFFLIB::swap_int(1);
-        one_out.begin = FIFFLIB::swap_float(one.time);
-        one_out.end = FIFFLIB::swap_float(one.time);
+        one_out.dipole = mne::swap_int(1);
+        one_out.begin = mne::swap_float(one.time);
+        one_out.end = mne::swap_float(one.time);
         for (int p = 0; p < 3; p++) {
-            one_out.r0[p] = FIFFLIB::swap_float(0.0f);
-            one_out.rd[p] = FIFFLIB::swap_float(one.rd[p]);
-            one_out.Q[p] = FIFFLIB::swap_float(one.Q[p]);
+            one_out.r0[p] = mne::swap_float(0.0f);
+            one_out.rd[p] = mne::swap_float(one.rd[p]);
+            one_out.Q[p] = mne::swap_float(one.Q[p]);
         }
-        one_out.goodness = FIFFLIB::swap_float(one.good);
-        one_out.errors_computed = FIFFLIB::swap_int(0);
-        one_out.khi2 = FIFFLIB::swap_float(one.khi2);
+        one_out.goodness = mne::swap_float(one.good);
+        one_out.errors_computed = mne::swap_int(0);
+        one_out.khi2 = mne::swap_float(one.khi2);
         out.write(reinterpret_cast<const char*>(&one_out), sizeof(bdipEcdRec));
         nsave++;
     }
     if (!out.flush()) {
-        BASELIB::Log::critical("Failed to write the dipoles to {}", path.string());
+        mne::Log::critical("Failed to write the dipoles to {}", path.string());
         out.close();
         std::error_code ec;
         std::filesystem::remove(path, ec);
         return false;
     }
-    BASELIB::Log::info("Save {} dipoles in bdip format to {}", nsave, path.string());
+    mne::Log::info("Save {} dipoles in bdip format to {}", nsave, path.string());
     return true;
 }
 
@@ -235,7 +234,7 @@ bool InvEcdSet::save_dipoles_dip(const std::filesystem::path& path) const
     }
     std::ofstream out(path);
     if (!out) {
-        BASELIB::Log::critical("Not able to write to: {}", path.string());
+        mne::Log::critical("Not able to write to: {}", path.string());
         return false;
     }
     // Column widths as in MNE-C save_dipoles_dip; other tools read this layout back.
@@ -255,9 +254,9 @@ bool InvEcdSet::save_dipoles_dip(const std::filesystem::path& path) const
     }
     out << "## Name \"ALL dipoles\" Style \"Dipoles\"\n";
     if (!out.flush()) {
-        BASELIB::Log::critical("Failed to write the dipoles to {}", path.string());
+        mne::Log::critical("Failed to write the dipoles to {}", path.string());
         return false;
     }
-    BASELIB::Log::info("Save {} dipoles in dip format to {}", nsave, path.string());
+    mne::Log::info("Save {} dipoles in dip format to {}", nsave, path.string());
     return true;
 }

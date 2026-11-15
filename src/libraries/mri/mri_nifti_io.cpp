@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref MRILIB::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
+ * @brief    Implementation of @ref mne::MriNiftiIO: 348-byte header parse, byte-order auto-detect, sform/qform/pixdim transform reconstruction.
  *
  * Implements the three pieces the header documents: (1) a
  * little-endian-by-default 348-byte header parse that flips to
@@ -62,10 +62,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
-using BASELIB::Log;
+using mne::Log;
 
 namespace
 {
@@ -81,16 +80,16 @@ constexpr std::int16_t DT_UINT16 = 512;
 constexpr std::size_t NIFTI_HDR_SIZE = 348;
 
 // Value of type T at @p p, stored with the file's byte order
-template<BASELIB::Swappable T>
+template<mne::Swappable T>
 T readValue(const std::byte* p, bool bigEndian)
 {
     T v;
     std::memcpy(&v, p, sizeof(T));
-    return bigEndian != (std::endian::native == std::endian::big) ? BASELIB::byteSwap(v) : v;
+    return bigEndian != (std::endian::native == std::endian::big) ? mne::byteSwap(v) : v;
 }
 
 // Decodes @p count values of type T from @p p and converts each one with @p convert into @p out
-template<BASELIB::Swappable T, typename Out, typename Convert>
+template<mne::Swappable T, typename Out, typename Convert>
 void readValues(const std::byte*& p, bool bigEndian, std::vector<Out>& out, std::size_t count, Convert convert)
 {
     out.resize(count);
@@ -104,7 +103,7 @@ void readValues(const std::byte*& p, bool bigEndian, std::vector<Out>& out, std:
 
 bool MriNiftiIO::decompress(const std::string& gzFile, std::vector<std::byte>& rawData)
 {
-    auto bytes = BASELIB::read_file_bytes(BASELIB::pathFromUtf8(gzFile), BASELIB::Compression::Gzip);
+    auto bytes = mne::read_file_bytes(mne::pathFromUtf8(gzFile), mne::Compression::Gzip);
     if (!bytes) {
         Log::critical("MriNiftiIO::decompress - {}", bytes.error().what());
         return false;
@@ -119,8 +118,8 @@ bool MriNiftiIO::read(const std::string& niiFile, MriVolData& volData, bool verb
 {
     volData.fileName = niiFile;
 
-    const bool compressed = BASELIB::toLower(niiFile).ends_with(".gz");
-    const auto content = BASELIB::read_file_bytes(BASELIB::pathFromUtf8(niiFile), compressed ? BASELIB::Compression::Gzip : BASELIB::Compression::None);
+    const bool compressed = mne::toLower(niiFile).ends_with(".gz");
+    const auto content = mne::read_file_bytes(mne::pathFromUtf8(niiFile), compressed ? mne::Compression::Gzip : mne::Compression::None);
     if (!content) {
         Log::critical("MriNiftiIO::read - {}", content.error().what());
         return false;

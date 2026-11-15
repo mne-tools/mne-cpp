@@ -1,18 +1,18 @@
 ---
 id: mne-project-to-surface
-title: "MNELIB::MNEProjectToSurface"
+title: "mne::MNEProjectToSurface"
 sidebar_label: MNEProjectToSurface
 sidebar_position: 46
 ---
 
 # MNEProjectToSurface
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_project_to_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_project_to_surface.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_project_to_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_project_to_surface.h)
 
 `#include <mne/mne_project_to_surface.h>`
 
 ```cpp
-class MNELIB::MNEProjectToSurface
+class mne::MNEProjectToSurface
 ```
 
 Description of what this class is intended to do (in detail).
@@ -54,7 +54,7 @@ Build a projector that snaps points onto the triangulation of `p_MNEBemSurf`.
 
 ### find_closest_on_surface(r, np, rTri, nearest, dist)
 
-Projects a set of points r on the [FsSurface](/docs/api/fs/fs-surface).
+Projects a set of points r on the [`FsSurface`](/docs/api/fs/fs-surface).
 
 Project a set of points onto the surface and return the nearest triangle and signed distance per point.
 
@@ -94,7 +94,7 @@ Project a set of points onto the surface and return the nearest triangle and sig
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 158"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 156"
 MNEProjectToSurface projector(innerSkull);
 MatrixXf points(2, 3);
 points << 0.0f, 0.0f, 0.12f, 0.05f, 0.01f, 0.03f; // one point outside, one inside the skull

@@ -29,9 +29,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using COMLIB::TcpSocket;
+using namespace mne;
+using namespace mne::detail;
+using mne::TcpSocket;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -100,8 +100,8 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<FtBufferTransport>> ACQLIB::detail::connect_ftbuffer(const std::string& host, std::uint16_t port,
-                                                                                 std::chrono::milliseconds timeout)
+AcqExpected<std::unique_ptr<FtBufferTransport>> mne::detail::connect_ftbuffer(const std::string& host, std::uint16_t port,
+                                                                              std::chrono::milliseconds timeout)
 {
     auto socket = TcpSocket::connect(host, port, timeout);
     if (!socket) {

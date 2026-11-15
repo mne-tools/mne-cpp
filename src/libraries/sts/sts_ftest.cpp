@@ -16,7 +16,7 @@
  * and @c N-k degrees of freedom.
  *
  * The right-tail p-value is obtained from the exact F CDF via the
- * regularised incomplete beta function reused from @ref STSLIB::StatsTtest,
+ * regularised incomplete beta function reused from @ref mne::StatsTtest,
  * so the t- and F-test machinery share the same numerically-stable
  * special-function back-end.
  */
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

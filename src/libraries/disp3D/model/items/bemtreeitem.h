@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Tree item wrapping a single @ref MNELIB::MNEBemSurface (brain / inner-skull / outer-skull / scalp shell).
+ * @brief    Tree item wrapping a single @ref mne::MNEBemSurface (brain / inner-skull / outer-skull / scalp shell).
  *
  * BEM surfaces are triangulated boundary meshes produced by
  * @c mne_watershed_bem or the FreeSurfer @c mri_make_bem_surfaces
@@ -28,7 +28,7 @@
 #include "abstracttreeitem.h"
 #include <mne/mne_bem_surface.h>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -37,15 +37,15 @@ namespace DISP3DLIB
 class DISP3DSHARED_EXPORT BemTreeItem : public AbstractTreeItem
 {
 public:
-    explicit BemTreeItem(const QString& text = "", const MNELIB::MNEBemSurface& bemSurf = MNELIB::MNEBemSurface());
+    explicit BemTreeItem(const QString& text = "", const mne::MNEBemSurface& bemSurf = mne::MNEBemSurface());
     virtual ~BemTreeItem() = default;
 
-    const MNELIB::MNEBemSurface& bemSurfaceData() const;
+    const mne::MNEBemSurface& bemSurfaceData() const;
 
 private:
-    MNELIB::MNEBemSurface m_bemSurface;
+    mne::MNEBemSurface m_bemSurface;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BEMTREEITEM_H

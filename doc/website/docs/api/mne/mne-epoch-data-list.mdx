@@ -1,20 +1,20 @@
 ---
 id: mne-epoch-data-list
-title: "MNELIB::MNEEpochDataList"
+title: "mne::MNEEpochDataList"
 sidebar_label: MNEEpochDataList
 sidebar_position: 19
 ---
 
 # MNEEpochDataList
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data_list.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data_list.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data_list.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data_list.h)
 
 `#include <mne/mne_epoch_data_list.h>`
 
 <Connections topics={["epochs-averaging"]} context="api" current="MNEEpochDataList" />
 
 ```cpp
-class MNELIB::MNEEpochDataList
+class mne::MNEEpochDataList
 ```
 
 Epoch data list, which corresponds to a set of events.
@@ -78,10 +78,10 @@ Note that no baseline correction performed.
 - **p_info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   measurement info.
 
-- **first** : *FIFFLIB::fiff_int_t*
+- **first** : *mne::fiff_int_t*
   First time sample.
 
-- **last** : *FIFFLIB::fiff_int_t*
+- **last** : *mne::fiff_int_t*
   Last time sample.
 
 - **sel** : *Eigen::VectorXi*
@@ -150,7 +150,7 @@ Read the epochs from a raw file based on provided events.
 - **mapReject** : *const std::map&lt; std::string, double &gt; &*
   Peak-to-peak rejection thresholds per channel type (e.g. "grad", "mag", "eeg").
 
-- **lExcludeChs** : *const BASELIB::StringList &*
+- **lExcludeChs** : *const mne::StringList &*
   List of channel names to exclude.
 
 - **picks** : *const Eigen::RowVectorXi &*
@@ -177,7 +177,7 @@ Checks the givven matrix for artifacts beyond a threshold value.
 - **mapReject** : *const std::map&lt; std::string, double &gt; &*
   The channel data types to scan for. EEG, MEG or EOG.
 
-- **lExcludeChs** : *const BASELIB::StringList &*
+- **lExcludeChs** : *const mne::StringList &*
   List of channel names to exclude.
 
 **Returns:**
@@ -190,7 +190,7 @@ Checks the givven matrix for artifacts beyond a threshold value.
 
 averageCategories
 
-Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) with one [FiffEvoked](/docs/api/fiff/fiff-evoked) per category. Ported from average.c (MNE-C).
+Multi-category offline averaging. Reads epochs from raw data for multiple event types and returns an [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) with one [`FiffEvoked`](/docs/api/fiff/fiff-evoked) per category. Ported from average.c (MNE-C).
 
 **Parameters:**
 
@@ -203,7 +203,7 @@ Multi-category offline averaging. Reads epochs from raw data for multiple event 
 - **eventCodes** : *const std::vector&lt; int &gt; &*
   List of event codes, one per category.
 
-- **comments** : *const BASELIB::StringList &*
+- **comments** : *const mne::StringList &*
   List of category names/comments, one per category.
 
 - **tmin** : *float*
@@ -223,7 +223,7 @@ Multi-category offline averaging. Reads epochs from raw data for multiple event 
 
 **Returns:**
 
-- *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)* — FiffEvokedSet containing one FiffEvoked per category.
+- *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set)* — [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) containing one [`FiffEvoked`](/docs/api/fiff/fiff-evoked) per category.
 
 ---
 
@@ -260,7 +260,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 - **mapReject** : *const std::map&lt; std::string, double &gt; &*
   The thresholds per channel type to reject epochs.
 
-- **lExcludeChs** : *const BASELIB::StringList &*
+- **lExcludeChs** : *const mne::StringList &*
   List of channel names to exclude.
 
 - **vecPicks** : *const Eigen::RowVectorXi &*
@@ -285,7 +285,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 232"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 230"
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 const FiffEvents events = FiffEvents::find_events(raw).value(); // rising edges on STI 014
 // Epochs of event 1 from -100 to 300 ms, no rejection
@@ -304,18 +304,18 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 113"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 112"
 std::shared_ptr<TFplot> m_pTfPlot;
 Eigen::MatrixXd m_matEvoked;
 Eigen::MatrixXd m_matEvokedSource;
-MNELIB::MNEEpochDataList epochs;
+mne::MNEEpochDataList epochs;
 ````
 
 ### [ex_averaging](../../examples/mne/ex_averaging.mdx)
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 154"
+````cpp title="src/examples/ex_averaging/main.cpp, line 152"
 FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
                                                      events,
                                                      fTMin,

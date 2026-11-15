@@ -52,8 +52,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -151,8 +150,8 @@ int main(int argc, char* argv[])
     //! [bad_channels_maxwell_usage]
     int worst = 0;
     bads.zScores.maxCoeff(&worst);
-    ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && BASELIB::contains(bads.badChannels, info.ch_names[meg[40]]),
-                 std::format("findBadChannelsMaxwell ranks {} worst (z = {:.0f}), flagged: {}", info.ch_names[meg[worst]], bads.zScores(worst), BASELIB::join(bads.badChannels, ", ")));
+    ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && mne::contains(bads.badChannels, info.ch_names[meg[40]]),
+                 std::format("findBadChannelsMaxwell ranks {} worst (z = {:.0f}), flagged: {}", info.ch_names[meg[worst]], bads.zScores(worst), mne::join(bads.badChannels, ", ")));
 
     //! [maxwell_movement_comp_usage]
     std::vector<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref INVLIB::SourceMorph (matrix caching and apply step).
+ * @brief    Implementation of @ref mne::SourceMorph (matrix caching and apply step).
  *
  * Implements @c compute (caches the from/to vertex lists and the
  * sparse @c (nTo × nFrom) interpolation matrix) and @c apply, which is
@@ -29,7 +29,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -41,12 +41,12 @@ void SourceMorph::compute(const VectorXi& verticesFrom,
                           const SparseMatrix<double>& morphMap)
 {
     if (verticesFrom.size() == 0 || verticesTo.size() == 0) {
-        BASELIB::Log::warning("[SourceMorph::compute] Empty vertex vectors.");
+        mne::Log::warning("[SourceMorph::compute] Empty vertex vectors.");
         return;
     }
 
     if (morphMap.rows() != verticesTo.size() || morphMap.cols() != verticesFrom.size()) {
-        BASELIB::Log::warning("[SourceMorph::compute] Morph map dimensions mismatch: {} x {} but expected {} x {}", morphMap.rows(), morphMap.cols(), verticesTo.size(), verticesFrom.size());
+        mne::Log::warning("[SourceMorph::compute] Morph map dimensions mismatch: {} x {} but expected {} x {}", morphMap.rows(), morphMap.cols(), verticesTo.size(), verticesFrom.size());
         return;
     }
 
@@ -61,17 +61,17 @@ void SourceMorph::compute(const VectorXi& verticesFrom,
 InvSourceEstimate SourceMorph::apply(const InvSourceEstimate& stcFrom) const
 {
     if (!m_bComputed) {
-        BASELIB::Log::warning("[SourceMorph::apply] Morph not computed. Call compute() first.");
+        mne::Log::warning("[SourceMorph::apply] Morph not computed. Call compute() first.");
         return InvSourceEstimate();
     }
 
     if (stcFrom.empty()) {
-        BASELIB::Log::warning("[SourceMorph::apply] Source estimate is empty.");
+        mne::Log::warning("[SourceMorph::apply] Source estimate is empty.");
         return InvSourceEstimate();
     }
 
     if (stcFrom.data.rows() != m_morphMatrix.cols()) {
-        BASELIB::Log::warning("[SourceMorph::apply] Source estimate rows {} != morph matrix cols {}", stcFrom.data.rows(), m_morphMatrix.cols());
+        mne::Log::warning("[SourceMorph::apply] Source estimate rows {} != morph matrix cols {}", stcFrom.data.rows(), m_morphMatrix.cols());
         return InvSourceEstimate();
     }
 

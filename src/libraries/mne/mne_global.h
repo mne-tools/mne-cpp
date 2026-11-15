@@ -10,15 +10,15 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
- * @brief    MNELIB shared-library export/import macros and library build metadata.
+ * @brief    mne_mne shared-library export/import macros and library build metadata.
  *
- * MNELIB is the central mne-cpp data library: it ties the on-disk FIFF
- * containers exposed by FIFFLIB to the higher-level neuroscience objects
+ * mne_mne is the central mne-cpp data library: it ties the on-disk FIFF
+ * containers exposed by mne_fiff to the higher-level neuroscience objects
  * (source spaces, hemispheres, BEM surfaces, forward solutions, inverse
  * operators, covariance matrices, raw/epoch/evoked aggregates and the
  * MSH display surfaces consumed by DISP3D). This translation unit only
  * declares the @c MNESHARED_EXPORT visibility macro and the
- * @ref MNELIB::buildDateTime helper so every other compilation unit can
+ * @ref mne::buildDateTime helper so every other compilation unit can
  * resolve symbol visibility identically across static and shared builds.
  */
 
@@ -54,15 +54,10 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace MNELIB
- * @brief     Core MNE data structures (source spaces, source estimates, hemispheres).
- */
-namespace MNELIB
+namespace mne
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

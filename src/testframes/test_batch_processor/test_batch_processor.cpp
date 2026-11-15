@@ -36,7 +36,7 @@
 //=============================================================================================================
 
 using namespace MNEPROCESSRAWAPP;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -298,7 +298,7 @@ void TestBatchProcessor::testRunDetectsEventsWithoutMask()
     settings.eventsOutFiles.push_back((m_tempDir.path() + "/detected-eve.fif").toStdString());
     QCOMPARE(BatchProcessor::run(settings), 0);
 
-    const FIFFLIB::FiffEvents events = FIFFLIB::FiffEvents::read_fif(settings.eventsOutFiles.front()).value();
+    const mne::FiffEvents events = mne::FiffEvents::read_fif(settings.eventsOutFiles.front()).value();
     QVERIFY2(events.num_events() > 0, "No events detected on STI 014");
 }
 
@@ -324,10 +324,10 @@ void TestBatchProcessor::testRunGrandAverageWeightsByNave()
     settings.grandAveFile = (m_tempDir.path() + "/grand-ave.fif").toStdString();
     QCOMPARE(BatchProcessor::run(settings), 0);
 
-    const FIFFLIB::FiffRawData raw(rawPath.toStdString());
-    const FIFFLIB::FiffEvokedSet grand(BASELIB::pathFromUtf8(settings.grandAveFile));
+    const mne::FiffRawData raw(rawPath.toStdString());
+    const mne::FiffEvokedSet grand(mne::pathFromUtf8(settings.grandAveFile));
     QCOMPARE(grand.evoked.size(), 1);
-    const FIFFLIB::FiffEvoked& g = grand.evoked.front();
+    const mne::FiffEvoked& g = grand.evoked.front();
     QCOMPARE(g.comment, std::string("Auditory Left"));
     QCOMPARE(g.info.nchan, raw.info.nchan);
     QVERIFY2(g.nave > 2 && g.nave % 2 == 0, qPrintable(QString("nave %1").arg(g.nave)));

@@ -12,9 +12,9 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Umbrella include header that exposes the full FIFFLIB public surface in a single include.
+ * @brief    Umbrella include header that exposes the full mne_fiff public surface in a single include.
  *
- * FIFFLIB reads and writes the Neuromag FIFF format: the tag stream and directory, measurement info and
+ * mne_fiff reads and writes the Neuromag FIFF format: the tag stream and directory, measurement info and
  * channels, raw data, evoked responses and epochs, covariances, projections, coordinate transformations,
  * digitization, events and annotations.
  */

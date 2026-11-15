@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -711,9 +711,9 @@ void TestStsCluster::testTrisAdjacencyMatchesMne()
     QCOMPARE(upperEdges(StatsAdjacency::fromSourceSpaceTemporal(tris, 6, 4)), expected);
 
     // Channels at x = 0, 1, 2, 3 and 10: neighbours lie within 3x the median nearest-neighbour distance
-    FIFFLIB::FiffInfo info;
+    mne::FiffInfo info;
     for (const float x : {0.0f, 1.0f, 2.0f, 3.0f, 10.0f}) {
-        FIFFLIB::FiffChInfo ch;
+        mne::FiffChInfo ch;
         ch.ch_name = QString("EEG%1").arg(static_cast<int>(x)).toStdString();
         ch.chpos.r0 = Eigen::Vector3f(x, 0.0f, 0.0f);
         info.chs.push_back(ch);

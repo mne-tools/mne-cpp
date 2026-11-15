@@ -1,18 +1,18 @@
 ---
 id: inv-guess-data
-title: "INVLIB::InvGuessData"
+title: "mne::InvGuessData"
 sidebar_label: InvGuessData
 sidebar_position: 28
 ---
 
 # InvGuessData
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_guess_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_guess_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_guess_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_guess_data.h)
 
 `#include <inv/inv_guess_data.h>`
 
 ```cpp
-class INVLIB::InvGuessData
+class mne::InvGuessData
 ```
 
 Implements [`InvGuessData`](/docs/api/inv/inv-guess-data) (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
@@ -120,7 +120,7 @@ Once the guess locations have been set up we can compute the fields Refactored: 
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 107"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 106"
 InvGuessData guesses({}, {}, 0.0f, 0.02f, 0.015f, fitData.get(), 0.08f); // 15 mm grid in an 80 mm sphere
 std::unique_ptr<InvDipoleForward> atTruth(InvDipoleFitData::dipole_forward_one(fitData.get(), truePos, nullptr));
 InvEcd dipole;

@@ -52,8 +52,8 @@
 //=============================================================================================================
 
 using namespace MNEANALYZE;
-using namespace ANSHAREDLIB;
-using namespace DISPLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -379,7 +379,7 @@ void MainWindow::changeStyle()
     if (QApplication* pApp = qobject_cast<QApplication*>(QApplication::instance())) {
         if (m_sCurrentStyle == "default") {
             pApp->setStyleSheet("");
-            emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Default);
+            emit guiStyleChanged(mne::disp::AbstractView::StyleMode::Default);
         } else if (m_sCurrentStyle == "dark") {
             QFile file(":/dark.qss");
             if (file.open(QFile::ReadOnly)) {
@@ -389,7 +389,7 @@ void MainWindow::changeStyle()
                 qWarning() << "Could not open dark theme stylesheet.";
                 pApp->setStyleSheet("");
             }
-            emit guiStyleChanged(DISPLIB::AbstractView::StyleMode::Dark);
+            emit guiStyleChanged(mne::disp::AbstractView::StyleMode::Dark);
         }
 
         // Set default font
@@ -406,9 +406,9 @@ void MainWindow::changeStyle()
 void MainWindow::manageGuiModeChanged()
 {
     if (m_pActionResearchMode->isChecked()) {
-        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
+        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Research);
     } else if (m_pActionClinicalMode->isChecked()) {
-        emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Clinical);
+        emit guiModeChanged(mne::disp::AbstractView::GuiMode::Clinical);
     }
 }
 
@@ -648,7 +648,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(BASELIB::dateTimeNow()) + " - " + QString(BASELIB::gitHash()));
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::dateTimeNow()) + " - " + QString(mne::gitHash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
 

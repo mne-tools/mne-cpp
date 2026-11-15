@@ -12,7 +12,7 @@
  * Owns the inputs to the field-map kernel &mdash; evoked info, head
  * and helmet surface geometry, MRI / head coordinate transforms,
  * channel picks and SSP projectors. Whenever any of these change
- * via the (mutex-protected) setters, @ref DISP3DLIB::RtSensorInterpolationMatWorker::computeMapping "computeMapping" rebuilds
+ * via the (mutex-protected) setters, @ref mne::disp::RtSensorInterpolationMatWorker::computeMapping "computeMapping" rebuilds
  * the dense (n_vertices x n_channels) matrix and emits it back to
  * the data worker, so the streaming pipeline never stalls.
  */
@@ -42,7 +42,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -50,7 +50,7 @@ namespace DISP3DLIB
  * RtSensorInterpolationMatWorker computes dense sensor-to-surface field-mapping
  * matrices in a background thread.
  *
- * This worker encapsulates the expensive FWDLIB::FwdFieldMap::computeMegMapping() and
+ * This worker encapsulates the expensive mne::FwdFieldMap::computeMegMapping() and
  * computeEegMapping() calls that were previously performed synchronously on the
  * main thread inside BrainView::buildSensorFieldMapping().
  *
@@ -82,7 +82,7 @@ public:
      *
      * @param[in] evoked    The evoked dataset.
      */
-    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
+    void setEvoked(const mne::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -91,7 +91,7 @@ public:
      * @param[in] trans              The transform.
      * @param[in] applySensorTrans   Whether to apply the transform.
      */
-    void setTransform(const FIFFLIB::FiffCoordTrans& trans, bool applySensorTrans);
+    void setTransform(const mne::FiffCoordTrans& trans, bool applySensorTrans);
 
     //=========================================================================================================
     /**
@@ -141,7 +141,7 @@ public slots:
      * Compute the sensor-to-surface mapping matrices.
      * This slot can be called directly or connected to a signal.
      * The computation reads the stored parameters and builds dense mapping
-     * matrices via FWDLIB::FwdFieldMap::computeMegMapping() / computeEegMapping().
+     * matrices via mne::FwdFieldMap::computeMegMapping() / computeEegMapping().
      */
     void computeMapping();
 
@@ -173,11 +173,11 @@ signals:
 private:
     mutable QMutex m_mutex; /**< Protects all data members. */
 
-    FIFFLIB::FiffEvoked m_evoked; /**< Evoked data with channel info. */
-    bool m_hasEvoked = false;     /**< Whether evoked data has been set. */
+    mne::FiffEvoked m_evoked; /**< Evoked data with channel info. */
+    bool m_hasEvoked = false; /**< Whether evoked data has been set. */
 
-    FIFFLIB::FiffCoordTrans m_headToMriTrans; /**< Head-to-MRI transform. */
-    bool m_applySensorTrans = true;           /**< Whether to apply sensor transform. */
+    mne::FiffCoordTrans m_headToMriTrans; /**< Head-to-MRI transform. */
+    bool m_applySensorTrans = true;       /**< Whether to apply sensor transform. */
 
     bool m_megOnHead = false; /**< Map MEG onto head vs helmet. */
 
@@ -196,6 +196,6 @@ private:
     QStringList m_bads; /**< Current bad channel names. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_RTSENSORINTERPOLATIONMATWORKER_H

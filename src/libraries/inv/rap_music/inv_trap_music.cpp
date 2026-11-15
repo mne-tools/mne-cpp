@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -67,7 +67,7 @@ std::vector<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
     const int nSrc = static_cast<int>(matSourcePos.rows());
 
     if (nCh == 0 || matData.rows() != nCh || matLeadField.cols() != static_cast<Eigen::Index>(nSrc) * iNOrient) {
-        BASELIB::Log::warning("[InvTrapMusic::compute] Dimension mismatch.");
+        mne::Log::warning("[InvTrapMusic::compute] Dimension mismatch.");
         return dipoles;
     }
 

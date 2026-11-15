@@ -56,9 +56,7 @@
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_types.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -164,7 +162,7 @@ private slots:
 
 void TestMneRawProjComp::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),

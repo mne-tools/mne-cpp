@@ -10,7 +10,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2013
- * @brief    Implementation of @ref MNELIB::MNESurface.
+ * @brief    Implementation of @ref mne::MNESurface.
  *
  * Provides constructors, per-vertex normal computation from triangle
  * normals and the FIFF helpers shared by @ref MNESourceSpace and
@@ -46,8 +46,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 
@@ -272,7 +271,7 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
     auto p = std::make_unique<MNEProjData>(this);
     int k;
 
-    BASELIB::Log::info("{} for {} points {} steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
+    mne::Log::info("{} for {} points {} steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
 
     for (k = 0; k < np_points; k++) {
         Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(r.row(k).data());
@@ -284,7 +283,7 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
         }
     }
 
-    BASELIB::Log::info("[done]\n");
+    mne::Log::info("[done]\n");
 }
 
 //=============================================================================================================
@@ -414,7 +413,7 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const std::filesystem::
     }
     surfs = stream.dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
-        BASELIB::Log::critical("No BEM surfaces found in {}", BASELIB::utf8FromPath(name));
+        mne::Log::critical("No BEM surfaces found in {}", mne::utf8FromPath(name));
         stream.close();
         return nullptr;
     }
@@ -428,7 +427,7 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const std::filesystem::
             }
         }
         if (id != which) {
-            BASELIB::Log::critical("Desired surface not found in {}", BASELIB::utf8FromPath(name));
+            mne::Log::critical("Desired surface not found in {}", mne::utf8FromPath(name));
             stream.close();
             return nullptr;
         }

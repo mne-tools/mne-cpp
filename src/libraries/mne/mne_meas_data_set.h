@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    One condition / averaging slice within a legacy @ref MNELIB::MNEMeasData.
+ * @brief    One condition / averaging slice within a legacy @ref mne::MNEMeasData.
  *
- * @ref MNELIB::MNEMeasDataSet represents either a single average or a
+ * @ref mne::MNEMeasDataSet represents either a single average or a
  * raw chunk together with its baseline, sampling info and event
- * metadata. Several sets are aggregated by @ref MNELIB::MNEMeasData to expose
+ * metadata. Several sets are aggregated by @ref mne::MNEMeasData to expose
  * all conditions of a study through a single object.
  */
 
@@ -32,10 +32,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -123,6 +123,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNE_MEAS_DATA_SET_H

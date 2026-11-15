@@ -1,18 +1,18 @@
 ---
 id: mri-cor-fif-io
-title: "MRILIB::MriCorFifIO"
+title: "mne::MriCorFifIO"
 sidebar_label: MriCorFifIO
 sidebar_position: 1
 ---
 
 # MriCorFifIO
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_cor_fif_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_cor_fif_io.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_cor_fif_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_cor_fif_io.h)
 
 `#include <mri/mri_cor_fif_io.h>`
 
 ```cpp
-class MRILIB::MriCorFifIO
+class mne::MriCorFifIO
 ```
 
 Stateless serialiser that turns an [`MriVolData`](/docs/api/mri/mri-vol-data) into a FIFF MRI set (COR.fif).
@@ -63,7 +63,7 @@ Writes COR.fif file from slice data.
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 148"
+````cpp title="src/examples/ex_mri/main.cpp, line 147"
 const QString corFif = dir.filePath("COR.fif");
 MriCorFifIO::write(corFif.toStdString(), corSlices, extraTransforms);
 ok &= expect(QFile(corFif).size() > 256 * 256 * 256, std::format("COR.fif written ({} bytes)", QFile(corFif).size()));

@@ -1,18 +1,18 @@
 ---
 id: fiff-annotation
-title: "FIFFLIB::FiffAnnotation"
+title: "mne::FiffAnnotation"
 sidebar_label: FiffAnnotation
 sidebar_position: 35
 ---
 
 # FiffAnnotation
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_annotations.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_annotations.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_annotations.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_annotations.h)
 
 `#include <fiff/fiff_annotations.h>`
 
 ```cpp
-struct FIFFLIB::FiffAnnotation
+struct mne::FiffAnnotation
 ```
 
 One FIFF / MNE annotation: onset (s), duration (s) and description string.
@@ -25,7 +25,7 @@ FiffAnnotations annotations = annotations_from_events(firstThree, info.sfreq, {{
 annotations.append(0.5, 1.0, "BAD_blink"); // onset s, duration s, description
 const std::filesystem::path csv = tmp.filePath("annot.csv").toStdString();
 const bool annotationsWritten = annotations.write(csv).has_value();
-const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws BASELIB::Error
+const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws mne::Error
 const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
 ```
 

@@ -11,7 +11,7 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     October 2012
- * @brief    Implementation of @ref MNELIB::MNEInverseOperator.
+ * @brief    Implementation of @ref mne::MNEInverseOperator.
  *
  * Implements FIFF read of the @c FIFFB_MNE_INVERSE_SOLUTION block, the
  * @c prepare_inverse_operator step (whitener + SVD scaling for a given
@@ -47,11 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -228,7 +224,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo& measInfo) const
 
     StringList missing_ch_names;
     for (qint32 i = 0; i < static_cast<int>(inv_ch_names.size()); ++i)
-        if (!FIFFLIB::has_channel(data_ch_names, inv_ch_names[i]))
+        if (!mne::has_channel(data_ch_names, inv_ch_names[i]))
             missing_ch_names.push_back(inv_ch_names[i]);
 
     qint32 n_missing = static_cast<int>(missing_ch_names.size());
@@ -358,7 +354,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
         // Calculate clusters
         //
         Log::info("Clustering... ");
-        const std::vector<RegionMTOut> res = BASELIB::ThreadPool::global().parallelMap(m_qListRegionMTIn, [](const RegionMT& region) { return region.cluster(); });
+        const std::vector<RegionMTOut> res = mne::ThreadPool::global().parallelMap(m_qListRegionMTIn, [](const RegionMT& region) { return region.cluster(); });
 
         //
         // Assign results
@@ -651,7 +647,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     RowVectorXd ch_idx(info.chs.size());
     qint32 count = 0;
     for (qint32 i = 0; i < std::ssize(info.chs); ++i) {
-        if (FIFFLIB::has_channel(gain_info.ch_names, info.chs[i].ch_name)) {
+        if (mne::has_channel(gain_info.ch_names, info.chs[i].ch_name)) {
             ch_idx[count] = i;
             ++count;
         }

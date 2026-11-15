@@ -1,13 +1,13 @@
 ---
 id: fiff-proj
-title: "FIFFLIB::FiffProj"
+title: "mne::FiffProj"
 sidebar_label: FiffProj
 sidebar_position: 7
 ---
 
 # FiffProj
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_proj.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_proj.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_proj.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_proj.h)
 
 :::info[Python equivalent]
 `mne.Projection` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 7
 <Connections topics={["ssp"]} context="api" current="FiffProj" />
 
 ```cpp
-class FIFFLIB::FiffProj
+class mne::FiffProj
 ```
 
 Single SSP projection item: kind, active flag, desired flag and the named projection vector matrix.
@@ -231,7 +231,7 @@ ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data.nrow == 1 && pca.da
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 431"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 429"
 const std::filesystem::path eveName = tmp.filePath("audvis-eve.fif").toStdU16String();
 const bool eventsWritten = events.write_fif(eveName).has_value();
 const MatrixXi eventsBack = FiffEvents::read(eveName).value().events;
@@ -248,7 +248,7 @@ ok &= expect(eventsWritten && eventsBack.rows() == 25 && eventsBack(0, 0) == 139
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 284"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 280"
 ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
 MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
 FiffInfo projInfo = *hpiInfo;

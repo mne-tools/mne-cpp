@@ -26,10 +26,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -62,6 +62,6 @@ struct AcqMemoryLocation
     friend constexpr bool operator==(const AcqMemoryLocation&, const AcqMemoryLocation&) noexcept = default;
 };
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_MEMORY_H

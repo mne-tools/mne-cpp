@@ -26,7 +26,7 @@
 #define PROBE_EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {

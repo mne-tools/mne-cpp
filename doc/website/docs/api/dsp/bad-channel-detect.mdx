@@ -1,18 +1,18 @@
 ---
 id: bad-channel-detect
-title: "DSPLIB::BadChannelDetect"
+title: "mne::BadChannelDetect"
 sidebar_label: BadChannelDetect
 sidebar_position: 68
 ---
 
 # BadChannelDetect
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channel_detect.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channel_detect.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channel_detect.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channel_detect.h)
 
 `#include <dsp/bad_channel_detect.h>`
 
 ```cpp
-class DSPLIB::BadChannelDetect
+class mne::BadChannelDetect
 ```
 
 Automated detection of bad MEG/EEG channels using flat, variance, and correlation criteria.
@@ -125,7 +125,7 @@ This detector is most useful for sensor arrays where physically close channels s
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 152"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 150"
 BadChannelDetect::Params badParams;
 badParams.dFlatThreshold = 1e-9; // EEG in volts
 const std::vector<int> flat = BadChannelDetect::detectFlat(data.topRows(kEeg), badParams.dFlatThreshold);

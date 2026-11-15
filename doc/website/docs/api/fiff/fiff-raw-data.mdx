@@ -1,13 +1,13 @@
 ---
 id: fiff-raw-data
-title: "FIFFLIB::FiffRawData"
+title: "mne::FiffRawData"
 sidebar_label: FiffRawData
 sidebar_position: 2
 ---
 
 # FiffRawData
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_raw_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_raw_data.h)
 
 :::info[Python equivalent]
 `mne.io.Raw` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 2
 <Connections topics={["fiff-io"]} context="api" current="FiffRawData" />
 
 ```cpp
-class FIFFLIB::FiffRawData
+class mne::FiffRawData
 ```
 
 Continuous FIFF raw recording: [`FiffInfo`](/docs/api/fiff/fiff-info) plus a random-access directory of `FIFF_DATA_BUFFER` tags.
@@ -347,7 +347,7 @@ ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround(
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 278"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 274"
 // ---------------------------------------------------------------------------------------------------------
 // HPI: fit the four coils of the test recording on the worker and directly
 FiffRawData hpiRaw((dataDir + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
@@ -367,7 +367,7 @@ projInfo.make_projector(projectors);
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 100"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 99"
 FiffRawData raw(QString::fromStdString(path).toStdString());
 const FiffDeviceInfo& recorded = raw.info.device_info; // backend, device and source id of the recording
 std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_str(), raw.info.nchan,

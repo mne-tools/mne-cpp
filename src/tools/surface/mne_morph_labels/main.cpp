@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -79,7 +79,7 @@ static VectorXi buildNearestMap(const MatrixX3f& srcSphere, const MatrixX3f& dst
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_morph_labels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

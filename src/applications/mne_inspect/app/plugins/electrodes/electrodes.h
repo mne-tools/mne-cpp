@@ -8,8 +8,8 @@
  * @since    2.3.0
  * @date     May, 2026
  * @brief    ElectrodesPlugin — mne_inspect plugin that loads an sEEG / ECoG
- *           implantation from BIDS, FIFF or CSV into an IEEGLIB::IeegImplantation,
- *           draws it through DISP3DLIB::ElectrodeObject, and publishes the
+ *           implantation from BIDS, FIFF or CSV into an mne::IeegImplantation,
+ *           draws it through mne::disp::ElectrodeObject, and publishes the
  *           selection through MultimodalScene.
  *
  *           NOTE: mne_inspect does not yet ship a plugin loader. The plugin
@@ -43,7 +43,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class MultimodalScene;
 }
@@ -71,11 +71,11 @@ enum class ElectrodeSource
  *   - Load sEEG / ECoG contact positions from BIDS iEEG (`*_electrodes.tsv`),
  *     FIFF (`FiffDigPointSet`) or CSV (`label,x,y,z[,lead,type]`).
  *   - Group contacts into the depth leads, strips and grids of an
- *     `IEEGLIB::IeegImplantation`.
- *   - Hand the resulting `DISP3DLIB::ElectrodeObject` to the host through
+ *     `mne::IeegImplantation`.
+ *   - Hand the resulting `mne::disp::ElectrodeObject` to the host through
  *     @ref electrodeObject() and register it as a `SceneLayerKind::Electrode`
  *     layer when @ref attachScene() has been called.
- *   - Translate scene picks (`DISP3DLIB::PickResult` with
+ *   - Translate scene picks (`mne::disp::PickResult` with
  *     `kind == ElectrodeContact`) into a contact-name selection and emit
  *     @ref contactPicked.
  *
@@ -123,7 +123,7 @@ public:
     //=========================================================================================================
     /**
      * Load sEEG / ECoG contacts from a BIDS iEEG `*_electrodes.tsv`, read and grouped into
-     * leads by IEEGLIB::IeegImplantation::readBids.
+     * leads by mne::IeegImplantation::readBids.
      *
      * Positions in "ACPC" or "ScanRAS" are scanner RAS of the subject's T1, as MNE-BIDS reads
      * them; they are moved into the surface RAS of the FreeSurfer surfaces using the T1 header,
@@ -173,7 +173,7 @@ public:
     /**
      * Replace the implantation directly, e.g. one built in code.
      */
-    void setImplantation(const IEEGLIB::IeegImplantation& implantation);
+    void setImplantation(const mne::IeegImplantation& implantation);
 
     //=========================================================================================================
     /**
@@ -209,7 +209,7 @@ public:
     /**
      * @return Underlying renderable. Owned by the plugin; never null.
      */
-    DISP3DLIB::ElectrodeObject* electrodeObject() const
+    mne::disp::ElectrodeObject* electrodeObject() const
     {
         return m_object.get();
     }
@@ -232,7 +232,7 @@ public:
      *
      * Passing a null pointer detaches.
      */
-    void attachScene(DISP3DLIB::MultimodalScene* scene);
+    void attachScene(mne::disp::MultimodalScene* scene);
 
     //=========================================================================================================
     /**
@@ -271,7 +271,7 @@ public slots:
      * pick originated from this plugin's layer, update the contact
      * selection and emit @ref contactPicked.
      */
-    void handlePick(const DISP3DLIB::PickResult& pick);
+    void handlePick(const mne::disp::PickResult& pick);
 
 signals:
     /** Emitted when the underlying ElectrodeObject is replaced. */
@@ -286,10 +286,10 @@ signals:
 
 private:
     void publishToScene();
-    void rebuild(const IEEGLIB::IeegImplantation& implantation);
+    void rebuild(const mne::IeegImplantation& implantation);
 
-    std::unique_ptr<DISP3DLIB::ElectrodeObject> m_object;
-    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    std::unique_ptr<mne::disp::ElectrodeObject> m_object;
+    mne::disp::MultimodalScene* m_scene = nullptr;
     ElectrodeSource m_source = ElectrodeSource::None;
     QString m_sourcePath;
     QString m_lastError;

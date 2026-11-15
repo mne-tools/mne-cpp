@@ -128,10 +128,10 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using DSPLIB::FilterKernel;
-using DSPLIB::FilterIO;
+using namespace mne::disp;
+using namespace mne;
+using mne::FilterKernel;
+using mne::FilterIO;
 using Eigen::MatrixXd;
 
 namespace
@@ -2004,12 +2004,12 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QCOMPARE(model.getIdxSelMap().size(), 4);
 
     model.markChBad(model.index(0, 0), true);
-    QVERIFY(BASELIB::contains(info->bads, "MEG 0111"));
+    QVERIFY(mne::contains(info->bads, "MEG 0111"));
     model.markChBad(model.index(0, 0), false);
-    QVERIFY(!BASELIB::contains(info->bads, "MEG 0111"));
+    QVERIFY(!mne::contains(info->bads, "MEG 0111"));
     model.markChBad({model.index(0, 0), model.index(2, 0)}, true);
-    QVERIFY(BASELIB::contains(info->bads, "MEG 0111"));
-    QVERIFY(BASELIB::contains(info->bads, "MEG 0113"));
+    QVERIFY(mne::contains(info->bads, "MEG 0111"));
+    QVERIFY(mne::contains(info->bads, "MEG 0113"));
 
     QMap<double, QColor> triggerColors;
     triggerColors.insert(3.0, Qt::red);
@@ -2416,7 +2416,7 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     QCOMPARE(matrices.at(0).second.first[5 * 4 + 3], 5.0);
     QVERIFY(!model.data(0, 1, Qt::BackgroundRole).isValid());
     QVERIFY(!model.data(0, 1, Qt::ToolTipRole).isValid());
-    QCOMPARE(model.data(0, 0).toStringList().join(QLatin1Char(',')).toStdString(), BASELIB::join(set->info.ch_names, ","));
+    QCOMPARE(model.data(0, 0).toStringList().join(QLatin1Char(',')).toStdString(), mne::join(set->info.ch_names, ","));
     QCOMPARE(model.headerData(1, Qt::Horizontal).toString(), QStringLiteral("data plot"));
     QCOMPARE(model.headerData(1, Qt::Horizontal, Qt::TextAlignmentRole).toInt(), static_cast<int>(Qt::AlignLeft));
     QVERIFY(!model.headerData(0, Qt::Horizontal).isValid());
@@ -3714,9 +3714,9 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QSignalSpy markSpy(&view, &RtFiffRawView::channelMarkingChanged);
     table->selectRow(2);
     contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as bad"));
-    QVERIFY(BASELIB::contains(info->bads, "MEG 0113"));
+    QVERIFY(mne::contains(info->bads, "MEG 0113"));
     contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as good"));
-    QVERIFY(!BASELIB::contains(info->bads, "MEG 0113"));
+    QVERIFY(!mne::contains(info->bads, "MEG 0113"));
     QCOMPARE(markSpy.size(), 2);
 
     // Only show / hide / reset the selected rows

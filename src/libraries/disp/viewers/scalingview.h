@@ -13,11 +13,11 @@
  * @date     July 2018
  * @brief    Per-modality vertical-scale spinbox panel (one spin per channel type).
  *
- * ScalingView assembles a @ref DISPLIB::ScaleControl per channel modality in
+ * ScalingView assembles a @ref mne::disp::ScaleControl per channel modality in
  * the active @c FiffInfo (MAG in fT, GRAD in fT/cm, EEG in µV, …)
  * and emits a @c scalingChanged map every time the user nudges one.
- * Consumed by @ref DISPLIB::RtFiffRawView, @ref DISPLIB::ChannelDataView and
- * @ref DISPLIB::ButterflyView to translate raw SI units into screen units.
+ * Consumed by @ref mne::disp::RtFiffRawView, @ref mne::disp::ChannelDataView and
+ * @ref mne::disp::ButterflyView to translate raw SI units into screen units.
  */
 
 #ifndef SCALINGVIEW_H
@@ -50,14 +50,14 @@ class ScalingViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 class ScaleControl;
 

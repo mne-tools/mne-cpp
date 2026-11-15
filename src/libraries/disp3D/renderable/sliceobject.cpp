@@ -20,7 +20,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -37,7 +37,7 @@ SliceObject::SliceObject()
 //=============================================================================================================
 
 void SliceObject::setSlice(const QImage& image,
-                           MRILIB::SliceOrientation orientation,
+                           mne::SliceOrientation orientation,
                            int sliceIndex,
                            const Eigen::Matrix4d& voxelToWorld)
 {
@@ -60,21 +60,21 @@ void SliceObject::setSlice(const QImage& image,
     Eigen::Vector4d c11 = Eigen::Vector4d::Zero();
 
     switch (m_orientation) {
-        case MRILIB::SliceOrientation::Axial:
+        case mne::SliceOrientation::Axial:
             //  u → X,  v → Y,  slice along Z
             c00 << 0, 0, sliceIndex, 1;
             c10 << w, 0, sliceIndex, 1;
             c01 << 0, h, sliceIndex, 1;
             c11 << w, h, sliceIndex, 1;
             break;
-        case MRILIB::SliceOrientation::Coronal:
+        case mne::SliceOrientation::Coronal:
             //  u → X,  v → Z,  slice along Y
             c00 << 0, sliceIndex, 0, 1;
             c10 << w, sliceIndex, 0, 1;
             c01 << 0, sliceIndex, h, 1;
             c11 << w, sliceIndex, h, 1;
             break;
-        case MRILIB::SliceOrientation::Sagittal:
+        case mne::SliceOrientation::Sagittal:
             //  u → Y,  v → Z,  slice along X
             c00 << sliceIndex, 0, 0, 1;
             c10 << sliceIndex, w, 0, 1;
@@ -98,7 +98,7 @@ void SliceObject::setSlice(const QImage& image,
 //=============================================================================================================
 
 void SliceObject::setSliceToWorld(const QImage& image,
-                                  MRILIB::SliceOrientation orientation,
+                                  mne::SliceOrientation orientation,
                                   int sliceIndex,
                                   const Eigen::Matrix4d& imageToWorld)
 {
@@ -122,7 +122,7 @@ void SliceObject::setSliceToWorld(const QImage& image,
 
 //=============================================================================================================
 
-MRILIB::SliceOrientation SliceObject::orientation() const
+mne::SliceOrientation SliceObject::orientation() const
 {
     return m_orientation;
 }

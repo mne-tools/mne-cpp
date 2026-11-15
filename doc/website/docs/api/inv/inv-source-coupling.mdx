@@ -1,18 +1,18 @@
 ---
 id: inv-source-coupling
-title: "INVLIB::InvSourceCoupling"
+title: "mne::InvSourceCoupling"
 sidebar_label: InvSourceCoupling
 sidebar_position: 48
 ---
 
 # InvSourceCoupling
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_source_coupling.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_source_coupling.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_source_coupling.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_source_coupling.h)
 
 `#include <inv/inv_source_coupling.h>`
 
 ```cpp
-struct INVLIB::InvSourceCoupling
+struct mne::InvSourceCoupling
 ```
 
 Describes a group of N coupled (correlated) source grid points found by algorithms such as RAP-MUSIC.
@@ -66,7 +66,7 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 272"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 269"
 dipole.moment = Vector3f(0.0f, 0.0f, 20e-9f);
 dipole.goodness = 0.9f;
 layered.focalDipoles.push_back(dipole);

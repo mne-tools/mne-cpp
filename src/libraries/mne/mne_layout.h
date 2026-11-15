@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    2-D plotter layout read from an MNE-C @c .lout file: viewports, channel matching and zoom.
  *
- * @ref MNELIB::MNELayout is the C++ counterpart of MNE-C's @c mneLayout
+ * @ref mne::MNELayout is the C++ counterpart of MNE-C's @c mneLayout
  * (@c mne_layout.c) and reads the same files as @c mne.channels.read_layout.
  * The first line holds the extent of the drawing area; every further line
  * describes one viewport: number, lower-left corner, width, height (negative
@@ -38,10 +38,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -89,11 +89,11 @@ public:
      *
      * @return The number of port/channel pairs found.
      */
-    int matchPorts(const BASELIB::StringList& channels);
+    int matchPorts(const mne::StringList& channels);
 
     //=========================================================================================================
     /**
-     * Returns which port shows which channel after matchPorts(const BASELIB::StringList&).
+     * Returns which port shows which channel after matchPorts(const mne::StringList&).
      *
      * @return Ports x channels, 1 where the port shows the channel.
      */
@@ -172,9 +172,9 @@ public:
 private:
     Eigen::AlignedBox2d m_extent;  /**< Drawing area from the first line of the file. */
     Eigen::AlignedBox2d m_visible; /**< Currently shown area. */
-    Eigen::MatrixXi m_matches;     /**< Ports x channels of the last matchPorts(const BASELIB::StringList&). */
+    Eigen::MatrixXi m_matches;     /**< Ports x channels of the last matchPorts(const mne::StringList&). */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_LAYOUT_H

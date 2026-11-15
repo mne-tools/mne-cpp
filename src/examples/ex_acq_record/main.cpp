@@ -51,9 +51,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // MAIN

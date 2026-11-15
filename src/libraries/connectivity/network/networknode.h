@@ -11,11 +11,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Node of a connectivity @ref CONNECTIVITYLIB::Network; carries a 3D position and the indices of its incident edges.
+ * @brief    Node of a connectivity @ref mne::Network; carries a 3D position and the indices of its incident edges.
  *
- * One @ref CONNECTIVITYLIB::NetworkNode exists per sensor (in sensor-space connectivity)
+ * One @ref mne::NetworkNode exists per sensor (in sensor-space connectivity)
  * or per source vertex / ROI centroid (in source-space connectivity). The
- * position comes from @c CONNECTIVITYLIB::ConnectivitySettings::setNodePositions "ConnectivitySettings::setNodePositions"
+ * position comes from @c mne::ConnectivitySettings::setNodePositions "ConnectivitySettings::setNodePositions"
  * and is used by disp3D to draw the node at its anatomical location.
  */
 
@@ -37,16 +37,16 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
- * Node of a @ref CONNECTIVITYLIB::Network "Network": a 3D position (sensor coordinate or source vertex),
- * a hub flag, and the indices into @ref CONNECTIVITYLIB::Network::edges "Network::edges" of every edge that
+ * Node of a @ref mne::Network "Network": a 3D position (sensor coordinate or source vertex),
+ * a hub flag, and the indices into @ref mne::Network::edges "Network::edges" of every edge that
  * starts or ends at this node. Degree and strength are computed by
  * @ref Network::degree and @ref Network::strength.
  *
@@ -114,6 +114,6 @@ private:
     bool m_hub = false;         /**< Hub flag. */
 };
 
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // NETWORKNODE_H

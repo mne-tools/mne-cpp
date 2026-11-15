@@ -40,9 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -60,7 +58,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser
@@ -190,9 +188,9 @@ int main(int argc, char* argv[])
             secondOfPair = QString::fromStdString(p_FiffEvokedSet.info.ch_names.at(pairs(i, 1)));
 
             //If one channel of the planar gradiometer is marked bad, add the other to the bad channel list
-            if (!BASELIB::contains(p_FiffEvokedSet.info.bads, firstOfPair.toStdString()) && BASELIB::contains(p_FiffEvokedSet.info.bads, secondOfPair.toStdString()))
+            if (!mne::contains(p_FiffEvokedSet.info.bads, firstOfPair.toStdString()) && mne::contains(p_FiffEvokedSet.info.bads, secondOfPair.toStdString()))
                 p_FiffEvokedSet.info.bads.push_back(secondOfPair.toStdString());
-            if (BASELIB::contains(p_FiffEvokedSet.info.bads, firstOfPair.toStdString()) && !BASELIB::contains(p_FiffEvokedSet.info.bads, secondOfPair.toStdString()))
+            if (mne::contains(p_FiffEvokedSet.info.bads, firstOfPair.toStdString()) && !mne::contains(p_FiffEvokedSet.info.bads, secondOfPair.toStdString()))
                 p_FiffEvokedSet.info.bads.push_back(firstOfPair.toStdString());
         }
     }

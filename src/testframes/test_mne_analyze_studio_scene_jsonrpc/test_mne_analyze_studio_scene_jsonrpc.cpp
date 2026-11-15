@@ -525,7 +525,7 @@ private slots:
 
         QVERIFY(buf.device() != nullptr);
 
-        const FIFFLIB::FiffRawData& raw = buf.rawData();
+        const mne::FiffRawData& raw = buf.rawData();
         QVERIFY(raw.info.nchan > 0);
     }
 

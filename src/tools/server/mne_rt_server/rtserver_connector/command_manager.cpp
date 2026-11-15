@@ -117,7 +117,7 @@ void CommandManager::insert(const QJsonDocument& p_jsonDocument)
         if (!m_qMapCommands.contains(it.key()))
             m_qMapCommands.insert(it.key(), Command(it.key(), it.value().toObject(), true, this));
         else
-            BASELIB::Log::warning("Warning: CommandMap contains command {} already. Insertion skipped.\n", it.key().toStdString());
+            mne::Log::warning("Warning: CommandMap contains command {} already. Insertion skipped.\n", it.key().toStdString());
     }
 
     emit commandMapChanged();

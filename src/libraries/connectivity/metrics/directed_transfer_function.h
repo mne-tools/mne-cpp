@@ -23,11 +23,11 @@
  * across cortex, and it remains a popular reference for directed flow in
  * multivariate spectral analysis.
  *
- * Unlike @ref CONNECTIVITYLIB::PartialDirectedCoherence, DTF includes both direct and
+ * Unlike @ref mne::PartialDirectedCoherence, DTF includes both direct and
  * indirect causal pathways: an indirect interaction @c j -> k -> i shows
  * up as a non-zero @c DTF_{ij}. The two metrics are therefore
- * complementary and are usually reported alongside @ref CONNECTIVITYLIB::GrangerCausality,
- * with all three computed from the same @ref CONNECTIVITYLIB::MvarModel fit.
+ * complementary and are usually reported alongside @ref mne::GrangerCausality,
+ * with all three computed from the same @ref mne::MvarModel fit.
  */
 
 #ifndef DIRECTEDTRANSFERFUNCTION_H
@@ -52,14 +52,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -106,6 +106,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // DIRECTEDTRANSFERFUNCTION_H

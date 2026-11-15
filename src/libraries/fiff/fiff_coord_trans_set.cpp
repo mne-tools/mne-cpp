@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Implementation of @ref FIFFLIB::FiffCoordTransSet: reading the Talairach @c .xfm file,
+ * @brief    Implementation of @ref mne::FiffCoordTransSet: reading the Talairach @c .xfm file,
  *           collecting the chain from FIFF files and mapping head coordinates to MNI and Talairach.
  */
 
@@ -38,7 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

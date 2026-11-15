@@ -12,7 +12,7 @@
  * Every error the public API can return has a catalogue entry: a stable code, a message that
  * names the cause, the fix, and a documentation anchor. Catalogue strings are static, so an AcqError on
  * the data path (Timeout, Overrun, Late, ...) never allocates; only control-path errors attach a context
- * string. Neither type throws, so ACQLIB builds with -fno-exceptions and -fno-rtti.
+ * string. Neither type throws, so mne_acq builds with -fno-exceptions and -fno-rtti.
  */
 
 #ifndef ACQ_ERROR_H
@@ -34,10 +34,10 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ enum class AcqErrorCode : std::uint16_t
     DeviceMemory = 116,        /**< The samples live in GPU memory, which the CPU must not read or write. */
     NotSupported = 117,        /**< The device does not offer this function (e.g. impedance measurement). */
     PermissionDenied = 118,    /**< The operating system refused the request (e.g. a realtime priority without the right). */
-    Internal = 199             /**< Invariant violation inside ACQLIB; please report it. */
+    Internal = 199             /**< Invariant violation inside mne_acq; please report it. */
 };
 
 //=============================================================================================================
@@ -167,7 +167,7 @@ ACQ_STD_MEMBERS_END
 
 //=============================================================================================================
 /**
- * Value-or-error result, the subset of C++23 std::expected that ACQLIB needs, without exceptions:
+ * Value-or-error result, the subset of C++23 std::expected that mne_acq needs, without exceptions:
  * accessing the wrong alternative is a precondition violation (assert), never a throw.
  *
  * @tparam T   The value type; may be move-only.
@@ -331,6 +331,6 @@ private:
     bool m_hasValue;
 };
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_ERROR_H

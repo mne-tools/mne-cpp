@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Background worker that builds the sparse source-to-vertex interpolation matrix for one hemisphere.
  *
- * Encapsulates the heavy-weight @ref DISP3DLIB::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
- * distance Dijkstra) and @ref DISP3DLIB::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
+ * Encapsulates the heavy-weight @ref mne::disp::GeometryInfo::scdc "GeometryInfo::scdc" (geodesic
+ * distance Dijkstra) and @ref mne::disp::Interpolation::createInterpolationMat "Interpolation::createInterpolationMat"
  * (distance-based sparse weight build) calls. It supports two
- * @ref DISP3DLIB::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
+ * @ref mne::disp::RtSourceInterpolationMatWorker::VisualizationType "VisualizationType" modes: @c InterpolationBased uses the
  * smooth distance kernel, @c AnnotationBased uses a per-parcel
  * uniform colouring derived from the FreeSurfer annotation so the
  * cortex lights up parcel-by-parcel.
@@ -46,7 +46,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 class FsLabel;
 }
@@ -55,7 +55,7 @@ class FsLabel;
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -164,7 +164,7 @@ public:
      * @param[in] vecVertNo     Source-space vertex numbers.
      */
     void setAnnotationInfoLeft(const Eigen::VectorXi& vecLabelIds,
-                               const std::vector<FSLIB::FsLabel>& lLabels,
+                               const std::vector<mne::FsLabel>& lLabels,
                                const Eigen::VectorXi& vecVertNo);
 
     //=========================================================================================================
@@ -176,7 +176,7 @@ public:
      * @param[in] vecVertNo     Source-space vertex numbers.
      */
     void setAnnotationInfoRight(const Eigen::VectorXi& vecLabelIds,
-                                const std::vector<FSLIB::FsLabel>& lLabels,
+                                const std::vector<mne::FsLabel>& lLabels,
                                 const Eigen::VectorXi& vecVertNo);
 
 public slots:
@@ -246,7 +246,7 @@ private:
      * @return FsAnnotation matrix (nVertices x nSources).
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> computeAnnotationOperator(
-        const std::vector<FSLIB::FsLabel>& lLabels,
+        const std::vector<mne::FsLabel>& lLabels,
         const QMap<qint32, qint32>& mapLabelIdSrc,
         const QList<int>& vertNos,
         int nVertices);
@@ -273,20 +273,20 @@ private:
     int m_iVisualizationType = InterpolationBased; /**< Current visualization type. */
 
     // LH annotation data
-    std::vector<FSLIB::FsLabel> m_lLabelsLh;    /**< LH FreeSurfer labels. */
+    std::vector<mne::FsLabel> m_lLabelsLh;      /**< LH FreeSurfer labels. */
     QMap<qint32, qint32> m_mapLabelIdSourcesLh; /**< LH source vertex → label ID map. */
     QList<int> m_vertNosLh;                     /**< LH source vertex numbers. */
     int m_nAnnotationVerticesLh = 0;            /**< LH surface vertex count (size of the label-id vector). */
     bool m_bAnnotationLhInit = false;           /**< Whether LH annotation data is set. */
 
     // RH annotation data
-    std::vector<FSLIB::FsLabel> m_lLabelsRh;    /**< RH FreeSurfer labels. */
+    std::vector<mne::FsLabel> m_lLabelsRh;      /**< RH FreeSurfer labels. */
     QMap<qint32, qint32> m_mapLabelIdSourcesRh; /**< RH source vertex → label ID map. */
     QList<int> m_vertNosRh;                     /**< RH source vertex numbers. */
     int m_nAnnotationVerticesRh = 0;            /**< RH surface vertex count (size of the label-id vector). */
     bool m_bAnnotationRhInit = false;           /**< Whether RH annotation data is set. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_RTSOURCEINTERPOLATIONMATWORKER_H

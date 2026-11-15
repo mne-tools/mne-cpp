@@ -36,7 +36,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class AbstractModel;
 class FiffRawViewModel;
@@ -60,12 +60,12 @@ namespace DIPOLEFITPLUGIN
  *
  * @brief The InvDipoleFit class provides a view with all currently loaded models.
  */
-class DIPOLEFITSHARED_EXPORT InvDipoleFit : public ANSHAREDLIB::AbstractPlugin
+class DIPOLEFITSHARED_EXPORT InvDipoleFit : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "dipolefit.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -89,8 +89,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
@@ -134,7 +134,7 @@ private:
      *
      * @param[in, out] pNewModel    pointer to newly selected model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -142,7 +142,7 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
@@ -207,7 +207,7 @@ private:
      *
      * @param[in] set      new EDCSet to be sent.
      */
-    void newDipoleFit(INVLIB::InvEcdSet set, const QString& sFitName);
+    void newDipoleFit(mne::InvEcdSet set, const QString& sFitName);
 
     //=========================================================================================================
     /**
@@ -247,7 +247,7 @@ private:
      *
      * @return returs InvEcd set resulting from dipole fit.
      */
-    INVLIB::InvEcdSet dipoleFitCalculation();
+    mne::InvEcdSet dipoleFitCalculation();
 
     //=========================================================================================================
     /**
@@ -269,16 +269,16 @@ private:
      */
     void triggerLoadingEnd(QString sMessage);
 
-    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>> m_ModelList; /**< List of models used in dipole fitting. Usded for storing for later selection. */
-    INVLIB::InvDipoleFitSettings m_DipoleSettings;                 /**< Settings for dipole fit. */
-    QString m_sFitName;                                            /**< Fit name for dipole fit. */
+    QList<QSharedPointer<mne::analyze::AbstractModel>> m_ModelList; /**< List of models used in dipole fitting. Usded for storing for later selection. */
+    mne::InvDipoleFitSettings m_DipoleSettings;                     /**< Settings for dipole fit. */
+    QString m_sFitName;                                             /**< Fit name for dipole fit. */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Communicator for sending events. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< Communicator for sending events. */
 
     QMutex m_FitMutex; /**< Mutex for thread-safing. */
 
-    QFutureWatcher<INVLIB::InvEcdSet> m_FutureWatcher; /**< Future watcher for notifing of completed fit calculations. */
-    QFuture<INVLIB::InvEcdSet> m_Future;               /**< Future for performing fit calculations of separate thread. */
+    QFutureWatcher<mne::InvEcdSet> m_FutureWatcher; /**< Future watcher for notifing of completed fit calculations. */
+    QFuture<mne::InvEcdSet> m_Future;               /**< Future for performing fit calculations of separate thread. */
 
 signals:
 

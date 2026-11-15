@@ -7,16 +7,16 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref INVLIB::InvSourceEstimate.
+ * @brief    Token vocabulary, value-carrier struct and tokenisation options for the foundation-model serialisation of @ref mne::InvSourceEstimate.
  *
- * Defines @ref INVLIB::InvTokenId — the integer vocabulary used by the
+ * Defines @ref mne::InvTokenId — the integer vocabulary used by the
  * tokeniser in @c inv_source_estimate_token.h — organised into stable
  * ID ranges for special markers, section brackets, method / source-space
  * / orientation labels, value-carrier tokens (amplitude, vertex,
  * position, time, correlation, ...), booleans, dimension sizes,
  * connectivity-measure names and a reserved block for external
- * quantisation bins. Also exposes the @ref INVLIB::InvToken value type
- * (id + continuous value) and the @ref INVLIB::InvTokenizeOptions knobs that
+ * quantisation bins. Also exposes the @ref mne::InvToken value type
+ * (id + continuous value) and the @ref mne::InvTokenizeOptions knobs that
  * control which layers are emitted and whether dense grids are
  * sub-sampled to fit a transformer's context window.
  */
@@ -32,10 +32,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -261,6 +261,6 @@ inline std::vector<float> tokenValues(const std::vector<InvToken>& tokens)
     return vals;
 }
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_TOKEN_H

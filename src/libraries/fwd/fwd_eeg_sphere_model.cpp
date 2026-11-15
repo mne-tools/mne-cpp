@@ -39,9 +39,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // Local constants and helpers
@@ -835,7 +833,7 @@ static void compute_svd(Eigen::MatrixXd& mat,
  */
 
 
-namespace FWDLIB
+namespace mne
 {
 
 /**

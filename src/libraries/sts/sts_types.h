@@ -9,12 +9,12 @@
  * @date     April 2026
  * @brief    Shared enumerations describing tail direction and multiple-comparison correction strategy.
  *
- * Centralising the @ref STSLIB::StatsTailType (left / right / both) and
- * @ref STSLIB::StatsCorrection (none, Bonferroni, FDR, cluster
+ * Centralising the @ref mne::StatsTailType (left / right / both) and
+ * @ref mne::StatsCorrection (none, Bonferroni, FDR, cluster
  * permutation) enums in a header with no Qt or Eigen dependency lets
  * lightweight modules - notably @c sts_ttest and @c sts_ftest - take
  * the same tail argument as the cluster permutation entry points in
- * @c sts_cluster without dragging the rest of STSLIB into client
+ * @c sts_cluster without dragging the rest of mne_sts into client
  * translation units.
  */
 
@@ -22,10 +22,10 @@
 #define STS_TYPES_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -55,6 +55,6 @@ enum class StatsCorrection
     ClusterPermutation /**< Cluster-based permutation test. */
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_TYPES_H

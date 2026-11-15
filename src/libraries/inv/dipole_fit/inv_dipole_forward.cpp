@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of the @ref INVLIB::InvDipoleForward forward-field cache.
+ * @brief    Implementation of the @ref mne::InvDipoleForward forward-field cache.
  *
  * Provides the trivial constructor / destructor for the cache; the
  * forward-matrix population, column normalisation and SVD that fill

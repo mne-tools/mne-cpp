@@ -49,10 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -218,7 +215,7 @@ static QImage renderFrame(const FsSurface& surf,
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_movie");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

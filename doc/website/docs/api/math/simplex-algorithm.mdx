@@ -1,13 +1,13 @@
 ---
 id: simplex-algorithm
-title: "MATHLIB::SimplexAlgorithm"
+title: "mne::SimplexAlgorithm"
 sidebar_label: SimplexAlgorithm
 sidebar_position: 3
 ---
 
 # SimplexAlgorithm
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/simplex_algorithm.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/simplex_algorithm.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/simplex_algorithm.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/simplex_algorithm.h)
 
 :::info[Python equivalent]
 `scipy.optimize.fmin` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 3
 `#include <math/simplex_algorithm.h>`
 
 ```cpp
-class MATHLIB::SimplexAlgorithm
+class mne::SimplexAlgorithm
 ```
 
 Header-only Nelder–Mead simplex minimiser templated on the scalar type and on the cost / report callables, implementing the Strategy pattern at zero runtime cost (the functors are inlined by the compiler).

@@ -10,20 +10,20 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Input-data and parameter container shared by every functional-connectivity metric in @c CONNECTIVITYLIB.
+ * @brief    Input-data and parameter container shared by every functional-connectivity metric in @c mne_connectivity.
  *
- * @ref CONNECTIVITYLIB::ConnectivitySettings carries the per-trial time-domain matrices, the
+ * @ref mne::ConnectivitySettings carries the per-trial time-domain matrices, the
  * derived per-trial cross-spectral data (DPSS tapered FFTs, CSDs and the
  * imaginary-part variants needed by PLI / wPLI / dwPLI), and the
  * accumulated cross-trial sums used to normalise the final estimates.
- * Holding all of this in one object lets the dispatcher in @ref CONNECTIVITYLIB::compute_connectivity
+ * Holding all of this in one object lets the dispatcher in @ref mne::compute_connectivity
  * compute several metrics in one pass without re-tapering and re-FFT'ing
- * the same trials: the @ref CONNECTIVITYLIB::ConnectivitySettings::IntermediateTrialData fields are filled lazily
+ * the same trials: the @ref mne::ConnectivitySettings::IntermediateTrialData fields are filled lazily
  * by the first metric that needs them and reused by everyone else.
  *
  * The container also stores the spectral-domain parameters (sampling rate,
  * FFT length, taper window name) and the 3D node positions used to lay out
- * the resulting @ref CONNECTIVITYLIB::Network - the latter can be sourced either from a
+ * the resulting @ref mne::Network - the latter can be sourced either from a
  * @c FiffInfo channel set (sensor space) or from a forward solution and
  * @c FsSurfaceSet pair (source space).
  */
@@ -59,38 +59,38 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
-namespace FSLIB
+namespace mne
 {
 class FsSurfaceSet;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
  * Mutable container that aggregates the inputs and intermediate spectral
- * results required by every metric implementation in @c CONNECTIVITYLIB.
+ * results required by every metric implementation in @c mne_connectivity.
  *
- * Each call to @c CONNECTIVITYLIB::ConnectivitySettings::append "append" adds one trial; the trial matrices live in
+ * Each call to @c mne::ConnectivitySettings::append "append" adds one trial; the trial matrices live in
  * @ref m_trialData, while DPSS tapered spectra, cross-spectral densities
  * and their imaginary-part derivatives are filled in lazily by whichever
  * metric runs first. Cross-trial sums accumulate in @ref m_intermediateSumData
@@ -99,7 +99,7 @@ namespace CONNECTIVITYLIB
  * @c FiffInfo (sensor space) or from a forward solution + @c FsSurfaceSet
  * (source space) and are propagated into the resulting @ref Network nodes.
  *
- * @brief Aggregates trial data, spectral cache and node geometry shared by all @c CONNECTIVITYLIB metrics.
+ * @brief Aggregates trial data, spectral cache and node geometry shared by all @c mne_connectivity metrics.
  *
  * @snippet ex_connectivity_metrics/main.cpp connectivity_settings_setup
  *
@@ -178,11 +178,11 @@ public:
 
     const std::string& getWindowType() const;
 
-    void setNodePositions(const FIFFLIB::FiffInfo& fiffInfo,
+    void setNodePositions(const mne::FiffInfo& fiffInfo,
                           const Eigen::RowVectorXi& picks);
 
-    void setNodePositions(const MNELIB::MNEForwardSolution& forwardSolution,
-                          const FSLIB::FsSurfaceSet& surfSet);
+    void setNodePositions(const mne::MNEForwardSolution& forwardSolution,
+                          const mne::FsSurfaceSet& surfSet);
 
     void setNodePositions(const Eigen::MatrixX3f& matNodePositions);
 
@@ -209,6 +209,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // CONNECTIVITYSETTINGS_H

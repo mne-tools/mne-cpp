@@ -1,18 +1,18 @@
 ---
 id: selection-io
-title: "CHANNELSLIB::SelectionIO"
+title: "mne::SelectionIO"
 sidebar_label: SelectionIO
 sidebar_position: 44
 ---
 
 # SelectionIO
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/selectionio.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/selectionio.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/selectionio.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/selectionio.h)
 
 `#include <channels/selectionio.h>`
 
 ```cpp
-class CHANNELSLIB::SelectionIO
+class mne::SelectionIO
 ```
 
 Reads and writes channel selection groups.
@@ -108,7 +108,7 @@ Writes each group to its own Brainstorm .mon file, named after the group.
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 77"
+````cpp title="src/examples/ex_channels/main.cpp, line 76"
 // MNE .sel: one "name:ch1|ch2|..." group per line, read back in file order
 const std::vector<ChannelSelection> selections{{"Left-temporal", {"MEG 0111", "MEG 0112", "MEG 0113"}}, {"Vertex", {"MEG 0711"}}};
 SelectionIO::write_sel(dir / "groups.sel", selections);

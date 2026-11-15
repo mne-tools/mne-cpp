@@ -13,7 +13,7 @@
  * @date     April 2018
  * @brief    Debiased squared Weighted Phase Lag Index (Vinck et al., 2011) between every channel pair.
  *
- * The plain @ref CONNECTIVITYLIB::WeightedPhaseLagIndex is still positively biased for
+ * The plain @ref mne::WeightedPhaseLagIndex is still positively biased for
  * small numbers of trials @c N because the squared expectation in the
  * numerator picks up a diagonal variance term. Vinck, Oostenveld, van
  * Wingerden, Battaglia and Pennartz (NeuroImage 2011) derived the
@@ -67,14 +67,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -153,6 +153,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // DEBIASEDSQUAREDWEIGHTEDPHASELAGINDEX_H

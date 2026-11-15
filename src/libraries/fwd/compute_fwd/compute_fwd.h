@@ -60,21 +60,21 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffNamedMatrix;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -117,7 +117,7 @@ public:
      *
      * @return The computed forward solution, or nullptr on error.
      */
-    std::unique_ptr<MNELIB::MNEForwardSolution> calculateFwd();
+    std::unique_ptr<mne::MNEForwardSolution> calculateFwd();
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      * @param[in,out] fwd        The forward solution to update in place.
      * @return True on success, false on error.
      */
-    bool updateHeadPos(const FIFFLIB::FiffCoordTrans& transDevHead, MNELIB::MNEForwardSolution& fwd);
+    bool updateHeadPos(const mne::FiffCoordTrans& transDevHead, mne::MNEForwardSolution& fwd);
 
 private:
     //=========================================================================================================
@@ -144,41 +144,41 @@ private:
      * Populate metadata fields of a forward solution from the current
      * computation state (settings, source spaces, channel info, etc.).
      */
-    void populateMetadata(MNELIB::MNEForwardSolution& fwd);
+    void populateMetadata(mne::MNEForwardSolution& fwd);
 
     //=========================================================================================================
     // Computation state
     //=========================================================================================================
 
-    std::vector<std::unique_ptr<MNELIB::MNESourceSpace>> m_spaces; /**< Source spaces. */
-    int m_iNSource = 0;                                            /**< Number of active source points. */
-    std::unique_ptr<FwdCoilSet> m_templates;                       /**< Template coil set. */
-    std::unique_ptr<FwdCoilSet> m_megcoils;                        /**< MEG coil set. */
-    std::unique_ptr<FwdCoilSet> m_compcoils;                       /**< Compensator coil set. */
-    std::unique_ptr<FwdCoilSet> m_eegels;                          /**< EEG electrode set. */
-    std::unique_ptr<MNELIB::MNECTFCompDataSet> m_compData;         /**< CTF compensation data. */
-    std::unique_ptr<FwdEegSphereModelSet> m_eegModels;             /**< EEG sphere model set. */
-    std::unique_ptr<FwdEegSphereModel> m_eegModel;                 /**< Active EEG sphere model. */
-    std::unique_ptr<FwdBemModel> m_bemModel;                       /**< BEM model. */
-    bool m_bInitialized = false;                                   /**< Whether initFwd completed. */
+    std::vector<std::unique_ptr<mne::MNESourceSpace>> m_spaces; /**< Source spaces. */
+    int m_iNSource = 0;                                         /**< Number of active source points. */
+    std::unique_ptr<FwdCoilSet> m_templates;                    /**< Template coil set. */
+    std::unique_ptr<FwdCoilSet> m_megcoils;                     /**< MEG coil set. */
+    std::unique_ptr<FwdCoilSet> m_compcoils;                    /**< Compensator coil set. */
+    std::unique_ptr<FwdCoilSet> m_eegels;                       /**< EEG electrode set. */
+    std::unique_ptr<mne::MNECTFCompDataSet> m_compData;         /**< CTF compensation data. */
+    std::unique_ptr<FwdEegSphereModelSet> m_eegModels;          /**< EEG sphere model set. */
+    std::unique_ptr<FwdEegSphereModel> m_eegModel;              /**< Active EEG sphere model. */
+    std::unique_ptr<FwdBemModel> m_bemModel;                    /**< BEM model. */
+    bool m_bInitialized = false;                                /**< Whether initFwd completed. */
 
-    std::vector<FIFFLIB::FiffChInfo> m_listMegChs;  /**< MEG channel information. */
-    std::vector<FIFFLIB::FiffChInfo> m_listEegChs;  /**< EEG channel information. */
-    std::vector<FIFFLIB::FiffChInfo> m_listCompChs; /**< Compensator channel list. */
-    int m_iNChan = 0;                               /**< Number of channels. */
+    std::vector<mne::FiffChInfo> m_listMegChs;  /**< MEG channel information. */
+    std::vector<mne::FiffChInfo> m_listEegChs;  /**< EEG channel information. */
+    std::vector<mne::FiffChInfo> m_listCompChs; /**< Compensator channel list. */
+    int m_iNChan = 0;                           /**< Number of channels. */
 
-    FIFFLIB::FiffId m_mri_id;             /**< MRI file ID. */
-    FIFFLIB::FiffId m_meas_id;            /**< Measurement ID. */
-    FIFFLIB::FiffCoordTrans m_mri_head_t; /**< MRI-to-head transform. */
-    FIFFLIB::FiffCoordTrans m_meg_head_t; /**< MEG-to-head transform. */
+    mne::FiffId m_mri_id;             /**< MRI file ID. */
+    mne::FiffId m_meas_id;            /**< Measurement ID. */
+    mne::FiffCoordTrans m_mri_head_t; /**< MRI-to-head transform. */
+    mne::FiffCoordTrans m_meg_head_t; /**< MEG-to-head transform. */
 
-    std::shared_ptr<FIFFLIB::FiffInfoBase> m_pInfoBase; /**< Measurement info. */
-    std::shared_ptr<ComputeFwdSettings> m_pSettings;    /**< Forward computation settings. */
+    std::shared_ptr<mne::FiffInfoBase> m_pInfoBase;  /**< Measurement info. */
+    std::shared_ptr<ComputeFwdSettings> m_pSettings; /**< Forward computation settings. */
 
-    FIFFLIB::FiffNamedMatrix m_meg_forward;      /**< MEG forward matrix. */
-    FIFFLIB::FiffNamedMatrix m_meg_forward_grad; /**< MEG gradient forward matrix. */
-    FIFFLIB::FiffNamedMatrix m_eeg_forward;      /**< EEG forward matrix. */
-    FIFFLIB::FiffNamedMatrix m_eeg_forward_grad; /**< EEG gradient forward matrix. */
+    mne::FiffNamedMatrix m_meg_forward;      /**< MEG forward matrix. */
+    mne::FiffNamedMatrix m_meg_forward_grad; /**< MEG gradient forward matrix. */
+    mne::FiffNamedMatrix m_eeg_forward;      /**< EEG forward matrix. */
+    mne::FiffNamedMatrix m_eeg_forward_grad; /**< EEG gradient forward matrix. */
 
     std::filesystem::path m_qPath; /**< Coil definition file path. */
 };
@@ -187,6 +187,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // namespace FWDLIB
+} // namespace mne
 
 #endif // COMPUTE_FWD_H

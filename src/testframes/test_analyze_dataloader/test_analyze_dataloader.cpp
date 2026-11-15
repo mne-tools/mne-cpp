@@ -31,8 +31,8 @@
 #include <memory>
 
 using namespace DATALOADERPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace INVLIB;
+using namespace mne::analyze;
+using namespace mne;
 
 //=============================================================================================================
 
@@ -134,7 +134,7 @@ void TestAnalyzeDataLoader::loadsEveryFileKind()
 void TestAnalyzeDataLoader::attachesEventFilesToTheRecording()
 {
     QTemporaryDir dir;
-    FIFFLIB::FiffEvents events;
+    mne::FiffEvents events;
     events.events.resize(2, 3);
     events.events << 25800, 0, 1, 26000, 0, 2;
     QFile fif(dir.filePath("triggers-eve.fif"));
@@ -195,8 +195,8 @@ void TestAnalyzeDataLoader::savesTheSelectedAverage()
     pSave->trigger();
     QVERIFY(QFile::exists(outPath));
 
-    const FIFFLIB::FiffEvokedSet expected(avePath.toStdU16String());
-    const FIFFLIB::FiffEvokedSet saved(outPath.toStdU16String());
+    const mne::FiffEvokedSet expected(avePath.toStdU16String());
+    const mne::FiffEvokedSet saved(outPath.toStdU16String());
     QCOMPARE(saved.evoked.size(), expected.evoked.size());
     for (int k = 0; k < std::ssize(expected.evoked); ++k) {
         QCOMPARE(saved.evoked[k].comment, expected.evoked[k].comment);

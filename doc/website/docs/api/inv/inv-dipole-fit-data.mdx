@@ -1,18 +1,18 @@
 ---
 id: inv-dipole-fit-data
-title: "INVLIB::InvDipoleFitData"
+title: "mne::InvDipoleFitData"
 sidebar_label: InvDipoleFitData
 sidebar_position: 23
 ---
 
 # InvDipoleFitData
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/dipole_fit/inv_dipole_fit_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/dipole_fit/inv_dipole_fit_data.h)
 
 `#include <inv/inv_dipole_fit_data.h>`
 
 ```cpp
-class INVLIB::InvDipoleFitData
+class mne::InvDipoleFitData
 ```
 
 Dipole fit workspace holding sensor geometry, forward model, noise covariance, and projection data.
@@ -392,7 +392,7 @@ Refactored: dipole_forward_one (fit_dipoles.c)
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 97"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 96"
 // MEG channels and SSP projectors from the sample file, sphere at (0, 0, 40) mm, ad-hoc noise
 // (5e-13 T/m gradiometers, 20 fT magnetometers).
 Vector3f r0(0.0f, 0.0f, 0.04f);

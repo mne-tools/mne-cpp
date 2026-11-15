@@ -64,8 +64,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace DISPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================

@@ -19,9 +19,9 @@
  * frequency bin.
  *
  * Both Welch-style segmenting (overlapping Hann-windowed segments) and
- * multitaper averaging (Slepian / DPSS tapers via @ref DSPLIB::Dpss) are supported
+ * multitaper averaging (Slepian / DPSS tapers via @ref mne::Dpss) are supported
  * to trade between spectral leakage, bias and variance. The output is
- * compatible with the connectivity routines in CONNECTIVITYLIB.
+ * compatible with the connectivity routines in mne_connectivity.
  */
 
 #ifndef CSD_H
@@ -43,10 +43,10 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -130,6 +130,6 @@ public:
                                    int nCycles = 7);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // CSD_H

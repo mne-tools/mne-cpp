@@ -41,20 +41,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -301,9 +301,9 @@ private:
      */
     QList<QStandardItem*> getAllItems(QModelIndex parent = QModelIndex()) const;
 
-    QPointer<DISPLIB::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
+    QPointer<mne::disp::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Used to send events. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< Used to send events. */
 
     QModelIndex m_SelectedItem;           /**< Index of currently selected item. */
     QModelIndex m_SelectedFunctionalData; /**< Index of currently selected data item. */

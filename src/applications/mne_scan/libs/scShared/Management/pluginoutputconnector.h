@@ -24,10 +24,10 @@
 #include <scMeas/measurement.h>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -81,7 +81,7 @@ public:
     virtual bool isOutputConnector() const;
 
 signals:
-    void notify(SCMEASLIB::Measurement::SPtr);
+    void notify(mne::scan::Measurement::SPtr);
 };
 } // NAMESPACE
 

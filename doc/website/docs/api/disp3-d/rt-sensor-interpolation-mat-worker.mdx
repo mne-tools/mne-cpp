@@ -1,23 +1,23 @@
 ---
 id: rt-sensor-interpolation-mat-worker
-title: "DISP3DLIB::RtSensorInterpolationMatWorker"
+title: "mne::disp::RtSensorInterpolationMatWorker"
 sidebar_label: RtSensorInterpolationMatWorker
 sidebar_position: 6
 ---
 
 # RtSensorInterpolationMatWorker
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensorinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensorinterpolationmatworker.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensorinterpolationmatworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensorinterpolationmatworker.h)
 
 `#include <disp3D/rtsensorinterpolationmatworker.h>`
 
 ```cpp
-class DISP3DLIB::RtSensorInterpolationMatWorker
+class mne::disp::RtSensorInterpolationMatWorker
 ```
 
 [`RtSensorInterpolationMatWorker`](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) computes dense sensor-to-surface field-mapping matrices in a background thread.
 
-This worker encapsulates the expensive `FWDLIB::FwdFieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside [BrainView](/docs/api/disp3-d/brain-view)::buildSensorFieldMapping().
+This worker encapsulates the expensive `mne::FwdFieldMap::computeMegMapping()` and computeEegMapping() calls that were previously performed synchronously on the main thread inside [BrainView](/docs/api/disp3-d/brain-view)::buildSensorFieldMapping().
 
 The worker stores all relevant parameters (evoked info, surface geometry, transforms, etc.) and recomputes the mapping matrices when any parameter changes. It emits newMappingMatrixAvailable() when a new matrix is ready.
 

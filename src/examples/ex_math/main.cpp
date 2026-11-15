@@ -51,7 +51,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -194,9 +194,9 @@ int main(int argc, char* argv[])
     const std::filesystem::path matrixPath = std::filesystem::temp_directory_path() / "ex_math_matrix.txt";
     MatrixXd matrix(2, 3);
     matrix << 0.1, -2.0 / 3.0, 3.25, 0.0, 1e-6, 42.0;
-    MATHLIB::write_matrix(matrix, matrixPath, "example matrix");
+    mne::write_matrix(matrix, matrixPath, "example matrix");
     MatrixXd readBack;
-    MATHLIB::read_matrix(readBack, matrixPath);
+    mne::read_matrix(readBack, matrixPath);
     //! [matrix_io_usage]
     std::filesystem::remove(matrixPath);
     ok &= expect(readBack == matrix, "text matrix round trip is bit-identical");

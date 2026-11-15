@@ -43,16 +43,10 @@
 //=============================================================================================================
 
 using namespace NEURONALCONNECTIVITYPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace MNELIB;
-using namespace CONNECTIVITYLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
-using namespace BASELIB;
+using namespace mne::scan;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
-using namespace FSLIB;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +60,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_fFreqBandHigh(13.0f)
 , m_iBlockSize(1)
 , m_sAvrType("1")
-, m_pCircularBuffer(std::make_shared<CircularBuffer<CONNECTIVITYLIB::Network>>(40))
+, m_pCircularBuffer(std::make_shared<CircularBuffer<mne::Network>>(40))
 , m_pRtConnectivity(std::make_shared<RtConnectivity>())
 , m_pActionShowYourWidget(nullptr)
 {
@@ -212,7 +206,7 @@ QWidget* NeuronalConnectivity::setupWidget()
 
 //=============================================================================================================
 
-void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateSource(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>()) {
         //Fiff information
@@ -277,7 +271,7 @@ void NeuronalConnectivity::updateSource(SCMEASLIB::Measurement::SPtr pMeasuremen
 
 //=============================================================================================================
 
-void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateRTMSA(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
@@ -346,7 +340,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
 
 //=============================================================================================================
 
-void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
+void NeuronalConnectivity::updateRTEV(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeEvokedSet> pRTEV = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
         std::shared_ptr<FiffEvokedSet> pFiffEvokedSet = pRTEV->getValue();
@@ -455,7 +449,7 @@ void NeuronalConnectivity::generateNodeVertices()
         m_vecPicks.resize(0);
 
         for (int i = 0; i < picksTmp.cols() - 1; i += 2) {
-            if (!BASELIB::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(picksTmp(i)))) {
+            if (!mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(picksTmp(i)))) {
                 m_vecPicks.conservativeResize(m_vecPicks.cols() + 1);
                 m_vecPicks(m_vecPicks.cols() - 1) = picksTmp(i);
             }

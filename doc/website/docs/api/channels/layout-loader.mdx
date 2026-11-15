@@ -1,18 +1,18 @@
 ---
 id: layout-loader
-title: "CHANNELSLIB::LayoutLoader"
+title: "mne::LayoutLoader"
 sidebar_label: LayoutLoader
 sidebar_position: 27
 ---
 
 # LayoutLoader
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutloader.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutloader.h)
 
 `#include <channels/layoutloader.h>`
 
 ```cpp
-class CHANNELSLIB::LayoutLoader
+class mne::LayoutLoader
 ```
 
 Reads ANT/ASA .elc files, which hold the electrode positions of an EEG cap.
@@ -72,7 +72,7 @@ Position lines are `"name : x y z"` or plain `"x y z"`; the names of a Labels bl
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 117"
+````cpp title="src/examples/ex_channels/main.cpp, line 116"
                                   "Labels\nFp1\tCz\n";
 // ANT .elc electrode file: names, 3-D positions and their unit
 const std::optional<ElectrodeLayout> cap = LayoutLoader::read_elc(dir / "cap.elc");
@@ -84,7 +84,7 @@ ok &= expect(cap && cap->names == StringList({"Fp1", "Cz"}) && cap->unit == "mm"
 
 Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
 
-````cpp title="src/examples/ex_make_layout/main.cpp, line 91"
+````cpp title="src/examples/ex_make_layout/main.cpp, line 89"
     if (const auto cap = LayoutLoader::read_elc(input)) {
         positions = cap->positions_3d;
         names = cap->names;

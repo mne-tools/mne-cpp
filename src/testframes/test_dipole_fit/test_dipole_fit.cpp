@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -141,10 +141,10 @@ void TestDipoleFit::dipoleFitSimple()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
 
-    QVERIFY(set.save_dipoles_dip(BASELIB::pathFromUtf8(settings.dipname)));
+    QVERIFY(set.save_dipoles_dip(mne::pathFromUtf8(settings.dipname)));
     printf("[checkpoint] dipole file written (simple)\n");
     fflush(stdout);
-    m_ECDSet = InvEcdSet::read_dipoles_dip(BASELIB::pathFromUtf8(settings.dipname));
+    m_ECDSet = InvEcdSet::read_dipoles_dip(mne::pathFromUtf8(settings.dipname));
     printf("[checkpoint] dipole file read back (simple, size=%d)\n", m_ECDSet.size());
     fflush(stdout);
 
@@ -255,10 +255,10 @@ void TestDipoleFit::dipoleFitAdvanced()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     fflush(stdout);
 
-    QVERIFY(set.save_dipoles_dip(BASELIB::pathFromUtf8(settings.dipname)));
+    QVERIFY(set.save_dipoles_dip(mne::pathFromUtf8(settings.dipname)));
     printf("[checkpoint] dipole file written (advanced)\n");
     fflush(stdout);
-    m_ECDSet = InvEcdSet::read_dipoles_dip(BASELIB::pathFromUtf8(settings.dipname));
+    m_ECDSet = InvEcdSet::read_dipoles_dip(mne::pathFromUtf8(settings.dipname));
     printf("[checkpoint] dipole file read back (advanced, size=%d)\n", m_ECDSet.size());
     fflush(stdout);
 

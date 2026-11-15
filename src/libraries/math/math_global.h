@@ -7,18 +7,18 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Export/import macros and build-stamp accessors for MATHLIB.
+ * @brief    Export/import macros and build-stamp accessors for mne_math.
  *
- * MATHLIB is the numerical-helpers layer of mne-cpp: linear algebra
- * (@ref MATHLIB::Linalg), general numerics and baseline rescaling
- * (@ref MATHLIB::Numerics), K-means clustering (@ref MATHLIB::KMeans),
- * multi-taper spectral estimation (@ref MATHLIB::Spectral),
+ * mne_math is the numerical-helpers layer of mne-cpp: linear algebra
+ * (@ref mne::Linalg), general numerics and baseline rescaling
+ * (@ref mne::Numerics), K-means clustering (@ref mne::KMeans),
+ * multi-taper spectral estimation (@ref mne::Spectral),
  * Nelder–Mead simplex optimisation
- * (@ref MATHLIB::SimplexAlgorithm), sphere fitting (@ref MATHLIB::Sphere)
- * thin-plate-spline warping (@ref MATHLIB::Warp) and plain-text matrix files
- * (@ref MATHLIB::write_matrix, @ref MATHLIB::read_matrix). It depends only on
- * Eigen and BASELIB and is therefore safe to pull into any
- * higher-level library (FIFFLIB, FWDLIB, INVERSELIB, CONNECTIVITYLIB).
+ * (@ref mne::SimplexAlgorithm), sphere fitting (@ref mne::Sphere)
+ * thin-plate-spline warping (@ref mne::Warp) and plain-text matrix files
+ * (@ref mne::write_matrix, @ref mne::read_matrix). It depends only on
+ * Eigen and mne_base and is therefore safe to pull into any
+ * higher-level library (mne_fiff, mne_fwd, mne_inv, mne_connectivity).
  *
  * This header defines the @c MATHSHARED_EXPORT visibility macro that
  * toggles between symbol export and import depending on
@@ -26,7 +26,7 @@
  * @c STATICBUILD short-circuit used on WebAssembly and other static
  * deployments. It also exposes @c buildDateTime(), @c buildHash() and
  * @c buildHashLong() so applications can stamp produced files with the
- * exact MATHLIB revision they were linked against.
+ * exact mne_math revision they were linked against.
  */
 
 #ifndef MATH_GLOBAL_H
@@ -60,12 +60,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace MATHLIB
- * @brief     Mathematical algorithms and geometry (linear algebra, optimization, spectral estimation).
- */
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================

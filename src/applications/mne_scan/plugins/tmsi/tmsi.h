@@ -47,12 +47,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -71,12 +71,12 @@ namespace TMSIPLUGIN
  * @brief EEG connector for TMSi Refa and Porti amplifiers through the tmsi:// source of mne_acq_devices, which can
  *        also simulate the amplifier.
  */
-class TMSISHARED_EXPORT TMSI : public SCSHAREDLIB::AbstractSensor
+class TMSISHARED_EXPORT TMSI : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "tmsi.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class TMSISetupWidget;
     friend class TMSIImpedanceWidget;
@@ -164,16 +164,16 @@ private:
     std::string uri() const;
 
     /** Names and places the EEG channels after the electrodes of the cap's .elc file. */
-    void applyElectrodeLayout(FIFFLIB::FiffInfo& info) const;
+    void applyElectrodeLayout(mne::FiffInfo& info) const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_TMSI; /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<TMSIManualAnnotationWidget> m_pTmsiManualAnnotationWidget;                         /**< Widget for manually annotation the trigger during session.*/
-    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;                                       /**< Widget for checking the impedances*/
-    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;                                 /**< Widget for checking the impedances*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRMTSA_TMSI; /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<TMSIManualAnnotationWidget> m_pTmsiManualAnnotationWidget;                       /**< Widget for manually annotation the trigger during session.*/
+    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;                                     /**< Widget for checking the impedances*/
+    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;                               /**< Widget for checking the impedances*/
 
-    ACQLIB::AcqDevice m_device; /**< The amplifier while streaming or measuring impedances. */
-    ACQLIB::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
-    int m_iStimRow = -1;        /**< Row of the stimulus channel in the blocks, -1 if it is not delivered. */
+    mne::AcqDevice m_device; /**< The amplifier while streaming or measuring impedances. */
+    mne::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
+    int m_iStimRow = -1;     /**< Row of the stimulus channel in the blocks, -1 if it is not delivered. */
 
     int m_iSamplingFreq = 2048;      /**< Sampling rate in Hz; the amplifier runs at the supported rate nearest to it.*/
     int m_iNumberOfChannels = 0;     /**< Leading amplifier channels to deliver; 0 = all.*/

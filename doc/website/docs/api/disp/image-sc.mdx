@@ -1,18 +1,18 @@
 ---
 id: image-sc
-title: "DISPLIB::ImageSc"
+title: "mne::disp::ImageSc"
 sidebar_label: ImageSc
 sidebar_position: 37
 ---
 
 # ImageSc
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/imagesc.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/imagesc.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/imagesc.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/imagesc.h)
 
 `#include <disp/imagesc.h>`
 
 ```cpp
-class DISPLIB::ImageSc
+class mne::disp::ImageSc
 ```
 
 False-colour heat-map QWidget visualising an Eigen matrix with selectable colour map.
@@ -241,7 +241,7 @@ for (int px = 0; px < scImage.width(); ++px) {
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
-````cpp title="src/examples/ex_disp/main.cpp, line 170"
+````cpp title="src/examples/ex_disp/main.cpp, line 167"
 const double limit = gradData.cwiseAbs().maxCoeff();
 ImageSc imagesc(gradData);
 imagesc.setTitle(QString("%1 gradiometers").arg(grads.size()));
@@ -257,11 +257,11 @@ imagesc.setExtent(times(0, 0), times(0, times.cols() - 1), grads.size(), 1);
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 108"
-DISPLIB::Plot* m_pEvokedSignalCoursePlot = nullptr;
-DISPLIB::Plot* m_pEpochSignalCoursePlot = nullptr;
-DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
-DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 107"
+mne::disp::Plot* m_pEvokedSignalCoursePlot = nullptr;
+mne::disp::Plot* m_pEpochSignalCoursePlot = nullptr;
+mne::disp::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
+mne::disp::ImageSc* m_pImageConnWeights = nullptr;
 ````
 
 Also used in [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx), [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx), [ex_read_epochs](../../examples/mne/ex_read_epochs.mdx).

@@ -30,7 +30,7 @@
 namespace MNEPROCESSRAWAPP
 {
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**

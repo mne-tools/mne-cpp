@@ -27,10 +27,10 @@
 
 //=============================================================================================================
 /**
- * @namespace EVENTSLIB
+ * @namespace mne::analyze::events
  * @brief     Event annotation management (creation, grouping, shared-memory transport).
  */
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 
 //=============================================================================================================

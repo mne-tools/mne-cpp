@@ -34,7 +34,7 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {

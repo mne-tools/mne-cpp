@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Horizontal time-axis ruler displayed beneath @ref DISPLIB::ChannelDataView with sample / second ticks.
+ * @brief    Horizontal time-axis ruler displayed beneath @ref mne::disp::ChannelDataView with sample / second ticks.
  *
  * TimeRulerWidget paints the time axis aligned with the central raw
  * table, supports left-click drag for window scrolling and
@@ -36,10 +36,10 @@
 class QContextMenuEvent;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -234,6 +234,6 @@ private:
     QVector<TimeRulerReferenceMark> m_referenceMarkers;
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // TIMERULERWIDGET_H

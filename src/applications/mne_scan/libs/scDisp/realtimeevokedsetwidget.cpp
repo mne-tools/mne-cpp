@@ -64,10 +64,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -146,7 +145,7 @@ RealTimeEvokedSetWidget::~RealTimeEvokedSetWidget()
 
 //=============================================================================================================
 
-void RealTimeEvokedSetWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RealTimeEvokedSetWidget::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (!m_pRTESet) {
         m_pRTESet = qSharedPointerDynamicCast<RealTimeEvokedSet>(pMeasurement);

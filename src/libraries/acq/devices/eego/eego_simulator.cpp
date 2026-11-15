@@ -27,8 +27,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -177,7 +177,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<EegoTransport> ACQLIB::detail::make_eego_simulator(const EegoSimulation& simulation)
+std::unique_ptr<EegoTransport> mne::detail::make_eego_simulator(const EegoSimulation& simulation)
 {
     return std::make_unique<EegoSimulator>(simulation);
 }

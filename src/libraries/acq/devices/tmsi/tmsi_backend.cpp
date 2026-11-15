@@ -42,8 +42,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -404,7 +404,7 @@ const Registrar kRegistrar;
 //=============================================================================================================
 
 #if !defined(_WIN32)
-AcqExpected<std::unique_ptr<TmsiTransport>> ACQLIB::detail::openTmsiDriver()
+AcqExpected<std::unique_ptr<TmsiTransport>> mne::detail::openTmsiDriver()
 {
     return AcqError(AcqErrorCode::BackendUnavailable, "the TMSi SDK is only available on Windows; use simulate=1 for the simulator");
 }
@@ -412,7 +412,7 @@ AcqExpected<std::unique_ptr<TmsiTransport>> ACQLIB::detail::openTmsiDriver()
 
 //=============================================================================================================
 
-AcqError ACQLIB::registerTmsiScheme()
+AcqError mne::registerTmsiScheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &TmsiBackend::open, &discover);
     return result;

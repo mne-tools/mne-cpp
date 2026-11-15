@@ -15,12 +15,12 @@
  * the unit of the @c x/@c y/@c z columns in the matching
  * @c _electrodes.tsv (@c m, @c mm or @c cm) and an optional 4×4 affine
  * linking that frame to an associated anatomical image. @ref
- * BIDSLIB::BidsCoordinateSystem is the value object that captures those fields
+ * mne::BidsCoordinateSystem is the value object that captures those fields
  * plus the recommended free-text description / processing-description /
  * @c IntendedFor pointer.
  *
- * @ref BIDSLIB::BidsCoordinateSystem::to_fiff_coord_trans "BidsCoordinateSystem::to_fiff_coord_trans" bridges the parsed affine
- * into a @c FIFFLIB::FiffCoordTrans so downstream MNE-CPP code (forward
+ * @ref mne::BidsCoordinateSystem::to_fiff_coord_trans "BidsCoordinateSystem::to_fiff_coord_trans" bridges the parsed affine
+ * into a @c mne::FiffCoordTrans so downstream MNE-CPP code (forward
  * solution, source localisation, visualisation) can treat a BIDS
  * dataset's coordinate metadata exactly like a FIFF MRI↔head transform.
  * The BIDS↔FIFF coordinate-frame name mapping lives in @ref
@@ -55,10 +55,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -102,10 +102,10 @@ struct BIDSSHARED_EXPORT BidsCoordinateSystem
      * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
      * @return FiffCoordTrans populated with the parsed 4x4 matrix.
      */
-    FIFFLIB::FiffCoordTrans to_fiff_coord_trans(int fromFrame = FIFFV_COORD_MRI,
-                                                int toFrame = FIFFV_COORD_HEAD) const;
+    mne::FiffCoordTrans to_fiff_coord_trans(int fromFrame = FIFFV_COORD_MRI,
+                                            int toFrame = FIFFV_COORD_HEAD) const;
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_COORDINATE_SYSTEM_H

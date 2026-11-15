@@ -37,12 +37,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
@@ -59,12 +59,12 @@ namespace BABYMEGPLUGIN
  * @brief Streams the acquisition server of a BabyMEG system through the babymeg:// source of mne_acq_devices, which
  *        can also simulate it, with the system's projectors, compensators and bad channels.
  */
-class BABYMEGSHARED_EXPORT BabyMEG : public SCSHAREDLIB::AbstractSensor
+class BABYMEGSHARED_EXPORT BabyMEG : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "babymeg.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class BabyMEGSetupWidget;
 
@@ -72,7 +72,7 @@ public:
     BabyMEG();
     ~BabyMEG() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -88,7 +88,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -105,12 +105,12 @@ private:
     std::string uri() const;
 
     /** Adds the system's projectors, compensators and bad channels from the plugin's resources to @p info. */
-    static void addSystemInfo(FIFFLIB::FiffInfo& info);
+    static void addSystemInfo(mne::FiffInfo& info);
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSABabyMEG; /**< The data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSABabyMEG; /**< The data. */
 
-    ACQLIB::AcqDevice m_device; /**< The system while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads its stream in run(). */
+    mne::AcqDevice m_device; /**< The system while streaming. */
+    mne::AcqReader m_reader; /**< Reads its stream in run(). */
 
     std::string m_host = "localhost";   /**< Host of the acquisition server. */
     std::uint16_t m_port = 6340;        /**< Its data port. */

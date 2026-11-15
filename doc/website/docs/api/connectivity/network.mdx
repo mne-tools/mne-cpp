@@ -1,18 +1,18 @@
 ---
 id: network
-title: "CONNECTIVITYLIB::Network"
+title: "mne::Network"
 sidebar_label: Network
 sidebar_position: 16
 ---
 
 # Network
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/network/network.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/network/network.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/network/network.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/network/network.h)
 
 `#include <connectivity/network.h>`
 
 ```cpp
-class CONNECTIVITYLIB::Network
+class mne::Network
 ```
 
 [Graph](/docs/api/disp/graph) container for one functional-connectivity result.
@@ -66,10 +66,10 @@ Reserves storage for the expected number of nodes and edges.
 **Parameters:**
 
 - **nodes** : *std::size_t*
-  Expected node count.
+  [`Expected`](/docs/api/base/expected) node count.
 
 - **edges** : *std::size_t*
-  Expected edge count.
+  [`Expected`](/docs/api/base/expected) edge count.
 
 ---
 
@@ -415,7 +415,7 @@ double edgeWeight(const Network& network, int start, int end)
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 93"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 92"
 ConnectivitySettings m_settings;
 std::shared_ptr<RtConnectivity> m_pRtConnectivity;
 std::vector<Network> m_rawNetworkData; /**< Results as computed. */
@@ -427,7 +427,7 @@ std::map<std::string, Eigen::Vector4i> mColor;
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 347"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 340"
 std::vector<Network> lNetworks = compute_connectivity(conSettings);
 ````
 

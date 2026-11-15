@@ -20,9 +20,9 @@
  * The null hypothesis is equality of the group means; the alternative is
  * that at least one group mean differs. P-values come from the exact F
  * CDF expressed via the regularised incomplete beta function that
- * @ref STSLIB::StatsTtest already exposes, so the two test families
+ * @ref mne::StatsTtest already exposes, so the two test families
  * remain numerically consistent. The F-statistic is also the natural
- * cluster-forming statistic for @ref STSLIB::StatsCluster::fTestPermutationTest.
+ * cluster-forming statistic for @ref mne::StatsCluster::fTestPermutationTest.
  *
  * Reference: Fisher (1925), Statistical Methods for Research Workers,
  * chapter 7.
@@ -50,10 +50,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -106,6 +106,6 @@ public:
     static double fCdf(double f, int df1, int df2);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_FTEST_H

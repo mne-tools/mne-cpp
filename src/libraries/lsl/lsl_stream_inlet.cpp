@@ -45,8 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
-using namespace LSLLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 namespace
 {
@@ -62,7 +62,7 @@ std::runtime_error failure(const std::string& what)
 
 //=============================================================================================================
 
-class LSLLIB::StreamInletPrivate
+class mne::StreamInletPrivate
 {
 public:
     explicit StreamInletPrivate(const stream_info& info)
@@ -169,7 +169,7 @@ public:
             }
         }
         if (result < 0) {
-            BASELIB::Log::warning("[lsl::stream_inlet] Malformed sample from the outlet; closing the stream");
+            mne::Log::warning("[lsl::stream_inlet] Malformed sample from the outlet; closing the stream");
             closeStream();
             return chunk;
         }

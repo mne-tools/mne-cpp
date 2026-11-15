@@ -13,10 +13,10 @@
  * @date     October 2012
  * @brief    Single epoch (one trial slice of preprocessed sensor data) with timing and rejection metadata.
  *
- * @ref MNELIB::MNEEpochData stores the windowed sensor matrix for one
+ * @ref mne::MNEEpochData stores the windowed sensor matrix for one
  * event together with the trigger sample, event id, baseline boundaries
  * and any rejection thresholds applied to produce it. Multiple epochs
- * are aggregated into @ref MNELIB::MNEEpochDataList which then feeds covariance
+ * are aggregated into @ref mne::MNEEpochDataList which then feeds covariance
  * estimation, average-by-condition evoked computation and induced-power
  * analyses.
  */
@@ -41,10 +41,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -140,13 +140,13 @@ public:
     }
 
 public:
-    Eigen::MatrixXd epoch;           /**< The data. */
-    FIFFLIB::fiff_int_t event;       /**< The event code. */
-    FIFFLIB::fiff_int_t eventSample; /**< The sample index of the triggering event. */
-    float tmin;                      /**< New start time (must be >= 0). */
-    float tmax;                      /**< New end time of the data (cannot exceed data duration). */
-    bool bReject;                    /**< Whether this epoch is to be rejected. */
-    bool bUserReject;                /**< Whether this epoch was manually excluded by the user. */
+    Eigen::MatrixXd epoch;       /**< The data. */
+    mne::fiff_int_t event;       /**< The event code. */
+    mne::fiff_int_t eventSample; /**< The sample index of the triggering event. */
+    float tmin;                  /**< New start time (must be >= 0). */
+    float tmax;                  /**< New end time of the data (cannot exceed data duration). */
+    bool bReject;                /**< Whether this epoch is to be rejected. */
+    bool bUserReject;            /**< Whether this epoch was manually excluded by the user. */
 };
 } // NAMESPACE
 

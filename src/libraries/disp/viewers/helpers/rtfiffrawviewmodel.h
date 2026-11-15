@@ -57,20 +57,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -158,7 +158,7 @@ public:
      *
      * @param[in] p_pFiffInfo   The corresponding fiff information.
      */
-    void setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo>& p_pFiffInfo);
+    void setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -194,7 +194,7 @@ public:
      *
      * @return kind of given channel number.
      */
-    FIFFLIB::fiff_int_t getKind(qint32 row) const;
+    mne::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -204,7 +204,7 @@ public:
      *
      * @return unit of given channel number.
      */
-    FIFFLIB::fiff_int_t getUnit(qint32 row) const;
+    mne::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -214,7 +214,7 @@ public:
      *
      * @return coil type of given channel number.
      */
-    FIFFLIB::fiff_int_t getCoil(qint32 row) const;
+    mne::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -294,7 +294,7 @@ public:
      *
      * @param[in] projs    The new projectors.
      */
-    void updateProjection(const std::vector<FIFFLIB::FiffProj>& projs);
+    void updateProjection(const std::vector<mne::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -328,7 +328,7 @@ public:
      *
      * @param[in] filterData    list of the new filter.
      */
-    void setFilter(QList<DSPLIB::FilterKernel> filterData);
+    void setFilter(QList<mne::FilterKernel> filterData);
 
     //=========================================================================================================
     /**
@@ -567,7 +567,7 @@ private:
      */
     void initSphara();
 
-    static void doFilterPerChannelRTMSA(QPair<QList<DSPLIB::FilterKernel>, QPair<int, Eigen::RowVectorXd>>& channelDataTime);
+    static void doFilterPerChannelRTMSA(QPair<QList<mne::FilterKernel>, QPair<int, Eigen::RowVectorXd>>& channelDataTime);
 
     //=========================================================================================================
     /**
@@ -614,7 +614,7 @@ private:
     QString m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
     QString m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
     Eigen::RowVectorXi m_vecBadIdcs;                   /**< Idcs of bad channels. */
     Eigen::VectorXd m_vecLastBlockFirstValuesFiltered; /**< The first value of the last complete filtered data display block. */
@@ -653,7 +653,7 @@ private:
     QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
     QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
     QMap<qint32, float> m_qMapChScaling;                                 /**< Channel scaling map. */
-    QList<DSPLIB::FilterKernel> m_filterKernel;                          /**< List of currently active filters. */
+    QList<mne::FilterKernel> m_filterKernel;                             /**< List of currently active filters. */
     QStringList m_filterChannelList;                                     /**< List of channels which are to be filtered.*/
     QMap<qint32, qint32> m_qMapIdxRowSelection;                          /**< Selection mapping.*/
 

@@ -1,18 +1,18 @@
 ---
 id: spline
-title: "DISPLIB::Spline"
+title: "mne::disp::Spline"
 sidebar_label: Spline
 sidebar_position: 62
 ---
 
 # Spline
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/spline.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/spline.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/spline.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/spline.h)
 
 `#include <disp/spline.h>`
 
 ```cpp
-class DISPLIB::Spline
+class mne::disp::Spline
 ```
 
 Histogram QWidget with cubic-spline overlay and interactive threshold markers.
@@ -176,7 +176,7 @@ ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its c
 
 Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
-````cpp title="src/examples/ex_histogram/main.cpp, line 212"
+````cpp title="src/examples/ex_histogram/main.cpp, line 208"
 //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
 Spline* displayObj = new Spline(0, QString("%1 of %2 clustered sources at 100 ms").arg(method).arg(sourceEstimateData.size()));
 //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");

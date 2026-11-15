@@ -69,10 +69,7 @@
 //=============================================================================================================
 
 
-using namespace MNALIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

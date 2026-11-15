@@ -24,7 +24,7 @@
  * samples), a per-kind index, and the (x, y, z) position in metres in the
  * @c FIFFV_COORD_HEAD frame.
  *
- * @ref FIFFLIB::FiffDigPoint wraps that record. The point cloud assembled from
+ * @ref mne::FiffDigPoint wraps that record. The point cloud assembled from
  * all dig points drives head-shape based coregistration and the iterative
  * closest-point fit in @c mne_analyze, mirroring the
  * @c info['dig'] list consumed by @c mne.io.Info in MNE-Python.
@@ -48,10 +48,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================

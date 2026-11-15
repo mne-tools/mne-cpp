@@ -35,11 +35,9 @@
 #include <base/string_utils.h>
 #include <fs/fs_surface.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -78,7 +76,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
             info.dev_head_t.to == FIFFV_COORD_HEAD &&
             !info.dev_head_t.trans.isIdentity()) {
             hasDevHead = true;
-            devHeadQTrans = SURFACEKEYS::toQMatrix4x4(info.dev_head_t.trans);
+            devHeadQTrans = mne::disp::surface_keys::toQMatrix4x4(info.dev_head_t.trans);
         }
 
         result.devHeadTrans = devHeadQTrans;
@@ -203,7 +201,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
                 if (helmetBem.size() > 0) {
                     MNEBemSurface helmetSurf = helmetBem[0];
                     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-                        helmetSurf.nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
+                        helmetSurf.nn = mne::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
                     }
 
                     if (hasDevHead) {
@@ -273,7 +271,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     MNEBemSurface helmetSurf = helmetBem[0];
 
     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-        helmetSurf.nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
+        helmetSurf.nn = mne::FsSurface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
     }
 
     if (applyTrans) {
@@ -335,7 +333,7 @@ bool DataLoader::loadHeadToMriTransform(const QString& transPath,
     // A file may hold several transforms (e.g. all-trans.fif: device -> head and MRI -> head)
     const auto read = FiffCoordTrans::read(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     if (!read) {
-        BASELIB::Log::warning("DataLoader: {}", read.error().what());
+        mne::Log::warning("DataLoader: {}", read.error().what());
         return false;
     }
     trans = *read;
@@ -386,4 +384,4 @@ QStringList DataLoader::probeEvokedSets(const QString& evokedPath)
     return result;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

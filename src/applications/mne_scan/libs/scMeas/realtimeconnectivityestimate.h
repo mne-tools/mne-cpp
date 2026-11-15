@@ -27,37 +27,37 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 class Network;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEBem;
 }
 
-namespace FSLIB
+namespace mne
 {
 class FsSurfaceSet;
 class FsAnnotationSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -92,7 +92,7 @@ public:
      *
      * @param[in] annotSet   the annotation set to set.
      */
-    inline void setAnnotSet(const std::shared_ptr<FSLIB::FsAnnotationSet>& annotSet);
+    inline void setAnnotSet(const std::shared_ptr<mne::FsAnnotationSet>& annotSet);
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      *
      * @return the annotation set.
      */
-    inline std::shared_ptr<FSLIB::FsAnnotationSet>& getAnnotSet();
+    inline std::shared_ptr<mne::FsAnnotationSet>& getAnnotSet();
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      *
      * @param[in] sensorSurface   the sensor surface.
      */
-    inline void setSensorSurface(const std::shared_ptr<MNELIB::MNEBem>& sensorSurface);
+    inline void setSensorSurface(const std::shared_ptr<mne::MNEBem>& sensorSurface);
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ public:
      *
      * @return the sensor surfac.
      */
-    inline std::shared_ptr<MNELIB::MNEBem>& getSensorSurface();
+    inline std::shared_ptr<mne::MNEBem>& getSensorSurface();
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
      *
      * @param[in] surfSet   the surface set to set.
      */
-    inline void setSurfSet(const std::shared_ptr<FSLIB::FsSurfaceSet>& surfSet);
+    inline void setSurfSet(const std::shared_ptr<mne::FsSurfaceSet>& surfSet);
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
      *
      * @return the surface set.
      */
-    inline std::shared_ptr<FSLIB::FsSurfaceSet>& getSurfSet();
+    inline std::shared_ptr<mne::FsSurfaceSet>& getSurfSet();
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set.
      */
-    inline void setFwdSolution(const std::shared_ptr<MNELIB::MNEForwardSolution>& fwdSolution);
+    inline void setFwdSolution(const std::shared_ptr<mne::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -148,7 +148,7 @@ public:
      *
      * @return the forward solution.
      */
-    inline std::shared_ptr<MNELIB::MNEForwardSolution>& getFwdSolution();
+    inline std::shared_ptr<mne::MNEForwardSolution>& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(const CONNECTIVITYLIB::Network& v);
+    virtual void setValue(const mne::Network& v);
 
     //=========================================================================================================
     /**
@@ -166,7 +166,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QSharedPointer<CONNECTIVITYLIB::Network>& getValue();
+    virtual QSharedPointer<mne::Network>& getValue();
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      *
      * @param[in] p_fiffInfo the new FiffInfo..
      */
-    void setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& p_fiffInfo);
+    void setFiffInfo(const std::shared_ptr<mne::FiffInfo>& p_fiffInfo);
 
     //=========================================================================================================
     /**
@@ -190,27 +190,27 @@ public:
      *
      * @return the current FiffInfo.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo();
+    std::shared_ptr<mne::FiffInfo> getFiffInfo();
 
 private:
     mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The Fiff info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The Fiff info. */
 
-    std::shared_ptr<FSLIB::FsAnnotationSet> m_pAnnotSet;        /**< FsAnnotation set. Needed for visualization. */
-    std::shared_ptr<FSLIB::FsSurfaceSet> m_pSurfSet;            /**< FsSurface set. Needed for visualization. */
-    std::shared_ptr<MNELIB::MNEForwardSolution> m_pFwdSolution; /**< Forward solution. Needed for visualization. */
-    std::shared_ptr<MNELIB::MNEBem> m_pSensorSurface;           /**< The sensor surface. Needed for visualization. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotSet;       /**< FsAnnotation set. Needed for visualization. */
+    std::shared_ptr<mne::FsSurfaceSet> m_pSurfSet;           /**< FsSurface set. Needed for visualization. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwdSolution; /**< Forward solution. Needed for visualization. */
+    std::shared_ptr<mne::MNEBem> m_pSensorSurface;           /**< The sensor surface. Needed for visualization. */
 
-    QSharedPointer<CONNECTIVITYLIB::Network> m_pNetwork; /**< The network/connectivity estimate. */
-    bool m_bInitialized;                                 /**< Is initialized. */
+    QSharedPointer<mne::Network> m_pNetwork; /**< The network/connectivity estimate. */
+    bool m_bInitialized;                     /**< Is initialized. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setAnnotSet(const std::shared_ptr<FSLIB::FsAnnotationSet>& annotSet)
+inline void RealTimeConnectivityEstimate::setAnnotSet(const std::shared_ptr<mne::FsAnnotationSet>& annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -218,7 +218,7 @@ inline void RealTimeConnectivityEstimate::setAnnotSet(const std::shared_ptr<FSLI
 
 //=============================================================================================================
 
-inline std::shared_ptr<FSLIB::FsAnnotationSet>& RealTimeConnectivityEstimate::getAnnotSet()
+inline std::shared_ptr<mne::FsAnnotationSet>& RealTimeConnectivityEstimate::getAnnotSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
@@ -226,7 +226,7 @@ inline std::shared_ptr<FSLIB::FsAnnotationSet>& RealTimeConnectivityEstimate::ge
 
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setSensorSurface(const std::shared_ptr<MNELIB::MNEBem>& annotSet)
+inline void RealTimeConnectivityEstimate::setSensorSurface(const std::shared_ptr<mne::MNEBem>& annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSensorSurface = annotSet;
@@ -234,7 +234,7 @@ inline void RealTimeConnectivityEstimate::setSensorSurface(const std::shared_ptr
 
 //=============================================================================================================
 
-inline std::shared_ptr<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorSurface()
+inline std::shared_ptr<mne::MNEBem>& RealTimeConnectivityEstimate::getSensorSurface()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSensorSurface;
@@ -242,7 +242,7 @@ inline std::shared_ptr<MNELIB::MNEBem>& RealTimeConnectivityEstimate::getSensorS
 
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setSurfSet(const std::shared_ptr<FSLIB::FsSurfaceSet>& surfSet)
+inline void RealTimeConnectivityEstimate::setSurfSet(const std::shared_ptr<mne::FsSurfaceSet>& surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -250,7 +250,7 @@ inline void RealTimeConnectivityEstimate::setSurfSet(const std::shared_ptr<FSLIB
 
 //=============================================================================================================
 
-inline std::shared_ptr<FSLIB::FsSurfaceSet>& RealTimeConnectivityEstimate::getSurfSet()
+inline std::shared_ptr<mne::FsSurfaceSet>& RealTimeConnectivityEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
@@ -258,7 +258,7 @@ inline std::shared_ptr<FSLIB::FsSurfaceSet>& RealTimeConnectivityEstimate::getSu
 
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setFwdSolution(const std::shared_ptr<MNELIB::MNEForwardSolution>& fwdSolution)
+inline void RealTimeConnectivityEstimate::setFwdSolution(const std::shared_ptr<mne::MNEForwardSolution>& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -266,7 +266,7 @@ inline void RealTimeConnectivityEstimate::setFwdSolution(const std::shared_ptr<M
 
 //=============================================================================================================
 
-inline std::shared_ptr<MNELIB::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
+inline std::shared_ptr<mne::MNEForwardSolution>& RealTimeConnectivityEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
@@ -282,7 +282,7 @@ inline bool RealTimeConnectivityEstimate::isInitialized() const
 
 //=============================================================================================================
 
-inline void RealTimeConnectivityEstimate::setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& p_fiffInfo)
+inline void RealTimeConnectivityEstimate::setFiffInfo(const std::shared_ptr<mne::FiffInfo>& p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffInfo = p_fiffInfo;
@@ -290,7 +290,7 @@ inline void RealTimeConnectivityEstimate::setFiffInfo(const std::shared_ptr<FIFF
 
 //=============================================================================================================
 
-inline std::shared_ptr<FIFFLIB::FiffInfo> RealTimeConnectivityEstimate::getFiffInfo()
+inline std::shared_ptr<mne::FiffInfo> RealTimeConnectivityEstimate::getFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

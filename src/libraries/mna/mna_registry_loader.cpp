@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -224,7 +224,7 @@ int MnaRegistryLoader::loadFile(const QString& path, MnaOpRegistry& registry)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
-        BASELIB::Log::warning("MnaRegistryLoader: Cannot open {}", path.toStdString());
+        mne::Log::warning("MnaRegistryLoader: Cannot open {}", path.toStdString());
         return -1;
     }
 
@@ -233,7 +233,7 @@ int MnaRegistryLoader::loadFile(const QString& path, MnaOpRegistry& registry)
     file.close();
 
     if (parseError.error != QJsonParseError::NoError) {
-        BASELIB::Log::warning("MnaRegistryLoader: JSON parse error in {} : {}", path.toStdString(), parseError.errorString().toStdString());
+        mne::Log::warning("MnaRegistryLoader: JSON parse error in {} : {}", path.toStdString(), parseError.errorString().toStdString());
         return -1;
     }
 
@@ -241,7 +241,7 @@ int MnaRegistryLoader::loadFile(const QString& path, MnaOpRegistry& registry)
 
     // Validate required fields
     if (!root.contains(QLatin1String("mna_registry_version"))) {
-        BASELIB::Log::warning("MnaRegistryLoader: Missing 'mna_registry_version' in {}", path.toStdString());
+        mne::Log::warning("MnaRegistryLoader: Missing 'mna_registry_version' in {}", path.toStdString());
         return -1;
     }
 
@@ -256,7 +256,7 @@ int MnaRegistryLoader::loadFile(const QString& path, MnaOpRegistry& registry)
         }
     }
 
-    BASELIB::Log::info("MnaRegistryLoader: Loaded {} ops from {} (provider: {} )", count, path.toStdString(), (root.value(QLatin1String("provider")).toString()).toStdString());
+    mne::Log::info("MnaRegistryLoader: Loaded {} ops from {} (provider: {} )", count, path.toStdString(), (root.value(QLatin1String("provider")).toString()).toStdString());
 
     return count;
 }
@@ -309,7 +309,7 @@ bool MnaRegistryLoader::saveFile(const QString& path,
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly)) {
-        BASELIB::Log::warning("MnaRegistryLoader: Cannot write {}", path.toStdString());
+        mne::Log::warning("MnaRegistryLoader: Cannot write {}", path.toStdString());
         return false;
     }
 

@@ -148,8 +148,8 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace std::chrono_literals;
 
 //=============================================================================================================
@@ -570,7 +570,7 @@ private:
         m_sfreq = info->sfreq;
         m_width = std::max<Eigen::Index>(2, static_cast<Eigen::Index>(kWindowSeconds * m_sfreq));
         m_sweep = Eigen::MatrixXd::Zero(m_channels, m_width);
-        m_view->init(std::make_shared<FIFFLIB::FiffInfo>(std::move(*fiffInfo)));
+        m_view->init(std::make_shared<mne::FiffInfo>(std::move(*fiffInfo)));
         m_view->setWindowSize(static_cast<float>(kWindowSeconds));
         m_view->setFileBounds(0, static_cast<int>(m_width) - 1);
         m_view->setData(m_sweep, 0);
@@ -777,7 +777,7 @@ int main(int argc, char* argv[])
 ## Related examples
 
 - [Recover the P300 from a streaming oddball session](../acq/ex_acq_oddball.mdx) — Recover the P300 from a streaming oddball session by trigger-locked averaging.
-- [Closed-loop acquisition and stimulation at full rate](../acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- [Closed-loop acquisition and stimulation at full rate](../acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - [Record a running source to FIFF and BIDS](../acq/ex_acq_record.mdx) — Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 - [Watch a multi-channel stream live with a closed-loop stimulator](../acq/ex_acq_scope.mdx) — Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 

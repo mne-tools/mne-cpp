@@ -12,7 +12,7 @@
  * @brief    QStandardItemModel mirroring the BIDS dataset hierarchy (subjects / sessions / runs / derivatives).
  *
  * BidsViewModel rebuilds itself from a top-level dataset path and
- * exposes the BIDS tree to @ref DISPLIB::BidsView. Item roles carry the
+ * exposes the BIDS tree to @ref mne::disp::BidsView. Item roles carry the
  * absolute path, the BIDS entity type and the loadable-by-this-app
  * flag so the surrounding plugin can react to double-clicks (load
  * raw, attach derivative, …) without re-walking the file system.
@@ -69,14 +69,14 @@ inline constexpr auto BIDS_UNKNOWN = 99;
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

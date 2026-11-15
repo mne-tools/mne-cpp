@@ -1,18 +1,18 @@
 ---
 id: acq-stream
-title: "ACQLIB::AcqStream"
+title: "mne::AcqStream"
 sidebar_label: AcqStream
 sidebar_position: 1
 ---
 
 # AcqStream
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
 
 `#include <acq/acq_stream.h>`
 
 ```cpp
-class ACQLIB::AcqStream
+class mne::AcqStream
 ```
 
 Shared handle of a stream.
@@ -159,7 +159,7 @@ Takes the writer of an output stream (control path).
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -169,7 +169,7 @@ Takes the writer of an output stream (control path).
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 203"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 202"
 const AcqStream stream = device->stream();
 const auto info = stream.info();
 // Electrode check before recording; amplifiers without an impedance mode return NotSupported.

@@ -24,9 +24,9 @@
  * oscillations to behaviorally relevant parameters*, NeuroImage 86,
  * 2014.
  *
- * @ref DECODINGLIB::DecodingSpoc mirrors @c mne.decoding.SPoC and reuses the same
+ * @ref mne::DecodingSpoc mirrors @c mne.decoding.SPoC and reuses the same
  * @c fit / @c transform / @c fitTransform scikit-learn pattern as
- * @ref DECODINGLIB::DecodingCsp, including the @c AveragePower vs @c CspSpace
+ * @ref mne::DecodingCsp, including the @c AveragePower vs @c CspSpace
  * @c TransformMode switch and the optional log / z-score normalisation
  * of the band-power features. Inputs are expected to be already
  * band-passed (SPoC has no spectral component of its own) and the
@@ -55,10 +55,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DECODINGLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DECODINGLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -85,7 +85,7 @@ namespace DECODINGLIB
  * filtered in the relevant frequency band; the target vector @f$z@f$
  * is a real-valued vector of length @c n_epochs.
  *
- * @see DECODINGLIB, @c mne.decoding.SPoC
+ * @see mne_decoding, @c mne.decoding.SPoC
  *
  * @snippet ex_decoding/main.cpp decoding_spoc_fit_transform
  */
@@ -189,6 +189,6 @@ private:
         const std::vector<Eigen::MatrixXd>& epochs) const;
 };
 
-} // namespace DECODINGLIB
+} // namespace mne
 
 #endif // DECODING_SPOC_H

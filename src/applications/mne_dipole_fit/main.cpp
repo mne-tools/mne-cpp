@@ -47,10 +47,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -84,7 +82,7 @@ int main(int argc, char* argv[])
             break;
         }
     }
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     std::unique_ptr<QCoreApplication> app;
     if (guiRequested) {
         app = std::make_unique<QApplication>(argc, argv);
@@ -122,7 +120,7 @@ int main(int argc, char* argv[])
 
         // Load brain surface if available
         if (!settings.bemname.empty()) {
-            MNEBem bem(BASELIB::pathFromUtf8(settings.bemname));
+            MNEBem bem(mne::pathFromUtf8(settings.bemname));
             for (std::size_t i = 0; i < bem.size(); ++i) {
                 pModel->addBemSurface("Subject", "BEM", bem[i]);
             }
@@ -136,11 +134,11 @@ int main(int argc, char* argv[])
     /*
      * Saving...
      */
-    if (!settings.dipname.empty() && !set.save_dipoles_dip(BASELIB::pathFromUtf8(settings.dipname))) {
+    if (!settings.dipname.empty() && !set.save_dipoles_dip(mne::pathFromUtf8(settings.dipname))) {
         qCritical("Dipoles could not be saved to %s.", settings.dipname.c_str());
         return 1;
     }
-    if (!settings.bdipname.empty() && !set.save_dipoles_bdip(BASELIB::pathFromUtf8(settings.bdipname))) {
+    if (!settings.bdipname.empty() && !set.save_dipoles_bdip(mne::pathFromUtf8(settings.bdipname))) {
         qCritical("Dipoles could not be saved to %s.", settings.bdipname.c_str());
         return 1;
     }

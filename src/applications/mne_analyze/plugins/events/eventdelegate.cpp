@@ -44,7 +44,7 @@ QWidget* EventDelegate::createEditor(QWidget* parent,
                                      const QStyleOptionViewItem& /* option */,
                                      const QModelIndex& index) const
 {
-    const ANSHAREDLIB::EventModel* pEventModel = static_cast<const ANSHAREDLIB::EventModel*>(index.model());
+    const mne::analyze::EventModel* pEventModel = static_cast<const mne::analyze::EventModel*>(index.model());
 
     switch (index.column()) {
         case 0: {

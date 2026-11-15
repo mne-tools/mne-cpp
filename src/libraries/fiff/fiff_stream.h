@@ -13,19 +13,19 @@
  * @date     October 2012
  * @brief    FIFF binary tag-stream layer: reads and writes FIFF tags, directories, blocks and the structured records nested inside them.
  *
- * @ref FIFFLIB::FiffStream is the workhorse of FIFFLIB. It owns a
- * @ref BASELIB::ByteStream "byte stream" (a file, or bytes in memory), reads and
+ * @ref mne::FiffStream is the workhorse of mne_fiff. It owns a
+ * @ref mne::ByteStream "byte stream" (a file, or bytes in memory), reads and
  * writes the 16-byte FIFF tag header, decodes payloads through the
  * endian-swap helpers in @ref fiff_byte_swap.h, and assembles the
  * directory and block tree on the way in. The high-level methods then
- * trade tag streams for typed objects: @ref FIFFLIB::FiffStream::read_meas_info "read_meas_info" returns a
- * @ref FIFFLIB::FiffInfo, @c read_raw_data returns a @ref FIFFLIB::FiffRawData,
- * @ref FIFFLIB::FiffEvoked::read "FiffEvoked::read" returns a @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffStream::read_cov "read_cov" returns a
- * @ref FIFFLIB::FiffCov, etc. On the writing side @ref FIFFLIB::FiffStream::start_writing_raw "start_writing_raw",
- * @ref FIFFLIB::FiffStream::write_tag "write_tag", @ref FIFFLIB::FiffStream::write_int "write_int" / @ref FIFFLIB::FiffStream::write_float "write_float" /
- * @ref FIFFLIB::FiffStream::write_float_matrix "write_float_matrix", @ref FIFFLIB::FiffStream::start_block "start_block" / @ref FIFFLIB::FiffStream::end_block "end_block" and the
- * record-level writers (@ref FIFFLIB::FiffStream::write_id "write_id", @ref FIFFLIB::FiffStream::write_ch_info "write_ch_info",
- * @ref FIFFLIB::FiffStream::write_coord_trans "write_coord_trans", ...) emit a fully spec-compliant FIFF file
+ * trade tag streams for typed objects: @ref mne::FiffStream::read_meas_info "read_meas_info" returns a
+ * @ref mne::FiffInfo, @c read_raw_data returns a @ref mne::FiffRawData,
+ * @ref mne::FiffEvoked::read "FiffEvoked::read" returns a @ref mne::FiffEvoked, @ref mne::FiffStream::read_cov "read_cov" returns a
+ * @ref mne::FiffCov, etc. On the writing side @ref mne::FiffStream::start_writing_raw "start_writing_raw",
+ * @ref mne::FiffStream::write_tag "write_tag", @ref mne::FiffStream::write_int "write_int" / @ref mne::FiffStream::write_float "write_float" /
+ * @ref mne::FiffStream::write_float_matrix "write_float_matrix", @ref mne::FiffStream::start_block "start_block" / @ref mne::FiffStream::end_block "end_block" and the
+ * record-level writers (@ref mne::FiffStream::write_id "write_id", @ref mne::FiffStream::write_ch_info "write_ch_info",
+ * @ref mne::FiffStream::write_coord_trans "write_coord_trans", ...) emit a fully spec-compliant FIFF file
  * that round-trips through MNE-Python and MNE-C unchanged.
  */
 
@@ -62,10 +62,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -123,7 +123,7 @@ public:
      * @param[in] bytes  The byte stream, already open; the fiff stream owns it.
      * @param[in] name   Name reported by stream_name(), e.g. the file path.
      */
-    explicit FiffStream(std::unique_ptr<BASELIB::ByteStream> bytes, std::string name = {});
+    explicit FiffStream(std::unique_ptr<mne::ByteStream> bytes, std::string name = {});
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
      *
      * @return The open stream, or why the file cannot be opened or is not a FIFF file.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffStream> open(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffStream> open(const std::filesystem::path& path);
 
     ~FiffStream();
 
@@ -147,7 +147,7 @@ public:
      * @return The bytes the stream reads and writes, e.g. to rewind them or to take what was written to memory;
      *         a stream constructed from a path has them only once it is open.
      */
-    BASELIB::ByteStream& byte_stream() const;
+    mne::ByteStream& byte_stream() const;
 
     //=========================================================================================================
     /**
@@ -402,7 +402,7 @@ public:
      *
      * @return The data, all points active, or NotFound if the node holds no digitizer points.
      */
-    [[nodiscard]] BASELIB::Expected<FiffDigitizerData> read_digitizer_data(const std::shared_ptr<FiffDirNode>& node);
+    [[nodiscard]] mne::Expected<FiffDigitizerData> read_digitizer_data(const std::shared_ptr<FiffDirNode>& node);
 
     //=========================================================================================================
     /**
@@ -517,7 +517,7 @@ public:
      *
      * @return The stream, or nullptr if @p bytes is null.
      */
-    static std::unique_ptr<FiffStream> start_file(std::unique_ptr<BASELIB::ByteStream> bytes);
+    static std::unique_ptr<FiffStream> start_file(std::unique_ptr<mne::ByteStream> bytes);
 
     //=========================================================================================================
     /**
@@ -576,7 +576,7 @@ public:
      *
      * @return the started stream, or null if @p bytes is null.
      */
-    static std::unique_ptr<FiffStream> start_writing_raw(std::unique_ptr<BASELIB::ByteStream> bytes,
+    static std::unique_ptr<FiffStream> start_writing_raw(std::unique_ptr<mne::ByteStream> bytes,
                                                          const FiffInfo& info,
                                                          Eigen::RowVectorXd& cals,
                                                          Eigen::MatrixXi sel = defaultMatrixXi,
@@ -959,7 +959,7 @@ private:
     void write_raw(const void* data, fiff_long_t bytes);
 
     // Reads one value in the stream's byte order; a short read yields 0 and marks the stream failed
-    template<BASELIB::Swappable T>
+    template<mne::Swappable T>
     void read(T& value)
     {
         if (m_bytes->read(&value, sizeof(T)) != sizeof(T)) {
@@ -968,21 +968,21 @@ private:
             return;
         }
         if (m_littleEndian != (std::endian::native == std::endian::little))
-            value = BASELIB::byteSwap(value);
+            value = mne::byteSwap(value);
     }
 
-    template<BASELIB::Swappable T>
+    template<mne::Swappable T>
     void write(T value)
     {
         if (m_littleEndian != (std::endian::native == std::endian::little))
-            value = BASELIB::byteSwap(value);
+            value = mne::byteSwap(value);
         m_bytes->write(&value, sizeof(T));
     }
 
 private:
-    std::filesystem::path m_path;                 /**< File of the path constructor, opened by open(). */
-    std::unique_ptr<BASELIB::ByteStream> m_bytes; /**< Null until a path is opened, or if it cannot be. */
-    std::string m_name;                           /**< File path, or empty for bytes in memory. */
+    std::filesystem::path m_path;             /**< File of the path constructor, opened by open(). */
+    std::unique_ptr<mne::ByteStream> m_bytes; /**< Null until a path is opened, or if it cannot be. */
+    std::string m_name;                       /**< File path, or empty for bytes in memory. */
     bool m_littleEndian = false;
     bool m_readFailed = false;
     FiffId m_id;                            /**< The file identifier. */

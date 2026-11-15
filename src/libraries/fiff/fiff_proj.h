@@ -15,12 +15,12 @@
  *
  * Signal-Space Projection (SSP) removes a low-rank subspace from MEG/EEG
  * data; the projector itself is stored under @c FIFFB_PROJ /
- * @c FIFFB_PROJ_ITEM tags. @ref FIFFLIB::FiffProj is the C++ wrapper for one such
+ * @c FIFFB_PROJ_ITEM tags. @ref mne::FiffProj is the C++ wrapper for one such
  * item: a description, the kind (@c FIFFV_PROJ_ITEM_FIELD,
  * @c FIFFV_PROJ_ITEM_EEG_AVREF, ...), the active flag, the desired flag
  * and the named matrix carrying the projection vectors keyed by channel
- * name. The list of @ref FIFFLIB::FiffProj inside @ref FIFFLIB::FiffInfo::projs "FiffInfo::projs" is what
- * @ref FIFFLIB::FiffRawData and @ref FIFFLIB::FiffEvoked apply (or de-apply) via
+ * name. The list of @ref mne::FiffProj inside @ref mne::FiffInfo::projs "FiffInfo::projs" is what
+ * @ref mne::FiffRawData and @ref mne::FiffEvoked apply (or de-apply) via
  * @c make_projector during raw / evoked processing, with field-for-field
  * parity to @c mne.Projection / @c mne.compute_proj_* in MNE-Python.
  */
@@ -53,10 +53,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -213,7 +213,7 @@ public:
      *
      * @return the stream with the attached fiff projector.
      */
-    friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj& p_FiffProj);
+    friend std::ostream& operator<<(std::ostream& out, const mne::FiffProj& p_FiffProj);
 
 public:
     fiff_int_t kind;  /**< Fiff kind. */
@@ -227,7 +227,7 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj& p_FiffProj)
+inline std::ostream& operator<<(std::ostream& out, const mne::FiffProj& p_FiffProj)
 {
     out << "#### Fiff Projector ####\n";
     out << "\tKind: " << p_FiffProj.kind << std::endl;

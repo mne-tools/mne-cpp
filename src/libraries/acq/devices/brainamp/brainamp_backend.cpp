@@ -40,8 +40,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -384,7 +384,7 @@ const Registrar kRegistrar;
 //=============================================================================================================
 
 #if !defined(MNE_ACQ_BRAINAMP_HARDWARE)
-AcqExpected<std::unique_ptr<BrainAmpTransport>> ACQLIB::detail::openBrainAmpDriver()
+AcqExpected<std::unique_ptr<BrainAmpTransport>> mne::detail::openBrainAmpDriver()
 {
     return AcqError(AcqErrorCode::BackendUnavailable,
                     "this build has no BrainAmp driver interface (it needs Windows and the BrainAmp SDK header, "
@@ -394,7 +394,7 @@ AcqExpected<std::unique_ptr<BrainAmpTransport>> ACQLIB::detail::openBrainAmpDriv
 
 //=============================================================================================================
 
-AcqError ACQLIB::registerBrainAmpScheme()
+AcqError mne::registerBrainAmpScheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &BrainAmpBackend::open, &discover);
     return result;

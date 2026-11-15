@@ -37,7 +37,7 @@ char folded(char c) noexcept
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-bool FIFFLIB::same_channel(std::string_view a, std::string_view b) noexcept
+bool mne::same_channel(std::string_view a, std::string_view b) noexcept
 {
     std::size_t i = 0;
     std::size_t j = 0;
@@ -59,7 +59,7 @@ bool FIFFLIB::same_channel(std::string_view a, std::string_view b) noexcept
 
 //=============================================================================================================
 
-int FIFFLIB::channel_index(const BASELIB::StringList& names, std::string_view name) noexcept
+int mne::channel_index(const mne::StringList& names, std::string_view name) noexcept
 {
     auto it = std::find(names.begin(), names.end(), name);
     if (it == names.end()) {

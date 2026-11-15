@@ -1,18 +1,18 @@
 ---
 id: python-runner
-title: "PYBRIDGELIB::PythonRunner"
+title: "mne::PythonRunner"
 sidebar_label: PythonRunner
 sidebar_position: 40
 ---
 
 # PythonRunner
 
-**Namespace:** `PYBRIDGELIB` &nbsp;·&nbsp; **Library:** Python Bridge Library &nbsp;·&nbsp; **Source:** [`pybridge/python_runner.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/pybridge/python_runner.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Python Bridge Library &nbsp;·&nbsp; **Source:** [`pybridge/python_runner.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/pybridge/python_runner.h)
 
 `#include <pybridge/python_runner.h>`
 
 ```cpp
-class PYBRIDGELIB::PythonRunner
+class mne::PythonRunner
 ```
 
 Runs Python scripts and one-liners in a child process.
@@ -99,7 +99,7 @@ Runs a script and waits for it to finish.
 - **script** : *const std::filesystem::path &*
   Path of the .py file.
 
-- **args** : *const BASELIB::StringList &*
+- **args** : *const mne::StringList &*
   Arguments passed to the script.
 
 **Returns:**
@@ -117,7 +117,7 @@ Runs Python code (`python` -c) and waits for it to finish.
 - **code** : *std::string_view*
   Python source.
 
-- **args** : *const BASELIB::StringList &*
+- **args** : *const mne::StringList &*
   Arguments available as `sys.argv`[1:].
 
 **Returns:**
@@ -178,7 +178,7 @@ Calls `ensure_venv`, then runs the script inside the venv.
 - **script** : *const std::filesystem::path &*
   Path of the .py file.
 
-- **args** : *const BASELIB::StringList &*
+- **args** : *const mne::StringList &*
   Arguments passed to the script.
 
 **Returns:**

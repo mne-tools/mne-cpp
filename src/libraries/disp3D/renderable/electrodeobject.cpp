@@ -33,7 +33,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 namespace
 {
@@ -146,7 +146,7 @@ ElectrodeObject::~ElectrodeObject() = default;
 
 //=============================================================================================================
 
-void ElectrodeObject::setImplantation(const IEEGLIB::IeegImplantation& implantation)
+void ElectrodeObject::setImplantation(const mne::IeegImplantation& implantation)
 {
     m_implantation = implantation;
     const int contactCount = int(m_implantation.contacts().size());
@@ -194,7 +194,7 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values, const
     for (int c = 0; c < int(contacts.size()); ++c) {
         const auto it = values.find(QString::fromStdString(contacts[c].name));
         if (it != values.end())
-            m_contactColors[c] = QColor::fromRgb(DISPLIB::ColorMap::valueToColor(normalized(it.value()), colormap));
+            m_contactColors[c] = QColor::fromRgb(mne::disp::ColorMap::valueToColor(normalized(it.value()), colormap));
     }
     buildContactInstances();
 }
@@ -235,13 +235,13 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
         if (it == m_contactValues.end())
             continue;
         const int lead = m_leadOfContact.value(c, -1);
-        const bool isDepth = lead < 0 || leads[lead].type == IEEGLIB::IeegLeadType::Depth;
+        const bool isDepth = lead < 0 || leads[lead].type == mne::IeegLeadType::Depth;
         (isDepth ? depth : subdural).row(c) = contacts[c].position.transpose();
         value(c) = it.value();
         hasValue(c) = 1.0;
     }
-    const Eigen::SparseMatrix<double> weights = IEEGLIB::IeegSurfaceMap::weights(subdural, vertices, distance, IEEGLIB::IeegSurfaceMapMode::Sum, true) +
-        IEEGLIB::IeegSurfaceMap::weights(depth, vertices, distance, IEEGLIB::IeegSurfaceMapMode::Sum, false);
+    const Eigen::SparseMatrix<double> weights = mne::IeegSurfaceMap::weights(subdural, vertices, distance, mne::IeegSurfaceMapMode::Sum, true) +
+        mne::IeegSurfaceMap::weights(depth, vertices, distance, mne::IeegSurfaceMapMode::Sum, false);
     const Eigen::VectorXd weighted = weights * value;
     const Eigen::VectorXd reach = weights * hasValue;
 
@@ -249,7 +249,7 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
     for (int v = 0; v < colors.size(); ++v) {
         if (reach(v) <= 0.0)
             continue;
-        const QRgb rgb = DISPLIB::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), m_colormap);
+        const QRgb rgb = mne::disp::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), m_colormap);
         colors[v] = packABGR(qRed(rgb), qGreen(rgb), qBlue(rgb), static_cast<uint32_t>(255.0 * std::min(1.0, reach(v))));
     }
     return colors;
@@ -300,7 +300,7 @@ QColor ElectrodeObject::leadColor(int index)
 float ElectrodeObject::contactRadius(int contact) const
 {
     const int lead = m_leadOfContact.value(contact, -1);
-    const bool depth = lead < 0 || m_implantation.leads()[lead].type == IEEGLIB::IeegLeadType::Depth;
+    const bool depth = lead < 0 || m_implantation.leads()[lead].type == mne::IeegLeadType::Depth;
     return depth ? kDepthContactRadius : kSubduralContactRadius;
 }
 
@@ -361,13 +361,13 @@ void ElectrodeObject::buildBodies()
 
     const auto& leads = m_implantation.leads();
     for (int l = 0; l < int(leads.size()); ++l) {
-        const IEEGLIB::IeegLead& lead = leads[l];
+        const mne::IeegLead& lead = leads[l];
         const auto& order = lead.contacts;
         if (order.size() < 2)
             continue;
         // The body is darker than the contacts so these stand out along it
         const QColor body = leadColor(l).darker(150);
-        if (lead.type == IEEGLIB::IeegLeadType::Depth) {
+        if (lead.type == mne::IeegLeadType::Depth) {
             const QVector3D tip = pos(order.front());
             const QVector3D tail = pos(order.back());
             const QVector3D dir = (tail - tip).normalized();
@@ -375,7 +375,7 @@ void ElectrodeObject::buildBodies()
             continue;
         }
         // Strips and grids: ties between neighbours along rows, and down columns for a grid of known shape
-        const int cols = (lead.type == IEEGLIB::IeegLeadType::Grid && lead.cols > 0) ? lead.cols : int(order.size());
+        const int cols = (lead.type == mne::IeegLeadType::Grid && lead.cols > 0) ? lead.cols : int(order.size());
         auto tie = [&](int i, int j) {
             if ((pos(order[i]) - pos(order[j])).length() <= kMaxTieLength)
                 addCylinder(pos(order[i]), pos(order[j]), kTieRadius, body);
@@ -420,7 +420,7 @@ int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayD
 
 //=============================================================================================================
 
-const IEEGLIB::IeegContact* ElectrodeObject::contactAt(int index) const
+const mne::IeegContact* ElectrodeObject::contactAt(int index) const
 {
     return (index >= 0 && index < int(m_implantation.contacts().size())) ? &m_implantation.contacts()[index] : nullptr;
 }
@@ -429,14 +429,14 @@ const IEEGLIB::IeegContact* ElectrodeObject::contactAt(int index) const
 
 QString ElectrodeObject::contactLabel(int index) const
 {
-    const IEEGLIB::IeegContact* contact = contactAt(index);
+    const mne::IeegContact* contact = contactAt(index);
     const int lead = m_leadOfContact.value(index, -1);
     if (!contact || lead < 0)
         return QString();
-    const IEEGLIB::IeegLead& l = m_implantation.leads()[lead];
-    const QString kind = l.type == IEEGLIB::IeegLeadType::Depth ? QStringLiteral("depth lead")
-        : l.type == IEEGLIB::IeegLeadType::Strip                ? QStringLiteral("strip")
-                                                                : QStringLiteral("grid");
+    const mne::IeegLead& l = m_implantation.leads()[lead];
+    const QString kind = l.type == mne::IeegLeadType::Depth ? QStringLiteral("depth lead")
+        : l.type == mne::IeegLeadType::Strip                ? QStringLiteral("strip")
+                                                            : QStringLiteral("grid");
     return QStringLiteral("%1 (%2 %3)").arg(QString::fromStdString(contact->name), kind, QString::fromStdString(l.name));
 }
 

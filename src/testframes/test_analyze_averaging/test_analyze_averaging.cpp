@@ -34,7 +34,7 @@
 #include <memory>
 
 using namespace AVERAGINGPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 
@@ -82,7 +82,7 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
     plugin->handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
 
     // -100..300 ms with a -100..0 ms baseline, set in the control panel
-    auto* settings = control->findChild<DISPLIB::AveragingSettingsView*>();
+    auto* settings = control->findChild<mne::disp::AveragingSettingsView*>();
     QVERIFY(settings);
     emit settings->changePreStim(100);
     emit settings->changePostStim(300);
@@ -111,15 +111,15 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
     };
     const Expected expected[2] = {{1, 5.0567231986985656e-14, -6.734846534962558e-08, -4.282182180774749e-09},
                                   {3, -6.863652119640187e-14, 3.3627187038465186e-08, -2.481697357232196e-11}};
-    const std::shared_ptr<FIFFLIB::FiffEvokedSet> set = average->getEvokedSet();
+    const std::shared_ptr<mne::FiffEvokedSet> set = average->getEvokedSet();
     QCOMPARE(set->evoked.size(), 2);
     for (int k = 0; k < 2; ++k) {
-        const FIFFLIB::FiffEvoked& evoked = set->evoked[k];
+        const mne::FiffEvoked& evoked = set->evoked[k];
         QCOMPARE(evoked.comment, QString::number(expected[k].code));
         QCOMPARE(evoked.nave, 6);
         QCOMPARE(evoked.data.cols(), Eigen::Index(121));
-        const int meg = static_cast<int>(BASELIB::indexOf(evoked.info.ch_names, "MEG 1332"));
-        const int eeg = static_cast<int>(BASELIB::indexOf(evoked.info.ch_names, "EEG 021"));
+        const int meg = static_cast<int>(mne::indexOf(evoked.info.ch_names, "MEG 1332"));
+        const int eeg = static_cast<int>(mne::indexOf(evoked.info.ch_names, "EEG 021"));
         QVERIFY(meg >= 0 && eeg >= 0);
         const auto near = [](double a, double b) {
             return std::abs(a - b) < 1e-5 * std::abs(b);

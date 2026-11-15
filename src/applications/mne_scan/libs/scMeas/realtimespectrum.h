@@ -36,10 +36,10 @@
 #include <QColor>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -74,7 +74,7 @@ public:
      *
      * @param[in] p_pFiffInfo     Info to init from.
      */
-    void initFromFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo>& p_pFiffInfo);
+    void initFromFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -98,7 +98,7 @@ public:
      *
      * @return the reference to the orig FiffInfo.
      */
-    inline std::shared_ptr<FIFFLIB::FiffInfo>& getFiffInfo();
+    inline std::shared_ptr<mne::FiffInfo>& getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
     inline bool containsValues() const;
 
 private:
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Original Fiff Info if initialized by fiff info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Original Fiff Info if initialized by fiff info. */
 
     Eigen::MatrixXd m_matValue; /**< The current attached sample vector.*/
 
@@ -155,7 +155,7 @@ inline bool RealTimeSpectrum::isInit() const
 
 //=============================================================================================================
 
-inline std::shared_ptr<FIFFLIB::FiffInfo>& RealTimeSpectrum::getFiffInfo()
+inline std::shared_ptr<mne::FiffInfo>& RealTimeSpectrum::getFiffInfo()
 {
     return m_pFiffInfo;
 }

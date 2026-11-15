@@ -40,12 +40,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 class TriggerDetectionView;
 }
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class FiffRawViewModel;
 }
@@ -55,7 +55,7 @@ namespace Ui
 class EventWindowDockWidget;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffRawData;
@@ -92,7 +92,7 @@ public:
      *
      * @param[in] pEventModel    Pointer to the event model of the current loaded file.
      */
-    void setModel(QSharedPointer<ANSHAREDLIB::EventModel> pEventModel);
+    void setModel(QSharedPointer<mne::analyze::EventModel> pEventModel);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
     /**
      * Clears the view
      */
-    void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void clearView(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
 public slots:
     //=========================================================================================================
@@ -121,7 +121,7 @@ public slots:
      *
      * @param[in] pFiffRawModel     saves pointer to ucurrently loaded FiffRawViewModel.
      */
-    void onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
+    void onNewFiffRawViewModel(QSharedPointer<mne::analyze::FiffRawViewModel> pFiffRawModel);
 
 signals:
     //=========================================================================================================
@@ -227,7 +227,7 @@ private slots:
      *
      * @param[in] info  data for the trigger view to get a list of the stim channels.
      */
-    void initTriggerDetect(const std::shared_ptr<FIFFLIB::FiffInfo> info);
+    void initTriggerDetect(const std::shared_ptr<mne::FiffInfo> info);
 
     //=========================================================================================================
     /**
@@ -359,7 +359,7 @@ private:
      */
     static QMap<double, QList<int>> detectTriggerCalculations(const QString& sChannelName,
                                                               double dThreshold,
-                                                              const FIFFLIB::FiffRawData& fiffRaw);
+                                                              const mne::FiffRawData& fiffRaw);
 
     //=========================================================================================================
     /**
@@ -377,11 +377,11 @@ private:
     int m_iCheckSelectedState; /** < State of the show selected checkbox (0 unchecked, 2 checked) */
     int m_iLastSampClicked;    /** < Number of the last sample clicked */
 
-    QSharedPointer<EventDelegate> m_pAnnDelegate;                  /** < Pointer to associated delegate */
-    QSharedPointer<ANSHAREDLIB::EventModel> m_pEventModel;         /** < Pointer to associated model. Points to currently loaded. */
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pFiffRawModel; /** < Pointer to currently loaded FIffRawViewModel */
+    QSharedPointer<EventDelegate> m_pAnnDelegate;                   /** < Pointer to associated delegate */
+    QSharedPointer<mne::analyze::EventModel> m_pEventModel;         /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<mne::analyze::FiffRawViewModel> m_pFiffRawModel; /** < Pointer to currently loaded FIffRawViewModel */
 
-    std::shared_ptr<DISPLIB::TriggerDetectionView> m_pTriggerDetectView; /** < Pointer to viewer to control GUI for detecting triggers */
+    std::shared_ptr<mne::disp::TriggerDetectionView> m_pTriggerDetectView; /** < Pointer to viewer to control GUI for detecting triggers */
 
     QColorDialog* m_pColordialog; /** < Used for Prompting users for event type colors */
 

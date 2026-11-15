@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March, 2026
- * @brief    Tests for MATHLIB::write_matrix and MATHLIB::read_matrix.
+ * @brief    Tests for mne::write_matrix and mne::read_matrix.
  */
 
 //=============================================================================================================
@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -89,7 +89,7 @@ void TestMatrixIo::writeText(const std::string& name, const std::string& text) c
 
 void TestMatrixIo::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QVERIFY(m_tempDir.isValid());
 }
 

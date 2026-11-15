@@ -44,8 +44,7 @@
 //=============================================================================================================
 
 #ifndef WASMBUILD
-using namespace MLLIB;
-using namespace PYBRIDGELIB;
+using namespace mne;
 #endif
 
 //=============================================================================================================
@@ -112,8 +111,8 @@ void TestMlTrainer::testCheckPrerequisitesStdlib()
     MLTrainer trainer;
 
     // "os" is always available in Python standard library
-    const BASELIB::StringList missing = trainer.check_prerequisites({"os"});
-    QVERIFY2(missing.empty(), ("Expected 'os' to be importable, missing: " + BASELIB::join(missing, ", ")).c_str());
+    const mne::StringList missing = trainer.check_prerequisites({"os"});
+    QVERIFY2(missing.empty(), ("Expected 'os' to be importable, missing: " + mne::join(missing, ", ")).c_str());
 #endif
 }
 
@@ -127,8 +126,8 @@ void TestMlTrainer::testCheckPrerequisitesNonexistent()
     MLTrainer trainer;
 
     // A nonexistent package should appear in the missing list
-    const BASELIB::StringList missing = trainer.check_prerequisites({"os", "nonexistent_xyz_package_12345"});
-    QVERIFY2(missing == BASELIB::StringList{"nonexistent_xyz_package_12345"},
+    const mne::StringList missing = trainer.check_prerequisites({"os", "nonexistent_xyz_package_12345"});
+    QVERIFY2(missing == mne::StringList{"nonexistent_xyz_package_12345"},
              "Nonexistent package should be reported as missing");
 #endif
 }

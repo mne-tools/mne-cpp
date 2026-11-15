@@ -22,7 +22,7 @@
  * This class loads such a file, keeps the indices, positions and values
  * together with the hemisphere id and a human-readable label name, and
  * provides helpers to project the label back onto a triangulation
- * (@ref FSLIB::FsLabel::selectTris "FsLabel::selectTris") so it can be drawn or fed into source-space
+ * (@ref mne::FsLabel::selectTris "FsLabel::selectTris") so it can be drawn or fed into source-space
  * masking.
  */
 
@@ -46,10 +46,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 const static Eigen::MatrixX3i defaultTris(0, 3);

@@ -14,7 +14,7 @@
  * and draws every visible trace in a single shader invocation. It
  * manages its own pipeline, samplers, resource bindings and a small
  * @c CrosshairOverlay for the time / amplitude cursor, and exposes
- * callbacks for the host @ref DISPLIB::ChannelDataView to push new samples,
+ * callbacks for the host @ref mne::disp::ChannelDataView to push new samples,
  * change scaling or update the visible window.
  */
 
@@ -47,7 +47,7 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
 class QRhi;
@@ -61,7 +61,7 @@ class QRhiTexture;
 
 class CrosshairOverlay; // defined in .cpp
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -731,6 +731,6 @@ private:
     void drawOverlays(); // QPainter-based overlays on top of the QRHI-rendered traces
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // CHANNELRHIVIEW_H

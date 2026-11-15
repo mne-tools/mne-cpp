@@ -24,10 +24,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 struct AcqBackend::Impl
@@ -61,6 +61,6 @@ struct BackendAccess
 
 } // namespace detail
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_BACKEND_IMPL_H

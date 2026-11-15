@@ -13,7 +13,7 @@
  * @date     May 2015
  * @brief    Reader / writer for MNE @c .sel channel-selection files and Brainstorm @c .mon montage files.
  *
- * @ref CHANNELSLIB::SelectionIO converts between two text-based
+ * @ref mne::SelectionIO converts between two text-based
  * grouping formats that mne-cpp's GUI tools and command-line
  * pipelines hand back and forth with sibling toolchains:
  *
@@ -45,10 +45,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CHANNELSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CHANNELSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -59,8 +59,8 @@ namespace CHANNELSLIB
  */
 struct CHANNELSSHARED_EXPORT ChannelSelection
 {
-    std::string name;             /**< Group name, e.g. "Left-temporal". */
-    BASELIB::StringList channels; /**< Channel names, in file order. */
+    std::string name;         /**< Group name, e.g. "Left-temporal". */
+    mne::StringList channels; /**< Channel names, in file order. */
 
     bool operator==(const ChannelSelection&) const = default;
 };
@@ -119,6 +119,6 @@ public:
     static bool write_mon(const std::filesystem::path& directory, std::span<const ChannelSelection> groups);
 };
 
-} // namespace CHANNELSLIB
+} // namespace mne
 
 #endif // CHANNELS_SELECTIONIO_H

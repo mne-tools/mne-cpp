@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Definition of @ref BASELIB::MemoryByteStream and @ref BASELIB::FileByteStream.
+ * @brief    Definition of @ref mne::MemoryByteStream and @ref mne::FileByteStream.
  */
 
 //=============================================================================================================
@@ -35,7 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS
@@ -287,7 +287,7 @@ bool FileByteStream::resize(std::uint64_t size)
 
 //=============================================================================================================
 
-Expected<std::vector<std::byte>> BASELIB::read_file_bytes(const std::filesystem::path& path, Compression compression)
+Expected<std::vector<std::byte>> mne::read_file_bytes(const std::filesystem::path& path, Compression compression)
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file) {
@@ -347,7 +347,7 @@ Expected<std::vector<std::byte>> BASELIB::read_file_bytes(const std::filesystem:
 
 //=============================================================================================================
 
-Expected<std::string> BASELIB::read_text_file(const std::filesystem::path& path)
+Expected<std::string> mne::read_text_file(const std::filesystem::path& path)
 {
     std::ifstream file(path, std::ios::binary);
     if (!file) {
@@ -362,7 +362,7 @@ Expected<std::string> BASELIB::read_text_file(const std::filesystem::path& path)
 
 //=============================================================================================================
 
-Expected<void> BASELIB::write_text_file(const std::filesystem::path& path, std::string_view text)
+Expected<void> mne::write_text_file(const std::filesystem::path& path, std::string_view text)
 {
     std::ofstream file(path, std::ios::binary | std::ios::trunc);
     if (!file || !file.write(text.data(), static_cast<std::streamsize>(text.size())) || !file.flush()) {

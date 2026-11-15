@@ -1,18 +1,18 @@
 ---
 id: surface-laplacian-result
-title: "DSPLIB::SurfaceLaplacianResult"
+title: "mne::SurfaceLaplacianResult"
 sidebar_label: SurfaceLaplacianResult
 sidebar_position: 63
 ---
 
 # SurfaceLaplacianResult
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/surface_laplacian.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/surface_laplacian.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/surface_laplacian.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/surface_laplacian.h)
 
 `#include <dsp/surface_laplacian.h>`
 
 ```cpp
-struct DSPLIB::SurfaceLaplacianResult
+struct mne::SurfaceLaplacianResult
 ```
 
 Result of a surface Laplacian (CSD) computation.
@@ -50,7 +50,7 @@ const SurfaceLaplacianResult csd = SurfaceLaplacian::compute(eeg, electrodes, 1e
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 220"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 218"
 const SurfaceLaplacianResult csd = SurfaceLaplacian::compute(eeg, electrodes, 1e-5, 4, 50, 0.09);
 // mne.preprocessing.compute_current_source_density(sphere=(0, 0, 0, 0.09), lambda2=1e-5, stiffness=4), sample 3
 VectorXd mneCsd(8);

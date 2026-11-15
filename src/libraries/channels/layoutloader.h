@@ -14,7 +14,7 @@
  *
  * ANT @c .elc is the ASCII electrode list of ANT/eemagine systems with 3-D head-frame
  * and 2-D projected positions and a unit declaration (mm / cm / m). MNE-C @c .lout
- * layouts are read by @ref MNELIB::MNELayout.
+ * layouts are read by @ref mne::MNELayout.
  */
 
 #ifndef CHANNELS_LAYOUTLOADER_H
@@ -41,10 +41,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CHANNELSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CHANNELSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -55,7 +55,7 @@ namespace CHANNELSLIB
  */
 struct CHANNELSSHARED_EXPORT ElectrodeLayout
 {
-    BASELIB::StringList names;                 /**< Electrode names, from the Labels block if present. */
+    mne::StringList names;                     /**< Electrode names, from the Labels block if present. */
     std::vector<Eigen::Vector3d> positions_3d; /**< 3-D positions, in @c unit. */
     std::vector<Eigen::Vector2d> positions_2d; /**< 2-D positions of the Positions2D block, if present. */
     std::string unit;                          /**< Unit of the positions, e.g. "mm". */
@@ -96,6 +96,6 @@ public:
     static std::optional<ElectrodeLayout> parse_elc(std::string_view text);
 };
 
-} // namespace CHANNELSLIB
+} // namespace mne
 
 #endif // CHANNELS_LAYOUTLOADER_H

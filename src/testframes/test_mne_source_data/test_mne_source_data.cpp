@@ -38,10 +38,7 @@
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -63,7 +60,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
             m_sDataPath = base;

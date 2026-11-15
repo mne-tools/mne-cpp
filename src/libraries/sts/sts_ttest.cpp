@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -103,7 +103,7 @@ StatsTtestResult StatsTtest::permutation(const MatrixXd& data, int nPermutations
     // Sign flips as n-bit numbers, sample 0 in the most significant bit; a two-sided test never flips sample 0
     const int bits = n - (tail == StatsTailType::Both ? 1 : 0);
     if (n < 2 || bits > 63) {
-        BASELIB::Log::warning("StatsTtest::permutation: needs 2 to 63 samples, got {}.", n);
+        mne::Log::warning("StatsTtest::permutation: needs 2 to 63 samples, got {}.", n);
         return StatsTtestResult();
     }
     const std::uint64_t maxPerms = (std::uint64_t(1) << bits) - 1;

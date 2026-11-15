@@ -113,9 +113,8 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // MAIN
@@ -250,6 +249,6 @@ int main(int argc, char* argv[])
 
 - [Try every acquisition device or its simulator: watch, record, play back](../acq/ex_acq_devices.mdx) — Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 - [Recover the P300 from a streaming oddball session](../acq/ex_acq_oddball.mdx) — Recover the P300 from a streaming oddball session by trigger-locked averaging.
-- [Closed-loop acquisition and stimulation at full rate](../acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- [Closed-loop acquisition and stimulation at full rate](../acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - [Watch a multi-channel stream live with a closed-loop stimulator](../acq/ex_acq_scope.mdx) — Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 

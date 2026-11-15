@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEPatchInfo.
+ * @brief    Implementation of @ref mne::MNEPatchInfo.
  *
  * Implements patch construction from the source-space @ref MNENearest
  * mapping and the FIFF read/write of @c FIFF_MNE_SOURCE_SPACE_PATCH_INFO
@@ -27,7 +27,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 // Axis indices for coordinate access (kept for documentation).
 [[maybe_unused]] constexpr int X = 0;

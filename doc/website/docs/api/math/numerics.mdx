@@ -1,21 +1,21 @@
 ---
 id: numerics
-title: "MATHLIB::Numerics"
+title: "mne::Numerics"
 sidebar_label: Numerics
 sidebar_position: 35
 ---
 
 # Numerics
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/numerics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/numerics.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/numerics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/numerics.h)
 
 `#include <math/numerics.h>`
 
 ```cpp
-class MATHLIB::Numerics
+class mne::Numerics
 ```
 
-Static numerical helpers: integer GCD and log2, `nchoose2`, sparsity test, fixed-width histogram binning and time-series baseline rescaling shared across `MATHLIB`, DISP and the evoked / source-estimate pipelines.
+Static numerical helpers: integer GCD and log2, `nchoose2`, sparsity test, fixed-width histogram binning and time-series baseline rescaling shared across mne_math, DISP and the evoked / source-estimate pipelines.
 
 Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).
 
@@ -206,7 +206,7 @@ ok &= expect(Numerics::gcd(84, 36) == 12 && Numerics::nchoose2(10) == 45, "gcd(8
 
 Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
-````cpp title="src/examples/ex_histogram/main.cpp, line 204"
+````cpp title="src/examples/ex_histogram/main.cpp, line 200"
 dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function
 qDebug() << "sourceEstimateData.rows = " << sourceEstimateData.rows();
 qDebug() << "sourceEstaimateData.cols = " << sourceEstimateData.cols();

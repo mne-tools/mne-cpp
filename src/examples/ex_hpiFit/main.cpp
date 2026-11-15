@@ -48,8 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -71,7 +70,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 
@@ -173,7 +172,7 @@ int main(int argc, char* argv[])
 
     //set columns of matrix to zero depending on bad channels indexes
     for (qint32 j = 0; j < static_cast<int>(infoTemp.bads.size()); ++j) {
-        matProjectors.col(BASELIB::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
+        matProjectors.col(mne::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
     }
 
     // if debugging files are necessary set bDoDebug = true;
@@ -258,6 +257,6 @@ int main(int argc, char* argv[])
             << "Average Duration:" << matPosition.col(9).mean() << "ms";
 
     if (bSave) {
-        MATHLIB::write_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut).toStdString());
+        mne::write_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut).toStdString());
     }
 }

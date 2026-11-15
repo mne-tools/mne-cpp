@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    LSLLIB shared-library export macro and build-stamp accessors used by every public LSL symbol.
+ * @brief    mne_lsl shared-library export macro and build-stamp accessors used by every public LSL symbol.
  *
  * This header defines the @c LSLSHARED_EXPORT decoration that every
- * exported class and free function in LSLLIB must carry so that the
+ * exported class and free function in mne_lsl must carry so that the
  * library can be linked both as a shared library (the default
  * mne-cpp build) and as a statically linked archive (the WebAssembly
  * and @c STATICBUILD configurations). The macro expands to
@@ -19,11 +19,11 @@
  * header is consumed by a downstream module, mirroring the convention
  * used throughout the other mne-cpp libraries.
  *
- * It also declares the @ref LSLLIB namespace itself and three
+ * It also declares the @c mne_lsl namespace itself and three
  * @c buildDateTime / @c buildHash / @c buildHashLong free functions
  * that surface the per-translation-unit build stamp produced by
  * @c utils/buildinfo.h. Those accessors are wired into the build-info
- * dialogs of every application that links against LSLLIB so the user
+ * dialogs of every application that links against mne_lsl so the user
  * can confirm which git revision of the LSL stack a running binary
  * was compiled from without having to launch a debugger.
  */
@@ -64,12 +64,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace LSLLIB
- * @brief     Lab Streaming Layer (LSL) integration for real-time data exchange.
- */
-namespace LSLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -96,6 +91,6 @@ LSLSHARED_EXPORT const char* buildHash();
  */
 LSLSHARED_EXPORT const char* buildHashLong();
 
-} // namespace LSLLIB
+} // namespace mne
 
 #endif // LSL_GLOBAL_H

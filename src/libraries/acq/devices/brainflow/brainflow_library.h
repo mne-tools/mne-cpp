@@ -32,10 +32,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** A board as get_board_descr() describes its default preset. */
@@ -120,6 +120,6 @@ std::string brainflow_board_key(std::string_view name);
  */
 AcqError brainflow_error(int code, std::string_view call);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // BRAINFLOW_LIBRARY_H

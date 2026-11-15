@@ -47,40 +47,40 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 class MinimumNormSettingsView;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 class MNEInverseOperator;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffInfoBase;
 }
 
-namespace INVLIB
+namespace mne
 {
 class InvMinimumNorm;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class RtInvOp;
 }
 
-namespace FSLIB
+namespace mne
 {
 class FsAnnotationSet;
 class FsSurfaceSet;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeEvokedSet;
 class RealTimeMultiSampleArray;
@@ -106,12 +106,12 @@ namespace RTCLUSTMNEPLUGIN
  *
  * @brief The RtClustMne class provides a plugin for estimating distributed source localization in real-time.
  */
-class RTCLUSTMNESHARED_EXPORT RtClustMne : public SCSHAREDLIB::AbstractAlgorithm
+class RTCLUSTMNESHARED_EXPORT RtClustMne : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtclustmne.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
     friend class RtClustMneSetupWidget;
 
@@ -132,7 +132,7 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     virtual void init() override;
 
     //=========================================================================================================
@@ -144,7 +144,7 @@ public:
     virtual void unload() override;
     virtual bool start() override;
     virtual bool stop() override;
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const override;
     virtual QString getName() const override;
     virtual QWidget* setupWidget() override;
     virtual QString getBuildInfo() override;
@@ -161,13 +161,13 @@ public:
     /**
      * Slot to update the real time multi sample array data
      */
-    void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTMSA(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
      * Slot to update the fiff covariance
      */
-    void updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTC(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -175,7 +175,7 @@ public:
      *
      * @param[in] pMeasurement   The evoked to be appended.
      */
-    void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTE(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -183,13 +183,13 @@ public:
      *
      * @param[in] invOp    The inverse operator to update.
      */
-    void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
+    void updateInvOp(const mne::MNEInverseOperator& invOp);
 
     //=========================================================================================================
     /**
      * Slot to update the real time forward solution
      */
-    void updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void updateRTFS(mne::scan::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -236,25 +236,25 @@ protected:
      *
      * @return The CMNE-corrected source estimate, or an empty estimate if prerequisites are missing.
      */
-    INVLIB::InvSourceEstimate computeCmneInverse(const FIFFLIB::FiffEvoked& evoked,
-                                                 float fLambda2,
-                                                 const QString& sModelCheckpoint);
+    mne::InvSourceEstimate computeCmneInverse(const mne::FiffEvoked& evoked,
+                                              float fLambda2,
+                                              const QString& sModelCheckpoint);
 
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeFwdSolution>> m_pRTFSInput;       /**< The RealTimeFwdSolution input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>> m_pRTESInput;         /**< The RealTimeEvoked input.*/
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeCov>> m_pRTCInput;                /**< The RealTimeCov input.*/
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeSourceEstimate>> m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;               /**< Holds incoming RealTimeMultiSampleArray data.*/
-    std::shared_ptr<BASELIB::CircularBuffer<FIFFLIB::FiffEvoked>> m_pCircularEvokedBuffer;           /**< Holds incoming RealTimeMultiSampleArray data.*/
-    std::shared_ptr<DSPLIB::RtInvOp> m_pRtInvOp;                                                     /**< Real-time inverse operator. */
-    std::shared_ptr<MNELIB::MNEForwardSolution> m_pFwd;                                              /**< Forward solution. */
-    std::shared_ptr<FIFFLIB::FiffCov> m_pNoiseCov;                                                   /**< Noise Covariance Matrix. */
-    std::shared_ptr<FSLIB::FsAnnotationSet> m_pAnnotationSet;                                        /**< FsAnnotation set. */
-    std::shared_ptr<FSLIB::FsSurfaceSet> m_pSurfaceSet;                                              /**< FsSurface set. */
-    std::shared_ptr<FIFFLIB::FiffInfoBase> m_pFiffInfoForward;                                       /**< Fiff information of the forward solution. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;                                                  /**< Fiff information. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfoInput;                                             /**< Fiff information of the evoked. */
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeFwdSolution>> m_pRTFSInput;       /**< The RealTimeFwdSolution input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>> m_pRTESInput;         /**< The RealTimeEvoked input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeCov>> m_pRTCInput;                /**< The RealTimeCov input.*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeSourceEstimate>> m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
+    std::shared_ptr<mne::CircularBuffer<mne::FiffEvoked>> m_pCircularEvokedBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
+    std::shared_ptr<mne::RtInvOp> m_pRtInvOp;                                                      /**< Real-time inverse operator. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwd;                                               /**< Forward solution. */
+    std::shared_ptr<mne::FiffCov> m_pNoiseCov;                                                     /**< Noise Covariance Matrix. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet;                                        /**< FsAnnotation set. */
+    std::shared_ptr<mne::FsSurfaceSet> m_pSurfaceSet;                                              /**< FsSurface set. */
+    std::shared_ptr<mne::FiffInfoBase> m_pFiffInfoForward;                                         /**< Fiff information of the forward solution. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                                    /**< Fiff information. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfoInput;                                               /**< Fiff information of the evoked. */
 
     bool m_bEvokedInput;       /**< Flag whether an evoked input was received. */
     bool m_bRawInput;          /**< Flag whether a raw data input was received. */
@@ -263,8 +263,8 @@ protected:
     QMutex m_qMutex;        /**< The mutex ensuring thread safety. */
     QFuture<void> m_future; /**< The future monitoring the clustering. */
 
-    FIFFLIB::FiffEvoked m_currentEvoked;
-    FIFFLIB::FiffCoordTrans m_mriHeadTrans; /**< the Mri Head transformation. */
+    mne::FiffEvoked m_currentEvoked;
+    mne::FiffCoordTrans m_mriHeadTrans; /**< the Mri Head transformation. */
 
     qint32 m_iNumAverages;  /**< The number of trials/averages to store. */
     qint32 m_iDownSample;   /**< Down sample factor. */
@@ -280,7 +280,7 @@ protected:
     std::vector<std::string> m_qListCovChNames;   /**< Covariance channel names. */
     std::vector<std::string> m_qListPickChannels; /**< Channels to pick. */
 
-    MNELIB::MNEInverseOperator m_invOp; /**< The inverse operator. */
+    mne::MNEInverseOperator m_invOp; /**< The inverse operator. */
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);

@@ -46,10 +46,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace CONNECTIVITYLIB;
-using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // Global Defines

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref INVLIB::InvHpiModelParameters (value semantics, equality, coil-count computation).
+ * @brief    Implementation of @ref mne::InvHpiModelParameters (value semantics, equality, coil-count computation).
  *
  * Implements the parameter-list constructor, the copy / assignment /
  * equality operators and the private @c computeNumberOfCoils /
@@ -28,7 +28,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

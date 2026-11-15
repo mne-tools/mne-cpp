@@ -1,18 +1,18 @@
 ---
 id: xdawn-result
-title: "DSPLIB::XdawnResult"
+title: "mne::XdawnResult"
 sidebar_label: XdawnResult
 sidebar_position: 65
 ---
 
 # XdawnResult
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/xdawn.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/xdawn.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/xdawn.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/xdawn.h)
 
 `#include <dsp/xdawn.h>`
 
 ```cpp
-struct DSPLIB::XdawnResult
+struct mne::XdawnResult
 ```
 
 Result of an xDAWN decomposition.
@@ -36,7 +36,7 @@ const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 187"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 185"
 const XdawnResult xdawn = Xdawn::fit(epochs, 1, 1); // enhance the response to event code 1
 const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 const VectorXd pattern = xdawn.matPatterns.col(0) / xdawn.matPatterns.col(0).cwiseAbs().maxCoeff();

@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Single equivalent current dipole (ECD) with position, moment and per-fit goodness/χ² metrics.
  *
- * @ref INVLIB::InvEcd represents one ECD record produced by the dipole-
+ * @ref mne::InvEcd represents one ECD record produced by the dipole-
  * fit pipeline at one time point: the head-frame position, the dipole
  * moment, the goodness-of-fit, the χ² value and the degrees of freedom /
  * function-evaluation count used by the optimiser. The class mirrors
  * the @c ecdRec record of MNE-C and is the atomic element collected
- * into the @ref INVLIB::InvEcdSet returned by @ref INVLIB::InvDipoleFit.
+ * into the @ref mne::InvEcdSet returned by @ref mne::InvDipoleFit.
  */
 
 #ifndef INV_ECD_H
@@ -33,10 +33,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -103,6 +103,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_ECD_H

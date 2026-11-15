@@ -15,7 +15,7 @@
  * @c mne_dipole_fit (measurement, BEM, noise covariance, mri trans,
  * time window, baseline, channel selection) and shows the fitted
  * dipole position, orientation, magnitude and goodness-of-fit in a
- * result table once the underlying @c INVERSELIB::DipoleFit job has
+ * result table once the underlying @c mne::DipoleFit job has
  * finished.
  */
 
@@ -48,10 +48,10 @@ class DipoleFitViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -59,7 +59,7 @@ namespace DISPLIB
  * @brief Single-equivalent-current-dipole-fit input / result panel.
  *
  * Collects measurement / BEM / covariance / trans inputs and a time
- * window, launches the underlying @c INVERSELIB::DipoleFit job, then
+ * window, launches the underlying @c mne::DipoleFit job, then
  * renders the fitted position, orientation, magnitude and
  * goodness-of-fit in a result table.
  */

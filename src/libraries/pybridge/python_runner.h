@@ -9,12 +9,12 @@
  * @date     April 2026
  * @brief    Embedding-free launcher that runs MNE-Python (or any user) scripts as a child process and streams their output back to the C++ caller.
  *
- * @ref PYBRIDGELIB::PythonRunner runs Python for cross-validation, reference data generation and pipeline glue
+ * @ref mne::PythonRunner runs Python for cross-validation, reference data generation and pipeline glue
  * without linking against @c libpython: unbuffered launch for real-time streaming, line callbacks for stdout and
  * stderr, a @c "[progress] <pct>%" protocol parsed into progress events, an optional virtual environment, and a
  * one-shot @c pip install of a pyproject directory or @c requirements.txt before the run.
  *
- * The runner is the foundation under @ref PYBRIDGELIB::PythonTestHelper, which every cross-language unit test
+ * The runner is the foundation under @ref mne::PythonTestHelper, which every cross-language unit test
  * uses, and under the training front ends of the ML and inverse libraries.
  */
 
@@ -42,10 +42,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE PYBRIDGELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace PYBRIDGELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -103,7 +103,7 @@ using PythonProgressCallback = std::function<void(float pct, std::string_view me
 /**
  * Runs Python scripts and one-liners in a child process.
  *
- * Output is streamed line by line to the optional callbacks and to BASELIB::Log, and collected into the
+ * Output is streamed line by line to the optional callbacks and to mne::Log, and collected into the
  * @ref PythonRunnerResult. Lines of the form @c "[progress] 42.5%" or @c "[progress] 42.5% Training epoch 10/50"
  * are reported as progress. No Python embedding or linkage is required.
  *
@@ -167,7 +167,7 @@ public:
      *
      * @return Exit code, captured output and last progress.
      */
-    PythonRunnerResult run(const std::filesystem::path& script, const BASELIB::StringList& args = {}) const;
+    PythonRunnerResult run(const std::filesystem::path& script, const mne::StringList& args = {}) const;
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ public:
      *
      * @return Exit code, captured output and last progress.
      */
-    PythonRunnerResult run_code(std::string_view code, const BASELIB::StringList& args = {}) const;
+    PythonRunnerResult run_code(std::string_view code, const mne::StringList& args = {}) const;
 
     //=========================================================================================================
     /**
@@ -222,7 +222,7 @@ public:
      *
      * @return The venv setup error, or the outcome of the run.
      */
-    PythonRunnerResult run_in_venv(const std::filesystem::path& script, const BASELIB::StringList& args = {});
+    PythonRunnerResult run_in_venv(const std::filesystem::path& script, const mne::StringList& args = {});
 
     //=========================================================================================================
     /**
@@ -231,7 +231,7 @@ public:
     std::filesystem::path venv_python_path() const;
 
 private:
-    PythonRunnerResult execute(const BASELIB::StringList& args) const;
+    PythonRunnerResult execute(const mne::StringList& args) const;
 
     PythonRunnerConfig m_config;               /**< Interpreter, environment and limits. */
     PythonLineCallback m_lineCallback;         /**< Optional line callback. */
@@ -249,6 +249,6 @@ private:
  */
 PYBRIDGESHARED_EXPORT std::optional<std::pair<float, std::string>> parse_progress_line(std::string_view line);
 
-} // namespace PYBRIDGELIB
+} // namespace mne
 
 #endif // PYBRIDGELIB_PYTHON_RUNNER_H

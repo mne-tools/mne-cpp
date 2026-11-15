@@ -1,13 +1,13 @@
 ---
 id: inv-vector-source-estimate
-title: "INVLIB::InvVectorSourceEstimate"
+title: "mne::InvVectorSourceEstimate"
 sidebar_label: InvVectorSourceEstimate
 sidebar_position: 13
 ---
 
 # InvVectorSourceEstimate
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_vector_source_estimate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_vector_source_estimate.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_vector_source_estimate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_vector_source_estimate.h)
 
 :::info[Python equivalent]
 `mne.VectorSourceEstimate` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 13
 `#include <inv/inv_vector_source_estimate.h>`
 
 ```cpp
-class INVLIB::InvVectorSourceEstimate
+class mne::InvVectorSourceEstimate
 ```
 
 Vector source estimate: each vertex carries a 3D orientation vector across time.
@@ -129,7 +129,7 @@ Project the 3D vectors onto surface normals to produce a signed scalar estimate.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 193"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 190"
 // The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
 const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov.names).data;
 const InvVectorSourceEstimate vectorStc(kernel * goodData, stc.vertices, stc.tmin, stc.tstep);

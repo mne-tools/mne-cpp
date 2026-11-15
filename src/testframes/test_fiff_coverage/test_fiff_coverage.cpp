@@ -50,8 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -132,7 +131,7 @@ private:
 
 void TestFiffCoverage::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
@@ -153,7 +152,7 @@ void TestFiffCoverage::testGetEvokedEntries()
 
     // Find evoked nodes in the directory tree
     std::vector<std::shared_ptr<FiffDirNode>> evoked_nodes = stream.dirtree()->dir_tree_find(FIFFB_EVOKED);
-    BASELIB::StringList comments;
+    mne::StringList comments;
     std::vector<fiff_int_t> aspect_kinds;
     std::string t;
     QVERIFY(stream.get_evoked_entries(evoked_nodes, comments, aspect_kinds, t));
@@ -173,7 +172,7 @@ void TestFiffCoverage::testGetEvokedEntriesCount()
     QVERIFY(stream.open());
 
     std::vector<std::shared_ptr<FiffDirNode>> evoked_nodes = stream.dirtree()->dir_tree_find(FIFFB_EVOKED);
-    BASELIB::StringList comments;
+    mne::StringList comments;
     std::vector<fiff_int_t> aspect_kinds;
     std::string t;
     QVERIFY(stream.get_evoked_entries(evoked_nodes, comments, aspect_kinds, t));

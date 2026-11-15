@@ -1,18 +1,18 @@
 ---
 id: sensor-field-mapper
-title: "DISP3DLIB::SensorFieldMapper"
+title: "mne::disp::SensorFieldMapper"
 sidebar_label: SensorFieldMapper
 sidebar_position: 39
 ---
 
 # SensorFieldMapper
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/sensorfieldmapper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/sensorfieldmapper.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/sensorfieldmapper.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/sensorfieldmapper.h)
 
 `#include <disp3D/sensorfieldmapper.h>`
 
 ```cpp
-class DISP3DLIB::SensorFieldMapper
+class mne::disp::SensorFieldMapper
 ```
 
 Encapsulates sensor-to-surface field mapping for MEG and EEG sensors.
@@ -199,7 +199,7 @@ Paints per-vertex colours onto the target surfaces and optionally generates iso-
 **Parameters:**
 
 - **surfaces** : *QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map (contour surfaces may be added).
+  [`FsSurface`](/docs/api/fs/fs-surface) map (contour surfaces may be added).
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   The single-view [`SubView`](/docs/api/disp3-d/sub-view) for visibility flags.
@@ -301,7 +301,7 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 **Parameters:**
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  FiffInfo containing the digitization points.
+  [`FiffInfo`](/docs/api/fiff/fiff-info) containing the digitization points.
 
 - **radius** : *float **
   Fitted sphere radius (metres). May be `nullptr`.
@@ -324,7 +324,7 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 308"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 306"
 // Contour spacing for a field map spanning +-120 fT with about 10 lines
 const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
 QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;

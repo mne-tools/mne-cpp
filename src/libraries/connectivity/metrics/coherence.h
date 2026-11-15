@@ -25,11 +25,11 @@
  * means no linear relationship. Because the squared magnitude discards the
  * phase, coherence is symmetric and cannot distinguish true coupling from
  * volume-conduction / common-reference artefacts that produce instantaneous
- * (zero-lag) mixing - use @ref CONNECTIVITYLIB::ImagCoherence (Nolte et al., 2004) when
+ * (zero-lag) mixing - use @ref mne::ImagCoherence (Nolte et al., 2004) when
  * volume conduction is a concern.
  *
  * This implementation delegates the per-trial FFT, tapering and CSD
- * accumulation to @ref CONNECTIVITYLIB::Coherency::calculateAbs "Coherency::calculateAbs", then collapses the result
+ * accumulation to @ref mne::Coherency::calculateAbs "Coherency::calculateAbs", then collapses the result
  * to a scalar per channel pair by averaging |coherency|^2 over the
  * frequency window @c [AbstractMetric::m_iNumberBinStart,
  * m_iNumberBinStart + m_iNumberBinAmount).
@@ -57,14 +57,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -106,6 +106,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // COHERENCE_H

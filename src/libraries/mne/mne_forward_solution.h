@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Forward solution (gain matrix mapping source dipoles to sensor measurements).
  *
- * @ref MNELIB::MNEForwardSolution is the in-memory representation of an
+ * @ref mne::MNEForwardSolution is the in-memory representation of an
  * @c -fwd.fif file: the leadfield matrix, the source spaces it was
  * computed on, the sensor coordinate transforms, the projection vectors
  * and the source-orientation flags. It is the central input to inverse
- * modelling (@ref MNELIB::MNEInverseOperator), to cluster-based dimensionality
+ * modelling (@ref mne::MNEInverseOperator), to cluster-based dimensionality
  * reduction (@c cluster_forward_solution) and to simulation routines.
  * FIFF tags involved: @c FIFFB_MNE_FORWARD_SOLUTION,
  * @c FIFF_MNE_FORWARD_SOLUTION_GRAD, @c FIFF_MNE_SOURCE_ORIENTATION,
@@ -57,10 +57,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=========================================================================================================
@@ -106,7 +106,7 @@ struct RegionData
         // Kmeans Reduction
         RegionDataOut p_RegionDataOut;
 
-        MATHLIB::KMeans t_kMeans(t_sDistMeasure, "sample", 5);
+        mne::KMeans t_kMeans(t_sDistMeasure, "sample", 5);
 
         if (bUseWhitened) {
             t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
@@ -136,8 +136,8 @@ struct RegionData
     }
 };
 
-const static FIFFLIB::FiffCov defaultCov;
-const static FIFFLIB::FiffInfo defaultInfo;
+const static mne::FiffCov defaultCov;
+const static mne::FiffInfo defaultInfo;
 static Eigen::MatrixXd defaultD;
 
 //=============================================================================================================
@@ -171,7 +171,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads a forward solution file like read(); throws BASELIB::Error if it cannot.
+     * Reads a forward solution file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The -fwd.fif file.
      */
@@ -179,7 +179,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads a forward solution file like read(); throws BASELIB::Error if it cannot.
+     * Reads a forward solution file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path      The -fwd.fif file.
      * @param[in] options   How to prepare the solution.
@@ -206,11 +206,11 @@ public:
      *
      * @return clustered MNE forward solution.
      */
-    MNEForwardSolution cluster_forward_solution(const FSLIB::FsAnnotationSet& p_AnnotationSet,
+    MNEForwardSolution cluster_forward_solution(const mne::FsAnnotationSet& p_AnnotationSet,
                                                 qint32 p_iClusterSize,
                                                 Eigen::MatrixXd& p_D = defaultD,
-                                                const FIFFLIB::FiffCov& p_pNoise_cov = defaultCov,
-                                                const FIFFLIB::FiffInfo& p_pInfo = defaultInfo,
+                                                const mne::FiffCov& p_pNoise_cov = defaultCov,
+                                                const mne::FiffInfo& p_pInfo = defaultInfo,
                                                 const std::string& p_sMethod = "cityblock") const;
 
     //=========================================================================================================
@@ -221,7 +221,7 @@ public:
      *
      * @return Orientation priors.
      */
-    FIFFLIB::FiffCov compute_orient_prior(float loose = 0.2);
+    mne::FiffCov compute_orient_prior(float loose = 0.2);
 
     //=========================================================================================================
     /**
@@ -238,13 +238,13 @@ public:
      *
      * @return the depth prior.
      */
-    static FIFFLIB::FiffCov compute_depth_prior(const Eigen::MatrixXd& Gain,
-                                                const FIFFLIB::FiffInfo& gain_info,
-                                                bool is_fixed_ori,
-                                                double exp = 0.8,
-                                                double limit = 10.0,
-                                                const Eigen::MatrixXd& patch_areas = FIFFLIB::defaultConstMatrixXd,
-                                                bool limit_depth_chs = false);
+    static mne::FiffCov compute_depth_prior(const Eigen::MatrixXd& Gain,
+                                            const mne::FiffInfo& gain_info,
+                                            bool is_fixed_ori,
+                                            double exp = 0.8,
+                                            double limit = 10.0,
+                                            const Eigen::MatrixXd& patch_areas = mne::defaultConstMatrixXd,
+                                            bool limit_depth_chs = false);
 
     //=========================================================================================================
     /**
@@ -292,7 +292,7 @@ public:
      *
      * @return the reduced forward solution.
      */
-    MNEForwardSolution pick_regions(const std::vector<FSLIB::FsLabel>& p_qListLabels) const;
+    MNEForwardSolution pick_regions(const std::vector<mne::FsLabel>& p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -325,12 +325,12 @@ public:
      * @param[out] p_outWhitener     Whitener.
      * @param[out] p_outNumNonZero   the rank (non zeros).
      */
-    void prepare_forward(const FIFFLIB::FiffInfo& p_info,
-                         const FIFFLIB::FiffCov& p_noise_cov,
+    void prepare_forward(const mne::FiffInfo& p_info,
+                         const mne::FiffCov& p_noise_cov,
                          bool p_pca,
-                         FIFFLIB::FiffInfo& p_outFwdInfo,
+                         mne::FiffInfo& p_outFwdInfo,
                          Eigen::MatrixXd& gain,
-                         FIFFLIB::FiffCov& p_outNoiseCov,
+                         mne::FiffCov& p_outNoiseCov,
                          Eigen::MatrixXd& p_outWhitener,
                          qint32& p_outNumNonZero) const;
 
@@ -358,7 +358,7 @@ public:
      * @return The forward solution, or why the file cannot be read: Io if it cannot be opened, NotFound if
      *         it holds no forward solution, Format if a required part is missing or inconsistent.
      */
-    [[nodiscard]] static BASELIB::Expected<MNEForwardSolution> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<MNEForwardSolution> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -370,7 +370,7 @@ public:
      *
      * @return The forward solution, or why the file cannot be read (see read(path)).
      */
-    [[nodiscard]] static BASELIB::Expected<MNEForwardSolution> read(const std::filesystem::path& path, const ReadOptions& options);
+    [[nodiscard]] static mne::Expected<MNEForwardSolution> read(const std::filesystem::path& path, const ReadOptions& options);
 
     //=========================================================================================================
     /**
@@ -386,7 +386,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -406,7 +406,7 @@ public:
      * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
      * @param[in] info       Fiff information.
      */
-    static void restrict_gain_matrix(Eigen::MatrixXd& G, const FIFFLIB::FiffInfo& info);
+    static void restrict_gain_matrix(Eigen::MatrixXd& G, const mne::FiffInfo& info);
 
     //=========================================================================================================
     /**
@@ -431,7 +431,7 @@ public:
      *
      * @return the stream with the attached fiff projector.
      */
-    friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution& p_MNEForwardSolution);
+    friend std::ostream& operator<<(std::ostream& out, const mne::MNEForwardSolution& p_MNEForwardSolution);
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -452,8 +452,8 @@ public:
      *
      * @return the source position in 3D space.
      */
-    Eigen::MatrixX3f getSourcePositionsByLabel(const std::vector<FSLIB::FsLabel>& lPickedLabels,
-                                               const FSLIB::FsSurfaceSet& tSurfSetInflated);
+    Eigen::MatrixX3f getSourcePositionsByLabel(const std::vector<mne::FsLabel>& lPickedLabels,
+                                               const mne::FsSurfaceSet& tSurfSetInflated);
 
 private:
     //=========================================================================================================
@@ -468,25 +468,25 @@ private:
      *
      * @return True if succeeded, false otherwise.
      */
-    static bool read_one(FIFFLIB::FiffStream& stream,
-                         const std::shared_ptr<FIFFLIB::FiffDirNode>& p_Node,
+    static bool read_one(mne::FiffStream& stream,
+                         const std::shared_ptr<mne::FiffDirNode>& p_Node,
                          MNEForwardSolution& one);
 
 public:
-    FIFFLIB::FiffInfoBase info;           /**< light weighted measurement info. */
-    FIFFLIB::fiff_int_t source_ori = -1;  /**< Source orientation: fixed or free. */
-    bool surf_ori = false;                /**< If surface oriented. */
-    FIFFLIB::fiff_int_t coord_frame = -1; /**< Coil coordinate system definition. */
-    FIFFLIB::fiff_int_t nsource = -1;     /**< Number of source dipoles. */
-    FIFFLIB::fiff_int_t nchan = -1;       /**< Number of channels. */
-    FIFFLIB::FiffNamedMatrix sol;         /**< Forward solution. */
-    FIFFLIB::FiffNamedMatrix sol_grad;    /**< ToDo... */
-    FIFFLIB::FiffCoordTrans mri_head_t;   /**< MRI head coordinate transformation. */
-    std::string mri_filename;             /**< MRI file name (parent provenance). */
-    FIFFLIB::FiffId mri_id;               /**< MRI file ID (parent provenance). */
-    MNELIB::MNESourceSpaces src;          /**< Geometric description of the source spaces (hemispheres). */
-    Eigen::MatrixX3f source_rr;           /**< Source locations. */
-    Eigen::MatrixX3f source_nn;           /**< Source normals (number depends on fixed or free orientation). */
+    mne::FiffInfoBase info;           /**< light weighted measurement info. */
+    mne::fiff_int_t source_ori = -1;  /**< Source orientation: fixed or free. */
+    bool surf_ori = false;            /**< If surface oriented. */
+    mne::fiff_int_t coord_frame = -1; /**< Coil coordinate system definition. */
+    mne::fiff_int_t nsource = -1;     /**< Number of source dipoles. */
+    mne::fiff_int_t nchan = -1;       /**< Number of channels. */
+    mne::FiffNamedMatrix sol;         /**< Forward solution. */
+    mne::FiffNamedMatrix sol_grad;    /**< ToDo... */
+    mne::FiffCoordTrans mri_head_t;   /**< MRI head coordinate transformation. */
+    std::string mri_filename;         /**< MRI file name (parent provenance). */
+    mne::FiffId mri_id;               /**< MRI file ID (parent provenance). */
+    mne::MNESourceSpaces src;         /**< Geometric description of the source spaces (hemispheres). */
+    Eigen::MatrixX3f source_rr;       /**< Source locations. */
+    Eigen::MatrixX3f source_nn;       /**< Source normals (number depends on fixed or free orientation). */
 };
 
 //=============================================================================================================
@@ -507,7 +507,7 @@ inline bool MNEForwardSolution::isFixedOrient() const
 
 //=============================================================================================================
 
-inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution& p_MNEForwardSolution)
+inline std::ostream& operator<<(std::ostream& out, const mne::MNEForwardSolution& p_MNEForwardSolution)
 {
     out << "#### MNE Forward Solution ####\n";
 

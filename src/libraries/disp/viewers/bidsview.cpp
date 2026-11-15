@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,13 +66,13 @@ void BidsView::setModel(QAbstractItemModel* pModel)
 
     connect(m_pUi->m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &BidsView::onCurrentItemChanged, Qt::UniqueConnection);
-    //    connect(static_cast<ANSHAREDLIB::AnalyzeDataModel*>(pModel), &ANSHAREDLIB::AnalyzeDataModel::newFileAdded,
+    //    connect(static_cast<mne::analyze::AnalyzeDataModel*>(pModel), &mne::analyze::AnalyzeDataModel::newFileAdded,
     //            this, &DataManagerControlView::onNewFileLoaded);
-    connect(static_cast<DISPLIB::BidsViewModel*>(pModel), &DISPLIB::BidsViewModel::newItemIndex,
+    connect(static_cast<mne::disp::BidsViewModel*>(pModel), &mne::disp::BidsViewModel::newItemIndex,
             this, &BidsView::onNewItemIndex);
 
     //Connect BIDS Model Functions
-    DISPLIB::BidsViewModel* pBidsModel = qobject_cast<DISPLIB::BidsViewModel*>(pModel);
+    mne::disp::BidsViewModel* pBidsModel = qobject_cast<mne::disp::BidsViewModel*>(pModel);
 
     //Adding
     connect(this, &BidsView::onAddSubject,
@@ -97,7 +97,7 @@ void BidsView::customMenuRequested(QPoint pos)
 {
     QString sToolTip = m_pUi->m_pTreeView->model()->data(m_pUi->m_pTreeView->indexAt(pos), Qt::ToolTipRole).toString();
 
-    DISPLIB::BidsViewModel* pModel = qobject_cast<DISPLIB::BidsViewModel*>(m_pUi->m_pTreeView->model());
+    mne::disp::BidsViewModel* pModel = qobject_cast<mne::disp::BidsViewModel*>(m_pUi->m_pTreeView->model());
 
     QAction* pRemoveAction;
 

@@ -44,7 +44,7 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
 #if defined(_MSC_VER)
@@ -52,7 +52,7 @@
 #pragma warning(disable : 4324) // padding from cache-line alignment is intended
 #endif
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 inline constexpr std::size_t kCacheLine = 64;
@@ -534,7 +534,7 @@ bool waitFor(Ready&& ready, AcqWait wait, std::chrono::nanoseconds spinFor,
     }
 }
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

@@ -1,18 +1,18 @@
 ---
 id: acq-recorder-options
-title: "ACQLIB::AcqRecorderOptions"
+title: "mne::AcqRecorderOptions"
 sidebar_label: AcqRecorderOptions
 sidebar_position: 48
 ---
 
 # AcqRecorderOptions
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
 
 `#include <acq/acq_recorder.h>`
 
 ```cpp
-struct ACQLIB::AcqRecorderOptions
+struct mne::AcqRecorderOptions
 ```
 
 Options of a recording; fixed at start().
@@ -81,7 +81,7 @@ m_sfreq = info->sfreq;
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 76"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 75"
 AcqRecorderOptions options;
 options.device = device->description(); // device and URI go into the file's measurement info
 const std::string path = QDir(directory).filePath("oddball_raw.fif").toStdString();

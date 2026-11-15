@@ -1,18 +1,18 @@
 ---
 id: source-estimate-overlay
-title: "DISP3DLIB::SourceEstimateOverlay"
+title: "mne::disp::SourceEstimateOverlay"
 sidebar_label: SourceEstimateOverlay
 sidebar_position: 42
 ---
 
 # SourceEstimateOverlay
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/sourceestimateoverlay.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/sourceestimateoverlay.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/sourceestimateoverlay.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/sourceestimateoverlay.h)
 
 `#include <disp3D/sourceestimateoverlay.h>`
 
 ```cpp
-class DISP3DLIB::SourceEstimateOverlay
+class mne::disp::SourceEstimateOverlay
 ```
 
 [`SourceEstimateOverlay`](/docs/api/disp3-d/source-estimate-overlay) manages source estimate data (.stc files) and applies colormap visualization to brain surfaces.
@@ -306,7 +306,7 @@ Used by the real-time streaming controller to feed data into the queue.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 240"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 238"
 // Source estimate on vertices 0 and 2 only; the others stay cortex grey
 MatrixXd activity(2, 1);
 activity << 1.0, 0.1;

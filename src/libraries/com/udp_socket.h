@@ -28,10 +28,10 @@
 #include <system_error>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace COMLIB
+namespace mne
 {
 
 /**
@@ -93,6 +93,6 @@ private:
     bool m_multicast_out = false; // the outgoing multicast interface is set
 };
 
-} // namespace COMLIB
+} // namespace mne
 
 #endif // COM_UDP_SOCKET_H

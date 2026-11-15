@@ -117,7 +117,7 @@ public:
      * @param[in] firstSample   First raw sample of the recording.
      * @param[in] sfreq         Recording sampling frequency in Hz.
      */
-    void setEpochs(const QList<MNELIB::MNEEpochDataList>& epochLists,
+    void setEpochs(const QList<mne::MNEEpochDataList>& epochLists,
                    const QList<int>& eventCodes,
                    int firstSample,
                    float sfreq);
@@ -189,11 +189,11 @@ private:
      */
     struct EpochEntry
     {
-        std::shared_ptr<MNELIB::MNEEpochData> epoch; /**< Backing epoch object with reject/exclude state. */
-        int eventCode = 0;                           /**< Event code that created this epoch. */
-        int absoluteSample = 0;                      /**< Absolute trigger sample in the raw file. */
-        int sample = 0;                              /**< Display sample relative to the loaded raw file. */
-        double timeSeconds = 0.0;                    /**< Trigger time in seconds relative to file start. */
+        std::shared_ptr<mne::MNEEpochData> epoch; /**< Backing epoch object with reject/exclude state. */
+        int eventCode = 0;                        /**< Event code that created this epoch. */
+        int absoluteSample = 0;                   /**< Absolute trigger sample in the raw file. */
+        int sample = 0;                           /**< Display sample relative to the loaded raw file. */
+        double timeSeconds = 0.0;                 /**< Trigger time in seconds relative to file start. */
     };
 
     //=========================================================================================================

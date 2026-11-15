@@ -60,10 +60,10 @@ class MNESetupMriSettings;
  * - mne_make_cor_set: Converts COR slices or .mgz files to COR.fif
  *
  * The actual I/O operations (MGH/MGZ reading, COR reading, COR.fif writing)
- * are delegated to the MRILIB library classes:
- *   - MRILIB::MriMghIO  — reads .mgz/.mgh files
- *   - MRILIB::MriCorIO  — reads COR-NNN slice files
- *   - MRILIB::MriCorFifIO — writes COR.fif FIFF files
+ * are delegated to the mne_mri library classes:
+ *   - mne::MriMghIO  — reads .mgz/.mgh files
+ *   - mne::MriCorIO  — reads COR-NNN slice files
+ *   - mne::MriCorFifIO — writes COR.fif FIFF files
  *
  * @brief Sets up MRI data for MNE use.
  */

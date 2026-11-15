@@ -46,14 +46,14 @@
 class QCheckBox;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -93,7 +93,7 @@ public:
      *
      * @return The current projectors.
      */
-    std::vector<FIFFLIB::FiffProj> getProjectors() const;
+    std::vector<mne::FiffProj> getProjectors() const;
 
     //=========================================================================================================
     /**
@@ -101,7 +101,7 @@ public:
      *
      * @param[in] projs    The new projectors.
      */
-    void setProjectors(const std::vector<FIFFLIB::FiffProj>& projs);
+    void setProjectors(const std::vector<mne::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ protected:
     QList<QCheckBox*> m_qListProjCheckBox; /**< List of projection CheckBox. */
     QCheckBox* m_pEnableDisableProjectors; /**< Holds the enable disable all check box. */
 
-    std::vector<FIFFLIB::FiffProj> m_pProjs; /**< The current projectors. */
+    std::vector<mne::FiffProj> m_pProjs; /**< The current projectors. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -172,7 +172,7 @@ signals:
     /**
      * Emit this signal whenever the user changes the projections.
      */
-    void projSelectionChanged(const std::vector<FIFFLIB::FiffProj>& projs);
+    void projSelectionChanged(const std::vector<mne::FiffProj>& projs);
 };
 } // NAMESPACE
 

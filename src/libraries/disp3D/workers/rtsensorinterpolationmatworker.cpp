@@ -32,8 +32,8 @@
 #include <QMatrix4x4>
 #include <cmath>
 
-using namespace FIFFLIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // ANONYMOUS HELPERS
@@ -201,7 +201,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
 
     for (int k = 0; k < std::ssize(evoked.info.chs); ++k) {
         const auto& ch = evoked.info.chs[k];
-        if (bads.contains(ch.ch_name) || BASELIB::contains(evoked.info.bads, ch.ch_name))
+        if (bads.contains(ch.ch_name) || mne::contains(evoked.info.bads, ch.ch_name))
             continue;
 
         QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
@@ -244,12 +244,12 @@ void RtSensorInterpolationMatWorker::computeMapping()
         // Recompute normals if missing
         if (norms.rows() != megVerts.rows()) {
             if (megTris.rows() > 0) {
-                norms = FSLIB::FsSurface::compute_normals(megVerts, megTris);
+                norms = mne::FsSurface::compute_normals(megVerts, megTris);
             }
         }
 
         if (megVerts.rows() > 0 && norms.rows() == megVerts.rows()) {
-            auto templates = FWDLIB::FwdCoilSet::read_coil_defs(BASELIB::resource_path("general/coilDefinitions/coil_def.dat"));
+            auto templates = mne::FwdCoilSet::read_coil_defs(mne::resource_path("general/coilDefinitions/coil_def.dat"));
 
             if (templates) {
                 FiffCoordTrans devToTarget;
@@ -269,10 +269,10 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 }
 
                 auto coils = templates->create_meg_coils(
-                    megChs, static_cast<int>(megChs.size()), FWDLIB::FWD_COIL_ACCURACY_NORMAL, devToTarget);
+                    megChs, static_cast<int>(megChs.size()), mne::FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
-                    auto mat = FWDLIB::FwdFieldMap::computeMegMapping(
+                    auto mat = mne::FwdFieldMap::computeMegMapping(
                         *coils, megVerts, norms, origin, kIntrad, kMegMiss);
 
                     if (mat && mat->rows() > 0) {
@@ -294,11 +294,11 @@ void RtSensorInterpolationMatWorker::computeMapping()
                 origin = applyTransform(origin, headMri);
 
             auto eegCoils =
-                FWDLIB::FwdCoilSet::create_eeg_els(
+                mne::FwdCoilSet::create_eeg_els(
                     eegChs, static_cast<int>(eegChs.size()), headMri);
 
             if (eegCoils && eegCoils->ncoil() > 0) {
-                auto mat = FWDLIB::FwdFieldMap::computeEegMapping(
+                auto mat = mne::FwdFieldMap::computeEegMapping(
                     *eegCoils, eegVerts, origin, kIntrad, kEegMiss);
 
                 if (mat && mat->rows() > 0) {

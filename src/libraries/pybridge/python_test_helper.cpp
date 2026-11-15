@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref PYBRIDGELIB::PythonTestHelper: package probes and @c eval helpers.
+ * @brief    Implementation of @ref mne::PythonTestHelper: package probes and @c eval helpers.
  *
- * Numeric output is parsed with MATHLIB::read_matrix, so stdout, files written by @c numpy.savetxt and files written
- * by MATHLIB::write_matrix all follow the same rules.
+ * Numeric output is parsed with mne::read_matrix, so stdout, files written by @c numpy.savetxt and files written
+ * by mne::write_matrix all follow the same rules.
  */
 
 //=============================================================================================================
@@ -40,8 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace PYBRIDGELIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -104,7 +103,7 @@ std::optional<VectorXd> PythonTestHelper::eval_vector(std::string_view code, std
     std::ranges::replace(flat, '\n', ' ');
     std::istringstream stream(flat);
     RowVectorXd values;
-    if (!MATHLIB::read_matrix(values, stream) || values.size() == 0) {
+    if (!mne::read_matrix(values, stream) || values.size() == 0) {
         return std::nullopt;
     }
     return values.transpose();
@@ -120,7 +119,7 @@ std::optional<MatrixXd> PythonTestHelper::eval_matrix(std::string_view code, std
     }
     std::istringstream stream(result.std_out);
     MatrixXd matrix;
-    if (!MATHLIB::read_matrix(matrix, stream) || matrix.size() == 0) {
+    if (!mne::read_matrix(matrix, stream) || matrix.size() == 0) {
         return std::nullopt;
     }
     return matrix;
@@ -136,7 +135,7 @@ std::optional<MatrixXd> PythonTestHelper::eval_matrix_via_file(std::string_view 
         return std::nullopt;
     }
     MatrixXd matrix;
-    if (!MATHLIB::read_matrix(matrix, file) || matrix.size() == 0) {
+    if (!mne::read_matrix(matrix, file) || matrix.size() == 0) {
         return std::nullopt;
     }
     return matrix;

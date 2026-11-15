@@ -40,13 +40,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AveragingDataModel::AveragingDataModel(std::shared_ptr<FIFFLIB::FiffEvokedSet> pEvokedSet,
+AveragingDataModel::AveragingDataModel(std::shared_ptr<mne::FiffEvokedSet> pEvokedSet,
                                        QObject* parent)
 : AbstractModel(parent)
 , m_pFiffEvokedSet(std::move(pEvokedSet))
@@ -64,7 +64,7 @@ AveragingDataModel::AveragingDataModel(const QString& sFilePath,
 {
     Q_UNUSED(byteLoadedData);
 
-    m_pFiffEvokedSet = std::make_shared<FIFFLIB::FiffEvokedSet>(sFilePath.toStdU16String());
+    m_pFiffEvokedSet = std::make_shared<mne::FiffEvokedSet>(sFilePath.toStdU16String());
 }
 
 //=============================================================================================================
@@ -109,7 +109,7 @@ int AveragingDataModel::columnCount(const QModelIndex& parent) const
 
 //=============================================================================================================
 
-void AveragingDataModel::setEvokedSet(std::shared_ptr<FIFFLIB::FiffEvokedSet> pEvokedSet)
+void AveragingDataModel::setEvokedSet(std::shared_ptr<mne::FiffEvokedSet> pEvokedSet)
 {
     m_pFiffEvokedSet = std::move(pEvokedSet);
 }
@@ -123,15 +123,15 @@ bool AveragingDataModel::isFromFile()
 
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffInfo> AveragingDataModel::getFiffInfo()
+std::shared_ptr<mne::FiffInfo> AveragingDataModel::getFiffInfo()
 {
-    std::shared_ptr<FIFFLIB::FiffInfo> pInfo = std::make_shared<FIFFLIB::FiffInfo>(m_pFiffEvokedSet->info);
+    std::shared_ptr<mne::FiffInfo> pInfo = std::make_shared<mne::FiffInfo>(m_pFiffEvokedSet->info);
     return pInfo;
 }
 
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffEvokedSet> AveragingDataModel::getEvokedSet()
+std::shared_ptr<mne::FiffEvokedSet> AveragingDataModel::getEvokedSet()
 {
     return m_pFiffEvokedSet;
 }

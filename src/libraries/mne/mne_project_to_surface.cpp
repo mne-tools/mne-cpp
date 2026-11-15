@@ -12,7 +12,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Implementation of @ref MNELIB::MNEProjectToSurface.
+ * @brief    Implementation of @ref mne::MNEProjectToSurface.
  *
  * Implements barycentric-coordinate projection per triangle, a fast
  * broad-phase pass using vertex-to-triangle adjacency and the fallback
@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -108,7 +108,7 @@ bool MNEProjectToSurface::find_closest_on_surface(const MatrixXf& r, const int n
     rTri.resize(np, 3);
 
     if (this->r1.isZero(0)) {
-        BASELIB::Log::debug("No surface loaded to make the projection./n");
+        mne::Log::debug("No surface loaded to make the projection./n");
         return false;
     }
     int bestTri = -1;
@@ -120,7 +120,7 @@ bool MNEProjectToSurface::find_closest_on_surface(const MatrixXf& r, const int n
          * For now it's OK to go through all triangles.
          */
         if (!this->project_to_surface(r.row(k).transpose(), rTriK, bestTri, bestDist)) {
-            BASELIB::Log::debug("The projection of point number {} didn't work./n", k);
+            mne::Log::debug("The projection of point number {} didn't work./n", k);
             return false;
         }
         rTri.row(k) = rTriK.transpose();
@@ -139,7 +139,7 @@ bool MNEProjectToSurface::project_to_surface(const Vector3f& r, Vector3f& rTri, 
     bestTri = -1;
     for (int tri = 0; tri < a.size(); ++tri) {
         if (!this->nearest_triangle_point(r, tri, p0, q0, dist0)) {
-            BASELIB::Log::debug("The projection on triangle {} didn't work./n", tri);
+            mne::Log::debug("The projection on triangle {} didn't work./n", tri);
             return false;
         }
 
@@ -153,13 +153,13 @@ bool MNEProjectToSurface::project_to_surface(const Vector3f& r, Vector3f& rTri, 
 
     if (bestTri >= 0) {
         if (!this->project_to_triangle(rTri, p, q, bestTri)) {
-            BASELIB::Log::debug("The coordinate transform to cartesian system didn't work./n");
+            mne::Log::debug("The coordinate transform to cartesian system didn't work./n");
             return false;
         }
         return true;
     }
 
-    BASELIB::Log::debug("No best Triangle found./n");
+    mne::Log::debug("No best Triangle found./n");
     return false;
 }
 

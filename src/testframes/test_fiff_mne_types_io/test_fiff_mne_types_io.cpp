@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -73,7 +73,7 @@ TestFiffMneTypesIO::TestFiffMneTypesIO()
 
 void TestFiffMneTypesIO::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qDebug() << "Epsilon" << dEpsilon;
     qDebug() << "Raw File Name" << sRawName;
     qDebug() << "Evoked File Name" << sEvokedName;

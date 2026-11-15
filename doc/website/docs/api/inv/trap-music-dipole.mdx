@@ -1,18 +1,18 @@
 ---
 id: trap-music-dipole
-title: "INVLIB::TrapMusicDipole"
+title: "mne::TrapMusicDipole"
 sidebar_label: TrapMusicDipole
 sidebar_position: 54
 ---
 
 # TrapMusicDipole
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_trap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_trap_music.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_trap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_trap_music.h)
 
 `#include <inv/inv_trap_music.h>`
 
 ```cpp
-struct INVLIB::TrapMusicDipole
+struct mne::TrapMusicDipole
 ```
 
 Result of a TRAP-MUSIC source scan.
@@ -38,7 +38,7 @@ const std::vector<TrapMusicDipole> dipoles = trap.compute(G, measured, positions
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 167"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 164"
 MatrixX3d positions = fwd.source_rr.cast<double>();
 InvTrapMusic trap(2, 0.85); // at most 2 dipoles, stop below a subspace correlation of 0.85
 const std::vector<TrapMusicDipole> dipoles = trap.compute(G, measured, positions, 3);

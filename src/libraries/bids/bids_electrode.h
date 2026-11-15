@@ -13,11 +13,11 @@
  * with REQUIRED @c name and @c x / @c y / @c z coordinates plus
  * optional @c size / @c type / @c material / @c impedance metadata.
  * Coordinates are interpreted in the frame named by the sibling
- * @c _coordsystem.json (see @ref BIDSLIB::BidsCoordinateSystem) using the unit
+ * @c _coordsystem.json (see @ref mne::BidsCoordinateSystem) using the unit
  * declared there.
  *
- * @ref BIDSLIB::BidsElectrode::to_fiff_dig_points "BidsElectrode::to_fiff_dig_points" converts a list of records into a
- * @c FIFFLIB::FiffDigPointSet of EEG digitizer points so the rest of
+ * @ref mne::BidsElectrode::to_fiff_dig_points "BidsElectrode::to_fiff_dig_points" converts a list of records into a
+ * @c mne::FiffDigPointSet of EEG digitizer points so the rest of
  * MNE-CPP — channel registration, forward modelling, 3-D rendering —
  * can consume BIDS electrodes through the same interface it uses for
  * FIFF digitization. An optional @c FiffCoordTrans is applied while
@@ -55,10 +55,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -112,11 +112,11 @@ struct BIDSSHARED_EXPORT BidsElectrode
      *                          Pass a default-constructed FiffCoordTrans to skip.
      * @return FiffDigPointSet with one point per valid electrode.
      */
-    static FIFFLIB::FiffDigPointSet to_fiff_dig_points(
+    static mne::FiffDigPointSet to_fiff_dig_points(
         std::span<const BidsElectrode> electrodes,
-        const FIFFLIB::FiffCoordTrans& trans = FIFFLIB::FiffCoordTrans());
+        const mne::FiffCoordTrans& trans = mne::FiffCoordTrans());
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_ELECTRODE_H

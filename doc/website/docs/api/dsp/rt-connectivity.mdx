@@ -1,20 +1,20 @@
 ---
 id: rt-connectivity
-title: "DSPLIB::RtConnectivity"
+title: "mne::RtConnectivity"
 sidebar_label: RtConnectivity
 sidebar_position: 32
 ---
 
 # RtConnectivity
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_connectivity.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_connectivity.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_connectivity.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_connectivity.h)
 
 `#include <dsp/rt_connectivity.h>`
 
 <Connections topics={["real-time"]} context="api" current="RtConnectivity" />
 
 ```cpp
-class DSPLIB::RtConnectivity
+class mne::RtConnectivity
 ```
 
 Real-time connectivity estimation.
@@ -99,7 +99,7 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 69"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 68"
 public:
     ConnectivitySettingsManager(QObject* parent = 0)
     : QObject(parent)
@@ -113,7 +113,7 @@ public:
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 263"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 259"
 RtConnectivity rtConnectivity;
 MatrixXd online;
 bool connectivityDone = false;

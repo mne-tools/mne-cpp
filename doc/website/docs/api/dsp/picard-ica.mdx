@@ -1,13 +1,13 @@
 ---
 id: picard-ica
-title: "DSPLIB::PicardIca"
+title: "mne::PicardIca"
 sidebar_label: PicardIca
 sidebar_position: 5
 ---
 
 # PicardIca
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/picard_ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/picard_ica.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/picard_ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/picard_ica.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.ICA (picard)` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 5
 `#include <dsp/picard_ica.h>`
 
 ```cpp
-class DSPLIB::PicardIca
+class mne::PicardIca
 ```
 
 Independent Component Analysis using the Picard algorithm.
@@ -73,7 +73,7 @@ Run the Picard [`ICA`](/docs/api/dsp/ica) algorithm.
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 133"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 131"
 const IcaResult picard = PicardIca::run(mixed, 3);
 ok &= expect(worstRecovery(picard.matSources, sources) > 0.99, std::format("Picard recovers all sources (worst |r| {:g})", worstRecovery(picard.matSources, sources)));
 ````

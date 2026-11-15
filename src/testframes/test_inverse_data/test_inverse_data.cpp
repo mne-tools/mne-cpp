@@ -45,10 +45,7 @@
 #include <inv/hpi/inv_sensor_set.h>
 #include <inv/hpi/inv_signal_model.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -224,7 +221,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         m_bDataLoaded = false;
 
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";

@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Single recorded event (sample, previous and new trigger code, comment).
  *
- * @ref MNELIB::MNEEvent is one entry of an @ref MNELIB::MNEEventList, holding the
+ * @ref mne::MNEEvent is one entry of an @ref mne::MNEEventList, holding the
  * sample relative to the start of the data, the trigger value before and
  * after the transition (the triplet of @c -eve.fif files) plus the comment
  * and display state MNE-C keeps for each event.
@@ -27,10 +27,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -58,6 +58,6 @@ public:
     }
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_EVENT_H

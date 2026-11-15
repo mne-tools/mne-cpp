@@ -1,18 +1,18 @@
 ---
 id: mne-filter-def
-title: "MNELIB::MNEFilterDef"
+title: "mne::MNEFilterDef"
 sidebar_label: MNEFilterDef
 sidebar_position: 22
 ---
 
 # MNEFilterDef
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_filter_def.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_filter_def.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_filter_def.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_filter_def.h)
 
 `#include <mne/mne_filter_def.h>`
 
 ```cpp
-class MNELIB::MNEFilterDef
+class mne::MNEFilterDef
 ```
 
 Filter definition parameters.
@@ -34,7 +34,7 @@ sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
 sel.pick.resize(sel.nchan());
 for (int c = 0; c < sel.nchan(); ++c) {
-    sel.pick[c] = static_cast<int>(BASELIB::indexOf(mneRaw->ch_names, sel.chspick[c]));
+    sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
 }
 
 const int ns = 25;
@@ -79,7 +79,7 @@ const double eegProj = segment(1, 0);
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 263"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 261"
 // MNE-C style reader: buffer directory, channel selection, projection and overlap-add filter
 MNEFilterDef filter; // 40 Hz lowpass, 5 Hz transition, 4096-sample blocks
 filter.filter_on = true;

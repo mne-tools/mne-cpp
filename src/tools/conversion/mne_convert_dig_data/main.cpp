@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -197,7 +197,7 @@ static bool writeHpts(const QString& filename, const QList<DigPt>& points)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_dig_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

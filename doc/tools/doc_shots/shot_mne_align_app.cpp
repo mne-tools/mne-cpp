@@ -56,7 +56,7 @@
 
 using MNEALIGN::AlignStep;
 using MNEALIGN::MneAlign;
-using ACQLIB::DigitizedPoint;
+using mne::DigitizedPoint;
 
 namespace DOCSHOTS
 {

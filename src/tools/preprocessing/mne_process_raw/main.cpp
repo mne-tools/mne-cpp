@@ -42,8 +42,7 @@
 //=============================================================================================================
 
 using namespace MNEPROCESSRAWAPP;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // VERSION
@@ -185,7 +184,7 @@ static void printHelp()
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_process_raw");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

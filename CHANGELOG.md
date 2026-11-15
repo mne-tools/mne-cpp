@@ -8,6 +8,24 @@ All notable changes to MNE-CPP will be documented in this file.
 
 **Breaking changes**
 
+All libraries share one namespace, `mne`. The per-library namespaces are gone;
+type names already carry their library prefix (`FiffInfo`, `BidsChannel`,
+`MnaProject`), so the qualification only repeated it. The Qt-based display
+libraries and the application libraries keep a namespace of their own. The
+entries below still use the 2.x namespace names; translate them with this
+table.
+
+| Before | Now |
+|---|---|
+| `BASELIB`, `FIFFLIB`, `MNELIB`, `FWDLIB`, `INVLIB`, `DSPLIB`, `ACQLIB`, `BIDSLIB`, `IEEGLIB`, `MNALIB`, `FSLIB`, `MRILIB`, `MATHLIB`, `STSLIB`, `CONNECTIVITYLIB`, `DECODINGLIB`, `MLLIB`, `LSLLIB`, `COMLIB`, `CHANNELSLIB`, `PYBRIDGELIB`, `REPORTLIB` | `mne` |
+| `DISPLIB`, `DISP3DLIB` | `mne::disp` |
+| `SURFACEKEYS` | `mne::disp::surface_keys` |
+| `ANSHAREDLIB` (MNE Analyze) | `mne::analyze` |
+| `EVENTSLIB` (MNE Analyze events) | `mne::analyze::events` |
+| `EVENTSINTERNAL` | `mne::analyze::events::detail` |
+| `SCSHAREDLIB`, `SCMEASLIB`, `SCDISPLIB` (MNE Scan) | `mne::scan` |
+| `using namespace FIFFLIB; using namespace MNELIB; ...` | `using namespace mne;` |
+
 The library interfaces use the C++ standard library instead of Qt for strings,
 paths, containers, smart pointers and logging. There are no compatibility
 aliases; replace the old spelling as below.

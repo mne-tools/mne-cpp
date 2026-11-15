@@ -1,20 +1,20 @@
 ---
 id: inv-pwl-rap-music
-title: "INVLIB::InvPwlRapMusic"
+title: "mne::InvPwlRapMusic"
 sidebar_label: InvPwlRapMusic
 sidebar_position: 32
 ---
 
 # InvPwlRapMusic
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_pwl_rap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_pwl_rap_music.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_pwl_rap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_pwl_rap_music.h)
 
 `#include <inv/inv_pwl_rap_music.h>`
 
 <Connections topics={["rap-music"]} context="api" current="InvPwlRapMusic" />
 
 ```cpp
-class INVLIB::InvPwlRapMusic
+class mne::InvPwlRapMusic
 ```
 
 Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting.
@@ -146,7 +146,7 @@ Even so the base class RAP MUSIC implementation is called.
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 157"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 154"
 InvRapMusic rap(fwd, false, 1, 0.5); // one correlated pair, subspace correlation >= 0.5
 rap.calculateInverse(measured, pairs);
 std::vector<InvDipolePair<double>> powellPairs;
@@ -160,7 +160,7 @@ ok &= expect(pairs.size() == 1 && isPair(pairs[0], 10, 50) && pairs[0].m_vCorrel
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 392"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 388"
 //
 // Compute inverse solution
 //
@@ -171,7 +171,7 @@ InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
 Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution.
 
-````cpp title="src/examples/ex_inverse_pwl_rap_music/main.cpp, line 146"
+````cpp title="src/examples/ex_inverse_pwl_rap_music/main.cpp, line 142"
 InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 ````
 

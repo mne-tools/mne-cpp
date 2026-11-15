@@ -45,8 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -263,7 +263,7 @@ void AverageLayoutView::channelSelectionChanged(const QVariant& selectionData)
         return;
     }
 
-    SelectionItem* pSelectionItem = selectionData.value<DISPLIB::SelectionItem*>();
+    SelectionItem* pSelectionItem = selectionData.value<mne::disp::SelectionItem*>();
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current selectionData
     m_pAverageScene->repaintSelectionItems(*pSelectionItem);
@@ -288,7 +288,7 @@ void AverageLayoutView::updateData()
 
             if (m_pEvokedSetModel) {
                 //Get only the necessary data from the average model (use column 2)
-                QList<QPair<QString, DISPLIB::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair>>>();
+                QList<QPair<QString, mne::disp::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, mne::disp::RowVectorPair>>>();
 
                 //Get the averageScenItem specific data row
                 int channelNumber = averageSceneItemTemp->m_iChannelNumber;
@@ -327,7 +327,7 @@ void AverageLayoutView::updateData()
         averageSceneItemTemp->m_lAverageData.clear();
 
         //Get only the necessary data from the average model (use column 2)
-        QList<QPair<QString, DISPLIB::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, DISPLIB::RowVectorPair>>>();
+        QList<QPair<QString, mne::disp::RowVectorPair>> averageData = m_pEvokedSetModel->data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<QPair<QString, mne::disp::RowVectorPair>>>();
 
         //Get the averageScenItem specific data row
         int channelNumber = m_pChannelInfoModel->getIndexFromMappedChName(averageSceneItemTemp->m_sChannelName);
@@ -401,7 +401,7 @@ void AverageLayoutView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void AverageLayoutView::setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo)
+void AverageLayoutView::setFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo)
 {
     m_pFiffInfo = pFiffInfo;
 }

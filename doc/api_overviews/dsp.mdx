@@ -3,9 +3,9 @@ title: DSP Library
 sidebar_label: DSP Library
 ---
 
-# DSP Library (`DSPLIB`)
+# DSP Library (`mne_dsp`)
 
-The DSP library provides digital signal processing algorithms for MEG/EEG data, covering both offline batch processing and real-time streaming scenarios. All classes reside in the `DSPLIB` namespace and depend only on Qt and Eigen.
+The DSP library provides digital signal processing algorithms for MEG/EEG data, covering both offline batch processing and real-time streaming scenarios. All classes reside in the `mne_dsp` namespace and depend only on Qt and Eigen.
 
 <Connections topic="spectral-analysis" context="manual" />
 
@@ -78,7 +78,7 @@ These classes are designed for streaming data and run in background threads:
 #include <dsp/welch_psd.h>
 #include <dsp/ica.h>
 
-using namespace DSPLIB;
+using namespace mne;
 
 // Design and apply a 1–40 Hz band-pass FIR filter
 FirFilter filter;
@@ -97,7 +97,7 @@ Eigen::MatrixXd cleaned = ica.apply(filtered, /*exclude=*/{0, 3});
 
 ## Doxygen Reference
 
-For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**DSPLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceDSPLIB.html) in the Doxygen API reference.
+For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**mne_dsp namespace**](https://mne-cpp.github.io/doxygen-api/namespaceDSPLIB.html) in the Doxygen API reference.
 
 ## See Also
 

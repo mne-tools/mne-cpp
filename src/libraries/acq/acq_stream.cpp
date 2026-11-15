@@ -32,8 +32,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 namespace
 {
@@ -100,7 +100,7 @@ void pushRecord(RecordRing<T>& ring, const T& record, std::span<const std::byte>
 // DEFINE DETAIL METHODS
 //=============================================================================================================
 
-std::uint64_t ACQLIB::detail::controlLockCount() noexcept
+std::uint64_t mne::detail::controlLockCount() noexcept
 {
     return g_controlLocks.load(std::memory_order_relaxed);
 }
@@ -115,7 +115,7 @@ void ControlMutex::lock()
 
 //=============================================================================================================
 
-void ACQLIB::detail::cpuRelax() noexcept
+void mne::detail::cpuRelax() noexcept
 {
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
     _mm_pause();
@@ -128,7 +128,7 @@ void ACQLIB::detail::cpuRelax() noexcept
 
 AcqExpected<std::shared_ptr<AcqStreamCore>> AcqStreamCore::create(AcqStreamInfo info, const AcqStreamOptions& options)
 {
-    const std::size_t bps = ACQLIB::bytesPerSample(info.format);
+    const std::size_t bps = mne::bytesPerSample(info.format);
     if (bps == 0 || (info.layout != AcqLayout::Interleaved && info.layout != AcqLayout::Planar)) {
         return AcqErrorCode::UnsupportedFormat;
     }

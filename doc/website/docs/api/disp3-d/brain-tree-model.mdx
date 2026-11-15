@@ -1,18 +1,18 @@
 ---
 id: brain-tree-model
-title: "DISP3DLIB::BrainTreeModel"
+title: "mne::disp::BrainTreeModel"
 sidebar_label: BrainTreeModel
 sidebar_position: 19
 ---
 
 # BrainTreeModel
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/model/braintreemodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/model/braintreemodel.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/model/braintreemodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/model/braintreemodel.h)
 
 `#include <disp3D/braintreemodel.h>`
 
 ```cpp
-class DISP3DLIB::BrainTreeModel
+class mne::disp::BrainTreeModel
 ```
 
 Hierarchical item model organizing all 3-D scene objects (surfaces, sensors, sources, networks) for QTreeView.
@@ -74,7 +74,7 @@ classDiagram
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 288"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 284"
 BrainView* pBrainView = new BrainView();
 BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);
@@ -84,7 +84,7 @@ pBrainView->setModel(pModel);
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 581"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 576"
 BrainView* pBrainView = new BrainView();
 BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);
@@ -94,7 +94,7 @@ pBrainView->setModel(pModel);
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 502"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 498"
 BrainView* pBrainView = new BrainView();
 BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);

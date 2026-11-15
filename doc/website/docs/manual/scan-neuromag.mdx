@@ -39,8 +39,8 @@ The same source is available to every program that links `mne_acq_devices`:
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 
-ACQLIB::register_neuromag_scheme();
-auto device = ACQLIB::AcqDevice::open("neuromag://?simulate=1&meg=306&eeg=64&rate=1000");
+mne::register_neuromag_scheme();
+auto device = mne::AcqDevice::open("neuromag://?simulate=1&meg=306&eeg=64&rate=1000");
 ```
 
 `host`, `port` and `client` select the collector and the data server's client id; `timeout` is how long to wait for the

@@ -68,11 +68,7 @@
 
 #include <fwd/fwd_bem_model.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FWDLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -257,7 +253,7 @@ private slots:
 
 void TestMneLibrary::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -714,8 +710,8 @@ void TestMneLibrary::inverseOp_readFromFile()
     QVERIFY(!invOp.isFixedOrient());
 
     // A forward solution holds no inverse solution
-    QCOMPARE(MNEInverseOperator::read(fwdPath().toStdU16String()).error().code, BASELIB::ErrorCode::NotFound);
-    QCOMPARE(MNEInverseOperator::read("no-such-inv.fif").error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(MNEInverseOperator::read(fwdPath().toStdU16String()).error().code, mne::ErrorCode::NotFound);
+    QCOMPARE(MNEInverseOperator::read("no-such-inv.fif").error().code, mne::ErrorCode::Io);
 }
 
 void TestMneLibrary::inverseOp_basicGetters()
@@ -1499,7 +1495,7 @@ void TestMneLibrary::layout_matchAndConfine()
     QCOMPARE(static_cast<int>(layout->ports.size()), 3);
     QVERIFY(layout->ports[2].invert);
     QVERIFY(layout->ports[2].rect().isApprox(Eigen::AlignedBox2d(Eigen::Vector2d(60, 30), Eigen::Vector2d(70, 35))));
-    QCOMPARE(layout->ports[1].names, (BASELIB::StringList{"meg0112", "meg0111"}));
+    QCOMPARE(layout->ports[1].names, (mne::StringList{"meg0112", "meg0111"}));
     QCOMPARE(layout->channelPositions().at("MEG 0111"), Eigen::Vector2d(30, 10));
 
     // Names match in any spelling; a CTF suffix after the dash is ignored.

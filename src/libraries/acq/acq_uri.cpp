@@ -27,7 +27,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {
@@ -204,8 +204,8 @@ std::string AcqUri::toString() const
 // DEFINE PARAMETER HELPERS
 //=============================================================================================================
 
-AcqExpected<std::int64_t> ACQLIB::detail::paramInt(const AcqUri& uri, std::string_view key, std::int64_t fallback,
-                                                   std::int64_t min, std::int64_t max)
+AcqExpected<std::int64_t> mne::detail::paramInt(const AcqUri& uri, std::string_view key, std::int64_t fallback,
+                                                std::int64_t min, std::int64_t max)
 {
     const auto text = uri.param(key);
     if (!text) {
@@ -221,8 +221,8 @@ AcqExpected<std::int64_t> ACQLIB::detail::paramInt(const AcqUri& uri, std::strin
 
 //=============================================================================================================
 
-AcqExpected<double> ACQLIB::detail::paramDouble(const AcqUri& uri, std::string_view key, double fallback, double min,
-                                                double max)
+AcqExpected<double> mne::detail::paramDouble(const AcqUri& uri, std::string_view key, double fallback, double min,
+                                             double max)
 {
     const auto text = uri.param(key);
     if (!text) {
@@ -245,7 +245,7 @@ AcqExpected<double> ACQLIB::detail::paramDouble(const AcqUri& uri, std::string_v
 
 //=============================================================================================================
 
-AcqExpected<bool> ACQLIB::detail::paramBool(const AcqUri& uri, std::string_view key, bool fallback)
+AcqExpected<bool> mne::detail::paramBool(const AcqUri& uri, std::string_view key, bool fallback)
 {
     const auto text = uri.param(key);
     if (!text) {
@@ -262,7 +262,7 @@ AcqExpected<bool> ACQLIB::detail::paramBool(const AcqUri& uri, std::string_view 
 
 //=============================================================================================================
 
-AcqExpected<AcqThreadPolicy> ACQLIB::detail::paramThreadPolicy(const AcqUri& uri)
+AcqExpected<AcqThreadPolicy> mne::detail::paramThreadPolicy(const AcqUri& uri)
 {
     AcqThreadPolicy policy;
     if (const auto cpus = uri.param("cpus")) {

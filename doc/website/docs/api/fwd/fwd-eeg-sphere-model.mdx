@@ -1,13 +1,13 @@
 ---
 id: fwd-eeg-sphere-model
-title: "FWDLIB::FwdEegSphereModel"
+title: "mne::FwdEegSphereModel"
 sidebar_label: FwdEegSphereModel
 sidebar_position: 3
 ---
 
 # FwdEegSphereModel
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_eeg_sphere_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_eeg_sphere_model.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_eeg_sphere_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_eeg_sphere_model.h)
 
 :::info[Python equivalent]
 `mne.make_sphere_model` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 3
 `#include <fwd/fwd_eeg_sphere_model.h>`
 
 ```cpp
-class FWDLIB::FwdEegSphereModel
+class mne::FwdEegSphereModel
 ```
 
 Implements [`FwdEegSphereModel`](/docs/api/fwd/fwd-eeg-sphere-model) (replaces `fwdEegSphereModel` / `fwdEegSphereModelRec` from MNE-C ``fwd_types.h``).
@@ -40,7 +40,7 @@ FwdEegSphereModel::fwd_eeg_spherepot_coil(rd, Q, *els, V, sphere.get()); // V pe
 
 ### FwdEegSphereModel()
 
-Constructs the Forward EEG [Sphere](/docs/api/math/sphere) Model.
+Constructs the Forward EEG [`Sphere`](/docs/api/math/sphere) Model.
 
 ---
 
@@ -51,7 +51,7 @@ Copy constructor.
 **Parameters:**
 
 - **p_FwdEegSphereModel** : *const FwdEegSphereModel &*
-  Forward EEG Sphere Model which should be copied.
+  Forward EEG [`Sphere`](/docs/api/math/sphere) Model which should be copied.
 
 ---
 
@@ -314,7 +314,7 @@ This routine calculates the fields for all dipole directions.
 
 The code is based on the formulas presented in
 
-J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for Modeling of EEG and MEG Data, Los Alamos Technical [Report](/docs/api/report/report-class), LA-UR-96-1993, 1996.
+J.C. Moscher, R.M. Leahy, and P.S. Lewis, Matrix Kernels for Modeling of EEG and MEG Data, Los Alamos Technical [`Report`](/docs/api/report/report-class), LA-UR-96-1993, 1996.
 
 This routine uses the acceleration with help of equivalent sources in the homogeneous sphere.
 
@@ -536,7 +536,7 @@ Objective function for the simplex optimizer: evaluate the residual sum of squar
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 137"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 135"
 std::unique_ptr<FwdEegSphereModelSet> models(FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr));
 std::unique_ptr<FwdEegSphereModel> sphere(models->fwd_select_eeg_sphere_model("Default")); // 4 layers: brain, CSF, skull, scalp
 // Scalp radius 90 mm; 3 Berg-Scherg dipoles approximate the layered potentials

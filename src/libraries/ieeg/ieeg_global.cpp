@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Definitions of the IEEGLIB build-info accessors declared in ieeg_global.h.
+ * @brief    Definitions of the mne_ieeg build-info accessors declared in ieeg_global.h.
  */
 
 //=============================================================================================================
@@ -20,21 +20,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* IEEGLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* IEEGLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* IEEGLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

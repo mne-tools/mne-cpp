@@ -66,18 +66,18 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class QWidget;
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class Event;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class MultimodalScene;
 }
 
-namespace FSLIB
+namespace mne
 {
 class FsSurface;
 class FsLabel;
@@ -120,10 +120,10 @@ enum class CorticalSurfaceType
  * @brief Options for @ref CorticalSurface::runComputeSourceEstimate.
  *
  * The method string selects which inverse algorithm is dispatched:
- *   - "MNE", "dSPM", "sLORETA", "eLORETA" → @ref INVLIB::InvMinimumNorm
- *   - "MxNE"                              → @ref INVLIB::InvMxne
- *   - "Gamma-MAP"                         → @ref INVLIB::InvGammaMap
- *   - "CMNE"                              → @ref INVLIB::InvCMNE
+ *   - "MNE", "dSPM", "sLORETA", "eLORETA" → @ref mne::InvMinimumNorm
+ *   - "MxNE"                              → @ref mne::InvMxne
+ *   - "Gamma-MAP"                         → @ref mne::InvGammaMap
+ *   - "CMNE"                              → @ref mne::InvCMNE
  */
 struct CORTICAL_SURFACE_SHARED_EXPORT ComputeSourceEstimateOptions
 {
@@ -157,20 +157,20 @@ struct CORTICAL_SURFACE_SHARED_EXPORT CorticalPickedVertex
  *   2. The plugin asks for the FreeSurfer `SUBJECTS_DIR` and lists the
  *      subjects found there.
  *   3. The user picks subject + hemisphere set + surface type.
- *   4. The plugin loads the requested @ref FSLIB::FsSurface objects and
+ *   4. The plugin loads the requested @ref mne::FsSurface objects and
  *      registers them as @c BrainSurface layers on the shared
- *      @ref DISP3DLIB::MultimodalScene.
+ *      @ref mne::disp::MultimodalScene.
  *   5. The hemisphere toggle and surface-type combo box let the user
  *      switch what is shown without re-opening the dialog.
  *
  * The plugin emits the standard `MODEL_ADDED` event so other plugins
  * (STC overlay, vertex picking) can subscribe.
  */
-class CORTICAL_SURFACE_SHARED_EXPORT CorticalSurface : public ANSHAREDLIB::AbstractPlugin
+class CORTICAL_SURFACE_SHARED_EXPORT CorticalSurface : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "cortical_surface.json")
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     CorticalSurface();
@@ -187,15 +187,15 @@ public:
     QWidget* getView() override;
     QString getBuildInfo() override;
 
-    void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
     //=========================================================================================================
     /**
      * @return Pointer to the shared MultimodalScene used by this plugin.
      *         Owned by the plugin; consumers must not delete it.
      */
-    DISP3DLIB::MultimodalScene* scene() const;
+    mne::disp::MultimodalScene* scene() const;
 
     //=========================================================================================================
     /**
@@ -238,12 +238,12 @@ public:
     /**
      * Install an already-constructed source estimate as the active overlay.
      * Resets the time slider to sample 0 and re-publishes the overlay layer
-     * on the shared @ref DISP3DLIB::MultimodalScene.
+     * on the shared @ref mne::disp::MultimodalScene.
      */
-    void setSourceEstimate(const INVLIB::InvSourceEstimate& stc);
+    void setSourceEstimate(const mne::InvSourceEstimate& stc);
 
     /** @return Current overlay (empty when none loaded). */
-    const INVLIB::InvSourceEstimate& sourceEstimate() const;
+    const mne::InvSourceEstimate& sourceEstimate() const;
 
     /** @return Number of vertex rows in the overlay (0 if none). */
     int overlayRowCount() const;
@@ -364,7 +364,7 @@ public:
     QDockWidget* getLabelsDock();
 
     /** @return Snapshot of all labels currently loaded in the labels dock. */
-    std::vector<FSLIB::FsLabel> labels() const;
+    std::vector<mne::FsLabel> labels() const;
 
     /**
      * Load a FreeSurfer `.label` file. The label is added to the labels
@@ -376,7 +376,7 @@ public:
 
     /**
      * Load a FreeSurfer `.annot` annotation and explode it into one
-     * @ref FSLIB::FsLabel per parcel.
+     * @ref mne::FsLabel per parcel.
      *
      * @return Number of labels added.
      */
@@ -387,10 +387,10 @@ public:
      * "mean", "mean_flip", "pca_flip", "max", "auto" and append the trace
      * to the Time Course Manager.
      */
-    bool extractLabelTimeCourse(const FSLIB::FsLabel& lbl, const QString& mode);
+    bool extractLabelTimeCourse(const mne::FsLabel& lbl, const QString& mode);
 
     /** Write @p lbl to @p path in FreeSurfer `.label` format. */
-    bool saveLabel(const FSLIB::FsLabel& lbl, const QString& path);
+    bool saveLabel(const mne::FsLabel& lbl, const QString& path);
 
 signals:
     /** Emitted after @ref setSourceEstimate succeeds. */
@@ -482,7 +482,7 @@ private:
     class TimeCoursePlotter* plotter() const;
 
     /** Add a label to the labels dock under the appropriate hemi root. */
-    QTreeWidgetItem* addLabelItem(const FSLIB::FsLabel& label);
+    QTreeWidgetItem* addLabelItem(const mne::FsLabel& label);
 
     /** Append a raw trace (used by both vertex picks and label extracts). */
     void appendTrace(const QString& name,
@@ -498,12 +498,12 @@ private:
     void refreshPlotter();
 
     /** Resolve the FsLabel cached as data on a tree item. */
-    static FSLIB::FsLabel labelFromItem(QTreeWidgetItem* item);
+    static mne::FsLabel labelFromItem(QTreeWidgetItem* item);
 
     /** Write @p label to disk in FreeSurfer `.label` format. */
-    static bool writeLabelFile(const FSLIB::FsLabel& label, const QString& path);
+    static bool writeLabelFile(const mne::FsLabel& label, const QString& path);
 
-    ANSHAREDLIB::Communicator* m_pCommu = nullptr;
+    mne::analyze::Communicator* m_pCommu = nullptr;
     QPointer<QMenu> m_pMenu;
     QPointer<QAction> m_pLoadSurfaceAction;
     QPointer<QAction> m_pLoadStcAction;
@@ -525,19 +525,19 @@ private:
     CorticalSurfaceType m_surfaceType = CorticalSurfaceType::Inflated;
 
     /** Loaded surfaces keyed by hemisphere index (0 = lh, 1 = rh). */
-    std::shared_ptr<FSLIB::FsSurface> m_pSurfaceLh;
-    std::shared_ptr<FSLIB::FsSurface> m_pSurfaceRh;
+    std::shared_ptr<mne::FsSurface> m_pSurfaceLh;
+    std::shared_ptr<mne::FsSurface> m_pSurfaceRh;
 
     /** Per-plugin scene; a future slice will share this with the
      *  MNE Inspect application via the AnalyzeData store. */
-    QScopedPointer<DISP3DLIB::MultimodalScene> m_pScene;
+    QScopedPointer<mne::disp::MultimodalScene> m_pScene;
 
     QString m_lastSubjectsDir;
     QString m_lastSubjectId;
     QString m_lastStcDir;
 
     // Overlay state
-    INVLIB::InvSourceEstimate m_stc;
+    mne::InvSourceEstimate m_stc;
     int m_currentSample = -1;
     float m_fThresh = 0.0f;
     float m_fMid = 0.5f;

@@ -33,8 +33,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -265,7 +265,7 @@ void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 
     if (m_pFiffInfo && channelIdx >= 0 && channelIdx < m_pFiffInfo->nchan) {
         const std::string& channelName = m_pFiffInfo->ch_names[channelIdx];
-        const int badIndex = BASELIB::indexOf(m_pFiffInfo->bads, channelName);
+        const int badIndex = mne::indexOf(m_pFiffInfo->bads, channelName);
 
         if (bad) {
             if (badIndex < 0)
@@ -510,7 +510,7 @@ void ChannelDataModel::rebuildDisplayInfo()
             m_displayInfo[ch].name = QString("CH %1").arg(ch + 1);
         m_displayInfo[ch].typeLabel = typeLabelForChannel(ch);
         m_displayInfo[ch].bad = (m_pFiffInfo && ch < realChannelCount)
-            ? BASELIB::contains(m_pFiffInfo->bads, m_displayInfo[ch].name.toStdString())
+            ? mne::contains(m_pFiffInfo->bads, m_displayInfo[ch].name.toStdString())
             : false;
         m_displayInfo[ch].isVirtualChannel = false;
     }

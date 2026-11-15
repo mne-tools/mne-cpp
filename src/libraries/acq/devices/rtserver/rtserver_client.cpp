@@ -30,9 +30,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using COMLIB::TcpSocket;
+using namespace mne;
+using namespace mne::detail;
+using mne::TcpSocket;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -215,8 +215,8 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<RtServerTransport>> ACQLIB::detail::connect_rtserver(const std::string& host, std::uint16_t port,
-                                                                                 std::chrono::milliseconds timeout)
+AcqExpected<std::unique_ptr<RtServerTransport>> mne::detail::connect_rtserver(const std::string& host, std::uint16_t port,
+                                                                              std::chrono::milliseconds timeout)
 {
     if (port == 65535) {
         return AcqError(AcqErrorCode::InvalidParameter, "the data port follows the command port; 65535 leaves none");

@@ -51,8 +51,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace
@@ -287,7 +286,7 @@ void TestMneAcqTool::recordWritesTheSource()
         if (names[c].rfind("EEG", 0) != 0) {
             continue;
         }
-        const auto row = static_cast<Eigen::Index>(BASELIB::indexOf(raw.info.ch_names, names[c]));
+        const auto row = static_cast<Eigen::Index>(mne::indexOf(raw.info.ch_names, names[c]));
         QVERIFY2(row >= 0, names[c].c_str());
         for (std::size_t s = 0; s < 2000; ++s) {
             const double want = expected[s * names.size() + c];
@@ -327,12 +326,12 @@ void TestMneAcqTool::streamPublishesLsl()
     tool.start(toolPath(), {QStringLiteral("stream"), QString::fromStdString(uri), QStringLiteral("--lsl"), QStringLiteral("--name"), name, QStringLiteral("--duration"), QStringLiteral("6")});
     QVERIFY(tool.waitForStarted());
 
-    const auto found = LSLLIB::resolve_stream("name", name.toStdString(), 10.0, 1);
+    const auto found = mne::resolve_stream("name", name.toStdString(), 10.0, 1);
     QVERIFY2(!found.empty(), qPrintable(QString::fromUtf8(tool.readAllStandardError())));
     QCOMPARE(found.front().channel_count(), 5);
     QCOMPARE(found.front().nominal_srate(), 1000.0);
 
-    LSLLIB::stream_inlet inlet(found.front());
+    mne::stream_inlet inlet(found.front());
     inlet.open_stream();
     std::vector<std::vector<float>> received;
     const auto deadline = std::chrono::steady_clock::now() + 3s;

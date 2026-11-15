@@ -41,9 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -192,7 +190,7 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_check_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

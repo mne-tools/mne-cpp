@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref INVLIB::InvEcd (default/copy ctors, destructor, debug print).
+ * @brief    Implementation of @ref mne::InvEcd (default/copy ctors, destructor, debug print).
  *
  * Provides the field initialisers and the human-readable debug print
  * helper used by the @c mne_dipole_fit driver to dump per-time-point
@@ -26,7 +26,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,14 +72,14 @@ void InvEcd::print() const
         return;
 
     // Time, location, moment magnitude and components, reduced khi^2, goodness of fit, function evaluations
-    BASELIB::Log::info("{:6.1f} {:7.2f} {:7.2f} {:7.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {}",
-                       1000 * this->time,
-                       1000 * this->rd[0],
-                       1000 * this->rd[1],
-                       1000 * this->rd[2],
-                       1e9 * this->Q.norm(),
-                       1e9 * this->Q[0], 1e9 * this->Q[1], 1e9 * this->Q[2],
-                       this->khi2 / this->nfree,
-                       100 * this->good,
-                       this->neval);
+    mne::Log::info("{:6.1f} {:7.2f} {:7.2f} {:7.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {:6.2f} {}",
+                   1000 * this->time,
+                   1000 * this->rd[0],
+                   1000 * this->rd[1],
+                   1000 * this->rd[2],
+                   1e9 * this->Q.norm(),
+                   1e9 * this->Q[0], 1e9 * this->Q[1], 1e9 * this->Q[2],
+                   this->khi2 / this->nfree,
+                   100 * this->good,
+                   this->neval);
 }

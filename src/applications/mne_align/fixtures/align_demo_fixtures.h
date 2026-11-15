@@ -30,7 +30,7 @@ namespace MNEALIGN
  * realistic for an adult head: NAS forward, LPA / RPA symmetric on
  * the ears.
  */
-QVector<ACQLIB::DigitizedPoint> demoFiducials();
+QVector<mne::DigitizedPoint> demoFiducials();
 
 //=============================================================================================================
 /**
@@ -41,7 +41,7 @@ QVector<ACQLIB::DigitizedPoint> demoFiducials();
  *
  * @param[in] count   Number of EEG points to return (clamped to 0..8).
  */
-QVector<ACQLIB::DigitizedPoint> demoEegCap(int count = 8);
+QVector<mne::DigitizedPoint> demoEegCap(int count = 8);
 
 //=============================================================================================================
 /**
@@ -50,7 +50,7 @@ QVector<ACQLIB::DigitizedPoint> demoEegCap(int count = 8);
  *
  * @param[in] count   Number of HSP points to return (>= 0).
  */
-QVector<ACQLIB::DigitizedPoint> demoHeadShape(int count = 40);
+QVector<mne::DigitizedPoint> demoHeadShape(int count = 40);
 
 //=============================================================================================================
 /**
@@ -58,15 +58,15 @@ QVector<ACQLIB::DigitizedPoint> demoHeadShape(int count = 40);
  * EEG cap + 40 HSP points. Convenience helper used by the Verify / Save
  * / Done screenshots where every category should be populated.
  */
-QVector<ACQLIB::DigitizedPoint> demoFullDigitisation();
+QVector<mne::DigitizedPoint> demoFullDigitisation();
 
 //=============================================================================================================
 /**
  * Push @p points into @p store, replacing whatever was there before.
  * Only one @c pointsChanged signal is emitted (after the final point).
  */
-void applyTo(ACQLIB::AcquiredPoints* store,
-             const QVector<ACQLIB::DigitizedPoint>& points);
+void applyTo(mne::AcquiredPoints* store,
+             const QVector<mne::DigitizedPoint>& points);
 
 } // namespace MNEALIGN
 

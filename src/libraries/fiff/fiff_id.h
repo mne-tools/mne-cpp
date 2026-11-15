@@ -21,8 +21,8 @@
  * to their source recording. All four are physically the same record:
  * the legacy @c fiffIdRec.
  *
- * @ref FIFFLIB::FiffId is the C++ wrapper for that record. It exposes the version
- * word, the 2x32-bit @c machid hardware identifier and a @ref FIFFLIB::FiffTime
+ * @ref mne::FiffId is the C++ wrapper for that record. It exposes the version
+ * word, the 2x32-bit @c machid hardware identifier and a @ref mne::FiffTime
  * creation time, plus convenience constructors that synthesize a fresh
  * ID for a newly written file (mirroring @c mne.io.write.write_id in
  * MNE-Python).
@@ -47,10 +47,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================

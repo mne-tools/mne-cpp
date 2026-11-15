@@ -21,11 +21,11 @@
 
 #include <cmath>
 
-using IEEGLIB::IeegContact;
-using IEEGLIB::IeegImplantation;
-using IEEGLIB::IeegLeadType;
-using MRILIB::MriSlice;
-using MRILIB::MriVolData;
+using mne::IeegContact;
+using mne::IeegImplantation;
+using mne::IeegLeadType;
+using mne::MriSlice;
+using mne::MriVolData;
 
 namespace MNEINSPECT
 {
@@ -85,12 +85,12 @@ std::unique_ptr<MriVolData> demoMriSlab(int dim)
 
     auto vol = std::make_unique<MriVolData>();
     vol->fileName = "<demo:slab>";
-    vol->version = MRILIB::MRI_MGH_VERSION;
+    vol->version = mne::MRI_MGH_VERSION;
     vol->width = dim;
     vol->height = dim;
     vol->depth = dim;
     vol->nframes = 1;
-    vol->type = MRILIB::MRI_FLOAT;
+    vol->type = mne::MRI_FLOAT;
     vol->dof = 0;
     vol->rasGood = true;
 

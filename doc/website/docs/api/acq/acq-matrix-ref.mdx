@@ -1,19 +1,19 @@
 ---
 id: acq-matrix-ref
-title: "ACQLIB::AcqMatrixRef"
+title: "mne::AcqMatrixRef"
 sidebar_label: AcqMatrixRef
 sidebar_position: 37
 ---
 
 # AcqMatrixRef
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_convert.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_convert.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_convert.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_convert.h)
 
 `#include <acq/acq_convert.h>`
 
 ```cpp
 template <typename T>
-struct ACQLIB::AcqMatrixRef
+struct mne::AcqMatrixRef
 ```
 
 Non-owning channels x samples matrix with element strides; describes Eigen (column-major), NumPy, std::vector or device memory alike.
@@ -135,7 +135,7 @@ Live multi-channel, multi-rate scope of a streaming source with a closed-loop st
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 297"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 296"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();
@@ -154,7 +154,7 @@ for (std::size_t e = 0; e < samples.events().size(); ++e) {
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 546"
                 // encode() handles a pulse that crosses the end of the ring (two parts).

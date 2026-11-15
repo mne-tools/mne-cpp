@@ -41,9 +41,7 @@
 #include <QtMath>
 
 using namespace MNEANALYZESTUDIO;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

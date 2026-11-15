@@ -44,7 +44,7 @@ class QScrollArea;
 class QSpinBox;
 class QVBoxLayout;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
@@ -91,7 +91,7 @@ public slots:
      * @param[in] firstSample Absolute sample index of column 0.
      */
     void setRawData(const Eigen::MatrixXd& rawData,
-                    std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo,
+                    std::shared_ptr<mne::FiffInfo> fiffInfo,
                     int firstSample = 0);
 
     void clearIca();
@@ -122,11 +122,11 @@ private:
 
     // Data
     Eigen::MatrixXd m_rawData;
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
     int m_firstSample = 0;
 
     // ICA result
-    DSPLIB::IcaResult m_icaResult;
+    mne::IcaResult m_icaResult;
     bool m_bHasResult = false;
 };
 

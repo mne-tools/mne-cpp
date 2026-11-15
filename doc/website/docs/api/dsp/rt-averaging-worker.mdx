@@ -1,18 +1,18 @@
 ---
 id: rt-averaging-worker
-title: "DSPLIB::RtAveragingWorker"
+title: "mne::RtAveragingWorker"
 sidebar_label: RtAveragingWorker
 sidebar_position: 31
 ---
 
 # RtAveragingWorker
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_averaging.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_averaging.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_averaging.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_averaging.h)
 
 `#include <dsp/rt_averaging.h>`
 
 ```cpp
-class DSPLIB::RtAveragingWorker
+class mne::RtAveragingWorker
 ```
 
 Real-time averaging worker.
@@ -199,7 +199,7 @@ Resets the averaged data stored.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 159"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 155"
 RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
 FiffEvokedSet evokedSet;
 QObject::connect(&averager, &RtAveragingWorker::resultReady,

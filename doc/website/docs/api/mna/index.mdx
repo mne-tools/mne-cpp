@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # MNA Library
 
-**Namespace:** `MNALIB` &nbsp;·&nbsp; **Source:** `src/libraries/mna`
-The `mne_mna` library (`MNALIB` namespace) implements the MNA graph-execution engine — a framework for defining, validating, serializing, and executing MEG/EEG analysis pipelines as directed acyclic graphs (DAGs). It is the runtime behind the [MNA project format](/docs/manual/mna-format).
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/mna`
+The `mne_mna` library (`mne_mna` namespace) implements the MNA graph-execution engine — a framework for defining, validating, serializing, and executing MEG/EEG analysis pipelines as directed acyclic graphs (DAGs). It is the runtime behind the [MNA project format](/docs/manual/mna-format).
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_mna)
@@ -64,7 +64,7 @@ Top-level container. Holds subjects, the processing pipeline, and project metada
 #include <mna/mna_project.h>
 
 // Create a project
-MNALIB::MnaProject project;
+mne::MnaProject project;
 project.name        = "audvis_dspm";
 project.description = "dSPM source localization";
 project.mnaVersion  = MnaProject::CURRENT_SCHEMA_VERSION;  // "1.0"
@@ -91,7 +91,7 @@ project.created     = QDateTime::currentDateTimeUtc();
 ### MnaSubject
 
 ```cpp
-MNALIB::MnaSubject subject;
+mne::MnaSubject subject;
 subject.id = "sample";
 subject.freeSurferDir = "subjects/sample";
 ```
@@ -105,7 +105,7 @@ subject.freeSurferDir = "subjects/sample";
 ### MnaSession
 
 ```cpp
-MNALIB::MnaSession session;
+mne::MnaSession session;
 session.id = "01";
 ```
 
@@ -117,7 +117,7 @@ session.id = "01";
 ### MnaRecording
 
 ```cpp
-MNALIB::MnaRecording rec;
+mne::MnaRecording rec;
 rec.id = "audvis";
 rec.files.append(rawFileRef);
 ```
@@ -130,7 +130,7 @@ rec.files.append(rawFileRef);
 ### MnaFileRef
 
 ```cpp
-MNALIB::MnaFileRef ref;
+mne::MnaFileRef ref;
 ref.role      = MnaFileRole::Raw;
 ref.path      = "data/sample_audvis_raw.fif";
 ref.format    = "fiff";
@@ -159,7 +159,7 @@ The graph container manages nodes, ports, connections, and validation:
 ```cpp
 #include <mna/mna_graph.h>
 
-MNALIB::MnaGraph graph;
+mne::MnaGraph graph;
 graph.addNode(readRawNode);
 graph.addNode(filterNode);
 graph.addNode(inverseNode);
@@ -199,7 +199,7 @@ bool valid = graph.validate(&errors);
 A single processing step in the graph:
 
 ```cpp
-MNALIB::MnaNode node;
+mne::MnaNode node;
 node.id      = "filter_01";
 node.opType  = "dsp.band_pass_filter";
 node.attributes = {{"low_freq", 1.0}, {"high_freq", 40.0}};
@@ -240,7 +240,7 @@ node.outputs.append(outPort);
 ### MnaPort
 
 ```cpp
-MNALIB::MnaPort port;
+mne::MnaPort port;
 port.name           = "source_estimate";
 port.dataKind       = MnaDataKind::SourceEstimate;
 port.direction      = MnaPortDir::Output;
@@ -272,7 +272,7 @@ Declarative contract for an operation:
 ```cpp
 #include <mna/mna_op_schema.h>
 
-MNALIB::MnaOpSchema schema;
+mne::MnaOpSchema schema;
 schema.opType      = "dsp.band_pass_filter";
 schema.version     = "2.2.0";
 schema.binding     = "internal";
@@ -324,7 +324,7 @@ Singleton catalog of all registered operations:
 ```cpp
 #include <mna/mna_op_registry.h>
 
-auto& reg = MNALIB::MnaOpRegistry::instance();
+auto& reg = mne::MnaOpRegistry::instance();
 
 // Register schema + implementation
 reg.registerOp(schema);
@@ -372,7 +372,7 @@ Loads operator schemas from declarative JSON manifest files:
 
 // Full execution
 QVariantMap inputs = {{"raw_file", "/data/sample_audvis_raw.fif"}};
-auto ctx = MNALIB::MnaGraphExecutor::execute(graph, inputs);
+auto ctx = mne::MnaGraphExecutor::execute(graph, inputs);
 
 // Access results
 QVariant stc = ctx.results["inverse_01::source_estimate"];
@@ -410,7 +410,7 @@ The execution context (`MnaGraphExecutor::Context`) holds:
 ```cpp
 #include <mna/mna_param_tree.h>
 
-MNALIB::MnaParamTree tree;
+mne::MnaParamTree tree;
 tree.setParam("filter_01/low_freq", 1.0);
 tree.setParam("filter_01/high_freq", 40.0);
 
@@ -435,7 +435,7 @@ QStringList paths = tree.allPaths();
 ### MnaParamBinding
 
 ```cpp
-MNALIB::MnaParamBinding binding;
+mne::MnaParamBinding binding;
 binding.targetPath   = "inverse_01/lambda";
 binding.expression   = "1.0 / pow(ref('inverse_01/snr'), 2)";
 binding.trigger      = "on_change";
@@ -493,7 +493,7 @@ Outcome of evaluating a single check:
 Inline code embedded in nodes (for `Script` exec mode) or verification checks:
 
 ```cpp
-MNALIB::MnaScript script;
+mne::MnaScript script;
 script.language    = "python";
 script.interpreter = "python3";
 script.code        = "import mne\nraw = mne.io.read_raw_fif('{{raw_path}}')\nraw.filter(1, 40)\nraw.save('{{output_path}}')";
@@ -521,13 +521,13 @@ Read/write MNA project files. Dispatches by file extension:
 #include <mna/mna_io.h>
 
 // Read
-MNALIB::MnaProject project = MNALIB::MnaIO::read("pipeline.mna");
+mne::MnaProject project = mne::MnaIO::read("pipeline.mna");
 
 // Write JSON
-MNALIB::MnaIO::write(project, "pipeline.mna");
+mne::MnaIO::write(project, "pipeline.mna");
 
 // Write CBOR (compact binary)
-MNALIB::MnaIO::write(project, "pipeline.mnx");
+mne::MnaIO::write(project, "pipeline.mnx");
 ```
 
 | Method | Description |
@@ -559,7 +559,7 @@ Custom operations can be registered at runtime via `MnaOpRegistry::registerOp()`
 
 ## MNE-Python Cross-Reference
 
-| MNE-CPP (MNALIB) | MNE-Python Equivalent |
+| MNE-CPP (mne_mna) | MNE-Python Equivalent |
 |---|---|
 | `MnaProject` | No direct equivalent (closest: `mne.Report` or BIDS-based project management) |
 | `MnaGraph` / `MnaNode` | No direct equivalent (MNE-Python uses procedural scripting) |

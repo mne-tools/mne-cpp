@@ -1,18 +1,18 @@
 ---
 id: acquired-points
-title: "ACQLIB::AcquiredPoints"
+title: "mne::AcquiredPoints"
 sidebar_label: AcquiredPoints
 sidebar_position: 54
 ---
 
 # AcquiredPoints
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/devices/polhemus/acquired_points.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/devices/polhemus/acquired_points.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/devices/polhemus/acquired_points.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/devices/polhemus/acquired_points.h)
 
 `#include <acq/acquired_points.h>`
 
 ```cpp
-class ACQLIB::AcquiredPoints
+class mne::AcquiredPoints
 ```
 
 In-memory store of all points captured during a session.
@@ -48,7 +48,7 @@ classDiagram
 
 ### append(p)
 
-Append a new point and emit `ACQLIB::AcquiredPoints::pointsChanged` "pointsChanged".
+Append a new point and emit `mne::AcquiredPoints::pointsChanged` "pointsChanged".
 
 **Parameters:**
 

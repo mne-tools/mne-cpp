@@ -32,10 +32,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace INVLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtHpiWorker
@@ -77,9 +75,9 @@ RtHpi::RtHpi(const InvSensorSet sensorSet, QObject* parent)
 : QObject(parent)
 , m_sensorSet(sensorSet)
 {
-    qRegisterMetaType<INVLIB::HpiFitResult>("INVLIB::HpiFitResult");
+    qRegisterMetaType<mne::HpiFitResult>("mne::HpiFitResult");
     qRegisterMetaType<QVector<int>>("QVector<int>");
-    qRegisterMetaType<std::shared_ptr<FIFFLIB::FiffInfo>>();
+    qRegisterMetaType<std::shared_ptr<mne::FiffInfo>>();
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
     RtHpiWorker* worker = new RtHpiWorker(m_sensorSet);
@@ -114,7 +112,7 @@ void RtHpi::append(const MatrixXd& data)
                      m_modelParameters,
                      m_matCoilsHead);
     } else {
-        BASELIB::Log::warning("[RtHpi::append] Not enough coil frequencies set. At least three frequencies are needed.");
+        mne::Log::warning("[RtHpi::append] Not enough coil frequencies set. At least three frequencies are needed.");
     }
 }
 
@@ -141,7 +139,7 @@ void RtHpi::setHpiDigitizer(const Eigen::MatrixXd& matCoilsHead)
 
 //=============================================================================================================
 
-void RtHpi::handleResults(const INVLIB::HpiFitResult& fitResult)
+void RtHpi::handleResults(const mne::HpiFitResult& fitResult)
 {
     emit newHpiFitResultAvailable(fitResult);
 }

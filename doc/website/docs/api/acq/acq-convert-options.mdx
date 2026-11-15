@@ -1,18 +1,18 @@
 ---
 id: acq-convert-options
-title: "ACQLIB::AcqConvertOptions"
+title: "mne::AcqConvertOptions"
 sidebar_label: AcqConvertOptions
 sidebar_position: 39
 ---
 
 # AcqConvertOptions
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_convert.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_convert.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_convert.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_convert.h)
 
 `#include <acq/acq_convert.h>`
 
 ```cpp
-struct ACQLIB::AcqConvertOptions
+struct mne::AcqConvertOptions
 ```
 
 Placement of a conversion inside the matrix.
@@ -75,7 +75,7 @@ From [ex_acq_oddball](../../examples/acq/ex_acq_oddball.mdx).
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 546"
                 // encode() handles a pulse that crosses the end of the ring (two parts).

@@ -21,11 +21,11 @@
  *
  * and spectral matrix @c S(f) = H(f) * Sigma * H(f)^H. @c H and @c S
  * are the only two quantities the directed-connectivity metrics in this
- * library actually need: spectral Granger Causality (@ref CONNECTIVITYLIB::GrangerCausality)
+ * library actually need: spectral Granger Causality (@ref mne::GrangerCausality)
  * is a ratio of diagonal entries of @c S before and after conditioning,
- * the Directed Transfer Function (@ref CONNECTIVITYLIB::DirectedTransferFunction) is a row-
+ * the Directed Transfer Function (@ref mne::DirectedTransferFunction) is a row-
  * normalised @c |H_{ij}(f)|^2, and Partial Directed Coherence
- * (@ref CONNECTIVITYLIB::PartialDirectedCoherence) is a column-normalised @c |A_{ij}(f)|.
+ * (@ref mne::PartialDirectedCoherence) is a column-normalised @c |A_{ij}(f)|.
  *
  * The coefficient matrices @c A_1..A_p and the innovation covariance
  * @c Sigma are estimated from the Yule-Walker equations via Levinson-
@@ -56,14 +56,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -190,6 +190,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // MVARMODEL_H

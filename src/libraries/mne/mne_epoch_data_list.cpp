@@ -10,7 +10,7 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     October 2012
- * @brief    Implementation of @ref MNELIB::MNEEpochDataList.
+ * @brief    Implementation of @ref mne::MNEEpochDataList.
  *
  * Implements list-level operations: appending epochs, applying SSP and
  * baseline, averaging by event id, dropping rejected trials and writing
@@ -43,9 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -281,7 +279,7 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
         }
         // Like mne.Epochs(reject=...): only channel types with a limit are checked
         const auto limit = key ? mapReject.find(key) : mapReject.end();
-        if (limit == mapReject.end() || FIFFLIB::has_channel(lExcludeChs, ch.ch_name) || FIFFLIB::has_channel(pFiffInfo.bads, ch.ch_name) || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG2) {
+        if (limit == mapReject.end() || mne::has_channel(lExcludeChs, ch.ch_name) || mne::has_channel(pFiffInfo.bads, ch.ch_name) || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG2) {
             continue;
         }
         ArtifactRejectionData tempData;

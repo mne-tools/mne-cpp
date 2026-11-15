@@ -15,7 +15,7 @@
  * @date     March 2013
  * @brief    Dense Eigen matrices to and from whitespace-separated text.
  *
- * @ref MATHLIB::write_matrix and @ref MATHLIB::read_matrix round-trip any
+ * @ref mne::write_matrix and @ref mne::read_matrix round-trip any
  * dense Eigen expression through plain text, one row per line, so
  * intermediate results can be compared with NumPy (@c numpy.loadtxt and
  * @c numpy.savetxt read and write the same layout) and reference data can be
@@ -55,10 +55,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ bool write_matrix(const Eigen::DenseBase<Derived>& matrix, const std::filesystem
 {
     std::ofstream file(path);
     if (!file) {
-        BASELIB::Log::warning("write_matrix: cannot open {} for writing", path.string());
+        mne::Log::warning("write_matrix: cannot open {} for writing", path.string());
         return false;
     }
     if (!description.empty()) {
@@ -130,7 +130,7 @@ bool parse_matrix(Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>& 
             Scalar value{};
             const auto [next, ec] = std::from_chars(pos, end, value);
             if (ec != std::errc{} || (next != end && !std::isspace(static_cast<unsigned char>(*next)))) {
-                BASELIB::Log::warning("read_matrix: non-numeric value in row {} of {}", rows + 1, source);
+                mne::Log::warning("read_matrix: non-numeric value in row {} of {}", rows + 1, source);
                 return false;
             }
             values.push_back(value);
@@ -141,7 +141,7 @@ bool parse_matrix(Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>& 
             continue;
         }
         if (rows > 0 && count != cols) {
-            BASELIB::Log::warning("read_matrix: row {} of {} has {} values, expected {}", rows + 1, source, count, cols);
+            mne::Log::warning("read_matrix: row {} of {} has {} values, expected {}", rows + 1, source, count, cols);
             return false;
         }
         cols = count;
@@ -158,7 +158,7 @@ bool parse_matrix(Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>& 
         outRows = cols > 0 ? rows : 0;
     }
     if ((Rows != Eigen::Dynamic && outRows != Rows) || (Cols != Eigen::Dynamic && outCols != Cols)) {
-        BASELIB::Log::warning("read_matrix: {} holds {} x {} values, which do not fit a {} x {} matrix", source, rows, cols, Rows, Cols);
+        mne::Log::warning("read_matrix: {} holds {} x {} values, which do not fit a {} x {} matrix", source, rows, cols, Rows, Cols);
         return false;
     }
 
@@ -189,7 +189,7 @@ bool read_matrix(Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>& o
 {
     std::ifstream file(path);
     if (!file) {
-        BASELIB::Log::warning("read_matrix: cannot open {}", path.string());
+        mne::Log::warning("read_matrix: cannot open {}", path.string());
         return false;
     }
     return detail::parse_matrix(out, file, path.string());
@@ -211,6 +211,6 @@ bool read_matrix(Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>& o
     return detail::parse_matrix(out, stream, "stream");
 }
 
-} // namespace MATHLIB
+} // namespace mne
 
 #endif // MATHLIB_MATRIX_IO_H

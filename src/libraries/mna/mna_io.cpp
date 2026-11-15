@@ -44,7 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC CONSTANTS
@@ -67,7 +67,7 @@ MnaProject MnaIO::read(const QString& path)
         return readCbor(path);
     }
 
-    BASELIB::Log::warning("[MnaIO::read] Unknown extension: {}", suffix.toStdString());
+    mne::Log::warning("[MnaIO::read] Unknown extension: {}", suffix.toStdString());
     return MnaProject();
 }
 
@@ -84,7 +84,7 @@ bool MnaIO::write(const MnaProject& project, const QString& path)
         return writeCbor(project, path);
     }
 
-    BASELIB::Log::warning("[MnaIO::write] Unknown extension: {}", suffix.toStdString());
+    mne::Log::warning("[MnaIO::write] Unknown extension: {}", suffix.toStdString());
     return false;
 }
 
@@ -94,7 +94,7 @@ MnaProject MnaIO::readJson(const QString& path)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
-        BASELIB::Log::warning("[MnaIO::readJson] Cannot open file: {}", path.toStdString());
+        mne::Log::warning("[MnaIO::readJson] Cannot open file: {}", path.toStdString());
         return MnaProject();
     }
 
@@ -104,7 +104,7 @@ MnaProject MnaIO::readJson(const QString& path)
     QJsonParseError parseError;
     const QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
-        BASELIB::Log::warning("[MnaIO::readJson] Parse error: {}", parseError.errorString().toStdString());
+        mne::Log::warning("[MnaIO::readJson] Parse error: {}", parseError.errorString().toStdString());
         return MnaProject();
     }
 
@@ -115,7 +115,7 @@ MnaProject MnaIO::readJson(const QString& path)
     const int fileMajor = fileVersion.section(QLatin1Char('.'), 0, 0).toInt();
     const int currentMajor = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION).section(QLatin1Char('.'), 0, 0).toInt();
     if (fileMajor != currentMajor) {
-        BASELIB::Log::warning("[MnaIO::readJson] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
+        mne::Log::warning("[MnaIO::readJson] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
         return MnaProject();
     }
 
@@ -128,7 +128,7 @@ bool MnaIO::writeJson(const MnaProject& project, const QString& path)
 {
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        BASELIB::Log::warning("[MnaIO::writeJson] Cannot open file for writing: {}", path.toStdString());
+        mne::Log::warning("[MnaIO::writeJson] Cannot open file for writing: {}", path.toStdString());
         return false;
     }
 
@@ -146,14 +146,14 @@ MnaProject MnaIO::readCbor(const QString& path)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
-        BASELIB::Log::warning("[MnaIO::readCbor] Cannot open file: {}", path.toStdString());
+        mne::Log::warning("[MnaIO::readCbor] Cannot open file: {}", path.toStdString());
         return MnaProject();
     }
 
     // Verify magic header
     const QByteArray magic = file.read(MNX_MAGIC.size());
     if (magic != MNX_MAGIC) {
-        BASELIB::Log::warning("[MnaIO::readCbor] Invalid magic header in: {}", path.toStdString());
+        mne::Log::warning("[MnaIO::readCbor] Invalid magic header in: {}", path.toStdString());
         file.close();
         return MnaProject();
     }
@@ -163,7 +163,7 @@ MnaProject MnaIO::readCbor(const QString& path)
 
     const QCborValue cborVal = QCborValue::fromCbor(cborData);
     if (!cborVal.isMap()) {
-        BASELIB::Log::warning("[MnaIO::readCbor] Root CBOR value is not a map");
+        mne::Log::warning("[MnaIO::readCbor] Root CBOR value is not a map");
         return MnaProject();
     }
 
@@ -174,7 +174,7 @@ MnaProject MnaIO::readCbor(const QString& path)
     const int fileMajor = fileVersion.section(QLatin1Char('.'), 0, 0).toInt();
     const int currentMajor = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION).section(QLatin1Char('.'), 0, 0).toInt();
     if (fileMajor != currentMajor) {
-        BASELIB::Log::warning("[MnaIO::readCbor] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
+        mne::Log::warning("[MnaIO::readCbor] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
         return MnaProject();
     }
 
@@ -187,13 +187,13 @@ bool MnaIO::writeCbor(const MnaProject& project, const QString& path)
 {
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        BASELIB::Log::warning("[MnaIO::writeCbor] Cannot open file for writing: {}", path.toStdString());
+        mne::Log::warning("[MnaIO::writeCbor] Cannot open file for writing: {}", path.toStdString());
         return false;
     }
 
     // Write magic header
     if (file.write(MNX_MAGIC) != MNX_MAGIC.size()) {
-        BASELIB::Log::warning("[MnaIO::writeCbor] Failed to write magic header");
+        mne::Log::warning("[MnaIO::writeCbor] Failed to write magic header");
         file.close();
         return false;
     }

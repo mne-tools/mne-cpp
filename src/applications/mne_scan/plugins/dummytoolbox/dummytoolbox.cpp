@@ -31,8 +31,7 @@
 //=============================================================================================================
 
 using namespace DUMMYTOOLBOXPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -40,7 +39,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
+: m_pCircularBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
 {
 }
 
@@ -141,7 +140,7 @@ QWidget* DummyToolbox::setupWidget()
 
 //=============================================================================================================
 
-void DummyToolbox::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void DummyToolbox::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information

@@ -23,9 +23,9 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ACQLIB::AcqExpected<ACQLIB::AcqTimebase> ACQLIB::verify(const AcqTimebase& target, std::span<const AcqSyncMarker> markers,
-                                                        const AcqTimebase& reference, std::uint64_t toleranceTicks,
-                                                        std::uint64_t minSpanSamples) noexcept
+mne::AcqExpected<mne::AcqTimebase> mne::verify(const AcqTimebase& target, std::span<const AcqSyncMarker> markers,
+                                               const AcqTimebase& reference, std::uint64_t toleranceTicks,
+                                               std::uint64_t minSpanSamples) noexcept
 {
     if (reference.domain == 0 || target.domain != reference.domain || reference.lock != AcqLockState::PhaseLocked ||
         target.lock == AcqLockState::Free) {

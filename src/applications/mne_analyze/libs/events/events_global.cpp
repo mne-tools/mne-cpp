@@ -22,21 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* EVENTSLIB::buildDateTime()
+const char* mne::analyze::events::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* EVENTSLIB::buildHash()
+const char* mne::analyze::events::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* EVENTSLIB::buildHashLong()
+const char* mne::analyze::events::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

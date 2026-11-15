@@ -40,12 +40,12 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
@@ -64,12 +64,12 @@ namespace EEGOSPORTSPLUGIN
  * @brief EEG connector for ANT Neuro eego amplifiers through the eego:// source of mne_acq_devices, which can also
  *        simulate the amplifier.
  */
-class EEGOSPORTSSHARED_EXPORT EEGoSports : public SCSHAREDLIB::AbstractSensor
+class EEGOSPORTSSHARED_EXPORT EEGoSports : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class EEGoSportsImpedanceWidget;
     friend class EEGoSportsSetupWidget;
@@ -143,17 +143,17 @@ private:
     std::string uri() const;
 
     /** Names and places the EEG channels after the cap's .elc file and sets the cardinal points. */
-    void applyElectrodeLayout(FIFFLIB::FiffInfo& info) const;
+    void applyElectrodeLayout(mne::FiffInfo& info) const;
 
     /** Stores the settings for the next session. */
     void saveSettings() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRMTSA_EEGoSports; /**< The EEG data. */
-    QSharedPointer<EEGoSportsImpedanceWidget> m_pEEGoSportsImpedanceWidget;                                 /**< Widget for checking the impedances. */
-    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget;                           /**< Widget for the layout and cardinals. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRMTSA_EEGoSports; /**< The EEG data. */
+    QSharedPointer<EEGoSportsImpedanceWidget> m_pEEGoSportsImpedanceWidget;                               /**< Widget for checking the impedances. */
+    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget;                         /**< Widget for the layout and cardinals. */
 
-    ACQLIB::AcqDevice m_device; /**< The amplifier while streaming or measuring impedances. */
-    ACQLIB::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
+    mne::AcqDevice m_device; /**< The amplifier while streaming or measuring impedances. */
+    mne::AcqReader m_reader; /**< Reads the amplifier's stream in run(). */
 
     int m_iSamplingFreq = 512;       /**< Sampling rate in Hz, one the amplifier supports. */
     int m_iSamplesPerBlock = 512;    /**< Samples per block handed to the connected plugins. */

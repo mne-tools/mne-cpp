@@ -46,9 +46,9 @@
 //=============================================================================================================
 
 using namespace RAWDATAVIEWERPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
+using namespace mne::analyze;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -145,7 +145,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->toggleDisplayEvent(e->getData().toInt());
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         case EVENT_TYPE::FILTER_CHANNEL_TYPE_CHANGED:
             m_pFiffRawView->setFilterChannelType(e->getData().toString());
@@ -157,29 +157,29 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
             break;
         case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
-            if (e->getData().value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("signalview")) {
+            if (e->getData().value<mne::disp::SelectionItem*>()->m_sViewsToApply.contains("signalview")) {
                 if (m_pFiffRawView->getModel().isNull()) {
                     return;
                 }
-                if (e->getData().value<DISPLIB::SelectionItem*>()->m_bShowAll) {
+                if (e->getData().value<mne::disp::SelectionItem*>()->m_bShowAll) {
                     m_pFiffRawView->showAllChannels();
                 } else {
-                    m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+                    m_pFiffRawView->showSelectedChannelsOnly(e->getData().value<mne::disp::SelectionItem*>()->m_iChannelNumber);
                 }
             }
             break;
         case EVENT_TYPE::SCALING_MAP_CHANGED:
-            if (e->getData().value<ANSHAREDLIB::ScalingParameters>().m_sViewsToApply.contains("signalview")) {
-                m_pFiffRawView->setScalingMap(e->getData().value<ANSHAREDLIB::ScalingParameters>().m_mScalingMap);
+            if (e->getData().value<mne::analyze::ScalingParameters>().m_sViewsToApply.contains("signalview")) {
+                m_pFiffRawView->setScalingMap(e->getData().value<mne::analyze::ScalingParameters>().m_mScalingMap);
             }
             break;
         case EVENT_TYPE::VIEW_SETTINGS_CHANGED:
-            if (e->getData().value<ANSHAREDLIB::ViewParameters>().m_sViewsToApply.contains("signalview")) {
-                updateViewParameters(e->getData().value<ANSHAREDLIB::ViewParameters>());
+            if (e->getData().value<mne::analyze::ViewParameters>().m_sViewsToApply.contains("signalview")) {
+                updateViewParameters(e->getData().value<mne::analyze::ViewParameters>());
             }
             break;
         case EVENT_TYPE::MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
@@ -246,34 +246,34 @@ void RawDataViewer::onSendSamplePos(int iSample)
 
 //=============================================================================================================
 
-void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters)
+void RawDataViewer::updateViewParameters(mne::analyze::ViewParameters viewParameters)
 {
     if (m_pFiffRawView->getModel().isNull()) {
         return;
     }
 
     switch (viewParameters.m_sSettingsToApply) {
-        case ANSHAREDLIB::ViewParameters::ViewSetting::signal:
+        case mne::analyze::ViewParameters::ViewSetting::signal:
             m_pFiffRawView->setSignalColor(viewParameters.m_colorSignal);
             m_pFiffRawView->updateView();
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::background:
+        case mne::analyze::ViewParameters::ViewSetting::background:
             m_pFiffRawView->setBackgroundColor(viewParameters.m_colorBackground);
             m_pFiffRawView->updateView();
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::zoom:
+        case mne::analyze::ViewParameters::ViewSetting::zoom:
             m_pFiffRawView->setZoom(viewParameters.m_dZoomValue);
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::window:
+        case mne::analyze::ViewParameters::ViewSetting::window:
             m_pFiffRawView->setWindowSize(viewParameters.m_iTimeWindow);
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::spacer:
+        case mne::analyze::ViewParameters::ViewSetting::spacer:
             m_pFiffRawView->setDistanceTimeSpacer(viewParameters.m_iTimeSpacers);
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::screenshot:
+        case mne::analyze::ViewParameters::ViewSetting::screenshot:
             m_pFiffRawView->onMakeScreenshot(viewParameters.m_sImageType);
             break;
-        case ANSHAREDLIB::ViewParameters::ViewSetting::all:
+        case mne::analyze::ViewParameters::ViewSetting::all:
             m_pFiffRawView->setSignalColor(viewParameters.m_colorSignal);
             m_pFiffRawView->setBackgroundColor(viewParameters.m_colorBackground);
             m_pFiffRawView->setZoom(viewParameters.m_dZoomValue);
@@ -288,7 +288,7 @@ void RawDataViewer::updateViewParameters(ANSHAREDLIB::ViewParameters viewParamet
 
 //=============================================================================================================
 
-void RawDataViewer::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void RawDataViewer::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
     if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if (m_pFiffRawView->getModel() == pRemovedModel) {

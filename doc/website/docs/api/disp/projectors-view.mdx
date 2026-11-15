@@ -1,23 +1,23 @@
 ---
 id: projectors-view
-title: "DISPLIB::ProjectorsView"
+title: "mne::disp::ProjectorsView"
 sidebar_label: ProjectorsView
 sidebar_position: 49
 ---
 
 # ProjectorsView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/projectorsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/projectorsview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/projectorsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/projectorsview.h)
 
 `#include <disp/projectorsview.h>`
 
 ```cpp
-class DISPLIB::ProjectorsView
+class mne::disp::ProjectorsView
 ```
 
 SSP projector enable / disable checkbox list.
 
-One `QCheckBox` per `FiffProj` plus a master toggle; emits `projSelectionChanged` so the `rtprocessing` pipeline can (de)project the streaming data on the fly.
+One `QCheckBox` per [`FiffProj`](/docs/api/fiff/fiff-proj) plus a master toggle; emits `projSelectionChanged` so the `rtprocessing` pipeline can (de)project the streaming data on the fly.
 
 ### Inheritance
 

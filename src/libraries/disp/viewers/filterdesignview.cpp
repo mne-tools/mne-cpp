@@ -45,9 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace DSPLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -541,7 +540,7 @@ double FilterDesignView::getTo()
 
 //=============================================================================================================
 
-void FilterDesignView::updateGuiFromFilter(const DSPLIB::FilterKernel& filter)
+void FilterDesignView::updateGuiFromFilter(const mne::FilterKernel& filter)
 {
     m_pUi->m_doubleSpinBox_from->setValue(filter.getHighpassFreq());
     m_pUi->m_doubleSpinBox_to->setValue(filter.getLowpassFreq());
@@ -553,7 +552,7 @@ void FilterDesignView::updateGuiFromFilter(const DSPLIB::FilterKernel& filter)
 
 //=============================================================================================================
 
-void FilterDesignView::guiStyleChanged(DISPLIB::AbstractView::StyleMode style)
+void FilterDesignView::guiStyleChanged(mne::disp::AbstractView::StyleMode style)
 {
     Q_UNUSED(style)
     updateFilterPlot();

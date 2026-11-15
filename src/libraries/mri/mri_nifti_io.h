@@ -11,11 +11,11 @@
  *
  * NIfTI-1 is the standard exchange container used by FSL, AFNI, SPM,
  * nibabel and essentially every neuroimaging toolchain outside the
- * FreeSurfer ecosystem; adding it to MRILIB lets mne-cpp consume
+ * FreeSurfer ecosystem; adding it to mne_mri lets mne-cpp consume
  * preprocessed structurals produced by any of those pipelines (e.g. BIDS
  * subjects whose anatomicals never pass through @c recon-all) without
  * requiring an external conversion step. The reader stays
- * surface-compatible with @ref MRILIB::MriMghIO so the slicing, rendering and
+ * surface-compatible with @ref mne::MriMghIO so the slicing, rendering and
  * COR.fif export paths downstream do not need to branch on source format.
  *
  * The header is 348 bytes; image data starts at @c vox_offset (typically
@@ -30,7 +30,7 @@
  * fall back to @c qform (unit quaternion + offset, expanded into a
  * rotation matrix), and as a last resort build a diagonal transform from
  * @c pixdim centred at the volume origin. This ordering is encoded once
- * in @ref MRILIB::MriNiftiIO::read "MriNiftiIO::read" so every caller gets the same RAS regardless
+ * in @ref mne::MriNiftiIO::read "MriNiftiIO::read" so every caller gets the same RAS regardless
  * of how the source file was authored.
  *
  * Format reference: https://nifti.nimh.nih.gov/nifti-1
@@ -55,10 +55,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MRILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -107,6 +107,6 @@ public:
     static bool decompress(const std::string& gzFile, std::vector<std::byte>& rawData);
 };
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_NIFTI_IO_H

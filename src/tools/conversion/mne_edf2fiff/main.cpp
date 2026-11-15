@@ -8,7 +8,7 @@
  *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @date     April, 2019
- * @brief    Converts EDF/EDF+ and BDF recordings to FIFF via BIDSLIB::EDFReader.
+ * @brief    Converts EDF/EDF+ and BDF recordings to FIFF via mne::EDFReader.
  */
 
 //=============================================================================================================
@@ -40,8 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +55,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mne_edf2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -79,9 +78,9 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    const std::filesystem::path inputPath = BASELIB::pathFromUtf8(sInputFile.toStdString());
+    const std::filesystem::path inputPath = mne::pathFromUtf8(sInputFile.toStdString());
     EDFReader reader;
-    if (!reader.supports_extension(BASELIB::utf8FromPath(inputPath.extension()))) {
+    if (!reader.supports_extension(mne::utf8FromPath(inputPath.extension()))) {
         qCritical() << "Not an EDF or BDF file:" << sInputFile;
         return 1;
     }

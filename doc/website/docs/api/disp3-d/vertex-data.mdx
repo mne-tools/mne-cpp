@@ -1,18 +1,18 @@
 ---
 id: vertex-data
-title: "DISP3DLIB::VertexData"
+title: "mne::disp::VertexData"
 sidebar_label: VertexData
 sidebar_position: 47
 ---
 
 # VertexData
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/brainsurface.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/brainsurface.h)
 
 `#include <disp3D/brainsurface.h>`
 
 ```cpp
-struct DISP3DLIB::VertexData
+struct mne::disp::VertexData
 ```
 
 Geometry of one brain surface vertex: position and normal.
@@ -46,7 +46,7 @@ const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position,
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 231"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 229"
 float hitDistance = 0.0f;
 int hitVertex = -1;
 const bool picked = patch.intersects(QVector3D(0.019f, 0.019f, 0.05f), QVector3D(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);

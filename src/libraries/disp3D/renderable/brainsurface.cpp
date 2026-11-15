@@ -24,7 +24,7 @@
 #include <limits>
 #include <set>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 namespace
@@ -117,7 +117,7 @@ void BrainSurface::setGeometry(QVector<VertexData> vertices, QVector<uint32_t> i
 
 //=============================================================================================================
 
-void BrainSurface::fromSurface(const FSLIB::FsSurface& surf)
+void BrainSurface::fromSurface(const mne::FsSurface& surf)
 {
     const Eigen::MatrixXf& rr = surf.rr();
     const Eigen::MatrixXf& nn = surf.nn();
@@ -139,14 +139,14 @@ void BrainSurface::fromSurface(const FSLIB::FsSurface& surf)
 
 //=============================================================================================================
 
-void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColor& color)
+void BrainSurface::fromBemSurface(const mne::MNEBemSurface& surf, const QColor& color)
 {
     m_curvature.clear();
 
     const int nVerts = surf.rr.rows();
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
-        nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
+        nn = mne::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
     QVector<VertexData> vertices(nVerts);
     for (int i = 0; i < nVerts; ++i)
@@ -160,7 +160,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColo
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color)
 {
-    createFromData(vertices, FSLIB::FsSurface::compute_normals(vertices, triangles), triangles, color);
+    createFromData(vertices, mne::FsSurface::compute_normals(vertices, triangles), triangles, color);
 }
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color)
@@ -207,8 +207,8 @@ Eigen::MatrixX3f BrainSurface::vertexNormals() const
 
 bool BrainSurface::loadAnnotation(const QString& path)
 {
-    FSLIB::FsAnnotation annotation;
-    if (!FSLIB::FsAnnotation::read(path.toStdU16String(), annotation)) {
+    mne::FsAnnotation annotation;
+    if (!mne::FsAnnotation::read(path.toStdU16String(), annotation)) {
         qWarning() << "BrainSurface: Failed to load annotation from" << path;
         return false;
     }
@@ -216,7 +216,7 @@ bool BrainSurface::loadAnnotation(const QString& path)
     return true;
 }
 
-void BrainSurface::addAnnotation(const FSLIB::FsAnnotation& annotation)
+void BrainSurface::addAnnotation(const mne::FsAnnotation& annotation)
 {
     m_annotation = annotation;
     m_hasAnnotation = true;
@@ -224,7 +224,7 @@ void BrainSurface::addAnnotation(const FSLIB::FsAnnotation& annotation)
     // Per-vertex label ids and colours, so hover lookups and drawing need no search
     const Eigen::VectorXi& vertices = m_annotation.getVertices();
     const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
-    const FSLIB::FsColortable& ct = m_annotation.getColortable();
+    const mne::FsColortable& ct = m_annotation.getColortable();
     QHash<int, uint32_t> labelColors;
     for (int c = 0; c < ct.numEntries; ++c)
         labelColors.insert(ct.table(c, 4), packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2)));
@@ -748,7 +748,7 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
     if (labelId == -1)
         return "Unknown";
 
-    const FSLIB::FsColortable& ct = m_annotation.getColortable();
+    const mne::FsColortable& ct = m_annotation.getColortable();
     for (int i = 0; i < ct.numEntries; ++i) {
         if (ct.table(i, 4) == labelId) {
             QString name = QString::fromStdString(ct.struct_names[static_cast<std::size_t>(i)]);
@@ -791,7 +791,7 @@ std::optional<uint32_t> BrainSurface::selectedLabel() const
     if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0 && m_selectedVertexStart < m_annotationColors.size())
         return m_annotationColors[m_selectedVertexStart];
     if (m_selected && m_selectedRegionId != -1 && m_hasAnnotation) {
-        const FSLIB::FsColortable& ct = m_annotation.getColortable();
+        const mne::FsColortable& ct = m_annotation.getColortable();
         for (int c = 0; c < ct.numEntries; ++c) {
             if (ct.table(c, 4) == m_selectedRegionId)
                 return packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2));
@@ -800,4 +800,4 @@ std::optional<uint32_t> BrainSurface::selectedLabel() const
     return std::nullopt;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

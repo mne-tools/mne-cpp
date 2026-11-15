@@ -5,7 +5,7 @@
  *
  * @file     test_fwd_extended.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @brief    Comprehensive tests for FWDLIB: FwdEegSphereModel, ComputeFwdSettings,
+ * @brief    Comprehensive tests for mne_fwd: FwdEegSphereModel, ComputeFwdSettings,
  *        FwdEegSphereLayer, and sphere-potential helpers.
  */
 #include <QTest>
@@ -18,7 +18,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/fwd_coil_set.h>
 
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFwdExtended : public QObject

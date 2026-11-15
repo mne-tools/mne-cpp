@@ -55,7 +55,7 @@ public:
         Type = UserType + 4
     };
 
-    Arrow(PluginItem* startItem, PluginItem* endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent = 0);
+    Arrow(PluginItem* startItem, PluginItem* endItem, mne::scan::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent = 0);
 
     int type() const
     {
@@ -76,7 +76,7 @@ public:
         return m_EndItem;
     }
 
-    SCSHAREDLIB::PluginConnectorConnection::SPtr connection()
+    mne::scan::PluginConnectorConnection::SPtr connection()
     {
         return m_pConnection;
     }
@@ -90,7 +90,7 @@ private:
     PluginItem* m_StartItem;
     PluginItem* m_EndItem;
 
-    SCSHAREDLIB::PluginConnectorConnection::SPtr m_pConnection;
+    mne::scan::PluginConnectorConnection::SPtr m_pConnection;
 
     QColor m_qColor;
     QPolygonF arrowHead;

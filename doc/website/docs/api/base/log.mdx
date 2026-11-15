@@ -1,18 +1,18 @@
 ---
 id: log
-title: "BASELIB::Log"
+title: "mne::Log"
 sidebar_label: Log
 sidebar_position: 67
 ---
 
 # Log
 
-**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/log.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/log.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/log.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/log.h)
 
 `#include <base/log.h>`
 
 ```cpp
-class BASELIB::Log
+class mne::Log
 ```
 
 Writes library messages to the current sink; thread-safe.
@@ -213,8 +213,8 @@ ok &= expect(logText.find("logging to") != std::string::npos, "Log wrote the mes
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 71"
-BASELIB::Log::install_qt_message_handler();
+````cpp title="src/examples/ex_averaging/main.cpp, line 69"
+mne::Log::install_qt_message_handler();
 QApplication a(argc, argv);
 ````
 
@@ -222,8 +222,8 @@ QApplication a(argc, argv);
 
 Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
 
-````cpp title="src/examples/ex_cancel_noise/main.cpp, line 59"
-BASELIB::Log::install_qt_message_handler();
+````cpp title="src/examples/ex_cancel_noise/main.cpp, line 58"
+mne::Log::install_qt_message_handler();
 QCoreApplication app(argc, argv);
 ````
 

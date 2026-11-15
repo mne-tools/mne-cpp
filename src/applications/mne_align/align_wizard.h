@@ -12,7 +12,7 @@
  *           Steps: Setup → Fiducials → EegCap → HeadShape → Verify → Save → Done.
  *           Each digitisation step listens to a single
  *           @ref MNEALIGN::Digitizer signal for the live cursor and
- *           appends to a shared @ref ACQLIB::AcquiredPoints store on demand.
+ *           appends to a shared @ref mne::AcquiredPoints store on demand.
  *           Digitisation can alternatively be imported from a FIFF .fif
  *           file via the Fiducials page.
  */
@@ -72,7 +72,7 @@ enum class AlignStep
  *
  * Steps: Setup → Fiducials → EegCap → HeadShape → Verify → Save → Done.
  * Each digitisation step listens to the @ref MNEALIGN::Digitizer for the
- * live cursor and appends to a shared @ref ACQLIB::AcquiredPoints store. The
+ * live cursor and appends to a shared @ref mne::AcquiredPoints store. The
  * Fiducials page also exposes a “Load digitisation (FIFF …)” action
  * which imports an existing ISOTRAK point set in lieu of live capture.
  */
@@ -89,7 +89,7 @@ public:
      * @param[in] digitizer   Polhemus connection (not owned, may be null).
      * @param[in] parent      Parent widget.
      */
-    AlignWizard(ACQLIB::AcquiredPoints* acquired,
+    AlignWizard(mne::AcquiredPoints* acquired,
                 Digitizer* digitizer,
                 QWidget* parent = nullptr);
 
@@ -140,7 +140,7 @@ public:
     }
 
     /** @return The selected EEG cap montage system. */
-    CHANNELSLIB::StandardMontage::System cap() const
+    mne::StandardMontage::System cap() const
     {
         return m_capSystem;
     }
@@ -159,7 +159,7 @@ signals:
     void bemPathChanged(const QString& path);
 
     /** @brief Emitted when the EEG cap selection changes. */
-    void capChanged(CHANNELSLIB::StandardMontage::System system);
+    void capChanged(mne::StandardMontage::System system);
 
     /** @brief Emitted when the user clicks Save in the Save step. */
     void requestSaveTrans(const QString& outPath);
@@ -243,20 +243,20 @@ private:
     void refreshSetupTwinUi();
 
     /** @return next un-captured fiducial in the {NAS,LPA,RPA} order. */
-    ACQLIB::FiducialId nextFiducial(bool* allDone) const;
+    mne::FiducialId nextFiducial(bool* allDone) const;
     /** @return next un-captured EEG label, or empty string when complete. */
     QString nextEegLabel(int* outIdent) const;
 
-    ACQLIB::AcquiredPoints* m_pPoints = nullptr;
+    mne::AcquiredPoints* m_pPoints = nullptr;
     Digitizer* m_pDigitizer = nullptr;
 
     QString m_bemPath;
-    CHANNELSLIB::StandardMontage::System m_capSystem = CHANNELSLIB::StandardMontage::System::Standard_1020;
+    mne::StandardMontage::System m_capSystem = mne::StandardMontage::System::Standard_1020;
 
     QVector3D m_lastLivePos;
     bool m_haveLive = false;
     int m_penStation = 1;
-    ACQLIB::FiducialId m_selectedFiducial = ACQLIB::FiducialId::NAS;
+    mne::FiducialId m_selectedFiducial = mne::FiducialId::NAS;
     QMatrix4x4 m_trackerToMri;
 
     QPointer<QLabel> m_pSetupBemLabel;
@@ -265,7 +265,7 @@ private:
     QPointer<QPushButton> m_pTwinNasBtn;
     QPointer<QPushButton> m_pTwinLpaBtn;
     QPointer<QPushButton> m_pTwinRpaBtn;
-    ACQLIB::FiducialId m_selectedTwinFid = ACQLIB::FiducialId::NAS;
+    mne::FiducialId m_selectedTwinFid = mne::FiducialId::NAS;
 
     QPointer<QLabel> m_pFidStatusLabel;
     QPointer<QLabel> m_pFidLiveLabel;

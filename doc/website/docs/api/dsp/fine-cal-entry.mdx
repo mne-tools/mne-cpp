@@ -1,18 +1,18 @@
 ---
 id: fine-cal-entry
-title: "DSPLIB::FineCalEntry"
+title: "mne::FineCalEntry"
 sidebar_label: FineCalEntry
 sidebar_position: 50
 ---
 
 # FineCalEntry
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/fine_calibration.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/fine_calibration.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/fine_calibration.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/fine_calibration.h)
 
 `#include <dsp/fine_calibration.h>`
 
 ```cpp
-struct DSPLIB::FineCalEntry
+struct mne::FineCalEntry
 ```
 
 Per-sensor fine calibration entry.
@@ -44,7 +44,7 @@ const FineCalibration calBack = FineCalibration::read(calPath);
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 176"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 175"
 FineCalibration calibration;
 FineCalEntry magnetometer;
 magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers

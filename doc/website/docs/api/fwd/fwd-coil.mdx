@@ -1,18 +1,18 @@
 ---
 id: fwd-coil
-title: "FWDLIB::FwdCoil"
+title: "mne::FwdCoil"
 sidebar_label: FwdCoil
 sidebar_position: 7
 ---
 
 # FwdCoil
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_coil.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_coil.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_coil.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_coil.h)
 
 `#include <fwd/fwd_coil.h>`
 
 ```cpp
-class FWDLIB::FwdCoil
+class mne::FwdCoil
 ```
 
 Implements [`FwdCoil`](/docs/api/fwd/fwd-coil) (replaces `fwdCoil` / `fwdCoilRec` from MNE-C ``fwd_types.h``).
@@ -162,7 +162,7 @@ Transform coordinate frame if so desired.
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 116"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 114"
 auto templates = FwdCoilSet::read_coil_defs(coilDefs.toStdU16String()); // integration points per coil type
 auto coils = templates->create_meg_coils(meg, static_cast<int>(meg.size()), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
 const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates

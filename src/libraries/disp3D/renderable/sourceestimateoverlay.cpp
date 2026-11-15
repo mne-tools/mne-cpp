@@ -26,7 +26,7 @@
 #include <QDebug>
 #include <cmath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -47,12 +47,12 @@ SourceEstimateOverlay::~SourceEstimateOverlay()
 
 bool SourceEstimateOverlay::loadStc(const QString& path, int hemi)
 {
-    auto read = INVLIB::InvSourceEstimate::read(path.toStdU16String());
+    auto read = mne::InvSourceEstimate::read(path.toStdU16String());
     if (!read) {
         qWarning() << "SourceEstimateOverlay::loadStc -" << read.error().what();
         return false;
     }
-    INVLIB::InvSourceEstimate& stc = *read;
+    mne::InvSourceEstimate& stc = *read;
 
     if (hemi == 0) {
         m_stcLh = stc;
@@ -95,7 +95,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
         return;
 
     int hemi = surface->hemi();
-    const INVLIB::InvSourceEstimate* stc = nullptr;
+    const mne::InvSourceEstimate* stc = nullptr;
     QSharedPointer<Eigen::SparseMatrix<float>> interpMat;
 
     if (hemi == 0 && m_hasLh) {
@@ -144,7 +144,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
         // Note: interpolateSignal returns by value, not QSharedPointer, so assignment matches
-        interpolatedData = DISP3DLIB::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
+        interpolatedData = mne::disp::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
@@ -266,7 +266,7 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
     maxVal = std::numeric_limits<double>::lowest();
 
     // applyToSurface() colours |data|, so the range is that of the magnitudes
-    for (const INVLIB::InvSourceEstimate* stc : {m_hasLh ? &m_stcLh : nullptr, m_hasRh ? &m_stcRh : nullptr}) {
+    for (const mne::InvSourceEstimate* stc : {m_hasLh ? &m_stcLh : nullptr, m_hasRh ? &m_stcRh : nullptr}) {
         if (stc && stc->data.size() > 0) {
             minVal = qMin(minVal, stc->data.cwiseAbs().minCoeff());
             maxVal = qMax(maxVal, stc->data.cwiseAbs().maxCoeff());
@@ -284,7 +284,7 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
 
 uint32_t SourceEstimateOverlay::valueToColor(double value, uint8_t alpha) const
 {
-    QRgb rgb = DISPLIB::ColorMap::valueToColor(value, m_colormap);
+    QRgb rgb = mne::disp::ColorMap::valueToColor(value, m_colormap);
 
     uint32_t r = qRed(rgb);
     uint32_t g = qGreen(rgb);
@@ -301,7 +301,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
     if (!surface)
         return;
 
-    const INVLIB::InvSourceEstimate* stc = nullptr;
+    const mne::InvSourceEstimate* stc = nullptr;
     QSharedPointer<Eigen::SparseMatrix<float>>* pMatPtr = nullptr;
 
     if (hemi == 0 && m_hasLh) {
@@ -338,7 +338,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
     // This uses Dijkstra's algorithm via GeometryInfo::scdc
     // Note: This can be slow for many sources!
     qDebug() << "SourceEstimateOverlay: Computing distance table (SCDC)...";
-    QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
+    QSharedPointer<Eigen::MatrixXd> distTable = mne::disp::GeometryInfo::scdc(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
@@ -351,10 +351,10 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
 
     // 2. Create Interpolation Matrix
     qDebug() << "SourceEstimateOverlay: Creating interpolation matrix...";
-    *pMatPtr = DISP3DLIB::Interpolation::createInterpolationMat(
+    *pMatPtr = mne::disp::Interpolation::createInterpolationMat(
         vecSourceVertices,
         distTable,
-        DISP3DLIB::Interpolation::cubic, // Use cubic interpolation function
+        mne::disp::Interpolation::cubic, // Use cubic interpolation function
         cancelDist);
 
     if (*pMatPtr && (*pMatPtr)->rows() > 0) {
@@ -367,7 +367,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setStcData(const INVLIB::InvSourceEstimate& stc, int hemi)
+void SourceEstimateOverlay::setStcData(const mne::InvSourceEstimate& stc, int hemi)
 {
     if (hemi == 0) {
         m_stcLh = stc;
@@ -432,4 +432,4 @@ Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
     return result;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

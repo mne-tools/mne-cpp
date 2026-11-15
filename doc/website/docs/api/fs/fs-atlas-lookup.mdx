@@ -1,18 +1,18 @@
 ---
 id: fs-atlas-lookup
-title: "FSLIB::FsAtlasLookup"
+title: "mne::FsAtlasLookup"
 sidebar_label: FsAtlasLookup
 sidebar_position: 6
 ---
 
 # FsAtlasLookup
 
-**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_atlas_lookup.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_atlas_lookup.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_atlas_lookup.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_atlas_lookup.h)
 
 `#include <fs/fs_atlas_lookup.h>`
 
 ```cpp
-class FSLIB::FsAtlasLookup
+class mne::FsAtlasLookup
 ```
 
 RAS-point → anatomical-region resolver backed by a FreeSurfer volumetric parcellation.
@@ -111,7 +111,7 @@ const std::vector<Vector3f> points{Vector3f(-4.0f, -4.0f, -4.0f), Vector3f(2.0f,
 const std::vector<std::string> regionsAt = atlas.labels_for_positions(points);
 // nibabel: inv(affine) maps (-4,-4,-4) to voxel (0,0,0) and (2,0,-2) to voxel (3,2,1)
 ok &= expect(atlas.is_loaded() && regionsAt == std::vector<std::string>{"Left-Hippocampus", "Right-Hippocampus", "Unknown"},
-             std::format("atlas lookup: {}", BASELIB::join(regionsAt, ", ")));
+             std::format("atlas lookup: {}", mne::join(regionsAt, ", ")));
 ````
 
 ## Authors of this file

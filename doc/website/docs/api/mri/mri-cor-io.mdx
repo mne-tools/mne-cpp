@@ -1,23 +1,23 @@
 ---
 id: mri-cor-io
-title: "MRILIB::MriCorIO"
+title: "mne::MriCorIO"
 sidebar_label: MriCorIO
 sidebar_position: 2
 ---
 
 # MriCorIO
 
-**Namespace:** `MRILIB` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_cor_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_cor_io.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MRI Library &nbsp;·&nbsp; **Source:** [`mri/mri_cor_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mri/mri_cor_io.h)
 
 `#include <mri/mri_cor_io.h>`
 
 ```cpp
-class MRILIB::MriCorIO
+class mne::MriCorIO
 ```
 
 Stateless reader for the FreeSurfer COR-NNN directory layout.
 
-Walks a `mri/T1` (or `mri/orig`, `mri/brain`, …) directory, loads the 256 `COR-001` … `COR-256` flat 256×256 unsigned-char coronal slice files, and assembles them into an [`MriVolData`](/docs/api/mri/mri-vol-data) with the per-slice coordinate transform (slice→surface RAS) the rest of `MRILIB` expects. The class exposes only `static` methods  there is no per-instance state, the caller supplies the directory path and an output volume.
+Walks a `mri/T1` (or `mri/orig`, `mri/brain`, …) directory, loads the 256 `COR-001` … `COR-256` flat 256×256 unsigned-char coronal slice files, and assembles them into an [`MriVolData`](/docs/api/mri/mri-vol-data) with the per-slice coordinate transform (slice→surface RAS) the rest of mne_mri expects. The class exposes only `static` methods  there is no per-instance state, the caller supplies the directory path and an output volume.
 
 Ported from `make_cor_set()` in MNE C `mne_make_cor_set` by Matti Hamalainen.
 
@@ -65,7 +65,7 @@ Expects files named COR-001 through COR-256, each containing 256×256 unsigned c
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
-````cpp title="src/examples/ex_mri/main.cpp, line 141"
+````cpp title="src/examples/ex_mri/main.cpp, line 140"
 std::vector<MriSlice> corSlices;
 MriCorIO::read(corDir.toStdString(), corSlices);
 ok &= expect(corSlices.size() == 256 && corSlices[7].pixels.size() == 256 * 256 && corSlices[7].pixels[0] == 7,

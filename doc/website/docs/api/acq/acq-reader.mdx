@@ -1,18 +1,18 @@
 ---
 id: acq-reader
-title: "ACQLIB::AcqReader"
+title: "mne::AcqReader"
 sidebar_label: AcqReader
 sidebar_position: 3
 ---
 
 # AcqReader
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_reader.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_reader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_reader.h)
 
 `#include <acq/acq_reader.h>`
 
 ```cpp
-class ACQLIB::AcqReader
+class mne::AcqReader
 ```
 
 A consumer of one [`AcqStream`](/docs/api/acq/acq-stream).
@@ -248,7 +248,7 @@ Copying convenience: waits for `out.cols` samples, decodes them into `out` and r
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -256,7 +256,7 @@ Copying convenience: waits for `out.cols` samples, decodes them into `out` and r
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 406"
 /** The card: writes the input ring in 1 ms blocks at the real-time rate and plays the output ring. */

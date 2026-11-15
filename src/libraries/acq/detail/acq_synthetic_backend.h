@@ -20,15 +20,15 @@
 #include "../acq_device_registry.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Registers synthetic:// with @p registry. */
 AcqError registerSyntheticScheme(AcqDeviceRegistry& registry);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_SYNTHETIC_BACKEND_H

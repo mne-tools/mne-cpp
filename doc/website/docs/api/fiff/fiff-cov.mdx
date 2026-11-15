@@ -1,13 +1,13 @@
 ---
 id: fiff-cov
-title: "FIFFLIB::FiffCov"
+title: "mne::FiffCov"
 sidebar_label: FiffCov
 sidebar_position: 6
 ---
 
 # FiffCov
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_cov.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_cov.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_cov.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_cov.h)
 
 :::info[Python equivalent]
 `mne.Covariance` in MNE-Python.
@@ -18,12 +18,12 @@ sidebar_position: 6
 <Connections topics={["noise-covariance"]} context="api" current="FiffCov" />
 
 ```cpp
-class FIFFLIB::FiffCov
+class mne::FiffCov
 ```
 
 FIFF noise / data covariance: matrix, channel names, kind, applied projectors, bads, dof and optional whitening eigendecomposition.
 
-Round-trips with `*-cov.fif` files and with `mne.Covariance` in MNE-Python. Carries both the raw matrix and the metadata needed to regularize, project away SSP subspaces, and pre-whiten downstream forward / inverse computations.
+Round-trips with `*-cov.fif` files and with ``mne.Covariance`` in MNE-Python. Carries both the raw matrix and the metadata needed to regularize, project away SSP subspaces, and pre-whiten downstream forward / inverse computations.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
 FiffCov cov((dir + "/sample_audvis-cov.fif").toStdString());
@@ -284,7 +284,7 @@ ok &= expect(cov.dim == 366 && cov.nfree == 15972 && cov.bads.size() == 2 && cov
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 200"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 196"
 RtCov rtCov(info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {
@@ -299,7 +299,7 @@ ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && 
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 114"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 111"
 FsLabel::read((data + "/subjects/sample/label/lh.V1.label").toStdU16String(), v1);
 const std::filesystem::path fwdPath = (data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String();
 const MNEForwardSolution fwd = MNEForwardSolution(fwdPath).pick_regions({v1}); // 70 sources x 3 orientations

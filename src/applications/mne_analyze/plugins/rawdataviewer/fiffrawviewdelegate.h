@@ -38,13 +38,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class ChannelData;
 class EventModel;
 }
 
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 struct Event;
 }
@@ -137,7 +137,7 @@ private:
      */
     void createPlotPath(const QStyleOptionViewItem& option,
                         QPainterPath& path,
-                        ANSHAREDLIB::ChannelData& data,
+                        mne::analyze::ChannelData& data,
                         double dDx,
                         const QModelIndex& index) const;
 
@@ -153,7 +153,7 @@ private:
     void createTimeSpacersPath(const QModelIndex& index,
                                const QStyleOptionViewItem& option,
                                QPainterPath& path,
-                               ANSHAREDLIB::ChannelData& data) const;
+                               mne::analyze::ChannelData& data) const;
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ private:
     void createEventsPath(const QModelIndex& index,
                           const QStyleOptionViewItem& option,
                           QPainterPath& path,
-                          ANSHAREDLIB::ChannelData& data,
+                          mne::analyze::ChannelData& data,
                           QPainter* painter) const;
 
     //=========================================================================================================
@@ -185,8 +185,8 @@ private:
      * @param[in] iStart            First sample currently drawn.
      * @param[in] dDx               Horizontal pixels per sample.
      */
-    void paintEvent(const EVENTSLIB::Event& event,
-                    ANSHAREDLIB::EventModel* pEventModel,
+    void paintEvent(const mne::analyze::events::Event& event,
+                    mne::analyze::EventModel* pEventModel,
                     QPainter* painter,
                     float fInitX,
                     float fTop,

@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Set of channel derivations (montages): MNE-C derivation files, text definitions and matching to recordings.
  *
- * @ref MNELIB::MNEDerivSet is the C++ counterpart of MNE-C's @c mneDerivSet
+ * @ref mne::MNEDerivSet is the C++ counterpart of MNE-C's @c mneDerivSet
  * (@c mne_derivations.c, @c mne_make_derivations). A derivation defines a
  * virtual channel as a weighted sum of recorded channels, e.g. a bipolar
  * pair or an average reference. Sets are read and written as
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -182,6 +182,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEDERIVSET_H

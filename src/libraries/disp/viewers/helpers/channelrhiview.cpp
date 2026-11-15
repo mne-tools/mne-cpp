@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // Uniform block layout — must match channeldata.vert / channeldata.frag

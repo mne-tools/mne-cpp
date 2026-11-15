@@ -13,12 +13,12 @@
  * @brief    2-D sensor-layout view placing per-channel evoked traces at their physical positions.
  *
  * AverageLayoutView embeds a @c QGraphicsView driven by an
- * @ref DISPLIB::AverageScene that draws an @ref DISPLIB::AverageSceneItem (one mini
+ * @ref mne::disp::AverageScene that draws an @ref mne::disp::AverageSceneItem (one mini
  * evoked-trace plot) at each sensor coordinate read from the active
- * @c Layout. It listens to an @ref DISPLIB::EvokedSetModel for new averaged
- * responses and to a @ref DISPLIB::ChannelInfoModel for channel-type / bad
+ * @c Layout. It listens to an @ref mne::disp::EvokedSetModel for new averaged
+ * responses and to a @ref mne::disp::ChannelInfoModel for channel-type / bad
  * flags, and supports per-condition colour selection and selective
- * channel display via @ref DISPLIB::SelectionItem groups.
+ * channel display via @ref mne::disp::SelectionItem groups.
  */
 
 #ifndef AVERAGELAYOUTVIEW_H
@@ -46,20 +46,20 @@
 class QGraphicsView;
 class QGraphicsItem;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class AverageScene;
@@ -208,7 +208,7 @@ public:
      *
      * @param[in] pFiffInfo    shared pointer to Fiff Info of currently loaded data.
      */
-    void setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void setFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -267,11 +267,11 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    std::shared_ptr<AverageScene> m_pAverageScene;                  /**< The pointer to the average scene. */
-    std::shared_ptr<DISPLIB::EvokedSetModel> m_pEvokedSetModel;     /**< The data model. */
-    std::shared_ptr<DISPLIB::ChannelInfoModel> m_pChannelInfoModel; /**< Channel info model. */
+    std::shared_ptr<AverageScene> m_pAverageScene;                    /**< The pointer to the average scene. */
+    std::shared_ptr<mne::disp::EvokedSetModel> m_pEvokedSetModel;     /**< The data model. */
+    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel; /**< Channel info model. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< FiffInfo for currently loaded file. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo for currently loaded file. */
 
     QPointer<QGraphicsView> m_pAverageLayoutView; /**< View for 2D average layout scene. */
 

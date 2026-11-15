@@ -25,7 +25,7 @@
 #include <QVector3D>
 #include <QtMath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -223,4 +223,4 @@ InstancedStreams PolylineObject::streams() const
             m_iInstanceCount};
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

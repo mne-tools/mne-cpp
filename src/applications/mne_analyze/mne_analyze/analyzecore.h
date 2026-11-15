@@ -33,7 +33,7 @@
 
 class QSplashScreen;
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class AbstractPlugin;
 class PluginManager;
@@ -104,7 +104,7 @@ public:
     /**
      * Retrieve all the loaded plugins from the Application.
      */
-    QVector<ANSHAREDLIB::AbstractPlugin*> getLoadedPlugins();
+    QVector<mne::analyze::AbstractPlugin*> getLoadedPlugins();
 
     //=========================================================================================================
     /**
@@ -164,10 +164,10 @@ private:
      */
     void loadandInitPlugins();
 
-    QSharedPointer<ANSHAREDLIB::PluginManager> m_pPluginManager; /**< Holds plugin manager. */
-    QSharedPointer<ANSHAREDLIB::AnalyzeData> m_pAnalyzeData;     /**< The global data base. */
-    QPointer<MainWindow> m_pMainWindow;                          /**< The main window. */
-    QCommandLineParser m_cmdLineParser;                          /**< The command line parser. */
+    QSharedPointer<mne::analyze::PluginManager> m_pPluginManager; /**< Holds plugin manager. */
+    QSharedPointer<mne::analyze::AnalyzeData> m_pAnalyzeData;     /**< The global data base. */
+    QPointer<MainWindow> m_pMainWindow;                           /**< The main window. */
+    QCommandLineParser m_cmdLineParser;                           /**< The command line parser. */
 };
 
 //=============================================================================================================

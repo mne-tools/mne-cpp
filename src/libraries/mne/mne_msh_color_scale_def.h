@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Mesh-display colour scale definition (FreeSurfer @c mri_glm style).
  *
- * @ref MNELIB::MNEMshColorScaleDef holds the threshold / fmid / fmax
+ * @ref mne::MNEMshColorScaleDef holds the threshold / fmid / fmax
  * triplet, the colormap kind and the sign mode used by the legacy
  * @c tksurfer / @c mneAnalyze viewers when mapping a scalar overlay
  * (curvature, sulcal depth, t-statistic, source estimate amplitude)
@@ -27,10 +27,10 @@
 #include "mne_global.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -58,6 +58,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMSHCOLORSCALEDEF_H

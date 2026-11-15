@@ -62,7 +62,7 @@ using namespace SHOWFIFF;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_show_fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

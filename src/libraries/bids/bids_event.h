@@ -14,10 +14,10 @@
  * @c duration (seconds) and a recommended @c trial_type label;
  * mne-cpp additionally tracks the original 0-based @c sample index and
  * the numeric trigger @c value so the record can round-trip back into
- * FIFF @c stim-channel land without re-deriving them. @ref BIDSLIB::BidsEvent is
- * the per-row value object and the static @ref BIDSLIB::BidsEvent::read_tsv "BidsEvent::read_tsv" /
- * @ref BIDSLIB::BidsEvent::write_tsv "BidsEvent::write_tsv" functions perform the TSV round-trip via
- * @ref BIDSLIB::BidsTsv. Missing / @c n/a fields default to zero / empty so
+ * FIFF @c stim-channel land without re-deriving them. @ref mne::BidsEvent is
+ * the per-row value object and the static @ref mne::BidsEvent::read_tsv "BidsEvent::read_tsv" /
+ * @ref mne::BidsEvent::write_tsv "BidsEvent::write_tsv" functions perform the TSV round-trip via
+ * @ref mne::BidsTsv. Missing / @c n/a fields default to zero / empty so
  * partially-populated event files still round-trip.
  *
  * Spec: https://bids-specification.readthedocs.io/en/stable/modality-agnostic-files.html#tasks
@@ -42,10 +42,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -87,6 +87,6 @@ struct BIDSSHARED_EXPORT BidsEvent
                           std::span<const BidsEvent> events);
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_EVENT_H

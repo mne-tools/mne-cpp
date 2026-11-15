@@ -1,20 +1,20 @@
 ---
 id: inv-cmne
-title: "INVLIB::InvCMNE"
+title: "mne::InvCMNE"
 sidebar_label: InvCMNE
 sidebar_position: 2
 ---
 
 # InvCMNE
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_cmne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_cmne.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_cmne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_cmne.h)
 
 `#include <inv/inv_cmne.h>`
 
 <Connections topics={["cmne"]} context="api" current="InvCMNE" />
 
 ```cpp
-class INVLIB::InvCMNE
+class mne::InvCMNE
 ```
 
 Contextual Minimum Norm Estimate (CMNE) inverse solver.
@@ -185,7 +185,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 **Returns:**
 
-- *[PythonRunnerResult](/docs/api/pybridge/python-runner-result)* — PythonRunnerResult with exit code, captured output and progress.
+- *[PythonRunnerResult](/docs/api/pybridge/python-runner-result)* — [`PythonRunnerResult`](/docs/api/pybridge/python-runner-result) with exit code, captured output and progress.
 
 ---
 
@@ -202,7 +202,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices.
 
-````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 137"
+````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 134"
 const MatrixXd sourceCov = MatrixXd::Identity(fwd.nsource, fwd.nsource);
 InvCMNEResult cmne = InvCMNE::compute(evoked.data, fwd.sol.data, noiseCov.data, sourceCov, settings);
 if (cmne.stcCmne.empty()) {

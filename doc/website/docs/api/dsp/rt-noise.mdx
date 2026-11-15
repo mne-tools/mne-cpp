@@ -1,18 +1,18 @@
 ---
 id: rt-noise
-title: "DSPLIB::RtNoise"
+title: "mne::RtNoise"
 sidebar_label: RtNoise
 sidebar_position: 39
 ---
 
 # RtNoise
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_noise.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_noise.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_noise.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_noise.h)
 
 `#include <dsp/rt_noise.h>`
 
 ```cpp
-class DSPLIB::RtNoise
+class mne::RtNoise
 ```
 
 Controller that manages [`RtNoiseWorker`](/docs/api/dsp/rt-noise-worker) for real-time noise spectrum estimation.
@@ -132,7 +132,7 @@ Blocks until the worker thread has finished, or until the timeout (ms) expires.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 232"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 228"
 RtNoise rtNoise(64, info200, 10);
 bool noiseDone = false;
 QObject::connect(&rtNoise, &RtNoise::SpecCalculated, [&](const MatrixXd& psd) { noiseDone = psd.topRows(2).isApprox(spectrum.topRows(2)); }); // the empty stim row is -inf dB

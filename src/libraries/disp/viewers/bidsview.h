@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.7
  * @date     October 2020
- * @brief    Tree view of the BIDS dataset hierarchy backed by @ref DISPLIB::BidsViewModel.
+ * @brief    Tree view of the BIDS dataset hierarchy backed by @ref mne::disp::BidsViewModel.
  *
- * BidsView wraps a @c QTreeView around a @ref DISPLIB::BidsViewModel so the
+ * BidsView wraps a @c QTreeView around a @ref mne::disp::BidsViewModel so the
  * user can browse a loaded BIDS dataset (subjects → sessions →
  * runs → derivatives) and double-click items to load them into the
  * application. Context-menu actions expose import / export / convert
@@ -49,10 +49,10 @@ class BidsViewWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -240,5 +240,5 @@ signals:
     void onMoveData(QModelIndex sessionIndex,
                     QModelIndex dataIndex);
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 #endif // BIDSVIEW_H

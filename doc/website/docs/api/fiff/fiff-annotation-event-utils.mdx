@@ -7,7 +7,7 @@ sidebar_position: 10
 
 # FiffAnnotationEventUtils
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-Two representations coexist in MNE workflows: free-text [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to `mne.Epochs`. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror `mne.events_from_annotations` and `mne.annotations_from_events` in MNE-Python.
+Two representations coexist in MNE workflows: free-text [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) entries (onset / duration / description) and integer (sample, prev, code) event triples extracted from a stim channel or fed to ``mne.Epochs``. These free functions translate between the two: mapping annotation descriptions to event codes via a description→code table, exploding annotation durations into start / stop event pairs, and the reverse aggregation. They mirror ``mne.events_from_annotations`` and ``mne.annotations_from_events`` in MNE-Python.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
 MatrixXi firstThree = events.events.topRows(3);
@@ -31,7 +31,7 @@ FiffAnnotations annotations = annotations_from_events(firstThree, info.sfreq, {{
 annotations.append(0.5, 1.0, "BAD_blink"); // onset s, duration s, description
 const std::filesystem::path csv = tmp.filePath("annot.csv").toStdString();
 const bool annotationsWritten = annotations.write(csv).has_value();
-const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws BASELIB::Error
+const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws mne::Error
 const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
 ```
 
@@ -45,7 +45,7 @@ const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("aud
 [FiffAnnotations](/docs/api/fiff/fiff-annotations) annotations_from_events(const Eigen::MatrixXi & events, double sfreq, const std::map< int, std::string > & event_desc, int first_sample);
 ```
 
-Converts events to annotations, like mne.annotations_from_events.
+Converts events to annotations, like `mne.annotations_from_events`.
 
 Each event becomes a point annotation at (sample - first_sample) / sfreq, described by the label of its id (the third column) or, without a label, by the id itself.
 
@@ -75,7 +75,7 @@ Each event becomes a point annotation at (sample - first_sample) / sfreq, descri
 Eigen::MatrixXi events_from_annotations(const [FiffAnnotations](/docs/api/fiff/fiff-annotations) & annotations, double sfreq, const std::map< std::string, int, std::less<> > & event_id, int first_sample);
 ```
 
-Converts annotations to events, like mne.events_from_annotations.
+Converts annotations to events, like `mne.events_from_annotations`.
 
 Each annotation becomes a row [sample, 0, id], with the id of its description in `event_id` or, failing that, the description read as an integer, or 0.
 
@@ -105,7 +105,7 @@ Each annotation becomes a row [sample, 0, id], with the id of its description in
 std::map< std::string, int, std::less<> > count_annotations(const [FiffAnnotations](/docs/api/fiff/fiff-annotations) & annotations);
 ```
 
-Counts annotations by description, like mne.count_annotations.
+Counts annotations by description, like `mne.count_annotations`.
 
 **Parameters:**
 

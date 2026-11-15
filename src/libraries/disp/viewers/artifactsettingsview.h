@@ -55,21 +55,21 @@ namespace Ui
 class AverageSettingsViewWidget;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvokedSet;
 class FiffChInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -86,7 +86,7 @@ class DISPSHARED_EXPORT ArtifactSettingsView : public AbstractView
 
 public:
     explicit ArtifactSettingsView(const QString& sSettingsPath = "",
-                                  const std::vector<FIFFLIB::FiffChInfo>& fiffChInfoList = std::vector<FIFFLIB::FiffChInfo>(),
+                                  const std::vector<mne::FiffChInfo>& fiffChInfoList = std::vector<mne::FiffChInfo>(),
                                   QWidget* parent = nullptr);
 
     //=========================================================================================================
@@ -95,7 +95,7 @@ public:
      */
     ~ArtifactSettingsView();
 
-    void setChInfo(const std::vector<FIFFLIB::FiffChInfo>& fiffChInfoList);
+    void setChInfo(const std::vector<mne::FiffChInfo>& fiffChInfoList);
 
     QMap<QString, double> getThresholdMap();
 
@@ -153,7 +153,7 @@ protected:
     QMap<QString, int> m_mapThresholdsSecond;
     QMap<QString, double> m_mapThresholds;
 
-    std::vector<FIFFLIB::FiffChInfo> m_fiffChInfoList;
+    std::vector<mne::FiffChInfo> m_fiffChInfoList;
 
     bool m_bDoArtifactThresholdReduction = false;
 

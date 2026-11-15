@@ -7,16 +7,16 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    INVLIB library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
+ * @brief    mne_inv library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
  *
- * The INVLIB library bundles every inverse-method, beamformer and HPI-fit
+ * The mne_inv library bundles every inverse-method, beamformer and HPI-fit
  * class used by mne-cpp: minimum-norm / dSPM / sLORETA / eLORETA, LCMV and
  * DICS beamformers, RAP-MUSIC, TRAP-MUSIC, MxNE / TF-MxNE / Gamma-MAP,
  * contextual MNE (CMNE), ECD dipole fitting and continuous head-position
  * estimation. This header defines the @c INVSHARED_EXPORT macro that
  * controls symbol visibility for the shared/static build variants, declares
- * the @c INVLIB namespace, and exposes @ref INVLIB::buildDateTime "buildDateTime" and
- * @ref INVLIB::buildHash "buildHash" so applications can stamp the linked INVLIB version into
+ * the @c mne_inv namespace, and exposes @ref mne::buildDateTime "buildDateTime" and
+ * @ref mne::buildHash "buildHash" so applications can stamp the linked mne_inv version into
  * log files and reports.
  */
 
@@ -52,15 +52,10 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace INVLIB
- * @brief     Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting).
- */
-namespace INVLIB
+namespace mne
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

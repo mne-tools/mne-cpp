@@ -1,18 +1,18 @@
 ---
 id: mne-event
-title: "MNELIB::MNEEvent"
+title: "mne::MNEEvent"
 sidebar_label: MNEEvent
 sidebar_position: 20
 ---
 
 # MNEEvent
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_event.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_event.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_event.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_event.h)
 
 `#include <mne/mne_event.h>`
 
 ```cpp
-class MNELIB::MNEEvent
+class mne::MNEEvent
 ```
 
 Single trigger-event marker.
@@ -47,7 +47,7 @@ const MNEEventList leftAuditory = relative->select_onsets(1);
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 462"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 460"
 // Annotate the detected onsets, save them with their comments and read them back relative to the first sample
 MNEEventList annotated = MNEEventList::from_matrix(events.events).select_onsets();
 annotated.sort();

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::FilterThreadArg.
+ * @brief    Implementation of @ref mne::FilterThreadArg.
  *
  * Provides constructors and the deep-copy semantics needed when the
  * argument is queued across a thread boundary.
@@ -30,7 +30,7 @@ constexpr int FAIL = -1;
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

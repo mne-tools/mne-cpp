@@ -39,14 +39,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffRawViewModel;
@@ -414,8 +414,8 @@ public:
      *
      * @return  Pointer to a vector of events.
      */
-    std::unique_ptr<std::vector<EVENTSLIB::Event>> getEventsToDisplay(int iBegin,
-                                                                      int iEnd) const;
+    std::unique_ptr<std::vector<mne::analyze::events::Event>> getEventsToDisplay(int iBegin,
+                                                                                 int iEnd) const;
 
     //=========================================================================================================
     /**
@@ -423,7 +423,7 @@ public:
      *
      * @return Pointer to a vector of groups
      */
-    std::unique_ptr<std::vector<EVENTSLIB::EventGroup>> getGroupsToDisplay() const;
+    std::unique_ptr<std::vector<mne::analyze::events::EventGroup>> getGroupsToDisplay() const;
 
     //=========================================================================================================
     /**
@@ -551,7 +551,7 @@ private:
 
     QSharedPointer<FiffRawViewModel> m_pFiffModel; /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 
-    EVENTSLIB::EventManager m_EventManager; /**< Database of of events. */
+    mne::analyze::events::EventManager m_EventManager; /**< Database of of events. */
 
     const static double m_dThreshold;
 };

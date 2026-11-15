@@ -29,10 +29,10 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -128,6 +128,6 @@ std::unexpected<Error> fail(ErrorCode code, std::format_string<Args...> format, 
     return std::unexpected(Error(code, std::format(format, std::forward<Args>(args)...)));
 }
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_ERROR_H

@@ -29,8 +29,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -216,7 +216,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<NeuromagTransport> ACQLIB::detail::make_neuromag_simulator(const NeuromagSimulation& simulation)
+std::unique_ptr<NeuromagTransport> mne::detail::make_neuromag_simulator(const NeuromagSimulation& simulation)
 {
     return std::make_unique<NeuromagSimulator>(simulation);
 }

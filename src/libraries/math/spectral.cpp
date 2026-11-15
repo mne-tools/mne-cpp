@@ -19,7 +19,7 @@
  *
  * Numerical conventions match MNE-Python's @c psd_array_multitaper and
  * @c csd_array_multitaper so coherence, phase-locking and DICS results
- * computed downstream by CONNECTIVITYLIB remain comparable across the
+ * computed downstream by mne_connectivity remain comparable across the
  * two stacks.
  */
 
@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

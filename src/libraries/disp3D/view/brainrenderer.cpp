@@ -25,7 +25,7 @@
 #include "renderable/videooverlay.h"
 #include "renderable/sliceobject.h"
 
-using DISP3DLIB::VideoOverlay;
+using mne::disp::VideoOverlay;
 
 #include <QFile>
 #include <QDebug>
@@ -36,7 +36,7 @@ using DISP3DLIB::VideoOverlay;
 #include <cstring>
 #include <unordered_map>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -1145,7 +1145,7 @@ void BrainRenderer::issueVideoOverlayDraw(QRhiCommandBuffer* cb,
 
 void BrainRenderer::prepareSlice(QRhi* rhi,
                                  QRhiResourceUpdateBatch* u,
-                                 DISP3DLIB::SliceObject* slice,
+                                 mne::disp::SliceObject* slice,
                                  int slotIndex)
 {
     if (!rhi || !u || d->insidePass("prepareSlice"))
@@ -1590,4 +1590,4 @@ void BrainRenderer::issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* pol
         d->issueInstanced(cb, uniformOffset, polyline->renderKey(), polyline->streams(), d->pipelines[Dipole].get());
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

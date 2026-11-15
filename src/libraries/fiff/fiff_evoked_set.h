@@ -15,13 +15,13 @@
  *
  * A single ``*-ave.fif`` typically contains several @c FIFFB_EVOKED
  * blocks (one per stimulus condition / averaging category). @ref
- * FIFFLIB::FiffEvokedSet groups them: a shared @ref FIFFLIB::FiffInfo and a list of
- * @ref FIFFLIB::FiffEvoked instances, plus channel-picking and compensation
+ * mne::FiffEvokedSet groups them: a shared @ref mne::FiffInfo and a list of
+ * @ref mne::FiffEvoked instances, plus channel-picking and compensation
  * helpers that apply uniformly to the whole set.
  *
  * The header additionally ports the three batch-averaging descriptor
- * structs from MNE-C's @c browser_types.h (@ref FIFFLIB::RejectionParams,
- * @ref FIFFLIB::AverageCategory, @ref FIFFLIB::AverageDescription) so the @c mne_browse_raw
+ * structs from MNE-C's @c browser_types.h (@ref mne::RejectionParams,
+ * @ref mne::AverageCategory, @ref mne::AverageDescription) so the @c mne_browse_raw
  * "ave description" files can be parsed and consumed verbatim. Together
  * they describe artifact-rejection thresholds, per-category timing and
  * trigger logic, and the file-level output settings used by the
@@ -58,10 +58,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 class FiffRawData;
@@ -171,7 +171,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads evoked data sets of a FIFF file, like read(); throws BASELIB::Error if it cannot.
+     * Reads evoked data sets of a FIFF file, like read(); throws mne::Error if it cannot.
      *
      * @param[in] path         The file.
      * @param[in] conditions   Indices or comments of the averages to read, in this order; empty reads all.
@@ -265,10 +265,10 @@ public:
      *
      * @return The evoked data sets, or why the file does not hold them.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvokedSet> read(const std::filesystem::path& path,
-                                                               const std::vector<FiffEvoked::Condition>& conditions = {},
-                                                               const FiffEvoked::Baseline& baseline = {},
-                                                               bool proj = true);
+    [[nodiscard]] static mne::Expected<FiffEvokedSet> read(const std::filesystem::path& path,
+                                                           const std::vector<FiffEvoked::Condition>& conditions = {},
+                                                           const FiffEvoked::Baseline& baseline = {},
+                                                           bool proj = true);
 
     //=========================================================================================================
     /**
@@ -278,7 +278,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> save(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> save(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**

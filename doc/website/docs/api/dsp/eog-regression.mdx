@@ -1,13 +1,13 @@
 ---
 id: eog-regression
-title: "DSPLIB::EogRegression"
+title: "mne::EogRegression"
 sidebar_label: EogRegression
 sidebar_position: 10
 ---
 
 # EogRegression
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/eog_regression.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/eog_regression.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/eog_regression.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/eog_regression.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.EOGRegression` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 10
 `#include <dsp/eog_regression.h>`
 
 ```cpp
-class DSPLIB::EogRegression
+class mne::EogRegression
 ```
 
 Remove EOG artifacts via linear regression.
@@ -44,7 +44,7 @@ Constructs a default [`EogRegression`](/docs/api/dsp/eog-regression) object.
 
 Fit regression coefficients from EOG to all other channels.
 
-Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^\{-1\}, T being the good data channels ([FiffInfoBase](/docs/api/fiff/fiff-info-base)::pick_data_channels without the bads).
+Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^\{-1\}, T being the good data channels (`FiffInfoBase::pick_data_channels` without the bads).
 
 **Parameters:**
 
@@ -54,7 +54,7 @@ Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^\{-1\}, T
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (identifies EOG channels by kind == FIFFV_EOG_CH).
 
-- **eogChannels** : *const BASELIB::StringList &*
+- **eogChannels** : *const mne::StringList &*
   Optional explicit EOG channel names. If empty, the good channels of kind FIFFV_EOG_CH.
 
 ---
@@ -109,7 +109,7 @@ Convenience: fit and apply in one step.
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info.
 
-- **eogChannels** : *const BASELIB::StringList &*
+- **eogChannels** : *const mne::StringList &*
   Optional explicit EOG channel names.
 
 ---
@@ -126,7 +126,7 @@ Convenience: fit and apply in one step.
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 184"
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 182"
 MatrixXd cleaned = data;
 EogRegression regression;
 regression.fit(cleaned, info); // EOG channels are found by kind

@@ -51,9 +51,9 @@ public:
 
     void init();
 
-    void setCovariance(const FIFFLIB::FiffCov& covariance,
+    void setCovariance(const mne::FiffCov& covariance,
                        const QString& sourceDescription = QString(),
-                       std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo = std::shared_ptr<FIFFLIB::FiffInfo>());
+                       std::shared_ptr<mne::FiffInfo> fiffInfo = std::shared_ptr<mne::FiffInfo>());
     void clearCovariance();
 
     void setWhiteningSettings(const WhiteningSettings& settings);
@@ -88,8 +88,8 @@ private:
     QDoubleSpinBox* m_pRegGradSpinBox = nullptr;
     QDoubleSpinBox* m_pRegEegSpinBox = nullptr;
 
-    FIFFLIB::FiffCov m_covariance;
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;
+    mne::FiffCov m_covariance;
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
     QString m_sSourceDescription;
 };
 

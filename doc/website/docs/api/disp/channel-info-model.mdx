@@ -1,23 +1,23 @@
 ---
 id: channel-info-model
-title: "DISPLIB::ChannelInfoModel"
+title: "mne::disp::ChannelInfoModel"
 sidebar_label: ChannelInfoModel
 sidebar_position: 15
 ---
 
 # ChannelInfoModel
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channelinfomodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channelinfomodel.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channelinfomodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channelinfomodel.h)
 
 `#include <disp/channelinfomodel.h>`
 
 ```cpp
-class DISPLIB::ChannelInfoModel
+class mne::disp::ChannelInfoModel
 ```
 
 QAbstractTableModel exposing per-channel FIFF metadata (name, type, unit, position, bad flag, mapping).
 
-Each row maps a FIFF channel to its presentation attributes and listens for live edits from the channel-selection / mapping dialogs so the underlying `FiffInfo` is updated in place.
+Each row maps a FIFF channel to its presentation attributes and listens for live edits from the channel-selection / mapping dialogs so the underlying [`FiffInfo`](/docs/api/fiff/fiff-info) is updated in place.
 
 ### Inheritance
 

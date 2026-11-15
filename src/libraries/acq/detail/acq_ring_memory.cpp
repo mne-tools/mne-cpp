@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB::detail;
+using namespace mne::detail;
 
 namespace
 {
@@ -244,8 +244,8 @@ bool mapMirror(RingMemory&, std::size_t, std::size_t, int) noexcept
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-RingMemory ACQLIB::detail::allocateRingMemory(std::size_t bytes, std::size_t alignment, bool hugePages,
-                                              int numaNode, bool mirror) noexcept
+RingMemory mne::detail::allocateRingMemory(std::size_t bytes, std::size_t alignment, bool hugePages,
+                                           int numaNode, bool mirror) noexcept
 {
     RingMemory out;
     if (mirror && !hugePages && mapMirror(out, bytes, alignment, numaNode)) {
@@ -316,7 +316,7 @@ RingMemory ACQLIB::detail::allocateRingMemory(std::size_t bytes, std::size_t ali
 
 //=============================================================================================================
 
-void ACQLIB::detail::lockRingMemory(RingMemory& memory) noexcept
+void mne::detail::lockRingMemory(RingMemory& memory) noexcept
 {
     if (memory.data == nullptr || memory.locked) {
         return;
@@ -331,7 +331,7 @@ void ACQLIB::detail::lockRingMemory(RingMemory& memory) noexcept
 
 //=============================================================================================================
 
-void ACQLIB::detail::releaseRingMemory(RingMemory& memory) noexcept
+void mne::detail::releaseRingMemory(RingMemory& memory) noexcept
 {
     if (memory.data == nullptr) {
         return;

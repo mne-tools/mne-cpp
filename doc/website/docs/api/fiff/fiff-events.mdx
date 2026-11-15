@@ -1,18 +1,18 @@
 ---
 id: fiff-events
-title: "FIFFLIB::FiffEvents"
+title: "mne::FiffEvents"
 sidebar_label: FiffEvents
 sidebar_position: 22
 ---
 
 # FiffEvents
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_events.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_events.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_events.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_events.h)
 
 `#include <fiff/fiff_events.h>`
 
 ```cpp
-class FIFFLIB::FiffEvents
+class mne::FiffEvents
 ```
 
 FIFF event list: (sample, prev, new) integer triples with read / write / detect / filter helpers.
@@ -382,7 +382,7 @@ ok &= expect(events.num_events() == 25 && events.events.row(0) == RowVector3i(13
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 231"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 229"
 QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 const FiffEvents events = FiffEvents::find_events(raw).value(); // rising edges on STI 014
@@ -402,7 +402,7 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 216"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 211"
     events = FiffEvents::read_fif(t_sEventName.toStdU16String()).value().events;
     printf("Events read from %s\n", t_sEventName.toUtf8().constData());
 } else {

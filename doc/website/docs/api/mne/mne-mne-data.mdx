@@ -1,13 +1,13 @@
 ---
 id: mne-mne-data
-title: "MNELIB::MNEMneData"
+title: "mne::MNEMneData"
 sidebar_label: MNEMneData
 sidebar_position: 30
 ---
 
 # MNEMneData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_mne_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_mne_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_mne_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_mne_data.h)
 
 :::info[Python equivalent]
 `mne.minimum_norm.estimate_snr` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 30
 `#include <mne/mne_mne_data.h>`
 
 ```cpp
-class MNELIB::MNEMneData
+class mne::MNEMneData
 ```
 
 Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C `mne_types.h`).
@@ -125,7 +125,7 @@ Fills all fields for one data set: projects it on the eigenfields, estimates the
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 130"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 127"
 const MNEMneData perTime = dspm.mneData(evoked);       // lambda2 estimated per time point (MNE-C mne_analyze)
 const MNEMneData atSnr3 = dspm.mneData(evoked, 9.0);   // power SNR 9: lambda2 = mean(sing^2) / 9
 const VectorXd amplitudeSnr = perTime.SNR.cwiseSqrt(); // == mne.minimum_norm.estimate_snr's snr

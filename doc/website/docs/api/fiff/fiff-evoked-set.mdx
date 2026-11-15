@@ -1,20 +1,20 @@
 ---
 id: fiff-evoked-set
-title: "FIFFLIB::FiffEvokedSet"
+title: "mne::FiffEvokedSet"
 sidebar_label: FiffEvokedSet
 sidebar_position: 31
 ---
 
 # FiffEvokedSet
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
 
 `#include <fiff/fiff_evoked_set.h>`
 
 <Connections topics={["epochs-averaging"]} context="api" current="FiffEvokedSet" />
 
 ```cpp
-class FIFFLIB::FiffEvokedSet
+class mne::FiffEvokedSet
 ```
 
 Set of [`FiffEvoked`](/docs/api/fiff/fiff-evoked) instances sharing one [`FiffInfo`](/docs/api/fiff/fiff-info), plus channel-picking and compensation helpers.
@@ -293,7 +293,7 @@ For each row (channel), the mean of the samples in [bminSamp, bminSamp+nBase) is
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 159"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 155"
 RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
 FiffEvokedSet evokedSet;
 QObject::connect(&averager, &RtAveragingWorker::resultReady,
@@ -313,7 +313,7 @@ if (avgOk) {
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 116"
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 115"
 // Hand the field to the pipeline as an evoked file with two samples.
 FiffEvokedSet evokedSet(sampleAve.toStdU16String());
 FiffEvoked evoked = evokedSet.evoked[0].pick_channels(StringList(fitData->ch_names.begin() + 0, fitData->ch_names.begin() + 0 + fitData->nmeg));

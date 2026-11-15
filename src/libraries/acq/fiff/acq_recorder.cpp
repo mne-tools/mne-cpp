@@ -72,9 +72,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using namespace FIFFLIB;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL
@@ -288,8 +287,8 @@ void putStim(std::byte* at, Pack pack, std::int32_t value)
 template<typename Write>
 QByteArray fiffTags(Write&& write)
 {
-    auto bytes = std::make_unique<BASELIB::MemoryByteStream>();
-    const BASELIB::MemoryByteStream& written = *bytes;
+    auto bytes = std::make_unique<mne::MemoryByteStream>();
+    const mne::MemoryByteStream& written = *bytes;
     FiffStream stream(std::move(bytes));
     write(stream);
     return QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
@@ -329,7 +328,7 @@ std::string clockSourceName(AcqClockSource source)
 
 bool isLabel(const std::string& value)
 {
-    return !value.empty() && BIDSLIB::BIDSPath::is_valid_entity_value(value);
+    return !value.empty() && mne::BIDSPath::is_valid_entity_value(value);
 }
 
 /** One unit of work for the writer thread: whole pages ending in a NOP that terminates the file. */
@@ -522,8 +521,8 @@ struct AcqRecorder::Impl
 
     std::unique_ptr<Block> header(std::size_t index, std::uint64_t firstTag) const
     {
-        auto memory = std::make_unique<BASELIB::MemoryByteStream>();
-        const BASELIB::MemoryByteStream& written = *memory;
+        auto memory = std::make_unique<mne::MemoryByteStream>();
+        const mne::MemoryByteStream& written = *memory;
         Eigen::RowVectorXd cals;
         auto tags = FiffStream::start_writing_raw(std::move(memory), fiffInfo, cals, defaultMatrixXi, false,
                                                   fiffType(pack));
@@ -969,14 +968,14 @@ struct AcqRecorder::Impl
 
     AcqError writeSidecars()
     {
-        BIDSLIB::BidsRawData data;
+        mne::BidsRawData data;
         data.raw.info = fiffInfo;
         data.raw.first_samp = static_cast<fiff_int_t>(firstSample - origin);
         data.raw.last_samp = static_cast<fiff_int_t>(firstSample - origin + statSamples.load() - 1);
         data.recordingType = "continuous";
         data.manufacturerModelName = options.device.device;
         for (const RecordedEvent& e : events) {
-            BIDSLIB::BidsEvent event;
+            mne::BidsEvent event;
             event.sample = static_cast<int>(e.sample - firstSample);
             event.onset = static_cast<float>(static_cast<double>(event.sample) / sfreq);
             event.duration = static_cast<float>(static_cast<double>(e.duration) / sfreq);
@@ -987,9 +986,9 @@ struct AcqRecorder::Impl
                 : std::string("n/a");
             data.events.push_back(std::move(event));
         }
-        BIDSLIB::BIDSPath path(BASELIB::pathFromUtf8(bids->root), bids->subject, bids->session, bids->task, "meg", "meg", ".fif");
+        mne::BIDSPath path(mne::pathFromUtf8(bids->root), bids->subject, bids->session, bids->task, "meg", "meg", ".fif");
         path.set_run(bids->run);
-        BIDSLIB::BidsRawData::WriteOptions write;
+        mne::BidsRawData::WriteOptions write;
         write.overwrite = true;
         write.copyData = false;
         write.datasetName = bids->datasetName;
@@ -1190,12 +1189,12 @@ AcqExpected<AcqRecorder> AcqRecorder::start(const AcqStream& stream, const AcqBi
         !optionalLabel(bids.run)) {
         return AcqError(AcqErrorCode::InvalidParameter, "BIDS needs a root, and alphanumeric subject and task labels");
     }
-    BIDSLIB::BIDSPath path(BASELIB::pathFromUtf8(bids.root), bids.subject, bids.session, bids.task, "meg", "meg", ".fif");
+    mne::BIDSPath path(mne::pathFromUtf8(bids.root), bids.subject, bids.session, bids.task, "meg", "meg", ".fif");
     path.set_run(bids.run);
     auto impl = std::make_unique<Impl>();
     impl->options = options;
     impl->bids = bids;
-    if (AcqError e = impl->begin(stream, BASELIB::utf8FromPath(path.file_path())); !e.ok()) {
+    if (AcqError e = impl->begin(stream, mne::utf8FromPath(path.file_path())); !e.ok()) {
         return e;
     }
     return AcqRecorder(std::move(impl));

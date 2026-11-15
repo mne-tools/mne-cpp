@@ -5,7 +5,7 @@
  *
  * @file     test_fs_io.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @brief    Tests for FSLIB I/O and processing: FsSurface, FsAnnotation, FsLabel,
+ * @brief    Tests for mne_fs I/O and processing: FsSurface, FsAnnotation, FsLabel,
  *        FsSurfaceSet, FsAnnotationSet, compute_normals, read_curv.
  *        Tests both error paths (invalid files) and synthetic surface operations.
  */
@@ -25,7 +25,7 @@
 
 #include <memory>
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFsIo : public QObject
@@ -277,7 +277,7 @@ private slots:
             QCOMPARE(s.tris(), expected);
 
             // MNE-C's surface reader, used by the source-space and display code, reads the same geometry
-            const std::unique_ptr<MNELIB::MNESourceSpace> mneSurf = MNELIB::MNESourceSpace::load_surface(file.fileName().toStdU16String(), QString().toStdU16String());
+            const std::unique_ptr<mne::MNESourceSpace> mneSurf = mne::MNESourceSpace::load_surface(file.fileName().toStdU16String(), QString().toStdU16String());
             QVERIFY(mneSurf);
             QVERIFY(mneSurf->rr.isApprox(s.rr(), 1e-6f));
             QCOMPARE(Eigen::MatrixX3i(mneSurf->itris), expected);
@@ -300,7 +300,7 @@ private slots:
         for (int i = 0; i < 5; ++i) {
             QVERIFY(std::fabs(values(i) - expectedCurv[i]) < 1e-6f);
         }
-        const std::unique_ptr<MNELIB::MNESourceSpace> withCurv = MNELIB::MNESourceSpace::load_surface(tmpDir.filePath("lh.newquad").toStdU16String(), curvFile.fileName().toStdU16String());
+        const std::unique_ptr<mne::MNESourceSpace> withCurv = mne::MNESourceSpace::load_surface(tmpDir.filePath("lh.newquad").toStdU16String(), curvFile.fileName().toStdU16String());
         QVERIFY(withCurv);
         QVERIFY(withCurv->curv.isApprox(values, 1e-6f));
 
@@ -338,8 +338,8 @@ private slots:
             if (!write(name, data) || (curvName && !write(curvName, curvData))) {
                 return false;
             }
-            return !MNELIB::MNESourceSpace::load_surface(tmpDir.filePath(QLatin1String(name)).toStdU16String(),
-                                                         curvName ? tmpDir.filePath(QLatin1String(curvName)).toStdU16String() : std::u16string());
+            return !mne::MNESourceSpace::load_surface(tmpDir.filePath(QLatin1String(name)).toStdU16String(),
+                                                      curvName ? tmpDir.filePath(QLatin1String(curvName)).toStdU16String() : std::u16string());
         };
         for (const qint32 nvert : {-1, 0x7fffffff}) {
             QByteArray tri;

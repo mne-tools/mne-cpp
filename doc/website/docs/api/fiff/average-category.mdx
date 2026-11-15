@@ -1,18 +1,18 @@
 ---
 id: average-category
-title: "FIFFLIB::AverageCategory"
+title: "mne::AverageCategory"
 sidebar_label: AverageCategory
 sidebar_position: 33
 ---
 
 # AverageCategory
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
 
 `#include <fiff/fiff_evoked_set.h>`
 
 ```cpp
-struct FIFFLIB::AverageCategory
+struct mne::AverageCategory
 ```
 
 One averaging category in an MNE-C ave-description file: trigger logic, timing window, baseline interval and display color.
@@ -57,7 +57,7 @@ const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, *averaging, e
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 369"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 367"
                "}\n");
 descFile.close();
 const std::optional<AverageDescription> averaging = MNEDescriptionParser::read_average(aveDesc.toStdU16String());

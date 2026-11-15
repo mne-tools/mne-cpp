@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // MAIN
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName(QStringLiteral("mne_inverse_pipeline"));
     QCoreApplication::setApplicationVersion(QStringLiteral(PROGRAM_VERSION));
 
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     //
     // Command-line parsing

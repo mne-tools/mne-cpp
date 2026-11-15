@@ -1,13 +1,13 @@
 ---
 id: ieeg-reference
-title: "IEEGLIB::IeegReference"
+title: "mne::IeegReference"
 sidebar_label: IeegReference
 sidebar_position: 4
 ---
 
 # IeegReference
 
-**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library &nbsp;·&nbsp; **Source:** [`ieeg/ieeg_reference.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ieeg/ieeg_reference.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** iEEG Library &nbsp;·&nbsp; **Source:** [`ieeg/ieeg_reference.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ieeg/ieeg_reference.h)
 
 :::info[Python equivalent]
 `mne.set_bipolar_reference` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 4
 `#include <ieeg/ieeg_reference.h>`
 
 ```cpp
-class IEEGLIB::IeegReference
+class mne::IeegReference
 ```
 
 Bipolar montages along sEEG / ECoG leads.
@@ -34,7 +34,7 @@ const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts
 
 ### bipolarPairs(implantation)
 
-[Pair](/docs/api/inv/pair) each contact with its next neighbour on the same lead: along a depth lead or strip, and along the rows and then the columns of a grid with a known shape.
+[`Pair`](/docs/api/inv/pair) each contact with its next neighbour on the same lead: along a depth lead or strip, and along the rows and then the columns of a grid with a known shape.
 
 The contact earlier along the lead is the anode, so a depth lead gives LA1-LA2, LA2-LA3, …
 

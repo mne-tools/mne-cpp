@@ -1,18 +1,18 @@
 ---
 id: rt-hpi-worker
-title: "DSPLIB::RtHpiWorker"
+title: "mne::RtHpiWorker"
 sidebar_label: RtHpiWorker
 sidebar_position: 36
 ---
 
 # RtHpiWorker
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_hpis.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_hpis.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_hpis.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_hpis.h)
 
 `#include <dsp/rt_hpis.h>`
 
 ```cpp
-class DSPLIB::RtHpiWorker
+class mne::RtHpiWorker
 ```
 
 Real-time HPI worker.
@@ -85,7 +85,7 @@ Perform one single HPI fit.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 297"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 293"
 RtHpiWorker hpiWorker(updater.getSensors());
 HpiFitResult workerFit;
 QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });

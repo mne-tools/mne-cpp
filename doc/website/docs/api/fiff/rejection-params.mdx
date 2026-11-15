@@ -1,18 +1,18 @@
 ---
 id: rejection-params
-title: "FIFFLIB::RejectionParams"
+title: "mne::RejectionParams"
 sidebar_label: RejectionParams
 sidebar_position: 38
 ---
 
 # RejectionParams
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked_set.h)
 
 `#include <fiff/fiff_evoked_set.h>`
 
 ```cpp
-struct FIFFLIB::RejectionParams
+struct mne::RejectionParams
 ```
 
 Artifact-rejection thresholds for the MNE-C batch averaging pipeline (gradiometer / magnetometer / EEG / EOG / ECG, peak-to-peak and flatness).
@@ -57,7 +57,7 @@ const FiffEvokedSet averages = FiffEvokedSet::computeAverages(raw, *averaging, e
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 370"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 368"
 descFile.close();
 const std::optional<AverageDescription> averaging = MNEDescriptionParser::read_average(aveDesc.toStdU16String());
 const AverageCategory& leftCategory = averaging->categories.front(); // name, events, tmin/tmax, baseline

@@ -7,19 +7,19 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref MLLIB::MLTrainer that dispatches training scripts through @ref PYBRIDGELIB::PythonRunner.
+ * @brief    Implementation of @ref mne::MLTrainer that dispatches training scripts through @ref mne::PythonRunner.
  *
  * The class is a few-line orchestrator on top of
- * @ref PYBRIDGELIB::PythonRunner: @c run first checks that a Python
+ * @ref mne::PythonRunner: @c run first checks that a Python
  * interpreter is reachable (returning an error-populated
- * @ref PYBRIDGELIB::PythonRunnerResult if not), then branches on whether
+ * @ref mne::PythonRunnerResult if not), then branches on whether
  * a @c venv_dir is configured. With a venv it calls @c run_in_venv which
  * creates / refreshes the virtual environment and installs the
  * required packages before launching the script; without a venv it
  * forwards directly to @c run and uses whatever interpreter the
  * caller's configuration points at.
  *
- * @ref MLLIB::MLTrainer::check_prerequisites iterates the caller's
+ * @ref mne::MLTrainer::check_prerequisites iterates the caller's
  * package list through @c is_package_available and returns the missing
  * ones so the UI can surface a single "install these to enable
  * training" message instead of failing mid-script. The whole TU is
@@ -39,9 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MLLIB;
-using namespace PYBRIDGELIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

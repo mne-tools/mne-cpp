@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMshEyes.
+ * @brief    Implementation of @ref mne::MNEMshEyes.
  *
  * Provides constructors, the default left/right cortex eye positions
  * and the linear interpolation used when animating between viewpoints.
@@ -23,4 +23,4 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;

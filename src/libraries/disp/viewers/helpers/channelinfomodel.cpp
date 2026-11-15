@@ -39,9 +39,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 using namespace Eigen;
-using namespace FIFFLIB;
+using namespace mne;
 
 static QStringList toQStringList(const StringList& names)
 {
@@ -577,7 +577,7 @@ const QStringList& ChannelInfoModel::getMappedChannelsList()
 
 int ChannelInfoModel::getIndexFromOrigChName(QString chName)
 {
-    return FIFFLIB::channel_index(m_pFiffInfo->ch_names, chName.toStdString());
+    return mne::channel_index(m_pFiffInfo->ch_names, chName.toStdString());
 }
 
 //=============================================================================================================

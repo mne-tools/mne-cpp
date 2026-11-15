@@ -7,15 +7,15 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Typed input or output slot on a graph node — carries an @ref MNALIB::MnaDataKind "MnaDataKind", an upstream link, an optional real-time stream binding and a cached-result reference.
+ * @brief    Typed input or output slot on a graph node — carries an @ref mne::MnaDataKind "MnaDataKind", an upstream link, an optional real-time stream binding and a cached-result reference.
  *
- * @ref MNALIB::MnaPort is the unit of connectivity in an MNA graph: every
- * data hand-off from one @ref MNALIB::MnaNode to another goes through a
+ * @ref mne::MnaPort is the unit of connectivity in an MNA graph: every
+ * data hand-off from one @ref mne::MnaNode to another goes through a
  * named, typed port pair, never an anonymous string. Input ports
  * carry an explicit @c sourceNodeId / @c sourcePortName pointing at
- * the producing output, which is what @c MNALIB::MnaGraph::topologicalSort "MnaGraph::topologicalSort"
- * and @ref MNALIB::MnaGraph::validate "MnaGraph::validate" rely on to detect cycles and reject
- * mismatched @ref MNALIB::MnaDataKind "MnaDataKind" connections at edit time.
+ * the producing output, which is what @c mne::MnaGraph::topologicalSort "MnaGraph::topologicalSort"
+ * and @ref mne::MnaGraph::validate "MnaGraph::validate" rely on to detect cycles and reject
+ * mismatched @ref mne::MnaDataKind "MnaDataKind" connections at edit time.
  *
  * When a port participates in a streaming pipeline (e.g. MNE Scan),
  * @c streamProtocol selects the transport — @c fiff-rt, @c lsl,
@@ -47,10 +47,10 @@
 #include <QSet>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -95,6 +95,6 @@ struct MNASHARED_EXPORT MnaPort
     static MnaPort fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_PORT_H

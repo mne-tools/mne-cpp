@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNETriangle.
+ * @brief    Implementation of @ref mne::MNETriangle.
  *
  * Implements the constructors and the triangle-property recomputation
  * from three vertex coordinates.
@@ -26,7 +26,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

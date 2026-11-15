@@ -14,7 +14,7 @@
  * POSIX path so projects remain portable between hosts. Any
  * subject-level fields not recognised by this build — demographics,
  * consent flags, clinical metadata — are routed through @c extras
- * to guarantee round-trip fidelity with newer MNALIB versions.
+ * to guarantee round-trip fidelity with newer mne_mna versions.
  */
 
 //=============================================================================================================
@@ -30,7 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE METHODS

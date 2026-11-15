@@ -1,18 +1,18 @@
 ---
 id: mne-named-vector
-title: "MNELIB::MNENamedVector"
+title: "mne::MNENamedVector"
 sidebar_label: MNENamedVector
 sidebar_position: 40
 ---
 
 # MNENamedVector
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_named_vector.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_named_vector.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_named_vector.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_named_vector.h)
 
 `#include <mne/mne_named_vector.h>`
 
 ```cpp
-class MNELIB::MNENamedVector
+class mne::MNENamedVector
 ```
 
 Named vector - vector specification with a channel list.
@@ -73,7 +73,7 @@ sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
 sel.pick.resize(sel.nchan());
 for (int c = 0; c < sel.nchan(); ++c) {
-    sel.pick[c] = static_cast<int>(BASELIB::indexOf(mneRaw->ch_names, sel.chspick[c]));
+    sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
 }
 
 const int ns = 25;

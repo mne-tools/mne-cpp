@@ -40,16 +40,16 @@
 class QVBoxLayout;
 class QHBoxLayout;
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 class RealTime3DWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -101,7 +101,7 @@ public:
 private:
     QList<QMetaObject::Connection> m_pListWidgetConnections; /**< all widget connections.*/
 
-    QPointer<SCDISPLIB::RealTime3DWidget> m_pRealTime3DWidget;
+    QPointer<mne::scan::RealTime3DWidget> m_pRealTime3DWidget;
 };
 } // NAMESPACE
 

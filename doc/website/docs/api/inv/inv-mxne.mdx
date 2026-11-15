@@ -1,13 +1,13 @@
 ---
 id: inv-mxne
-title: "INVLIB::InvMxne"
+title: "mne::InvMxne"
 sidebar_label: InvMxne
 sidebar_position: 8
 ---
 
 # InvMxne
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_mxne.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_mxne.h)
 
 :::info[Python equivalent]
 `mne.inverse_sparse.mixed_norm` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 8
 <Connections topics={["sparse-inverse"]} context="api" current="InvMxne" />
 
 ```cpp
-class INVLIB::InvMxne
+class mne::InvMxne
 ```
 
 Mixed-Norm Estimate (MxNE) sparse inverse solver.
@@ -81,7 +81,7 @@ Compute the MxNE inverse solution.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 238"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 235"
 const MatrixXd gain = whitener * fixedFwd.sol.data * 1e-9;
 const MatrixXd measured = whitener * evoked.pick_channels(inverse.noise_cov.names).data.middleCols(170, 40); // 83-148 ms
 const double alphaMax = (gain.transpose() * measured).rowwise().norm().maxCoeff();

@@ -1,18 +1,18 @@
 ---
 id: inv-sensor-set
-title: "INVLIB::InvSensorSet"
+title: "mne::InvSensorSet"
 sidebar_label: InvSensorSet
 sidebar_position: 33
 ---
 
 # InvSensorSet
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_sensor_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_sensor_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_sensor_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_sensor_set.h)
 
 `#include <inv/inv_sensor_set.h>`
 
 ```cpp
-class INVLIB::InvSensorSet
+class mne::InvSensorSet
 ```
 
 Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type.
@@ -44,7 +44,7 @@ Default Constructor.
 **Parameters:**
 
 - **pFwdCoilSet** : *const std::shared_ptr&lt; [FwdCoilSet](/docs/api/fwd/fwd-coil-set) &gt; &*
-  The FwdCoilSet to extract the data from.
+  The [`FwdCoilSet`](/docs/api/fwd/fwd-coil-set) to extract the data from.
 
 ---
 
@@ -125,7 +125,7 @@ Default Constructor.
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 104"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 103"
 const InvSensorSet sensors = creator.updateSensorSet(megChannels, Accuracy::high); // integration points per coil
 ok &= expect(sensors.ncoils() == 306 && sensors.np() == 8 && sensors.rmag().rows() == 306 * 8, "InvSensorSetCreator/InvSensorSet: 306 MEG sensors with 8 integration points each");
 ````

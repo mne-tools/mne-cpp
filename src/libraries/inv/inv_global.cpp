@@ -7,11 +7,11 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of the INVLIB build-info accessors.
+ * @brief    Implementation of the mne_inv build-info accessors.
  *
- * Defines @ref INVLIB::buildDateTime and @ref INVLIB::buildHash using
+ * Defines @ref mne::buildDateTime and @ref mne::buildHash using
  * the compile-time strings produced by @c utils/buildinfo.h. The two
- * strings let an application link against INVLIB and still report the
+ * strings let an application link against mne_inv and still report the
  * exact upstream commit and build timestamp of the inverse library it
  * is using — essential for reproducibility of source estimates.
  */
@@ -26,21 +26,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* INVLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* INVLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* INVLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

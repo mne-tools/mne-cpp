@@ -13,7 +13,7 @@
  * @date     April 2018
  * @brief    Weighted Phase Lag Index (Vinck, Oostenveld, van Wingerden, Battaglia & Pennartz 2011) between every channel pair.
  *
- * The weighted PLI replaces the unweighted sign average used by @ref CONNECTIVITYLIB::PhaseLagIndex
+ * The weighted PLI replaces the unweighted sign average used by @ref mne::PhaseLagIndex
  * with an imaginary-part-magnitude-weighted version,
  *
  *   wPLI_{xy}(f) = | E[ Im(S_{xy}(f)) ] | / E[ |Im(S_{xy}(f))| ]
@@ -29,7 +29,7 @@
  *
  * The output is bounded in @c [0, 1] and is still positively biased for
  * small numbers of trials. The squared, debiased variant
- * @ref CONNECTIVITYLIB::DebiasedSquaredWeightedPhaseLagIndex - also from Vinck et al.
+ * @ref mne::DebiasedSquaredWeightedPhaseLagIndex - also from Vinck et al.
  * (2011) - removes that small-sample bias analytically and should be
  * preferred when the trial count is low.
  */
@@ -66,14 +66,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -152,6 +152,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // WEIGHTEDPHASELAGINDEX_H

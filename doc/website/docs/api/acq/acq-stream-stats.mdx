@@ -1,18 +1,18 @@
 ---
 id: acq-stream-stats
-title: "ACQLIB::AcqStreamStats"
+title: "mne::AcqStreamStats"
 sidebar_label: AcqStreamStats
 sidebar_position: 16
 ---
 
 # AcqStreamStats
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
 
 `#include <acq/acq_stream.h>`
 
 ```cpp
-struct ACQLIB::AcqStreamStats
+struct mne::AcqStreamStats
 ```
 
 Producer-side counters of a stream.
@@ -27,7 +27,7 @@ const bool lossless = recorded.lost == 0 && recorded.eventsLost == 0 && recorded
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -35,7 +35,7 @@ const bool lossless = recorded.lost == 0 && recorded.eventsLost == 0 && recorded
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 756"
     const AcqStreamStats produced = input->stream().stats();

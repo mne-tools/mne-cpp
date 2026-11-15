@@ -3,7 +3,7 @@
 Converts the XML emitted by `doc/Doxyfile` into one MDX page
 per registered public class plus a sidebar fragment consumed by
 `doc/website/sidebars.ts`.  Port of `src/external/skigen/doc/doxygen2mdx.py`,
-adapted for MNE-CPP's `FIFFLIB::` / `MNELIB::` namespaces, Qt
+adapted for MNE-CPP's `mne::` and `mne::disp::` namespaces, Qt
 `Q_SIGNALS:` / `Q_SLOTS:` sections, SPDX author headers, and
 the existing `doc/api_registry.json`.
 
@@ -15,7 +15,7 @@ python3 scripts/doxy2mdx/doxy2mdx.py \
     --out-dir   doc/website/docs/api \
     --registry  doc/api_registry.json \
     --generate-sidebars \
-    [--classes FIFFLIB::FiffInfo,MNELIB::MNEForwardSolution] \
+    [--classes mne::FiffInfo,mne::MNEForwardSolution] \
     [--sidebar-out doc/website/sidebars.api.generated.ts] \
     [--strict]
 ```
@@ -70,10 +70,9 @@ step blocks merge.
 
 ## Implementation notes
 
-* `class_slug("FIFFLIB::FiffInfo")` → `fiff-info`.
-* `module_for("FIFFLIB::FiffInfo")` first looks up the leaf name
-  (`FiffInfo`); on collisions it disambiguates via the lowercased
-  namespace (`FIFFLIB` → `fiff`).
+* `class_slug("mne::FiffInfo")` → `fiff-info`.
+* `module_for("mne::FiffInfo")` looks up the leaf name (`FiffInfo`),
+  which is unique across the registry.
 * `read_spdx_authors(path)` regex-scrapes the first 30 lines of the
   source file for `Name <email>` lines after an
   `SPDX-License-Identifier` marker.  Falls back to Doxygen `@author`
@@ -124,7 +123,7 @@ and sidebar label; the program name appears as a tag) besides its `tasks`,
 `modalities` and `level`.
 
 Figures come from running the examples. A program writes a figure with
-`DISPLIB::FigureExporter::save(widget, name, caption)`, which does nothing
+`mne::disp::FigureExporter::save(widget, name, caption)`, which does nothing
 unless `MNE_CPP_FIGURE_DIR` is set. To refresh the gallery after building the
 examples (sample data in `resources/data`):
 

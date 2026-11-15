@@ -20,7 +20,7 @@
 #include <QQuaternion>
 #include <QRandomGenerator>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -40,7 +40,7 @@ InstancedStreams DipoleObject::streams() const
             m_instanceCount};
 }
 
-void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
+void DipoleObject::load(const mne::InvEcdSet& ecdSet)
 {
     createGeometry();
 
@@ -316,4 +316,4 @@ void DipoleObject::setSelected(int index, bool selected)
     ++m_instanceGeneration;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

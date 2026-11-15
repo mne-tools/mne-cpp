@@ -43,8 +43,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -406,7 +406,7 @@ const Registrar kRegistrar;
 //=============================================================================================================
 
 #if !defined(__unix__) && !defined(__APPLE__) || defined(__EMSCRIPTEN__)
-AcqExpected<std::unique_ptr<NeuromagTransport>> ACQLIB::detail::make_neuromag_client(const NeuromagDacq& /*dacq*/)
+AcqExpected<std::unique_ptr<NeuromagTransport>> mne::detail::make_neuromag_client(const NeuromagDacq& /*dacq*/)
 {
     return AcqError(AcqErrorCode::PlatformUnsupported, "the Neuromag acquisition runs on Linux and macOS; use simulate=1 for the simulator");
 }
@@ -414,7 +414,7 @@ AcqExpected<std::unique_ptr<NeuromagTransport>> ACQLIB::detail::make_neuromag_cl
 
 //=============================================================================================================
 
-AcqError ACQLIB::register_neuromag_scheme()
+AcqError mne::register_neuromag_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &NeuromagBackend::open);
     return result;

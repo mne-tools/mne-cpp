@@ -13,7 +13,7 @@
 
 Every example runs with its default options, ``MNE_CPP_FIGURE_DIR`` pointing at
 ``doc/website/static/img/examples/<name>/`` and ``QT_QPA_PLATFORM=offscreen``.
-The PNGs it writes through ``DISPLIB::FigureExporter`` and its console output
+The PNGs it writes through ``mne::disp::FigureExporter`` and its console output
 (``output.txt``, with the repository path made relative) replace the previous
 results, which ``generate_examples.py`` then embeds into the example's page.
 

@@ -43,8 +43,7 @@
 //=============================================================================================================
 
 using namespace RTCLUSTMNEPLUGIN;
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -145,7 +144,7 @@ void RtClustMneSetupWidget::showMriHeadFileDialog()
                                                           tr("Fif Files (*.fif)"));
 
 
-    const auto mriHeadTrans = FIFFLIB::FiffCoordTrans::read(t_sMriHeadFile.toStdU16String());
+    const auto mriHeadTrans = mne::FiffCoordTrans::read(t_sMriHeadFile.toStdU16String());
     if (mriHeadTrans) {
         m_pMNE->m_mriHeadTrans = *mriHeadTrans;
         ui.m_qLineEdit_MriHeadTrans->setText(t_sMriHeadFile);

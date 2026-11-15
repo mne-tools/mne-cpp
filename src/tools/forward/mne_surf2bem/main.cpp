@@ -63,7 +63,7 @@ using namespace MNESURF2BEM;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_surf2bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

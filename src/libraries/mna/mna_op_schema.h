@@ -7,25 +7,25 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Declarative contract for an MNA operation — expected input/output ports, attributes, binding kind and validation against a concrete @ref MNALIB::MnaNode.
+ * @brief    Declarative contract for an MNA operation — expected input/output ports, attributes, binding kind and validation against a concrete @ref mne::MnaNode.
  *
- * @ref MNALIB::MnaOpSchema is the type information an MNA operation
+ * @ref mne::MnaOpSchema is the type information an MNA operation
  * publishes to the rest of the system. It declares the
  * @c opType identifier, version, category and binding mode
  * (@c internal in-process function, @c cli external executable
  * driven by @c cliTemplate, or @c script delegating to an inline
- * @ref MNALIB::MnaScript), plus the @ref MNALIB::MnaOpSchemaPort and
- * @ref MNALIB::MnaOpSchemaAttr lists that describe expected I/O and
+ * @ref mne::MnaScript), plus the @ref mne::MnaOpSchemaPort and
+ * @ref mne::MnaOpSchemaAttr lists that describe expected I/O and
  * parameters with their data kinds, default values and required
  * flags.
  *
- * The @ref MNALIB::MnaOpSchema::validate "MnaOpSchema::validate" method is the gatekeeper used by
- * @ref MNALIB::MnaGraph::validate "MnaGraph::validate" and the GUI editor: it checks that a
- * concrete @ref MNALIB::MnaNode declares every required port, that the
+ * The @ref mne::MnaOpSchema::validate "MnaOpSchema::validate" method is the gatekeeper used by
+ * @ref mne::MnaGraph::validate "MnaGraph::validate" and the GUI editor: it checks that a
+ * concrete @ref mne::MnaNode declares every required port, that the
  * attribute types match @c QMetaType expectations, and that no
  * unknown attribute leaks through. Schemas are normally authored
  * declaratively in @c mna-registry.json and loaded by
- * @ref MNALIB::MnaRegistryLoader rather than written in C++.
+ * @ref mne::MnaRegistryLoader rather than written in C++.
  */
 
 #ifndef MNA_OP_SCHEMA_H
@@ -52,16 +52,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 struct MnaNode;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -127,6 +127,6 @@ public:
     bool validate(const MnaNode& node, QStringList* errors = nullptr) const;
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_OP_SCHEMA_H

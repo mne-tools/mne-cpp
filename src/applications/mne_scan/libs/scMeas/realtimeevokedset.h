@@ -41,21 +41,21 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvokedSet;
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCMEASLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=========================================================================================================
@@ -150,7 +150,7 @@ public:
      *
      * @return the reference to the current info.
      */
-    inline std::shared_ptr<FIFFLIB::FiffInfo> info();
+    inline std::shared_ptr<mne::FiffInfo> info();
 
     //=========================================================================================================
     /**
@@ -160,8 +160,8 @@ public:
      * @param[in] p_fiffinfo                the evoked fiff info as shared pointer.
      * @param[in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
      */
-    virtual void setValue(const FIFFLIB::FiffEvokedSet& v,
-                          const std::shared_ptr<FIFFLIB::FiffInfo>& p_fiffinfo,
+    virtual void setValue(const mne::FiffEvokedSet& v,
+                          const std::shared_ptr<mne::FiffInfo>& p_fiffinfo,
                           const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
@@ -171,7 +171,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual std::shared_ptr<FIFFLIB::FiffEvokedSet>& getValue();
+    virtual std::shared_ptr<mne::FiffEvokedSet>& getValue();
 
     //=========================================================================================================
     /**
@@ -212,15 +212,15 @@ private:
      *
      * @param[in] p_fiffInfo     Info to init from.
      */
-    void init(const std::shared_ptr<FIFFLIB::FiffInfo>& p_fiffInfo);
+    void init(const std::shared_ptr<mne::FiffInfo>& p_fiffInfo);
 
     mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**< Evoked data set*/
+    std::shared_ptr<mne::FiffEvokedSet> m_pFiffEvokedSet; /**< Evoked data set*/
 
     QStringList m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
     QString m_sXMLLayoutFile; /**< Layout file name. */
 
@@ -260,7 +260,7 @@ inline unsigned int RealTimeEvokedSet::getNumChannels() const
     QMutexLocker locker(&m_qMutex);
     // nchan is -1 before any channel info is set, so it is clamped here rather
     // than wrapping to a huge value through the unsigned return type.
-    const FIFFLIB::fiff_int_t nchan = m_pFiffEvokedSet->info.nchan;
+    const mne::fiff_int_t nchan = m_pFiffEvokedSet->info.nchan;
     return nchan > 0 ? static_cast<unsigned int>(nchan) : 0u;
 }
 
@@ -298,7 +298,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvokedSet::chInfo()
 
 //=============================================================================================================
 
-inline std::shared_ptr<FIFFLIB::FiffInfo> RealTimeEvokedSet::info()
+inline std::shared_ptr<mne::FiffInfo> RealTimeEvokedSet::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

@@ -26,7 +26,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 
-using namespace MNALIB;
+using namespace mne;
 
 namespace
 {

@@ -1,13 +1,13 @@
 ---
 id: inv-volume-source-estimate
-title: "INVLIB::InvVolumeSourceEstimate"
+title: "mne::InvVolumeSourceEstimate"
 sidebar_label: InvVolumeSourceEstimate
 sidebar_position: 14
 ---
 
 # InvVolumeSourceEstimate
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_volume_source_estimate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_volume_source_estimate.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_volume_source_estimate.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_volume_source_estimate.h)
 
 :::info[Python equivalent]
 `mne.VolumeSourceEstimate` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 14
 `#include <inv/inv_volume_source_estimate.h>`
 
 ```cpp
-class INVLIB::InvVolumeSourceEstimate
+class mne::InvVolumeSourceEstimate
 ```
 
 Volume source estimate: scalar values at voxel locations.
@@ -140,7 +140,7 @@ Compute the centre of mass of the activity at a given time point.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 203"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 200"
 // A volume estimate keeps the grid shape, so a time slice can be written back into the full grid.
 InvVolumeSourceEstimate volumeStc(stc.data.topRows(4), VectorXi::LinSpaced(4, 0, 6), stc.tmin, stc.tstep);
 volumeStc.set_shape({2, 2, 2}); // 8 voxels, 4 of them sources

@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Set of CTF compensation matrices plus the currently active grade.
  *
- * @ref MNELIB::MNECTFCompDataSet aggregates the @ref MNELIB::MNECTFCompData
+ * @ref mne::MNECTFCompDataSet aggregates the @ref mne::MNECTFCompData
  * entries shipped with a CTF dataset and produces, given a target
  * compensation grade, the channel-aligned compensator that must be
  * applied to raw or forward data. Mirrors @c make_compensator in the
@@ -44,10 +44,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -113,9 +113,9 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int make_comp(const std::vector<FIFFLIB::FiffChInfo>& chList,
+    int make_comp(const std::vector<mne::FiffChInfo>& chList,
                   int nChan,
-                  std::vector<FIFFLIB::FiffChInfo> compchs,
+                  std::vector<mne::FiffChInfo> compchs,
                   int nCompChan);
 
     //=========================================================================================================
@@ -129,7 +129,7 @@ public:
      *
      * @return Number of channels modified.
      */
-    static int set_comp(std::vector<FIFFLIB::FiffChInfo>& chs,
+    static int set_comp(std::vector<mne::FiffChInfo>& chs,
                         int nch,
                         int comp);
 
@@ -183,7 +183,7 @@ public:
      * @return The uniform compensation grade, or FAIL if channels have
      *         inconsistent compensation.
      */
-    static int get_comp(const std::vector<FIFFLIB::FiffChInfo>& chs, int nch);
+    static int get_comp(const std::vector<mne::FiffChInfo>& chs, int nch);
 
     //=========================================================================================================
     /**
@@ -220,15 +220,15 @@ public:
      * @return OK on success, FAIL on error.
      */
     int set_compensation(int compensate_to,
-                         std::vector<FIFFLIB::FiffChInfo>& chList,
+                         std::vector<mne::FiffChInfo>& chList,
                          int nchan,
-                         std::vector<FIFFLIB::FiffChInfo> comp_chs,
+                         std::vector<mne::FiffChInfo> comp_chs,
                          int ncomp_chan);
 
 public:
     std::vector<std::unique_ptr<MNECTFCompData>> comps; /**< All available compensation data sets. */
     int ncomp;                                          /**< Number of compensation data sets. */
-    std::vector<FIFFLIB::FiffChInfo> chs;               /**< Channel information associated with compensation. */
+    std::vector<mne::FiffChInfo> chs;                   /**< Channel information associated with compensation. */
     int nch;                                            /**< Number of channels. */
     std::unique_ptr<MNECTFCompData> undo;               /**< Compensation data to undo the current state. */
     std::unique_ptr<MNECTFCompData> current;            /**< Compiled compensation operator for the current target grade. */
@@ -237,6 +237,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNECTFCOMPDATASET_H

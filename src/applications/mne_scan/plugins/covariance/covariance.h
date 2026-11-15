@@ -37,18 +37,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCov;
 class FiffInfo;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class RtCov;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 class RealTimeCov;
@@ -71,12 +71,12 @@ namespace COVARIANCEPLUGIN
  *
  * @brief The Covariance class provides a Covariance algorithm structure.
  */
-class COVARIANCESHARED_EXPORT Covariance : public SCSHAREDLIB::AbstractAlgorithm
+class COVARIANCESHARED_EXPORT Covariance : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "covariance.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -113,17 +113,17 @@ public:
     /**
      * Clone the plugin
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
 
     virtual bool start() override;
     virtual bool stop() override;
 
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const override;
     virtual QString getName() const override;
 
     virtual QWidget* setupWidget() override;
 
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
     void showCovarianceWidget();
 
@@ -140,12 +140,12 @@ private:
     QMutex m_mutex;
     qint32 m_iEstimationSamples;
 
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Matrix data circular buffer. */
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Matrix data circular buffer. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pCovarianceInput; /**< The RealTimeMultiSampleArray of the Covariance input.*/
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov>> m_pCovarianceOutput;            /**< The RealTimeCov of the Covariance output.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pCovarianceInput; /**< The RealTimeMultiSampleArray of the Covariance input.*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeCov>> m_pCovarianceOutput;            /**< The RealTimeCov of the Covariance output.*/
 
 signals:
 };

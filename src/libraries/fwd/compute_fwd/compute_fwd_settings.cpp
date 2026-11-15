@@ -22,8 +22,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -66,25 +65,25 @@ ComputeFwdSettings::~ComputeFwdSettings()
 bool ComputeFwdSettings::checkIntegrity() const
 {
     if (srcname.empty()) {
-        BASELIB::Log::critical("Source space name is missing. Use the --src option to specify it.");
+        mne::Log::critical("Source space name is missing. Use the --src option to specify it.");
         return false;
     }
     if (!mri_head_ident) {
         if (mriname.empty() && transname.empty()) {
-            BASELIB::Log::critical("MRI <-> head coordinate transformation is missing. Use the --mri or --trans option to specify it.");
+            mne::Log::critical("MRI <-> head coordinate transformation is missing. Use the --mri or --trans option to specify it.");
             return false;
         }
     }
     if (measname.empty()) {
-        BASELIB::Log::critical("Source of coil and electrode locations is missing. Use the --meas option to specify it.");
+        mne::Log::critical("Source of coil and electrode locations is missing. Use the --meas option to specify it.");
         return false;
     }
     if (solname.empty()) {
-        BASELIB::Log::critical("Solution name is missing. Use the --fwd option to specify it.");
+        mne::Log::critical("Solution name is missing. Use the --fwd option to specify it.");
         return false;
     }
     if (!(include_meg || include_eeg)) {
-        BASELIB::Log::critical("Employ the --meg and --eeg options to select MEG and/or EEG");
+        mne::Log::critical("Employ the --meg and --eeg options to select MEG and/or EEG");
         return false;
     }
     return true;

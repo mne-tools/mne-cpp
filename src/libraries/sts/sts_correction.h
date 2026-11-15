@@ -21,7 +21,7 @@
  * return a matrix of the same shape with corrected p-values; the caller
  * compares against the desired @f$\alpha@f$ as usual. Cluster-based
  * correction (the Maris-Oostenveld alternative to FDR for spatially
- * structured data) lives in @ref STSLIB::StatsCluster.
+ * structured data) lives in @ref mne::StatsCluster.
  *
  * References: Holm (1979), Scandinavian Journal of Statistics 6(2);
  * Benjamini & Hochberg (1995), JRSS-B 57(1).
@@ -43,10 +43,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -114,6 +114,6 @@ public:
                                RejectMask* reject = nullptr);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_CORRECTION_H

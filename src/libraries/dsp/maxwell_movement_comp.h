@@ -39,10 +39,10 @@
 #include <Eigen/Geometry>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -100,7 +100,7 @@ public:
      * @return Movement-compensated data (n_channels × n_samples).
      */
     static Eigen::MatrixXd apply(const Eigen::MatrixXd& matData,
-                                 const FIFFLIB::FiffInfo& fiffInfo,
+                                 const mne::FiffInfo& fiffInfo,
                                  const std::vector<HeadPosEntry>& headPos,
                                  double dSFreq,
                                  const MaxwellMoveCompParams& params = MaxwellMoveCompParams());
@@ -134,11 +134,11 @@ private:
     /**
      * @brief Create a modified FiffInfo with sensor positions transformed by a head position.
      */
-    static FIFFLIB::FiffInfo transformFiffInfo(const FIFFLIB::FiffInfo& fiffInfo,
-                                               const HeadPosEntry& headPosRef,
-                                               const HeadPosEntry& headPosCurrent);
+    static mne::FiffInfo transformFiffInfo(const mne::FiffInfo& fiffInfo,
+                                           const HeadPosEntry& headPosRef,
+                                           const HeadPosEntry& headPosCurrent);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // MAXWELL_MOVEMENT_COMP_DSP_H

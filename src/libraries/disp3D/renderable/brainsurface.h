@@ -10,21 +10,21 @@
  * @brief    Renderable cortical / BEM mesh: CPU geometry, colour and annotation streams for the renderer.
  *
  * BrainSurface is the core 3-D primitive of disp3D. It owns the CPU
- * streams the renderer uploads: geometry (@ref DISP3DLIB::VertexData,
+ * streams the renderer uploads: geometry (@ref mne::disp::VertexData,
  * position and normal), packed-ABGR colour, packed-ABGR annotation
  * colour and the triangle indices. Each stream has its own generation,
  * so a source-estimate frame re-uploads only the 4-byte colour stream.
  *
  * Per-vertex colour is computed once on the CPU from one of four
- * sources selected by @ref DISP3DLIB::VisualizationMode &mdash; flat base colour,
+ * sources selected by @ref mne::disp::VisualizationMode &mdash; flat base colour,
  * FsAnnotation parcellation, scientific curvature shading (Lambertian
  * ambient + sulcal darkening), or a source-time-course value mapped
  * through the active colormap &mdash; then packed into the second
  * colour slot so a single fragment shader covers every mode by
  * blending the two colour streams.
  *
- * The class accepts geometry from a @ref FSLIB::FsSurface, an
- * @ref MNELIB::MNEBemSurface or raw Eigen matrices, and can carry a
+ * The class accepts geometry from a @ref mne::FsSurface, an
+ * @ref mne::MNEBemSurface or raw Eigen matrices, and can carry a
  * @c BrainSurface::TissueType "TissueType" tag so the renderer knows whether the mesh is a
  * cortex, skin, skull or generic shell for alpha / lighting tuning.
  */
@@ -56,7 +56,7 @@
 // STRUCTS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -171,7 +171,7 @@ public:
      *
      * @param[in] surf       Input FreeSurfer surface.
      */
-    void fromSurface(const FSLIB::FsSurface& surf);
+    void fromSurface(const mne::FsSurface& surf);
 
     //=========================================================================================================
     /**
@@ -180,7 +180,7 @@ public:
      * @param[in] surf       Input BEM surface.
      * @param[in] color      Base color for the surface.
      */
-    void fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColor& color = Qt::white);
+    void fromBemSurface(const mne::MNEBemSurface& surf, const QColor& color = Qt::white);
 
     //=========================================================================================================
     /**
@@ -218,7 +218,7 @@ public:
      *
      * @param[in] annotation Input annotation data.
      */
-    void addAnnotation(const FSLIB::FsAnnotation& annotation);
+    void addAnnotation(const mne::FsAnnotation& annotation);
 
     //=========================================================================================================
     /**
@@ -252,7 +252,7 @@ public:
 
     //=========================================================================================================
     /**
-     * @return Geometry stream (@ref DISP3DLIB::VertexData per vertex).
+     * @return Geometry stream (@ref mne::disp::VertexData per vertex).
      */
     GpuStream geometryStream() const;
 
@@ -504,7 +504,7 @@ private:
     QColor m_defaultColor = Qt::white;
     QColor m_baseColor = Qt::white;
 
-    FSLIB::FsAnnotation m_annotation;
+    mne::FsAnnotation m_annotation;
     bool m_hasAnnotation = false;
     VisualizationMode m_visMode = ModeSurface;
     QVector<float> m_curvature;
@@ -528,6 +528,6 @@ private:
     mutable std::shared_ptr<const Bvh> m_bvh;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINSURFACE_H

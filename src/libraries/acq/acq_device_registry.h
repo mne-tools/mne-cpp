@@ -38,10 +38,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 ACQ_STD_MEMBERS_BEGIN
@@ -177,6 +177,6 @@ private:
 };
 ACQ_STD_MEMBERS_END
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_DEVICE_REGISTRY_H

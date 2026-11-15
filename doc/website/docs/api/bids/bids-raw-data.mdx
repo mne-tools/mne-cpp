@@ -1,13 +1,13 @@
 ---
 id: bids-raw-data
-title: "BIDSLIB::BidsRawData"
+title: "mne::BidsRawData"
 sidebar_label: BidsRawData
 sidebar_position: 2
 ---
 
 # BidsRawData
 
-**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_raw_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_raw_data.h)
 
 :::info[Python equivalent]
 `mne_bids.read_raw_bids` in MNE-Python.
@@ -16,17 +16,17 @@ sidebar_position: 2
 `#include <bids/bids_raw_data.h>`
 
 ```cpp
-class BIDSLIB::BidsRawData
+class mne::BidsRawData
 ```
 
 Central container for a BIDS raw dataset, bundling electrophysiological data with all associated sidecar metadata.
 
-[`BidsRawData`](/docs/api/bids/bids-raw-data) is the primary data object of the BIDS library, analogous to [FiffRawData](/docs/api/fiff/fiff-raw-data) for the FIFF library. It owns both the data and the I/O logic:
+[`BidsRawData`](/docs/api/bids/bids-raw-data) is the primary data object of the BIDS library, analogous to [`FiffRawData`](/docs/api/fiff/fiff-raw-data) for the FIFF library. It owns both the data and the I/O logic:
 
 - **`read()`** — static factory that loads a BIDS dataset from disk.
 - **`write()`** — member that writes the current dataset to a BIDS directory.
 
-Sidecar and coordinate-system fields that are derivable from [FiffInfo](/docs/api/fiff/fiff-info) (sampling frequency, channel counts) are computed on write and applied to [FiffInfo](/docs/api/fiff/fiff-info) on read. Only fields carrying independent information are stored as explicit members.
+Sidecar and coordinate-system fields that are derivable from [`FiffInfo`](/docs/api/fiff/fiff-info) (sampling frequency, channel counts) are computed on write and applied to [`FiffInfo`](/docs/api/fiff/fiff-info) on read. Only fields carrying independent information are stored as explicit members.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
 BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, electrodes and sidecar metadata
@@ -36,7 +36,7 @@ BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, e
 QTemporaryDir out;
 BidsRawData::WriteOptions options;
 options.datasetName = "ex_bids";
-const BIDSPath written = data.write(BIDSPath(BASELIB::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+const BIDSPath written = data.write(BIDSPath(mne::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
 const BidsRawData readBack = BidsRawData::read(written);
 ```
 
@@ -226,7 +226,7 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
 const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
-const FIFFLIB::FiffInfo edfInfo = edf->info();
+const mne::FiffInfo edfInfo = edf->info();
 const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
 ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->format_name() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->sample_count() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),

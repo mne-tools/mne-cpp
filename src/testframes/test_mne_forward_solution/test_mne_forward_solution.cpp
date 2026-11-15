@@ -42,8 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -79,7 +78,7 @@ TestMneForwardSolution::TestMneForwardSolution()
 
 void TestMneForwardSolution::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 }
 
 //=============================================================================================================
@@ -119,8 +118,8 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->solname = (QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif").toStdString();
 
 
-    FIFFLIB::FiffRawData raw(pSettingsMEGEEG->measname);
-    std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo = std::make_shared<FIFFLIB::FiffInfo>(raw.info);
+    mne::FiffRawData raw(pSettingsMEGEEG->measname);
+    std::shared_ptr<mne::FiffInfo> pFiffInfo = std::make_shared<mne::FiffInfo>(raw.info);
 
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
@@ -131,21 +130,21 @@ void TestMneForwardSolution::computeForward()
     // recalculate with same meg_head_t to check that we still get the same result
     pFwdComputer->updateHeadPos(pFiffInfo->dev_head_t, *pFwdSolution);
 
-    QVERIFY(pFwdSolution->write(BASELIB::pathFromUtf8(pSettingsMEGEEG->solname)));
+    QVERIFY(pFwdSolution->write(mne::pathFromUtf8(pSettingsMEGEEG->solname)));
 
     // Read newly created fwd
-    m_pFwdMEGEEGRead = std::make_shared<MNEForwardSolution>(BASELIB::pathFromUtf8(pSettingsMEGEEG->solname));
+    m_pFwdMEGEEGRead = std::make_shared<MNEForwardSolution>(mne::pathFromUtf8(pSettingsMEGEEG->solname));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     // The reference was written while MNE-CPP dropped the spaces of channel names ("MEG0113"); the new
     // forward keeps the measurement's names ("MEG 0113"). Compare them as the same channels.
-    const auto sameChannels = [](const BASELIB::StringList& a, const BASELIB::StringList& b) {
-        return std::ranges::equal(a, b, [](const std::string& x, const std::string& y) { return FIFFLIB::same_channel(x, y); });
+    const auto sameChannels = [](const mne::StringList& a, const mne::StringList& b) {
+        return std::ranges::equal(a, b, [](const std::string& x, const std::string& y) { return mne::same_channel(x, y); });
     };
     QVERIFY(sameChannels(m_pFwdMEGEEGRead->info.ch_names, m_pFwdMEGEEGRef->info.ch_names));
     QVERIFY(sameChannels(m_pFwdMEGEEGRead->info.bads, m_pFwdMEGEEGRef->info.bads));
-    FIFFLIB::FiffInfoBase refInfo = m_pFwdMEGEEGRef->info;
+    mne::FiffInfoBase refInfo = m_pFwdMEGEEGRef->info;
     refInfo.ch_names = m_pFwdMEGEEGRead->info.ch_names;
     refInfo.bads = m_pFwdMEGEEGRead->info.bads;
     for (std::size_t k = 0; k < refInfo.chs.size(); ++k)

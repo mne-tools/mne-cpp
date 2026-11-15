@@ -64,7 +64,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 /**
@@ -146,7 +146,7 @@ void TestAnSharedModels::rawModel_saveToFileRoundTrips()
     const QString out = dir.filePath("saved_raw.fif");
     QVERIFY(model.saveToFile(out));
 
-    const FIFFLIB::FiffRawData saved(out.toStdString());
+    const mne::FiffRawData saved(out.toStdString());
     QCOMPARE(static_cast<int>(saved.first_samp), 12900);
     QCOMPARE(static_cast<int>(saved.last_samp), 18906);
     QCOMPARE(saved.info.nchan, 376);
@@ -156,21 +156,21 @@ void TestAnSharedModels::rawModel_saveToFileRoundTrips()
     // With the viewer's filter on, the saved file is filtered on the channels the viewer filters (EEG here) only:
     // trigger codes and the other channels are written unchanged
     const double sfreq = model.getSamplingFrequency();
-    model.setFilter(DSPLIB::FilterKernel("lp", 0, 128, 20.0 / (sfreq / 2.0), 0.0, 5.0 / (sfreq / 2.0), sfreq, 0));
+    model.setFilter(mne::FilterKernel("lp", 0, 128, 20.0 / (sfreq / 2.0), 0.0, 5.0 / (sfreq / 2.0), sfreq, 0));
     model.setFilterChannelType(QStringLiteral("EEG"));
     model.setFilterActive(true);
     const QString filtered = dir.filePath("filtered_raw.fif");
     QVERIFY(model.saveToFile(filtered));
-    const FIFFLIB::FiffRawData lowpassed(filtered.toStdString());
-    const FIFFLIB::FiffRawData original(rawPath().toStdString());
+    const mne::FiffRawData lowpassed(filtered.toStdString());
+    const mne::FiffRawData original(rawPath().toStdString());
     Eigen::MatrixXd a, b, t;
     QVERIFY(original.read_raw_segment(a, t, 14000, 14999));
     QVERIFY(lowpassed.read_raw_segment(b, t, 14000, 14999));
     for (const char* name : {"STI 014", "MEG 0113", "EOG 061"}) {
-        const int k = static_cast<int>(BASELIB::indexOf(original.info.ch_names, name));
+        const int k = static_cast<int>(mne::indexOf(original.info.ch_names, name));
         QVERIFY2(k >= 0 && (a.row(k) - b.row(k)).cwiseAbs().maxCoeff() <= 1e-6 * a.row(k).cwiseAbs().maxCoeff(), name);
     }
-    const int eeg = static_cast<int>(BASELIB::indexOf(original.info.ch_names, "EEG 001"));
+    const int eeg = static_cast<int>(mne::indexOf(original.info.ch_names, "EEG 001"));
     QVERIFY((a.row(eeg) - b.row(eeg)).cwiseAbs().maxCoeff() > 1e-3 * a.row(eeg).cwiseAbs().maxCoeff());
 }
 
@@ -214,7 +214,7 @@ void TestAnSharedModels::eventModel_emptyStateIsSafe()
 
     // Event lists load from both the FIFF and the text format
     QTemporaryDir dir;
-    FIFFLIB::FiffEvents events;
+    mne::FiffEvents events;
     events.events.resize(2, 3);
     events.events << 25800, 0, 1, 26000, 0, 2;
     QFile fif(dir.filePath("triggers-eve.fif"));

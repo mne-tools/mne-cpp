@@ -72,8 +72,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace DISPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace std::chrono_literals;
 
 //=============================================================================================================
@@ -494,7 +494,7 @@ private:
         m_sfreq = info->sfreq;
         m_width = std::max<Eigen::Index>(2, static_cast<Eigen::Index>(kWindowSeconds * m_sfreq));
         m_sweep = Eigen::MatrixXd::Zero(m_channels, m_width);
-        m_view->init(std::make_shared<FIFFLIB::FiffInfo>(std::move(*fiffInfo)));
+        m_view->init(std::make_shared<mne::FiffInfo>(std::move(*fiffInfo)));
         m_view->setWindowSize(static_cast<float>(kWindowSeconds));
         m_view->setFileBounds(0, static_cast<int>(m_width) - 1);
         m_view->setData(m_sweep, 0);

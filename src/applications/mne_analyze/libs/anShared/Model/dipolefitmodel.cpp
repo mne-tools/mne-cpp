@@ -25,13 +25,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DipoleFitModel::DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
+DipoleFitModel::DipoleFitModel(mne::InvEcdSet InvEcdSet,
                                const QString& sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)
@@ -49,7 +49,7 @@ DipoleFitModel::DipoleFitModel(const QString& sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)
 : AbstractModel(sFilePath, parent)
-, m_ECD_Set(INVLIB::InvEcdSet::read_dipoles_dip(sFilePath.toStdU16String()))
+, m_ECD_Set(mne::InvEcdSet::read_dipoles_dip(sFilePath.toStdU16String()))
 {
     Q_UNUSED(byteLoadedData);
 }

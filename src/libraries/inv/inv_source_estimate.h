@@ -7,19 +7,19 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    InvSourceEstimate value type — central source-space data container produced by every INVLIB inverse solver.
+ * @brief    InvSourceEstimate value type — central source-space data container produced by every mne_inv inverse solver.
  *
- * @ref INVLIB::InvSourceEstimate replaces the legacy MNE-C
+ * @ref mne::InvSourceEstimate replaces the legacy MNE-C
  * @c mneStcDataRec record and carries the full output of an inverse
  * solution: an @c (n_sources × n_times) data matrix plus the vertex
  * indices, time origin and sample step. Beyond the dense grid it also
- * holds the optional focal-dipole list (@ref INVLIB::InvFocalDipole), coupling
- * groups (@ref INVLIB::InvSourceCoupling) and pairwise connectivity layers
- * (@ref INVLIB::InvConnectivity), so a single value can represent the output of
+ * holds the optional focal-dipole list (@ref mne::InvFocalDipole), coupling
+ * groups (@ref mne::InvSourceCoupling) and pairwise connectivity layers
+ * (@ref mne::InvConnectivity), so a single value can represent the output of
  * MNE / dSPM / sLORETA, RAP-MUSIC, MxNE or DICS without losing
  * algorithm-specific by-products. The class implements STC / W binary
  * I/O (round-trip compatible with MNE-Python and MNE-C), label-based
- * slicing via @c FSLIB::FsLabel and copy / reduce / scale operations
+ * slicing via @c mne::FsLabel and copy / reduce / scale operations
  * needed by the visualisation and analysis pipelines.
  */
 
@@ -48,19 +48,19 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
- * Central source-space container produced by every INVLIB inverse solver.
+ * Central source-space container produced by every mne_inv inverse solver.
  * Carries the dense @c (n_sources × n_times) data matrix plus vertex
  * indices, time origin and step, and optional focal dipoles, coupling
  * groups and connectivity layers so one value can represent the output
- * of any algorithm in INVLIB. Replaces @c mneStcDataRec of MNE-C and
+ * of any algorithm in mne_inv. Replaces @c mneStcDataRec of MNE-C and
  * implements round-trip STC / W binary I/O with mne-python and mne-c.
  *
  * @brief Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
@@ -88,7 +88,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads an .stc file like read(); throws BASELIB::Error if it cannot.
+     * Reads an .stc file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The .stc file.
      */
@@ -103,7 +103,7 @@ public:
      * @return The source estimate, or why the file cannot be read: Io if it cannot be opened, Format if
      *         it ends before the data its header announces.
      */
-    [[nodiscard]] static BASELIB::Expected<InvSourceEstimate> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<InvSourceEstimate> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
      * @return Nothing, or why the pair cannot be written: Format if the split point is unknown or the
      *         data do not match the vertices, Io if a file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> write_hemisphere_pair(const std::filesystem::path& base) const;
+    [[nodiscard]] mne::Expected<void> write_hemisphere_pair(const std::filesystem::path& base) const;
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
      *
      * @return A single-column source estimate, or why the file cannot be read (Io or Format).
      */
-    [[nodiscard]] static BASELIB::Expected<InvSourceEstimate> read_w(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<InvSourceEstimate> read_w(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -146,7 +146,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written: Format if the estimate is empty, Io otherwise.
      */
-    [[nodiscard]] BASELIB::Expected<void> write_w(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write_w(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      *
      * @return The rows of the sources inside the labels, in row order.
      */
-    Eigen::VectorXi indices_by_label(std::span<const FSLIB::FsLabel> labels, bool clustered) const;
+    Eigen::VectorXi indices_by_label(std::span<const mne::FsLabel> labels, bool clustered) const;
 
     /** @return Whether the estimate holds grid data (distributed methods or RAP-MUSIC amplitudes). */
     bool has_grid_data() const

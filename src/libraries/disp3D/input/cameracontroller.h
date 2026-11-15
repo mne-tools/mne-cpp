@@ -10,9 +10,9 @@
  * @brief    Camera state and projection / view / model matrix computation for single- and multi-view layouts.
  *
  * CameraController is widget-agnostic: it takes the visible scene
- * centroid + extent and a per-pane @ref DISP3DLIB::SubView and produces the
- * @ref DISP3DLIB::CameraResult bundle (projection, view, model, eye position,
- * look-at and up vector) consumed by @ref DISP3DLIB::BrainRenderer.
+ * centroid + extent and a per-pane @ref mne::disp::SubView and produces the
+ * @ref mne::disp::CameraResult bundle (projection, view, model, eye position,
+ * look-at and up vector) consumed by @ref mne::disp::BrainRenderer.
  *
  * It also encodes the mouse-interaction conventions used everywhere
  * in disp3D: left-drag rotates via quaternion accumulation, wheel
@@ -40,7 +40,7 @@
 #include <QPoint>
 #include <QSize>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -203,6 +203,6 @@ private:
     float m_zoom = 0.0f;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // CAMERACONTROLLER_H

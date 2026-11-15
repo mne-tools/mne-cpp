@@ -43,7 +43,7 @@ using namespace Eigen;
 // DEFINE NAMESPACE MNEANALYZE
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 //=========================================================================================================
 /**
@@ -82,7 +82,7 @@ enum EVENT_TYPE
     PING,                        ///< [NO DATA] Dummy event for testing and debuggin purposes
     PLUGIN_INIT_FINISHED,        ///< [NO DATA] Send when all plugins finished initializing
     STATUS_BAR_MSG,              ///< [QString] Send a message to the status bar (part of gui)
-    SELECTED_MODEL_CHANGED,      ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] Send whenever the selection changes in the datamanager plugin
+    SELECTED_MODEL_CHANGED,      ///< [QSharedPointer<mne::analyze::AbstractModel>>] Send whenever the selection changes in the datamanager plugin
     NEW_EVENT_ADDED,             ///< [int] event send whenever the user adds a new event in the rawdataviewer plugin
     EVENTS_UPDATED,              ///< [NO DATA] send when events or events-groups have changed
     TRIGGER_REDRAW,              ///< [NO DATA] send when viewer needs to be updated
@@ -92,20 +92,20 @@ enum EVENT_TYPE
     FILTER_ACTIVE_CHANGED,       ///< [bool] send when the filter active state was toggled
     FILTER_DESIGN_CHANGED,       ///< [FilterKernel] send when the designed filter changed
     CHANNEL_SELECTION_ITEMS,     ///< [send when channel selection changes with channel info about graphic items to draw
-    SCALING_MAP_CHANGED,         ///< [DISPLIB::SelectionItem*] send when view scaling controls are updated
-    VIEW_SETTINGS_CHANGED,       ///< [ANSHAREDLIB::ViewParameters] send to trigger view settings update
+    SCALING_MAP_CHANGED,         ///< [mne::disp::SelectionItem*] send when view scaling controls are updated
+    VIEW_SETTINGS_CHANGED,       ///< [mne::analyze::ViewParameters] send to trigger view settings update
     LOADING_START,               ///< [QString] send to start status bar loaidng bar and message
     LOADING_END,                 ///< [QString] send to end status bar loading bar and message
-    SELECTED_BEM_CHANGED,        ///< [QSharedPointer<ANSHAREDLIB::BemDataModel>] event send whenever the Bem file within the coregistration changed
-    NEW_DIGITIZER_ADDED,         ///< [FIFFLIB::FiffDigPointSet] event send whenever new digitizers are loaded
-    NEW_FIDUCIALS_ADDED,         ///< [FIFFLIB::FiffDigPointSet] event send whenever new fiducials are loaded
-    NEW_TRANS_AVAILABE,          ///< [FIFFLIB::FiffCoordTrans] event send whenever a new head-mri transformation is available
+    SELECTED_BEM_CHANGED,        ///< [QSharedPointer<mne::analyze::BemDataModel>] event send whenever the Bem file within the coregistration changed
+    NEW_DIGITIZER_ADDED,         ///< [mne::FiffDigPointSet] event send whenever new digitizers are loaded
+    NEW_FIDUCIALS_ADDED,         ///< [mne::FiffDigPointSet] event send whenever new fiducials are loaded
+    NEW_TRANS_AVAILABE,          ///< [mne::FiffCoordTrans] event send whenever a new head-mri transformation is available
     FID_PICKING_STATUS,          ///< [bool] event send whenever status of fiducial picking has changed
     NEW_FIDUCIAL_PICKED,         ///< [QVector3D] event send whenever a new fiducial was picked
     FIDUCIAL_CHANGED,            ///< [int] event send when fiducial was changed
     SET_DATA3D_TREE_MODEL,       ///< [QSharedPointer<BrainTreeModel>] send when a new 3D Model is set
-    VIEW3D_SETTINGS_CHANGED,     ///< [ANSHAREDLIB::View3DParameters] send to trigger view 3D settings update
-    MODEL_REMOVED                ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] send to alert plugins when model is being removed
+    VIEW3D_SETTINGS_CHANGED,     ///< [mne::analyze::View3DParameters] send to trigger view 3D settings update
+    MODEL_REMOVED                ///< [QSharedPointer<mne::analyze::AbstractModel>>] send to alert plugins when model is being removed
 };
 
 //=========================================================================================================
@@ -135,7 +135,7 @@ struct ViewParameters
         all
     };
 
-    // Defaults are those of DISPLIB::FiffRawViewSettings
+    // Defaults are those of mne::disp::FiffRawViewSettings
     QList<QString> m_sViewsToApply;
     ViewSetting m_sSettingsToApply = all;
     QColor m_colorSignal = Qt::blue;

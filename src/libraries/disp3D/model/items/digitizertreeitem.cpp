@@ -16,7 +16,7 @@
 
 #include "digitizertreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -67,4 +67,4 @@ DigitizerTreeItem::PointKind DigitizerTreeItem::pointKind() const
     return m_kind;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

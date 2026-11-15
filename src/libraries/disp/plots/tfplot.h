@@ -12,7 +12,7 @@
  * @date     July 2018
  * @brief    Time-frequency power image of a spectrogram, with time and frequency axes and a colour bar.
  *
- * TFplot accepts a spectrogram as produced by @c DSPLIB::Spectrogram::makeSpectrogram (rows = the
+ * TFplot accepts a spectrogram as produced by @c mne::Spectrogram::makeSpectrogram (rows = the
  * first N/2 frequency bins of an N-point FFT, columns = the N time samples) together with the sample
  * rate, an optional frequency band, a colour map and the time of the first sample, and draws it with
  * @c ImageSc: time in seconds, frequency in Hz and power normalized to its maximum in the band.
@@ -39,14 +39,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 enum ColorMaps

@@ -45,8 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -433,7 +433,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::register_eego_scheme()
+AcqError mne::register_eego_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &EegoBackend::open, &discover);
     return result;

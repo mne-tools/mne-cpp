@@ -1,23 +1,23 @@
 ---
 id: fwd-settings-view
-title: "DISPLIB::FwdSettingsView"
+title: "mne::disp::FwdSettingsView"
 sidebar_label: FwdSettingsView
 sidebar_position: 34
 ---
 
 # FwdSettingsView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/fwdsettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/fwdsettingsview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/fwdsettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/fwdsettingsview.h)
 
 `#include <disp/fwdsettingsview.h>`
 
 ```cpp
-class DISPLIB::FwdSettingsView
+class mne::disp::FwdSettingsView
 ```
 
 Forward-solution computation control panel (BEM / source-space / EEG sphere model selectors).
 
-Exposes the parameters required by the ``FWDLIB`` recomputation job and provides a `Recompute` trigger plus live status labels showing the currently loaded BEM and dipole / sensor counts.
+Exposes the parameters required by the `mne_fwd` recomputation job and provides a `Recompute` trigger plus live status labels showing the currently loaded BEM and dipole / sensor counts.
 
 ### Inheritance
 
@@ -105,10 +105,10 @@ Updates forward solution information.
 
 **Parameters:**
 
-- **iSourceOri** : *FIFFLIB::fiff_int_t*
+- **iSourceOri** : *mne::fiff_int_t*
   Source orientation: fixed or free.
 
-- **iCoordFrame** : *FIFFLIB::fiff_int_t*
+- **iCoordFrame** : *mne::fiff_int_t*
   Coil coordinate system definition.
 
 - **iNSource** : *int*

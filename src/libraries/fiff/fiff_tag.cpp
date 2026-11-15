@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -94,7 +94,7 @@ bool FiffTag::matrix_dimensions(std::int32_t& p_ndim, std::vector<std::int32_t>&
     const int coding = fiff_type_matrix_coding(this->type);
     const bool sparse = coding == FIFFTS_MC_CCS || coding == FIFFTS_MC_RCS;
     if (coding != FIFFTS_MC_DENSE && !sparse) {
-        BASELIB::Log::warning("Cannot handle other than dense or sparse matrices yet.");
+        mne::Log::warning("Cannot handle other than dense or sparse matrices yet.");
         return false;
     }
     const std::int32_t nTrailer = ndim + (sparse ? 2 : 1);
@@ -665,7 +665,7 @@ fiff_int_t FiffTag::fiff_type_matrix_coding(fiff_int_t type)
 const std::int32_t* FiffTag::to_int() const
 {
     if (this->is_matrix() || this->data_type() != FIFFT_INT) {
-        BASELIB::Log::warning("Expected an integer tag : {} (found data type {} instead)\n", this->kind, this->data_type());
+        mne::Log::warning("Expected an integer tag : {} (found data type {} instead)\n", this->kind, this->data_type());
         return nullptr;
     } else
         return reinterpret_cast<const std::int32_t*>(this->data());
@@ -676,7 +676,7 @@ const std::int32_t* FiffTag::to_int() const
 const std::int32_t* FiffTag::to_julian() const
 {
     if (this->is_matrix() || this->data_type() != FIFFT_JULIAN) {
-        BASELIB::Log::warning("Expected a julian tag : {} (found data type {} instead)\n", this->kind, this->data_type());
+        mne::Log::warning("Expected a julian tag : {} (found data type {} instead)\n", this->kind, this->data_type());
         return nullptr;
     } else
         return reinterpret_cast<const std::int32_t*>(this->data());
@@ -694,7 +694,7 @@ Eigen::MatrixXi FiffTag::to_int_matrix() const
     this->matrix_dimensions(ndim, dims);
 
     if (ndim != 2) {
-        BASELIB::Log::warning("Only two-dimensional matrices are supported at this time");
+        mne::Log::warning("Only two-dimensional matrices are supported at this time");
         return Eigen::MatrixXi();
     }
 
@@ -712,7 +712,7 @@ Eigen::MatrixXf FiffTag::to_float_matrix() const
         return Eigen::MatrixXf(); //NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE) {
-        BASELIB::Log::warning("Error in FiffTag::to_float_matrix(): Matrix is not dense!");
+        mne::Log::warning("Error in FiffTag::to_float_matrix(): Matrix is not dense!");
         return Eigen::MatrixXf();
     }
 
@@ -721,7 +721,7 @@ Eigen::MatrixXf FiffTag::to_float_matrix() const
     this->matrix_dimensions(ndim, dims);
 
     if (ndim != 2) {
-        BASELIB::Log::warning("Only two-dimensional matrices are supported at this time");
+        mne::Log::warning("Only two-dimensional matrices are supported at this time");
         return Eigen::MatrixXf();
     }
 

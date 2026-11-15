@@ -62,10 +62,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -225,7 +225,7 @@ public:
      *
      * @return The geometry; an Io error if the file cannot be read, a Format error if it is not a valid surface.
      */
-    static BASELIB::Expected<Geometry> read_geometry(const std::filesystem::path& file);
+    static mne::Expected<Geometry> read_geometry(const std::filesystem::path& file);
 
     //=========================================================================================================
     /**
@@ -319,7 +319,7 @@ public:
      * @param[in] stream  Stream to read from.
      * @return the read 3-byte integer.
      */
-    static std::int32_t fread3(BASELIB::ByteStream& stream);
+    static std::int32_t fread3(mne::ByteStream& stream);
 
     //=========================================================================================================
     /**
@@ -329,7 +329,7 @@ public:
      * @param[in] count   Number of elements to read.
      * @return the read 3-byte integers.
      */
-    static Eigen::VectorXi fread3_many(BASELIB::ByteStream& stream, std::int32_t count);
+    static Eigen::VectorXi fread3_many(mne::ByteStream& stream, std::int32_t count);
 
 private:
     std::string m_sFilePath;    /**< Path to surf directory. */

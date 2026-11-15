@@ -33,10 +33,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMneHemisphereEpoch : public QObject
@@ -54,7 +51,7 @@ private:
 private slots:
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;

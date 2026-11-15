@@ -52,16 +52,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -93,9 +93,9 @@ struct DSPSHARED_EXPORT LofBadChannelParams
  *
  * @return List of bad channel names.
  */
-DSPSHARED_EXPORT BASELIB::StringList findBadChannelsLof(const Eigen::MatrixXd& data,
-                                                        const FIFFLIB::FiffInfo& info,
-                                                        const LofBadChannelParams& params = LofBadChannelParams());
+DSPSHARED_EXPORT mne::StringList findBadChannelsLof(const Eigen::MatrixXd& data,
+                                                    const mne::FiffInfo& info,
+                                                    const LofBadChannelParams& params = LofBadChannelParams());
 
 //=============================================================================================================
 /**
@@ -111,6 +111,6 @@ DSPSHARED_EXPORT BASELIB::StringList findBadChannelsLof(const Eigen::MatrixXd& d
 DSPSHARED_EXPORT Eigen::VectorXd computeLofScores(const Eigen::MatrixXd& features,
                                                   int k);
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // BAD_CHANNELS_LOF_H

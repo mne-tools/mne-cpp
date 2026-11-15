@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Container for all recordings collected within a single experimental session for one subject.
  *
- * @ref MNALIB::MnaSession sits between @ref MNALIB::MnaSubject and @ref MNALIB::MnaRecording
+ * @ref mne::MnaSession sits between @ref mne::MnaSubject and @ref mne::MnaRecording
  * in the MNA project tree and mirrors the BIDS @c ses-XX directory
  * level. It captures the natural grouping that occurs when a
  * subject visits the scanner more than once — e.g. baseline,
@@ -18,10 +18,10 @@
  *
  * The structure is intentionally thin: an opaque @c id (typically
  * @c ses-01, @c ses-pre, @c ses-post), an ordered list of
- * @ref MNALIB::MnaRecording instances, and an @c extras bag for
+ * @ref mne::MnaRecording instances, and an @c extras bag for
  * session-level sidecar metadata (date, scanner head-coil swap,
  * paradigm version) that should round-trip losslessly even when
- * unknown to the current MNALIB build.
+ * unknown to the current mne_mna build.
  */
 
 #ifndef MNA_SESSION_H
@@ -45,10 +45,10 @@
 #include <QSet>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -100,6 +100,6 @@ struct MNASHARED_EXPORT MnaSession
     static MnaSession fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_SESSION_H

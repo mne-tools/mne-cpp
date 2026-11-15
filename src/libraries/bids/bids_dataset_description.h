@@ -12,13 +12,13 @@
  * Every BIDS validator refuses to walk a tree that does not have a
  * @c dataset_description.json at the root, so this is also the first
  * file mne-cpp writes when exporting a dataset and the last sanity
- * check performed on import. @ref BIDSLIB::BidsDatasetDescription captures the
+ * check performed on import. @ref mne::BidsDatasetDescription captures the
  * two REQUIRED fields (@c Name and @c BIDSVersion) plus the two most
  * commonly populated recommended fields (@c DatasetType,
  * @c License); additional recommended/optional fields can be added
  * without breaking the JSON-pass-through wire format.
  *
- * I/O goes through BASELIB::JsonDocument; missing required fields fall
+ * I/O goes through mne::JsonDocument; missing required fields fall
  * back to safe defaults (BIDS version pinned to the spec version this
  * library was tested against) so a partially-populated dataset still
  * round-trips.
@@ -43,10 +43,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -82,6 +82,6 @@ struct BIDSSHARED_EXPORT BidsDatasetDescription
                       const BidsDatasetDescription& desc);
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_DATASET_DESCRIPTION_H

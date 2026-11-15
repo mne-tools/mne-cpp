@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Named subset of channels (e.g. @c "Left-temporal") loaded from an MNE @c .sel file.
  *
- * @ref MNELIB::MNEChSelection represents one entry of the channel
+ * @ref mne::MNEChSelection represents one entry of the channel
  * selection files shipped with the MNE C tools (per-region groupings of
  * MEG / EEG channels). Used by browsers and analyzers to drive
  * topographic layouts and quick channel subsets.
@@ -30,16 +30,16 @@
 #include <string>
 #include <vector>
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffChInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 class MNEDeriv;
@@ -80,7 +80,7 @@ public:
      *
      * @return The number of definitions matched to a recorded channel (derivations excluded).
      */
-    int assign_channels(std::span<const FIFFLIB::FiffChInfo> chs, const MNEDeriv* deriv = nullptr);
+    int assign_channels(std::span<const mne::FiffChInfo> chs, const MNEDeriv* deriv = nullptr);
 
     //=========================================================================================================
     /**
@@ -110,6 +110,6 @@ public:
     int kind = 0;               /**< Loaded from file or created here? */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_CH_SELECTION_H

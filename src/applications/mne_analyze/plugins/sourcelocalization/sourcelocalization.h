@@ -34,7 +34,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 }
@@ -56,12 +56,12 @@ namespace SOURCELOCALIZATIONPLUGIN
  *
  * @brief The sourcelocalization class provides a plugin for computing averages.
  */
-class SOURCELOCALIZATIONSHARED_EXPORT SourceLocalization : public ANSHAREDLIB::AbstractPlugin
+class SOURCELOCALIZATIONSHARED_EXPORT SourceLocalization : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "sourcelocalization.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -87,11 +87,11 @@ public:
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
 
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
 };
 
 } // NAMESPACE

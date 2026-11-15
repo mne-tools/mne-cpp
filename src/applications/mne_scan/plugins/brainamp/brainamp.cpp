@@ -45,9 +45,8 @@
 //=============================================================================================================
 
 using namespace BRAINAMPPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -128,14 +127,14 @@ std::string BrainAMP::uri() const
 
 bool BrainAMP::start()
 {
-    ACQLIB::registerBrainAmpScheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::registerBrainAmpScheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[BrainAMP::start]" << QString::fromStdString(device.error().text());
         return false;
     }
-    auto fiffInfo = ACQLIB::toFiffInfo(*device->stream().info());
-    auto reader = device->stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*device->stream().info());
+    auto reader = device->stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[BrainAMP::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         return false;
@@ -145,7 +144,7 @@ bool BrainAMP::start()
     m_pRMTSA_BrainAMP->measurementData()->initFromFiffInfo(std::make_shared<FiffInfo>(std::move(*fiffInfo)));
     m_pRMTSA_BrainAMP->measurementData()->setMultiArraySize(1);
 
-    if (ACQLIB::AcqError e = device->start(); !e.ok()) {
+    if (mne::AcqError e = device->start(); !e.ok()) {
         qWarning() << "[BrainAMP::start]" << QString::fromStdString(e.text());
         return false;
     }
@@ -163,7 +162,7 @@ bool BrainAMP::stop()
     wait();
 
     m_device.close();
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_BrainAMP->measurementData()->clear();
@@ -234,11 +233,11 @@ void BrainAMP::run()
     const std::size_t channels = m_reader.channelCount();
     MatrixXd block(static_cast<Index>(channels), m_iSamplesPerBlock);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (read) {
             m_pRMTSA_BrainAMP->measurementData()->setValue(block);
-        } else if (read.error() != ACQLIB::AcqErrorCode::Timeout && read.error() != ACQLIB::AcqErrorCode::Overrun) {
+        } else if (read.error() != mne::AcqErrorCode::Timeout && read.error() != mne::AcqErrorCode::Overrun) {
             qWarning() << "[BrainAMP::run]" << QString::fromStdString(read.error().text());
             return;
         }

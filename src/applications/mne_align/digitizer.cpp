@@ -27,7 +27,7 @@
 //=============================================================================================================
 
 using namespace MNEALIGN;
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {

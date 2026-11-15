@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    General numerical helpers: GCD, log2, histogram binning, baseline rescaling, sparsity tests.
  *
- * @ref MATHLIB::Numerics groups the scalar / per-vector numerical
+ * @ref mne::Numerics groups the scalar / per-vector numerical
  * primitives that almost every other library needs but that have no
- * natural home in Eigen or @ref MATHLIB::Linalg "Linalg": the Euclidean GCD,
+ * natural home in Eigen or @ref mne::Linalg "Linalg": the Euclidean GCD,
  * integer log2 and @c nchoose2 combinatorics used to size connectivity
  * containers, the sparsity heuristic that decides whether a dense
  * vector should be promoted to an Eigen sparse matrix, fixed-width
@@ -56,17 +56,17 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
  * Static numerical helpers: integer GCD and log2, @c nchoose2,
  * sparsity test, fixed-width histogram binning and time-series
- * baseline rescaling shared across MATHLIB, DISP and the evoked /
+ * baseline rescaling shared across mne_math, DISP and the evoked /
  * source-estimate pipelines.
  *
  * @brief Static scalar/per-vector numerical helpers (GCD, log2, histograms, baseline rescaling).

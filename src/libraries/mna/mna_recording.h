@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Grouping of every file that belongs to one continuous measurement run inside an MNA project.
  *
- * An @ref MNALIB::MnaRecording is the second tier of the
+ * An @ref mne::MnaRecording is the second tier of the
  * subject → session → recording → file hierarchy used by MNA, and
  * corresponds to a single "press record / stop record" interval in
  * the acquisition software: one FIFF raw file plus its derived
@@ -17,10 +17,10 @@
  * boundary explicitly avoids the legacy @c .ds / @c .fif sprawl
  * where the only grouping was a shared filename prefix.
  *
- * The @c id field is opaque to MNALIB but is conventionally the
+ * The @c id field is opaque to mne_mna but is conventionally the
  * recording's base name (e.g. @c run-01_meg) so the user-facing
  * GUI can render meaningful tree labels. @c files is an ordered
- * @ref MNALIB::MnaFileRef list whose first @c MnaFileRole::Raw entry is
+ * @ref mne::MnaFileRef list whose first @c MnaFileRole::Raw entry is
  * treated as the canonical recording; everything else is derived
  * data. @c extras keeps tool-specific metadata (acquisition notes,
  * BIDS sidecars) attached without forcing schema changes.
@@ -47,10 +47,10 @@
 #include <QSet>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -102,6 +102,6 @@ struct MNASHARED_EXPORT MnaRecording
     static MnaRecording fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_RECORDING_H

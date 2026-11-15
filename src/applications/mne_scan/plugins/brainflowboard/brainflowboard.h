@@ -33,7 +33,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 }
@@ -50,12 +50,12 @@ namespace BRAINFLOWBOARDPLUGIN
  * @brief Streams any board BrainFlow supports through the brainflow:// source of mne_acq_devices, which loads an
  *        installed BrainFlow at run time.
  */
-class BRAINFLOWBOARD_EXPORT BrainFlowBoard : public SCSHAREDLIB::AbstractSensor
+class BRAINFLOWBOARD_EXPORT BrainFlowBoard : public mne::scan::AbstractSensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "brainflowboard.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+    Q_INTERFACES(mne::scan::AbstractSensor)
 
     friend class BrainFlowSetupWidget;
 
@@ -63,7 +63,7 @@ public:
     BrainFlowBoard();
     ~BrainFlowBoard() override;
 
-    QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     void init() override;
     void unload() override;
 
@@ -79,7 +79,7 @@ public:
      */
     bool stop() override;
 
-    SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    mne::scan::AbstractPlugin::PluginType getType() const override;
     QString getName() const override;
     QWidget* setupWidget() override;
     QString getBuildInfo() override;
@@ -95,10 +95,10 @@ private:
     /** @return The brainflow:// URI of the current settings. */
     std::string uri() const;
 
-    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pOutput; /**< The data. */
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pOutput; /**< The data. */
 
-    ACQLIB::AcqDevice m_device; /**< The board while streaming. */
-    ACQLIB::AcqReader m_reader; /**< Reads its stream in run(). */
+    mne::AcqDevice m_device; /**< The board while streaming. */
+    mne::AcqReader m_reader; /**< Reads its stream in run(). */
 
     std::string m_board = "synthetic"; /**< BrainFlow board id or name. */
     std::string m_serial_port;         /**< BrainFlow input parameters, empty when not needed. */

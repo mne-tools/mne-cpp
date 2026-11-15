@@ -1,18 +1,18 @@
 ---
 id: ml-trainer
-title: "MLLIB::MLTrainer"
+title: "mne::MLTrainer"
 sidebar_label: MLTrainer
 sidebar_position: 4
 ---
 
 # MLTrainer
 
-**Namespace:** `MLLIB` &nbsp;·&nbsp; **Library:** Machine Learning Library &nbsp;·&nbsp; **Source:** [`ml/ml_trainer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ml/ml_trainer.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Machine Learning Library &nbsp;·&nbsp; **Source:** [`ml/ml_trainer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ml/ml_trainer.h)
 
 `#include <ml/ml_trainer.h>`
 
 ```cpp
-class MLLIB::MLTrainer
+class mne::MLTrainer
 ```
 
 Launches Python training scripts via [`PythonRunner`](/docs/api/pybridge/python-runner) with automatic venv handling and prerequisite checks.
@@ -24,8 +24,8 @@ QTemporaryDir dir;
 QFile script(dir.filePath("train.py"));
 const bool written = script.open(QIODevice::WriteOnly) && script.write("import sys\nprint('trained on', sys.argv[1], 'epochs')\n") > 0;
 script.close();
-MLTrainer trainer; // runs python3; a venv and pip install are configured via PYBRIDGELIB::PythonRunnerConfig
-const PYBRIDGELIB::PythonRunnerResult result = trainer.run(script.fileName().toStdString(), {"5"});
+MLTrainer trainer; // runs python3; a venv and pip install are configured via mne::PythonRunnerConfig
+const mne::PythonRunnerResult result = trainer.run(script.fileName().toStdString(), {"5"});
 ```
 
 ---
@@ -34,28 +34,28 @@ const PYBRIDGELIB::PythonRunnerResult result = trainer.run(script.fileName().toS
 
 ### MLTrainer()
 
-Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with default [PythonRunner](/docs/api/pybridge/python-runner) configuration.
+Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with default [`PythonRunner`](/docs/api/pybridge/python-runner) configuration.
 
 ---
 
 ### MLTrainer(config)
 
-Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with explicit [PythonRunner](/docs/api/pybridge/python-runner) configuration.
+Construct an [`MLTrainer`](/docs/api/ml/ml-trainer) with explicit [`PythonRunner`](/docs/api/pybridge/python-runner) configuration.
 
 **Parameters:**
 
 - **config** : *const [PythonRunnerConfig](/docs/api/pybridge/python-runner-config) &*
-  PythonRunner configuration to use.
+  [`PythonRunner`](/docs/api/pybridge/python-runner) configuration to use.
 
 ---
 
 ### runner()
 
-Access the underlying [PythonRunner](/docs/api/pybridge/python-runner) for callback/config changes.
+Access the underlying [`PythonRunner`](/docs/api/pybridge/python-runner) for callback/config changes.
 
 **Returns:**
 
-- *[PythonRunner](/docs/api/pybridge/python-runner) &* — Reference to the PythonRunner instance.
+- *[PythonRunner](/docs/api/pybridge/python-runner) &* — Reference to the [`PythonRunner`](/docs/api/pybridge/python-runner) instance.
 
 ---
 
@@ -63,19 +63,19 @@ Access the underlying [PythonRunner](/docs/api/pybridge/python-runner) for callb
 
 Run a training script.
 
-If the [PythonRunner](/docs/api/pybridge/python-runner) is configured with a venv_dir and package_dir, the venv is created/updated automatically before the script runs.
+If the [`PythonRunner`](/docs/api/pybridge/python-runner) is configured with a venv_dir and package_dir, the venv is created/updated automatically before the script runs.
 
 **Parameters:**
 
 - **scriptPath** : *const std::filesystem::path &*
   Path to the .py training script.
 
-- **args** : *const BASELIB::StringList &*
+- **args** : *const mne::StringList &*
   Arguments forwarded to the script.
 
 **Returns:**
 
-- *[PythonRunnerResult](/docs/api/pybridge/python-runner-result)* — PythonRunnerResult with exit code, output, and progress.
+- *[PythonRunnerResult](/docs/api/pybridge/python-runner-result)* — [`PythonRunnerResult`](/docs/api/pybridge/python-runner-result) with exit code, output, and progress.
 
 ---
 
@@ -85,12 +85,12 @@ Check that the required Python packages are importable.
 
 **Parameters:**
 
-- **packages** : *const BASELIB::StringList &*
+- **packages** : *const mne::StringList &*
   List of package names (e.g. \{"torch", "mne"\}).
 
 **Returns:**
 
-- *BASELIB::StringList* — List of packages that could NOT be imported (empty = all OK).
+- *mne::StringList* — List of packages that could NOT be imported (empty = all OK).
 
 ---
 
@@ -110,10 +110,10 @@ ML library: tensors, ONNX inference through the MlModel interface, and the Pytho
 QFile script(dir.filePath("train.py"));
 const bool written = script.open(QIODevice::WriteOnly) && script.write("import sys\nprint('trained on', sys.argv[1], 'epochs')\n") > 0;
 script.close();
-MLTrainer trainer; // runs python3; a venv and pip install are configured via PYBRIDGELIB::PythonRunnerConfig
-const PYBRIDGELIB::PythonRunnerResult result = trainer.run(script.fileName().toStdString(), {"5"});
+MLTrainer trainer; // runs python3; a venv and pip install are configured via mne::PythonRunnerConfig
+const mne::PythonRunnerResult result = trainer.run(script.fileName().toStdString(), {"5"});
 if (trainer.runner().is_python_available()) {
-    ok &= expect(written && result.success && result.std_out == "trained on 5 epochs" && trainer.check_prerequisites({"json", "no_such_package_xyz"}) == BASELIB::StringList{"no_such_package_xyz"},
+    ok &= expect(written && result.success && result.std_out == "trained on 5 epochs" && trainer.check_prerequisites({"json", "no_such_package_xyz"}) == mne::StringList{"no_such_package_xyz"},
                  "MLTrainer runs the script with its arguments and reports the missing package");
 } else {
     std::println("  skip  MLTrainer (python3 not found)");

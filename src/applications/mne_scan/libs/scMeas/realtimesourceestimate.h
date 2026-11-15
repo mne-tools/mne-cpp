@@ -46,10 +46,10 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -84,7 +84,7 @@ public:
      *
      * @param[in] annotSet   the annotation set to set.
      */
-    inline void setAnnotSet(std::shared_ptr<FSLIB::FsAnnotationSet>& annotSet);
+    inline void setAnnotSet(std::shared_ptr<mne::FsAnnotationSet>& annotSet);
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      *
      * @return the annotation set.
      */
-    inline std::shared_ptr<FSLIB::FsAnnotationSet>& getAnnotSet();
+    inline std::shared_ptr<mne::FsAnnotationSet>& getAnnotSet();
 
     //=========================================================================================================
     /**
@@ -100,7 +100,7 @@ public:
      *
      * @param[in] surfSet   the surface set to set.
      */
-    inline void setSurfSet(std::shared_ptr<FSLIB::FsSurfaceSet>& surfSet);
+    inline void setSurfSet(std::shared_ptr<mne::FsSurfaceSet>& surfSet);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      *
      * @return the surface set.
      */
-    inline std::shared_ptr<FSLIB::FsSurfaceSet>& getSurfSet();
+    inline std::shared_ptr<mne::FsSurfaceSet>& getSurfSet();
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ public:
      *
      * @param[in] mriHeadTrans   The transformation to set.
      */
-    inline void setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans);
+    inline void setMriHeadTrans(mne::FiffCoordTrans& mriHeadTrans);
 
     //=========================================================================================================
     /**
@@ -124,7 +124,7 @@ public:
      *
      * @return the mri head transformation.
      */
-    inline FIFFLIB::FiffCoordTrans& getMriHeadTrans();
+    inline mne::FiffCoordTrans& getMriHeadTrans();
 
     //=========================================================================================================
     /**
@@ -132,7 +132,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set.
      */
-    inline void setFwdSolution(std::shared_ptr<MNELIB::MNEForwardSolution>& fwdSolution);
+    inline void setFwdSolution(std::shared_ptr<mne::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ public:
      *
      * @return the forward solution.
      */
-    inline std::shared_ptr<MNELIB::MNEForwardSolution>& getFwdSolution();
+    inline std::shared_ptr<mne::MNEForwardSolution>& getFwdSolution();
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
      *
      * @param[in] v the value which is attached to the sample array vector.
      */
-    virtual void setValue(INVLIB::InvSourceEstimate& v);
+    virtual void setValue(mne::InvSourceEstimate& v);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
      *
      * @return the last attached value.
      */
-    virtual QList<std::shared_ptr<INVLIB::InvSourceEstimate>>& getValue();
+    virtual QList<std::shared_ptr<mne::InvSourceEstimate>>& getValue();
 
     //=========================================================================================================
     /**
@@ -174,7 +174,7 @@ public:
      *
      * @param[in] p_fiffInfo the new FiffInfo..
      */
-    void setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> p_fiffInfo);
+    void setFiffInfo(std::shared_ptr<mne::FiffInfo> p_fiffInfo);
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      *
      * @return the current FiffInfo.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo();
+    std::shared_ptr<mne::FiffInfo> getFiffInfo();
 
     //=========================================================================================================
     /**
@@ -203,24 +203,24 @@ public:
 private:
     mutable QMutex m_qMutex; /**< Mutex to ensure thread safety. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The Fiff info. */
-    FIFFLIB::FiffCoordTrans m_mriHeadTrans;         /**< Mri to head transformation. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The Fiff info. */
+    mne::FiffCoordTrans m_mriHeadTrans;         /**< Mri to head transformation. */
 
-    std::shared_ptr<FSLIB::FsAnnotationSet> m_pAnnotSet;        /**< FsAnnotation set. */
-    std::shared_ptr<FSLIB::FsSurfaceSet> m_pSurfSet;            /**< FsSurface set. */
-    std::shared_ptr<MNELIB::MNEForwardSolution> m_pFwdSolution; /**< Forward solution. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotSet;       /**< FsAnnotation set. */
+    std::shared_ptr<mne::FsSurfaceSet> m_pSurfSet;           /**< FsSurface set. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwdSolution; /**< Forward solution. */
 
     qint32 m_iSourceEstimateSize; /**< Sample size of the multi sample array.*/
 
-    QList<std::shared_ptr<INVLIB::InvSourceEstimate>> m_pMNEStc; /**< The source estimates. */
-    bool m_bInitialized;                                         /**< Is initialized. */
+    QList<std::shared_ptr<mne::InvSourceEstimate>> m_pMNEStc; /**< The source estimates. */
+    bool m_bInitialized;                                      /**< Is initialized. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setAnnotSet(std::shared_ptr<FSLIB::FsAnnotationSet>& annotSet)
+inline void RealTimeSourceEstimate::setAnnotSet(std::shared_ptr<mne::FsAnnotationSet>& annotSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
@@ -228,7 +228,7 @@ inline void RealTimeSourceEstimate::setAnnotSet(std::shared_ptr<FSLIB::FsAnnotat
 
 //=============================================================================================================
 
-inline std::shared_ptr<FSLIB::FsAnnotationSet>& RealTimeSourceEstimate::getAnnotSet()
+inline std::shared_ptr<mne::FsAnnotationSet>& RealTimeSourceEstimate::getAnnotSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
@@ -236,7 +236,7 @@ inline std::shared_ptr<FSLIB::FsAnnotationSet>& RealTimeSourceEstimate::getAnnot
 
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setSurfSet(std::shared_ptr<FSLIB::FsSurfaceSet>& surfSet)
+inline void RealTimeSourceEstimate::setSurfSet(std::shared_ptr<mne::FsSurfaceSet>& surfSet)
 {
     QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
@@ -244,7 +244,7 @@ inline void RealTimeSourceEstimate::setSurfSet(std::shared_ptr<FSLIB::FsSurfaceS
 
 //=============================================================================================================
 
-inline std::shared_ptr<FSLIB::FsSurfaceSet>& RealTimeSourceEstimate::getSurfSet()
+inline std::shared_ptr<mne::FsSurfaceSet>& RealTimeSourceEstimate::getSurfSet()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
@@ -252,7 +252,7 @@ inline std::shared_ptr<FSLIB::FsSurfaceSet>& RealTimeSourceEstimate::getSurfSet(
 
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans)
+inline void RealTimeSourceEstimate::setMriHeadTrans(mne::FiffCoordTrans& mriHeadTrans)
 {
     QMutexLocker locker(&m_qMutex);
     m_mriHeadTrans = mriHeadTrans;
@@ -260,14 +260,14 @@ inline void RealTimeSourceEstimate::setMriHeadTrans(FIFFLIB::FiffCoordTrans& mri
 
 //=============================================================================================================
 
-inline FIFFLIB::FiffCoordTrans& RealTimeSourceEstimate::getMriHeadTrans()
+inline mne::FiffCoordTrans& RealTimeSourceEstimate::getMriHeadTrans()
 {
     QMutexLocker locker(&m_qMutex);
     return m_mriHeadTrans;
 }
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setFwdSolution(std::shared_ptr<MNELIB::MNEForwardSolution>& fwdSolution)
+inline void RealTimeSourceEstimate::setFwdSolution(std::shared_ptr<mne::MNEForwardSolution>& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;
@@ -275,7 +275,7 @@ inline void RealTimeSourceEstimate::setFwdSolution(std::shared_ptr<MNELIB::MNEFo
 
 //=============================================================================================================
 
-inline std::shared_ptr<MNELIB::MNEForwardSolution>& RealTimeSourceEstimate::getFwdSolution()
+inline std::shared_ptr<mne::MNEForwardSolution>& RealTimeSourceEstimate::getFwdSolution()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFwdSolution;
@@ -291,7 +291,7 @@ inline bool RealTimeSourceEstimate::isInitialized() const
 
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> p_fiffInfo)
+inline void RealTimeSourceEstimate::setFiffInfo(std::shared_ptr<mne::FiffInfo> p_fiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffInfo = std::move(p_fiffInfo);
@@ -299,7 +299,7 @@ inline void RealTimeSourceEstimate::setFiffInfo(std::shared_ptr<FIFFLIB::FiffInf
 
 //=============================================================================================================
 
-inline std::shared_ptr<FIFFLIB::FiffInfo> RealTimeSourceEstimate::getFiffInfo()
+inline std::shared_ptr<mne::FiffInfo> RealTimeSourceEstimate::getFiffInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo;

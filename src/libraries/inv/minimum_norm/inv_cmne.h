@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Contextual Minimum-Norm Estimate (CMNE) inverse solver — deep-learning-corrected dSPM (Dinh et al. 2021).
  *
- * @ref INVLIB::InvCMNE implements the CMNE algorithm of Dinh et al.,
+ * @ref mne::InvCMNE implements the CMNE algorithm of Dinh et al.,
  * @em Contextual Minimum-Norm Estimates: A Deep Learning Method for
  * Source Estimation in Neuroimaging, 2021, and matches the reference
  * implementation, the @c cmne Python package (0.2.1). The static @c compute
@@ -20,7 +20,7 @@
  * |prediction|. Without a model the paper's control estimate is returned. The
  * @c train_lstm helper drives the Python training pipeline
  * (@c scripts/ml/training/train_cmne_lstm.py) through
- * @ref PYBRIDGELIB::PythonRunner so the full train-and-deploy cycle is
+ * @ref mne::PythonRunner so the full train-and-deploy cycle is
  * reachable from C++ without leaving the mne-cpp process.
  */
 
@@ -54,17 +54,17 @@
 //=============================================================================================================
 
 #ifndef WASMBUILD
-namespace PYBRIDGELIB
+namespace mne
 {
 struct PythonRunnerResult;
 }
 #endif
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -167,7 +167,7 @@ public:
      * Train the CMNE LSTM model by invoking the Python training script.
      *
      * This is a convenience wrapper that calls
-     * ``scripts/ml/training/train_cmne_lstm.py`` via PYBRIDGELIB::PythonRunner.
+     * ``scripts/ml/training/train_cmne_lstm.py`` via mne::PythonRunner.
      * The heavy lifting (PyTorch LSTM training + ONNX export) happens in
      * Python; C++ only launches the process and streams its output.
      *
@@ -187,7 +187,7 @@ public:
      *
      * @return PythonRunnerResult with exit code, captured output and progress.
      */
-    static PYBRIDGELIB::PythonRunnerResult train_lstm(
+    static mne::PythonRunnerResult train_lstm(
         const std::filesystem::path& fwdPath,
         const std::filesystem::path& covPath,
         const std::filesystem::path& epochsPath,
@@ -224,6 +224,6 @@ private:
     static Eigen::MatrixXd standardize(const Eigen::MatrixXd& matStcData);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_CMNE_H

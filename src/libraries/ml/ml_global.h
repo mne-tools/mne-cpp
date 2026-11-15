@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Export/import macros, build-stamp accessors and namespace anchor for the MLLIB machine-learning library.
+ * @brief    Export/import macros, build-stamp accessors and namespace anchor for the mne_ml machine-learning library.
  *
- * MLLIB is the thin C++ surface mne-cpp puts around third-party ML
+ * mne_ml is the thin C++ surface mne-cpp puts around third-party ML
  * runtimes (currently ONNX Runtime) and Python-side training drivers.
  * The library deliberately stays small: an N-dimensional tensor type,
  * an abstract model interface, an ONNX inference backend and a
@@ -56,12 +56,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace MLLIB
- * @brief Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp.
- */
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================

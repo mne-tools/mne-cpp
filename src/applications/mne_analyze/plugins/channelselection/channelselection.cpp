@@ -41,14 +41,14 @@
 //=============================================================================================================
 
 using namespace CHANNELSELECTIONPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 ChannelSelection::ChannelSelection()
-: m_pSelectionItem(std::make_unique<DISPLIB::SelectionItem>())
+: m_pSelectionItem(std::make_unique<mne::disp::SelectionItem>())
 , m_pChannelInfoModel(nullptr)
 , m_pFiffInfo(nullptr)
 , m_pViewLayout(nullptr)
@@ -135,12 +135,12 @@ void ChannelSelection::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            if (e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
-                onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            if (e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+                onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             }
             break;
         case EVENT_TYPE::MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
@@ -161,7 +161,7 @@ QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void ChannelSelection::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if (auto info = qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo()) {
@@ -172,7 +172,7 @@ void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel>
 
 //=============================================================================================================
 
-void ChannelSelection::setFiffSettings(std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo)
+void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
 {
     m_pFiffInfo = std::move(pFiffInfo);
 
@@ -184,29 +184,29 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<FIFFLIB::FiffInfo> pFiffI
     //First time set up only
     m_pControlLayout->takeAt(0)->widget()->hide();
 
-    m_pChannelInfoModel = std::make_shared<DISPLIB::ChannelInfoModel>(m_pFiffInfo);
+    m_pChannelInfoModel = std::make_shared<mne::disp::ChannelInfoModel>(m_pFiffInfo);
 
-    m_pChannelSelectionView = std::make_unique<DISPLIB::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
-                                                                              nullptr,
-                                                                              m_pChannelInfoModel,
-                                                                              Qt::Window);
+    m_pChannelSelectionView = std::make_unique<mne::disp::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
+                                                                                nullptr,
+                                                                                m_pChannelInfoModel,
+                                                                                Qt::Window);
 
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    m_pApplyToView = new DISPLIB::ApplyToView("", m_pControlLayout->widget());
+    m_pApplyToView = new mne::disp::ApplyToView("", m_pControlLayout->widget());
 
     m_pControlLayout->addWidget(m_pApplyToView);
 
-    connect(m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
-            m_pChannelInfoModel.get(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
+    connect(m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::loadedLayoutMap,
+            m_pChannelInfoModel.get(), &mne::disp::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
-    connect(m_pChannelInfoModel.get(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+    connect(m_pChannelInfoModel.get(), &mne::disp::ChannelInfoModel::channelsMappedToLayout,
+            m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     //Slots for event loop
 
-    connect(m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::selectionChanged,
+    connect(m_pChannelSelectionView.get(), &mne::disp::ChannelSelectionView::selectionChanged,
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -230,7 +230,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
     m_pSelectionItem->m_sViewsToApply.clear();
 
     while (i.hasNext()) {
-        DISPLIB::SelectionSceneItem* selectionSceneItemTemp = static_cast<DISPLIB::SelectionSceneItem*>(i.next());
+        mne::disp::SelectionSceneItem* selectionSceneItemTemp = static_cast<mne::disp::SelectionSceneItem*>(i.next());
 
         m_pSelectionItem->m_sChannelName.append(selectionSceneItemTemp->m_sChannelName);
         m_pSelectionItem->m_iChannelNumber.append(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName));
@@ -248,7 +248,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
 //=============================================================================================================
 
-void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
     // The view is only created with the first recording
     if (!m_bIsInit) {

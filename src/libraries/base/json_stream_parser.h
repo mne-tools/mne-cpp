@@ -38,10 +38,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -298,6 +298,6 @@ private:
     bool m_tokenBuffered = false;       /**< Whether part of the current token is in m_token. */
 };
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_JSON_STREAM_PARSER_H

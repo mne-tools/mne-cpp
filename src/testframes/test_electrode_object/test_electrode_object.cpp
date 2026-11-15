@@ -30,8 +30,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
-using namespace IEEGLIB;
+using namespace mne::disp;
+using namespace mne;
 
 namespace
 {

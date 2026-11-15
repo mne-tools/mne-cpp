@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::WeightedPhaseLagIndex - the imaginary-part-magnitude-weighted PLI of Vinck et al. (NeuroImage 2011).
+ * @brief    Implementation of @ref mne::WeightedPhaseLagIndex - the imaginary-part-magnitude-weighted PLI of Vinck et al. (NeuroImage 2011).
  */
 
 //=============================================================================================================
@@ -45,10 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

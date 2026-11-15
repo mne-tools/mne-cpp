@@ -40,10 +40,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -129,6 +129,6 @@ private:
     static Eigen::MatrixXd evaluateLegendre(const Eigen::MatrixXd& matX, int iMaxOrder);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // SURFACE_LAPLACIAN_H

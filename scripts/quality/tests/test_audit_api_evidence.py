@@ -41,7 +41,7 @@ class FixtureTree:
         _write(root, "src/libraries/fiff/fiff_reader.h",
                "class FIFFSHARED_EXPORT FiffReader : public QObject\n{\n};\n"
                "struct FIFFSHARED_EXPORT FiffRecord\n{\n};\n"               "class FIFFSHARED_EXPORT FiffWorker\n{\n};\n"               "FIFFSHARED_EXPORT int countTags(const QString& path);\n")
-        _write(root, "src/libraries/fiff/fiff_utils.h", "namespace FIFFLIB { int helper(); }\n")
+        _write(root, "src/libraries/fiff/fiff_utils.h", "namespace mne { int helper(); }\n")
         _write(root, "src/libraries/disp/viewers/rawview.h", "class DISPSHARED_EXPORT RawView\n{\n};\n")
         _write(root, "src/examples/CMakeLists.txt", "add_subdirectory(ex_read)\n")
         _write(root, "src/examples/ex_read/main.cpp", "#include <fiff/fiff_reader.h>\n")

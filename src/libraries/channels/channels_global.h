@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro and build-info accessors of CHANNELSLIB.
+ * @brief    Export macro and build-info accessors of mne_channels.
  *
- * CHANNELSLIB holds sensor layouts, channel selections and standard EEG montages.
+ * mne_channels holds sensor layouts, channel selections and standard EEG montages.
  */
 
 #ifndef CHANNELS_GLOBAL_H
@@ -39,12 +39,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace CHANNELSLIB
- * @brief     Sensor layouts, channel selections and standard EEG montages.
- */
-namespace CHANNELSLIB
+namespace mne
 {
 
 //=============================================================================================================

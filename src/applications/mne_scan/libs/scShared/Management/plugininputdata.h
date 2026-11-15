@@ -25,10 +25,10 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 template<class T>
@@ -73,7 +73,7 @@ public:
     //=========================================================================================================
     /**
      * Convinience function - this can be used to register a function which should be called when new data are available.
-     * The signal void notify(SCMEASLIB::Measurement::SPtr) can be used instead of registering a function.
+     * The signal void notify(mne::scan::Measurement::SPtr) can be used instead of registering a function.
      *
      * @param[in] pFunc  callback function to register.
      */
@@ -86,7 +86,7 @@ protected:
      *
      * @param[in] pMeasurement   the measurement data to downcast.
      */
-    void notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void notifyCallbackFunction(mne::scan::Measurement::SPtr pMeasurement);
 
 private:
     callback_function m_pFunc; /**< registered callback function. */

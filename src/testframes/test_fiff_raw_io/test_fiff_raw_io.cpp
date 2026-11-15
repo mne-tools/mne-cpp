@@ -44,8 +44,7 @@
 #include <fiff/fiff_id.h>
 #include <fiff/fiff_sparse_matrix.h>
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -67,7 +66,7 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
             m_sDataPath = base;
@@ -789,10 +788,10 @@ private slots:
         }
 
         // Reading it back must fail with a format error rather than an out-of-bounds crash.
-        QCOMPARE(FiffRawData::read(path).error().code, BASELIB::ErrorCode::Format);
-        QVERIFY_THROWS_EXCEPTION(BASELIB::Error, FiffRawData{path});
+        QCOMPARE(FiffRawData::read(path).error().code, mne::ErrorCode::Format);
+        QVERIFY_THROWS_EXCEPTION(mne::Error, FiffRawData{path});
         // A FIFF file without raw data is not raw data
-        QCOMPARE(FiffRawData::read((m_sDataPath + "/MEG/sample/sample_audvis-cov.fif").toStdString()).error().code, BASELIB::ErrorCode::NotFound);
+        QCOMPARE(FiffRawData::read((m_sDataPath + "/MEG/sample/sample_audvis-cov.fif").toStdString()).error().code, mne::ErrorCode::NotFound);
     }
 
     //=========================================================================

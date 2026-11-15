@@ -57,9 +57,8 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 // MAIN
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -161,7 +160,7 @@ int main(int argc, char* argv[])
     }
 
     // align fiducials
-    if (!MNELIB::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
+    if (!mne::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -190,7 +189,7 @@ int main(int argc, char* argv[])
     float fRMSE = 0.0;
 
     // discard outliers
-    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
+    if (!mne::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -200,7 +199,7 @@ int main(int argc, char* argv[])
     }
 
     // icp
-    if (!MNELIB::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if (!mne::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     qInfo() << "transHeadMri:";

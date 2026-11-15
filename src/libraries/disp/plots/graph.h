@@ -12,12 +12,12 @@
  * @date     July 2018
  * @brief    Abstract base widget providing title, axis labels and resize handling for the in-house 2-D plots.
  *
- * Graph centralises the boilerplate shared by @ref DISPLIB::Plot, @ref DISPLIB::ImageSc
- * and any other small @c QPainter-based plot widget in DISPLIB:
+ * Graph centralises the boilerplate shared by @ref mne::disp::Plot, @ref mne::disp::ImageSc
+ * and any other small @c QPainter-based plot widget in mne_disp:
  * storing the plot title and x/y axis label strings, performing the
  * minimal resize bookkeeping that keeps tick spacing readable, and
  * drawing the label band around the actual plot area. Concrete
- * subclasses paint inside the content rectangle that @ref DISPLIB::Graph leaves
+ * subclasses paint inside the content rectangle that @ref mne::disp::Graph leaves
  * free after the labels and title.
  */
 
@@ -48,19 +48,19 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * @brief Common base widget providing title, axis labels and resize handling for DISPLIB's QPainter plots.
+ * @brief Common base widget providing title, axis labels and resize handling for mne_disp's QPainter plots.
  *
  * Subclasses such as @ref Plot and @ref ImageSc paint inside the
  * content rectangle that @ref Graph leaves free after stamping the

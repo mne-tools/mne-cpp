@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -370,7 +370,7 @@ static void mapCtfToFiff(const CtfSensorInfo& sen, FiffChInfo& ch)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

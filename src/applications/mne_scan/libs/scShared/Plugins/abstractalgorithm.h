@@ -27,10 +27,10 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -144,6 +144,6 @@ inline bool AbstractAlgorithm::multiInstanceAllowed() const
 }
 } // NAMESPACE
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractAlgorithm, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(mne::scan::AbstractAlgorithm, "scsharedlib/1.0")
 
 #endif // MNESCAN_ABSTRACTALGORITHM_H

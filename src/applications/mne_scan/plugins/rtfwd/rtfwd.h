@@ -43,34 +43,34 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffCoordTrans;
 }
 
-namespace FWDLIB
+namespace mne
 {
 class ComputeFwdSettings;
 class ComputeFwd;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
-namespace FSLIB
+namespace mne
 {
 class FsAnnotationSet;
 }
 
-namespace INVLIB
+namespace mne
 {
 struct HpiFitResult;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeFwdSolution;
 class RealTimeHpiResult;
@@ -94,12 +94,12 @@ namespace RTFWDPLUGIN
  *
  * @brief The RtFwd class provides a plugin for calculating and updating the forward solution.
  */
-class RTFWDSHARED_EXPORT RtFwd : public SCSHAREDLIB::AbstractAlgorithm
+class RTFWDSHARED_EXPORT RtFwd : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "rtfwd.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -118,12 +118,12 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual bool start() override;
     virtual bool stop() override;
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const override;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const override;
     virtual QString getName() const override;
     virtual QWidget* setupWidget() override;
     virtual QString getBuildInfo() override;
@@ -136,9 +136,9 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
-    std::shared_ptr<FWDLIB::ComputeFwdSettings> m_pFwdSettings; /**< Forward Solution Settings. */
+    std::shared_ptr<mne::ComputeFwdSettings> m_pFwdSettings; /**< Forward Solution Settings. */
 
 protected:
     //=========================================================================================================
@@ -192,7 +192,7 @@ private:
      * @param[in] pAnnotationSet        The FsAnnotation set.
      */
     void onAtlasDirChanged(const QString& sDirPath,
-                           const std::shared_ptr<FSLIB::FsAnnotationSet>& pAnnotationSet);
+                           const std::shared_ptr<mne::FsAnnotationSet>& pAnnotationSet);
 
     QMutex m_mutex;         /**< The threads mutex.*/
     QFuture<void> m_future; /**< The future monitoring the clustering and forward calculation. */
@@ -208,25 +208,25 @@ private:
 
     QString m_sAtlasDir; /**< File to Atlas. */
 
-    QSharedPointer<INVLIB::HpiFitResult> m_pHpiFitResult; /**< The Hpi fitting result.**/
+    QSharedPointer<mne::HpiFitResult> m_pHpiFitResult; /**< The Hpi fitting result.**/
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
-    FIFFLIB::FiffCoordTrans m_transDevHead;         /**< Updated meg->head transformation. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    mne::FiffCoordTrans m_transDevHead;         /**< Updated meg->head transformation. */
 
-    std::shared_ptr<FSLIB::FsAnnotationSet> m_pAnnotationSet; /**< FsAnnotation set. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet; /**< FsAnnotation set. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeHpiResult>::SPtr m_pHpiInput;          /**< The incoming Hpi data.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The incoming data.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeHpiResult>::SPtr m_pHpiInput;          /**< The incoming Hpi data.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The incoming data.*/
 
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr m_pRTFSOutput; /**< The fwd solution.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeFwdSolution>::SPtr m_pRTFSOutput; /**< The fwd solution.*/
 
 signals:
     //=========================================================================================================
     /**
      * Emitted when forward solution is available
      */
-    void fwdSolutionAvailable(FIFFLIB::fiff_int_t iSourceOri,
-                              FIFFLIB::fiff_int_t iCoordFrame,
+    void fwdSolutionAvailable(mne::fiff_int_t iSourceOri,
+                              mne::fiff_int_t iCoordFrame,
                               int iNSource,
                               int iNChan,
                               int iNSpaces);

@@ -52,9 +52,7 @@
 // MAIN
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 int main(int argc, char* argv[])
 {
@@ -102,17 +100,17 @@ int main(int argc, char* argv[])
             bytes.insert(bytes.end(), 4 * sizeof(std::int32_t), std::byte{0xFF});
         }
 
-        FIFFLIB::FiffStream stream(std::make_unique<BASELIB::MemoryByteStream>(std::move(bytes)));
+        mne::FiffStream stream(std::make_unique<mne::MemoryByteStream>(std::move(bytes)));
         stream.set_little_endian(littleEndian);
 
         if (stream.open()) {
-            FIFFLIB::FiffInfo FifInfo;
-            std::shared_ptr<FIFFLIB::FiffDirNode> DirNode;
+            mne::FiffInfo FifInfo;
+            std::shared_ptr<mne::FiffDirNode> DirNode;
 
-            FIFFLIB::FiffDigitizerData digData;
+            mne::FiffDigitizerData digData;
 
             if (stream.read_meas_info(stream.dirtree(), FifInfo, DirNode)) {
-                FIFFLIB::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
+                mne::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
 
                 std::cout << "Num. raw dat sets: " << p_fiffIO.raw.size() << "\n";
                 std::cout << "Num. evoked sets: " << p_fiffIO.evoked.size() << "\n";

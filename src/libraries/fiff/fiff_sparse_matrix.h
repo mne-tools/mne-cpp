@@ -12,7 +12,7 @@
  * The FIFF matrix tag format supports three storage modes encoded in the
  * type word (see @ref fiff_tag.h): dense, column-compressed sparse
  * (@c MATRIX_CODING_CCS) and row-compressed sparse (@c MATRIX_CODING_RCS).
- * @ref FIFFLIB::FiffSparseMatrix is the in-memory representation of the two sparse
+ * @ref mne::FiffSparseMatrix is the in-memory representation of the two sparse
  * forms. It owns the value array, the index array and the pointer array
  * in the layout the FIFF stream produced, and exposes a conversion to
  * @c Eigen::SparseMatrix so downstream linear-algebra code can operate
@@ -51,10 +51,10 @@
 
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -85,7 +85,7 @@ public:
      * @param[in] coding  FIFF storage coding (FIFFTS_MC_RCS or FIFFTS_MC_CCS).
      */
     explicit FiffSparseMatrix(Eigen::SparseMatrix<float>&& mat,
-                              FIFFLIB::fiff_int_t coding = FIFFTS_MC_RCS);
+                              mne::fiff_int_t coding = FIFFTS_MC_RCS);
 
     //=========================================================================================================
     /**
@@ -189,7 +189,7 @@ public:
      *
      * @return A vector with the matrix dimension info, or empty on error.
      */
-    static std::vector<int> fiff_get_matrix_sparse_dims(const FIFFLIB::FiffTag& tag);
+    static std::vector<int> fiff_get_matrix_sparse_dims(const mne::FiffTag& tag);
 
     /**
      * Conversion of tag data into the standard sparse representation.
@@ -198,7 +198,7 @@ public:
      *
      * @return A unique pointer to the newly constructed FiffSparseMatrix, or nullptr on error.
      */
-    static std::unique_ptr<FiffSparseMatrix> fiff_get_float_sparse_matrix(const FIFFLIB::FiffTag& tag);
+    static std::unique_ptr<FiffSparseMatrix> fiff_get_float_sparse_matrix(const mne::FiffTag& tag);
 
     //============================= mne_sparse_matop.c =============================
 
@@ -267,7 +267,7 @@ public:
     static FiffSparseMatrix fromEigenSparse(const Eigen::SparseMatrix<float>& mat);
 
 public:
-    FIFFLIB::fiff_int_t coding; /**< FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS). Used for serialization only. */
+    mne::fiff_int_t coding; /**< FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS). Used for serialization only. */
 
 private:
     Eigen::SparseMatrix<float> m_eigen; /**< The sparse matrix data. */
@@ -287,6 +287,6 @@ inline Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
     return m_eigen.cast<double>();
 }
 
-} // NAMESPACE FIFFLIB
+} // NAMESPACE mne_fiff
 
 #endif // FIFFSPARSEMATRIX_H

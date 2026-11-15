@@ -10,7 +10,7 @@
  * @brief    Implementation of the sequential ECD-fit driver.
  *
  * Implements the time-bin loop that calls into the Nelder-Mead /
- * guess-grid optimiser, reads averaged or raw data through @c MNELIB
+ * guess-grid optimiser, reads averaged or raw data through @c mne_mne
  * and assembles the per-time-point @ref InvEcd records into the output
  * @ref InvEcdSet. Refactored from @c fit_dipoles.c / @c fit_dipoles_raw
  * in the MNE-C reference implementation.
@@ -34,9 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // CONSTANTS
@@ -58,10 +56,10 @@ InvEcdSet InvDipoleFit::calculateFit() const
 {
     InvEcdSet set;
 
-    BASELIB::Log::info("---- Setting up...\n");
+    mne::Log::info("---- Setting up...\n");
     std::unique_ptr<FwdEegSphereModel> eeg_model;
     if (settings->include_eeg) {
-        eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(BASELIB::pathFromUtf8(settings->eeg_model_file), settings->eeg_model_name, settings->eeg_sphere_rad);
+        eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(mne::pathFromUtf8(settings->eeg_model_file), settings->eeg_model_name, settings->eeg_sphere_rad);
         if (!eeg_model)
             return set;
     }
@@ -97,8 +95,8 @@ InvEcdSet InvDipoleFit::calculateFit() const
     std::unique_ptr<MNEChSelection> sel;
 
     if (settings->is_raw) {
-        BASELIB::Log::info("\n---- Opening a raw data file...\n");
-        raw.reset(MNERawData::open_file(BASELIB::pathFromUtf8(settings->measname), true, false, settings->filter));
+        mne::Log::info("\n---- Opening a raw data file...\n");
+        raw.reset(MNERawData::open_file(mne::pathFromUtf8(settings->measname), true, false, settings->filter));
         if (!raw)
             return set;
         /*
@@ -109,10 +107,10 @@ InvEcdSet InvDipoleFit::calculateFit() const
         sel->assign_channels(raw->info->chInfo, raw->deriv_matched.get());
         for (int c = 0; c < sel->nchan(); c++)
             if (sel->pick[c] < 0) {
-                BASELIB::Log::critical("All desired channels were not available");
+                mne::Log::critical("All desired channels were not available");
                 return set;
             }
-        BASELIB::Log::info("\tChannel selection created.");
+        mne::Log::info("\tChannel selection created.");
         /*
          * Let's be a little generous here
          */
@@ -125,10 +123,10 @@ InvEcdSet InvDipoleFit::calculateFit() const
         if (settings->tstep < 0)
             settings->tstep = 1.0f / raw->info->sfreq;
 
-        BASELIB::Log::info("\tOpened raw data file {} : {} MEG and {} EEG", settings->measname, fit_data->nmeg, fit_data->neeg);
+        mne::Log::info("\tOpened raw data file {} : {} MEG and {} EEG", settings->measname, fit_data->nmeg, fit_data->neeg);
     } else {
-        BASELIB::Log::info("\n---- Reading data...\n");
-        data = MNEMeasData::mne_read_meas_data(BASELIB::pathFromUtf8(settings->measname),
+        mne::Log::info("\n---- Reading data...\n");
+        data = MNEMeasData::mne_read_meas_data(mne::pathFromUtf8(settings->measname),
                                                settings->setno,
                                                nullptr,
                                                nullptr,
@@ -139,7 +137,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
         if (settings->do_baseline)
             data->adjust_baselines(settings->bmin, settings->bmax);
         else
-            BASELIB::Log::info("\tNo baseline setting in effect.");
+            mne::Log::info("\tNo baseline setting in effect.");
         if (settings->tmin < data->current->tmin + settings->integ / 2.0f)
             settings->tmin = data->current->tmin + settings->integ / 2.0f;
         if (settings->tmax > data->current->tmin + (data->current->np - 1) * data->current->tstep - settings->integ / 2.0f)
@@ -147,9 +145,9 @@ InvEcdSet InvDipoleFit::calculateFit() const
         if (settings->tstep < 0)
             settings->tstep = data->current->tstep;
 
-        BASELIB::Log::info("\tRead data set {} from {} : {} MEG and {} EEG", settings->setno, settings->measname, fit_data->nmeg, fit_data->neeg);
+        mne::Log::info("\tRead data set {} from {} : {} MEG and {} EEG", settings->setno, settings->measname, fit_data->nmeg, fit_data->neeg);
         if (!settings->noisename.empty()) {
-            BASELIB::Log::info("Scaling the noise covariance...");
+            mne::Log::info("Scaling the noise covariance...");
             if (InvDipoleFitData::scale_noise_cov(fit_data.get(), data->current->nave) < 0)
                 return set;
         }
@@ -158,16 +156,16 @@ InvEcdSet InvDipoleFit::calculateFit() const
     /*
      * Proceed to computing the fits
      */
-    BASELIB::Log::info("\n---- Computing the forward solution for the guesses...\n");
-    auto guess = std::make_unique<InvGuessData>(BASELIB::pathFromUtf8(settings->guessname),
-                                                BASELIB::pathFromUtf8(settings->guess_surfname),
+    mne::Log::info("\n---- Computing the forward solution for the guesses...\n");
+    auto guess = std::make_unique<InvGuessData>(mne::pathFromUtf8(settings->guessname),
+                                                mne::pathFromUtf8(settings->guess_surfname),
                                                 settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data.get(), settings->guess_rad);
     if (guess->nguess == 0) {
-        BASELIB::Log::critical("Could not create the initial guesses.");
+        mne::Log::critical("Could not create the initial guesses.");
         return set;
     }
 
-    BASELIB::Log::info("\n---- Fitting : {:7.1f} ... {:7.1f} ms (step: {:6.1f} ms integ: {:6.1f} ms)\n", 1000 * settings->tmin, 1000 * settings->tmax, 1000 * settings->tstep, 1000 * settings->integ);
+    mne::Log::info("\n---- Fitting : {:7.1f} ... {:7.1f} ms (step: {:6.1f} ms integ: {:6.1f} ms)\n", 1000 * settings->tmin, 1000 * settings->tmax, 1000 * settings->tstep, 1000 * settings->integ);
 
     if (raw) {
         if (!fit_dipoles_raw(settings->measname, raw.get(), sel.get(), fit_data.get(), guess.get(), settings->tmin, settings->tmax, settings->tstep, settings->integ, settings->verbose, set))
@@ -176,7 +174,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
         if (!fit_dipoles(settings->measname, data.get(), fit_data.get(), guess.get(), settings->tmin, settings->tmax, settings->tstep, settings->integ, settings->verbose, set))
             return set;
     }
-    BASELIB::Log::info("{} dipoles fitted", set.size());
+    mne::Log::info("{} dipoles fitted", set.size());
 
     return set;
 }
@@ -193,28 +191,28 @@ bool InvDipoleFit::fit_dipoles(const std::string& dataname, MNEMeasData* data, I
     set.dataname = dataname;
 
     if (verbose)
-        BASELIB::Log::info("Fitting...");
+        mne::Log::info("Fitting...");
     for (int s = 0; tmin + s * tstep < tmax; s++) {
         float time = tmin + s * tstep;
         if (data->current->getValuesAtTime(time, integ, false, one) < 0) {
-            BASELIB::Log::warning("Cannot pick time: {:7.1f} ms", 1000.0f * time);
+            mne::Log::warning("Cannot pick time: {:7.1f} ms", 1000.0f * time);
             continue;
         }
 
         if (!InvDipoleFitData::fit_one(fit, guess, time, one, verbose, dip))
-            BASELIB::Log::warning("t = {:7.1f} ms : fit error", 1000.0f * time);
+            mne::Log::warning("t = {:7.1f} ms : fit error", 1000.0f * time);
         else {
             set.push_back(dip);
             if (verbose)
                 dip.print();
             else {
                 if (set.size() % report_interval == 0)
-                    BASELIB::Log::info("{}..", set.size());
+                    mne::Log::info("{}..", set.size());
             }
         }
     }
     if (!verbose)
-        BASELIB::Log::info("[done]");
+        mne::Log::info("[done]");
     p_set = set;
     return true;
 }
@@ -248,7 +246,7 @@ bool InvDipoleFit::fit_dipoles_raw(const std::string& dataname, MNERawData* raw,
     if (raw->pick_data_filt(sel, start, segment) < 0)
         return false;
     if (verbose)
-        BASELIB::Log::info("Fitting...");
+        mne::Log::info("Fitting...");
     for (int s = 0; tmin + s * tstep < tmax; s++) {
         float time = tmin + s * tstep;
         int picks = time * sfreq - start;
@@ -260,23 +258,23 @@ bool InvDipoleFit::fit_dipoles_raw(const std::string& dataname, MNERawData* raw,
             stime = start / sfreq;
         }
         if (MNEMeasDataSet::getValuesFromChannelData(time, integ, segment, stime, sfreq, false, one) < 0) {
-            BASELIB::Log::warning("Cannot pick time: {:8.3f} s", time);
+            mne::Log::warning("Cannot pick time: {:8.3f} s", time);
             continue;
         }
         if (!InvDipoleFitData::fit_one(fit, guess, time, one, verbose, dip))
-            BASELIB::Log::warning("t = {:8.3f} s : fit error", time);
+            mne::Log::warning("t = {:8.3f} s : fit error", time);
         else {
             set.push_back(dip);
             if (verbose)
                 dip.print();
             else {
                 if (set.size() % report_interval == 0)
-                    BASELIB::Log::info("{}..", set.size());
+                    mne::Log::info("{}..", set.size());
             }
         }
     }
     if (!verbose)
-        BASELIB::Log::info("[done]");
+        mne::Log::info("[done]");
     p_set = set;
     return true;
 }

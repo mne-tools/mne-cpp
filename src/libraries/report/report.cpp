@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref REPORTLIB::Report.
+ * @brief    Implementation of @ref mne::Report.
  */
 
 //=============================================================================================================
@@ -34,8 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace REPORTLIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -105,7 +104,7 @@ void appendElement(std::string& html, std::string_view tag, std::string_view tex
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::string REPORTLIB::html_escape(std::string_view text)
+std::string mne::html_escape(std::string_view text)
 {
     std::string escaped;
     escaped.reserve(text.size());
@@ -135,7 +134,7 @@ std::string REPORTLIB::html_escape(std::string_view text)
 
 //=============================================================================================================
 
-std::string REPORTLIB::base64_encode(std::string_view data)
+std::string mne::base64_encode(std::string_view data)
 {
     constexpr std::string_view alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     std::string encoded;

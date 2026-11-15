@@ -36,10 +36,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 namespace detail
@@ -155,6 +155,6 @@ private:
 };
 ACQ_STD_MEMBERS_END
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_BACKEND_H

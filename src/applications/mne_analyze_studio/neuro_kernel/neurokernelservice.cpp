@@ -191,13 +191,13 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
-        auto rawRead = FIFFLIB::FiffRawData::read(filePath.toStdU16String());
+        auto rawRead = mne::FiffRawData::read(filePath.toStdU16String());
         if (!rawRead) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
-        FIFFLIB::FiffRawData raw = std::move(*rawRead);
+        mne::FiffRawData raw = std::move(*rawRead);
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
         const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
         const int fromSample = std::max<int>(raw.first_samp, requestedFrom);
@@ -277,13 +277,13 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
-        auto rawRead = FIFFLIB::FiffRawData::read(filePath.toStdU16String());
+        auto rawRead = mne::FiffRawData::read(filePath.toStdU16String());
         if (!rawRead) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
-        FIFFLIB::FiffRawData raw = std::move(*rawRead);
+        mne::FiffRawData raw = std::move(*rawRead);
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
         const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
@@ -363,13 +363,13 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
-        auto rawRead = FIFFLIB::FiffRawData::read(filePath.toStdU16String());
+        auto rawRead = mne::FiffRawData::read(filePath.toStdU16String());
         if (!rawRead) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
-        FIFFLIB::FiffRawData raw = std::move(*rawRead);
+        mne::FiffRawData raw = std::move(*rawRead);
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
         const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
@@ -435,13 +435,13 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
                 {"message", QString("Neuro-Kernel could not find raw file: %1").arg(filePath)}};
         }
 
-        auto rawRead = FIFFLIB::FiffRawData::read(filePath.toStdU16String());
+        auto rawRead = mne::FiffRawData::read(filePath.toStdU16String());
         if (!rawRead) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
         }
-        FIFFLIB::FiffRawData raw = std::move(*rawRead);
+        mne::FiffRawData raw = std::move(*rawRead);
 
         const int requestedFrom = arguments.value("from_sample").toInt(raw.first_samp);
         const int requestedTo = arguments.value("to_sample").toInt(raw.last_samp);
@@ -478,13 +478,13 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         }
 
         const Eigen::RowVectorXi selectedPicks = picks.head(pickCount);
-        const DSPLIB::WelchPsdResult psdResult =
-            DSPLIB::WelchPsd::compute(data,
-                                      raw.info.sfreq,
-                                      std::min(nfft, static_cast<int>(data.cols())),
-                                      0.5,
-                                      DSPLIB::WelchPsd::Hann,
-                                      selectedPicks);
+        const mne::WelchPsdResult psdResult =
+            mne::WelchPsd::compute(data,
+                                   raw.info.sfreq,
+                                   std::min(nfft, static_cast<int>(data.cols())),
+                                   0.5,
+                                   mne::WelchPsd::Hann,
+                                   selectedPicks);
 
         const Eigen::RowVectorXd meanPsd = psdResult.matPsd.colwise().mean();
         QJsonArray frequencies;

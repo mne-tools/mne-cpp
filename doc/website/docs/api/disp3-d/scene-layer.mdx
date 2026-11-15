@@ -1,23 +1,23 @@
 ---
 id: scene-layer
-title: "DISP3DLIB::SceneLayer"
+title: "mne::disp::SceneLayer"
 sidebar_label: SceneLayer
 sidebar_position: 14
 ---
 
 # SceneLayer
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/multimodalscene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/multimodalscene.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/multimodalscene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/multimodalscene.h)
 
 `#include <disp3D/multimodalscene.h>`
 
 ```cpp
-struct DISP3DLIB::SceneLayer
+struct mne::disp::SceneLayer
 ```
 
 Opaque, type-erased handle to a layer payload.
 
-The payload is owned by the caller (e.g. the plugin that loaded the data) and supplied as a `std::shared_ptr<void>` so the scene neither owns nor inspects it. The scene only needs the `DISP3DLIB::SceneLayer::kind` "kind", the `id`, and the generic visibility / opacity flags to drive draw order; the renderer downcasts the payload by `DISP3DLIB::SceneLayer::kind` "kind".
+The payload is owned by the caller (e.g. the plugin that loaded the data) and supplied as a `std::shared_ptr<void>` so the scene neither owns nor inspects it. The scene only needs the `mne::disp::SceneLayer::kind` "kind", the `id`, and the generic visibility / opacity flags to drive draw order; the renderer downcasts the payload by `mne::disp::SceneLayer::kind` "kind".
 
 This indirection keeps `disp3D/scene/` free of QRhi includes and means new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without touching this header.
 
@@ -59,7 +59,7 @@ scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds func
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 176"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 174"
 MultimodalScene scene;
 scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
     const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());

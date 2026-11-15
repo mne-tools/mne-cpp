@@ -1,18 +1,18 @@
 ---
 id: rt-sensor-data-worker
-title: "DISP3DLIB::RtSensorDataWorker"
+title: "mne::disp::RtSensorDataWorker"
 sidebar_label: RtSensorDataWorker
 sidebar_position: 5
 ---
 
 # RtSensorDataWorker
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensordataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensordataworker.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensordataworker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensordataworker.h)
 
 `#include <disp3D/rtsensordataworker.h>`
 
 ```cpp
-class DISP3DLIB::RtSensorDataWorker
+class mne::disp::RtSensorDataWorker
 ```
 
 [`RtSensorDataWorker`](/docs/api/disp3-d/rt-sensor-data-worker) processes incoming sensor measurement data in a background thread.
@@ -68,7 +68,7 @@ Clear all queued data and reset averaging state.
 
 Set the dense mapping matrix (sensor → surface vertices).
 
-This matrix is typically produced by `FWDLIB::FwdFieldMap::computeMegMapping()` or computeEegMapping(). Size: (nVertices × nChannels).
+This matrix is typically produced by `mne::FwdFieldMap::computeMegMapping()` or computeEegMapping(). Size: (nVertices × nChannels).
 
 **Parameters:**
 

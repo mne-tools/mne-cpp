@@ -18,7 +18,7 @@
 #include <Eigen/Core>
 #include <Eigen/Sparse>
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestSourceMorph : public QObject

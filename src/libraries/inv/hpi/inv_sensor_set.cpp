@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref INVLIB::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
+ * @brief    Implementation of @ref mne::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
  *
  * Implements the @c FwdCoilSet → @c InvSensorSet conversion (sizing
  * the per-integration-point matrices, copying positions / normals /
@@ -44,9 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -66,7 +64,7 @@ InvSensorSet::InvSensorSet(const std::shared_ptr<FwdCoilSet>& pFwdSensorSet)
 
 //=============================================================================================================
 
-void InvSensorSet::initFromFwdCoilSet(const std::shared_ptr<FWDLIB::FwdCoilSet>& pFwdSensorSet)
+void InvSensorSet::initFromFwdCoilSet(const std::shared_ptr<mne::FwdCoilSet>& pFwdSensorSet)
 {
     m_ncoils = pFwdSensorSet->ncoil();
     m_np = pFwdSensorSet->coils[0]->np;
@@ -118,12 +116,12 @@ void InvSensorSet::initMatrices(int ncoils, int np)
 
 InvSensorSetCreator::InvSensorSetCreator()
 {
-    m_pCoilDefinitions = FwdCoilSet::read_coil_defs(BASELIB::resource_path("general/coilDefinitions/coil_def.dat"));
+    m_pCoilDefinitions = FwdCoilSet::read_coil_defs(mne::resource_path("general/coilDefinitions/coil_def.dat"));
 }
 
 //=============================================================================================================
 
-InvSensorSet InvSensorSetCreator::updateSensorSet(const std::vector<FIFFLIB::FiffChInfo>& channelList,
+InvSensorSet InvSensorSetCreator::updateSensorSet(const std::vector<mne::FiffChInfo>& channelList,
                                                   const Accuracy& accuracy)
 {
     if (channelList.empty()) {

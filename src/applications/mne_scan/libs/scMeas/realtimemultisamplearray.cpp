@@ -35,8 +35,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -80,7 +80,7 @@ void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo>& chInfo)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::initFromFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo)
+void RealTimeMultiSampleArray::initFromFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
@@ -143,7 +143,7 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::setDigitizerData(std::shared_ptr<FIFFLIB::FiffDigitizerData> digData)
+void RealTimeMultiSampleArray::setDigitizerData(std::shared_ptr<mne::FiffDigitizerData> digData)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFiffDigitizerData_orig = std::move(digData);

@@ -15,7 +15,7 @@
  * @c QDoubleSpinBox so the user can either drag for coarse control
  * or type for precise control. It supports linear and log10 mapping,
  * configurable min / max and the option to invert direction, and is
- * the building block of @ref DISPLIB::ScalingView and several settings
+ * the building block of @ref mne::disp::ScalingView and several settings
  * panels.
  */
 #ifndef SCALECONTROL_H
@@ -46,10 +46,10 @@ class ScaleControlWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -297,6 +297,6 @@ private:
     QMenu* m_pSettingsMenu;
 };
 
-} //DISPLIB NAMESPACE
+} //mne_disp NAMESPACE
 
 #endif // SCALECONTROL_H

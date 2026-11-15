@@ -7,12 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEForwardSolution.
+ * @brief    Implementation of @ref mne::MNEForwardSolution.
  *
  * Implements FIFF read/write of the gain matrix, source-space attachment,
  * coordinate-frame conversion, label-restricted clustering using
- * @ref MATHLIB::KMeans, gain-matrix whitening against an
- * @ref FIFFLIB::FiffCov noise covariance and SSP/CTF application. Mirrors
+ * @ref mne::KMeans, gain-matrix whitening against an
+ * @ref mne::FiffCov noise covariance and SSP/CTF application. Mirrors
  * @c mne.forward of MNE-Python and the @c mne_inverse_operator C tool.
  */
 
@@ -55,12 +55,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
-using namespace MATHLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 
@@ -70,7 +66,7 @@ namespace
 /** @return Whether any name of @p chNamesA names a channel in @p chNamesB. */
 bool check_matching_chnames(const StringList& chNamesA, const StringList& chNamesB)
 {
-    return std::ranges::any_of(chNamesA, [&](const std::string& name) { return FIFFLIB::has_channel(chNamesB, name); });
+    return std::ranges::any_of(chNamesA, [&](const std::string& name) { return mne::has_channel(chNamesB, name); });
 }
 
 } // anonymous namespace
@@ -475,7 +471,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         // Calculate clusters
         //
         Log::info("Clustering...");
-        const std::vector<RegionDataOut> res = BASELIB::ThreadPool::global().parallelMap(regionDataIn, [](const RegionData& region) { return region.cluster(); });
+        const std::vector<RegionDataOut> res = mne::ThreadPool::global().parallelMap(regionDataIn, [](const RegionData& region) { return region.cluster(); });
 
         //
         // Assign results
@@ -868,7 +864,7 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
 
     StringList bads;
     for (const std::string& bad : fwd.info.bads)
-        if (FIFFLIB::has_channel(ch_names, bad))
+        if (mne::has_channel(ch_names, bad))
             bads.push_back(bad);
     fwd.info.bads = std::move(bads);
     fwd.sol.row_names = std::move(ch_names);
@@ -964,7 +960,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
 
     ch_names.clear();
     for (qint32 i = 0; i < std::ssize(p_info.chs); ++i)
-        if (!FIFFLIB::has_channel(p_info.bads, p_info.chs[i].ch_name) && !FIFFLIB::has_channel(p_noise_cov.bads, p_info.chs[i].ch_name) && FIFFLIB::has_channel(p_noise_cov.names, p_info.chs[i].ch_name) && FIFFLIB::has_channel(fwd_ch_names, p_info.chs[i].ch_name))
+        if (!mne::has_channel(p_info.bads, p_info.chs[i].ch_name) && !mne::has_channel(p_noise_cov.bads, p_info.chs[i].ch_name) && mne::has_channel(p_noise_cov.names, p_info.chs[i].ch_name) && mne::has_channel(fwd_ch_names, p_info.chs[i].ch_name))
             ch_names.push_back(p_info.chs[i].ch_name);
 
     qint32 n_chan = static_cast<int>(ch_names.size());
@@ -1010,12 +1006,12 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
     qint32 count_fwd_idx = 0;
     qint32 count_info_idx = 0;
     for (qint32 i = 0; i < static_cast<int>(ch_names.size()); ++i) {
-        idx = FIFFLIB::channel_index(fwd_ch_names, ch_names[i]);
+        idx = mne::channel_index(fwd_ch_names, ch_names[i]);
         if (idx > -1) {
             fwd_idx[count_fwd_idx] = idx;
             ++count_fwd_idx;
         }
-        idx = FIFFLIB::channel_index(p_info.ch_names, ch_names[i]);
+        idx = mne::channel_index(p_info.ch_names, ch_names[i]);
         if (idx > -1) {
             info_idx[count_info_idx] = idx;
             ++count_info_idx;
@@ -1274,7 +1270,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     StringList exclude_bads = options.exclude;
     if (bads.size() > 0) {
         for (qint32 k = 0; k < static_cast<int>(bads.size()); ++k)
-            if (std::none_of(exclude_bads.begin(), exclude_bads.end(), [&](const std::string& e) { return BASELIB::equalsIgnoreCase(e, bads[k]); }))
+            if (std::none_of(exclude_bads.begin(), exclude_bads.end(), [&](const std::string& e) { return mne::equalsIgnoreCase(e, bads[k]); }))
                 exclude_bads.push_back(bads[k]);
     }
 

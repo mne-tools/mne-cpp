@@ -21,11 +21,11 @@
 #include <QQuaternion>
 #include <cmath>
 
-using namespace CONNECTIVITYLIB;
-using namespace DISPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -488,4 +488,4 @@ void NetworkObject::buildEdgeInstances()
 
 //=============================================================================================================
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

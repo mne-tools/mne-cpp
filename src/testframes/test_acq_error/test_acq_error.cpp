@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Tests for the ACQLIB error catalogue and AcqExpected.
+ * @brief    Tests for the mne_acq error catalogue and AcqExpected.
  */
 
 //=============================================================================================================
@@ -33,7 +33,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 //=============================================================================================================
 

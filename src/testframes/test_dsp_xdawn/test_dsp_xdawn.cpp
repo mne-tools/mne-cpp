@@ -18,8 +18,7 @@
 
 #include <random>
 
-using namespace DSPLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

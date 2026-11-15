@@ -50,15 +50,15 @@
 //=============================================================================================================
 
 using namespace RAWDATAVIEWERPLUGIN;
-using namespace ANSHAREDLIB;
-using namespace DSPLIB;
+using namespace mne::analyze;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FiffRawView::FiffRawView(QWidget* parent)
-: DISPLIB::AbstractView(parent)
+: mne::disp::AbstractView(parent)
 , m_pTableView(new QTableView())
 , m_fDefaultSectionSize(80.0f)
 {

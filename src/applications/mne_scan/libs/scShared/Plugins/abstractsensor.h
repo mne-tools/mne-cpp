@@ -21,10 +21,10 @@
 #include "abstractplugin.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -135,6 +135,6 @@ inline bool AbstractSensor::multiInstanceAllowed() const
 }
 } //NAMESPACE
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractSensor, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(mne::scan::AbstractSensor, "scsharedlib/1.0")
 
 #endif // MNESCAN_ABSTRACTSENSOR_H

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref PYBRIDGELIB::PythonRunner: process plumbing, line buffering and progress parsing.
+ * @brief    Implementation of @ref mne::PythonRunner: process plumbing, line buffering and progress parsing.
  *
  * Output of the child interpreter is polled, split on @c \\n and dispatched synchronously to the line callback, so
  * progress displays update in real time. The runner keeps no static state; several runners can work concurrently in
@@ -46,8 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace PYBRIDGELIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -153,7 +152,7 @@ bool isValidModuleName(std::string_view name)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::optional<std::pair<float, std::string>> PYBRIDGELIB::parse_progress_line(std::string_view line)
+std::optional<std::pair<float, std::string>> mne::parse_progress_line(std::string_view line)
 {
     constexpr std::string_view tag = "[progress]";
     line = trimmed(line);

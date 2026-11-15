@@ -90,8 +90,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -415,20 +415,20 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     // a network still renders without its tree row
     const QString dataDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
     QTemporaryDir dir;
-    INVLIB::InvEcd ecd;
+    mne::InvEcd ecd;
     ecd.valid = true;
     ecd.time = 0.1f;
     ecd.rd = Eigen::Vector3f(0.0f, 0.0f, 0.05f);
     ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
     ecd.good = 0.9f;
-    INVLIB::InvEcdSet dipoles;
+    mne::InvEcdSet dipoles;
     dipoles.push_back(ecd);
     const QString dipPath = dir.filePath(QStringLiteral("one.dip"));
     QVERIFY(dipoles.save_dipoles_dip(dipPath.toStdU16String()));
-    CONNECTIVITYLIB::Network network("Coherence");
+    mne::Network network("Coherence");
     network.add_node(Eigen::Vector3f::Zero());
     network.add_node(Eigen::Vector3f::Constant(0.01f));
-    network.add_edge(CONNECTIVITYLIB::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
+    network.add_edge(mne::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
     const QString avePath = dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif");
     const QString fwdPath = dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QVERIFY(!view.loadSensors(avePath));
@@ -438,9 +438,9 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
 
     // Dipoles alone frame the camera: the view centre looks at an off-axis dipole
     {
-        INVLIB::InvEcd offAxis = ecd;
+        mne::InvEcd offAxis = ecd;
         offAxis.rd = Eigen::Vector3f(0.08f, 0.06f, 0.05f);
-        INVLIB::InvEcdSet offAxisSet;
+        mne::InvEcdSet offAxisSet;
         offAxisSet.push_back(offAxis);
         const QString offAxisPath = dir.filePath(QStringLiteral("off-axis.dip"));
         QVERIFY(offAxisSet.save_dipoles_dip(offAxisPath.toStdU16String()));
@@ -523,14 +523,14 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(std::fabs(modelView.cardinalFiducialsInMri()[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
 
     // The head <-> MRI transform is found wherever it sits in the file; a file without one is refused
-    FIFFLIB::FiffCoordTransSet allTrans;
+    mne::FiffCoordTransSet allTrans;
     QVERIFY(allTrans.read((dataDir + QStringLiteral("MEG/sample/all-trans.fif")).toStdU16String()) > 0);
-    const FIFFLIB::FiffCoordTrans devHead(FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD, Eigen::Matrix3f::Identity(), Eigen::Vector3f(0.0f, 0.0f, 0.04f));
+    const mne::FiffCoordTrans devHead(FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD, Eigen::Matrix3f::Identity(), Eigen::Vector3f(0.0f, 0.0f, 0.04f));
     const QString reordered = dir.filePath(QStringLiteral("mri-head-first-trans.fif"));
     const QString devOnly = dir.filePath(QStringLiteral("dev-head-trans.fif"));
     for (const QString& path : {reordered, devOnly}) {
         QFile out(path);
-        auto stream = FIFFLIB::FiffStream::start_file(path.toStdU16String());
+        auto stream = mne::FiffStream::start_file(path.toStdU16String());
         QVERIFY(stream);
         if (path == reordered) {
             stream->write_coord_trans(allTrans.head_surf_RAS_t.inverted());
@@ -708,10 +708,10 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     // Every vertex shows the mean of its label's sources.
     Eigen::VectorXi labelIds(6);
     labelIds << 10, 10, 10, 20, 20, 20;
-    FSLIB::FsLabel a;
+    mne::FsLabel a;
     a.label_id = 10;
     a.vertices = Eigen::VectorXi::LinSpaced(3, 0, 2);
-    FSLIB::FsLabel b;
+    mne::FsLabel b;
     b.label_id = 20;
     b.vertices = Eigen::VectorXi::LinSpaced(3, 3, 5);
     Eigen::VectorXi sources(3);
@@ -840,12 +840,12 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     QCOMPARE(eegCount, 0);
 
     // EEG of the sample data onto a small scalp patch: one mapping row per vertex, one column per picked EEG channel
-    const FIFFLIB::FiffEvoked evoked((QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")).toStdU16String(), 0);
+    const mne::FiffEvoked evoked((QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")).toStdU16String(), 0);
     QVERIFY(!evoked.empty());
     Eigen::MatrixX3f scalp(6, 3);
     scalp << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
     worker.setEvoked(evoked);
-    worker.setTransform(FIFFLIB::FiffCoordTrans(), false);
+    worker.setTransform(mne::FiffCoordTrans(), false);
     worker.setEegSurface(QStringLiteral("bem_head"), scalp);
     worker.computeMapping();
     QCOMPARE(eegCount, 1);
@@ -855,16 +855,16 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     QVERIFY(!evoked.info.bads.empty());
     for (int k : pick) {
         QCOMPARE(evoked.info.chs[k].kind, FIFFV_EEG_CH);
-        QVERIFY(!BASELIB::contains(evoked.info.bads, evoked.info.chs[k].ch_name));
+        QVERIFY(!mne::contains(evoked.info.bads, evoked.info.chs[k].ch_name));
     }
 
     // Same mapping as FwdFieldMap with the origin fitted to the head shape (MNE-Python's make_field_map origin="auto")
-    std::vector<FIFFLIB::FiffChInfo> eegChs;
+    std::vector<mne::FiffChInfo> eegChs;
     for (int k : pick) {
         eegChs.push_back(evoked.info.chs[k]);
     }
-    auto coils = FWDLIB::FwdCoilSet::create_eeg_els(eegChs, static_cast<int>(eegChs.size()), FIFFLIB::FiffCoordTrans());
-    const auto expected = FWDLIB::FwdFieldMap::computeEegMapping(*coils, scalp, SensorFieldMapper::fitSphereOrigin(evoked.info), 0.06f, 1e-3f);
+    auto coils = mne::FwdCoilSet::create_eeg_els(eegChs, static_cast<int>(eegChs.size()), mne::FiffCoordTrans());
+    const auto expected = mne::FwdFieldMap::computeEegMapping(*coils, scalp, SensorFieldMapper::fitSphereOrigin(evoked.info), 0.06f, 1e-3f);
     QVERIFY((*mapping - *expected).cwiseAbs().maxCoeff() <= 1e-5f * expected->cwiseAbs().maxCoeff());
 
     const auto nEeg = pick.size();
@@ -899,7 +899,7 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     connect(&controller, &RtSensorDataController::newRawSensorDataAvailable,
             [&](const Eigen::VectorXf& data) { raw = data; });
     controller.setEvoked(evoked);
-    controller.setTransform(FIFFLIB::FiffCoordTrans(), false);
+    controller.setTransform(mne::FiffCoordTrans(), false);
     controller.setEegSurface(QStringLiteral("bem_head"), scalp);
     controller.recomputeMapping();
     QTRY_COMPARE(controllerKey, QStringLiteral("bem_head"));
@@ -949,7 +949,7 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     Eigen::VectorXi vertices(2);
     vertices << 0, 3;
     {
-        QVERIFY(INVLIB::InvSourceEstimate(data, vertices, -0.01f, 0.005f).write(lhPath.toStdU16String()));
+        QVERIFY(mne::InvSourceEstimate(data, vertices, -0.01f, 0.005f).write(lhPath.toStdU16String()));
     }
     Eigen::MatrixX3f rr(4, 3);
     rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.01f, 0.01f, 0.0f;
@@ -1020,7 +1020,7 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
     QVERIFY(!manager.isStreaming());
 
     // EEG of the sample data mapped onto a small scalp surface
-    mapper.setEvoked(FIFFLIB::FiffEvoked((QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")).toStdU16String(), 0));
+    mapper.setEvoked(mne::FiffEvoked((QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")).toStdU16String(), 0));
     Eigen::MatrixX3f rr(6, 3);
     rr << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
     Eigen::MatrixX3i tris(4, 3);
@@ -1028,7 +1028,7 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
     auto head = std::make_shared<BrainSurface>();
     head->createFromData(rr, tris, Qt::gray);
     surfaces.insert(QStringLiteral("bem_head"), head);
-    QVERIFY(mapper.buildMapping(surfaces, FIFFLIB::FiffCoordTrans(), false));
+    QVERIFY(mapper.buildMapping(surfaces, mne::FiffCoordTrans(), false));
     QVERIFY(!manager.startStreaming(QStringLiteral("ECoG"), mapper, surfaces));
 
     // Streaming sends colours for every vertex of the mapped surface, addressed by its key
@@ -1088,7 +1088,7 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     Eigen::VectorXi vertices(2);
     vertices << 0, 3;
     {
-        QVERIFY(INVLIB::InvSourceEstimate(data, vertices, 0.0f, 0.001f).write(lhPath.toStdU16String()));
+        QVERIFY(mne::InvSourceEstimate(data, vertices, 0.0f, 0.001f).write(lhPath.toStdU16String()));
     }
     Eigen::MatrixX3f rr(4, 3);
     rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.01f, 0.01f, 0.0f;
@@ -1303,9 +1303,9 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     QVERIFY(emptyItem.categoryItem(FIFFV_POINT_CARDINAL) == nullptr);
 
     // Build a list with one point of each known kind
-    std::vector<FIFFLIB::FiffDigPoint> pts;
+    std::vector<mne::FiffDigPoint> pts;
 
-    FIFFLIB::FiffDigPoint cardinal;
+    mne::FiffDigPoint cardinal;
     cardinal.kind = FIFFV_POINT_CARDINAL;
     cardinal.ident = FIFFV_POINT_NASION;
     cardinal.r[0] = 0.0f;
@@ -1313,7 +1313,7 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     cardinal.r[2] = 0.0f;
     pts.push_back(cardinal);
 
-    FIFFLIB::FiffDigPoint lpa;
+    mne::FiffDigPoint lpa;
     lpa.kind = FIFFV_POINT_CARDINAL;
     lpa.ident = FIFFV_POINT_LPA;
     lpa.r[0] = -0.07f;
@@ -1321,7 +1321,7 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     lpa.r[2] = 0.0f;
     pts.push_back(lpa);
 
-    FIFFLIB::FiffDigPoint hpi;
+    mne::FiffDigPoint hpi;
     hpi.kind = FIFFV_POINT_HPI;
     hpi.ident = 1;
     hpi.r[0] = 0.01f;
@@ -1329,7 +1329,7 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     hpi.r[2] = 0.06f;
     pts.push_back(hpi);
 
-    FIFFLIB::FiffDigPoint eeg;
+    mne::FiffDigPoint eeg;
     eeg.kind = FIFFV_POINT_EEG;
     eeg.ident = 1;
     eeg.r[0] = 0.02f;
@@ -1337,7 +1337,7 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     eeg.r[2] = 0.07f;
     pts.push_back(eeg);
 
-    FIFFLIB::FiffDigPoint extra;
+    mne::FiffDigPoint extra;
     extra.kind = FIFFV_POINT_EXTRA;
     extra.ident = 1;
     extra.r[0] = 0.03f;
@@ -1476,33 +1476,33 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     tris << 0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3;
     BrainSurface surface;
     surface.createFromData(rr, tris, Qt::gray);
-    INVLIB::InvEcd ecd;
+    mne::InvEcd ecd;
     ecd.rd = Eigen::Vector3f(0.0f, 0.0f, 0.05f);
     ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
-    INVLIB::InvEcdSet ecds;
+    mne::InvEcdSet ecds;
     ecds.push_back(ecd);
     DipoleObject dipoles;
     dipoles.load(ecds);
-    CONNECTIVITYLIB::Network network("Coherence");
+    mne::Network network("Coherence");
     network.add_node(Eigen::Vector3f::Zero());
     network.add_node(Eigen::Vector3f::Constant(0.02f));
-    network.add_edge(CONNECTIVITYLIB::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
+    network.add_edge(mne::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
     NetworkObject networkObject;
     networkObject.load(network, QStringLiteral("Jet"));
     networkObject.setThreshold(0.0);
-    std::vector<IEEGLIB::IeegContact> lead(3);
+    std::vector<mne::IeegContact> lead(3);
     for (int i = 0; i < 3; ++i) {
         lead[i].name = "LA" + std::to_string(i + 1);
         lead[i].position = Eigen::Vector3f(0.0f, 0.0f, 0.0035f * float(i));
     }
     ElectrodeObject electrodes;
-    electrodes.setImplantation(IEEGLIB::IeegImplantation(lead));
+    electrodes.setImplantation(mne::IeegImplantation(lead));
     PolylineObject path;
     path.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.01f, 0.0f)});
     QImage mri(4, 3, QImage::Format_Grayscale8);
     mri.fill(128);
     SliceObject slice;
-    slice.setSlice(mri, MRILIB::SliceOrientation::Axial, 1, Eigen::Matrix4d::Identity());
+    slice.setSlice(mri, mne::SliceOrientation::Axial, 1, Eigen::Matrix4d::Identity());
     VideoOverlay video;
     video.setEnabled(true);
     QImage frame(8, 4, QImage::Format_RGB32);
@@ -1521,7 +1521,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
     // The uniform buffer grows to one slot per draw (at most 16384); a whole frame must stay usable when it overflows
     QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer|inside a render pass")));
-    const auto modes = {DISP3DLIB::Standard, DISP3DLIB::Holographic, DISP3DLIB::Anatomical, DISP3DLIB::XRay, DISP3DLIB::ShowNormals};
+    const auto modes = {mne::disp::Standard, mne::disp::Holographic, mne::disp::Anatomical, mne::disp::XRay, mne::disp::ShowNormals};
     for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
         QRhiCommandBuffer* cb = nullptr;
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
@@ -1576,8 +1576,8 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.issueElectrodeDraw(cb, &electrodes, electrodeOffset);
         renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
         renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
-        renderer.issueSurfaceDraw(cb, &surface, DISP3DLIB::Standard, last);
-        renderer.issueSurfaceDraw(cb, &surface, DISP3DLIB::Standard, -1);
+        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, last);
+        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, -1);
 
         // QRhi forbids resource updates inside a pass, so preparing one there is refused
         QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
@@ -1594,7 +1594,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.endPass(cb);
 
         renderer.beginPreservingPass(cb);
-        renderer.issueSurfaceDraw(cb, &surface, DISP3DLIB::Standard, surfaceOffset);
+        renderer.issueSurfaceDraw(cb, &surface, mne::disp::Standard, surfaceOffset);
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
@@ -1637,7 +1637,7 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
     BrainRenderer::SceneData scene;
     scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
     scene.lightDir = QVector3D(0.0f, 0.0f, 1.0f);
-    scene.overlayMode = static_cast<float>(DISP3DLIB::ModeScientific);
+    scene.overlayMode = static_cast<float>(mne::disp::ModeScientific);
 
     const bool hasOpenGl = QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL);
     std::unique_ptr<QOffscreenSurface> glSurface(hasOpenGl ? QRhiGles2InitParams::newFallbackSurface() : nullptr);
@@ -1677,8 +1677,8 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         QVERIFY2(second >= 256, qPrintable(QStringLiteral("%1: second slot at byte %2").arg(rhi->backendName()).arg(second)));
         QCOMPARE(second % rhi->ubufAlignment(), 0);
         renderer.beginFrame(cb, updates);
-        renderer.issueSurfaceDraw(cb, &left, DISP3DLIB::Standard, first);
-        renderer.issueSurfaceDraw(cb, &right, DISP3DLIB::Standard, second);
+        renderer.issueSurfaceDraw(cb, &left, mne::disp::Standard, first);
+        renderer.issueSurfaceDraw(cb, &right, mne::disp::Standard, second);
         renderer.endPass(cb);
         QRhiReadbackResult readback;
         QRhiResourceUpdateBatch* read = rhi->nextResourceUpdateBatch();
@@ -1818,8 +1818,8 @@ void TestDisp3dBrainView::brainTreeModel_advanced()
     model.addDigitizerData({});
 
     // addDigitizerData with a real set of points
-    std::vector<FIFFLIB::FiffDigPoint> pts;
-    FIFFLIB::FiffDigPoint nasion;
+    std::vector<mne::FiffDigPoint> pts;
+    mne::FiffDigPoint nasion;
     nasion.kind = FIFFV_POINT_CARDINAL;
     nasion.ident = FIFFV_POINT_NASION;
     nasion.r[0] = 0.0f;
@@ -1827,7 +1827,7 @@ void TestDisp3dBrainView::brainTreeModel_advanced()
     nasion.r[2] = 0.0f;
     pts.push_back(nasion);
 
-    FIFFLIB::FiffDigPoint hpi;
+    mne::FiffDigPoint hpi;
     hpi.kind = FIFFV_POINT_HPI;
     hpi.ident = 1;
     hpi.r[0] = 0.01f;
@@ -1860,9 +1860,9 @@ void TestDisp3dBrainView::treeItems_basics()
         item.setShaderMode(0);
         item.setShaderMode(1);
         QCOMPARE(item.shaderMode(), 1);
-        FSLIB::FsSurface emptySurf;
+        mne::FsSurface emptySurf;
         item.setSurfaceData(emptySurf);
-        FSLIB::FsAnnotation emptyAnnot;
+        mne::FsAnnotation emptyAnnot;
         item.setAnnotationData(emptyAnnot);
         item.surfaceData();
         item.annotationData();
@@ -1870,10 +1870,10 @@ void TestDisp3dBrainView::treeItems_basics()
 
     // BemTreeItem
     {
-        MNELIB::MNEBemSurface bemSurf;
+        mne::MNEBemSurface bemSurf;
         BemTreeItem bemItem("BEM", bemSurf);
         QCOMPARE(bemItem.text(), QString("BEM"));
-        const MNELIB::MNEBemSurface& ref = bemItem.bemSurfaceData();
+        const mne::MNEBemSurface& ref = bemItem.bemSurfaceData();
         Q_UNUSED(ref);
     }
 
@@ -1885,7 +1885,7 @@ void TestDisp3dBrainView::treeItems_basics()
 
     // DipoleTreeItem
     {
-        INVLIB::InvEcdSet emptySet;
+        mne::InvEcdSet emptySet;
         DipoleTreeItem dipItem("Dipoles", emptySet);
         QCOMPARE(dipItem.text(), QString("Dipoles"));
         QCOMPARE(dipItem.ecdSet().size(), 0);
@@ -1912,45 +1912,45 @@ void TestDisp3dBrainView::brainTreeModel_extended()
 
     // addBemSurface
     {
-        MNELIB::MNEBemSurface bemSurf;
+        mne::MNEBemSurface bemSurf;
         bemSurf.id = 4; // Head
         BemTreeItem* bemItem = model.addBemSurface("SubjectA", "head", bemSurf);
         QVERIFY(bemItem != nullptr);
         QCOMPARE(bemItem->text(), QString("head"));
 
-        MNELIB::MNEBemSurface bemSurf2;
+        mne::MNEBemSurface bemSurf2;
         bemSurf2.id = 3;
         model.addBemSurface("SubjectA", "outer_skull", bemSurf2);
 
-        MNELIB::MNEBemSurface bemSurf3;
+        mne::MNEBemSurface bemSurf3;
         bemSurf3.id = 1;
         model.addBemSurface("SubjectA", "inner_skull", bemSurf3);
 
-        MNELIB::MNEBemSurface bemSurf4;
+        mne::MNEBemSurface bemSurf4;
         bemSurf4.id = 99;
         model.addBemSurface("SubjectB", "unknown_bem", bemSurf4);
     }
 
     // addDipoles
     {
-        INVLIB::InvEcdSet emptySet;
+        mne::InvEcdSet emptySet;
         model.addDipoles(emptySet);
     }
 
     // addSourceSpace with empty source spaces
     {
-        MNELIB::MNESourceSpaces srcSpace;
+        mne::MNESourceSpaces srcSpace;
         model.addSourceSpace(srcSpace);
     }
 
     // addNetwork
     {
-        CONNECTIVITYLIB::Network net("Coherence");
+        mne::Network net("Coherence");
         NetworkTreeItem* netItem = model.addNetwork(net, "TestNet");
         QVERIFY(netItem != nullptr);
         QCOMPARE(netItem->text(), QString("TestNet"));
 
-        CONNECTIVITYLIB::Network net2("PLV");
+        mne::Network net2("PLV");
         NetworkTreeItem* netItem2 = model.addNetwork(net2, "");
         QVERIFY(netItem2 != nullptr);
     }
@@ -2005,10 +2005,10 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.applyTransform(QMatrix4x4());
     QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.0f));
     QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
-    surf.setVisualizationMode(DISP3DLIB::ModeSurface);
-    surf.setVisualizationMode(DISP3DLIB::ModeScientific);
-    surf.setVisualizationMode(DISP3DLIB::ModeSourceEstimate);
-    surf.setVisualizationMode(DISP3DLIB::ModeAnnotation);
+    surf.setVisualizationMode(mne::disp::ModeSurface);
+    surf.setVisualizationMode(mne::disp::ModeScientific);
+    surf.setVisualizationMode(mne::disp::ModeSourceEstimate);
+    surf.setVisualizationMode(mne::disp::ModeAnnotation);
 
     // applySourceEstimateColors
     QVector<uint32_t> colors(3, 0xFF808080u);
@@ -2092,7 +2092,7 @@ void TestDisp3dBrainView::rtWorkers_extended()
         worker.setInterpolationInfoRight(emptyVerts, emptyNeighbors, emptyVtx);
 
         Eigen::VectorXi emptyLabelIds;
-        std::vector<FSLIB::FsLabel> emptyLabels;
+        std::vector<mne::FsLabel> emptyLabels;
         worker.setAnnotationInfoLeft(emptyLabelIds, emptyLabels, emptyVtx);
         worker.setAnnotationInfoRight(emptyLabelIds, emptyLabels, emptyVtx);
     }
@@ -2105,7 +2105,7 @@ void TestDisp3dBrainView::rtWorkers_extended()
         worker.setBadChannels(QStringList() << "MEG 0111");
         worker.setBadChannels(QStringList());
 
-        FIFFLIB::FiffCoordTrans emptyTrans;
+        mne::FiffCoordTrans emptyTrans;
         worker.setTransform(emptyTrans, false);
         worker.setTransform(emptyTrans, true);
 
@@ -2224,7 +2224,7 @@ void TestDisp3dBrainView::brainView_streamingApi()
         BrainTreeModel model;
         BrainView fieldView;
         fieldView.setModel(&model);
-        MNELIB::MNEBemSurface scalp;
+        mne::MNEBemSurface scalp;
         scalp.id = FIFFV_BEM_SURF_ID_HEAD;
         scalp.rr.resize(6, 3);
         scalp.rr << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
@@ -2331,9 +2331,9 @@ void TestDisp3dBrainView::rtDataWorkers_basics()
 void TestDisp3dBrainView::dipoleObject_extended()
 {
     // Build a real InvEcdSet with 2 dipoles
-    INVLIB::InvEcdSet ecdSet;
+    mne::InvEcdSet ecdSet;
     {
-        INVLIB::InvEcd d1;
+        mne::InvEcd d1;
         d1.valid = true;
         d1.time = 0.05f;
         d1.rd = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
@@ -2344,7 +2344,7 @@ void TestDisp3dBrainView::dipoleObject_extended()
         d1.neval = 10;
         ecdSet.push_back(d1);
 
-        INVLIB::InvEcd d2 = d1;
+        mne::InvEcd d2 = d1;
         d2.rd = Eigen::Vector3f(-0.01f, 0.01f, 0.04f);
         d2.Q = Eigen::Vector3f(0.0f, 1e-9f, 0.0f);
         ecdSet.push_back(d2);
@@ -2407,13 +2407,13 @@ void TestDisp3dBrainView::networkObject_thresholdAndInstances()
     QCOMPARE(obj.edgeInstanceCount(), 0);
 
     // Chain 0 -- 1 -- 2 -- 3 with weights 0.2, 0.5, 1.0 and an isolated node 4
-    CONNECTIVITYLIB::Network network("Coherence");
+    mne::Network network("Coherence");
     for (int i = 0; i < 5; ++i) {
         network.add_node(Eigen::Vector3f(0.01f * static_cast<float>(i), 0.0f, 0.05f));
     }
     const double weights[] = {0.2, 0.5, 1.0};
     for (int i = 0; i < 3; ++i) {
-        network.add_edge(CONNECTIVITYLIB::NetworkEdge(i, i + 1, Eigen::MatrixXd::Constant(1, 1, weights[i])));
+        network.add_edge(mne::NetworkEdge(i, i + 1, Eigen::MatrixXd::Constant(1, 1, weights[i])));
     }
 
     obj.load(network, QStringLiteral("Jet"));
@@ -2455,7 +2455,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
         4.0, 2.0;
     Eigen::VectorXi vertices(2);
     vertices << 0, 2;
-    overlay.setStcData(INVLIB::InvSourceEstimate(data, vertices, -0.1f, 0.01f), 0);
+    overlay.setStcData(mne::InvSourceEstimate(data, vertices, -0.1f, 0.01f), 0);
     QVERIFY(overlay.isLoaded());
     QCOMPARE(overlay.numTimePoints(), 2);
     QCOMPARE(overlay.tmin(), -0.1f);
@@ -2480,7 +2480,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     overlay.setColormap(QStringLiteral("Hot"));
     overlay.applyToSurface(&surface, 0);
     const auto& colors = surface.colorsRef();
-    const QRgb top = DISPLIB::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
+    const QRgb top = mne::disp::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
     const uint32_t vertex2 = colors[2];
     QCOMPARE(static_cast<int>(vertex2 & 0xFFu), qRed(top));
     QCOMPARE(static_cast<int>((vertex2 >> 8) & 0xFFu), qGreen(top));
@@ -2496,7 +2496,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     rhData << 5.0, 6.0;
     Eigen::VectorXi rhVertices(1);
     rhVertices << 1;
-    overlay.setStcData(INVLIB::InvSourceEstimate(rhData, rhVertices, -0.1f, 0.01f), 1);
+    overlay.setStcData(mne::InvSourceEstimate(rhData, rhVertices, -0.1f, 0.01f), 1);
     const Eigen::VectorXd column = overlay.sourceDataColumn(1);
     QCOMPARE(column.size(), Eigen::Index(3));
     QCOMPARE(column(0), -4.0);
@@ -2539,8 +2539,8 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
 
     SliceObject slice;
     // Axial slice 5: columns along x, rows along y, at z = -30 + 2 * 5
-    slice.setSlice(image, MRILIB::SliceOrientation::Axial, 5, voxelToWorld);
-    QCOMPARE(slice.orientation(), MRILIB::SliceOrientation::Axial);
+    slice.setSlice(image, mne::SliceOrientation::Axial, 5, voxelToWorld);
+    QCOMPARE(slice.orientation(), mne::SliceOrientation::Axial);
     QCOMPARE(slice.sliceIndex(), 5);
     QCOMPARE(slice.image().size(), QSize(4, 3));
     QVector<QVector3D> points = corners(slice);
@@ -2552,17 +2552,17 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
     QCOMPARE(slice.sliceToWorld().map(QVector3D(1.0f, 1.0f, 0.0f)), points[3]);
 
     // Coronal: columns along x, rows along z; sagittal: columns along y, rows along z
-    slice.setSlice(image, MRILIB::SliceOrientation::Coronal, 1, voxelToWorld);
+    slice.setSlice(image, mne::SliceOrientation::Coronal, 1, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[0], QVector3D(-10.0f, -18.0f, -30.0f));
     QCOMPARE(points[3], QVector3D(-2.0f, -18.0f, -24.0f));
-    slice.setSlice(image, MRILIB::SliceOrientation::Sagittal, 2, voxelToWorld);
+    slice.setSlice(image, mne::SliceOrientation::Sagittal, 2, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[0], QVector3D(-6.0f, -20.0f, -30.0f));
     QCOMPARE(points[3], QVector3D(-6.0f, -12.0f, -24.0f));
 
     // An explicit image-to-world transform places the image plane directly
-    slice.setSliceToWorld(image, MRILIB::SliceOrientation::Axial, 0, voxelToWorld);
+    slice.setSliceToWorld(image, mne::SliceOrientation::Axial, 0, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[3], QVector3D(-2.0f, -14.0f, -30.0f));
 
@@ -2610,9 +2610,9 @@ void TestDisp3dBrainView::brainView_clearRemovesObjectsAndRows()
     const auto loadAll = [&] {
         for (const QString& hemi : {QStringLiteral("lh"), QStringLiteral("rh")}) {
             model.addSurface(QStringLiteral("sample"), hemi, QStringLiteral("white"),
-                             FSLIB::FsSurface((dataDir + QStringLiteral("subjects/sample/surf/%1.white").arg(hemi)).toStdU16String()));
+                             mne::FsSurface((dataDir + QStringLiteral("subjects/sample/surf/%1.white").arg(hemi)).toStdU16String()));
         }
-        MNELIB::MNEBem bem((dataDir + QStringLiteral("subjects/sample/bem/sample-5120-bem.fif")).toStdU16String());
+        mne::MNEBem bem((dataDir + QStringLiteral("subjects/sample/bem/sample-5120-bem.fif")).toStdU16String());
         QVERIFY(bem.size() > 0);
         model.addBemSurface(QStringLiteral("sample"), QStringLiteral("inner_skull"), bem[0]);
         QVERIFY(view.loadSensors(dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif")));
@@ -2660,7 +2660,7 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     view.resetAllSubViewState();
     view.resetMultiViewLayout();
     view.setViewCount(4);
-    const FSLIB::FsSurface lh((dataDir + QStringLiteral("subjects/sample/surf/lh.white")).toStdU16String());
+    const mne::FsSurface lh((dataDir + QStringLiteral("subjects/sample/surf/lh.white")).toStdU16String());
     SurfaceTreeItem* lhItem = model.addSurface(QStringLiteral("sample"), QStringLiteral("lh"), QStringLiteral("white"), lh);
     // Aim the view centre at the hemisphere, not at the gap between hemispheres
     const Eigen::Vector3f centroid = lh.rr().colwise().mean();
@@ -2729,11 +2729,11 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     QCOMPARE(doubleClicked.size(), 1);
 
     // Contact values paint the white surface of their hemisphere; an empty map clears them
-    std::vector<IEEGLIB::IeegContact> grid(1);
+    std::vector<mne::IeegContact> grid(1);
     grid[0].name = "G1";
     grid[0].position = lh.rr().row(0).transpose();
     ElectrodeObject electrodes;
-    electrodes.setImplantation(IEEGLIB::IeegImplantation(grid));
+    electrodes.setImplantation(mne::IeegImplantation(grid));
     view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}}); // no electrodes yet: ignored
     view.setElectrodes(&electrodes);
     view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}});

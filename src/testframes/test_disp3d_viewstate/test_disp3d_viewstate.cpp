@@ -30,7 +30,7 @@
 #include <QTemporaryDir>
 #include <QtTest>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 /**
@@ -368,32 +368,32 @@ void TestDisp3dViewState::testMultiViewPresetIsPerspective()
 void TestDisp3dViewState::testSurfaceKeyConstants()
 {
     // Verify key string constants are non-empty and match expected prefixes
-    QCOMPARE(QString(SURFACEKEYS::kLhPrefix), QString("lh_"));
-    QCOMPARE(QString(SURFACEKEYS::kRhPrefix), QString("rh_"));
-    QCOMPARE(QString(SURFACEKEYS::kBemHead), QString("bem_head"));
-    QCOMPARE(QString(SURFACEKEYS::kBemPrefix), QString("bem_"));
-    QCOMPARE(QString(SURFACEKEYS::kSensPrefix), QString("sens_"));
-    QCOMPARE(QString(SURFACEKEYS::kDigPrefix), QString("dig_"));
-    QCOMPARE(QString(SURFACEKEYS::kDigCardinal), QString("dig_cardinal"));
-    QCOMPARE(QString(SURFACEKEYS::kDigHpi), QString("dig_hpi"));
-    QCOMPARE(QString(SURFACEKEYS::kDigEeg), QString("dig_eeg"));
-    QCOMPARE(QString(SURFACEKEYS::kDigExtra), QString("dig_extra"));
+    QCOMPARE(QString(mne::disp::surface_keys::kLhPrefix), QString("lh_"));
+    QCOMPARE(QString(mne::disp::surface_keys::kRhPrefix), QString("rh_"));
+    QCOMPARE(QString(mne::disp::surface_keys::kBemHead), QString("bem_head"));
+    QCOMPARE(QString(mne::disp::surface_keys::kBemPrefix), QString("bem_"));
+    QCOMPARE(QString(mne::disp::surface_keys::kSensPrefix), QString("sens_"));
+    QCOMPARE(QString(mne::disp::surface_keys::kDigPrefix), QString("dig_"));
+    QCOMPARE(QString(mne::disp::surface_keys::kDigCardinal), QString("dig_cardinal"));
+    QCOMPARE(QString(mne::disp::surface_keys::kDigHpi), QString("dig_hpi"));
+    QCOMPARE(QString(mne::disp::surface_keys::kDigEeg), QString("dig_eeg"));
+    QCOMPARE(QString(mne::disp::surface_keys::kDigExtra), QString("dig_extra"));
 }
 
 //=============================================================================================================
 
 void TestDisp3dViewState::testSensorTypeToObjectKey()
 {
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("MEG"), QString("sens_meg"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("MEG/Grad"), QString("sens_meg_grad"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("MEG/Mag"), QString("sens_meg_mag"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("EEG"), QString("sens_eeg"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("Digitizer"), QString("dig"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("Digitizer/Cardinal"), QString("dig_cardinal"));
-    QCOMPARE(SURFACEKEYS::sensorTypeToObjectKey("Digitizer/HPI"), QString("dig_hpi"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG"), QString("sens_meg"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Grad"), QString("sens_meg_grad"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Mag"), QString("sens_meg_mag"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("EEG"), QString("sens_eeg"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer"), QString("dig"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/Cardinal"), QString("dig_cardinal"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/HPI"), QString("dig_hpi"));
 
     // Unknown type should return empty string
-    QVERIFY(SURFACEKEYS::sensorTypeToObjectKey("Unknown").isEmpty());
+    QVERIFY(mne::disp::surface_keys::sensorTypeToObjectKey("Unknown").isEmpty());
 }
 
 //=============================================================================================================

@@ -23,7 +23,7 @@
 #include <cmath>
 #include <limits>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -527,4 +527,4 @@ void SubView::save(QSettings& settings, const QString& prefix) const
     settings.setValue(prefix + "perspRotZ", perspectiveRotation.z());
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

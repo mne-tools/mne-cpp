@@ -54,19 +54,19 @@ namespace
 
 bool writePipeline(const QJsonArray& pipeline, const QString& path, QString& err)
 {
-    MNALIB::MnaProject project;
+    mne::MnaProject project;
     project.name = QStringLiteral("MNE Scan Pipeline");
-    project.mnaVersion = QString::fromLatin1(MNALIB::MnaProject::CURRENT_SCHEMA_VERSION);
+    project.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
     QString previous;
     for (int i = 0; i < pipeline.size(); ++i) {
         const QJsonObject entry = pipeline.at(i).toObject();
-        MNALIB::MnaNode node;
+        mne::MnaNode node;
         node.id = QStringLiteral("node_%1").arg(i);
         node.opType = entry.value(QStringLiteral("plugin")).toString();
         node.attributes.insert(QStringLiteral("gui_x"), entry.value(QStringLiteral("x")).toDouble());
         node.attributes.insert(QStringLiteral("gui_y"), entry.value(QStringLiteral("y")).toDouble());
         if (!previous.isEmpty()) {
-            MNALIB::MnaPort input;
+            mne::MnaPort input;
             input.name = QStringLiteral("in");
             input.sourceNodeId = previous;
             input.sourcePortName = QStringLiteral("out");
@@ -75,7 +75,7 @@ bool writePipeline(const QJsonArray& pipeline, const QString& path, QString& err
         previous = node.id;
         project.pipeline.append(node);
     }
-    if (!MNALIB::MnaIO::write(project, path)) {
+    if (!mne::MnaIO::write(project, path)) {
         err = QStringLiteral("cannot write the pipeline to %1").arg(path);
         return false;
     }
@@ -136,7 +136,7 @@ bool renderMneScanApp(const ShotSpec& spec, const QString& outPath, bool& skippe
 
     static const bool typesRegistered = [] {
         initScanResources();
-        SCMEASLIB::MeasurementTypes::registerTypes();
+        mne::scan::MeasurementTypes::registerTypes();
         return true;
     }();
     Q_UNUSED(typesRegistered);

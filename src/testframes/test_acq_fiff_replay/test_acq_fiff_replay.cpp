@@ -56,8 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace

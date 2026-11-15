@@ -58,14 +58,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -80,7 +80,7 @@ class Network;
  * returned edge weights reflect interactions with non-zero conduction
  * delay only. The cross-spectral accumulation is delegated to
  * @ref Coherency::calculateImag; this class is the public entry point used
- * by the dispatcher in @ref CONNECTIVITYLIB::compute_connectivity.
+ * by the dispatcher in @ref mne::compute_connectivity.
  *
  * @brief Imaginary-coherence estimator (Nolte et al. 2004); rejects zero-lag volume-conduction mixing.
  *
@@ -109,6 +109,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // IMAGCOHERENCE_H

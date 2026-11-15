@@ -10,9 +10,9 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>
  * @since    0.1.0
  * @date     November 2014
- * @brief    Implementation of @ref CHANNELSLIB::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.
+ * @brief    Implementation of @ref mne::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.
  *
- * The sphere is fitted with @ref MATHLIB::Sphere::fit_sphere_simplex,
+ * The sphere is fitted with @ref mne::Sphere::fit_sphere_simplex,
  * the Nelder-Mead fit of the original MNE-C @c make_eeg_layout routine.
  */
 
@@ -34,9 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CHANNELSLIB;
-using namespace MATHLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

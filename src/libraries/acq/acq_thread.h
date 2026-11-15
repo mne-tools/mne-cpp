@@ -31,10 +31,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -119,6 +119,6 @@ struct AcqThreadPolicy
  */
 [[nodiscard]] ACQSHARED_EXPORT AcqExpected<std::thread> start_thread(const AcqThreadPolicy& policy, std::function<void()> body);
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_THREAD_H

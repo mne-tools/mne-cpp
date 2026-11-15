@@ -1,13 +1,13 @@
 ---
 id: sss
-title: "DSPLIB::SSS"
+title: "mne::SSS"
 sidebar_label: SSS
 sidebar_position: 7
 ---
 
 # SSS
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/sss.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/sss.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/sss.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/sss.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.maxwell_filter` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 7
 `#include <dsp/sss.h>`
 
 ```cpp
-class DSPLIB::SSS
+class mne::SSS
 ```
 
 Implements Signal Space Separation ([`SSS`](/docs/api/dsp/sss)) and temporal [`SSS`](/docs/api/dsp/sss) (tSSS) for MEG data.
@@ -41,7 +41,7 @@ const MatrixXd cleaned = SSS::apply(data, basis); // MEG rows replaced by their 
 
 Build the [`SSS`](/docs/api/dsp/sss) spherical-harmonic basis from MEG sensor geometry.
 
-Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from [FiffChInfo](/docs/api/fiff/fiff-ch-info)::chpos (coil-centre single-point model).
+Only channels with kind == FIFFV_MEG_CH or FIFFV_REF_MEG_CH are used. Sensor positions and normals are taken from `FiffChInfo::chpos` (coil-centre single-point model).
 
 **Parameters:**
 
@@ -93,7 +93,7 @@ tSSS processes the data in sliding windows and removes the temporal subspace of 
   Window length in samples (default 10000 ≈ 10 s at 1 kHz).
 
 - **dCorrLimit** : *double*
-  Correlation threshold [0, 1]; singular vectors of the external subspace whose normalised value exceeds this are removed from the internal expansion (default 0.98).
+  [`Correlation`](/docs/api/connectivity/correlation) threshold [0, 1]; singular vectors of the external subspace whose normalised value exceeds this are removed from the internal expansion (default 0.98).
 
 **Returns:**
 
@@ -114,7 +114,7 @@ tSSS processes the data in sliding windows and removes the temporal subspace of 
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 114"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 113"
 SSS::Params params; // internal order 8, external order 3
 params.origin = Vector3d(0.0, 0.0, 0.04);
 const SSS::Basis basis = SSS::computeBasis(info, params); // geometry only, reusable for every buffer

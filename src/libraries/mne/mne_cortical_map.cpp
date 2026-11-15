@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref MNELIB::MNECorticalMap.
+ * @brief    Implementation of @ref mne::MNECorticalMap.
  *
  * Implements binary read of the FreeSurfer @c .map file and the
  * construction of the per-vertex weight table.
@@ -31,8 +31,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -47,12 +46,12 @@ MatrixXd MNECorticalMap::makeCorticalMap(
     // Get the inverse kernel (nSources x nChannels)
     const MatrixXd& kernel = const_cast<MNEInverseOperator&>(inv).getKernel();
     if (kernel.rows() == 0 || kernel.cols() == 0) {
-        BASELIB::Log::warning("MNECorticalMap::makeCorticalMap - Inverse kernel is empty. Make sure the inverse operator has been prepared (assemble_kernel).");
+        mne::Log::warning("MNECorticalMap::makeCorticalMap - Inverse kernel is empty. Make sure the inverse operator has been prepared (assemble_kernel).");
         return MatrixXd();
     }
 
     if (fwd.sol.data.rows() == 0) {
-        BASELIB::Log::warning("MNECorticalMap::makeCorticalMap - Forward solution is empty.");
+        mne::Log::warning("MNECorticalMap::makeCorticalMap - Forward solution is empty.");
         return MatrixXd();
     }
     // A loose inverse kernel is in surface coordinates; rotate a Cartesian free forward to match
@@ -69,9 +68,9 @@ MatrixXd MNECorticalMap::makeCorticalMap(
     if (static_cast<int>(invChannels.size()) == kernel.cols() && static_cast<int>(matched.sol.row_names.size()) == gain.rows()) {
         MatrixXd picked(kernel.cols(), gain.cols());
         for (int c = 0; c < static_cast<int>(invChannels.size()); ++c) {
-            const int row = static_cast<int>(FIFFLIB::channel_index(matched.sol.row_names, invChannels[c]));
+            const int row = static_cast<int>(mne::channel_index(matched.sol.row_names, invChannels[c]));
             if (row < 0) {
-                BASELIB::Log::warning("MNECorticalMap::makeCorticalMap - Channel {} is not in the forward solution.", invChannels[c]);
+                mne::Log::warning("MNECorticalMap::makeCorticalMap - Channel {} is not in the forward solution.", invChannels[c]);
                 return MatrixXd();
             }
             picked.row(c) = gain.row(row);
@@ -81,7 +80,7 @@ MatrixXd MNECorticalMap::makeCorticalMap(
 
     // Verify dimension compatibility
     if (kernel.cols() != gain.rows()) {
-        BASELIB::Log::warning("MNECorticalMap::makeCorticalMap - Dimension mismatch: kernel is {} x {}, gain is {} x {}", kernel.rows(), kernel.cols(), gain.rows(), gain.cols());
+        mne::Log::warning("MNECorticalMap::makeCorticalMap - Dimension mismatch: kernel is {} x {}, gain is {} x {}", kernel.rows(), kernel.cols(), gain.rows(), gain.cols());
         return MatrixXd();
     }
 

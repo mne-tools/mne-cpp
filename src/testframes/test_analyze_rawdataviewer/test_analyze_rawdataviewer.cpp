@@ -32,7 +32,7 @@
 #include <new>
 
 using namespace RAWDATAVIEWERPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref MRILIB::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
+ * @brief    Implementation of @ref mne::MriSlicer: per-orientation extraction with on-the-fly type promotion and per-volume normalisation.
  *
  * Implements the three jobs the header advertises: (1) pick the
  * right axis stride from the volume's @c (dimX, dimY, dimZ)
@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MRILIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

@@ -40,7 +40,7 @@
 #include <memory>
 
 using namespace DIPOLEFITPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 
@@ -98,17 +98,17 @@ void TestAnalyzeDipoleFit::defaultPanelFitsLikeMneC()
             return !fitModel.isNull();
         }(),
         60000);
-    const auto fit = fitModel->data(QModelIndex()).value<INVLIB::InvEcdSet>();
+    const auto fit = fitModel->data(QModelIndex()).value<mne::InvEcdSet>();
 
     // The same fit with MNE-C's defaults (sphere origin (0, 0, 40) mm, EEG sphere radius 90 mm, ...)
-    INVLIB::InvDipoleFitSettings settings;
+    mne::InvDipoleFitSettings settings;
     settings.measname = avePath.toStdString();
     settings.include_meg = true;
     settings.tmin = 0.09f;
     settings.tmax = 0.1f;
     settings.checkIntegrity();
-    INVLIB::InvDipoleFit reference(&settings);
-    const INVLIB::InvEcdSet expected = reference.calculateFit();
+    mne::InvDipoleFit reference(&settings);
+    const mne::InvEcdSet expected = reference.calculateFit();
 
     QVERIFY(expected.size() > 0);
     QCOMPARE(fit.size(), expected.size());

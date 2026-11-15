@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Lossless conversion between AcqStreamInfo and FIFFLIB::FiffInfo.
+ * @brief    Lossless conversion between AcqStreamInfo and mne::FiffInfo.
  *
- * Part of the separate bridge library mne_acq_fiff, the only ACQLIB component that depends on FIFF
+ * Part of the separate bridge library mne_acq_fiff, the only mne_acq component that depends on FIFF
  * (and therefore Qt); mne_acq itself stays standard-library only.
  *
  * Round trip: per-channel fields map to AcqChannelInfo (name, kind, unit, scale = cal * range) and
@@ -33,10 +33,10 @@
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -48,7 +48,7 @@ namespace ACQLIB
  *
  * @return The stream description, version 0.
  */
-ACQFIFFSHARED_EXPORT AcqStreamInfo fromFiffInfo(const FIFFLIB::FiffInfo& info,
+ACQFIFFSHARED_EXPORT AcqStreamInfo fromFiffInfo(const mne::FiffInfo& info,
                                                 AcqSampleFormat format = AcqSampleFormat::Float32);
 
 //=============================================================================================================
@@ -61,8 +61,8 @@ ACQFIFFSHARED_EXPORT AcqStreamInfo fromFiffInfo(const FIFFLIB::FiffInfo& info,
  *
  * @return The FIFF info, or UnsupportedFormat for complex or segmented streams (no FIFF representation).
  */
-ACQFIFFSHARED_EXPORT AcqExpected<FIFFLIB::FiffInfo> toFiffInfo(const AcqStreamInfo& info);
+ACQFIFFSHARED_EXPORT AcqExpected<mne::FiffInfo> toFiffInfo(const AcqStreamInfo& info);
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_FIFF_H

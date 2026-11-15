@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
  *
- * @ref INVLIB::InvHpiDataUpdater isolates everything that has to
- * happen before @ref INVLIB::InvHpiFit can run on a new measurement block:
+ * @ref mne::InvHpiDataUpdater isolates everything that has to
+ * happen before @ref mne::InvHpiFit can run on a new measurement block:
  * re-deriving the good-channel list from the @c FiffInfo, slicing the
  * SSP projector to those channels, projecting the data buffer, lifting
  * the digitised HPI coil positions out of the dig-point list and
- * rebuilding the @ref INVLIB::InvSensorSet whenever the channel layout changes.
+ * rebuilding the @ref mne::InvSensorSet whenever the channel layout changes.
  * The class caches the most recent state so consecutive HPI fits on
  * the same configuration only re-run the steps that actually changed.
  */
@@ -38,7 +38,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffChInfo;
@@ -46,10 +46,10 @@ class FiffDigPointSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE HPILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -57,7 +57,7 @@ namespace INVLIB
 //=============================================================================================================
 
 //=============================================================================================================
-// HPILIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -77,7 +77,7 @@ public:
     *
     * @param[in] pFiffInfo     Measurement info used to initialize channels, bads, HPI digitizer points and sensors.
     */
-    InvHpiDataUpdater(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    InvHpiDataUpdater(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -86,7 +86,7 @@ public:
      * @param[in] pFiffInfo     The FiffInfo to check for changes.
      *
      */
-    void checkForUpdate(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void checkForUpdate(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -104,7 +104,7 @@ public:
      *
      * @return Const reference to the channel list with bad channels excluded.
      */
-    inline const std::vector<FIFFLIB::FiffChInfo>& getChannels();
+    inline const std::vector<mne::FiffChInfo>& getChannels();
     inline const Eigen::MatrixXd& getProjectors();
     inline const Eigen::MatrixXd& getHpiDigitizer();
     inline const Eigen::MatrixXd& getData();
@@ -119,7 +119,7 @@ private:
      * @param[in] pFiffInfo         The FiffInfo file from the measurement.
      *
      */
-    void updateChannels(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void updateChannels(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ private:
      * @param[in] pFiffInfo         The FiffInfo file from the measurement.
      *
      */
-    void updateBadChannels(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void updateBadChannels(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ private:
      * @param[in]   dig             The digitizer points to extract the hpi coils from.
      *
      */
-    void updateHpiDigitizer(const FIFFLIB::FiffDigPointSet& dig);
+    void updateHpiDigitizer(const mne::FiffDigPointSet& dig);
 
     //=========================================================================================================
     /**
@@ -145,7 +145,7 @@ private:
      * @param[in] lChannels       The channel list to update the sensors with.
      *
      */
-    void updateSensors(const std::vector<FIFFLIB::FiffChInfo>& lChannels);
+    void updateSensors(const std::vector<mne::FiffChInfo>& lChannels);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ private:
      *
      * @return true if changed
      */
-    bool checkIfChanged(const StringList& lBads, const std::vector<FIFFLIB::FiffChInfo>& lChannels);
+    bool checkIfChanged(const StringList& lBads, const std::vector<mne::FiffChInfo>& lChannels);
 
     //=========================================================================================================
     /**
@@ -176,22 +176,22 @@ private:
      */
     void prepareProjectors(const Eigen::MatrixXd& matProjectors);
 
-    std::vector<FIFFLIB::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
-    std::vector<int> m_vecInnerind;               /**< index of inner channels . */
-    StringList m_lBads;                           /**< contains bad channels . */
-    Eigen::MatrixXd m_matHpiDigitizer;            /**< The coordinates of the digitized HPI coils in head space*/
-    Eigen::MatrixXd m_matProjectors;              /**< The projectors ready to use*/
-    Eigen::MatrixXd m_matInnerdata;               /**< The data ready to use*/
-    Eigen::MatrixXd m_matDataProjected;           /**< The data with projectros applied*/
-    InvSensorSetCreator m_sensorSetCreator;       /**< ThesensorSetCreator to create a sensorset*/
-    InvSensorSet m_sensors;                       /**< The most recent InvSensorSet*/
+    std::vector<mne::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
+    std::vector<int> m_vecInnerind;           /**< index of inner channels . */
+    StringList m_lBads;                       /**< contains bad channels . */
+    Eigen::MatrixXd m_matHpiDigitizer;        /**< The coordinates of the digitized HPI coils in head space*/
+    Eigen::MatrixXd m_matProjectors;          /**< The projectors ready to use*/
+    Eigen::MatrixXd m_matInnerdata;           /**< The data ready to use*/
+    Eigen::MatrixXd m_matDataProjected;       /**< The data with projectros applied*/
+    InvSensorSetCreator m_sensorSetCreator;   /**< ThesensorSetCreator to create a sensorset*/
+    InvSensorSet m_sensors;                   /**< The most recent InvSensorSet*/
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const std::vector<FIFFLIB::FiffChInfo>& InvHpiDataUpdater::getChannels()
+inline const std::vector<mne::FiffChInfo>& InvHpiDataUpdater::getChannels()
 {
     return m_lChannels;
 }
@@ -221,6 +221,6 @@ inline const InvSensorSet& InvHpiDataUpdater::getSensors()
     return m_sensors;
 }
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_HPI_DATA_UPDATER_H

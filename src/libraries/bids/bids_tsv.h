@@ -13,11 +13,11 @@
  * mandatory header row defines the column names, values are separated
  * by single literal tabs, missing values are encoded as the three-byte
  * string @c n/a, and the file MUST be UTF-8 encoded with LF (no CR)
- * line terminators. @ref BIDSLIB::BidsTsv implements that dialect once via
- * @ref BIDSLIB::BidsTsv::read_tsv "BidsTsv::read_tsv" / @ref BIDSLIB::BidsTsv::write_tsv "BidsTsv::write_tsv" so the domain-specific
- * wrappers @ref BIDSLIB::BidsChannel, @ref BIDSLIB::BidsElectrode and @ref BIDSLIB::BidsEvent do
+ * line terminators. @ref mne::BidsTsv implements that dialect once via
+ * @ref mne::BidsTsv::read_tsv "BidsTsv::read_tsv" / @ref mne::BidsTsv::write_tsv "BidsTsv::write_tsv" so the domain-specific
+ * wrappers @ref mne::BidsChannel, @ref mne::BidsElectrode and @ref mne::BidsEvent do
  * not each re-derive it. Rows are returned as ordered
- * column-name → value maps (@ref BIDSLIB::BidsTsvRow "BidsTsvRow"), preserving the header
+ * column-name → value maps (@ref mne::BidsTsvRow "BidsTsvRow"), preserving the header
  * ordering for round-trip-stable writes.
  */
 
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -105,6 +105,6 @@ public:
     static std::string_view value(const BidsTsvRow& row, std::string_view column, std::string_view fallback = {});
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_TSV_H

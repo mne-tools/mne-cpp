@@ -64,15 +64,10 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace DSPLIB
- * @brief     Digital signal processing (filtering, spectrograms, real-time averaging, HPI, noise reduction).
- */
-namespace DSPLIB
+namespace mne
 {
 
-using BASELIB::StringList;
+using mne::StringList;
 
 //=============================================================================================================
 /**

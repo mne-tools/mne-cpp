@@ -65,9 +65,8 @@
 
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 
 class TestMneScanPlugins : public QObject
 {

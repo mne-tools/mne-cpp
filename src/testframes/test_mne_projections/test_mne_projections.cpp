@@ -32,8 +32,7 @@
 #include <mne/mne_description_parser.h>
 #include <mne/mne_process_description.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 

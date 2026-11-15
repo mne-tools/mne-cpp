@@ -1,18 +1,18 @@
 ---
 id: acq-writer
-title: "ACQLIB::AcqWriter"
+title: "mne::AcqWriter"
 sidebar_label: AcqWriter
 sidebar_position: 2
 ---
 
 # AcqWriter
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_stream.h)
 
 `#include <acq/acq_stream.h>`
 
 ```cpp
-class ACQLIB::AcqWriter
+class mne::AcqWriter
 ```
 
 The single producer of a ring: the backend for an input stream, the application for an output stream.
@@ -336,7 +336,7 @@ Creates a standalone ring with its writer (backends, DMA emulation, application-
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -344,7 +344,7 @@ Creates a standalone ring with its writer (backends, DMA emulation, application-
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 406"
 /** The card: writes the input ring in 1 ms blocks at the real-time rate and plays the output ring. */

@@ -12,13 +12,13 @@
  * BIDS mandates that every electrophysiology recording (MEG, EEG, iEEG)
  * ship a sibling @c _channels.tsv with one row per channel describing
  * @c name, @c type and @c units (REQUIRED) plus optional sampling /
- * filter / status / description columns. @ref BIDSLIB::BidsChannel is the in-memory
- * row record and the static @ref BIDSLIB::BidsChannel::read_tsv "BidsChannel::read_tsv" /
- * @ref BIDSLIB::BidsChannel::write_tsv "BidsChannel::write_tsv" functions perform the TSV round-trip via
- * @ref BIDSLIB::BidsTsv. The BIDS channel-type vocabulary (@c MEGMAG, @c EEG,
+ * filter / status / description columns. @ref mne::BidsChannel is the in-memory
+ * row record and the static @ref mne::BidsChannel::read_tsv "BidsChannel::read_tsv" /
+ * @ref mne::BidsChannel::write_tsv "BidsChannel::write_tsv" functions perform the TSV round-trip via
+ * @ref mne::BidsTsv. The BIDS channel-type vocabulary (@c MEGMAG, @c EEG,
  * @c ECOG, @c SEEG, @c DBS, @c TRIG, …) maps to FIFF channel kinds
  * through the tables in @ref bids_const.h, so a channel record read
- * from a BIDS dataset can be merged into a @c FIFFLIB::FiffInfo without
+ * from a BIDS dataset can be merged into a @c mne::FiffInfo without
  * an additional translation layer.
  *
  * Spec: https://bids-specification.readthedocs.io/en/stable/modality-specific-files/electrophysiology.html
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -84,6 +84,6 @@ struct BIDSSHARED_EXPORT BidsChannel
                           std::span<const BidsChannel> channels);
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_CHANNEL_H

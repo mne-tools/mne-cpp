@@ -34,7 +34,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Arrow::Arrow(PluginItem* startItem, PluginItem* endItem, SCSHAREDLIB::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent)
+Arrow::Arrow(PluginItem* startItem, PluginItem* endItem, mne::scan::PluginConnectorConnection::SPtr& connection, QGraphicsItem* parent)
 : QGraphicsLineItem(parent)
 , m_StartItem(startItem)
 , m_EndItem(endItem)

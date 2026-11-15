@@ -11,7 +11,7 @@
  *
  * Implements the dSPM kernel assembly, the per-source z-score
  * rectification, the sliding-window LSTM inference via ONNX Runtime
- * and (outside WebAssembly builds) the @ref PYBRIDGELIB::PythonRunner-based
+ * and (outside WebAssembly builds) the @ref mne::PythonRunner-based
  * training driver that invokes the upstream
  * @c train_cmne_lstm.py script. The training driver is a thin process
  * wrapper — the actual PyTorch model + ONNX export lives in Python and
@@ -59,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -81,12 +81,12 @@ InvCMNEResult InvCMNE::compute(
 
     MatrixXd sensing, prediction, cmne;
     if (settings.onnxModelPath.empty()) {
-        BASELIB::Log::info("[InvCMNE] No model: control estimate with look-back {}", settings.lookBack);
+        mne::Log::info("[InvCMNE] No model: control estimate with look-back {}", settings.lookBack);
         cmne = controlEstimate(matDspm, settings.lookBack);
         sensing = zScoreRectify(matDspm);
         prediction = sensing;
     } else if (!applyCmne(matDspm, settings.onnxModelPath, sensing, prediction, cmne)) {
-        BASELIB::Log::warning("[InvCMNE] CMNE could not be applied; returning the dSPM estimate only.");
+        mne::Log::warning("[InvCMNE] CMNE could not be applied; returning the dSPM estimate only.");
         return result;
     }
     result.stcSensing = InvSourceEstimate(sensing, vertices, 0.0f, 1.0f);
@@ -108,7 +108,7 @@ MatrixXd InvCMNE::computeDspmKernel(
 
     // Step 1: Whiten noise covariance via eigendecomposition
     // C_n = V * D * V^T  ->  C_n^{-1/2} = V * D^{-1/2} * V^T
-    BASELIB::Log::info("  [dSPM kernel] Eigendecomposition of noise covariance ( {} x {} ) …", nChannels, nChannels);
+    mne::Log::info("  [dSPM kernel] Eigendecomposition of noise covariance ( {} x {} ) …", nChannels, nChannels);
     // Decompose the correlation matrix D^-1/2 C D^-1/2: MEG (T^2) and EEG (V^2) variances differ by 1e13,
     // so a cutoff relative to the largest eigenvalue of C would drop every MEG component.
     const VectorXd scale = matNoiseCov.diagonal().cwiseMax(std::numeric_limits<double>::min()).cwiseSqrt();
@@ -129,11 +129,11 @@ MatrixXd InvCMNE::computeDspmKernel(
     MatrixXd matWhitener = eigVecs * eigValsInvSqrt.asDiagonal() * eigVecs.transpose() * scale.cwiseInverse().asDiagonal();
 
     // Step 2: Whiten gain matrix
-    BASELIB::Log::info("  [dSPM kernel] Whitening gain matrix …");
+    mne::Log::info("  [dSPM kernel] Whitening gain matrix …");
     MatrixXd matGainWhitened = matWhitener * matGain; // n_channels x n_sources
 
     // Step 3: MNE kernel
-    BASELIB::Log::info("  [dSPM kernel] Computing MNE kernel (LDLT solve, {} x {} ) …", nChannels, nChannels);
+    mne::Log::info("  [dSPM kernel] Computing MNE kernel (LDLT solve, {} x {} ) …", nChannels, nChannels);
     // K = C_R * G_tilde^T * (G_tilde * C_R * G_tilde^T + lambda2 * I)^{-1}
     MatrixXd matGCR = matGainWhitened * matSrcCov;        // n_channels x n_sources
     MatrixXd matA = matGCR * matGainWhitened.transpose(); // n_channels x n_channels
@@ -146,7 +146,7 @@ MatrixXd InvCMNE::computeDspmKernel(
     // Step 4: dSPM normalization
     // noise_norm_i = sqrt((K * C_n * K^T)(i,i))
     // K_dSPM(i,:) = K(i,:) / noise_norm_i
-    BASELIB::Log::info("  [dSPM kernel] Normalizing {} source rows …", nSources);
+    mne::Log::info("  [dSPM kernel] Normalizing {} source rows …", nSources);
     MatrixXd matKCn = matK * matNoiseCov; // n_sources x n_channels
     for (int i = 0; i < nSources; ++i) {
         double noiseNorm = std::sqrt(matKCn.row(i).dot(matK.row(i)));
@@ -200,21 +200,21 @@ bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
                         MatrixXd& prediction,
                         MatrixXd& cmne)
 {
-    MLLIB::MlOnnxModel model;
+    mne::MlOnnxModel model;
     if (!model.load(onnxModelPath)) {
-        BASELIB::Log::warning("[InvCMNE] Cannot load CMNE model {}", onnxModelPath);
+        mne::Log::warning("[InvCMNE] Cannot load CMNE model {}", onnxModelPath);
         return false;
     }
-    const BASELIB::JsonDocument metadata = BASELIB::JsonDocument::from_json(model.metadata("cmne_config"));
-    const BASELIB::JsonObject& config = metadata.object();
+    const mne::JsonDocument metadata = mne::JsonDocument::from_json(model.metadata("cmne_config"));
+    const mne::JsonObject& config = metadata.object();
     const int k = config.value("look_back").to_int();
     const int nSources = config.value("n_sources").to_int();
     if (k <= 0 || nSources != matDspmData.rows()) {
-        BASELIB::Log::warning("[InvCMNE] Model {} has no cmne_config for {} sources (look_back {} , n_sources {} ).", onnxModelPath, matDspmData.rows(), k, nSources);
+        mne::Log::warning("[InvCMNE] Model {} has no cmne_config for {} sources (look_back {} , n_sources {} ).", onnxModelPath, matDspmData.rows(), k, nSources);
         return false;
     }
     if (matDspmData.cols() <= k) {
-        BASELIB::Log::warning("[InvCMNE] Need more than look_back = {} samples, got {}", k, matDspmData.cols());
+        mne::Log::warning("[InvCMNE] Need more than look_back = {} samples, got {}", k, matDspmData.cols());
         return false;
     }
     sensing = config.value("rectify").to_bool(true) ? zScoreRectify(matDspmData) : standardize(matDspmData);
@@ -226,7 +226,7 @@ bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
     std::vector<float> window(static_cast<size_t>(k) * static_cast<size_t>(nSources));
     for (int t = k; t < q.cols(); ++t) {
         Map<MatrixXf>(window.data(), nSources, k) = b.middleCols(t - k, k);
-        const MLLIB::MlTensor out = model.predict(MLLIB::MlTensor::view(window.data(), {1, k, nSources}));
+        const mne::MlTensor out = model.predict(mne::MlTensor::view(window.data(), {1, k, nSources}));
         const Map<const VectorXf> p(out.data(), nSources);
         pred.col(t) = p;
         const VectorXf w = p.cwiseAbs();
@@ -242,7 +242,7 @@ bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
 
 #ifndef WASMBUILD
 
-PYBRIDGELIB::PythonRunnerResult InvCMNE::train_lstm(
+mne::PythonRunnerResult InvCMNE::train_lstm(
     const std::filesystem::path& fwdPath,
     const std::filesystem::path& covPath,
     const std::filesystem::path& epochsPath,
@@ -258,11 +258,11 @@ PYBRIDGELIB::PythonRunnerResult InvCMNE::train_lstm(
     const std::string& pythonExe)
 {
     namespace fs = std::filesystem;
-    using BASELIB::utf8FromPath;
+    using mne::utf8FromPath;
 
     // Training package directory (pyproject.toml + script): <app_dir>/../scripts/ml/training/cmne/, with the source
     // tree relative to the working directory as fallback
-    fs::path cmneDir = BASELIB::executable_dir().parent_path() / "scripts" / "ml" / "training" / "cmne";
+    fs::path cmneDir = mne::executable_dir().parent_path() / "scripts" / "ml" / "training" / "cmne";
     std::error_code ec;
     if (!fs::exists(cmneDir / "pyproject.toml", ec)) {
         cmneDir = fs::path("scripts") / "ml" / "training" / "cmne";
@@ -271,14 +271,14 @@ PYBRIDGELIB::PythonRunnerResult InvCMNE::train_lstm(
     const fs::path scriptPath = cmneDir / "train_cmne_lstm.py";
 
     if (!fs::exists(scriptPath, ec)) {
-        PYBRIDGELIB::PythonRunnerResult result;
+        mne::PythonRunnerResult result;
         result.std_err = "Training script not found: " + utf8FromPath(scriptPath);
-        BASELIB::Log::warning("[InvCMNE::train_lstm] {}", result.std_err);
+        mne::Log::warning("[InvCMNE::train_lstm] {}", result.std_err);
         return result;
     }
 
-    BASELIB::Log::debug("[InvCMNE::train_lstm] Script: {}", utf8FromPath(scriptPath));
-    BASELIB::Log::debug("[InvCMNE::train_lstm] Package dir: {}", utf8FromPath(cmneDir));
+    mne::Log::debug("[InvCMNE::train_lstm] Script: {}", utf8FromPath(scriptPath));
+    mne::Log::debug("[InvCMNE::train_lstm] Package dir: {}", utf8FromPath(cmneDir));
 
     const char* method = "dSPM";
     switch (settings.method) {
@@ -298,7 +298,7 @@ PYBRIDGELIB::PythonRunnerResult InvCMNE::train_lstm(
     const double snr = 1.0 / std::sqrt(settings.lambda2);
 
     // Argument list of the train_cmne_lstm.py command line
-    BASELIB::StringList args = {
+    mne::StringList args = {
         "--fwd", utf8FromPath(fwdPath),
         "--cov", utf8FromPath(covPath),
         "--epochs", utf8FromPath(epochsPath),
@@ -319,12 +319,12 @@ PYBRIDGELIB::PythonRunnerResult InvCMNE::train_lstm(
     }
 
     // The venv lives inside the cmne package directory as .venv/
-    PYBRIDGELIB::PythonRunnerConfig config;
+    mne::PythonRunnerConfig config;
     config.python_exe = pythonExe;
     config.venv_dir = cmneDir / ".venv";
     config.package_dir = cmneDir;
 
-    MLLIB::MLTrainer trainer(config);
+    mne::MLTrainer trainer(config);
     return trainer.run(scriptPath, args);
 }
 

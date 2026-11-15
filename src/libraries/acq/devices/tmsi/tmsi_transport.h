@@ -34,10 +34,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Channel types, as the SDK's signal format reports them. */
@@ -156,6 +156,6 @@ std::unique_ptr<TmsiTransport> makeTmsiSimulator(const TmsiSimulation& simulatio
 /** @return The SDK connection to the first connected amplifier, or BackendUnavailable / DeviceNotFound. */
 AcqExpected<std::unique_ptr<TmsiTransport>> openTmsiDriver();
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // TMSI_TRANSPORT_H

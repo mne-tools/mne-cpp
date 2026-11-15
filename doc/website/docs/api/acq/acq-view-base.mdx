@@ -1,19 +1,19 @@
 ---
 id: acq-view-base
-title: "ACQLIB::AcqViewBase"
+title: "mne::AcqViewBase"
 sidebar_label: AcqViewBase
 sidebar_position: 7
 ---
 
 # AcqViewBase
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
 
 `#include <acq/acq_block_view.h>`
 
 ```cpp
 template <typename Byte>
-class ACQLIB::AcqViewBase
+class mne::AcqViewBase
 ```
 
 Fields shared by read and write views.
@@ -168,7 +168,7 @@ for (std::size_t e = 0; e < view->events().size(); ++e) {
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 

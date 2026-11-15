@@ -35,10 +35,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -82,7 +82,7 @@ public:
      *
      * @return XdawnResult containing filters, patterns, and covariances.
      */
-    static XdawnResult fit(const std::vector<MNELIB::MNEEpochData>& epochs,
+    static XdawnResult fit(const std::vector<mne::MNEEpochData>& epochs,
                            int iTargetEvent = 1,
                            int nComponents = 2,
                            double dReg = 1e-6);
@@ -125,11 +125,11 @@ public:
      *
      * @return Copy of the input epochs with denoised epoch matrices.
      */
-    static std::vector<MNELIB::MNEEpochData> denoiseEpochs(std::vector<MNELIB::MNEEpochData> epochs,
-                                                           const XdawnResult& result,
-                                                           int nComponents = -1);
+    static std::vector<mne::MNEEpochData> denoiseEpochs(std::vector<mne::MNEEpochData> epochs,
+                                                        const XdawnResult& result,
+                                                        int nComponents = -1);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // XDAWN_DSP_H

@@ -1,18 +1,18 @@
 ---
 id: mne-raw-data
-title: "MNELIB::MNERawData"
+title: "mne::MNERawData"
 sidebar_label: MNERawData
 sidebar_position: 48
 ---
 
 # MNERawData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_raw_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_raw_data.h)
 
 `#include <mne/mne_raw_data.h>`
 
 ```cpp
-class MNELIB::MNERawData
+class mne::MNERawData
 ```
 
 Implements the MNE Raw Data (Replaces *mneRawData,mneRawDataRec; struct of MNE-C `mne_types.h`).
@@ -36,7 +36,7 @@ sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
 sel.pick.resize(sel.nchan());
 for (int c = 0; c < sel.nchan(); ++c) {
-    sel.pick[c] = static_cast<int>(BASELIB::indexOf(mneRaw->ch_names, sel.chspick[c]));
+    sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
 }
 
 const int ns = 25;
@@ -238,7 +238,7 @@ Attaches channel derivations (MNE-C `mne_raw_attach_derivations`): merges them i
 
 Open a raw FIFF file with explicit compensation grade.
 
-Reads channel info, compensation data, [SSS](/docs/api/dsp/sss) data, sets up data/filter buffers and bad channels, and returns a fully initialized raw data object.
+Reads channel info, compensation data, [`SSS`](/docs/api/dsp/sss) data, sets up data/filter buffers and bad channels, and returns a fully initialized raw data object.
 
 **Parameters:**
 
@@ -302,7 +302,7 @@ Convenience wrapper for `open_file_comp()` with comp_set = -1.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 267"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 265"
 filter.taper_size = 2048;
 filter.lowpass = filter.eog_lowpass = 40.0f;
 filter.lowpass_width = filter.eog_lowpass_width = 5.0f;

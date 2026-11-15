@@ -9,16 +9,16 @@
  * @date     March 2026
  * @brief    Centralised BIDS vocabulary: datatype / suffix / extension whitelists, FIFF↔BIDS channel-type and coordinate-frame maps, and entity ordering.
  *
- * Every other translation unit in BIDSLIB derives its allowed values from
+ * Every other translation unit in mne_bids derives its allowed values from
  * the constants defined here, so a future BIDS specification bump
  * (currently 1.9.x) only requires touching this header. The file groups
  * five orthogonal concerns: BIDS datatype strings (@c meg, @c eeg,
  * @c ieeg, @c anat, …), per-modality raw-data file extension
  * whitelists, bidirectional FIFF-kind ↔ BIDS channel-type maps used by
- * @ref BIDSLIB::BidsChannel and @ref BIDSLIB::BidsRawData, coordinate-system name ↔
- * @c FIFFV_COORD_* maps used by @ref BIDSLIB::BidsCoordinateSystem, and the
+ * @ref mne::BidsChannel and @ref mne::BidsRawData, coordinate-system name ↔
+ * @c FIFFV_COORD_* maps used by @ref mne::BidsCoordinateSystem, and the
  * canonical entity order (@c sub, @c ses, @c task, @c acq, @c run, …)
- * consumed by @ref BIDSLIB::BIDSPath when it serialises a filename.
+ * consumed by @ref mne::BIDSPath when it serialises a filename.
  *
  * Header-only and constexpr, so the tables live in read-only data and
  * lookups need no allocation.
@@ -40,10 +40,10 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -175,6 +175,6 @@ constexpr auto bids_lookup(const Table& table, const Key& key) -> std::optional<
     return it == table.end() ? std::nullopt : std::optional(it->second);
 }
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_CONST_H

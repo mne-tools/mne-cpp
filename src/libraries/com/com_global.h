@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     December, 2012
- * @brief    Export macros, build-info entry points and namespace anchor for the @c COMLIB communication library.
+ * @brief    Export macros, build-info entry points and namespace anchor for the @c mne_com communication library.
  *
  * This header defines @ref COMSHARED_EXPORT, expanding to the export decoration when building the shared library,
  * the import one when consuming it, and to nothing for the static build configuration (@c STATICBUILD). It also
@@ -33,18 +33,12 @@
 #define COMSHARED_EXPORT __attribute__((visibility("default"))) /**< Default visibility on ELF/Mach-O. */
 #endif
 
-//=============================================================================================================
-/**
- * @namespace COMLIB
- * @brief Byte transports to devices and servers in standard C++: TCP connections, UDP sockets and serial ports,
- *        each with timeouts and std::error_code results.
- */
-namespace COMLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
- * @brief Compile-time date/time stamp baked into the @c COMLIB binary.
+ * @brief Compile-time date/time stamp baked into the @c mne_com binary.
  *
  * Resolved from the @c __DATE__ / @c __TIME__ macros at build time. Used by About dialogs and bug
  * reports to disambiguate identically-versioned builds.

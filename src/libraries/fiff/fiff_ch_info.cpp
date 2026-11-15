@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,7 +87,7 @@ bool FiffChInfo::checkEegLocations(const std::vector<FiffChInfo>& chs, int nch)
     for (int k = 0; k < nch; k++) {
         if (chs.at(k).kind == FIFFV_EEG_CH) {
             if (chs.at(k).chpos.r0.norm() < close) {
-                BASELIB::Log::critical("Some EEG channels do not have locations assigned.");
+                mne::Log::critical("Some EEG channels do not have locations assigned.");
                 return false;
             }
         }

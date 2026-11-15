@@ -53,10 +53,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -1222,27 +1222,27 @@ inline bool JsonDocument::operator==(const JsonDocument& other) const
     return m_root == other.m_root;
 }
 
-} // namespace BASELIB
+} // namespace mne
 
 //=============================================================================================================
 // STRUCTURED BINDINGS
 //=============================================================================================================
 
 template<>
-struct std::tuple_size<BASELIB::JsonObject::Member> : std::integral_constant<std::size_t, 2>
+struct std::tuple_size<mne::JsonObject::Member> : std::integral_constant<std::size_t, 2>
 {
 };
 
 template<>
-struct std::tuple_element<0, BASELIB::JsonObject::Member>
+struct std::tuple_element<0, mne::JsonObject::Member>
 {
     using type = const std::string;
 };
 
 template<>
-struct std::tuple_element<1, BASELIB::JsonObject::Member>
+struct std::tuple_element<1, mne::JsonObject::Member>
 {
-    using type = BASELIB::JsonValue;
+    using type = mne::JsonValue;
 };
 
 #endif // BASE_JSON_H

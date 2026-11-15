@@ -16,7 +16,7 @@
  * over the per-sample derivative to localise rising edges, with optional
  * de-bouncing controlled by a minimum inter-event distance.
  *
- * @ref DSPLIB::toEventMatrix "toEventMatrix" turns the per-channel @c QMap of detected events into
+ * @ref mne::toEventMatrix "toEventMatrix" turns the per-channel @c QMap of detected events into
  * the canonical three-column @c Eigen::MatrixXi event layout (sample,
  * previous code, new code) consumed by the rest of the mne-cpp pipeline
  * (averaging, epoching, annotations).
@@ -44,14 +44,14 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
-// DSPLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=========================================================================================================

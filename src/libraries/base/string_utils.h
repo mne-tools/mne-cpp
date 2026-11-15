@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 /** Ordered list of names, e.g. channel names; the standard-library counterpart of QStringList. */
@@ -156,6 +156,6 @@ BASESHARED_EXPORT std::filesystem::path executable_dir();
  */
 BASESHARED_EXPORT std::filesystem::path resource_path(std::string_view relative);
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_STRING_UTILS_H

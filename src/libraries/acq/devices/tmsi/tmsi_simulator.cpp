@@ -28,8 +28,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -206,7 +206,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<TmsiTransport> ACQLIB::detail::makeTmsiSimulator(const TmsiSimulation& simulation)
+std::unique_ptr<TmsiTransport> mne::detail::makeTmsiSimulator(const TmsiSimulation& simulation)
 {
     return std::make_unique<TmsiSimulator>(simulation);
 }

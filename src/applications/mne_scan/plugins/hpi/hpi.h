@@ -46,7 +46,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffDigPointSet;
@@ -54,12 +54,12 @@ class FiffCoordTrans;
 class FiffDigitizerData;
 }
 
-namespace INVLIB
+namespace mne
 {
 class InvHpiFit;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 class RealTimeHpiResult;
@@ -84,12 +84,12 @@ namespace HPIPLUGIN
  *
  * @brief The Hpi class provides a tools to reduce noise of an incoming data stream. It then forwards the processed data to subsequent plugins.
  */
-class HPISHARED_EXPORT Hpi : public SCSHAREDLIB::AbstractAlgorithm
+class HPISHARED_EXPORT Hpi : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "hpi.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -108,7 +108,7 @@ public:
     /**
      * AbstractAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const override;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual bool start() override;
@@ -126,7 +126,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ private:
      * @param[in] digitizers   The new digitizers.
      * @param[in] sFilePath    The file path to the new digitizers.
      */
-    void onDigitizersChanged(const FIFFLIB::FiffDigPointSet& digitizers,
+    void onDigitizersChanged(const mne::FiffDigPointSet& digitizers,
                              const QString& sFilePath);
 
     //=========================================================================================================
@@ -225,7 +225,7 @@ private:
      *
      * @param[in] devHeadTrans    The new device to head transformation matrix changed.
      */
-    void onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
+    void onDevHeadTransAvailable(const mne::FiffCoordTrans& devHeadTrans);
 
     //=========================================================================================================
     /**
@@ -247,7 +247,7 @@ private:
      *
      * @param[in] pRTMSA    input real-time multi-sample arraymeasurement
      */
-    void manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA);
+    void manageInitialization(QSharedPointer<mne::scan::RealTimeMultiSampleArray> pRTMSA);
 
     //=========================================================================================================
     /**
@@ -255,7 +255,7 @@ private:
      *
      * @param[in] info      input fiff info objcts
      */
-    void initFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo> info);
+    void initFiffInfo(std::shared_ptr<mne::FiffInfo> info);
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ private:
      *
      * @param[in] fiffDig   input fiff digitizer information
      */
-    void initFiffDigitizers(const std::shared_ptr<FIFFLIB::FiffDigitizerData>& fiffDig);
+    void initFiffDigitizers(const std::shared_ptr<mne::FiffDigitizerData>& fiffDig);
 
     //=========================================================================================================
     /**
@@ -295,12 +295,12 @@ private:
     Eigen::MatrixXd m_matData;           /**< The last data block.*/
     Eigen::MatrixXd m_matCompProjectors; /**< Holds the matrix with the SSP and compensator projectors.*/
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
-    std::shared_ptr<FIFFLIB::FiffDigitizerData> m_pFiffDigitizerData;
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::shared_ptr<mne::FiffDigitizerData> m_pFiffDigitizerData;
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pHpiInput; /**< The RealTimeMultiSampleArray of the Hpi input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr m_pHpiOutput;      /**< The RealTimeHpiResult of the Hpi output.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pHpiInput; /**< The RealTimeMultiSampleArray of the Hpi input.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeHpiResult>::SPtr m_pHpiOutput;      /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
     void errorsChanged(const QVector<double>& vErrors,
@@ -309,9 +309,9 @@ signals:
                     const double dMeanGoF);
     void movementResultsChanged(double dMovement,
                                 double dRotation);
-    void devHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
+    void devHeadTransAvailable(const mne::FiffCoordTrans& devHeadTrans);
 
-    void newDigitizerList(const FIFFLIB::FiffDigPointSet& digitizers);
+    void newDigitizerList(const mne::FiffDigPointSet& digitizers);
 };
 } // NAMESPACE
 

@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEDeriv (MNE-C mne_derivations.c).
+ * @brief    Implementation of @ref mne::MNEDeriv (MNE-C mne_derivations.c).
  */
 
 //=============================================================================================================
@@ -24,8 +24,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -73,7 +72,7 @@ int MNEDeriv::validate(const std::vector<FiffChInfo>& chInfo)
         const FiffChInfo* first = nullptr;
         bool ok = true;
         for (Eigen::SparseMatrix<float, Eigen::RowMajor>::InnerIterator it(rows, j); it && ok; ++it) {
-            const int pick = static_cast<int>(FIFFLIB::channel_index(names, ((deriv_data->collist[static_cast<int>(it.col())]))));
+            const int pick = static_cast<int>(mne::channel_index(names, ((deriv_data->collist[static_cast<int>(it.col())]))));
             if (pick < 0) {
                 ok = false;
             } else if (!first) {

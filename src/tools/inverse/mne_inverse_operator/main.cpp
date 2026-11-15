@@ -68,9 +68,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINES
@@ -220,7 +218,7 @@ static QStringList readBadFile(const QString& fileName)
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_inverse_operator");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -488,19 +486,19 @@ int main(int argc, char* argv[])
               badFileName.toUtf8().constData());
         QStringList fileBads = readBadFile(badFileName);
         for (const QString& bad : fileBads) {
-            if (!BASELIB::contains(info.bads, bad.toStdString()))
+            if (!mne::contains(info.bads, bad.toStdString()))
                 info.bads.push_back(bad.toStdString());
         }
     }
     // Also merge bad channels from the noise covariance
     for (const std::string& bad : noiseCov.bads) {
-        if (!BASELIB::contains(info.bads, bad))
+        if (!mne::contains(info.bads, bad))
             info.bads.push_back(bad);
     }
     if (!info.bads.empty()) {
         qInfo("  Bad channels (%lld): %s",
               static_cast<long long>(info.bads.size()),
-              QString::fromStdString(BASELIB::join(info.bads, " ")).toUtf8().constData());
+              QString::fromStdString(mne::join(info.bads, " ")).toUtf8().constData());
     }
 
     //=========================================================================================================

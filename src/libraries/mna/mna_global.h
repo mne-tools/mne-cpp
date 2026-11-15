@@ -7,20 +7,20 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Export/import macros, build-info accessors, and MNALIB namespace anchor for the MNE Analysis Container Format.
+ * @brief    Export/import macros, build-info accessors, and mne_mna namespace anchor for the MNE Analysis Container Format.
  *
- * MNALIB implements the @c .mna (JSON) and @c .mnx (CBOR) project
+ * mne_mna implements the @c .mna (JSON) and @c .mnx (CBOR) project
  * container — a declarative, reproducible record of MEG/EEG analyses
  * spanning subjects, recordings, processing pipelines, parameter
  * trees, verification checks, and provenance. The container is
  * self-describing, lossless on round-trip (unknown keys preserved
- * via @c extras) and version-tagged via @ref MNALIB::MnaProject::CURRENT_SCHEMA_VERSION "MnaProject::CURRENT_SCHEMA_VERSION".
+ * via @c extras) and version-tagged via @ref mne::MnaProject::CURRENT_SCHEMA_VERSION "MnaProject::CURRENT_SCHEMA_VERSION".
  *
  * This header defines the @c MNASHARED_EXPORT visibility macro that
  * gates every public symbol in the library, the static-build override,
  * and two free functions returning the build date/time and git hash
  * burned into the binary by @c utils/buildinfo.h. The macro must be
- * defined once before any other MNALIB include so the same translation
+ * defined once before any other mne_mna include so the same translation
  * unit cannot accidentally mix import and export linkage.
  */
 
@@ -60,12 +60,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace MNALIB
- * @brief     MNE Analysis Container Format (mna/mnx).
- */
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================

@@ -20,7 +20,7 @@
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-ACQLIB::AcqError ACQLIB::register_device_schemes()
+mne::AcqError mne::register_device_schemes()
 {
     for (AcqError (*registration)() : {&registerBrainAmpScheme, &registerTmsiScheme, &register_gusbamp_scheme, &register_eego_scheme,
                                        &register_neuromag_scheme, &register_polhemus_scheme, &register_ftbuffer_scheme,

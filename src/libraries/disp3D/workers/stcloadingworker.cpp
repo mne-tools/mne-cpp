@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QDebug>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -83,11 +83,11 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
         emit progress(pct, QString("%1 geodesic interpolation %2/%3").arg(hemiLabel).arg(current).arg(total));
     };
 
-    auto interpMat = DISP3DLIB::GeometryInfo::scdcInterpolationMat(
+    auto interpMat = mne::disp::GeometryInfo::scdcInterpolationMat(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
-        DISP3DLIB::Interpolation::cubic,
+        mne::disp::Interpolation::cubic,
         cancelDist,
         progressCallback,
         &m_cancelled);
@@ -107,7 +107,7 @@ void StcLoadingWorker::process()
 
     // Load LH STC file
     if (!m_lhPath.isEmpty()) {
-        if (auto stc = INVLIB::InvSourceEstimate::read(m_lhPath.toStdU16String())) {
+        if (auto stc = mne::InvSourceEstimate::read(m_lhPath.toStdU16String())) {
             m_stcLh = std::move(*stc);
             m_hasLh = true;
         } else {
@@ -119,7 +119,7 @@ void StcLoadingWorker::process()
 
     // Load RH STC file
     if (!m_rhPath.isEmpty()) {
-        if (auto stc = INVLIB::InvSourceEstimate::read(m_rhPath.toStdU16String())) {
+        if (auto stc = mne::InvSourceEstimate::read(m_rhPath.toStdU16String())) {
             m_stcRh = std::move(*stc);
             m_hasRh = true;
         } else {
@@ -173,4 +173,4 @@ void StcLoadingWorker::process()
     emit finished(true);
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

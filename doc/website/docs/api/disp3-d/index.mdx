@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # 3D Display Library
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Source:** `src/libraries/disp3D`
-Starting with MNE-CPP v2.0, the 3D visualization library has been rebuilt on top of Qt's **Rendering Hardware Interface (RHI)**. The library is called `disp3D` (namespace `DISP3DLIB`). Unlike the previous Qt3D-based implementation, the RHI backend talks directly to the platform's native graphics API — Metal on macOS, Vulkan on Linux, Direct3D 11/12 on Windows, or OpenGL as a fallback — giving MNE-CPP a thinner, more portable rendering stack.
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Source:** `src/libraries/disp3D`
+Starting with MNE-CPP v2.0, the 3D visualization library has been rebuilt on top of Qt's **Rendering Hardware Interface (RHI)**. The library is called `disp3D` (namespace `mne_disp3D`). Unlike the previous Qt3D-based implementation, the RHI backend talks directly to the platform's native graphics API — Metal on macOS, Vulkan on Linux, Direct3D 11/12 on Windows, or OpenGL as a fallback — giving MNE-CPP a thinner, more portable rendering stack.
 
 :::info Why RHI?
 Qt3D provided a high-level scene-graph but added significant abstraction overhead. With RHI, the library manages its own render pipeline, vertex buffers, and shader programs directly, resulting in lower latency, smaller binary size, and better control over GPU resource lifetime — all critical for real-time neuroimaging visualization.
@@ -209,13 +209,13 @@ BrainTreeModel *model = new BrainTreeModel();
 view->setModel(model);
 
 // Load FreeSurfer surfaces
-FSLIB::FsSurface surfLh("sample", 0, "inflated", subjectsDir);
-FSLIB::FsSurface surfRh("sample", 1, "inflated", subjectsDir);
+mne::FsSurface surfLh("sample", 0, "inflated", subjectsDir);
+mne::FsSurface surfRh("sample", 1, "inflated", subjectsDir);
 model->addSurface("sample", "lh", "inflated", surfLh);
 model->addSurface("sample", "rh", "inflated", surfRh);
 
 // Load annotations
-FSLIB::FsAnnotation annotLh("sample", 0, "aparc", subjectsDir);
+mne::FsAnnotation annotLh("sample", 0, "aparc", subjectsDir);
 model->addAnnotation("sample", "lh", annotLh);
 
 view->show();
@@ -321,7 +321,7 @@ The renderer supports multiple shader pipelines (`ShaderMode`) and surface overl
 
 ## Doxygen Reference
 
-For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**DISP3DLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceDISP3DLIB.html) in the Doxygen API reference.
+For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**mne_disp3D namespace**](https://mne-cpp.github.io/doxygen-api/namespaceDISP3DLIB.html) in the Doxygen API reference.
 
 ## See Also
 

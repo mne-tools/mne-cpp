@@ -47,10 +47,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -103,17 +102,17 @@ public:
 
     QList<ConnectivitySettings::IntermediateTrialData> m_dataListOriginal;
 
-    DISPLIB::Plot* m_pSignalCoursePlot = nullptr;
-    DISPLIB::Plot* m_pSpectrumPlot = nullptr;
-    DISPLIB::Plot* m_pEvokedSignalCoursePlot = nullptr;
-    DISPLIB::Plot* m_pEpochSignalCoursePlot = nullptr;
-    DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
-    DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
+    mne::disp::Plot* m_pSignalCoursePlot = nullptr;
+    mne::disp::Plot* m_pSpectrumPlot = nullptr;
+    mne::disp::Plot* m_pEvokedSignalCoursePlot = nullptr;
+    mne::disp::Plot* m_pEpochSignalCoursePlot = nullptr;
+    mne::disp::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
+    mne::disp::ImageSc* m_pImageConnWeights = nullptr;
 
     std::shared_ptr<TFplot> m_pTfPlot;
     Eigen::MatrixXd m_matEvoked;
     Eigen::MatrixXd m_matEvokedSource;
-    MNELIB::MNEEpochDataList epochs;
+    mne::MNEEpochDataList epochs;
 
     void onConnectivityMetricChanged(const QString& sMetric)
     {
@@ -220,7 +219,7 @@ public:
                 Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
                 Eigen::VectorXd tempa = v1a.array() - v1a.mean();
                 if (!m_pSignalCoursePlot) {
-                    m_pSignalCoursePlot = new DISPLIB::Plot(tempa);
+                    m_pSignalCoursePlot = new mne::disp::Plot(tempa);
                 } else {
                     m_pSignalCoursePlot->updateData(tempa);
                 }
@@ -239,7 +238,7 @@ public:
                 Eigen::Map<Eigen::VectorXd> v1c(plotVecc.data(), plotVecc.size());
                 Eigen::VectorXd tempc = v1c;
                 if (!m_pEpochSignalCoursePlot) {
-                    m_pEpochSignalCoursePlot = new DISPLIB::Plot(tempc);
+                    m_pEpochSignalCoursePlot = new mne::disp::Plot(tempc);
                 } else {
                     m_pEpochSignalCoursePlot->updateData(tempc);
                 }
@@ -253,7 +252,7 @@ public:
                 Eigen::Map<Eigen::VectorXd> v1(plotVec.data(), plotVec.size());
                 Eigen::VectorXd temp = v1;
                 if (!m_pSpectrumPlot) {
-                    m_pSpectrumPlot = new DISPLIB::Plot(temp);
+                    m_pSpectrumPlot = new mne::disp::Plot(temp);
                 } else {
                     m_pSpectrumPlot->updateData(temp);
                 }
@@ -268,7 +267,7 @@ public:
             Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
             Eigen::VectorXd tempa = v1a;
             if (!m_pEvokedSignalCoursePlot) {
-                m_pEvokedSignalCoursePlot = new DISPLIB::Plot(tempa);
+                m_pEvokedSignalCoursePlot = new mne::disp::Plot(tempa);
             } else {
                 m_pEvokedSignalCoursePlot->updateData(tempa);
             }
@@ -282,7 +281,7 @@ public:
             Eigen::Map<Eigen::VectorXd> v1a(plotVeca.data(), plotVeca.size());
             Eigen::VectorXd tempa = v1a;
             if (!m_pEvokedSourceSignalCoursePlot) {
-                m_pEvokedSourceSignalCoursePlot = new DISPLIB::Plot(tempa);
+                m_pEvokedSourceSignalCoursePlot = new mne::disp::Plot(tempa);
             } else {
                 m_pEvokedSourceSignalCoursePlot->updateData(tempa);
             }

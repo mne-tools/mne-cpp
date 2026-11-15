@@ -65,7 +65,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace
@@ -746,7 +746,7 @@ void TestFiffStreamPython::writesAnnotationsAndDevice()
 
     // Without devices and orig_time nothing of either is written.
     info.device_info = FiffDeviceInfo();
-    FiffStream plain(std::make_unique<BASELIB::MemoryByteStream>());
+    FiffStream plain(std::make_unique<mne::MemoryByteStream>());
     QCOMPARE(plain.write_device_info(info.device_info), fiff_long_t(-1));
     QCOMPARE(plain.byte_stream().size(), std::uint64_t(0));
 

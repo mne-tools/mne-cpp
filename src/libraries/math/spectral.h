@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Multi-taper spectral estimation: tapered FFT, power and cross-spectral density, DPSS weighting.
  *
- * @ref MATHLIB::Spectral implements the multi-taper / Welch family of
+ * @ref mne::Spectral implements the multi-taper / Welch family of
  * spectral estimators that the connectivity and time-frequency pipelines
  * in mne-cpp rely on. A single segment of length @c N is windowed by
  * each of @c K Slepian (DPSS) tapers, FFT'd to length @c iNfft, and the
@@ -24,7 +24,7 @@
  * (factor 2 on bins 1…Nyquist-1, no doubling at DC or Nyquist) so
  * results are directly comparable to MNE-Python's @c psd_array_multitaper,
  * and CSD matrices are returned as one complex matrix per frequency bin
- * for direct ingestion by CONNECTIVITYLIB's coherence and phase
+ * for direct ingestion by mne_connectivity's coherence and phase
  * estimators.
  *
  * Reference: Percival & Walden (1993) "Spectral Analysis for Physical
@@ -57,10 +57,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 /**
@@ -78,7 +78,7 @@ struct TaperedSpectraInputData
  * Static multi-taper spectral estimator producing tapered spectra, PSDs
  * and cross-spectral density matrices over @c Eigen row inputs. Designed
  * for fan-out across channels on std::async tasks and feeding
- * CONNECTIVITYLIB's coherence / phase estimators.
+ * mne_connectivity's coherence / phase estimators.
  *
  * @brief Static multi-taper spectra, PSD and CSD estimator for MEG/EEG time series.
  *

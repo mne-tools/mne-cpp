@@ -1,18 +1,18 @@
 ---
 id: source-estimate-manager
-title: "DISP3DLIB::SourceEstimateManager"
+title: "mne::disp::SourceEstimateManager"
 sidebar_label: SourceEstimateManager
 sidebar_position: 41
 ---
 
 # SourceEstimateManager
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/sourceestimatemanager.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/sourceestimatemanager.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/sourceestimatemanager.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/sourceestimatemanager.h)
 
 `#include <disp3D/sourceestimatemanager.h>`
 
 ```cpp
-class DISP3DLIB::SourceEstimateManager
+class mne::disp::SourceEstimateManager
 ```
 
 Manages source estimate data: async loading, time-point navigation, colormap/threshold control, and real-time streaming via [`RtSourceDataController`](/docs/api/disp3-d/rt-source-data-controller).
@@ -62,7 +62,7 @@ Start async STC file loading on a background thread.
   Path to right-hemisphere STC file.
 
 - **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map for finding lh/rh brain surfaces.
+  [`FsSurface`](/docs/api/fs/fs-surface) map for finding lh/rh brain surfaces.
 
 - **activeSurfaceType** : *const QString &*
   Active surface type name (e.g. "pial").
@@ -105,7 +105,7 @@ Set the current STC time-point and apply colours to matching surfaces.
   Time-point index.
 
 - **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map.
+  [`FsSurface`](/docs/api/fs/fs-surface) map.
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   Single-view state (for active surface type).
@@ -197,7 +197,7 @@ Feeds all STC time-points into the streaming queue and begins the interpolation 
 **Parameters:**
 
 - **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map (for colour application).
+  [`FsSurface`](/docs/api/fs/fs-surface) map (for colour application).
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   Single-view state.

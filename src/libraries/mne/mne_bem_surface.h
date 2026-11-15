@@ -14,8 +14,8 @@
  * @date     June 2015
  * @brief    Single closed BEM surface (triangulation, normals, conductivity).
  *
- * @ref MNELIB::MNEBemSurface stores one of the head-model boundary
- * surfaces of an @ref MNELIB::MNEBem "MNEBem": vertices, oriented triangles, vertex
+ * @ref mne::MNEBemSurface stores one of the head-model boundary
+ * surfaces of an @ref mne::MNEBem "MNEBem": vertices, oriented triangles, vertex
  * normals, surface id (inner skull / outer skull / scalp), coordinate
  * frame and conductivity. FIFF tags: @c FIFFB_BEM_SURF,
  * @c FIFF_BEM_SURF_ID, @c FIFF_BEM_SURF_NTRI, @c FIFF_BEM_SURF_TRIANGLES,
@@ -49,10 +49,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================

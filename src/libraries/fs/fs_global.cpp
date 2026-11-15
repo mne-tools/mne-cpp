@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    Build-info accessor implementations (date/time, abbreviated and full git hash) for the FSLIB FreeSurfer I/O library.
+ * @brief    Build-info accessor implementations (date/time, abbreviated and full git hash) for the mne_fs FreeSurfer I/O library.
  */
 
 //=============================================================================================================
@@ -22,21 +22,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FSLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* FSLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* FSLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

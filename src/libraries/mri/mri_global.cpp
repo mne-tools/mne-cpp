@@ -7,13 +7,13 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Out-of-line definitions of the MRILIB build-info accessors declared in @ref mri_global.h.
+ * @brief    Out-of-line definitions of the mne_mri build-info accessors declared in @ref mri_global.h.
  *
  * Pulls the build timestamp and short git hash from
  * @c utils/buildinfo.h (populated at configure time by
  * @c cmake/BuildInfo.cmake) and exposes them through the
  * @c buildDateTime() / @c buildHash() entry points so any binary
- * linking against MRILIB can report which snapshot of the
+ * linking against mne_mri can report which snapshot of the
  * library it is actually running.
  */
 
@@ -27,15 +27,15 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-const char* MRILIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
-const char* MRILIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
-const char* MRILIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

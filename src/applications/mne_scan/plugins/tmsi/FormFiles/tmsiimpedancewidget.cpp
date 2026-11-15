@@ -55,7 +55,7 @@ QString layoutDirectory()
 
 using namespace TMSIPLUGIN;
 using namespace Eigen;
-using namespace DISPLIB;
+using namespace mne::disp;
 using namespace std;
 
 //=============================================================================================================
@@ -131,7 +131,7 @@ void TMSIImpedanceWidget::initGraphicScene()
     // Clear all items from scene
     m_qGScene->clear();
 
-    const auto layout = CHANNELSLIB::LayoutLoader::read_elc(BASELIB::pathFromUtf8((layoutDirectory() + "standard_waveguard128.elc").toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8((layoutDirectory() + "standard_waveguard128.elc").toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -152,7 +152,7 @@ void TMSIImpedanceWidget::addElectrodeItem(const QString& electrodeName, QVector
 
 //=============================================================================================================
 
-void TMSIImpedanceWidget::addElectrodeItems(const CHANNELSLIB::ElectrodeLayout& layout)
+void TMSIImpedanceWidget::addElectrodeItems(const mne::ElectrodeLayout& layout)
 {
     for (std::size_t i = 0; i < layout.positions_2d.size(); ++i)
         m_qmElectrodeNameIndex.insert(QString::fromStdString(layout.names[i]), static_cast<int>(i));
@@ -236,7 +236,7 @@ void TMSIImpedanceWidget::loadLayout()
                                                         layoutDirectory(),
                                                         tr("ELC layout file (*.elc)"));
 
-    const auto layout = CHANNELSLIB::LayoutLoader::read_elc(BASELIB::pathFromUtf8(sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(sElcFilePath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

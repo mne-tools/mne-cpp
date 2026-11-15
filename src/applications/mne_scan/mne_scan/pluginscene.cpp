@@ -83,7 +83,7 @@ void PluginScene::drawBackground(QPainter* painter, const QRectF& rect)
 void PluginScene::insertItem(const QPointF& pos)
 {
     PluginItem* item;
-    SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
+    mne::scan::AbstractPlugin::SPtr pPlugin;
     QString name;
     switch (m_mode) {
         case InsertPluginItem:
@@ -109,7 +109,7 @@ void PluginScene::insertItem(const QPointF& pos)
 
 //=============================================================================================================
 
-bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr& pAddedPlugin)
+bool PluginScene::insertPlugin(QAction* pActionPluginItem, mne::scan::AbstractPlugin::SPtr& pAddedPlugin)
 {
     if (pActionPluginItem->isEnabled()) {
         QString name = pActionPluginItem->text();
@@ -118,7 +118,7 @@ bool PluginScene::insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::Abstract
             qDebug() << "Unable to find index";
             return false;
         }
-        SCSHAREDLIB::AbstractPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
+        mne::scan::AbstractPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];
 
         if (m_pPluginGui->m_pPluginSceneManager->addPlugin(pPlugin, pAddedPlugin)) {
             //If only single instance -> disable insert action
@@ -179,7 +179,7 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
             PluginItem* startItem = qgraphicsitem_cast<PluginItem*>(startItems.first());
             PluginItem* endItem = qgraphicsitem_cast<PluginItem*>(endItems.first());
 
-            SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection = SCSHAREDLIB::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+            mne::scan::PluginConnectorConnection::SPtr pConnection = mne::scan::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
 
             if (pConnection->isConnected()) {
                 Arrow* arrow = new Arrow(startItem, endItem, pConnection);

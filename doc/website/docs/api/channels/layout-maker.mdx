@@ -1,18 +1,18 @@
 ---
 id: layout-maker
-title: "CHANNELSLIB::LayoutMaker"
+title: "mne::LayoutMaker"
 sidebar_label: LayoutMaker
 sidebar_position: 28
 ---
 
 # LayoutMaker
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutmaker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutmaker.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutmaker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutmaker.h)
 
 `#include <channels/layoutmaker.h>`
 
 ```cpp
-class CHANNELSLIB::LayoutMaker
+class mne::LayoutMaker
 ```
 
 Makes 2-D channel layouts from 3-D sensor positions.
@@ -67,7 +67,7 @@ Writes channel boxes as an MNE-C .lout file.
 - **corners** : *std::span&lt; const Eigen::Vector2d &gt;*
   The lower-left corner of each box, as returned by `make_layout()`.
 
-- **names** : *const BASELIB::StringList &*
+- **names** : *const mne::StringList &*
   The channel names; boxes without a name are written unnamed.
 
 - **options** : *const [LayoutOptions](/docs/api/channels/layout-options) &*
@@ -91,7 +91,7 @@ Writes channel boxes as an MNE-C .lout file.
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 99"
+````cpp title="src/examples/ex_channels/main.cpp, line 98"
 const LayoutOptions options{.radius = 20.0, .box_width = 5.0, .box_height = 4.0};
 const auto layout = LayoutMaker::make_layout(positions, options);
 if (layout)
@@ -111,7 +111,7 @@ if (layout) {
 
 Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
 
-````cpp title="src/examples/ex_make_layout/main.cpp, line 103"
+````cpp title="src/examples/ex_make_layout/main.cpp, line 101"
                                       .box_height = 4.0,
                                       .mirror_x = options["--mirrorX"] == "1",
                                       .mirror_y = options["--mirrorY"] == "1"};

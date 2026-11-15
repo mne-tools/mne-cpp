@@ -36,9 +36,9 @@
 #include <QDebug>
 #include <cmath>
 
-using namespace FIFFLIB;
+using namespace mne;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -239,7 +239,7 @@ bool SensorFieldMapper::buildMapping(
     std::vector<std::string> megChNames, eegChNames;
 
     auto isBad = [this](const std::string& name) {
-        return BASELIB::contains(m_evoked.info.bads, name);
+        return mne::contains(m_evoked.info.bads, name);
     };
 
     const int nChs = static_cast<int>(m_evoked.info.chs.size());
@@ -311,12 +311,12 @@ bool SensorFieldMapper::buildMapping(
                     tris(t, 1) = static_cast<int>(idx[t * 3 + 1]);
                     tris(t, 2) = static_cast<int>(idx[t * 3 + 2]);
                 }
-                norms = FSLIB::FsSurface::compute_normals(verts, tris);
+                norms = mne::FsSurface::compute_normals(verts, tris);
             }
         }
 
         if (verts.rows() > 0 && norms.rows() == verts.rows()) {
-            auto templates = FWDLIB::FwdCoilSet::read_coil_defs(BASELIB::resource_path("general/coilDefinitions/coil_def.dat"));
+            auto templates = mne::FwdCoilSet::read_coil_defs(mne::resource_path("general/coilDefinitions/coil_def.dat"));
 
             if (templates) {
                 FiffCoordTrans devToTarget;
@@ -335,16 +335,16 @@ bool SensorFieldMapper::buildMapping(
                     origin = applyTransform(origin, headMri);
 
                 auto coils = templates->create_meg_coils(
-                    megChs, static_cast<int>(megChs.size()), FWDLIB::FWD_COIL_ACCURACY_NORMAL, devToTarget);
+                    megChs, static_cast<int>(megChs.size()), mne::FWD_COIL_ACCURACY_NORMAL, devToTarget);
 
                 if (coils && coils->ncoil() > 0) {
-                    m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
+                    m_megMapping = mne::FwdFieldMap::computeMegMapping(
                         *coils, verts, norms, origin,
                         m_evoked.info, megChNames,
                         kIntrad, kMegMiss);
                 }
             } else {
-                qWarning() << "MEG coil definitions not found at" << QString::fromStdString(BASELIB::utf8FromPath(BASELIB::resource_path("general/coilDefinitions/coil_def.dat")));
+                qWarning() << "MEG coil definitions not found at" << QString::fromStdString(mne::utf8FromPath(mne::resource_path("general/coilDefinitions/coil_def.dat")));
             }
         }
     }
@@ -360,11 +360,11 @@ bool SensorFieldMapper::buildMapping(
                 origin = applyTransform(origin, headMri);
 
             auto eegCoils =
-                FWDLIB::FwdCoilSet::create_eeg_els(
+                mne::FwdCoilSet::create_eeg_els(
                     eegChs, static_cast<int>(eegChs.size()), headMri);
 
             if (eegCoils && eegCoils->ncoil() > 0) {
-                m_eegMapping = FWDLIB::FwdFieldMap::computeEegMapping(
+                m_eegMapping = mne::FwdFieldMap::computeEegMapping(
                     *eegCoils, verts, origin,
                     m_evoked.info, eegChNames,
                     kIntrad, kEegMiss);
@@ -378,7 +378,7 @@ bool SensorFieldMapper::buildMapping(
 
 //=============================================================================================================
 
-Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo& info,
+Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const mne::FiffInfo& info,
                                                    float* radius)
 {
     const Eigen::Vector3f fallback(0.0f, 0.0f, 0.04f);
@@ -544,13 +544,13 @@ void SensorFieldMapper::apply(
 
         auto surface = surfaces[key];
         if (!visible || !mat || pick.size() == 0) {
-            surface->setVisualizationMode(DISP3DLIB::ModeSurface);
+            surface->setVisualizationMode(mne::disp::ModeSurface);
             updateContourSurfaces(surfaces, contourPrefix, *surface,
                                   QVector<float>(), 0.0f, false);
             return;
         }
         if (mat->cols() != pick.size()) {
-            surface->setVisualizationMode(DISP3DLIB::ModeSurface);
+            surface->setVisualizationMode(mne::disp::ModeSurface);
             updateContourSurfaces(surfaces, contourPrefix, *surface,
                                   QVector<float>(), 0.0f, false);
             return;
@@ -575,7 +575,7 @@ void SensorFieldMapper::apply(
 
             QRgb rgb = (m_colormap == "MNE")
                 ? mneAnalyzeColor(norm)
-                : DISPLIB::ColorMap::valueToColor(norm, m_colormap);
+                : mne::disp::ColorMap::valueToColor(norm, m_colormap);
 
             uint32_t r = qRed(rgb);
             uint32_t g = qGreen(rgb);
@@ -820,4 +820,4 @@ void SensorFieldMapper::updateContourSurfaces(
     updateSurf("_pos", posBuf, QColor(255, 0, 0, 200), visible && !posBuf.verts.isEmpty());
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

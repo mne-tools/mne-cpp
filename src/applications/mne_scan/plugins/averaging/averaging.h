@@ -33,13 +33,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 class RealTimeEvokedSet;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class RtAveraging;
 }
@@ -61,12 +61,12 @@ namespace AVERAGINGPLUGIN
  *
  * @brief The Averaging class provides a Averaging algorithm structure.
  */
-class AVERAGINGSHARED_EXPORT Averaging : public SCSHAREDLIB::AbstractAlgorithm
+class AVERAGINGSHARED_EXPORT Averaging : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "averaging.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
     friend class AveragingSettingsWidget;
 
@@ -94,13 +94,13 @@ public:
      * Reimplemented virtual functions
      */
     virtual void unload();
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const;
     virtual bool start();
     virtual bool stop();
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
     virtual QString getBuildInfo();
 
     //=========================================================================================================
@@ -188,7 +188,7 @@ public:
      * @param[in] evokedSet                  The new FiffEvokedSet.
      * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
      */
-    void onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
+    void onNewEvokedSet(const mne::FiffEvokedSet& evokedSet,
                         const QStringList& lResponsibleTriggerTypes);
 
     //=========================================================================================================
@@ -202,16 +202,16 @@ public:
 private:
     virtual void run();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pAveragingInput; /**< The RealTimeSampleArray of the Averaging input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeEvokedSet>::SPtr m_pAveragingOutput;      /**< The RealTimeEvoked of the Averaging output.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pAveragingInput; /**< The RealTimeSampleArray of the Averaging input.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeEvokedSet>::SPtr m_pAveragingOutput;      /**< The RealTimeEvoked of the Averaging output.*/
 
-    std::shared_ptr<BASELIB::CircularBuffer<FIFFLIB::FiffEvokedSet>> m_pCircularBuffer; /**< Holds incoming fiff evoked sets. */
+    std::shared_ptr<mne::CircularBuffer<mne::FiffEvokedSet>> m_pCircularBuffer; /**< Holds incoming fiff evoked sets. */
 
     QMutex m_qMutex; /**< Provides access serialization between threads. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    std::shared_ptr<DSPLIB::RtAveraging> m_pRtAve; /**< Real-time average object. */
+    std::shared_ptr<mne::RtAveraging> m_pRtAve; /**< Real-time average object. */
 
     QStringList m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
@@ -219,8 +219,8 @@ private:
 
 signals:
     void stimChannelsChanged(const QMap<QString, int>& mapStimChsIndexNames);
-    void fiffChInfoChanged(const std::vector<FIFFLIB::FiffChInfo>& fiffChInfoList);
-    void evokedSetChanged(const FIFFLIB::FiffEvokedSet& evokedSet);
+    void fiffChInfoChanged(const std::vector<mne::FiffChInfo>& fiffChInfoList);
+    void evokedSetChanged(const mne::FiffEvokedSet& evokedSet);
 };
 } // NAMESPACE
 

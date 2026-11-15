@@ -1,18 +1,18 @@
 ---
 id: layout-options
-title: "CHANNELSLIB::LayoutOptions"
+title: "mne::LayoutOptions"
 sidebar_label: LayoutOptions
 sidebar_position: 59
 ---
 
 # LayoutOptions
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutmaker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutmaker.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutmaker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutmaker.h)
 
 `#include <channels/layoutmaker.h>`
 
 ```cpp
-struct CHANNELSLIB::LayoutOptions
+struct mne::LayoutOptions
 ```
 
 How `LayoutMaker::make_layout` projects and sizes the channel boxes.
@@ -45,7 +45,7 @@ if (layout)
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 99"
+````cpp title="src/examples/ex_channels/main.cpp, line 98"
 const LayoutOptions options{.radius = 20.0, .box_width = 5.0, .box_height = 4.0};
 const auto layout = LayoutMaker::make_layout(positions, options);
 if (layout)
@@ -65,7 +65,7 @@ if (layout) {
 
 Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
 
-````cpp title="src/examples/ex_make_layout/main.cpp, line 101"
+````cpp title="src/examples/ex_make_layout/main.cpp, line 99"
     const LayoutOptions layoutOptions{.radius = 60.0,
                                       .box_width = 5.0,
                                       .box_height = 4.0,

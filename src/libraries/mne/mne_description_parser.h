@@ -9,9 +9,9 @@
  * @date     February 2026
  * @brief    Parser for the legacy MNE-C @c .ave / @c .cov plain-text description files.
  *
- * @ref MNELIB::MNEDescriptionParser tokenises the @c "average { ... }"
+ * @ref mne::MNEDescriptionParser tokenises the @c "average { ... }"
  * / @c "cov { ... }" stanzas used by @c mne_process_raw and turns them
- * into @c FIFFLIB::AverageDescription / @c MNELIB::CovDescription records that the epoch /
+ * into @c mne::AverageDescription / @c mne::CovDescription records that the epoch /
  * covariance machinery downstream can act on.
  */
 
@@ -32,10 +32,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -60,7 +60,7 @@ public:
      *
      * @return The description, or no value if the file cannot be read or is malformed.
      */
-    static std::optional<FIFFLIB::AverageDescription> read_average(const std::filesystem::path& path);
+    static std::optional<mne::AverageDescription> read_average(const std::filesystem::path& path);
 
     /**
      * Reads a covariance description file.
@@ -72,7 +72,7 @@ public:
     static std::optional<CovDescription> read_covariance(const std::filesystem::path& path);
 
 private:
-    static bool parse_average(std::istream& in, const std::filesystem::path& path, FIFFLIB::AverageDescription& desc);
+    static bool parse_average(std::istream& in, const std::filesystem::path& path, mne::AverageDescription& desc);
 
     static bool parse_covariance(std::istream& in, const std::filesystem::path& path, CovDescription& desc);
 
@@ -102,9 +102,9 @@ private:
      * Returns true if the keyword was handled, false otherwise (unrecognized keyword).
      */
     static bool parse_rejection_param(std::string_view keyword, std::istream& in,
-                                      FIFFLIB::RejectionParams& rej, bool& ok);
+                                      mne::RejectionParams& rej, bool& ok);
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_DESCRIPTION_PARSER_H

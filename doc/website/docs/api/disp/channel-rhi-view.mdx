@@ -1,18 +1,18 @@
 ---
 id: channel-rhi-view
-title: "DISPLIB::ChannelRhiView"
+title: "mne::disp::ChannelRhiView"
 sidebar_label: ChannelRhiView
 sidebar_position: 17
 ---
 
 # ChannelRhiView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channelrhiview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channelrhiview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channelrhiview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channelrhiview.h)
 
 `#include <disp/channelrhiview.h>`
 
 ```cpp
-class DISPLIB::ChannelRhiView
+class mne::disp::ChannelRhiView
 ```
 
 QRhi-based GPU-accelerated channel time-series renderer used by the modern raw browser.
@@ -349,7 +349,7 @@ Show or hide the time and amplitude grid overlay.
 
 Set the sampling frequency (Hz) used to place time-grid tick lines.
 
-Call this from `ChannelDataView::init()` after [FiffInfo](/docs/api/fiff/fiff-info) is available.
+Call this from `ChannelDataView::init()` after [`FiffInfo`](/docs/api/fiff/fiff-info) is available.
 
 **Parameters:**
 

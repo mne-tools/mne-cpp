@@ -37,9 +37,8 @@
 //=============================================================================================================
 
 using namespace LSLADAPTERPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -60,8 +59,8 @@ LSLAdapter::LSLAdapter()
 , m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
-    qRegisterMetaType<LSLLIB::stream_info>("LSLLIB::stream_info");
-    qRegisterMetaType<QVector<LSLLIB::stream_info>>("QVector<LSLLIB::stream_info>");
+    qRegisterMetaType<mne::stream_info>("mne::stream_info");
+    qRegisterMetaType<QVector<mne::stream_info>>("QVector<mne::stream_info>");
 }
 
 //=============================================================================================================
@@ -98,7 +97,7 @@ void LSLAdapter::init()
 
     // connect finished signal for background lsl stream scanning
     connect(&m_updateStreamsFutureWatcher,
-            &QFutureWatcher<QVector<LSLLIB::stream_info>>::finished,
+            &QFutureWatcher<QVector<mne::stream_info>>::finished,
             this,
             &LSLAdapter::onLSLStreamScanReady);
 
@@ -203,7 +202,7 @@ void LSLAdapter::onRefreshAvailableStreams()
 {
     // lsl stream scanning is time-consuming, run in background:
     if (m_updateStreamsFutureWatcher.isFinished()) {
-        QFuture<QVector<LSLLIB::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
+        QFuture<QVector<mne::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
         m_updateStreamsFutureWatcher.setFuture(future);
     }
 }
@@ -219,7 +218,7 @@ void LSLAdapter::onLSLStreamScanReady()
     if (m_vAvailableStreams.size() == 0) {
         m_bHasValidStream = false;
         // overwrite current stream with default constructor, this will also result in correct UI display
-        m_currentStream = LSLLIB::stream_info();
+        m_currentStream = mne::stream_info();
     } else {
         // check whether we had a valid stream, and if its still amongst the available ones
         if (m_bHasValidStream) {
@@ -242,11 +241,11 @@ void LSLAdapter::onLSLStreamScanReady()
 
 //=============================================================================================================
 
-QVector<LSLLIB::stream_info> LSLAdapter::scanAvailableLSLStreams()
+QVector<mne::stream_info> LSLAdapter::scanAvailableLSLStreams()
 {
     // no filtering implemented so far, simply get all streams
-    const auto streams = LSLLIB::resolve_streams();
-    QVector<LSLLIB::stream_info> vAvailableStreams;
+    const auto streams = mne::resolve_streams();
+    QVector<mne::stream_info> vAvailableStreams;
     vAvailableStreams.reserve(static_cast<int>(streams.size()));
     for (const auto& stream : streams) {
         vAvailableStreams.append(stream);
@@ -264,7 +263,7 @@ QVector<LSLLIB::stream_info> LSLAdapter::scanAvailableLSLStreams()
 
 //=============================================================================================================
 
-void LSLAdapter::onStreamSelectionChanged(const LSLLIB::stream_info& newStream)
+void LSLAdapter::onStreamSelectionChanged(const mne::stream_info& newStream)
 {
     // no validity checks are done, since the UI only knows the streams we told it about
     m_bHasValidStream = true;
@@ -273,7 +272,7 @@ void LSLAdapter::onStreamSelectionChanged(const LSLLIB::stream_info& newStream)
 
 //=============================================================================================================
 
-void LSLAdapter::prepareFiffInfo(const LSLLIB::stream_info& stream)
+void LSLAdapter::prepareFiffInfo(const mne::stream_info& stream)
 {
     // parse fiff info from lsl stream info
     QString type = QString::fromStdString(stream.type()).toUpper();

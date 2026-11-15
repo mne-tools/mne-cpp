@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Lightweight filter specification (kind, cutoff frequencies, length).
  *
- * @ref MNELIB::MNEFilterDef captures the parameters needed by the
+ * @ref mne::MNEFilterDef captures the parameters needed by the
  * legacy MNE-C raw browser to instantiate a band-pass / band-stop
  * filter; used here to feed the filter thread machinery in
  * @ref filter_thread_arg.h.
@@ -25,10 +25,10 @@
 #include "mne_global.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 #ifndef MNEFILTERDEF
@@ -59,6 +59,6 @@ public:
 
 #endif
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_FILTER_DEF_H

@@ -9,8 +9,8 @@
  * @date     March 2026
  * @brief    Real-time recomputation of the linear inverse operator from updated noise covariance.
  *
- * RtInvOp recomputes a regularised @ref MNELIB::MNEInverseOperator whenever
- * a new noise-covariance estimate is published by @ref DSPLIB::RtCov, so a live
+ * RtInvOp recomputes a regularised @ref mne::MNEInverseOperator whenever
+ * a new noise-covariance estimate is published by @ref mne::RtCov, so a live
  * source-localisation pipeline can adapt to changes in the sensor noise
  * floor (subject movement, ambient electromagnetic noise, channel removal)
  * without dropping a sample. The forward solution, source-orientation
@@ -45,25 +45,25 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
-// DSPLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 /**
@@ -71,9 +71,9 @@ namespace DSPLIB
  */
 struct RtInvOpInput
 {
-    std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo;
-    std::shared_ptr<MNELIB::MNEForwardSolution> pFwd;
-    FIFFLIB::FiffCov noiseCov;
+    std::shared_ptr<mne::FiffInfo> pFiffInfo;
+    std::shared_ptr<mne::MNEForwardSolution> pFwd;
+    mne::FiffCov noiseCov;
 };
 
 //=============================================================================================================
@@ -104,7 +104,7 @@ signals:
      *
      * @param[in] invOp  The final inverse operator estimation.
      */
-    void resultReady(const MNELIB::MNEInverseOperator& invOp);
+    void resultReady(const mne::MNEInverseOperator& invOp);
 };
 
 //=============================================================================================================
@@ -128,8 +128,8 @@ public:
      * @param[in] p_pFwd         Forward solution.
      * @param[in] parent         Parent QObject (optional).
      */
-    explicit RtInvOp(std::shared_ptr<FIFFLIB::FiffInfo>& p_pFiffInfo,
-                     std::shared_ptr<MNELIB::MNEForwardSolution>& p_pFwd,
+    explicit RtInvOp(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo,
+                     std::shared_ptr<mne::MNEForwardSolution>& p_pFwd,
                      QObject* parent = 0);
 
     //=========================================================================================================
@@ -144,7 +144,7 @@ public:
      *
      * @param[in] noiseCov     Noise covariance estimation.
      */
-    void append(const FIFFLIB::FiffCov& noiseCov);
+    void append(const mne::FiffCov& noiseCov);
 
     //=========================================================================================================
     /**
@@ -152,7 +152,7 @@ public:
      *
      * @param[in] pFwd     Forward solution.
      */
-    void setFwdSolution(std::shared_ptr<MNELIB::MNEForwardSolution> pFwd);
+    void setFwdSolution(std::shared_ptr<mne::MNEForwardSolution> pFwd);
 
     //=========================================================================================================
     /**
@@ -173,10 +173,10 @@ protected:
      *
      * @param[in] invOp  Inverse operator computed by the worker, re-emitted via invOperatorCalculated().
      */
-    void handleResults(const MNELIB::MNEInverseOperator& invOp);
+    void handleResults(const mne::MNEInverseOperator& invOp);
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;     /**< The fiff measurement information. */
-    std::shared_ptr<MNELIB::MNEForwardSolution> m_pFwd; /**< The forward solution. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;      /**< The fiff measurement information. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwd; /**< The forward solution. */
 
     QThread m_workerThread; /**< The worker thread. */
 
@@ -187,7 +187,7 @@ signals:
      *
      * @param[out] invOp  The inverse operator.
      */
-    void invOperatorCalculated(const MNELIB::MNEInverseOperator& invOp);
+    void invOperatorCalculated(const mne::MNEInverseOperator& invOp);
 
     //=========================================================================================================
     /**

@@ -1,18 +1,18 @@
 ---
 id: slice-object
-title: "DISP3DLIB::SliceObject"
+title: "mne::disp::SliceObject"
 sidebar_label: SliceObject
 sidebar_position: 9
 ---
 
 # SliceObject
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/sliceobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/sliceobject.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/sliceobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/sliceobject.h)
 
 `#include <disp3D/sliceobject.h>`
 
 ```cpp
-class DISP3DLIB::SliceObject
+class mne::disp::SliceObject
 ```
 
 Data model for a single 2-D MRI volume slice.
@@ -25,7 +25,7 @@ axial.fill(128);
 Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
 voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
-slice.setSlice(axial, MRILIB::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+slice.setSlice(axial, mne::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
 QVector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);
@@ -48,7 +48,7 @@ Set the slice image data and orientation.
 - **image** : *const QImage &*
   Greyscale slice image (QImage::Format_Grayscale8 or 16).
 
-- **orientation** : *MRILIB::SliceOrientation*
+- **orientation** : *mne::SliceOrientation*
   Axial, Sagittal, or Coronal.
 
 - **sliceIndex** : *int*
@@ -68,7 +68,7 @@ Set the slice image data with an explicit image-to-world transform.
 - **image** : *const QImage &*
   Greyscale slice image (QImage::Format_Grayscale8 or 16).
 
-- **orientation** : *MRILIB::SliceOrientation*
+- **orientation** : *mne::SliceOrientation*
   Anatomical orientation of the slice.
 
 - **sliceIndex** : *int*
@@ -83,7 +83,7 @@ Set the slice image data with an explicit image-to-world transform.
 
 **Returns:**
 
-- *MRILIB::SliceOrientation* — Current slice orientation.
+- *mne::SliceOrientation* — Current slice orientation.
 
 ---
 
@@ -194,12 +194,12 @@ Generate quad index buffer: 2 triangles = 6 indices.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 150"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 148"
 axial.fill(128);
 Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
 voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
-slice.setSlice(axial, MRILIB::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+slice.setSlice(axial, mne::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
 QVector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);

@@ -1,13 +1,13 @@
 ---
 id: fiff-stream
-title: "FIFFLIB::FiffStream"
+title: "mne::FiffStream"
 sidebar_label: FiffStream
 sidebar_position: 1
 ---
 
 # FiffStream
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_stream.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_stream.h)
 
 :::info[Python equivalent]
 `mne.io.fiff.FiffStream` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 1
 <Connections topics={["fiff-io"]} context="api" current="FiffStream" />
 
 ```cpp
-class FIFFLIB::FiffStream
+class mne::FiffStream
 ```
 
 FIFF tag-stream reader/writer: exposes typed read_* / write_* methods for every FIFF block and record kind.
@@ -1274,8 +1274,8 @@ ok &= expect(opened && measNodes.size() == 1 && nchan && *nchan->to_int() == 376
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 105"
-FIFFLIB::FiffStream stream(std::make_unique<BASELIB::MemoryByteStream>(std::move(bytes)));
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 103"
+mne::FiffStream stream(std::make_unique<mne::MemoryByteStream>(std::move(bytes)));
 stream.set_little_endian(littleEndian);
 ````
 

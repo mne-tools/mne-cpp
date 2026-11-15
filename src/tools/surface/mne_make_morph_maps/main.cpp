@@ -11,7 +11,7 @@
  *
  * Writes $SUBJECTS_DIR/morph-maps/<from>-<to>-morph.fif with the maps of both
  * hemispheres in both directions, like MNE-C mne_make_morph_maps and
- * mne.read_morph_map (see MNELIB::MNEMorphMap::compute).
+ * mne.read_morph_map (see mne::MNEMorphMap::compute).
  */
 
 //=============================================================================================================
@@ -41,8 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -54,7 +53,7 @@ using namespace MNELIB;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_morph_maps");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

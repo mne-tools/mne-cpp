@@ -16,7 +16,7 @@
  * The @c keepTempFile debug flag and the @c language /
  * @c interpreter pair round-trip symmetrically so a project can be
  * re-executed bit-for-bit later. Unknown fields are captured into
- * the standard @c extras pattern used across MNALIB structs.
+ * the standard @c extras pattern used across mne_mna structs.
  */
 
 //=============================================================================================================
@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

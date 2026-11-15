@@ -76,7 +76,7 @@ public:
      *
      * @return true if the surface is complete.
      */
-    static bool isCompleteSurface(const MNELIB::MNEBemSurface& surf);
+    static bool isCompleteSurface(const mne::MNEBemSurface& surf);
 
     //=========================================================================================================
     /**
@@ -89,7 +89,7 @@ public:
      *
      * @return true if all checks pass.
      */
-    static bool checkSurfaces(const QVector<MNELIB::MNEBemSurface>& surfs);
+    static bool checkSurfaces(const QVector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
     /**
@@ -99,7 +99,7 @@ public:
      *
      * @return true if thickness check passes.
      */
-    static bool checkThicknesses(const QVector<MNELIB::MNEBemSurface>& surfs);
+    static bool checkThicknesses(const QVector<mne::MNEBemSurface>& surfs);
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
      *
      * @return true if surface dimensions look reasonable.
      */
-    static bool checkSurfaceSize(const MNELIB::MNEBemSurface& surf);
+    static bool checkSurfaceSize(const mne::MNEBemSurface& surf);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      * @param[in] surf  The BEM surface.
      * @param[in] name  Display name for the surface.
      */
-    static void reportTriangleAreas(const MNELIB::MNEBemSurface& surf, const QString& name);
+    static void reportTriangleAreas(const mne::MNEBemSurface& surf, const QString& name);
 
 private:
     //=========================================================================================================
@@ -151,7 +151,7 @@ private:
      * @return Total solid angle in steradians.
      */
     static double sumSolids(const Eigen::Vector3f& from,
-                            const MNELIB::MNEBemSurface& surf);
+                            const mne::MNEBemSurface& surf);
 
     //=========================================================================================================
     /**
@@ -162,8 +162,8 @@ private:
      *
      * @return true if 'from' is completely inside 'to'.
      */
-    static bool isInside(const MNELIB::MNEBemSurface& from,
-                         const MNELIB::MNEBemSurface& to);
+    static bool isInside(const mne::MNEBemSurface& from,
+                         const mne::MNEBemSurface& to);
 
     //=========================================================================================================
     /**
@@ -174,8 +174,8 @@ private:
      *
      * @return Minimum distance in meters.
      */
-    static float minSurfaceDistance(const MNELIB::MNEBemSurface& s1,
-                                    const MNELIB::MNEBemSurface& s2);
+    static float minSurfaceDistance(const mne::MNEBemSurface& s1,
+                                    const mne::MNEBemSurface& s2);
 };
 
 } // namespace MNESURF2BEM

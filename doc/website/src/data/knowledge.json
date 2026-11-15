@@ -100,7 +100,7 @@
     {
       "name": "ex_acq_performance",
       "title": "Closed-loop acquisition and stimulation at full rate",
-      "brief": "Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class",
+      "brief": "Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class",
       "thumbnail": "",
       "url": "/docs/examples/acq/ex_acq_performance/",
       "library": "acq",
@@ -1883,7 +1883,7 @@
     {
       "name": "ex_warp",
       "title": "Thin-plate-spline warping",
-      "brief": "Example demonstrating thin-plate-spline (TPS) warping with MATHLIB::Warp",
+      "brief": "Example demonstrating thin-plate-spline (TPS) warping with mne::Warp",
       "thumbnail": "",
       "url": "/docs/examples/math/ex_warp/",
       "library": "math",

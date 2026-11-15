@@ -1,25 +1,25 @@
 ---
 id: rt-sensor-data-controller
-title: "DISP3DLIB::RtSensorDataController"
+title: "mne::disp::RtSensorDataController"
 sidebar_label: RtSensorDataController
 sidebar_position: 36
 ---
 
 # RtSensorDataController
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensordatacontroller.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensordatacontroller.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/workers/rtsensordatacontroller.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/workers/rtsensordatacontroller.h)
 
 `#include <disp3D/rtsensordatacontroller.h>`
 
 ```cpp
-class DISP3DLIB::RtSensorDataController
+class mne::disp::RtSensorDataController
 ```
 
 [`RtSensorDataController`](/docs/api/disp3-d/rt-sensor-data-controller) orchestrates real-time sensor data streaming.
 
 It manages a background data worker thread, a background interpolation matrix worker thread, and a timer that drives the data flow.
 
-Unlike the source-estimate controller (which uses sparse interpolation matrices split by hemisphere), this controller uses a single dense mapping matrix produced by [FWDLIB::FwdFieldMap](/docs/api/fwd/fwd-field-map)::computeMeg/EegMapping() that maps sensor measurements directly to surface vertex values.
+Unlike the source-estimate controller (which uses sparse interpolation matrices split by hemisphere), this controller uses a single dense mapping matrix produced by mne::[FwdFieldMap](/docs/api/fwd/fwd-field-map)::computeMeg/EegMapping() that maps sensor measurements directly to surface vertex values.
 
 The controller can either accept a precomputed mapping matrix via `setMappingMatrix()`, or compute one on-the-fly in a background thread by providing evoked data, surface geometry, and transforms via the setInterpolationInfo() / `setEvoked()` / `setTransform()` methods. When parameters change, `recomputeMapping()` triggers an asynchronous recomputation; the new matrix is automatically forwarded to the data worker.
 

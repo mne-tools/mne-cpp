@@ -9,19 +9,19 @@
  * @date     April 2026
  * @brief    Top-level MNA container binding subjects, processing pipeline, schema version and project metadata.
  *
- * @ref MNALIB::MnaProject is the in-memory representation of one @c .mna
+ * @ref mne::MnaProject is the in-memory representation of one @c .mna
  * (JSON) or @c .mnx (CBOR) file and the entry point for every other
- * MNALIB type: it owns the @ref MNALIB::MnaSubject list (subject → session
- * → recording → file) plus the @ref MNALIB::MnaNode pipeline that describes
+ * mne_mna type: it owns the @ref mne::MnaSubject list (subject → session
+ * → recording → file) plus the @ref mne::MnaNode pipeline that describes
  * how derivatives are produced from raw inputs. Reading or writing
- * a project is a single @ref MNALIB::MnaIO call away — @ref MNALIB::MnaProject::read "read" and
- * @ref MNALIB::MnaProject::write "write" are thin façades that dispatch on extension.
+ * a project is a single @ref mne::MnaIO call away — @ref mne::MnaProject::read "read" and
+ * @ref mne::MnaProject::write "write" are thin façades that dispatch on extension.
  *
  * The container is intentionally @em declarative: it records what
  * should be computed (operations, parameters, file references and
  * hashes) rather than embedding executable code, so collaborators
  * on different platforms can reproduce the analysis using their
- * own MNE-CPP build. @c mnaVersion / @ref MNALIB::MnaProject::CURRENT_SCHEMA_VERSION "CURRENT_SCHEMA_VERSION"
+ * own MNE-CPP build. @c mnaVersion / @ref mne::MnaProject::CURRENT_SCHEMA_VERSION "CURRENT_SCHEMA_VERSION"
  * are bumped on breaking schema changes, while @c extras preserves
  * forward-compatible additions so projects written by a newer
  * version round-trip losslessly through an older one.
@@ -50,10 +50,10 @@
 #include <QCborMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -142,6 +142,6 @@ public:
     static bool write(const MnaProject& project, const QString& path);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_PROJECT_H

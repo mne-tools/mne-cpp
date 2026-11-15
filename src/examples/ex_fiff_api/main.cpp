@@ -72,7 +72,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     const std::filesystem::path datPath = tmp.filePath("electrodes.dat").toStdString();
     std::ofstream(datPath) << "Nz 78 0 0.1 0\nLPA 76 -0.08 0 0\nRPA 82 0.08 0 0\nFz 1 0 0.06 0.08\nCz 2 0 0 0.1\n";
     //! [fiff_dig_montage_usage]
-    const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // BASELIB::Expected, like mne.channels.read_dig_dat
+    const auto montage = FiffDigMontage::read_neuroscan_dat(datPath); // mne::Expected, like mne.channels.read_dig_dat
     //! [fiff_dig_montage_usage]
     ok &= expect(montage && montage->ch_names == std::vector<std::string>{"Fz", "Cz"} && montage->dig.size() == 5 && montage->dig[0].ident == FIFFV_POINT_LPA &&
                      montage->dig[4].kind == FIFFV_POINT_EEG,
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
     //! [fiff_coord_trans_usage]
     const std::filesystem::path trans = (dir + "/all-trans.fif").toStdU16String();
-    const FiffCoordTrans headToMri(trans, FIFFV_COORD_HEAD, FIFFV_COORD_MRI); // throws BASELIB::Error if it is missing
+    const FiffCoordTrans headToMri(trans, FIFFV_COORD_HEAD, FIFFV_COORD_MRI); // throws mne::Error if it is missing
     const FiffCoordTrans devHead = info.dev_head_t;                           // device -> head, from the measurement info
     float r[3] = {0.0f, 0.0f, 0.0f};
     FiffCoordTrans::apply_trans(r, devHead, true); // the device origin in head coordinates
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     annotations.append(0.5, 1.0, "BAD_blink"); // onset s, duration s, description
     const std::filesystem::path csv = tmp.filePath("annot.csv").toStdString();
     const bool annotationsWritten = annotations.write(csv).has_value();
-    const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws BASELIB::Error
+    const FiffAnnotations annotationsBack = FiffAnnotations::read(csv).value(); // value() throws mne::Error
     const MatrixXi eventsAgain = events_from_annotations(annotationsBack.select("auditory"), info.sfreq, {{"auditory/left", 1}, {"auditory/right", 2}}, raw.first_samp);
     //! [fiff_annotations_usage]
     // Event 13988 (code 2) is (13988 - 12900) / 300.307 s = 3.6230 s after the first sample; code 3 has no description and stays "3"; the CSV keeps onsets to well within half a sample

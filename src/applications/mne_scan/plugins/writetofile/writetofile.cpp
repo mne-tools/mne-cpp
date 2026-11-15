@@ -35,10 +35,9 @@
 //=============================================================================================================
 
 using namespace WRITETOFILEPLUGIN;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace SCSHAREDLIB;
+using namespace mne::scan;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -52,7 +51,7 @@ WriteToFile::WriteToFile()
 , m_iBlinkStatus(0)
 , m_iSplitCount(0)
 , m_iRecordingMSeconds(5 * 60 * 1000)
-, m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
+, m_pCircularBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
 {
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"), this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
@@ -168,7 +167,7 @@ QWidget* WriteToFile::setupWidget()
 
 //=============================================================================================================
 
-void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void WriteToFile::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
@@ -505,7 +504,7 @@ void WriteToFile::clipRecording(bool bChecked)
         qWarning() << "Could not reopen realtime file:" << m_qFileOut.fileName();
         return;
     }
-    BASELIB::ByteStream& bytes = m_pOutfid->byte_stream();
+    mne::ByteStream& bytes = m_pOutfid->byte_stream();
     bytes.seek(bytes.size());
 }
 

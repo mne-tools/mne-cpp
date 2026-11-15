@@ -13,45 +13,45 @@
  * device: electrical or magnetic stimulation waveforms, audio/visual stimuli, trigger lines, RF
  * transmit pulses). Both are described by the same structure and carried by the same ring.
  *
- * The description can be converted to and from FIFFLIB::FiffInfo without loss (fiff/acq_fiff.h) and
+ * The description can be converted to and from mne::FiffInfo without loss (fiff/acq_fiff.h) and
  * also describes what FIFF cannot, such as segmented complex-valued MR data. Nothing is guessed:
  * an unknown unit is AcqUnit::Unknown, an unknown range is NaN, an irregular stream has sfreq 0.
  * Metadata changes are versioned at a sample index (@c version, @c validFromSample).
  *
  * MR receive (32 coils, 512-sample readouts, ISMRMRD header per readout) and RF transmit:
  * @code
- * ACQLIB::AcqStreamInfo rx;
+ * mne::AcqStreamInfo rx;
  * rx.name = "rx";
- * rx.direction = ACQLIB::AcqDirection::Input;
- * rx.format = ACQLIB::AcqSampleFormat::ComplexInt16;
- * rx.layout = ACQLIB::AcqLayout::Planar;                    // one DMA buffer per coil
+ * rx.direction = mne::AcqDirection::Input;
+ * rx.format = mne::AcqSampleFormat::ComplexInt16;
+ * rx.layout = mne::AcqLayout::Planar;                    // one DMA buffer per coil
  * rx.sfreq = 1.0e6;                                         // 1 us dwell time
- * ACQLIB::AcqChannelInfo coil;
- * coil.kind = ACQLIB::AcqChannelKind::MrReceive;
- * coil.unit = ACQLIB::AcqUnit::Volt;
+ * mne::AcqChannelInfo coil;
+ * coil.kind = mne::AcqChannelKind::MrReceive;
+ * coil.unit = mne::AcqUnit::Volt;
  * coil.scale = 1.0 / 32768.0;                               // ADC full scale -> 1 V
  * for (int c = 0; c < 32; ++c) {
  *     coil.name = "coil" + std::to_string(c);
  *     rx.channels.push_back(coil);
  * }
- * rx.segmentation.mode = ACQLIB::AcqSegmentation::Mode::Triggered;
+ * rx.segmentation.mode = mne::AcqSegmentation::Mode::Triggered;
  * rx.segmentation.samplesPerSegment = 512;
  * rx.segmentation.headerBytes = 340;                        // sizeof(ISMRMRD_AcquisitionHeader)
  * rx.segmentation.headerSchema = "ismrmrd.AcquisitionHeader/1";
  * rx.clockDomain = "spectrum:12345";                        // set by the backend: the clock-master card
  *
- * ACQLIB::AcqStreamInfo tx = rx;                              // same card, transmit path
+ * mne::AcqStreamInfo tx = rx;                              // same card, transmit path
  * tx.name = "tx";
- * tx.direction = ACQLIB::AcqDirection::Output;
- * tx.format = ACQLIB::AcqSampleFormat::ComplexInt16;
+ * tx.direction = mne::AcqDirection::Output;
+ * tx.format = mne::AcqSampleFormat::ComplexInt16;
  * tx.channels[0].digitalBits = 1;                           // bit 15 of the I word drives the T/R switch
- * tx.bitFields.push_back({"tr_switch", 0, 15, 1, ACQLIB::AcqChannelKind::RfSwitch});
+ * tx.bitFields.push_back({"tr_switch", 0, 15, 1, mne::AcqChannelKind::RfSwitch});
  * tx.channels.resize(1);
  * tx.channels[0].name = "rf0";
- * tx.channels[0].kind = ACQLIB::AcqChannelKind::MrTransmit;
+ * tx.channels[0].kind = mne::AcqChannelKind::MrTransmit;
  * tx.channels[0].scale = 1.0;
  * tx.segmentation.samplesPerSegment = 0;                    // pulses of variable length
- * tx.underrunFill = ACQLIB::AcqUnderrunFill::Zero;          // never hold an RF amplitude
+ * tx.underrunFill = mne::AcqUnderrunFill::Zero;          // never hold an RF amplitude
  * @endcode
  */
 
@@ -75,10 +75,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -299,6 +299,6 @@ struct AcqStreamInfo
     }
 };
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_STREAM_INFO_H

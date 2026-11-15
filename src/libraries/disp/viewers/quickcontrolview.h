@@ -12,9 +12,9 @@
  * @date     July 2018
  * @brief    Floating frameless container hosting the modular Quick-Control settings tabs.
  *
- * QuickControlView is a @ref DISPLIB::DraggableFramelessWidget that owns a
+ * QuickControlView is a @ref mne::disp::DraggableFramelessWidget that owns a
  * @c QTabWidget into which application code can drop arbitrary
- * @ref DISPLIB::AbstractView panels grouped by name. It is the floating
+ * @ref mne::disp::AbstractView panels grouped by name. It is the floating
  * settings sidebar shown next to MNE-Scan plugin widgets, supports
  * opacity, transparency and "pinned" behaviour, and persists the
  * current tab through @c QSettings.
@@ -46,14 +46,14 @@ class QuickControlViewWidget;
 class QVBoxLayout;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -65,7 +65,7 @@ namespace DISPLIB
  * transparency and "pinned" behaviour and persists the current tab
  * through @c QSettings.
  */
-class DISPSHARED_EXPORT QuickControlView : public DISPLIB::DraggableFramelessWidget
+class DISPSHARED_EXPORT QuickControlView : public mne::disp::DraggableFramelessWidget
 {
     Q_OBJECT
 
@@ -213,6 +213,6 @@ private:
 
 signals:
 };
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // QUICKCONTROLVIEW_H

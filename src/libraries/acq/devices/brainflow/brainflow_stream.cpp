@@ -28,8 +28,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -95,7 +95,7 @@ int row_of(const BrainFlowDescription& description, std::string_view role)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::optional<std::pair<int, BrainFlowDescription>> ACQLIB::detail::builtin_brainflow_board(std::string_view board)
+std::optional<std::pair<int, BrainFlowDescription>> mne::detail::builtin_brainflow_board(std::string_view board)
 {
     const std::optional<int> id = parse_id(board);
     const std::string key = brainflow_board_key(board);
@@ -110,7 +110,7 @@ std::optional<std::pair<int, BrainFlowDescription>> ACQLIB::detail::builtin_brai
 
 //=============================================================================================================
 
-AcqExpected<std::pair<int, BrainFlowDescription>> ACQLIB::detail::brainflow_board(std::string_view board)
+AcqExpected<std::pair<int, BrainFlowDescription>> mne::detail::brainflow_board(std::string_view board)
 {
     if (auto builtin = builtin_brainflow_board(board)) {
         return std::move(*builtin);
@@ -136,7 +136,7 @@ AcqExpected<std::pair<int, BrainFlowDescription>> ACQLIB::detail::brainflow_boar
 
 //=============================================================================================================
 
-std::vector<std::string> ACQLIB::detail::brainflow_library_candidates()
+std::vector<std::string> mne::detail::brainflow_library_candidates()
 {
     std::vector<std::string> candidates = {acqEnvironment("MNE_CPP_BRAINFLOW_LIB")};
     if (const std::string pip = acqPythonPackageDir("brainflow", "lib"); !pip.empty()) {
@@ -148,7 +148,7 @@ std::vector<std::string> ACQLIB::detail::brainflow_library_candidates()
 
 //=============================================================================================================
 
-AcqStreamInfo ACQLIB::detail::brainflow_stream_info(const BrainFlowDescription& description, std::string sourceId)
+AcqStreamInfo mne::detail::brainflow_stream_info(const BrainFlowDescription& description, std::string sourceId)
 {
     AcqStreamInfo info;
     info.name = "eeg";
@@ -263,7 +263,7 @@ void BrainFlowRowWriter::publishClock(std::uint64_t sample, double timestamp)
 AcqExpected<BrainFlowStreamer> BrainFlowStreamer::open(const BrainFlowDescription& description, std::string address, std::uint16_t port,
                                                        std::size_t batch)
 {
-    auto socket = COMLIB::UdpSocket::bind("0.0.0.0", 0);
+    auto socket = mne::UdpSocket::bind("0.0.0.0", 0);
     if (!socket) {
         return AcqError(AcqErrorCode::DeviceIo, "cannot open a UDP socket: " + socket.error().message());
     }

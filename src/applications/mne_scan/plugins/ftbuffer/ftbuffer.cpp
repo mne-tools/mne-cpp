@@ -44,8 +44,7 @@
 //=============================================================================================================
 
 using namespace FTBUFFERPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -89,7 +88,7 @@ void FtBuffer::unload()
 
 std::string FtBuffer::uri() const
 {
-    ACQLIB::AcqUri uri{.scheme = "ftbuffer", .target = {}, .params = {{"simulate", "1"}}};
+    mne::AcqUri uri{.scheme = "ftbuffer", .target = {}, .params = {{"simulate", "1"}}};
     if (!m_bSimulate) {
         uri.target = m_host + ":" + std::to_string(m_port);
         uri.params.clear();
@@ -101,15 +100,15 @@ std::string FtBuffer::uri() const
 
 bool FtBuffer::start()
 {
-    ACQLIB::register_ftbuffer_scheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::register_ftbuffer_scheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[FtBuffer::start]" << QString::fromStdString(device.error().text());
         return false;
     }
     m_device = std::move(*device);
-    auto fiffInfo = ACQLIB::toFiffInfo(*m_device.stream().info());
-    auto reader = m_device.stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
+    auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[FtBuffer::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         m_device.close();
@@ -117,10 +116,10 @@ bool FtBuffer::start()
     }
 
     //The buffer can hold another measurement on every start, so it is set up here and not in init()
-    auto info = std::make_shared<FIFFLIB::FiffInfo>(std::move(*fiffInfo));
+    auto info = std::make_shared<mne::FiffInfo>(std::move(*fiffInfo));
     if (info->dig.size() > 0) {
         // neuromag2ft puts the acquisition's isotrak, which the HPI plugin fits the coils to
-        auto digitizers = std::make_shared<FIFFLIB::FiffDigitizerData>();
+        auto digitizers = std::make_shared<mne::FiffDigitizerData>();
         digitizers->points = info->dig;
         digitizers->coord_frame = FIFFV_COORD_HEAD;
         digitizers->active.assign(info->dig.size(), true);
@@ -130,7 +129,7 @@ bool FtBuffer::start()
     m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(info);
     m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
 
-    if (ACQLIB::AcqError e = m_device.start(); !e.ok()) {
+    if (mne::AcqError e = m_device.start(); !e.ok()) {
         qWarning() << "[FtBuffer::start]" << QString::fromStdString(e.text());
         m_device.close();
         return false;
@@ -146,7 +145,7 @@ bool FtBuffer::stop()
 {
     requestInterruption();
     wait();
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
     m_device.close();
 
     // Clear all data in the buffer connected to displays and other plugins
@@ -182,10 +181,10 @@ void FtBuffer::run()
     const std::size_t channels = m_device.stream().info()->channelCount();
     MatrixXd block(static_cast<Index>(channels), m_iSamplesPerBlock);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (!read) {
-            if (read.error() == ACQLIB::AcqErrorCode::Timeout || read.error() == ACQLIB::AcqErrorCode::Overrun) {
+            if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
             qWarning() << "[FtBuffer::run]" << QString::fromStdString(read.error().text());

@@ -38,7 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EVENTSLIB;
+using namespace mne::analyze::events;
 
 //=============================================================================================================
 /**
@@ -114,7 +114,7 @@ TestEvents::TestEvents()
 
 void TestEvents::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qInfo() << "TestEvents: Starting EventManager unit tests";
 }
 

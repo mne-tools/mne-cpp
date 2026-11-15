@@ -81,8 +81,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 
 //*************************************************************************************************************
@@ -90,7 +89,7 @@ using namespace FIFFLIB;
 // Forward Declarations
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffIO;
 }
@@ -283,7 +282,7 @@ private:
     bool m_bFileloaded;                                      /**< True when a FIFF raw file is loaded. */
     std::vector<FiffChInfo> m_chInfolist;                    /**< Cached channel metadata for the loaded raw file. */
     std::shared_ptr<FiffInfo> m_pFiffInfo;                   /**< Shared measurement info of the loaded raw file. */
-    QSharedPointer<FIFFLIB::FiffIO> m_pfiffIO;               /**< Legacy FIFF I/O backend used by the table model path. */
+    QSharedPointer<mne::FiffIO> m_pfiffIO;                   /**< Legacy FIFF I/O backend used by the table model path. */
     QMap<QString, std::shared_ptr<MNEOperator>> m_Operators; /**< Available processing operators keyed by operator name. */
 
     bool m_bStartReached; /**< True when the buffered window touches the file start. */

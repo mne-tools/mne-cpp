@@ -1,18 +1,18 @@
 ---
 id: spectrogram
-title: "DSPLIB::Spectrogram"
+title: "mne::Spectrogram"
 sidebar_label: Spectrogram
 sidebar_position: 77
 ---
 
 # Spectrogram
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/spectrogram.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/spectrogram.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/spectrogram.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/spectrogram.h)
 
 `#include <dsp/spectrogram.h>`
 
 ```cpp
-class DSPLIB::Spectrogram
+class mne::Spectrogram
 ```
 
 Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
@@ -55,7 +55,7 @@ Calculates the spectrogram (tf-representation) of a given signal.
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
-````cpp title="src/examples/ex_disp/main.cpp, line 189"
+````cpp title="src/examples/ex_disp/main.cpp, line 186"
 //tf plot example: spectrogram of the same channel
 MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
 TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0));
@@ -75,7 +75,7 @@ ok &= expect(spectrogram.cols() == n && spectrogram.rows() > 0 && spectrogram.al
 
 Spectrogram of one evoked channel shown as a time-frequency plot.
 
-````cpp title="src/examples/ex_tf_plot/main.cpp, line 78"
+````cpp title="src/examples/ex_tf_plot/main.cpp, line 77"
 //tf plot
 VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
 MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);

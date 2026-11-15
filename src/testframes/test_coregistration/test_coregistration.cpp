@@ -52,8 +52,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -145,7 +144,7 @@ void TestCoregistration::initTestCase()
     }
 
     // align fiducials
-    if (!MNELIB::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
+    if (!mne::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
         qWarning() << "Point cloud registration not succesfull.";
     }
 
@@ -175,7 +174,7 @@ void TestCoregistration::initTestCase()
     VectorXi vecTake;
 
     // discard outliers
-    if (!MNELIB::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
+    if (!mne::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
     VectorXf vecWeightsICPClean(vecTake.size());
@@ -185,7 +184,7 @@ void TestCoregistration::initTestCase()
 
     // icp
     float fRMSE = 0.0;
-    if (!MNELIB::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
+    if (!mne::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
         qWarning() << "ICP was not succesfull.";
     }
     transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp.fileName().toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);

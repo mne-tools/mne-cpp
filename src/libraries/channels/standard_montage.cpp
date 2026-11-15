@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref CHANNELSLIB::StandardMontage.
+ * @brief    Implementation of @ref mne::StandardMontage.
  */
 
 //=============================================================================================================
@@ -26,8 +26,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CHANNELSLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

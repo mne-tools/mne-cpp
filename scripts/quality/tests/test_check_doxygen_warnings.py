@@ -34,7 +34,7 @@ _spec.loader.exec_module(checker)
 
 ROOT = "/checkout/mne-cpp"
 LOG = f"""{ROOT}/src/libraries/fiff/a.h:12: warning: unable to resolve reference to 'Foo' for \\ref command
-{ROOT}/src/libraries/fiff/a.h:40: warning: The following parameter of FIFFLIB::f(int x) is not documented:
+{ROOT}/src/libraries/fiff/a.h:40: warning: The following parameter of mne::f(int x) is not documented:
   parameter 'x'
 {ROOT}/src/libraries/fiff/b.h:7: warning: end of comment block while expecting command </tt> (Probable start '{ROOT}/src/libraries/fiff/b.h' at line 6)
 """
@@ -62,7 +62,7 @@ class TestKeys(unittest.TestCase):
     def test_keys_are_relative_and_line_free(self) -> None:
         keys = checker.parse_log(LOG, Path(ROOT))
         self.assertEqual(3, sum(keys.values()))
-        self.assertIn("src/libraries/fiff/a.h: warning: The following parameter of FIFFLIB::f(int x) "
+        self.assertIn("src/libraries/fiff/a.h: warning: The following parameter of mne::f(int x) "
                       "is not documented: | parameter 'x'", keys)
         self.assertIn("src/libraries/fiff/b.h: warning: end of comment block while expecting command </tt> "
                       "(Probable start 'src/libraries/fiff/b.h' at line N)", keys)

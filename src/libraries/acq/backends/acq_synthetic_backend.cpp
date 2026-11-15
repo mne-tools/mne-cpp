@@ -54,8 +54,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 namespace
 {
@@ -1067,7 +1067,7 @@ AcqSchemeInfo schemeInfo()
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::detail::registerSyntheticScheme(AcqDeviceRegistry& registry)
+AcqError mne::detail::registerSyntheticScheme(AcqDeviceRegistry& registry)
 {
     return registry.registerScheme(schemeInfo(), &SyntheticBackend::open, [](std::chrono::milliseconds) {
         return std::vector<AcqDiscoveredDevice>{

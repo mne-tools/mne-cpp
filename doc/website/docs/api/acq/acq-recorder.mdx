@@ -1,18 +1,18 @@
 ---
 id: acq-recorder
-title: "ACQLIB::AcqRecorder"
+title: "mne::AcqRecorder"
 sidebar_label: AcqRecorder
 sidebar_position: 47
 ---
 
 # AcqRecorder
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
 
 `#include <acq/acq_recorder.h>`
 
 ```cpp
-class ACQLIB::AcqRecorder
+class mne::AcqRecorder
 ```
 
 Records one stream to FIFF on its own threads (reader and writer, double-buffered).
@@ -194,7 +194,7 @@ Starts recording `stream` into a BIDS dataset; `stop()` writes the sidecars (cha
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 76"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 75"
 AcqRecorderOptions options;
 options.device = device->description(); // device and URI go into the file's measurement info
 const std::string path = QDir(directory).filePath("oddball_raw.fif").toStdString();

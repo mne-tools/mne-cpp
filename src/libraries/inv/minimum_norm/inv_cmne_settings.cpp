@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Definition of the @ref INVLIB::InvCMNESettings aggregate (default values).
+ * @brief    Definition of the @ref mne::InvCMNESettings aggregate (default values).
  *
  * Provides storage for the @ref InvCMNESettings defaults; the struct
  * is otherwise an aggregate so client code can list-initialise

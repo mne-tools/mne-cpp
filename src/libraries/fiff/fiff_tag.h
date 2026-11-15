@@ -21,11 +21,11 @@
  * (@c FIFFFS_MATRIX == 0x40) — and the matrix variants additionally carry
  * a coding flag in the low bits selecting dense (@c MATRIX_CODING_DENSE),
  * column-compressed sparse (@c MATRIX_CODING_CCS) or row-compressed
- * sparse (@c MATRIX_CODING_RCS) storage. @ref FIFFLIB::FiffTag is the C++ wrapper
+ * sparse (@c MATRIX_CODING_RCS) storage. @ref mne::FiffTag is the C++ wrapper
  * that holds the header fields, the raw payload bytes and a small set of
  * typed accessors (@c to_int, @c to_float, @c to_float_matrix, @c to_coord_trans,
  * @c to_ch_info, ...) that decode the payload on demand into the relevant
- * FIFFLIB class.
+ * mne_fiff class.
  *
  * The header also re-publishes the @c IS_MATRIX / @c MATRIX_CODING_*
  * bitmasks and the @c NATIVE_ENDIAN macro driven by the OS-detection
@@ -113,10 +113,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 class FiffStream;

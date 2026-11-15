@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Lightweight pairwise source-connectivity container that travels alongside a source estimate.
  *
- * @ref INVLIB::InvConnectivity stores one @c N×N connectivity matrix
+ * @ref mne::InvConnectivity stores one @c N×N connectivity matrix
  * between source-space grid points together with its measure name
  * (coherence, imCoh, PLV, PLI, wPLI, Granger, PDC, DTF, ...), direction
  * flag and frequency/time window. The struct is deliberately decoupled
- * from the connectivity library so an @ref INVLIB::InvSourceEstimate can carry
+ * from the connectivity library so an @ref mne::InvSourceEstimate can carry
  * multiple connectivity layers (one per band / window) without pulling
  * in the full CONNECTIVITY graph machinery.
  */
@@ -34,10 +34,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -74,6 +74,6 @@ struct InvConnectivity
     }
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_CONNECTIVITY_H

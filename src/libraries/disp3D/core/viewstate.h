@@ -10,10 +10,10 @@
  * @brief    Per-viewport state (camera preset, zoom, pan, visibility filter) and serialisation helpers.
  *
  * A disp3D scene can be displayed either in a single interactive
- * viewport or in a 2x2 multi-view grid. @ref DISP3DLIB::SubView holds the
+ * viewport or in a 2x2 multi-view grid. @ref mne::disp::SubView holds the
  * per-pane camera state &mdash; preset (Top / Left / Front /
  * Perspective), zoom, pan offset and rotation quaternion &mdash;
- * and @ref DISP3DLIB::ViewVisibilityProfile holds the per-pane visibility mask
+ * and @ref mne::disp::ViewVisibilityProfile holds the per-pane visibility mask
  * (hide skin in the cortex view, hide dipoles in the sensor view,
  * ...).
  *
@@ -49,7 +49,7 @@
 
 class QSettings;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -347,6 +347,6 @@ inline bool isTrue(const QVariant& value, bool fallback)
     return value.isValid() ? value.toBool() : fallback;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // VIEWSTATE_H

@@ -31,7 +31,7 @@
 //=============================================================================================================
 
 using namespace MNEBROWSE;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -126,7 +126,7 @@ bool FiffBlockReader::openBuffer(const QByteArray& data, const QString& displayN
 
     const auto* begin = reinterpret_cast<const std::byte*>(data.constData());
     try {
-        m_raw = std::make_shared<FiffRawData>(std::make_unique<BASELIB::MemoryByteStream>(std::vector<std::byte>(begin, begin + data.size())));
+        m_raw = std::make_shared<FiffRawData>(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + data.size())));
     } catch (const std::exception& e) {
         qWarning() << "[FiffBlockReader] Exception constructing FiffRawData from buffer:" << e.what();
         return false;

@@ -43,7 +43,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -124,7 +124,7 @@ int MnaOpRegistry::loadRegistryFiles()
     if (QDir(relPath).exists())
         return MnaRegistryLoader::loadDirectory(QDir::currentPath() + QStringLiteral("/") + relPath, *this);
 
-    BASELIB::Log::warning("MnaOpRegistry: Could not find resources/mna/ registry directory");
+    mne::Log::warning("MnaOpRegistry: Could not find resources/mna/ registry directory");
     return 0;
 }
 

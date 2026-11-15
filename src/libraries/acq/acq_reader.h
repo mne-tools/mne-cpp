@@ -22,10 +22,10 @@
  *
  * Zero-copy loop:
  * @code
- * auto reader = stream.reader(ACQLIB::AcqReader::ReadMode::Lossless);
+ * auto reader = stream.reader(mne::AcqReader::ReadMode::Lossless);
  * while (running) {
  *     auto view = reader->lease(256, std::chrono::milliseconds(100));
- *     if (!view) { if (view.error() == ACQLIB::AcqErrorCode::Timeout) continue; break; }
+ *     if (!view) { if (view.error() == mne::AcqErrorCode::Timeout) continue; break; }
  *     process(**view);                                  // parts point into the ring
  *     if (!view->release().ok()) discardLastResult(); // the producer overtook the view
  * }
@@ -51,10 +51,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 namespace detail
@@ -305,6 +305,6 @@ private:
 };
 ACQ_STD_MEMBERS_END
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_READER_H

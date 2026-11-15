@@ -11,7 +11,7 @@
  *
  * The multitaper estimator (Thomson, 1982) computes @c K independent
  * eigenspectra by tapering the input with the first @c K Discrete Prolate
- * Spheroidal Sequences (@ref DSPLIB::Dpss) of time-half-bandwidth product @c NW,
+ * Spheroidal Sequences (@ref mne::Dpss) of time-half-bandwidth product @c NW,
  * then averages them. Because each Slepian taper concentrates almost all
  * of its energy inside the design bandwidth, the resulting estimate has
  * dramatically lower spectral leakage than a single-tapered periodogram
@@ -42,10 +42,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -93,6 +93,6 @@ public:
                                        int nFft = -1);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // MULTITAPER_PSD_H

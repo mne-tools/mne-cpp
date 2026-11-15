@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) and BioSemi BDF files.
+ * @brief    @ref mne::AbstractFormatReader implementation for European Data Format (EDF / EDF+) and BioSemi BDF files.
  *
  * EDF stores a recording as a fixed-size ASCII header followed by a
  * stream of @c duration_seconds-long "data records"; inside each
@@ -15,14 +15,14 @@
  * @c samples_per_record little-endian @c int16 samples (24-bit integers
  * in a @c .bdf file). The header
  * additionally lists per-channel physical / digital min / max which
- * @ref BIDSLIB::EDFReader uses to derive the affine calibration that
+ * @ref mne::EDFReader uses to derive the affine calibration that
  * converts the on-disk integers back into the channel's physical unit
  * (volts, microvolts, degrees Celsius, …).
  *
- * The same parser feeds @ref BIDSLIB::BidsRawData and the @c mne_edf2fiff
+ * The same parser feeds @ref mne::BidsRawData and the @c mne_edf2fiff
  * converter. Each channel is scaled from its physical dimension
  * (µV, mV) into SI units, as in mne read_raw_edf, so voltages emerge
- * in volts, matching the MNE-CPP @c FIFFLIB convention. A "Status" or
+ * in volts, matching the MNE-CPP @c mne_fiff convention. A "Status" or
  * "Trigger" channel keeps the low 17 bits of its value (raw for BDF),
  * as in mne read_raw_edf / read_raw_bdf.
  *
@@ -55,16 +55,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 class FileByteStream;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -90,7 +90,7 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
     bool isMeasurement{false};
 
     /** @return The FIFF channel description: kind from the label, volts for voltage dimensions. */
-    FIFFLIB::FiffChInfo to_fiff_ch_info() const;
+    mne::FiffChInfo to_fiff_ch_info() const;
 
     /** @return Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1; 1 for a "Status"/"Trigger" stim channel), as in mne read_raw_edf. */
     float to_si() const;
@@ -113,7 +113,7 @@ public:
     ~EDFReader() override;
 
     bool open(const std::filesystem::path& path) override;
-    FIFFLIB::FiffInfo info() const override;
+    mne::FiffInfo info() const override;
     Eigen::MatrixXf read_raw_segment(long first, long last) const override;
     long sample_count() const override;
     float sfreq() const override;
@@ -153,10 +153,10 @@ private:
     std::vector<EDFChannelInfo> m_allChannels;
     std::vector<EDFChannelInfo> m_measChannels;
 
-    std::unique_ptr<BASELIB::FileByteStream> m_file;
+    std::unique_ptr<mne::FileByteStream> m_file;
     int m_bytesPerSample{2}; // 3 for BDF
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_EDF_READER_H

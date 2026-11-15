@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Tag kinds, block kinds and types of the FIFF format that the acquisition stream uses. */
@@ -184,6 +184,6 @@ inline constexpr const char* kMeasInfoSchema = "fiff.MeasInfo/1";
  */
 [[nodiscard]] std::optional<std::size_t> trigger_channel(const AcqStreamInfo& info);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // NEUROMAG_FIFF_H

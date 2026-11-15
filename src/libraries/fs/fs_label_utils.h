@@ -9,8 +9,8 @@
  * @date     May 2026
  * @brief    Surface-mesh label manipulation: grow, split into connected components, STC ↔ label conversion.
  *
- * Algorithmic counterpart to @ref FSLIB::FsLabel I/O. Operates on labels in the
- * frame of an accompanying @ref FSLIB::FsSurface, using the surface’s triangle
+ * Algorithmic counterpart to @ref mne::FsLabel I/O. Operates on labels in the
+ * frame of an accompanying @ref mne::FsSurface, using the surface’s triangle
  * connectivity as the vertex adjacency graph (one breadth-first hop per
  * @c step in @c growLabel; connectivity-component flood-fill in
  * @c splitLabel).
@@ -52,10 +52,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -175,6 +175,6 @@ public:
                                                         int nVerts);
 };
 
-} // namespace FSLIB
+} // namespace mne
 
 #endif // FS_LABEL_UTILS_H

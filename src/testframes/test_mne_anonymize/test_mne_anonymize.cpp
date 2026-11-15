@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace MNEANONYMIZE;
 
 class TestSettingsControllerCl : public SettingsControllerCl
@@ -127,7 +127,7 @@ private slots:
 private:
     QSharedPointer<QStack<int32_t>> m_pBlockTypeList;
 
-    void verifyTags(FIFFLIB::FiffStream& outStream,
+    void verifyTags(mne::FiffStream& outStream,
                     QString testArg = "blank");
     int mDaysToOffsetDates;
     QDateTime mDefaultMeasDate;
@@ -145,7 +145,7 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 }
 
 //=============================================================================================================
@@ -554,7 +554,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
 //=============================================================================================================
 
-void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream& stream,
+void TestMneAnonymize::verifyTags(mne::FiffStream& stream,
                                   QString testArg)
 {
     FiffTag pTag;

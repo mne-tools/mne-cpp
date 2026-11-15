@@ -7,21 +7,21 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Strategy interface for format-specific raw-data readers (BrainVision, EDF, …) consumed by @ref BIDSLIB::BidsRawData.
+ * @brief    Strategy interface for format-specific raw-data readers (BrainVision, EDF, …) consumed by @ref mne::BidsRawData.
  *
  * BIDS allows several wire formats for electrophysiology raw data
  * (BrainVision @c .vhdr triplets and @c .edf are by far the most common
  * for iEEG; @c .set and @c .nwb are also permitted). @ref
- * BIDSLIB::AbstractFormatReader is the polymorphic interface every
- * concrete reader implements so @ref BIDSLIB::BidsRawData can drive
- * them uniformly: @ref BIDSLIB::AbstractFormatReader::open "open" parses the format-specific header,
- * @ref BIDSLIB::AbstractFormatReader::info "info" emits a populated @c FIFFLIB::FiffInfo, @ref
- * BIDSLIB::AbstractFormatReader::read_raw_segment "read_raw_segment" returns a calibrated @c (n_channels × n_samples)
- * matrix in physical units, and @ref BIDSLIB::AbstractFormatReader::to_fiff_raw_data "to_fiff_raw_data" assembles the
- * whole recording into a @c FIFFLIB::FiffRawData ready to hand to MNE-CPP's
- * filtering / source-localisation stack. @ref BIDSLIB::AbstractFormatReader::format_name "format_name" and
- * @ref BIDSLIB::AbstractFormatReader::supports_extension "supports_extension" power the dispatch implemented by @ref
- * BIDSLIB::BidsRawData::create_reader.
+ * mne::AbstractFormatReader is the polymorphic interface every
+ * concrete reader implements so @ref mne::BidsRawData can drive
+ * them uniformly: @ref mne::AbstractFormatReader::open "open" parses the format-specific header,
+ * @ref mne::AbstractFormatReader::info "info" emits a populated @c mne::FiffInfo, @ref
+ * mne::AbstractFormatReader::read_raw_segment "read_raw_segment" returns a calibrated @c (n_channels × n_samples)
+ * matrix in physical units, and @ref mne::AbstractFormatReader::to_fiff_raw_data "to_fiff_raw_data" assembles the
+ * whole recording into a @c mne::FiffRawData ready to hand to MNE-CPP's
+ * filtering / source-localisation stack. @ref mne::AbstractFormatReader::format_name "format_name" and
+ * @ref mne::AbstractFormatReader::supports_extension "supports_extension" power the dispatch implemented by @ref
+ * mne::BidsRawData::create_reader.
  *
  * Readers are owned through @c std::unique_ptr because the concrete
  * readers keep the underlying file open for lazy segment reads.
@@ -53,10 +53,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -84,7 +84,7 @@ public:
     virtual bool open(const std::filesystem::path& path) = 0;
 
     /** @return Measurement metadata populated from the native format header. */
-    virtual FIFFLIB::FiffInfo info() const = 0;
+    virtual mne::FiffInfo info() const = 0;
 
     //=========================================================================================================
     /**
@@ -118,9 +118,9 @@ public:
     virtual bool supports_extension(std::string_view extension) const = 0;
 
     /** @return The whole recording as FiffRawData: info, calibrations and sample bounds. */
-    FIFFLIB::FiffRawData to_fiff_raw_data() const
+    mne::FiffRawData to_fiff_raw_data() const
     {
-        FIFFLIB::FiffRawData raw;
+        mne::FiffRawData raw;
         raw.info = info();
         raw.first_samp = 0;
         raw.last_samp = static_cast<int>(sample_count()) - 1;
@@ -135,6 +135,6 @@ protected:
     AbstractFormatReader() = default;
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_ABSTRACT_FORMAT_READER_H

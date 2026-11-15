@@ -61,7 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace
@@ -298,9 +298,9 @@ int streamLsl(AcqDevice& device, AcqReader& reader, const QString& name, double 
     const auto streamInfo = reader.stream().info();
     const std::size_t channels = streamInfo->channels.size();
     const std::string type = channels > 0 ? kindName(streamInfo->channels.front().kind) : "unknown";
-    LSLLIB::stream_outlet outlet(LSLLIB::stream_info(name.isEmpty() ? streamInfo->name : name.toStdString(), type,
-                                                     static_cast<int>(channels), streamInfo->sfreq,
-                                                     LSLLIB::ChannelFormat::Float32, device.description().uri));
+    mne::stream_outlet outlet(mne::stream_info(name.isEmpty() ? streamInfo->name : name.toStdString(), type,
+                                               static_cast<int>(channels), streamInfo->sfreq,
+                                               mne::ChannelFormat::Float32, device.description().uri));
     out() << QString::asprintf("Publishing %s as LSL stream \"%s\" (%zu channels, %g Hz, float32)\n",
                                device.description().uri.c_str(), outlet.info().name().c_str(), channels,
                                streamInfo->sfreq);

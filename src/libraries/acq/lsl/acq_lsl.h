@@ -12,7 +12,7 @@
  * lsl://NAME opens the LSL stream called NAME (or the first stream matching type= or source_id=) as a device
  * with one input stream. liblsl is loaded at runtime when it is installed: MNE_CPP_LIBLSL (a file path), the
  * library that pylsl ships (pip install pylsl), then the system library paths. Without liblsl the in-tree
- * LSLLIB implementation is used, which speaks the same protocol (discovery, data protocol 1.10, time
+ * mne_lsl implementation is used, which speaks the same protocol (discovery, data protocol 1.10, time
  * correction) with any LSL outlet. AcqDeviceDescription::backendVersion names the path in use ("liblsl 1.16"
  * or "in-tree"); library=liblsl or library=intree forces one.
  *
@@ -24,8 +24,8 @@
  * (marker) streams are not supported yet.
  *
  * @code
- * ACQLIB::registerLslScheme(); // needed only where static linking drops the library's initialiser
- * auto device = ACQLIB::AcqDevice::open("lsl://BioSemi?timeout=5");
+ * mne::registerLslScheme(); // needed only where static linking drops the library's initialiser
+ * auto device = mne::AcqDevice::open("lsl://BioSemi?timeout=5");
  * @endcode
  */
 
@@ -42,10 +42,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -63,6 +63,6 @@ ACQLSLSHARED_EXPORT AcqError registerLslScheme();
  */
 ACQLSLSHARED_EXPORT std::string lslRuntime();
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_LSL_H

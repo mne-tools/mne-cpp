@@ -29,10 +29,10 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
@@ -57,7 +57,7 @@ public:
                    QObject* parent = nullptr);
 
     //=========================================================================================================
-    DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
+    DipoleFitModel(mne::InvEcdSet InvEcdSet,
                    const QString& sFilePath = "",
                    const QByteArray& byteLoadedData = QByteArray(),
                    QObject* parent = nullptr);
@@ -128,7 +128,7 @@ public:
     inline QModelIndex parent(const QModelIndex& index) const override;
 
 private:
-    INVLIB::InvEcdSet m_ECD_Set;
+    mne::InvEcdSet m_ECD_Set;
 };
 
 //=============================================================================================================

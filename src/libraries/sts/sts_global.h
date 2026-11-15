@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    STSLIB shared-library export macro and build-info accessors for the statistical-tests library.
+ * @brief    mne_sts shared-library export macro and build-info accessors for the statistical-tests library.
  *
- * STSLIB is the mne-cpp library that performs frequentist inference on
+ * mne_sts is the mne-cpp library that performs frequentist inference on
  * sensor- and source-level M/EEG data. It bundles classic parametric
  * tests (one-sample, paired and two-sample Student t-tests, one-way
  * ANOVA), the family of multiple-comparison corrections used in the
@@ -22,7 +22,7 @@
  *
  * This header only exposes the @c STSSHARED_EXPORT decoration and the
  * three @c buildDateTime / @c buildHash accessors that let downstream
- * tools stamp the exact STSLIB binary used to produce a result; all
+ * tools stamp the exact mne_sts binary used to produce a result; all
  * statistical machinery lives in the per-method headers in this folder.
  */
 
@@ -57,12 +57,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace STSLIB
- * @brief     Statistical testing (t-tests, F-tests, cluster permutation, multiple comparison correction).
- */
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================

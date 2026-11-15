@@ -9,7 +9,7 @@
  * @date     May, 2026
  * @brief    Lightweight 3-D viewer for MNE Align.
  *
- *           Hosts a @ref DISP3DLIB::MultimodalScene and registers two
+ *           Hosts a @ref mne::disp::MultimodalScene and registers two
  *           layers: the loaded head BEM mesh (`SceneLayerKind::BrainSurface`)
  *           and the live set of acquired digitisation points
  *           (`SceneLayerKind::Custom`, id="acquired_points"). The actual
@@ -42,17 +42,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class BrainTreeModel;
 class BrainView;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class MultimodalScene;
 }
-namespace MNELIB
+namespace mne
 {
 class MNEBem;
 }
@@ -78,7 +78,7 @@ enum class CameraFocus
 /**
  * @brief 3-D viewer widget for the MNE Align digitisation workflow.
  *
- * Hosts a @ref DISP3DLIB::MultimodalScene, renders the head BEM mesh,
+ * Hosts a @ref mne::disp::MultimodalScene, renders the head BEM mesh,
  * digitised points, and live Polhemus tracker markers. Manages the
  * device→head and head→MRI transform chain.
  */
@@ -94,7 +94,7 @@ public:
      * @param[in] acquired   Shared digitised-point store (not owned).
      * @param[in] parent     Parent widget.
      */
-    explicit Align3DView(ACQLIB::AcquiredPoints* acquired, QWidget* parent = nullptr);
+    explicit Align3DView(mne::AcquiredPoints* acquired, QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      *
      * @param[in] bem   BEM model to display.
      */
-    void setBem(std::shared_ptr<MNELIB::MNEBem> bem);
+    void setBem(std::shared_ptr<mne::MNEBem> bem);
 
     /**
      * @brief Set the number of viewport panes (1–4).
@@ -158,10 +158,10 @@ public:
     }
 
     /** @return The underlying multimodal scene. */
-    DISP3DLIB::MultimodalScene* scene() const;
+    mne::disp::MultimodalScene* scene() const;
 
     /** @return The loaded BEM data (may be null). */
-    std::shared_ptr<MNELIB::MNEBem> bem() const
+    std::shared_ptr<mne::MNEBem> bem() const
     {
         return m_pBem;
     }
@@ -243,9 +243,9 @@ private:
     void recomputeAlignment();
     void applyViewConfiguration();
 
-    ACQLIB::AcquiredPoints* m_pPoints = nullptr;
-    std::unique_ptr<DISP3DLIB::MultimodalScene> m_pScene;
-    std::shared_ptr<MNELIB::MNEBem> m_pBem;
+    mne::AcquiredPoints* m_pPoints = nullptr;
+    std::unique_ptr<mne::disp::MultimodalScene> m_pScene;
+    std::shared_ptr<mne::MNEBem> m_pBem;
     int m_cameraPreset = 1;
     CameraFocus m_cameraFocus = CameraFocus::Brain;
     int m_penStation = 1;
@@ -265,8 +265,8 @@ private:
     bool m_haveHeadToMriOverride = false;
     QMatrix4x4 m_headToMriOverride;
 
-    QPointer<DISP3DLIB::BrainView> m_pBrainView;
-    QPointer<DISP3DLIB::BrainTreeModel> m_pBrainModel;
+    QPointer<mne::disp::BrainView> m_pBrainView;
+    QPointer<mne::disp::BrainTreeModel> m_pBrainModel;
 };
 
 } // namespace MNEALIGN

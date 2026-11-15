@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -123,4 +123,4 @@ void CameraController::applyMousePan(const QPoint& delta,
     pan += QVector2D(-delta.x() * panSpeed, delta.y() * panSpeed);
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

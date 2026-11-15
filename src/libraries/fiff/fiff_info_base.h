@@ -13,11 +13,11 @@
  * @date     February 2013
  * @brief    Minimal measurement-info subset (channel list, sampling rate, basic transforms) shared by FIFF readers that do not need the full FiffInfo.
  *
- * @ref FIFFLIB::FiffInfoBase carries only what every downstream component needs to
+ * @ref mne::FiffInfoBase carries only what every downstream component needs to
  * interpret a data matrix: the channel list (@c chs / @c ch_names /
  * @c nchan), the sampling frequency, the @c FIFFV_COORD_DEVICE →
  * @c FIFFV_COORD_HEAD transform recovered from HPI, and the bad-channel
- * list. @ref FIFFLIB::FiffInfo derives from it and adds the acquisition-specific
+ * list. @ref mne::FiffInfo derives from it and adds the acquisition-specific
  * metadata (projectors, CTF compensators, filter setups, subject info,
  * HPI fit details, ...).
  *
@@ -56,10 +56,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================

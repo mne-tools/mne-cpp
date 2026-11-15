@@ -7,8 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @brief       Tests the CorticalSurface plugin's Labels dock plumbing.
  *
- * Builds an in-memory @ref FSLIB::FsLabel, round-trips it through
- * `saveLabel` + @ref FSLIB::FsLabel::read, and extracts an ROI mean
+ * Builds an in-memory @ref mne::FsLabel, round-trips it through
+ * `saveLabel` + @ref mne::FsLabel::read, and extracts an ROI mean
  * trace via @ref CorticalSurface::extractLabelTimeCourse.
  */
 
@@ -26,8 +26,7 @@
 #include <inv/inv_source_estimate.h>
 
 using namespace CORTICALSURFACEPLUGIN;
-using namespace FSLIB;
-using namespace INVLIB;
+using namespace mne;
 
 namespace
 {

@@ -31,17 +31,17 @@ using idNum = unsigned int; //We want to eventually modify the idNum to be a has
 using uchar = unsigned char;
 
 //=============================================================================================================
-// NAMESPACE EVENTSLIB
+// NAMESPACE mne::analyze::events
 //=============================================================================================================
 
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 
 //=============================================================================================================
-// EVENTSINTERNAL FORWARD DECLARATIONS
+// detail FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 class EventGroupINT;
 }
@@ -110,7 +110,7 @@ struct EVENTS_EXPORT EventGroup
      *
      * @param [in] g rhs EventGroup
      */
-    EventGroup(const EVENTSLIB::EventGroup& g);
+    EventGroup(const mne::analyze::events::EventGroup& g);
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ struct EVENTS_EXPORT EventGroup
      *
      * @param [in] g EventGroupInt input.
      */
-    EventGroup(const EVENTSINTERNAL::EventGroupINT& g);
+    EventGroup(const detail::EventGroupINT& g);
 
     idNum id;         /**< Id of the event group. */
     std::string name; /**< Name of the event group. */
@@ -126,7 +126,7 @@ struct EVENTS_EXPORT EventGroup
     int order;        /**< Holder for an ordering variable. */
 };
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 
 /**
@@ -170,7 +170,7 @@ public:
      * @param [in] name Name of the new group.
      * @param [in] color  Color of the new group.
      */
-    EventGroupINT(idNum id, const std::string& name, const EVENTSLIB::RgbColor& color);
+    EventGroupINT(idNum id, const std::string& name, const mne::analyze::events::RgbColor& color);
 
     //=========================================================================================================
     /**
@@ -178,7 +178,7 @@ public:
      *
      * @param [in] color New color of the group.
      */
-    void setColor(const EVENTSLIB::RgbColor& color);
+    void setColor(const mne::analyze::events::RgbColor& color);
 
     //=========================================================================================================
     /**
@@ -192,7 +192,7 @@ public:
      *
      * @return Color of the group.
      */
-    EVENTSLIB::RgbColor getColor() const;
+    mne::analyze::events::RgbColor getColor() const;
 
     //=========================================================================================================
     /**
@@ -253,13 +253,13 @@ public:
     bool operator<(const EventGroupINT& groupRHS) const;
 
 private:
-    std::string m_sName;         /**< Group name. */
-    EVENTSLIB::RgbColor m_Color; /**< Group color. */
-    idNum m_Id;                  /**< Group Id.*/
-    std::string m_sDescription;  /**< Group description text.*/
-    int m_order;                 /**< Group order placeholder.*/
+    std::string m_sName;                    /**< Group name. */
+    mne::analyze::events::RgbColor m_Color; /**< Group color. */
+    idNum m_Id;                             /**< Group Id.*/
+    std::string m_sDescription;             /**< Group description text.*/
+    int m_order;                            /**< Group order placeholder.*/
 };
 
-} //namespace EVENTSINTERNAL
-} //namespace EVENTSLIB
+} //namespace detail
+} //namespace mne::analyze::events
 #endif // EVENTGROUP_H

@@ -44,31 +44,31 @@ class QTime;
 class QVBoxLayout;
 class QLabel;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeCov;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ModalitySelectionView;
 class ImageSc;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -112,7 +112,7 @@ public:
      *
      * @param[in] pMeasurement  pointer to measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -127,16 +127,16 @@ protected:
      */
     void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
 
-    QSharedPointer<SCMEASLIB::RealTimeCov> m_pRTC; /**< The real-time covariance measurement. */
+    QSharedPointer<mne::scan::RealTimeCov> m_pRTC; /**< The real-time covariance measurement. */
 
     QPointer<QVBoxLayout> m_pRtcLayout; /**< Widget layout. */
     QPointer<QLabel> m_pLabelInit;      /**< Initialization label. */
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
 
     QMap<QString, bool> m_modalityMap; /**< Map of different modalities. */
 
-    QPointer<DISPLIB::ImageSc> m_pImageSc; /**< The covariance colormap. */
+    QPointer<mne::disp::ImageSc> m_pImageSc; /**< The covariance colormap. */
 
     QList<qint32> m_qListSelChannel; /**< The channel list generated from the selected modalities. */
 };

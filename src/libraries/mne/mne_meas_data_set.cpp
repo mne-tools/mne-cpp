@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMeasDataSet.
+ * @brief    Implementation of @ref mne::MNEMeasDataSet.
  *
  * Provides constructors, deep-copy of the per-condition sample matrix
  * and the timing helpers used by the legacy C-ported algorithms.
@@ -29,7 +29,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -60,7 +60,7 @@ int MNEMeasDataSet::getValuesAtTime(float time, float integ, bool use_abs, Eigen
     const auto nch = static_cast<int>(value.size());
 
     if (value.size() > data.cols()) {
-        BASELIB::Log::warning("Cannot pick {} values from data with {} channels", value.size(), data.cols());
+        mne::Log::warning("Cannot pick {} values from data with {} channels", value.size(), data.cols());
         return -1;
     }
 
@@ -72,7 +72,7 @@ int MNEMeasDataSet::getValuesAtTime(float time, float integ, bool use_abs, Eigen
             int n1 = static_cast<int>(std::floor(s1));
             float f1 = 1.0f + n1 - s1;
             if (n1 < 0 || n1 > np - 1) {
-                BASELIB::Log::warning("Sample value out of range {} (0..{})", n1, np - 1);
+                mne::Log::warning("Sample value out of range {} (0..{})", n1, np - 1);
                 return -1;
             }
             if (n1 == np - 1) {
@@ -80,7 +80,7 @@ int MNEMeasDataSet::getValuesAtTime(float time, float integ, bool use_abs, Eigen
                     f1 = 1.0f;
             }
             if (f1 < 1.0f && n1 > np - 2) {
-                BASELIB::Log::warning("Sample value out of range {} (0..{}) {:.4f}", n1, np - 1, f1);
+                mne::Log::warning("Sample value out of range {} (0..{}) {:.4f}", n1, np - 1, f1);
                 return -1;
             }
             if (f1 < 1.0f) {
@@ -112,11 +112,11 @@ int MNEMeasDataSet::getValuesAtTime(float time, float integ, bool use_abs, Eigen
                 float f1 = n1 - s1;
                 float f2 = s2 - n2;
                 if (n1 < 0 || n1 > np - 1) {
-                    BASELIB::Log::warning("Sample value out of range {} (0..{})", n1, np - 1);
+                    mne::Log::warning("Sample value out of range {} (0..{})", n1, np - 1);
                     return -1;
                 }
                 if (n2 < 0 || n2 > np - 1) {
-                    BASELIB::Log::warning("Sample value out of range {} (0..{})", n2, np - 1);
+                    mne::Log::warning("Sample value out of range {} (0..{})", n2, np - 1);
                     return -1;
                 }
                 if (f1 != 0.0f && n1 < 1)
@@ -170,7 +170,7 @@ int MNEMeasDataSet::getValuesFromChannelData(float time, float integ,
     const auto nsamp = static_cast<int>(data.cols());
 
     if (value.size() != data.rows()) {
-        BASELIB::Log::warning("Cannot pick channel values: the output holds {} values for {} channels", value.size(), nch);
+        mne::Log::warning("Cannot pick channel values: the output holds {} values for {} channels", value.size(), nch);
         return -1;
     }
 

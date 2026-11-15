@@ -1,18 +1,18 @@
 ---
 id: mesh-factory
-title: "DISP3DLIB::MeshFactory"
+title: "mne::disp::MeshFactory"
 sidebar_label: MeshFactory
 sidebar_position: 29
 ---
 
 # MeshFactory
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/geometry/meshfactory.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/geometry/meshfactory.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/geometry/meshfactory.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/geometry/meshfactory.h)
 
 `#include <disp3D/meshfactory.h>`
 
 ```cpp
-class DISP3DLIB::MeshFactory
+class mne::disp::MeshFactory
 ```
 
 Static factory for procedural mesh primitives.
@@ -42,7 +42,7 @@ Create a subdivided icosahedron sphere.
   Radius in meters.
 
 - **color** : *const QColor &*
-  FsSurface color.
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 - **subdivisions** : *int*
   Number of subdivision passes (0 = 20 tris, 1 = 80 tris).
@@ -66,7 +66,7 @@ Create a thin oriented rectangular plate (used for MEG magnetometers).
   3×3 rotation embedded in a 4×4 matrix (coil_trans).
 
 - **color** : *const QColor &*
-  FsSurface color.
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 - **size** : *float*
   Side length in meters (plate is size × size × thin).
@@ -90,7 +90,7 @@ Create a barbell shape (two spheres connected by a thin rod), used for MEG gradi
   3×3 rotation embedded in a 4×4 matrix (coil_trans).
 
 - **color** : *const QColor &*
-  FsSurface color.
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 - **size** : *float*
   Overall size scale in meters.
@@ -113,10 +113,10 @@ All spheres are merged into a single [`BrainSurface`](/docs/api/disp3-d/brain-su
   World-space positions for each sphere.
 
 - **radius** : *float*
-  Sphere radius in meters.
+  [`Sphere`](/docs/api/math/sphere) radius in meters.
 
 - **color** : *const QColor &*
-  Sphere color.
+  [`Sphere`](/docs/api/math/sphere) color.
 
 - **subdivisions** : *int*
   Number of subdivision passes per sphere.

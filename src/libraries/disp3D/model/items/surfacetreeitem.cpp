@@ -16,7 +16,7 @@
 
 #include "surfacetreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 SurfaceTreeItem::SurfaceTreeItem(const QString& text)
@@ -26,14 +26,14 @@ SurfaceTreeItem::SurfaceTreeItem(const QString& text)
     setData(0, ShaderModeRole);
 }
 
-void SurfaceTreeItem::setSurfaceData(const FSLIB::FsSurface& surface)
+void SurfaceTreeItem::setSurfaceData(const mne::FsSurface& surface)
 {
     QVariant v;
     v.setValue(surface);
     setData(v, SurfaceDataRole);
 }
 
-void SurfaceTreeItem::setAnnotationData(const FSLIB::FsAnnotation& annotation)
+void SurfaceTreeItem::setAnnotationData(const mne::FsAnnotation& annotation)
 {
     QVariant v;
     v.setValue(annotation);
@@ -45,14 +45,14 @@ void SurfaceTreeItem::setShaderMode(int mode)
     setData(mode, ShaderModeRole);
 }
 
-FSLIB::FsSurface SurfaceTreeItem::surfaceData() const
+mne::FsSurface SurfaceTreeItem::surfaceData() const
 {
-    return data(SurfaceDataRole).value<FSLIB::FsSurface>();
+    return data(SurfaceDataRole).value<mne::FsSurface>();
 }
 
-FSLIB::FsAnnotation SurfaceTreeItem::annotationData() const
+mne::FsAnnotation SurfaceTreeItem::annotationData() const
 {
-    return data(AnnotationDataRole).value<FSLIB::FsAnnotation>();
+    return data(AnnotationDataRole).value<mne::FsAnnotation>();
 }
 
 int SurfaceTreeItem::shaderMode() const
@@ -60,4 +60,4 @@ int SurfaceTreeItem::shaderMode() const
     return data(ShaderModeRole).toInt();
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

@@ -136,10 +136,8 @@ The documented classes this example uses most:
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace BASELIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -161,7 +159,7 @@ int main(int argc, char* argv[])
 
 #endif
 
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -272,7 +270,7 @@ int main(int argc, char* argv[])
     butterfly.setXLabel("Time [ms]");
     butterfly.setYLabel("Gradiometers [fT/cm]");
     for (int c = 0; c < evoked.data.rows(); ++c) {
-        if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !BASELIB::contains(evoked.info.bads, evoked.info.ch_names[c])) {
+        if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !mne::contains(evoked.info.bads, evoked.info.ch_names[c])) {
             QVector<double> values(times.size());
             for (int s = 0; s < times.size(); ++s) {
                 values[s] = 1e13 * evoked.data(c, s);

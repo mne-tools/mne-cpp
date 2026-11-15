@@ -27,7 +27,7 @@
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::optional<ACQLIB::detail::FastrakRecord> ACQLIB::detail::parse_fastrak_record(std::string_view line, FastrakUnits units)
+std::optional<mne::detail::FastrakRecord> mne::detail::parse_fastrak_record(std::string_view line, FastrakUnits units)
 {
     // A minus sign that follows a digit starts the next field
     std::string text;

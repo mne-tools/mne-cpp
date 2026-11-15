@@ -37,7 +37,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // HELPERS
@@ -60,7 +60,7 @@ static QString humanSize(qint64 bytes)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_show_mna"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));

@@ -52,9 +52,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -196,7 +194,7 @@ private slots:
 
 void TestInvBeamformer::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     m_bDataLoaded = false;
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (!QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {

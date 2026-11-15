@@ -1,18 +1,18 @@
 ---
 id: bids-electrode
-title: "BIDSLIB::BidsElectrode"
+title: "mne::BidsElectrode"
 sidebar_label: BidsElectrode
 sidebar_position: 10
 ---
 
 # BidsElectrode
 
-**Namespace:** `BIDSLIB` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_electrode.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_electrode.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** BIDS Library &nbsp;·&nbsp; **Source:** [`bids/bids_electrode.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/bids/bids_electrode.h)
 
 `#include <bids/bids_electrode.h>`
 
 ```cpp
-struct BIDSLIB::BidsElectrode
+struct mne::BidsElectrode
 ```
 
 Electrode position record corresponding to one row in *_electrodes.tsv.
@@ -66,7 +66,7 @@ Write a BIDS *_electrodes.tsv file.
 
 Convert a list of BIDS electrodes to a FIFF digitizer point set.
 
-Each electrode with valid numeric x/y/z coordinates is converted to a [FiffDigPoint](/docs/api/fiff/fiff-dig-point) with kind FIFFV_POINT_EEG. Electrodes with "n/a" coordinates are skipped.
+Each electrode with valid numeric x/y/z coordinates is converted to a [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) with kind FIFFV_POINT_EEG. Electrodes with "n/a" coordinates are skipped.
 
 If a coordinate transform is supplied, the positions are transformed from the BIDS coordinate frame into the FIFF head frame before insertion, and the points are in its target frame; otherwise their frame is FIFFV_COORD_UNKNOWN.
 
@@ -76,11 +76,11 @@ If a coordinate transform is supplied, the positions are transformed from the BI
   List of BIDS electrode records.
 
 - **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
-  Optional coordinate transform (BIDS frame → head). Pass a default-constructed FiffCoordTrans to skip.
+  Optional coordinate transform (BIDS frame → head). Pass a default-constructed [`FiffCoordTrans`](/docs/api/fiff/fiff-coord-trans) to skip.
 
 **Returns:**
 
-- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)* — FiffDigPointSet with one point per valid electrode.
+- *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)* — [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) with one point per valid electrode.
 
 ---
 

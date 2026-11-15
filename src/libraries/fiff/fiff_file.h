@@ -11,7 +11,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     September 2012
- * @brief    FIFF tag-kind, block-kind and type-code numerical definitions, authoritative for FIFFLIB.
+ * @brief    FIFF tag-kind, block-kind and type-code numerical definitions, authoritative for mne_fiff.
  *
  * Companion to @ref fiff_constants.h that focuses on the value space of
  * tag kinds (the FIFF_* numbers below 1000), of block kinds (FIFFB_*)
@@ -31,7 +31,7 @@
 #define FIFF_FILE_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
 

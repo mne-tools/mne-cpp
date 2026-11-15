@@ -60,7 +60,7 @@ public:
 
     //    void deactivateRawBufferSending();
 
-    void parseCommand(const FIFFLIB::FiffTag& p_pTag);
+    void parseCommand(const mne::FiffTag& p_pTag);
 
     void writeClientId();
 
@@ -86,7 +86,7 @@ private:
 
     void stopMeas(qint32 ID);
 
-    void sendMeasurementInfo(qint32 ID, const FIFFLIB::FiffInfo& p_fiffInfo);
+    void sendMeasurementInfo(qint32 ID, const mne::FiffInfo& p_fiffInfo);
 
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
     //void readToBuffer1();

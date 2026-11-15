@@ -1,21 +1,21 @@
 ---
 id: dipole-object
-title: "DISP3DLIB::DipoleObject"
+title: "mne::disp::DipoleObject"
 sidebar_label: DipoleObject
 sidebar_position: 26
 ---
 
 # DipoleObject
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/dipoleobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/dipoleobject.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/dipoleobject.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/dipoleobject.h)
 
 `#include <disp3D/dipoleobject.h>`
 
 ```cpp
-class DISP3DLIB::DipoleObject
+class mne::disp::DipoleObject
 ```
 
-Renderable dipole object that builds instanced arrow geometry from an [InvEcdSet](/docs/api/inv/inv-ecd-set) and provides its CPU streams for instanced rendering.
+Renderable dipole object that builds instanced arrow geometry from an [`InvEcdSet`](/docs/api/inv/inv-ecd-set) and provides its CPU streams for instanced rendering.
 
 Renderable dipole arrow set with instanced GPU rendering.
 
@@ -142,7 +142,7 @@ Test ray intersection with dipoles.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 261"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 259"
 weak.Q = Vector3f(10e-9f, 0.0f, 0.0f);
 dipoles.push_back(strong);
 dipoles.push_back(weak);

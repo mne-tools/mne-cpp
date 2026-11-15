@@ -15,7 +15,7 @@
  * AverageSelectionView shows a row per evoked condition (active flag,
  * label, colour swatch) and re-emits the resulting visibility +
  * colour map so any plot listening to it — typically
- * @ref DISPLIB::ButterflyView and @ref DISPLIB::AverageLayoutView — can update its
+ * @ref mne::disp::ButterflyView and @ref mne::disp::AverageLayoutView — can update its
  * rendering accordingly.
  */
 
@@ -42,14 +42,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

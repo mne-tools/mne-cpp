@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEVolGeom.
+ * @brief    Implementation of @ref mne::MNEVolGeom.
  *
  * Implements ASCII parsing of the @c valid/filename/volume/voxelsize
  * lines that FreeSurfer writes verbatim, plus the construction of the
@@ -25,7 +25,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

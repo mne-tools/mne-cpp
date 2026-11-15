@@ -155,7 +155,7 @@ class GenerateExamplesTest(unittest.TestCase):
             (root / kn.DOCS / "manual").mkdir(parents=True)
             (root / kn.DOCS / "manual" / "m.mdx").write_text("---\ntitle: M\n---\n\n## Known\n")
             (root / kn.DOCS / "api" / "inv").mkdir(parents=True)
-            (root / kn.DOCS / "api" / "inv" / "inv-a.mdx").write_text('---\ntitle: "INVLIB::InvA"\n---\n\n### run(x)\n')
+            (root / kn.DOCS / "api" / "inv" / "inv-a.mdx").write_text('---\ntitle: "mne::InvA"\n---\n\n### run(x)\n')
             topic = {"id": "t", "title": "T", "summary": "S", "manual": ["manual/m.mdx#known", "manual/m.mdx#gone"],
                      "tools": ["manual/none.mdx"], "classes": ["InvA", "InvB"], "methods": ["InvA::run", "InvA::walk"],
                      "examples": ["ex_a", "ex_missing"], "start": "ex_a"}

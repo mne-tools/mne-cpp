@@ -54,8 +54,7 @@
 #include <fs/fs_colortable.h>
 #include <fs/fs_global.h>
 
-using namespace FIFFLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -259,7 +258,7 @@ private slots:
 
 void TestFiffFsLibrary::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -1150,7 +1149,7 @@ void TestFiffFsLibrary::fiffInfo_writeAndRead()
 
 void TestFiffFsLibrary::fiffStream_startAndEndFile()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     QVERIFY(stream);
     stream->end_file();
     QVERIFY(stream->byte_stream().size() > 0);
@@ -1158,7 +1157,7 @@ void TestFiffFsLibrary::fiffStream_startAndEndFile()
 
 void TestFiffFsLibrary::fiffStream_writeIntAndFloat()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_int_t intData[] = {1, 2, 3, 4, 5};
     fiff_long_t pos1 = stream->write_int(FIFF_MNE_NROW, intData, 5);
     QVERIFY(pos1 >= 0);
@@ -1173,7 +1172,7 @@ void TestFiffFsLibrary::fiffStream_writeIntAndFloat()
 
 void TestFiffFsLibrary::fiffStream_writeMatrices()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     MatrixXf floatMat = MatrixXf::Random(3, 4);
     fiff_long_t pos1 = stream->write_float_matrix(FIFF_MNE_FORWARD_SOLUTION, floatMat);
     QVERIFY(pos1 >= 0);
@@ -1186,7 +1185,7 @@ void TestFiffFsLibrary::fiffStream_writeMatrices()
 
 void TestFiffFsLibrary::fiffStream_writeStringAndNameList()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_long_t pos1 = stream->write_string(FIFF_DESCRIPTION, "Test description string");
     QVERIFY(pos1 >= 0);
     StringList names;
@@ -1201,7 +1200,7 @@ void TestFiffFsLibrary::fiffStream_writeStringAndNameList()
 
 void TestFiffFsLibrary::fiffStream_writeId()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_long_t pos1 = stream->write_id(FIFF_FILE_ID);
     QVERIFY(pos1 >= 0);
     FiffId id = FiffId::new_file_id();
@@ -1212,7 +1211,7 @@ void TestFiffFsLibrary::fiffStream_writeId()
 
 void TestFiffFsLibrary::fiffStream_writeChInfo()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     stream->start_block(FIFFB_MEAS_INFO);
     FiffChInfo chInfo;
     chInfo.ch_name = "MEG 0113";
@@ -1234,7 +1233,7 @@ void TestFiffFsLibrary::fiffStream_writeChInfo()
 
 void TestFiffFsLibrary::fiffStream_writeCoordTrans()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     FiffCoordTrans trans;
     trans.from = FIFFV_COORD_HEAD;
     trans.to = FIFFV_COORD_MRI;
@@ -1247,7 +1246,7 @@ void TestFiffFsLibrary::fiffStream_writeCoordTrans()
 
 void TestFiffFsLibrary::fiffStream_writeDigPoint()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     FiffDigPoint digPoint;
     digPoint.kind = FIFFV_POINT_HPI;
     digPoint.ident = 1;
@@ -1261,7 +1260,7 @@ void TestFiffFsLibrary::fiffStream_writeDigPoint()
 
 void TestFiffFsLibrary::fiffStream_writeCov()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     FiffCov cov;
     cov.kind = FIFFV_MNE_NOISE_COV;
     cov.dim = 3;
@@ -1277,7 +1276,7 @@ void TestFiffFsLibrary::fiffStream_writeCov()
 
 void TestFiffFsLibrary::fiffStream_writeProj()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     std::vector<FiffProj> projs;
     FiffProj proj;
     proj.kind = 1;
@@ -1300,7 +1299,7 @@ void TestFiffFsLibrary::fiffStream_writeProj()
 
 void TestFiffFsLibrary::fiffStream_writeNamedMatrix()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     FiffNamedMatrix named;
     named.nrow = 2;
     named.ncol = 3;
@@ -1317,7 +1316,7 @@ void TestFiffFsLibrary::fiffStream_writeNamedMatrix()
 
 void TestFiffFsLibrary::fiffStream_writeRawBuffer()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     stream->start_block(FIFFB_RAW_DATA);
     MatrixXd rawBuf = MatrixXd::Random(5, 100);
     bool ok1 = stream->write_raw_buffer(rawBuf);
@@ -1335,7 +1334,7 @@ void TestFiffFsLibrary::fiffStream_writeRawBuffer()
 
 void TestFiffFsLibrary::fiffStream_writeSparseMatrix()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     SparseMatrix<float> sparseMat(4, 4);
     sparseMat.insert(0, 0) = 1.0f;
     sparseMat.insert(1, 1) = 2.0f;
@@ -1351,7 +1350,7 @@ void TestFiffFsLibrary::fiffStream_writeSparseMatrix()
 
 void TestFiffFsLibrary::fiffStream_writeDirEntries()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     const std::vector<FiffDirEntry> dir{{FIFF_FILE_ID, FIFFT_ID_STRUCT, 20, 0}};
     fiff_long_t pos = stream->write_dir_entries(dir);
     QVERIFY(pos >= 0);
@@ -1362,7 +1361,7 @@ void TestFiffFsLibrary::fiffStream_writeDirEntries()
 
 void TestFiffFsLibrary::fiffStream_startEndBlocks()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_long_t p1 = stream->start_block(FIFFB_MEAS);
     QVERIFY(p1 >= 0);
     fiff_long_t p2 = stream->start_block(FIFFB_MEAS_INFO);
@@ -1376,7 +1375,7 @@ void TestFiffFsLibrary::fiffStream_startEndBlocks()
 
 void TestFiffFsLibrary::fiffStream_writeRtCommand()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     stream->write_rt_command(1, "test_command");
     stream->write_rt_command(2, "another_command");
     stream->end_file();
@@ -1385,7 +1384,7 @@ void TestFiffFsLibrary::fiffStream_writeRtCommand()
 
 void TestFiffFsLibrary::fiffStream_readTagInfoAndData()
 {
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_int_t val = 42;
     stream->write_int(FIFF_MNE_NROW, &val, 1);
     stream->end_file();
@@ -1408,7 +1407,7 @@ void TestFiffFsLibrary::fiff_microCoveragePush()
     QVERIFY(storageSize > 0);
     FiffDigitizerData digData;
     QVERIFY(digData.nfids() == 0);
-    auto stream = FiffStream::start_file(std::make_unique<BASELIB::MemoryByteStream>());
+    auto stream = FiffStream::start_file(std::make_unique<mne::MemoryByteStream>());
     fiff_int_t val2 = 1;
     stream->write_int(FIFF_MNE_NROW, &val2, 1);
     stream->end_file();
@@ -1424,7 +1423,7 @@ void TestFiffFsLibrary::fiff_microCoveragePush()
     QVERIFY(stdErrStr.contains("Error", Qt::CaseInsensitive));
     evoked.aspect_kind = 999;
     evoked.aspectKindToString();
-    const char* hashLong = FIFFLIB::buildHashLong();
+    const char* hashLong = mne::buildHashLong();
     Q_UNUSED(hashLong);
     FiffId id;
     id.version = (1 << 16) | 5;
@@ -1911,11 +1910,11 @@ void TestFiffFsLibrary::fs_surfaceSetIsEmptyCheck()
 
 void TestFiffFsLibrary::fs_globalBuildInfo()
 {
-    const char* dt = FSLIB::buildDateTime();
+    const char* dt = mne::buildDateTime();
     QVERIFY(dt != nullptr);
-    const char* h = FSLIB::buildHash();
+    const char* h = mne::buildHash();
     QVERIFY(h != nullptr);
-    const char* hl = FSLIB::buildHashLong();
+    const char* hl = mne::buildHashLong();
     QVERIFY(hl != nullptr);
 }
 

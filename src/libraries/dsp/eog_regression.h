@@ -39,16 +39,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -81,8 +81,8 @@ public:
      * @param[in] eogChannels  Optional explicit EOG channel names. If empty, the good channels of kind FIFFV_EOG_CH.
      */
     void fit(const Eigen::MatrixXd& data,
-             const FIFFLIB::FiffInfo& info,
-             const BASELIB::StringList& eogChannels = {});
+             const mne::FiffInfo& info,
+             const mne::StringList& eogChannels = {});
 
     //=========================================================================================================
     /**
@@ -95,7 +95,7 @@ public:
      * @param[in]     info   Measurement info.
      */
     void apply(Eigen::MatrixXd& data,
-               const FIFFLIB::FiffInfo& info) const;
+               const mne::FiffInfo& info) const;
 
     //=========================================================================================================
     /**
@@ -106,8 +106,8 @@ public:
      * @param[in]     eogChannels  Optional explicit EOG channel names.
      */
     static void fitApply(Eigen::MatrixXd& data,
-                         const FIFFLIB::FiffInfo& info,
-                         const BASELIB::StringList& eogChannels = {});
+                         const mne::FiffInfo& info,
+                         const mne::StringList& eogChannels = {});
 
     //=========================================================================================================
     /**
@@ -137,6 +137,6 @@ private:
     bool m_bFitted = false;              /**< Whether fit() has been called. */
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // EOG_REGRESSION_DSP_H

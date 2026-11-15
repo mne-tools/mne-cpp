@@ -36,9 +36,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -56,7 +55,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

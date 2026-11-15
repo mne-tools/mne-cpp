@@ -40,7 +40,7 @@
 // Using NAMESPACE
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ void TestMNEProjectToSurface::initTestCase()
     mneSurfacePoints->find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
 
     // read reference
-    MATHLIB::read_matrix(matRef, sRef.toStdString());
+    mne::read_matrix(matRef, sRef.toStdString());
 }
 
 //=============================================================================================================

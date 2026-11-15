@@ -1,21 +1,21 @@
 ---
 id: evoked-set-model
-title: "DISPLIB::EvokedSetModel"
+title: "mne::disp::EvokedSetModel"
 sidebar_label: EvokedSetModel
 sidebar_position: 27
 ---
 
 # EvokedSetModel
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/evokedsetmodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/evokedsetmodel.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/evokedsetmodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/evokedsetmodel.h)
 
 `#include <disp/evokedsetmodel.h>`
 
 ```cpp
-class DISPLIB::EvokedSetModel
+class mne::disp::EvokedSetModel
 ```
 
-QAbstractTableModel wrapping a [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) (one row per channel, one column per condition).
+QAbstractTableModel wrapping a [`FiffEvokedSet`](/docs/api/fiff/fiff-evoked-set) (one row per channel, one column per condition).
 
 Propagates baseline-correction, SSP-projection and bad-channel updates so connected views ([`ButterflyView`](/docs/api/disp/butterfly-view), [`AverageLayoutView`](/docs/api/disp/average-layout-view)) stay in sync with the latest pre-processing settings.
 
@@ -235,7 +235,7 @@ Returns the kind of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — kind of given channel number.
+- *mne::fiff_int_t* — kind of given channel number.
 
 ---
 
@@ -265,7 +265,7 @@ Returns the unit of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — unit of given channel number.
+- *mne::fiff_int_t* — unit of given channel number.
 
 ---
 
@@ -280,7 +280,7 @@ Returns the coil type of a given channel number.
 
 **Returns:**
 
-- *FIFFLIB::fiff_int_t* — coil type of given channel number.
+- *mne::fiff_int_t* — coil type of given channel number.
 
 ---
 
@@ -399,7 +399,7 @@ Update the compensator.
 **Parameters:**
 
 - **to** : *int*
-  Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
+  Compensator to use in fiff constant format `FiffCtfComp.kind` (NOT `FiffCtfComp.ctfkind`).
 
 ---
 

@@ -13,19 +13,19 @@
  * (`root/sub-XX/[ses-YY/]<datatype>/`) and the `<entity>-<value>`
  * ordering of the basename (@c sub, @c ses, @c task, @c acq, @c run,
  * @c proc, @c space, @c rec, @c split, @c desc, then a `_<suffix>`
- * and a `.<ext>`). @ref BIDSLIB::BIDSPath is the value object that encodes
- * those entities and emits canonical paths via @ref BIDSLIB::BIDSPath::basename "BIDSPath::basename",
- * @ref BIDSLIB::BIDSPath::directory "BIDSPath::directory" and @ref BIDSLIB::BIDSPath::file_path "BIDSPath::file_path", mirroring the
+ * and a `.<ext>`). @ref mne::BIDSPath is the value object that encodes
+ * those entities and emits canonical paths via @ref mne::BIDSPath::basename "BIDSPath::basename",
+ * @ref mne::BIDSPath::directory "BIDSPath::directory" and @ref mne::BIDSPath::file_path "BIDSPath::file_path", mirroring the
  * API of @c mne_bids.BIDSPath in mne-python so call sites can be
  * ported with minimal cognitive overhead.
  *
- * Beyond serialisation, @ref BIDSLIB::BIDSPath provides three orthogonal
- * conveniences: @ref BIDSLIB::BIDSPath::with_suffix "BIDSPath::with_suffix" and the dedicated
+ * Beyond serialisation, @ref mne::BIDSPath provides three orthogonal
+ * conveniences: @ref mne::BIDSPath::with_suffix "BIDSPath::with_suffix" and the dedicated
  * @c channels_tsv_path / @c electrodes_tsv_path / @c coordsystem_json_path /
  * @c events_tsv_path / @c sidecar_json_path helpers so a single
- * @ref BIDSLIB::BIDSPath instance can spawn every sidecar derived from a raw-data
- * BIDSPath; @ref BIDSLIB::BIDSPath::mkdirs "BIDSPath::mkdirs" to materialise the directory
- * hierarchy lazily on write; and @ref BIDSLIB::BIDSPath::match "BIDSPath::match" to enumerate
+ * @ref mne::BIDSPath instance can spawn every sidecar derived from a raw-data
+ * BIDSPath; @ref mne::BIDSPath::mkdirs "BIDSPath::mkdirs" to materialise the directory
+ * hierarchy lazily on write; and @ref mne::BIDSPath::match "BIDSPath::match" to enumerate
  * actual on-disk files whose entity values complete the unset slots of
  * the current path. Entity-value validation rejects the three
  * characters BIDS forbids inside a label (@c -, @c _, @c /).
@@ -52,10 +52,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BIDSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -376,6 +376,6 @@ private:
     static std::string zero_pad(std::string sValue);
 };
 
-} // namespace BIDSLIB
+} // namespace mne
 
 #endif // BIDS_PATH_H

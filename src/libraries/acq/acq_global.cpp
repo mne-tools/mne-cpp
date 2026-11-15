@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Definitions of the ACQLIB build-info accessors declared in @ref acq_global.h.
+ * @brief    Definitions of the mne_acq build-info accessors declared in @ref acq_global.h.
  */
 
 //=============================================================================================================
@@ -29,28 +29,28 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* ACQLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
     return __DATE__ " " __TIME__;
 }
 
 //=============================================================================================================
 
-const char* ACQLIB::buildHash()
+const char* mne::buildHash()
 {
     return MNE_GIT_HASH_SHORT;
 }
 
 //=============================================================================================================
 
-const char* ACQLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
     return MNE_GIT_HASH_LONG;
 }
 
 //=============================================================================================================
 
-std::string_view ACQLIB::sampleFormatName(AcqSampleFormat format) noexcept
+std::string_view mne::sampleFormatName(AcqSampleFormat format) noexcept
 {
     switch (format) {
         case AcqSampleFormat::Int16:

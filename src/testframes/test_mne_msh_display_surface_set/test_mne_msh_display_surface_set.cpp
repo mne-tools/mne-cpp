@@ -37,7 +37,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -75,7 +75,7 @@ TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 
 void TestMneMshDisplaySurfaceSet::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     //qDebug() << "dEpsilon" << dEpsilon;
 
     //Read the results produced with MNE-CPP

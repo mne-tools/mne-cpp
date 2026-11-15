@@ -115,9 +115,9 @@ class TestDoxygenXml(unittest.TestCase):
         # Compound file names depend on the platform's CASE_SENSE_NAMES default, so match by name.
         for path in xml_dir.glob("class*.xml"):
             compound = ET.parse(path).getroot().find("compounddef")
-            if compound is not None and compound.findtext("compoundname") == "FIFFLIB::FiffRawData":
+            if compound is not None and compound.findtext("compoundname") == "mne::FiffRawData":
                 return list(compound.iter("programlisting"))
-        self.fail("FiffRawData is not documented inside FIFFLIB")
+        self.fail("FiffRawData is not documented inside mne")
 
     def test_xml_contains_exactly_the_named_regions(self) -> None:
         """Each listing is its region, line for line, and nothing else."""

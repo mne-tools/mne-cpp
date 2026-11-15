@@ -1,18 +1,18 @@
 ---
 id: ray-picker
-title: "DISP3DLIB::RayPicker"
+title: "mne::disp::RayPicker"
 sidebar_label: RayPicker
 sidebar_position: 35
 ---
 
 # RayPicker
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/input/raypicker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/input/raypicker.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/input/raypicker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/input/raypicker.h)
 
 `#include <disp3D/raypicker.h>`
 
 ```cpp
-class DISP3DLIB::RayPicker
+class mne::disp::RayPicker
 ```
 
 Stateless ray-picking utility.
@@ -97,7 +97,7 @@ This examines the surface key, annotation data, and item type to produce a human
   Map for reverse item → surface lookup.
 
 - **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map for key-based lookup.
+  [`FsSurface`](/docs/api/fs/fs-surface) map for key-based lookup.
 
 **Returns:**
 

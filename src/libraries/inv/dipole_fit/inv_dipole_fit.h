@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    High-level driver for sequential equivalent-current-dipole (ECD) fitting at every time point of an evoked or raw recording.
  *
- * @ref INVLIB::InvDipoleFit orchestrates the full mne-c
+ * @ref mne::InvDipoleFit orchestrates the full mne-c
  * @c mne_dipole_fit pipeline: it consumes a populated
- * @ref INVLIB::InvDipoleFitSettings, builds the forward-model workspace via
- * @ref INVLIB::InvDipoleFitData, generates the initial-guess grid via
- * @ref INVLIB::InvGuessData, and then fits one ECD per requested time bin
- * returning the result as an @ref INVLIB::InvEcdSet. Refactored from
+ * @ref mne::InvDipoleFitSettings, builds the forward-model workspace via
+ * @ref mne::InvDipoleFitData, generates the initial-guess grid via
+ * @ref mne::InvGuessData, and then fits one ECD per requested time bin
+ * returning the result as an @ref mne::InvEcdSet. Refactored from
  * @c fit_dipoles.c / @c dipole_fit_setup.c (MNE-C) while preserving the
  * sphere-model and BEM forward-model code paths used by the original
  * mne-c tooling.
@@ -35,10 +35,10 @@
 
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -103,7 +103,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fit_dipoles(const std::string& dataname, MNELIB::MNEMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
+    static bool fit_dipoles(const std::string& dataname, mne::MNEMeasData* data, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fit_dipoles_raw(const std::string& dataname, MNELIB::MNERawData* raw, MNELIB::MNEChSelection* sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
+    static bool fit_dipoles_raw(const std::string& dataname, mne::MNERawData* raw, mne::MNEChSelection* sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, InvEcdSet& p_set);
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
      *
      * @return true when successful.
      */
-    static bool fit_dipoles_raw(const std::string& dataname, MNELIB::MNERawData* raw, MNELIB::MNEChSelection* sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static bool fit_dipoles_raw(const std::string& dataname, mne::MNERawData* raw, mne::MNEChSelection* sel, InvDipoleFitData* fit, InvGuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     InvDipoleFitSettings* settings; /**< Non-owning pointer to the dipole fit settings. */

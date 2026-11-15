@@ -38,10 +38,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -136,7 +136,7 @@ public:
      * @return              Sample indices (0-based) of detected R-peaks.
      */
     static std::vector<int> detectEcg(const Eigen::MatrixXd& matData,
-                                      const FIFFLIB::FiffInfo& fiffInfo,
+                                      const mne::FiffInfo& fiffInfo,
                                       double dSFreq,
                                       const EcgParams& params = EcgParams());
 
@@ -155,7 +155,7 @@ public:
      * @return              Sample indices (0-based) of the detected EOG peaks.
      */
     static std::vector<int> detectEog(const Eigen::MatrixXd& matData,
-                                      const FIFFLIB::FiffInfo& fiffInfo,
+                                      const mne::FiffInfo& fiffInfo,
                                       double dSFreq,
                                       const EogParams& params = EogParams());
 
@@ -175,11 +175,11 @@ public:
      *
      * @return The projectors, or only the info projectors if no event or epoch survives.
      */
-    static std::vector<FIFFLIB::FiffProj> computeProjEcg(const Eigen::MatrixXd& matData,
-                                                         const FIFFLIB::FiffInfo& fiffInfo,
-                                                         double dSFreq,
-                                                         const ProjParams& proj = ProjParams::ecg(),
-                                                         const EcgParams& detect = EcgParams());
+    static std::vector<mne::FiffProj> computeProjEcg(const Eigen::MatrixXd& matData,
+                                                     const mne::FiffInfo& fiffInfo,
+                                                     double dSFreq,
+                                                     const ProjParams& proj = ProjParams::ecg(),
+                                                     const EcgParams& detect = EcgParams());
 
     //=========================================================================================================
     /**
@@ -193,17 +193,17 @@ public:
      *
      * @return The projectors, or only the info projectors if no event or epoch survives.
      */
-    static std::vector<FIFFLIB::FiffProj> computeProjEog(const Eigen::MatrixXd& matData,
-                                                         const FIFFLIB::FiffInfo& fiffInfo,
-                                                         double dSFreq,
-                                                         const ProjParams& proj = ProjParams::eog(),
-                                                         const EogParams& detect = EogParams());
+    static std::vector<mne::FiffProj> computeProjEog(const Eigen::MatrixXd& matData,
+                                                     const mne::FiffInfo& fiffInfo,
+                                                     double dSFreq,
+                                                     const ProjParams& proj = ProjParams::eog(),
+                                                     const EogParams& detect = EogParams());
 
 private:
     /** R-peak search of mne.preprocessing.qrs_detector on an already filtered ECG. */
     static std::vector<int> qrsDetector(const Eigen::RowVectorXd& filtered, double dSFreq, double dThreshold, double dTStart);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // ARTIFACT_DETECT_DSP_H

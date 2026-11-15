@@ -16,13 +16,13 @@
  * JSON/CBOR serialisers, the op-registry loader and the executor all
  * agree on the canonical spelling.
  *
- * @ref MNALIB::MnaFileRole "MnaFileRole" classifies the semantic purpose of a file within a
+ * @ref mne::MnaFileRole "MnaFileRole" classifies the semantic purpose of a file within a
  * project (Raw, Forward, Inverse, Covariance, …) so a viewer can pick
- * the right reader without sniffing magic bytes. @ref MNALIB::MnaDataKind "MnaDataKind"
+ * the right reader without sniffing magic bytes. @ref mne::MnaDataKind "MnaDataKind"
  * describes the runtime payload travelling through a graph port
  * (FiffRaw, Epochs, SourceEstimate, RealTimeStream, …) and is what
- * @ref MNALIB::MnaGraph::validate "MnaGraph::validate" uses to reject incompatible connections.
- * @ref MNALIB::MnaPortDir "MnaPortDir" and @ref MNALIB::MnaNodeExecMode "MnaNodeExecMode" (Batch/Stream/Ipc/Script)
+ * @ref mne::MnaGraph::validate "MnaGraph::validate" uses to reject incompatible connections.
+ * @ref mne::MnaPortDir "MnaPortDir" and @ref mne::MnaNodeExecMode "MnaNodeExecMode" (Batch/Stream/Ipc/Script)
  * complete the surface needed by the graph executor.
  *
  * The inline @c xxxToString / @c xxxFromString helpers are the single
@@ -41,10 +41,10 @@
 #include <QString>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -314,6 +314,6 @@ inline MnaDataKind mnaDataKindFromString(const QString& str)
     return MnaDataKind::Custom;
 }
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_TYPES_H

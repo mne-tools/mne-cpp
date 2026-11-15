@@ -1,18 +1,18 @@
 ---
 id: rt-sensor-stream-manager
-title: "DISP3DLIB::RtSensorStreamManager"
+title: "mne::disp::RtSensorStreamManager"
 sidebar_label: RtSensorStreamManager
 sidebar_position: 37
 ---
 
 # RtSensorStreamManager
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/rtsensorstreammanager.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/rtsensorstreammanager.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/rtsensorstreammanager.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/rtsensorstreammanager.h)
 
 `#include <disp3D/rtsensorstreammanager.h>`
 
 ```cpp
-class DISP3DLIB::RtSensorStreamManager
+class mne::disp::RtSensorStreamManager
 ```
 
 Manages real-time sensor data streaming via [`RtSensorDataController`](/docs/api/disp3-d/rt-sensor-data-controller).
@@ -64,7 +64,7 @@ Reads mapping matrices, pick vectors, evoked data, and colourmap from the provid
   Sensor-field mapper with built mapping data.
 
 - **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
-  FsSurface map for target-surface validation.
+  [`FsSurface`](/docs/api/fs/fs-surface) map for target-surface validation.
 
 **Returns:**
 

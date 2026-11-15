@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Single FreeSurfer MGH/MGZ tag (key, length, opaque payload).
  *
- * @ref MNELIB::MNEMghTag mirrors the trailing tag stream of an MGH file
+ * @ref mne::MNEMghTag mirrors the trailing tag stream of an MGH file
  * (volume geometry, TR, FOV, command-line history, talairach transform
  * and so on). Each tag is a 32-bit kind, a 64-bit length and an opaque
  * byte payload that the consumer decodes on demand.
@@ -32,10 +32,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -55,6 +55,6 @@ struct MNEMghTag
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMGHTAG_H

@@ -1,23 +1,23 @@
 ---
 id: average-scene
-title: "DISPLIB::AverageScene"
+title: "mne::disp::AverageScene"
 sidebar_label: AverageScene
 sidebar_position: 5
 ---
 
 # AverageScene
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/averagescene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/averagescene.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/averagescene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/averagescene.h)
 
 `#include <disp/averagescene.h>`
 
 ```cpp
-class DISPLIB::AverageScene
+class mne::disp::AverageScene
 ```
 
 Sensor-layout `QGraphicsScene` placing one [`AverageSceneItem`](/docs/api/disp/average-scene-item) per visible channel.
 
-Extends [`LayoutScene`](/docs/api/disp/layout-scene) with the per-condition colour table, the cached `FiffInfo` channel map and the dispatcher that creates / refreshes one [`AverageSceneItem`](/docs/api/disp/average-scene-item) per visible sensor.
+Extends [`LayoutScene`](/docs/api/disp/layout-scene) with the per-condition colour table, the cached [`FiffInfo`](/docs/api/fiff/fiff-info) channel map and the dispatcher that creates / refreshes one [`AverageSceneItem`](/docs/api/disp/average-scene-item) per visible sensor.
 
 ### Inheritance
 

@@ -1,13 +1,13 @@
 ---
 id: connectivity-aec
-title: "DSPLIB::ConnectivityAec"
+title: "mne::ConnectivityAec"
 sidebar_label: ConnectivityAec
 sidebar_position: 27
 ---
 
 # ConnectivityAec
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/connectivity_aec.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/connectivity_aec.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/connectivity_aec.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/connectivity_aec.h)
 
 :::info[Python equivalent]
 `mne_connectivity.envelope_correlation` in MNE-Python.
@@ -16,10 +16,10 @@ sidebar_position: 27
 `#include <dsp/connectivity_aec.h>`
 
 ```cpp
-class DSPLIB::ConnectivityAec
+class mne::ConnectivityAec
 ```
 
-Amplitude Envelope [Correlation](/docs/api/connectivity/correlation) connectivity.
+Amplitude Envelope [`Correlation`](/docs/api/connectivity/correlation) connectivity.
 
 ```cpp title="src/examples/ex_dsp_analysis/main.cpp"
 const MatrixXd aec = ConnectivityAec::compute(envelopeSignals);                   // Pearson r of Hilbert envelopes
@@ -96,7 +96,7 @@ Pearson correlation between two vectors.
 
 **Returns:**
 
-- *double* — Correlation coefficient in [-1, 1].
+- *double* — [`Correlation`](/docs/api/connectivity/correlation) coefficient in [-1, 1].
 
 ---
 

@@ -9,11 +9,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    Translation unit anchoring the @c CONNECTIVITYLIB shared-library symbols.
+ * @brief    Translation unit anchoring the @c mne_connectivity shared-library symbols.
  *
  * The file intentionally contains no executable code: it exists so that
  * the build system has at least one @c .cpp unit to compile when building
- * @c CONNECTIVITYLIB as a shared library on platforms (Windows) that require an
+ * @c mne_connectivity as a shared library on platforms (Windows) that require an
  * explicit object to host the exported symbols declared via the
  * @c CONNECTIVITYSHARED_EXPORT macro in @ref connectivity_global.h.
  */
@@ -28,21 +28,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* CONNECTIVITYLIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* CONNECTIVITYLIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* CONNECTIVITYLIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

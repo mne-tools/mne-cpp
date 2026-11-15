@@ -10,7 +10,7 @@
  * @brief    Implementation of the sensor- and source-space adjacency builders declared in sts_adjacency.h.
  *
  * The channel-position constructor extracts the @c r0 entries from
- * @ref FIFFLIB::FiffInfo, computes the per-channel nearest-neighbour
+ * @ref mne::FiffInfo, computes the per-channel nearest-neighbour
  * distance and adds an edge whenever the pairwise Euclidean distance is
  * within three times the median nearest-neighbour distance - the same
  * heuristic MNE-Python uses for sensor-space cluster tests.
@@ -38,8 +38,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

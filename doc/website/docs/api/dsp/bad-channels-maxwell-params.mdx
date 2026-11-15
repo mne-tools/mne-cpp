@@ -1,18 +1,18 @@
 ---
 id: bad-channels-maxwell-params
-title: "DSPLIB::BadChannelsMaxwellParams"
+title: "mne::BadChannelsMaxwellParams"
 sidebar_label: BadChannelsMaxwellParams
 sidebar_position: 46
 ---
 
 # BadChannelsMaxwellParams
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channels_maxwell.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channels_maxwell.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/bad_channels_maxwell.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/bad_channels_maxwell.h)
 
 `#include <dsp/bad_channels_maxwell.h>`
 
 ```cpp
-struct DSPLIB::BadChannelsMaxwellParams
+struct mne::BadChannelsMaxwellParams
 ```
 
 Parameters for SSS-based bad channel detection.
@@ -41,7 +41,7 @@ const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badPa
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 145"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 144"
 MatrixXd broken = data;
 broken.row(meg[40]).array() += 2e-7; // a sensor with a constant offset the multipole model cannot explain
 BadChannelsMaxwellParams badParams;
@@ -50,8 +50,8 @@ badParams.dZThreshold = 50.0; // robust z-score of the reconstruction residual
 const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badParams);
 int worst = 0;
 bads.zScores.maxCoeff(&worst);
-ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && BASELIB::contains(bads.badChannels, info.ch_names[meg[40]]),
-             std::format("findBadChannelsMaxwell ranks {} worst (z = {:.0f}), flagged: {}", info.ch_names[meg[worst]], bads.zScores(worst), BASELIB::join(bads.badChannels, ", ")));
+ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && mne::contains(bads.badChannels, info.ch_names[meg[40]]),
+             std::format("findBadChannelsMaxwell ranks {} worst (z = {:.0f}), flagged: {}", info.ch_names[meg[worst]], bads.zScores(worst), mne::join(bads.badChannels, ", ")));
 ````
 
 ## Authors of this file

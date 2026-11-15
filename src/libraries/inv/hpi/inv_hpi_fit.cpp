@@ -62,9 +62,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVLIB;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -112,16 +110,16 @@ void InvHpiFit::fit(const MatrixXd& matProjectedData,
                     HpiFitResult& hpiFitResult)
 {
     if (matProjectedData.rows() != matProjectors.rows()) {
-        BASELIB::Log::warning("InvHpiFit::fit - Projector and data dimensions do not match. Returning.");
+        mne::Log::warning("InvHpiFit::fit - Projector and data dimensions do not match. Returning.");
         return;
     } else if (hpiModelParameters.iNHpiCoils() != matCoilsHead.rows()) {
-        BASELIB::Log::warning("InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning.");
+        mne::Log::warning("InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning.");
         return;
     } else if (matProjectedData.rows() == 0 || matProjectors.rows() == 0) {
-        BASELIB::Log::warning("InvHpiFit::fit - No data or Projectors passed. Returning.");
+        mne::Log::warning("InvHpiFit::fit - No data or Projectors passed. Returning.");
         return;
     } else if (m_sensors.ncoils() != matProjectedData.rows()) {
-        BASELIB::Log::warning("InvHpiFit::fit - Number of channels in sensors and data do not match. Returning.");
+        mne::Log::warning("InvHpiFit::fit - Number of channels in sensors and data do not match. Returning.");
         return;
     }
 
@@ -196,7 +194,7 @@ Eigen::MatrixXd InvHpiFit::computeAmplitudes(const Eigen::MatrixXd& matProjected
 //=============================================================================================================
 
 Eigen::MatrixXd InvHpiFit::computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
-                                             const FIFFLIB::FiffCoordTrans& transDevHead,
+                                             const mne::FiffCoordTrans& transDevHead,
                                              const std::vector<double>& vecError,
                                              const Eigen::MatrixXd& matCoilsHead)
 {
@@ -261,7 +259,7 @@ CoilParam InvHpiFit::dipfit(const MatrixXd matCoilsSeed,
     CoilParam coil(iNumCoils);
 
     if (!lCoilData.empty()) {
-        BASELIB::ThreadPool::global().parallelFor(0, lCoilData.size(), [&lCoilData](std::size_t i) { lCoilData[i].doDipfitConcurrent(); });
+        mne::ThreadPool::global().parallelFor(0, lCoilData.size(), [&lCoilData](std::size_t i) { lCoilData[i].doDipfitConcurrent(); });
 
         //Transform results to final coil information
         for (Eigen::Index i = 0; i < std::ssize(lCoilData); ++i) {
@@ -382,8 +380,8 @@ Eigen::VectorXd InvHpiFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
 
 //=============================================================================================================
 
-FIFFLIB::FiffCoordTrans InvHpiFit::computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
-                                                                   const Eigen::MatrixXd& matCoilsHead)
+mne::FiffCoordTrans InvHpiFit::computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+                                                               const Eigen::MatrixXd& matCoilsHead)
 {
     const MatrixXd matTrans = computeTransformation(matCoilsHead, matCoilsDev);
     return FiffCoordTrans(1, 4, matTrans.cast<float>(), true);
@@ -458,7 +456,7 @@ Eigen::Matrix4d InvHpiFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd
 
 std::vector<double> InvHpiFit::computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
                                                       const Eigen::MatrixXd& matCoilsHead,
-                                                      const FIFFLIB::FiffCoordTrans& transDevHead)
+                                                      const mne::FiffCoordTrans& transDevHead)
 {
     //Calculate Error
     MatrixXd matTemp = matCoilsDev;
@@ -476,7 +474,7 @@ std::vector<double> InvHpiFit::computeEstimationError(const Eigen::MatrixXd& mat
 
 //=============================================================================================================
 
-FIFFLIB::FiffDigPointSet InvHpiFit::getFittedPointSet(const Eigen::MatrixXd& matCoilsDev)
+mne::FiffDigPointSet InvHpiFit::getFittedPointSet(const Eigen::MatrixXd& matCoilsDev)
 {
     FiffDigPointSet fittedPointSet;
     const int iNumCoils = matCoilsDev.rows();
@@ -548,10 +546,10 @@ bool InvHpiFit::compareTransformation(const MatrixX4f& mDevHeadT,
 
     // compare to thresholds and update
     if (fMove > fThreshTrans) {
-        BASELIB::Log::info("Large movement: {} mm", fMove * 1000);
+        mne::Log::info("Large movement: {} mm", fMove * 1000);
         bState = true;
     } else if (fAngle > fThreshRot) {
-        BASELIB::Log::info("Large rotation: {} degree", fAngle);
+        mne::Log::info("Large rotation: {} degree", fAngle);
         bState = true;
     } else {
         bState = false;

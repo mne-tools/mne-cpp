@@ -50,7 +50,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class MultimodalScene;
 }
@@ -63,9 +63,9 @@ namespace MRISLICESPLUGIN
  * @brief mne_inspect plugin: load an MRI volume and render ortho slices.
  *
  * Responsibilities:
- *   - Load a 3-D volume from MGH / MGZ / NIfTI via `MRILIB::MriVolData::read`.
+ *   - Load a 3-D volume from MGH / MGZ / NIfTI via `mne::MriVolData::read`.
  *   - Maintain a crosshair in MRI RAS coordinates and (re-)materialise three
- *     `DISP3DLIB::SliceObject` payloads (axial, coronal, sagittal) that
+ *     `mne::disp::SliceObject` payloads (axial, coronal, sagittal) that
  *     intersect that crosshair.
  *   - Register / refresh the three layers on a `MultimodalScene` under the
  *     ids `mri_axial`, `mri_coronal`, `mri_sagittal`.
@@ -108,7 +108,7 @@ public:
      * @param[in] volume  Already-populated volume. Must satisfy `isValid()`.
      * @return true on success.
      */
-    bool setVolume(std::unique_ptr<MRILIB::MriVolData> volume);
+    bool setVolume(std::unique_ptr<mne::MriVolData> volume);
 
     //=========================================================================================================
     /**
@@ -123,7 +123,7 @@ public:
     /**
      * @return Underlying volume, or nullptr if no volume is loaded.
      */
-    const MRILIB::MriVolData* volume() const
+    const mne::MriVolData* volume() const
     {
         return m_volume.get();
     }
@@ -177,21 +177,21 @@ public:
     //=========================================================================================================
     /** @return Renderable for the axial slice. May be null when
      *  no volume is loaded. */
-    DISP3DLIB::SliceObject* axialSlice() const
+    mne::disp::SliceObject* axialSlice() const
     {
         return m_slices[0].get();
     }
 
     //=========================================================================================================
     /** @return Renderable for the coronal slice. */
-    DISP3DLIB::SliceObject* coronalSlice() const
+    mne::disp::SliceObject* coronalSlice() const
     {
         return m_slices[1].get();
     }
 
     //=========================================================================================================
     /** @return Renderable for the sagittal slice. */
-    DISP3DLIB::SliceObject* sagittalSlice() const
+    mne::disp::SliceObject* sagittalSlice() const
     {
         return m_slices[2].get();
     }
@@ -208,7 +208,7 @@ public:
      *
      * Passing a null pointer detaches.
      */
-    void attachScene(DISP3DLIB::MultimodalScene* scene);
+    void attachScene(mne::disp::MultimodalScene* scene);
 
 public slots:
     //=========================================================================================================
@@ -216,7 +216,7 @@ public slots:
      * Pick callback. If `pick.kind == PickKind::MriVoxel`, snap the
      * crosshair to `pick.world` and emit @ref crosshairChanged.
      */
-    void handlePick(const DISP3DLIB::PickResult& pick);
+    void handlePick(const mne::disp::PickResult& pick);
 
 signals:
     /** Emitted when a new volume is loaded. */
@@ -230,9 +230,9 @@ private:
     void publishToScene();
     Eigen::Vector3f volumeCenter() const;
 
-    std::unique_ptr<MRILIB::MriVolData> m_volume;
-    std::array<std::unique_ptr<DISP3DLIB::SliceObject>, 3> m_slices;
-    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    std::unique_ptr<mne::MriVolData> m_volume;
+    std::array<std::unique_ptr<mne::disp::SliceObject>, 3> m_slices;
+    mne::disp::MultimodalScene* m_scene = nullptr;
     Eigen::Vector3f m_crosshair = Eigen::Vector3f::Zero();
     QString m_sourcePath;
 };

@@ -1,18 +1,18 @@
 ---
 id: fwd-eeg-sphere-layer
-title: "FWDLIB::FwdEegSphereLayer"
+title: "mne::FwdEegSphereLayer"
 sidebar_label: FwdEegSphereLayer
 sidebar_position: 10
 ---
 
 # FwdEegSphereLayer
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_eeg_sphere_layer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_eeg_sphere_layer.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_eeg_sphere_layer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_eeg_sphere_layer.h)
 
 `#include <fwd/fwd_eeg_sphere_layer.h>`
 
 ```cpp
-class FWDLIB::FwdEegSphereLayer
+class mne::FwdEegSphereLayer
 ```
 
 Implements [`FwdEegSphereLayer`](/docs/api/fwd/fwd-eeg-sphere-layer) (replaces `fwdEegSphereLayer` / `fwdEegSphereLayerRec` from MNE-C ``fwd_types.h``).
@@ -42,7 +42,7 @@ Constructs the Electric Current Dipole.
 
 ### ~FwdEegSphereLayer()
 
-Destroys the Forward EEG [Sphere](/docs/api/math/sphere) Layer description.
+Destroys the Forward EEG [`Sphere`](/docs/api/math/sphere) Layer description.
 
 ---
 
@@ -79,7 +79,7 @@ Compare two sphere layers by radius for sorting.
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 146"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 144"
 // mne.make_sphere_model(r0=(0, 0, 0.04), head_radius=0.09): layers at 81, 82.8, 87.3, 90 mm; |V| = 452.86725
 ok &= expect(sphere->nlayer() == 4 && near(sphere->layers[2].rel_rad, 0.97, 1e-6) && near(sphere->layers[2].sigma, 0.004, 1e-6) && near(V.norm(), 452.86725, 1e-3) && near(V[0], 12.079552, 1e-2),
              "FwdEegSphereModel/FwdEegSphereModelSet/FwdEegSphereLayer: 4-layer sphere potentials match mne");

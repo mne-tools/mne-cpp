@@ -42,7 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -160,7 +160,7 @@ bool FiffId::get_machid(int* fixed_id)
 void FiffId::print() const
 {
     if (!empty()) {
-        BASELIB::Log::info("\t{}.{} 0x{:x}{:x} {} {}\n", this->version >> 16, this->version & 0xFFFF, this->machid[0], this->machid[1], this->time.secs, this->time.usecs);
+        mne::Log::info("\t{}.{} 0x{:x}{:x} {} {}\n", this->version >> 16, this->version & 0xFFFF, this->machid[0], this->machid[1], this->time.secs, this->time.usecs);
     }
 }
 

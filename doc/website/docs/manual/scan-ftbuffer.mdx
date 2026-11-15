@@ -56,8 +56,8 @@ The same source is available to every program that links `mne_acq_devices`:
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 
-ACQLIB::register_ftbuffer_scheme();
-auto device = ACQLIB::AcqDevice::open("ftbuffer://megacq:1972");
+mne::register_ftbuffer_scheme();
+auto device = mne::AcqDevice::open("ftbuffer://megacq:1972");
 ```
 
 `timeout` is how long to wait for the connection and the producer's header. `ftbuffer://?simulate=1` accepts `meg`,

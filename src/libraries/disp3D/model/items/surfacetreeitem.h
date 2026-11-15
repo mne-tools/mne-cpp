@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Tree item wrapping a FreeSurfer @ref FSLIB::FsSurface plus optional @ref FSLIB::FsAnnotation parcellation.
+ * @brief    Tree item wrapping a FreeSurfer @ref mne::FsSurface plus optional @ref mne::FsAnnotation parcellation.
  *
  * Carries the per-surface shader mode (Standard / Holographic /
  * Anatomical) and the optional annotation that drives the
@@ -29,7 +29,7 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 /**
@@ -49,16 +49,16 @@ public:
     ~SurfaceTreeItem() override = default;
 
     // Setters
-    void setSurfaceData(const FSLIB::FsSurface& surface);
-    void setAnnotationData(const FSLIB::FsAnnotation& annotation);
+    void setSurfaceData(const mne::FsSurface& surface);
+    void setAnnotationData(const mne::FsAnnotation& annotation);
     void setShaderMode(int mode); // 0=Standard, 1=Holo, 2=Glossy
 
     // Getters
-    FSLIB::FsSurface surfaceData() const;
-    FSLIB::FsAnnotation annotationData() const;
+    mne::FsSurface surfaceData() const;
+    mne::FsAnnotation annotationData() const;
     int shaderMode() const;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SURFACETREEITEM_H

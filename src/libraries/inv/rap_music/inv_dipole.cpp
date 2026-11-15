@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Template definitions for @ref INVLIB::InvDipole<T> (included from the matching header).
+ * @brief    Template definitions for @ref mne::InvDipole<T> (included from the matching header).
  *
  * Provides the explicit ctor / dtor and the @c clean reset method for
- * @ref INVLIB::InvDipole<T>. This file is included from
+ * @ref mne::InvDipole<T>. This file is included from
  * @c inv_dipole.h rather than compiled standalone so the templates are
  * available to every translation unit that uses them without an
  * explicit instantiation list.
@@ -26,10 +26,10 @@
 #include "inv_dipole.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================

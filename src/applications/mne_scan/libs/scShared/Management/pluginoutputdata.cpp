@@ -27,10 +27,10 @@
 #include <QSharedPointer>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -49,12 +49,12 @@ PluginOutputData<T>::PluginOutputData(AbstractPlugin* parent,
 {
     m_pMeasurement = QSharedPointer<T>(new T);
 
-    QSharedPointer<SCMEASLIB::Measurement> t_measurement = qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement);
+    QSharedPointer<mne::scan::Measurement> t_measurement = qSharedPointerDynamicCast<mne::scan::Measurement>(m_pMeasurement);
 
     if (t_measurement.isNull())
         qFatal("Template type is not a measurement and therefor not supported!");
     else
-        connect(t_measurement.data(), &SCMEASLIB::Measurement::notify,
+        connect(t_measurement.data(), &mne::scan::Measurement::notify,
                 this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }
 
@@ -63,7 +63,7 @@ PluginOutputData<T>::PluginOutputData(AbstractPlugin* parent,
 template<class T>
 void PluginOutputData<T>::update()
 {
-    emit notify(qSharedPointerDynamicCast<SCMEASLIB::Measurement>(m_pMeasurement));
+    emit notify(qSharedPointerDynamicCast<mne::scan::Measurement>(m_pMeasurement));
 }
 } //Namespace
 

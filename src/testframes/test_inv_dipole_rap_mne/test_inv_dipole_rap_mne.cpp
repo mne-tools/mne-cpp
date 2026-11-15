@@ -56,9 +56,7 @@
 #include <inv/inv_types.h>
 #include <inv/inv_token.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -178,7 +176,7 @@ private slots:
 
 void TestInvDipoleRapMne::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
@@ -913,11 +911,11 @@ void TestInvDipoleRapMne::minimumNorm_sLORETA()
 
 void TestInvDipoleRapMne::inv_globalBuildInfo()
 {
-    const char* dt = INVLIB::buildDateTime();
+    const char* dt = mne::buildDateTime();
     QVERIFY(dt != nullptr);
-    const char* h = INVLIB::buildHash();
+    const char* h = mne::buildHash();
     QVERIFY(h != nullptr);
-    const char* hl = INVLIB::buildHashLong();
+    const char* hl = mne::buildHashLong();
     QVERIFY(hl != nullptr);
 }
 
@@ -979,7 +977,7 @@ void TestInvDipoleRapMne::tokenize_simpleEstimate()
     stc.sourceSpaceType = InvSourceSpaceType::Surface;
     stc.orientationType = InvOrientationType::Fixed;
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
     QVERIFY(!tokens.empty());
 
     // Should start with BOS and end with EOS
@@ -1002,8 +1000,8 @@ void TestInvDipoleRapMne::tokenize_roundtrip()
     stc.sourceSpaceType = InvSourceSpaceType::Volume;
     stc.orientationType = InvOrientationType::Free;
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
-    InvSourceEstimate recovered = INVLIB::fromTokens(tokens);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
+    InvSourceEstimate recovered = mne::fromTokens(tokens);
 
     QCOMPARE(recovered.data.rows(), stc.data.rows());
     QCOMPARE(recovered.data.cols(), stc.data.cols());
@@ -1034,7 +1032,7 @@ void TestInvDipoleRapMne::tokenize_metadataOnly()
     opts.includeConnectivity = false;
     opts.includePositions = false;
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc, opts);
+    std::vector<InvToken> tokens = mne::tokenize(stc, opts);
     QVERIFY(!tokens.empty());
 
     // Should not contain amplitude tokens
@@ -1063,7 +1061,7 @@ void TestInvDipoleRapMne::tokenize_withCouplings()
     coupling.correlations = Eigen::MatrixXd::Identity(3, 3);
     stc.couplings.push_back(coupling);
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
     QVERIFY(!tokens.empty());
 
     // Should contain coupling section
@@ -1095,7 +1093,7 @@ void TestInvDipoleRapMne::tokenize_withFocalDipoles()
     dipole.valid = true;
     stc.focalDipoles.push_back(dipole);
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
     QVERIFY(!tokens.empty());
 
     bool hasFocalBegin = false;
@@ -1128,7 +1126,7 @@ void TestInvDipoleRapMne::tokenize_withConnectivity()
     conn.matrix = cmat;
     stc.connectivity.push_back(conn);
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
     QVERIFY(!tokens.empty());
 
     bool hasConnBegin = false;
@@ -1141,7 +1139,7 @@ void TestInvDipoleRapMne::tokenize_withConnectivity()
     QVERIFY(hasConnBegin);
 
     // Round-trip
-    InvSourceEstimate recovered = INVLIB::fromTokens(tokens);
+    InvSourceEstimate recovered = mne::fromTokens(tokens);
     QCOMPARE(recovered.connectivity.size(), static_cast<size_t>(1));
 }
 
@@ -1159,7 +1157,7 @@ void TestInvDipoleRapMne::tokenize_subsampling()
     opts.maxSources = 3;
     opts.maxTimePoints = 2;
 
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc, opts);
+    std::vector<InvToken> tokens = mne::tokenize(stc, opts);
     QVERIFY(!tokens.empty());
 
     // Count amplitude tokens - should be reduced from full 10*5=50
@@ -1182,15 +1180,15 @@ void TestInvDipoleRapMne::tokenIds_and_values()
     vertices << 0, 1;
 
     InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
-    std::vector<InvToken> tokens = INVLIB::tokenize(stc);
+    std::vector<InvToken> tokens = mne::tokenize(stc);
 
     // tokenIds extracts just IDs
-    std::vector<int32_t> ids = INVLIB::tokenIds(tokens);
+    std::vector<int32_t> ids = mne::tokenIds(tokens);
     QCOMPARE(ids.size(), tokens.size());
     QCOMPARE(ids.front(), static_cast<int32_t>(InvTokenId::Bos));
 
     // tokenValues extracts just values
-    std::vector<float> vals = INVLIB::tokenValues(tokens);
+    std::vector<float> vals = mne::tokenValues(tokens);
     QCOMPARE(vals.size(), tokens.size());
 }
 

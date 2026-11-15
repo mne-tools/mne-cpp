@@ -35,8 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // MAIN
@@ -53,7 +52,7 @@ using namespace FSLIB;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
@@ -110,7 +109,7 @@ int main(int argc, char* argv[])
     qDebug() << "col_names:";
     qDebug() << t_clusteredFwd.sol.col_names;
     qDebug() << "write fwd data to ./test_fwd.txt ...";
-    MATHLIB::write_matrix(t_clusteredFwd.sol.data, QDir::temp().filePath("ex_read_fwd-clustered.txt").toStdString());
+    mne::write_matrix(t_clusteredFwd.sol.data, QDir::temp().filePath("ex_read_fwd-clustered.txt").toStdString());
     qDebug() << "[done]";
 
     return t_clusteredFwd.sol.ncol > 0 && t_clusteredFwd.sol.ncol < t_Fwd.sol.ncol ? 0 : 1;

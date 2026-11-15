@@ -36,16 +36,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE FUNCTIONS
 //=============================================================================================================
 
-BadChannelsMaxwellResult DSPLIB::findBadChannelsMaxwell(
+BadChannelsMaxwellResult mne::findBadChannelsMaxwell(
     const MatrixXd& matData,
     const FiffInfo& info,
     const BadChannelsMaxwellParams& params)

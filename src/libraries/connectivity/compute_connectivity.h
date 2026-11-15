@@ -9,12 +9,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     March 2017
- * @brief    Runs the requested connectivity metrics over a @ref CONNECTIVITYLIB::ConnectivitySettings batch.
+ * @brief    Runs the requested connectivity metrics over a @ref mne::ConnectivitySettings batch.
  *
- * The caller fills a @ref CONNECTIVITYLIB::ConnectivitySettings object with the trial data, sampling frequency,
+ * The caller fills a @ref mne::ConnectivitySettings object with the trial data, sampling frequency,
  * FFT length, taper window, node positions and the method names ("COH", "IMAGCOH", "PLI", "WPLI", "DSWPLI",
- * "USPLI", "PLV", "COR", "XCOR", "GC", "DTF", "PDC"); @ref CONNECTIVITYLIB::compute_connectivity returns one
- * @ref CONNECTIVITYLIB::Network per method. The DPSS-tapered FFTs and spectral sums are cached on the settings,
+ * "USPLI", "PLV", "COR", "XCOR", "GC", "DTF", "PDC"); @ref mne::compute_connectivity returns one
+ * @ref mne::Network per method. The DPSS-tapered FFTs and spectral sums are cached on the settings,
  * so several spectral methods cost one FFT pass.
  */
 
@@ -31,10 +31,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 class ConnectivitySettings;
@@ -51,6 +51,6 @@ class ConnectivitySettings;
  */
 CONNECTIVITYSHARED_EXPORT std::vector<Network> compute_connectivity(ConnectivitySettings& settings);
 
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // COMPUTE_CONNECTIVITY_H

@@ -49,7 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 
 namespace
 {
@@ -108,7 +108,7 @@ bool parseCpuList(const std::string& text, std::vector<unsigned>& out)
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::acqPinThisThread(std::span<const unsigned> cpus) noexcept
+AcqError mne::acqPinThisThread(std::span<const unsigned> cpus) noexcept
 {
 #if defined(__linux__)
     if (cpus.empty()) {
@@ -153,7 +153,7 @@ AcqError ACQLIB::acqPinThisThread(std::span<const unsigned> cpus) noexcept
 
 //=============================================================================================================
 
-AcqError ACQLIB::acqSetThisThreadPriority(AcqThreadPriority priority) noexcept
+AcqError mne::acqSetThisThreadPriority(AcqThreadPriority priority) noexcept
 {
 #if defined(__linux__)
     const auto tid = static_cast<id_t>(syscall(SYS_gettid));
@@ -235,7 +235,7 @@ AcqError ACQLIB::acqSetThisThreadPriority(AcqThreadPriority priority) noexcept
 
 //=============================================================================================================
 
-AcqError ACQLIB::acqApplyThreadPolicy(const AcqThreadPolicy& policy) noexcept
+AcqError mne::acqApplyThreadPolicy(const AcqThreadPolicy& policy) noexcept
 {
     if (!policy.cpus.empty()) {
         if (AcqError e = acqPinThisThread(policy.cpus); !e.ok()) {
@@ -247,7 +247,7 @@ AcqError ACQLIB::acqApplyThreadPolicy(const AcqThreadPolicy& policy) noexcept
 
 //=============================================================================================================
 
-int ACQLIB::acqCurrentCpu() noexcept
+int mne::acqCurrentCpu() noexcept
 {
 #if defined(__linux__)
     return sched_getcpu();
@@ -262,7 +262,7 @@ int ACQLIB::acqCurrentCpu() noexcept
 
 //=============================================================================================================
 
-AcqExpected<std::vector<unsigned>> ACQLIB::acqNumaNodeCpus(int node)
+AcqExpected<std::vector<unsigned>> mne::acqNumaNodeCpus(int node)
 {
     if (node < 0) {
         return AcqError(AcqErrorCode::InvalidParameter, "NUMA node " + std::to_string(node) + " does not exist");
@@ -302,7 +302,7 @@ AcqExpected<std::vector<unsigned>> ACQLIB::acqNumaNodeCpus(int node)
 
 //=============================================================================================================
 
-AcqExpected<std::thread> ACQLIB::start_thread(const AcqThreadPolicy& policy, std::function<void()> body)
+AcqExpected<std::thread> mne::start_thread(const AcqThreadPolicy& policy, std::function<void()> body)
 {
     // The promise's shared state outlives both ends, unlike a flag the thread could still notify after we return
     std::promise<AcqError> applied;

@@ -1,13 +1,13 @@
 ---
 id: mne-forward-solution
-title: "MNELIB::MNEForwardSolution"
+title: "mne::MNEForwardSolution"
 sidebar_label: MNEForwardSolution
 sidebar_position: 1
 ---
 
 # MNEForwardSolution
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_forward_solution.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_forward_solution.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_forward_solution.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_forward_solution.h)
 
 :::info[Python equivalent]
 `mne.Forward` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 1
 <Connections topics={["forward-modeling"]} context="api" current="MNEForwardSolution" />
 
 ```cpp
-class MNELIB::MNEForwardSolution
+class mne::MNEForwardSolution
 ```
 
 Forward solution: leadfield matrix mapping source-space dipoles to sensor measurements, together with the source spaces, coordinate transforms and SSP/CTF state it was computed under.
@@ -89,7 +89,7 @@ The clustering is done by using the provided annotations
 **Parameters:**
 
 - **p_AnnotationSet** : *const [FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
-  FsAnnotation set containing the annotation of left & right hemisphere.
+  [`FsAnnotation`](/docs/api/fs/fs-annotation) set containing the annotation of left & right hemisphere.
 
 - **p_iClusterSize** : *qint32*
   Maximal cluster size per roi.
@@ -329,7 +329,7 @@ Returns the positions of the specified sources based on their beloning labels.
 
 Compute weighting for depth prior.
 
-ToDo move this to [FiffCov](/docs/api/fiff/fiff-cov)
+ToDo move this to [`FiffCov`](/docs/api/fiff/fiff-cov)
 
 **Parameters:**
 
@@ -422,7 +422,7 @@ Restrict gain matrix entries for optimal depth weighting.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 113"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 110"
 FsLabel v1;
 FsLabel::read((data + "/subjects/sample/label/lh.V1.label").toStdU16String(), v1);
 const std::filesystem::path fwdPath = (data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String();
@@ -435,7 +435,7 @@ const FiffEvoked evoked((data + "/MEG/sample/sample_audvis-ave.fif").toStdU16Str
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/main.cpp, line 187"
+````cpp title="src/examples/ex_connectivity/main.cpp, line 180"
 MNEForwardSolution t_clusteredFwd;
 MNEForwardSolution t_Fwd;
 ````
@@ -444,7 +444,7 @@ MNEForwardSolution t_Fwd;
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 188"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 181"
 MNEForwardSolution t_clusteredFwd;
 MNEForwardSolution t_Fwd;
 ````

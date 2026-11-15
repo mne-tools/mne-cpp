@@ -32,8 +32,8 @@ The same source is available to every program that links `mne_acq_devices`:
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 
-ACQLIB::registerTmsiScheme();
-auto device = ACQLIB::AcqDevice::open("tmsi://?simulate=1&exg=32&rate=1024");
+mne::registerTmsiScheme();
+auto device = mne::AcqDevice::open("tmsi://?simulate=1&exg=32&rate=1024");
 auto impedances = device->measureImpedances();
 ```
 

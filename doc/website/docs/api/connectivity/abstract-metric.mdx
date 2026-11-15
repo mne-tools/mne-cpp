@@ -1,28 +1,28 @@
 ---
 id: abstract-metric
-title: "CONNECTIVITYLIB::AbstractMetric"
+title: "mne::AbstractMetric"
 sidebar_label: AbstractMetric
 sidebar_position: 8
 ---
 
 # AbstractMetric
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/abstractmetric.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/abstractmetric.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/abstractmetric.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/abstractmetric.h)
 
 `#include <connectivity/abstractmetric.h>`
 
 ```cpp
-class CONNECTIVITYLIB::AbstractMetric
+class mne::AbstractMetric
 ```
 
-Static base for every estimator in ``CONNECTIVITYLIB``.
+Static base for every estimator in `mne_connectivity`.
 
 Holds the two pieces of global state that the dispatcher (`compute_connectivity`) must set before any metric runs:
 
-- `CONNECTIVITYLIB::AbstractMetric::m_bStorageModeIsActive` "m_bStorageModeIsActive" enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
-- `CONNECTIVITYLIB::AbstractMetric::m_iNumberBinStart` "m_iNumberBinStart" and `CONNECTIVITYLIB::AbstractMetric::m_iNumberBinAmount` "m_iNumberBinAmount" define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
+- `mne::AbstractMetric::m_bStorageModeIsActive` "m_bStorageModeIsActive" enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
+- `mne::AbstractMetric::m_iNumberBinStart` "m_iNumberBinStart" and `mne::AbstractMetric::m_iNumberBinAmount` "m_iNumberBinAmount" define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
 
-Static control knobs (storage mode, frequency band) shared by all `CONNECTIVITYLIB` metrics.
+Static control knobs (storage mode, frequency band) shared by all mne_connectivity metrics.
 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
 // Spectral metrics evaluate the bins [start, start + amount); -1 means the full half spectrum.
@@ -85,7 +85,7 @@ Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 
 Benchmark the run time of connectivity methods over channel and sample counts.
 
-````cpp title="src/examples/ex_connectivity_performance/main.cpp, line 138"
+````cpp title="src/examples/ex_connectivity_performance/main.cpp, line 135"
 AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
 AbstractMetric::m_iNumberBinStart = 8;
 AbstractMetric::m_iNumberBinAmount = 4;
@@ -95,7 +95,7 @@ AbstractMetric::m_iNumberBinAmount = 4;
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/main.cpp, line 104"
+````cpp title="src/examples/ex_connectivity/main.cpp, line 97"
 AbstractMetric::m_bStorageModeIsActive = false;
 AbstractMetric::m_iNumberBinStart = 0;
 AbstractMetric::m_iNumberBinAmount = 50;

@@ -23,11 +23,11 @@
  * <em>shader draw</em>. Per-vertex colour is computed either from
  * FreeSurfer curvature, FsAnnotation parcellation, an iso-contour
  * field map, or a smoothed source-time-course produced by the
- * @ref DISP3DLIB::Interpolation helpers, then packed ABGR and uploaded
+ * @ref mne::disp::Interpolation helpers, then packed ABGR and uploaded
  * alongside the geometry so a single draw covers the whole surface.
  *
  * The header itself only carries the import / export macro plumbing;
- * consumers should include @ref DISP3DLIB::BrainView (top-level QWidget) or the
+ * consumers should include @ref mne::disp::BrainView (top-level QWidget) or the
  * scene controllers in scene/ and workers/ for high-level integration.
  */
 
@@ -53,12 +53,7 @@
 #define DISP3DSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-//=============================================================================================================
-/**
- * @namespace DISP3DLIB
- * @brief     3-D brain visualisation using the Qt RHI rendering backend.
- */
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================

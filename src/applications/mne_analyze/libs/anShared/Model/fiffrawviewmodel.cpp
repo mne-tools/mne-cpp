@@ -50,9 +50,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
-using namespace FIFFLIB;
-using namespace DSPLIB;
+using namespace mne::analyze;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -126,7 +125,7 @@ FiffRawViewModel::~FiffRawViewModel()
 
 //=============================================================================================================
 
-bool FiffRawViewModel::initFiffData(QSharedPointer<FIFFLIB::FiffIO> io)
+bool FiffRawViewModel::initFiffData(QSharedPointer<mne::FiffIO> io)
 {
     m_pFiffIO = std::move(io);
 
@@ -208,7 +207,7 @@ QVariant FiffRawViewModel::data(const QModelIndex& index,
 
         // whether channel is marked as bad
         else if (index.column() == 2) {
-            return QVariant(BASELIB::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[index.row()]));
+            return QVariant(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[index.row()]));
         } else {
             qWarning() << "[FiffRawViewModel::data] Column " << index.column() << " not implemented !";
             return QVariant();
@@ -235,7 +234,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     const std::filesystem::path path = target.toStdU16String();
     // The same channels as in the view; an empty pick list would filter every channel, triggers included
     const bool ok = m_bPerformFiltering && m_lFilterChannelList.size() > 0
-        ? DSPLIB::filterFile(path, m_pFiffIO->raw[0], m_filterKernel, m_lFilterChannelList)
+        ? mne::filterFile(path, m_pFiffIO->raw[0], m_filterKernel, m_lFilterChannelList)
         : m_pFiffIO->write_raw(path, 0);
 #ifdef WASMBUILD
     QFile file(target);
@@ -322,7 +321,7 @@ bool FiffRawViewModel::hasChildren(const QModelIndex& parent) const
 
 //=============================================================================================================
 
-std::shared_ptr<FIFFLIB::FiffInfo> FiffRawViewModel::getFiffInfo() const
+std::shared_ptr<mne::FiffInfo> FiffRawViewModel::getFiffInfo() const
 {
     return m_pFiffInfo;
 }
@@ -529,7 +528,7 @@ bool FiffRawViewModel::isFilterActive() const
 
 //=============================================================================================================
 
-QSharedPointer<FIFFLIB::FiffIO> FiffRawViewModel::getFiffIO() const
+QSharedPointer<mne::FiffIO> FiffRawViewModel::getFiffIO() const
 {
     return m_pFiffIO;
 }
@@ -970,7 +969,7 @@ bool FiffRawViewModel::hasEventModel()
 
 //=============================================================================================================
 
-void FiffRawViewModel::setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
+void FiffRawViewModel::setEventModel(QSharedPointer<mne::analyze::EventModel> pModel)
 {
     m_pEventModel = pModel;
 }

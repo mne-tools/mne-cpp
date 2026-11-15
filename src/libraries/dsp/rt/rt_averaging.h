@@ -11,7 +11,7 @@
  *
  * RtAveragingWorker accumulates fixed-length epochs around trigger events
  * detected on a user-specified stim channel and maintains a running
- * arithmetic mean per condition, yielding a @ref FIFFLIB::FiffEvokedSet that
+ * arithmetic mean per condition, yielding a @ref mne::FiffEvokedSet that
  * updates as new data arrives. The worker is designed to run on its own
  * @c QThread so the GUI and acquisition pipeline remain responsive even at
  * high sample rates and large evoked counts. RtAveraging is the thin
@@ -61,14 +61,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
-// DSPLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -102,7 +102,7 @@ public:
                       qint32 iBaselineFromMSecs,
                       qint32 iBaselineToMSecs,
                       quint32 iTriggerIndex,
-                      std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo);
+                      std::shared_ptr<mne::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -256,8 +256,8 @@ protected:
     QPair<float, float> m_pairBaselineSec;  /**< Baseline information in seconds form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
     QPair<float, float> m_pairBaselineSamp; /**< Baseline information in samples form where the seconds are seen relative to the trigger, meaning they can also be negative [from to]*/
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Holds the fiff measurement information. */
-    FIFFLIB::FiffEvokedSet m_stimEvokedSet;         /**< Holds the evoked information. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Holds the fiff measurement information. */
+    mne::FiffEvokedSet m_stimEvokedSet;         /**< Holds the evoked information. */
 
     std::map<std::string, double> m_mapThresholds;     /**< Holds the current thresholds for artifact rejection. */
     QMap<double, QList<Eigen::MatrixXd>> m_mapStimAve; /**< the current stimulus average buffer. Holds m_iNumAverages vectors. */
@@ -275,7 +275,7 @@ signals:
      * @param[in] evokedStimSet              The evoked stimulus data set.
      * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
      */
-    void resultReady(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+    void resultReady(const mne::FiffEvokedSet& evokedStimSet,
                      const QStringList& lResponsibleTriggerTypes);
 };
 
@@ -311,7 +311,7 @@ public:
                          qint32 iBaselineFromMSecs,
                          qint32 iBaselineToMSecs,
                          quint32 iTriggerIndex,
-                         std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo,
+                         std::shared_ptr<mne::FiffInfo> pFiffInfo,
                          QObject* parent = 0);
 
     //=========================================================================================================
@@ -346,7 +346,7 @@ public:
                  qint32 iBaselineFromMSecs,
                  qint32 iBaselineToMSecs,
                  quint32 iTriggerIndex,
-                 std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo);
+                 std::shared_ptr<mne::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -440,13 +440,13 @@ protected:
      * @param[in] evokedStimSet             Evoked set produced by the worker, re-emitted via evokedStim().
      * @param[in] lResponsibleTriggerTypes  Trigger types that contributed to this update.
      */
-    void handleResults(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+    void handleResults(const mne::FiffEvokedSet& evokedStimSet,
                        const QStringList& lResponsibleTriggerTypes);
 
     QThread m_workerThread; /**< The worker thread. */
 
 signals:
-    void evokedStim(const FIFFLIB::FiffEvokedSet& evokedStimSet,
+    void evokedStim(const mne::FiffEvokedSet& evokedStimSet,
                     const QStringList& lResponsibleTriggerTypes);
     void operate(const Eigen::MatrixXd& matData);
     void averageNumberChanged(qint32 numAve);

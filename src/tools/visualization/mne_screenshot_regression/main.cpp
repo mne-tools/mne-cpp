@@ -27,8 +27,8 @@
 
 #include <cmath>
 
-using namespace FSLIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 //=============================================================================================================
 
@@ -57,7 +57,7 @@ static double imageRmse(const QImage& a, const QImage& b)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QApplication app(argc, argv);
     app.setApplicationName("mne_screenshot_regression");
 

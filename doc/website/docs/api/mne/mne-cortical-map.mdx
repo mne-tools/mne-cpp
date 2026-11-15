@@ -1,18 +1,18 @@
 ---
 id: mne-cortical-map
-title: "MNELIB::MNECorticalMap"
+title: "mne::MNECorticalMap"
 sidebar_label: MNECorticalMap
 sidebar_position: 13
 ---
 
 # MNECorticalMap
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cortical_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cortical_map.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cortical_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cortical_map.h)
 
 `#include <mne/mne_cortical_map.h>`
 
 ```cpp
-class MNELIB::MNECorticalMap
+class mne::MNECorticalMap
 ```
 
 Builds the resolution matrix K G that maps source activity to its estimate.
@@ -76,7 +76,7 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 156"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 153"
 std::vector<VectorXi> kernelVertices;
 prepared.assemble_kernel(FsLabel(), "MNE", false, surfaceKernel, noNormals, kernelVertices);
 prepared.getKernel() = surfaceKernel;

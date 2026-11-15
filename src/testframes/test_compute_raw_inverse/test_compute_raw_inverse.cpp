@@ -52,10 +52,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -160,7 +157,7 @@ QString TestComputeRawInverse::findDataPath()
 
 void TestComputeRawInverse::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Raw Inverse Test Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 

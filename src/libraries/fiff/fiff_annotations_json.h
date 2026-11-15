@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-namespace FIFFLIB
+namespace mne
 {
 
 /**
@@ -28,29 +28,29 @@ namespace FIFFLIB
  *
  * @return The names as a JSON array of strings.
  */
-BASELIB::JsonArray names_to_json(const std::vector<std::string>& names);
+mne::JsonArray names_to_json(const std::vector<std::string>& names);
 
 /**
  * @param[in] array   A JSON array of strings.
  *
  * @return The strings.
  */
-std::vector<std::string> names_from_json(const BASELIB::JsonArray& array);
+std::vector<std::string> names_from_json(const mne::JsonArray& array);
 
 /**
  * @param[in] extras   Annotation extras.
  *
  * @return The extras as a JSON object.
  */
-BASELIB::JsonObject extras_to_json(const FiffAnnotation::Extras& extras);
+mne::JsonObject extras_to_json(const FiffAnnotation::Extras& extras);
 
 /**
  * @param[in] object   A JSON object.
  *
  * @return Its values as extras; values other than null, bool, number or string are skipped.
  */
-FiffAnnotation::Extras extras_from_json(const BASELIB::JsonObject& object);
+FiffAnnotation::Extras extras_from_json(const mne::JsonObject& object);
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_ANNOTATIONS_JSON_H

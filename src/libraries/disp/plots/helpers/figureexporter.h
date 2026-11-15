@@ -38,10 +38,10 @@ class QImage;
 class QWidget;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -92,6 +92,6 @@ public:
                         const QString& caption);
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // FIGUREEXPORTER_H

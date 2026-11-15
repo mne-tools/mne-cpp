@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 namespace
 {
@@ -65,8 +65,8 @@ namespace
 template<typename Write>
 QByteArray tagBytes(Write&& write)
 {
-    auto bytes = std::make_unique<BASELIB::MemoryByteStream>();
-    const BASELIB::MemoryByteStream& written = *bytes;
+    auto bytes = std::make_unique<mne::MemoryByteStream>();
+    const mne::MemoryByteStream& written = *bytes;
     FiffStream stream(std::move(bytes));
     write(stream);
     return QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
@@ -231,13 +231,13 @@ void TestRtServerFiffReplay::readsTheMeasurementInfo()
 
     MeasInfoServer server(info);
     QVERIFY(server.port() > 0);
-    QVERIFY(ACQLIB::register_rtserver_scheme().ok());
-    ACQLIB::AcqExpected<ACQLIB::AcqDevice> device = ACQLIB::AcqError(ACQLIB::AcqErrorCode::Timeout);
-    std::thread client([&] { device = ACQLIB::AcqDevice::open(std::format("rtserver://127.0.0.1:{}?timeout=5", server.port())); });
+    QVERIFY(mne::register_rtserver_scheme().ok());
+    mne::AcqExpected<mne::AcqDevice> device = mne::AcqError(mne::AcqErrorCode::Timeout);
+    std::thread client([&] { device = mne::AcqDevice::open(std::format("rtserver://127.0.0.1:{}?timeout=5", server.port())); });
     server.serve();
     client.join();
     QVERIFY2(device, device ? "" : device.error().text().c_str());
-    const auto converted = ACQLIB::toFiffInfo(*device->stream().info());
+    const auto converted = mne::toFiffInfo(*device->stream().info());
     QVERIFY2(converted, converted ? "" : converted.error().text().c_str());
     const FiffInfo& got = *converted;
 
@@ -345,14 +345,14 @@ void TestRtServerFiffReplay::streamsTheFile()
     QVERIFY(notFiff.open(QIODevice::WriteOnly));
     notFiff.write("not a FIFF file");
     notFiff.close();
-    QVERIFY(ACQLIB::register_rtserver_scheme().ok());
-    auto refused = ACQLIB::AcqDevice::open(std::format("rtserver://127.0.0.1:4217?simfile={}", notFiff.fileName().toStdString()));
+    QVERIFY(mne::register_rtserver_scheme().ok());
+    auto refused = mne::AcqDevice::open(std::format("rtserver://127.0.0.1:4217?simfile={}", notFiff.fileName().toStdString()));
     QVERIFY(!refused);
-    QCOMPARE(refused.error().code(), ACQLIB::AcqErrorCode::InvalidParameter);
+    QCOMPARE(refused.error().code(), mne::AcqErrorCode::InvalidParameter);
     QVERIFY(!send(command, QStringLiteral("accel 100")).isEmpty());
 
     const int bufsize = 100;
-    auto device = ACQLIB::AcqDevice::open(std::format("rtserver://127.0.0.1:4217?simfile={}&buffer={}", file.toStdString(), bufsize));
+    auto device = mne::AcqDevice::open(std::format("rtserver://127.0.0.1:4217?simfile={}&buffer={}", file.toStdString(), bufsize));
     QVERIFY2(device, device ? "" : device.error().text().c_str());
     const auto info = device->stream().info();
     FiffRawData raw(file.toStdString());
@@ -360,9 +360,9 @@ void TestRtServerFiffReplay::streamsTheFile()
     QCOMPARE(info->sfreq, double(raw.info.sfreq * 100.0F)); // the acceleration factor scales the advertised rate
 
     // The reader gates the stream, so the client stops reading the socket once the reader stops reading
-    ACQLIB::AcqReaderOptions gating;
+    mne::AcqReaderOptions gating;
     gating.gating = true;
-    auto reader = device->stream().reader(ACQLIB::AcqReader::ReadMode::Lossless, gating);
+    auto reader = device->stream().reader(mne::AcqReader::ReadMode::Lossless, gating);
     QVERIFY(reader);
     QVERIFY(device->start().ok());
     // Buffers go out calibrated, as read_raw_segment returns them, and follow each other without gaps. A client
@@ -378,7 +378,7 @@ void TestRtServerFiffReplay::streamsTheFile()
     Eigen::MatrixXd received(raw.info.nchan, bufsize);
     // At 100 times real time a buffer is due every 1.7 ms, faster than the server polls its socket.
     for (int b = 0; b < 30; ++b) {
-        const auto read = reader->read(ACQLIB::AcqMatrixRef<double>::columnMajor(received.data(), std::size_t(received.rows()), std::size_t(bufsize)),
+        const auto read = reader->read(mne::AcqMatrixRef<double>::columnMajor(received.data(), std::size_t(received.rows()), std::size_t(bufsize)),
                                        std::chrono::seconds(10));
         QVERIFY2(read, read ? "" : read.error().text().c_str());
         for (int k = 0; offset < 0 && k < buffers; ++k) {

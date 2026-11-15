@@ -1,13 +1,13 @@
 ---
 id: fwd-bem-model
-title: "FWDLIB::FwdBemModel"
+title: "mne::FwdBemModel"
 sidebar_label: FwdBemModel
 sidebar_position: 2
 ---
 
 # FwdBemModel
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_bem_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_bem_model.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_bem_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_bem_model.h)
 
 :::info[Python equivalent]
 `mne.make_bem_model` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 2
 <Connections topics={["forward-modeling"]} context="api" current="FwdBemModel" />
 
 ```cpp
-class FWDLIB::FwdBemModel
+class mne::FwdBemModel
 ```
 
 Layered triangulated volume-conductor model (scalp/skull/inner-skull surfaces, per-compartment conductivities, IP-approach data and dense potential-solution matrix) used by the linear-collocation BEM forward solver.
@@ -52,7 +52,7 @@ All Eigen containers are left at size zero; scalar members are set to safe defau
 
 Destroys the BEM model.
 
-[FsSurface](/docs/api/fs/fs-surface) ownership is released automatically via std::unique_ptr. The solution matrix is freed by `fwd_bem_free_solution()`.
+[`FsSurface`](/docs/api/fs/fs-surface) ownership is released automatically via std::unique_ptr. The solution matrix is freed by `fwd_bem_free_solution()`.
 
 ---
 
@@ -71,7 +71,7 @@ Find a surface of the given kind in this BEM model.
 **Parameters:**
 
 - **kind** : *int*
-  FsSurface ID to look for.
+  [`FsSurface`](/docs/api/fs/fs-surface) ID to look for.
 
 **Returns:**
 
@@ -474,7 +474,7 @@ Compute the MEG forward solution for one or more source spaces.
   If true, use fixed-orientation dipoles.
 
 - **r0** : *const Eigen::Vector3f &*
-  Sphere model origin.
+  [`Sphere`](/docs/api/math/sphere) model origin.
 
 - **use_threads** : *bool*
   If true, parallelize across source spaces.
@@ -510,7 +510,7 @@ Compute the EEG forward solution for one or more source spaces.
   If true, use fixed-orientation dipoles.
 
 - **eeg_model** : *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) **
-  Sphere model definition.
+  [`Sphere`](/docs/api/math/sphere) model definition.
 
 - **use_threads** : *bool*
   If true, parallelize across source spaces.
@@ -611,7 +611,7 @@ Load BEM surfaces of specified kinds from a FIFF file.
   Path to the BEM FIFF file.
 
 - **kinds** : *const std::vector&lt; int &gt; &*
-  FsSurface IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
+  [`FsSurface`](/docs/api/fs/fs-surface) IDs to load (e.g. FIFFV_BEM_SURF_ID_BRAIN).
 
 **Returns:**
 
@@ -832,7 +832,7 @@ Verify that solid-angle sums match the expected value.
   Column count.
 
 - **desired** : *float*
-  Expected solid-angle sum per row.
+  [`Expected`](/docs/api/base/expected) solid-angle sum per row.
 
 **Returns:**
 
@@ -1446,7 +1446,7 @@ Returns one row per cardinal dipole direction (x, y, z).
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 125"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 123"
 auto bem = FwdBemModel::fwd_bem_load_homog_surface((data + "/subjects/sample/bem/sample-5120-bem.fif").toStdU16String());
 bem->fwd_bem_load_recompute_solution((data + "/subjects/sample/bem/sample-5120-bem-sol.fif").toStdU16String(), FWD_BEM_LINEAR_COLL, 0);
 bem->fwd_bem_set_head_mri_t(FiffCoordTrans((data + "/MEG/sample/all-trans.fif").toStdU16String(), FIFFV_COORD_MRI, FIFFV_COORD_HEAD));

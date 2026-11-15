@@ -13,10 +13,10 @@
  * @brief    Per-channel frequency-spectrum heat-map TableView (rows = channels, columns = frequencies).
  *
  * SpectrumView wraps a @c QTableView around a
- * @ref DISPLIB::FrequencySpectrumModel and paints each row with
- * @ref DISPLIB::FrequencySpectrumDelegate so the live FFT amplitudes appear as
+ * @ref mne::disp::FrequencySpectrumModel and paints each row with
+ * @ref mne::disp::FrequencySpectrumDelegate so the live FFT amplitudes appear as
  * a rolling colour band per channel. The visible frequency range is
- * controlled by @ref DISPLIB::SpectrumSettingsView.
+ * controlled by @ref mne::disp::SpectrumSettingsView.
  */
 
 #ifndef SPECTRUMVIEW_H
@@ -48,20 +48,20 @@
 
 class QTableView;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FrequencySpectrumDelegate;
@@ -105,7 +105,7 @@ public:
      * @param[in] info          The FiffInfo.
      * @param[in] iScaleType    The scale type.
      */
-    void init(std::shared_ptr<FIFFLIB::FiffInfo>& info,
+    void init(std::shared_ptr<mne::FiffInfo>& info,
               int iScaleType);
 
     //=========================================================================================================
@@ -173,9 +173,9 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QPointer<QTableView> m_pTableView;                          /**< The QTableView being part of the model/view framework of Qt. */
-    QPointer<DISPLIB::FrequencySpectrumDelegate> m_pFSDelegate; /**< Frequency spectrum delegate. */
-    QPointer<DISPLIB::FrequencySpectrumModel> m_pFSModel;       /**< Frequency spectrum model. */
+    QPointer<QTableView> m_pTableView;                            /**< The QTableView being part of the model/view framework of Qt. */
+    QPointer<mne::disp::FrequencySpectrumDelegate> m_pFSDelegate; /**< Frequency spectrum delegate. */
+    QPointer<mne::disp::FrequencySpectrumModel> m_pFSModel;       /**< Frequency spectrum model. */
 
 signals:
     //=========================================================================================================

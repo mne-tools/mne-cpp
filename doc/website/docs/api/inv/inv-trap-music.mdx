@@ -1,13 +1,13 @@
 ---
 id: inv-trap-music
-title: "INVLIB::InvTrapMusic"
+title: "mne::InvTrapMusic"
 sidebar_label: InvTrapMusic
 sidebar_position: 6
 ---
 
 # InvTrapMusic
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_trap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_trap_music.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_trap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_trap_music.h)
 
 :::info[Python equivalent]
 `mne.beamformer.trap_music` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 6
 <Connections topics={["rap-music"]} context="api" current="InvTrapMusic" />
 
 ```cpp
-class INVLIB::InvTrapMusic
+class mne::InvTrapMusic
 ```
 
 TRAP-MUSIC (Truncated RAP-MUSIC) source localization.
@@ -47,7 +47,7 @@ Construct TRAP-MUSIC scanner.
   Maximum number of sources to find (default 5).
 
 - **dThreshold** : *double*
-  Correlation threshold to stop scanning (default 0.85).
+  [`Correlation`](/docs/api/connectivity/correlation) threshold to stop scanning (default 0.85).
 
 ---
 
@@ -94,7 +94,7 @@ Compute the MUSIC-type subspace correlation for all source locations.
 
 **Returns:**
 
-- *Eigen::VectorXd* — Correlation vector (n_sources).
+- *Eigen::VectorXd* — [`Correlation`](/docs/api/connectivity/correlation) vector (n_sources).
 
 ---
 
@@ -111,7 +111,7 @@ Compute the MUSIC-type subspace correlation for all source locations.
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 167"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 164"
 MatrixX3d positions = fwd.source_rr.cast<double>();
 InvTrapMusic trap(2, 0.85); // at most 2 dipoles, stop below a subspace correlation of 0.85
 const std::vector<TrapMusicDipole> dipoles = trap.compute(G, measured, positions, 3);

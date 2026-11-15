@@ -24,8 +24,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCDISPLIB;
-using namespace DISPLIB;
+using namespace mne::scan;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

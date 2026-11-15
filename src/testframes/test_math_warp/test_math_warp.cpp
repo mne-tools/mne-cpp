@@ -7,7 +7,7 @@
 #include <QTemporaryFile>
 #include <math/warp.h>
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMathWarp : public QObject

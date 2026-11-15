@@ -27,8 +27,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -180,7 +180,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<GusbampTransport> ACQLIB::detail::make_gusbamp_simulator(std::vector<std::string> serials, const GusbampSimulation& simulation)
+std::unique_ptr<GusbampTransport> mne::detail::make_gusbamp_simulator(std::vector<std::string> serials, const GusbampSimulation& simulation)
 {
     return std::make_unique<GusbampSimulator>(std::move(serials), simulation);
 }

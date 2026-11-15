@@ -23,7 +23,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EVENTSLIB;
+using namespace mne::analyze::events;
 
 //=============================================================================================================
 // INIT STATIC MEMBERS
@@ -51,7 +51,7 @@ Event::Event(const idNum id, const int sample, const idNum groupId)
 
 //=============================================================================================================
 
-Event::Event(const EVENTSINTERNAL::EventINT& e)
+Event::Event(const detail::EventINT& e)
 : Event(e.getId(), e.getSample(), e.getGroupId())
 {
     duration = e.getDuration();
@@ -60,14 +60,14 @@ Event::Event(const EVENTSINTERNAL::EventINT& e)
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventINT::EventINT(idNum id)
+detail::EventINT::EventINT(idNum id)
 : EventINT(id, 0, 0)
 {
 }
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventINT::EventINT(idNum id, int iSample, idNum groupId)
+detail::EventINT::EventINT(idNum id, int iSample, idNum groupId)
 : m_iId(id)
 , m_iSample(iSample)
 , m_iDuration(0)
@@ -79,7 +79,7 @@ EVENTSINTERNAL::EventINT::EventINT(idNum id, int iSample, idNum groupId)
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
+detail::EventINT::EventINT(const EventINT& rhs)
 : m_iId(rhs.getId())
 , m_iSample(rhs.getSample())
 , m_iDuration(rhs.getDuration())
@@ -91,7 +91,7 @@ EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
 
 //=============================================================================================================
 
-EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
+detail::EventINT::EventINT(EventINT&& other)
 : m_iId(other.getId())
 , m_iSample(other.getSample())
 , m_iDuration(other.getDuration())
@@ -103,28 +103,28 @@ EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventINT::getSample() const
+int detail::EventINT::getSample() const
 {
     return m_iSample;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventINT::setSample(int iSample)
+void detail::EventINT::setSample(int iSample)
 {
     m_iSample = iSample;
 }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventINT::getDuration() const
+int detail::EventINT::getDuration() const
 {
     return m_iDuration;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventINT::setDuration(int iDuration)
+void detail::EventINT::setDuration(int iDuration)
 {
     // An event cannot end before it starts.
     m_iDuration = iDuration > 0 ? iDuration : 0;
@@ -132,75 +132,75 @@ void EVENTSINTERNAL::EventINT::setDuration(int iDuration)
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventINT::getEndSample() const
+int detail::EventINT::getEndSample() const
 {
     return m_iSample + m_iDuration;
 }
 
 //=============================================================================================================
 
-bool EVENTSINTERNAL::EventINT::isRanged() const
+bool detail::EventINT::isRanged() const
 {
     return m_iDuration > 0;
 }
 
 //=============================================================================================================
 
-int EVENTSINTERNAL::EventINT::getEventCode() const
+int detail::EventINT::getEventCode() const
 {
     return m_iEventCode;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventINT::setEventCode(int iEventCode)
+void detail::EventINT::setEventCode(int iEventCode)
 {
     m_iEventCode = iEventCode;
 }
 
 //=============================================================================================================
 
-idNum EVENTSINTERNAL::EventINT::getGroupId() const
+idNum detail::EventINT::getGroupId() const
 {
     return m_iGroup;
 }
 
 //=============================================================================================================
 
-void EVENTSINTERNAL::EventINT::setGroupId(idNum iGroup)
+void detail::EventINT::setGroupId(idNum iGroup)
 {
     m_iGroup = iGroup;
 }
 
 //=============================================================================================================
 
-idNum EVENTSINTERNAL::EventINT::getId() const
+idNum detail::EventINT::getId() const
 {
     return m_iId;
 }
 
 //=============================================================================================================
 
-std::string EVENTSINTERNAL::EventINT::getDescription() const
+std::string detail::EventINT::getDescription() const
 {
     return m_sDescription;
 }
 
 //=============================================================================================================
 
-bool EVENTSINTERNAL::EventINT::operator<(const EventINT& rhs) const
+bool detail::EventINT::operator<(const EventINT& rhs) const
 {
     return m_iSample < rhs.getSample();
 }
 
 //=============================================================================================================
 
-bool EVENTSINTERNAL::EventINT::operator==(const EventINT& rhs) const
+bool detail::EventINT::operator==(const EventINT& rhs) const
 {
     return (m_iId == rhs.getId());
 }
 
-EVENTSINTERNAL::EventINT EVENTSINTERNAL::EventINT::operator=(const EventINT& rhs)
+detail::EventINT detail::EventINT::operator=(const EventINT& rhs)
 {
-    return EVENTSINTERNAL::EventINT(rhs);
+    return detail::EventINT(rhs);
 }

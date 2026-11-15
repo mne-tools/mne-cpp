@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Tree item holding one hemisphere of source-space dipole positions rendered as batched spheres.
  *
- * Source-space points come from @ref MNELIB::MNESourceSpaces (the
+ * Source-space points come from @ref mne::MNESourceSpaces (the
  * decimated cortical grid used by the forward model). Each
  * hemisphere is rendered as a single batched-sphere mesh built by
- * @ref DISP3DLIB::MeshFactory::createBatchedSpheres so the typical
+ * @ref mne::disp::MeshFactory::createBatchedSpheres so the typical
  * ~7500-point ico-4 grid stays at one draw call per hemisphere.
  */
 
@@ -30,7 +30,7 @@
 #include <QVector3D>
 #include <QVector>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -81,6 +81,6 @@ private:
     float m_scale;                  /**< Radius/size for rendering. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // SOURCESPACETREEITEM_H

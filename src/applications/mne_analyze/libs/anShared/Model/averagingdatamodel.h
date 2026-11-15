@@ -42,16 +42,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvokedSet;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
@@ -70,7 +70,7 @@ public:
      * @param[in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty.
      * @param[in] parent       sets parent of the object. NULL if left empty.
      */
-    AveragingDataModel(std::shared_ptr<FIFFLIB::FiffEvokedSet> pEvokedSet = nullptr,
+    AveragingDataModel(std::shared_ptr<mne::FiffEvokedSet> pEvokedSet = nullptr,
                        QObject* parent = nullptr);
 
     //=========================================================================================================
@@ -126,7 +126,7 @@ public:
      *
      * @param[in] pEvokedSet   new evoked set to be saved.
      */
-    void setEvokedSet(std::shared_ptr<FIFFLIB::FiffEvokedSet> pEvokedSet);
+    void setEvokedSet(std::shared_ptr<mne::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
      *
      * @return the stored FiffEvokedSet.
      */
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> getEvokedSet();
+    std::shared_ptr<mne::FiffEvokedSet> getEvokedSet();
 
     //=========================================================================================================
     /**
@@ -191,10 +191,10 @@ public:
      *
      * @return  Shared pointer to FiffInfo of m_pFiffEvokedSet.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo();
+    std::shared_ptr<mne::FiffInfo> getFiffInfo();
 
 private:
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/
+    std::shared_ptr<mne::FiffEvokedSet> m_pFiffEvokedSet; /**<  Pointer to FiffEvokedData for the calculated average*/
 
     bool m_bFromFile;
 };

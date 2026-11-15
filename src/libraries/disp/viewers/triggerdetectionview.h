@@ -15,7 +15,7 @@
  * TriggerDetectionView lets the user pick the stim channel to monitor,
  * set the rising-edge threshold and reset the detected-event list.
  * Detected events feed the averaging pipeline and the
- * @ref DISPLIB::ChannelDataView trigger overlay.
+ * @ref mne::disp::ChannelDataView trigger overlay.
  */
 
 #ifndef TRIGGERDETECTIONVIEW_H
@@ -45,20 +45,20 @@ namespace Ui
 class TriggerDetectionViewWidget;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -98,7 +98,7 @@ public:
      *
      * @param[in] pFiffInfo  Measurement info whose STIM channels populate the trigger channel list; ignored if null.
      */
-    void init(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void init(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -189,7 +189,7 @@ protected:
 
     std::unique_ptr<Ui::TriggerDetectionViewWidget> m_pUi;
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
 
     QMap<double, QColor> m_qMapTriggerColor; /**< Trigger colors per detected type. */
 

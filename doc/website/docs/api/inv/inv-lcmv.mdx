@@ -1,13 +1,13 @@
 ---
 id: inv-lcmv
-title: "INVLIB::InvLCMV"
+title: "mne::InvLCMV"
 sidebar_label: InvLCMV
 sidebar_position: 3
 ---
 
 # InvLCMV
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_lcmv.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_lcmv.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/beamformer/inv_lcmv.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/beamformer/inv_lcmv.h)
 
 :::info[Python equivalent]
 `mne.beamformer.make_lcmv / apply_lcmv` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 3
 <Connections topics={["beamformers"]} context="api" current="InvLCMV" />
 
 ```cpp
-class INVLIB::InvLCMV
+class mne::InvLCMV
 ```
 
 Linearly Constrained Minimum Variance (LCMV) beamformer for MEG/EEG source localization.
@@ -208,7 +208,7 @@ The resolution matrix describes the point-spread function of the beamformer. Eac
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 126"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 123"
 FiffCov dataCov = noiseCov; // noise plus the two sources
 dataCov.data += g1 * g1.transpose() + g2 * g2.transpose();
 const InvBeamformer lcmv = InvLCMV::makeLCMV(info, fwd, dataCov, 0.05, noiseCov,

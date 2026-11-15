@@ -15,8 +15,8 @@
  * @c mne.Annotations type and writes them under
  * @c FIFFB_MNE_ANNOTATIONS; this header is the C++ mirror.
  *
- * @ref FIFFLIB::FiffAnnotation is one entry (onset in seconds since the
- * recording start, duration, description string), @ref FIFFLIB::FiffAnnotations is
+ * @ref mne::FiffAnnotation is one entry (onset in seconds since the
+ * recording start, duration, description string), @ref mne::FiffAnnotations is
  * the container; together they expose JSON and CSV serialization so the
  * same annotations can be exchanged with external tools that do not
  * speak FIFF (eg. BIDS sidecar files).
@@ -45,10 +45,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -252,7 +252,7 @@ public:
      *
      * @return The annotations, or why the file cannot be read (Io or Format).
      */
-    [[nodiscard]] static BASELIB::Expected<FiffAnnotations> read_json(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffAnnotations> read_json(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -263,7 +263,7 @@ public:
      *
      * @return The annotations, or why the file cannot be read (Io).
      */
-    [[nodiscard]] static BASELIB::Expected<FiffAnnotations> read_csv(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffAnnotations> read_csv(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ public:
      *
      * @return The annotations, or why the file cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffAnnotations> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffAnnotations> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -283,7 +283,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write_json(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write_json(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -293,7 +293,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write_csv(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write_csv(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -303,12 +303,12 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
 private:
     std::vector<FiffAnnotation> m_annotations; /**< Annotation storage. */
 };
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_ANNOTATIONS_H

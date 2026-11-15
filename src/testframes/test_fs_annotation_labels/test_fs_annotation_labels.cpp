@@ -13,7 +13,7 @@
 #include <fs/fs_label_utils.h>
 #include <fs/fs_colortable.h>
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFsAnnotationLabels : public QObject

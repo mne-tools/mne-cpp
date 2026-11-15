@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 using namespace MNESURF2BEM;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -200,7 +200,7 @@ void TestSurfaceChecks::testIsCompleteWithRealBemData()
     if (!QFile::exists(bemPath))
         QSKIP("BEM test data not available");
 
-    const MNELIB::MNEBem bem(bemPath.toStdU16String());
+    const mne::MNEBem bem(bemPath.toStdU16String());
 
     QVERIFY(bem.size() > 0);
     for (std::size_t i = 0; i < bem.size(); ++i) {

@@ -9,8 +9,8 @@
  * @date     March 2026
  * @brief    Argument record passed to a background raw-data filter worker.
  *
- * @ref MNELIB::FilterThreadArg bundles the input buffer, an
- * @ref MNELIB::MNEFilterDef and the completion callback that the
+ * @ref mne::FilterThreadArg bundles the input buffer, an
+ * @ref mne::MNEFilterDef and the completion callback that the
  * legacy raw-browser filter worker thread needs to run a filter on one
  * FIFF data buffer asynchronously. Kept POD-like so it can be passed
  * across @c QThread boundaries without ownership headaches.
@@ -39,16 +39,16 @@
 
 #include <memory>
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCoordTrans;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -75,17 +75,17 @@ public:
     ~FilterThreadArg();
 
 public:
-    MNESourceSpace* s;                                   /**< The source space to process. */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI-to-head coordinate transformation. */
-    std::weak_ptr<MNESurface> surf;                      /**< Non-owning reference to the inner skull BEM surface (owned by the caller). */
-    float limit;                                         /**< Distance limit for filtering (meters). */
-    std::ostream* filtered;                              /**< Optional stream to log omitted point locations (may be NULL). */
-    int stat;                                            /**< Status code indicating whether filtering succeeded. */
+    MNESourceSpace* s;                               /**< The source space to process. */
+    std::unique_ptr<mne::FiffCoordTrans> mri_head_t; /**< MRI-to-head coordinate transformation. */
+    std::weak_ptr<MNESurface> surf;                  /**< Non-owning reference to the inner skull BEM surface (owned by the caller). */
+    float limit;                                     /**< Distance limit for filtering (meters). */
+    std::ostream* filtered;                          /**< Optional stream to log omitted point locations (may be NULL). */
+    int stat;                                        /**< Status code indicating whether filtering succeeded. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // FILTERTHREADARG_H

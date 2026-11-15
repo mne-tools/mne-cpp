@@ -11,9 +11,9 @@
  * @brief    Composite real-time multi-channel time-series scroller (label panel, table view, time ruler, scrollbars).
  *
  * ChannelDataView assembles the four widgets that make up the rolling
- * raw-data browser: a @ref DISPLIB::ChannelLabelPanel column on the left, a
- * central @c QTableView driven by @ref DISPLIB::ChannelDataModel and
- * @ref DISPLIB::RtFiffRawViewDelegate, a @ref DISPLIB::TimeRulerWidget at the bottom
+ * raw-data browser: a @ref mne::disp::ChannelLabelPanel column on the left, a
+ * central @c QTableView driven by @ref mne::disp::ChannelDataModel and
+ * @ref mne::disp::RtFiffRawViewDelegate, a @ref mne::disp::TimeRulerWidget at the bottom
  * and synchronised vertical / horizontal @c QScrollBars. It exposes
  * playback controls, zoom and channel-selection signals that the
  * hosting Quick-Control panels feed into.
@@ -57,20 +57,20 @@ class QScrollBar;
 class QSplitter;
 class QToolButton;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 enum class DetrendMode;
@@ -113,7 +113,7 @@ public:
      *
      * @param[in] pInfo  Shared pointer to FiffInfo.
      */
-    void init(const std::shared_ptr<FIFFLIB::FiffInfo>& pInfo);
+    void init(const std::shared_ptr<mne::FiffInfo>& pInfo);
 
     // ── Data management ───────────────────────────────────────────────
 
@@ -518,7 +518,7 @@ private:
 
     bool m_channelScrollBarUpdating = false;
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
     QMap<qint32, float> m_scaleMap;
     QColor m_signalColor{Qt::darkGreen};
     QColor m_bgColor{250, 250, 250};
@@ -532,6 +532,6 @@ private:
     int m_lastFileSample = -1;  // -1 = not yet set
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // CHANNELDATAVIEW_H

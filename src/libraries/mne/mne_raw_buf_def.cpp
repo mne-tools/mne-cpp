@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNERawBufDef.
+ * @brief    Implementation of @ref mne::MNERawBufDef.
  *
  * Provides constructors and the per-buffer disk-to-Eigen materialiser
  * (handling int16 / int32 / float / double encodings with the
@@ -27,8 +27,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

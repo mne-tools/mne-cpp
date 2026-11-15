@@ -180,7 +180,7 @@ Qt::ItemFlags EpochModel::flags(const QModelIndex& index) const
 
 //=============================================================================================================
 
-void EpochModel::setEpochs(const QList<MNELIB::MNEEpochDataList>& epochLists,
+void EpochModel::setEpochs(const QList<mne::MNEEpochDataList>& epochLists,
                            const QList<int>& eventCodes,
                            int firstSample,
                            float sfreq)
@@ -191,7 +191,7 @@ void EpochModel::setEpochs(const QList<MNELIB::MNEEpochDataList>& epochLists,
 
     for (int eventIndex = 0; eventIndex < epochLists.size(); ++eventIndex) {
         const int eventCode = eventIndex < eventCodes.size() ? eventCodes.at(eventIndex) : 0;
-        const MNELIB::MNEEpochDataList& epochList = epochLists.at(eventIndex);
+        const mne::MNEEpochDataList& epochList = epochLists.at(eventIndex);
 
         for (const auto& epoch : epochList) {
             if (!epoch) {

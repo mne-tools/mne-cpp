@@ -1,18 +1,18 @@
 ---
 id: acq-impedance
-title: "ACQLIB::AcqImpedance"
+title: "mne::AcqImpedance"
 sidebar_label: AcqImpedance
 sidebar_position: 44
 ---
 
 # AcqImpedance
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_backend.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_backend.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_backend.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_backend.h)
 
 `#include <acq/acq_backend.h>`
 
 ```cpp
-struct ACQLIB::AcqImpedance
+struct mne::AcqImpedance
 ```
 
 Electrode impedance of one channel.
@@ -57,7 +57,7 @@ if (!reader || !device->start().ok()) {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 207"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 206"
     for (const AcqImpedance& z : *impedances) {
         if (z.ohms > kMaxImpedanceOhms) {
             std::printf("  check electrode %s: %.0f kOhm\n",

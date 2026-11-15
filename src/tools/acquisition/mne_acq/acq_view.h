@@ -29,6 +29,6 @@
  *
  * @return 0, or 2 when the source or the screenshot fails.
  */
-int runAcqView(ACQLIB::AcqDevice& device, double window, double duration, const QString& screenshot);
+int runAcqView(mne::AcqDevice& device, double window, double duration, const QString& screenshot);
 
 #endif // MNE_ACQ_VIEW_H

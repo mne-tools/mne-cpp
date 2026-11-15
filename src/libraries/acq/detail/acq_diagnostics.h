@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Internal instrumentation of ACQLIB for tests; not installed.
+ * @brief    Internal instrumentation of mne_acq for tests; not installed.
  */
 
 #ifndef ACQ_DIAGNOSTICS_H
@@ -22,18 +22,18 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 //=============================================================================================================
 /**
- * @return Number of mutex acquisitions inside ACQLIB since process start; the data path must not change it.
+ * @return Number of mutex acquisitions inside mne_acq since process start; the data path must not change it.
  */
 ACQSHARED_EXPORT std::uint64_t controlLockCount() noexcept;
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // ACQ_DIAGNOSTICS_H

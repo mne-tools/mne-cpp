@@ -18,7 +18,7 @@
 
 #include <QInputDialog>
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 const static float m_dDefaultMin(0.0f);
 const static float m_dDefaultMax(1.0f);

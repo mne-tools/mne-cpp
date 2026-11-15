@@ -50,8 +50,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 using namespace std::chrono_literals;
 
 namespace
@@ -378,8 +378,8 @@ void TestAcqLsl::readsInTreeOutlet()
         QSKIP("liblsl not found");
     }
     const std::string name = uniqueName("intree");
-    LSLLIB::stream_outlet outlet(
-        LSLLIB::stream_info(name, "EEG", kChannels, kSfreq, static_cast<LSLLIB::ChannelFormat>(lslFormat), name));
+    mne::stream_outlet outlet(
+        mne::stream_info(name, "EEG", kChannels, kSfreq, static_cast<mne::ChannelFormat>(lslFormat), name));
     auto device = AcqDevice::open("lsl://" + name + "?timeout=5&library=" + library.toStdString());
     QVERIFY2(device, device ? "" : device.error().text().c_str());
     AcqReaderOptions gating;
@@ -399,7 +399,7 @@ void TestAcqLsl::readsInTreeOutlet()
             chunk[s][c] = static_cast<float>(value(s, c));
         }
     }
-    const double pushed = LSLLIB::local_clock();
+    const double pushed = mne::local_clock();
     outlet.push_chunk(chunk);
     const std::vector<double> got = drain(*reader, chunk.size());
     QCOMPARE(got.size(), chunk.size() * kChannels);
@@ -413,7 +413,7 @@ void TestAcqLsl::readsInTreeOutlet()
     const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(
                             std::chrono::steady_clock::now().time_since_epoch())
                             .count();
-    const double want = static_cast<double>(steady) + (stamp - LSLLIB::local_clock()) * 1e9;
+    const double want = static_cast<double>(steady) + (stamp - mne::local_clock()) * 1e9;
     QVERIFY2(std::abs(static_cast<double>(clock.anchorHostNs) - want) < 5e6,
              qPrintable(QString("clock off by %1 ms").arg((static_cast<double>(clock.anchorHostNs) - want) / 1e6)));
     device->close();
@@ -431,7 +431,7 @@ void TestAcqLsl::pylslReadsInTreeOutlet()
         QSKIP("pylsl with its liblsl not installed for the Python on the PATH");
     }
     const std::string name = uniqueName("topylsl");
-    LSLLIB::stream_outlet outlet(LSLLIB::stream_info(name, "EEG", kChannels, kSfreq, LSLLIB::ChannelFormat::Int16, name));
+    mne::stream_outlet outlet(mne::stream_info(name, "EEG", kChannels, kSfreq, mne::ChannelFormat::Int16, name));
     // pylsl resolves the outlet by name, checks its description, reads 300 samples and prints them.
     const QString script = QStringLiteral(
                                "import pylsl,sys\n"

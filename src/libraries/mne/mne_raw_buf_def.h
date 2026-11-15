@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Descriptor of a single @c FIFF_DATA_BUFFER block (file offset, sample range, type).
  *
- * @ref MNELIB::MNERawBufDef is the C++ port of @c mneRawBufDefRec. It
+ * @ref mne::MNERawBufDef is the C++ port of @c mneRawBufDefRec. It
  * lets the raw reader perform random-access seek to any sample without
  * rescanning the file because each buffer's first sample, length and
  * FIFF datatype are precomputed once at open time.
@@ -33,10 +33,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -72,7 +72,7 @@ public:
 
 
 public:
-    FIFFLIB::FiffDirEntry ent;                                                  /**< Directory entry locating this buffer in the FIFF file (file buffers only). */
+    mne::FiffDirEntry ent;                                                      /**< Directory entry locating this buffer in the FIFF file (file buffers only). */
     int firsts = 0;                                                             /**< First sample index. */
     int lasts = 0;                                                              /**< Last sample index. */
     int ntaper = 0;                                                             /**< Taper length for filtered buffers. */
@@ -85,6 +85,6 @@ public:
     int comp_status = 0;                                                        /**< Compensation status for raw buffers. */
 };
 
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNERAWBUFDEF_H

@@ -1,21 +1,21 @@
 ---
 id: mne-surface
-title: "MNELIB::MNESurface"
+title: "mne::MNESurface"
 sidebar_label: MNESurface
 sidebar_position: 53
 ---
 
 # MNESurface
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_surface.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_surface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_surface.h)
 
 `#include <mne/mne_surface.h>`
 
 ```cpp
-class MNELIB::MNESurface
+class mne::MNESurface
 ```
 
-Implements the MNE [FsSurface](/docs/api/fs/fs-surface) (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C `mne_types.h`).
+Implements the MNE [`FsSurface`](/docs/api/fs/fs-surface) (Replaces typedef mneSurfaceOrVolume mneSurface; struct of MNE-C `mne_types.h`).
 
 Lightweight triangulated surface (vertices, triangles, normals).
 
@@ -50,13 +50,13 @@ classDiagram
 
 ### MNESurface()
 
-Constructs the MNE [FsSurface](/docs/api/fs/fs-surface).
+Constructs the MNE [`FsSurface`](/docs/api/fs/fs-surface).
 
 ---
 
 ### ~MNESurface()
 
-Destroys the MNE [FsSurface](/docs/api/fs/fs-surface).
+Destroys the MNE [`FsSurface`](/docs/api/fs/fs-surface).
 
 ---
 
@@ -300,7 +300,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
   Path to the BEM FIFF file.
 
 - **which** : *int*
-  FsSurface ID to load (-1 loads the first found).
+  [`FsSurface`](/docs/api/fs/fs-surface) ID to load (-1 loads the first found).
 
 - **add_geometry** : *bool*
   If true, compute full geometry info.
@@ -321,7 +321,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking enabled).
   Path to the BEM FIFF file.
 
 - **which** : *int*
-  FsSurface ID to load (-1 loads the first found).
+  [`FsSurface`](/docs/api/fs/fs-surface) ID to load (-1 loads the first found).
 
 - **add_geometry** : *bool*
   If true, compute full geometry info.
@@ -345,7 +345,7 @@ Read a BEM surface from a FIFF file (excess-neighbor checking disabled).
   Path to the BEM FIFF file.
 
 - **which** : *int*
-  FsSurface ID to load (-1 loads the first found).
+  [`FsSurface`](/docs/api/fs/fs-surface) ID to load (-1 loads the first found).
 
 - **add_geometry** : *bool*
   If true, compute full geometry info.
@@ -366,7 +366,7 @@ Read a BEM surface from a FIFF file.
   Path to the BEM FIFF file.
 
 - **which** : *int*
-  FsSurface ID to load (-1 loads the first found).
+  [`FsSurface`](/docs/api/fs/fs-surface) ID to load (-1 loads the first found).
 
 - **add_geometry** : *bool*
   If true, compute full geometry info.
@@ -396,7 +396,7 @@ Read a BEM surface from a FIFF file.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 443"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 441"
 // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
 auto skull = MNESurface::read_bem_surface2(bemPath.toStdU16String(), FIFFV_BEM_SURF_ID_BRAIN, true);
 skull->compute_surface_cm();

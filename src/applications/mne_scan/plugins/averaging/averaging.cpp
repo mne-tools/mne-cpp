@@ -39,11 +39,9 @@
 //=============================================================================================================
 
 using namespace AVERAGINGPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
-using namespace DISPLIB;
-using namespace DSPLIB;
+using namespace mne::scan;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -68,7 +66,7 @@ std::map<std::string, double> toStdThresholds(const QMap<QString, double>& thres
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pCircularBuffer(std::make_shared<BASELIB::CircularBuffer<FIFFLIB::FiffEvokedSet>>(40))
+: m_pCircularBuffer(std::make_shared<mne::CircularBuffer<mne::FiffEvokedSet>>(40))
 {
 }
 
@@ -139,7 +137,7 @@ QWidget* Averaging::setupWidget()
 
 //=============================================================================================================
 
-void Averaging::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void Averaging::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
@@ -395,7 +393,7 @@ void Averaging::onChangeBaselineActive(bool state)
 
 //=============================================================================================================
 
-void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
+void Averaging::onNewEvokedSet(const mne::FiffEvokedSet& evokedSet,
                                const QStringList& lResponsibleTriggerTypes)
 {
     if (!this->isRunning()) {
@@ -428,7 +426,7 @@ void Averaging::onResetAverage(bool state)
 
 void Averaging::run()
 {
-    FIFFLIB::FiffEvokedSet evokedSet;
+    mne::FiffEvokedSet evokedSet;
     QStringList lResponsibleTriggerTypes;
 
     while (!isInterruptionRequested()) {

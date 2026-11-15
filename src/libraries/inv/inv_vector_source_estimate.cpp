@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref INVLIB::InvVectorSourceEstimate.
+ * @brief    Implementation of @ref mne::InvVectorSourceEstimate.
  *
  * Implements the constructors, the L2-norm magnitude collapse, the
  * signed projection onto surface normals and the per-vertex slice
@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

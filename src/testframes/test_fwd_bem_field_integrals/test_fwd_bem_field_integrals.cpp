@@ -51,8 +51,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace

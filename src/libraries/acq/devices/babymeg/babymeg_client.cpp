@@ -31,9 +31,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using COMLIB::TcpSocket;
+using namespace mne;
+using namespace mne::detail;
+using mne::TcpSocket;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -207,8 +207,8 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<BabyMegTransport>> ACQLIB::detail::connect_babymeg(const std::string& host, std::uint16_t data_port,
-                                                                               std::uint16_t command_port, std::chrono::milliseconds timeout)
+AcqExpected<std::unique_ptr<BabyMegTransport>> mne::detail::connect_babymeg(const std::string& host, std::uint16_t data_port,
+                                                                            std::uint16_t command_port, std::chrono::milliseconds timeout)
 {
     auto data = TcpSocket::connect(host, data_port, timeout);
     if (!data) {

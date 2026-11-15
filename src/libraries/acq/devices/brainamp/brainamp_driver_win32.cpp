@@ -35,8 +35,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -162,7 +162,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<BrainAmpTransport>> ACQLIB::detail::openBrainAmpDriver()
+AcqExpected<std::unique_ptr<BrainAmpTransport>> mne::detail::openBrainAmpDriver()
 {
     constexpr DWORD kFlags = FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH;
     bool usb = true;

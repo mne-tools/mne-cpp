@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMshDisplaySurfaceSet.
+ * @brief    Implementation of @ref mne::MNEMshDisplaySurfaceSet.
  *
  * Implements addition / lookup of named surfaces, the per-set apply of
  * a new colour scale and the broadcast of camera / light updates to all
@@ -68,18 +68,18 @@ constexpr int SHOW_OVERLAY_HEAT = 1;
 // STATIC DATA
 //=============================================================================================================
 
-static MNELIB::MNEMshEyes default_eyes;
-static MNELIB::MNEMshEyes* all_eyes = nullptr;
+static mne::MNEMshEyes default_eyes;
+static mne::MNEMshEyes* all_eyes = nullptr;
 static int neyes = 0;
 static int current_eyes = -1;
 
-static std::unique_ptr<MNELIB::MNEMshLightSet> custom_lights;
+static std::unique_ptr<mne::MNEMshLightSet> custom_lights;
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -123,13 +123,13 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
       * Load new display surface data
       */
 {
-    const std::filesystem::path surfDir = subjects_dir / BASELIB::pathFromUtf8(subject_id) / "surf";
-    const std::filesystem::path pathLh = surfDir / BASELIB::pathFromUtf8("lh." + surf);
+    const std::filesystem::path surfDir = subjects_dir / mne::pathFromUtf8(subject_id) / "surf";
+    const std::filesystem::path pathLh = surfDir / mne::pathFromUtf8("lh." + surf);
     const std::filesystem::path pathLhCurv = surfDir / "lh.curv";
-    const std::filesystem::path pathRh = surfDir / BASELIB::pathFromUtf8("rh." + surf);
+    const std::filesystem::path pathRh = surfDir / mne::pathFromUtf8("rh." + surf);
     const std::filesystem::path pathRhCurv = surfDir / "rh.curv";
 
-    BASELIB::Log::info("Loading surface {} ...\n", BASELIB::utf8FromPath(pathLh));
+    mne::Log::info("Loading surface {} ...\n", mne::utf8FromPath(pathLh));
     auto left = MNESourceSpace::load_surface(pathLh, pathLhCurv);
     if (!left) {
         left = MNESourceSpace::load_surface(pathLh, {});
@@ -138,7 +138,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
         left->add_uniform_curv();
     }
 
-    BASELIB::Log::info("Loading surface {} ...\n", BASELIB::utf8FromPath(pathRh));
+    mne::Log::info("Loading surface {} ...\n", mne::utf8FromPath(pathRh));
     auto right = MNESourceSpace::load_surface(pathRh, pathRhCurv);
     if (!right) {
         right = MNESourceSpace::load_surface(pathRh, {});
@@ -193,7 +193,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const std::filesystem::path& filepa
                                              int full_geom,
                                              int check)
 {
-    BASELIB::Log::info("Loading BEM surface {} (id = {}) from {} ...\n", bemname, kind, BASELIB::utf8FromPath(filepath));
+    mne::Log::info("Loading BEM surface {} (id = {}) from {} ...\n", bemname, kind, mne::utf8FromPath(filepath));
 
     std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath, kind, full_geom));
     if (!surf)
@@ -203,7 +203,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const std::filesystem::path& filepa
         surf->compute_surface_cm();
         double sum = surf->sum_solids(Eigen::Map<const Eigen::Vector3f>(surf->cm)) / (4 * std::numbers::pi);
         if (std::fabs(sum - 1.0) > 1e-4) {
-            BASELIB::Log::critical("{} surface is not closed (sum of solid angles = {:g} * 4*PI).", bemname, sum);
+            mne::Log::critical("{} surface is not closed (sum of solid angles = {:g} * 4*PI).", bemname, sum);
             return -1;
         }
     }

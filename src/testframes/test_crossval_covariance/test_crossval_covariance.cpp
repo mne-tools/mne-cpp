@@ -19,7 +19,7 @@
  *    1. Both sides load the same raw FIFF file (sample data).
  *    2. C++  computes the result using the library under test.
  *    3. Python computes the reference via numpy.savetxt → temp file.
- *    4. C++  reads the file-based result with MATHLIB::read_matrix.
+ *    4. C++  reads the file-based result with mne::read_matrix.
  *    5. Element-wise comparison within a numeric tolerance.
  *  -----------------------------------------------------------------
  *
@@ -65,9 +65,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace STSLIB;
-using namespace FIFFLIB;
-using namespace PYBRIDGELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -130,7 +128,7 @@ private:
 void TestCrossvalCovariance::initTestCase()
 {
     // --- Paths ---
-    m_sDataPath = QString::fromStdString(BASELIB::utf8FromPath(PythonTestHelper::test_data_path())) + "/";
+    m_sDataPath = QString::fromStdString(mne::utf8FromPath(PythonTestHelper::test_data_path())) + "/";
     m_sRawFile = m_sDataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
 
     QVERIFY2(QFile::exists(m_sRawFile),
@@ -249,12 +247,12 @@ void TestCrossvalCovariance::computePythonCovariance()
     QVERIFY2(result.success, std::format("Python failed (exit {}): {}", result.exit_code, result.std_err).c_str());
 
     // Parse shrinkage from stdout
-    const std::optional<double> alpha = BASELIB::toDouble(BASELIB::trimmed(result.std_out));
+    const std::optional<double> alpha = mne::toDouble(mne::trimmed(result.std_out));
     QVERIFY2(alpha, std::format("Could not parse shrinkage: '{}'", result.std_out).c_str());
     m_pyAlpha = *alpha;
 
     // Read covariance matrix from file
-    QVERIFY2(MATHLIB::read_matrix(m_pyCov, covFilePath.toStdString()), "Failed to read Python covariance matrix from file");
+    QVERIFY2(mne::read_matrix(m_pyCov, covFilePath.toStdString()), "Failed to read Python covariance matrix from file");
 
     QCOMPARE(m_pyCov.rows(), m_nChannels);
     QCOMPARE(m_pyCov.cols(), m_nChannels);

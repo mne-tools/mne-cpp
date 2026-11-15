@@ -3,11 +3,11 @@
   "namespaces": {
     "std": "Standard library.",
     "Ui": "Qt Designer generated form classes.",
-    "SURFACEKEYS": "String-key constants for disp3D surface lookups, not types."
+    "mne::disp::surface_keys": "String-key constants for disp3D surface lookups, not types."
   },
   "classes": {
-    "ACQLIB::AcqExtension": "Declared ahead of its implementation; registered with the FIFF bridge that implements and exercises it.",
-    "ACQLIB::AcqFiffChannel": "Declared ahead of its implementation; registered with the FIFF bridge that implements and exercises it.",
-    "FIFFLIB::FiffEvokedFile": "Internal reader behind FiffEvoked::read and FiffEvokedSet::read; its header is not installed."
+    "mne::AcqExtension": "Declared ahead of its implementation; registered with the FIFF bridge that implements and exercises it.",
+    "mne::AcqFiffChannel": "Declared ahead of its implementation; registered with the FIFF bridge that implements and exercises it.",
+    "mne::FiffEvokedFile": "Internal reader behind FiffEvoked::read and FiffEvokedSet::read; its header is not installed."
   }
 }

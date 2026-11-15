@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Dynamic Imaging of Coherent Sources (DICS) beamformer — frequency-domain source-power and source-time-course estimation.
  *
- * @ref INVLIB::InvDICS implements the DICS beamformer of Gross et al.,
+ * @ref mne::InvDICS implements the DICS beamformer of Gross et al.,
  * PNAS 98(2), 694-699 (2001). Where LCMV operates on a time-domain data
  * covariance, DICS designs one spatial filter per frequency bin from
  * the corresponding cross-spectral density (CSD) matrix, yielding
@@ -54,20 +54,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 class MNEForwardSolution;
 }
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -103,13 +103,13 @@ public:
      *
      * @return Beamformer with one filter weight matrix per frequency.
      */
-    static InvBeamformer makeDICS(const FIFFLIB::FiffInfo& info,
-                                  const MNELIB::MNEForwardSolution& forward,
+    static InvBeamformer makeDICS(const mne::FiffInfo& info,
+                                  const mne::MNEForwardSolution& forward,
                                   const std::vector<Eigen::MatrixXd>& csdMatrices,
                                   const Eigen::VectorXd& frequencies,
                                   double reg = 0.05,
                                   bool realFilter = true,
-                                  const FIFFLIB::FiffCov& noiseCov = FIFFLIB::FiffCov(),
+                                  const mne::FiffCov& noiseCov = mne::FiffCov(),
                                   BeamformerPickOri pickOri = BeamformerPickOri::None,
                                   BeamformerWeightNorm weightNorm = BeamformerWeightNorm::UnitNoiseGain,
                                   bool reduceRank = false,
@@ -171,6 +171,6 @@ public:
                                                           int freqIdx = 0);
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_DICS_H

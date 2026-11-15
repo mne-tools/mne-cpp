@@ -36,7 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -44,7 +44,7 @@ using namespace ANSHAREDLIB;
 
 AnalyzeData::AnalyzeData(QObject* pParent)
 : QObject(pParent)
-, m_pData(new DISPLIB::BidsViewModel(this))
+, m_pData(new mne::disp::BidsViewModel(this))
 {
     m_pCommu = new Communicator();
 }

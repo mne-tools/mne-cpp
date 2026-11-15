@@ -35,7 +35,7 @@
 //=============================================================================================================
 
 using namespace EEGOSPORTSPLUGIN;
-using namespace CHANNELSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -177,7 +177,7 @@ void EEGoSportsSetupProjectWidget::onCardinalComboBoxChanged()
 
 void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    const auto layout = LayoutLoader::read_elc(BASELIB::pathFromUtf8(sPath.toStdString()));
+    const auto layout = LayoutLoader::read_elc(mne::pathFromUtf8(sPath.toStdString()));
     if (!layout) {
         qCritical() << "Unable to read elc file.";
         return;

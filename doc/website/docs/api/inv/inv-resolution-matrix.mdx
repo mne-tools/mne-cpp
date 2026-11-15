@@ -1,13 +1,13 @@
 ---
 id: inv-resolution-matrix
-title: "INVLIB::InvResolutionMatrix"
+title: "mne::InvResolutionMatrix"
 sidebar_label: InvResolutionMatrix
 sidebar_position: 17
 ---
 
 # InvResolutionMatrix
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_resolution_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_resolution_matrix.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_resolution_matrix.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_resolution_matrix.h)
 
 :::info[Python equivalent]
 `mne.minimum_norm.make_inverse_resolution_matrix` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 17
 `#include <inv/inv_resolution_matrix.h>`
 
 ```cpp
-class INVLIB::InvResolutionMatrix
+class mne::InvResolutionMatrix
 ```
 
 Resolution matrix analysis for linear inverse operators.
@@ -182,7 +182,7 @@ Distance between true source location and the location of the maximum of the PSF
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 142"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 139"
 mne.doInverseSetup(evoked.nave);
 const MatrixXd& kernel = mne.getKernel(); // 210 source components x 364 good channels
 const MNEForwardSolution goodFwd = fwd.pick_channels(inverse.noise_cov.names);

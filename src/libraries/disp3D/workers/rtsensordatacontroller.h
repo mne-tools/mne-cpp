@@ -10,8 +10,8 @@
  * @brief    Real-time MEG / EEG sensor streaming controller that orchestrates the data and field-mapping workers.
  *
  * RtSensorDataController spins up a background @ref
- * DISP3DLIB::RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
- * ABGR packing) and an optional @ref DISP3DLIB::RtSensorInterpolationMatWorker
+ * mne::disp::RtSensorDataWorker (queue, averaging, dense mat-vec mapping,
+ * ABGR packing) and an optional @ref mne::disp::RtSensorInterpolationMatWorker
  * (asynchronous recomputation of the dense mapping matrix when the
  * sensor configuration, projectors or target surface change) and
  * ties them together with a timer that paces the streaming.
@@ -46,7 +46,7 @@
 class QThread;
 class QTimer;
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class RtSensorDataWorker;
@@ -60,7 +60,7 @@ class RtSensorInterpolationMatWorker;
  *
  * Unlike the source-estimate controller (which uses sparse interpolation matrices
  * split by hemisphere), this controller uses a single dense mapping matrix
- * produced by FWDLIB::FwdFieldMap::computeMeg/EegMapping() that maps sensor measurements
+ * produced by mne::FwdFieldMap::computeMeg/EegMapping() that maps sensor measurements
  * directly to surface vertex values.
  *
  * The controller can either accept a precomputed mapping matrix via
@@ -210,7 +210,7 @@ public:
      *
      * @param[in] evoked    The evoked dataset.
      */
-    void setEvoked(const FIFFLIB::FiffEvoked& evoked);
+    void setEvoked(const mne::FiffEvoked& evoked);
 
     //=========================================================================================================
     /**
@@ -219,7 +219,7 @@ public:
      * @param[in] trans              The transform.
      * @param[in] applySensorTrans   Whether to apply the transform.
      */
-    void setTransform(const FIFFLIB::FiffCoordTrans& trans, bool applySensorTrans);
+    void setTransform(const mne::FiffCoordTrans& trans, bool applySensorTrans);
 
     //=========================================================================================================
     /**
@@ -323,15 +323,15 @@ private slots:
 
 private:
     QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
-    DISP3DLIB::RtSensorDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
+    mne::disp::RtSensorDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
     QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
     bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
     QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
-    DISP3DLIB::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
+    mne::disp::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_RTSENSORDATACONTROLLER_H

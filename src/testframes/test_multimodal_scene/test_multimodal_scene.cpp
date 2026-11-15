@@ -27,7 +27,7 @@
 #include <QSignalSpy>
 #include <QtTest>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 class TestMultimodalScene : public QObject
@@ -358,16 +358,16 @@ void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
 void TestMultimodalScene::testStripLayoutSkipsCylinderGeometry()
 {
     // A strip has no shaft: its two contacts are joined by one thin tie
-    IEEGLIB::IeegContact c0;
+    mne::IeegContact c0;
     c0.name = "S1";
-    IEEGLIB::IeegContact c1;
+    mne::IeegContact c1;
     c1.name = "S2";
     c1.position = Eigen::Vector3f(0.01f, 0.0f, 0.0f);
 
     ElectrodeObject obj;
-    obj.setImplantation(IEEGLIB::IeegImplantation({c0, c1}));
+    obj.setImplantation(mne::IeegImplantation({c0, c1}));
 
-    QCOMPARE(obj.implantation().leads().front().type, IEEGLIB::IeegLeadType::Strip);
+    QCOMPARE(obj.implantation().leads().front().type, mne::IeegLeadType::Strip);
     QCOMPARE(obj.bodyStreams().instanceCount, 1);
     QCOMPARE(obj.contactStreams().instanceCount, 2);
 }

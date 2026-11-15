@@ -7,20 +7,20 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref MLLIB::MlTensor including row-major/Eigen interop and shared-buffer reshape.
+ * @brief    Implementation of @ref mne::MlTensor including row-major/Eigen interop and shared-buffer reshape.
  *
  * The translation unit keeps the storage rule in one place: every
  * owning constructor allocates a @c std::shared_ptr<std::vector<float>>
  * sized from the product of the shape, copies (or moves) the caller's
  * buffer in, and points @c m_data at the shared vector. The static
- * @ref MLLIB::MlTensor::view factory bypasses that allocation and
- * leaves @c m_storage null so @ref MLLIB::MlTensor::isView can still
+ * @ref mne::MlTensor::view factory bypasses that allocation and
+ * leaves @c m_storage null so @ref mne::MlTensor::isView can still
  * distinguish the two cases later.
  *
  * Eigen interop is handled with @c Eigen::Map: row-major maps over the
  * tensor's own buffer for in-place access, and assignment from a
  * column-major @c MatrixXf / @c MatrixXd transposes the layout in a
- * single Eigen expression. @ref MLLIB::MlTensor::reshape simply
+ * single Eigen expression. @ref mne::MlTensor::reshape simply
  * clones the @c shared_ptr and rewrites the shape vector, which is why
  * any number of reshaped or sliced tensors can share one allocation
  * without lifetime headaches.
@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MLLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

@@ -37,27 +37,24 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace BASELIB;
-using namespace MNELIB;
 
 //=============================================================================================================
-// DEFINE GLOBAL DSPLIB METHODS
+// DEFINE GLOBAL mne_dsp METHODS
 //=============================================================================================================
 
-bool DSPLIB::filterFile(const std::filesystem::path& path,
-                        const std::shared_ptr<FiffRawData>& pFiffRawData,
-                        int type,
-                        double dCenterfreq,
-                        double bandwidth,
-                        double dTransition,
-                        double dSFreq,
-                        int iOrder,
-                        int designMethod,
-                        const RowVectorXi& vecPicks,
-                        bool bUseThreads)
+bool mne::filterFile(const std::filesystem::path& path,
+                     const std::shared_ptr<FiffRawData>& pFiffRawData,
+                     int type,
+                     double dCenterfreq,
+                     double bandwidth,
+                     double dTransition,
+                     double dSFreq,
+                     int iOrder,
+                     int designMethod,
+                     const RowVectorXi& vecPicks,
+                     bool bUseThreads)
 {
     // Normalize cut off frequencies to nyquist
     dCenterfreq = dCenterfreq / (dSFreq / 2.0);
@@ -83,11 +80,11 @@ bool DSPLIB::filterFile(const std::filesystem::path& path,
 
 //=============================================================================================================
 
-bool DSPLIB::filterFile(const std::filesystem::path& path,
-                        const std::shared_ptr<FiffRawData>& pFiffRawData,
-                        const FilterKernel& filterKernel,
-                        const RowVectorXi& vecPicks,
-                        bool bUseThreads)
+bool mne::filterFile(const std::filesystem::path& path,
+                     const std::shared_ptr<FiffRawData>& pFiffRawData,
+                     const FilterKernel& filterKernel,
+                     const RowVectorXi& vecPicks,
+                     bool bUseThreads)
 {
     int iOrder = filterKernel.getFilterOrder();
 
@@ -173,17 +170,17 @@ bool DSPLIB::filterFile(const std::filesystem::path& path,
 
 //=============================================================================================================
 
-MatrixXd DSPLIB::filterData(const MatrixXd& matData,
-                            int type,
-                            double dCenterfreq,
-                            double bandwidth,
-                            double dTransition,
-                            double dSFreq,
-                            int iOrder,
-                            int designMethod,
-                            const RowVectorXi& vecPicks,
-                            bool bUseThreads,
-                            bool bKeepOverhead)
+MatrixXd mne::filterData(const MatrixXd& matData,
+                         int type,
+                         double dCenterfreq,
+                         double bandwidth,
+                         double dTransition,
+                         double dSFreq,
+                         int iOrder,
+                         int designMethod,
+                         const RowVectorXi& vecPicks,
+                         bool bUseThreads,
+                         bool bKeepOverhead)
 {
     // Check for size of data
     if (matData.cols() < iOrder) {
@@ -215,11 +212,11 @@ MatrixXd DSPLIB::filterData(const MatrixXd& matData,
 
 //=============================================================================================================
 
-MatrixXd DSPLIB::filterData(const MatrixXd& matData,
-                            const FilterKernel& filterKernel,
-                            const RowVectorXi& vecPicks,
-                            bool bUseThreads,
-                            bool bKeepOverhead)
+MatrixXd mne::filterData(const MatrixXd& matData,
+                         const FilterKernel& filterKernel,
+                         const RowVectorXi& vecPicks,
+                         bool bUseThreads,
+                         bool bKeepOverhead)
 {
     int iOrder = filterKernel.getFilterOrder();
 
@@ -290,10 +287,10 @@ MatrixXd DSPLIB::filterData(const MatrixXd& matData,
 
 //=============================================================================================================
 
-MatrixXd DSPLIB::filterDataBlock(const MatrixXd& matData,
-                                 const RowVectorXi& vecPicks,
-                                 const FilterKernel& filterKernel,
-                                 bool bUseThreads)
+MatrixXd mne::filterDataBlock(const MatrixXd& matData,
+                              const RowVectorXi& vecPicks,
+                              const FilterKernel& filterKernel,
+                              bool bUseThreads)
 {
     int iOrder = filterKernel.getFilterOrder();
 
@@ -353,7 +350,7 @@ MatrixXd DSPLIB::filterDataBlock(const MatrixXd& matData,
 
 //=============================================================================================================
 
-void DSPLIB::filterChannel(DSPLIB::FilterObject& channelDataTime)
+void mne::filterChannel(mne::FilterObject& channelDataTime)
 {
     //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
     channelDataTime.filterKernel.applyFftFilter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
@@ -517,18 +514,18 @@ void FilterOverlapAdd::reset()
 
 //=============================================================================================================
 
-FiffEvoked DSPLIB::computeFilteredAverage(const FiffRawData& raw,
-                                          const MatrixXi& matEvents,
-                                          float fTMinS,
-                                          float fTMaxS,
-                                          qint32 eventType,
-                                          bool bApplyBaseline,
-                                          float fTBaselineFromS,
-                                          float fTBaselineToS,
-                                          const std::map<std::string, double>& mapReject,
-                                          const FilterKernel& filterKernel,
-                                          const StringList& lExcludeChs,
-                                          const RowVectorXi& picks)
+FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
+                                       const MatrixXi& matEvents,
+                                       float fTMinS,
+                                       float fTMaxS,
+                                       qint32 eventType,
+                                       bool bApplyBaseline,
+                                       float fTBaselineFromS,
+                                       float fTBaselineToS,
+                                       const std::map<std::string, double>& mapReject,
+                                       const FilterKernel& filterKernel,
+                                       const StringList& lExcludeChs,
+                                       const RowVectorXi& picks)
 {
     MNEEpochDataList lstEpochDataList;
 
@@ -544,7 +541,7 @@ FiffEvoked DSPLIB::computeFilteredAverage(const FiffRawData& raw,
     }
     selected.conservativeResize(1, count);
     if (count > 0) {
-        Log::info("[DSPLIB::computeFilteredAverage] {} matching events found", count);
+        Log::info("[mne::computeFilteredAverage] {} matching events found", count);
     }
 
     // If picks are empty, pick all
@@ -575,7 +572,7 @@ FiffEvoked DSPLIB::computeFilteredAverage(const FiffRawData& raw,
 
         if (raw.read_raw_segment(epoch->epoch, timesDummy, from - iFilterDelay, to + iFilterDelay, picksNew)) {
             // Filter the data
-            epoch->epoch = DSPLIB::filterData(epoch->epoch, filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to - from + 1);
+            epoch->epoch = mne::filterData(epoch->epoch, filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to - from + 1);
 
             if (p == 0) {
                 times.resize(1, to - from + 1);

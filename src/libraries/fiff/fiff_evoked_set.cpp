@@ -62,9 +62,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -72,8 +71,8 @@ using namespace BASELIB;
 
 FiffEvokedSet::FiffEvokedSet()
 {
-    qRegisterMetaType<FIFFLIB::FiffEvokedSet>("FIFFLIB::FiffEvokedSet");
-    qRegisterMetaType<std::shared_ptr<FIFFLIB::FiffEvokedSet>>();
+    qRegisterMetaType<mne::FiffEvokedSet>("mne::FiffEvokedSet");
+    qRegisterMetaType<std::shared_ptr<mne::FiffEvokedSet>>();
 }
 
 //=============================================================================================================
@@ -247,16 +246,16 @@ FiffEvokedSet FiffEvokedSet::computeGrandAverage(const std::vector<FiffEvokedSet
         StringList bads;
         for (const FiffEvokedSet& eset : evokedSets) {
             for (const std::string& bad : eset.evoked[j].info.bads) {
-                if (!FIFFLIB::has_channel(bads, bad)) {
+                if (!mne::has_channel(bads, bad)) {
                     bads.push_back(bad);
                 }
             }
         }
         StringList common;
         for (const std::string& name : evokedSets.front().evoked[j].info.ch_names) {
-            bool inAll = !FIFFLIB::has_channel(bads, name);
+            bool inAll = !mne::has_channel(bads, name);
             for (const FiffEvokedSet& eset : evokedSets) {
-                inAll = inAll && FIFFLIB::has_channel(eset.evoked[j].info.ch_names, name);
+                inAll = inAll && mne::has_channel(eset.evoked[j].info.ch_names, name);
             }
             if (inAll) {
                 common.push_back(name);
@@ -426,7 +425,7 @@ bool FiffEvokedSet::checkArtifacts(const MatrixXd& epoch,
 {
     for (int c = 0; c < epoch.rows(); ++c) {
         // Skip bad channels
-        if (FIFFLIB::has_channel(bads, info.ch_names[c]))
+        if (mne::has_channel(bads, info.ch_names[c]))
             continue;
 
         double minVal = epoch.row(c).minCoeff();

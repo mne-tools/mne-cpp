@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Axis tick positions and labels shared by the DISPLIB plot widgets; not installed.
+ * @brief    Axis tick positions and labels shared by the mne_disp plot widgets; not installed.
  */
 
 #ifndef DISPLIB_DETAIL_NICETICKS_H
@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace DISPLIB
+namespace mne::disp
 {
 namespace detail
 {
@@ -61,6 +61,6 @@ inline QString tickLabel(double value)
 }
 
 } // namespace detail
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // DISPLIB_DETAIL_NICETICKS_H

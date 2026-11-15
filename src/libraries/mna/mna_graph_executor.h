@@ -7,22 +7,22 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Stateless executor that runs an @ref MNALIB::MnaGraph in topological order, in batch or stream mode, and reports progress.
+ * @brief    Stateless executor that runs an @ref mne::MnaGraph in topological order, in batch or stream mode, and reports progress.
  *
- * @ref MNALIB::MnaGraphExecutor is the bridge between the declarative
- * @ref MNALIB::MnaGraph and the live op functions registered with
- * @ref MNALIB::MnaOpRegistry. @ref MNALIB::MnaGraphExecutor::execute "execute" walks the topologically-sorted
- * node list, feeds each one its inputs from the @ref MNALIB::MnaGraphExecutor::Context
+ * @ref mne::MnaGraphExecutor is the bridge between the declarative
+ * @ref mne::MnaGraph and the live op functions registered with
+ * @ref mne::MnaOpRegistry. @ref mne::MnaGraphExecutor::execute "execute" walks the topologically-sorted
+ * node list, feeds each one its inputs from the @ref mne::MnaGraphExecutor::Context
  * result map (keyed by @c nodeId::portName) plus the @c graphInputs
  * map, invokes the registered op function and stores the outputs
- * back into the context; @ref MNALIB::MnaGraphExecutor::executeIncremental "executeIncremental" restricts the
+ * back into the context; @ref mne::MnaGraphExecutor::executeIncremental "executeIncremental" restricts the
  * walk to dirty nodes and their downstream dependents so a
  * parameter tweak does not re-run the whole pipeline.
  *
- * Stream mode (@ref MNALIB::MnaGraphExecutor::startStream "startStream" / @ref MNALIB::MnaGraphExecutor::stopStream "stopStream") targets MNE Scan:
+ * Stream mode (@ref mne::MnaGraphExecutor::startStream "startStream" / @ref mne::MnaGraphExecutor::stopStream "stopStream") targets MNE Scan:
  * instead of calling op functions, the executor asks a host-supplied
- * @ref MNALIB::MnaGraphExecutor::PluginFactory "PluginFactory" for a live @c QObject per node, applies
- * @ref MNALIB::MnaParamTree values to the plugin's attributes, and wires
+ * @ref mne::MnaGraphExecutor::PluginFactory "PluginFactory" for a live @c QObject per node, applies
+ * @ref mne::MnaParamTree values to the plugin's attributes, and wires
  * up port connections so the graph drives a continuously-running
  * real-time pipeline. The mna library deliberately holds plugins
  * as @c QObject* to avoid pulling in MNE Scan as a dependency.
@@ -55,16 +55,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 class MnaGraph;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -196,6 +196,6 @@ private:
     static ProgressCallback s_progressCallback;
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_GRAPH_EXECUTOR_H

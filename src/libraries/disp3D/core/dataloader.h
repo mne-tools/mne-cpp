@@ -9,10 +9,10 @@
  * @date     March 2026
  * @brief    Static helpers for loading FreeSurfer / MNE source-space and BEM data into the disp3D model tree.
  *
- * DataLoader is a thin facade over @ref FSLIB and @ref MNELIB readers
+ * DataLoader is a thin facade over @c mne_fs and @c mne_mne readers
  * that turns raw files (FsSurface, FsAnnotation, MNESourceSpaces,
  * MNEBemSurface, FIFF digitizer / sensor blocks) into the in-memory
- * objects that @ref DISP3DLIB::BrainTreeModel and the @c renderable/ layer
+ * objects that @ref mne::disp::BrainTreeModel and the @c renderable/ layer
  * expect. It exists so GUI code can populate the 3-D scene without
  * knowing the FreeSurfer / MNE file-format conventions (subject
  * directory layout, hemisphere suffixes, surface-RAS vs head
@@ -50,7 +50,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class BrainSurface;
@@ -82,11 +82,11 @@ public:
         bool hasInfo = false;
         bool hasDigitizer = false;
 
-        FIFFLIB::FiffInfo info;             ///< Channel / dig info
+        mne::FiffInfo info;                 ///< Channel / dig info
         QList<QStandardItem*> megGradItems; ///< Ownership passes to caller
         QList<QStandardItem*> megMagItems;
         QList<QStandardItem*> eegItems;
-        FIFFLIB::FiffDigPointSet digitizerPoints;
+        mne::FiffDigPointSet digitizerPoints;
 
         std::shared_ptr<BrainSurface> helmetSurface; ///< May be null
 
@@ -125,7 +125,7 @@ public:
      * @param[in] dipPath  Path to the dipole file.
      * @return The loaded InvEcdSet (may be empty on failure).
      */
-    static INVLIB::InvEcdSet loadDipoles(const QString& dipPath);
+    static mne::InvEcdSet loadDipoles(const QString& dipPath);
 
     /**
      * Load source space from a forward-solution FIF file.
@@ -133,7 +133,7 @@ public:
      * @param[in] fwdPath  Path to the FIF file with source space.
      * @return The loaded source space (may be empty on failure).
      */
-    static MNELIB::MNESourceSpaces loadSourceSpace(const QString& fwdPath);
+    static mne::MNESourceSpaces loadSourceSpace(const QString& fwdPath);
 
     /**
      * Load the Head ↔ MRI transformation from a FIF file and normalise it
@@ -144,7 +144,7 @@ public:
      * @return true on success; false if the file holds no Head ↔ MRI transform.
      */
     static bool loadHeadToMriTransform(const QString& transPath,
-                                       FIFFLIB::FiffCoordTrans& trans);
+                                       mne::FiffCoordTrans& trans);
 
     /**
      * Load an FiffEvoked from a FIF file.
@@ -153,7 +153,7 @@ public:
      * @param[in] aveIndex    Set index to load.
      * @return The loaded FiffEvoked (may be empty on failure).
      */
-    static FIFFLIB::FiffEvoked loadEvoked(const QString& evokedPath, int aveIndex = 0);
+    static mne::FiffEvoked loadEvoked(const QString& evokedPath, int aveIndex = 0);
 
     /**
      * Probe a FIF file for the available evoked data sets.
@@ -164,6 +164,6 @@ public:
     static QStringList probeEvokedSets(const QString& evokedPath);
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DATALOADER_H

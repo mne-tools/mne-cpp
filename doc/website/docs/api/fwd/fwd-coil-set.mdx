@@ -1,20 +1,20 @@
 ---
 id: fwd-coil-set
-title: "FWDLIB::FwdCoilSet"
+title: "mne::FwdCoilSet"
 sidebar_label: FwdCoilSet
 sidebar_position: 8
 ---
 
 # FwdCoilSet
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_coil_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_coil_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_coil_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_coil_set.h)
 
 `#include <fwd/fwd_coil_set.h>`
 
 <Connections topics={["forward-modeling"]} context="api" current="FwdCoilSet" />
 
 ```cpp
-class FWDLIB::FwdCoilSet
+class mne::FwdCoilSet
 ```
 
 Implements [`FwdCoilSet`](/docs/api/fwd/fwd-coil-set) (replaces `fwdCoilSet` / `fwdCoilSetRec` from MNE-C ``fwd_types.h``).
@@ -224,7 +224,7 @@ Read a coil definitions from file.
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 116"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 114"
 auto templates = FwdCoilSet::read_coil_defs(coilDefs.toStdU16String()); // integration points per coil type
 auto coils = templates->create_meg_coils(meg, static_cast<int>(meg.size()), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
 const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates

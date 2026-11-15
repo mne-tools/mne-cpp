@@ -1,18 +1,18 @@
 ---
 id: infomax-result
-title: "DSPLIB::InfomaxResult"
+title: "mne::InfomaxResult"
 sidebar_label: InfomaxResult
 sidebar_position: 54
 ---
 
 # InfomaxResult
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/extended_infomax.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/extended_infomax.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/extended_infomax.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/extended_infomax.h)
 
 `#include <dsp/extended_infomax.h>`
 
 ```cpp
-struct DSPLIB::InfomaxResult
+struct mne::InfomaxResult
 ```
 
 Result structure for Extended Infomax [`ICA`](/docs/api/dsp/ica).
@@ -36,7 +36,7 @@ const InfomaxResult infomax = ExtendedInfomax::compute(centered, 3, 500, 0.1, 1e
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 138"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 136"
 const MatrixXd centered = mixed.colwise() - mixed.rowwise().mean();                            // infomax expects zero-mean data
 const InfomaxResult infomax = ExtendedInfomax::compute(centered, 3, 500, 0.1, 1e-7, true, 42); // the 0.001 default is too slow here
 ok &= expect(infomax.converged && worstRecovery(infomax.matSources, sources) > 0.99,

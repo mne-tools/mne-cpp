@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -53,38 +53,38 @@ FiffRawData::FiffRawData(const std::filesystem::path& path)
 
 //=============================================================================================================
 
-FiffRawData::FiffRawData(std::unique_ptr<BASELIB::ByteStream> bytes)
+FiffRawData::FiffRawData(std::unique_ptr<mne::ByteStream> bytes)
 : FiffRawData(read(std::move(bytes)).value())
 {
 }
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffRawData> FiffRawData::read(const std::filesystem::path& path, bool allow_maxshield)
+mne::Expected<FiffRawData> FiffRawData::read(const std::filesystem::path& path, bool allow_maxshield)
 {
-    auto bytes = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Read);
+    auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!bytes) {
-        return BASELIB::fail(BASELIB::ErrorCode::Io, "cannot open {}", BASELIB::utf8FromPath(path));
+        return mne::fail(mne::ErrorCode::Io, "cannot open {}", mne::utf8FromPath(path));
     }
-    return read(std::make_unique<FiffStream>(std::move(bytes), BASELIB::utf8FromPath(path)), allow_maxshield);
+    return read(std::make_unique<FiffStream>(std::move(bytes), mne::utf8FromPath(path)), allow_maxshield);
 }
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffRawData> FiffRawData::read(std::unique_ptr<BASELIB::ByteStream> bytes, bool allow_maxshield)
+mne::Expected<FiffRawData> FiffRawData::read(std::unique_ptr<mne::ByteStream> bytes, bool allow_maxshield)
 {
     if (!bytes) {
-        return BASELIB::fail(BASELIB::ErrorCode::Io, "no raw data bytes");
+        return mne::fail(mne::ErrorCode::Io, "no raw data bytes");
     }
     return read(std::make_unique<FiffStream>(std::move(bytes)), allow_maxshield);
 }
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffRawData> FiffRawData::read(std::unique_ptr<FiffStream> stream, bool allow_maxshield)
+mne::Expected<FiffRawData> FiffRawData::read(std::unique_ptr<FiffStream> stream, bool allow_maxshield)
 {
-    using BASELIB::ErrorCode;
-    using BASELIB::fail;
+    using mne::ErrorCode;
+    using mne::fail;
     const std::string name = stream->stream_name();
     if (!stream->open()) {
         return fail(ErrorCode::Io, "cannot open {}", name);
@@ -202,7 +202,7 @@ BASELIB::Expected<FiffRawData> FiffRawData::read(std::unique_ptr<FiffStream> str
     data.file = std::move(stream);
     data.file->close();
 
-    BASELIB::Log::info("\tRange : {} ... {}  =  {:9.3f} ... {:9.3f} secs", data.first_samp, data.last_samp, static_cast<double>(data.first_samp) / data.info.sfreq, static_cast<double>(data.last_samp) / data.info.sfreq);
+    mne::Log::info("\tRange : {} ... {}  =  {:9.3f} ... {:9.3f} secs", data.first_samp, data.last_samp, static_cast<double>(data.first_samp) / data.info.sfreq, static_cast<double>(data.last_samp) / data.info.sfreq);
     return data;
 }
 
@@ -255,7 +255,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         to = this->last_samp;
     //
     if (from > to) {
-        BASELIB::Log::warning("No data in this range {} ... {}  =  {:9.3f} ... {:9.3f} secs...", from, to, (static_cast<float>(from)) / this->info.sfreq, (static_cast<float>(to)) / this->info.sfreq);
+        mne::Log::warning("No data in this range {} ... {}  =  {:9.3f} ... {:9.3f} secs...", from, to, (static_cast<float>(from)) / this->info.sfreq, (static_cast<float>(to)) / this->info.sfreq);
         return false;
     }
     //
@@ -340,7 +340,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     FiffStream& fid = *this->file;
     const bool open_here = !fid.is_open();
     if (open_here && !fid.reopen()) {
-        BASELIB::Log::warning("Cannot open file {}", this->info.filename);
+        mne::Log::warning("Cannot open file {}", this->info.filename);
         return false;
     }
 
@@ -357,7 +357,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 //  Take the easy route: skip is translated to zeros
                 //
                 if (do_debug)
-                    BASELIB::Log::debug("S");
+                    mne::Log::debug("S");
                 if (sel.cols() <= 0)
                     one.resize(nchan, thisRawDir.nsamp);
                 else
@@ -383,7 +383,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if (t_pTag->type == FIFFT_DOUBLE)
                             one = cal * Map<const MatrixXd>(t_pTag->to_double(), nchan, thisRawDir.nsamp);
                         else {
-                            BASELIB::Log::warning("Data Storage Format not known yet [1]!! Type: {}\n", t_pTag->type);
+                            mne::Log::warning("Data Storage Format not known yet [1]!! Type: {}\n", t_pTag->type);
                             if (open_here)
                                 this->file->close();
                             return false;
@@ -418,7 +418,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else {
-                            BASELIB::Log::warning("Data Storage Format not known yet [2]!! Type: {}\n", t_pTag->type);
+                            mne::Log::warning("Data Storage Format not known yet [2]!! Type: {}\n", t_pTag->type);
                             if (open_here)
                                 this->file->close();
                             return false;
@@ -438,7 +438,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if (t_pTag->type == FIFFT_DOUBLE)
                         one = mult * Map<const MatrixXd>(t_pTag->to_double(), nchan, thisRawDir.nsamp);
                     else {
-                        BASELIB::Log::warning("Data Storage Format not known yet [3]!! Type: {}\n", t_pTag->type);
+                        mne::Log::warning("Data Storage Format not known yet [3]!! Type: {}\n", t_pTag->type);
                         if (open_here)
                             this->file->close();
                         return false;
@@ -455,7 +455,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0; //1;
                 last_pick = thisRawDir.nsamp - 1;
                 if (do_debug)
-                    BASELIB::Log::debug("W");
+                    mne::Log::debug("W");
             } else if (from > thisRawDir.first) {
                 first_pick = from - thisRawDir.first; // + 1;
                 if (to < thisRawDir.last) {
@@ -464,14 +464,14 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     //
                     last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1; //is this alright?
                     if (do_debug)
-                        BASELIB::Log::debug("M");
+                        mne::Log::debug("M");
                 } else {
                     //
                     //  From the middle to the end
                     //
                     last_pick = thisRawDir.nsamp - 1;
                     if (do_debug)
-                        BASELIB::Log::debug("E");
+                        mne::Log::debug("E");
                 }
             } else {
                 //
@@ -480,7 +480,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;                    //1;
                 last_pick = to - thisRawDir.first; // + 1;
                 if (do_debug)
-                    BASELIB::Log::debug("B");
+                    mne::Log::debug("B");
             }
             //
             //  Now we are ready to pick
@@ -488,9 +488,9 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             picksamp = last_pick - first_pick + 1;
 
             if (do_debug) {
-                BASELIB::Log::debug("first_pick: {}", first_pick);
-                BASELIB::Log::debug("last_pick: {}", last_pick);
-                BASELIB::Log::debug("picksamp: {}", picksamp);
+                mne::Log::debug("first_pick: {}", first_pick);
+                mne::Log::debug("last_pick: {}", last_pick);
+                mne::Log::debug("picksamp: {}", picksamp);
             }
 
             if (picksamp > 0) {
@@ -551,7 +551,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         to = this->last_samp;
     //
     if (from > to) {
-        BASELIB::Log::warning("No data in this range");
+        mne::Log::warning("No data in this range");
         return false;
     }
     //
@@ -638,7 +638,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
     FiffStream& fid = *this->file;
     const bool open_here = !fid.is_open();
     if (open_here && !fid.reopen()) {
-        BASELIB::Log::warning("Cannot open file {}", this->info.filename);
+        mne::Log::warning("Cannot open file {}", this->info.filename);
         return false;
     }
 
@@ -654,7 +654,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 //  Take the easy route: skip is translated to zeros
                 //
                 if (do_debug)
-                    BASELIB::Log::debug("S");
+                    mne::Log::debug("S");
                 if (sel.cols() <= 0)
                     one.resize(nchan, thisRawDir.nsamp);
                 else
@@ -681,7 +681,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         else if (t_pTag->type == FIFFT_DOUBLE)
                             one = cal * Map<const MatrixXd>(t_pTag->to_double(), nchan, thisRawDir.nsamp);
                         else {
-                            BASELIB::Log::warning("Data Storage Format not known yet [1]!! Type: {}\n", t_pTag->type);
+                            mne::Log::warning("Data Storage Format not known yet [1]!! Type: {}\n", t_pTag->type);
                             if (open_here)
                                 this->file->close();
                             return false;
@@ -716,7 +716,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else {
-                            BASELIB::Log::warning("Data Storage Format not known yet [2]!! Type: {}\n", t_pTag->type);
+                            mne::Log::warning("Data Storage Format not known yet [2]!! Type: {}\n", t_pTag->type);
                             if (open_here)
                                 this->file->close();
                             return false;
@@ -736,7 +736,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     else if (t_pTag->type == FIFFT_DOUBLE)
                         one = mult * Map<const MatrixXd>(t_pTag->to_double(), nchan, thisRawDir.nsamp);
                     else {
-                        BASELIB::Log::warning("Data Storage Format not known yet [3]!! Type: {}\n", t_pTag->type);
+                        mne::Log::warning("Data Storage Format not known yet [3]!! Type: {}\n", t_pTag->type);
                         if (open_here)
                             this->file->close();
                         return false;
@@ -753,7 +753,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0; //1;
                 last_pick = thisRawDir.nsamp - 1;
                 if (do_debug)
-                    BASELIB::Log::debug("W");
+                    mne::Log::debug("W");
             } else if (from > thisRawDir.first) {
                 first_pick = from - thisRawDir.first; // + 1;
                 if (to < thisRawDir.last) {
@@ -762,14 +762,14 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     //
                     last_pick = thisRawDir.nsamp + to - thisRawDir.last - 1; //is this alright?
                     if (do_debug)
-                        BASELIB::Log::debug("M");
+                        mne::Log::debug("M");
                 } else {
                     //
                     //  From the middle to the end
                     //
                     last_pick = thisRawDir.nsamp - 1;
                     if (do_debug)
-                        BASELIB::Log::debug("E");
+                        mne::Log::debug("E");
                 }
             } else {
                 //
@@ -778,7 +778,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 first_pick = 0;                    //1;
                 last_pick = to - thisRawDir.first; // + 1;
                 if (do_debug)
-                    BASELIB::Log::debug("B");
+                    mne::Log::debug("B");
             }
             //
             //  Now we are ready to pick
@@ -786,9 +786,9 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
             picksamp = last_pick - first_pick + 1;
 
             if (do_debug) {
-                BASELIB::Log::debug("first_pick: {}", first_pick);
-                BASELIB::Log::debug("last_pick: {}", last_pick);
-                BASELIB::Log::debug("picksamp: {}", picksamp);
+                mne::Log::debug("first_pick: {}", first_pick);
+                mne::Log::debug("last_pick: {}", last_pick);
+                mne::Log::debug("picksamp: {}", picksamp);
             }
 
             if (picksamp > 0) {
@@ -859,14 +859,14 @@ int FiffRawData::activate_projections()
 
 //=============================================================================================================
 
-BASELIB::Expected<void> FiffRawData::apply_gradient_compensation(int grade)
+mne::Expected<void> FiffRawData::apply_gradient_compensation(int grade)
 {
     const int current = info.get_current_comp();
     if (current == grade) {
         return {};
     }
     if (!info.make_compensator(current, grade, comp)) {
-        return BASELIB::fail(BASELIB::ErrorCode::Format, "cannot compensate from grade {} to grade {}", current, grade);
+        return mne::fail(mne::ErrorCode::Format, "cannot compensate from grade {} to grade {}", current, grade);
     }
     info.set_current_comp(grade);
     return {};
@@ -887,7 +887,7 @@ bool FiffRawData::save(const std::filesystem::path& path,
     int lastSamp = (to >= 0) ? to : last_samp;
 
     if (firstSamp > lastSamp) {
-        BASELIB::Log::warning("[FiffRawData::save] Invalid sample range.");
+        mne::Log::warning("[FiffRawData::save] Invalid sample range.");
         return false;
     }
 
@@ -903,7 +903,7 @@ bool FiffRawData::save(const std::filesystem::path& path,
     RowVectorXd calsOut;
     auto pStream = FiffStream::start_writing_raw(path, outInfo, calsOut, picks);
     if (!pStream) {
-        BASELIB::Log::warning("[FiffRawData::save] Cannot start writing raw file.");
+        mne::Log::warning("[FiffRawData::save] Cannot start writing raw file.");
         return false;
     }
 
@@ -921,7 +921,7 @@ bool FiffRawData::save(const std::filesystem::path& path,
         MatrixXd segData;
         MatrixXd segTimes;
         if (!read_raw_segment(segData, segTimes, samp, samp + nsamp - 1, picks)) {
-            BASELIB::Log::warning("[FiffRawData::save] Error reading data at sample {}", samp);
+            mne::Log::warning("[FiffRawData::save] Error reading data at sample {}", samp);
             pStream->finish_writing_raw();
             return false;
         }
@@ -941,6 +941,6 @@ bool FiffRawData::save(const std::filesystem::path& path,
 
     pStream->finish_writing_raw();
 
-    BASELIB::Log::info("[FiffRawData::save] Saved raw data from sample {} to {} (decim= {} )", firstSamp, lastSamp, decim);
+    mne::Log::info("[FiffRawData::save] Saved raw data from sample {} to {} (decim= {} )", firstSamp, lastSamp, decim);
     return true;
 }

@@ -30,8 +30,7 @@
 //=============================================================================================================
 
 using namespace LSLADAPTERPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -66,7 +65,7 @@ void LSLAdapterProducer::readStream()
 
     // start to stream: build a stream inlet
     try {
-        m_StreamInlet = std::make_unique<LSLLIB::stream_inlet>(m_StreamInfo);
+        m_StreamInlet = std::make_unique<mne::stream_inlet>(m_StreamInfo);
         m_StreamInlet->open_stream();
     } catch (std::exception& e) {
         qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to open LSL stream inlet: " << e.what();
@@ -122,7 +121,7 @@ void LSLAdapterProducer::readStream()
 
 //=============================================================================================================
 
-void LSLAdapterProducer::setStreamInfo(const LSLLIB::stream_info& stream)
+void LSLAdapterProducer::setStreamInfo(const mne::stream_info& stream)
 {
     m_StreamInfo = stream;
     m_bHasStreamInfo = true;
@@ -145,7 +144,7 @@ void LSLAdapterProducer::reset()
     // clear buffer
     m_vBufferedSamples.clear();
     // reset lsl members
-    m_StreamInfo = LSLLIB::stream_info();
+    m_StreamInfo = mne::stream_info();
     m_StreamInlet.reset();
 }
 

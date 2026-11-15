@@ -41,7 +41,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -75,10 +75,10 @@ MatrixXd InvSignalModel::fitData(const InvHpiModelParameters& hpiModelParameters
 bool InvSignalModel::checkEmpty(const InvHpiModelParameters& hpiModelParameters)
 {
     if (hpiModelParameters.vecHpiFreqs().empty()) {
-        BASELIB::Log::warning("InvSignalModel::checkEmpty - no Hpi frequencies set");
+        mne::Log::warning("InvSignalModel::checkEmpty - no Hpi frequencies set");
         return true;
     } else if (hpiModelParameters.iSampleFreq() == 0) {
-        BASELIB::Log::warning("InvSignalModel::checkEmpty - no sampling frequencies set");
+        mne::Log::warning("InvSignalModel::checkEmpty - no sampling frequencies set");
         return true;
     }
     return false;
@@ -110,7 +110,7 @@ void InvSignalModel::computeInverseBasicModel()
         matSimsig.col(i) = sin(2 * std::numbers::pi * m_modelParameters.vecHpiFreqs()[i] * vecTime.array());
         matSimsig.col(i + iNumCoils) = cos(2 * std::numbers::pi * m_modelParameters.vecHpiFreqs()[i] * vecTime.array());
     }
-    m_matInverseSignalModel = MATHLIB::Linalg::pinv(matSimsig);
+    m_matInverseSignalModel = mne::Linalg::pinv(matSimsig);
 }
 
 //=============================================================================================================
@@ -134,6 +134,6 @@ void InvSignalModel::computeInverseAdvancedModel()
     }
     matSimsig.col(iNumCoils * 4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
     matSimsig.col(iNumCoils * 4 + 1).fill(1);
-    matSimsigInvTemp = MATHLIB::Linalg::pinv(matSimsig);
+    matSimsigInvTemp = mne::Linalg::pinv(matSimsig);
     m_matInverseSignalModel = matSimsigInvTemp.block(0, 0, iNumCoils * 2, m_iCurrentModelCols);
 }

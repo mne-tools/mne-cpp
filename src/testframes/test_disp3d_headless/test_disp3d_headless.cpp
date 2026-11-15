@@ -25,7 +25,7 @@
 
 #include <fiff/fiff.h>
 
-using namespace DISP3DLIB;
+using namespace mne::disp;
 using namespace Eigen;
 
 class TestDisp3dHeadless : public QObject
@@ -333,7 +333,7 @@ private slots:
             QSKIP("Transform file not available");
         }
 
-        FIFFLIB::FiffCoordTrans trans;
+        mne::FiffCoordTrans trans;
         bool ok = DataLoader::loadHeadToMriTransform(transFile, trans);
         QVERIFY(ok);
     }

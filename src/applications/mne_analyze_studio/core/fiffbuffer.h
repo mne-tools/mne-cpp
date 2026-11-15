@@ -40,7 +40,7 @@ public:
     QJsonObject getMetadata() const override;
     QIODevice* device() const override;
 
-    const FIFFLIB::FiffRawData& rawData() const;
+    const mne::FiffRawData& rawData() const;
 
 private:
     void loadHeaderMetadata();
@@ -48,8 +48,8 @@ private:
     QString m_filePath;
     mutable QJsonObject m_metadata;
     QFile m_file;
-    FIFFLIB::FiffStream* m_stream = nullptr; // owned by m_rawData
-    FIFFLIB::FiffRawData m_rawData;
+    mne::FiffStream* m_stream = nullptr; // owned by m_rawData
+    mne::FiffRawData m_rawData;
 };
 
 } // namespace MNEANALYZESTUDIO

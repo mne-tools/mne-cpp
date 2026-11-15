@@ -1,18 +1,18 @@
 ---
 id: brain-view
-title: "DISP3DLIB::BrainView"
+title: "mne::disp::BrainView"
 sidebar_label: BrainView
 sidebar_position: 20
 ---
 
 # BrainView
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/brainview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/brainview.h)
 
 `#include <disp3D/brainview.h>`
 
 ```cpp
-class DISP3DLIB::BrainView
+class mne::disp::BrainView
 ```
 
 [`BrainView`](/docs/api/disp3-d/brain-view) is the main widget for the 3D brain visualization.
@@ -99,7 +99,7 @@ Each view can start from a different orientation (e.g., top, front, left).
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 92"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 90"
 QApplication app(argc, argv); // BrainView is a widget
 bool ok = true;
 ````
@@ -108,7 +108,7 @@ bool ok = true;
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 288"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 284"
 BrainView* pBrainView = new BrainView();
 BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);
@@ -118,7 +118,7 @@ pBrainView->setModel(pModel);
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 581"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 576"
 BrainView* pBrainView = new BrainView();
 BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);

@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Templated dipole and dipole-pair value types used by the RAP-MUSIC scanning algorithm.
  *
- * @ref INVLIB::InvDipole<T> is a templated representation of a single
+ * @ref mne::InvDipole<T> is a templated representation of a single
  * current dipole (position + orientation, optionally length and
- * frequency) and @ref INVLIB::InvDipolePair<T> a pair of correlated
+ * frequency) and @ref mne::InvDipolePair<T> a pair of correlated
  * dipoles returned by one iteration of the RAP-MUSIC search. The
- * templates are kept separate from the rest of INVLIB so that
+ * templates are kept separate from the rest of mne_inv so that
  * scanning code can run in @c float, @c double or even integer-index
  * mode without forcing a global precision choice. The header
  * includes its own @c .cpp at the bottom because the templates have to
@@ -32,10 +32,10 @@
 #include <iostream>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -161,9 +161,9 @@ private:
 } // NAMESPACE
 
 //TypeDefs
-typedef INVLIB::InvDipole<int> InvDipole_INT;
-typedef INVLIB::InvDipole<float> InvDipole_FLOAT;
-typedef INVLIB::InvDipole<double> InvDipole_DOUBLE;
+typedef mne::InvDipole<int> InvDipole_INT;
+typedef mne::InvDipole<float> InvDipole_FLOAT;
+typedef mne::InvDipole<double> InvDipole_DOUBLE;
 
 //Make the template definition visible to compiler in the first point of instantiation
 #include "inv_dipole.cpp"

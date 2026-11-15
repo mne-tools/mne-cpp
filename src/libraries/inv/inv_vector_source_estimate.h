@@ -9,13 +9,13 @@
  * @date     May 2026
  * @brief    Free-orientation surface source estimate carrying a 3-component vector per vertex.
  *
- * @ref INVLIB::InvVectorSourceEstimate extends
- * @ref INVLIB::InvSourceEstimate so that the data matrix holds an interleaved
+ * @ref mne::InvVectorSourceEstimate extends
+ * @ref mne::InvSourceEstimate so that the data matrix holds an interleaved
  * @c (x,y,z) triplet per surface vertex — the output of free- or loose-
  * orientation MNE / dSPM solutions before any orientation pooling. The
- * class adds the @ref INVLIB::InvVectorSourceEstimate::magnitude "magnitude" collapse to scalar magnitude, the
- * @ref INVLIB::InvVectorSourceEstimate::projectToNormals "projectToNormals" signed-projection helper and per-vertex
- * @ref INVLIB::InvVectorSourceEstimate::vertexData "vertexData" access, mirroring mne-python's
+ * class adds the @ref mne::InvVectorSourceEstimate::magnitude "magnitude" collapse to scalar magnitude, the
+ * @ref mne::InvVectorSourceEstimate::projectToNormals "projectToNormals" signed-projection helper and per-vertex
+ * @ref mne::InvVectorSourceEstimate::vertexData "vertexData" access, mirroring mne-python's
  * @c VectorSourceEstimate.
  */
 
@@ -29,10 +29,10 @@
 #include "inv_source_estimate.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -100,6 +100,6 @@ public:
     InvSourceEstimate projectToNormals(const Eigen::MatrixX3f& normals) const;
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_VECTOR_SOURCE_ESTIMATE_H

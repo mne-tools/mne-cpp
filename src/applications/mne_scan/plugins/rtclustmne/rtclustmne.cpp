@@ -60,15 +60,9 @@
 //=============================================================================================================
 
 using namespace RTCLUSTMNEPLUGIN;
-using namespace FIFFLIB;
-using namespace SCMEASLIB;
-using namespace DISPLIB;
-using namespace INVLIB;
-using namespace DSPLIB;
-using namespace SCSHAREDLIB;
-using namespace BASELIB;
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
+using namespace mne::scan;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -76,8 +70,8 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtClustMne::RtClustMne()
-: m_pCircularMatrixBuffer(std::make_shared<BASELIB::CircularBuffer<Eigen::MatrixXd>>(40))
-, m_pCircularEvokedBuffer(std::make_shared<CircularBuffer<FIFFLIB::FiffEvoked>>(40))
+: m_pCircularMatrixBuffer(std::make_shared<mne::CircularBuffer<Eigen::MatrixXd>>(40))
+, m_pCircularEvokedBuffer(std::make_shared<CircularBuffer<mne::FiffEvoked>>(40))
 , m_bEvokedInput(false)
 , m_bRawInput(false)
 , m_bUpdateMinimumNorm(false)
@@ -119,7 +113,7 @@ void RtClustMne::init()
     m_pAnnotationSet = std::make_shared<FsAnnotationSet>((m_sAtlasDir + "/lh.aparc.a2009s.annot").toStdU16String(), (m_sAtlasDir + "/rh.aparc.a2009s.annot").toStdU16String());
     m_pSurfaceSet = std::make_shared<FsSurfaceSet>((m_sSurfaceDir + "/lh.orig").toStdU16String(), (m_sSurfaceDir + "/rh.orig").toStdU16String());
     // The sample-data transform is optional; a missing file leaves no transform
-    m_mriHeadTrans = FIFFLIB::FiffCoordTrans::read(m_fMriHeadTrans.fileName().toStdU16String()).value_or(FIFFLIB::FiffCoordTrans());
+    m_mriHeadTrans = mne::FiffCoordTrans::read(m_fMriHeadTrans.fileName().toStdU16String()).value_or(mne::FiffCoordTrans());
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
@@ -272,7 +266,7 @@ bool RtClustMne::calcFiffInfo()
         //Pick only channels which are present in all data structures (covariance, evoked and forward)
         m_qListPickChannels.clear();
         for (const std::string& ch : m_pFiffInfoForward->ch_names) {
-            if (FIFFLIB::has_channel(m_pFiffInfoInput->ch_names, ch) && FIFFLIB::has_channel(m_qListCovChNames, ch))
+            if (mne::has_channel(m_pFiffInfoInput->ch_names, ch) && mne::has_channel(m_qListCovChNames, ch))
                 m_qListPickChannels.push_back(ch);
         }
         RowVectorXi sel = m_pFiffInfoInput->pick_channels(m_qListPickChannels);
@@ -340,7 +334,7 @@ QWidget* RtClustMne::setupWidget()
 
 //=============================================================================================================
 
-void RtClustMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTFS(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
         //
@@ -371,7 +365,7 @@ void RtClustMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtClustMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTMSA(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
@@ -418,7 +412,7 @@ void RtClustMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtClustMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTC(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
@@ -446,7 +440,7 @@ void RtClustMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtClustMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtClustMne::updateRTE(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (m_pFwd) {
         if (QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
@@ -587,7 +581,7 @@ void RtClustMne::run()
     bool bUpdateMinimumNorm = false;
     bool bCmne = false;
     QString sModelCheckpoint;
-    std::shared_ptr<INVLIB::InvMinimumNorm> pMinimumNorm;
+    std::shared_ptr<mne::InvMinimumNorm> pMinimumNorm;
     StringList lChNamesFiffInfo;
     StringList lChNamesInvOp;
 
@@ -633,7 +627,7 @@ void RtClustMne::run()
                     matDataResized.resize(iNumberChannels, matData.cols());
 
                     for (j = 0; j < iNumberChannels; ++j) {
-                        matDataResized.row(j) = matData.row(FIFFLIB::channel_index(lChNamesFiffInfo, lChNamesInvOp.at(j)));
+                        matDataResized.row(j) = matData.row(mne::channel_index(lChNamesFiffInfo, lChNamesInvOp.at(j)));
                     }
 
                     //TODO: Add picking here. See evoked part as input.

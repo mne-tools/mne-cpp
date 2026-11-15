@@ -11,14 +11,14 @@
  *
  * Two cooperating types live in this header:
  *
- * - @ref MRILIB::MriSlice --- a single 2D slice with its own pixel buffer
+ * - @ref mne::MriSlice --- a single 2D slice with its own pixel buffer
  * (byte / word / float, picked at load time to mirror the
  * on-disk @c FIFFV_MRI_PIXEL_* encoding) and an explicit
- * slice-to-MRI (surface RAS) @ref FIFFLIB::FiffCoordTrans.
+ * slice-to-MRI (surface RAS) @ref mne::FiffCoordTrans.
  * This is the unit the rendering pipeline and the COR.fif
  * writer consume, so every loader (MGH, NIfTI, raw COR)
  * ultimately decomposes its 3D buffer into a vector of these.
- * - @ref MRILIB::MriVolData --- the full volume bundle: header geometry
+ * - @ref mne::MriVolData --- the full volume bundle: header geometry
  * (width/height/depth, voxel spacing, direction cosines,
  * RAS centre), optional scan parameters (TR / TE / flip-angle
  * / FoV), and the slice vector above. It owns the
@@ -28,7 +28,7 @@
  * source-file reader (e.g. talairach.xfm).
  *
  * The @c read() convenience method dispatches by file suffix to
- * the matching loader (@ref MRILIB::MriMghIO, @ref MRILIB::MriNiftiIO, COR
+ * the matching loader (@ref mne::MriMghIO, @ref mne::MriNiftiIO, COR
  * directory) so application code can stay one-liner clean
  * irrespective of the on-disk format --- the equivalent of
  * @c nibabel.load() on the Python side.
@@ -66,10 +66,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MRILIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MRILIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -80,7 +80,7 @@ namespace MRILIB
  * through COR.fif is lossless: each slice owns its pixel buffer in the
  * source's native @c FIFFV_MRI_PIXEL_BYTE / @c _WORD / @c _FLOAT encoding,
  * its width/height in pixels and millimetres, and an explicit
- * @ref FIFFLIB::FiffCoordTrans mapping slice (column, row) to MRI surface
+ * @ref mne::FiffCoordTrans mapping slice (column, row) to MRI surface
  * RAS. The slicing pipeline and the COR.fif writer consume slices directly
  * --- every format-specific loader (MGH, NIfTI, raw COR) builds its volume
  * as a vector of these.
@@ -101,7 +101,7 @@ struct MRISHARED_EXPORT MriSlice
     float dimx;                             /**< Pixel size in x direction (meters). */
     float dimy;                             /**< Pixel size in y direction (meters). */
     float scale;                            /**< Scaling factor for pixel data. */
-    FIFFLIB::FiffCoordTrans trans;          /**< Coordinate transform: slice -> MRI (surface RAS). */
+    mne::FiffCoordTrans trans;              /**< Coordinate transform: slice -> MRI (surface RAS). */
 
     //=========================================================================================================
     /**
@@ -274,7 +274,7 @@ public:
     // Coordinate Transforms
     //=========================================================================================================
 
-    FIFFLIB::FiffCoordTrans voxelSurfRasT; /**< Voxel -> surface RAS (MRI) transform. */
+    mne::FiffCoordTrans voxelSurfRasT; /**< Voxel -> surface RAS (MRI) transform. */
 
     //=========================================================================================================
     // Optional Footer Data (scan parameters)
@@ -299,6 +299,6 @@ public:
     std::vector<MriSlice> slices; /**< Per-slice data (for COR-equivalent representation). */
 };
 
-} // namespace MRILIB
+} // namespace mne
 
 #endif // MRI_VOL_DATA_H

@@ -30,7 +30,7 @@
 #include <QVector3D>
 #include <QVector>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -118,6 +118,6 @@ private:
     float m_scale;                  /**< Radius/size for rendering. */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DIGITIZERTREEITEM_H

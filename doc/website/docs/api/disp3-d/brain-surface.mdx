@@ -1,18 +1,18 @@
 ---
 id: brain-surface
-title: "DISP3DLIB::BrainSurface"
+title: "mne::disp::BrainSurface"
 sidebar_label: BrainSurface
 sidebar_position: 18
 ---
 
 # BrainSurface
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/brainsurface.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/renderable/brainsurface.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/renderable/brainsurface.h)
 
 `#include <disp3D/brainsurface.h>`
 
 ```cpp
-class DISP3DLIB::BrainSurface
+class mne::disp::BrainSurface
 ```
 
 [`BrainSurface`](/docs/api/disp3-d/brain-surface) manages the geometry and visual properties of a single brain mesh.
@@ -153,7 +153,7 @@ Vertex normals are the sums of the adjacent face normals.
   Mx3 matrix of triangle indices.
 
 - **color** : *const QColor &*
-  FsSurface color.
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 ---
 
@@ -173,7 +173,7 @@ Create surface from raw vertex, normal and triangle data.
   Mx3 matrix of triangle indices.
 
 - **color** : *const QColor &*
-  FsSurface color.
+  [`FsSurface`](/docs/api/fs/fs-surface) color.
 
 ---
 
@@ -218,7 +218,7 @@ one digitizer sphere) can be highlighted on its own.
 
 ### setVisualizationMode(mode)
 
-Set the visualization mode ([FsSurface](/docs/api/fs/fs-surface), [FsAnnotation](/docs/api/fs/fs-annotation), Scientific).
+Set the visualization mode ([`FsSurface`](/docs/api/fs/fs-surface), [`FsAnnotation`](/docs/api/fs/fs-annotation), Scientific).
 
 **Parameters:**
 
@@ -415,7 +415,7 @@ Get the annotation label name for a given vertex.
 
 **Returns:**
 
-- *QString* — FsLabel name.
+- *QString* — [`FsLabel`](/docs/api/fs/fs-label) name.
 
 ---
 
@@ -565,7 +565,7 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 225"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 223"
 patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 0.02f, 0.0f;
 MatrixX3i patchTriangles(2, 3);
 patchTriangles << 0, 1, 2, 0, 2, 3;

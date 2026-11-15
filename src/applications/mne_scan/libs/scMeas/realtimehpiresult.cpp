@@ -27,9 +27,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
-using namespace INVLIB;
+using namespace mne::scan;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -51,7 +50,7 @@ RealTimeHpiResult::~RealTimeHpiResult()
 
 //=============================================================================================================
 
-QSharedPointer<INVLIB::HpiFitResult>& RealTimeHpiResult::getValue()
+QSharedPointer<mne::HpiFitResult>& RealTimeHpiResult::getValue()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pHpiFitResult;
@@ -126,7 +125,7 @@ void RealTimeHpiResult::setHeadPositionHistorySize(int iMaxPositions)
 
 //=============================================================================================================
 
-void RealTimeHpiResult::setDigitizerData(std::shared_ptr<FIFFLIB::FiffDigitizerData> digData)
+void RealTimeHpiResult::setDigitizerData(std::shared_ptr<mne::FiffDigitizerData> digData)
 {
     QMutexLocker lock(&m_qMutex);
     m_pFiffDigData = std::move(digData);

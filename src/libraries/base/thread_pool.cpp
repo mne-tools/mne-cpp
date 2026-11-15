@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Definition of @ref BASELIB::ThreadPool.
+ * @brief    Definition of @ref mne::ThreadPool.
  */
 
 //=============================================================================================================
@@ -28,7 +28,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS

@@ -1,18 +1,18 @@
 ---
 id: acq-device-registry
-title: "ACQLIB::AcqDeviceRegistry"
+title: "mne::AcqDeviceRegistry"
 sidebar_label: AcqDeviceRegistry
 sidebar_position: 28
 ---
 
 # AcqDeviceRegistry
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
 
 `#include <acq/acq_device_registry.h>`
 
 ```cpp
-class ACQLIB::AcqDeviceRegistry
+class mne::AcqDeviceRegistry
 ```
 
 Process-wide registry of source schemes.
@@ -139,7 +139,7 @@ public:
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 182"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 181"
     const AcqDeviceRegistry& registry = AcqDeviceRegistry::instance();
     for (const AcqSchemeInfo& scheme : registry.schemes()) {
         std::printf("%s://  %s\n", scheme.scheme.c_str(), scheme.description.c_str());

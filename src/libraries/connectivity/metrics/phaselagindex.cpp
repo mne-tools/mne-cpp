@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::PhaseLagIndex - the volume-conduction-robust phase-asymmetry estimator of Stam, Nolte & Daffertshofer (HBM 2007).
+ * @brief    Implementation of @ref mne::PhaseLagIndex - the volume-conduction-robust phase-asymmetry estimator of Stam, Nolte & Daffertshofer (HBM 2007).
  */
 
 //=============================================================================================================
@@ -45,10 +45,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS

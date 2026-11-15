@@ -13,8 +13,8 @@
  * ChannelDataModel keeps a per-channel @c Eigen::MatrixXd ring buffer
  * of the most recent N seconds of data and translates Qt's
  * @c QAbstractTableModel API into the view-friendly per-row /
- * per-time slice access that @ref DISPLIB::ChannelDataView and
- * @ref DISPLIB::RtFiffRawViewDelegate need. It also tracks bad-channel flags,
+ * per-time slice access that @ref mne::disp::ChannelDataView and
+ * @ref mne::disp::RtFiffRawViewDelegate need. It also tracks bad-channel flags,
  * trigger annotations and the currently-active SSP / compensation /
  * filter operators so the delegate can render the pre-processed
  * signal without touching the raw buffer.
@@ -50,16 +50,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ public:
      *
      * @param[in] pFiffInfo  The FiffInfo describing the channels.
      */
-    void init(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void init(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -298,7 +298,7 @@ private:
 
     mutable QReadWriteLock m_lock;
 
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
     QVector<QVector<float>> m_channelData; // [ch][sample]
     int m_firstSample = 0;
     int m_maxStoredSamples = 0; // 0 = unlimited
@@ -311,6 +311,6 @@ private:
     DetrendMode m_detrendMode = DetrendMode::None;
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // CHANNELDATAMODEL_H

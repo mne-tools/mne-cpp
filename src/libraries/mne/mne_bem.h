@@ -14,11 +14,11 @@
  * @date     June 2015
  * @brief    Boundary element model bundle (inner skull, outer skull, outer skin) loaded from -bem.fif.
  *
- * @ref MNELIB::MNEBem aggregates the @ref MNELIB::MNEBemSurface objects that
+ * @ref mne::MNEBem aggregates the @ref mne::MNEBemSurface objects that
  * make up a head conductor model produced by @c mne_setup_forward_model.
  * Depending on the model it carries one (single layer) or three
  * (three-layer EEG) surfaces in MRI coordinates. It is consumed by the
- * forward solver in FWDLIB to build the BEM linear system and by the
+ * forward solver in mne_fwd to build the BEM linear system and by the
  * 3D viewer to render the head surfaces alongside the cortex.
  */
 
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -69,7 +69,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads a -bem.fif file like read(); throws BASELIB::Error if it cannot.
+     * Reads a -bem.fif file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The -bem.fif file.
      */
@@ -85,7 +85,7 @@ public:
      * @return The model, or why the file cannot be read: Io if it cannot be opened, NotFound if it holds no
      *         BEM surfaces, Format if a surface is incomplete or inconsistent.
      */
-    [[nodiscard]] static BASELIB::Expected<MNEBem> read(const std::filesystem::path& path, bool patch_stats = true);
+    [[nodiscard]] static mne::Expected<MNEBem> read(const std::filesystem::path& path, bool patch_stats = true);
 
     //=========================================================================================================
     /**
@@ -96,7 +96,7 @@ public:
      *
      * @return The model, or why the stream cannot be read (see read(path)).
      */
-    [[nodiscard]] static BASELIB::Expected<MNEBem> read(FIFFLIB::FiffStream& stream, bool patch_stats = true);
+    [[nodiscard]] static mne::Expected<MNEBem> read(mne::FiffStream& stream, bool patch_stats = true);
 
     //=========================================================================================================
     /**
@@ -106,7 +106,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -114,7 +114,7 @@ public:
      *
      * @param[in] stream  The stream to write to.
      */
-    void write_to_stream(FIFFLIB::FiffStream& stream) const;
+    void write_to_stream(mne::FiffStream& stream) const;
 
     /** @return The number of surfaces. */
     std::size_t size() const noexcept
@@ -207,7 +207,7 @@ public:
      *
      * @param[in] trans     The transformation.
      */
-    void transform(const FIFFLIB::FiffCoordTrans& trans);
+    void transform(const mne::FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -215,7 +215,7 @@ public:
      *
      * @param[in] trans     The transformation.
      */
-    void inverse_transform(const FIFFLIB::FiffCoordTrans& trans);
+    void inverse_transform(const mne::FiffCoordTrans& trans);
 
 private:
     std::vector<MNEBemSurface> m_surfaces; /**< The BEM surfaces, innermost first as in the file. */

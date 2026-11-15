@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref FSLIB::FsLabel: parses FreeSurfer/MNE ASCII .label files into vertex / position / value arrays.
+ * @brief    Implementation of @ref mne::FsLabel: parses FreeSurfer/MNE ASCII .label files into vertex / position / value arrays.
  */
 
 //=============================================================================================================
@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -123,16 +123,16 @@ bool FsLabel::read(const std::filesystem::path& p_sFileName, FsLabel& p_Label)
 {
     p_Label.clear();
 
-    const std::string fileName = BASELIB::utf8FromPath(p_sFileName.filename());
+    const std::string fileName = mne::utf8FromPath(p_sFileName.filename());
     if (!fileName.ends_with(".label")) {
-        BASELIB::Log::warning("Given file ({}) is not a .label file!\n", BASELIB::utf8FromPath(p_sFileName));
+        mne::Log::warning("Given file ({}) is not a .label file!\n", mne::utf8FromPath(p_sFileName));
         return false;
     }
 
-    BASELIB::Log::info("Reading label...");
+    mne::Log::info("Reading label...");
     std::ifstream file(p_sFileName);
     if (!file) {
-        BASELIB::Log::warning("\tError: Couldn't open the label file\n");
+        mne::Log::warning("\tError: Couldn't open the label file\n");
         return false;
     }
 
@@ -140,7 +140,7 @@ bool FsLabel::read(const std::filesystem::path& p_sFileName, FsLabel& p_Label)
     std::string line;
     std::getline(file, comment);
     std::getline(file, line);
-    const int nv = BASELIB::toInt(line).value_or(0);
+    const int nv = mne::toInt(line).value_or(0);
 
     // One row per vertex: vertex number, x, y, z (mm) and value
     MatrixXd data = MatrixXd::Zero(nv, 5);
@@ -165,7 +165,7 @@ bool FsLabel::read(const std::filesystem::path& p_sFileName, FsLabel& p_Label)
     else if (fileName.size() > 3 + 6 && (fileName.starts_with("lh.") || fileName.starts_with("rh.")))
         p_Label.name = fileName.substr(3, fileName.size() - 3 - 6);
 
-    BASELIB::Log::info("[done]\n");
+    mne::Log::info("[done]\n");
 
     return true;
 }

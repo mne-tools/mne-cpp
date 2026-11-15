@@ -54,10 +54,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -124,8 +124,8 @@ public:
      *
      * @return   The created coil.
      */
-    static std::unique_ptr<FwdCoil> create_eeg_el(const FIFFLIB::FiffChInfo& ch,
-                                                  const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
+    static std::unique_ptr<FwdCoil> create_eeg_el(const mne::FiffChInfo& ch,
+                                                  const mne::FiffCoordTrans& t = mne::FiffCoordTrans());
 
     //=========================================================================================================
     /**
@@ -202,6 +202,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE FWDLIB
+} // NAMESPACE mne_fwd
 
 #endif // FWD_COIL_H

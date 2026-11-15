@@ -35,26 +35,26 @@
 
 class QTime;
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 class RealTimeSpectrum;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class SpectrumSettingsView;
 class SpectrumView;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ public:
      * @param[in] pTime         pointer to application time.
      * @param[in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
-    RealTimeSpectrumWidget(QSharedPointer<SCMEASLIB::RealTimeSpectrum> pNE,
+    RealTimeSpectrumWidget(QSharedPointer<mne::scan::RealTimeSpectrum> pNE,
                            QSharedPointer<QTime>& pTime,
                            QWidget* parent = 0);
 
@@ -100,7 +100,7 @@ public:
      *
      * @param[in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
@@ -135,11 +135,11 @@ private:
      */
     void showSpectrumSettingsView();
 
-    QPointer<QAction> m_pActionFrequencySettings;    /**< Frequency spectrum settings action. */
-    QPointer<DISPLIB::SpectrumView> m_pSpectrumView; /**< Frequency spectrum view. */
+    QPointer<QAction> m_pActionFrequencySettings;      /**< Frequency spectrum settings action. */
+    QPointer<mne::disp::SpectrumView> m_pSpectrumView; /**< Frequency spectrum view. */
 
-    std::shared_ptr<DISPLIB::SpectrumSettingsView> m_pSpectrumSettingsView; /**< Frequency spectrum settings modality widget. */
-    QSharedPointer<SCMEASLIB::RealTimeSpectrum> m_pFS;                      /**< The frequency spectrum measurement. */
+    std::shared_ptr<mne::disp::SpectrumSettingsView> m_pSpectrumSettingsView; /**< Frequency spectrum settings modality widget. */
+    QSharedPointer<mne::scan::RealTimeSpectrum> m_pFS;                        /**< The frequency spectrum measurement. */
 
     float m_fLowerFrqBound; /**< Lower frequency bound. */
     float m_fUpperFrqBound; /**< Upper frequency bound. */

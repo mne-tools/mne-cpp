@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Declares stream_info, the LSL metadata descriptor that identifies and routes a stream on the network.
  *
- * A @ref LSLLIB::stream_info is the handshake object of the Lab
+ * A @ref mne::stream_info is the handshake object of the Lab
  * Streaming Layer protocol: every outlet announces itself with one,
- * @ref LSLLIB::resolve_streams returns a vector of them, and every
+ * @ref mne::resolve_streams returns a vector of them, and every
  * inlet is constructed from one. It carries both the semantic
  * description of the stream (name, content type, channel count,
  * nominal sampling rate, per-channel data format, and a stable
@@ -20,7 +20,7 @@
  * hostname, and the TCP host/port pair filled in by the discovery
  * layer) needed to actually open a connection.
  *
- * This header also defines the @ref LSLLIB::ChannelFormat enum,
+ * This header also defines the @ref mne::ChannelFormat enum,
  * whose integer values match the @c cf_* constants of the upstream
  * liblsl C API. @c to_string produces liblsl's shortinfo XML, so
  * outlets and inlets of this library interoperate with liblsl.
@@ -47,10 +47,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace LSLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -289,6 +289,6 @@ private:
  */
 LSLSHARED_EXPORT double local_clock();
 
-} // namespace LSLLIB
+} // namespace mne
 
 #endif // LSL_STREAM_INFO_H

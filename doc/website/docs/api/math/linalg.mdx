@@ -1,13 +1,13 @@
 ---
 id: linalg
-title: "MATHLIB::Linalg"
+title: "mne::Linalg"
 sidebar_label: Linalg
 sidebar_position: 2
 ---
 
 # Linalg
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/linalg.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/linalg.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/linalg.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/linalg.h)
 
 :::info[Python equivalent]
 `numpy.linalg / scipy.linalg` in MNE-Python.
@@ -16,12 +16,12 @@ sidebar_position: 2
 `#include <math/linalg.h>`
 
 ```cpp
-class MATHLIB::Linalg
+class mne::Linalg
 ```
 
-Static linear-algebra utilities (condition numbers, block-diagonal sparse assembly, xyz reductions, stable index sort) layered on top of Eigen for use across `MATHLIB`, `FWDLIB` and INVERSELIB.
+Static linear-algebra utilities (condition numbers, block-diagonal sparse assembly, xyz reductions, stable index sort) layered on top of Eigen for use across mne_math, mne_fwd and mne_inv.
 
-Static Eigen-based linear-algebra helpers used across `MATHLIB` and the inverse solvers.
+Static Eigen-based linear-algebra helpers used across mne_math and the inverse solvers.
 
 ```cpp title="src/examples/ex_math/main.cpp"
 MatrixXd tall(3, 2);
@@ -337,7 +337,7 @@ Compares triplet second entry (column).
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 224"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 220"
 double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol.data, s);
 double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol.data, s);
 ````
@@ -346,7 +346,7 @@ double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.s
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 517"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 512"
 double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol.data, s);
 double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol.data, s);
 ````

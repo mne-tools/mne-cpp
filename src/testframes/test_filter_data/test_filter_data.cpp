@@ -14,8 +14,7 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 
-using namespace DSPLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFilterData : public QObject
@@ -211,7 +210,7 @@ private slots:
         MatrixXd a, b, t;
         QVERIFY(raw->read_raw_segment(a, t, raw->first_samp, raw->last_samp));
         QVERIFY(filtered.read_raw_segment(b, t, raw->first_samp, raw->last_samp));
-        const int stim = static_cast<int>(BASELIB::indexOf(raw->info.ch_names, "STI 014"));
+        const int stim = static_cast<int>(mne::indexOf(raw->info.ch_names, "STI 014"));
         QVERIFY(stim >= 0);
         QCOMPARE(b.row(stim), a.row(stim));
         QVERIFY((b.row(3) - a.row(3)).cwiseAbs().maxCoeff() <= 1e-6 * a.row(3).cwiseAbs().maxCoeff());

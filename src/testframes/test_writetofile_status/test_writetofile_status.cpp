@@ -168,9 +168,9 @@ void TestWriteToFileStatus::recording_refusesUnwritableFile()
 {
     QTemporaryDir tmpDir;
     WriteToFile plugin;
-    plugin.m_pFiffInfo = std::make_shared<FIFFLIB::FiffInfo>();
+    plugin.m_pFiffInfo = std::make_shared<mne::FiffInfo>();
     plugin.m_pFiffInfo->sfreq = 1000.0;
-    FIFFLIB::FiffChInfo ch;
+    mne::FiffChInfo ch;
     ch.ch_name = "EEG 001";
     ch.kind = FIFFV_EEG_CH;
     plugin.m_pFiffInfo->chs.push_back(ch);
@@ -191,14 +191,14 @@ void TestWriteToFileStatus::recording_refusesUnwritableFile()
 
     // A split whose next file cannot be created stops writing instead of crashing
     QFile first(tmpDir.filePath(QStringLiteral("rec_raw.fif")));
-    plugin.m_pOutfid = FIFFLIB::FiffStream::start_writing_raw(tmpDir.filePath(QStringLiteral("rec_raw.fif")).toStdString(), *plugin.m_pFiffInfo, plugin.m_mCals);
+    plugin.m_pOutfid = mne::FiffStream::start_writing_raw(tmpDir.filePath(QStringLiteral("rec_raw.fif")).toStdString(), *plugin.m_pFiffInfo, plugin.m_mCals);
     QVERIFY(plugin.m_pOutfid);
     plugin.m_bWriteToFile = true;
     QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot write"));
     plugin.splitRecordingFile();
     QVERIFY(!plugin.m_pOutfid);
     QVERIFY(!plugin.m_bWriteToFile);
-    FIFFLIB::FiffStream finished(QString(tmpDir.filePath(QStringLiteral("rec_raw.fif"))).toStdU16String()); // the first file was finished and links to the next one
+    mne::FiffStream finished(QString(tmpDir.filePath(QStringLiteral("rec_raw.fif"))).toStdU16String()); // the first file was finished and links to the next one
     QVERIFY(finished.open());
     QVERIFY(finished.dirtree()->has_kind(FIFFB_REF));
 
@@ -207,7 +207,7 @@ void TestWriteToFileStatus::recording_refusesUnwritableFile()
     plugin.m_sRecordFileName = recordFileName;
     plugin.m_iSplitCount = 0;
     plugin.m_qFileOut.setFileName(recordFileName);
-    plugin.m_pOutfid = FIFFLIB::FiffStream::start_writing_raw(plugin.m_qFileOut.fileName().toStdU16String(), *plugin.m_pFiffInfo, plugin.m_mCals);
+    plugin.m_pOutfid = mne::FiffStream::start_writing_raw(plugin.m_qFileOut.fileName().toStdU16String(), *plugin.m_pFiffInfo, plugin.m_mCals);
     plugin.m_bWriteToFile = true;
     plugin.splitRecordingFile();
     QVERIFY(plugin.m_pOutfid);

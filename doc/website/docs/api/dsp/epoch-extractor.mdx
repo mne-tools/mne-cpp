@@ -1,18 +1,18 @@
 ---
 id: epoch-extractor
-title: "DSPLIB::EpochExtractor"
+title: "mne::EpochExtractor"
 sidebar_label: EpochExtractor
 sidebar_position: 73
 ---
 
 # EpochExtractor
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/epoch_extractor.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/epoch_extractor.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/epoch_extractor.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/epoch_extractor.h)
 
 `#include <dsp/epoch_extractor.h>`
 
 ```cpp
-class DSPLIB::EpochExtractor
+class mne::EpochExtractor
 ```
 
 Segments continuous raw data into fixed-length epochs locked to events.
@@ -67,11 +67,11 @@ Epochs whose window extends outside the data boundaries are silently skipped.
   Extraction parameters.
 
 - **eventCodes** : *const std::vector&lt; int &gt; &*
-  Optional per-event integer codes stored in MNEEpochData::event. Must be empty or the same length as eventSamples.
+  Optional per-event integer codes stored in `MNEEpochData::event`. Must be empty or the same length as eventSamples.
 
 **Returns:**
 
-- *std::vector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Vector of MNEEpochData (one per valid event). Rejected epochs are included with MNEEpochData::bReject == true so callers can choose whether to exclude them.
+- *std::vector&lt; [MNEEpochData](/docs/api/mne/mne-epoch-data) &gt;* — Vector of [`MNEEpochData`](/docs/api/mne/mne-epoch-data) (one per valid event). Rejected epochs are included with `MNEEpochData::bReject` == true so callers can choose whether to exclude them.
 
 ---
 
@@ -117,7 +117,7 @@ Return only the epochs that are NOT marked for rejection.
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 168"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 166"
 EpochExtractor::Params params;
 params.dTmin = -0.1;
 params.dTmax = 0.4;

@@ -53,9 +53,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
-using namespace FIFFLIB;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -593,7 +592,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::registerFiffScheme()
+AcqError mne::registerFiffScheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &FiffReplayBackend::open);
     return result;

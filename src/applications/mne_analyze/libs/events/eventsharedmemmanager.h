@@ -40,11 +40,11 @@
 #include "event.h"
 #include "eventgroup.h"
 
-namespace EVENTSLIB
+namespace mne::analyze::events
 {
 
 //=============================================================================================================
-// EVENTSLIB FORWARD DECLARATIONS
+// mne::analyze::events FORWARD DECLARATIONS
 //=============================================================================================================
 
 enum SharedMemoryMode
@@ -55,7 +55,7 @@ enum SharedMemoryMode
 };
 class EventManager;
 
-namespace EVENTSINTERNAL
+namespace detail
 {
 
 //=========================================================================================================
@@ -195,7 +195,7 @@ public:
      * EventSharedMemManager
      * @param[in] Pointer to Parent
      */
-    explicit EventSharedMemManager(EVENTSLIB::EventManager* parent = nullptr);
+    explicit EventSharedMemManager(mne::analyze::events::EventManager* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -208,7 +208,7 @@ public:
      * init
      * @param[in] mode
      */
-    void init(EVENTSLIB::SharedMemoryMode mode);
+    void init(mne::analyze::events::SharedMemoryMode mode);
 
     //=========================================================================================================
     /**
@@ -368,23 +368,23 @@ private:
      */
     void createGroupIfNeeded();
 
-    static int m_iLastUpdateIndex;                 /**<  The last position in the buffer to be updated.*/
-    EVENTSLIB::EventManager* m_pEventManager;      /**<  Pointer to the parent EventManager object.*/
-    QSharedMemory m_SharedMemory;                  /**<  Multiplatform Qt shared memory object.*/
-    std::atomic_bool m_IsInit;                     /**<  Flag if the shared memory has not been initialized.*/
-    std::string m_sGroupName;                      /**<  Group name to use when creating events in the shared memory segment.*/
-    bool m_bGroupCreated;                          /**<  Check if the group has already been created.*/
-    idNum m_GroupId;                               /**<  Store the group ID of the event group to which events will be assigned.*/
-    int m_SharedMemorySize;                        /**<  Size of the shared memory segment.*/
-    int m_fTimerCheckBuffer;                       /**<  Time period between checks of the shared buffer.*/
-    std::thread m_BufferWatcherThread;             /**<  Offloaded thread to check for new events.*/
-    std::atomic_bool m_BufferWatcherThreadRunning; /**<  Flag if the BufferWatcher thread has been created.*/
-    std::atomic_bool m_WritingToSharedMemory;      /**<  Mutex to control writing new events to the shared memory buffer.*/
-    long long m_lastCheckTime;                     /**<  Place holder for the time when the buffer was last checked.*/
-    std::vector<EventUpdate> m_LocalBuffer;        /**<  Buffer in the local memory of this application, mirroring the shared memory buffer.*/
-    EventUpdate* m_SharedBuffer;                   /**<  Buffer in shared memory segment.*/
-    int m_Id;                                      /**<  Stores the creator Id.*/
-    enum EVENTSLIB::SharedMemoryMode m_Mode;       /**<  Shared memory working mode.*/
+    static int m_iLastUpdateIndex;                       /**<  The last position in the buffer to be updated.*/
+    mne::analyze::events::EventManager* m_pEventManager; /**<  Pointer to the parent EventManager object.*/
+    QSharedMemory m_SharedMemory;                        /**<  Multiplatform Qt shared memory object.*/
+    std::atomic_bool m_IsInit;                           /**<  Flag if the shared memory has not been initialized.*/
+    std::string m_sGroupName;                            /**<  Group name to use when creating events in the shared memory segment.*/
+    bool m_bGroupCreated;                                /**<  Check if the group has already been created.*/
+    idNum m_GroupId;                                     /**<  Store the group ID of the event group to which events will be assigned.*/
+    int m_SharedMemorySize;                              /**<  Size of the shared memory segment.*/
+    int m_fTimerCheckBuffer;                             /**<  Time period between checks of the shared buffer.*/
+    std::thread m_BufferWatcherThread;                   /**<  Offloaded thread to check for new events.*/
+    std::atomic_bool m_BufferWatcherThreadRunning;       /**<  Flag if the BufferWatcher thread has been created.*/
+    std::atomic_bool m_WritingToSharedMemory;            /**<  Mutex to control writing new events to the shared memory buffer.*/
+    long long m_lastCheckTime;                           /**<  Place holder for the time when the buffer was last checked.*/
+    std::vector<EventUpdate> m_LocalBuffer;              /**<  Buffer in the local memory of this application, mirroring the shared memory buffer.*/
+    EventUpdate* m_SharedBuffer;                         /**<  Buffer in shared memory segment.*/
+    int m_Id;                                            /**<  Stores the creator Id.*/
+    enum mne::analyze::events::SharedMemoryMode m_Mode;  /**<  Shared memory working mode.*/
 };
 
 //=========================================================================================================
@@ -398,6 +398,6 @@ inline int EventSharedMemManager::generateId()
     return abs(t);
 }
 
-} //namespace EVENTSINTERNAL
-} //namespace EVENTSLIB
+} //namespace detail
+} //namespace mne::analyze::events
 #endif // EVENTSHAREDMEMMANAGER_EVENTS_H

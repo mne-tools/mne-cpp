@@ -9,7 +9,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     October 2012
- * @brief    Implementation of @ref MNELIB::MNEEpochData.
+ * @brief    Implementation of @ref mne::MNEEpochData.
  *
  * Provides constructors, deep-copy semantics for the sensor matrix and
  * the application of SSP / baseline correction to one epoch in place.
@@ -32,10 +32,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 using namespace Eigen;
-using namespace MATHLIB;
-using namespace BASELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

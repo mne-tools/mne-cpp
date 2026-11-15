@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April, 2026
- * @brief    Convert an MNE-C channel derivation text file into a FIFF derivation file (MNELIB::MNEDerivSet).
+ * @brief    Convert an MNE-C channel derivation text file into a FIFF derivation file (mne::MNEDerivSet).
  */
 
 //=============================================================================================================
@@ -29,7 +29,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC DEFINITIONS
@@ -41,7 +41,7 @@ using namespace MNELIB;
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_derivations");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

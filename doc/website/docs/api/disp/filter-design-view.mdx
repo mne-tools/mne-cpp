@@ -1,23 +1,23 @@
 ---
 id: filter-design-view
-title: "DISPLIB::FilterDesignView"
+title: "mne::disp::FilterDesignView"
 sidebar_label: FilterDesignView
 sidebar_position: 29
 ---
 
 # FilterDesignView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/filterdesignview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/filterdesignview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/filterdesignview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/filterdesignview.h)
 
 `#include <disp/filterdesignview.h>`
 
 ```cpp
-class DISPLIB::FilterDesignView
+class mne::disp::FilterDesignView
 ```
 
 Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
 
-Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), cutoff frequencies, transition bandwidth and tap count, then renders the resulting frequency response in an embedded [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) and emits the `FilterKernel` as a `filterChanged` signal consumed by the `rtprocessing` chain.
+Lets the user pick filter type, design family (cosine, Hamming, Blackman, …), cutoff frequencies, transition bandwidth and tap count, then renders the resulting frequency response in an embedded [`FilterPlotScene`](/docs/api/disp/filter-plot-scene) and emits the [`FilterKernel`](/docs/api/dsp/filter-kernel) as a `filterChanged` signal consumed by the `rtprocessing` chain.
 
 ### Inheritance
 
@@ -191,7 +191,7 @@ Process the event of style mode change in an upper class.
 
 **Parameters:**
 
-- **style** : *[DISPLIB::AbstractView](/docs/api/disp/abstract-view)::StyleMode*
+- **style** : *mne::disp::[AbstractView](/docs/api/disp/abstract-view)::StyleMode*
   New style mode (unused; the filter plot is simply redrawn).
 
 ---

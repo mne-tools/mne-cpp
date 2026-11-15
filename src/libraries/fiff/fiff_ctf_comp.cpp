@@ -28,7 +28,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -83,14 +83,14 @@ int uniqueChannel(const std::vector<FiffChInfo>& chs, const std::string& name)
     for (int i = 0; i < std::ssize(chs); ++i) {
         if (chs[i].ch_name == name) {
             if (found >= 0) {
-                BASELIB::Log::warning("Ambiguous channel {}", name);
+                mne::Log::warning("Ambiguous channel {}", name);
                 return -1;
             }
             found = i;
         }
     }
     if (found < 0)
-        BASELIB::Log::warning("Channel {} is not available in data", name);
+        mne::Log::warning("Channel {} is not available in data", name);
     return found;
 }
 

@@ -54,26 +54,26 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 class FiffChInfo;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class FilterOverlapAdd;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE ANSHAREDLIB
+// DEFINE NAMESPACE mne::analyze
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 
 //=============================================================================================================
-// ANSHAREDLIB FORWARD DECLARATIONS
+// mne::analyze FORWARD DECLARATIONS
 //=============================================================================================================
 
 class EventModel;
@@ -128,7 +128,7 @@ public:
      *
      * @return Whether @p io has raw data.
      */
-    bool initFiffData(QSharedPointer<FIFFLIB::FiffIO> io);
+    bool initFiffData(QSharedPointer<mne::FiffIO> io);
 
     //=========================================================================================================
     /**
@@ -300,7 +300,7 @@ public:
      *
      * @return Shared Pointer pointing to m_pFiffInfo.
      */
-    std::shared_ptr<FIFFLIB::FiffInfo> getFiffInfo() const;
+    std::shared_ptr<mne::FiffInfo> getFiffInfo() const;
 
     //=========================================================================================================
     /**
@@ -446,7 +446,7 @@ public:
      *
      * @param[in] filterData    list of the new filter.
      */
-    void setFilter(const DSPLIB::FilterKernel& filterData);
+    void setFilter(const mne::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -454,7 +454,7 @@ public:
      *
      * @param[out] Reference to filterKernel in model.
      */
-    const DSPLIB::FilterKernel& getFilter();
+    const mne::FilterKernel& getFilter();
 
     //=========================================================================================================
     /**
@@ -486,7 +486,7 @@ public:
      *
      * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters.
      */
-    QSharedPointer<FIFFLIB::FiffIO> getFiffIO() const;
+    QSharedPointer<mne::FiffIO> getFiffIO() const;
 
     //=========================================================================================================
     /**
@@ -518,7 +518,7 @@ public:
      * @param [in] pModel   associated event model
 >>>>>>> MAINT: renaming and cleaning up
      */
-    void setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel);
+    void setEventModel(QSharedPointer<mne::analyze::EventModel> pModel);
 
     void setScrollerSample(int iScrollerPos);
 
@@ -617,17 +617,17 @@ private:
     QFile m_file;
 
     // Filter stuff
-    qint32 m_iMaxFilterLength;                             /**< Max order of the current filters. */
-    QString m_sFilterChannelType;                          /**< Kind of channel which is to be filtered. */
-    std::shared_ptr<DSPLIB::FilterOverlapAdd> m_pRtFilter; /**< The filter object. */
-    Eigen::RowVectorXi m_lFilterChannelList;               /**< The indices of the channels to be filtered.*/
-    bool m_bPerformFiltering;                              /**< Flag whether to activate/deactivate filtering. */
-    DSPLIB::FilterKernel m_filterKernel;                   /**< List of currently active filters. */
+    qint32 m_iMaxFilterLength;                          /**< Max order of the current filters. */
+    QString m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
+    std::shared_ptr<mne::FilterOverlapAdd> m_pRtFilter; /**< The filter object. */
+    Eigen::RowVectorXi m_lFilterChannelList;            /**< The indices of the channels to be filtered.*/
+    bool m_bPerformFiltering;                           /**< Flag whether to activate/deactivate filtering. */
+    mne::FilterKernel m_filterKernel;                   /**< List of currently active filters. */
 
     // fiff stuff
-    QSharedPointer<FIFFLIB::FiffIO> m_pFiffIO;          /**< Fiff IO. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;     /**< Fiff info of whole fiff file. */
-    std::vector<FIFFLIB::FiffChInfo> m_ChannelInfoList; /**< List of FiffChInfo objects that holds the corresponding channels information. */
+    QSharedPointer<mne::FiffIO> m_pFiffIO;          /**< Fiff IO. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;     /**< Fiff info of whole fiff file. */
+    std::vector<mne::FiffChInfo> m_ChannelInfoList; /**< List of FiffChInfo objects that holds the corresponding channels information. */
 
     QMap<qint32, float> m_qMapChScaling; /**< Channel scaling map. */
 
@@ -636,8 +636,8 @@ private:
     int m_iDistanceTimerSpacer; /**< The distance for the horizontal time spacers in the view in ms. */
     int m_iScroller;
 
-    FIFFLIB::FiffFileSharer m_FileSharer; /**< Lists the recordings MNE Scan shares during a realtime session. */
-    QFileSystemWatcher m_watcher;         /**< Tells when MNE Scan shared another recording. */
+    mne::FiffFileSharer m_FileSharer; /**< Lists the recordings MNE Scan shares during a realtime session. */
+    QFileSystemWatcher m_watcher;     /**< Tells when MNE Scan shared another recording. */
 
     qint32 m_iScrollPos; /**< Position of the scrollbar */
 
@@ -958,6 +958,6 @@ private:
     qint64 m_iNumSamples;
 };
 
-} // namespace ANSHAREDLIB
+} // namespace mne::analyze
 
 #endif // ANSHAREDLIB_FIFFRAWVIEWMODEL_H

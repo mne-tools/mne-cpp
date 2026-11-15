@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Per-iteration forward-field cache (forward matrix, SVD, column normalisation) used by the dipole-fit cost function.
  *
- * @ref INVLIB::InvDipoleForward replaces the @c dipoleForwardRec record
+ * @ref mne::InvDipoleForward replaces the @c dipoleForwardRec record
  * of MNE-C and stores, for one candidate dipole or set of dipoles, the
  * column-normalised @c (3·n_dip × n_ch) forward matrix together with
  * its singular-value decomposition @c U·diag(σ)·V^T. Holding the SVD
@@ -40,10 +40,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -88,6 +88,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_DIPOLE_FORWARD_H

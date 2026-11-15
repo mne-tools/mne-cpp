@@ -7,8 +7,8 @@ sidebar_position: 0
 
 # Machine Learning Library
 
-**Namespace:** `MLLIB` &nbsp;·&nbsp; **Source:** `src/libraries/ml`
-The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators (scalers, linear models, covariance shrinkage) come from the external skigen library. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/ml`
+The `mne_ml` library (`mne_ml` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators (scalers, linear models, covariance shrinkage) come from the external skigen library. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_ml)
@@ -71,16 +71,16 @@ ONNX Runtime backed model for deploying pre-trained neural networks (e.g., CMNE 
 ```cpp
 #include <ml/ml_onnx_model.h>
 
-MLLIB::MlOnnxModel model;
+mne::MlOnnxModel model;
 if (model.load("cmne_lstm.onnx")) {
     qDebug() << "Model loaded, type:" << model.modelType();
 
     // Prepare input tensor: [batch, sequence_length, features]
     std::vector<float> data(1 * 20 * 204, 0.0f);
-    MLLIB::MlTensor input(std::move(data), {1, 20, 204});
+    mne::MlTensor input(std::move(data), {1, 20, 204});
 
     // Run inference
-    MLLIB::MlTensor output = model.predict(input);
+    mne::MlTensor output = model.predict(input);
     qDebug() << "Output shape:" << output.shape();
 }
 ```
@@ -109,15 +109,15 @@ N-dimensional tensor with contiguous row-major (C-order) float32 storage. Data i
 
 // From moved buffer
 std::vector<float> buf(1 * 20 * 204, 0.0f);
-MLLIB::MlTensor t1(std::move(buf), {1, 20, 204});
+mne::MlTensor t1(std::move(buf), {1, 20, 204});
 
 // From Eigen matrix (copied + transposed to row-major)
 Eigen::MatrixXf mat(100, 50);
-MLLIB::MlTensor t2(mat);
+mne::MlTensor t2(mat);
 
 // From raw pointer
 float* ptr = ...;
-MLLIB::MlTensor t3(ptr, {10, 20});
+mne::MlTensor t3(ptr, {10, 20});
 
 // Access shape
 std::vector<int64_t> shape = t1.shape();  // {1, 20, 204}
@@ -147,19 +147,19 @@ auto eigenMap = t2.matrix();  // RowMajorMatrixMap
 
 ## MLTrainer
 
-ML-specific convenience wrapper over `PYBRIDGELIB::PythonRunner` for launching Python training scripts. Not available in WASM builds.
+ML-specific convenience wrapper over `mne::PythonRunner` for launching Python training scripts. Not available in WASM builds.
 
 ```cpp
 #include <ml/ml_trainer.h>
 
-MLLIB::MLTrainer trainer;
+mne::MLTrainer trainer;
 
 // Check prerequisites
 if (trainer.check_prerequisites({"torch", "mne", "numpy"}).empty()) {
     // Run training script
     const auto result = trainer.run("scripts/ml/training/train_cmne.py", {"--epochs", "100", "--lr", "0.001"});
     if (result.success) {
-        BASELIB::Log::info("Training complete");
+        mne::Log::info("Training complete");
     }
 }
 ```
@@ -174,11 +174,11 @@ if (trainer.check_prerequisites({"torch", "mne", "numpy"}).empty()) {
 
 ## CMNE Workflow
 
-CMNE is implemented by `INVLIB::InvCMNE` in the inverse library: it z-scores the dSPM estimate and re-weights each time point with the prediction of an LSTM run in ONNX Runtime from the previous contextual estimates (Dinh et al. 2021); see the [Inverse Estimation API](/docs/api/inv/). Use `MlOnnxModel` directly for other ONNX networks.
+CMNE is implemented by `mne::InvCMNE` in the inverse library: it z-scores the dSPM estimate and re-weights each time point with the prediction of an LSTM run in ONNX Runtime from the previous contextual estimates (Dinh et al. 2021); see the [Inverse Estimation API](/docs/api/inv/). Use `MlOnnxModel` directly for other ONNX networks.
 
 ## MNE-Python Cross-Reference
 
-| MNE-CPP (MLLIB) | Python Equivalent |
+| MNE-CPP (mne_ml) | Python Equivalent |
 |---|---|
 | `MlOnnxModel` | `onnxruntime.InferenceSession` |
 | `MlTensor` | `numpy.ndarray` / `torch.Tensor` |

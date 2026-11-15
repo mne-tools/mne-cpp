@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BIDSPath — entity-based construction and matching of BIDS-compliant paths and sidecar siblings.
+ * @brief    Implementation of @ref mne::BIDSPath — entity-based construction and matching of BIDS-compliant paths and sidecar siblings.
  */
 
 //=============================================================================================================
@@ -32,7 +32,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -219,13 +219,13 @@ std::filesystem::path BIDSPath::directory() const
     std::filesystem::path dir = m_sRoot;
 
     if (!m_sSubject.empty())
-        dir /= BASELIB::pathFromUtf8("sub-" + m_sSubject);
+        dir /= mne::pathFromUtf8("sub-" + m_sSubject);
 
     if (!m_sSession.empty())
-        dir /= BASELIB::pathFromUtf8("ses-" + m_sSession);
+        dir /= mne::pathFromUtf8("ses-" + m_sSession);
 
     if (!m_sDatatype.empty())
-        dir /= BASELIB::pathFromUtf8(m_sDatatype);
+        dir /= mne::pathFromUtf8(m_sDatatype);
 
     return dir;
 }
@@ -234,7 +234,7 @@ std::filesystem::path BIDSPath::directory() const
 
 std::filesystem::path BIDSPath::file_path() const
 {
-    return directory() / BASELIB::pathFromUtf8(basename());
+    return directory() / mne::pathFromUtf8(basename());
 }
 
 //=============================================================================================================
@@ -323,7 +323,7 @@ std::vector<BIDSPath> BIDSPath::match() const
     for (auto it = std::filesystem::recursive_directory_iterator(m_sRoot, error);
          it != std::filesystem::recursive_directory_iterator();
          it.increment(error)) {
-        const std::string name = BASELIB::utf8FromPath(it->path().filename());
+        const std::string name = mne::utf8FromPath(it->path().filename());
         if (name.starts_with('.')) {
             if (it->is_directory(error))
                 it.disable_recursion_pending();
@@ -338,12 +338,12 @@ std::vector<BIDSPath> BIDSPath::match() const
         BIDSPath p;
         p.m_sRoot = m_sRoot;
         p.m_sExtension = name.substr(dot);
-        const std::string dirName = BASELIB::utf8FromPath(it->path().parent_path().filename());
+        const std::string dirName = mne::utf8FromPath(it->path().parent_path().filename());
         if (!dirName.starts_with("sub-") && !dirName.starts_with("ses-"))
             p.m_sDatatype = dirName;
 
         bool valid = true;
-        const BASELIB::StringList parts = BASELIB::split(std::string_view(name).substr(0, dot), '_');
+        const mne::StringList parts = mne::split(std::string_view(name).substr(0, dot), '_');
         for (std::size_t i = 0; i < parts.size() && valid; ++i) {
             const std::size_t dash = parts[i].find('-');
             if (dash == std::string::npos) {
@@ -420,7 +420,7 @@ bool BIDSPath::is_valid_entity_value(std::string_view sValue)
 
 std::string BIDSPath::zero_pad(std::string sValue)
 {
-    if (const std::optional<int> num = BASELIB::toInt(sValue))
+    if (const std::optional<int> num = mne::toInt(sValue))
         return std::format("{:02}", *num);
     return sValue;
 }

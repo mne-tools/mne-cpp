@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of the @ref INVLIB::tokenize / @ref INVLIB::fromTokens free functions.
+ * @brief    Implementation of the @ref mne::tokenize / @ref mne::fromTokens free functions.
  *
  * Walks the @ref InvSourceEstimate in canonical order — metadata,
  * positions, dense grid, coupling groups, focal dipoles, connectivity
@@ -34,7 +34,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -259,7 +259,7 @@ int stride(int total, int max)
 
 } // anonymous namespace
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -749,4 +749,4 @@ InvSourceEstimate fromTokens(const std::vector<InvToken>& tokens)
     return est;
 }
 
-} // namespace INVLIB
+} // namespace mne

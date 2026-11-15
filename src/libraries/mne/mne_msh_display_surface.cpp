@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNEMshDisplaySurface.
+ * @brief    Implementation of @ref mne::MNEMshDisplaySurface.
  *
  * Implements per-vertex colour assembly from a scalar overlay, the
  * binding of an overlay range to a colour scale and the toggle of
@@ -48,8 +48,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //============================= local macros =================================
 
@@ -121,19 +120,19 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
 
     for (k = 0; k < 3; k++) {
         if (!head_fid_found[k]) {
-            BASELIB::Log::critical("Some of the MEG fiducials were missing");
+            mne::Log::critical("Some of the MEG fiducials were missing");
             return FAIL;
         }
 
         if (!mri_fid_found[k]) {
-            BASELIB::Log::critical("Some of the MRI fiducials were missing");
+            mne::Log::critical("Some of the MRI fiducials were missing");
             return FAIL;
         }
     }
 
     if (scale_head) {
         get_head_scale(head_dig, mri_fid, scales);
-        BASELIB::Log::info("xscale = {:.3f} yscale = {:.3f} zscale = {:.3f}\n", scales[0], scales[1], scales[2]);
+        mne::Log::info("xscale = {:.3f} yscale = {:.3f} zscale = {:.3f}\n", scales[0], scales[1], scales[2]);
 
         for (j = 0; j < 3; j++)
             for (k = 0; k < 3; k++)
@@ -143,8 +142,8 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     }
 
     // Initial alignment
-    head_dig.head_mri_t_adj = FIFFLIB::FiffCoordTrans::from_cardinal_points(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-                                                                            mri_fid.row(0).data(), mri_fid.row(1).data(), mri_fid.row(2).data());
+    head_dig.head_mri_t_adj = mne::FiffCoordTrans::from_cardinal_points(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
+                                                                        mri_fid.row(0).data(), mri_fid.row(1).data(), mri_fid.row(2).data());
 
     // Populate mri_fids from cardinal digitizer points transformed into MRI coords
     head_dig.pick_cardinal_fiducials();
@@ -153,7 +152,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
     for (k = 0; k < head_dig.nfids(); k++)
         Eigen::Map<Eigen::Vector3f>(head_dig.mri_fids[k].r) = mri_fid.row(k).transpose();
     head_dig.head_mri_t_adj->print();
-    BASELIB::Log::info("After simple alignment : \n");
+    mne::Log::info("After simple alignment : \n");
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig, omit_dist);
@@ -165,8 +164,8 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
                 return FAIL;
         }
 
-        BASELIB::Log::info("{} / {} iterations done. RMS dist = {:7.1f} mm\n", k, niter, 1000.0 * rms_digitizer_distance(head_dig));
-        BASELIB::Log::info("After refinement :\n");
+        mne::Log::info("{} / {} iterations done. RMS dist = {:7.1f} mm\n", k, niter, 1000.0 * rms_digitizer_distance(head_dig));
+        mne::Log::info("After refinement :\n");
         head_dig.head_mri_t_adj->print();
     }
 
@@ -176,7 +175,7 @@ int MNEMshDisplaySurface::align_fiducials(FiffDigitizerData& head_dig,
 //=============================================================================================================
 
 // Simple head size fit
-void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
+void MNEMshDisplaySurface::get_head_scale(mne::FiffDigitizerData& dig,
                                           const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
                                           Eigen::Vector3f& scales)
 {
@@ -197,11 +196,11 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         }
     }
 
-    if (!MATHLIB::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig), simplex_size, r0, Rdig)) {
+    if (!mne::Sphere::fit_sphere_to_points(dig_rr.topRows(ndig), simplex_size, r0, Rdig)) {
         return;
     }
 
-    BASELIB::Log::info("Polhemus : ({:.1f} {:.1f} {:.1f}) mm R = {:.1f} mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rdig);
+    mne::Log::info("Polhemus : ({:.1f} {:.1f} {:.1f}) mm R = {:.1f} mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rdig);
 
     // Pick only the points above the fiducial plane
     Eigen::Vector3f LR = mri_fid.row(2).transpose() - mri_fid.row(0).transpose();
@@ -216,18 +215,18 @@ void MNEMshDisplaySurface::get_head_scale(FIFFLIB::FiffDigitizerData& dig,
         }
     }
 
-    if (!MATHLIB::Sphere::fit_sphere_to_points(head_rr.topRows(nhead), simplex_size, r0, Rscalp)) {
+    if (!mne::Sphere::fit_sphere_to_points(head_rr.topRows(nhead), simplex_size, r0, Rscalp)) {
         return;
     }
 
-    BASELIB::Log::info("Scalp : ({:.1f} {:.1f} {:.1f}) mm R = {:.1f} mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rscalp);
+    mne::Log::info("Scalp : ({:.1f} {:.1f} {:.1f}) mm R = {:.1f} mm\n", 1000 * r0[0], 1000 * r0[1], 1000 * r0[2], 1000 * Rscalp);
 
     scales[0] = scales[1] = scales[2] = Rdig / Rscalp;
 }
 
 //=============================================================================================================
 
-int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
+int MNEMshDisplaySurface::discard_outlier_digitizer_points(mne::FiffDigitizerData& d,
                                                            float maxdist) const
 /*
       * Discard outlier digitizer points
@@ -250,14 +249,14 @@ int MNEMshDisplaySurface::discard_outlier_digitizer_points(FIFFLIB::FiffDigitize
             d.discard[k] = true;
         }
     }
-    BASELIB::Log::info("{} points discarded (maxdist = {:6.1f} mm).\n", discarded, 1000 * maxdist);
+    mne::Log::info("{} points discarded (maxdist = {:6.1f} mm).\n", discarded, 1000 * maxdist);
 
     return discarded;
 }
 
 //=============================================================================================================
 
-void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
+void MNEMshDisplaySurface::calculate_digitizer_distances(mne::FiffDigitizerData& dig,
                                                          bool do_all, bool do_approx) const
 /*
  * Calculate the distances from the scalp surface
@@ -306,7 +305,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
      * Project the points on the triangles
      */
     if (!do_approx)
-        BASELIB::Log::info("Inside or outside for {} points...", nactive);
+        mne::Log::info("Inside or outside for {} points...", nactive);
     for (k = 0, nactive = 0; k < static_cast<int>(dig.points.size()); k++) {
         if ((dig.active[k] && !dig.discard[k]) || do_all) {
             dig.dist(k) = dists[nactive];
@@ -355,7 +354,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
     }
 
     if (!do_approx)
-        BASELIB::Log::info("[done]\n");
+        mne::Log::info("[done]\n");
 
     dig.dist_valid = true;
 
@@ -364,7 +363,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(FIFFLIB::FiffDigitizerD
 
 //=============================================================================================================
 
-int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,                  /* The digitizer data */
+int MNEMshDisplaySurface::iterate_alignment_once(mne::FiffDigitizerData& dig,                      /* The digitizer data */
                                                  int nasion_weight,                                /* Weight for the nasion */
                                                  const std::optional<Eigen::Vector3f>& nasion_mri, /* Fixed correspondence point for the nasion (optional) */
                                                  int last_step) const                              /* Is this the last iteration step */
@@ -381,7 +380,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
     float max_diff = 40e-3f;
 
     if (!dig.head_mri_t_adj) {
-        BASELIB::Log::critical("Not adjusting the transformation");
+        mne::Log::critical("Not adjusting the transformation");
         return FAIL;
     }
     /*
@@ -416,7 +415,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
         }
     }
     if (nactive < 3) {
-        BASELIB::Log::critical("Not enough points to do the alignment");
+        mne::Log::critical("Not enough points to do the alignment");
         return FAIL;
     }
     if ((t = FiffCoordTrans::procrustes_align(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
@@ -439,7 +438,7 @@ int MNEMshDisplaySurface::iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig
 
 //=============================================================================================================
 
-float MNEMshDisplaySurface::rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig) const
+float MNEMshDisplaySurface::rms_digitizer_distance(mne::FiffDigitizerData& dig) const
 {
     float rms;
     int k, nactive;
@@ -489,10 +488,10 @@ void MNEMshDisplaySurface::decide_surface_extent([[maybe_unused]] const std::str
     }
 
 #ifdef DEBUG
-    BASELIB::Log::info("{}:\n", tag.toStdString());
-    BASELIB::Log::info("\tx = {:f} ... {:f} mm\n", 1000 * mn[0], 1000 * mx[0]);
-    BASELIB::Log::info("\ty = {:f} ... {:f} mm\n", 1000 * mn[1], 1000 * mx[1]);
-    BASELIB::Log::info("\tz = {:f} ... {:f} mm\n", 1000 * mn[2], 1000 * mx[2]);
+    mne::Log::info("{}:\n", tag.toStdString());
+    mne::Log::info("\tx = {:f} ... {:f} mm\n", 1000 * mn[0], 1000 * mx[0]);
+    mne::Log::info("\ty = {:f} ... {:f} mm\n", 1000 * mn[1], 1000 * mx[1]);
+    mne::Log::info("\tz = {:f} ... {:f} mm\n", 1000 * mn[2], 1000 * mx[2]);
 #endif
 
     fov = std::max(mn.cwiseAbs().maxCoeff(), mx.cwiseAbs().maxCoeff());
@@ -548,6 +547,6 @@ void MNEMshDisplaySurface::setup_curvature_colors()
         }
     }
 #ifdef DEBUG
-    BASELIB::Log::info("Average curvature : {:f}\n", curv_sum / np);
+    mne::Log::info("Average curvature : {:f}\n", curv_sum / np);
 #endif
 }

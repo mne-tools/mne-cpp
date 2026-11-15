@@ -1,21 +1,21 @@
 ---
 id: mne-sss-data
-title: "MNELIB::MNESssData"
+title: "mne::MNESssData"
 sidebar_label: MNESssData
 sidebar_position: 52
 ---
 
 # MNESssData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_sss_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_sss_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_sss_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_sss_data.h)
 
 `#include <mne/mne_sss_data.h>`
 
 ```cpp
-class MNELIB::MNESssData
+class mne::MNESssData
 ```
 
-Implements MNE [SSS](/docs/api/dsp/sss) Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C `mne_types.h`).
+Implements MNE [`SSS`](/docs/api/dsp/sss) Data (Replaces *mneSssData,mneSssDataRec struct of MNE-C `mne_types.h`).
 
 Container for Signal Space Separation ([SSS](/docs/api/dsp/sss)/Maxwell filtering) expansion coefficients and metadata.
 
@@ -29,7 +29,7 @@ auto sss = MNESssData::read(sssPath.toStdU16String()); // the SSS block written 
 
 ### MNESssData()
 
-Constructs the MNE [SSS](/docs/api/dsp/sss) Data.
+Constructs the MNE [`SSS`](/docs/api/dsp/sss) Data.
 
 ---
 
@@ -42,26 +42,26 @@ Refactored: mne_dup_sss_data (mne_sss_data.c)
 **Parameters:**
 
 - **p_MneSssData** : *const MNESssData &*
-  MNE SSS Data which should be copied.
+  MNE [`SSS`](/docs/api/dsp/sss) Data which should be copied.
 
 ---
 
 ### ~MNESssData()
 
-Destroys the MNE [SSS](/docs/api/dsp/sss) Data description.
+Destroys the MNE [`SSS`](/docs/api/dsp/sss) Data description.
 
 ---
 
 ### print(out)
 
-Output the [SSS](/docs/api/dsp/sss) information for debugging purposes.
+Output the [`SSS`](/docs/api/dsp/sss) information for debugging purposes.
 
 Refactored: mne_print_sss_data (mne_sss_data.c)
 
 **Parameters:**
 
 - **out** : *std::ostream &*
-  The stream to write the SSS diagnostics to.
+  The stream to write the [`SSS`](/docs/api/dsp/sss) diagnostics to.
 
 ---
 
@@ -69,22 +69,22 @@ Refactored: mne_print_sss_data (mne_sss_data.c)
 
 ### read(name)
 
-Read [SSS](/docs/api/dsp/sss) data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
+Read [`SSS`](/docs/api/dsp/sss) data from anywhere in a file Refactored: mne_read (mne_sss_data.c).
 
 **Parameters:**
 
 - **name** : *const std::filesystem::path &*
-  Name of the file to read the SSS data from.
+  Name of the file to read the [`SSS`](/docs/api/dsp/sss) data from.
 
 **Returns:**
 
-- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read SSS data.
+- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read [`SSS`](/docs/api/dsp/sss) data.
 
 ---
 
 ### read_from_node(stream, start)
 
-Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
+Read the [`SSS`](/docs/api/dsp/sss) data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
 
 **Parameters:**
 
@@ -92,11 +92,11 @@ Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff strea
   The open fiff stream.
 
 - **start** : *const std::shared_ptr&lt; [FiffDirNode](/docs/api/fiff/fiff-dir-node) &gt; &*
-  The node/tree to read the SSS data from.
+  The node/tree to read the [`SSS`](/docs/api/dsp/sss) data from.
 
 **Returns:**
 
-- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read SSS data.
+- *std::unique_ptr&lt; [MNESssData](/docs/api/mne/mne-sss-data) &gt;* — The read [`SSS`](/docs/api/dsp/sss) data.
 
 ---
 
@@ -113,7 +113,7 @@ Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff strea
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 425"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 423"
 auto sss = MNESssData::read(sssPath.toStdU16String()); // the SSS block written by mne.preprocessing.maxwell_filter
 // maxwell_filter(origin=(0, 0, 0.04), int_order=8, ext_order=3): head frame, 306 channels, 70 of 80 internal and 15 external components
 ok &= expect(sss && sss->job == FIFFV_SSS_JOB_FILTER && sss->coord_frame == FIFFV_COORD_HEAD && sss->nchan == 306 && sss->in_order == 8 && sss->out_order == 3 && sss->in_nuse == 70 && sss->out_nuse == 15 && std::fabs(sss->origin[2] - 0.04f) < 1e-7f,

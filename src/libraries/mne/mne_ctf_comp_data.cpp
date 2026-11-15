@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNECTFCompData.
+ * @brief    Implementation of @ref mne::MNECTFCompData.
  *
  * Implements FIFF read/write and the calibration toggle that switches
  * the matrix between raw and calibrated units.
@@ -37,8 +37,7 @@ constexpr int OK = 0;
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -77,7 +76,7 @@ MNECTFCompData::~MNECTFCompData()
 
 //=============================================================================================================
 
-int MNECTFCompData::calibrate(const std::vector<FIFFLIB::FiffChInfo>& chs, int nch, bool do_it)
+int MNECTFCompData::calibrate(const std::vector<mne::FiffChInfo>& chs, int nch, bool do_it)
 {
     Eigen::VectorXf col_cals(this->data->ncol());
     Eigen::VectorXf row_cals(this->data->nrow());
@@ -96,7 +95,7 @@ int MNECTFCompData::calibrate(const std::vector<FIFFLIB::FiffChInfo>& chs, int n
                 break;
             }
         if (!found) {
-            BASELIB::Log::critical("Channel {} not found. Cannot calibrate the compensation matrix.", name);
+            mne::Log::critical("Channel {} not found. Cannot calibrate the compensation matrix.", name);
             return FAIL;
         }
     }
@@ -110,7 +109,7 @@ int MNECTFCompData::calibrate(const std::vector<FIFFLIB::FiffChInfo>& chs, int n
                 break;
             }
         if (!found) {
-            BASELIB::Log::critical("Channel {} not found. Cannot calibrate the compensation matrix.", name);
+            mne::Log::critical("Channel {} not found. Cannot calibrate the compensation matrix.", name);
             return FAIL;
         }
     }

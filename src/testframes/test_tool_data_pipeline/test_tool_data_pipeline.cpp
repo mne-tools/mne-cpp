@@ -105,12 +105,12 @@ private:
     }
 
     /** Writes @p data (channels x samples) as two raw buffers of @p type, @p skip buffers apart; stim channels get range @p stimRange. */
-    static bool writeTriggerRaw(const QString& path, FIFFLIB::fiff_int_t type, const BASELIB::StringList& names, const Eigen::MatrixXd& data,
-                                float stimRange, FIFFLIB::fiff_int_t skip = 0)
+    static bool writeTriggerRaw(const QString& path, mne::fiff_int_t type, const mne::StringList& names, const Eigen::MatrixXd& data,
+                                float stimRange, mne::fiff_int_t skip = 0)
     {
-        FIFFLIB::FiffInfo info;
+        mne::FiffInfo info;
         for (const std::string& name : names) {
-            FIFFLIB::FiffChInfo ch;
+            mne::FiffChInfo ch;
             ch.ch_name = name;
             ch.scanNo = ch.logNo = static_cast<int>(info.chs.size()) + 1;
             ch.kind = name.starts_with("STI") ? FIFFV_STIM_CH : FIFFV_EEG_CH;
@@ -123,7 +123,7 @@ private:
         info.nchan = static_cast<int>(names.size());
         info.sfreq = 1000.0f;
         Eigen::RowVectorXd cals;
-        auto out = FIFFLIB::FiffStream::start_writing_raw(path.toStdString(), info, cals, FIFFLIB::defaultMatrixXi, false, type);
+        auto out = mne::FiffStream::start_writing_raw(path.toStdString(), info, cals, mne::defaultMatrixXi, false, type);
         if (!out) {
             return false;
         }
@@ -134,7 +134,7 @@ private:
             if (!std::exchange(first, false) && skip > 0) {
                 out->write_int(FIFF_DATA_SKIP, &skip);
             }
-            FIFFLIB::FiffTag tag;
+            mne::FiffTag tag;
             tag.kind = FIFF_DATA_BUFFER;
             tag.type = type;
             tag.next = FIFFV_NEXT_SEQ;
@@ -351,7 +351,7 @@ private slots:
         if (!QFile::exists(rawFile))
             QSKIP("Raw data not available");
 
-        FIFFLIB::FiffRawData sourceRaw(rawFile.toStdString());
+        mne::FiffRawData sourceRaw(rawFile.toStdString());
         QVERIFY(!sourceRaw.info.empty());
         Eigen::MatrixXd sourceData;
         Eigen::MatrixXd sourceTimes;
@@ -372,7 +372,7 @@ private slots:
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
 
-        FIFFLIB::FiffRawData mergedRaw(outFile.toStdString());
+        mne::FiffRawData mergedRaw(outFile.toStdString());
         QVERIFY(!mergedRaw.info.empty());
         QCOMPARE(mergedRaw.info.nchan, sourceRaw.info.nchan + 2);
         QCOMPARE(mergedRaw.first_samp, sourceRaw.first_samp);
@@ -519,7 +519,7 @@ private slots:
         if (!QFile::exists(rawFile))
             QSKIP("Raw data not available");
 
-        FIFFLIB::FiffRawData inputRaw(rawFile.toStdString());
+        mne::FiffRawData inputRaw(rawFile.toStdString());
         QVERIFY(!inputRaw.info.empty());
         const int firstSample = inputRaw.first_samp;
 
@@ -540,7 +540,7 @@ private slots:
         QCOMPARE(m_lastExitCode, 0);
         QVERIFY(QFileInfo(outFile).size() > 0);
 
-        FIFFLIB::FiffRawData outputRaw(outFile.toStdString());
+        mne::FiffRawData outputRaw(outFile.toStdString());
         QVERIFY(!outputRaw.info.empty());
         QCOMPARE(outputRaw.first_samp, firstSample);
         int stimIndex = -1;
@@ -573,13 +573,13 @@ private slots:
         Eigen::MatrixXd data(2, 4);
         data << 0x0105, -7, 3, 0x7F00, //
             0, 5, 0x0105, -1;
-        for (const FIFFLIB::fiff_int_t type : {FIFFT_DAU_PACK16, FIFFT_SHORT}) {
+        for (const mne::fiff_int_t type : {FIFFT_DAU_PACK16, FIFFT_SHORT}) {
             const QString path = m_tempDir.filePath(QString("stim14-%1-raw.fif").arg(type));
             QVERIFY(writeTriggerRaw(path, type, {"EEG 001", "STI 014"}, data, 0.5f));
             const QString output = runTool("mne_fix_stim14", {path});
             QVERIFY2(m_lastProcessFinished && m_lastExitCode == 0, qPrintable(output));
 
-            FIFFLIB::FiffRawData raw(path.toStdString());
+            mne::FiffRawData raw(path.toStdString());
             QCOMPARE(raw.info.chs[1].range, 1.0f);
             Eigen::MatrixXd fixed, times;
             QVERIFY(raw.read_raw_segment(fixed, times));
@@ -616,13 +616,13 @@ private slots:
         data << 0x10003, -2, 7, 0x40000, //
             0x10003, 1, 0x20100, -2,     //
             0x10003, 3, 0x30001, 9;
-        for (const FIFFLIB::fiff_int_t type : {FIFFT_INT, FIFFT_FLOAT}) {
+        for (const mne::fiff_int_t type : {FIFFT_INT, FIFFT_FLOAT}) {
             const QString path = m_tempDir.filePath(QString("stim32-%1-raw.fif").arg(type));
             QVERIFY(writeTriggerRaw(path, type, {"EEG 001", "STI101", "STI201"}, data, 1.0f));
             const QString output = runTool("mne_fix_stim14", {"--32", path});
             QVERIFY2(m_lastProcessFinished && m_lastExitCode == 0, qPrintable(output));
 
-            FIFFLIB::FiffRawData raw(path.toStdString());
+            mne::FiffRawData raw(path.toStdString());
             Eigen::MatrixXd fixed, times;
             QVERIFY(raw.read_raw_segment(fixed, times));
             QCOMPARE(fixed.row(0), data.row(0));
@@ -652,13 +652,13 @@ private slots:
         const QString path = m_tempDir.filePath("skips-raw.fif");
         QVERIFY(writeTriggerRaw(path, FIFFT_INT, {"EEG 001"}, data, 1.0f, 1));
         const auto samples = [&path] {
-            FIFFLIB::FiffRawData raw(path.toStdString());
+            mne::FiffRawData raw(path.toStdString());
             return raw.last_samp - raw.first_samp + 1;
         };
         const auto kinds = [&path] {
-            std::vector<FIFFLIB::fiff_int_t> found;
-            auto stream = FIFFLIB::FiffStream::open(path.toStdString());
-            for (const FIFFLIB::FiffDirEntry& entry : stream ? stream->dir() : std::vector<FIFFLIB::FiffDirEntry>{}) {
+            std::vector<mne::fiff_int_t> found;
+            auto stream = mne::FiffStream::open(path.toStdString());
+            for (const mne::FiffDirEntry& entry : stream ? stream->dir() : std::vector<mne::FiffDirEntry>{}) {
                 if (entry.kind == FIFF_DATA_SKIP || entry.kind == FIFF_MNE_DATA_SKIP_NOP) {
                     found.push_back(entry.kind);
                 }
@@ -669,12 +669,12 @@ private slots:
 
         QString output = runTool("mne_toggle_skips", {"--raw", path});
         QVERIFY2(m_lastProcessFinished && m_lastExitCode == 0, qPrintable(output));
-        QCOMPARE(kinds(), std::vector<FIFFLIB::fiff_int_t>{FIFF_MNE_DATA_SKIP_NOP});
+        QCOMPARE(kinds(), std::vector<mne::fiff_int_t>{FIFF_MNE_DATA_SKIP_NOP});
         QCOMPARE(samples(), 4);
 
         output = runTool("mne_toggle_skips", {"--raw", path});
         QVERIFY2(m_lastProcessFinished && m_lastExitCode == 0, qPrintable(output));
-        QCOMPARE(kinds(), std::vector<FIFFLIB::fiff_int_t>{FIFF_DATA_SKIP});
+        QCOMPARE(kinds(), std::vector<mne::fiff_int_t>{FIFF_DATA_SKIP});
         QCOMPARE(samples(), 6);
     }
 
@@ -734,13 +734,13 @@ private slots:
         const QString firstPath = m_tempDir.filePath("average-first.stc");
         const QString secondPath = m_tempDir.filePath("average-second.stc");
         {
-            INVLIB::InvSourceEstimate first(Eigen::MatrixXd::Constant(3, 4, 2.0),
-                                            vertices, 0.0f, 0.001f);
+            mne::InvSourceEstimate first(Eigen::MatrixXd::Constant(3, 4, 2.0),
+                                         vertices, 0.0f, 0.001f);
             QVERIFY(first.write(firstPath.toStdU16String()));
         }
         {
-            INVLIB::InvSourceEstimate second(Eigen::MatrixXd::Constant(3, 4, 8.0),
-                                             vertices, 0.0f, 0.001f);
+            mne::InvSourceEstimate second(Eigen::MatrixXd::Constant(3, 4, 8.0),
+                                          vertices, 0.0f, 0.001f);
             QVERIFY(second.write(secondPath.toStdU16String()));
         }
 
@@ -759,7 +759,7 @@ private slots:
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
 
-        const INVLIB::InvSourceEstimate result(outPath.toStdU16String());
+        const mne::InvSourceEstimate result(outPath.toStdU16String());
         QCOMPARE(result.vertices, vertices);
         QVERIFY(result.data.isApprox(Eigen::MatrixXd::Constant(3, 4, 6.5)));
     }
@@ -858,7 +858,7 @@ private slots:
         runTool("mne_eximia2fiff", {"--nxe", QStringLiteral(TOOL_DATA_DIR "/eximia.nxe"), "--out", outPath});
         QCOMPARE(m_lastExitCode, 0);
 
-        FIFFLIB::FiffRawData raw(outPath.toStdString());
+        mne::FiffRawData raw(outPath.toStdString());
         QCOMPARE(raw.info.sfreq, 1450.0);
         QCOMPARE(raw.info.nchan, 64);
         QCOMPARE(raw.last_samp - raw.first_samp + 1, 100);
@@ -903,9 +903,9 @@ private slots:
         runTool("mne_eximia2fiff", {"--nxe", QStringLiteral(TOOL_DATA_DIR "/eximia.nxe"), "--dig", digPath, "--out", outPath});
         QCOMPARE(m_lastExitCode, 0);
 
-        FIFFLIB::FiffRawData raw(outPath.toStdString());
+        mne::FiffRawData raw(outPath.toStdString());
         QCOMPARE(raw.info.dig.size(), 4);
-        for (const FIFFLIB::FiffDigPoint& p : raw.info.dig)
+        for (const mne::FiffDigPoint& p : raw.info.dig)
             QCOMPARE(p.coord_frame, FIFFV_COORD_HEAD);
         QCOMPARE(raw.info.dig[1].ident, FIFFV_POINT_NASION);
         QVERIFY(std::abs(raw.info.dig[1].r[0]) < 1e-6f && raw.info.dig[1].r[1] > 0.0f);
@@ -1602,12 +1602,12 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate left;
-        auto leftRead = INVLIB::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
+        mne::InvSourceEstimate left;
+        auto leftRead = mne::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
         QVERIFY2(leftRead.has_value(), qPrintable(output));
         left = std::move(*leftRead);
-        INVLIB::InvSourceEstimate right;
-        auto rightRead = INVLIB::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
+        mne::InvSourceEstimate right;
+        auto rightRead = mne::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
         QVERIFY2(rightRead.has_value(), qPrintable(output));
         right = std::move(*rightRead);
         QVERIFY(left.data.rows() > 0);
@@ -1637,12 +1637,12 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate left;
-        auto leftRead = INVLIB::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
+        mne::InvSourceEstimate left;
+        auto leftRead = mne::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
         QVERIFY2(leftRead.has_value(), qPrintable(output));
         left = std::move(*leftRead);
-        INVLIB::InvSourceEstimate right;
-        auto rightRead = INVLIB::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
+        mne::InvSourceEstimate right;
+        auto rightRead = mne::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
         QVERIFY2(rightRead.has_value(), qPrintable(output));
         right = std::move(*rightRead);
         QVERIFY(left.data.allFinite());
@@ -1668,12 +1668,12 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate left;
-        auto leftRead = INVLIB::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
+        mne::InvSourceEstimate left;
+        auto leftRead = mne::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
         QVERIFY2(leftRead.has_value(), qPrintable(output));
         left = std::move(*leftRead);
-        INVLIB::InvSourceEstimate right;
-        auto rightRead = INVLIB::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
+        mne::InvSourceEstimate right;
+        auto rightRead = mne::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
         QVERIFY2(rightRead.has_value(), qPrintable(output));
         right = std::move(*rightRead);
         QVERIFY(left.data.allFinite());
@@ -1699,12 +1699,12 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate left;
-        auto leftRead = INVLIB::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
+        mne::InvSourceEstimate left;
+        auto leftRead = mne::InvSourceEstimate::read((outBase + "-lh.stc").toStdU16String());
         QVERIFY2(leftRead.has_value(), qPrintable(output));
         left = std::move(*leftRead);
-        INVLIB::InvSourceEstimate right;
-        auto rightRead = INVLIB::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
+        mne::InvSourceEstimate right;
+        auto rightRead = mne::InvSourceEstimate::read((outBase + "-rh.stc").toStdU16String());
         QVERIFY2(rightRead.has_value(), qPrintable(output));
         right = std::move(*rightRead);
         QVERIFY(left.data.allFinite());
@@ -1726,8 +1726,8 @@ private slots:
             QSKIP("Mapping data not available");
         }
 
-        FIFFLIB::FiffEvokedSet sourceSet;
-        sourceSet = FIFFLIB::FiffEvokedSet(evokedFile.toStdU16String());
+        mne::FiffEvokedSet sourceSet;
+        sourceSet = mne::FiffEvokedSet(evokedFile.toStdU16String());
         QVERIFY(!sourceSet.evoked.empty());
         sourceSet.evoked = {sourceSet.evoked.front()};
         const QString sourceEvokedFile = m_tempDir.filePath("single-condition-evoked.fif");
@@ -1770,12 +1770,12 @@ private slots:
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
 
         QFile file(outFile);
-        FIFFLIB::FiffStream stream(outFile.toStdU16String());
+        mne::FiffStream stream(outFile.toStdU16String());
         QVERIFY(stream.open());
-        const std::vector<FIFFLIB::FiffProj> projectors = stream.read_proj(stream.dirtree());
+        const std::vector<mne::FiffProj> projectors = stream.read_proj(stream.dirtree());
         stream.close();
         QCOMPARE(projectors.size(), 2);
-        for (const FIFFLIB::FiffProj& projector : projectors) {
+        for (const mne::FiffProj& projector : projectors) {
             QVERIFY(!projector.data.empty());
             QCOMPARE(projector.data.nrow, 1);
             QCOMPARE(projector.data.ncol, 366);
@@ -1806,16 +1806,16 @@ private slots:
                  0);
 
         // One file per hemisphere, holding the forward solution's vertex numbers
-        const INVLIB::InvSourceEstimate dspm((outPrefix + "-dspm-lh.stc").toStdU16String());
-        const INVLIB::InvSourceEstimate dspmRh((outPrefix + "-dspm-rh.stc").toStdU16String());
+        const mne::InvSourceEstimate dspm((outPrefix + "-dspm-lh.stc").toStdU16String());
+        const mne::InvSourceEstimate dspmRh((outPrefix + "-dspm-rh.stc").toStdU16String());
 
-        INVLIB::InvSourceEstimate cmne;
-        auto cmneRead = INVLIB::InvSourceEstimate::read((outPrefix + "-cmne-lh.stc").toStdU16String());
+        mne::InvSourceEstimate cmne;
+        auto cmneRead = mne::InvSourceEstimate::read((outPrefix + "-cmne-lh.stc").toStdU16String());
         QVERIFY(cmneRead.has_value());
         cmne = std::move(*cmneRead);
         QVERIFY(QFile::exists(outPrefix + "-cmne-rh.stc"));
 
-        const std::vector<Eigen::VectorXi> vertno = MNELIB::MNEForwardSolution(fwdFile.toStdU16String()).src.get_vertno();
+        const std::vector<Eigen::VectorXi> vertno = mne::MNEForwardSolution(fwdFile.toStdU16String()).src.get_vertno();
         QVERIFY(dspm.vertices == vertno[0]);
         QVERIFY(dspmRh.vertices == vertno[1]);
         QCOMPARE(dspm.data.rows() + dspmRh.data.rows(), 7928);
@@ -1846,7 +1846,7 @@ private slots:
         QCOMPARE(runToolExitCode("mne_dipole_fit", {"--meas", evokedFile, "--meg", "--eeg", "--tmin", "32", "--tmax", "42", "--bmin", "-100", "--bmax", "0", "--dip", dipoleFile}, 180000),
                  0);
 
-        const INVLIB::InvEcdSet dipoles = INVLIB::InvEcdSet::read_dipoles_dip(dipoleFile.toStdU16String());
+        const mne::InvEcdSet dipoles = mne::InvEcdSet::read_dipoles_dip(dipoleFile.toStdU16String());
         QVERIFY(dipoles.size() >= 1);
     }
 
@@ -1872,7 +1872,7 @@ private slots:
             10.0, -10.0;
 
         const QString stcPrefix = m_tempDir.filePath("movie-source");
-        INVLIB::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
+        mne::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
         QVERIFY(stc.write(QString(stcPrefix + "-lh.stc").toStdU16String()));
 
         const QString pngPrefix = m_tempDir.filePath("movie-frame");
@@ -1917,7 +1917,7 @@ private slots:
             3.0, 7.0,
             4.0, 8.0;
         const QString stcPath = m_tempDir.filePath("volume-source.stc");
-        INVLIB::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
+        mne::InvSourceEstimate stc(data, vertices, 0.0f, 0.001f);
         QVERIFY(stc.write(stcPath.toStdU16String()));
 
         const QString outFile = m_tempDir.filePath("volume-overlay.txt");
@@ -1959,8 +1959,8 @@ private slots:
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
 
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outFile.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outFile.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.rows() > 0);
@@ -1980,7 +1980,7 @@ private slots:
             3.0, -6.0,
             4.0, -8.0;
         const QString inputPath = m_tempDir.filePath("process-input.stc");
-        INVLIB::InvSourceEstimate input(data, vertices, 0.1f, 0.002f);
+        mne::InvSourceEstimate input(data, vertices, 0.1f, 0.002f);
         QVERIFY(input.write(inputPath.toStdU16String()));
 
         const QString outFile = m_tempDir.filePath("process-output.stc");
@@ -1990,8 +1990,8 @@ private slots:
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
 
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outFile.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outFile.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.isApprox(data * 1.5, 1e-6));
@@ -2020,8 +2020,8 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outBase.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outBase.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.rows() > 0);
@@ -2248,7 +2248,7 @@ private slots:
             {512, 1020},
             {5120, 5120}};
         for (const auto& [grade, expectedTriangles] : expectedMeshes) {
-            const MNELIB::MNEBem bem(QDir(outputDir).filePath(QString("scalp-%1.fif").arg(grade)).toStdU16String());
+            const mne::MNEBem bem(QDir(outputDir).filePath(QString("scalp-%1.fif").arg(grade)).toStdU16String());
             QCOMPARE(bem.size(), 1);
             const int expectedVertices = grade == 5120 ? 2562 : grade;
             QCOMPARE(bem[0].np, expectedVertices);
@@ -2275,11 +2275,11 @@ private slots:
         QVERIFY(QFile::exists(outPath));
 
         // Like an MNE-C -sol.fif: the surfaces and the linear potential solution (one row per vertex)
-        MNELIB::MNEBem bem(outPath.toStdU16String());
+        mne::MNEBem bem(outPath.toStdU16String());
         QCOMPARE(bem.size(), 1);
-        FIFFLIB::FiffStream stream(outPath.toStdU16String());
+        mne::FiffStream stream(outPath.toStdU16String());
         QVERIFY(stream.open());
-        const std::vector<std::shared_ptr<FIFFLIB::FiffDirNode>> bemNodes = stream.dirtree()->dir_tree_find(FIFFB_BEM);
+        const std::vector<std::shared_ptr<mne::FiffDirNode>> bemNodes = stream.dirtree()->dir_tree_find(FIFFB_BEM);
         QCOMPARE(bemNodes.size(), 1);
         const auto approx = bemNodes[0]->find_tag(stream, FIFF_BEM_APPROX);
         QVERIFY(approx);
@@ -2494,8 +2494,8 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outBase.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outBase.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.allFinite());
@@ -2521,8 +2521,8 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outBase.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outBase.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.allFinite());
@@ -2548,8 +2548,8 @@ private slots:
         QVERIFY2(m_lastProcessFinished, qPrintable(output));
         QCOMPARE(m_lastExitStatus, QProcess::NormalExit);
         QVERIFY2(m_lastExitCode == 0, qPrintable(output));
-        INVLIB::InvSourceEstimate result;
-        auto resultRead = INVLIB::InvSourceEstimate::read(outBase.toStdU16String());
+        mne::InvSourceEstimate result;
+        auto resultRead = mne::InvSourceEstimate::read(outBase.toStdU16String());
         QVERIFY2(resultRead.has_value(), qPrintable(output));
         result = std::move(*resultRead);
         QVERIFY(result.data.allFinite());
@@ -2899,11 +2899,11 @@ private slots:
         if (!QFile::exists(rawFile))
             QSKIP("Raw data not available");
 
-        const FIFFLIB::FiffRawData raw(rawFile.toStdString());
+        const mne::FiffRawData raw(rawFile.toStdString());
         QVERIFY(!raw.info.empty());
         int megCount = 0;
         int eegCount = 0;
-        for (const FIFFLIB::FiffChInfo& channel : raw.info.chs) {
+        for (const mne::FiffChInfo& channel : raw.info.chs) {
             if (channel.kind == FIFFV_MEG_CH || channel.kind == FIFFV_REF_MEG_CH) {
                 ++megCount;
             } else if (channel.kind == FIFFV_EEG_CH) {
@@ -2931,7 +2931,7 @@ private slots:
                                  {"--ncov", ncovPath, "--meas", rawFile,
                                   "--meg", "--cov", outputPath}),
                  0);
-        const FIFFLIB::FiffCov covariance(outputPath.toStdString());
+        const mne::FiffCov covariance(outputPath.toStdString());
         QCOMPARE(covariance.dim, megCount);
         QCOMPARE(covariance.nfree, 42);
         QCOMPARE(covariance.data.rows(), megCount * (megCount + 1) / 2);

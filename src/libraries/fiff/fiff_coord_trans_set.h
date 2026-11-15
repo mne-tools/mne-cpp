@@ -11,7 +11,7 @@
  *
  * C++ peer of the MNE-C @c coordTransSet that @c mne_analyze uses to report a picked
  * location in head, MRI, MNI and Talairach coordinates and that @c mne_collect_transforms
- * gathers into one file; @ref FIFFLIB::FiffCoordTransSet::headToMni matches
+ * gathers into one file; @ref mne::FiffCoordTransSet::headToMni matches
  * @c mne.head_to_mni.
  */
 
@@ -40,10 +40,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -140,6 +140,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE FIFFLIB
+} // NAMESPACE mne_fiff
 
 #endif // FIFFCOORDTRANSSET_H

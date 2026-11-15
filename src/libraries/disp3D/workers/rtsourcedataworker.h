@@ -39,7 +39,7 @@
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -241,6 +241,6 @@ private:
     QVector<uint32_t> m_baseColorsRh; /**< RH base surface colors (curvature/annotation). */
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINVIEW_RTSOURCEDATAWORKER_H

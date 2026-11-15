@@ -40,10 +40,10 @@
 #endif
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace COMLIB::detail
+namespace mne::detail
 {
 
 #ifdef _WIN32
@@ -121,6 +121,6 @@ inline bool would_block(const std::error_code& error) noexcept
 
 inline constexpr auto kInvalidHandle = static_cast<Handle>(kInvalid);
 
-} // namespace COMLIB::detail
+} // namespace mne::detail
 
 #endif // COM_DETAIL_SOCKET_PLATFORM_H

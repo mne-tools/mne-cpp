@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     April 2018
- * @brief    Implementation of @ref CONNECTIVITYLIB::ImagCoherence - the volume-conduction-robust imaginary part of complex coherency of Nolte et al. (NeuroImage 2004).
+ * @brief    Implementation of @ref mne::ImagCoherence - the volume-conduction-robust imaginary part of complex coherency of Nolte et al. (NeuroImage 2004).
  */
 
 //=============================================================================================================
@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -62,7 +62,7 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
     Network finalNetwork("IMAGCOH");
 
     if (connectivitySettings.empty()) {
-        BASELIB::Log::debug("ImagCoherence::calculate - Input data is empty");
+        mne::Log::debug("ImagCoherence::calculate - Input data is empty");
         return finalNetwork;
     }
 
@@ -87,7 +87,7 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
         m_iNumberBinStart > iNFreqs ||
         m_iNumberBinAmount > iNFreqs ||
         m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
-        BASELIB::Log::debug("ImagCoherence::calculate - Resetting to full spectrum");
+        mne::Log::debug("ImagCoherence::calculate - Resetting to full spectrum");
         AbstractMetric::m_iNumberBinStart = 0;
         AbstractMetric::m_iNumberBinAmount = iNFreqs;
     }

@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Ordered group of @ref MNELIB::MNEMghTag entries appended to an MGH/MGZ file.
+ * @brief    Ordered group of @ref mne::MNEMghTag entries appended to an MGH/MGZ file.
  *
- * @ref MNELIB::MNEMghTagGroup gathers every tag present at the tail of
+ * @ref mne::MNEMghTagGroup gathers every tag present at the tail of
  * an MGH volume and offers typed accessors for the commonly used kinds
  * (@c MGH_TAG_OLD_COLORTABLE, @c MGH_TAG_MGH_XFORM,
  * @c MGH_TAG_CMDLINE, ...) so callers do not have to walk the raw byte
@@ -33,10 +33,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -71,6 +71,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNEMGHTAGGROUP_H

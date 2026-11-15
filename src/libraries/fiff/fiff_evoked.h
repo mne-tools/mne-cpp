@@ -13,14 +13,14 @@
  * @date     March 2013
  * @brief    Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
  *
- * @ref FIFFLIB::FiffEvoked is one averaged response as written under a
+ * @ref mne::FiffEvoked is one averaged response as written under a
  * @c FIFFB_EVOKED block: the time axis (@c times, @c first, @c last),
  * the (nchan × nsamples) data matrix, the baseline interval, the
  * averaging kind (@c FIFFV_ASPECT_AVERAGE,
  * @c FIFFV_ASPECT_STD_ERR, ...), the trigger comment, the number of
- * averaged epochs (@c nave) and the associated @ref FIFFLIB::FiffInfo. Multiple
- * @ref FIFFLIB::FiffEvoked objects belonging to the same recording (one per
- * condition) make up a @ref FIFFLIB::FiffEvokedSet.
+ * averaged epochs (@c nave) and the associated @ref mne::FiffInfo. Multiple
+ * @ref mne::FiffEvoked objects belonging to the same recording (one per
+ * condition) make up a @ref mne::FiffEvokedSet.
  *
  * Drop-in counterpart of @c mne.Evoked in MNE-Python: the same kind /
  * nave / comment / baseline semantics and the same channel-picking,
@@ -62,10 +62,10 @@
 #include <variant>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -96,7 +96,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads one evoked data set, like read(); throws BASELIB::Error if it cannot.
+     * Reads one evoked data set, like read(); throws mne::Error if it cannot.
      *
      * @param[in] path        The file.
      * @param[in] condition   Index of the data set, or its comment together with @p kind.
@@ -122,11 +122,11 @@ public:
      *
      * @return The evoked data, or why the file holds none matching @p condition.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffEvoked> read(const std::filesystem::path& path,
-                                                            const Condition& condition = 0,
-                                                            const Baseline& baseline = {},
-                                                            bool proj = true,
-                                                            fiff_int_t kind = FIFFV_ASPECT_AVERAGE);
+    [[nodiscard]] static mne::Expected<FiffEvoked> read(const std::filesystem::path& path,
+                                                        const Condition& condition = 0,
+                                                        const Baseline& baseline = {},
+                                                        bool proj = true,
+                                                        fiff_int_t kind = FIFFV_ASPECT_AVERAGE);
 
     //=========================================================================================================
     /**

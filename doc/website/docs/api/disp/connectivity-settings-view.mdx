@@ -1,18 +1,18 @@
 ---
 id: connectivity-settings-view
-title: "DISPLIB::ConnectivitySettingsView"
+title: "mne::disp::ConnectivitySettingsView"
 sidebar_label: ConnectivitySettingsView
 sidebar_position: 21
 ---
 
 # ConnectivitySettingsView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/connectivitysettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/connectivitysettingsview.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/connectivitysettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/connectivitysettingsview.h)
 
 `#include <disp/connectivitysettingsview.h>`
 
 ```cpp
-class DISPLIB::ConnectivitySettingsView
+class mne::disp::ConnectivitySettingsView
 ```
 
 Settings panel for the on-line connectivity estimator (metric, window, trials).
@@ -174,7 +174,7 @@ Clears the view.
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/main.cpp, line 385"
+````cpp title="src/examples/ex_connectivity/main.cpp, line 378"
 // Create ConnectivitySettingsView as standalone widget
 std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<ConnectivitySettingsView>("EX_CONNECTIVITY");
 ````
@@ -183,7 +183,7 @@ std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<C
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 381"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 374"
 // Create ConnectivitySettingsView as standalone widget
 std::shared_ptr<ConnectivitySettingsView> pConnSettingsView = std::make_shared<ConnectivitySettingsView>("EX_CONNECTIVITY_COMP");
 pConnSettingsView->setNumberTrials(iNumTrials);

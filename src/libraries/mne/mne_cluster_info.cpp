@@ -9,7 +9,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2013
- * @brief    Implementation of @ref MNELIB::MNEClusterInfo.
+ * @brief    Implementation of @ref mne::MNEClusterInfo.
  *
  * Implements constructors and the helpers that group source vertices
  * into clusters / undo the grouping when expanding back to the original
@@ -35,7 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -64,7 +64,7 @@ bool MNEClusterInfo::write(const std::filesystem::path& p_sFileName) const
 {
     std::ofstream out(p_sFileName);
     if (!out) {
-        BASELIB::Log::warning("MNEClusterInfo::write - Cannot open {}", BASELIB::utf8FromPath(p_sFileName));
+        mne::Log::warning("MNEClusterInfo::write - Cannot open {}", mne::utf8FromPath(p_sFileName));
         return false;
     }
     out << "MNE Cluster Info\n";

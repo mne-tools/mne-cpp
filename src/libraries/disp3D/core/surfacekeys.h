@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    String key constants for surfaces in the @ref DISP3DLIB scene map.
+ * @brief    String key constants for surfaces in the @c mne_disp3D scene map.
  *
  * BrainView and the scene controllers store all renderable surfaces
  * in a single @c QMap<QString, std::shared_ptr<BrainSurface>>. The
@@ -39,7 +39,7 @@
 
 //=============================================================================================================
 /**
- * @namespace SURFACEKEYS
+ * @namespace mne::disp::surface_keys
  * @brief     Centralised string constants for surface map keys.
  *
  * Every surface stored in BrainView's `m_surfaces` map is identified by a
@@ -47,7 +47,7 @@
  * suffix.  Using these constants instead of raw string literals ensures
  * consistency and enables compile-time typo detection.
  */
-namespace SURFACEKEYS
+namespace mne::disp::surface_keys
 {
 // ── Hemisphere prefixes ────────────────────────────────────────────
 inline constexpr QLatin1String kLhPrefix{"lh_"};
@@ -153,6 +153,6 @@ inline QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f& m)
     return q;
 }
 
-} // namespace SURFACEKEYS
+} // namespace mne::disp::surface_keys
 
 #endif // SURFACEKEYS_H

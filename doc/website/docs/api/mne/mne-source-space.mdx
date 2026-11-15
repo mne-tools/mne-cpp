@@ -1,13 +1,13 @@
 ---
 id: mne-source-space
-title: "MNELIB::MNESourceSpace"
+title: "mne::MNESourceSpace"
 sidebar_label: MNESourceSpace
 sidebar_position: 3
 ---
 
 # MNESourceSpace
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_source_space.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_source_space.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_source_space.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_source_space.h)
 
 :::info[Python equivalent]
 `mne.SourceSpaces` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 3
 `#include <mne/mne_source_space.h>`
 
 ```cpp
-class MNELIB::MNESourceSpace
+class mne::MNESourceSpace
 ```
 
 Implements the MNE Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C `mne_types.h`).
@@ -340,7 +340,7 @@ Vertices of a subject's surfaces nearest to an icosahedron of the given grade (m
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 210"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 208"
 // A FreeSurfer surface with its curvature and the volume geometry from the file footer
 const auto white = MNESourceSpace::load_surface((data + "/subjects/sample/surf/lh.white").toStdU16String(), (data + "/subjects/sample/surf/lh.curv").toStdU16String());
 const MNEVolGeom& geometry = *white->vol_geom; // sizes and centre converted to metres

@@ -1,18 +1,18 @@
 ---
 id: multimodal-scene
-title: "DISP3DLIB::MultimodalScene"
+title: "mne::disp::MultimodalScene"
 sidebar_label: MultimodalScene
 sidebar_position: 4
 ---
 
 # MultimodalScene
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/multimodalscene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/multimodalscene.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/scene/multimodalscene.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/scene/multimodalscene.h)
 
 `#include <disp3D/multimodalscene.h>`
 
 ```cpp
-class DISP3DLIB::MultimodalScene
+class mne::disp::MultimodalScene
 ```
 
 Host-app-agnostic controller that owns the ordered renderable set and dispatches picks back to the producing layer.
@@ -251,7 +251,7 @@ The values are clamped to fmin &lt;= fmid &lt;= fmax. Emits `overlayThresholdsCh
 
 ### reportPick(pick)
 
-[Report](/docs/api/report/report-class) a pick result from a layer's renderer or hit-tester.
+[`Report`](/docs/api/report/report-class) a pick result from a layer's renderer or hit-tester.
 
 Emits `picked`. Used by both real ray-cast picking and synthetic picks (e.g. wizard "show this contact" navigation).
 
@@ -306,7 +306,7 @@ Replaces any previously registered fn for that kind.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 176"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 174"
 MultimodalScene scene;
 scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
     const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());

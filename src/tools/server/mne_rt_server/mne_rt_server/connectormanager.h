@@ -22,7 +22,7 @@
 #include <rtserver_connector/iconnector.h>
 
 //=============================================================================================================
-// MNELIB INCLUDES
+// mne_mne INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
@@ -127,7 +127,7 @@ public:
     QByteArray setActiveConnector(qint32 ID);
 
 signals:
-    void sendMeasInfo(qint32, FIFFLIB::FiffInfo);
+    void sendMeasInfo(qint32, mne::FiffInfo);
     //    void setBufferSize(qint32 ID);
     //    void startMeasConnector();
     //    void stopMeasConnector();

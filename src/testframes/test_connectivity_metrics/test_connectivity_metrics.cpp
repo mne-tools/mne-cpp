@@ -17,7 +17,7 @@
 #include <cmath>
 #include <random>
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestConnectivityMetrics : public QObject
@@ -97,10 +97,10 @@ private slots:
         QCOMPARE(settings.getNodePositions().rows(), 4);
 
         // From the picked channels of a recording: EEG/MEG take their position, other channels sit at the origin
-        FIFFLIB::FiffInfo info;
+        mne::FiffInfo info;
         const QList<int> kinds{FIFFV_STIM_CH, FIFFV_EEG_CH, FIFFV_MEG_CH};
         for (int k = 0; k < kinds.size(); ++k) {
-            FIFFLIB::FiffChInfo ch;
+            mne::FiffChInfo ch;
             ch.kind = kinds[k];
             ch.chpos.r0 = Vector3f(k + 1.0f, 2.0f * k, -1.0f);
             info.chs.push_back(ch);

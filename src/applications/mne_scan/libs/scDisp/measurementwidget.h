@@ -33,20 +33,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 class QuickControlView;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCDISPLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCDISPLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
-// SCDISPLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ public:
      *
      * @param[in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
      */
-    virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement) = 0;
+    virtual void update(mne::scan::Measurement::SPtr pMeasurement) = 0;
 
     //=========================================================================================================
     /**

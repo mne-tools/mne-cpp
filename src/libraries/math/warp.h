@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Thin-plate-spline 3-D warp from landmark correspondences.
  *
- * @ref MATHLIB::Warp implements Bookstein's thin-plate spline (TPS), the
+ * @ref mne::Warp implements Bookstein's thin-plate spline (TPS), the
  * minimum-bending-energy interpolant that maps an @c n×3 set of source
  * landmarks exactly onto an @c n×3 set of destination landmarks and
  * extends smoothly to the rest of @c R^3. It is mne-cpp's reference
@@ -23,7 +23,7 @@
  * kernel). Fitting requires one @c (n+4)×(n+4) linear solve
  * (@c Eigen::FullPivLU); evaluation at @c m points is then
  * @c O(m*n + m). The class is also a wrapper around a tiny landmark
- * file reader (@ref MATHLIB::Warp::readsLm "readsLm") so calibration data shipped as plain text
+ * file reader (@ref mne::Warp::readsLm "readsLm") so calibration data shipped as plain text
  * can be ingested without extra glue.
  *
  * Reference: Bookstein (1989) "Principal Warps: Thin-Plate Splines and
@@ -54,10 +54,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================

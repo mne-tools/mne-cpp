@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FWDLIB;
+using namespace mne;
 
 //=============================================================================================================
 // LOCAL CONSTANTS AND HELPERS
@@ -445,7 +445,7 @@ std::unique_ptr<MatrixXf> FwdFieldMap::computeMegMapping(
     const MatrixX3f& vertices,
     const MatrixX3f& normals,
     const Vector3f& origin,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     const StringList& chNames,
     float intrad,
     float miss)
@@ -462,7 +462,7 @@ std::unique_ptr<MatrixXf> FwdFieldMap::computeMegMapping(
 
     // Build SSP projector
     MatrixXd projOp;
-    FIFFLIB::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
+    mne::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
 
     return computeMappingMatrix(selfDots, surfaceDots, stds,
                                 static_cast<double>(miss), projOp, false);
@@ -500,7 +500,7 @@ std::unique_ptr<MatrixXf> FwdFieldMap::computeEegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const Vector3f& origin,
-    const FIFFLIB::FiffInfo& info,
+    const mne::FiffInfo& info,
     const StringList& chNames,
     float intrad,
     float miss)
@@ -519,7 +519,7 @@ std::unique_ptr<MatrixXf> FwdFieldMap::computeEegMapping(
 
     // Build SSP projector
     MatrixXd projOp;
-    FIFFLIB::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
+    mne::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
 
     // Check for average EEG reference projection
     bool hasAvgRef = false;

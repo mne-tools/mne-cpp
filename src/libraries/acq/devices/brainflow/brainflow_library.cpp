@@ -30,8 +30,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -252,7 +252,7 @@ AcqExpected<int> BrainFlowLibrary::find_board(std::string_view name) const
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<BrainFlowDescription> ACQLIB::detail::parse_brainflow_description(std::string_view json)
+AcqExpected<BrainFlowDescription> mne::detail::parse_brainflow_description(std::string_view json)
 {
     const auto malformed = [&] {
         return AcqError(AcqErrorCode::DeviceIo, "malformed BrainFlow board description: " + std::string(json.substr(0, 200)));
@@ -329,7 +329,7 @@ AcqExpected<BrainFlowDescription> ACQLIB::detail::parse_brainflow_description(st
 
 //=============================================================================================================
 
-AcqError ACQLIB::detail::brainflow_error(int code, std::string_view call)
+AcqError mne::detail::brainflow_error(int code, std::string_view call)
 {
     // BrainFlow's exit codes
     static constexpr std::array<std::string_view, 24> kNames = {
@@ -364,7 +364,7 @@ AcqError ACQLIB::detail::brainflow_error(int code, std::string_view call)
 
 //=============================================================================================================
 
-std::string ACQLIB::detail::brainflow_board_key(std::string_view name)
+std::string mne::detail::brainflow_board_key(std::string_view name)
 {
     std::string out;
     for (const char c : name) {

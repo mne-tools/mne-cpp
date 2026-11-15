@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    The lsl:// backend: liblsl loaded at runtime, the in-tree LSLLIB as fallback.
+ * @brief    The lsl:// backend: liblsl loaded at runtime, the in-tree mne_lsl as fallback.
  */
 
 //=============================================================================================================
@@ -47,8 +47,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // DEFINE LOCAL METHODS
@@ -425,7 +425,7 @@ private:
 class InTreeLink final : public Link
 {
 public:
-    InTreeLink(const LSLLIB::stream_info& info, std::size_t channels)
+    InTreeLink(const mne::stream_info& info, std::size_t channels)
     : m_inlet(info)
     , m_channels(channels)
     {
@@ -488,11 +488,11 @@ public:
 
     double localClock() const override
     {
-        return LSLLIB::local_clock();
+        return mne::local_clock();
     }
 
 private:
-    LSLLIB::stream_inlet m_inlet;
+    mne::stream_inlet m_inlet;
     std::size_t m_channels;
     std::vector<std::vector<float>> m_pending;
     std::vector<double> m_stamps;
@@ -543,7 +543,7 @@ public:
 
 private:
     LslSimulator(const Config& c, std::size_t block, AcqDevice session, AcqReader reader)
-    : m_outlet(LSLLIB::stream_info(c.name, c.type, static_cast<int>(c.channels), c.sfreq, LSLLIB::ChannelFormat::Float32, c.sourceId))
+    : m_outlet(mne::stream_info(c.name, c.type, static_cast<int>(c.channels), c.sfreq, mne::ChannelFormat::Float32, c.sourceId))
     , m_session(std::move(session))
     , m_reader(std::move(reader))
     , m_chunk(block, std::vector<float>(c.channels))
@@ -577,7 +577,7 @@ private:
         }
     }
 
-    LSLLIB::stream_outlet m_outlet;
+    mne::stream_outlet m_outlet;
     AcqDevice m_session;
     AcqReader m_reader;
     std::vector<std::vector<float>> m_chunk;
@@ -744,12 +744,12 @@ private:
     AcqError connectInTree()
     {
         const auto [property, value] = selector(m_config);
-        const std::vector<LSLLIB::stream_info> found = LSLLIB::resolve_stream(property, value, m_config.timeout, 1);
+        const std::vector<mne::stream_info> found = mne::resolve_stream(property, value, m_config.timeout, 1);
         if (found.empty()) {
             return {AcqErrorCode::DeviceNotFound, "no LSL stream with " + property + "=" + value + " within " + std::to_string(m_config.timeout) + " s (in-tree LSL)"};
         }
-        const LSLLIB::stream_info& info = found.front();
-        if (info.channel_format() == LSLLIB::ChannelFormat::String) {
+        const mne::stream_info& info = found.front();
+        if (info.channel_format() == mne::ChannelFormat::String) {
             return {AcqErrorCode::UnsupportedFormat, "string (marker) LSL streams are not supported yet"};
         }
         if (info.nominal_srate() <= 0.0) {
@@ -922,7 +922,7 @@ std::vector<AcqDiscoveredDevice> discover(std::chrono::milliseconds timeout)
         }
         return out;
     }
-    for (const LSLLIB::stream_info& info : LSLLIB::resolve_streams(seconds)) {
+    for (const mne::stream_info& info : mne::resolve_streams(seconds)) {
         out.push_back({"lsl://" + info.name() + "?library=intree", info.name(), "lsl",
                        std::to_string(info.channel_count()) + " ch, " + info.type() + " (in-tree LSL)", true});
     }
@@ -946,7 +946,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::registerLslScheme()
+AcqError mne::registerLslScheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &LslBackend::open, &discover);
     return result;
@@ -954,7 +954,7 @@ AcqError ACQLIB::registerLslScheme()
 
 //=============================================================================================================
 
-std::string ACQLIB::lslRuntime()
+std::string mne::lslRuntime()
 {
     std::string why;
     if (const Liblsl* lsl = Liblsl::instance(&why)) {

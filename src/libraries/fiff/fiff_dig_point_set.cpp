@@ -45,7 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -70,7 +70,7 @@ FiffDigPointSet::FiffDigPointSet(const std::filesystem::path& path)
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffDigPointSet> FiffDigPointSet::read(const std::filesystem::path& path)
+mne::Expected<FiffDigPointSet> FiffDigPointSet::read(const std::filesystem::path& path)
 {
     auto stream = FiffStream::open(path);
     if (!stream) {
@@ -81,11 +81,11 @@ BASELIB::Expected<FiffDigPointSet> FiffDigPointSet::read(const std::filesystem::
 
 //=============================================================================================================
 
-BASELIB::Expected<FiffDigPointSet> FiffDigPointSet::read(FiffStream& stream)
+mne::Expected<FiffDigPointSet> FiffDigPointSet::read(FiffStream& stream)
 {
     const bool openHere = !stream.is_open();
     if (openHere && !stream.open()) {
-        return BASELIB::fail(BASELIB::ErrorCode::Io, "cannot open {}", stream.stream_name());
+        return mne::fail(mne::ErrorCode::Io, "cannot open {}", stream.stream_name());
     }
 
     FiffDigPointSet dig;
@@ -98,7 +98,7 @@ BASELIB::Expected<FiffDigPointSet> FiffDigPointSet::read(FiffStream& stream)
             }
             const std::optional<FiffTag> tag = stream.read_tag(entry.pos);
             if (!tag) {
-                return BASELIB::fail(BASELIB::ErrorCode::Format, "cannot read the digitizer tag at {}", entry.pos);
+                return mne::fail(mne::ErrorCode::Format, "cannot read the digitizer tag at {}", entry.pos);
             }
             if (entry.kind == FIFF_DIG_POINT) {
                 dig.m_points.push_back(tag->to_dig_point());
@@ -120,19 +120,19 @@ BASELIB::Expected<FiffDigPointSet> FiffDigPointSet::read(FiffStream& stream)
 
 //=============================================================================================================
 
-BASELIB::Expected<void> FiffDigPointSet::write(const std::filesystem::path& path) const
+mne::Expected<void> FiffDigPointSet::write(const std::filesystem::path& path) const
 {
     if (path.empty()) {
-        return BASELIB::fail(BASELIB::ErrorCode::Io, "the output path is empty");
+        return mne::fail(mne::ErrorCode::Io, "the output path is empty");
     }
     std::error_code ec;
     const std::filesystem::path dir = path.has_parent_path() ? path.parent_path() : std::filesystem::path(".");
     if (!std::filesystem::is_directory(dir, ec)) {
-        return BASELIB::fail(BASELIB::ErrorCode::NotFound, "the directory {} does not exist", BASELIB::utf8FromPath(dir));
+        return mne::fail(mne::ErrorCode::NotFound, "the directory {} does not exist", mne::utf8FromPath(dir));
     }
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return BASELIB::fail(BASELIB::ErrorCode::Io, "cannot open {} for writing", BASELIB::utf8FromPath(path));
+        return mne::fail(mne::ErrorCode::Io, "cannot open {} for writing", mne::utf8FromPath(path));
     }
     write_to_stream(*stream);
     stream->end_file();
@@ -192,7 +192,7 @@ bool FiffDigPointSet::transform_to_head()
         }
     }
     if (!fid[0] || !fid[1] || !fid[2] || fid[0]->coord_frame != fid[1]->coord_frame || fid[0]->coord_frame != fid[2]->coord_frame) {
-        BASELIB::Log::warning("[FiffDigPointSet::transform_to_head] LPA, nasion and RPA in one frame are required.");
+        mne::Log::warning("[FiffDigPointSet::transform_to_head] LPA, nasion and RPA in one frame are required.");
         return false;
     }
     const int frame = fid[0]->coord_frame;

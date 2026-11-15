@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of @ref MNELIB::MNENearest.
+ * @brief    Implementation of @ref mne::MNENearest.
  *
  * Provides constructors and the FIFF reader for the nearest-vertex /
  * nearest-distance tags.
@@ -25,7 +25,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

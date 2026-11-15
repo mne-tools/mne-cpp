@@ -36,7 +36,7 @@
 //=============================================================================================================
 
 using namespace DATAMANAGERPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,17 +92,17 @@ QMenu* DataManager::getMenu()
 
 QDockWidget* DataManager::getControl()
 {
-    DISPLIB::BidsView* pDataManagerBidsView = new DISPLIB::BidsView;
+    mne::disp::BidsView* pDataManagerBidsView = new mne::disp::BidsView;
 
     pDataManagerBidsView->setModel(m_pAnalyzeData->getDataModel());
 
-    connect(pDataManagerBidsView, &DISPLIB::BidsView::selectedModelChanged,
+    connect(pDataManagerBidsView, &mne::disp::BidsView::selectedModelChanged,
             this, &DataManager::onCurrentlySelectedModelChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerBidsView, &DISPLIB::BidsView::selectedItemChanged,
+    connect(pDataManagerBidsView, &mne::disp::BidsView::selectedItemChanged,
             this, &DataManager::onCurrentItemChanged, Qt::UniqueConnection);
 
-    connect(pDataManagerBidsView, &DISPLIB::BidsView::removeItem,
+    connect(pDataManagerBidsView, &mne::disp::BidsView::removeItem,
             this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
     QDockWidget* pControlDock = new QDockWidget(getName());

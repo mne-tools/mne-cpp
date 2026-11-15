@@ -1,18 +1,18 @@
 ---
 id: acq-recorder-stats
-title: "ACQLIB::AcqRecorderStats"
+title: "mne::AcqRecorderStats"
 sidebar_label: AcqRecorderStats
 sidebar_position: 49
 ---
 
 # AcqRecorderStats
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/fiff/acq_recorder.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/fiff/acq_recorder.h)
 
 `#include <acq/acq_recorder.h>`
 
 ```cpp
-struct ACQLIB::AcqRecorderStats
+struct mne::AcqRecorderStats
 ```
 
 Progress of a recording; exact once stop() has returned.
@@ -74,7 +74,7 @@ Pick an acquisition device or its simulator, watch it, record it to FIFF and pla
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 92"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 91"
 const AcqRecorderStats stats = recorder->stats();
 std::printf("recorded %llu samples (%llu lost) and %llu events in %llu buffers, %.1f MB, direct I/O %s\n",
             static_cast<unsigned long long>(stats.samples), static_cast<unsigned long long>(stats.lost),

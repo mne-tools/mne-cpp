@@ -44,9 +44,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
-using namespace SCDISPLIB;
-using namespace SCMEASLIB;
+using namespace mne::scan;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

@@ -28,10 +28,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 /**
@@ -49,7 +49,7 @@ FIFFSHARED_EXPORT bool same_channel(std::string_view a, std::string_view b) noex
  *
  * @return The index of @p name in @p names, an exact match before one by same_channel(); -1 if there is none.
  */
-FIFFSHARED_EXPORT int channel_index(const BASELIB::StringList& names, std::string_view name) noexcept;
+FIFFSHARED_EXPORT int channel_index(const mne::StringList& names, std::string_view name) noexcept;
 
 /**
  * @param[in] names   Channel names.
@@ -57,11 +57,11 @@ FIFFSHARED_EXPORT int channel_index(const BASELIB::StringList& names, std::strin
  *
  * @return Whether @p names has channel @p name, see channel_index().
  */
-inline bool has_channel(const BASELIB::StringList& names, std::string_view name) noexcept
+inline bool has_channel(const mne::StringList& names, std::string_view name) noexcept
 {
     return channel_index(names, name) >= 0;
 }
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFF_CH_NAME_H

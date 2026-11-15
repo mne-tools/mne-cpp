@@ -35,7 +35,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent)
+PluginItem::PluginItem(mne::scan::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
 , m_iWidth(MIN_WIDTH)
@@ -49,11 +49,11 @@ PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu* context
 
     // Modern color palette
     switch (m_pPlugin->getType()) {
-        case SCSHAREDLIB::AbstractPlugin::_IAlgorithm:
+        case mne::scan::AbstractPlugin::_IAlgorithm:
             m_qColorContour = QColor(34, 197, 94);   // green-500
             m_qColorFillTop = QColor(240, 253, 244); // green-50
             break;
-        case SCSHAREDLIB::AbstractPlugin::_ISensor:
+        case mne::scan::AbstractPlugin::_ISensor:
             m_qColorContour = QColor(59, 130, 246);  // blue-500
             m_qColorFillTop = QColor(239, 246, 255); // blue-50
             break;
@@ -142,10 +142,10 @@ void PluginItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
     // Type label
     QString typeLabel;
     switch (m_pPlugin->getType()) {
-        case SCSHAREDLIB::AbstractPlugin::_ISensor:
+        case mne::scan::AbstractPlugin::_ISensor:
             typeLabel = QStringLiteral("SENSOR");
             break;
-        case SCSHAREDLIB::AbstractPlugin::_IAlgorithm:
+        case mne::scan::AbstractPlugin::_IAlgorithm:
             typeLabel = QStringLiteral("ALGORITHM");
             break;
         default:

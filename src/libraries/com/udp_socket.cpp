@@ -24,8 +24,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace COMLIB;
-using namespace COMLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS

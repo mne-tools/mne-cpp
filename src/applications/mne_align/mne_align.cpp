@@ -42,7 +42,7 @@
 #include <QStatusBar>
 #include <QToolBar>
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace MNEALIGN;
 
 //=============================================================================================================
@@ -336,7 +336,7 @@ void MneAlign::onWizardBemPathChanged(const QString& path)
         return;
     }
 
-    auto bem = std::make_shared<MNELIB::MNEBem>(path.toStdU16String());
+    auto bem = std::make_shared<mne::MNEBem>(path.toStdU16String());
     if (m_pView3d)
         m_pView3d->setBem(bem);
     if (m_pStatusBem) {
@@ -408,8 +408,6 @@ void MneAlign::onWizardStepChanged(MNEALIGN::AlignStep step)
 
 void MneAlign::onWizardSaveDigitisation(const QString& outPath)
 {
-    using namespace FIFFLIB;
-
     FiffDigPointSet set;
     int eegIdent = 1;
     int hspIdent = 1;
@@ -447,8 +445,6 @@ void MneAlign::onWizardSaveDigitisation(const QString& outPath)
 
 void MneAlign::onWizardSaveTrans(const QString& outPath)
 {
-    using namespace FIFFLIB;
-
     if (!m_pView3d)
         return;
 
@@ -494,9 +490,6 @@ void MneAlign::onAbout()
 
 void MneAlign::onIcpFit()
 {
-    using namespace MNELIB;
-    using namespace FIFFLIB;
-
     if (!m_pPoints || !m_pView3d)
         return;
     auto bem = m_pView3d->bem();

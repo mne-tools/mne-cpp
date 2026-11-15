@@ -18,11 +18,11 @@
  * narrower windows do the opposite.
  *
  * The implementation parallelises across windowed segments via Qt Concurrent's
- * map–reduce pattern; @ref DSPLIB::SpectogramInputData carries the per-window
- * parameters and @c DSPLIB::Spectrogram::reduce "Spectrogram::reduce" sums the partial spectrograms back
+ * map–reduce pattern; @ref mne::SpectogramInputData carries the per-window
+ * parameters and @c mne::Spectrogram::reduce "Spectrogram::reduce" sums the partial spectrograms back
  * into the final matrix. Use this when a single global STFT view is
  * sufficient — for multitaper or wavelet representations see
- * @ref DSPLIB::MultitaperTfr and @ref DSPLIB::MorletTfr.
+ * @ref mne::MultitaperTfr and @ref mne::MorletTfr.
  */
 
 #ifndef SPECTROGRAM_H
@@ -43,10 +43,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 /**

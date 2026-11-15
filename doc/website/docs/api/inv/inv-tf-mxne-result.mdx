@@ -1,18 +1,18 @@
 ---
 id: inv-tf-mxne-result
-title: "INVLIB::InvTfMxneResult"
+title: "mne::InvTfMxneResult"
 sidebar_label: InvTfMxneResult
 sidebar_position: 50
 ---
 
 # InvTfMxneResult
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
 
 `#include <inv/inv_tf_mxne.h>`
 
 ```cpp
-struct INVLIB::InvTfMxneResult
+struct mne::InvTfMxneResult
 ```
 
 Result structure for the TF-MxNE solver.
@@ -44,7 +44,7 @@ const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 260"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 257"
 tfParams.iNFreqs = 4;
 tfParams.dFMin = 5.0;
 tfParams.dFMax = 40.0;

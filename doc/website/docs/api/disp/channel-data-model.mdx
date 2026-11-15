@@ -1,18 +1,18 @@
 ---
 id: channel-data-model
-title: "DISPLIB::ChannelDataModel"
+title: "mne::disp::ChannelDataModel"
 sidebar_label: ChannelDataModel
 sidebar_position: 13
 ---
 
 # ChannelDataModel
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channeldatamodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channeldatamodel.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/helpers/channeldatamodel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/helpers/channeldatamodel.h)
 
 `#include <disp/channeldatamodel.h>`
 
 ```cpp
-class DISPLIB::ChannelDataModel
+class mne::disp::ChannelDataModel
 ```
 
 Circular-buffer Qt model exposing a rolling window of the live FIFF stream as a table.
@@ -36,12 +36,12 @@ classDiagram
 
 ### init(pFiffInfo)
 
-Initialise with channel metadata from a [FiffInfo](/docs/api/fiff/fiff-info).
+Initialise with channel metadata from a [`FiffInfo`](/docs/api/fiff/fiff-info).
 
 **Parameters:**
 
 - **pFiffInfo** : *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
-  The FiffInfo describing the channels.
+  The [`FiffInfo`](/docs/api/fiff/fiff-info) describing the channels.
 
 ---
 
@@ -198,7 +198,7 @@ When enabled each channel's mean amplitude over the requested window is subtract
 
 **Returns:**
 
-- *float* — Sampling frequency in Hz; 0 if no FiffInfo attached.
+- *float* — Sampling frequency in Hz; 0 if no [`FiffInfo`](/docs/api/fiff/fiff-info) attached.
 
 ---
 

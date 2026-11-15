@@ -1,18 +1,18 @@
 ---
 id: mne-epoch-data
-title: "MNELIB::MNEEpochData"
+title: "mne::MNEEpochData"
 sidebar_label: MNEEpochData
 sidebar_position: 18
 ---
 
 # MNEEpochData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data.h)
 
 `#include <mne/mne_epoch_data.h>`
 
 ```cpp
-class MNELIB::MNEEpochData
+class mne::MNEEpochData
 ```
 
 Epoch data, which corresponds to an event.
@@ -123,7 +123,7 @@ Returns whether this epoch should be excluded from averaging.
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 298"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 293"
 MNEEpochData* epoch = NULL;
 ````
 
@@ -131,7 +131,7 @@ MNEEpochData* epoch = NULL;
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 309"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 305"
 MNEEpochData* epoch = NULL;
 ````
 
@@ -139,7 +139,7 @@ MNEEpochData* epoch = NULL;
 
 Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 306"
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 302"
 MNEEpochData* epoch = NULL;
 ````
 

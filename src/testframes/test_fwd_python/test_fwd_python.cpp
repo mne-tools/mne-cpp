@@ -64,10 +64,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FWDLIB;
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 namespace
@@ -154,7 +151,7 @@ void TestFwdPython::initTestCase()
     QVERIFY(!m_ref.empty());
     // The reference stores "MEG0113", the measurement "MEG 0113": compare against the measurement's spelling.
     for (std::string& name : m_ref.sol.row_names) {
-        const int k = FIFFLIB::channel_index(m_raw.info.ch_names, name);
+        const int k = mne::channel_index(m_raw.info.ch_names, name);
         QVERIFY(k >= 0);
         name = m_raw.info.ch_names[static_cast<std::size_t>(k)];
     }

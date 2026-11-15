@@ -37,13 +37,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 class AbstractModel;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class ChannelSelectionView;
 class ChannelInfoModel;
@@ -51,7 +51,7 @@ class SelectionItem;
 class ApplyToView;
 }
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
@@ -69,12 +69,12 @@ namespace CHANNELSELECTIONPLUGIN
  *
  * @brief The channelselection class provides a view with all currently loaded models.
  */
-class CHANNELSELECTIONSHARED_EXPORT ChannelSelection : public ANSHAREDLIB::AbstractPlugin
+class CHANNELSELECTIONSHARED_EXPORT ChannelSelection : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "channelselection.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -98,8 +98,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private slots:
     //=========================================================================================================
@@ -117,7 +117,7 @@ private:
      *
      * @param[in] pNewModel    new loaded model.
      */
-    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+    void onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel);
 
     //=========================================================================================================
     /**
@@ -125,7 +125,7 @@ private:
      *
      * @param[in] pRemovedModel    Pointer to model being removed.
      */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+    void onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
@@ -133,17 +133,17 @@ private:
      *
      * @param[in] pFiffInfo    FiffInfo for currently loaded file.
      */
-    void setFiffSettings(std::shared_ptr<FIFFLIB::FiffInfo> pFiffInfo);
+    void setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcast signals. */
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcast signals. */
 
-    std::unique_ptr<DISPLIB::SelectionItem> m_pSelectionItem; /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
+    std::unique_ptr<mne::disp::SelectionItem> m_pSelectionItem; /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
 
-    std::unique_ptr<DISPLIB::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
-    std::shared_ptr<DISPLIB::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo;                         /**< Hold Information baout currently loaded file. */
+    std::unique_ptr<mne::disp::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
+    std::shared_ptr<mne::disp::ChannelInfoModel> m_pChannelInfoModel;         /**< Hold channel info - needed to initialize channelselectionview. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                               /**< Hold Information baout currently loaded file. */
 
-    DISPLIB::ApplyToView* m_pApplyToView;
+    mne::disp::ApplyToView* m_pApplyToView;
 
     QHBoxLayout* m_pViewLayout;    /**< Holds the view portion of the channel selection to be displayed. */
     QVBoxLayout* m_pControlLayout; /**< Holds the control portion of the channel selection to be displayed. */

@@ -27,8 +27,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -253,7 +253,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::unique_ptr<FtBufferTransport> ACQLIB::detail::make_ftbuffer_simulator(const FtBufferSimulation& simulation)
+std::unique_ptr<FtBufferTransport> mne::detail::make_ftbuffer_simulator(const FtBufferSimulation& simulation)
 {
     return std::make_unique<FtBufferSimulator>(simulation);
 }

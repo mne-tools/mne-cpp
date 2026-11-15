@@ -38,8 +38,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace FSLIB;
+using namespace mne::disp;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -192,8 +192,8 @@ void FwdSettingsView::setRecomputationStatus(int iStatus)
 
 //=============================================================================================================
 
-void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
-                                             FIFFLIB::fiff_int_t iCoordFrame,
+void FwdSettingsView::setSolutionInformation(mne::fiff_int_t iSourceOri,
+                                             mne::fiff_int_t iCoordFrame,
                                              int iNSource,
                                              int iNChan,
                                              int iNSpaces)

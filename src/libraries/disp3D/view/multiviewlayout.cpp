@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -272,4 +272,4 @@ void MultiViewLayout::dragSplitter(const QPoint& pos,
     }
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

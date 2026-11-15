@@ -52,8 +52,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace LSLLIB;
-using namespace LSLLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 namespace
 {
@@ -84,7 +84,7 @@ std::string number(double value)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class LSLLIB::StreamOutletPrivate
+class mne::StreamOutletPrivate
 {
 public:
     explicit StreamOutletPrivate(const stream_info& info)

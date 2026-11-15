@@ -56,14 +56,9 @@
 //=============================================================================================================
 
 using namespace RTFWDPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FWDLIB;
-using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace INVLIB;
-using namespace MNELIB;
-using namespace DISPLIB;
+using namespace mne::scan;
+using namespace mne;
+using namespace mne::disp;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -157,7 +152,7 @@ bool RtFwd::start()
         {&m_pFwdSettings->measname, "The meaurement file cannot be opend. Chosse another file."},
     };
     for (const auto& [path, message] : inputs) {
-        if (!FiffStream::open(BASELIB::pathFromUtf8(*path))) {
+        if (!FiffStream::open(mne::pathFromUtf8(*path))) {
             QMessageBox msgBox;
             msgBox.setText(message);
             msgBox.setInformativeText(QString::fromStdString(*path));
@@ -210,7 +205,7 @@ QWidget* RtFwd::setupWidget()
 
 //=============================================================================================================
 
-void RtFwd::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void RtFwd::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
@@ -405,7 +400,7 @@ void RtFwd::run()
             // compute and store
             pFwdSolution.reset(pFwdComputer->calculateFwd().release());
 
-            if (auto written = pFwdSolution->write(BASELIB::pathFromUtf8(m_pFwdSettings->solname)); !written) {
+            if (auto written = pFwdSolution->write(mne::pathFromUtf8(m_pFwdSettings->solname)); !written) {
                 qWarning() << written.error().what();
             }
 

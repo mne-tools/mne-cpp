@@ -7,15 +7,15 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    MNE-CPP BIDS library entry point: symbol-visibility macro and the @ref BIDSLIB namespace documentation.
+ * @brief    MNE-CPP BIDS library entry point: symbol-visibility macro and the @c mne_bids namespace documentation.
  *
  * Every public symbol in the BIDS library is annotated with
  * @c BIDSSHARED_EXPORT, which exports the symbols when the
  * shared library itself is being built, imports them for a
  * downstream consumer, and to nothing when the project is configured
  * with @c STATICBUILD. Including this header also pulls in
- * @c utils/buildinfo.h so the @ref BIDSLIB::buildDateTime, @ref
- * BIDSLIB::buildHash and @ref BIDSLIB::buildHashLong free functions
+ * @c utils/buildinfo.h so the @ref mne::buildDateTime, @ref
+ * mne::buildHash and @ref mne::buildHashLong free functions
  * are available to clients that need to log which build of the BIDS
  * library they linked against.
  */
@@ -56,12 +56,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace BIDSLIB
- * @brief     BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG.
- */
-namespace BIDSLIB
+namespace mne
 {
 
 //=============================================================================================================

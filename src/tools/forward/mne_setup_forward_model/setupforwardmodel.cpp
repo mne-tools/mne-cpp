@@ -64,10 +64,7 @@
 //=============================================================================================================
 
 using namespace MNESETUPFORWARDMODEL;
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

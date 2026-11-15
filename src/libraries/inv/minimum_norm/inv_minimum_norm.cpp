@@ -46,11 +46,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace MATHLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

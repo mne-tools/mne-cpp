@@ -27,20 +27,20 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void DSPLIB::fixStimArtifact(MatrixXd& data,
-                             const MatrixXi& events,
-                             double sfreq,
-                             int eventId,
-                             double tmin,
-                             double tmax,
-                             StimArtifactMode mode)
+void mne::fixStimArtifact(MatrixXd& data,
+                          const MatrixXi& events,
+                          double sfreq,
+                          int eventId,
+                          double tmin,
+                          double tmax,
+                          StimArtifactMode mode)
 {
     if (events.rows() == 0 || events.cols() < 3 || data.cols() == 0 || data.rows() == 0) {
         return;

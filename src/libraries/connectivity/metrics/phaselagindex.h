@@ -31,9 +31,9 @@
  * PLI shares the anti-leakage property of imaginary coherence but, being
  * amplitude-independent, is more robust to amplitude artefacts at the cost
  * of being biased upward for small samples and discontinuous around the
- * zero-phase line. The weighted variants @ref CONNECTIVITYLIB::WeightedPhaseLagIndex and
- * @ref CONNECTIVITYLIB::DebiasedSquaredWeightedPhaseLagIndex (Vinck et al., 2011) and the
- * sample-bias correction @ref CONNECTIVITYLIB::UnbiasedSquaredPhaseLagIndex address those
+ * zero-phase line. The weighted variants @ref mne::WeightedPhaseLagIndex and
+ * @ref mne::DebiasedSquaredWeightedPhaseLagIndex (Vinck et al., 2011) and the
+ * sample-bias correction @ref mne::UnbiasedSquaredPhaseLagIndex address those
  * shortcomings.
  */
 
@@ -69,14 +69,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -152,6 +152,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // PHASELAGINDEX_H

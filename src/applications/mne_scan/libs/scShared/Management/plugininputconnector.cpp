@@ -23,7 +23,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
+using namespace mne::scan;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -52,7 +52,7 @@ bool PluginInputConnector::isOutputConnector() const
 
 //=============================================================================================================
 
-void PluginInputConnector::update(SCMEASLIB::Measurement::SPtr pMeasurement)
+void PluginInputConnector::update(mne::scan::Measurement::SPtr pMeasurement)
 {
     emit notify(pMeasurement);
 }

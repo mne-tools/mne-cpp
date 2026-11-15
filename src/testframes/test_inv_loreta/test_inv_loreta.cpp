@@ -50,9 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -134,7 +132,7 @@ private slots:
 
 void TestInvLoreta::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     m_bDataLoaded = false;
 
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";

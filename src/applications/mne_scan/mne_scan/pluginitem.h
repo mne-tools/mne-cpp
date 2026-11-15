@@ -48,17 +48,17 @@ public:
     {
         Type = UserType + 15
     };
-    PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent = 0);
+    PluginItem(mne::scan::AbstractPlugin::SPtr pPlugin, QMenu* contextMenu, QGraphicsItem* parent = 0);
 
     ~PluginItem();
 
     void removeArrow(Arrow* arrow);
     void removeArrows();
-    SCSHAREDLIB::AbstractPlugin::PluginType diagramType() const
+    mne::scan::AbstractPlugin::PluginType diagramType() const
     {
         return m_pPlugin->getType();
     }
-    SCSHAREDLIB::AbstractPlugin::SPtr plugin()
+    mne::scan::AbstractPlugin::SPtr plugin()
     {
         return m_pPlugin;
     }
@@ -87,7 +87,7 @@ protected:
     void resizeAsRectangle(int width, int height);
 
 private:
-    SCSHAREDLIB::AbstractPlugin::SPtr m_pPlugin;
+    mne::scan::AbstractPlugin::SPtr m_pPlugin;
 
     qint32 m_iWidth;
     qint32 m_iHeight;

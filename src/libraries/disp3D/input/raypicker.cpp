@@ -23,7 +23,7 @@
 #include <QVector4D>
 #include <limits>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -262,4 +262,4 @@ QString RayHit::displayLabel() const
     return surfaceKey;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

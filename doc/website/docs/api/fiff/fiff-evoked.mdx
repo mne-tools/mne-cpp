@@ -1,13 +1,13 @@
 ---
 id: fiff-evoked
-title: "FIFFLIB::FiffEvoked"
+title: "mne::FiffEvoked"
 sidebar_label: FiffEvoked
 sidebar_position: 4
 ---
 
 # FiffEvoked
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked.h)
 
 :::info[Python equivalent]
 `mne.Evoked` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 4
 <Connections topics={["fiff-io", "epochs-averaging"]} context="api" current="FiffEvoked" />
 
 ```cpp
-class FIFFLIB::FiffEvoked
+class mne::FiffEvoked
 ```
 
 Single averaged evoked response: time axis, data, baseline, channel info and averaging metadata.
@@ -275,7 +275,7 @@ Merges evoked data with a predefined weighting strategy (weights="nave" or "equa
 
 Read an evoked data set from FIFF and print its measurement info and coordinate transforms.
 
-````cpp title="src/examples/ex_read_evoked/main.cpp, line 54"
+````cpp title="src/examples/ex_read_evoked/main.cpp, line 53"
 /** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
 void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
 {
@@ -288,7 +288,7 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
     plot.setXLabel("Time [ms]");
     plot.setYLabel(yLabel);
     for (int c = 0; c < evoked.data.rows(); ++c) {
-        if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || BASELIB::contains(evoked.info.bads, evoked.info.ch_names[c])) {
+        if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || mne::contains(evoked.info.bads, evoked.info.ch_names[c])) {
             continue;
 ````
 
@@ -296,7 +296,7 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 379"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 375"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
 ````
 
@@ -304,7 +304,7 @@ FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * r
 
 Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 374"
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 370"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
 ````
 

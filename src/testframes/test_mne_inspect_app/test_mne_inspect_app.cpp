@@ -209,11 +209,11 @@ void TestMneInspectApp::exportsAndReopensProjects()
         exportProject->trigger();
         QVERIFY2(QFile::exists(dir.filePath(name)), qPrintable(name));
 
-        const MNALIB::MnaProject project = MNALIB::MnaIO::read(dir.filePath(name));
+        const mne::MnaProject project = mne::MnaIO::read(dir.filePath(name));
         QCOMPARE(project.subjects.size(), 1);
         const auto& refs = project.subjects.first().sessions.first().recordings.first().files;
         QCOMPARE(refs.size(), expected.size());
-        for (const MNALIB::MnaFileRef& ref : refs)
+        for (const mne::MnaFileRef& ref : refs)
             QCOMPARE(ref.embedded, name.endsWith(".mnx"));
 
         MainWindow* reopened = makeWindow();

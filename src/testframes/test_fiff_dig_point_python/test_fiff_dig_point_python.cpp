@@ -67,7 +67,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 /**
@@ -270,10 +270,10 @@ void TestFiffDigPointPython::writeRoundTrip()
             QCOMPARE(back[i].r[c], m_dig[i].r[c]);
     }
 
-    QCOMPARE(m_dig.write(std::filesystem::path()).error().code, BASELIB::ErrorCode::Io);
-    QCOMPARE(m_dig.write(dir.filePath("missing/dig.fif").toStdString()).error().code, BASELIB::ErrorCode::NotFound);
-    QCOMPARE(m_dig.write(dir.path().toStdString()).error().code, BASELIB::ErrorCode::Io);
-    QVERIFY_THROWS_EXCEPTION(BASELIB::Error, FiffDigPointSet(dir.filePath("absent.fif").toStdString()));
+    QCOMPARE(m_dig.write(std::filesystem::path()).error().code, mne::ErrorCode::Io);
+    QCOMPARE(m_dig.write(dir.filePath("missing/dig.fif").toStdString()).error().code, mne::ErrorCode::NotFound);
+    QCOMPARE(m_dig.write(dir.path().toStdString()).error().code, mne::ErrorCode::Io);
+    QVERIFY_THROWS_EXCEPTION(mne::Error, FiffDigPointSet(dir.filePath("absent.fif").toStdString()));
 
     // FIFF_MNE_COORD_FRAME in the isotrak block puts every point into that frame, as mne's _read_dig_fif
     const std::string framed = dir.filePath("framed.fif").toStdString();
@@ -475,10 +475,10 @@ void TestFiffDigPointPython::polhemusReaders_rejectBadInput()
 {
     // Each of these raises in mne-python.
     const std::vector<std::string> oneName{"Fp1"};
-    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test.elp"), oneName).error().code, BASELIB::ErrorCode::Format);
-    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test.elp"), {}, "inch").error().code, BASELIB::ErrorCode::Format);
-    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test_elp.txt")).error().code, BASELIB::ErrorCode::Format);
-    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("missing.hsp")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test.elp"), oneName).error().code, mne::ErrorCode::Format);
+    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test.elp"), {}, "inch").error().code, mne::ErrorCode::Format);
+    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("test_elp.txt")).error().code, mne::ErrorCode::Format);
+    QCOMPARE(FiffDigMontage::read_polhemus_isotrak(digFile("missing.hsp")).error().code, mne::ErrorCode::Io);
 
     // A FastSCAN file whose header does not name FastSCAN is rejected unless asked not to
     QTemporaryDir dir;
@@ -605,7 +605,7 @@ void TestFiffDigPointPython::montageReaders_rejectBadInput()
 
     // FastSCAN: a known unit, a .txt that exists, three numbers per row
     QVERIFY(!FiffDigMontage::read_polhemus_fastscan(file("a.txt", "% FastSCAN\n1 2 3\n"), "inch").has_value());
-    QCOMPARE(FiffDigMontage::read_polhemus_fastscan(missing("missing.txt")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffDigMontage::read_polhemus_fastscan(missing("missing.txt")).error().code, mne::ErrorCode::Io);
     QVERIFY(!FiffDigMontage::read_polhemus_fastscan(file("b.txt", "% FastSCAN\n1 2\n")).has_value());
     QVERIFY(!FiffDigMontage::read_polhemus_fastscan(file("c.txt", "% FastSCAN\n1 2 x\n")).has_value());
 
@@ -640,9 +640,9 @@ void TestFiffDigPointPython::montageReaders_rejectBadInput()
     QVERIFY(csv.has_value());
     QCOMPARE(csv->dig.size(), std::size_t{2});
     QCOMPARE(csv->dig[0].ident, FIFFV_POINT_NASION);
-    QCOMPARE(FiffDigMontage::read_localite(file("b.csv", localite), "Nasion", "LPA", "RPA").error().code, BASELIB::ErrorCode::NotFound);
-    QCOMPARE(FiffDigMontage::read_localite(file("c.csv", localite + "2,ch02,1,2\n"), "Nasion").error().code, BASELIB::ErrorCode::Format);
-    QCOMPARE(FiffDigMontage::read_localite(missing("missing.csv"), "Nasion", "LPA", "RPA").error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffDigMontage::read_localite(file("b.csv", localite), "Nasion", "LPA", "RPA").error().code, mne::ErrorCode::NotFound);
+    QCOMPARE(FiffDigMontage::read_localite(file("c.csv", localite + "2,ch02,1,2\n"), "Nasion").error().code, mne::ErrorCode::Format);
+    QCOMPARE(FiffDigMontage::read_localite(missing("missing.csv"), "Nasion", "LPA", "RPA").error().code, mne::ErrorCode::Io);
 
     // Neuroscan .dat: "name number x y z" rows; without fiducials only the electrodes remain
     const auto dat = FiffDigMontage::read_neuroscan_dat(file("a.dat", "Fz 1 0 1 2\n"));
@@ -652,7 +652,7 @@ void TestFiffDigPointPython::montageReaders_rejectBadInput()
     QCOMPARE(dat->ch_names, std::vector<std::string>{"Fz"});
     QVERIFY(!FiffDigMontage::read_neuroscan_dat(file("b.dat", "Fz 1 0 1\n")).has_value());
     QVERIFY(!FiffDigMontage::read_neuroscan_dat(file("c.dat", "Fz 1 0 x 2\n")).has_value());
-    QCOMPARE(FiffDigMontage::read_neuroscan_dat(missing("missing.dat")).error().code, BASELIB::ErrorCode::Io);
+    QCOMPARE(FiffDigMontage::read_neuroscan_dat(missing("missing.dat")).error().code, mne::ErrorCode::Io);
 }
 
 //=============================================================================================================

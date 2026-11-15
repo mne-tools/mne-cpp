@@ -1,13 +1,13 @@
 ---
 id: inv-tf-mxne
-title: "INVLIB::InvTfMxne"
+title: "mne::InvTfMxne"
 sidebar_label: InvTfMxne
 sidebar_position: 10
 ---
 
 # InvTfMxne
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_tf_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_tf_mxne.h)
 
 :::info[Python equivalent]
 `mne.inverse_sparse.tf_mixed_norm` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 10
 <Connections topics={["sparse-inverse"]} context="api" current="InvTfMxne" />
 
 ```cpp
-class INVLIB::InvTfMxne
+class mne::InvTfMxne
 ```
 
 Time-Frequency Mixed-Norm Estimate (TF-MxNE) sparse inverse solver.
@@ -104,7 +104,7 @@ Build a Gabor dictionary (tight frame) for time-frequency decomposition.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 260"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 257"
 tfParams.iNFreqs = 4;
 tfParams.dFMin = 5.0;
 tfParams.dFMax = 40.0;

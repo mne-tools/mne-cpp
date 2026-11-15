@@ -7,7 +7,7 @@ sidebar_position: 23
 
 # MatrixIo
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Math Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -23,16 +23,16 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2013-2026 MNE-CPP Authors.
 
-`MATHLIB::write_matrix` and `MATHLIB::read_matrix` round-trip any dense Eigen expression through plain text, one row per line, so intermediate results can be compared with NumPy (`numpy.loadtxt` and `numpy.savetxt` read and write the same layout) and reference data can be checked into a test-data repository. Values are written with enough digits to read back bit-identical; lines containing `#` are comments.
+`mne::write_matrix` and `mne::read_matrix` round-trip any dense Eigen expression through plain text, one row per line, so intermediate results can be compared with NumPy (`numpy.loadtxt` and `numpy.savetxt` read and write the same layout) and reference data can be checked into a test-data repository. Values are written with enough digits to read back bit-identical; lines containing `#` are comments.
 
 ```cpp title="src/examples/ex_math/main.cpp"
 // Plain text, one row per line: numpy.loadtxt reads it, and values read back bit-identical
 const std::filesystem::path matrixPath = std::filesystem::temp_directory_path() / "ex_math_matrix.txt";
 MatrixXd matrix(2, 3);
 matrix << 0.1, -2.0 / 3.0, 3.25, 0.0, 1e-6, 42.0;
-MATHLIB::write_matrix(matrix, matrixPath, "example matrix");
+mne::write_matrix(matrix, matrixPath, "example matrix");
 MatrixXd readBack;
-MATHLIB::read_matrix(readBack, matrixPath);
+mne::read_matrix(readBack, matrixPath);
 ```
 
 ---

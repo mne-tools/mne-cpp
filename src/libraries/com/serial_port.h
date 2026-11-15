@@ -29,10 +29,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE COMLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace COMLIB
+namespace mne
 {
 
 /**
@@ -95,6 +95,6 @@ private:
 /** @return The serial ports of this machine, USB-serial adapters first. */
 COMSHARED_EXPORT std::vector<std::string> list_serial_ports();
 
-} // namespace COMLIB
+} // namespace mne
 
 #endif // COM_SERIAL_PORT_H

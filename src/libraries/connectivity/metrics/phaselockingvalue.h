@@ -33,7 +33,7 @@
  * choice for source-space analyses (where volume conduction is largely
  * absorbed into the inverse operator) and for paradigms in which zero-lag
  * locking is a hypothesis of interest; in sensor-space EEG/MEG it should
- * be reported alongside @ref CONNECTIVITYLIB::ImagCoherence or @ref CONNECTIVITYLIB::WeightedPhaseLagIndex.
+ * be reported alongside @ref mne::ImagCoherence or @ref mne::WeightedPhaseLagIndex.
  */
 
 #ifndef PHASELOCKINGVALUE_H
@@ -68,14 +68,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -152,6 +152,6 @@ protected:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // PHASELOCKINGVALUE_H

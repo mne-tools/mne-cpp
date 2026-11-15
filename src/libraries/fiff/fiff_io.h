@@ -11,13 +11,13 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     November 2013
- * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into FIFFLIB containers in one call.
+ * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into mne_fiff containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a
- * @ref FIFFLIB::FiffRawData (for "*-raw.fif"), a @ref FIFFLIB::FiffEvokedSet (for
- * "*-ave.fif"), a @ref FIFFLIB::FiffCov (for "*-cov.fif"), or the
- * appropriate combination without micromanaging @ref FIFFLIB::FiffStream and the
- * directory tree. @ref FIFFLIB::FiffIO provides exactly that one-call facade: it
+ * @ref mne::FiffRawData (for "*-raw.fif"), a @ref mne::FiffEvokedSet (for
+ * "*-ave.fif"), a @ref mne::FiffCov (for "*-cov.fif"), or the
+ * appropriate combination without micromanaging @ref mne::FiffStream and the
+ * directory tree. @ref mne::FiffIO provides exactly that one-call facade: it
  * sniffs the top-level FIFF blocks (@c FIFFB_RAW_DATA, @c FIFFB_EVOKED,
  * @c FIFFB_MNE_COV, ...), invokes the matching specialized reader and
  * exposes the results as ready-to-use shared pointers, with parity to
@@ -45,15 +45,15 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
- * @brief One-call FIFF reader/writer: opens a file, dispatches to the right specialized loader and returns ready-to-use FIFFLIB containers.
+ * @brief One-call FIFF reader/writer: opens a file, dispatches to the right specialized loader and returns ready-to-use mne_fiff containers.
  *
  * Sniffs the FIFF block tree, dispatches @ref FiffRawData /
  * @ref FiffEvokedSet loaders as appropriate, and returns shared pointers so the
@@ -153,7 +153,7 @@ public:
 
 private:
     /** Reads the info of @p stream and its raw data from @p rawBytes; @return the directory tree of the info, or nullptr. */
-    std::shared_ptr<FiffDirNode> readRaw(FiffStream& stream, std::unique_ptr<BASELIB::ByteStream> rawBytes);
+    std::shared_ptr<FiffDirNode> readRaw(FiffStream& stream, std::unique_ptr<mne::ByteStream> rawBytes);
 };
 
 } // NAMESPACE

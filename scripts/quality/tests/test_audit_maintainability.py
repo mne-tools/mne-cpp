@@ -58,7 +58,7 @@ class PatternTests(unittest.TestCase):
                    "class Data : public QSharedData {")
         classes = audit.qt_derived_classes(headers)
         self.assertEqual(classes, {"View", "ScaleView", "Item"})
-        code = "auto* a = new DISPLIB::ScaleView(label); auto* b = new Item(x); auto* c = new Plain();"
+        code = "auto* a = new mne::disp::ScaleView(label); auto* b = new Item(x); auto* c = new Plain();"
         self.assertEqual({k: v for k, v in audit.count_file(code, classes).items() if v},
                          {"qt_new_unparented": 2, "raw_new": 1})
 

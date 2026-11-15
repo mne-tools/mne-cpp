@@ -1,19 +1,19 @@
 ---
 id: circular-buffer
-title: "BASELIB::CircularBuffer"
+title: "mne::CircularBuffer"
 sidebar_label: CircularBuffer
 sidebar_position: 7
 ---
 
 # CircularBuffer
 
-**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/circular_buffer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/circular_buffer.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/circular_buffer.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/circular_buffer.h)
 
 `#include <base/circular_buffer.h>`
 
 ```cpp
 template <typename T>
-class BASELIB::CircularBuffer
+class mne::CircularBuffer
 ```
 
 Fixed-capacity first-in first-out queue; push waits while it is full and pop while it is empty, each for at most the timeout.

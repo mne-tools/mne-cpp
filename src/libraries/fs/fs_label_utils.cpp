@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Implementation of @ref FSLIB::FsLabelUtils: grow / split labels on the surface mesh and convert between source-estimate matrices and labels.
+ * @brief    Implementation of @ref mne::FsLabelUtils: grow / split labels on the surface mesh and convert between source-estimate matrices and labels.
  */
 
 //=============================================================================================================
@@ -31,7 +31,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

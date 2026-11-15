@@ -39,7 +39,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -114,7 +114,7 @@ InvTfMxneResult InvTfMxne::compute(const MatrixXd& matGain,
     const int nAtoms = 2 * params.iNFreqs;
 
     if (matData.rows() != nChannels) {
-        BASELIB::Log::warning("[InvTfMxne::compute] Dimension mismatch: data rows {} != gain rows {}", matData.rows(), nChannels);
+        mne::Log::warning("[InvTfMxne::compute] Dimension mismatch: data rows {} != gain rows {}", matData.rows(), nChannels);
         return result;
     }
 

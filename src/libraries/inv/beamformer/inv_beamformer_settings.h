@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Strongly-typed enumerations shared by the LCMV and DICS beamformer pipelines.
  *
- * Defines @ref INVLIB::BeamformerWeightNorm (none / unit-noise-gain /
- * NAI / rotation-invariant unit-noise-gain), @ref INVLIB::BeamformerPickOri "BeamformerPickOri"
+ * Defines @ref mne::BeamformerWeightNorm (none / unit-noise-gain /
+ * NAI / rotation-invariant unit-noise-gain), @ref mne::BeamformerPickOri "BeamformerPickOri"
  * (keep-all / surface-normal / max-power / 3-vector) and
- * @ref INVLIB::BeamformerInversion "BeamformerInversion" (full-matrix vs. scalar denominator
+ * @ref mne::BeamformerInversion "BeamformerInversion" (full-matrix vs. scalar denominator
  * inversion). These knobs are the user-facing API surface that
- * @ref INVLIB::InvLCMV / @ref INVLIB::InvDICS expose to control how the spatial-filter
+ * @ref mne::InvLCMV / @ref mne::InvDICS expose to control how the spatial-filter
  * weights are derived from the leadfield and data covariance / CSD.
  * The normalisation choices follow Sekihara &amp; Nagarajan,
  * @em Adaptive Spatial Filters for Electromagnetic Brain Imaging,
@@ -25,10 +25,10 @@
 #define INV_BEAMFORMER_SETTINGS_H
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -69,6 +69,6 @@ enum class BeamformerInversion
     Single      /**< Scalar (diagonal) inversion per source. */
 };
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_BEAMFORMER_SETTINGS_H

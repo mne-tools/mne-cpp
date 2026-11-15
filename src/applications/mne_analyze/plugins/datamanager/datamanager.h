@@ -37,7 +37,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 }
@@ -55,12 +55,12 @@ namespace DATAMANAGERPLUGIN
  *
  * @brief The DataManager class provides a view with all currently loaded models.
  */
-class DATAMANAGERSHARED_EXPORT DataManager : public ANSHAREDLIB::AbstractPlugin
+class DATAMANAGERSHARED_EXPORT DataManager : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "datamanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -84,8 +84,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
@@ -112,7 +112,7 @@ private:
      */
     void onRemoveItem(const QModelIndex& index);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu;
+    QPointer<mne::analyze::Communicator> m_pCommu;
 };
 
 //=============================================================================================================

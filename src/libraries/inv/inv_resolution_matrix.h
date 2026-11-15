@@ -9,7 +9,7 @@
  * @date     May 2026
  * @brief    Resolution-matrix analysis for linear inverse operators — point-spread and cross-talk functions.
  *
- * @ref INVLIB::InvResolutionMatrix computes
+ * @ref mne::InvResolutionMatrix computes
  * @f$ \mathbf{R} = \mathbf{K}\,\mathbf{L} @f$ from an inverse kernel
  * @c K and a leadfield @c L, then exposes the column-wise point-spread
  * functions (PSF), row-wise cross-talk functions (CTF), spatial-spread
@@ -37,10 +37,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -144,6 +144,6 @@ public:
                                                  const Eigen::MatrixX3d& matPositions);
 };
 
-} // namespace INVLIB
+} // namespace mne
 
 #endif // INV_RESOLUTION_MATRIX_H

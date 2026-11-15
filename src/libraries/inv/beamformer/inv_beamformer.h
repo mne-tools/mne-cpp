@@ -9,8 +9,8 @@
  * @date     March 2026
  * @brief    InvBeamformer value type — container for pre-computed LCMV / DICS spatial filters and associated metadata.
  *
- * @ref INVLIB::InvBeamformer stores the spatial filter weights produced
- * by @ref INVLIB::InvLCMV::makeLCMV "InvLCMV::makeLCMV" or @ref INVLIB::InvDICS::makeDICS "InvDICS::makeDICS" together with the
+ * @ref mne::InvBeamformer stores the spatial filter weights produced
+ * by @ref mne::InvLCMV::makeLCMV "InvLCMV::makeLCMV" or @ref mne::InvDICS::makeDICS "InvDICS::makeDICS" together with the
  * whitener, SSP projector, source-space vertex list, source normals,
  * weight-normalisation mode (none / unit-noise-gain / NAI), max-power
  * orientations and (for DICS) the per-frequency filter stack. Holding
@@ -43,10 +43,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE INVLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace INVLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -183,6 +183,6 @@ inline int InvBeamformer::nFreqs() const
     return static_cast<int>(weights.size());
 }
 
-} // NAMESPACE INVLIB
+} // NAMESPACE mne_inv
 
 #endif // INV_BEAMFORMER_H

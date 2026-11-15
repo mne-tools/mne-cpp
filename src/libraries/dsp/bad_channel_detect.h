@@ -44,10 +44,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -161,6 +161,6 @@ private:
     static double median(std::vector<double> values);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // BAD_CHANNEL_DETECT_DSP_H

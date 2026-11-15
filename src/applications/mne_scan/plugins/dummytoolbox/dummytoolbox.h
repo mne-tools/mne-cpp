@@ -62,12 +62,12 @@ namespace DUMMYTOOLBOXPLUGIN
  *
  * @brief The DummyToolbox class provides a dummy algorithm structure.
  */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public SCSHAREDLIB::AbstractAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public mne::scan::AbstractAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "dummytoolbox.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(mne::scan::AbstractAlgorithm)
 
 public:
     //=========================================================================================================
@@ -86,12 +86,12 @@ public:
     /**
      * IAlgorithm functions
      */
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+    virtual QSharedPointer<mne::scan::AbstractPlugin> clone() const;
     virtual void init();
     virtual void unload();
     virtual bool start();
     virtual bool stop();
-    virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
+    virtual mne::scan::AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     virtual QString getBuildInfo();
@@ -102,7 +102,7 @@ public:
      *
      * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
      */
-    void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    void update(mne::scan::Measurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -118,14 +118,14 @@ protected:
     virtual void run();
 
 private:
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
     QSharedPointer<DummyYourWidget> m_pYourWidget; /**< The widget used to control this plugin by the user.*/
 
-    std::shared_ptr<BASELIB::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularBuffer; /**< Holds incoming raw data. */
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pInput;   /**< The incoming data.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pOutput; /**< The outgoing data.*/
+    mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pInput;   /**< The incoming data.*/
+    mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pOutput; /**< The outgoing data.*/
 
 signals:
     //=========================================================================================================

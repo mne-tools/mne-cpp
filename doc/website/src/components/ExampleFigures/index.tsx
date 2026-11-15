@@ -10,7 +10,7 @@ import clsx from 'clsx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
-/** Figures an example wrote with DISPLIB::FigureExporter; one per row on narrow screens, two otherwise. */
+/** Figures an example wrote with mne::disp::FigureExporter; one per row on narrow screens, two otherwise. */
 export function ExampleFigures({ children }: { children: React.ReactNode }): React.JSX.Element {
     const single = React.Children.count(children) === 1;
     return <div className={clsx(styles.figures, single && styles.single)}>{children}</div>;

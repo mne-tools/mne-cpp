@@ -14,12 +14,12 @@
  * @date     July 2016
  * @brief    Container for the FIFF_DIG_POINT records of a measurement (a parsed FIFFB_ISOTRAK block).
  *
- * @ref FIFFLIB::FiffDigPointSet holds the head-coordinate point cloud associated
+ * @ref mne::FiffDigPointSet holds the head-coordinate point cloud associated
  * with one recording: cardinal fiducials, HPI coil positions, EEG
  * electrodes and the extra head-shape samples. It is what
- * @ref FIFFLIB::FiffStream returns when asked for the contents of an
+ * @ref mne::FiffStream returns when asked for the contents of an
  * @c FIFFB_ISOTRAK / @c FIFFB_HPI_MEAS block, and what
- * @ref FIFFLIB::FiffDigitizerData consumes when constructing a digitization
+ * @ref mne::FiffDigitizerData consumes when constructing a digitization
  * view for the registration GUIs. Round-trips with the @c info['dig']
  * list in MNE-Python.
  */
@@ -56,14 +56,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffDigPoint;
@@ -102,7 +102,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the digitizer points of a FIFF file, like read(); throws BASELIB::Error if it cannot.
+     * Reads the digitizer points of a FIFF file, like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The file.
      */
@@ -116,7 +116,7 @@ public:
      *
      * @return The points, or why the file cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigPointSet> read(const std::filesystem::path& path);
+    [[nodiscard]] static mne::Expected<FiffDigPointSet> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -126,7 +126,7 @@ public:
      *
      * @return The points, which are none if the stream holds no isotrak block, or why the stream cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffDigPointSet> read(FiffStream& stream);
+    [[nodiscard]] static mne::Expected<FiffDigPointSet> read(FiffStream& stream);
 
     /** @return Whether the set holds no point. */
     bool empty() const noexcept
@@ -219,7 +219,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written.
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -266,6 +266,6 @@ private:
     std::vector<FiffDigPoint> m_points;
 };
 
-} // namespace FIFFLIB
+} // namespace mne
 
 #endif // FIFFLIB_FIFF_DIG_POINT_SET_H

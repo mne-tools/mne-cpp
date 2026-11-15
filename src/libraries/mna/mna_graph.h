@@ -7,24 +7,24 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    In-memory directed acyclic graph of @ref MNALIB::MnaNode operations — connectivity, validation, topological sort and serialization.
+ * @brief    In-memory directed acyclic graph of @ref mne::MnaNode operations — connectivity, validation, topological sort and serialization.
  *
- * @ref MNALIB::MnaGraph is the executable spine of an MNA project: a
- * collection of @ref MNALIB::MnaNode operations wired together through
- * named @ref MNALIB::MnaPort connections, surrounded by graph-level inputs
+ * @ref mne::MnaGraph is the executable spine of an MNA project: a
+ * collection of @ref mne::MnaNode operations wired together through
+ * named @ref mne::MnaPort connections, surrounded by graph-level inputs
  * and outputs that expose the pipeline to its host application,
- * and parametrised by a shared @ref MNALIB::MnaParamTree.
+ * and parametrised by a shared @ref mne::MnaParamTree.
  *
  * The class owns four responsibilities. (1) @em Composition: add /
- * remove nodes, look them up by id, and @ref MNALIB::MnaGraph::connect "connect" output ports
- * to input ports by name. (2) @em Validation: @ref MNALIB::MnaGraph::validate "validate" checks
+ * remove nodes, look them up by id, and @ref mne::MnaGraph::connect "connect" output ports
+ * to input ports by name. (2) @em Validation: @ref mne::MnaGraph::validate "validate" checks
  * acyclicity, that every required input is connected, that
- * @ref MNALIB::MnaDataKind "MnaDataKind" matches across each edge, and that every node
- * conforms to its @ref MNALIB::MnaOpSchema. (3) @em Scheduling:
- * @c MNALIB::MnaGraph::topologicalSort "topologicalSort", @c MNALIB::MnaGraph::upstreamNodes "upstreamNodes", @c MNALIB::MnaGraph::downstreamNodes "downstreamNodes"
- * and @c MNALIB::MnaGraph::dirtyNodes "dirtyNodes" feed the executor's incremental re-run
+ * @ref mne::MnaDataKind "MnaDataKind" matches across each edge, and that every node
+ * conforms to its @ref mne::MnaOpSchema. (3) @em Scheduling:
+ * @c mne::MnaGraph::topologicalSort "topologicalSort", @c mne::MnaGraph::upstreamNodes "upstreamNodes", @c mne::MnaGraph::downstreamNodes "downstreamNodes"
+ * and @c mne::MnaGraph::dirtyNodes "dirtyNodes" feed the executor's incremental re-run
  * logic. (4) @em Persistence: lossless JSON and CBOR round-trip
- * mirroring the @ref MNALIB::MnaIO codec choices.
+ * mirroring the @ref mne::MnaIO codec choices.
  */
 
 #ifndef MNA_GRAPH_H
@@ -50,10 +50,10 @@
 #include <QCborMap>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -149,6 +149,6 @@ private:
     QList<MnaNode> m_nodes;
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_GRAPH_H

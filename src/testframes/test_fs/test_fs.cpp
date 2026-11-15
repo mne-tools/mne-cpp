@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -124,7 +124,7 @@ TestFS::TestFS()
 
 void TestFS::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     qInfo() << "TestFS: Starting FreeSurfer library unit tests";
 }
 
@@ -572,7 +572,7 @@ void TestFS::testColortableAccessors()
     QCOMPARE(ids(1), 1002);
 
     // getNames
-    const BASELIB::StringList& names = ct.getNames();
+    const mne::StringList& names = ct.getNames();
     QCOMPARE(names.size(), 2);
     QCOMPARE(names[0], QString("RegionA"));
     QCOMPARE(names[1], QString("RegionB"));

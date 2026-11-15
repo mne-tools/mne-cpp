@@ -9,7 +9,7 @@
  *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @date     August, 2019
- * @brief    Runs mne_edf2fiff and compares the FIFF it writes with mne.io.read_raw_edf and BIDSLIB::EDFReader.
+ * @brief    Runs mne_edf2fiff and compares the FIFF it writes with mne.io.read_raw_edf and mne::EDFReader.
  */
 
 //=============================================================================================================
@@ -36,8 +36,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,7 +64,7 @@ private:
 
 void TestEDF2FIFFRWR::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     const QString appDir = QCoreApplication::applicationDirPath();
     m_sEdf = appDir + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf";
     QVERIFY(QFileInfo::exists(m_sEdf));
@@ -125,7 +124,7 @@ void TestEDF2FIFFRWR::convertMatchesPython()
         {QStringLiteral("Status"), FIFFV_STIM_CH, {4352.0, 0.0, 0.0, 57624.0}},
     };
     for (const auto& [name, kind, values] : expected) {
-        const int k = BASELIB::indexOf(raw.info.ch_names, name.toStdString());
+        const int k = mne::indexOf(raw.info.ch_names, name.toStdString());
         QVERIFY2(k >= 0, qPrintable(name));
         QCOMPARE(raw.info.chs[k].kind, kind);
         const double tol = 1e-6 * std::abs(values[3]);
@@ -137,7 +136,7 @@ void TestEDF2FIFFRWR::convertMatchesPython()
 
     // Every channel equals what EDFReader reads (float samples, float FIFF buffers)
     EDFReader reader;
-    QVERIFY(reader.open(BASELIB::pathFromUtf8(m_sEdf.toStdString())));
+    QVERIFY(reader.open(mne::pathFromUtf8(m_sEdf.toStdString())));
     QVERIFY(data.isApprox(reader.read_raw_segment(0, 3072).cast<double>()));
 
     // Without --fileOut the output goes next to the input

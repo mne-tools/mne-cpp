@@ -1,18 +1,18 @@
 ---
 id: filter-chpi-params
-title: "DSPLIB::FilterChpiParams"
+title: "mne::FilterChpiParams"
 sidebar_label: FilterChpiParams
 sidebar_position: 49
 ---
 
 # FilterChpiParams
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/filter_chpi.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/filter_chpi.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/filter_chpi.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/filter_chpi.h)
 
 `#include <dsp/filter_chpi.h>`
 
 ```cpp
-struct DSPLIB::FilterChpiParams
+struct mne::FilterChpiParams
 ```
 
 Parameters for cHPI notch filtering.
@@ -43,7 +43,7 @@ filterChpi(chpi, info, sFreq, coilFreqs, chpiParams);
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 195"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 194"
 const std::vector<double> coilFreqs{83.0};
 FilterChpiParams chpiParams; // +-2 Hz order-4 notches on the MEG channels only
 filterChpi(chpi, info, sFreq, coilFreqs, chpiParams);

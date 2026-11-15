@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     August 2016
- * @brief    Implementation of @ref CONNECTIVITYLIB::Network - graph container for one connectivity result, including thresholding, frequency-band averaging and adjacency-matrix extraction.
+ * @brief    Implementation of @ref mne::Network - graph container for one connectivity result, including thresholding, frequency-band averaging and adjacency-matrix extraction.
  */
 
 //=============================================================================================================
@@ -29,7 +29,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -43,8 +43,8 @@ Network::Network(std::string method, double threshold)
 {
     // Registered once for queued signal/slot connections, not on every construction
     static const bool registered = [] {
-        qRegisterMetaType<CONNECTIVITYLIB::Network>("CONNECTIVITYLIB::Network");
-        qRegisterMetaType<std::vector<CONNECTIVITYLIB::Network>>("std::vector<CONNECTIVITYLIB::Network>");
+        qRegisterMetaType<mne::Network>("mne::Network");
+        qRegisterMetaType<std::vector<mne::Network>>("std::vector<mne::Network>");
         return true;
     }();
     Q_UNUSED(registered)
@@ -216,19 +216,19 @@ void Network::set_threshold(double threshold)
 void Network::set_frequency_range(float lower, float upper)
 {
     if (lower > upper) {
-        BASELIB::Log::warning("Network::set_frequency_range - Lower frequency is above the upper frequency. Weights are not recalculated.");
+        mne::Log::warning("Network::set_frequency_range - Lower frequency is above the upper frequency. Weights are not recalculated.");
         return;
     }
     if (m_sfreq <= 0.0f) {
-        BASELIB::Log::warning("Network::set_frequency_range - Sampling frequency has not been set.");
+        mne::Log::warning("Network::set_frequency_range - Sampling frequency has not been set.");
         return;
     }
     if (upper > m_sfreq / 2.0f) {
-        BASELIB::Log::warning("Network::set_frequency_range - Upper frequency is above the Nyquist frequency.");
+        mne::Log::warning("Network::set_frequency_range - Upper frequency is above the Nyquist frequency.");
         return;
     }
     if (m_used_freq_bins <= 0) {
-        BASELIB::Log::warning("Network::set_frequency_range - Number of frequency bins has not been set.");
+        mne::Log::warning("Network::set_frequency_range - Number of frequency bins has not been set.");
         return;
     }
 
@@ -252,7 +252,7 @@ void Network::normalize()
 {
     const double max = m_weight_range.second;
     if (max == 0.0) {
-        BASELIB::Log::warning("Network::normalize - All weights are 0; nothing to normalize.");
+        mne::Log::warning("Network::normalize - All weights are 0; nothing to normalize.");
         return;
     }
 

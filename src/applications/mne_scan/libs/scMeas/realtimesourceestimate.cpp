@@ -23,10 +23,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne::scan;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

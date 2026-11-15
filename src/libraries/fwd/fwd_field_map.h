@@ -50,10 +50,10 @@
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FWDLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FWDLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ public:
                                                               const Eigen::MatrixX3f& vertices,
                                                               const Eigen::MatrixX3f& normals,
                                                               const Eigen::Vector3f& origin,
-                                                              const FIFFLIB::FiffInfo& info,
+                                                              const mne::FiffInfo& info,
                                                               const StringList& chNames,
                                                               float intrad = 0.06f,
                                                               float miss = 1e-4f);
@@ -150,13 +150,13 @@ public:
     static std::unique_ptr<Eigen::MatrixXf> computeEegMapping(const FwdCoilSet& coils,
                                                               const Eigen::MatrixX3f& vertices,
                                                               const Eigen::Vector3f& origin,
-                                                              const FIFFLIB::FiffInfo& info,
+                                                              const mne::FiffInfo& info,
                                                               const StringList& chNames,
                                                               float intrad = 0.06f,
                                                               float miss = 1e-3f);
 };
 
 //=============================================================================================================
-} // NAMESPACE FWDLIB
+} // NAMESPACE mne_fwd
 
 #endif // FWD_FIELD_MAP_H

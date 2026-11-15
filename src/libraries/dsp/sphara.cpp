@@ -21,23 +21,23 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE GLOBAL DSPLIB METHODS
+// DEFINE GLOBAL mne_dsp METHODS
 //=============================================================================================================
 
-MatrixXd DSPLIB::makeSpharaProjector(const MatrixXd& matBaseFct,
-                                     const VectorXi& vecIndices,
-                                     int iOperatorDim,
-                                     int iNBaseFct,
-                                     int iSkip)
+MatrixXd mne::makeSpharaProjector(const MatrixXd& matBaseFct,
+                                  const VectorXi& vecIndices,
+                                  int iOperatorDim,
+                                  int iNBaseFct,
+                                  int iSkip)
 {
     MatrixXd matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
 
     if (matBaseFct.size() == 0) {
-        Log::warning("[DSPLIB::makeSpharaProjector] Basis function matrix was empty. Returning identity matrix instead.");
+        Log::warning("[mne::makeSpharaProjector] Basis function matrix was empty. Returning identity matrix instead.");
         return matSpharaOperator;
     }
 
@@ -55,7 +55,7 @@ MatrixXd DSPLIB::makeSpharaProjector(const MatrixXd& matBaseFct,
                 if ((r < vecIndices.rows() || c < vecIndices.rows()) && (rowIndex < matSpharaMultGrad.rows() || colIndex < matSpharaMultGrad.cols())) {
                     matSpharaOperator(vecIndices(r), vecIndices(c)) = matSpharaMultGrad(rowIndex, colIndex);
                 } else {
-                    Log::warning("DSPLIB::makeSpharaProjector - Index is out of range. Returning identity matrix.");
+                    Log::warning("mne::makeSpharaProjector - Index is out of range. Returning identity matrix.");
                     //matSpharaOperator.setZero();
                     matSpharaOperator = MatrixXd::Identity(iOperatorDim, iOperatorDim);
                     return matSpharaOperator;

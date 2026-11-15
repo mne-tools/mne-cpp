@@ -13,12 +13,12 @@
  * @date     September 2012
  * @brief    FIFF continuous raw recording: FiffInfo plus a directory of FIFF_DATA_BUFFER tags for random-access sample reads.
  *
- * @ref FIFFLIB::FiffRawData represents a continuous ("raw") Neuromag recording
+ * @ref mne::FiffRawData represents a continuous ("raw") Neuromag recording
  * as stored under @c FIFFB_RAW_DATA / @c FIFFB_CONTINUOUS_DATA: a
- * @ref FIFFLIB::FiffInfo describing the channels and acquisition setup, a list of
- * @ref FIFFLIB::FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
+ * @ref mne::FiffInfo describing the channels and acquisition setup, a list of
+ * @ref mne::FiffRawDir entries pointing at each @c FIFF_DATA_BUFFER tag, the
  * first and last sample indices, the per-channel calibration vector and a
- * @ref FIFFLIB::FiffStream handle for on-demand reads. The
+ * @ref mne::FiffStream handle for on-demand reads. The
  * @c FiffStream::read_raw_segment family uses that directory to seek
  * directly to the buffers that cover a requested sample range, decode
  * them through the channel cals and projectors, and return a contiguous
@@ -56,10 +56,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 class FiffRawData;
@@ -96,7 +96,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Opens a raw FIFF file like read(); throws BASELIB::Error if it cannot.
+     * Opens a raw FIFF file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The raw data file.
      */
@@ -105,11 +105,11 @@ public:
     //=========================================================================================================
     /**
      * Opens raw FIFF data held in bytes that are not a file, e.g. in memory, like read(); throws
-     * BASELIB::Error if it cannot.
+     * mne::Error if it cannot.
      *
      * @param[in] bytes   The raw data; kept for reading segments.
      */
-    explicit FiffRawData(std::unique_ptr<BASELIB::ByteStream> bytes);
+    explicit FiffRawData(std::unique_ptr<mne::ByteStream> bytes);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      * @return The raw data, or why the file cannot be read: Io if it cannot be opened, NotFound if it
      *         holds no raw data, Format if it is damaged or holds MaxShield data that is not allowed.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffRawData> read(const std::filesystem::path& path, bool allow_maxshield = false);
+    [[nodiscard]] static mne::Expected<FiffRawData> read(const std::filesystem::path& path, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
      *
      * @return The raw data, or why it cannot be read.
      */
-    [[nodiscard]] static BASELIB::Expected<FiffRawData> read(std::unique_ptr<BASELIB::ByteStream> bytes, bool allow_maxshield = false);
+    [[nodiscard]] static mne::Expected<FiffRawData> read(std::unique_ptr<mne::ByteStream> bytes, bool allow_maxshield = false);
 
     //=========================================================================================================
     /**
@@ -244,7 +244,7 @@ public:
      *
      * @return Nothing, or why the compensator cannot be made (Format).
      */
-    [[nodiscard]] BASELIB::Expected<void> apply_gradient_compensation(int grade);
+    [[nodiscard]] mne::Expected<void> apply_gradient_compensation(int grade);
 
 public:
     std::unique_ptr<FiffStream> file; /**< replaces fid. */
@@ -257,7 +257,7 @@ public:
     FiffCtfComp comp;                 /**< Compensator. */
 
 private:
-    static BASELIB::Expected<FiffRawData> read(std::unique_ptr<FiffStream> stream, bool allow_maxshield);
+    static mne::Expected<FiffRawData> read(std::unique_ptr<FiffStream> stream, bool allow_maxshield);
 };
 } // NAMESPACE
 

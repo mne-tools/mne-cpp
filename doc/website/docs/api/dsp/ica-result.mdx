@@ -1,18 +1,18 @@
 ---
 id: ica-result
-title: "DSPLIB::IcaResult"
+title: "mne::IcaResult"
 sidebar_label: IcaResult
 sidebar_position: 52
 ---
 
 # IcaResult
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/ica.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/ica.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/ica.h)
 
 `#include <dsp/ica.h>`
 
 ```cpp
-struct DSPLIB::IcaResult
+struct mne::IcaResult
 ```
 
 Result of an [`ICA`](/docs/api/dsp/ica) decomposition.
@@ -38,7 +38,7 @@ const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop compon
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 125"
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 123"
 const IcaResult ica = ICA::run(mixed, 3);                         // FastICA, logcosh, fixed seed
 const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop component 0, back-project the rest
 ok &= expect(worstRecovery(ica.matSources, sources) > 0.99, std::format("FastICA recovers all sources (worst |r| {:g})", worstRecovery(ica.matSources, sources)));

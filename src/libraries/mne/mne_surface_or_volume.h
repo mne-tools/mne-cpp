@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Discriminated geometry container that can represent either a triangulated surface or a discrete/volume source space.
  *
- * @ref MNELIB::MNESurfaceOrVolume is the direct port of the
+ * @ref mne::MNESurfaceOrVolume is the direct port of the
  * @c mneSurfaceOrVolumeRec / @c mneSourceSpaceRec structure of MNE-C and
- * is the common base used by @ref MNELIB::MNESourceSpace and @ref MNELIB::MNEBemSurface.
+ * is the common base used by @ref mne::MNESourceSpace and @ref mne::MNEBemSurface.
  * It carries the union of fields used by both flavours - vertices,
  * triangles, normals, voxel size and lattice geometry - so a single
  * loader can return either kind without templated machinery.
@@ -61,21 +61,21 @@ inline constexpr auto TAG_OLD_SURF_GEOM = 20;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffDigitizerData;
 class FiffStream;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNESourceSpace;
@@ -130,7 +130,7 @@ public:
      * @return The solid angle in steradians.
      */
     static double solid_angle(const Eigen::Vector3f& from, /* From this point... */
-                              const MNELIB::MNETriangle& tri);
+                              const mne::MNETriangle& tri);
 
     /**
      * Set all vertex curvature values to 1.0 (uniform curvature),
@@ -311,27 +311,27 @@ public:
     std::vector<MNENearest> nearest;                  /**< Nearest in-use vertex info for each vertex (np elements). */
     std::vector<std::optional<MNEPatchInfo>> patches; /**< Patch information for each in-use vertex (nuse elements). */
 
-    FIFFLIB::FiffSparseMatrix dist; /**< Distances between (used) vertices along the surface. */
-    float dist_limit;               /**< Distance limit: values above this were not computed. Negative means only used vertices were considered. */
+    mne::FiffSparseMatrix dist; /**< Distances between (used) vertices along the surface. */
+    float dist_limit;           /**< Distance limit: values above this were not computed. Negative means only used vertices were considered. */
 
     Eigen::VectorXf curv; /**< The FreeSurfer curvature values (np elements). */
     Eigen::VectorXf val;  /**< Auxiliary values associated with the vertices (np elements). */
     /*
      * These are for volumes only
      */
-    std::optional<FIFFLIB::FiffCoordTrans> voxel_surf_RAS_t;     /**< Transform from voxel coordinates to surface RAS (MRI) coordinates. */
-    int vol_dims[3];                                             /**< Dimensions of the volume grid (width x height x depth). Present only for complete rectangular grids including unused vertices. */
-    float voxel_size[3];                                         /**< Voxel size in meters, derived from the voxel transform. */
-    std::optional<FIFFLIB::FiffSparseMatrix> interpolator;       /**< Sparse matrix to interpolate from source space into an MRI volume. */
-    std::string MRI_volume;                                      /**< Path to the MRI volume file the interpolator is based on. */
-    std::optional<FIFFLIB::FiffCoordTrans> MRI_voxel_surf_RAS_t; /**< Voxel-to-surface-RAS transform for the associated MRI volume. */
-    std::optional<FIFFLIB::FiffCoordTrans> MRI_surf_RAS_RAS_t;   /**< Transform from surface RAS to scanner RAS in the associated MRI volume. */
-    int MRI_vol_dims[3];                                         /**< Dimensions of the associated MRI volume (width x height x depth). */
+    std::optional<mne::FiffCoordTrans> voxel_surf_RAS_t;     /**< Transform from voxel coordinates to surface RAS (MRI) coordinates. */
+    int vol_dims[3];                                         /**< Dimensions of the volume grid (width x height x depth). Present only for complete rectangular grids including unused vertices. */
+    float voxel_size[3];                                     /**< Voxel size in meters, derived from the voxel transform. */
+    std::optional<mne::FiffSparseMatrix> interpolator;       /**< Sparse matrix to interpolate from source space into an MRI volume. */
+    std::string MRI_volume;                                  /**< Path to the MRI volume file the interpolator is based on. */
+    std::optional<mne::FiffCoordTrans> MRI_voxel_surf_RAS_t; /**< Voxel-to-surface-RAS transform for the associated MRI volume. */
+    std::optional<mne::FiffCoordTrans> MRI_surf_RAS_RAS_t;   /**< Transform from surface RAS to scanner RAS in the associated MRI volume. */
+    int MRI_vol_dims[3];                                     /**< Dimensions of the associated MRI volume (width x height x depth). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNESURFACEORVOLUME_H

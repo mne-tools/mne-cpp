@@ -7,7 +7,7 @@
 #include <math/spectral.h>
 #include <cmath>
 
-using namespace MATHLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMathSpectral : public QObject

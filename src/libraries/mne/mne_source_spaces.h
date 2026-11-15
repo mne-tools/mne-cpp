@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Container pairing the left and right cortical source spaces of a subject.
  *
- * @ref MNELIB::MNESourceSpaces wraps the @c QList of
- * @ref MNELIB::MNESourceSpace objects that form a complete cortical source space
+ * @ref mne::MNESourceSpaces wraps the @c QList of
+ * @ref mne::MNESourceSpace objects that form a complete cortical source space
  * as written by @c mne_setup_source_space (one entry per hemisphere, or
  * additional entries for discrete / volume source spaces). It is the
- * natural input to @ref MNELIB::MNEForwardSolution and @ref MNELIB::MNEInverseOperator
- * and feeds the 3D rendering pipeline via @ref MNELIB::MNEHemisphere. Provides
+ * natural input to @ref mne::MNEForwardSolution and @ref mne::MNEInverseOperator
+ * and feeds the 3D rendering pipeline via @ref mne::MNEHemisphere. Provides
  * FIFF read/write at the file level so callers do not have to walk the
  * block tree by hand.
  */
@@ -48,20 +48,20 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 class FsLabel;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -127,7 +127,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads a source space file like read(); throws BASELIB::Error if it cannot.
+     * Reads a source space file like read(); throws mne::Error if it cannot.
      *
      * @param[in] path   The -src.fif file (or any FIFF file holding source spaces).
      */
@@ -143,7 +143,7 @@ public:
      * @return The source spaces, or why the file cannot be read: Io if it cannot be opened, NotFound if it holds
      *         no source space, Format if a source space is incomplete or inconsistent.
      */
-    [[nodiscard]] static BASELIB::Expected<MNESourceSpaces> read(const std::filesystem::path& path, bool add_geom = true);
+    [[nodiscard]] static mne::Expected<MNESourceSpaces> read(const std::filesystem::path& path, bool add_geom = true);
 
     //=========================================================================================================
     /**
@@ -154,7 +154,7 @@ public:
      *
      * @return The source spaces, or why the stream cannot be read (see read(path)).
      */
-    [[nodiscard]] static BASELIB::Expected<MNESourceSpaces> read(FIFFLIB::FiffStream& stream, bool add_geom = true);
+    [[nodiscard]] static mne::Expected<MNESourceSpaces> read(mne::FiffStream& stream, bool add_geom = true);
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @return Nothing, or why the file cannot be written (Io).
      */
-    [[nodiscard]] BASELIB::Expected<void> write(const std::filesystem::path& path) const;
+    [[nodiscard]] mne::Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -198,7 +198,7 @@ public:
      *
      * @return vertno list of length 2 Vertex numbers for lh and rh.
      */
-    std::vector<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::FsLabel& p_label, Eigen::VectorXi& src_sel) const;
+    std::vector<Eigen::VectorXi> label_src_vertno_sel(const mne::FsLabel& p_label, Eigen::VectorXi& src_sel) const;
 
     //=========================================================================================================
     /**
@@ -208,7 +208,7 @@ public:
      *
      * @return the reduced source space.
      */
-    MNESourceSpaces pick_regions(const std::vector<FSLIB::FsLabel>& p_qListLabels) const;
+    MNESourceSpaces pick_regions(const std::vector<mne::FsLabel>& p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -233,8 +233,8 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool transform_source_space_to(FIFFLIB::fiff_int_t dest,
-                                   FIFFLIB::FiffCoordTrans& trans);
+    bool transform_source_space_to(mne::fiff_int_t dest,
+                                   mne::FiffCoordTrans& trans);
 
     //=========================================================================================================
     /**
@@ -242,7 +242,7 @@ public:
      *
      * @param[in] stream  The stream to write to.
      */
-    void write_to_stream(FIFFLIB::FiffStream& stream) const;
+    void write_to_stream(mne::FiffStream& stream) const;
 
     //=========================================================================================================
     /**

@@ -38,7 +38,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 class MultimodalScene;
 }
@@ -60,7 +60,7 @@ namespace MNEINSPECT
 /**
  * @brief Reactive model behind the "Pick" dock.
  *
- * Subscribes to @ref DISP3DLIB::MultimodalScene::picked and exposes the
+ * Subscribes to @ref mne::disp::MultimodalScene::picked and exposes the
  * latest pick as four formatted rows. Optionally drives cross-modality
  * jumps:
  *   - On a `CorticalVertex` or `ElectrodeContact` pick, asks the attached
@@ -82,7 +82,7 @@ public:
     /**
      * Subscribe to the scene's `picked` signal. Passing nullptr detaches.
      */
-    void attachScene(DISP3DLIB::MultimodalScene* scene);
+    void attachScene(mne::disp::MultimodalScene* scene);
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
     //=========================================================================================================
     /** @return Most recent pick payload (default-constructed before the
      *  first hit). */
-    const DISP3DLIB::PickResult& lastPick() const
+    const mne::disp::PickResult& lastPick() const
     {
         return m_lastPick;
     }
@@ -145,7 +145,7 @@ public slots:
      * Drive the model from a synthesised pick. Called by the scene's
      * `picked` signal in normal operation; tests can call this directly.
      */
-    void handlePick(const DISP3DLIB::PickResult& pick);
+    void handlePick(const mne::disp::PickResult& pick);
 
 signals:
     /** Emitted whenever any of the four rows change. */
@@ -153,13 +153,13 @@ signals:
 
 private:
     void clearRows();
-    void formatRows(const DISP3DLIB::PickResult& pick);
+    void formatRows(const mne::disp::PickResult& pick);
     static QString formatVec(const QVector3D& v);
 
-    DISP3DLIB::MultimodalScene* m_scene = nullptr;
+    mne::disp::MultimodalScene* m_scene = nullptr;
     ELECTRODESPLUGIN::ElectrodesPlugin* m_electrodes = nullptr;
     MRISLICESPLUGIN::MriSlicesPlugin* m_mriSlices = nullptr;
-    DISP3DLIB::PickResult m_lastPick;
+    mne::disp::PickResult m_lastPick;
     QString m_labelRow;
     QString m_worldRow;
     QString m_voxelRow;

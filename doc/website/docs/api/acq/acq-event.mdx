@@ -1,18 +1,18 @@
 ---
 id: acq-event
-title: "ACQLIB::AcqEvent"
+title: "mne::AcqEvent"
 sidebar_label: AcqEvent
 sidebar_position: 10
 ---
 
 # AcqEvent
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_block_view.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_block_view.h)
 
 `#include <acq/acq_block_view.h>`
 
 ```cpp
-struct ACQLIB::AcqEvent
+struct mne::AcqEvent
 ```
 
 An event at a sample index: input trigger or marker, or a scheduled output trigger (TMS pulse, stimulus onset, RF gate).
@@ -42,7 +42,7 @@ for (std::size_t e = 0; e < view->events().size(); ++e) {
 
 ## Example
 
-- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+- Start here: [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx) — Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 - Full source: [`src/examples/ex_acq_performance/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_performance/main.cpp)
 - Build target: `ex_acq_performance` (runs under CTest)
 
@@ -52,7 +52,7 @@ for (std::size_t e = 0; e < view->events().size(); ++e) {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 247"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 246"
 const std::size_t maxView = capacity - length;
 std::vector<float> history(capacity * frame);
 std::vector<float> block(maxView * frame);
@@ -89,7 +89,7 @@ if (ended) {
 
 ### [ex_acq_performance](../../examples/acq/ex_acq_performance.mdx)
 
-Closed-loop acquisition and stimulation with ACQLIB, and its sustained throughput per device class.
+Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
 ````cpp title="src/examples/ex_acq_performance/main.cpp, line 428"
             AcqEvent marker;

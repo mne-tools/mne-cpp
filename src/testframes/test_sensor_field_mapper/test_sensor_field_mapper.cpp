@@ -26,8 +26,8 @@
 #include <cmath>
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace DISP3DLIB;
+using namespace mne;
+using namespace mne::disp;
 
 namespace
 {

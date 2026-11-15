@@ -35,10 +35,10 @@
 #include <QAction>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCSHAREDLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCSHAREDLIB
+namespace mne::scan
 {
 
 //=============================================================================================================
@@ -46,7 +46,7 @@ namespace SCSHAREDLIB
 //=============================================================================================================
 
 //=============================================================================================================
-// SCSHAREDLIB FORWARD DECLARATIONS
+// mne::scan FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -235,7 +235,7 @@ signals:
      *
      * @param[in] mode       the new gui mode.
      */
-    void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
+    void guiModeChanged(mne::disp::AbstractView::GuiMode mode);
 
 protected:
     //=========================================================================================================
@@ -294,6 +294,6 @@ inline void AbstractPlugin::addPluginAction(QAction* pAction)
 //}
 } //Namespace
 
-Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractPlugin, "scsharedlib/1.0")
+Q_DECLARE_INTERFACE(mne::scan::AbstractPlugin, "scsharedlib/1.0")
 
 #endif //MNESCAN_ABSTRACTPLUGIN_H

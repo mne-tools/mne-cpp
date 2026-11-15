@@ -1,18 +1,18 @@
 ---
 id: acq-parameter-info
-title: "ACQLIB::AcqParameterInfo"
+title: "mne::AcqParameterInfo"
 sidebar_label: AcqParameterInfo
 sidebar_position: 31
 ---
 
 # AcqParameterInfo
 
-**Namespace:** `ACQLIB` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_device_registry.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_device_registry.h)
 
 `#include <acq/acq_device_registry.h>`
 
 ```cpp
-struct ACQLIB::AcqParameterInfo
+struct mne::AcqParameterInfo
 ```
 
 One parameter a scheme accepts, for help texts, the CLI and generated settings widgets.
@@ -59,7 +59,7 @@ QComboBox* combo = nullptr;
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 184"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 183"
         std::printf("%s://  %s\n", scheme.scheme.c_str(), scheme.description.c_str());
         for (const AcqParameterInfo& parameter : scheme.parameters) {
             std::printf("    %-9s %-7s %-6s %s\n", parameter.name.c_str(), parameter.type.c_str(),

@@ -41,8 +41,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -242,7 +242,8 @@ public:
         backend->m_trigger_channel = trigger_channel(*info);
         // Four seconds, though no more than kRingBytes when a simulator replays a recording many times faster
         AcqStreamOptions options;
-        const double frames = static_cast<double>(kRingBytes / (backend->m_width * sizeof(float)));
+        const std::size_t wholeFrames = kRingBytes / (backend->m_width * sizeof(float));
+        const auto frames = static_cast<double>(wholeFrames);
         options.capacitySamples = static_cast<std::size_t>(std::max(std::min(4.0 * info->sfreq, frames), 4096.0));
         auto writer = backend->addInputStream(std::move(*info), options);
         if (!writer) {
@@ -437,7 +438,7 @@ const Registrar kRegistrar;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqError ACQLIB::register_rtserver_scheme()
+AcqError mne::register_rtserver_scheme()
 {
     static const AcqError result = AcqDeviceRegistry::instance().registerScheme(schemeInfo(), &RtServerBackend::open);
     return result;

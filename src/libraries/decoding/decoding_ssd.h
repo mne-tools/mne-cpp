@@ -24,8 +24,8 @@
  * reliable and fast extraction of neuronal EEG/MEG oscillations on the
  * basis of spatio-spectral decomposition*, NeuroImage 55, 2011.
  *
- * @ref DECODINGLIB::DecodingSsd mirrors @c mne.decoding.SSD and adds an explicit
- * @ref DECODINGLIB::DecodingSsd::apply "DecodingSsd::apply" method that reconstructs the sensor-space
+ * @ref mne::DecodingSsd mirrors @c mne.decoding.SSD and adds an explicit
+ * @ref mne::DecodingSsd::apply "DecodingSsd::apply" method that reconstructs the sensor-space
  * signal from a chosen subset of components, providing a low-rank
  * denoised version of the input that the connectivity and inverse
  * pipelines can consume without re-filtering. The covariance of the
@@ -52,10 +52,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DECODINGLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DECODINGLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -84,7 +84,7 @@ namespace DECODINGLIB
  * the call most downstream pipelines (connectivity, inverse modelling)
  * want when SSD is used purely as a preprocessor.
  *
- * @see DECODINGLIB, @c mne.decoding.SSD
+ * @see mne_decoding, @c mne.decoding.SSD
  *
  * @snippet ex_decoding/main.cpp decoding_ssd_fit_transform
  */
@@ -197,6 +197,6 @@ private:
                                           double highFreq);
 };
 
-} // namespace DECODINGLIB
+} // namespace mne
 
 #endif // DECODING_SSD_H

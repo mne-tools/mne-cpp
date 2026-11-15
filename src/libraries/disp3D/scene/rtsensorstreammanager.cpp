@@ -21,7 +21,7 @@
 
 #include <QDebug>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -187,4 +187,4 @@ void RtSensorStreamManager::setColormap(const QString& name)
         m_controller->setColormapType(name);
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

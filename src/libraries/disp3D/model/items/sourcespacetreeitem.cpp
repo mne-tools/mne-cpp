@@ -16,7 +16,7 @@
 
 #include "sourcespacetreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -49,4 +49,4 @@ float SourceSpaceTreeItem::scale() const
     return m_scale;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

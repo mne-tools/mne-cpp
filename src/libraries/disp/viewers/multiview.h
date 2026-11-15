@@ -10,14 +10,14 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     February 2020
- * @brief    QMainWindow container hosting an arbitrary number of @ref DISPLIB::MultiViewWindow dock widgets.
+ * @brief    QMainWindow container hosting an arbitrary number of @ref mne::disp::MultiViewWindow dock widgets.
  *
  * MultiView is the top-level layout primitive used by every MNE-Scan
  * plugin GUI: it inherits @c QMainWindow purely to gain the dock
  * infrastructure, lets callers add named views through
  * @c addWidgetTop / @c addWidgetBottom and persists / restores its
  * dock geometry via @c QSettings. Views are added as
- * @ref DISPLIB::MultiViewWindow instances so the user can detach, retab and
+ * @ref mne::disp::MultiViewWindow instances so the user can detach, retab and
  * stack them freely.
  */
 
@@ -42,14 +42,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MultiViewWindow;

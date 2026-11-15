@@ -3,9 +3,9 @@ title: Forward Library
 sidebar_label: Forward Library
 ---
 
-# Forward Library (`FWDLIB`)
+# Forward Library (`mne_fwd`)
 
-The Forward library computes MEG and EEG forward solutions — the mapping from source currents in the brain to sensor measurements. It supports BEM (Boundary Element Method) models with constant or linear collocation, multi-layer concentric-sphere EEG head models, and arbitrary coil/electrode configurations. The library also provides sensor-to-surface field mapping for topographic interpolation. All classes reside in the `FWDLIB` namespace.
+The Forward library computes MEG and EEG forward solutions — the mapping from source currents in the brain to sensor measurements. It supports BEM (Boundary Element Method) models with constant or linear collocation, multi-layer concentric-sphere EEG head models, and arbitrary coil/electrode configurations. The library also provides sensor-to-surface field mapping for topographic interpolation. All classes reside in the `mne_fwd` namespace.
 
 ## Architecture
 
@@ -136,7 +136,7 @@ flowchart TD
 ```cpp
 #include <fwd/fwd.h>
 
-using namespace FWDLIB;
+using namespace mne;
 
 // Option A: Read an existing forward solution
 MNEForwardSolution fwd("sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -159,7 +159,7 @@ Eigen::MatrixXd megMapping =
 
 ## Doxygen Reference
 
-For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**FWDLIB namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFWDLIB.html) in the Doxygen API reference.
+For method signatures, inheritance diagrams, and source-level documentation see the auto-generated [**mne_fwd namespace**](https://mne-cpp.github.io/doxygen-api/namespaceFWDLIB.html) in the Doxygen API reference.
 
 ## See Also
 

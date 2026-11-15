@@ -12,10 +12,10 @@
  * @date     August 2016
  * @brief    Graph container that stores the result of one functional-connectivity metric as nodes (sources/sensors) and weighted edges (channel-pair couplings).
  *
- * @ref CONNECTIVITYLIB::Network is the common output type returned by every estimator in
- * @c CONNECTIVITYLIB. Each @ref CONNECTIVITYLIB::NetworkNode carries a 3D position (sensor coordinate
+ * @ref mne::Network is the common output type returned by every estimator in
+ * @c mne_connectivity. Each @ref mne::NetworkNode carries a 3D position (sensor coordinate
  * for sensor-space metrics, source vertex for source-space metrics) and
- * the indices of its incident edges, and each @ref CONNECTIVITYLIB::NetworkEdge stores the
+ * the indices of its incident edges, and each @ref mne::NetworkEdge stores the
  * full per-frequency weight matrix together with the scalar band-averaged
  * weight used for thresholding and display. The same container is used
  * for symmetric metrics (coherence, PLV, PLI/wPLI/dwPLI, imaginary
@@ -55,10 +55,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 /**
@@ -407,6 +407,6 @@ private:
     VisualizationInfo m_visualization_info; /**< Rendering hints. */
 };
 
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // NETWORK_H

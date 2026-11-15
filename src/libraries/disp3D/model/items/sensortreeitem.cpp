@@ -16,7 +16,7 @@
 
 #include "sensortreeitem.h"
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 SensorTreeItem::SensorTreeItem(const QString& text, const QVector3D& pos, const QColor& color, float scale, int type)
@@ -53,4 +53,4 @@ bool SensorTreeItem::hasOrientation() const
     return m_hasOrientation;
 }
 
-} // namespace DISP3DLIB
+} // namespace mne::disp

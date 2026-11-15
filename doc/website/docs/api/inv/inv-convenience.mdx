@@ -7,7 +7,7 @@ sidebar_position: 18
 
 # InvConvenience
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 `apply_inverse_*` / `compute_source_psd` helpers.
 
-Free functions in this header glue together the lower-level `INVLIB` classes so users can match the MNE-Python ergonomics: `INVLIB::apply_inverse_epochs` applies a precomputed inverse operator across an epoch list, `apply_inverse_raw` streams raw data through the kernel, `estimate_snr` returns the whitened-data SNR trace from an evoked + inverse pair, `compute_whitener` produces the diagonal whitener from a noise covariance, and `compute_source_psd` / `compute_source_band_power` run Welch-based spectral analysis directly on [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / MNE primitives.
+Free functions in this header glue together the lower-level mne_inv classes so users can match the MNE-Python ergonomics: `mne::apply_inverse_epochs` applies a precomputed inverse operator across an epoch list, `apply_inverse_raw` streams raw data through the kernel, `estimate_snr` returns the whitened-data SNR trace from an evoked + inverse pair, `compute_whitener` produces the diagonal whitener from a noise covariance, and `compute_source_psd` / `compute_source_band_power` run Welch-based spectral analysis directly on [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) output. All methods are headers-only orchestration on top of [`InvMinimumNorm`](/docs/api/inv/inv-minimum-norm) and the underlying FIFF / MNE primitives.
 
 ```cpp title="src/examples/ex_inv_api/main.cpp"
 // Whitened data and a gain per nAm make the noise level 1, as mne.inverse_sparse.mixed_norm does.
@@ -125,7 +125,7 @@ Reads the requested range and applies the inverse operator with nave = 1. Equiva
 [FiffEvoked](/docs/api/fiff/fiff-evoked) apply_forward(const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) & fwd, const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, const [FiffInfo](/docs/api/fiff/fiff-info) & info);
 ```
 
-Project a source estimate to the sensors, as mne.apply_forward.
+Project a source estimate to the sensors, as `mne.apply_forward`.
 
 A free-orientation forward is first converted to fixed orientation along the (patch-averaged) cortical normals. The source estimate rows are matched to forward columns by vertex number per hemisphere (`stc.nVerticesLh` splits lh and rh); a vertex the forward lacks is an error. A forward without source spaces is used column by column. The evoked carries the forward's channels taken from `info`.
 

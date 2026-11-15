@@ -1,23 +1,23 @@
 ---
 id: digitizer-set-tree-item
-title: "DISP3DLIB::DigitizerSetTreeItem"
+title: "mne::disp::DigitizerSetTreeItem"
 sidebar_label: DigitizerSetTreeItem
 sidebar_position: 24
 ---
 
 # DigitizerSetTreeItem
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/model/items/digitizersettreeitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/model/items/digitizersettreeitem.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/model/items/digitizersettreeitem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/model/items/digitizersettreeitem.h)
 
 `#include <disp3D/digitizersettreeitem.h>`
 
 ```cpp
-class DISP3DLIB::DigitizerSetTreeItem
+class mne::disp::DigitizerSetTreeItem
 ```
 
 [`DigitizerSetTreeItem`](/docs/api/disp3-d/digitizer-set-tree-item) is a container item that groups digitizer points by category.
 
-It parses a list of [FiffDigPoint](/docs/api/fiff/fiff-dig-point) entries and creates child [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) instances for each category: Cardinal (Nasion, LPA, RPA), HPI, EEG, and Extra (head shape).
+It parses a list of [`FiffDigPoint`](/docs/api/fiff/fiff-dig-point) entries and creates child [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) instances for each category: Cardinal (Nasion, LPA, RPA), HPI, EEG, and Extra (head shape).
 
 This matches the disp3D [`DigitizerSetTreeItem`](/docs/api/disp3-d/digitizer-set-tree-item) pattern, providing per-category color coding, sizing, and independent visibility control.
 

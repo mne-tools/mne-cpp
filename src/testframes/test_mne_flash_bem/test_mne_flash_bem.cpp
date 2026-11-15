@@ -128,7 +128,7 @@ bool TestMneFlashBem::hasFreeSurfer()
 
 void TestMneFlashBem::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
 

@@ -10,7 +10,7 @@
  * @brief    QStandardItemModel hierarchy that organises every 3-D scene object (surfaces, sensors, sources, networks) for a QTreeView.
  *
  * BrainTreeModel is the single source of truth for what is in the
- * scene: each renderable owns a @ref DISP3DLIB::AbstractTreeItem "AbstractTreeItem"-derived row
+ * scene: each renderable owns a @ref mne::disp::AbstractTreeItem "AbstractTreeItem"-derived row
  * and exposes its visibility, transform, colour and alpha through
  * the standard Qt item-data roles. The tree is structured by
  * subject &rarr; modality &rarr; instance so a multi-subject study can
@@ -41,12 +41,12 @@
 #include <span>
 #include <connectivity/network/network.h>
 
-namespace INVLIB
+namespace mne
 {
 class InvEcdSet;
 }
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 class NetworkTreeItem;
@@ -64,34 +64,34 @@ public:
     ~BrainTreeModel() override = default;
 
     // Helper functions to populate the tree
-    SurfaceTreeItem* addSurface(const QString& subject, const QString& hemi, const QString& surfType, const FSLIB::FsSurface& surface);
+    SurfaceTreeItem* addSurface(const QString& subject, const QString& hemi, const QString& surfType, const mne::FsSurface& surface);
 
     // Add annotation to an existing surface item? Or separate item?
     // Usually annotation is property of a surface or child of surface.
     // Let's attach it to the surface item for now or find the surface item and update it.
-    bool addAnnotation(const QString& subject, const QString& hemi, const FSLIB::FsAnnotation& annotation);
+    bool addAnnotation(const QString& subject, const QString& hemi, const mne::FsAnnotation& annotation);
 
     // Add BEM surface
-    BemTreeItem* addBemSurface(const QString& subject, const QString& bemName, const MNELIB::MNEBemSurface& bemSurf);
+    BemTreeItem* addBemSurface(const QString& subject, const QString& bemName, const mne::MNEBemSurface& bemSurf);
 
     // Helpers to populate the tree
     void addSensors(const QString& type, const QList<QStandardItem*>& items);
-    void addDipoles(const INVLIB::InvEcdSet& set);
+    void addDipoles(const mne::InvEcdSet& set);
 
     // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
-    void addDigitizerData(std::span<const FIFFLIB::FiffDigPoint> digitizerPoints);
+    void addDigitizerData(std::span<const mne::FiffDigPoint> digitizerPoints);
 
     // Add source space points
-    void addSourceSpace(const MNELIB::MNESourceSpaces& srcSpace);
+    void addSourceSpace(const mne::MNESourceSpaces& srcSpace);
 
     // Add connectivity network
-    NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network& network, const QString& name = "Network");
+    NetworkTreeItem* addNetwork(const mne::Network& network, const QString& name = "Network");
 
 private:
     // Helpers to find specific items
     QStandardItem* getSubjectItem(const QString& subject);
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // BRAINTREEMODEL_H

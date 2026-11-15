@@ -37,10 +37,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /**
@@ -158,7 +158,7 @@ public:
     }
 
 private:
-    COMLIB::UdpSocket m_socket;
+    mne::UdpSocket m_socket;
     std::string m_address;
     std::uint16_t m_port = 0;
     std::size_t m_rows = 0;
@@ -171,6 +171,6 @@ private:
     std::vector<double> m_datagram;
 };
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // BRAINFLOW_STREAM_H

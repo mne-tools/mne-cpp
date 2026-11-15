@@ -1,18 +1,18 @@
 ---
 id: mne-source-spaces
-title: "MNELIB::MNESourceSpaces"
+title: "mne::MNESourceSpaces"
 sidebar_label: MNESourceSpaces
 sidebar_position: 50
 ---
 
 # MNESourceSpaces
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_source_spaces.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_source_spaces.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_source_spaces.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_source_spaces.h)
 
 `#include <mne/mne_source_spaces.h>`
 
 ```cpp
-class MNELIB::MNESourceSpaces
+class mne::MNESourceSpaces
 ```
 
 Container pairing the left and right cortical source spaces (and optional discrete / volume source spaces) of a subject as written by `mne_setup_source_space`.
@@ -193,7 +193,7 @@ Returns the number of stored hemispheres 0, 1 or 2.
 
 **Parameters:**
 
-- **dest** : *FIFFLIB::fiff_int_t*
+- **dest** : *mne::fiff_int_t*
   destination check code.
 
 - **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -398,7 +398,7 @@ Reads the source spaces from an open FIFF stream.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 200"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 198"
 const QString srcPath = data + "/subjects/sample/bem/sample-oct-6-src.fif";
 const MNESourceSpaces src(srcPath.toStdU16String()); // with normals, triangle data and patches
 const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);

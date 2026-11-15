@@ -33,10 +33,10 @@
 #include <utility>
 
 //=============================================================================================================
-// DEFINE NAMESPACE SCMEASLIB
+// DEFINE NAMESPACE mne::scan
 //=============================================================================================================
 
-namespace SCMEASLIB
+namespace mne::scan
 {
 
 //=========================================================================================================
@@ -133,7 +133,7 @@ public:
      *
      * @param[in] unit of the data.
      */
-    inline void setUnit(FIFFLIB::fiff_int_t unit);
+    inline void setUnit(mne::fiff_int_t unit);
 
     //=========================================================================================================
     /**
@@ -141,7 +141,7 @@ public:
      *
      * @return the unit of the data of measurement.
      */
-    inline FIFFLIB::fiff_int_t getUnit() const;
+    inline mne::fiff_int_t getUnit() const;
 
     //=========================================================================================================
     /**
@@ -149,7 +149,7 @@ public:
      *
      * @param[in] coil description of the sensor.
      */
-    inline void setCoil(FIFFLIB::fiff_int_t coil);
+    inline void setCoil(mne::fiff_int_t coil);
 
     //=========================================================================================================
     /**
@@ -157,15 +157,15 @@ public:
      *
      * @return the coil type of the sensor.
      */
-    inline FIFFLIB::fiff_int_t getCoil() const;
+    inline mne::fiff_int_t getCoil() const;
 
 private:
-    QString m_qStringChName;         /**< The channel name.*/
-    double m_dMinValue;              /**< The minimal value.*/
-    double m_dMaxValue;              /**< The maximal value.*/
-    qint32 m_iKind;                  /**< The channel kind.*/
-    FIFFLIB::fiff_int_t m_iUnit;     /**< Unit of the data of the measurement.*/
-    FIFFLIB::fiff_int_t m_iCoilType; /**< What kind of coil. */
+    QString m_qStringChName;     /**< The channel name.*/
+    double m_dMinValue;          /**< The minimal value.*/
+    double m_dMaxValue;          /**< The maximal value.*/
+    qint32 m_iKind;              /**< The channel kind.*/
+    mne::fiff_int_t m_iUnit;     /**< Unit of the data of the measurement.*/
+    mne::fiff_int_t m_iCoilType; /**< What kind of coil. */
 };
 
 //=============================================================================================================
@@ -229,28 +229,28 @@ inline double RealTimeSampleArrayChInfo::getMaxValue() const
 
 //=============================================================================================================
 
-inline void RealTimeSampleArrayChInfo::setUnit(FIFFLIB::fiff_int_t unit)
+inline void RealTimeSampleArrayChInfo::setUnit(mne::fiff_int_t unit)
 {
     m_iUnit = unit;
 }
 
 //=============================================================================================================
 
-inline FIFFLIB::fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
+inline mne::fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
 {
     return m_iUnit;
 }
 
 //=============================================================================================================
 
-inline void RealTimeSampleArrayChInfo::setCoil(FIFFLIB::fiff_int_t coil)
+inline void RealTimeSampleArrayChInfo::setCoil(mne::fiff_int_t coil)
 {
     m_iCoilType = coil;
 }
 
 //=============================================================================================================
 
-inline FIFFLIB::fiff_int_t RealTimeSampleArrayChInfo::getCoil() const
+inline mne::fiff_int_t RealTimeSampleArrayChInfo::getCoil() const
 {
     return m_iCoilType;
 }

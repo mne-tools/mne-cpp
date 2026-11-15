@@ -21,7 +21,7 @@ that quote it, related examples and the full source.
 
 The figures and console output are committed under
 ``doc/website/static/img/examples/<name>/`` by ``scripts/doxy2mdx/run_examples.py``:
-``*.png`` written by ``DISPLIB::FigureExporter`` (caption in the PNG's
+``*.png`` written by ``mne::disp::FigureExporter`` (caption in the PNG's
 ``Description`` text chunk) and ``output.txt``.
 
 Examples are filed under their primary library: the ``library`` of their entry

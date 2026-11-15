@@ -45,8 +45,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVLIB;
-using namespace FSLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -79,7 +78,7 @@ MatrixXd InvLabelTimeCourse::extract(const InvSourceEstimate& stc,
                                      bool bAllowEmpty)
 {
     if (stc.empty() || labels.empty()) {
-        BASELIB::Log::warning("[InvLabelTimeCourse::extract] Empty stc or labels.");
+        mne::Log::warning("[InvLabelTimeCourse::extract] Empty stc or labels.");
         return MatrixXd();
     }
 
@@ -173,7 +172,7 @@ MatrixXd InvLabelTimeCourse::extract(const InvSourceEstimate& stc,
                 result(oi, t) = maxVal;
             }
         } else {
-            BASELIB::Log::warning("[InvLabelTimeCourse::extract] Unknown mode: {} — using mean.", mode);
+            mne::Log::warning("[InvLabelTimeCourse::extract] Unknown mode: {} — using mean.", mode);
             result.row(oi) = labelData.colwise().mean();
         }
     }

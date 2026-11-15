@@ -7,7 +7,7 @@ sidebar_position: 11
 
 # EegReference
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library
 
 :::info[Module]
 This page documents a **header-level module** — a collection of free
@@ -39,7 +39,7 @@ setEegReference(averageRef, info); // average of the EEG channels; EOG/ECG rows 
 ### setEegReference(data, info, refChannels, projection)
 
 ```cpp
-void setEegReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const BASELIB::StringList & refChannels, bool projection);
+void setEegReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const mne::StringList & refChannels, bool projection);
 ```
 
 Re-reference EEG channels to average, specific channel(s), or REST.
@@ -54,7 +54,7 @@ Only modifies rows of good EEG channels (kind == FIFFV_EEG_CH, not in info.bads)
 - **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info (identifies EEG channels; receives the projector).
 
-- **refChannels** : *const BASELIB::StringList &*
+- **refChannels** : *const mne::StringList &*
   Reference channel name(s). - Empty or "average" -&gt; average reference (mean of all good EEG channels). - Single channel name -&gt; re-reference to that channel. - Multiple channel names -&gt; re-reference to mean of those channels.
 
 - **projection** : *bool*
@@ -65,7 +65,7 @@ Only modifies rows of good EEG channels (kind == FIFFV_EEG_CH, not in info.bads)
 ### addReferenceChannels(data, info, chNames)
 
 ```cpp
-void addReferenceChannels(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const BASELIB::StringList & chNames);
+void addReferenceChannels(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const mne::StringList & chNames);
 ```
 
 Add reference channel(s) back as zero-filled rows.
@@ -80,7 +80,7 @@ When EEG data was recorded with a physical reference electrode, that channel is 
 - **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info. New EEG channels are appended.
 
-- **chNames** : *const BASELIB::StringList &*
+- **chNames** : *const mne::StringList &*
   Names of the reference channel(s) to add.
 
 ---
@@ -88,7 +88,7 @@ When EEG data was recorded with a physical reference electrode, that channel is 
 ### setBipolarReference(data, info, anodes, cathodes, dropOriginals)
 
 ```cpp
-void setBipolarReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const BASELIB::StringList & anodes, const BASELIB::StringList & cathodes, bool dropOriginals);
+void setBipolarReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const mne::StringList & anodes, const mne::StringList & cathodes, bool dropOriginals);
 ```
 
 Create bipolar derivations from EEG channels.
@@ -103,10 +103,10 @@ Creates new bipolar channels by subtracting cathode from anode for each pair. Th
 - **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
   Measurement info. Updated with new bipolar channel info.
 
-- **anodes** : *const BASELIB::StringList &*
+- **anodes** : *const mne::StringList &*
   List of anode channel names.
 
-- **cathodes** : *const BASELIB::StringList &*
+- **cathodes** : *const mne::StringList &*
   List of cathode channel names (same length as anodes).
 
 - **dropOriginals** : *bool*

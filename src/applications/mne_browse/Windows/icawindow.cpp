@@ -41,7 +41,7 @@
 
 using namespace MNEBROWSE;
 using namespace Eigen;
-using namespace DSPLIB;
+using namespace mne;
 
 //=============================================================================================================
 
@@ -126,7 +126,7 @@ void IcaWindow::setupUi()
 //=============================================================================================================
 
 void IcaWindow::setRawData(const MatrixXd& rawData,
-                           std::shared_ptr<FIFFLIB::FiffInfo> fiffInfo,
+                           std::shared_ptr<mne::FiffInfo> fiffInfo,
                            int firstSample)
 {
     m_rawData = rawData;

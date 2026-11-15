@@ -17,7 +17,7 @@
  * (@c cachedResultPath, @c cachedResultHash) are only written when
  * non-default so simple file-based projects stay compact, and any
  * unknown attribute is shovelled into @c extras to keep the round
- * trip lossless across MNALIB versions.
+ * trip lossless across mne_mna versions.
  */
 
 //=============================================================================================================
@@ -30,7 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS

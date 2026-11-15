@@ -9,9 +9,9 @@
  * @date     March 2026
  * @brief    Event list with comments: MNE-C text and FIFF event files, sorting, merging and selection.
  *
- * @ref MNELIB::MNEEventList is the C++ counterpart of MNE-C's @c mneEventList
+ * @ref mne::MNEEventList is the C++ counterpart of MNE-C's @c mneEventList
  * (@c mne_events.c). Unlike the plain sample/before/after matrix of
- * @ref FIFFLIB::FiffEvents it keeps a comment per event, reads the comments
+ * @ref mne::FiffEvents it keeps a comment per event, reads the comments
  * stored in @c -eve.fif files and in MNE-C text event files, and removes the
  * skipped samples at the start of a recording from the sample numbers.
  */
@@ -33,10 +33,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -125,7 +125,7 @@ public:
     //=========================================================================================================
     /**
      * Returns the events as rows of sample, value before and value after, the layout of
-     * @ref FIFFLIB::FiffEvents::events and of @c mne.read_events.
+     * @ref mne::FiffEvents::events and of @c mne.read_events.
      *
      * @return nEvents x 3 matrix.
      */
@@ -155,6 +155,6 @@ public:
     std::vector<MNEEvent> events; /**< The events. */
 };
 
-} // namespace MNELIB
+} // namespace mne
 
 #endif // MNE_EVENT_LIST_H

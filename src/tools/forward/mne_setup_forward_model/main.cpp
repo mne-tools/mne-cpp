@@ -68,7 +68,7 @@ using namespace MNESETUPFORWARDMODEL;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_setup_forward_model");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

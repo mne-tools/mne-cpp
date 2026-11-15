@@ -47,9 +47,7 @@
 //=============================================================================================================
 
 using namespace MNESURF2BEM;
-using namespace FSLIB;
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================

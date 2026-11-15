@@ -14,7 +14,7 @@
  * and unusable as the @c C operator in MNE/dSPM/sLORETA inverse
  * solutions. This module provides the same family of regularised
  * estimators as @c mne.compute_covariance with @c method='auto', so
- * STSLIB users get a numerically well-conditioned covariance regardless
+ * mne_sts users get a numerically well-conditioned covariance regardless
  * of how undersampled the input is.
  *
  * Six estimators are exposed: the analytic Ledoit-Wolf shrinkage,
@@ -60,10 +60,10 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -198,6 +198,6 @@ public:
                                         const Eigen::MatrixXd& matCov);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_COV_ESTIMATORS_H

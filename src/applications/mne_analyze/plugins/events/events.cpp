@@ -34,7 +34,7 @@
 //=============================================================================================================
 
 using namespace EVENTSPLUGIN;
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -62,7 +62,7 @@ QSharedPointer<AbstractPlugin> Events::clone() const
 
 void Events::init()
 {
-    m_pCommu = QSharedPointer<ANSHAREDLIB::Communicator>(new ANSHAREDLIB::Communicator(this));
+    m_pCommu = QSharedPointer<mne::analyze::Communicator>(new mne::analyze::Communicator(this));
 }
 
 //=============================================================================================================
@@ -153,10 +153,10 @@ void Events::handleEvent(QSharedPointer<Event> e)
             onTriggerRedraw();
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         case EVENT_TYPE::MODEL_REMOVED:
-            onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+            onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
             qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
@@ -177,7 +177,7 @@ QVector<EVENT_TYPE> Events::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void Events::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewModel)
 {
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit disconnectFromModel();
@@ -192,8 +192,8 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
             }
             pFiffRawModel->setEventModel(pEventModel);
             emit newEventModelAvailable(pEventModel);
-            m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pEventModel,
-                                                              "Events");
+            m_pAnalyzeData->addModel<mne::analyze::EventModel>(pEventModel,
+                                                               "Events");
         }
         emit newFiffRawViewModel(pFiffRawModel);
     } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
@@ -249,7 +249,7 @@ void Events::triggerLoadingEnd(const QString& sMessage)
 
 //=============================================================================================================
 
-void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void Events::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemovedModel)
 {
     if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit clearView(pRemovedModel);

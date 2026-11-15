@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro, build-info accessors and the ACQLIB namespace anchor of the acquisition library.
+ * @brief    Export macro, build-info accessors and the mne_acq namespace anchor of the acquisition library.
  *
- * ACQLIB is the headless acquisition library of MNE-CPP. It depends only on the C++20 standard
+ * mne_acq is the headless acquisition library of MNE-CPP. It depends only on the C++20 standard
  * library, so the export macro is defined here without Qt and the library builds for embedded targets.
  */
 
@@ -44,12 +44,7 @@
 #define ACQ_STD_MEMBERS_END
 #endif
 
-//=============================================================================================================
-/**
- * @namespace ACQLIB
- * @brief     Headless acquisition: sources, streams, zero-copy readers and native sample formats.
- */
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -76,6 +71,6 @@ ACQSHARED_EXPORT const char* buildHash();
  */
 ACQSHARED_EXPORT const char* buildHashLong();
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_GLOBAL_H

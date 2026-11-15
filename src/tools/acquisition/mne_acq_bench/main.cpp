@@ -11,7 +11,7 @@
  *
  * Measures the per-call cost of the stream protocol, commit-to-wake latency, sustained ring throughput over a
  * channel sweep and the converters, and writes a table and optionally a JSON report. The measured code is
- * standard C++ against the ACQLIB API only, so the tool also builds against an older mne_acq for A/B runs.
+ * standard C++ against the mne_acq API only, so the tool also builds against an older mne_acq for A/B runs.
  */
 
 //=============================================================================================================
@@ -55,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
+using namespace mne;
 using namespace std::chrono_literals;
 
 namespace
@@ -769,7 +769,7 @@ int main(int argc, char* argv[])
     }
 
     QTextStream out(stdout);
-    out << "mne_acq_bench " << MNE_CPP_VERSION << " (ACQLIB " << buildHash() << "), "
+    out << "mne_acq_bench " << MNE_CPP_VERSION << " (mne_acq " << buildHash() << "), "
         << std::thread::hardware_concurrency() << " hardware threads\n";
     out.flush();
     const std::vector<Metric> metrics = run(settings);

@@ -14,7 +14,7 @@
  * @date     May 2020
  * @brief    Forward-solution computation controls (BEM / source space / EEG sphere model selectors).
  *
- * FwdSettingsView exposes the parameters needed by the @c FWDLIB
+ * FwdSettingsView exposes the parameters needed by the @c mne_fwd
  * forward-model recomputation: paths to BEM and source-space files,
  * EEG sphere / individual model choice, MEG / EEG enable flags and a
  * @c Recompute trigger. The panel also displays current model status
@@ -46,7 +46,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FSLIB
+namespace mne
 {
 class FsAnnotationSet;
 }
@@ -56,17 +56,17 @@ namespace Ui
 class FwdSettingsViewWidget;
 }
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
 /**
  * @brief Forward-solution computation control panel (BEM / source-space / EEG sphere model selectors).
  *
- * Exposes the parameters required by the @c FWDLIB recomputation job
+ * Exposes the parameters required by the @c mne_fwd recomputation job
  * and provides a @c Recompute trigger plus live status labels
  * showing the currently loaded BEM and dipole / sensor counts.
  */
@@ -139,8 +139,8 @@ public:
      * @param[in] iNSpaces      Number of source spaces.
      */
 
-    void setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
-                                FIFFLIB::fiff_int_t iCoordFrame,
+    void setSolutionInformation(mne::fiff_int_t iSourceOri,
+                                mne::fiff_int_t iCoordFrame,
                                 int iNSource,
                                 int iNChan,
                                 int iNSpaces);
@@ -229,7 +229,7 @@ signals:
      * @param[in] pAnnotationSet        The FsAnnotation set.
      */
     void atlasDirChanged(const QString& sDirPath,
-                         const std::shared_ptr<FSLIB::FsAnnotationSet>& pAnnotationSet);
+                         const std::shared_ptr<mne::FsAnnotationSet>& pAnnotationSet);
 
     //=========================================================================================================
     /**

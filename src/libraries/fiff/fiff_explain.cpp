@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    Implementation of @ref FIFFLIB::FiffExplain from the compiled-in fiff_explanations.txt table.
+ * @brief    Implementation of @ref mne::FiffExplain from the compiled-in fiff_explanations.txt table.
  */
 
 //=============================================================================================================
@@ -29,7 +29,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -66,7 +66,7 @@ const std::unordered_map<std::uint64_t, std::string>& explanations()
         std::unordered_map<std::uint64_t, std::string> entries;
         QFile file(QStringLiteral(":/fiff/fiff_explanations.txt"));
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            BASELIB::Log::warning("[FiffExplain] the built-in explanation table is missing");
+            mne::Log::warning("[FiffExplain] the built-in explanation table is missing");
             return entries;
         }
         // <class> <kind> "<text>"; the first entry of a duplicated class/kind wins, inner spaces collapse as in MNE-C

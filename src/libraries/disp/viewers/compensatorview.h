@@ -43,20 +43,20 @@
 
 class QCheckBox;
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffCtfComp;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -96,7 +96,7 @@ public:
      *
      * @return The current compensators.
      */
-    std::vector<FIFFLIB::FiffCtfComp> getCompensators() const;
+    std::vector<mne::FiffCtfComp> getCompensators() const;
 
     //=========================================================================================================
     /**
@@ -112,7 +112,7 @@ public:
      *
      * @param[in] comps    The new compensators.
      */
-    void setCompensators(const std::vector<FIFFLIB::FiffCtfComp>& comps);
+    void setCompensators(const std::vector<mne::FiffCtfComp>& comps);
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ protected:
 
     QList<QCheckBox*> m_qListCompCheckBox; /**< List of compensator CheckBox. */
 
-    std::vector<FIFFLIB::FiffCtfComp> m_pComps; /**< The current compensators. */
+    std::vector<mne::FiffCtfComp> m_pComps; /**< The current compensators. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 

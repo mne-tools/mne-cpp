@@ -152,7 +152,7 @@ public:
      *
      * @param[in] pFiffInfo  Measurement info of the currently loaded raw file.
      */
-    void setFiffInfo(const std::shared_ptr<FIFFLIB::FiffInfo>& pFiffInfo);
+    void setFiffInfo(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -232,7 +232,7 @@ public:
      *
      * @return Const reference to the FiffAnnotations storage.
      */
-    const FIFFLIB::FiffAnnotations& fiffAnnotations() const;
+    const mne::FiffAnnotations& fiffAnnotations() const;
 
     //=========================================================================================================
     /**
@@ -240,7 +240,7 @@ public:
      *
      * @param[in] annotations   Annotation data to load.
      */
-    void setFiffAnnotations(const FIFFLIB::FiffAnnotations& annotations);
+    void setFiffAnnotations(const mne::FiffAnnotations& annotations);
 
     //=========================================================================================================
     /**
@@ -443,11 +443,11 @@ private:
      */
     QVector<AnnotationEntry> exportEntries() const;
 
-    FIFFLIB::FiffAnnotations m_fiffAnnotations;     /**< Canonical annotation storage (time-based). */
-    std::shared_ptr<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Measurement info used for sample/time conversion. */
-    int m_iFirstSample = 0;                         /**< First sample of the loaded raw file. */
-    int m_iLastSample = 0;                          /**< Last sample of the loaded raw file. */
-    bool m_bFileLoaded = false;                     /**< True if annotations were loaded from disk. */
+    mne::FiffAnnotations m_fiffAnnotations;     /**< Canonical annotation storage (time-based). */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Measurement info used for sample/time conversion. */
+    int m_iFirstSample = 0;                     /**< First sample of the loaded raw file. */
+    int m_iLastSample = 0;                      /**< Last sample of the loaded raw file. */
+    bool m_bFileLoaded = false;                 /**< True if annotations were loaded from disk. */
 };
 
 } // namespace MNEBROWSE

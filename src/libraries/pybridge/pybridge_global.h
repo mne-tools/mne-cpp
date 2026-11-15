@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro and build-info accessors of PYBRIDGELIB.
+ * @brief    Export macro and build-info accessors of mne_pybridge.
  *
- * PYBRIDGELIB runs Python as a child process: scripts, one-liners and MNE-Python
+ * mne_pybridge runs Python as a child process: scripts, one-liners and MNE-Python
  * cross-validation in tests, without linking against libpython.
  */
 
@@ -40,12 +40,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace PYBRIDGELIB
- * @brief     Python interoperability: script launcher and MNE-Python cross-validation helpers.
- */
-namespace PYBRIDGELIB
+namespace mne
 {
 
 //=============================================================================================================

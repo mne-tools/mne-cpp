@@ -28,8 +28,7 @@
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
-using namespace FWDLIB;
+using namespace mne;
 
 
 //=============================================================================================================
@@ -98,11 +97,11 @@ FwdCoil::~FwdCoil()
 std::unique_ptr<FwdCoil> FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTrans& t)
 {
     if (ch.kind != FIFFV_EEG_CH) {
-        BASELIB::Log::warning("{} is not an EEG channel. Cannot create an electrode definition.", ch.ch_name);
+        mne::Log::warning("{} is not an EEG channel. Cannot create an electrode definition.", ch.ch_name);
         return nullptr;
     }
     if (!t.empty() && t.from != FIFFV_COORD_HEAD) {
-        BASELIB::Log::warning("Inappropriate coordinate transformation in fwd_create_eeg_el");
+        mne::Log::warning("Inappropriate coordinate transformation in fwd_create_eeg_el");
         return nullptr;
     }
 

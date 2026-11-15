@@ -9,9 +9,9 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     August 2021
- * @brief    MNELIB build-info helper implementation.
+ * @brief    mne_mne build-info helper implementation.
  *
- * Provides the out-of-line definition of @ref MNELIB::buildDateTime which
+ * Provides the out-of-line definition of @ref mne::buildDateTime which
  * returns the timestamp baked in by @c utils/buildinfo.h. Kept in a
  * separate translation unit so that touching the build date does not
  * force a recompile of every consumer of @c mne_global.h.
@@ -27,21 +27,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* MNELIB::buildDateTime()
+const char* mne::buildDateTime()
 {
-    return BASELIB::dateTimeNow();
+    return mne::dateTimeNow();
 }
 
 //=============================================================================================================
 
-const char* MNELIB::buildHash()
+const char* mne::buildHash()
 {
-    return BASELIB::gitHash();
+    return mne::gitHash();
 }
 
 //=============================================================================================================
 
-const char* MNELIB::buildHashLong()
+const char* mne::buildHashLong()
 {
-    return BASELIB::gitHashLong();
+    return mne::gitHashLong();
 }

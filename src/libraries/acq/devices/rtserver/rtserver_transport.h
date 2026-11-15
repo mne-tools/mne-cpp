@@ -36,10 +36,10 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace ACQLIB::detail
+namespace mne::detail
 {
 
 /** Tags and commands of the data port. */
@@ -116,6 +116,6 @@ std::unique_ptr<RtServerTransport> make_rtserver_simulator(const RtServerSimulat
  */
 AcqExpected<std::unique_ptr<RtServerTransport>> connect_rtserver(const std::string& host, std::uint16_t port, std::chrono::milliseconds timeout);
 
-} // namespace ACQLIB::detail
+} // namespace mne::detail
 
 #endif // RTSERVER_TRANSPORT_H

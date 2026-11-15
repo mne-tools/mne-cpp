@@ -95,7 +95,7 @@ private:
 
     std::unique_ptr<Ui::TMSIImpedanceWidget> ui; /**< The user interface for the TMSIImpedanceWidget.*/
 
-    std::shared_ptr<DISPLIB::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
+    std::shared_ptr<mne::disp::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
 
     double m_dMaxImpedance; /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 
@@ -110,7 +110,7 @@ private:
     * Adds every electrode with a 2-D position of a cap to the QGraphicScene and to the name lookup table.
     * @param[in] layout The cap.
     */
-    void addElectrodeItems(const CHANNELSLIB::ElectrodeLayout& layout);
+    void addElectrodeItems(const mne::ElectrodeLayout& layout);
 
     //=========================================================================================================
     /**

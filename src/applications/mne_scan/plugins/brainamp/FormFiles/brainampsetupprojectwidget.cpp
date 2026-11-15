@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 using namespace BRAINAMPPLUGIN;
-using namespace CHANNELSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -170,7 +170,7 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
 void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    const auto layout = LayoutLoader::read_elc(BASELIB::pathFromUtf8(sPath.toStdString()));
+    const auto layout = LayoutLoader::read_elc(mne::pathFromUtf8(sPath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IEEGLIB;
+using namespace mne;
 
 namespace
 {

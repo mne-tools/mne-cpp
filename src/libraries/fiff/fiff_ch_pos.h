@@ -15,7 +15,7 @@
  *
  * A FIFF channel info record carries a sub-record describing where the
  * sensing element sits in the device coordinate frame (@c FIFFV_COORD_DEVICE)
- * and how it is oriented. @ref FIFFLIB::FiffChPos owns that sub-record: a 3-vector
+ * and how it is oriented. @ref mne::FiffChPos owns that sub-record: a 3-vector
  * @c r0 with the coil origin in metres plus three orthonormal 3-vectors
  * @c ex, @c ey, @c ez encoding the coil-local axes (typically used by the
  * forward solution to integrate over the coil pickup area).
@@ -44,10 +44,10 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================

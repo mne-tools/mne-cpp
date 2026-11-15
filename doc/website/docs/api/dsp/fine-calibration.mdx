@@ -1,13 +1,13 @@
 ---
 id: fine-calibration
-title: "DSPLIB::FineCalibration"
+title: "mne::FineCalibration"
 sidebar_label: FineCalibration
 sidebar_position: 16
 ---
 
 # FineCalibration
 
-**Namespace:** `DSPLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/fine_calibration.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/fine_calibration.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/fine_calibration.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/fine_calibration.h)
 
 :::info[Python equivalent]
 `mne.preprocessing.read_fine_calibration` in MNE-Python.
@@ -16,7 +16,7 @@ sidebar_position: 16
 `#include <dsp/fine_calibration.h>`
 
 ```cpp
-class DSPLIB::FineCalibration
+class mne::FineCalibration
 ```
 
 Fine calibration data for [`SSS`](/docs/api/dsp/sss).
@@ -169,7 +169,7 @@ Each line has 14 or 16 whitespace-separated columns (see the class description);
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 176"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 175"
 FineCalibration calibration;
 FineCalEntry magnetometer;
 magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers

@@ -114,7 +114,7 @@ private:
      * @return true on success.
      */
     bool readAsciiTriFile(const QString& fileName, int id, float sigma,
-                          float shift, MNELIB::MNEBemSurface& surf) const;
+                          float shift, mne::MNEBemSurface& surf) const;
 
     //=========================================================================================================
     /**
@@ -129,7 +129,7 @@ private:
      * @return true on success.
      */
     bool readFreeSurferSurf(const QString& fileName, int id, float sigma,
-                            float shift, MNELIB::MNEBemSurface& surf) const;
+                            float shift, mne::MNEBemSurface& surf) const;
 
     //=========================================================================================================
     /**
@@ -138,7 +138,7 @@ private:
      * @param[in,out] surf   The surface to modify.
      * @param[in]     shift  Shift distance in meters.
      */
-    void shiftVertices(MNELIB::MNEBemSurface& surf, float shift) const;
+    void shiftVertices(mne::MNEBemSurface& surf, float shift) const;
 
     //=========================================================================================================
     /**
@@ -151,7 +151,7 @@ private:
      *
      * @return true on success.
      */
-    bool exportPntFile(const MNELIB::MNEBemSurface& surf,
+    bool exportPntFile(const mne::MNEBemSurface& surf,
                        const QString& fileName) const;
 
     //=========================================================================================================
@@ -164,7 +164,7 @@ private:
      *
      * @return true on success.
      */
-    bool exportSurfFile(const MNELIB::MNEBemSurface& surf,
+    bool exportSurfFile(const mne::MNEBemSurface& surf,
                         const QString& fileName) const;
 
     //=========================================================================================================

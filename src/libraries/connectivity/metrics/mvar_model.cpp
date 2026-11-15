@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Implementation of @ref CONNECTIVITYLIB::MvarModel - Yule-Walker / Levinson-Durbin MVAR fit and frequency-domain decomposition into H(f) and S(f); backbone of the directed-connectivity metrics.
+ * @brief    Implementation of @ref mne::MvarModel - Yule-Walker / Levinson-Durbin MVAR fit and frequency-domain decomposition into H(f) and S(f); backbone of the directed-connectivity metrics.
  */
 
 //=============================================================================================================
@@ -35,7 +35,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -133,7 +133,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
     const int nObs = nSamples - p;
 
     if (nObs <= 0) {
-        BASELIB::Log::warning("MvarModel::fitLevinsonDurbin - Not enough samples for model order {}", p);
+        mne::Log::warning("MvarModel::fitLevinsonDurbin - Not enough samples for model order {}", p);
         m_order = 0;
         m_coeffs.clear();
         m_noiseCov = MatrixXd::Identity(nCh, nCh);

@@ -5,7 +5,7 @@ are introduced as part of the v2.3.0 quality push (tasks 10.1 and 10.2):
 
 | Folder         | Static-lib target      | Purpose                                                |
 |----------------|------------------------|--------------------------------------------------------|
-| `electrodes/`  | `inspect_electrodes`   | Load sEEG / ECoG contacts from BIDS, CSV or FIFF into an `IEEGLIB::IeegImplantation`, show it as a `DISP3DLIB::ElectrodeObject` and handle picks via `DISP3DLIB::PickResult`. |
+| `electrodes/`  | `inspect_electrodes`   | Load sEEG / ECoG contacts from BIDS, CSV or FIFF into an `mne::IeegImplantation`, show it as a `mne::disp::ElectrodeObject` and handle picks via `mne::disp::PickResult`. |
 | `mri_slices/`  | `inspect_mri_slices`   | Load an MRI volume (MGH / MGZ), publish axial / coronal / sagittal `Disp3D::SliceObject`s, and follow `PickKind::MriVoxel` picks with a shared crosshair. |
 
 ## Why static libraries (and not plugins)?
@@ -29,7 +29,7 @@ The build wires both static libraries into the `mne_inspect` executable, but
 nothing in `mainwindow.cpp` currently calls them. To finish the integration
 the host needs to:
 
-1. Construct a `DISP3DLIB::MultimodalScene` (single instance per main
+1. Construct a `mne::disp::MultimodalScene` (single instance per main
    window).
 2. Construct `ELECTRODESPLUGIN::ElectrodesPlugin` and
    `MRISLICESPLUGIN::MriSlicesPlugin`, then call `attachScene(&scene)` on

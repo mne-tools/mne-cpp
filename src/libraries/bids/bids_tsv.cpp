@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Implementation of @ref BIDSLIB::BidsTsv — generic UTF-8 / LF / @c n/a TSV reader and writer for BIDS sidecars.
+ * @brief    Implementation of @ref mne::BidsTsv — generic UTF-8 / LF / @c n/a TSV reader and writer for BIDS sidecars.
  */
 
 //=============================================================================================================
@@ -29,7 +29,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BIDSLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -43,18 +43,18 @@ std::vector<BidsTsvRow> BidsTsv::read_tsv(const std::filesystem::path& path,
 
     std::ifstream file(path, std::ios::binary);
     if (!file) {
-        BASELIB::Log::warning("[BidsTsv::read_tsv] Cannot open {}", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[BidsTsv::read_tsv] Cannot open {}", mne::utf8FromPath(path));
         return rows;
     }
 
     bool firstLine = true;
     std::string line;
     while (std::getline(file, line)) {
-        const std::string_view text = BASELIB::trimmed(line);
+        const std::string_view text = mne::trimmed(line);
         if (text.empty())
             continue;
 
-        BASELIB::StringList fields = BASELIB::split(text, '\t');
+        mne::StringList fields = mne::split(text, '\t');
 
         if (firstLine) {
             headers = std::move(fields);
@@ -80,7 +80,7 @@ bool BidsTsv::write_tsv(const std::filesystem::path& path,
 {
     std::ofstream out(path, std::ios::binary);
     if (!out) {
-        BASELIB::Log::warning("[BidsTsv::write_tsv] Cannot open {} for writing", BASELIB::utf8FromPath(path));
+        mne::Log::warning("[BidsTsv::write_tsv] Cannot open {} for writing", mne::utf8FromPath(path));
         return false;
     }
 

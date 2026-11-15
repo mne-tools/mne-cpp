@@ -1,13 +1,13 @@
 ---
 id: inv-rap-music
-title: "INVLIB::InvRapMusic"
+title: "mne::InvRapMusic"
 sidebar_label: InvRapMusic
 sidebar_position: 5
 ---
 
 # InvRapMusic
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_rap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_rap_music.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_rap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_rap_music.h)
 
 :::info[Python equivalent]
 `mne.beamformer.rap_music` in MNE-Python.
@@ -18,7 +18,7 @@ sidebar_position: 5
 <Connections topics={["rap-music"]} context="api" current="InvRapMusic" />
 
 ```cpp
-class INVLIB::InvRapMusic
+class mne::InvRapMusic
 ```
 
 RAP MUSIC (Recursively Applied and Projected Multiple Signal Classification) source localization algorithm.
@@ -154,7 +154,7 @@ Sets the source estimate attributes.
 
 Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 
-````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 154"
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 151"
 for (int t = 0; t < nSamples; ++t)
     measured.col(t) = g1 * std::sin(0.21 * t) + g2 * std::sin(0.53 * t + 0.4);
 std::vector<InvDipolePair<double>> pairs;
@@ -171,7 +171,7 @@ ok &= expect(pairs.size() == 1 && isPair(pairs[0], 10, 50) && pairs[0].m_vCorrel
 
 Localize dipole pairs in the sample evoked response with RAP-MUSIC on a clustered forward solution.
 
-````cpp title="src/examples/ex_inverse_rap_music/main.cpp, line 87"
+````cpp title="src/examples/ex_inverse_rap_music/main.cpp, line 83"
 QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
 QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
@@ -186,7 +186,7 @@ QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "ori
 
 Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 387"
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 383"
 //
 // Compute inverse solution
 //

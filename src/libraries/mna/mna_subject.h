@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    One participant in an MNA project — owner of measurement sessions and link to the FreeSurfer anatomy.
  *
- * @ref MNALIB::MnaSubject is the root of the per-participant subtree in an
+ * @ref mne::MnaSubject is the root of the per-participant subtree in an
  * MNA project. It binds together all sessions/recordings that
  * belong to one person and pins their structural MRI reconstruction
  * via @c freeSurferDir, a project-relative path to the matching
@@ -21,9 +21,9 @@
  * The @c id mirrors the BIDS @c sub-XX convention and is the key
  * downstream consumers (forward modelling, source estimation,
  * group statistics) use to look the subject up. @c sessions holds
- * the ordered @ref MNALIB::MnaSession list, and @c extras preserves any
+ * the ordered @ref mne::MnaSession list, and @c extras preserves any
  * demographic, clinical or consent-tracking fields that newer
- * tooling may attach so older MNALIB builds can still read and
+ * tooling may attach so older mne_mna builds can still read and
  * re-write the project without data loss.
  */
 
@@ -48,10 +48,10 @@
 #include <QSet>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -104,6 +104,6 @@ struct MNASHARED_EXPORT MnaSubject
     static MnaSubject fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_SUBJECT_H

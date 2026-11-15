@@ -1,18 +1,18 @@
 ---
 id: data-loader
-title: "DISP3DLIB::DataLoader"
+title: "mne::disp::DataLoader"
 sidebar_label: DataLoader
 sidebar_position: 23
 ---
 
 # DataLoader
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/core/dataloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/core/dataloader.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/core/dataloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/core/dataloader.h)
 
 `#include <disp3D/dataloader.h>`
 
 ```cpp
-class DISP3DLIB::DataLoader
+class mne::disp::DataLoader
 ```
 
 Pure I/O helpers that load MNE data files and return results.
@@ -79,7 +79,7 @@ Load dipole set from a .dip file.
 
 **Returns:**
 
-- *[InvEcdSet](/docs/api/inv/inv-ecd-set)* — The loaded InvEcdSet (may be empty on failure).
+- *[InvEcdSet](/docs/api/inv/inv-ecd-set)* — The loaded [`InvEcdSet`](/docs/api/inv/inv-ecd-set) (may be empty on failure).
 
 ---
 
@@ -120,7 +120,7 @@ Other transforms in the file are ignored.
 
 ### loadEvoked(evokedPath, aveIndex)
 
-Load an [FiffEvoked](/docs/api/fiff/fiff-evoked) from a FIF file.
+Load an [`FiffEvoked`](/docs/api/fiff/fiff-evoked) from a FIF file.
 
 **Parameters:**
 
@@ -132,7 +132,7 @@ Load an [FiffEvoked](/docs/api/fiff/fiff-evoked) from a FIF file.
 
 **Returns:**
 
-- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The loaded FiffEvoked (may be empty on failure).
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The loaded [`FiffEvoked`](/docs/api/fiff/fiff-evoked) (may be empty on failure).
 
 ---
 

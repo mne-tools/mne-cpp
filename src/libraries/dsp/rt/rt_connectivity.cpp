@@ -24,8 +24,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DSPLIB;
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS RtConnectivityWorker
@@ -38,7 +37,7 @@ void RtConnectivityWorker::doWork(const std::shared_ptr<ConnectivitySettings>& c
     }
 
     if (connectivitySettings->getConnectivityMethods().empty()) {
-        BASELIB::Log::debug("RtConnectivityWorker::doWork() - Network methods are empty");
+        mne::Log::debug("RtConnectivityWorker::doWork() - Network methods are empty");
         return;
     }
 

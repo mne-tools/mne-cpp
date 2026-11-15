@@ -49,11 +49,7 @@
 
 #include <connectivity/connectivitysettings.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace INVLIB;
-using namespace DSPLIB;
-using namespace CONNECTIVITYLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -148,7 +144,7 @@ private slots:
 
 void TestInvRtLibrary::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -515,8 +511,8 @@ void TestInvRtLibrary::rtprocessing_filterFile()
     tmpFile.setAutoRemove(true);
     QVERIFY(tmpFile.open());
 
-    bool ok = DSPLIB::filterFile(tmpFile.fileName().toStdU16String(), pRaw, 2, 10.0, 5.0, 2.0,
-                                 pRaw->info.sfreq, 512);
+    bool ok = mne::filterFile(tmpFile.fileName().toStdU16String(), pRaw, 2, 10.0, 5.0, 2.0,
+                              pRaw->info.sfreq, 512);
     QVERIFY(ok);
     QVERIFY(tmpFile.size() > 0);
 }
@@ -734,7 +730,7 @@ void TestInvRtLibrary::filter_applyToRawData()
     raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + 4000);
     FilterKernel kernel("test_lp", 0, 256, 40.0, 0.0, 0.0, raw.info.sfreq, 0);
     MatrixXd subData = data.block(0, 0, qMin(5, static_cast<int>(data.rows())), data.cols());
-    MatrixXd filtered = DSPLIB::filterData(subData, kernel);
+    MatrixXd filtered = mne::filterData(subData, kernel);
     QVERIFY(filtered.rows() > 0);
     QVERIFY(filtered.cols() > 0);
 }
@@ -748,7 +744,7 @@ void TestInvRtLibrary::filter_applyWithChannelSelection()
     raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + 2000);
     FilterKernel kernel("test_hp", 1, 128, 0.0, 1.0, 0.0, raw.info.sfreq, 0);
     MatrixXd subData = data.block(0, 0, qMin(3, static_cast<int>(data.rows())), data.cols());
-    MatrixXd filtered = DSPLIB::filterData(subData, kernel);
+    MatrixXd filtered = mne::filterData(subData, kernel);
     QVERIFY(filtered.rows() > 0);
 }
 
@@ -781,9 +777,9 @@ void TestInvRtLibrary::rtAveragingWorker_doWork()
     pInfo->ch_names.push_back("MEG 0111");
     pInfo->ch_names.push_back("STI 014");
     quint32 preStim = 50, postStim = 100;
-    DSPLIB::RtAveragingWorker worker(2, preStim, postStim, 0, 0, 1, pInfo);
+    mne::RtAveragingWorker worker(2, preStim, postStim, 0, 0, 1, pInfo);
     QList<FiffEvokedSet> results;
-    connect(&worker, &DSPLIB::RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
+    connect(&worker, &mne::RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
     for (int block = 0; block < 5; ++block) {
         MatrixXd data = MatrixXd::Zero(2, 200);
         for (int j = 0; j < 200; ++j)
@@ -809,7 +805,7 @@ void TestInvRtLibrary::filterOverlapAdd_calculate()
     MatrixXd data = MatrixXd::Random(2, 2048);
     RowVectorXi picks(2);
     picks << 0, 1;
-    DSPLIB::FilterOverlapAdd filterOA;
+    mne::FilterOverlapAdd filterOA;
     MatrixXd result = filterOA.calculate(data, 0, 40.0, 0.0, 5.0, 1000.0, 128, 0,
                                          picks, true, false, false);
     QVERIFY(result.rows() == data.rows());
@@ -822,8 +818,8 @@ void TestInvRtLibrary::filterData_paramOverload()
     MatrixXd data = MatrixXd::Random(3, 1024);
     RowVectorXi picks(3);
     picks << 0, 1, 2;
-    MatrixXd result = DSPLIB::filterData(data, 0, 40.0, 0.0, 5.0, 1000.0, 128, 0,
-                                         picks, false, false);
+    MatrixXd result = mne::filterData(data, 0, 40.0, 0.0, 5.0, 1000.0, 128, 0,
+                                      picks, false, false);
     QVERIFY(result.rows() == data.rows());
     QVERIFY(result.cols() > 0);
 }

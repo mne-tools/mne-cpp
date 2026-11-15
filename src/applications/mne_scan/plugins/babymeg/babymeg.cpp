@@ -49,9 +49,8 @@
 //=============================================================================================================
 
 using namespace BABYMEGPLUGIN;
-using namespace SCSHAREDLIB;
-using namespace SCMEASLIB;
-using namespace FIFFLIB;
+using namespace mne::scan;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -95,7 +94,7 @@ void BabyMEG::unload()
 
 std::string BabyMEG::uri() const
 {
-    ACQLIB::AcqUri uri{.scheme = "babymeg", .target = {}, .params = {}};
+    mne::AcqUri uri{.scheme = "babymeg", .target = {}, .params = {}};
     if (m_bSimulate) {
         uri.params.emplace_back("simulate", "1");
     } else {
@@ -134,15 +133,15 @@ void BabyMEG::addSystemInfo(FiffInfo& info)
 
 bool BabyMEG::start()
 {
-    ACQLIB::register_babymeg_scheme();
-    auto device = ACQLIB::AcqDevice::open(uri());
+    mne::register_babymeg_scheme();
+    auto device = mne::AcqDevice::open(uri());
     if (!device) {
         qWarning() << "[BabyMEG::start]" << QString::fromStdString(device.error().text());
         return false;
     }
     m_device = std::move(*device);
-    auto fiffInfo = ACQLIB::toFiffInfo(*m_device.stream().info());
-    auto reader = m_device.stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+    auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
+    auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
         qWarning() << "[BabyMEG::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
         m_device.close();
@@ -155,7 +154,7 @@ bool BabyMEG::start()
     m_pRTMSABabyMEG->measurementData()->initFromFiffInfo(info);
     m_pRTMSABabyMEG->measurementData()->setMultiArraySize(1);
 
-    if (ACQLIB::AcqError e = m_device.start(); !e.ok()) {
+    if (mne::AcqError e = m_device.start(); !e.ok()) {
         qWarning() << "[BabyMEG::start]" << QString::fromStdString(e.text());
         m_device.close();
         return false;
@@ -171,7 +170,7 @@ bool BabyMEG::stop()
 {
     requestInterruption();
     wait();
-    m_reader = ACQLIB::AcqReader();
+    m_reader = mne::AcqReader();
     m_device.close();
 
     // Clear all data in the buffer connected to displays and other plugins
@@ -207,10 +206,10 @@ void BabyMEG::run()
     const std::size_t channels = m_device.stream().info()->channelCount();
     MatrixXd block(static_cast<Index>(channels), m_iSamplesPerBlock);
     while (!isInterruptionRequested()) {
-        const auto read = m_reader.read(ACQLIB::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
+        const auto read = m_reader.read(mne::AcqMatrixRef<double>::columnMajor(block.data(), channels, static_cast<std::size_t>(block.cols())),
                                         std::chrono::milliseconds(100));
         if (!read) {
-            if (read.error() == ACQLIB::AcqErrorCode::Timeout || read.error() == ACQLIB::AcqErrorCode::Overrun) {
+            if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
             qWarning() << "[BabyMEG::run]" << QString::fromStdString(read.error().text());

@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     }
 
     QFile file(argv[1]);
-    FIFFLIB::FiffRawData raw(file);
+    mne::FiffRawData raw(file);
     if (raw.isEmpty()) {
         std::fprintf(stderr, "could not read %s\n", argv[1]);
         return 1;

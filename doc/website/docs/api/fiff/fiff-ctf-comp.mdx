@@ -1,18 +1,18 @@
 ---
 id: fiff-ctf-comp
-title: "FIFFLIB::FiffCtfComp"
+title: "mne::FiffCtfComp"
 sidebar_label: FiffCtfComp
 sidebar_position: 15
 ---
 
 # FiffCtfComp
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_ctf_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_ctf_comp.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_ctf_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_ctf_comp.h)
 
 `#include <fiff/fiff_ctf_comp.h>`
 
 ```cpp
-class FIFFLIB::FiffCtfComp
+class mne::FiffCtfComp
 ```
 
 One CTF software-gradient compensation matrix: grade kind, calibration flag and the gradiometer × reference named matrix.
@@ -121,7 +121,7 @@ ok &= expect(ctf.info.comps.size() == 5 && compensator.rows() == 36 && std::abs(
 
 Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
 
-````cpp title="src/examples/ex_cancel_noise/main.cpp, line 85"
+````cpp title="src/examples/ex_cancel_noise/main.cpp, line 84"
 //example for compensator generation
 FiffCtfComp comp;
 if (dest_comp > 0) {

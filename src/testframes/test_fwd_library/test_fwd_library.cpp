@@ -33,9 +33,7 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/fwd_global.h>
 
-using namespace FIFFLIB;
-using namespace MNELIB;
-using namespace FWDLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -126,7 +124,7 @@ private slots:
 
 void TestFwdLibrary::initTestCase()
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -783,11 +781,11 @@ void TestFwdLibrary::coilSet_eegElectrodeType()
 
 void TestFwdLibrary::fwd_globalBuildInfo()
 {
-    const char* dt = FWDLIB::buildDateTime();
+    const char* dt = mne::buildDateTime();
     QVERIFY(dt != nullptr);
-    const char* h = FWDLIB::buildHash();
+    const char* h = mne::buildHash();
     QVERIFY(h != nullptr);
-    const char* hl = FWDLIB::buildHashLong();
+    const char* hl = mne::buildHashLong();
     QVERIFY(hl != nullptr);
 }
 

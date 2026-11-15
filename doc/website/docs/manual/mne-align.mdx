@@ -68,8 +68,8 @@ Re-running ICP after editing fiducials produces a new fit. Returning to an earli
 
 Two save actions are exposed:
 
-- **Save -trans.fif…** writes the head→MRI rigid transform as a `FiffCoordTrans` via `FIFFLIB::FiffCoordTrans::write`. The suggested filename derives from the BEM stem (e.g. `subject01-trans.fif`). The transform is what downstream tools (`mne_forward_solution`, `mne_compute_mne`, mne-python's `read_trans`) expect.
-- **Save digitisation FIFF…** writes the captured `ISOTRAK` point set (cardinal, EEG, HSP) via `FIFFLIB::FiffDigPointSet::write` — useful for archiving the raw capture independently of the transform.
+- **Save -trans.fif…** writes the head→MRI rigid transform as a `FiffCoordTrans` via `mne::FiffCoordTrans::write`. The suggested filename derives from the BEM stem (e.g. `subject01-trans.fif`). The transform is what downstream tools (`mne_forward_solution`, `mne_compute_mne`, mne-python's `read_trans`) expect.
+- **Save digitisation FIFF…** writes the captured `ISOTRAK` point set (cardinal, EEG, HSP) via `mne::FiffDigPointSet::write` — useful for archiving the raw capture independently of the transform.
 
 ![Step 6 — Save](/img/manual/auto/mne-align/step6-save.png)
 
@@ -129,7 +129,7 @@ The digitisation `.fif` written in parallel can be merged back into a raw record
 - `src/applications/mne_align/align_3d_view.{h,cpp}` — 3D scene + camera presets.
 - `src/applications/mne_align/digitizer.{h,cpp}` — the `polhemus://` stream as Qt signals.
 - `src/libraries/acq/devices/polhemus/` — the `polhemus://` source (FASTRAK records, serial port, simulator), the `AcquiredPoints` store and `PolhemusCoregistration`.
-- `src/libraries/mne/mne_icp.{h,cpp}` — ICP refinement entry point (`MNELIB::performIcp`).
+- `src/libraries/mne/mne_icp.{h,cpp}` — ICP refinement entry point (`mne::performIcp`).
 
 ## Related manual pages
 

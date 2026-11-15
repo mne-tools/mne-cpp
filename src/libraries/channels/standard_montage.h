@@ -9,7 +9,7 @@
  * @date     May 2026
  * @brief    Standard 10-20 / 10-10 / 10-05 EEG electrode positions of MNE-Python's standard_1005 montage.
  *
- * @ref CHANNELSLIB::StandardMontage gives every consumer in mne-cpp (the coregistration wizard,
+ * @ref mne::StandardMontage gives every consumer in mne-cpp (the coregistration wizard,
  * the layout maker, forward modelling) a default cap when no digitised positions exist. The
  * positions are those of mne.channels.make_standard_montage("standard_1005"), in metres in
  * the MNI (fsaverage MRI) frame; the 10-20 and 10-10 systems are its electrodes of those names.
@@ -39,10 +39,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE CHANNELSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CHANNELSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -95,7 +95,7 @@ public:
      *
      * @return The electrode names, in montage order.
      */
-    static BASELIB::StringList electrode_names(System system);
+    static mne::StringList electrode_names(System system);
 
     //=========================================================================================================
     /**
@@ -118,6 +118,6 @@ public:
     static std::size_t electrode_count(System system);
 };
 
-} // namespace CHANNELSLIB
+} // namespace mne
 
 #endif // CHANNELS_STANDARD_MONTAGE_H

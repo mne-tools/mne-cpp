@@ -1,23 +1,23 @@
 ---
 id: inv-sensor-set-creator
-title: "INVLIB::InvSensorSetCreator"
+title: "mne::InvSensorSetCreator"
 sidebar_label: InvSensorSetCreator
 sidebar_position: 34
 ---
 
 # InvSensorSetCreator
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_sensor_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_sensor_set.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_sensor_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_sensor_set.h)
 
 `#include <inv/inv_sensor_set.h>`
 
 ```cpp
-class INVLIB::InvSensorSetCreator
+class mne::InvSensorSetCreator
 ```
 
 Create a [`InvSensorSet`](/docs/api/inv/inv-sensor-set) struct from a channel list with specified accuracy.
 
-Builds [`InvSensorSet`](/docs/api/inv/inv-sensor-set) objects from [FiffInfo](/docs/api/fiff/fiff-info) channel definitions, applying SSP projections and compensation
+Builds [`InvSensorSet`](/docs/api/inv/inv-sensor-set) objects from [`FiffInfo`](/docs/api/fiff/fiff-info) channel definitions, applying SSP projections and compensation
 
 ```cpp title="src/examples/ex_inv_hpi/main.cpp"
 InvSensorSetCreator creator; // reads resources/general/coilDefinitions/coil_def.dat
@@ -70,7 +70,7 @@ Update [`InvSensorSet`](/docs/api/inv/inv-sensor-set) from new channel list with
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 98"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 97"
 InvSensorSetCreator creator; // reads resources/general/coilDefinitions/coil_def.dat
 std::vector<FiffChInfo> megChannels;
 for (const FiffChInfo& ch : info->chs) {

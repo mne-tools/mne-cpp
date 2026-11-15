@@ -37,16 +37,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -77,7 +77,7 @@ struct DSPSHARED_EXPORT FilterChpiParams
  * @param[in]     params       Filtering parameters.
  */
 DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
-                                 const FIFFLIB::FiffInfo& info,
+                                 const mne::FiffInfo& info,
                                  double sfreq,
                                  const std::vector<double>& hpiFreqs,
                                  const FilterChpiParams& params = FilterChpiParams());
@@ -97,10 +97,10 @@ DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
  * @param[in]     params  Filtering parameters.
  */
 DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
-                                 const FIFFLIB::FiffInfo& info,
+                                 const mne::FiffInfo& info,
                                  double sfreq,
                                  const FilterChpiParams& params = FilterChpiParams());
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // FILTER_CHPI_DSP_H

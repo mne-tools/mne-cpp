@@ -10,9 +10,9 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     March 2013
- * @brief    Export macro and build-info accessors of BASELIB.
+ * @brief    Export macro and build-info accessors of mne_base.
  *
- * BASELIB is the bottom of the library stack: logging, error results, byte streams, JSON, string and path
+ * mne_base is the bottom of the library stack: logging, error results, byte streams, JSON, string and path
  * helpers, the thread pool and the circular buffer. It depends on the C++ standard library, zlib and
  * Qt Core only, so every other library can use it.
  */
@@ -46,10 +46,13 @@
 
 //=============================================================================================================
 /**
- * @namespace BASELIB
- * @brief     Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms).
+ * @namespace mne
+ * @brief     MNE-CPP: reading, processing, source estimation and acquisition of MEG/EEG data in standard C++.
+ *
+ * Every library shares this namespace; the class names carry their library prefix (FiffInfo, BidsChannel,
+ * MnaProject, ...). The Qt-based display libraries live in @ref mne::disp.
  */
-namespace BASELIB
+namespace mne
 {
 
 //=============================================================================================================

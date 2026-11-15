@@ -1,18 +1,18 @@
 ---
 id: inv-tokenize-options
-title: "INVLIB::InvTokenizeOptions"
+title: "mne::InvTokenizeOptions"
 sidebar_label: InvTokenizeOptions
 sidebar_position: 52
 ---
 
 # InvTokenizeOptions
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_token.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_token.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_token.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_token.h)
 
 `#include <inv/inv_token.h>`
 
 ```cpp
-struct INVLIB::InvTokenizeOptions
+struct mne::InvTokenizeOptions
 ```
 
 Controls which layers of an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) are emitted during tokenization.
@@ -60,7 +60,7 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 283"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 280"
 coherence.fmin = 8.0f;
 coherence.fmax = 12.0f;
 layered.connectivity.push_back(coherence);

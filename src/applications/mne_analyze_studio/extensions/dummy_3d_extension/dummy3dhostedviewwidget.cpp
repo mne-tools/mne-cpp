@@ -36,7 +36,7 @@
 #include <QVBoxLayout>
 
 using namespace MNEANALYZESTUDIO;
-using namespace DISP3DLIB;
+using namespace mne::disp;
 
 namespace
 {
@@ -54,7 +54,7 @@ QStringList jsonArrayToStringList(const QJsonArray& values)
     return result;
 }
 
-QString bemSurfaceName(const MNELIB::MNEBemSurface& bemSurface, std::size_t index)
+QString bemSurfaceName(const mne::MNEBemSurface& bemSurface, std::size_t index)
 {
     switch (bemSurface.id) {
         case 4:
@@ -327,7 +327,7 @@ bool Dummy3DHostedViewWidget::loadFileInternal(const QString& filePath,
 
 bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* errorMessage)
 {
-    FSLIB::FsSurface surface(filePath.toStdU16String());
+    mne::FsSurface surface(filePath.toStdU16String());
     if (surface.empty()) {
         if (errorMessage) {
             *errorMessage = QString("Failed to load FreeSurfer surface %1.").arg(filePath);
@@ -350,14 +350,14 @@ bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* 
 
 bool Dummy3DHostedViewWidget::loadBemFile(const QString& filePath, QString* errorMessage)
 {
-    auto read = MNELIB::MNEBem::read(filePath.toStdU16String());
+    auto read = mne::MNEBem::read(filePath.toStdU16String());
     if (!read) {
         if (errorMessage) {
             *errorMessage = QString("Failed to load BEM surface set %1: %2").arg(filePath, QString::fromStdString(read.error().what()));
         }
         return false;
     }
-    const MNELIB::MNEBem& bem = *read;
+    const mne::MNEBem& bem = *read;
 
     const QString subjectName = inferSubjectName(filePath);
     for (std::size_t i = 0; i < bem.size(); ++i) {

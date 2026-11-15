@@ -36,17 +36,17 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace ANSHAREDLIB
+namespace mne::analyze
 {
 class Communicator;
 }
 
-namespace DSPLIB
+namespace mne
 {
 class FilterKernel;
 }
 
-namespace DISPLIB
+namespace mne::disp
 {
 class FilterSettingsView;
 }
@@ -64,12 +64,12 @@ namespace FILTERINGPLUGIN
  *
  * @brief The Filtering class provides a view with all currently loaded models.
  */
-class FILTERINGSHARED_EXPORT Filtering : public ANSHAREDLIB::AbstractPlugin
+class FILTERINGSHARED_EXPORT Filtering : public mne::analyze::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "filtering.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
+    Q_INTERFACES(mne::analyze::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -93,8 +93,8 @@ public:
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
     virtual QString getBuildInfo() override;
-    virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
-    virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
+    virtual void handleEvent(QSharedPointer<mne::analyze::Event> e) override;
+    virtual QVector<mne::analyze::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:
     //=========================================================================================================
@@ -111,7 +111,7 @@ private:
      *
      * @param[in] filterData    The currently active filter.
      */
-    void setFilter(const DSPLIB::FilterKernel& filterData);
+    void setFilter(const mne::FilterKernel& filterData);
 
     //=========================================================================================================
     /**
@@ -121,8 +121,8 @@ private:
      */
     void setFilterActive(bool state);
 
-    QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcst signals. */
-    QPointer<DISPLIB::FilterSettingsView> m_pFilterSettingsView;
+    QPointer<mne::analyze::Communicator> m_pCommu; /**< To broadcst signals. */
+    QPointer<mne::disp::FilterSettingsView> m_pFilterSettingsView;
 };
 
 //=============================================================================================================

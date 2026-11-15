@@ -13,9 +13,9 @@
  * @brief    Display-style settings for the FIFF raw browser (zoom, time window, signal / background colours).
  *
  * FiffRawViewSettings centralises the visual knobs of
- * @ref DISPLIB::RtFiffRawView / @ref DISPLIB::ChannelDataView "ChannelDataView": visible time window in
+ * @ref mne::disp::RtFiffRawView / @ref mne::disp::ChannelDataView "ChannelDataView": visible time window in
  * seconds, distance-to-axis spinbox, trigger colour, background and
- * signal pen colour, plus a @ref DISPLIB::ApplyToView selector that decides
+ * signal pen colour, plus a @ref mne::disp::ApplyToView selector that decides
  * whether the scaling change affects all / visible / selected
  * channels.
  */
@@ -48,14 +48,14 @@ class FiffRawViewSettingsWidget;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

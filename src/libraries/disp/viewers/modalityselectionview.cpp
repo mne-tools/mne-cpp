@@ -34,13 +34,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
+using namespace mne::disp;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ModalitySelectionView::ModalitySelectionView(const std::vector<FIFFLIB::FiffChInfo>& lChannelList,
+ModalitySelectionView::ModalitySelectionView(const std::vector<mne::FiffChInfo>& lChannelList,
                                              const QString& sSettingsPath,
                                              QWidget* parent,
                                              Qt::WindowFlags f)

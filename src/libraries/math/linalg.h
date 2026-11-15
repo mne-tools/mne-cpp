@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Static linear-algebra helpers: SVD-based conditioning, block-diagonal assembly, sorted index pairs.
  *
- * @ref MATHLIB::Linalg collects the dense / sparse Eigen primitives
+ * @ref mne::Linalg collects the dense / sparse Eigen primitives
  * that the rest of mne-cpp keeps reaching for but that are not part of
  * Eigen itself: condition number and condition slope from a Jacobi SVD,
  * assembly of block-diagonal sparse matrices from a stack of dense
@@ -23,7 +23,7 @@
  * needs to be instantiated. Dense paths run through @c Eigen::JacobiSVD
  * (@c O(min(m,n)^2 * max(m,n))) while the sparse paths are linear in
  * the number of stored non-zeros, which keeps the helpers usable even
- * on the source-space-sized matrices manipulated by INVERSELIB.
+ * on the source-space-sized matrices manipulated by mne_inv.
  */
 
 #ifndef LINALG_H
@@ -54,19 +54,19 @@
 #include <string>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MATHLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MATHLIB
+namespace mne
 {
 
 //=============================================================================================================
 /**
  * Static linear-algebra utilities (condition numbers, block-diagonal
  * sparse assembly, xyz reductions, stable index sort) layered on top of
- * Eigen for use across MATHLIB, FWDLIB and INVERSELIB.
+ * Eigen for use across mne_math, mne_fwd and mne_inv.
  *
- * @brief Static Eigen-based linear-algebra helpers used across MATHLIB and the inverse solvers.
+ * @brief Static Eigen-based linear-algebra helpers used across mne_math and the inverse solvers.
  *
  * @snippet ex_math/main.cpp linalg_usage
  */

@@ -11,12 +11,12 @@
  *
  * MultimodalScene composes the disp3D primitives into a single
  * depth-sorted layer stack so the GUI shell does not need to know
- * the per-modality render order. Each @ref DISP3DLIB::SceneLayer carries its
+ * the per-modality render order. Each @ref mne::disp::SceneLayer carries its
  * renderable, a sort key and a visibility flag; the controller
  * iterates layers in order and issues the corresponding draw calls.
  *
- * It also routes pick events from @ref DISP3DLIB::RayPicker through every
- * layer and returns a uniform @ref DISP3DLIB::PickResult to the host, hiding
+ * It also routes pick events from @ref mne::disp::RayPicker through every
+ * layer and returns a uniform @ref mne::disp::PickResult to the host, hiding
  * the per-primitive intersection logic.
  */
 
@@ -43,7 +43,7 @@
 #include <functional>
 #include <memory>
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -73,9 +73,9 @@ enum class SceneLayerKind
  *
  * The payload is owned by the caller (e.g. the plugin that loaded the data)
  * and supplied as a `std::shared_ptr<void>` so the scene neither owns nor
- * inspects it. The scene only needs the @c DISP3DLIB::SceneLayer::kind "kind", the @ref id, and the
+ * inspects it. The scene only needs the @c mne::disp::SceneLayer::kind "kind", the @ref id, and the
  * generic visibility / opacity flags to drive draw order; the renderer
- * downcasts the payload by @c DISP3DLIB::SceneLayer::kind "kind".
+ * downcasts the payload by @c mne::disp::SceneLayer::kind "kind".
  *
  * This indirection keeps `disp3D/scene/` free of QRhi includes and means
  * new renderables (sEEG, ECoG, future fNIRS optodes, …) plug in without
@@ -105,7 +105,7 @@ struct DISP3DSHARED_EXPORT SceneLayer
  *     visibility/opacity flips, so the renderer can rebuild its draw list.
  *   - Maintain a shared timeline (current time index) that data overlays
  *     across modalities consume; emits @ref timeSampleChanged.
- *   - Maintain the most recent @ref DISP3DLIB::PickResult and emit @ref picked when
+ *   - Maintain the most recent @ref mne::disp::PickResult and emit @ref picked when
  *     a layer producer reports a hit; consumers (Pick dock, status bar,
  *     MRI ortho viewer) subscribe to that signal.
  *
@@ -331,7 +331,7 @@ signals:
      * Emitted when a pick is reported. Pick dock, status bar, and MRI
      * ortho viewer subscribe.
      */
-    void picked(const DISP3DLIB::PickResult& pick);
+    void picked(const mne::disp::PickResult& pick);
 
 private:
     QVector<SceneLayer> m_layers;     /**< Insertion-ordered layers. */
@@ -348,6 +348,6 @@ private:
     void rebuildOrder();
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // DISP3DLIB_MULTIMODALSCENE_H

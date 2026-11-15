@@ -63,7 +63,7 @@ using namespace MNEFLASHBEM;
  */
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_flash_bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

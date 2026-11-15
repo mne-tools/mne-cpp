@@ -9,7 +9,7 @@
  * @date     April 2026
  * @brief    Renderable view of an sEEG / ECoG implantation: contact spheres and lead bodies.
  *
- * ElectrodeObject draws an @ref IEEGLIB::IeegImplantation. It provides two instanced streams for
+ * ElectrodeObject draws an @ref mne::IeegImplantation. It provides two instanced streams for
  * the renderer: one sphere per contact, and the lead bodies (one cylinder along each depth lead,
  * thin ties between neighbouring strip and grid contacts). Depth leads and subdural arrays thus
  * differ by shape, while colour tells one lead from another.
@@ -44,10 +44,10 @@
 #include <QVector3D>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
@@ -83,12 +83,12 @@ public:
      *
      * @param[in] implantation  Contacts and leads, positions in the frame of the surfaces.
      */
-    void setImplantation(const IEEGLIB::IeegImplantation& implantation);
+    void setImplantation(const mne::IeegImplantation& implantation);
 
     /**
      * @return The drawn implantation.
      */
-    const IEEGLIB::IeegImplantation& implantation() const
+    const mne::IeegImplantation& implantation() const
     {
         return m_implantation;
     }
@@ -104,7 +104,7 @@ public:
      * Contacts without a value keep the colour of their lead.
      *
      * @param[in] values    Map of contact name -> scalar value.
-     * @param[in] colormap  DISPLIB::ColorMap name.
+     * @param[in] colormap  mne::disp::ColorMap name.
      */
     void setContactValues(const QMap<QString, float>& values, const QString& colormap = QStringLiteral("Hot"));
 
@@ -173,7 +173,7 @@ public:
      * @param[in] index  Contact index.
      * @return The contact, or nullptr when out of range.
      */
-    const IEEGLIB::IeegContact* contactAt(int index) const;
+    const mne::IeegContact* contactAt(int index) const;
 
     /**
      * @param[in] index  Contact index.
@@ -237,7 +237,7 @@ private:
     void buildContactInstances();
     float contactRadius(int contact) const;
 
-    IEEGLIB::IeegImplantation m_implantation;
+    mne::IeegImplantation m_implantation;
     QVector<int> m_leadOfContact;    /**< Lead index per contact. */
     QVector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
     QMap<QString, float> m_contactValues;
@@ -271,6 +271,6 @@ private:
     float normalized(float value) const;
 };
 
-} // namespace DISP3DLIB
+} // namespace mne::disp
 
 #endif // ELECTRODEOBJECT_H

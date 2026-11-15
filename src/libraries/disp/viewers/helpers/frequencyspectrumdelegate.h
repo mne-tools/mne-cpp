@@ -10,13 +10,13 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QAbstractItemDelegate painting one row of the @ref DISPLIB::SpectrumView as a horizontal frequency band.
+ * @brief    QAbstractItemDelegate painting one row of the @ref mne::disp::SpectrumView as a horizontal frequency band.
  *
  * FrequencySpectrumDelegate reads the per-row FFT amplitudes from
- * @ref DISPLIB::FrequencySpectrumModel, maps them through a Hot / Jet colour
+ * @ref mne::disp::FrequencySpectrumModel, maps them through a Hot / Jet colour
  * table and draws the resulting pixel strip into the row rectangle
  * during @c paint(). It also paints the lower / upper frequency
- * cursors emitted by @ref DISPLIB::SpectrumSettingsView.
+ * cursors emitted by @ref mne::disp::SpectrumSettingsView.
  */
 
 #ifndef FREQUENCYSPECTRUMDELEGATE_H
@@ -48,14 +48,14 @@
 class QTableView;
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================

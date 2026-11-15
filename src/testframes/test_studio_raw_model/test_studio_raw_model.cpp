@@ -100,12 +100,12 @@ void TestStudioRawModel::loadAndInspect()
 
     QModelIndexList channels{dataIndex};
     const QString channelName = QString::fromStdString(model.channelInfoList().front().ch_name);
-    const bool initiallyBad = BASELIB::contains(model.fiffInfo()->bads, channelName.toStdString());
+    const bool initiallyBad = mne::contains(model.fiffInfo()->bads, channelName.toStdString());
     model.markChBad(channels, !initiallyBad);
-    QCOMPARE(BASELIB::contains(model.fiffInfo()->bads, channelName.toStdString()), !initiallyBad);
+    QCOMPARE(mne::contains(model.fiffInfo()->bads, channelName.toStdString()), !initiallyBad);
     QVERIFY(model.data(dataIndex, Qt::BackgroundRole).isValid());
     model.markChBad(channels, initiallyBad);
-    QCOMPARE(BASELIB::contains(model.fiffInfo()->bads, channelName.toStdString()), initiallyBad);
+    QCOMPARE(mne::contains(model.fiffInfo()->bads, channelName.toStdString()), initiallyBad);
 
     model.updateProjections();
     model.updateCompensator(0);
@@ -158,8 +158,8 @@ void TestStudioRawModel::writeAndReopen()
     QCOMPARE(writtenModel.lastSample(), model.lastSample());
 
     // The samples come back as they were; the source's channel ranges are not 1
-    const FIFFLIB::FiffRawData source(rawFilePath().toStdU16String());
-    const FIFFLIB::FiffRawData written(outputPath.toStdU16String());
+    const mne::FiffRawData source(rawFilePath().toStdU16String());
+    const mne::FiffRawData written(outputPath.toStdU16String());
     Eigen::MatrixXd expected, actual, times;
     QVERIFY(source.read_raw_segment(expected, times, source.first_samp, source.first_samp + 99));
     QVERIFY(written.read_raw_segment(actual, times, written.first_samp, written.first_samp + 99));
@@ -176,7 +176,7 @@ void TestStudioRawModel::browserWidgetNavigatesTheRecording()
     QTemporaryDir dir;
     const QString rawCopy = dir.filePath("run_raw.fif");
     QVERIFY(QFile::copy(rawFilePath(), rawCopy));
-    FIFFLIB::FiffEvents events;
+    mne::FiffEvents events;
     events.events.resize(2, 3);
     events.events << 15000, 0, 1, 16000, 0, 2;
     QFile eveFile(dir.filePath("run_raw-eve.fif"));

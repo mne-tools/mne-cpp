@@ -24,8 +24,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point_set.h>
 
-using namespace FIFFLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestFiffInfo : public QObject
@@ -68,7 +67,7 @@ private:
 private slots:
     void initTestCase()
     {
-        BASELIB::Log::install_qt_message_handler();
+        mne::Log::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
@@ -84,7 +83,7 @@ private slots:
         const FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
         QCOMPARE(raw.info.ch_names.front(), std::string("MEG 0113"));
         QCOMPARE(raw.info.chs.front().ch_name, std::string("MEG 0113"));
-        QCOMPARE(raw.info.bads, (BASELIB::StringList{"MEG 2443", "EEG 053"}));
+        QCOMPARE(raw.info.bads, (mne::StringList{"MEG 2443", "EEG 053"}));
         QVERIFY(!raw.info.projs.empty());
         QCOMPARE(raw.info.projs.front().data.col_names.front(), std::string("MEG 0111"));
     }
@@ -99,7 +98,7 @@ private slots:
         QVERIFY(!same_channel("MEG 011", "MEG 0113"));
 
         // An exact name wins over one that only matches across conventions
-        const BASELIB::StringList names{"EEG001", "EEG 001", "STI 014"};
+        const mne::StringList names{"EEG001", "EEG 001", "STI 014"};
         QCOMPARE(channel_index(names, "EEG 001"), 1);
         QCOMPARE(channel_index(names, "STI014"), 2);
         QCOMPARE(channel_index(names, "EEG 002"), -1);
@@ -206,7 +205,7 @@ private slots:
         FiffInfoBase info = makeSyntheticInfoBase(3);
         StringList types = info.get_channel_types();
         QVERIFY(types.size() > 0);
-        QVERIFY(BASELIB::contains(types, "mag"));
+        QVERIFY(mne::contains(types, "mag"));
     }
 
     void infoBase_equality()
@@ -377,7 +376,7 @@ private slots:
 
         StringList chTypes = raw.info.get_channel_types();
         QVERIFY(chTypes.size() > 0);
-        QVERIFY(BASELIB::contains(chTypes, "mag") || BASELIB::contains(chTypes, "grad") || BASELIB::contains(chTypes, "eeg"));
+        QVERIFY(mne::contains(chTypes, "mag") || mne::contains(chTypes, "grad") || mne::contains(chTypes, "eeg"));
     }
 
     //=========================================================================

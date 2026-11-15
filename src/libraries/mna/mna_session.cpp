@@ -14,7 +14,7 @@
  * @c toCbor, ordering is preserved to keep run numbering stable,
  * and any unknown sidecar metadata supplied by newer tooling is
  * captured into @c extras on read and re-emitted on write so the
- * round-trip stays lossless across MNALIB versions.
+ * round-trip stays lossless across mne_mna versions.
  */
 
 //=============================================================================================================
@@ -30,7 +30,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // DEFINE METHODS

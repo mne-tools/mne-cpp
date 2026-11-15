@@ -80,7 +80,7 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
         isJson = true;
 
     if (isJson) {
-        BASELIB::Log::debug("JSON command recognized");
+        mne::Log::debug("JSON command recognized");
 
         QJsonObject t_jsonObjectCommand;
         QJsonObject t_jsonObjectParameters;
@@ -97,7 +97,7 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
         QJsonObject::Iterator itParam;
         for (it = t_jsonObjectCommand.begin(); it != t_jsonObjectCommand.end(); ++it) {
             //Print Command
-            BASELIB::Log::info("{}\r\n", it.key().toStdString());
+            mne::Log::info("{}\r\n", it.key().toStdString());
 
             if (exists(it.key())) {
                 RawCommand t_rawCommand(it.key(), true);
@@ -109,7 +109,7 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
 
                 //append the parameters
                 for (itParam = t_jsonObjectParameters.begin(); itParam != t_jsonObjectParameters.end(); ++itParam) {
-                    BASELIB::Log::info(" {}", itParam.value().toString().toStdString());
+                    mne::Log::info(" {}", itParam.value().toString().toStdString());
                     //ToDo do a cross check with the param naming and key
                     m_rawCommand.pValues().append(itParam.value().toString());
                 }
@@ -117,16 +117,16 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
                 //Notify attached command manager
                 notify();
             }
-            BASELIB::Log::info("\r\n");
+            mne::Log::info("\r\n");
         }
     } else {
         QStringList t_qCommandList = p_sInput.split(" ");
 
         //Print command
-        BASELIB::Log::info("{}\r\n", t_qCommandList[0].toStdString());
+        mne::Log::info("{}\r\n", t_qCommandList[0].toStdString());
 
         if (!exists(t_qCommandList[0])) {
-            BASELIB::Log::info("\r\n");
+            mne::Log::info("\r\n");
             return false;
         }
 
@@ -140,11 +140,11 @@ bool CommandParser::parse(const QString& p_sInput, QStringList& p_qListCommandsP
         {
             //Parse Parameters
             for (qint32 i = 1; i < t_qCommandList.size(); ++i) {
-                BASELIB::Log::info(" {}", t_qCommandList[i].toStdString());
+                mne::Log::info(" {}", t_qCommandList[i].toStdString());
                 m_rawCommand.pValues().append(t_qCommandList[i]);
             }
         }
-        BASELIB::Log::info("\r\n");
+        mne::Log::info("\r\n");
         notify();
     }
 

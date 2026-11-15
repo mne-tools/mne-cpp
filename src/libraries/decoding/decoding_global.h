@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.1
  * @date     May 2026
- * @brief    Export/import macros and build-info entry points for DECODINGLIB.
+ * @brief    Export/import macros and build-info entry points for mne_decoding.
  *
- * DECODINGLIB groups the supervised- and unsupervised-decomposition
+ * mne_decoding groups the supervised- and unsupervised-decomposition
  * algorithms that turn raw M/EEG into discriminative or regressable
  * features for brain-computer interfaces and pattern-recognition
  * pipelines: Common Spatial Patterns (CSP), Source Power Comodulation
@@ -24,7 +24,7 @@
  * applications layer; the actual algorithms are declared in
  * @ref decoding_csp.h, @ref decoding_spoc.h, @ref decoding_ssd.h and
  * @ref decoding_ica_label.h. Keeping the export macro in its own
- * translation unit lets us link DECODINGLIB statically (@c STATICBUILD)
+ * translation unit lets us link mne_decoding statically (@c STATICBUILD)
  * or as a shared library without touching the per-algorithm files.
  */
 
@@ -59,32 +59,7 @@
 #pragma warning(disable : 4251 4275)
 #endif
 
-//=============================================================================================================
-/**
- * @namespace DECODINGLIB
- * @brief     Supervised and unsupervised spatial-filter decompositions for M/EEG decoding.
- *
- * DECODINGLIB exposes a small, deliberately scikit-learn-shaped API
- * (@c fit, @c transform, @c fitTransform, @c inverseTransform) around
- * the four spatial-filter families that dominate BCI and biomarker work
- * on continuous and epoched M/EEG: CSP for binary class-discriminative
- * power, SPoC for regressing a continuous target onto band-power, SSD
- * for noise-aware narrowband enhancement, and an ICA component
- * labeller for automatic artefact tagging. The public surface mirrors
- * @c mne.decoding so that a pipeline prototyped in MNE-Python can be
- * ported one-to-one into a real-time mne-cpp application.
- *
- * Every algorithm reduces to a generalised eigendecomposition of two
- * symmetric positive-definite covariance matrices, computed inline with
- * Eigen rather than delegated to LAPACK; this keeps the library free of
- * heavyweight numerical dependencies and makes it trivially usable from
- * the WebAssembly build. MNE-specific extensions on top of the
- * upstream Python API are the explicit @c TransformMode enums
- * (@c AveragePower vs raw @c CspSpace projection), opt-in log or
- * z-score normalisation of band-power features, and a closed-form
- * inverse-transform back to sensor space.
- */
-namespace DECODINGLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -110,6 +85,6 @@ DECODINGSHARED_EXPORT const char* buildHash();
  * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
  */
 DECODINGSHARED_EXPORT const char* buildHashLong();
-} // namespace DECODINGLIB
+} // namespace mne
 
 #endif // DECODING_GLOBAL_H

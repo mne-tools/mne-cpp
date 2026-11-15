@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Legacy MNE-C noise covariance container preserved for cross-toolchain compatibility.
  *
- * @ref MNELIB::MNECovMatrix mirrors the @c mneCovMatrixRec struct of the
+ * @ref mne::MNECovMatrix mirrors the @c mneCovMatrixRec struct of the
  * original MNE C tooling: a dense or diagonal noise covariance kept as a
  * vector plus eigen-decomposition, used internally by routines ported
  * verbatim from @c mne_inverse_operator. New code should prefer
- * @ref FIFFLIB::FiffCov; this class exists so legacy algorithms can be
+ * @ref mne::FiffCov; this class exists so legacy algorithms can be
  * translated without rewriting their algebra.
  */
 
@@ -55,21 +55,21 @@ inline constexpr auto MNE_COV_CH_EEG = 2;      /**< EEG [V]. */
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffSparseMatrix;
 class FiffChInfo;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNELIB
+namespace mne
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class MNEProjOp;
@@ -99,7 +99,7 @@ public:
      * @param[in] p_cov_diag    Diagonal data (may be empty).
      * @param[in] p_cov_sparse  Sparse covariance data (may be nullptr).
      */
-    MNECovMatrix(int p_kind, int p_ncov, const StringList& p_names, const Eigen::VectorXd& p_cov, const Eigen::VectorXd& p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
+    MNECovMatrix(int p_kind, int p_ncov, const StringList& p_names, const Eigen::VectorXd& p_cov, const Eigen::VectorXd& p_cov_diag, mne::FiffSparseMatrix* p_cov_sparse);
 
     //=========================================================================================================
     /**
@@ -168,7 +168,7 @@ public:
     static std::unique_ptr<MNECovMatrix> create_sparse(int kind,
                                                        int ncov,
                                                        const StringList& names,
-                                                       FIFFLIB::FiffSparseMatrix* cov_sparse)
+                                                       mne::FiffSparseMatrix* cov_sparse)
     {
         return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind, ncov, names, Eigen::VectorXd(), Eigen::VectorXd(), cov_sparse));
     }
@@ -278,7 +278,7 @@ public:
      *
      * @return OK on success, FAIL if channel information is not available.
      */
-    int classify_channels(const std::vector<FIFFLIB::FiffChInfo>& chs, int nchan);
+    int classify_channels(const std::vector<mne::FiffChInfo>& chs, int nchan);
 
     //=========================================================================================================
     /**
@@ -323,7 +323,7 @@ public:
      */
     std::unique_ptr<MNECovMatrix> pick_chs_omit(std::span<const std::string> new_names,
                                                 bool omit_meg_eeg,
-                                                std::span<const FIFFLIB::FiffChInfo> chs = {}) const;
+                                                std::span<const mne::FiffChInfo> chs = {}) const;
 
     int kind;                                                                    /**< Covariance kind: sensor or source. */
     int ncov;                                                                    /**< Dimension (number of channels). */
@@ -333,7 +333,7 @@ public:
     StringList names;                                                            /**< Channel names (optional). */
     Eigen::VectorXd cov;                                                         /**< Packed lower-triangle covariance data (ncov*(ncov+1)/2 elements). */
     Eigen::VectorXd cov_diag;                                                    /**< Diagonal covariance data (ncov elements). */
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> cov_sparse;                       /**< Sparse covariance matrix (note: data are floats). */
+    std::unique_ptr<mne::FiffSparseMatrix> cov_sparse;                           /**< Sparse covariance matrix (note: data are floats). */
     Eigen::VectorXd lambda;                                                      /**< Eigenvalues of the covariance matrix. */
     Eigen::VectorXd inv_lambda;                                                  /**< Inverse square-roots of eigenvalues (for whitening). */
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen; /**< Eigenvectors of the covariance matrix (nzero columns removed). */
@@ -346,6 +346,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // NAMESPACE MNELIB
+} // NAMESPACE mne_mne
 
 #endif // MNECOVMATRIX_H

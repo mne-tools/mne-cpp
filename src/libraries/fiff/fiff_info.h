@@ -14,19 +14,19 @@
  * @date     September 2012
  * @brief    Full FIFF measurement metadata: everything from FIFFB_MEAS / FIFFB_MEAS_INFO needed to interpret a recording.
  *
- * @ref FIFFLIB::FiffInfo is the C++ counterpart of MNE-Python's
+ * @ref mne::FiffInfo is the C++ counterpart of MNE-Python's
  * @c mne.Info dictionary. It collects everything stored under
  * @c FIFFB_MEAS / @c FIFFB_MEAS_INFO of a FIFF file: per-channel
- * descriptors (@ref FIFFLIB::FiffChInfo via @ref FIFFLIB::FiffInfoBase), sampling frequency,
+ * descriptors (@ref mne::FiffChInfo via @ref mne::FiffInfoBase), sampling frequency,
  * lowpass / highpass filter cutoffs, line frequency, measurement date,
- * subject info, experimenter, projector list (@ref FIFFLIB::FiffProj), CTF
- * software compensation list (@ref FIFFLIB::FiffCtfComp), HPI fit results, the
+ * subject info, experimenter, projector list (@ref mne::FiffProj), CTF
+ * software compensation list (@ref mne::FiffCtfComp), HPI fit results, the
  * device→head and CTF compensation transforms, the @c FIFFB_ISOTRAK
- * digitization (@ref FIFFLIB::FiffDigPoint), and the per-channel calibration vectors.
+ * digitization (@ref mne::FiffDigPoint), and the per-channel calibration vectors.
  *
- * Every higher-level container in FIFFLIB (@ref FIFFLIB::FiffRawData,
- * @ref FIFFLIB::FiffEvoked, @ref FIFFLIB::FiffCov, @ref FIFFLIB::FiffEvokedSet) carries a
- * @ref FIFFLIB::FiffInfo so that downstream consumers (filtering, source
+ * Every higher-level container in mne_fiff (@ref mne::FiffRawData,
+ * @ref mne::FiffEvoked, @ref mne::FiffCov, @ref mne::FiffEvokedSet) carries a
+ * @ref mne::FiffInfo so that downstream consumers (filtering, source
  * localization, plotting, BIDS export) can interpret the data without
  * re-reading the file.
  */
@@ -61,14 +61,14 @@
 #include <cstdint>
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 
 //=============================================================================================================
-// FIFFLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class FiffStream;

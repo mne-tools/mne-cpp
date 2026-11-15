@@ -31,8 +31,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ACQLIB;
-using namespace ACQLIB::detail;
+using namespace mne;
+using namespace mne::detail;
 
 //=============================================================================================================
 // STATIC HELPERS
@@ -328,7 +328,7 @@ private:
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-AcqExpected<std::unique_ptr<TmsiTransport>> ACQLIB::detail::openTmsiDriver()
+AcqExpected<std::unique_ptr<TmsiTransport>> mne::detail::openTmsiDriver()
 {
     auto driver = std::make_unique<TmsiDriver>();
     if (AcqError e = driver->open(); !e.ok()) {

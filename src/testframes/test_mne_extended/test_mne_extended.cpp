@@ -5,7 +5,7 @@
  *
  * @file     test_mne_extended.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @brief    Comprehensive tests for MNELIB classes: MNENamedMatrix, MNEEpochData,
+ * @brief    Comprehensive tests for mne_mne classes: MNENamedMatrix, MNEEpochData,
  *        MNEEpochDataList, MNEClusterInfo, MNESourceSpaces, MNEForwardSolution.
  */
 #include <QTest>
@@ -25,8 +25,7 @@
 #include <mne/mne_named_matrix.h>
 #include <fiff/fiff.h>
 
-using namespace MNELIB;
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 class TestMneExtended : public QObject

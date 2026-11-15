@@ -9,11 +9,11 @@
  * @date     March 2026
  * @brief    Declares stream_outlet, the server side of an LSL stream that publishes samples over TCP and answers discovery queries by UDP.
  *
- * A @ref LSLLIB::stream_outlet is the producer counterpart of
- * @ref LSLLIB::stream_inlet "stream_inlet": instantiating it immediately binds a
+ * A @ref mne::stream_outlet is the producer counterpart of
+ * @ref mne::stream_inlet "stream_inlet": instantiating it immediately binds a
  * @c QTcpServer on an OS-assigned port (which is written back into
- * the contained @ref LSLLIB::stream_info so callers can read it via
- * @ref LSLLIB::stream_outlet::info "info"), starts a background worker that answers
+ * the contained @ref mne::stream_info so callers can read it via
+ * @ref mne::stream_outlet::info "info"), starts a background worker that answers
  * liblsl discovery and time-correction queries by UDP, and serves
  * inlets (of this library or of liblsl) over TCP with liblsl's data
  * protocol 1.10 from the outlet's internal sample queue.
@@ -46,10 +46,10 @@
 #include <memory>
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace LSLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -123,6 +123,6 @@ private:
     std::unique_ptr<StreamOutletPrivate> m_pImpl;
 };
 
-} // namespace LSLLIB
+} // namespace mne
 
 #endif // LSL_STREAM_OUTLET_H

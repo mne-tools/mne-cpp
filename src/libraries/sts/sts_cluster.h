@@ -14,7 +14,7 @@
  * implements the standard fix: form an observed statistic map, threshold
  * it at an a-priori cluster-forming level, group the supra-threshold
  * samples into spatially (or spatio-temporally) connected clusters using
- * a sparse adjacency graph from @ref STSLIB::StatsAdjacency and assign
+ * a sparse adjacency graph from @ref mne::StatsAdjacency and assign
  * each cluster a cluster-mass test statistic equal to the sum of the
  * underlying t- or F-values.
  *
@@ -57,10 +57,10 @@
 #include <Eigen/SparseCore>
 
 //=============================================================================================================
-// DEFINE NAMESPACE STSLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace STSLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -271,6 +271,6 @@ private:
         double threshold);
 };
 
-} // namespace STSLIB
+} // namespace mne
 
 #endif // STS_CLUSTER_H

@@ -46,9 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-using namespace MATHLIB;
-using namespace BASELIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -537,7 +535,7 @@ FiffEvoked FiffEvoked::combine(const std::vector<FiffEvoked>& evokeds, const Vec
         res.data += w * e.data;
         invNave += w * w / e.nave;
         for (const std::string& bad : e.info.bads) {
-            if (!FIFFLIB::has_channel(res.info.bads, bad)) {
+            if (!mne::has_channel(res.info.bads, bad)) {
                 res.info.bads.push_back(bad);
             }
         }

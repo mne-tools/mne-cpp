@@ -9,21 +9,21 @@
  * @date     March 2026
  * @brief    Declares stream_inlet, the client side of an LSL connection that pulls multichannel sample chunks from a remote outlet.
  *
- * A @ref LSLLIB::stream_inlet is constructed from a resolved
- * @ref LSLLIB::stream_info (typically obtained via
- * @ref LSLLIB::resolve_streams) and represents a one-way TCP
+ * A @ref mne::stream_inlet is constructed from a resolved
+ * @ref mne::stream_info (typically obtained via
+ * @ref mne::resolve_streams) and represents a one-way TCP
  * connection to the corresponding outlet, of this library or of
  * liblsl, speaking liblsl's data protocol 1.10. The class wraps the
  * @c QTcpSocket plumbing and the sample decoding behind a PIMPL so
  * that the public header pulls in no Qt network symbols.
  *
  * The data path is intentionally chunked rather than
- * sample-at-a-time: @ref LSLLIB::stream_inlet::samples_available "samples_available" drains pending bytes off
- * the socket in a non-blocking pass and @ref LSLLIB::stream_inlet::pull_chunk "pull_chunk" returns
+ * sample-at-a-time: @ref mne::stream_inlet::samples_available "samples_available" drains pending bytes off
+ * the socket in a non-blocking pass and @ref mne::stream_inlet::pull_chunk "pull_chunk" returns
  * every fully-received multichannel sample in one call, which is the
  * pattern that real-time acquisition pipelines in mne-cpp (sensor
  * plug-ins under @c applications/mne_scan_plugins) consume most
- * efficiently. The templated @ref LSLLIB::stream_inlet::pull_chunk "pull_chunk" is provided purely for
+ * efficiently. The templated @ref mne::stream_inlet::pull_chunk "pull_chunk" is provided purely for
  * source-level compatibility with liblsl; in this implementation
  * only the @c float specialisation is wired up: samples of every
  * numeric channel format are converted to float (int32, int64 and
@@ -49,10 +49,10 @@
 #include <type_traits>
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace LSLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -167,6 +167,6 @@ private:
     std::unique_ptr<StreamInletPrivate> m_pImpl;
 };
 
-} // namespace LSLLIB
+} // namespace mne
 
 #endif // LSL_STREAM_INLET_H

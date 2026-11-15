@@ -38,10 +38,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DSPLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace DSPLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -93,11 +93,11 @@ public:
      * @return Vector of MNEEpochData (one per valid event).  Rejected epochs are included with
      *         MNEEpochData::bReject == true so callers can choose whether to exclude them.
      */
-    static std::vector<MNELIB::MNEEpochData> extract(const Eigen::MatrixXd& matData,
-                                                     const std::vector<int>& eventSamples,
-                                                     double dSFreq,
-                                                     const Params& params = Params(),
-                                                     const std::vector<int>& eventCodes = std::vector<int>());
+    static std::vector<mne::MNEEpochData> extract(const Eigen::MatrixXd& matData,
+                                                  const std::vector<int>& eventSamples,
+                                                  double dSFreq,
+                                                  const Params& params = Params(),
+                                                  const std::vector<int>& eventCodes = std::vector<int>());
 
     //=========================================================================================================
     /**
@@ -107,7 +107,7 @@ public:
      *
      * @return Mean data matrix (n_channels × n_epoch_samples), or empty matrix if no good epochs.
      */
-    static Eigen::MatrixXd average(const std::vector<MNELIB::MNEEpochData>& epochs);
+    static Eigen::MatrixXd average(const std::vector<mne::MNEEpochData>& epochs);
 
     //=========================================================================================================
     /**
@@ -117,7 +117,7 @@ public:
      *
      * @return Subset of epochs with bReject == false.
      */
-    static std::vector<MNELIB::MNEEpochData> rejectMarked(const std::vector<MNELIB::MNEEpochData>& epochs);
+    static std::vector<mne::MNEEpochData> rejectMarked(const std::vector<mne::MNEEpochData>& epochs);
 
 private:
     //=========================================================================================================
@@ -134,6 +134,6 @@ private:
     static void applyBaseline(Eigen::MatrixXd& matEpoch, int iBase0, int iBase1);
 };
 
-} // namespace DSPLIB
+} // namespace mne
 
 #endif // EPOCH_EXTRACTOR_DSP_H

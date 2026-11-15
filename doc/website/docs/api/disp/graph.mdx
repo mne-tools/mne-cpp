@@ -1,21 +1,21 @@
 ---
 id: graph
-title: "DISPLIB::Graph"
+title: "mne::disp::Graph"
 sidebar_label: Graph
 sidebar_position: 35
 ---
 
 # Graph
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/graph.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/graph.h)
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/graph.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/graph.h)
 
 `#include <disp/graph.h>`
 
 ```cpp
-class DISPLIB::Graph
+class mne::disp::Graph
 ```
 
-Common base widget providing title, axis labels and resize handling for `DISPLIB`'s QPainter plots.
+Common base widget providing title, axis labels and resize handling for mne_disp's QPainter plots.
 
 Subclasses such as [`Plot`](/docs/api/disp/plot) and [`ImageSc`](/docs/api/disp/image-sc) paint inside the content rectangle that [`Graph`](/docs/api/disp/graph) leaves free after stamping the title bar at the top and the x / y axis labels on the bottom and left margins.
 

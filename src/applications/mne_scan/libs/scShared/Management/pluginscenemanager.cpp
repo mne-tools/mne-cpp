@@ -28,7 +28,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SCSHAREDLIB;
+using namespace mne::scan;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -36,7 +36,7 @@ using namespace SCSHAREDLIB;
 
 PluginSceneManager::PluginSceneManager(QObject* parent)
 : QObject(parent)
-, m_pPipelineGraph(std::make_unique<MNALIB::MnaGraph>())
+, m_pPipelineGraph(std::make_unique<mne::MnaGraph>())
 {
 }
 
@@ -198,14 +198,14 @@ void PluginSceneManager::stopNonSensorPlugins()
 // MnaGraph management
 //=============================================================================================================
 
-MNALIB::MnaGraph& PluginSceneManager::pipelineGraph()
+mne::MnaGraph& PluginSceneManager::pipelineGraph()
 {
     return *m_pPipelineGraph;
 }
 
 //=============================================================================================================
 
-const MNALIB::MnaGraph& PluginSceneManager::pipelineGraph() const
+const mne::MnaGraph& PluginSceneManager::pipelineGraph() const
 {
     return *m_pPipelineGraph;
 }
@@ -214,10 +214,10 @@ const MNALIB::MnaGraph& PluginSceneManager::pipelineGraph() const
 
 void PluginSceneManager::addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal guiX, qreal guiY)
 {
-    MNALIB::MnaNode node;
+    mne::MnaNode node;
     node.id = pPlugin->getName();
     node.opType = pPlugin->getName();
-    node.execMode = MNALIB::MnaNodeExecMode::Stream;
+    node.execMode = mne::MnaNodeExecMode::Stream;
     node.dirty = true;
 
     node.attributes.insert(QStringLiteral("gui_x"), guiX);
@@ -230,9 +230,9 @@ void PluginSceneManager::addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal
 
     // Build output ports from plugin output connectors
     for (int i = 0; i < pPlugin->getOutputConnectors().size(); ++i) {
-        MNALIB::MnaPort outPort;
+        mne::MnaPort outPort;
         outPort.name = pPlugin->getOutputConnectors()[i]->getName();
-        outPort.direction = MNALIB::MnaPortDir::Output;
+        outPort.direction = mne::MnaPortDir::Output;
         outPort.dataKind = connectorDataTypeToMnaDataKind(
             PluginConnectorConnection::getDataType(pPlugin->getOutputConnectors()[i]));
         node.outputs.append(outPort);
@@ -240,9 +240,9 @@ void PluginSceneManager::addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal
 
     // Build input ports from plugin input connectors
     for (int i = 0; i < pPlugin->getInputConnectors().size(); ++i) {
-        MNALIB::MnaPort inPort;
+        mne::MnaPort inPort;
         inPort.name = pPlugin->getInputConnectors()[i]->getName();
-        inPort.direction = MNALIB::MnaPortDir::Input;
+        inPort.direction = mne::MnaPortDir::Input;
         inPort.dataKind = connectorDataTypeToMnaDataKind(
             PluginConnectorConnection::getDataType(pPlugin->getInputConnectors()[i]));
         node.inputs.append(inPort);
@@ -264,10 +264,10 @@ void PluginSceneManager::connectGraphNodes(const AbstractPlugin::SPtr& pSender,
                                            const AbstractPlugin::SPtr& pReceiver)
 {
     // Find matching output→input ports by data kind
-    const MNALIB::MnaNode& srcNode = m_pPipelineGraph->node(pSender->getName());
-    MNALIB::MnaNode& dstNode = m_pPipelineGraph->node(pReceiver->getName());
+    const mne::MnaNode& srcNode = m_pPipelineGraph->node(pSender->getName());
+    mne::MnaNode& dstNode = m_pPipelineGraph->node(pReceiver->getName());
 
-    for (const MNALIB::MnaPort& outPort : srcNode.outputs) {
+    for (const mne::MnaPort& outPort : srcNode.outputs) {
         for (int i = 0; i < dstNode.inputs.size(); ++i) {
             if (dstNode.inputs[i].dataKind == outPort.dataKind && dstNode.inputs[i].sourceNodeId.isEmpty()) {
                 m_pPipelineGraph->connect(pSender->getName(), outPort.name,
@@ -284,7 +284,7 @@ void PluginSceneManager::updateGraphNodePosition(const AbstractPlugin::SPtr& pPl
                                                  qreal guiX, qreal guiY)
 {
     if (m_pPipelineGraph->hasNode(pPlugin->getName())) {
-        MNALIB::MnaNode& n = m_pPipelineGraph->node(pPlugin->getName());
+        mne::MnaNode& n = m_pPipelineGraph->node(pPlugin->getName());
         n.attributes.insert(QStringLiteral("gui_x"), guiX);
         n.attributes.insert(QStringLiteral("gui_y"), guiY);
     }
@@ -297,7 +297,7 @@ void PluginSceneManager::refreshGraphNodeAttributes()
     for (const auto& pPlugin : m_pluginList) {
         if (!m_pPipelineGraph->hasNode(pPlugin->getName()))
             continue;
-        MNALIB::MnaNode& node = m_pPipelineGraph->node(pPlugin->getName());
+        mne::MnaNode& node = m_pPipelineGraph->node(pPlugin->getName());
         const QVariantMap pluginAttrs = pPlugin->getAttributes();
         for (auto it = pluginAttrs.constBegin(); it != pluginAttrs.constEnd(); ++it)
             node.attributes.insert(it.key(), it.value());

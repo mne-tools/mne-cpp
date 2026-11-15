@@ -1,18 +1,18 @@
 ---
 id: inv-hpi-fit-data
-title: "INVLIB::InvHpiFitData"
+title: "mne::InvHpiFitData"
 sidebar_label: InvHpiFitData
 sidebar_position: 30
 ---
 
 # InvHpiFitData
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit_data.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit_data.h)
 
 `#include <inv/inv_hpi_fit_data.h>`
 
 ```cpp
-class INVLIB::InvHpiFitData
+class mne::InvHpiFitData
 ```
 
 Per-coil magnetic-dipole fitter: computes the infinite-medium leadfield for a candidate coil position, evaluates the residual against the projected MEG sample and refines the position with a Nelder-Mead simplex search.
@@ -64,7 +64,7 @@ dipfit function is adapted from Fieldtrip Software.
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 136"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 135"
 // One coil's magnetic-dipole fit, as InvHpiFit runs it per coil: seeded 5 mm off the fitted position.
 const MatrixXd coilsDevice = fit.devHeadTrans.apply_inverse_trans(updater.getHpiDigitizer().cast<float>()).cast<double>();
 InvHpiFitData coilFit;

@@ -7,9 +7,9 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Vertical column of channel-name labels synced with @ref DISPLIB::ChannelDataView's row geometry.
+ * @brief    Vertical column of channel-name labels synced with @ref mne::disp::ChannelDataView's row geometry.
  *
- * ChannelLabelPanel listens to the same @ref DISPLIB::ChannelDataModel as the
+ * ChannelLabelPanel listens to the same @ref mne::disp::ChannelDataModel as the
  * central data view and paints each visible channel's label aligned
  * to the row centre. Bad channels are greyed out and label clicks
  * emit a channel-selection signal that the data view consumes.
@@ -33,14 +33,14 @@
 #include <QWidget>
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class ChannelDataModel;
@@ -154,6 +154,6 @@ private:
     int m_dragStartFirst = 0;
 };
 
-} // namespace DISPLIB
+} // namespace mne::disp
 
 #endif // CHANNELLABELPANEL_H

@@ -51,10 +51,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISPLIB;
-using namespace DSPLIB;
-using namespace BASELIB;
-using namespace FIFFLIB;
+using namespace mne::disp;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -192,7 +190,7 @@ QVariant RtFiffRawViewModel::data(const QModelIndex& index, int role) const
 
         //******** third column (bad channel) ********
         if (index.column() == 2 && role == Qt::DisplayRole) {
-            return QVariant(BASELIB::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[row]));
+            return QVariant(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[row]));
         } // end column check
 
     } // end index.valid() check
@@ -236,13 +234,13 @@ QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation
 void RtFiffRawViewModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
-    MATHLIB::read_matrix(m_matSpharaVVGradLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt")).toStdString());
-    MATHLIB::read_matrix(m_matSpharaVVMagLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt")).toStdString());
+    mne::read_matrix(m_matSpharaVVGradLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt")).toStdString());
+    mne::read_matrix(m_matSpharaVVMagLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt")).toStdString());
 
-    MATHLIB::read_matrix(m_matSpharaBabyMEGInnerLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt")).toStdString());
-    MATHLIB::read_matrix(m_matSpharaBabyMEGOuterLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt")).toStdString());
+    mne::read_matrix(m_matSpharaBabyMEGInnerLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt")).toStdString());
+    mne::read_matrix(m_matSpharaBabyMEGOuterLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt")).toStdString());
 
-    MATHLIB::read_matrix(m_matSpharaEEGLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt")).toStdString());
+    mne::read_matrix(m_matSpharaEEGLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt")).toStdString());
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -297,7 +295,7 @@ void RtFiffRawViewModel::initSphara()
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<FIFFLIB::FiffInfo>& p_pFiffInfo)
+void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo)
 {
     if (p_pFiffInfo) {
         RowVectorXi sel; // = RowVectorXi(0,0);
@@ -438,7 +436,7 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
 
         QList<QPair<int, double>> lTriggers;
         if (m_bTriggerDetectionActive) {
-            lTriggers = DSPLIB::detectTriggerFlanksMax(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
+            lTriggers = mne::detectTriggerFlanksMax(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
         }
 
         forWrappedSpan(m_iCurrentSample, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
@@ -642,7 +640,7 @@ void RtFiffRawViewModel::setScaling(const QMap<qint32, float>& p_qMapChScaling)
 
 //=============================================================================================================
 
-void RtFiffRawViewModel::updateProjection(const std::vector<FIFFLIB::FiffProj>& projs)
+void RtFiffRawViewModel::updateProjection(const std::vector<mne::FiffProj>& projs)
 {
     //  Update the SSP projector
     if (m_pFiffInfo) {
@@ -722,16 +720,16 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
         MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
         if (sSytemType == "VectorView" && m_matSpharaVVGradLoaded.size() != 0 && m_matSpharaVVMagLoaded.size() != 0) {
-            matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1);   //GRADIOMETERS
-            matSpharaMultSecond = DSPLIB::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1);   //GRADIOMETERS
+            matSpharaMultSecond = mne::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
         }
 
         if (sSytemType == "BabyMEG" && m_matSpharaBabyMEGInnerLoaded.size() != 0) {
-            matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
         if (sSytemType == "EEG" && m_matSpharaEEGLoaded.size() != 0) {
-            matSpharaMultFirst = DSPLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
 
@@ -799,11 +797,11 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
     const std::vector<FiffChInfo>& chInfolist = m_pFiffInfo->chs;
 
     if (status) {
-        if (!BASELIB::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name))
+        if (!mne::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name))
             m_pFiffInfo->bads.push_back(chInfolist[ch.row()].ch_name);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
-    } else if (BASELIB::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name)) {
-        int index = BASELIB::indexOf(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name);
+    } else if (mne::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name)) {
+        int index = mne::indexOf(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name);
         m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
     }
@@ -868,11 +866,11 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 
     for (int i = 0; i < chlist.size(); ++i) {
         if (status) {
-            if (!BASELIB::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name))
+            if (!mne::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.push_back(chInfolist[chlist[i].row()].ch_name);
         } else {
-            if (BASELIB::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name)) {
-                int index = BASELIB::indexOf(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name);
+            if (mne::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name)) {
+                int index = mne::indexOf(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name);
                 m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
             }
         }

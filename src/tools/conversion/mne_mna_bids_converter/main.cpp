@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNALIB;
+using namespace mne;
 
 //=============================================================================================================
 // BIDS HELPERS
@@ -452,7 +452,7 @@ static void printUsage(QTextStream& out)
 
 int main(int argc, char* argv[])
 {
-    BASELIB::Log::install_qt_message_handler();
+    mne::Log::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_mna_bids_converter"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));

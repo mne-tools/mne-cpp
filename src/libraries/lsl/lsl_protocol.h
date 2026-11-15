@@ -42,10 +42,10 @@
 #include <QUdpSocket>
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLLIB::detail
+// DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
-namespace LSLLIB::detail
+namespace mne::detail
 {
 
 inline constexpr quint16 kDiscoveryPort = 16571;       /**< UDP port outlets listen on for queries. */
@@ -186,6 +186,6 @@ LSLSHARED_EXPORT bool bindQuerySocket(QUdpSocket& socket, quint16 port);
  */
 LSLSHARED_EXPORT bool waitForDatagrams(QUdpSocket& socket, quint16 port, int ms);
 
-} // namespace LSLLIB::detail
+} // namespace mne::detail
 
 #endif // LSL_PROTOCOL_H

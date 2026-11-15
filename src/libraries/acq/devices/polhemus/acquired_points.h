@@ -36,10 +36,10 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// DEFINE NAMESPACE ACQLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace ACQLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -108,7 +108,7 @@ public:
     }
 
     /**
-     * Append a new point and emit @c ACQLIB::AcquiredPoints::pointsChanged "pointsChanged".
+     * Append a new point and emit @c mne::AcquiredPoints::pointsChanged "pointsChanged".
      *
      * @param[in] p Captured point to append.
      */
@@ -259,6 +259,6 @@ private:
     QMap<int, Eigen::Vector3f> m_twinFiducials; ///< BEM-space fiducials keyed by FiducialId
 };
 
-} // namespace ACQLIB
+} // namespace mne
 
 #endif // ACQ_ACQUIRED_POINTS_H

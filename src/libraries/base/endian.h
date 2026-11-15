@@ -23,10 +23,10 @@
 #include <type_traits>
 
 //=============================================================================================================
-// DEFINE NAMESPACE BASELIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace BASELIB
+namespace mne
 {
 
 /** Integers and floating-point values of 1, 2, 4 or 8 bytes. */
@@ -99,6 +99,6 @@ void byteSwapInPlace(T* data, std::size_t count) noexcept
     }
 }
 
-} // namespace BASELIB
+} // namespace mne
 
 #endif // BASE_ENDIAN_H

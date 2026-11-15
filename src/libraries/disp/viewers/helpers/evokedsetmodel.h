@@ -14,8 +14,8 @@
  *
  * EvokedSetModel exposes one row per FIFF channel and one column per
  * condition; each cell yields the underlying time-series view
- * (plus colour / visibility) needed by @ref DISPLIB::ButterflyView and
- * @ref DISPLIB::AverageLayoutView. It also propagates baseline-correction,
+ * (plus colour / visibility) needed by @ref mne::disp::ButterflyView and
+ * @ref mne::disp::AverageLayoutView. It also propagates baseline-correction,
  * SSP-projection and bad-channel updates so the visualisations stay
  * in sync with the latest pre-processing settings.
  */
@@ -53,21 +53,21 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
+namespace mne
 {
 class FiffEvokedSet;
 class FiffProj;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace EvokedSetModelRoles
@@ -85,7 +85,7 @@ enum ItemRole
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
 typedef QPair<const double*, qint32> RowVectorPair;
 typedef QPair<QString, Eigen::RowVectorXd> AvrTypeRowVector;
-typedef QPair<QString, DISPLIB::RowVectorPair> AvrTypeRowVectorPair;
+typedef QPair<QString, mne::disp::RowVectorPair> AvrTypeRowVectorPair;
 
 //=============================================================================================================
 /**
@@ -195,10 +195,10 @@ public:
      *
      * @param[in] pEvokedSet      The evoked set.
      */
-    void setEvokedSet(std::shared_ptr<FIFFLIB::FiffEvokedSet> pEvokedSet);
+    void setEvokedSet(std::shared_ptr<mne::FiffEvokedSet> pEvokedSet);
 
     //=========================================================================================================
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> getEvokedSet();
+    std::shared_ptr<mne::FiffEvokedSet> getEvokedSet();
 
     //=========================================================================================================
     /**
@@ -246,7 +246,7 @@ public:
      *
      * @return kind of given channel number.
      */
-    FIFFLIB::fiff_int_t getKind(qint32 row) const;
+    mne::fiff_int_t getKind(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ public:
      *
      * @return unit of given channel number.
      */
-    FIFFLIB::fiff_int_t getUnit(qint32 row) const;
+    mne::fiff_int_t getUnit(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -276,7 +276,7 @@ public:
      *
      * @return coil type of given channel number.
      */
-    FIFFLIB::fiff_int_t getCoil(qint32 row) const;
+    mne::fiff_int_t getCoil(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -362,7 +362,7 @@ public:
      *
      * @param[in] projs  SSP projectors to store in the evoked set info and build the projection matrix from.
      */
-    void updateProjection(const std::vector<FIFFLIB::FiffProj>& projs);
+    void updateProjection(const std::vector<mne::FiffProj>& projs);
 
     //=========================================================================================================
     /**
@@ -379,7 +379,7 @@ public:
     void toggleFreeze();
 
 private:
-    std::shared_ptr<FIFFLIB::FiffEvokedSet> m_pEvokedSet; /**< The evoked set measurement. */
+    std::shared_ptr<mne::FiffEvokedSet> m_pEvokedSet; /**< The evoked set measurement. */
 
     QMap<qint32, qint32> m_qMapIdxRowSelection;                      /**< Selection mapping.*/
     std::shared_ptr<QMap<QString, QColor>> m_qMapAverageColor;       /**< Average colors. */

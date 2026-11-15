@@ -1,18 +1,18 @@
 ---
 id: electrode-layout
-title: "CHANNELSLIB::ElectrodeLayout"
+title: "mne::ElectrodeLayout"
 sidebar_label: ElectrodeLayout
 sidebar_position: 58
 ---
 
 # ElectrodeLayout
 
-**Namespace:** `CHANNELSLIB` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutloader.h)
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Channels Library &nbsp;·&nbsp; **Source:** [`channels/layoutloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/channels/layoutloader.h)
 
 `#include <channels/layoutloader.h>`
 
 ```cpp
-struct CHANNELSLIB::ElectrodeLayout
+struct mne::ElectrodeLayout
 ```
 
 The electrodes of an .elc file, in file order.
@@ -36,7 +36,7 @@ const std::optional<ElectrodeLayout> cap = LayoutLoader::read_elc(dir / "cap.elc
 
 Channels library: montages, layouts and selections.
 
-````cpp title="src/examples/ex_channels/main.cpp, line 117"
+````cpp title="src/examples/ex_channels/main.cpp, line 116"
                                   "Labels\nFp1\tCz\n";
 // ANT .elc electrode file: names, 3-D positions and their unit
 const std::optional<ElectrodeLayout> cap = LayoutLoader::read_elc(dir / "cap.elc");

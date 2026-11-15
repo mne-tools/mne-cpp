@@ -48,7 +48,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -93,7 +93,7 @@ RowVectorXi TestFiffRawSavePython::picks() const
     const QStringList names{"MEG 0113", "MEG 0112", "MEG 0111", "EEG 001", "STI 014", "EOG 061"};
     RowVectorXi sel(names.size());
     for (int k = 0; k < names.size(); ++k)
-        sel[k] = static_cast<int>(BASELIB::indexOf(m_raw.info.ch_names, names[k].toStdString()));
+        sel[k] = static_cast<int>(mne::indexOf(m_raw.info.ch_names, names[k].toStdString()));
     return sel;
 }
 

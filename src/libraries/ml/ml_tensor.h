@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    N-dimensional, row-major, reference-counted float32 tensor used as the universal MLLIB data carrier.
+ * @brief    N-dimensional, row-major, reference-counted float32 tensor used as the universal mne_ml data carrier.
  *
- * @ref MLLIB::MlTensor is the interchange type that crosses every
- * MLLIB boundary: feature matrices going into a classifier, batched
+ * @ref mne::MlTensor is the interchange type that crosses every
+ * mne_ml boundary: feature matrices going into a classifier, batched
  * activations between pre-processing and inference, prediction tensors
  * coming back from ONNX Runtime. The storage is contiguous row-major
  * float32 wrapped in a @c std::shared_ptr buffer so copies, reshapes
@@ -52,10 +52,10 @@
 #include <vector>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MLLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MLLIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -272,6 +272,6 @@ private:
     int64_t m_size = 0;                            /**< Cached total element count. */
 };
 
-} // namespace MLLIB
+} // namespace mne
 
 #endif // ML_TENSOR_H

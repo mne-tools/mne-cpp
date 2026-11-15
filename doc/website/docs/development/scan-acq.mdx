@@ -23,15 +23,15 @@ The source has no Qt dependency and works the same from any program, e.g. `mne_a
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 
-ACQLIB::register_gusbamp_scheme();
-auto device = ACQLIB::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512");
-auto reader = device->stream().reader(ACQLIB::AcqReader::ReadMode::Lossless);
+mne::register_gusbamp_scheme();
+auto device = mne::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512");
+auto reader = device->stream().reader(mne::AcqReader::ReadMode::Lossless);
 device->start();
 ```
 
 ## Data Flow
 
-`start()` of the plugin opens the source, converts its stream description to a `FiffInfo` with `ACQLIB::toFiffInfo()`, creates a Lossless reader and starts the source and the plugin thread. The plugin thread reads blocks of the configured size in physical units with `AcqReader::read()` and passes them to its `RealTimeMultiSampleArray`. `stop()` interrupts the plugin thread and closes the source, which stops its acquisition thread and releases the device.
+`start()` of the plugin opens the source, converts its stream description to a `FiffInfo` with `mne::toFiffInfo()`, creates a Lossless reader and starts the source and the plugin thread. The plugin thread reads blocks of the configured size in physical units with `AcqReader::read()` and passes them to its `RealTimeMultiSampleArray`. `stop()` interrupts the plugin thread and closes the source, which stops its acquisition thread and releases the device.
 
 ## Key Classes
 

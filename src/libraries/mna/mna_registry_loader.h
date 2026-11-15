@@ -7,23 +7,23 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Declarative loader for @ref MNALIB::MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
+ * @brief    Declarative loader for @ref mne::MnaOpRegistry contents — ingests @c mna-registry.json manifests and overrides them with drop-ins under @c mna-registry.d/.
  *
- * @ref MNALIB::MnaRegistryLoader is the bridge between the on-disk
+ * @ref mne::MnaRegistryLoader is the bridge between the on-disk
  * representation of MNA op schemas (JSON manifests authored by
  * library and tool maintainers) and the in-memory
- * @ref MNALIB::MnaOpRegistry consulted by the validator and executor. A
+ * @ref mne::MnaOpRegistry consulted by the validator and executor. A
  * manifest carries an @c mna_registry_version field for future-
  * proofing, a @c provider name for diagnostics, and an @c ops
- * array whose entries are deserialised into @ref MNALIB::MnaOpSchema
+ * array whose entries are deserialised into @ref mne::MnaOpSchema
  * instances.
  *
- * @ref MNALIB::MnaRegistryLoader::loadFile "loadFile" handles a single manifest, @ref MNALIB::MnaRegistryLoader::loadDirectory "loadDirectory"
+ * @ref mne::MnaRegistryLoader::loadFile "loadFile" handles a single manifest, @ref mne::MnaRegistryLoader::loadDirectory "loadDirectory"
  * loads the master @c mna-registry.json first and then every
  * @c *.json drop-in from @c mna-registry.d/ in alphabetical order;
  * later files overwrite earlier definitions for the same op type,
  * which is the mechanism plug-ins use to extend or shadow built-in
- * operations. @ref MNALIB::MnaRegistryLoader::saveFile "saveFile" re-emits the current registry to a
+ * operations. @ref mne::MnaRegistryLoader::saveFile "saveFile" re-emits the current registry to a
  * canonical manifest so a running process can publish the exact
  * op surface it offers.
  */
@@ -47,16 +47,16 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 class MnaOpRegistry;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -109,6 +109,6 @@ public:
                          const MnaOpRegistry& registry);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_REGISTRY_LOADER_H

@@ -14,12 +14,12 @@
  * @brief    Butterfly plot overlaying every channel of one or more averaged conditions.
  *
  * ButterflyView is a @c QWidget that paints all averaged traces of
- * the active @ref DISPLIB::EvokedSetModel with @c QPainter, decimated to
+ * the active @ref mne::disp::EvokedSetModel with @c QPainter, decimated to
  * the widget width. Per-modality visibility (@c MAG / @c GRAD / @c EEG) is
- * toggled through @ref DISPLIB::ModalitySelectionView and the colour /
- * selection of conditions through @ref DISPLIB::AverageSelectionView. The
+ * toggled through @ref mne::disp::ModalitySelectionView and the colour /
+ * selection of conditions through @ref mne::disp::AverageSelectionView. The
  * widget is the workhorse evoked viewer in MNE-Scan and is intended
- * to live as a tab inside a @ref DISPLIB::MultiView dock.
+ * to live as a tab inside a @ref mne::disp::MultiView dock.
  */
 
 #ifndef BUTTERFLYVIEW_H
@@ -46,14 +46,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 class EvokedSetModel;

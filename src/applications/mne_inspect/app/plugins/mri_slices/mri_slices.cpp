@@ -38,8 +38,8 @@
 //=============================================================================================================
 
 using namespace MRISLICESPLUGIN;
-using namespace DISP3DLIB;
-using namespace MRILIB;
+using namespace mne::disp;
+using namespace mne;
 
 namespace
 {

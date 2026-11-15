@@ -21,13 +21,13 @@
  * introduced PDC explicitly to separate direct from indirect causal
  * pathways: a relay @c j -> k -> i contributes 0 to @c PDC_{ij} because
  * the direct coefficient @c A_{ij}(f) is zero, in contrast to
- * @ref CONNECTIVITYLIB::DirectedTransferFunction which would still flag the indirect
+ * @ref mne::DirectedTransferFunction which would still flag the indirect
  * route.
  *
  * PDC therefore plays the role that partial correlation plays in static
  * Gaussian models: it removes the influence of all other channels in the
  * MVAR system before measuring the @c j -> i interaction. Like DTF and
- * @ref CONNECTIVITYLIB::GrangerCausality, PDC reuses the @ref CONNECTIVITYLIB::MvarModel fit, so requesting
+ * @ref mne::GrangerCausality, PDC reuses the @ref mne::MvarModel fit, so requesting
  * all three metrics in one batch costs only one Levinson-Durbin solve.
  */
 
@@ -53,14 +53,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE CONNECTIVITYLIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace CONNECTIVITYLIB
+namespace mne
 {
 
 //=============================================================================================================
-// CONNECTIVITYLIB FORWARD DECLARATIONS
+// mne FORWARD DECLARATIONS
 //=============================================================================================================
 
 class Network;
@@ -107,6 +107,6 @@ public:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-} // namespace CONNECTIVITYLIB
+} // namespace mne
 
 #endif // PARTIALDIRECTEDCOHERENCE_H

@@ -9,11 +9,11 @@
  * @date     April 2026
  * @brief    Reference to a file inside an MNA project — relative path, semantic role, SHA-256 hash, and optional embedded payload.
  *
- * @ref MNALIB::MnaFileRef is the leaf node of an MNA project tree. Every raw
+ * @ref mne::MnaFileRef is the leaf node of an MNA project tree. Every raw
  * recording, forward/inverse operator, covariance matrix, BEM model
  * or annotation that belongs to a subject is recorded as one of
  * these structures, never as a bare path string, so the container
- * always knows what the file @em is (via @ref MNALIB::MnaFileRole "MnaFileRole"), what
+ * always knows what the file @em is (via @ref mne::MnaFileRole "MnaFileRole"), what
  * format it carries (FIFF, MGH, STC, …), how big it is, and whether
  * its bytes have changed since the project was last saved.
  *
@@ -49,10 +49,10 @@
 #include <QSet>
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNALIB
+// DEFINE NAMESPACE mne
 //=============================================================================================================
 
-namespace MNALIB
+namespace mne
 {
 
 //=============================================================================================================
@@ -109,6 +109,6 @@ struct MNASHARED_EXPORT MnaFileRef
     static MnaFileRef fromCbor(const QCborMap& cbor);
 };
 
-} // namespace MNALIB
+} // namespace mne
 
 #endif // MNA_FILE_REF_H

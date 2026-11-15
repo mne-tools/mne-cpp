@@ -10,11 +10,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Channel-selection group descriptor (@ref DISPLIB::SelectionItem) and the matching @c QGraphicsItem (@ref DISPLIB::SelectionSceneItem).
+ * @brief    Channel-selection group descriptor (@ref mne::disp::SelectionItem) and the matching @c QGraphicsItem (@ref mne::disp::SelectionSceneItem).
  *
  * SelectionItem is a value type holding a named list of channel names
  * loaded from an MNE @c .sel file. SelectionSceneItem is the visual
- * @c QGraphicsItem drawn for each sensor inside @ref DISPLIB::SelectionScene;
+ * @c QGraphicsItem drawn for each sensor inside @ref mne::disp::SelectionScene;
  * it tracks selection / hover state and paints itself with the
  * modality-specific colour and shape.
  */
@@ -39,14 +39,14 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// DEFINE NAMESPACE DISPLIB
+// DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
-namespace DISPLIB
+namespace mne::disp
 {
 
 //=============================================================================================================
-// DISPLIB FORWARD DECLARATIONS
+// mne::disp FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
@@ -131,6 +131,6 @@ public:
     bool m_bIsBadChannel;        /**< Whether this item is a bad channel.*/
 };
 
-} // NAMESPACE DISPLIB
+} // NAMESPACE mne_disp
 
 #endif // SELECTIONSCENEITEM_H

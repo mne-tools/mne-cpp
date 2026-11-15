@@ -40,7 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANSHAREDLIB;
+using namespace mne::analyze;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -62,8 +62,8 @@ StatusBar::StatusBar(QWidget* pParent)
     connect(m_pCommunicator.get(), &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
 
-    m_pProgressView = new DISPLIB::ProgressView(true,
-                                                "QLabel { color : red; }");
+    m_pProgressView = new mne::disp::ProgressView(true,
+                                                  "QLabel { color : red; }");
 
     this->addPermanentWidget(m_pProgressView);
     m_pProgressView->hide();
