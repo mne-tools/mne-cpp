@@ -148,7 +148,7 @@ for (const FiffChInfo& ch : raw.info.chs) {
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 78"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 79"
         const FiffChInfo& ch = info.chs[meg[k]];
         const Vector3d r = ch.chpos.r0.cast<double>() - pos;
         const double d = r.norm();

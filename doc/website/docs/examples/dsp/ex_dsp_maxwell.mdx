@@ -73,9 +73,9 @@ The documented classes this example uses most:
 | [`FineCalibration`](../../api/dsp/fine-calibration.mdx) | Signal Processing |
 | [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
 | [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
-| [`HeadPosEntry`](../../api/dsp/head-pos-entry.mdx) | Signal Processing |
 | [`BadChannelsMaxwellParams`](../../api/dsp/bad-channels-maxwell-params.mdx) | Signal Processing |
 | [`BadChannelsMaxwellResult`](../../api/dsp/bad-channels-maxwell-result.mdx) | Signal Processing |
+| [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
 
 ## Used in the API reference
 
@@ -144,6 +144,7 @@ The documented classes this example uses most:
 
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
 #include <format>
 #include <print>
 #include <string_view>
@@ -260,15 +261,15 @@ int main(int argc, char* argv[])
     const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
 
     QTemporaryDir dir;
-    const QString posPath = dir.filePath("head.pos"); // same columns as mne.chpi.write_head_pos
-    const bool posWritten = MaxwellMovementComp::writeHeadPos(posPath, headPos);
-    const std::vector<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
+    const std::filesystem::path posPath = dir.filePath("head.pos").toStdString(); // MaxFilter -headpos format
+    const bool posWritten = MaxwellMovementComp::write_head_pos(posPath, headPos).has_value();
+    const auto posBack = MaxwellMovementComp::read_head_pos(posPath);
     //! [maxwell_movement_comp_usage]
     double moveError = 0.0;
     for (int k = 0; k < std::ssize(meg); ++k) {
         moveError = std::max(moveError, (compensated.row(meg[k]) - cleaned.row(meg[k])).cwiseAbs().maxCoeff());
     }
-    ok &= expect(posWritten && posBack.size() == 1 && moveError < 1e-3 * megIn.cwiseAbs().maxCoeff(),
+    ok &= expect(posWritten && posBack && posBack->size() == 1 && moveError < 1e-3 * megIn.cwiseAbs().maxCoeff(),
                  "MaxwellMovementComp without movement equals SSS; head positions round-trip");
 
     //! [fine_calibration_usage]
@@ -277,12 +278,12 @@ int main(int argc, char* argv[])
     magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
     magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
     magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
-    calibration.addEntry(magnetometer);
-    const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
-    const bool calWritten = calibration.write(calPath);
-    const FineCalibration calBack = FineCalibration::read(calPath);
+    calibration.push_back(magnetometer);
+    const std::filesystem::path calPath = dir.filePath("sss_cal.dat").toStdString(); // MaxFilter's format
+    const bool calWritten = calibration.write(calPath).has_value();
+    const auto calBack = FineCalibration::read(calPath);
     //! [fine_calibration_usage]
-    ok &= expect(calWritten && calBack.size() == 1 && calBack.gainVector()(0) == 0.996645 && calBack.entries().front().position.isApprox(magnetometer.position),
+    ok &= expect(calWritten && calBack && calBack->size() == 1 && calBack->gain_vector()(0) == 0.996645 && calBack->find(111)->position.isApprox(magnetometer.position),
                  "FineCalibration round-trips a magnetometer line");
 
     //! [filter_chpi_usage]

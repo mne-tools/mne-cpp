@@ -33,7 +33,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9972,
+    "tokens": 9925,
     "gui_outside_design": []
   },
   "libraries": {
@@ -208,18 +208,18 @@
       ]
     },
     "dsp": {
-      "tokens": 430,
+      "tokens": 383,
       "by_category": {
         "containers": 79,
-        "files": 24,
-        "global": 121,
+        "files": 8,
+        "global": 119,
         "objects_signals": 82,
         "other": 3,
-        "regex": 3,
-        "strings": 97,
+        "regex": 1,
+        "strings": 70,
         "threads": 21
       },
-      "public_header_includes": 19,
+      "public_header_includes": 18,
       "q_object": 12,
       "files": 93,
       "modules": [

@@ -28,9 +28,9 @@ moveParams.origin = params.origin;
 const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
 
 QTemporaryDir dir;
-const QString posPath = dir.filePath("head.pos"); // same columns as mne.chpi.write_head_pos
-const bool posWritten = MaxwellMovementComp::writeHeadPos(posPath, headPos);
-const std::vector<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
+const std::filesystem::path posPath = dir.filePath("head.pos").toStdString(); // MaxFilter -headpos format
+const bool posWritten = MaxwellMovementComp::write_head_pos(posPath, headPos).has_value();
+const auto posBack = MaxwellMovementComp::read_head_pos(posPath);
 ```
 
 ---
@@ -70,38 +70,38 @@ Reconstructed at the reference head position.
 
 ---
 
-### readHeadPos(sPath)
+### read_head_pos(path)
 
-Read head positions from a file.
+Reads a MaxFilter head position file (maxfilter -headpos), like mne.chpi.read_head_pos.
 
-File format: whitespace-separated columns per line: time q1 q2 q3 tx ty tz gof
+After a header line, each line holds time, q1 q2 q3 (rotation quaternion without its scalar part), q4 q5 q6 (translation), goodness of fit, error and velocity; lines starting with '#' are skipped.
 
 **Parameters:**
 
-- **sPath** : *const QString &*
-  Path to head position file.
+- **path** : *const std::filesystem::path &*
+  Path to the .pos file.
 
 **Returns:**
 
-- *std::vector&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt;* — List of head position entries.
+- *[Expected](/docs/api/base/expected)&lt; std::vector&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt; &gt;* — The head positions, or an error if the file cannot be read or a line has another layout.
 
 ---
 
-### writeHeadPos(sPath, headPos)
+### write_head_pos(path, headPos)
 
-Write head positions to a file.
+Writes a MaxFilter head position file, like mne.chpi.write_head_pos.
 
 **Parameters:**
 
-- **sPath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Output file path.
 
-- **headPos** : *const std::vector&lt; [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt; &*
+- **headPos** : *std::span&lt; const [HeadPosEntry](/docs/api/dsp/head-pos-entry) &gt;*
   Head positions to write.
 
 **Returns:**
 
-- *bool* — true if successful.
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or an error if the file cannot be written.
 
 ---
 
@@ -118,7 +118,7 @@ Write head positions to a file.
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 157"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 158"
 std::vector<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
 MaxwellMoveCompParams moveParams;
 moveParams.origin = params.origin;

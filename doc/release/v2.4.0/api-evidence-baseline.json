@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 487,
-    "exported_free_functions": 150,
+    "exported_free_functions": 151,
     "registered_classes": 579,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -516,6 +516,11 @@
     },
     {
       "name": "split",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "split_whitespace",
       "header": "base/string_utils.h",
       "library": "base"
     },

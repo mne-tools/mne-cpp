@@ -29,10 +29,10 @@ FineCalEntry magnetometer;
 magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
 magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
 magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
-calibration.addEntry(magnetometer);
-const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
-const bool calWritten = calibration.write(calPath);
-const FineCalibration calBack = FineCalibration::read(calPath);
+calibration.push_back(magnetometer);
+const std::filesystem::path calPath = dir.filePath("sss_cal.dat").toStdString(); // MaxFilter's format
+const bool calWritten = calibration.write(calPath).has_value();
+const auto calBack = FineCalibration::read(calPath);
 ```
 
 ---
@@ -43,18 +43,18 @@ const FineCalibration calBack = FineCalibration::read(calPath);
 
 ---
 
-### write(sPath)
+### write(path)
 
-Write fine calibration to a .dat file.
+Writes a .dat file like MaxFilter: bare channel numbers and values with six decimals.
 
 **Parameters:**
 
-- **sPath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Output file path.
 
 **Returns:**
 
-- *bool* — true if successful.
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or an error if the file cannot be written.
 
 ---
 
@@ -88,25 +88,20 @@ Check if empty.
 
 ---
 
-### findEntry(chNumber, entry)
-
-Find entry by channel number.
+### find(chNumber)
 
 **Parameters:**
 
 - **chNumber** : *int*
-  Channel number to find.
-
-- **entry** : *[FineCalEntry](/docs/api/dsp/fine-cal-entry) &*
-  Found entry (if any).
+  Channel number to find, e.g. 113 for MEG0113.
 
 **Returns:**
 
-- *bool* — true if found.
+- *const [FineCalEntry](/docs/api/dsp/fine-cal-entry) ** — The entry of that channel, or nullptr.
 
 ---
 
-### addEntry(entry)
+### push_back(entry)
 
 Add an entry.
 
@@ -117,7 +112,7 @@ Add an entry.
 
 ---
 
-### gainVector()
+### gain_vector()
 
 Magnetometer calibration factors.
 
@@ -127,7 +122,7 @@ Magnetometer calibration factors.
 
 ---
 
-### imbalanceMatrix()
+### imbalance_matrix()
 
 Gradiometer imbalance terms.
 
@@ -139,20 +134,20 @@ Gradiometer imbalance terms.
 
 ## Static Methods
 
-### read(sPath)
+### read(path)
 
 Read a fine calibration file (.dat format).
 
-Each line has 14 or 16 whitespace-separated columns (see the class description); lines starting with '#' are comments and malformed lines are skipped.
+Each line has 14 or 16 whitespace-separated columns (see the class description); lines starting with '#' are comments. Channel names "MEG0113" are read as channel number 113.
 
 **Parameters:**
 
-- **sPath** : *const QString &*
-  Path to .dat file.
+- **path** : *const std::filesystem::path &*
+  Path to the .dat file.
 
 **Returns:**
 
-- *FineCalibration* — [`FineCalibration`](/docs/api/dsp/fine-calibration) with loaded entries.
+- *[Expected](/docs/api/base/expected)&lt; FineCalibration &gt;* — The calibration, or an error if the file cannot be read or a line has another number of columns.
 
 ---
 
@@ -169,17 +164,17 @@ Each line has 14 or 16 whitespace-separated columns (see the class description);
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 175"
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 176"
 FineCalibration calibration;
 FineCalEntry magnetometer;
 magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
 magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
 magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
-calibration.addEntry(magnetometer);
-const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
-const bool calWritten = calibration.write(calPath);
-const FineCalibration calBack = FineCalibration::read(calPath);
-ok &= expect(calWritten && calBack.size() == 1 && calBack.gainVector()(0) == 0.996645 && calBack.entries().front().position.isApprox(magnetometer.position),
+calibration.push_back(magnetometer);
+const std::filesystem::path calPath = dir.filePath("sss_cal.dat").toStdString(); // MaxFilter's format
+const bool calWritten = calibration.write(calPath).has_value();
+const auto calBack = FineCalibration::read(calPath);
+ok &= expect(calWritten && calBack && calBack->size() == 1 && calBack->gain_vector()(0) == 0.996645 && calBack->find(111)->position.isApprox(magnetometer.position),
              "FineCalibration round-trips a magnetometer line");
 ````
 
