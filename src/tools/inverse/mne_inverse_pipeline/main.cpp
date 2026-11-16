@@ -25,6 +25,7 @@
 #include <mna/mna_op_registry.h>
 
 #include <base/log.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -33,8 +34,14 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QFile>
-#include <QTextStream>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,17 +90,15 @@ int main(int argc, char* argv[])
 
     parser.process(app);
 
-    QTextStream out(stdout);
-
     //
     // --list-ops: print registered operators
     //
     if (parser.isSet(listOpsOpt)) {
-        const auto ops = MnaOpRegistry::instance().registeredOps();
-        out << QStringLiteral("Registered MNA operators (%1):\n").arg(ops.size());
-        for (const auto& op : ops) {
-            const auto schema = MnaOpRegistry::instance().schema(op);
-            out << QStringLiteral("  %1  %2\n").arg(op, -30).arg(schema.description);
+        const MnaOpRegistry& registry = MnaOpRegistry::instance();
+        const StringList ops = registry.registered_ops();
+        std::println("Registered MNA operators ({}):", ops.size());
+        for (const std::string& op : ops) {
+            std::println("  {:<30}  {}", op, registry.schema(op).description);
         }
         return 0;
     }
@@ -102,55 +107,42 @@ int main(int argc, char* argv[])
     // Require project file
     //
     if (!parser.isSet(mnaFileOpt)) {
-        qCritical() << "Error: --project <file> is required.";
+        Log::critical("Error: --project <file> is required.");
         parser.showHelp(1);
-    }
-
-    const QString mnaPath = parser.value(mnaFileOpt);
-    if (!QFile::exists(mnaPath)) {
-        qCritical() << "Error: file not found:" << mnaPath;
-        return 1;
     }
 
     //
     // Load MNA project
     //
-    qInfo() << "Loading MNA project:" << mnaPath;
-    MnaProject project;
-    try {
-        project = MnaIO::read(mnaPath);
-    } catch (const std::exception& e) {
-        qCritical() << "Failed to load project:" << e.what();
+    const std::filesystem::path mnaPath = path_from_utf8(parser.value(mnaFileOpt).toStdString());
+    Log::info("Loading MNA project: {}", utf8_from_path(mnaPath));
+    Expected<MnaProject> project = MnaIO::read(mnaPath);
+    if (!project) {
+        Log::critical("Failed to load project: {}", project.error().what());
         return 1;
     }
-
-    const QList<MnaNode>& pipeline = project.pipeline;
-    if (pipeline.isEmpty()) {
-        qCritical() << "Error: project pipeline is empty.";
+    if (project->pipeline.empty()) {
+        Log::critical("Error: project pipeline is empty.");
         return 1;
     }
-
-    qInfo() << "Project:" << project.name
-            << "—" << pipeline.size() << "pipeline nodes.";
+    Log::info("Project: {} — {} pipeline nodes.", project->name, project->pipeline.size());
 
     //
     // Build the execution graph from pipeline nodes
     //
     MnaGraph graph;
-    for (const MnaNode& node : pipeline)
-        graph.addNode(node);
+    for (MnaNode& node : project->pipeline)
+        graph.add_node(std::move(node));
 
-    QStringList order = graph.topologicalSort();
-    qInfo() << "Execution order:" << order.join(QStringLiteral(" -> "));
+    Log::info("Execution order: {}", join(graph.topological_sort(), " -> "));
 
     //
     // Validate
     //
-    QStringList validationErrors;
-    if (!graph.validate(&validationErrors)) {
-        qCritical() << "Graph validation failed:";
-        for (const QString& err : validationErrors)
-            qCritical() << "  " << err;
+    if (const StringList errors = graph.validate(); !errors.empty()) {
+        Log::critical("Graph validation failed:");
+        for (const std::string& err : errors)
+            Log::critical("  {}", err);
         return 1;
     }
 
@@ -158,16 +150,20 @@ int main(int argc, char* argv[])
     // Dry run — stop here
     //
     if (parser.isSet(dryRunOpt)) {
-        out << "Dry run complete. " << pipeline.size() << " nodes validated.\n";
+        std::println("Dry run complete. {} nodes validated.", graph.nodes().size());
         return 0;
     }
 
     //
     // Execute via MnaGraphExecutor
     //
-    qInfo() << "Executing pipeline...";
-    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
+    Log::info("Executing pipeline...");
+    const MnaGraphExecutor::Context context = MnaGraphExecutor::execute(graph);
+    if (!context.aborted_node.empty()) {
+        Log::critical("Pipeline stopped at node '{}' by a failed check.", context.aborted_node);
+        return 1;
+    }
 
-    qInfo() << "Pipeline execution complete.";
+    Log::info("Pipeline execution complete.");
     return 0;
 }

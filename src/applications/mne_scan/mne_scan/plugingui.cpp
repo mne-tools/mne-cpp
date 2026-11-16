@@ -31,6 +31,9 @@
 #include <mna/mna_io.h>
 #include <mna/mna_graph.h>
 #include <mna/mna_node.h>
+#include <scShared/Management/mna_scan_types.h>
+
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -195,20 +198,21 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
 void PluginGui::loadConfigMna(const QString& fullPath)
 {
-    mne::MnaProject project = mne::MnaIO::read(fullPath);
-    if (project.pipeline.isEmpty()) {
-        qWarning() << "Empty or invalid MNA pipeline in" << fullPath;
+    mne::Expected<mne::MnaProject> read = mne::MnaIO::read(mne::path_from_utf8(fullPath.toStdString()));
+    if (!read || read->pipeline.empty()) {
+        qWarning() << "Empty or invalid MNA pipeline in" << fullPath << (read ? "" : read.error().what());
         return;
     }
+    mne::MnaProject& project = *read;
 
     clearScene();
 
     // Phase 1: Create plugins from pipeline nodes
-    QMap<QString, PluginItem*> itemMap;
+    std::map<std::string, PluginItem*, std::less<>> itemMap;
     for (const mne::MnaNode& node : project.pipeline) {
         QAction* pCurrentAction = nullptr;
         for (int i = 0; i < m_pActionGroupPlugins->actions().size(); ++i) {
-            if (m_pActionGroupPlugins->actions()[i]->text() == node.opType) {
+            if (m_pActionGroupPlugins->actions()[i]->text().toStdString() == node.op_type) {
                 pCurrentAction = m_pActionGroupPlugins->actions()[i];
                 break;
             }
@@ -220,12 +224,12 @@ void PluginGui::loadConfigMna(const QString& fullPath)
             // quietly missing a stage, so say which one was dropped.
             //
             qWarning() << "[PluginGui::loadConfigMna] Configuration refers to unknown plugin"
-                       << node.opType << "- skipping it.";
+                       << QString::fromStdString(node.op_type) << "- skipping it.";
             continue;
         }
 
-        qreal posX = node.attributes.value(QStringLiteral("gui_x"), 0).toReal();
-        qreal posY = node.attributes.value(QStringLiteral("gui_y"), 0).toReal();
+        const qreal posX = node.attributes["gui_x"].to_double();
+        const qreal posY = node.attributes["gui_y"].to_double();
         QPointF pos(posX, posY);
 
         mne::scan::AbstractPlugin::SPtr pPlugin;
@@ -248,10 +252,10 @@ void PluginGui::loadConfigMna(const QString& fullPath)
                 if (!pi || !pi->plugin()) {
                     continue;
                 }
-                if (pi->plugin()->getName() == node.opType && !itemMap.contains(node.id)) {
-                    itemMap.insert(node.id, pi);
+                if (pi->plugin()->getName().toStdString() == node.op_type && !itemMap.contains(node.id)) {
+                    itemMap.emplace(node.id, pi);
                     // Restore plugin-specific settings from node attributes
-                    pi->plugin()->setAttributes(node.attributes);
+                    pi->plugin()->setAttributes(mne::scan::toPluginAttributes(node.attributes));
                     break;
                 }
             }
@@ -261,13 +265,12 @@ void PluginGui::loadConfigMna(const QString& fullPath)
     // Phase 2: Create connections from port links
     for (const mne::MnaNode& node : project.pipeline) {
         for (const mne::MnaPort& inPort : node.inputs) {
-            if (inPort.sourceNodeId.isEmpty())
+            const auto start = itemMap.find(inPort.source_node_id);
+            const auto end = itemMap.find(node.id);
+            if (inPort.source_node_id.empty() || start == itemMap.end() || end == itemMap.end())
                 continue;
-
-            PluginItem* startItem = itemMap.value(inPort.sourceNodeId);
-            PluginItem* endItem = itemMap.value(node.id);
-            if (!startItem || !endItem)
-                continue;
+            PluginItem* startItem = start->second;
+            PluginItem* endItem = end->second;
 
             mne::scan::PluginConnectorConnection::SPtr pConnection =
                 mne::scan::PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
@@ -286,7 +289,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
         }
     }
 
-    m_loadedMnaProject = project;
+    m_loadedMnaProject = std::move(project);
 }
 
 //=============================================================================================================
@@ -309,29 +312,21 @@ constexpr const char* kUiLayoutPrefix = "ui.layout.";
 
 QByteArray PluginGui::uiLayoutBlob(const QString& sWindowKey) const
 {
-    const QString fullKey = QString::fromLatin1(kUiLayoutPrefix) + sWindowKey;
-    const QJsonObject& extras = m_loadedMnaProject.extras;
-    if (!extras.contains(fullKey)) {
-        return {};
-    }
-    const QJsonValue v = extras.value(fullKey);
-    if (!v.isString()) {
-        return {};
-    }
-    return QByteArray::fromBase64(v.toString().toLatin1());
+    const std::string fullKey = kUiLayoutPrefix + sWindowKey.toStdString();
+    const std::string_view text = m_loadedMnaProject.extras[fullKey].to_string();
+    return QByteArray::fromBase64(QByteArray(text.data(), static_cast<qsizetype>(text.size())));
 }
 
 //=============================================================================================================
 
 void PluginGui::setUiLayoutBlob(const QString& sWindowKey, const QByteArray& blob)
 {
-    const QString fullKey = QString::fromLatin1(kUiLayoutPrefix) + sWindowKey;
+    const std::string fullKey = kUiLayoutPrefix + sWindowKey.toStdString();
     if (blob.isEmpty()) {
         m_loadedMnaProject.extras.remove(fullKey);
         return;
     }
-    m_loadedMnaProject.extras.insert(fullKey,
-                                     QString::fromLatin1(blob.toBase64()));
+    m_loadedMnaProject.extras.insert(fullKey, blob.toBase64().toStdString());
 }
 
 //=============================================================================================================
@@ -354,16 +349,14 @@ void PluginGui::saveConfigMna(const QString& fullPath)
 
     // ── Enriching mode: start from loaded project to preserve foreign data ──
     mne::MnaProject project;
-    if (!m_loadedMnaProject.subjects.isEmpty() || !m_loadedMnaProject.pipeline.isEmpty()) {
+    if (!m_loadedMnaProject.subjects.empty() || !m_loadedMnaProject.pipeline.empty()) {
         project = m_loadedMnaProject;
     } else {
-        project.name = QStringLiteral("MNE Scan Pipeline");
-        project.description = QStringLiteral("MNE Scan plugin configuration");
-        project.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
-        project.created = QDateTime::currentDateTimeUtc();
+        project.name = "MNE Scan Pipeline";
+        project.description = "MNE Scan plugin configuration";
     }
     project.pipeline = m_pPluginSceneManager->pipelineGraph().nodes();
-    project.modified = QDateTime::currentDateTimeUtc();
+    project.modified = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 
     // Ensure directory exists
     QFileInfo fi(fullPath);
@@ -372,8 +365,10 @@ void PluginGui::saveConfigMna(const QString& fullPath)
         if (!dir.mkpath(fi.path()))
             return;
 
-    mne::MnaIO::write(project, fullPath);
-    m_loadedMnaProject = project;
+    if (const mne::Expected<void> written = project.write(mne::path_from_utf8(fullPath.toStdString())); !written) {
+        qWarning() << "[PluginGui::saveConfigMna]" << written.error().what();
+    }
+    m_loadedMnaProject = std::move(project);
 }
 
 //=============================================================================================================

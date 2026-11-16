@@ -51,7 +51,9 @@
 #include <QFileInfo>
 
 #include <QJsonObject>
+#include <chrono>
 #include <cmath>
+#include <set>
 #include <algorithm>
 #include <functional>
 
@@ -2757,11 +2759,12 @@ void MainWindow::openProject()
         return;
 
     // Read project via MNA library (handles both .mna JSON and .mnx CBOR)
-    mne::MnaProject proj = mne::MnaIO::read(filename);
-    if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
-        QMessageBox::warning(this, tr("Open Project"), tr("Failed to open project:\n%1").arg(filename));
+    mne::Expected<mne::MnaProject> read = mne::MnaIO::read(mne::path_from_utf8(filename.toStdString()));
+    if (!read) {
+        QMessageBox::warning(this, tr("Open Project"), tr("Failed to open project:\n%1").arg(QString::fromUtf8(read.error().what())));
         return;
     }
+    mne::MnaProject& proj = *read;
 
     // Extract embedded files to a temp directory;
     // resolve external paths relative to the project file.
@@ -2782,19 +2785,18 @@ void MainWindow::openProject()
         for (const auto& sess : subj.sessions) {
             for (const auto& rec : sess.recordings) {
                 for (const auto& ref : rec.files) {
+                    const QString refPath = QString::fromStdString(ref.path);
                     QString filePath;
-                    if (ref.embedded && !ref.data.isEmpty()) {
+                    if (ref.embedded && !ref.data.empty()) {
                         // Write embedded data to temp dir preserving BIDS path
-                        filePath = extractDir + QDir::separator() + ref.path;
+                        filePath = extractDir + QDir::separator() + refPath;
                         QDir().mkpath(QFileInfo(filePath).absolutePath());
-                        QFile f(filePath);
-                        if (f.open(QIODevice::WriteOnly)) {
-                            f.write(ref.data);
-                            f.close();
+                        if (!mne::write_file_bytes(mne::path_from_utf8(filePath.toStdString()), ref.data)) {
+                            continue;
                         }
                     } else {
                         // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
-                        filePath = QDir::cleanPath(QDir(projectDir).absoluteFilePath(ref.path));
+                        filePath = QDir::cleanPath(QDir(projectDir).absoluteFilePath(refPath));
                     }
 
                     if (!QFileInfo::exists(filePath))
@@ -2876,9 +2878,9 @@ void MainWindow::openProject()
             for (auto& r : se.recordings)
                 for (auto& f : r.files)
                     if (!f.embedded)
-                        f.path = QDir(projectDir).absoluteFilePath(f.path);
+                        f.path = QDir(projectDir).absoluteFilePath(QString::fromStdString(f.path)).toStdString();
 
-    m_mnxProject = proj;
+    m_mnxProject = std::move(proj);
     m_mnxFilePath = filename;
     statusBar()->showMessage(tr("Project loaded: %1").arg(QFileInfo(filename).fileName()), 5000);
     setWindowStatus();
@@ -2941,7 +2943,7 @@ void MainWindow::saveProject()
 
     // ── Enriching mode: start from loaded project to preserve foreign data ──
     // Roles that mne_browse owns and will replace with current state
-    static const QSet<mne::MnaFileRole> ownedRoles = {
+    static const std::set<mne::MnaFileRole> ownedRoles = {
         mne::MnaFileRole::Raw,
         mne::MnaFileRole::Event,
         mne::MnaFileRole::Annotation,
@@ -2951,69 +2953,50 @@ void MainWindow::saveProject()
         mne::MnaFileRole::Inverse};
 
     mne::MnaProject proj;
-    const bool hasBase = !m_mnxProject.subjects.isEmpty();
+    const bool hasBase = !m_mnxProject.subjects.empty();
 
     if (hasBase) {
         // Preserve all metadata, pipeline, and subject structure from the loaded project
         proj = m_mnxProject;
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.modified = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 
         // Strip only our owned roles from the first recording; keep everything else
-        if (!proj.subjects.isEmpty() && !proj.subjects[0].sessions.isEmpty() && !proj.subjects[0].sessions[0].recordings.isEmpty()) {
+        if (!proj.subjects.empty() && !proj.subjects[0].sessions.empty() && !proj.subjects[0].sessions[0].recordings.empty()) {
             auto& files = proj.subjects[0].sessions[0].recordings[0].files;
-            files.erase(std::remove_if(files.begin(), files.end(),
-                                       [](const mne::MnaFileRef& r) { return ownedRoles.contains(r.role); }),
-                        files.end());
+            std::erase_if(files, [](const mne::MnaFileRef& r) { return ownedRoles.contains(r.role); });
 
             // Re-serialize foreign embedded/external refs for the target format
             for (auto& ref : files) {
+                const QString refPath = QString::fromStdString(ref.path);
                 if (embed) {
-                    if (!ref.embedded && !ref.path.isEmpty()) {
-                        // External → embed: read file data
-                        QFile f(ref.path);
-                        if (f.open(QIODevice::ReadOnly)) {
-                            ref.data = f.readAll();
-                            ref.sizeBytes = ref.data.size();
-                            f.close();
-                        }
-                        ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/") + QFileInfo(ref.path).fileName();
-                        ref.embedded = true;
+                    if (!ref.embedded && !ref.path.empty() && ref.embed(mne::path_from_utf8(ref.path))) {
+                        ref.path = proj.subjects[0].id + "/" + proj.subjects[0].sessions[0].id + "/passthrough/" + QFileInfo(refPath).fileName().toStdString();
                     }
                 } else {
-                    if (ref.embedded && !ref.data.isEmpty()) {
+                    if (ref.embedded && !ref.data.empty()) {
                         // Embed → external: write data out alongside the project file
-                        const QString outPath = projectDir + QDir::separator() + QFileInfo(ref.path).fileName();
-                        QFile f(outPath);
-                        if (f.open(QIODevice::WriteOnly)) {
-                            f.write(ref.data);
-                            f.close();
+                        const QString outPath = projectDir + QDir::separator() + QFileInfo(refPath).fileName();
+                        if (ref.extract(mne::path_from_utf8(outPath.toStdString()))) {
+                            ref.path = QDir(projectDir).relativeFilePath(outPath).toStdString();
                         }
-                        ref.path = QDir(projectDir).relativeFilePath(outPath);
-                        ref.embedded = false;
-                        ref.data.clear();
                     } else if (!ref.embedded) {
-                        ref.path = QDir(projectDir).relativeFilePath(ref.path);
+                        ref.path = QDir(projectDir).relativeFilePath(refPath).toStdString();
                     }
                 }
             }
         }
     } else {
         // Brand-new project — create minimal structure
-        proj.name = QFileInfo(m_qFileRaw.fileName()).completeBaseName();
-        proj.description = QStringLiteral("MNE Browse project");
-        proj.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
-        proj.created = QDateTime::currentDateTimeUtc();
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.name = QFileInfo(m_qFileRaw.fileName()).completeBaseName().toStdString();
+        proj.description = "MNE Browse project";
 
         mne::MnaSubject subj;
-        subj.id = QStringLiteral("sub-01");
+        subj.id = "sub-01";
         mne::MnaSession sess;
-        sess.id = QStringLiteral("ses-browse");
-        mne::MnaRecording rec;
-        rec.id = QStringLiteral("rec-01");
-        sess.recordings.append(rec);
-        subj.sessions.append(sess);
-        proj.subjects.append(subj);
+        sess.id = "ses-browse";
+        sess.recordings.emplace_back().id = "rec-01";
+        subj.sessions.push_back(std::move(sess));
+        proj.subjects.push_back(std::move(subj));
     }
 
     // Reference to the first recording where we add our files
@@ -3025,15 +3008,12 @@ void MainWindow::saveProject()
             return;
         mne::MnaFileRef ref;
         ref.role = role;
-        ref.format = QFileInfo(filePath).suffix();
-        ref.sizeBytes = QFileInfo(filePath).size();
+        ref.format = QFileInfo(filePath).suffix().toStdString();
+        ref.size_bytes = QFileInfo(filePath).size();
         if (embed) {
-            ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/meg/") + QFileInfo(filePath).fileName();
-            ref.embedded = true;
-            QFile f(filePath);
-            if (f.open(QIODevice::ReadOnly)) {
-                ref.data = f.readAll();
-                f.close();
+            ref.path = proj.subjects[0].id + "/" + proj.subjects[0].sessions[0].id + "/meg/" + QFileInfo(filePath).fileName().toStdString();
+            if (!ref.embed(mne::path_from_utf8(filePath.toStdString()))) {
+                return;
             }
         } else {
             // Files extracted from an opened .mnx live in a temp dir that goes away with this window
@@ -3043,10 +3023,10 @@ void MainWindow::saveProject()
                 QFile::remove(externalPath);
                 QFile::copy(filePath, externalPath);
             }
-            ref.path = QDir(projectDir).relativeFilePath(externalPath);
+            ref.path = QDir(projectDir).relativeFilePath(externalPath).toStdString();
             ref.embedded = false;
         }
-        rec.files.append(ref);
+        rec.files.push_back(std::move(ref));
     };
 
     addFileRef(m_qFileRaw.fileName(), mne::MnaFileRole::Raw);
@@ -3057,12 +3037,12 @@ void MainWindow::saveProject()
     addFileRef(m_qCovFile.fileName(), mne::MnaFileRole::Covariance);
     addFileRef(m_qInverseOperatorFile.fileName(), mne::MnaFileRole::Inverse);
 
-    if (!mne::MnaIO::write(proj, filename)) {
-        QMessageBox::warning(this, tr("Save Project"), tr("Failed to write project to:\n%1").arg(filename));
+    if (const mne::Expected<void> written = mne::MnaIO::write(proj, mne::path_from_utf8(filename.toStdString())); !written) {
+        QMessageBox::warning(this, tr("Save Project"), tr("Failed to write project:\n%1").arg(QString::fromUtf8(written.error().what())));
         return;
     }
 
-    m_mnxProject = proj;
+    m_mnxProject = std::move(proj);
     m_mnxFilePath = filename;
     statusBar()->showMessage(tr("Project saved: %1").arg(QFileInfo(filename).fileName()), 5000);
 }

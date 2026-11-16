@@ -28,8 +28,12 @@
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 
+#include <base/json.h>
+#include <base/string_utils.h>
+
 #include <QFileInfo>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 
 using namespace MNEANALYZESTUDIO;
@@ -92,19 +96,23 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
             {"message", QStringLiteral("Run MNA node `%1`: project `%2` not found.").arg(nodeState.uid, path)}};
     }
 
-    const MnaProject project = MnaIO::read(path);
+    Expected<MnaProject> read = MnaIO::read(path_from_utf8(path.toStdString()));
+    if (!read) {
+        return QJsonObject{
+            {"status", "error"},
+            {"message", QStringLiteral("Run MNA node `%1`: %2").arg(nodeState.uid, QString::fromUtf8(read.error().what()))}};
+    }
 
     // Wrap the project pipeline into a transient graph for the executor.
     MnaGraph graph;
-    for (const MnaNode& node : project.pipeline) {
-        graph.addNode(node);
+    for (MnaNode& node : read->pipeline) {
+        graph.add_node(std::move(node));
     }
 
-    QStringList validationErrors;
-    if (!graph.validate(&validationErrors)) {
+    if (const StringList validationErrors = graph.validate(); !validationErrors.empty()) {
         QJsonArray errs;
-        for (const QString& e : validationErrors) {
-            errs.append(e);
+        for (const std::string& e : validationErrors) {
+            errs.append(QString::fromStdString(e));
         }
         return QJsonObject{
             {"status", "error"},
@@ -112,15 +120,17 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
             {"errors", errs}};
     }
 
-    QVariantMap graphInputs = nodeState.parameters.value("graph_inputs")
-                                  .toObject()
-                                  .toVariantMap();
+    const QByteArray inputsJson = QJsonDocument(nodeState.parameters.value("graph_inputs").toObject()).toJson(QJsonDocument::Compact);
+    MnaValues graphInputs;
+    for (const auto& [key, value] : JsonDocument::from_json(inputsJson.toStdString()).object()) {
+        graphInputs.emplace(key, value);
+    }
 
-    const auto context = MnaGraphExecutor::execute(graph, graphInputs);
+    const MnaGraphExecutor::Context context = MnaGraphExecutor::execute(graph, graphInputs);
 
     QJsonArray keys;
-    for (auto it = context.results.constBegin(); it != context.results.constEnd(); ++it) {
-        keys.append(it.key());
+    for (const auto& [key, value] : context.results) {
+        keys.append(QString::fromStdString(key));
     }
 
     return QJsonObject{

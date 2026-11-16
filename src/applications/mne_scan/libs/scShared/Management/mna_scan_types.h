@@ -22,6 +22,10 @@
 
 #include <mna/mna_types.h>
 
+#include <base/json.h>
+
+#include <QVariantMap>
+
 //=============================================================================================================
 // DEFINE NAMESPACE mne::scan
 //=============================================================================================================
@@ -88,6 +92,22 @@ inline ConnectorDataType mnaDataKindToConnectorDataType(MnaDataKind k)
             return _N;
     }
 }
+
+//=============================================================================================================
+/**
+ * @param[in] attributes   Plugin attributes.
+ *
+ * @return The same attributes as MNA node attributes.
+ */
+SCSHAREDSHARED_EXPORT JsonObject toNodeAttributes(const QVariantMap& attributes);
+
+//=============================================================================================================
+/**
+ * @param[in] attributes   MNA node attributes.
+ *
+ * @return The same attributes as plugin attributes.
+ */
+SCSHAREDSHARED_EXPORT QVariantMap toPluginAttributes(const JsonObject& attributes);
 
 } // namespace mne::scan
 

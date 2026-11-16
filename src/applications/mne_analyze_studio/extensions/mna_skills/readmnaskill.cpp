@@ -19,6 +19,8 @@
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 
+#include <base/string_utils.h>
+
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -84,17 +86,24 @@ QJsonObject ReadMnaSkill::executeSkill(const WorkflowNode& nodeState)
             {"message", QStringLiteral("Read MNA node `%1`: file `%2` not found.").arg(nodeState.uid, path)}};
     }
 
-    const MnaProject project = MnaIO::read(path);
+    const Expected<MnaProject> read = MnaIO::read(path_from_utf8(path.toStdString()));
+    if (!read) {
+        return QJsonObject{
+            {"status", "error"},
+            {"message", QStringLiteral("Read MNA node `%1`: %2").arg(nodeState.uid, QString::fromUtf8(read.error().what()))}};
+    }
+    const MnaProject& project = *read;
+    const QString name = QString::fromStdString(project.name);
 
     QJsonObject summary{
-        {"name", project.name},
-        {"description", project.description},
-        {"mna_version", project.mnaVersion},
-        {"subject_count", project.subjects.size()},
-        {"pipeline_length", project.pipeline.size()}};
+        {"name", name},
+        {"description", QString::fromStdString(project.description)},
+        {"mna_version", QString::fromStdString(project.mna_version)},
+        {"subject_count", static_cast<qint64>(project.subjects.size())},
+        {"pipeline_length", static_cast<qint64>(project.pipeline.size())}};
 
     return QJsonObject{
         {"status", "completed"},
-        {"message", QStringLiteral("Loaded MNA project `%1` (%2 subjects, %3 pipeline nodes).").arg(project.name).arg(project.subjects.size()).arg(project.pipeline.size())},
+        {"message", QStringLiteral("Loaded MNA project `%1` (%2 subjects, %3 pipeline nodes).").arg(name).arg(project.subjects.size()).arg(project.pipeline.size())},
         {"outputs", QJsonObject{{"project_summary", summary}, {"project_path", path}}}};
 }

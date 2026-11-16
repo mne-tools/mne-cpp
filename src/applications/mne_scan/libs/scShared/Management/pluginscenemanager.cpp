@@ -215,47 +215,43 @@ const mne::MnaGraph& PluginSceneManager::pipelineGraph() const
 void PluginSceneManager::addGraphNode(const AbstractPlugin::SPtr& pPlugin, qreal guiX, qreal guiY)
 {
     mne::MnaNode node;
-    node.id = pPlugin->getName();
-    node.opType = pPlugin->getName();
-    node.execMode = mne::MnaNodeExecMode::Stream;
+    node.id = pPlugin->getName().toStdString();
+    node.op_type = node.id;
+    node.exec_mode = mne::MnaNodeExecMode::Stream;
     node.dirty = true;
 
-    node.attributes.insert(QStringLiteral("gui_x"), guiX);
-    node.attributes.insert(QStringLiteral("gui_y"), guiY);
-
-    // Store plugin-specific settings
-    const QVariantMap pluginAttrs = pPlugin->getAttributes();
-    for (auto it = pluginAttrs.constBegin(); it != pluginAttrs.constEnd(); ++it)
-        node.attributes.insert(it.key(), it.value());
+    node.attributes = toNodeAttributes(pPlugin->getAttributes());
+    node.attributes["gui_x"] = guiX;
+    node.attributes["gui_y"] = guiY;
 
     // Build output ports from plugin output connectors
     for (int i = 0; i < pPlugin->getOutputConnectors().size(); ++i) {
         mne::MnaPort outPort;
-        outPort.name = pPlugin->getOutputConnectors()[i]->getName();
+        outPort.name = pPlugin->getOutputConnectors()[i]->getName().toStdString();
         outPort.direction = mne::MnaPortDir::Output;
-        outPort.dataKind = connectorDataTypeToMnaDataKind(
+        outPort.data_kind = connectorDataTypeToMnaDataKind(
             PluginConnectorConnection::getDataType(pPlugin->getOutputConnectors()[i]));
-        node.outputs.append(outPort);
+        node.outputs.push_back(outPort);
     }
 
     // Build input ports from plugin input connectors
     for (int i = 0; i < pPlugin->getInputConnectors().size(); ++i) {
         mne::MnaPort inPort;
-        inPort.name = pPlugin->getInputConnectors()[i]->getName();
+        inPort.name = pPlugin->getInputConnectors()[i]->getName().toStdString();
         inPort.direction = mne::MnaPortDir::Input;
-        inPort.dataKind = connectorDataTypeToMnaDataKind(
+        inPort.data_kind = connectorDataTypeToMnaDataKind(
             PluginConnectorConnection::getDataType(pPlugin->getInputConnectors()[i]));
-        node.inputs.append(inPort);
+        node.inputs.push_back(inPort);
     }
 
-    m_pPipelineGraph->addNode(node);
+    m_pPipelineGraph->add_node(std::move(node));
 }
 
 //=============================================================================================================
 
 void PluginSceneManager::removeGraphNode(const AbstractPlugin::SPtr& pPlugin)
 {
-    m_pPipelineGraph->removeNode(pPlugin->getName());
+    m_pPipelineGraph->remove_node(pPlugin->getName().toStdString());
 }
 
 //=============================================================================================================
@@ -264,14 +260,17 @@ void PluginSceneManager::connectGraphNodes(const AbstractPlugin::SPtr& pSender,
                                            const AbstractPlugin::SPtr& pReceiver)
 {
     // Find matching output→input ports by data kind
-    const mne::MnaNode& srcNode = m_pPipelineGraph->node(pSender->getName());
-    mne::MnaNode& dstNode = m_pPipelineGraph->node(pReceiver->getName());
-
-    for (const mne::MnaPort& outPort : srcNode.outputs) {
-        for (int i = 0; i < dstNode.inputs.size(); ++i) {
-            if (dstNode.inputs[i].dataKind == outPort.dataKind && dstNode.inputs[i].sourceNodeId.isEmpty()) {
-                m_pPipelineGraph->connect(pSender->getName(), outPort.name,
-                                          pReceiver->getName(), dstNode.inputs[i].name);
+    const std::string sender = pSender->getName().toStdString();
+    const std::string receiver = pReceiver->getName().toStdString();
+    const mne::MnaNode* srcNode = m_pPipelineGraph->find_node(sender);
+    const mne::MnaNode* dstNode = m_pPipelineGraph->find_node(receiver);
+    if (!srcNode || !dstNode) {
+        return;
+    }
+    for (const mne::MnaPort& outPort : srcNode->outputs) {
+        for (const mne::MnaPort& inPort : dstNode->inputs) {
+            if (inPort.data_kind == outPort.data_kind && inPort.source_node_id.empty()) {
+                m_pPipelineGraph->connect(sender, outPort.name, receiver, inPort.name);
                 return;
             }
         }
@@ -283,10 +282,9 @@ void PluginSceneManager::connectGraphNodes(const AbstractPlugin::SPtr& pSender,
 void PluginSceneManager::updateGraphNodePosition(const AbstractPlugin::SPtr& pPlugin,
                                                  qreal guiX, qreal guiY)
 {
-    if (m_pPipelineGraph->hasNode(pPlugin->getName())) {
-        mne::MnaNode& n = m_pPipelineGraph->node(pPlugin->getName());
-        n.attributes.insert(QStringLiteral("gui_x"), guiX);
-        n.attributes.insert(QStringLiteral("gui_y"), guiY);
+    if (mne::MnaNode* n = m_pPipelineGraph->find_node(pPlugin->getName().toStdString())) {
+        n->attributes["gui_x"] = guiX;
+        n->attributes["gui_y"] = guiY;
     }
 }
 
@@ -295,11 +293,10 @@ void PluginSceneManager::updateGraphNodePosition(const AbstractPlugin::SPtr& pPl
 void PluginSceneManager::refreshGraphNodeAttributes()
 {
     for (const auto& pPlugin : m_pluginList) {
-        if (!m_pPipelineGraph->hasNode(pPlugin->getName()))
+        mne::MnaNode* node = m_pPipelineGraph->find_node(pPlugin->getName().toStdString());
+        if (!node)
             continue;
-        mne::MnaNode& node = m_pPipelineGraph->node(pPlugin->getName());
-        const QVariantMap pluginAttrs = pPlugin->getAttributes();
-        for (auto it = pluginAttrs.constBegin(); it != pluginAttrs.constEnd(); ++it)
-            node.attributes.insert(it.key(), it.value());
+        for (const auto& [key, value] : toNodeAttributes(pPlugin->getAttributes()))
+            node->attributes.insert(key, value);
     }
 }

@@ -24,6 +24,7 @@
 
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
+#include <base/string_utils.h>
 #include <scMeas/measurementtypes.h>
 
 #include <QApplication>
@@ -40,6 +41,9 @@
 #include <QTemporaryDir>
 #include <QToolButton>
 
+#include <format>
+#include <string>
+
 // Q_INIT_RESOURCE must be used outside a namespace; mne_scan.qrc lives in the static mne_scan_app_core.
 static void initScanResources()
 {
@@ -55,28 +59,27 @@ namespace
 bool writePipeline(const QJsonArray& pipeline, const QString& path, QString& err)
 {
     mne::MnaProject project;
-    project.name = QStringLiteral("MNE Scan Pipeline");
-    project.mnaVersion = QString::fromLatin1(mne::MnaProject::CURRENT_SCHEMA_VERSION);
-    QString previous;
+    project.name = "MNE Scan Pipeline";
+    std::string previous;
     for (int i = 0; i < pipeline.size(); ++i) {
         const QJsonObject entry = pipeline.at(i).toObject();
         mne::MnaNode node;
-        node.id = QStringLiteral("node_%1").arg(i);
-        node.opType = entry.value(QStringLiteral("plugin")).toString();
-        node.attributes.insert(QStringLiteral("gui_x"), entry.value(QStringLiteral("x")).toDouble());
-        node.attributes.insert(QStringLiteral("gui_y"), entry.value(QStringLiteral("y")).toDouble());
-        if (!previous.isEmpty()) {
+        node.id = std::format("node_{}", i);
+        node.op_type = entry.value(QStringLiteral("plugin")).toString().toStdString();
+        node.attributes.insert("gui_x", entry.value(QStringLiteral("x")).toDouble());
+        node.attributes.insert("gui_y", entry.value(QStringLiteral("y")).toDouble());
+        if (!previous.empty()) {
             mne::MnaPort input;
-            input.name = QStringLiteral("in");
-            input.sourceNodeId = previous;
-            input.sourcePortName = QStringLiteral("out");
-            node.inputs.append(input);
+            input.name = "in";
+            input.source_node_id = previous;
+            input.source_port_name = "out";
+            node.inputs.push_back(std::move(input));
         }
         previous = node.id;
-        project.pipeline.append(node);
+        project.pipeline.push_back(std::move(node));
     }
-    if (!mne::MnaIO::write(project, path)) {
-        err = QStringLiteral("cannot write the pipeline to %1").arg(path);
+    if (const auto written = mne::MnaIO::write(project, mne::path_from_utf8(path.toStdString())); !written) {
+        err = QString::fromUtf8(written.error().what());
         return false;
     }
     return true;

@@ -26,6 +26,9 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
+
+#include <base/byte_stream.h>
+#include <base/string_utils.h>
 #include <base/log.h>
 
 //=============================================================================================================
@@ -39,8 +42,15 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDateTime>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <filesystem>
+#include <optional>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -147,13 +157,47 @@ static MnaFileRole guessRoleFromBidsDir(const QString& dirName)
 // COMMAND: extract
 //=============================================================================================================
 
-static int cmdExtract(const QString& inputPath, const QString& outputDir)
+/** @return @p path as a std::filesystem path. */
+static std::filesystem::path fsPath(const QString& path)
 {
-    MnaProject proj = MnaIO::read(inputPath);
-    if (proj.subjects.isEmpty()) {
-        qCritical().noquote().nospace() << "failed to read or empty project: " << inputPath;
+    return path_from_utf8(path.toStdString());
+}
+
+/** @return The project at @p path, or nothing after reporting why it cannot be read. */
+static std::optional<MnaProject> readProject(const QString& path)
+{
+    Expected<MnaProject> project = MnaIO::read(fsPath(path));
+    if (!project) {
+        qCritical().noquote().nospace() << "failed to read project: " << project.error().what();
+        return std::nullopt;
+    }
+    return std::move(*project);
+}
+
+/** Writes @p project to @p path and reports the outcome; returns the exit code. */
+static int writeProject(const MnaProject& project, const QString& path, const QString& done)
+{
+    if (const Expected<void> written = MnaIO::write(project, fsPath(path)); !written) {
+        qCritical().noquote().nospace() << "failed to write " << written.error().what();
         return 1;
     }
+    qInfo().noquote().nospace() << done;
+    return 0;
+}
+
+static UtcTime now()
+{
+    return std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+}
+
+static int cmdExtract(const QString& inputPath, const QString& outputDir)
+{
+    std::optional<MnaProject> read = readProject(inputPath);
+    if (!read || read->subjects.empty()) {
+        qCritical().noquote().nospace() << "empty project: " << inputPath;
+        return 1;
+    }
+    const MnaProject& proj = *read;
 
     int extracted = 0;
     int skipped = 0;
@@ -163,19 +207,17 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
             for (const MnaRecording& rec : sess.recordings) {
                 for (const MnaFileRef& ref : rec.files) {
                     // Build BIDS output path
-                    QString relPath = ref.path;
+                    const QString refPath = QString::fromStdString(ref.path);
+                    QString relPath = refPath;
                     if (relPath.isEmpty())
-                        relPath = bidsBuildRelPath(subj.id, sess.id, ref.role,
+                        relPath = bidsBuildRelPath(QString::fromStdString(subj.id), QString::fromStdString(sess.id), ref.role,
                                                    QStringLiteral("file_") + QString::number(extracted));
 
                     const QString fullPath = QDir(outputDir).filePath(relPath);
 
-                    if (ref.embedded && !ref.data.isEmpty()) {
+                    if (ref.embedded && !ref.data.empty()) {
                         QDir().mkpath(QFileInfo(fullPath).absolutePath());
-                        QFile f(fullPath);
-                        if (f.open(QIODevice::WriteOnly)) {
-                            f.write(ref.data);
-                            f.close();
+                        if (write_file_bytes(fsPath(fullPath), ref.data)) {
                             qInfo().noquote().nospace() << "  extracted: " << relPath;
                             ++extracted;
                         } else {
@@ -185,7 +227,7 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                         // Copy from source location relative to the project file
                         const QString srcDir = QFileInfo(inputPath).absolutePath();
                         // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
-                        const QString srcPath = QDir::cleanPath(QDir(srcDir).filePath(ref.path));
+                        const QString srcPath = QDir::cleanPath(QDir(srcDir).filePath(refPath));
                         if (QFile::exists(srcPath)) {
                             QDir().mkpath(QFileInfo(fullPath).absolutePath());
                             if (QFile::copy(srcPath, fullPath)) {
@@ -195,11 +237,11 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                                 qCritical().noquote().nospace() << "Failed: " << relPath << " (copy error)";
                             }
                         } else {
-                            qWarning().noquote().nospace() << "Skipped: " << ref.path << " (source not found)";
+                            qWarning().noquote().nospace() << "Skipped: " << refPath << " (source not found)";
                             ++skipped;
                         }
                     } else {
-                        qWarning().noquote().nospace() << "Skipped: " << ref.path << " (empty embedded data)";
+                        qWarning().noquote().nospace() << "Skipped: " << refPath << " (empty embedded data)";
                         ++skipped;
                     }
                 }
@@ -219,10 +261,11 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
             }
         }
     }
-    outProj.modified = QDateTime::currentDateTimeUtc();
+    outProj.modified = now();
     const QString sidecarPath = QDir(outputDir).filePath(QStringLiteral("project.mna"));
-    MnaIO::write(outProj, sidecarPath);
-    qInfo().noquote().nospace() << "  Sidecar written: " << sidecarPath;
+    if (writeProject(outProj, sidecarPath, QStringLiteral("  Sidecar written: ") + sidecarPath) != 0) {
+        return 1;
+    }
 
     qInfo().noquote().nospace() << "  Done. Extracted: " << extracted << "  Skipped: " << skipped;
     return 0;
@@ -239,7 +282,11 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
     MnaProject proj;
 
     if (QFile::exists(sidecarPath)) {
-        proj = MnaIO::read(sidecarPath);
+        std::optional<MnaProject> sidecar = readProject(sidecarPath);
+        if (!sidecar) {
+            return 1;
+        }
+        proj = std::move(*sidecar);
         qInfo().noquote().nospace() << "  Using existing sidecar: " << sidecarPath;
 
         if (embed) {
@@ -248,14 +295,8 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                 for (MnaSession& sess : subj.sessions) {
                     for (MnaRecording& rec : sess.recordings) {
                         for (MnaFileRef& ref : rec.files) {
-                            const QString filePath = QDir(inputDir).filePath(ref.path);
-                            QFile f(filePath);
-                            if (f.open(QIODevice::ReadOnly)) {
-                                ref.data = f.readAll();
-                                ref.sizeBytes = ref.data.size();
-                                ref.embedded = true;
-                                f.close();
-                            } else {
+                            const QString filePath = QDir(inputDir).filePath(QString::fromStdString(ref.path));
+                            if (!ref.embed(fsPath(filePath))) {
                                 qWarning().noquote().nospace() << "cannot read " << filePath;
                             }
                         }
@@ -267,9 +308,8 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
         // Scan the directory for BIDS structure: sub-*/ses-*/<modality>/*
         qInfo().noquote().nospace() << "  Scanning BIDS directory: " << inputDir;
 
-        proj.name = QStringLiteral("BIDS Import");
-        proj.description = QStringLiteral("Imported from BIDS directory");
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.name = "BIDS Import";
+        proj.description = "Imported from BIDS directory";
 
         // Find sub-* directories
         QDir rootDir(inputDir);
@@ -283,9 +323,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
 
         for (const QString& subDirName : subDirs) {
             MnaSubject subj;
-            subj.id = subDirName.startsWith(QLatin1String("sub-"))
-                ? subDirName.mid(4)
-                : subDirName;
+            subj.id = (subDirName.startsWith(QLatin1String("sub-")) ? subDirName.mid(4) : subDirName).toStdString();
 
             QDir subDir(rootDir.filePath(subDirName));
             QStringList sesDirs = subDir.entryList(QStringList() << QStringLiteral("ses-*"),
@@ -295,12 +333,10 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
 
             for (const QString& sesDirName : sesDirs) {
                 MnaSession sess;
-                sess.id = sesDirName.startsWith(QLatin1String("ses-"))
-                    ? sesDirName.mid(4)
-                    : QStringLiteral("01");
+                sess.id = sesDirName.startsWith(QLatin1String("ses-")) ? sesDirName.mid(4).toStdString() : std::string("01");
 
                 MnaRecording rec;
-                rec.id = QStringLiteral("recording-01");
+                rec.id = "recording-01";
 
                 QDir sesDir(subDir.filePath(sesDirName));
                 // Iterate modality dirs: anat, meg, bem, source, etc.
@@ -321,47 +357,36 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                             ref.role = defaultRole;
 
                         const QString absPath = modDir.filePath(fileName);
-                        ref.path = rootDir.relativeFilePath(absPath);
-                        ref.format = QFileInfo(fileName).suffix();
+                        ref.path = rootDir.relativeFilePath(absPath).toStdString();
+                        ref.format = QFileInfo(fileName).suffix().toStdString();
 
                         if (embed) {
-                            QFile f(absPath);
-                            if (f.open(QIODevice::ReadOnly)) {
-                                ref.data = f.readAll();
-                                ref.sizeBytes = ref.data.size();
-                                ref.embedded = true;
-                                f.close();
+                            if (!ref.embed(fsPath(absPath))) {
+                                qWarning().noquote().nospace() << "cannot read " << absPath;
                             }
                         } else {
                             ref.embedded = false;
-                            ref.sizeBytes = QFileInfo(absPath).size();
+                            ref.size_bytes = QFileInfo(absPath).size();
                         }
 
-                        rec.files.append(ref);
-                        qInfo().noquote().nospace() << "  + " << mnaFileRoleToString(ref.role) << "  " << ref.path;
+                        qInfo().noquote().nospace() << "  + " << QString::fromUtf8(to_string(ref.role)) << "  " << QString::fromStdString(ref.path);
+                        rec.files.push_back(std::move(ref));
                     }
                 }
 
-                if (!rec.files.isEmpty()) {
-                    sess.recordings.append(rec);
+                if (!rec.files.empty()) {
+                    sess.recordings.push_back(std::move(rec));
                 }
             }
 
-            if (!subj.sessions.isEmpty()) {
-                proj.subjects.append(subj);
+            if (!subj.sessions.empty()) {
+                proj.subjects.push_back(std::move(subj));
             }
         }
     }
 
-    proj.modified = QDateTime::currentDateTimeUtc();
-
-    if (MnaIO::write(proj, outputPath)) {
-        qInfo().noquote().nospace() << "  Written: " << outputPath;
-        return 0;
-    } else {
-        qCritical().noquote().nospace() << "failed to write " << outputPath;
-        return 1;
-    }
+    proj.modified = now();
+    return writeProject(proj, outputPath, QStringLiteral("  Written: ") + outputPath);
 }
 
 //=============================================================================================================
@@ -370,11 +395,11 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
 
 static int cmdConvert(const QString& inputPath, const QString& outputPath)
 {
-    MnaProject proj = MnaIO::read(inputPath);
-    if (proj.name.isEmpty() && proj.subjects.isEmpty() && proj.pipeline.isEmpty()) {
-        qCritical().noquote().nospace() << "failed to read project: " << inputPath;
+    std::optional<MnaProject> read = readProject(inputPath);
+    if (!read) {
         return 1;
     }
+    MnaProject& proj = *read;
 
     const QString outSuffix = QFileInfo(outputPath).suffix().toLower();
     const QString inSuffix = QFileInfo(inputPath).suffix().toLower();
@@ -387,14 +412,9 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
                 for (MnaRecording& rec : sess.recordings) {
                     for (MnaFileRef& ref : rec.files) {
                         if (!ref.embedded) {
-                            const QString filePath = QDir::cleanPath(QDir(projDir).filePath(ref.path));
-                            QFile f(filePath);
-                            if (f.open(QIODevice::ReadOnly)) {
-                                ref.data = f.readAll();
-                                ref.sizeBytes = ref.data.size();
-                                ref.embedded = true;
-                                ref.path = QFileInfo(ref.path).fileName();
-                                f.close();
+                            const QString filePath = QDir::cleanPath(QDir(projDir).filePath(QString::fromStdString(ref.path)));
+                            if (ref.embed(fsPath(filePath))) {
+                                ref.path = QFileInfo(filePath).fileName().toStdString();
                                 qInfo().noquote().nospace() << "  embedded: " << filePath;
                             } else {
                                 qWarning().noquote().nospace() << "cannot read " << filePath << ", keeping as reference";
@@ -421,15 +441,8 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
         }
     }
 
-    proj.modified = QDateTime::currentDateTimeUtc();
-
-    if (MnaIO::write(proj, outputPath)) {
-        qInfo().noquote().nospace() << "  Converted: " << inputPath << " -> " << outputPath;
-        return 0;
-    } else {
-        qCritical().noquote().nospace() << "failed to write " << outputPath;
-        return 1;
-    }
+    proj.modified = now();
+    return writeProject(proj, outputPath, QStringLiteral("  Converted: ") + inputPath + QStringLiteral(" -> ") + outputPath);
 }
 
 //=============================================================================================================

@@ -18,6 +18,7 @@
 
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -209,9 +210,9 @@ void TestMneInspectApp::exportsAndReopensProjects()
         exportProject->trigger();
         QVERIFY2(QFile::exists(dir.filePath(name)), qPrintable(name));
 
-        const mne::MnaProject project = mne::MnaIO::read(dir.filePath(name));
-        QCOMPARE(project.subjects.size(), 1);
-        const auto& refs = project.subjects.first().sessions.first().recordings.first().files;
+        const mne::MnaProject project = mne::MnaIO::read(mne::path_from_utf8(dir.filePath(name).toStdString())).value();
+        QCOMPARE(project.subjects.size(), std::size_t(1));
+        const auto& refs = project.subjects.front().sessions.front().recordings.front().files;
         QCOMPARE(refs.size(), expected.size());
         for (const mne::MnaFileRef& ref : refs)
             QCOMPARE(ref.embedded, name.endsWith(".mnx"));

@@ -19,10 +19,13 @@
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 
-#include <QDateTime>
+#include <base/string_utils.h>
+
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+
+#include <chrono>
 
 using namespace MNEANALYZESTUDIO;
 using namespace mne;
@@ -87,14 +90,18 @@ QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
                 {"status", "error"},
                 {"message", QStringLiteral("Write MNA node `%1`: source `%2` not found.").arg(nodeState.uid, path)}};
         }
-        project = MnaIO::read(path);
+        Expected<MnaProject> read = MnaIO::read(path_from_utf8(path.toStdString()));
+        if (!read) {
+            return QJsonObject{
+                {"status", "error"},
+                {"message", QStringLiteral("Write MNA node `%1`: %2").arg(nodeState.uid, QString::fromUtf8(read.error().what()))}};
+        }
+        project = std::move(*read);
     } else {
-        project.name = nodeState.parameters.value("project_name").toString(QStringLiteral("Untitled MNA Project"));
-        project.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
-        project.created = QDateTime::currentDateTimeUtc();
+        project.name = nodeState.parameters.value("project_name").toString(QStringLiteral("Untitled MNA Project")).toStdString();
     }
 
-    project.modified = QDateTime::currentDateTimeUtc();
+    project.modified = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 
     // MnaIO::write dispatches by file suffix (.mna -> JSON, .mnx -> CBOR).
     // The optional "format" parameter is honoured by ensuring the output
@@ -106,12 +113,10 @@ QJsonObject WriteMnaSkill::executeSkill(const WorkflowNode& nodeState)
     } else if (format == QLatin1String("mnx") && !writePath.endsWith(QLatin1String(".mnx"), Qt::CaseInsensitive)) {
         writePath += QLatin1String(".mnx");
     }
-    const bool ok = MnaIO::write(project, writePath);
-
-    if (!ok) {
+    if (const Expected<void> written = MnaIO::write(project, path_from_utf8(writePath.toStdString())); !written) {
         return QJsonObject{
             {"status", "error"},
-            {"message", QStringLiteral("Write MNA node `%1`: failed to write `%2`.").arg(nodeState.uid, writePath)}};
+            {"message", QStringLiteral("Write MNA node `%1`: %2").arg(nodeState.uid, QString::fromUtf8(written.error().what()))}};
     }
 
     return QJsonObject{

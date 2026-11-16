@@ -45,6 +45,8 @@
 #include <inv/inv_source_estimate.h>
 #include <mna/mna_project.h>
 
+#include <filesystem>
+
 #include <QAction>
 #include <QBuffer>
 #include <QColorDialog>
@@ -791,22 +793,21 @@ void TestMneBrowseApp::savesAndOpensProjects()
     const QString mnxPath = dir.filePath("study.mnx");
     chooseFile(mnxPath);
     findAction(first, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
-    const mne::MnaProject mnx = mne::MnaIO::read(mnxPath);
-    QCOMPARE(mnx.subjects.size(), 1);
-    const mne::MnaFileRef rawRef = mnx.subjects[0].sessions[0].recordings[0].files.first();
+    const mne::MnaProject mnx = mne::MnaIO::read(mne::path_from_utf8(mnxPath.toStdString())).value();
+    QCOMPARE(mnx.subjects.size(), std::size_t(1));
+    const mne::MnaFileRef& rawRef = mnx.subjects[0].sessions[0].recordings[0].files.front();
     QCOMPARE(rawRef.role, mne::MnaFileRole::Raw);
     QVERIFY(rawRef.embedded);
-    QCOMPARE(rawRef.data.size(), QFileInfo(rawPath).size());
+    QCOMPARE(static_cast<qint64>(rawRef.data.size()), QFileInfo(rawPath).size());
     // The events detected on load travel with it, like mne.find_events(raw, "STI 014") (mne 1.11.0)
-    QByteArray eventData;
+    mne::MnaFileRef eventRef;
     for (const mne::MnaFileRef& ref : mnx.subjects[0].sessions[0].recordings[0].files) {
         if (ref.role == mne::MnaFileRole::Event)
-            eventData = ref.data;
+            eventRef = ref;
     }
-    QFile eventFile(dir.filePath("embedded-eve.fif"));
-    QVERIFY(eventFile.open(QIODevice::WriteOnly) && eventFile.write(eventData) == eventData.size());
-    eventFile.close();
-    const mne::FiffEvents events = mne::FiffEvents::read_fif(eventFile.fileName().toStdString()).value();
+    const std::filesystem::path eventFile = mne::path_from_utf8(dir.filePath("embedded-eve.fif").toStdString());
+    QVERIFY(eventRef.extract(eventFile));
+    const mne::FiffEvents events = mne::FiffEvents::read_fif(eventFile).value();
     QCOMPARE(events.num_events(), 25);
     QCOMPARE(events.events.row(0), Eigen::RowVector3i(13988, 0, 2));
     first->hide();
@@ -824,11 +825,11 @@ void TestMneBrowseApp::savesAndOpensProjects()
     chooseFile(mnaPath);
     findAction(second, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
     second->hide();
-    const mne::MnaProject mna = mne::MnaIO::read(mnaPath);
-    const mne::MnaFileRef mnaRaw = mna.subjects[0].sessions[0].recordings[0].files.first();
+    const mne::MnaProject mna = mne::MnaIO::read(mne::path_from_utf8(mnaPath.toStdString())).value();
+    const mne::MnaFileRef& mnaRaw = mna.subjects[0].sessions[0].recordings[0].files.front();
     QVERIFY(!mnaRaw.embedded);
-    const QString referenced = QDir(dir.path()).absoluteFilePath(mnaRaw.path);
-    QVERIFY2(QFileInfo(referenced).absolutePath() == QFileInfo(mnaPath).absolutePath(), qPrintable(mnaRaw.path));
+    const QString referenced = QDir(dir.path()).absoluteFilePath(QString::fromStdString(mnaRaw.path));
+    QVERIFY2(QFileInfo(referenced).absolutePath() == QFileInfo(mnaPath).absolutePath(), mnaRaw.path.c_str());
     QCOMPARE(QFileInfo(referenced).size(), QFileInfo(rawPath).size());
 
     auto* third = openWindow();

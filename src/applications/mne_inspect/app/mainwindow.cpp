@@ -33,6 +33,9 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_types.h>
 
+#include <base/byte_stream.h>
+#include <base/string_utils.h>
+
 #include <mri/mri_slicer.h>
 
 #include <QVBoxLayout>
@@ -81,7 +84,12 @@
 #include <QSignalBlocker>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <cstdint>
+#include <filesystem>
+#include <set>
+#include <vector>
 
 #ifdef WASMBUILD
 #include <QBuffer>
@@ -209,11 +217,18 @@ static QString bidsSubdirForRole(MnaFileRole role)
 /**
  * Build a BIDS-like relative path: sub-<subj>/ses-<sess>/<modality>/<filename>
  */
-static QString bidsBuildRelPath(const QString& subjId, const QString& sessId,
-                                MnaFileRole role, const QString& fileName)
+static std::string bidsBuildRelPath(const std::string& subjId, const std::string& sessId,
+                                    MnaFileRole role, const QString& fileName)
 {
     return QStringLiteral("sub-%1/ses-%2/%3/%4")
-        .arg(subjId, sessId, bidsSubdirForRole(role), QFileInfo(fileName).fileName());
+        .arg(QString::fromStdString(subjId), QString::fromStdString(sessId), bidsSubdirForRole(role), QFileInfo(fileName).fileName())
+        .toStdString();
+}
+
+/** @return @p path as a std::filesystem path. */
+static std::filesystem::path fsPath(const QString& path)
+{
+    return path_from_utf8(path.toStdString());
 }
 
 //=============================================================================================================
@@ -979,44 +994,34 @@ void MainWindow::setupConnections()
 #ifdef WASMBUILD
         // WASM always exports as .mnx with embedded data
         MnaProject proj;
-        proj.name = QStringLiteral("MNE Inspect Export");
-        proj.description = QStringLiteral("Exported from MNE Inspect (WASM)");
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.name = "MNE Inspect Export";
+        proj.description = "Exported from MNE Inspect (WASM)";
 
         MnaSubject subj;
-        subj.id = QStringLiteral("User");
+        subj.id = "User";
         MnaSession session;
-        session.id = QStringLiteral("session-01");
+        session.id = "session-01";
         MnaRecording rec;
-        rec.id = QStringLiteral("recording-01");
+        rec.id = "recording-01";
 
         for (const auto& entry : m_loadedFiles) {
             MnaFileRef ref;
             ref.role = static_cast<MnaFileRole>(entry.second);
             ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
-            ref.format = QFileInfo(entry.first).suffix();
-            ref.embedded = true;
-
-            QFile f(entry.first);
-            if (f.open(QIODevice::ReadOnly)) {
-                ref.data = f.readAll();
-                ref.sizeBytes = ref.data.size();
-                f.close();
+            ref.format = QFileInfo(entry.first).suffix().toStdString();
+            if (const Expected<void> embedded = ref.embed(fsPath(entry.first)); !embedded) {
+                qWarning() << "Cannot embed" << entry.first << embedded.error().what();
+                continue;
             }
-            rec.files.append(ref);
+            rec.files.push_back(std::move(ref));
         }
 
-        session.recordings.append(rec);
-        subj.sessions.append(session);
-        proj.subjects.append(subj);
+        session.recordings.push_back(std::move(rec));
+        subj.sessions.push_back(std::move(session));
+        proj.subjects.push_back(std::move(subj));
 
-        // Serialize to CBOR in memory
-        const QByteArray magic = QByteArrayLiteral("MNX1");
-        QCborValue cborVal(proj.toCbor());
-        QByteArray cborData = cborVal.toCbor();
-        QByteArray out = magic + cborData;
-
-        QFileDialog::saveFileContent(out, "project.mnx");
+        const std::vector<std::byte> out = MnaIO::to_mnx(proj);
+        QFileDialog::saveFileContent(QByteArray(reinterpret_cast<const char*>(out.data()), static_cast<qsizetype>(out.size())), "project.mnx");
 #else
         QString path = QFileDialog::getSaveFileName(this, "Export MNA Project", "project.mnx",
                                                     "MNX Binary (*.mnx);;MNA JSON (*.mna);;All Files (*)");
@@ -2548,42 +2553,41 @@ void MainWindow::unloadFileFromScene(MnaFileRole role, const QString& path)
 
 void MainWindow::importMnaProject(const QString& path)
 {
-    MnaProject proj = MnaIO::read(path);
-    if (proj.name.isEmpty() && proj.subjects.isEmpty()) {
-        qWarning() << "Failed to read MNA project from:" << path;
+    Expected<MnaProject> read = MnaIO::read(fsPath(path));
+    if (!read) {
+        qWarning() << "Failed to read MNA project:" << read.error().what();
         return;
     }
+    MnaProject& proj = *read;
+    const QString projectName = QString::fromStdString(proj.name);
 
-    qInfo() << "Importing MNA project:" << proj.name;
+    qInfo() << "Importing MNA project:" << projectName;
     const QString projectDir = QFileInfo(path).absolutePath();
 
     // Create a unique extraction root under /tmp using the project name
     const QString extractRoot = QStringLiteral("/tmp/mna_") +
-        proj.name.toLower().replace(QRegularExpression(QStringLiteral("[^a-z0-9]+")), QStringLiteral("_"));
+        projectName.toLower().replace(QRegularExpression(QStringLiteral("[^a-z0-9]+")), QStringLiteral("_"));
 
     // Collect all file refs from all subjects/sessions/recordings
     for (const MnaSubject& subj : proj.subjects) {
         for (const MnaSession& sess : subj.sessions) {
             for (const MnaRecording& rec : sess.recordings) {
                 for (const MnaFileRef& ref : rec.files) {
+                    const QString refPath = QString::fromStdString(ref.path);
                     // Resolve the file: embedded → extract to BIDS tree, external → resolve relative path
                     QString filePath;
-                    if (ref.embedded && !ref.data.isEmpty()) {
+                    if (ref.embedded && !ref.data.empty()) {
                         // Preserve BIDS directory structure: <extractRoot>/<ref.path>
-                        filePath = extractRoot + QStringLiteral("/") + ref.path;
+                        filePath = extractRoot + QStringLiteral("/") + refPath;
                         QDir().mkpath(QFileInfo(filePath).absolutePath());
-                        QFile f(filePath);
-                        if (f.open(QIODevice::WriteOnly)) {
-                            f.write(ref.data);
-                            f.close();
-                        } else {
-                            qWarning() << "Failed to extract embedded file:" << ref.path;
+                        if (!write_file_bytes(fsPath(filePath), ref.data)) {
+                            qWarning() << "Failed to extract embedded file:" << refPath;
                             continue;
                         }
                     } else {
                         // Resolve relative path against the project file directory
                         // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
-                        filePath = QDir::cleanPath(QDir(projectDir).filePath(ref.path));
+                        filePath = QDir::cleanPath(QDir(projectDir).filePath(refPath));
                         if (!QFile::exists(filePath)) {
                             qWarning() << "Referenced file not found:" << filePath;
                             continue;
@@ -2606,7 +2610,7 @@ void MainWindow::importMnaProject(const QString& path)
                                 type = "orig";
                             FsSurface surf(filePath.toStdU16String());
                             if (!surf.empty()) {
-                                m_model->addSurface(subj.id, hemi, type, surf);
+                                m_model->addSurface(QString::fromStdString(subj.id), hemi, type, surf);
                                 m_surfGroup->setEnabled(true);
                                 qInfo() << "Imported surface:" << fn;
                             }
@@ -2617,14 +2621,14 @@ void MainWindow::importMnaProject(const QString& path)
                             QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
                             FsAnnotation annot(filePath.toStdU16String());
                             if (!annot.empty()) {
-                                m_model->addAnnotation(subj.id, hemi, annot);
+                                m_model->addAnnotation(QString::fromStdString(subj.id), hemi, annot);
                                 qInfo() << "Imported annotation:" << fn;
                             }
                             break;
                         }
                         case MnaFileRole::Bem:
-                            loadBem(subj.id, filePath);
-                            qInfo() << "Imported BEM:" << ref.path;
+                            loadBem(QString::fromStdString(subj.id), filePath);
+                            qInfo() << "Imported BEM:" << refPath;
                             break;
                         case MnaFileRole::Digitizer:
                             if (m_brainView->loadSensors(filePath)) {
@@ -2634,12 +2638,12 @@ void MainWindow::importMnaProject(const QString& path)
                                 m_showDigCheck->setEnabled(true);
                                 m_showHelmetCheck->setEnabled(true);
                                 m_helmetShapeCombo->setEnabled(true);
-                                qInfo() << "Imported digitizer:" << ref.path;
+                                qInfo() << "Imported digitizer:" << refPath;
                             }
                             break;
                         case MnaFileRole::Transform:
                             m_brainView->loadTransformation(filePath);
-                            qInfo() << "Imported transformation:" << ref.path;
+                            qInfo() << "Imported transformation:" << refPath;
                             break;
                         case MnaFileRole::SourceSpace:
                             if (m_brainView->loadSourceSpace(filePath)) {
@@ -2647,12 +2651,12 @@ void MainWindow::importMnaProject(const QString& path)
                                 m_showSrcSpaceCheck->setEnabled(true);
                                 m_showSrcSpaceCheck->setChecked(false);
                                 m_brainView->setSourceSpaceVisible(false);
-                                qInfo() << "Imported source space:" << ref.path;
+                                qInfo() << "Imported source space:" << refPath;
                             }
                             break;
                         case MnaFileRole::SourceEstimate:
                             addStcEntry(filePath, m_stcCombo->count() == 0);
-                            qInfo() << "Imported STC:" << ref.path;
+                            qInfo() << "Imported STC:" << refPath;
                             break;
                         case MnaFileRole::Evoked: {
                             QStringList sets = BrainView::probeEvokedSets(filePath);
@@ -2666,11 +2670,11 @@ void MainWindow::importMnaProject(const QString& path)
                             m_evokedSetCombo->blockSignals(false);
                             m_evokedSetCombo->setProperty("evokedPath", filePath);
                             m_brainView->loadSensorField(filePath, 0);
-                            qInfo() << "Imported evoked:" << ref.path;
+                            qInfo() << "Imported evoked:" << refPath;
                             break;
                         }
                         default:
-                            qInfo() << "Preserving foreign file with role:" << mnaFileRoleToString(ref.role) << ref.path;
+                            qInfo() << "Preserving foreign file with role:" << QString::fromUtf8(to_string(ref.role)) << refPath;
                             break;
                     }
                 }
@@ -2685,9 +2689,9 @@ void MainWindow::importMnaProject(const QString& path)
             for (auto& r : se.recordings)
                 for (auto& f : r.files)
                     if (!f.embedded)
-                        f.path = QDir(projectDir).absoluteFilePath(f.path);
+                        f.path = QDir(projectDir).absoluteFilePath(QString::fromStdString(f.path)).toStdString();
 
-    m_loadedMnaProject = proj;
+    m_loadedMnaProject = std::move(proj);
 
     qInfo() << "MNA project import complete.";
     addRecentFile(path);
@@ -2699,7 +2703,7 @@ void MainWindow::exportMnaProject(const QString& path, bool embedData)
 {
     // ── Enriching mode: start from loaded project to preserve foreign data ──
     // Roles that mne_inspect owns and will replace with current state
-    static const QSet<MnaFileRole> ownedRoles = {
+    static const std::set<MnaFileRole> ownedRoles = {
         MnaFileRole::Surface,
         MnaFileRole::Annotation,
         MnaFileRole::Bem,
@@ -2710,68 +2714,50 @@ void MainWindow::exportMnaProject(const QString& path, bool embedData)
         MnaFileRole::Evoked};
 
     MnaProject proj;
-    const bool hasBase = !m_loadedMnaProject.subjects.isEmpty();
+    const bool hasBase = !m_loadedMnaProject.subjects.empty();
     const QString projectDir = QFileInfo(path).absolutePath();
 
     if (hasBase) {
         // Preserve all metadata, pipeline, and subject structure from the loaded project
         proj = m_loadedMnaProject;
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.modified = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 
         // Strip only our owned roles from the first recording; keep everything else
-        if (!proj.subjects.isEmpty() && !proj.subjects[0].sessions.isEmpty() && !proj.subjects[0].sessions[0].recordings.isEmpty()) {
+        if (!proj.subjects.empty() && !proj.subjects[0].sessions.empty() && !proj.subjects[0].sessions[0].recordings.empty()) {
             auto& files = proj.subjects[0].sessions[0].recordings[0].files;
-            files.erase(std::remove_if(files.begin(), files.end(),
-                                       [](const MnaFileRef& r) { return ownedRoles.contains(r.role); }),
-                        files.end());
+            std::erase_if(files, [](const MnaFileRef& r) { return ownedRoles.contains(r.role); });
 
             // Re-serialize foreign refs for the target format
             for (auto& ref : files) {
+                const QString refPath = QString::fromStdString(ref.path);
                 if (embedData) {
-                    if (!ref.embedded && !ref.path.isEmpty()) {
-                        QFile f(ref.path);
-                        if (f.open(QIODevice::ReadOnly)) {
-                            ref.data = f.readAll();
-                            ref.sizeBytes = ref.data.size();
-                            f.close();
-                        }
-                        ref.path = proj.subjects[0].id + QStringLiteral("/") + proj.subjects[0].sessions[0].id + QStringLiteral("/passthrough/") + QFileInfo(ref.path).fileName();
-                        ref.embedded = true;
+                    if (!ref.embedded && !ref.path.empty() && ref.embed(fsPath(refPath))) {
+                        ref.path = proj.subjects[0].id + "/" + proj.subjects[0].sessions[0].id + "/passthrough/" + QFileInfo(refPath).fileName().toStdString();
                     }
                 } else {
-                    if (ref.embedded && !ref.data.isEmpty()) {
-                        const QString outPath = projectDir + QDir::separator() + QFileInfo(ref.path).fileName();
-                        QFile f(outPath);
-                        if (f.open(QIODevice::WriteOnly)) {
-                            f.write(ref.data);
-                            f.close();
+                    if (ref.embedded && !ref.data.empty()) {
+                        const QString outPath = projectDir + QDir::separator() + QFileInfo(refPath).fileName();
+                        if (ref.extract(fsPath(outPath))) {
+                            ref.path = QDir(projectDir).relativeFilePath(outPath).toStdString();
                         }
-                        ref.path = QDir(projectDir).relativeFilePath(outPath);
-                        ref.embedded = false;
-                        ref.data.clear();
                     } else if (!ref.embedded) {
-                        ref.path = QDir(projectDir).relativeFilePath(ref.path);
+                        ref.path = QDir(projectDir).relativeFilePath(refPath).toStdString();
                     }
                 }
             }
         }
     } else {
         // Brand-new project — create minimal structure
-        proj.name = QStringLiteral("MNE Inspect Export");
-        proj.description = QStringLiteral("Exported from MNE Inspect");
-        proj.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
-        proj.created = QDateTime::currentDateTimeUtc();
-        proj.modified = QDateTime::currentDateTimeUtc();
+        proj.name = "MNE Inspect Export";
+        proj.description = "Exported from MNE Inspect";
 
         MnaSubject subj;
-        subj.id = QStringLiteral("User");
+        subj.id = "User";
         MnaSession session;
-        session.id = QStringLiteral("session-01");
-        MnaRecording rec;
-        rec.id = QStringLiteral("recording-01");
-        session.recordings.append(rec);
-        subj.sessions.append(session);
-        proj.subjects.append(subj);
+        session.id = "session-01";
+        session.recordings.emplace_back().id = "recording-01";
+        subj.sessions.push_back(std::move(session));
+        proj.subjects.push_back(std::move(subj));
     }
 
     // Reference to the first recording where we add our files
@@ -2781,34 +2767,30 @@ void MainWindow::exportMnaProject(const QString& path, bool embedData)
     for (const auto& entry : m_loadedFiles) {
         MnaFileRef ref;
         ref.role = static_cast<MnaFileRole>(entry.second);
-        ref.format = QFileInfo(entry.first).suffix();
+        ref.format = QFileInfo(entry.first).suffix().toStdString();
 
         if (embedData) {
             ref.path = bidsBuildRelPath(proj.subjects[0].id,
                                         proj.subjects[0].sessions[0].id,
                                         ref.role, entry.first);
-            ref.embedded = true;
-            QFile f(entry.first);
-            if (f.open(QIODevice::ReadOnly)) {
-                ref.data = f.readAll();
-                ref.sizeBytes = ref.data.size();
-                f.close();
+            if (const Expected<void> embedded = ref.embed(fsPath(entry.first)); !embedded) {
+                qWarning() << "Cannot embed" << entry.first << embedded.error().what();
+                continue;
             }
         } else {
-            ref.path = QDir(projectDir).relativeFilePath(entry.first);
+            ref.path = QDir(projectDir).relativeFilePath(entry.first).toStdString();
             ref.embedded = false;
-            QFileInfo fi(entry.first);
-            ref.sizeBytes = fi.size();
+            ref.size_bytes = QFileInfo(entry.first).size();
         }
 
-        rec.files.append(ref);
+        rec.files.push_back(std::move(ref));
     }
 
-    if (MnaIO::write(proj, path)) {
-        m_loadedMnaProject = proj;
+    if (const Expected<void> written = MnaIO::write(proj, fsPath(path)); written) {
+        m_loadedMnaProject = std::move(proj);
         qInfo() << "Exported MNA project to:" << path;
     } else {
-        qWarning() << "Failed to export MNA project to:" << path;
+        qWarning() << "Failed to export MNA project:" << written.error().what();
     }
 }
 
@@ -3044,7 +3026,7 @@ void MainWindow::addLoadedFileEntry(const QString& path, int role)
 
     QTreeWidgetItem* item = new QTreeWidgetItem;
     item->setText(0, QFileInfo(path).fileName());
-    item->setText(1, mnaFileRoleToString(static_cast<MnaFileRole>(role)));
+    item->setText(1, QString::fromUtf8(to_string(static_cast<MnaFileRole>(role))));
     item->setText(2, path);
     item->setData(0, Qt::UserRole, role);
     m_loadedFilesTree->addTopLevelItem(item);

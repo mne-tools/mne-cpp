@@ -21,7 +21,9 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
+#include <base/json.h>
 #include <base/log.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,9 +31,16 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QFile>
-#include <QFileInfo>
-#include <QTextStream>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <filesystem>
+#include <format>
+#include <print>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -43,15 +52,16 @@ using namespace mne;
 // HELPERS
 //=============================================================================================================
 
-static QString humanSize(qint64 bytes)
+static std::string humanSize(std::uintmax_t bytes)
 {
+    const double b = static_cast<double>(bytes);
     if (bytes < 1024)
-        return QString::number(bytes) + QStringLiteral(" B");
+        return std::format("{} B", bytes);
     if (bytes < 1024 * 1024)
-        return QString::number(bytes / 1024.0, 'f', 1) + QStringLiteral(" KB");
+        return std::format("{:.1f} KB", b / 1024.0);
     if (bytes < 1024 * 1024 * 1024)
-        return QString::number(bytes / (1024.0 * 1024.0), 'f', 1) + QStringLiteral(" MB");
-    return QString::number(bytes / (1024.0 * 1024.0 * 1024.0), 'f', 2) + QStringLiteral(" GB");
+        return std::format("{:.1f} MB", b / (1024.0 * 1024.0));
+    return std::format("{:.2f} GB", b / (1024.0 * 1024.0 * 1024.0));
 }
 
 //=============================================================================================================
@@ -92,128 +102,103 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    const QString filePath = args.first();
-    if (!QFile::exists(filePath)) {
-        qCritical("Error: file not found: %s", qPrintable(filePath));
+    const std::filesystem::path filePath = path_from_utf8(args.first().toStdString());
+    const Expected<MnaProject> read = MnaIO::read(filePath);
+    if (!read) {
+        std::println(stderr, "Error: {}", read.error().what());
         return 1;
     }
-
-    // ── Read the project ────────────────────────────────────────────────
-    MnaProject proj = MnaIO::read(filePath);
-    if (proj.name.isEmpty() && proj.subjects.isEmpty() && proj.pipeline.isEmpty()) {
-        qCritical("Error: failed to read or empty project: %s", qPrintable(filePath));
-        return 1;
-    }
-
-    QTextStream out(stdout);
+    const MnaProject& proj = *read;
 
     // ── JSON dump mode ──────────────────────────────────────────────────
     if (parser.isSet(jsonOpt)) {
-        QJsonDocument doc(proj.toJson());
-        out << doc.toJson(QJsonDocument::Indented);
+        std::print("{}", JsonDocument(proj.to_json()).to_json(JsonDocument::Indented));
         return 0;
     }
 
     // ── Human-readable display ──────────────────────────────────────────
     const bool verbose = parser.isSet(verboseOpt);
-    const QFileInfo fi(filePath);
+    std::error_code ec;
 
-    out << "═══════════════════════════════════════════════════════════════\n";
-    out << " MNA Project: " << proj.name << "\n";
-    out << "═══════════════════════════════════════════════════════════════\n";
-    out << "  File:        " << fi.fileName() << " (" << humanSize(fi.size()) << ")\n";
-    out << "  Format:      " << (fi.suffix().toLower() == QLatin1String("mnx") ? "MNX (CBOR)" : "MNA (JSON)") << "\n";
-    out << "  MNA Version: " << proj.mnaVersion << "\n";
-    if (!proj.description.isEmpty())
-        out << "  Description: " << proj.description << "\n";
-    if (proj.created.isValid())
-        out << "  Created:     " << proj.created.toString(Qt::ISODate) << "\n";
-    if (proj.modified.isValid())
-        out << "  Modified:    " << proj.modified.toString(Qt::ISODate) << "\n";
-    out << "\n";
+    std::println("═══════════════════════════════════════════════════════════════");
+    std::println(" MNA Project: {}", proj.name);
+    std::println("═══════════════════════════════════════════════════════════════");
+    std::println("  File:        {} ({})", utf8_from_path(filePath.filename()), humanSize(std::filesystem::file_size(filePath, ec)));
+    std::println("  Format:      {}", to_lower(utf8_from_path(filePath.extension())) == ".mnx" ? "MNX (CBOR)" : "MNA (JSON)");
+    std::println("  MNA Version: {}", proj.mna_version);
+    if (!proj.description.empty())
+        std::println("  Description: {}", proj.description);
+    if (proj.created)
+        std::println("  Created:     {}", format_iso8601(*proj.created));
+    if (proj.modified)
+        std::println("  Modified:    {}", format_iso8601(*proj.modified));
+    std::println("");
 
     // ── Subjects / Sessions / Recordings / Files ────────────────────────
     int totalFiles = 0;
-    qint64 totalEmbeddedSize = 0;
+    std::int64_t totalEmbeddedSize = 0;
     int embeddedCount = 0;
 
-    if (!proj.subjects.isEmpty()) {
-        out << "  Subjects: " << proj.subjects.size() << "\n";
-        out << "  ───────────────────────────────────────────────────────────\n";
-
-        for (int si = 0; si < proj.subjects.size(); ++si) {
+    if (!proj.subjects.empty()) {
+        std::println("  Subjects: {}", proj.subjects.size());
+        std::println("  ───────────────────────────────────────────────────────────");
+        for (std::size_t si = 0; si < proj.subjects.size(); ++si) {
             const MnaSubject& subj = proj.subjects[si];
-            out << "  [Subject " << (si + 1) << "] " << subj.id << "\n";
-
-            for (int sei = 0; sei < subj.sessions.size(); ++sei) {
+            std::println("  [Subject {}] {}", si + 1, subj.id);
+            for (std::size_t sei = 0; sei < subj.sessions.size(); ++sei) {
                 const MnaSession& sess = subj.sessions[sei];
-                out << "    [Session " << (sei + 1) << "] " << sess.id << "\n";
-
-                for (int ri = 0; ri < sess.recordings.size(); ++ri) {
+                std::println("    [Session {}] {}", sei + 1, sess.id);
+                for (std::size_t ri = 0; ri < sess.recordings.size(); ++ri) {
                     const MnaRecording& rec = sess.recordings[ri];
-                    out << "      [Recording " << (ri + 1) << "] " << rec.id
-                        << " ─ " << rec.files.size() << " file(s)\n";
-
-                    for (int fi2 = 0; fi2 < rec.files.size(); ++fi2) {
-                        const MnaFileRef& ref = rec.files[fi2];
+                    std::println("      [Recording {}] {} ─ {} file(s)", ri + 1, rec.id, rec.files.size());
+                    for (std::size_t f = 0; f < rec.files.size(); ++f) {
+                        const MnaFileRef& ref = rec.files[f];
                         ++totalFiles;
-
-                        QString embTag;
                         if (ref.embedded) {
-                            embTag = QStringLiteral(" [EMBEDDED]");
                             embeddedCount++;
-                            totalEmbeddedSize += ref.sizeBytes;
+                            totalEmbeddedSize += ref.size_bytes;
                         }
-
-                        out << "        " << (fi2 + 1) << ". "
-                            << mnaFileRoleToString(ref.role) << "  "
-                            << ref.path << embTag << "\n";
-
+                        std::println("        {}. {}  {}{}", f + 1, to_string(ref.role), ref.path, ref.embedded ? " [EMBEDDED]" : "");
                         if (verbose) {
-                            out << "           format: " << ref.format
-                                << "  size: " << humanSize(ref.sizeBytes);
-                            if (!ref.sha256.isEmpty())
-                                out << "  sha256: " << ref.sha256.left(16) << "...";
-                            out << "\n";
+                            std::print("           format: {}  size: {}", ref.format, humanSize(static_cast<std::uintmax_t>(ref.size_bytes)));
+                            if (!ref.sha256.empty())
+                                std::print("  sha256: {}...", ref.sha256.substr(0, 16));
+                            std::println("");
                         }
                     }
                 }
             }
         }
-        out << "\n";
+        std::println("");
     }
 
     // ── Pipeline ────────────────────────────────────────────────────────
-    if (!proj.pipeline.isEmpty()) {
-        out << "  Pipeline: " << proj.pipeline.size() << " node(s)\n";
-        out << "  ───────────────────────────────────────────────────────────\n";
-
-        for (int ni = 0; ni < proj.pipeline.size(); ++ni) {
+    if (!proj.pipeline.empty()) {
+        std::println("  Pipeline: {} node(s)", proj.pipeline.size());
+        std::println("  ───────────────────────────────────────────────────────────");
+        for (std::size_t ni = 0; ni < proj.pipeline.size(); ++ni) {
             const MnaNode& node = proj.pipeline[ni];
-            out << "  [" << (ni + 1) << "] " << node.id
-                << "  op=" << node.opType;
-            if (!node.toolVersion.isEmpty())
-                out << "  v" << node.toolVersion;
-            out << "\n";
-
+            std::print("  [{}] {}  op={}", ni + 1, node.id, node.op_type);
+            if (!node.tool_version.empty())
+                std::print("  v{}", node.tool_version);
+            std::println("");
             if (verbose) {
                 for (const MnaPort& p : node.inputs)
-                    out << "       IN  " << p.name << " (" << mnaDataKindToString(p.dataKind) << ")\n";
+                    std::println("       IN  {} ({})", p.name, to_string(p.data_kind));
                 for (const MnaPort& p : node.outputs)
-                    out << "       OUT " << p.name << " (" << mnaDataKindToString(p.dataKind) << ")\n";
+                    std::println("       OUT {} ({})", p.name, to_string(p.data_kind));
             }
         }
-        out << "\n";
+        std::println("");
     }
 
     // ── Summary ─────────────────────────────────────────────────────────
-    out << "  Summary\n";
-    out << "  ───────────────────────────────────────────────────────────\n";
-    out << "  Total files:    " << totalFiles << "\n";
+    std::println("  Summary");
+    std::println("  ───────────────────────────────────────────────────────────");
+    std::println("  Total files:    {}", totalFiles);
     if (embeddedCount > 0)
-        out << "  Embedded:       " << embeddedCount << " (" << humanSize(totalEmbeddedSize) << ")\n";
-    out << "  Pipeline nodes: " << proj.pipeline.size() << "\n";
-    out << "═══════════════════════════════════════════════════════════════\n";
-
+        std::println("  Embedded:       {} ({})", embeddedCount, humanSize(static_cast<std::uintmax_t>(totalEmbeddedSize)));
+    std::println("  Pipeline nodes: {}", proj.pipeline.size());
+    std::println("═══════════════════════════════════════════════════════════════");
     return 0;
 }

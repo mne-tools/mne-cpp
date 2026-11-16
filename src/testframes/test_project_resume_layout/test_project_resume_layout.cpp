@@ -16,6 +16,12 @@
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 
+#include <base/json.h>
+#include <base/string_utils.h>
+
+#include <filesystem>
+#include <string>
+
 #include <QByteArray>
 #include <QDir>
 #include <QDockWidget>
@@ -103,27 +109,22 @@ void TestProjectResumeLayout::layoutBlob_roundTripsThroughMnaExtras()
 
     // 2. Build a minimal MnaProject, stash the layout blob (base64) under ui.layout.MainWindow.
     MnaProject proj;
-    proj.name = QStringLiteral("Synthetic");
-    proj.mnaVersion = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION);
-    proj.created = QDateTime::currentDateTimeUtc();
-    proj.modified = proj.created;
+    proj.name = "Synthetic";
 
-    const QString key = layoutKey(QStringLiteral("MainWindow"));
-    proj.extras.insert(key, QString::fromLatin1(expectedState.toBase64()));
+    const std::string key = layoutKey(QStringLiteral("MainWindow")).toStdString();
+    proj.extras.insert(key, expectedState.toBase64().toStdString());
 
     // 3. Persist via MnaIO (mna -> JSON, mnx -> CBOR).
-    MnaIO::write(proj, path);
-    QVERIFY(QFileInfo::exists(path));
+    const std::filesystem::path file = path_from_utf8(path.toStdString());
+    QVERIFY(MnaIO::write(proj, file));
 
     // 4. Reopen and read back through the same code path used by MNE Scan.
-    MnaProject reloaded = MnaIO::read(path);
-    QVERIFY2(reloaded.extras.contains(key),
-             qPrintable(QStringLiteral("extras missing %1; have: %2")
-                            .arg(key, QString::fromUtf8(QJsonDocument(reloaded.extras).toJson(QJsonDocument::Compact)))));
+    const MnaProject reloaded = MnaIO::read(file).value();
+    QVERIFY2(reloaded.extras.contains(key), (key + " missing; have: " + JsonDocument(reloaded.extras).to_json(JsonDocument::Compact)).c_str());
 
-    const QString restoredBase64 = reloaded.extras.value(key).toString();
-    QVERIFY(!restoredBase64.isEmpty());
-    const QByteArray restored = QByteArray::fromBase64(restoredBase64.toLatin1());
+    const std::string_view restoredBase64 = reloaded.extras[key].to_string();
+    QVERIFY(!restoredBase64.empty());
+    const QByteArray restored = QByteArray::fromBase64(QByteArray(restoredBase64.data(), qsizetype(restoredBase64.size())));
     QCOMPARE(restored, expectedState);
 
     // 5. Apply restored bytes to a *fresh* QMainWindow and verify restoreState succeeds.
