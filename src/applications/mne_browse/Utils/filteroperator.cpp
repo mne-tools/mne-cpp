@@ -61,7 +61,7 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 , m_sName(unique_name)
 {
     // Frequencies are relative to Nyquist. The kernel is linear phase with a delay of half its length.
-    const mne::FilterKernel kernel(unique_name,
+    const mne::FilterKernel kernel(unique_name.toStdString(),
                                    type,
                                    order,
                                    centerfreq,
@@ -69,7 +69,7 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
                                    parkswidth,
                                    sFreq,
                                    designMethod == Cosine ? 0 : 1);
-    m_dCoeffA = kernel.getCoefficients();
+    m_dCoeffA = kernel.coefficients();
     m_iFilterOrder = static_cast<int>(m_dCoeffA.cols());
 
     //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering

@@ -63,7 +63,7 @@ void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
                                    int cutOffLow,
                                    int cutOffHigh)
 {
-    if (operatorFilter.getCoefficients().cols() == 0)
+    if (operatorFilter.coefficients().cols() == 0)
         return;
 
     m_pCurrentFilter = operatorFilter;
@@ -82,7 +82,7 @@ void FilterPlotScene::updateFilter(const FilterKernel& operatorFilter,
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram(samplingFreq, operatorFilter.getName());
+    plotMagnitudeDiagram(samplingFreq, QString::fromStdString(operatorFilter.name()));
 }
 
 //=============================================================================================================
@@ -154,7 +154,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //Plot lower higher cut off frequency
     double pos = 0;
-    switch (FilterKernel::filterTypeIndex(m_pCurrentFilter.getFilterType().getName())) {
+    switch (FilterKernel::filter_type_index(m_pCurrentFilter.filter_type().name())) {
         case 0: //LPF
             pos = (static_cast<double>(m_iCutOffLow) / static_cast<double>(fMax)) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
@@ -196,7 +196,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 void FilterPlotScene::plotFilterFrequencyResponse()
 {
     //Get row vector with filter coefficients and norm to 1
-    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.getFftCoefficients();
+    RowVectorXcd coefficientsAFreq = m_pCurrentFilter.fft_coefficients();
 
     float numberCoeff = coefficientsAFreq.cols();
     float dsFactor = numberCoeff / m_qvView->width();

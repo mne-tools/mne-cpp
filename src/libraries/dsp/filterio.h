@@ -31,11 +31,9 @@
 #include "dsp_global.h"
 #include "filterkernel.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
+#include <base/error.h>
 
-#include <QString>
+#include <filesystem>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -45,18 +43,9 @@ namespace mne
 {
 
 //=============================================================================================================
-// DEFINES
-//=============================================================================================================
-
-//=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class FilterKernel;
-
-//=============================================================================================================
 /**
- * Processes txt files which hold filter coefficients.
+ * Reads and writes FIR filters as text: "#key value" lines (sFreq, name, type, order, HPFreq, LPFreq,
+ * CenterFreq, DesignMethod, ParksWidth) followed by one coefficient per line.
  *
  * @brief Processes txt files which hold filter coefficients.
  *
@@ -67,34 +56,25 @@ class DSPSHARED_EXPORT FilterIO
 public:
     //=========================================================================================================
     /**
-     * Constructs a FilterIO object.
+     * @param[in] path   The filter file.
+     *
+     * @return The filter, with as many taps as the file has coefficients, or an error if the file cannot be read
+     *         or holds a value that is no number.
      */
-    FilterIO();
+    static Expected<FilterKernel> read_filter(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
-     * Reads a given txt file and scans it for filter coefficients. Pls see sample file for file syntax.
+     * Writes the coefficients with all the digits they need to be read back exactly.
      *
-     * @param[in] path holds the file path of the txt file which is to be read.
-     * @param[in, out] filter holds the filter which the read parameters are to be saved to.
+     * @param[in] path     The filter file to write.
+     * @param[in] filter   The filter.
      *
-     * @return true if reading was successful, false otherwise.
+     * @return Nothing, or an error if the file cannot be written.
      */
-    static bool readFilter(QString path, FilterKernel& filter);
-
-    //=========================================================================================================
-    /**
-     * Writes a given filter to txt file .
-     *
-     * @param[in] path holds the file path of the txt file which is to be written to.
-     * @param[in] filter holds the filter which is to be written to file.
-     *
-     * @return true if reading was successful, false otherwise.
-     */
-    static bool writeFilter(const QString& path, const FilterKernel& filter);
-
-private:
+    static Expected<void> write_filter(const std::filesystem::path& path, const FilterKernel& filter);
 };
-} // NAMESPACE mne_dsp
+
+} // namespace mne
 
 #endif // FILTERIO_H

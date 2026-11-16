@@ -670,6 +670,29 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- `FilterKernel`, `FilterParameter`, `FilterIO` and `ParksMcClellan` use
+  standard C++ only. `FilterIO` writes coefficients with all their digits,
+  so they read back exactly, keeps spaces in filter names, and rejects a
+  value that is no number. `FilterKernel::prepare_filter` no longer
+  re-transforms the coefficients on every call. Migration:
+  - `FilterKernel` methods are snake_case: `getName`/`setName` →
+    `name`/`set_name` (`std::string`), `getSamplingFrequency` →
+    `sampling_frequency`, `getFilterOrder` → `filter_order`,
+    `getCoefficients` → `coefficients` (a const reference),
+    `getDesignMethod`/`getFilterType` → `design_method`/`filter_type`,
+    `getShortDescription` → `short_description`, `prepareFilter`,
+    `applyConvFilter`, `applyFftFilter` → `prepare_filter`,
+    `apply_conv_filter`, `apply_fft_filter`, and so on for every getter and
+    setter. `designMethodIndex`/`filterTypeIndex` →
+    `design_method_index`/`filter_type_index` (take `std::string_view`),
+    `m_designMethods`/`m_filterTypes` → `design_methods`/`filter_types`.
+    `FilterParameter::getName` → `name`.
+  - `FilterIO::readFilter(QString, FilterKernel&)` → `read_filter(path)`
+    returning `Expected<FilterKernel>`; `writeFilter(QString, kernel)` →
+    `write_filter(path, kernel)` returning `Expected<void>`.
+  - `ParksMcClellan` is no `QObject`; `FirCoeff` → `coefficients`, and the
+    Remez exchange steps (`init`, `CalcParkCoeff2`, `Remez2`, ...) are
+    private.
 - Cosine FIR filters (`FilterKernel` with the "Cosine" design method) match
   MNE-C `mne_apply_filter` again: the lower band edge had no cos² taper but
   a hard step one half-width above the edge, so band-pass and high-pass

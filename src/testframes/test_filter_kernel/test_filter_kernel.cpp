@@ -26,70 +26,69 @@ private slots:
     void defaultCtor()
     {
         FilterKernel fk;
-        QVERIFY(fk.getName().isEmpty() || true);
-        QVERIFY(fk.getSamplingFrequency() >= 0);
+        QCOMPARE(fk.name(), std::string("Unknown"));
+        QVERIFY(fk.sampling_frequency() >= 0);
     }
 
     void lpfCtor()
     {
         FilterKernel fk("TestLPF", 0, 128, 0.2, 0.0, 0.01, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestLPF"));
-        QVERIFY(fk.getFilterOrder() > 0);
-        QVERIFY(fk.getSamplingFrequency() > 0);
+        QCOMPARE(fk.name(), std::string("TestLPF"));
+        QVERIFY(fk.filter_order() > 0);
+        QVERIFY(fk.sampling_frequency() > 0);
     }
 
     void hpfCtor()
     {
         FilterKernel fk("TestHPF", 1, 128, 0.0, 0.01, 0.005, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestHPF"));
+        QCOMPARE(fk.name(), std::string("TestHPF"));
     }
 
     void bpfCtor()
     {
         FilterKernel fk("TestBPF", 2, 128, 0.02, 0.01, 0.005, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestBPF"));
+        QCOMPARE(fk.name(), std::string("TestBPF"));
     }
 
     void gettersSetters()
     {
         FilterKernel fk("Test", 0, 64, 0.2, 0.0, 0.01, 500.0, 0);
 
-        fk.setName("NewName");
-        QCOMPARE(fk.getName(), QString("NewName"));
+        fk.set_name("NewName");
+        QCOMPARE(fk.name(), std::string("NewName"));
 
-        fk.setSamplingFrequency(2000.0);
-        QVERIFY(qAbs(fk.getSamplingFrequency() - 2000.0) < 0.1);
+        fk.set_sampling_frequency(2000.0);
+        QVERIFY(std::abs(fk.sampling_frequency() - 2000.0) < 0.1);
 
-        fk.setFilterOrder(256);
-        QCOMPARE(fk.getFilterOrder(), 256);
+        fk.set_filter_order(256);
+        QCOMPARE(fk.filter_order(), 256);
 
-        fk.setCenterFrequency(0.1);
-        QVERIFY(qAbs(fk.getCenterFrequency() - 0.1) < 0.01);
+        fk.set_center_frequency(0.1);
+        QVERIFY(std::abs(fk.center_frequency() - 0.1) < 0.01);
 
-        fk.setBandwidth(0.05);
-        QVERIFY(qAbs(fk.getBandwidth() - 0.05) < 0.01);
+        fk.set_bandwidth(0.05);
+        QVERIFY(std::abs(fk.bandwidth() - 0.05) < 0.01);
 
-        fk.setParksWidth(0.02);
-        QVERIFY(qAbs(fk.getParksWidth() - 0.02) < 0.01);
+        fk.set_parks_width(0.02);
+        QVERIFY(std::abs(fk.parks_width() - 0.02) < 0.01);
 
-        fk.setHighpassFreq(5.0);
-        QVERIFY(qAbs(fk.getHighpassFreq() - 5.0) < 0.1);
+        fk.set_highpass_freq(5.0);
+        QVERIFY(std::abs(fk.highpass_freq() - 5.0) < 0.1);
 
-        fk.setLowpassFreq(40.0);
-        QVERIFY(qAbs(fk.getLowpassFreq() - 40.0) < 0.1);
+        fk.set_lowpass_freq(40.0);
+        QVERIFY(std::abs(fk.lowpass_freq() - 40.0) < 0.1);
     }
 
     void shortDescription()
     {
         FilterKernel fk("Desc", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
-        QString desc = fk.getShortDescription();
-        QVERIFY(!desc.isEmpty());
+        QCOMPARE(fk.short_description(), std::string("Cosine  -  100Hz to 0Hz  -  Ord: 64"));
     }
 
     void coefficients()
     {
         FilterKernel fk("Coeff", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
-        RowVectorXd coeffs = fk.getCoefficients();
+        const RowVectorXd& coeffs = fk.coefficients();
         QVERIFY(coeffs.size() > 0);
     }
 
@@ -100,10 +99,10 @@ private slots:
     {
         FilterKernel fk("ConvTest", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
         int N = 256;
-        fk.prepareFilter(N);
+        fk.prepare_filter(N);
 
         RowVectorXd data = RowVectorXd::Random(N);
-        RowVectorXd filtered = fk.applyConvFilter(data, false);
+        RowVectorXd filtered = fk.apply_conv_filter(data, false);
         QCOMPARE(filtered.size(), N);
     }
 
@@ -111,26 +110,26 @@ private slots:
     {
         FilterKernel fk("FftTest", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
         int N = 512;
-        fk.prepareFilter(N);
+        fk.prepare_filter(N);
 
         RowVectorXd data = RowVectorXd::Random(N);
-        fk.applyFftFilter(data, false);
+        fk.apply_fft_filter(data, false);
         QCOMPARE(data.size(), N);
     }
 
     void designMethods()
     {
         FilterKernel fkCosine("Cosine", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
-        QVERIFY(fkCosine.getCoefficients().size() > 0);
+        QVERIFY(fkCosine.coefficients().size() > 0);
 
         FilterKernel fkParks("Parks", 0, 64, 0.2, 0.0, 0.01, 1000.0, 1);
-        QVERIFY(fkParks.getCoefficients().size() > 0);
+        QVERIFY(fkParks.coefficients().size() > 0);
     }
 
     void cosineBandPassHasHalfAmplitudeAtBothEdges()
     {
         // Like MNE-C mne_apply_filter: cos^2 tapers centred on 45 and 55 Hz, flat in between
-        const RowVectorXd h = FilterKernel("BPF", 2, 511, 50.0 / 500.0, 10.0 / 500.0, 0.01, 1000.0, 0).getCoefficients();
+        const RowVectorXd h = FilterKernel("BPF", 2, 511, 50.0 / 500.0, 10.0 / 500.0, 0.01, 1000.0, 0).coefficients();
         auto gain = [&h](double hz) {
             std::complex<double> response = 0.0;
             for (Index t = 0; t < h.size(); ++t) {
@@ -145,15 +144,15 @@ private slots:
         QVERIFY(gain(35.0) < 0.05 && gain(65.0) < 0.05);
 
         // A pass band above Nyquist passes nothing
-        const RowVectorXd none = FilterKernel("BPF", 2, 256, 40.0, 1.0, 0.0, 1000.0, 0).getCoefficients();
+        const RowVectorXd none = FilterKernel("BPF", 2, 256, 40.0, 1.0, 0.0, 1000.0, 0).coefficients();
         QVERIFY(none.allFinite() && none.isZero());
     }
 
     void notchRemovesItsCenterFrequency_data()
     {
         QTest::addColumn<int>("designMethod");
-        QTest::newRow("Cosine") << FilterKernel::designMethodIndex("Cosine");
-        QTest::newRow("Tschebyscheff") << FilterKernel::designMethodIndex("Tschebyscheff");
+        QTest::newRow("Cosine") << FilterKernel::design_method_index("Cosine");
+        QTest::newRow("Tschebyscheff") << FilterKernel::design_method_index("Tschebyscheff");
     }
 
     void notchRemovesItsCenterFrequency()
@@ -161,7 +160,7 @@ private slots:
         QFETCH(int, designMethod);
         // A 50 Hz notch, 20 Hz wide, at 1 kHz; odd order as the Parks-McClellan notch requires
         const double sFreq = 1000.0;
-        FilterKernel notch("Notch", FilterKernel::filterTypeIndex("NOTCH"), 255, 50.0 / 500.0, 20.0 / 500.0, 0.01, sFreq,
+        FilterKernel notch("Notch", FilterKernel::filter_type_index("NOTCH"), 255, 50.0 / 500.0, 20.0 / 500.0, 0.01, sFreq,
                            designMethod);
         const int n = 4096;
         auto amplitude = [&](double hz) {
@@ -169,8 +168,8 @@ private slots:
             for (int t = 0; t < n; ++t) {
                 data(t) = std::sin(2.0 * M_PI * hz * t / sFreq);
             }
-            notch.prepareFilter(n);
-            notch.applyFftFilter(data);
+            notch.prepare_filter(n);
+            notch.apply_fft_filter(data);
             return data.segment(n / 4, n / 2).cwiseAbs().maxCoeff();
         };
         QVERIFY2(amplitude(50.0) < 0.1, qPrintable(QString::number(amplitude(50.0))));
@@ -181,7 +180,7 @@ private slots:
     void cosineKernelOfOddOrderIsSymmetric()
     {
         // The cosine design has a real (zero-phase) response, so its taps are symmetric about the centre tap
-        const RowVectorXd taps = FilterKernel("LPF", 0, 63, 0.1, 0.0, 0.02, 1000.0, 0).getCoefficients();
+        const RowVectorXd taps = FilterKernel("LPF", 0, 63, 0.1, 0.0, 0.02, 1000.0, 0).coefficients();
         QCOMPARE(taps.size(), Index(63));
         QVERIFY2((taps - taps.reverse()).cwiseAbs().maxCoeff() < 1e-12 * taps.cwiseAbs().maxCoeff(),
                  qPrintable(QString::number((taps - taps.reverse()).cwiseAbs().maxCoeff())));
@@ -191,13 +190,13 @@ private slots:
     void filterParameter()
     {
         FilterParameter fp;
-        QCOMPARE(fp.getName(), QString("Unknown"));
+        QCOMPARE(fp.name(), std::string("Unknown"));
 
         FilterParameter fp2("TestParam");
-        QCOMPARE(fp2.getName(), QString("TestParam"));
+        QCOMPARE(fp2.name(), std::string("TestParam"));
 
         FilterParameter fp3("Param", "Description");
-        QCOMPARE(fp3.getName(), QString("Param"));
+        QCOMPARE(fp3.name(), std::string("Param"));
 
         QVERIFY(fp2 == FilterParameter("TestParam"));
     }
@@ -208,7 +207,7 @@ private slots:
     void parksMcClellan_basic()
     {
         ParksMcClellan pm(33, 0.3, 0.2, 0.1, ParksMcClellan::LPF);
-        QVERIFY(pm.FirCoeff.size() > 0);
+        QVERIFY(pm.coefficients.size() > 0);
     }
 
     //=========================================================================

@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <format>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -27,12 +29,6 @@
 
 #include <Eigen/Core>
 #include <unsupported/Eigen/FFT>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,19 +79,19 @@ FilterKernel FirFilter::design(int iOrder,
             break;
     }
 
-    QString sName;
+    std::string sName;
     switch (type) {
         case LowPass:
-            sName = QStringLiteral("LP_%1Hz").arg(dCutoffLow);
+            sName = std::format("LP_{}Hz", dCutoffLow);
             break;
         case HighPass:
-            sName = QStringLiteral("HP_%1Hz").arg(dCutoffLow);
+            sName = std::format("HP_{}Hz", dCutoffLow);
             break;
         case BandPass:
-            sName = QStringLiteral("BP_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh);
+            sName = std::format("BP_{}-{}Hz", dCutoffLow, dCutoffHigh);
             break;
         case BandStop:
-            sName = QStringLiteral("BS_%1-%2Hz").arg(dCutoffLow).arg(dCutoffHigh);
+            sName = std::format("BS_{}-{}Hz", dCutoffLow, dCutoffHigh);
             break;
     }
 
@@ -115,7 +111,7 @@ RowVectorXd FirFilter::apply(const RowVectorXd& vecData,
                              FilterKernel& kernel)
 {
     RowVectorXd work = vecData;
-    kernel.applyFftFilter(work, /*bKeepOverhead=*/false);
+    kernel.apply_fft_filter(work, /*bKeepOverhead=*/false);
     return work;
 }
 
@@ -126,11 +122,11 @@ RowVectorXd FirFilter::applyZeroPhase(const RowVectorXd& vecData,
 {
     // Forward pass
     RowVectorXd work = vecData;
-    kernel.applyFftFilter(work, false);
+    kernel.apply_fft_filter(work, false);
 
     // Reverse pass
     RowVectorXd rev = work.reverse();
-    kernel.applyFftFilter(rev, false);
+    kernel.apply_fft_filter(rev, false);
 
     return rev.reverse();
 }

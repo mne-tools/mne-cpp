@@ -675,15 +675,15 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     bool bBeforeStartReached = false;
 
     if (m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
-        end += m_filterKernel.getFilterOrder() / 2;
+        iFilterDelay = m_filterKernel.filter_order() / 2;
+        end += m_filterKernel.filter_order() / 2;
 
         // Check if we have reached the beginning/end of the file
         if (start - iFilterDelay >= absoluteFirstSample()) {
-            start -= m_filterKernel.getFilterOrder() / 2;
+            start -= m_filterKernel.filter_order() / 2;
         } else {
             // Add another filter delay because we need enough data to sucessfully filter with arbiritary filter lengths
-            end += m_filterKernel.getFilterOrder() / 2;
+            end += m_filterKernel.filter_order() / 2;
             iFilterDelay = 0;
             bBeforeStartReached = true;
         }
@@ -706,7 +706,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     if (m_bPerformFiltering) {
         bool bFilterSuccess = false;
         if (bBeforeStartReached) {
-            iFilterDelay = m_filterKernel.getFilterOrder() / 4;
+            iFilterDelay = m_filterKernel.filter_order() / 4;
             bFilterSuccess = filterDataBlock(matData, true, true);
         } else {
             bFilterSuccess = filterDataBlock(matData, true);
@@ -770,17 +770,17 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     int iFilterDelay = 0;
 
     if (m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
+        iFilterDelay = m_filterKernel.filter_order() / 2;
 
         // Check if we have reached the beginning/end of the file
         if (start - iFilterDelay > absoluteFirstSample()) {
-            start -= m_filterKernel.getFilterOrder() / 2;
+            start -= m_filterKernel.filter_order() / 2;
         } else {
             iFilterDelay = 0;
         }
 
         if (end + iFilterDelay < m_pFiffIO->raw[0]->last_samp) {
-            end += m_filterKernel.getFilterOrder() / 2;
+            end += m_filterKernel.filter_order() / 2;
         } else {
             iFilterDelay = 0;
         }
@@ -907,15 +907,15 @@ void FiffRawViewModel::reloadAllData()
     bool bBeforeStartReached = false;
 
     if (m_bPerformFiltering) {
-        iFilterDelay = m_filterKernel.getFilterOrder() / 2;
-        end += m_filterKernel.getFilterOrder() / 2;
+        iFilterDelay = m_filterKernel.filter_order() / 2;
+        end += m_filterKernel.filter_order() / 2;
 
         // Check if we have reached the beginning of the file
         if (start - iFilterDelay >= m_pFiffIO->raw[0]->first_samp) {
-            start -= m_filterKernel.getFilterOrder() / 2;
+            start -= m_filterKernel.filter_order() / 2;
         } else {
             // Add another filter delay because we need enough data to sucessfully filter with arbiritary filter lengths
-            end += m_filterKernel.getFilterOrder() / 2;
+            end += m_filterKernel.filter_order() / 2;
             iFilterDelay = 0;
             bBeforeStartReached = true;
         }
@@ -939,7 +939,7 @@ void FiffRawViewModel::reloadAllData()
     if (m_bPerformFiltering) {
         bool bFilterSuccess = false;
         if (bBeforeStartReached) {
-            iFilterDelay = m_filterKernel.getFilterOrder() / 4;
+            iFilterDelay = m_filterKernel.filter_order() / 4;
             bFilterSuccess = filterDataBlock(matData, true, true);
         } else {
             bFilterSuccess = filterDataBlock(matData, true);

@@ -123,10 +123,10 @@ private slots:
         double omegaC = 0.25; // Cutoff at Nyquist/4
         ParksMcClellan pm(numTaps, omegaC, 0.0, 0.01, ParksMcClellan::LPF);
         // Verify coefficients exist and have correct length
-        QCOMPARE(static_cast<int>(pm.FirCoeff.size()), numTaps);
+        QCOMPARE(static_cast<int>(pm.coefficients.size()), numTaps);
         // Coefficients should be symmetric (linear phase FIR)
         for (int i = 0; i < numTaps / 2; ++i) {
-            QVERIFY(std::abs(pm.FirCoeff[i] - pm.FirCoeff[numTaps - 1 - i]) < 1e-10);
+            QVERIFY(std::abs(pm.coefficients[i] - pm.coefficients[numTaps - 1 - i]) < 1e-10);
         }
     }
 
@@ -135,7 +135,7 @@ private slots:
         int numTaps = 51; // Must be odd for HPF
         double omegaC = 0.25;
         ParksMcClellan pm(numTaps, omegaC, 0.0, 0.01, ParksMcClellan::HPF);
-        QCOMPARE(static_cast<int>(pm.FirCoeff.size()), numTaps);
+        QCOMPARE(static_cast<int>(pm.coefficients.size()), numTaps);
     }
 
     void testParksMcClellanBPF()
@@ -144,7 +144,7 @@ private slots:
         double omegaC = 0.25;
         double bw = 0.1;
         ParksMcClellan pm(numTaps, omegaC, bw, 0.01, ParksMcClellan::BPF);
-        QCOMPARE(static_cast<int>(pm.FirCoeff.size()), numTaps);
+        QCOMPARE(static_cast<int>(pm.coefficients.size()), numTaps);
     }
 
     void testParksMcClellanNOTCH()
@@ -153,7 +153,7 @@ private slots:
         double omegaC = 0.25;
         double bw = 0.1;
         ParksMcClellan pm(numTaps, omegaC, bw, 0.01, ParksMcClellan::NOTCH);
-        QCOMPARE(static_cast<int>(pm.FirCoeff.size()), numTaps);
+        QCOMPARE(static_cast<int>(pm.coefficients.size()), numTaps);
     }
 
     void testParksMcClellanDifferentTapSizes()
@@ -161,7 +161,7 @@ private slots:
         // Test various tap sizes
         for (int taps : {11, 21, 31, 65, 101}) {
             ParksMcClellan pm(taps, 0.3, 0.0, 0.01, ParksMcClellan::LPF);
-            QCOMPARE(static_cast<int>(pm.FirCoeff.size()), taps);
+            QCOMPARE(static_cast<int>(pm.coefficients.size()), taps);
         }
     }
 
@@ -169,7 +169,7 @@ private slots:
     void testFilterKernelDefaultCtor()
     {
         FilterKernel fk;
-        QVERIFY(fk.getName().isEmpty() || fk.getName() == "Unknown");
+        QCOMPARE(fk.name(), std::string("Unknown"));
     }
 
     void testFilterKernelLPF()
@@ -183,77 +183,74 @@ private slots:
                         1000.0, // sampling frequency
                         0);     // design method = Parks-McClellan
 
-        QCOMPARE(fk.getName(), QString("TestLPF"));
-        QVERIFY(fk.getFilterOrder() > 0);
-        QVERIFY(fk.getSamplingFrequency() > 0);
-        QVERIFY(fk.getCoefficients().size() > 0);
+        QCOMPARE(fk.name(), std::string("TestLPF"));
+        QVERIFY(fk.filter_order() > 0);
+        QVERIFY(fk.sampling_frequency() > 0);
+        QVERIFY(fk.coefficients().size() > 0);
     }
 
     void testFilterKernelHPF()
     {
         FilterKernel fk("TestHPF", 1, 64, 0.3, 0.0, 0.01, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestHPF"));
-        QVERIFY(fk.getCoefficients().size() > 0);
+        QCOMPARE(fk.name(), std::string("TestHPF"));
+        QVERIFY(fk.coefficients().size() > 0);
     }
 
     void testFilterKernelBPF()
     {
         FilterKernel fk("TestBPF", 2, 64, 0.25, 0.1, 0.01, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestBPF"));
+        QCOMPARE(fk.name(), std::string("TestBPF"));
     }
 
     void testFilterKernelGetters()
     {
         FilterKernel fk("TestFilter", 0, 64, 0.1, 0.0, 0.01, 1000.0, 0);
-        QCOMPARE(fk.getName(), QString("TestFilter"));
-        QVERIFY(fk.getSamplingFrequency() - 1000.0 < 0.1);
-        QVERIFY(fk.getFilterOrder() > 0);
-        QVERIFY(!fk.getShortDescription().isEmpty());
+        QCOMPARE(fk.name(), std::string("TestFilter"));
+        QVERIFY(fk.sampling_frequency() - 1000.0 < 0.1);
+        QVERIFY(fk.filter_order() > 0);
+        QVERIFY(!fk.short_description().empty());
 
-        FilterParameter dm = fk.getDesignMethod();
-        QVERIFY(!dm.getName().isEmpty());
-
-        FilterParameter ft = fk.getFilterType();
-        QVERIFY(!ft.getName().isEmpty());
+        QCOMPARE(fk.design_method().name(), std::string("Cosine"));
+        QCOMPARE(fk.filter_type().name(), std::string("LPF"));
     }
 
     void testFilterKernelSetters()
     {
         FilterKernel fk;
-        fk.setDesignMethod(1);
-        fk.setFilterType(1);
-        QCOMPARE(fk.getDesignMethod().getName(), QString("Tschebyscheff"));
-        QCOMPARE(fk.getFilterType().getName(), QString("HPF"));
+        fk.set_design_method(1);
+        fk.set_filter_type(1);
+        QCOMPARE(fk.design_method().name(), std::string("Tschebyscheff"));
+        QCOMPARE(fk.filter_type().name(), std::string("HPF"));
 
         // Unknown indices (e.g. index_of() of an unknown name) fall back to the first entry
-        fk.setDesignMethod(-1);
-        fk.setFilterType(99);
-        QCOMPARE(fk.getDesignMethod().getName(), QString("Cosine"));
-        QCOMPARE(fk.getFilterType().getName(), QString("LPF"));
+        fk.set_design_method(-1);
+        fk.set_filter_type(99);
+        QCOMPARE(fk.design_method().name(), std::string("Cosine"));
+        QCOMPARE(fk.filter_type().name(), std::string("LPF"));
     }
 
     void testFilterKernelPrepareFilter()
     {
         // Coefficients are transformed for the next power of two that holds data plus filter
         FilterKernel fk("TestLPF", 0, 64, 0.1, 0.0, 0.01, 1000.0, 0);
-        fk.prepareFilter(256);
-        QCOMPARE(fk.getFftCoefficients().cols(), Eigen::Index(512 / 2 + 1));
+        fk.prepare_filter(256);
+        QCOMPARE(fk.fft_coefficients().cols(), Eigen::Index(512 / 2 + 1));
     }
 
     void testFilterKernelApplyConvFilter()
     {
         FilterKernel fk("TestLPF", 0, 32, 0.1, 0.0, 0.01, 1000.0, 0);
         RowVectorXd signal = RowVectorXd::Random(256);
-        RowVectorXd filtered = fk.applyConvFilter(signal, false);
+        RowVectorXd filtered = fk.apply_conv_filter(signal, false);
         QVERIFY(filtered.size() > 0);
     }
 
     void testFilterKernelApplyFftFilter()
     {
         FilterKernel fk("TestLPF", 0, 32, 0.1, 0.0, 0.01, 1000.0, 0);
-        fk.prepareFilter(256);
+        fk.prepare_filter(256);
         RowVectorXd signal = RowVectorXd::Random(256);
-        fk.applyFftFilter(signal, false);
+        fk.apply_fft_filter(signal, false);
         // signal is filtered in-place
         QVERIFY(signal.size() == 256);
     }

@@ -15,17 +15,16 @@
 //=============================================================================================================
 
 #include "filterio.h"
-#include <base/log.h>
 
+#include <base/byte_stream.h>
+#include <base/string_utils.h>
+
+#include <format>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-#include <QStringList>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,131 +37,76 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterIO::FilterIO()
+Expected<FilterKernel> FilterIO::read_filter(const std::filesystem::path& path)
 {
-}
-
-//=============================================================================================================
-
-bool FilterIO::readFilter(QString path, FilterKernel& filter)
-{
-    //Open .txt file
-    if (!path.contains(".txt"))
-        return false;
-
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::debug("Error opening filter txt file for reading");
-        return false;
+    const Expected<std::string> text = read_text_file(path);
+    if (!text) {
+        return std::unexpected(text.error());
     }
-
-    //Start reading from file
-    QTextStream in(&file);
-    std::vector<double> coefficientsTemp;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-
-        QStringList fields = line.split(QRegularExpression("\\s+"));
-
-        //Delete last element if it is a blank character
-        if (fields.at(fields.size() - 1) == "")
-            fields.removeLast();
-
-        if (line.contains("#")) //Filter meta information commented areas in file
-        {
-            //Read filter sFreq
-            if (line.contains("sFreq") && fields.size() == 2)
-                filter.setSamplingFrequency(fields.at(1).toDouble());
-
-            //Read filter name
-            if (line.contains("name")) {
-                QString sFilterName;
-                for (int i = 1; i < fields.size(); i++)
-                    sFilterName.append(fields.at(i));
-                filter.setName(sFilterName);
-            }
-
-            //Read the filter order
-            if (line.contains("order") && fields.size() == 2)
-                filter.setFilterOrder(fields.at(1).toInt());
-
-            //Read the filter type
-            if (line.contains("type") && fields.size() == 2)
-                filter.setFilterType(FilterKernel::filterTypeIndex(fields.at(1)));
-
-            //Read the filter LPFreq
-            if (line.contains("LPFreq") && fields.size() == 2)
-                filter.setLowpassFreq(fields.at(1).toDouble());
-
-            //Read the filter HPFreq
-            if (line.contains("HPFreq") && fields.size() == 2)
-                filter.setHighpassFreq(fields.at(1).toDouble());
-
-            //Read the filter CenterFreq
-            if (line.contains("CenterFreq") && fields.size() == 2)
-                filter.setCenterFrequency(fields.at(1).toDouble());
-
-            //Read the filter DesignMethod
-            if (line.contains("DesignMethod") && fields.size() == 2)
-                filter.setDesignMethod(FilterKernel::designMethodIndex(fields.at(1)));
-
-            if (line.contains("ParksWidth") && fields.size() == 2)
-                filter.setParksWidth(fields.at(1).toDouble());
-
-        } else // Read filter coefficients
-            coefficientsTemp.push_back(fields.join("").toDouble());
-    }
-    // Check if reading was successful and correct
-    if (filter.getFilterOrder() != std::ssize(coefficientsTemp)) {
-        filter.setFilterOrder(static_cast<int>(coefficientsTemp.size()));
-    }
-
-    RowVectorXd vecCoeff = RowVectorXd::Zero(coefficientsTemp.size());
-    for (int i = 0; i < vecCoeff.cols(); i++) {
-        vecCoeff(i) = coefficientsTemp.at(i);
-    }
-    filter.setCoefficients(vecCoeff);
-
-    file.close();
-
-    return true;
-}
-
-//=============================================================================================================
-
-bool FilterIO::writeFilter(const QString& path, const FilterKernel& filter)
-{
-    // Open file dialog
-    if (!path.isEmpty()) {
-        QFile file(path);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            Log::debug("Error opening filter txt file for writing");
-            return false;
+    FilterKernel filter;
+    std::vector<double> coefficients;
+    std::string_view rest = *text;
+    while (!rest.empty()) {
+        const std::size_t end = rest.find('\n');
+        const std::string_view line = trimmed(rest.substr(0, end));
+        rest = end == std::string_view::npos ? std::string_view() : rest.substr(end + 1);
+        if (line.empty()) {
+            continue;
         }
-
-        //Write coefficients to file
-        QTextStream out(&file);
-
-        out << "#sFreq " << filter.getSamplingFrequency() << "\n";
-        out << "#name " << filter.getName() << "\n";
-        out << "#type " << filter.getFilterType().getName() << "\n";
-        out << "#order " << filter.getFilterOrder() << "\n";
-        out << "#HPFreq " << filter.getHighpassFreq() << "\n";
-        out << "#LPFreq " << filter.getLowpassFreq() << "\n";
-        out << "#CenterFreq " << filter.getCenterFrequency() << "\n";
-        out << "#DesignMethod " << filter.getDesignMethod().getName() << "\n";
-        out << "#ParksWidth " << filter.getParksWidth() << "\n";
-
-        for (int i = 0; i < filter.getCoefficients().cols(); i++)
-            out << filter.getCoefficients()(i) << "\n";
-
-        file.close();
-
-        return true;
+        if (!line.starts_with('#')) {
+            const std::optional<double> value = to_double(line);
+            if (!value) {
+                return fail(ErrorCode::Format, "{} has a filter coefficient that is no number: \"{}\"",
+                            utf8_from_path(path), line);
+            }
+            coefficients.push_back(*value);
+            continue;
+        }
+        const std::string_view entry = line.substr(1);
+        const std::size_t space = entry.find_first_of(" \t");
+        const std::string_view key = entry.substr(0, space);
+        const std::string_view value = space == std::string_view::npos ? std::string_view() : trimmed(entry.substr(space));
+        if (key == "name") {
+            filter.set_name(std::string(value));
+        } else if (key == "type") {
+            filter.set_filter_type(FilterKernel::filter_type_index(value));
+        } else if (key == "DesignMethod") {
+            filter.set_design_method(FilterKernel::design_method_index(value));
+        } else if (key == "order") {
+            continue; // the coefficients give the order
+        } else {
+            const auto setter = key == "sFreq" ? &FilterKernel::set_sampling_frequency
+                : key == "HPFreq"              ? &FilterKernel::set_highpass_freq
+                : key == "LPFreq"              ? &FilterKernel::set_lowpass_freq
+                : key == "CenterFreq"          ? &FilterKernel::set_center_frequency
+                : key == "ParksWidth"          ? &FilterKernel::set_parks_width
+                                               : nullptr;
+            if (!setter) {
+                continue;
+            }
+            const std::optional<double> number = to_double(value);
+            if (!number) {
+                return fail(ErrorCode::Format, "{} has no number for {}: \"{}\"", utf8_from_path(path), key, value);
+            }
+            (filter.*setter)(*number);
+        }
     }
+    filter.set_filter_order(static_cast<int>(coefficients.size()));
+    filter.set_coefficients(Map<const RowVectorXd>(coefficients.data(), std::ssize(coefficients)));
+    return filter;
+}
 
-    Log::debug("Error Filter File path is empty");
+//=============================================================================================================
 
-    return false;
+Expected<void> FilterIO::write_filter(const std::filesystem::path& path, const FilterKernel& filter)
+{
+    std::string text = std::format("#sFreq {}\n#name {}\n#type {}\n#order {}\n#HPFreq {}\n#LPFreq {}\n#CenterFreq {}\n"
+                                   "#DesignMethod {}\n#ParksWidth {}\n",
+                                   filter.sampling_frequency(), filter.name(), filter.filter_type().name(),
+                                   filter.filter_order(), filter.highpass_freq(), filter.lowpass_freq(),
+                                   filter.center_frequency(), filter.design_method().name(), filter.parks_width());
+    for (const double coefficient : filter.coefficients()) {
+        std::format_to(std::back_inserter(text), "{}\n", coefficient);
+    }
+    return write_text_file(path, text);
 }

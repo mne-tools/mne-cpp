@@ -23,6 +23,7 @@
 
 #include "helpers/filterplotscene.h"
 
+#include <base/string_utils.h>
 #include <dsp/filterio.h>
 
 #include <fiff/fiff_info.h>
@@ -178,11 +179,11 @@ void FilterDesignView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.getHighpassFreq());
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.getLowpassFreq());
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.getFilterOrder());
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::designMethodIndex(m_filterKernel.getDesignMethod().getName()));
-    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.getParksWidth() * (m_filterKernel.getSamplingFrequency() / 2));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), m_filterKernel.highpass_freq());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTo"), m_filterKernel.lowpass_freq());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), m_filterKernel.filter_order());
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::design_method_index(m_filterKernel.design_method().name()));
+    settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), m_filterKernel.parks_width() * (m_filterKernel.sampling_frequency() / 2));
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), getChannelType());
     settings.setValue(m_sSettingsPath + QString("/FilterDesignView/Position"), this->pos());
 }
@@ -201,7 +202,7 @@ void FilterDesignView::loadSettings()
     m_pUi->m_doubleSpinBox_to->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTo"), 40.0).toDouble());
     m_pUi->m_doubleSpinBox_from->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterFrom"), 1.0).toDouble());
     m_pUi->m_spinBox_filterTaps->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterOrder"), 128).toInt());
-    m_pUi->m_comboBox_designMethod->setCurrentIndex(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::designMethodIndex("Cosine")).toInt());
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterDesignMethod"), FilterKernel::design_method_index("Cosine")).toInt());
     m_pUi->m_doubleSpinBox_transitionband->setValue(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterTransition"), 0.1).toDouble());
     m_pUi->m_comboBox_filterApplyTo->setCurrentText(settings.value(m_sSettingsPath + QString("/FilterDesignView/filterChannelType"), "All").toString());
 
@@ -279,8 +280,8 @@ void FilterDesignView::initButtons()
 
 void FilterDesignView::initComboBoxes()
 {
-    for (FilterParameter filterMethod : FilterKernel::m_designMethods) {
-        m_pUi->m_comboBox_designMethod->addItem(filterMethod.getName());
+    for (const FilterParameter& filterMethod : FilterKernel::design_methods) {
+        m_pUi->m_comboBox_designMethod->addItem(QString::fromStdString(filterMethod.name()));
     }
 
     connect(m_pUi->m_comboBox_designMethod, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -340,7 +341,7 @@ void FilterDesignView::updateFilterPlot()
 {
     //Update the filter of the scene
     m_pFilterPlotScene->updateFilter(m_filterKernel,
-                                     m_filterKernel.getSamplingFrequency(), //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
+                                     m_filterKernel.sampling_frequency(), //Pass the filters sampling frequency, not the one from the fiff info. Reason: sFreq from a loaded filter could be different
                                      m_pUi->m_doubleSpinBox_from->value(),
                                      m_pUi->m_doubleSpinBox_to->value());
 
@@ -406,11 +407,11 @@ void FilterDesignView::filterParametersChanged()
     m_pUi->m_doubleSpinBox_to->setMinimum(m_pUi->m_doubleSpinBox_from->value());
     m_pUi->m_doubleSpinBox_from->setMaximum(m_pUi->m_doubleSpinBox_to->value());
 
-    int iMethod = FilterKernel::designMethodIndex(m_pUi->m_comboBox_designMethod->currentText());
+    int iMethod = FilterKernel::design_method_index(m_pUi->m_comboBox_designMethod->currentText().toStdString());
 
     //Generate filters
     m_filterKernel = FilterKernel("Designed Filter",
-                                  FilterKernel::filterTypeIndex("BPF"),
+                                  FilterKernel::filter_type_index("BPF"),
                                   m_iFilterTaps,
                                   center / nyquistFrequency,
                                   bw / nyquistFrequency,
@@ -477,18 +478,22 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(m_filterKernel.getFilterType().getName()).arg(static_cast<int>(m_filterKernel.getHighpassFreq())).arg(static_cast<int>(m_filterKernel.getLowpassFreq())).arg(static_cast<int>(m_filterKernel.getSamplingFrequency()));
+    filtername = QString("%1_%2_%3_Fs%4").arg(QString::fromStdString(m_filterKernel.filter_type().name())).arg(static_cast<int>(m_filterKernel.highpass_freq())).arg(static_cast<int>(m_filterKernel.lowpass_freq())).arg(static_cast<int>(m_filterKernel.sampling_frequency()));
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterKernel filterWriteTemp = m_filterKernel;
-    filterWriteTemp.setName(filtername);
+    filterWriteTemp.set_name(filtername.toStdString());
 
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",
                                                     QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(filtername),
                                                     tr("Text file(*.txt)"));
-
-    FilterIO::writeFilter(fileName, filterWriteTemp);
+    if (fileName.isEmpty()) {
+        return;
+    }
+    if (const auto written = FilterIO::write_filter(path_from_utf8(fileName.toStdString()), filterWriteTemp); !written) {
+        qWarning() << written.error().what();
+    }
 }
 
 //=============================================================================================================
@@ -502,12 +507,12 @@ void FilterDesignView::onBtnLoadFilter()
 
     if (!path.isEmpty()) {
         //Replace old with new filter operator
-        FilterKernel filterLoadTemp;
-
-        if (!FilterIO::readFilter(path, filterLoadTemp)) {
+        const auto filterLoadTemp = FilterIO::read_filter(path_from_utf8(path.toStdString()));
+        if (!filterLoadTemp) {
+            qWarning() << filterLoadTemp.error().what();
             return;
         }
-        updateGuiFromFilter(filterLoadTemp);
+        updateGuiFromFilter(*filterLoadTemp);
 
         updateFilterPlot();
 
@@ -542,12 +547,12 @@ double FilterDesignView::getTo()
 
 void FilterDesignView::updateGuiFromFilter(const mne::FilterKernel& filter)
 {
-    m_pUi->m_doubleSpinBox_from->setValue(filter.getHighpassFreq());
-    m_pUi->m_doubleSpinBox_to->setValue(filter.getLowpassFreq());
-    m_pUi->m_spinBox_filterTaps->setValue(filter.getFilterOrder());
-    m_pUi->m_doubleSpinBox_transitionband->setValue(filter.getParksWidth() * (filter.getSamplingFrequency() / 2));
+    m_pUi->m_doubleSpinBox_from->setValue(filter.highpass_freq());
+    m_pUi->m_doubleSpinBox_to->setValue(filter.lowpass_freq());
+    m_pUi->m_spinBox_filterTaps->setValue(filter.filter_order());
+    m_pUi->m_doubleSpinBox_transitionband->setValue(filter.parks_width() * (filter.sampling_frequency() / 2));
 
-    m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::designMethodIndex(filter.getDesignMethod().getName()));
+    m_pUi->m_comboBox_designMethod->setCurrentIndex(FilterKernel::design_method_index(filter.design_method().name()));
 }
 
 //=============================================================================================================

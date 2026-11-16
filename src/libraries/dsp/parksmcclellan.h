@@ -45,12 +45,6 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
-
-//=============================================================================================================
 // DEFINE NAMESPACE mne
 //=============================================================================================================
 
@@ -64,10 +58,8 @@ namespace mne
  *
  * @snippet ex_dsp_filter/main.cpp parks_mcclellan_design
  */
-class DSPSHARED_EXPORT ParksMcClellan : public QObject
+class DSPSHARED_EXPORT ParksMcClellan
 {
-    Q_OBJECT
-
 public:
     enum TPassType
     {
@@ -76,7 +68,6 @@ public:
         BPF,
         NOTCH
     };
-    Q_ENUM(TPassType)
 
     ParksMcClellan();
 
@@ -100,7 +91,7 @@ public:
 
      * e.g. NewParksMcClellan(33, 0.7, 0.2, 0.1, HPF);
      * gives a 33 tap high pass filter with 3 dB corner at 0.7 with a transition bandwidth of 0.1
-     * The FIR coefficients are placed in FirCoeff, starting at index 0.
+     * The FIR coefficients are placed in coefficients, starting at index 0.
      *
      * @param[in] NumTaps     Number of filter taps (9 to 128; odd for HPF and NOTCH).
      * @param[in] OmegaC      Corner (LPF/HPF) or center (BPF/NOTCH) frequency, normalized to Pi.
@@ -114,8 +105,9 @@ public:
                    double ParksWidth,
                    TPassType PassType);
 
-    ~ParksMcClellan();
+    Eigen::RowVectorXd coefficients; /**< containt the generated filter coefficients. */
 
+private:
     //=========================================================================================================
     /**
      * Using nothrow prevents an exception from being thrown. new will instead return NULL.
@@ -127,16 +119,16 @@ public:
      * @param[in] ParksWidth  Width of the transition bands, normalized to Pi.
      * @param[in] PassType    Filter type (LPF, HPF, BPF or NOTCH).
      */
-    void init(int NumTaps,
-              double OmegaC,
-              double BW,
-              double ParksWidth,
-              TPassType PassType);
+    void design(int NumTaps,
+                double OmegaC,
+                double BW,
+                double ParksWidth,
+                TPassType PassType);
 
     //=========================================================================================================
     /**
      */
-    void CalcParkCoeff2(int NBANDS, int NFILT);
+    void calc_park_coeff(int NBANDS, int NFILT);
 
     //=========================================================================================================
     /**
@@ -147,7 +139,7 @@ public:
      * @param[in] M  Stride used to interleave the product for numerical stability.
      * @return Barycentric Lagrange coefficient for point K (denominator clamped away from zero).
      */
-    double LeGrangeInterp2(int K, int N, int M);
+    double lagrange_interp(int K, int N, int M);
 
     //=========================================================================================================
     /**
@@ -158,12 +150,12 @@ public:
      * @param[in] N  Number of extremal points used in the interpolation.
      * @return Interpolated frequency response at grid point K.
      */
-    double GEE2(int K, int N);
+    double gee(int K, int N);
 
     //=========================================================================================================
     /**
      */
-    int Remez2(int GridIndex);
+    int remez(int GridIndex);
 
     //=========================================================================================================
     /**
@@ -175,21 +167,18 @@ public:
      * @param[out] Err  Weighted approximation error at grid point k.
      * @return True if Nut times the error does not exceed Comp, false otherwise.
      */
-    bool ErrTest(int k,
-                 int Nut,
-                 double Comp,
-                 double* Err);
+    bool err_test(int k,
+                  int Nut,
+                  double Comp,
+                  double* Err);
 
     //=========================================================================================================
     /**
-     * This was added by IowaHills and is called from CalcParkCoeff2().
+     * This was added by IowaHills and is called from calc_park_coeff().
      * Calculation of the coefficients of the best approximation using the inverse discrete fourier transform.
      */
-    void CalcCoefficients();
+    void calc_coefficients();
 
-    Eigen::RowVectorXd FirCoeff; /**< containt the generated filter coefficients. */
-
-private:
     int HalfTapCount;
     Eigen::VectorXi ExchangeIndex;
     Eigen::VectorXd LeGrangeD;
@@ -203,8 +192,6 @@ private:
     Eigen::VectorXd DesiredMag;
     Eigen::VectorXd Grid;
     Eigen::VectorXd Weight;
-
-    bool InitDone2;
 };
 } // NAMESPACE mne_dsp
 

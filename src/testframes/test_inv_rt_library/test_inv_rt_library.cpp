@@ -702,19 +702,19 @@ void TestInvRtLibrary::signalModel_construction()
 void TestInvRtLibrary::filterKernel_design_lpf()
 {
     FilterKernel kernel("lpf_test", 0, 256, 40.0, 0.0, 0.0, 1000.0, 0);
-    QVERIFY(kernel.getCoefficients().size() > 0);
+    QVERIFY(kernel.coefficients().size() > 0);
 }
 
 void TestInvRtLibrary::filterKernel_design_hpf()
 {
     FilterKernel kernel("hpf_test", 1, 256, 0.0, 1.0, 0.0, 1000.0, 0);
-    QVERIFY(kernel.getCoefficients().size() > 0);
+    QVERIFY(kernel.coefficients().size() > 0);
 }
 
 void TestInvRtLibrary::filterKernel_design_bpf()
 {
     FilterKernel kernel("bpf_test", 2, 256, 40.0, 1.0, 0.0, 1000.0, 0);
-    QVERIFY(kernel.getCoefficients().size() > 0);
+    QVERIFY(kernel.coefficients().size() > 0);
 }
 
 //=============================================================================================================

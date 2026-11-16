@@ -533,8 +533,8 @@ void NoiseReduction::setFilter(const FilterKernel& filterData)
     m_filterKernel = filterData;
 
     m_iMaxFilterLength = 1;
-    if (m_iMaxFilterLength < m_filterKernel.getFilterOrder()) {
-        m_iMaxFilterLength = m_filterKernel.getFilterOrder();
+    if (m_iMaxFilterLength < m_filterKernel.filter_order()) {
+        m_iMaxFilterLength = m_filterKernel.filter_order();
     }
     m_mutex.unlock();
 }

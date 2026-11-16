@@ -25,6 +25,8 @@
 #include "cosinefilter.h"
 
 #include <algorithm>
+#include <format>
+#include <utility>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -47,20 +49,20 @@ using namespace Eigen;
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-const std::vector<mne::FilterParameter> FilterKernel::m_designMethods({FilterParameter(QString("Cosine"), QString("A cosine filter")),
-                                                                       FilterParameter(QString("Tschebyscheff"), QString("A tschebyscheff filter"))});
-const std::vector<mne::FilterParameter> FilterKernel::m_filterTypes({FilterParameter(QString("LPF"), QString("An LPF filter")),
-                                                                     FilterParameter(QString("HPF"), QString("An HPF filter")),
-                                                                     FilterParameter(QString("BPF"), QString("A BPF filter")),
-                                                                     FilterParameter(QString("NOTCH"), QString("A NOTCH filter")),
-                                                                     FilterParameter(QString("UNKNOWN"), QString("An UNKNOWN filter"))});
+const std::vector<mne::FilterParameter> FilterKernel::design_methods({FilterParameter("Cosine", "A cosine filter"),
+                                                                      FilterParameter("Tschebyscheff", "A tschebyscheff filter")});
+const std::vector<mne::FilterParameter> FilterKernel::filter_types({FilterParameter("LPF", "An LPF filter"),
+                                                                    FilterParameter("HPF", "An HPF filter"),
+                                                                    FilterParameter("BPF", "A BPF filter"),
+                                                                    FilterParameter("NOTCH", "A NOTCH filter"),
+                                                                    FilterParameter("UNKNOWN", "An UNKNOWN filter")});
 
 namespace
 {
 
-int indexOfName(const std::vector<FilterParameter>& table, const QString& sName)
+int indexOfName(const std::vector<FilterParameter>& table, std::string_view sName)
 {
-    const auto it = std::ranges::find(table, sName, &FilterParameter::getName);
+    const auto it = std::ranges::find(table, sName, &FilterParameter::name);
     return it == table.end() ? -1 : static_cast<int>(it - table.begin());
 }
 
@@ -78,17 +80,16 @@ FilterKernel::FilterKernel()
 , m_dLowpassFreq(40)
 , m_dHighpassFreq(4)
 , m_iFilterOrder(80)
-, m_iDesignMethod(designMethodIndex("Cosine"))
-, m_iFilterType(filterTypeIndex("BPF"))
+, m_iDesignMethod(design_method_index("Cosine"))
+, m_iFilterType(filter_type_index("BPF"))
 , m_sFilterName("Unknown")
-, m_sFilterShortDescription("")
 {
-    designFilter();
+    design_filter();
 }
 
 //=============================================================================================================
 
-FilterKernel::FilterKernel(const QString& sFilterName,
+FilterKernel::FilterKernel(const std::string& sFilterName,
                            int iFilterType,
                            int iOrder,
                            double dCenterfreq,
@@ -104,18 +105,17 @@ FilterKernel::FilterKernel(const QString& sFilterName,
 , m_iDesignMethod(iDesignMethod)
 , m_iFilterType(iFilterType)
 , m_sFilterName(sFilterName)
-, m_sFilterShortDescription()
 {
     if (iOrder < 9) {
         Log::warning("[FilterKernel::FilterKernel] Less than 9 taps were provided. Setting number of taps to 9.");
     }
 
-    designFilter();
+    design_filter();
 }
 
 //=============================================================================================================
 
-void FilterKernel::prepareFilter(int iDataSize)
+void FilterKernel::prepare_filter(int iDataSize)
 {
     int iFftLength, exp;
 
@@ -124,15 +124,15 @@ void FilterKernel::prepareFilter(int iDataSize)
     iFftLength = pow(2, exp);
 
     // Transform coefficients anew if needed
-    if (m_vecCoeff.cols() != (iFftLength / 2 + 1)) {
-        fftTransformCoeffs(iFftLength);
+    if (m_vecFftCoeff.cols() != (iFftLength / 2 + 1)) {
+        fft_transform_coeffs(iFftLength);
     }
 }
 
 //=============================================================================================================
 
-RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
-                                          bool bKeepOverhead) const
+RowVectorXd FilterKernel::apply_conv_filter(const RowVectorXd& vecData,
+                                            bool bKeepOverhead) const
 {
     //Do zero padding or mirroring depending on user input
     RowVectorXd vecDataZeroPad = RowVectorXd::Zero(2 * m_vecCoeff.cols() + vecData.cols());
@@ -155,8 +155,8 @@ RowVectorXd FilterKernel::applyConvFilter(const RowVectorXd& vecData,
 
 //=============================================================================================================
 
-void FilterKernel::applyFftFilter(RowVectorXd& vecData,
-                                  bool bKeepOverhead)
+void FilterKernel::apply_fft_filter(RowVectorXd& vecData,
+                                    bool bKeepOverhead)
 {
 #ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
@@ -169,7 +169,7 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
 
     // Transform coefficients anew if needed
     if (m_vecFftCoeff.cols() != (iFftLength / 2 + 1)) {
-        fftTransformCoeffs(iFftLength);
+        fft_transform_coeffs(iFftLength);
     }
 
     //generate fft object
@@ -204,154 +204,154 @@ void FilterKernel::applyFftFilter(RowVectorXd& vecData,
 
 //=============================================================================================================
 
-QString FilterKernel::getName() const
+const std::string& FilterKernel::name() const
 {
     return m_sFilterName;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setName(const QString& sFilterName)
+void FilterKernel::set_name(std::string sFilterName)
 {
-    m_sFilterName = sFilterName;
+    m_sFilterName = std::move(sFilterName);
 }
 
 //=============================================================================================================
 
-double FilterKernel::getSamplingFrequency() const
+double FilterKernel::sampling_frequency() const
 {
     return m_sFreq;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setSamplingFrequency(double dSFreq)
+void FilterKernel::set_sampling_frequency(double dSFreq)
 {
     m_sFreq = dSFreq;
 }
 
 //=============================================================================================================
 
-int FilterKernel::getFilterOrder() const
+int FilterKernel::filter_order() const
 {
     return m_iFilterOrder;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setFilterOrder(int iOrder)
+void FilterKernel::set_filter_order(int iOrder)
 {
     m_iFilterOrder = iOrder;
 }
 
 //=============================================================================================================
 
-double FilterKernel::getCenterFrequency() const
+double FilterKernel::center_frequency() const
 {
     return m_dCenterFreq;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setCenterFrequency(double dCenterFreq)
+void FilterKernel::set_center_frequency(double dCenterFreq)
 {
     m_dCenterFreq = dCenterFreq;
 }
 
 //=============================================================================================================
 
-double FilterKernel::getBandwidth() const
+double FilterKernel::bandwidth() const
 {
     return m_dBandwidth;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setBandwidth(double dBandwidth)
+void FilterKernel::set_bandwidth(double dBandwidth)
 {
     m_dBandwidth = dBandwidth;
 }
 
 //=============================================================================================================
 
-double FilterKernel::getParksWidth() const
+double FilterKernel::parks_width() const
 {
     return m_dParksWidth;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setParksWidth(double dParksWidth)
+void FilterKernel::set_parks_width(double dParksWidth)
 {
     m_dParksWidth = dParksWidth;
 }
 
 //=============================================================================================================
 
-double FilterKernel::getHighpassFreq() const
+double FilterKernel::highpass_freq() const
 {
     return m_dHighpassFreq;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setHighpassFreq(double dHighpassFreq)
+void FilterKernel::set_highpass_freq(double dHighpassFreq)
 {
     m_dHighpassFreq = dHighpassFreq;
 }
 
 //=============================================================================================================
 
-double FilterKernel::getLowpassFreq() const
+double FilterKernel::lowpass_freq() const
 {
     return m_dLowpassFreq;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setLowpassFreq(double dLowpassFreq)
+void FilterKernel::set_lowpass_freq(double dLowpassFreq)
 {
     m_dLowpassFreq = dLowpassFreq;
 }
 
 //=============================================================================================================
 
-Eigen::RowVectorXd FilterKernel::getCoefficients() const
+const Eigen::RowVectorXd& FilterKernel::coefficients() const
 {
     return m_vecCoeff;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setCoefficients(const Eigen::RowVectorXd& vecCoeff)
+void FilterKernel::set_coefficients(const Eigen::RowVectorXd& vecCoeff)
 {
     m_vecCoeff = vecCoeff;
 }
 
 //=============================================================================================================
 
-Eigen::RowVectorXcd FilterKernel::getFftCoefficients() const
+const Eigen::RowVectorXcd& FilterKernel::fft_coefficients() const
 {
     return m_vecFftCoeff;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff)
+void FilterKernel::set_fft_coefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 {
     m_vecFftCoeff = vecFftCoeff;
 }
 
 //=============================================================================================================
 
-bool FilterKernel::fftTransformCoeffs(int iFftLength)
+bool FilterKernel::fft_transform_coeffs(int iFftLength)
 {
 #ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
 #endif
 
     if (m_vecCoeff.cols() > iFftLength) {
-        Log::warning("[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length.");
+        Log::warning("[FilterKernel::fft_transform_coeffs] The number of filter taps is bigger than the FFT length.");
         return false;
     }
 
@@ -372,14 +372,13 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
     RowVectorXcd vecFreqData;
     fft.fwd(vecFreqData, vecInputFft, iFftLength);
     m_vecFftCoeff = vecFreqData;
-    ;
 
     return true;
 }
 
 //=============================================================================================================
 
-void FilterKernel::designFilter()
+void FilterKernel::design_filter()
 {
     // Make sure we only use a minimum needed FFT size
     int iFftLength = m_iFilterOrder;
@@ -421,10 +420,10 @@ void FilterKernel::designFilter()
                                   m_dBandwidth,
                                   m_dParksWidth,
                                   static_cast<ParksMcClellan::TPassType>(m_iFilterType));
-            m_vecCoeff = filter.FirCoeff;
+            m_vecCoeff = filter.coefficients;
 
             //fft-transform m_vecCoeff in order to be able to perform frequency-domain filtering
-            fftTransformCoeffs(iFftLength);
+            fft_transform_coeffs(iFftLength);
 
             break;
         }
@@ -474,7 +473,7 @@ void FilterKernel::designFilter()
             m_vecCoeff.tail(m_iFilterOrder - m_iFilterOrder / 2) = filtercos.m_vecCoeff.head(m_iFilterOrder - m_iFilterOrder / 2);
 
             //Now generate the fft version of the shortened impulse response
-            fftTransformCoeffs(iFftLength);
+            fft_transform_coeffs(iFftLength);
 
             break;
         }
@@ -497,52 +496,48 @@ void FilterKernel::designFilter()
             m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth / 2) * (m_sFreq / 2);
             break;
     }
-    getShortDescription();
 }
 
 //=============================================================================================================
 
-QString FilterKernel::getShortDescription() const
+std::string FilterKernel::short_description() const
 {
-    QString description(m_designMethods.at(m_iDesignMethod).getName() + "  -  " +
-                        QString::number(m_dHighpassFreq, 'g', 4) + "Hz to " + QString::number(m_dLowpassFreq, 'g', 4) + "Hz  -  "
-                                                                                                                        "Ord: " +
-                        QString::number(m_iFilterOrder));
-    return description;
+    return std::format("{}  -  {:.4g}Hz to {:.4g}Hz  -  Ord: {}", design_method().name(), m_dHighpassFreq, m_dLowpassFreq,
+                       m_iFilterOrder);
 }
 
 //=============================================================================================================
 
-mne::FilterParameter FilterKernel::getDesignMethod() const
+const mne::FilterParameter& FilterKernel::design_method() const
 {
     if (m_iDesignMethod < 0) {
-        return m_designMethods.at(0);
+        return design_methods.at(0);
     }
-    return m_designMethods.at(m_iDesignMethod);
+    return design_methods.at(m_iDesignMethod);
 }
 
 //=============================================================================================================
 
-mne::FilterParameter FilterKernel::getFilterType() const
+const mne::FilterParameter& FilterKernel::filter_type() const
 {
     if (m_iFilterType < 0) {
-        return m_filterTypes.at(0);
+        return filter_types.at(0);
     }
-    return m_filterTypes.at(m_iFilterType);
+    return filter_types.at(m_iFilterType);
 }
 
 //=============================================================================================================
 
-void FilterKernel::setDesignMethod(int iDesignMethod)
+void FilterKernel::set_design_method(int iDesignMethod)
 {
-    m_iDesignMethod = (iDesignMethod >= 0 && iDesignMethod < std::ssize(m_designMethods)) ? iDesignMethod : 0;
+    m_iDesignMethod = (iDesignMethod >= 0 && iDesignMethod < std::ssize(design_methods)) ? iDesignMethod : 0;
 }
 
 //=============================================================================================================
 
-void FilterKernel::setFilterType(int iFilterType)
+void FilterKernel::set_filter_type(int iFilterType)
 {
-    m_iFilterType = (iFilterType >= 0 && iFilterType < std::ssize(m_filterTypes)) ? iFilterType : 0;
+    m_iFilterType = (iFilterType >= 0 && iFilterType < std::ssize(filter_types)) ? iFilterType : 0;
 }
 
 //=============================================================================================================
@@ -554,39 +549,37 @@ FilterParameter::FilterParameter()
 
 //=============================================================================================================
 
-FilterParameter::FilterParameter(QString sName)
-: FilterParameter(sName, "")
+FilterParameter::FilterParameter(std::string sName)
+: FilterParameter(std::move(sName), "")
 {
 }
 
 //=============================================================================================================
 
-FilterParameter::FilterParameter(QString sName,
-                                 QString sDescription)
-: m_sName(sName)
-, m_sDescription(sDescription)
+FilterParameter::FilterParameter(std::string sName,
+                                 std::string sDescription)
+: m_sName(std::move(sName))
+, m_sDescription(std::move(sDescription))
 {
 }
 
 //=============================================================================================================
 
-QString FilterParameter::getName() const
+const std::string& FilterParameter::name() const
 {
     return m_sName;
 }
 
 //=============================================================================================================
 
-//=============================================================================================================
-
-int FilterKernel::designMethodIndex(const QString& sName)
+int FilterKernel::design_method_index(std::string_view sName)
 {
-    return indexOfName(m_designMethods, sName);
+    return indexOfName(design_methods, sName);
 }
 
 //=============================================================================================================
 
-int FilterKernel::filterTypeIndex(const QString& sName)
+int FilterKernel::filter_type_index(std::string_view sName)
 {
-    return indexOfName(m_filterTypes, sName);
+    return indexOfName(filter_types, sName);
 }

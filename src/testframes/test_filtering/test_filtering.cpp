@@ -125,7 +125,7 @@ void TestFiltering::initTestCase()
 
     // initialize filter settings
     QString sFilterName = "example_cosine";
-    int type = FilterKernel::filterTypeIndex("BPF");
+    int type = FilterKernel::filter_type_index("BPF");
     double dSFreq = rawFirstInRaw.info.sfreq;
     double dCenterfreq = 10;
     double dBandwidth = 10;
@@ -148,7 +148,7 @@ void TestFiltering::initTestCase()
                                      dTransition,
                                      dSFreq,
                                      1024,
-                                     mne::FilterKernel::designMethodIndex("Cosine"),
+                                     mne::FilterKernel::design_method_index("Cosine"),
                                      vPicks);
     printf("[done]\n");
 

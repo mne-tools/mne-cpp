@@ -43,6 +43,8 @@
 
 #include "dsp_global.h"
 
+#include <string>
+#include <string_view>
 #include <vector>
 
 //=============================================================================================================
@@ -50,13 +52,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
-#include <QMetaType>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -86,7 +81,7 @@ public:
      *
      * @param[in] sName    input name.
      */
-    explicit FilterParameter(QString sName);
+    explicit FilterParameter(std::string sName);
 
     //=========================================================================================================
     /**
@@ -95,7 +90,7 @@ public:
      * @param[in] sName            input name.
      * @param[in] sDescription     input desxription.
      */
-    explicit FilterParameter(QString sName, QString sDescription);
+    explicit FilterParameter(std::string sName, std::string sDescription);
 
     //=========================================================================================================
     /**
@@ -103,16 +98,16 @@ public:
      *
      * @return Parameter name.
      */
-    QString getName() const;
+    const std::string& name() const;
 
     friend bool operator==(const FilterParameter& in1, const FilterParameter& in2)
     {
-        return (in1.getName() == in2.getName());
+        return in1.name() == in2.name();
     }
 
 protected:
-    QString m_sName;        /**< Item name. */
-    QString m_sDescription; /**< Item description. */
+    std::string m_sName;        /**< Item name. */
+    std::string m_sDescription; /**< Item description. */
 };
 
 //=============================================================================================================
@@ -145,7 +140,7 @@ public:
      * @param[in] dSFreq           The sampling frequency.
      * @param[in] iDesignMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff.
      **/
-    FilterKernel(const QString& sFilterName,
+    FilterKernel(const std::string& sFilterName,
                  int iFilterType,
                  int iOrder,
                  double dCenterfreq,
@@ -164,7 +159,7 @@ public:
      *
      * @param[in] iDataSize           The data size to setup the filters to.
      */
-    void prepareFilter(int iDataSize);
+    void prepare_filter(int iDataSize);
 
     //=========================================================================================================
     /**
@@ -176,8 +171,8 @@ public:
      *
      * @return the filtered data in form of a RowVectorXd.
      */
-    Eigen::RowVectorXd applyConvFilter(const Eigen::RowVectorXd& vecData,
-                                       bool bKeepOverhead = false) const;
+    Eigen::RowVectorXd apply_conv_filter(const Eigen::RowVectorXd& vecData,
+                                         bool bKeepOverhead = false) const;
 
     //=========================================================================================================
     /**
@@ -187,65 +182,65 @@ public:
      * @param[in] bKeepOverhead            Whether the result should still include the overhead information in front and back of the data.
      *                                      Default is set to false.
      */
-    void applyFftFilter(Eigen::RowVectorXd& vecData,
-                        bool bKeepOverhead = false);
+    void apply_fft_filter(Eigen::RowVectorXd& vecData,
+                          bool bKeepOverhead = false);
 
-    QString getName() const;
-    void setName(const QString& sFilterName);
+    const std::string& name() const;
+    void set_name(std::string sFilterName);
 
-    double getSamplingFrequency() const;
-    void setSamplingFrequency(double dSFreq);
+    double sampling_frequency() const;
+    void set_sampling_frequency(double dSFreq);
 
-    int getFilterOrder() const;
-    void setFilterOrder(int iOrder);
+    int filter_order() const;
+    void set_filter_order(int iOrder);
 
-    double getCenterFrequency() const;
-    void setCenterFrequency(double dCenterFreq);
+    double center_frequency() const;
+    void set_center_frequency(double dCenterFreq);
 
-    double getBandwidth() const;
-    void setBandwidth(double dBandwidth);
+    double bandwidth() const;
+    void set_bandwidth(double dBandwidth);
 
-    double getParksWidth() const;
-    void setParksWidth(double dParksWidth);
+    double parks_width() const;
+    void set_parks_width(double dParksWidth);
 
-    double getHighpassFreq() const;
-    void setHighpassFreq(double dHighpassFreq);
+    double highpass_freq() const;
+    void set_highpass_freq(double dHighpassFreq);
 
-    double getLowpassFreq() const;
-    void setLowpassFreq(double dLowpassFreq);
+    double lowpass_freq() const;
+    void set_lowpass_freq(double dLowpassFreq);
 
-    Eigen::RowVectorXd getCoefficients() const;
-    void setCoefficients(const Eigen::RowVectorXd& vecCoeff);
+    const Eigen::RowVectorXd& coefficients() const;
+    void set_coefficients(const Eigen::RowVectorXd& vecCoeff);
 
-    Eigen::RowVectorXcd getFftCoefficients() const;
-    void setFftCoefficients(const Eigen::RowVectorXcd& vecFftCoeff);
+    const Eigen::RowVectorXcd& fft_coefficients() const;
+    void set_fft_coefficients(const Eigen::RowVectorXcd& vecFftCoeff);
 
-    FilterParameter getDesignMethod() const;
-    void setDesignMethod(int iDesignMethod);
+    const FilterParameter& design_method() const;
+    void set_design_method(int iDesignMethod);
 
-    FilterParameter getFilterType() const;
-    void setFilterType(int iFilterType);
+    const FilterParameter& filter_type() const;
+    void set_filter_type(int iFilterType);
 
-    QString getShortDescription() const;
+    std::string short_description() const;
 
     //=========================================================================================================
     /**
      * @param[in] sName    A design method name, e.g. "Cosine".
      *
-     * @return The index of the method in m_designMethods, or -1 if there is none of that name.
+     * @return The index of the method in design_methods, or -1 if there is none of that name.
      */
-    static int designMethodIndex(const QString& sName);
+    static int design_method_index(std::string_view sName);
 
     //=========================================================================================================
     /**
      * @param[in] sName    A filter type name, e.g. "BPF".
      *
-     * @return The index of the type in m_filterTypes, or -1 if there is none of that name.
+     * @return The index of the type in filter_types, or -1 if there is none of that name.
      */
-    static int filterTypeIndex(const QString& sName);
+    static int filter_type_index(std::string_view sName);
 
-    static const std::vector<FilterParameter> m_designMethods; /**< Vector of possible filter design methods. */
-    static const std::vector<FilterParameter> m_filterTypes;   /**< Vector of possible filter design types. */
+    static const std::vector<FilterParameter> design_methods; /**< Vector of possible filter design methods. */
+    static const std::vector<FilterParameter> filter_types;   /**< Vector of possible filter design types. */
 
 private:
     //=========================================================================================================
@@ -254,13 +249,13 @@ private:
      *
      * @param[in] iFftLength                  The FFT length to use.
      */
-    bool fftTransformCoeffs(int iFftLength);
+    bool fft_transform_coeffs(int iFftLength);
 
     //=========================================================================================================
     /**
      * Designs the actual filter with the given parameters
      */
-    void designFilter();
+    void design_filter();
 
     double m_sFreq;         /**< the sampling frequency. */
     double m_dCenterFreq;   /**< contains center freq of the filter. */
@@ -273,8 +268,7 @@ private:
     int m_iDesignMethod; /**< represents the design method of the filter instance.*/
     int m_iFilterType;   /**< represents the type of the filter instance.*/
 
-    QString m_sFilterName;             /**< contains name of the filter. */
-    QString m_sFilterShortDescription; /**< contains a short string describign some filter parameters. */
+    std::string m_sFilterName; /**< contains name of the filter. */
 
     Eigen::RowVectorXd m_vecCoeff;     /**< contains the forward filter coefficient set. */
     Eigen::RowVectorXcd m_vecFftCoeff; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFftLength. */

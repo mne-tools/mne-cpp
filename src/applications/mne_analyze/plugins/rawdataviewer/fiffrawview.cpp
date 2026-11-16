@@ -732,7 +732,7 @@ void FiffRawView::updateFilterLabel()
     } else {
         label += "   |   Filter OFF";
     }
-    label += "  -  " + m_pModel->getFilter().getShortDescription() + "  |";
+    label += QString::fromStdString("  -  " + m_pModel->getFilter().short_description() + "  |");
     m_pFilterLabel->setText(label);
 }
 

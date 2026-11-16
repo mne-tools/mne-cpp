@@ -330,7 +330,7 @@ private slots:
         // Apply filter row-by-row
         for (int r = 0; r < filtered.rows(); ++r) {
             RowVectorXd row = filtered.row(r);
-            kernel.applyFftFilter(row);
+            kernel.apply_fft_filter(row);
             filtered.row(r) = row;
         }
 
@@ -597,7 +597,7 @@ private slots:
         MatrixXd all, allTimes;
         QVERIFY(raw.read_raw_segment(all, allTimes, raw.first_samp, raw.last_samp, picks));
         const MatrixXd allFiltered = mne::filterData(all, kernel);
-        const int delay = kernel.getFilterOrder() / 2;
+        const int delay = kernel.filter_order() / 2;
         MatrixXd sum = MatrixXd::Zero(all.rows(), to - from + 1);
         int nave = 0;
         for (int e = 0; e < events.rows(); ++e) {

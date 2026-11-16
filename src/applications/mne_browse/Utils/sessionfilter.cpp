@@ -342,7 +342,7 @@ void SessionFilter::ensureDesigned(int iDataSizeHint) const
         }
 
         if (iDataSizeHint > 0 && iDataSizeHint != m_iPreparedDataSize) {
-            m_firKernel.prepareFilter(iDataSizeHint);
+            m_firKernel.prepare_filter(iDataSizeHint);
             m_iPreparedDataSize = iDataSizeHint;
         }
     } else if (!m_bIirDesigned) {
@@ -407,7 +407,7 @@ VectorXcd SessionFilter::frequencyResponse(int iPoints) const
 
     if (isFir()) {
         ensureDesigned();
-        const RowVectorXd coefficients = m_firKernel.getCoefficients();
+        const RowVectorXd coefficients = m_firKernel.coefficients();
         if (coefficients.size() == 0) {
             return response;
         }
@@ -484,7 +484,7 @@ QString SessionFilter::coefficientExportText() const
     QTextStream stream(&output);
 
     if (isFir()) {
-        const RowVectorXd coefficients = m_firKernel.getCoefficients();
+        const RowVectorXd coefficients = m_firKernel.coefficients();
         for (Index index = 0; index < coefficients.cols(); ++index) {
             stream << coefficients(index) << '\n';
         }

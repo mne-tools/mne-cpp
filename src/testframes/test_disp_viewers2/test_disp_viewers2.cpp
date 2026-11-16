@@ -910,19 +910,19 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     QCOMPARE(fromSpy.last().at(0).toDouble(), 2.0);
     QCOMPARE(toSpy.last().at(0).toDouble(), 45.0);
     FilterKernel kernel = view.getCurrentFilter();
-    QCOMPARE(filterSpy.last().at(0).value<FilterKernel>().getName(), kernel.getName());
-    QCOMPARE(kernel.getFilterType().getName(), QStringLiteral("BPF"));
-    QCOMPARE(kernel.getFilterOrder(), 128);
-    QCOMPARE(kernel.getSamplingFrequency(), 1000.0);
-    QVERIFY(qAbs(kernel.getHighpassFreq() - 2.0) < 1e-9);
-    QVERIFY(qAbs(kernel.getLowpassFreq() - 45.0) < 1e-9);
-    QCOMPARE(kernel.getCoefficients().cols(), 128);
+    QCOMPARE(filterSpy.last().at(0).value<FilterKernel>().name(), kernel.name());
+    QCOMPARE(kernel.filter_type().name(), std::string("BPF"));
+    QCOMPARE(kernel.filter_order(), 128);
+    QCOMPARE(kernel.sampling_frequency(), 1000.0);
+    QVERIFY(qAbs(kernel.highpass_freq() - 2.0) < 1e-9);
+    QVERIFY(qAbs(kernel.lowpass_freq() - 45.0) < 1e-9);
+    QCOMPARE(kernel.coefficients().cols(), 128);
 
     // Band edges are clamped to Nyquist and kept ordered
     view.setSamplingRate(60.0);
     QCOMPARE(pTo->maximum(), 30.0);
     QCOMPARE(view.getTo(), 30.0);
-    QVERIFY(qAbs(view.getCurrentFilter().getLowpassFreq() - 30.0) < 1e-9);
+    QVERIFY(qAbs(view.getCurrentFilter().lowpass_freq() - 30.0) < 1e-9);
     view.setSamplingRate(1000.0);
     view.setTo(40.0);
     view.setFrom(10.0);
@@ -934,9 +934,9 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     pTrans->setValue(2.0);
     emit pTrans->editingFinished();
     QCOMPARE(filterSpy.count(), iBefore + 1);
-    QVERIFY(qAbs(view.getCurrentFilter().getParksWidth() * 500.0 - 2.0) < 1e-9);
+    QVERIFY(qAbs(view.getCurrentFilter().parks_width() * 500.0 - 2.0) < 1e-9);
     pMethod->setCurrentIndex(pMethod->count() - 1);
-    QCOMPARE(view.getCurrentFilter().getDesignMethod().getName(), pMethod->currentText());
+    QCOMPARE(view.getCurrentFilter().design_method().name(), pMethod->currentText());
     pMethod->setCurrentIndex(0);
 
     // Channel type: selection, Enter and Delete report it
@@ -967,9 +967,9 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportFilter")), Qt::LeftButton);
     QVERIFY(QFile::exists(sFile));
     // The file is named after type, band and sampling rate, like the suggested file name
-    FilterKernel exported;
-    QVERIFY(FilterIO::readFilter(sFile, exported));
-    QCOMPARE(exported.getName(), QStringLiteral("%1_4_30_Fs%2").arg(kernel.getFilterType().getName()).arg(static_cast<int>(kernel.getSamplingFrequency())));
+    const auto exported = FilterIO::read_filter(sFile.toStdString());
+    QVERIFY(exported);
+    QCOMPARE(exported->name(), std::format("{}_4_30_Fs{}", kernel.filter_type().name(), static_cast<int>(kernel.sampling_frequency())));
 
     view.setFrom(1.0);
     view.setTo(20.0);
@@ -980,9 +980,9 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     QCOMPARE(view.getFrom(), 4.0);
     QCOMPARE(view.getTo(), 30.0);
     QCOMPARE(pTaps->value(), 128);
-    QVERIFY(qAbs(view.getCurrentFilter().getHighpassFreq() - 4.0) < 1e-9);
-    QVERIFY(qAbs(view.getCurrentFilter().getLowpassFreq() - 30.0) < 1e-9);
-    QVERIFY((view.getCurrentFilter().getCoefficients() - kernel.getCoefficients()).cwiseAbs().maxCoeff() < 1e-6);
+    QVERIFY(qAbs(view.getCurrentFilter().highpass_freq() - 4.0) < 1e-9);
+    QVERIFY(qAbs(view.getCurrentFilter().lowpass_freq() - 30.0) < 1e-9);
+    QVERIFY((view.getCurrentFilter().coefficients() - kernel.coefficients()).cwiseAbs().maxCoeff() < 1e-6);
 
     // Plot export as PNG
     const QString sPng = dir.filePath(QStringLiteral("plot.png"));
@@ -2089,8 +2089,8 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
         auto info = createBrowserTestInfo();
         model.setFiffInfo(info);
         model.setSamplingInfo(100.0f, 1, true);
-        const FilterKernel kernel(QStringLiteral("lp"), 0, 50, 0.2, 0.0, 0.05, 100.0, 0);
-        const Eigen::RowVectorXd h = kernel.getCoefficients();
+        const FilterKernel kernel("lp", 0, 50, 0.2, 0.0, 0.05, 100.0, 0);
+        const Eigen::RowVectorXd& h = kernel.coefficients();
         const int L = static_cast<int>(h.cols());
         const int iDelay = L / 2;
         model.setFilterChannelType(QStringLiteral("MEG"));
@@ -2222,7 +2222,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
 
     // Real-time filtering: a 50-tap low-pass on the MEG channels only, a pass-through on STIM
     model.setFilterChannelType(QStringLiteral("MEG"));
-    model.setFilter({FilterKernel(QStringLiteral("lp"), 0, 50, 0.2, 0.0, 0.05, 100.0, 0)});
+    model.setFilter({FilterKernel("lp", 0, 50, 0.2, 0.0, 0.05, 100.0, 0)});
     model.setFilterActive(true);
     Eigen::MatrixXd tone(4, 50);
     for (int s = 0; s < 50; ++s) {

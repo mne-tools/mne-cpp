@@ -12,7 +12,11 @@
 
 #include <QtTest/QtTest>
 
+#include <base/byte_stream.h>
 #include <dsp/filterio.h>
+
+#include <filesystem>
+#include <string>
 
 using namespace mne;
 
@@ -21,85 +25,67 @@ class TestDspFilterIo : public QObject
     Q_OBJECT
 
 private slots:
+    void initTestCase()
+    {
+        QVERIFY(m_dir.isValid());
+        m_path = m_dir.filePath(QStringLiteral("filter.txt")).toStdString();
+    }
+
     void writeAndReadRoundTrip()
     {
-        FilterKernel original("RoundTrip Filter",
-                              2,
-                              33,
-                              25.0,
-                              10.0,
-                              5.0,
-                              1000.0,
-                              1);
+        const FilterKernel original("RoundTrip Filter", 2, 33, 25.0, 10.0, 5.0, 1000.0, 1);
+        QVERIFY(FilterIO::write_filter(m_path, original));
 
-        QTemporaryDir dir;
-        QVERIFY(dir.isValid());
-
-        const QString path = dir.path() + "/roundtrip_filter.txt";
-        QVERIFY(FilterIO::writeFilter(path, original));
-
-        FilterKernel restored;
-        QVERIFY(FilterIO::readFilter(path, restored));
-
-        QCOMPARE(restored.getName(), QString(original.getName()).remove(' '));
-        QCOMPARE(restored.getFilterOrder(), original.getFilterOrder());
-        QCOMPARE(restored.getDesignMethod().getName(), original.getDesignMethod().getName());
-        QCOMPARE(restored.getFilterType().getName(), original.getFilterType().getName());
-        QCOMPARE(restored.getSamplingFrequency(), original.getSamplingFrequency());
-        QCOMPARE(restored.getParksWidth(), original.getParksWidth());
-        QCOMPARE(restored.getCoefficients().size(), original.getCoefficients().size());
-
-        for (int i = 0; i < restored.getCoefficients().size(); ++i) {
-            QVERIFY(qAbs(restored.getCoefficients()(i) - original.getCoefficients()(i)) < 1e-9);
-        }
+        const auto restored = FilterIO::read_filter(m_path);
+        QVERIFY(restored);
+        QCOMPARE(restored->name(), original.name());
+        QCOMPARE(restored->filter_order(), original.filter_order());
+        QCOMPARE(restored->design_method().name(), original.design_method().name());
+        QCOMPARE(restored->filter_type().name(), original.filter_type().name());
+        QCOMPARE(restored->sampling_frequency(), original.sampling_frequency());
+        QCOMPARE(restored->parks_width(), original.parks_width());
+        QCOMPARE(restored->highpass_freq(), original.highpass_freq());
+        QCOMPARE(restored->lowpass_freq(), original.lowpass_freq());
+        QCOMPARE(restored->center_frequency(), original.center_frequency());
+        QVERIFY(restored->coefficients() == original.coefficients());
     }
 
-    void readRejectsNonTxtPath()
+    void readRejectsMissingFileAndBadValues()
     {
-        FilterKernel filter;
-        QVERIFY(!FilterIO::readFilter("not_a_filter.csv", filter));
-    }
-
-    void writeRejectsEmptyPath()
-    {
-        FilterKernel filter("EmptyPath", 0, 17, 40.0, 0.0, 5.0, 1000.0, 0);
-        QVERIFY(!FilterIO::writeFilter(QString(), filter));
+        QVERIFY(!FilterIO::read_filter("/nonexistent/filter.txt"));
+        QVERIFY(!FilterIO::write_filter("/nonexistent/dir/filter.txt", FilterKernel()));
+        QVERIFY(write_text_file(m_path, "#sFreq 512\n0.25\nnot a number\n"));
+        QVERIFY(!FilterIO::read_filter(m_path));
+        QVERIFY(write_text_file(m_path, "#sFreq fast\n0.25\n"));
+        QVERIFY(!FilterIO::read_filter(m_path));
     }
 
     void readAdjustsOrderToCoefficientCount()
     {
-        QTemporaryDir dir;
-        QVERIFY(dir.isValid());
-
-        const QString path = dir.path() + "/manual_filter.txt";
-        QFile file(path);
-        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
-
-        QTextStream out(&file);
-        out << "#sFreq 512\n";
-        out << "#name Manual Filter\n";
-        out << "#type LPF\n";
-        out << "#order 99\n";
-        out << "#HPFreq 0\n";
-        out << "#LPFreq 40\n";
-        out << "#CenterFreq 20\n";
-        out << "#DesignMethod Cosine\n";
-        out << "0.25\n";
-        out << "0.50\n";
-        out << "0.25\n";
-        file.close();
-
-        FilterKernel filter;
-        QVERIFY(FilterIO::readFilter(path, filter));
-
-        QCOMPARE(filter.getSamplingFrequency(), 512.0);
-        QCOMPARE(filter.getName(), QString("ManualFilter"));
-        QCOMPARE(filter.getFilterOrder(), 3);
-        QCOMPARE(filter.getCoefficients().size(), 3);
-        QVERIFY(qAbs(filter.getCoefficients()(0) - 0.25) < 1e-12);
-        QVERIFY(qAbs(filter.getCoefficients()(1) - 0.50) < 1e-12);
-        QVERIFY(qAbs(filter.getCoefficients()(2) - 0.25) < 1e-12);
+        QVERIFY(write_text_file(m_path, "#sFreq 512\n"
+                                        "#name Manual type filter\n"
+                                        "#type LPF\n"
+                                        "#order 99\n"
+                                        "#HPFreq 0\n"
+                                        "#LPFreq 40\n"
+                                        "#CenterFreq 20\n"
+                                        "#DesignMethod Cosine\n"
+                                        "0.25\n"
+                                        "0.50\n"
+                                        "0.25\n"));
+        const auto filter = FilterIO::read_filter(m_path);
+        QVERIFY(filter);
+        QCOMPARE(filter->sampling_frequency(), 512.0);
+        QCOMPARE(filter->name(), std::string("Manual type filter"));
+        QCOMPARE(filter->filter_type().name(), std::string("LPF"));
+        QCOMPARE(filter->lowpass_freq(), 40.0);
+        QCOMPARE(filter->filter_order(), 3);
+        QVERIFY(filter->coefficients() == Eigen::RowVector3d(0.25, 0.5, 0.25));
     }
+
+private:
+    QTemporaryDir m_dir;
+    std::filesystem::path m_path;
 };
 
 QTEST_GUILESS_MAIN(TestDspFilterIo)

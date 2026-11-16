@@ -86,7 +86,7 @@ bool mne::filterFile(const std::filesystem::path& path,
                      const RowVectorXi& vecPicks,
                      bool bUseThreads)
 {
-    int iOrder = filterKernel.getFilterOrder();
+    int iOrder = filterKernel.filter_order();
 
     RowVectorXd cals;
     SparseMatrix<double> mult;
@@ -218,7 +218,7 @@ MatrixXd mne::filterData(const MatrixXd& matData,
                          bool bUseThreads,
                          bool bKeepOverhead)
 {
-    int iOrder = filterKernel.getFilterOrder();
+    int iOrder = filterKernel.filter_order();
 
     // Check for size of data
     if (matData.cols() < iOrder) {
@@ -292,7 +292,7 @@ MatrixXd mne::filterDataBlock(const MatrixXd& matData,
                               const FilterKernel& filterKernel,
                               bool bUseThreads)
 {
-    int iOrder = filterKernel.getFilterOrder();
+    int iOrder = filterKernel.filter_order();
 
     // Check for size of data
     if (matData.cols() < iOrder) {
@@ -302,7 +302,7 @@ MatrixXd mne::filterDataBlock(const MatrixXd& matData,
 
     // Setup filters to the correct length, so we do not have to do this everytime we call the FFT filter function
     FilterKernel filterKernelSetup = filterKernel;
-    filterKernelSetup.prepareFilter(matData.cols());
+    filterKernelSetup.prepare_filter(matData.cols());
 
     // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
@@ -353,7 +353,7 @@ MatrixXd mne::filterDataBlock(const MatrixXd& matData,
 void mne::filterChannel(mne::FilterObject& channelDataTime)
 {
     //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
-    channelDataTime.filterKernel.applyFftFilter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    channelDataTime.filterKernel.apply_fft_filter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 //=============================================================================================================
@@ -411,7 +411,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& matData,
                                      bool bUseThreads,
                                      bool bKeepOverhead)
 {
-    int iOrder = filterKernel.getFilterOrder();
+    int iOrder = filterKernel.filter_order();
 
     // Check for size of data
     if (matData.cols() < iOrder) {
@@ -559,7 +559,7 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
     MatrixXd times;
 
     std::unique_ptr<MNEEpochData> epoch;
-    int iFilterDelay = filterKernel.getFilterOrder() / 2;
+    int iFilterDelay = filterKernel.filter_order() / 2;
 
     for (p = 0; p < count; ++p) {
         // Read a data segment

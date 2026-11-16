@@ -749,8 +749,8 @@ void RtFiffRawViewModel::setFilter(QList<FilterKernel> filterData)
 
     m_iMaxFilterLength = 1;
     for (int i = 0; i < filterData.size(); ++i) {
-        if (m_iMaxFilterLength < filterData.at(i).getFilterOrder()) {
-            m_iMaxFilterLength = filterData.at(i).getFilterOrder();
+        if (m_iMaxFilterLength < filterData.at(i).filter_order()) {
+            m_iMaxFilterLength = filterData.at(i).filter_order();
         }
     }
 
@@ -889,7 +889,7 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>& channelDataTime)
 {
     for (int i = 0; i < channelDataTime.first.size(); ++i) {
-        channelDataTime.first[i].applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+        channelDataTime.first[i].apply_fft_filter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
 }
 

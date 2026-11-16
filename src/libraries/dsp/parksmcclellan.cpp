@@ -61,7 +61,6 @@ ParksMcClellan::ParksMcClellan()
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
-, InitDone2(false)
 {
 }
 
@@ -81,20 +80,14 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
-, InitDone2(false)
 {
-    init(NumTaps, OmegaC, BW, ParksWidth, PassType);
+    design(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
 
 //=============================================================================================================
 
-ParksMcClellan::~ParksMcClellan()
-{
-}
 
-//=============================================================================================================
-
-void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
+void ParksMcClellan::design(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
 {
     // Set per pass type below; an unrecognised type leaves the band table empty
     // rather than reading an indeterminate count.
@@ -201,12 +194,12 @@ void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWid
     for (j = 1; j <= 2 * NumBands; j++)
         Edge[j] /= 2.0;
 
-    CalcParkCoeff2(NumBands, NumTaps);
+    calc_park_coeff(NumBands, NumTaps);
 }
 
 //=============================================================================================================
 
-void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
+void ParksMcClellan::calc_park_coeff(int NumBands, int TapCount)
 {
     int j, k, GridCount, GridIndex, BandIndex, NumIterations;
     double LowFreqEdge, UpperFreq, TempVar, Change;
@@ -266,8 +259,8 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
     }
     ExchangeIndex[HalfTapCount + 1] = GridIndex;
 
-    NumIterations = Remez2(GridIndex);
-    CalcCoefficients();
+    NumIterations = remez(GridIndex);
+    calc_coefficients();
 
     // Calculate the impulse response.
     if (OddNumTaps) {
@@ -283,16 +276,16 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         Coeff[HalfTapCount] = 0.5 * Alpha[1] + 0.25 * Alpha[2];
     }
 
-    // Output section: TapCount may differ from the count the object was constructed with (clamped, or init() later)
-    FirCoeff = RowVectorXd::Zero(TapCount);
+    // Output section: TapCount may differ from the count the object was constructed with (clamped, or design() later)
+    coefficients = RowVectorXd::Zero(TapCount);
     for (j = 1; j <= HalfTapCount; j++)
-        FirCoeff[j - 1] = Coeff[j];
+        coefficients[j - 1] = Coeff[j];
     if (OddNumTaps)
         for (j = 1; j < HalfTapCount; j++)
-            FirCoeff[HalfTapCount + j - 1] = Coeff[HalfTapCount - j];
+            coefficients[HalfTapCount + j - 1] = Coeff[HalfTapCount - j];
     else
         for (j = 1; j <= HalfTapCount; j++)
-            FirCoeff[HalfTapCount + j - 1] = Coeff[HalfTapCount - j + 1];
+            coefficients[HalfTapCount + j - 1] = Coeff[HalfTapCount - j + 1];
 
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function
@@ -307,7 +300,7 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
 
 //=============================================================================================================
 
-int ParksMcClellan::Remez2(int GridIndex)
+int ParksMcClellan::remez(int GridIndex)
 {
     // This routine is a direct port of the original goto-driven Fortran, so the
     // compiler cannot prove that every path assigns these before use. Give them
@@ -332,7 +325,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
 
     JET = (HalfTapCount - 1) / 15 + 1;
     for (j = 1; j <= HalfTapCount + 1; j++) {
-        LeGrangeD[j] = LeGrangeInterp2(j, HalfTapCount + 1, JET);
+        LeGrangeD[j] = lagrange_interp(j, HalfTapCount + 1, JET);
     }
 
     DNUM = 0.0;
@@ -379,11 +372,11 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
             Y1 = COMP;
         COMP = Deviation;
 
-        if (k < KUP && !ErrTest(k, NUT, COMP, &ERR)) {
+        if (k < KUP && !err_test(k, NUT, COMP, &ERR)) {
         L210:
             COMP = static_cast<double>(NUT) * ERR;
             for (k++; k < KUP; k++) {
-                if (ErrTest(k, NUT, COMP, &ERR))
+                if (err_test(k, NUT, COMP, &ERR))
                     break; // for loop
                 COMP = static_cast<double>(NUT) * ERR;
             }
@@ -410,7 +403,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
             } else        // JCHNGE <= 0
             {
                 for (k++; k < KUP; k++) {
-                    if (ErrTest(k, NUT, COMP, &ERR))
+                    if (err_test(k, NUT, COMP, &ERR))
                         continue; // for loop
                     goto L210;
                 }
@@ -421,10 +414,10 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
             }
         }
         // Can't use a do while loop here, it would outdent the two continue statements.
-        if (ErrTest(k, NUT, COMP, &ERR) && JCHNGE <= 0)
+        if (err_test(k, NUT, COMP, &ERR) && JCHNGE <= 0)
             goto L225;
 
-        if (ErrTest(k, NUT, COMP, &ERR)) {
+        if (err_test(k, NUT, COMP, &ERR)) {
             KLOW = ExchangeIndex[j];
             j++;
             continue; // while loop
@@ -434,7 +427,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
 
     L235:
         for (k--; k > KLOW; k--) {
-            if (ErrTest(k, NUT, COMP, &ERR))
+            if (err_test(k, NUT, COMP, &ERR))
                 break; // for loop
             COMP = static_cast<double>(NUT) * ERR;
         }
@@ -461,7 +454,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
         LUCK = 1;
 
         for (k++; k < KUP; k++) {
-            if (ErrTest(k, NUT, COMP, &ERR))
+            if (err_test(k, NUT, COMP, &ERR))
                 continue; // for loop
             j = HalfTapCount + 2;
             goto L210;
@@ -483,7 +476,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
         COMP = Y1 * 1.00001;
 
         for (k--; k > KLOW; k--) {
-            if (ErrTest(k, NUT, COMP, &ERR))
+            if (err_test(k, NUT, COMP, &ERR))
                 continue; // for loop
             j = HalfTapCount + 2;
             COMP = static_cast<double>(NUT) * ERR;
@@ -519,7 +512,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
 
 //=============================================================================================================
 
-double ParksMcClellan::LeGrangeInterp2(int K, int N, int M) // D
+double ParksMcClellan::lagrange_interp(int K, int N, int M) // D
 {
     int j, k;
     double Dee, Q;
@@ -541,7 +534,7 @@ double ParksMcClellan::LeGrangeInterp2(int K, int N, int M) // D
 
 //=============================================================================================================
 
-double ParksMcClellan::GEE2(int K, int N)
+double ParksMcClellan::gee(int K, int N)
 {
     int j;
     double P, C, Dee, XF;
@@ -572,9 +565,9 @@ double ParksMcClellan::GEE2(int K, int N)
 
 //=============================================================================================================
 
-bool ParksMcClellan::ErrTest(int k, int Nut, double Comp, double* Err)
+bool ParksMcClellan::err_test(int k, int Nut, double Comp, double* Err)
 {
-    *Err = GEE2(k, HalfTapCount + 1);
+    *Err = gee(k, HalfTapCount + 1);
     *Err = (*Err - DesiredMag[k]) * Weight[k];
     if (static_cast<double>(Nut) * *Err - Comp <= 0.0)
         return (true);
@@ -584,7 +577,7 @@ bool ParksMcClellan::ErrTest(int k, int Nut, double Comp, double* Err)
 
 //=============================================================================================================
 
-void ParksMcClellan::CalcCoefficients()
+void ParksMcClellan::calc_coefficients()
 {
     int j, k, n;
     double GTempVar, OneOverNumTaps;
@@ -613,7 +606,7 @@ void ParksMcClellan::CalcCoefficients()
             GeeArray[j] = DesPlus[k]; // Desired Response
         } else {
             Grid[1] = FreqN;
-            GeeArray[j] = GEE2(1, HalfTapCount + 1);
+            GeeArray[j] = gee(1, HalfTapCount + 1);
         }
         if (k > 1)
             k--;

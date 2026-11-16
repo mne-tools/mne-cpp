@@ -198,7 +198,7 @@ void TestDspFirFilter::filterOrder_isPreserved()
 {
     const int order = 100;
     FilterKernel k = FirFilter::design(order, FirFilter::LowPass, 20.0, 0.0, 1000.0);
-    QCOMPARE(k.getFilterOrder(), order);
+    QCOMPARE(k.filter_order(), order);
 }
 
 //=============================================================================================================
@@ -368,9 +368,9 @@ void TestDspFirFilter::design_parksMcClellan_producesValidKernel()
     FilterKernel k = FirFilter::design(128, FirFilter::BandPass,
                                        1.0, 40.0, 600.0,
                                        3.0, FirFilter::ParksMcClellan);
-    QCOMPARE(k.getFilterOrder(), 128);
+    QCOMPARE(k.filter_order(), 128);
     // Coefficient vector must be non-zero
-    QVERIFY(k.getCoefficients().norm() > 1e-12);
+    QVERIFY(k.coefficients().norm() > 1e-12);
 }
 
 //=============================================================================================================
@@ -402,7 +402,7 @@ void TestDspFirFilter::parksMcClellan_passTypes()
     ParksMcClellan pm(taps, omega, bw, 0.1, passType);
     // High-pass and notch filters need a symmetric odd-length kernel
     const int expectedTaps = (passType == ParksMcClellan::HPF || passType == ParksMcClellan::NOTCH) && taps % 2 == 0 ? taps - 1 : taps;
-    QCOMPARE(pm.FirCoeff.size(), Eigen::Index(expectedTaps));
+    QCOMPARE(pm.coefficients.size(), Eigen::Index(expectedTaps));
     const auto gain = [](const Eigen::RowVectorXd& h, double w) {
         std::complex<double> sum = 0.0;
         for (Eigen::Index n = 0; n < h.size(); ++n)
@@ -410,18 +410,16 @@ void TestDspFirFilter::parksMcClellan_passTypes()
         return std::abs(sum);
     };
     for (double w : pass)
-        QVERIFY2(std::abs(gain(pm.FirCoeff, w) - 1.0) < 0.05, qPrintable(QString("pass %1: %2").arg(w).arg(gain(pm.FirCoeff, w))));
+        QVERIFY2(std::abs(gain(pm.coefficients, w) - 1.0) < 0.05, qPrintable(QString("pass %1: %2").arg(w).arg(gain(pm.coefficients, w))));
     for (double w : stop)
-        QVERIFY2(gain(pm.FirCoeff, w) < 0.05, qPrintable(QString("stop %1: %2").arg(w).arg(gain(pm.FirCoeff, w))));
+        QVERIFY2(gain(pm.coefficients, w) < 0.05, qPrintable(QString("stop %1: %2").arg(w).arg(gain(pm.coefficients, w))));
 
-    // Too few taps are raised to 9, too many lowered to 256, and init() on a default object designs the same kernel
-    const Eigen::RowVectorXd nine = ParksMcClellan(9, omega, bw, 0.1, passType).FirCoeff;
-    QCOMPARE(ParksMcClellan(4, omega, bw, 0.1, passType).FirCoeff, nine);
-    const Eigen::RowVectorXd many = ParksMcClellan(256, omega, bw, 0.1, passType).FirCoeff;
-    QCOMPARE(ParksMcClellan(300, omega, bw, 0.1, passType).FirCoeff, many);
-    ParksMcClellan later;
-    later.init(taps, omega, bw, 0.1, passType);
-    QCOMPARE(later.FirCoeff, pm.FirCoeff);
+    // Too few taps are raised to 9, too many lowered to 256; a default object holds no kernel
+    const Eigen::RowVectorXd nine = ParksMcClellan(9, omega, bw, 0.1, passType).coefficients;
+    QCOMPARE(ParksMcClellan(4, omega, bw, 0.1, passType).coefficients, nine);
+    const Eigen::RowVectorXd many = ParksMcClellan(256, omega, bw, 0.1, passType).coefficients;
+    QCOMPARE(ParksMcClellan(300, omega, bw, 0.1, passType).coefficients, many);
+    QCOMPARE(ParksMcClellan().coefficients.size(), Eigen::Index(0));
 }
 
 //=============================================================================================================

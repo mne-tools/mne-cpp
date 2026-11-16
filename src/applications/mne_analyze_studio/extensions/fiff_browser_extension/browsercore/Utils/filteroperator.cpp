@@ -62,7 +62,7 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
     switch (designMethod) {
         case Tschebyscheff: {
             ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-            m_dCoeffA = filter.FirCoeff;
+            m_dCoeffA = filter.coefficients;
 
             //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
             fftTransformCoeffs();
