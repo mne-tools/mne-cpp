@@ -30,13 +30,8 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <base/json.h>
 #include <fiff/fiff_dig_point_set.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QJsonDocument>
 
 #include <memory>
 
@@ -191,11 +186,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Load coil presets from json file at the provided path
+     * Replaces the coil presets, by default the Neuromag VectorView frequencies, with those of a JSON file:
+     * an object mapping the number of coils ("4", "5", ...) to an array of {"name": ..., "coils": [Hz, ...]}.
      *
-     * @param[in] sFilePath     PAth to json file with coil preset data
+     * @param[in] sFilePath     Path to the JSON file.
+     * @return Whether the file could be read and parsed; if not, the presets are left unchanged.
      */
-    void loadCoilPresets(const QString& sFilePath);
+    bool loadCoilPresets(const QString& sFilePath);
 
     //=========================================================================================================
     /**
@@ -284,7 +281,7 @@ protected:
      *
      * @param[in] presetData    json array containing the coil preset name and freqs.
      */
-    void populatePresetGUI(const QJsonArray& presetData);
+    void populatePresetGUI(const mne::JsonArray& presetData);
 
     //=========================================================================================================
     /**
@@ -334,7 +331,7 @@ protected:
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QJsonDocument m_CoilPresets; /**< Loaded coil frequency presets */
+    mne::JsonObject m_CoilPresets; /**< Coil frequency presets by number of coils */
 
 signals:
     //=========================================================================================================

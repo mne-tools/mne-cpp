@@ -21,6 +21,8 @@
 
 #include "hpisettingsview.h"
 
+#include <base/byte_stream.h>
+#include <base/log.h>
 #include <base/string_utils.h>
 
 #include "ui_hpisettingsview.h"
@@ -37,8 +39,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
-#include <QJsonObject>
-#include <QJsonArray>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -46,6 +46,21 @@
 
 using namespace mne::disp;
 using namespace mne;
+
+namespace
+{
+
+/** Neuromag VectorView coil frequencies in Hz, by number of coils. */
+constexpr std::string_view kVectorViewPresets = R"({
+    "4": [{"name": "VV 154-166Hz", "coils": [154, 158, 161, 166]},
+          {"name": "VV 293-321Hz", "coils": [293, 307, 314, 321]},
+          {"name": "VV 586-642Hz", "coils": [586, 614, 628, 642]}],
+    "5": [{"name": "VV 154-172Hz", "coils": [154, 158, 161, 166, 172]},
+          {"name": "VV 293-328Hz", "coils": [293, 307, 314, 321, 328]},
+          {"name": "VV 586-656Hz", "coils": [586, 614, 628, 642, 656]}]
+})";
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -56,6 +71,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(std::make_unique<Ui::HpiSettingsViewWidget>())
+, m_CoilPresets(JsonDocument::from_json(kVectorViewPresets).object())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -565,43 +581,48 @@ void HpiSettingsView::clearView()
 {
 }
 
-//==============================================void populateCoilGUI(int iNumCoils);===============================================================
+//=============================================================================================================
 
-void HpiSettingsView::loadCoilPresets(const QString& sFilePath)
+bool HpiSettingsView::loadCoilPresets(const QString& sFilePath)
 {
-    QFile inFile(sFilePath);
-    if (inFile.open(QIODevice::ReadOnly)) {
-        QByteArray inArray = inFile.readAll();
-        m_CoilPresets = QJsonDocument::fromJson(inArray);
+    const Expected<std::string> text = read_text_file(path_from_utf8(sFilePath.toStdString()));
+    if (!text) {
+        Log::warning("Cannot read HPI coil presets: {}", text.error().what());
+        return false;
     }
+    JsonParseError error;
+    const JsonDocument presets = JsonDocument::from_json(*text, &error);
+    if (error.error != JsonParseError::NoError || !presets.is_object()) {
+        Log::warning("{} holds no JSON object of HPI coil presets", sFilePath.toStdString());
+        return false;
+    }
+    m_CoilPresets = presets.object();
+    setupCoilPresets(static_cast<int>(m_vCoilFreqs.size()));
+    return true;
 }
 
 //=============================================================================================================
 
 void HpiSettingsView::setupCoilPresets(int iNumCoils)
 {
-    if (!m_CoilPresets.isNull()) {
-        QJsonArray presetData = m_CoilPresets.object()[QString::number(iNumCoils)].toArray();
-        populatePresetGUI(presetData);
-    }
+    populatePresetGUI(m_CoilPresets[std::to_string(iNumCoils)].to_array());
 }
 
 //=============================================================================================================
 
-void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
+void HpiSettingsView::populatePresetGUI(const JsonArray& presetData)
 {
     m_pUi->comboBox_coilPreset->clear();
     m_pUi->comboBox_coilPreset->addItem("Load preset");
 
-    for (const auto& entry : presetData) {
-        QString name = entry.toObject()["name"].toString();
+    for (const JsonValue& entry : presetData) {
+        const JsonObject& preset = entry.to_object();
         QVector<int> vecCoils;
-
-        for (const auto& coil : entry.toObject()["coils"].toArray()) {
-            vecCoils.append(coil.toInt());
+        for (const JsonValue& coil : preset["coils"].to_array()) {
+            vecCoils.append(coil.to_int());
         }
-
-        m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(vecCoils));
+        m_pUi->comboBox_coilPreset->addItem(QString::fromStdString(preset["name"].to_std_string()),
+                                            QVariant::fromValue(vecCoils));
     }
 }
 

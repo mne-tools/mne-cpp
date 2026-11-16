@@ -723,14 +723,6 @@ void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
     auto* resultTable = view.findChild<QTableWidget*>(QStringLiteral("m_tableWidget_results"));
     QVERIFY(freqTable && resultTable);
 
-    QTemporaryDir dir;
-    QVERIFY(dir.isValid());
-    QFile presets(dir.filePath(QStringLiteral("presets.json")));
-    QVERIFY(presets.open(QIODevice::WriteOnly));
-    presets.write(R"({"4": [{"name": "VectorView", "coils": [154, 158, 162, 166]}]})");
-    presets.close();
-    view.loadCoilPresets(presets.fileName());
-
     // 4 HPI coils, 3 fiducials, 2 EEG and 1 extra point
     FiffDigPointSet points;
     const QVector<int> kinds = {FIFFV_POINT_CARDINAL, FIFFV_POINT_CARDINAL, FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI,
@@ -754,8 +746,25 @@ void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
     QCOMPARE(resultTable->rowCount(), 4);
     QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{293, 307, 314, 321}));
 
-    // Choosing the preset for 4 coils fills the table
+    // The VectorView presets are built in; a file that cannot be read keeps them
     auto* preset = view.findChild<QComboBox*>(QStringLiteral("comboBox_coilPreset"));
+    QCOMPARE(preset->count(), 4);
+    QCOMPARE(preset->itemText(2), QStringLiteral("VV 293-321Hz"));
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QVERIFY(!view.loadCoilPresets(dir.filePath(QStringLiteral("missing.json"))));
+    QFile presets(dir.filePath(QStringLiteral("presets.json")));
+    QVERIFY(presets.open(QIODevice::WriteOnly));
+    presets.write("{\"4\": [");
+    presets.close();
+    QVERIFY(!view.loadCoilPresets(presets.fileName()));
+    QCOMPARE(preset->count(), 4);
+
+    // A preset file replaces them for the loaded number of coils; choosing a preset fills the table
+    QVERIFY(presets.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    presets.write(R"({"4": [{"name": "VectorView", "coils": [154, 158, 162, 166]}]})");
+    presets.close();
+    QVERIFY(view.loadCoilPresets(presets.fileName()));
     QCOMPARE(preset->count(), 2);
     preset->setCurrentIndex(1);
     QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{154, 158, 162, 166}));

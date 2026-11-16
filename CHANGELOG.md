@@ -667,6 +667,11 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- The MNE Scan HPI plugin offers the Neuromag VectorView coil-frequency
+  presets again; its preset file has not been installed since the move to
+  CMake, so the list was empty. `HpiSettingsView` now has them built in, and
+  `loadCoilPresets()` returns whether the file could be read, keeps the
+  presets if not, and refreshes the list for the loaded coils.
 - `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
   UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
   not valid in that encoding. Latin-1 headers from older recorders kept raw
