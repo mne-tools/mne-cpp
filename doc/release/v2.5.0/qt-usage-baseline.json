@@ -33,7 +33,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9981,
+    "tokens": 9972,
     "gui_outside_design": []
   },
   "libraries": {
@@ -154,22 +154,21 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6034,
+      "tokens": 6025,
       "by_category": {
         "containers": 477,
-        "files": 108,
+        "files": 106,
         "global": 1257,
         "gui": 924,
-        "json": 5,
         "logging": 49,
         "objects_signals": 545,
         "other": 1504,
         "regex": 4,
-        "strings": 1127,
+        "strings": 1125,
         "threads": 23,
         "time": 11
       },
-      "public_header_includes": 111,
+      "public_header_includes": 110,
       "q_object": 60,
       "files": 134,
       "modules": [

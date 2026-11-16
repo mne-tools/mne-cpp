@@ -177,12 +177,16 @@ Displays the metadata of digitizer points.
 
 ### loadCoilPresets(sFilePath)
 
-Load coil presets from json file at the provided path.
+Replaces the coil presets, by default the Neuromag VectorView frequencies, with those of a JSON file: an object mapping the number of coils ("4", "5", ...) to an array of \{"name": ..., "coils": [Hz, ...]\}.
 
 **Parameters:**
 
 - **sFilePath** : *const QString &*
-  PAth to json file with coil preset data
+  Path to the JSON file.
+
+**Returns:**
+
+- *bool* — Whether the file could be read and parsed; if not, the presets are left unchanged.
 
 ---
 
