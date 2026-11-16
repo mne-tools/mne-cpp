@@ -98,7 +98,7 @@ CosineFilter::CosineFilter(int fftLength,
             mult = 1.0 / w;
             add = 3.0;
 
-            for (k = 0; k < resp_size; k++)
+            for (k = 0; k < std::min(highpasss - w + 1, resp_size); k++)
                 filterFreqResp(k) = 0.0;
 
             for (k = -w + 1, s = highpasss - w + 1; k < w; k++, s++) {
@@ -106,10 +106,6 @@ CosineFilter::CosineFilter(int fftLength,
                     c = cos(pi4 * (k * mult + add));
                     filterFreqResp(s) = filterFreqResp(s).real() * c * c;
                 }
-            }
-
-            for (k = std::max(0, highpasss + w); k < resp_size; ++k) {
-                filterFreqResp(k) = 1.0;
             }
         }
     }
@@ -136,23 +132,17 @@ CosineFilter::CosineFilter(int fftLength,
         }
     }
 
+    if (type == NOTCH) {
+        filterFreqResp = RowVectorXcd::Ones(resp_size) - filterFreqResp;
+    }
+
     m_vecFftCoeff = filterFreqResp;
 
     //Generate windowed impulse response - invert fft coeeficients to time domain
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    //invert to time domain and
-    fft.inv(m_vecCoeff, filterFreqResp); /*
-    m_vecCoeff = m_vecCoeff.segment(0,1024).eval();
-
-    //window/zero-pad m_vecCoeff to m_iFftLength
-    RowVectorXd vecCoeffZeroPad = RowVectorXd::Zero(fftLength);
-    vecCoeffZeroPad.head(m_vecCoeff.cols()) = m_vecCoeff;
-
-    //fft-transform filter coeffs
-    m_vecFftCoeff = RowVectorXcd::Zero(fftLength);
-    fft.fwd(m_vecFftCoeff,vecCoeffZeroPad);*/
+    fft.inv(m_vecCoeff, filterFreqResp);
 }
 
 //=============================================================================================================

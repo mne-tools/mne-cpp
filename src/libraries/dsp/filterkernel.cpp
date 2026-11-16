@@ -456,6 +456,7 @@ void FilterKernel::designFilter()
                     break;
 
                 case 2:
+                case 3:
                     filtercos = CosineFilter(iFftLength,
                                              (m_dCenterFreq + m_dBandwidth / 2) * (m_sFreq / 2),
                                              m_dParksWidth * (m_sFreq / 2),
@@ -467,11 +468,10 @@ void FilterKernel::designFilter()
                     break;
             }
 
-            //This filter is designed in the frequency domain, hence the time domain impulse response need to be shortend by the users dependent number of taps
+            // Cut the circular zero-phase impulse response to the taps around t = 0: tap m_iFilterOrder / 2 is t = 0
             m_vecCoeff.resize(m_iFilterOrder);
-
             m_vecCoeff.head(m_iFilterOrder / 2) = filtercos.m_vecCoeff.tail(m_iFilterOrder / 2);
-            m_vecCoeff.tail(m_iFilterOrder / 2) = filtercos.m_vecCoeff.head(m_iFilterOrder / 2);
+            m_vecCoeff.tail(m_iFilterOrder - m_iFilterOrder / 2) = filtercos.m_vecCoeff.head(m_iFilterOrder - m_iFilterOrder / 2);
 
             //Now generate the fft version of the shortened impulse response
             fftTransformCoeffs(iFftLength);
@@ -492,6 +492,7 @@ void FilterKernel::designFilter()
             break;
 
         case 2:
+        case 3:
             m_dLowpassFreq = (m_dCenterFreq + m_dBandwidth / 2) * (m_sFreq / 2);
             m_dHighpassFreq = (m_dCenterFreq - m_dBandwidth / 2) * (m_sFreq / 2);
             break;
