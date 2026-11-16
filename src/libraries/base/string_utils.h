@@ -61,6 +61,14 @@ BASESHARED_EXPORT std::string_view trimmed(std::string_view text);
  */
 BASESHARED_EXPORT StringList split(std::string_view text, char separator, bool skipEmpty = false);
 
+/**
+ * @param[in] text   Any text, e.g. a line of a whitespace-separated table.
+ *
+ * @return The fields of @p text between runs of ASCII whitespace, like
+ *         QString::split(QRegularExpression("\\s+"), Qt::SkipEmptyParts); they view @p text.
+ */
+BASESHARED_EXPORT std::vector<std::string_view> split_whitespace(std::string_view text);
+
 //=============================================================================================================
 /**
  * @param[in] list   A list of names, e.g. channel names.

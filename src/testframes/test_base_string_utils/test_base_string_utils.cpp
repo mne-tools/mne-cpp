@@ -58,6 +58,7 @@ private slots:
     void trimmedMatchesQString();
     void splitMatchesQString_data();
     void splitMatchesQString();
+    void splitWhitespaceMatchesQString();
     void caseHelpersMatchQString();
     void nameListHelpersMatchQStringList();
     void toDoubleMatchesQString_data();
@@ -123,6 +124,22 @@ void TestUtilsStringUtils::splitMatchesQString()
     QCOMPARE(static_cast<qsizetype>(actual.size()), expected.size());
     for (std::size_t i = 0; i < actual.size(); ++i) {
         QCOMPARE(QString::fromStdString(actual[i]), expected[static_cast<qsizetype>(i)]);
+    }
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::splitWhitespaceMatchesQString()
+{
+    for (const char* text : {"", "   ", "MEG0113", "  9.000  0.07303\t-0.01983 \r\n", "a\v\fb\n\nc"}) {
+        const QStringList expected = QString::fromLatin1(text).split(QRegularExpression(QStringLiteral("\\s+")),
+                                                                     Qt::SkipEmptyParts);
+        const std::vector<std::string_view> actual = split_whitespace(text);
+        QCOMPARE(static_cast<qsizetype>(actual.size()), expected.size());
+        for (std::size_t i = 0; i < actual.size(); ++i) {
+            QCOMPARE(QString::fromLatin1(actual[i].data(), static_cast<qsizetype>(actual[i].size())),
+                     expected[static_cast<qsizetype>(i)]);
+        }
     }
 }
 

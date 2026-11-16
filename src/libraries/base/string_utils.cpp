@@ -144,6 +144,27 @@ mne::StringList mne::split(std::string_view text, char separator, bool skipEmpty
 
 //=============================================================================================================
 
+std::vector<std::string_view> mne::split_whitespace(std::string_view text)
+{
+    std::vector<std::string_view> fields;
+    std::size_t pos = 0;
+    while (true) {
+        while (pos < text.size() && isSpace(text[pos])) {
+            ++pos;
+        }
+        if (pos == text.size()) {
+            return fields;
+        }
+        const std::size_t start = pos;
+        while (pos < text.size() && !isSpace(text[pos])) {
+            ++pos;
+        }
+        fields.push_back(text.substr(start, pos - start));
+    }
+}
+
+//=============================================================================================================
+
 int mne::index_of(const StringList& list, std::string_view name)
 {
     const auto it = std::find(list.begin(), list.end(), name);

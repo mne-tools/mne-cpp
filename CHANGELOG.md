@@ -606,6 +606,9 @@ aliases; replace the old spelling as below.
   The MNA graph executor fingerprints node inputs with it.
 - New `mne::write_file_bytes()` (`base/byte_stream.h`) writes a whole file
   from bytes, the counterpart of `read_file_bytes()`.
+- New `mne::split_whitespace()` (`base/string_utils.h`) splits a line of a
+  whitespace-separated table into views of its fields, the counterpart of
+  `QString::split(QRegularExpression("\\s+"), Qt::SkipEmptyParts)`.
 - New `JsonArray::from_string_list()` / `to_string_list()`,
   `CborArray::from_string_list()` and `JsonObject::without(keys)`, the
   counterparts of `QJsonArray::fromStringList()` and
