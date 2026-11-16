@@ -27,6 +27,15 @@
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
 
+#include <base/string_utils.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <format>
+#include <string>
+#include <vector>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -98,6 +107,19 @@ private slots:
 
 private:
     MnaProject createTestProject(bool embed = true);
+    static std::filesystem::path fs(const QString& path)
+    {
+        return path_from_utf8(path.toStdString());
+    }
+    static MnaProject read(const QString& path)
+    {
+        return MnaIO::read(fs(path)).value();
+    }
+    static bool write(const MnaProject& project, const QString& path)
+    {
+        return MnaIO::write(project, fs(path)).has_value();
+    }
+    static void extractAll(const MnaProject& project, const QString& dir);
     void createBidsTree(const QString& rootDir);
     QString findTool(const QString& name);
 
@@ -156,8 +178,6 @@ MnaProject TestMnaBids::createTestProject(bool embed)
     MnaProject proj;
     proj.name = "BIDS Test Project";
     proj.description = "Test project for BIDS integration tests";
-    proj.mnaVersion = MnaProject::CURRENT_SCHEMA_VERSION;
-    proj.modified = QDateTime::currentDateTimeUtc();
 
     MnaSubject subj;
     subj.id = "sample";
@@ -176,10 +196,10 @@ MnaProject TestMnaBids::createTestProject(bool embed)
         ref.format = "pial";
         ref.embedded = embed;
         if (embed) {
-            ref.data = QByteArray(256, '\x11');
-            ref.sizeBytes = ref.data.size();
+            ref.data.assign(256, std::byte{0x11});
+            ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
         }
-        rec.files.append(ref);
+        rec.files.push_back(ref);
     }
 
     // Annotation
@@ -190,10 +210,10 @@ MnaProject TestMnaBids::createTestProject(bool embed)
         ref.format = "annot";
         ref.embedded = embed;
         if (embed) {
-            ref.data = QByteArray(128, '\x22');
-            ref.sizeBytes = ref.data.size();
+            ref.data.assign(128, std::byte{0x22});
+            ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
         }
-        rec.files.append(ref);
+        rec.files.push_back(ref);
     }
 
     // BEM
@@ -204,10 +224,10 @@ MnaProject TestMnaBids::createTestProject(bool embed)
         ref.format = "fif";
         ref.embedded = embed;
         if (embed) {
-            ref.data = QByteArray(512, '\x33');
-            ref.sizeBytes = ref.data.size();
+            ref.data.assign(512, std::byte{0x33});
+            ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
         }
-        rec.files.append(ref);
+        rec.files.push_back(ref);
     }
 
     // Digitizer
@@ -218,10 +238,10 @@ MnaProject TestMnaBids::createTestProject(bool embed)
         ref.format = "fif";
         ref.embedded = embed;
         if (embed) {
-            ref.data = QByteArray(64, '\x44');
-            ref.sizeBytes = ref.data.size();
+            ref.data.assign(64, std::byte{0x44});
+            ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
         }
-        rec.files.append(ref);
+        rec.files.push_back(ref);
     }
 
     // Source estimate
@@ -232,16 +252,37 @@ MnaProject TestMnaBids::createTestProject(bool embed)
         ref.format = "stc";
         ref.embedded = embed;
         if (embed) {
-            ref.data = QByteArray(1024, '\x55');
-            ref.sizeBytes = ref.data.size();
+            ref.data.assign(1024, std::byte{0x55});
+            ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
         }
-        rec.files.append(ref);
+        rec.files.push_back(ref);
     }
 
-    sess.recordings.append(rec);
-    subj.sessions.append(sess);
-    proj.subjects.append(subj);
+    sess.recordings.push_back(rec);
+    subj.sessions.push_back(sess);
+    proj.subjects.push_back(subj);
     return proj;
+}
+
+//=============================================================================================================
+// HELPER: write every embedded file of a project below a directory, at its relative path
+//=============================================================================================================
+
+void TestMnaBids::extractAll(const MnaProject& project, const QString& dir)
+{
+    for (const MnaSubject& subj : project.subjects) {
+        for (const MnaSession& sess : subj.sessions) {
+            for (const MnaRecording& rec : sess.recordings) {
+                for (MnaFileRef ref : rec.files) {
+                    if (ref.embedded) {
+                        const QString fullPath = QDir(dir).filePath(QString::fromStdString(ref.path));
+                        QDir().mkpath(QFileInfo(fullPath).absolutePath());
+                        QVERIFY(ref.extract(fs(fullPath)));
+                    }
+                }
+            }
+        }
+    }
 }
 
 //=============================================================================================================
@@ -281,7 +322,7 @@ void TestMnaBids::testCreateBidsStructuredMnx()
 {
     MnaProject proj = createTestProject(true);
     const QString path = m_tempDir.filePath("bids_test.mnx");
-    QVERIFY(MnaIO::write(proj, path));
+    QVERIFY(write(proj, path));
     QVERIFY(QFile::exists(path));
     QVERIFY(QFileInfo(path).size() > 0);
 }
@@ -290,29 +331,14 @@ void TestMnaBids::testExtractMnxToBidsDir()
 {
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("extract_test.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
     // Read and extract
-    MnaProject loaded = MnaIO::read(mnxPath);
+    MnaProject loaded = read(mnxPath);
     const QString extractDir = m_tempDir.filePath("extracted");
     QDir().mkpath(extractDir);
 
-    for (const MnaSubject& subj : loaded.subjects) {
-        for (const MnaSession& sess : subj.sessions) {
-            for (const MnaRecording& rec : sess.recordings) {
-                for (const MnaFileRef& ref : rec.files) {
-                    if (ref.embedded && !ref.data.isEmpty()) {
-                        const QString fullPath = QDir(extractDir).filePath(ref.path);
-                        QDir().mkpath(QFileInfo(fullPath).absolutePath());
-                        QFile f(fullPath);
-                        QVERIFY(f.open(QIODevice::WriteOnly));
-                        f.write(ref.data);
-                        f.close();
-                    }
-                }
-            }
-        }
-    }
+    extractAll(loaded, extractDir);
 
     // Verify files exist
     QVERIFY(QFile::exists(extractDir + "/sub-sample/ses-01/anat/lh.pial"));
@@ -326,28 +352,13 @@ void TestMnaBids::testExtractPreservesDirStructure()
 {
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("dir_structure_test.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
-    MnaProject loaded = MnaIO::read(mnxPath);
+    MnaProject loaded = read(mnxPath);
     const QString extractDir = m_tempDir.filePath("dir_structure");
     QDir().mkpath(extractDir);
 
-    for (const auto& subj : loaded.subjects) {
-        for (const auto& sess : subj.sessions) {
-            for (const auto& rec : sess.recordings) {
-                for (const auto& ref : rec.files) {
-                    if (ref.embedded) {
-                        const QString fullPath = QDir(extractDir).filePath(ref.path);
-                        QDir().mkpath(QFileInfo(fullPath).absolutePath());
-                        QFile f(fullPath);
-                        QVERIFY(f.open(QIODevice::WriteOnly));
-                        f.write(ref.data);
-                        f.close();
-                    }
-                }
-            }
-        }
-    }
+    extractAll(loaded, extractDir);
 
     // Verify directory structure
     QDir extractRoot(extractDir);
@@ -363,28 +374,13 @@ void TestMnaBids::testExtractedDataIntegrity()
 {
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("integrity_test.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
-    MnaProject loaded = MnaIO::read(mnxPath);
+    MnaProject loaded = read(mnxPath);
     const QString extractDir = m_tempDir.filePath("integrity");
     QDir().mkpath(extractDir);
 
-    for (const auto& subj : loaded.subjects) {
-        for (const auto& sess : subj.sessions) {
-            for (const auto& rec : sess.recordings) {
-                for (const auto& ref : rec.files) {
-                    if (ref.embedded) {
-                        const QString fullPath = QDir(extractDir).filePath(ref.path);
-                        QDir().mkpath(QFileInfo(fullPath).absolutePath());
-                        QFile f(fullPath);
-                        QVERIFY(f.open(QIODevice::WriteOnly));
-                        f.write(ref.data);
-                        f.close();
-                    }
-                }
-            }
-        }
-    }
+    extractAll(loaded, extractDir);
 
     // Read extracted files and verify data matches
     QFile surface(extractDir + "/sub-sample/ses-01/anat/lh.pial");
@@ -411,23 +407,16 @@ void TestMnaBids::testPackBidsDirToMnx()
 
     // Create a sidecar .mna from the test project (non-embedded references)
     MnaProject refProj = createTestProject(false);
-    QVERIFY(MnaIO::write(refProj, bidsDir + "/project.mna"));
+    QVERIFY(write(refProj, bidsDir + "/project.mna"));
 
     // Read sidecar and embed
-    MnaProject loaded = MnaIO::read(bidsDir + "/project.mna");
+    MnaProject loaded = read(bidsDir + "/project.mna");
     for (MnaSubject& subj : loaded.subjects) {
         for (MnaSession& sess : subj.sessions) {
             for (MnaRecording& rec : sess.recordings) {
                 for (MnaFileRef& ref : rec.files) {
                     if (!ref.embedded) {
-                        QString filePath = QDir(bidsDir).filePath(ref.path);
-                        QFile f(filePath);
-                        if (f.open(QIODevice::ReadOnly)) {
-                            ref.data = f.readAll();
-                            ref.sizeBytes = ref.data.size();
-                            ref.embedded = true;
-                            f.close();
-                        }
+                        QVERIFY(ref.embed(fs(QDir(bidsDir).filePath(QString::fromStdString(ref.path)))));
                     }
                 }
             }
@@ -435,17 +424,17 @@ void TestMnaBids::testPackBidsDirToMnx()
     }
 
     const QString mnxPath = m_tempDir.filePath("packed.mnx");
-    QVERIFY(MnaIO::write(loaded, mnxPath));
+    QVERIFY(write(loaded, mnxPath));
     QVERIFY(QFileInfo(mnxPath).size() > 0);
 
     // Verify round-trip
-    MnaProject verify = MnaIO::read(mnxPath);
-    QCOMPARE(verify.subjects.size(), 1);
+    MnaProject verify = read(mnxPath);
+    QCOMPARE(verify.subjects.size(), std::size_t(1));
     int totalFiles = 0;
     for (const auto& s : verify.subjects)
         for (const auto& se : s.sessions)
             for (const auto& r : se.recordings)
-                totalFiles += r.files.size();
+                totalFiles += static_cast<int>(r.files.size());
     QCOMPARE(totalFiles, 5);
 }
 
@@ -456,10 +445,10 @@ void TestMnaBids::testPackBidsDirToMna()
 
     MnaProject refProj = createTestProject(false);
     const QString mnaPath = bidsDir + "/project.mna";
-    QVERIFY(MnaIO::write(refProj, mnaPath));
+    QVERIFY(write(refProj, mnaPath));
 
     // Read back and verify it's non-embedded
-    MnaProject loaded = MnaIO::read(mnaPath);
+    MnaProject loaded = read(mnaPath);
     for (const auto& subj : loaded.subjects)
         for (const auto& sess : subj.sessions)
             for (const auto& rec : sess.recordings)
@@ -474,13 +463,13 @@ void TestMnaBids::testPackWithSidecar()
 
     MnaProject proj = createTestProject(false);
     const QString sidecarPath = bidsDir + "/project.mna";
-    QVERIFY(MnaIO::write(proj, sidecarPath));
+    QVERIFY(write(proj, sidecarPath));
 
     // Verify sidecar has same structure
-    MnaProject loaded = MnaIO::read(sidecarPath);
-    QCOMPARE(loaded.name, "BIDS Test Project");
-    QCOMPARE(loaded.subjects[0].id, "sample");
-    QCOMPARE(loaded.subjects[0].sessions[0].recordings[0].files.size(), 5);
+    MnaProject loaded = read(sidecarPath);
+    QCOMPARE(loaded.name, std::string("BIDS Test Project"));
+    QCOMPARE(loaded.subjects[0].id, std::string("sample"));
+    QCOMPARE(loaded.subjects[0].sessions[0].recordings[0].files.size(), std::size_t(5));
 }
 
 //=============================================================================================================
@@ -491,28 +480,28 @@ void TestMnaBids::testConvertMnaToMnx()
 {
     MnaProject proj = createTestProject(false);
     const QString mnaPath = m_tempDir.filePath("convert_src.mna");
-    QVERIFY(MnaIO::write(proj, mnaPath));
+    QVERIFY(write(proj, mnaPath));
 
-    MnaProject loaded = MnaIO::read(mnaPath);
+    MnaProject loaded = read(mnaPath);
     const QString mnxPath = m_tempDir.filePath("convert_dst.mnx");
-    QVERIFY(MnaIO::write(loaded, mnxPath));
+    QVERIFY(write(loaded, mnxPath));
 
-    MnaProject verify = MnaIO::read(mnxPath);
+    MnaProject verify = read(mnxPath);
     QCOMPARE(verify.name, proj.name);
-    QCOMPARE(verify.subjects.size(), 1);
+    QCOMPARE(verify.subjects.size(), std::size_t(1));
 }
 
 void TestMnaBids::testConvertMnxToMna()
 {
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("convert_src.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
-    MnaProject loaded = MnaIO::read(mnxPath);
+    MnaProject loaded = read(mnxPath);
     const QString mnaPath = m_tempDir.filePath("convert_dst.mna");
-    QVERIFY(MnaIO::write(loaded, mnaPath));
+    QVERIFY(write(loaded, mnaPath));
 
-    MnaProject verify = MnaIO::read(mnaPath);
+    MnaProject verify = read(mnaPath);
     QCOMPARE(verify.name, proj.name);
     // Embedded data preserved in JSON (base64)
     QCOMPARE(verify.subjects[0].sessions[0].recordings[0].files[0].embedded, true);
@@ -524,16 +513,16 @@ void TestMnaBids::testConvertMnaToMnxEmbedsData()
     // doesn't lose structure
     MnaProject proj = createTestProject(false);
     const QString mnaPath = m_tempDir.filePath("embed_convert.mna");
-    QVERIFY(MnaIO::write(proj, mnaPath));
+    QVERIFY(write(proj, mnaPath));
 
-    MnaProject loaded = MnaIO::read(mnaPath);
+    MnaProject loaded = read(mnaPath);
     QCOMPARE(loaded.subjects[0].sessions[0].recordings[0].files[0].embedded, false);
 
     // Write as .mnx (non-embedded refs pass through)
     const QString mnxPath = m_tempDir.filePath("embed_convert.mnx");
-    QVERIFY(MnaIO::write(loaded, mnxPath));
+    QVERIFY(write(loaded, mnxPath));
 
-    MnaProject verify = MnaIO::read(mnxPath);
+    MnaProject verify = read(mnxPath);
     QCOMPARE(verify.subjects[0].sessions[0].recordings[0].files[0].embedded, false);
 }
 
@@ -562,7 +551,7 @@ void TestMnaBids::testShowMnaDisplaysProject()
 
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("show_test.mnx");
-    MnaIO::write(proj, mnxPath);
+    write(proj, mnxPath);
 
     QProcess proc;
     proc.start(m_showMnaPath, QStringList() << mnxPath);
@@ -583,7 +572,7 @@ void TestMnaBids::testShowMnaVerbose()
     MnaProject proj = createTestProject(true);
     proj.subjects[0].sessions[0].recordings[0].files[0].sha256 = "abcdef1234567890";
     const QString mnxPath = m_tempDir.filePath("show_verbose.mnx");
-    MnaIO::write(proj, mnxPath);
+    write(proj, mnxPath);
 
     QProcess proc;
     proc.start(m_showMnaPath, QStringList() << "-V" << mnxPath);
@@ -601,7 +590,7 @@ void TestMnaBids::testShowMnaJsonOutput()
 
     MnaProject proj = createTestProject(false);
     const QString mnaPath = m_tempDir.filePath("show_json.mna");
-    MnaIO::write(proj, mnaPath);
+    write(proj, mnaPath);
 
     QProcess proc;
     proc.start(m_showMnaPath, QStringList() << "--json" << mnaPath);
@@ -653,7 +642,7 @@ void TestMnaBids::testConverterExtract()
 
     MnaProject proj = createTestProject(true);
     const QString mnxPath = m_tempDir.filePath("cli_extract.mnx");
-    MnaIO::write(proj, mnxPath);
+    write(proj, mnxPath);
 
     const QString outputDir = m_tempDir.filePath("cli_extracted");
 
@@ -685,7 +674,7 @@ void TestMnaBids::testConverterPack()
     const QString bidsDir = m_tempDir.filePath("cli_pack_bids");
     createBidsTree(bidsDir);
     MnaProject refProj = createTestProject(false);
-    MnaIO::write(refProj, bidsDir + "/project.mna");
+    write(refProj, bidsDir + "/project.mna");
 
     const QString mnxPath = m_tempDir.filePath("cli_packed.mnx");
 
@@ -696,8 +685,8 @@ void TestMnaBids::testConverterPack()
 
     // Verify packed file
     QVERIFY(QFile::exists(mnxPath));
-    MnaProject verify = MnaIO::read(mnxPath);
-    QCOMPARE(verify.subjects.size(), 1);
+    MnaProject verify = read(mnxPath);
+    QCOMPARE(verify.subjects.size(), std::size_t(1));
 
     // All files should be embedded (default for .mnx)
     for (const auto& subj : verify.subjects)
@@ -714,7 +703,7 @@ void TestMnaBids::testConverterConvert()
 
     MnaProject proj = createTestProject(false);
     const QString mnaPath = m_tempDir.filePath("cli_convert_src.mna");
-    MnaIO::write(proj, mnaPath);
+    write(proj, mnaPath);
 
     const QString mnxPath = m_tempDir.filePath("cli_convert_dst.mnx");
 
@@ -724,7 +713,7 @@ void TestMnaBids::testConverterConvert()
     QCOMPARE(proc.exitCode(), 0);
 
     QVERIFY(QFile::exists(mnxPath));
-    MnaProject verify = MnaIO::read(mnxPath);
+    MnaProject verify = read(mnxPath);
     QCOMPARE(verify.name, "BIDS Test Project");
 
 #ifdef Q_OS_UNIX
@@ -741,15 +730,15 @@ void TestMnaBids::testConverterConvert()
     linked.subjects[0].sessions[0].recordings[0].files[0].role = MnaFileRole::Raw;
     linked.subjects[0].sessions[0].recordings[0].files[0].path = "../outside.fif";
     const QString linkedMna = root.filePath("link/linked.mna");
-    QVERIFY(MnaIO::write(linked, linkedMna));
+    QVERIFY(write(linked, linkedMna));
     const QString linkedMnx = root.filePath("linked.mnx");
     QProcess linkedProc;
     linkedProc.start(m_converterPath, QStringList() << "convert" << linkedMna << linkedMnx);
     QVERIFY(linkedProc.waitForFinished(10000));
     QCOMPARE(linkedProc.exitCode(), 0);
-    const MnaFileRef embedded = MnaIO::read(linkedMnx).subjects[0].sessions[0].recordings[0].files[0];
+    const MnaFileRef embedded = read(linkedMnx).subjects[0].sessions[0].recordings[0].files[0];
     QVERIFY2(embedded.embedded, qPrintable(QString::fromUtf8(linkedProc.readAllStandardError())));
-    QCOMPARE(embedded.data, QByteArray("payload"));
+    QCOMPARE(std::string(reinterpret_cast<const char*>(embedded.data.data()), embedded.data.size()), std::string("payload"));
 #endif
 }
 
@@ -772,13 +761,12 @@ void TestMnaBids::testExtractEmptyProject()
 {
     MnaProject empty;
     empty.name = "Empty";
-    empty.mnaVersion = MnaProject::CURRENT_SCHEMA_VERSION;
 
     const QString mnxPath = m_tempDir.filePath("empty_extract.mnx");
-    QVERIFY(MnaIO::write(empty, mnxPath));
+    QVERIFY(write(empty, mnxPath));
 
-    MnaProject loaded = MnaIO::read(mnxPath);
-    QCOMPARE(loaded.subjects.size(), 0);
+    MnaProject loaded = read(mnxPath);
+    QCOMPARE(loaded.subjects.size(), std::size_t(0));
 }
 
 void TestMnaBids::testPackEmptyDirectory()
@@ -789,78 +777,74 @@ void TestMnaBids::testPackEmptyDirectory()
 
     MnaProject proj;
     proj.name = "Empty Pack";
-    proj.mnaVersion = MnaProject::CURRENT_SCHEMA_VERSION;
 
     const QString mnxPath = m_tempDir.filePath("empty_packed.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
-    MnaProject verify = MnaIO::read(mnxPath);
-    QCOMPARE(verify.name, "Empty Pack");
-    QCOMPARE(verify.subjects.size(), 0);
+    MnaProject verify = read(mnxPath);
+    QCOMPARE(verify.name, std::string("Empty Pack"));
+    QCOMPARE(verify.subjects.size(), std::size_t(0));
 }
 
 void TestMnaBids::testMultiSubjectMultiSession()
 {
     MnaProject proj;
     proj.name = "Multi-BIDS";
-    proj.mnaVersion = MnaProject::CURRENT_SCHEMA_VERSION;
-    proj.modified = QDateTime::currentDateTimeUtc();
 
-    const QList<MnaFileRole> roles = {
+    const std::vector<MnaFileRole> roles = {
         MnaFileRole::Surface, MnaFileRole::Annotation, MnaFileRole::Bem,
         MnaFileRole::Digitizer, MnaFileRole::SourceEstimate};
 
     for (int si = 0; si < 3; ++si) {
         MnaSubject subj;
-        subj.id = QString("sub%1").arg(si + 1);
+        subj.id = std::format("sub{}", si + 1);
 
         for (int sei = 0; sei < 2; ++sei) {
             MnaSession sess;
-            sess.id = QString("ses%1").arg(sei + 1);
+            sess.id = std::format("ses{}", sei + 1);
 
             MnaRecording rec;
             rec.id = "rec01";
 
-            for (int fi = 0; fi < roles.size(); ++fi) {
+            for (int fi = 0; fi < static_cast<int>(roles.size()); ++fi) {
                 MnaFileRef ref;
-                ref.role = roles[fi];
-                ref.path = QString("sub-%1/ses-%2/%3/file_%4")
-                               .arg(subj.id, sess.id, mnaFileRoleToString(ref.role), QString::number(fi));
+                ref.role = roles[static_cast<std::size_t>(fi)];
+                ref.path = std::format("sub-{}/ses-{}/{}/file_{}", subj.id, sess.id, to_string(ref.role), fi);
                 ref.embedded = true;
-                ref.data = QByteArray(32 * (fi + 1), static_cast<char>(si * 20 + sei * 10 + fi));
-                ref.sizeBytes = ref.data.size();
-                rec.files.append(ref);
+                ref.data.assign(32 * (static_cast<std::size_t>(fi) + 1), static_cast<std::byte>(si * 20 + sei * 10 + fi));
+                ref.size_bytes = static_cast<std::int64_t>(ref.data.size());
+                rec.files.push_back(ref);
             }
 
-            sess.recordings.append(rec);
-            subj.sessions.append(sess);
+            sess.recordings.push_back(rec);
+            subj.sessions.push_back(sess);
         }
-        proj.subjects.append(subj);
+        proj.subjects.push_back(subj);
     }
 
     // MNX round-trip
     const QString mnxPath = m_tempDir.filePath("multi_bids.mnx");
-    QVERIFY(MnaIO::write(proj, mnxPath));
+    QVERIFY(write(proj, mnxPath));
 
-    MnaProject verify = MnaIO::read(mnxPath);
-    QCOMPARE(verify.subjects.size(), 3);
+    MnaProject verify = read(mnxPath);
+    QCOMPARE(verify.subjects.size(), std::size_t(3));
 
     int totalFiles = 0;
     for (const auto& s : verify.subjects)
         for (const auto& se : s.sessions)
             for (const auto& r : se.recordings)
-                totalFiles += r.files.size();
+                totalFiles += static_cast<int>(r.files.size());
 
     QCOMPARE(totalFiles, 3 * 2 * 5); // 3 subjects × 2 sessions × 5 files
 
     // Verify data integrity of first and last file
     const auto& firstFile = verify.subjects[0].sessions[0].recordings[0].files[0];
-    QCOMPARE(firstFile.data.size(), 32);
-    QCOMPARE(firstFile.data[0], '\x00');
+    QCOMPARE(firstFile.data.size(), std::size_t(32));
+    QCOMPARE(firstFile.data[0], std::byte{0});
 
     const auto& lastFile = verify.subjects[2].sessions[1].recordings[0].files[4];
-    QCOMPARE(lastFile.data.size(), 160);
-    QCOMPARE(lastFile.data[0], static_cast<char>(2 * 20 + 1 * 10 + 4));
+    QCOMPARE(lastFile.data.size(), std::size_t(160));
+    QCOMPARE(lastFile.data[0], static_cast<std::byte>(2 * 20 + 1 * 10 + 4));
 }
 
 //=============================================================================================================

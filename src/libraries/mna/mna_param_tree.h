@@ -21,7 +21,7 @@
  * id (@c bandpass_01/lowcut, @c bandpass_01/highcut), letting the
  * executor merge static defaults from the op schema, static
  * overrides from the project, and dynamically bound values into
- * the final @c resolvedAttributes captured in the
+ * the final @c resolved_attributes captured in the
  * @ref mne::MnaProvenance record. @ref mne::MnaParamTree::evaluate "evaluate" walks all registered
  * bindings whose triggers have fired and returns the list of paths
  * whose values changed, which the executor uses to mark downstream
@@ -38,17 +38,18 @@
 #include "mna_global.h"
 #include "mna_param_binding.h"
 
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QVariant>
-#include <QVariantMap>
-#include <QMap>
-#include <QList>
-#include <QJsonObject>
+#include <functional>
+#include <map>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -59,9 +60,13 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Hierarchical parameter store for the MNA graph. Each parameter has a path
- * ("nodeId/attrKey") and an optional binding — a formula that recomputes the
- * value whenever a trigger condition is met.
+ * Hierarchical parameter store keyed by "nodeId/attrKey" paths, with bindings that recompute parameters from
+ * formulas.
+ *
+ * Formulas combine numbers, true/false, 'text', names (a parameter, else a result), ref('path'), the functions
+ * clamp(v, lo, hi), scale(v, f), threshold(v, t, above, below) and lerp(a, b, t), the operators + - * / with
+ * parentheses, and one comparison (>= <= == != > <). Names may contain '.', ':' and '/', so put spaces around a
+ * division that follows a name.
  *
  * @brief Path-keyed parameter store with formula-driven dynamic bindings.
  *
@@ -70,56 +75,59 @@ namespace mne
 class MNASHARED_EXPORT MnaParamTree
 {
 public:
-    MnaParamTree();
+    /** @param[in] path   "nodeId/attrKey". @param[in] value   The value. */
+    void set_param(std::string_view path, JsonValue value);
+
+    /** @param[in] path   "nodeId/attrKey". @return The value, or an undefined value if there is none. */
+    const JsonValue& param(std::string_view path) const;
+
+    /** @param[in] path   "nodeId/attrKey". @return Whether the parameter is set. */
+    bool has_param(std::string_view path) const;
+
+    /** @return The paths of all parameters in ascending order. */
+    StringList all_paths() const;
+
+    /** @param[in] binding   A binding; replaces the binding of the same target. */
+    void add_binding(const MnaParamBinding& binding);
+
+    /** @param[in] target_path   Target of the binding to remove. */
+    void remove_binding(std::string_view target_path);
+
+    /** @return The bindings, ordered by target path. */
+    std::vector<MnaParamBinding> bindings() const;
+
+    /** @param[in] target_path   A parameter path. @return Whether a binding controls it. */
+    bool has_binding(std::string_view target_path) const;
 
     //=========================================================================================================
-    // Static parameters
-    //=========================================================================================================
-
-    void setParam(const QString& path, const QVariant& value);
-    QVariant param(const QString& path) const;
-    bool hasParam(const QString& path) const;
-    QStringList allPaths() const;
-
-    //=========================================================================================================
-    // Dynamic bindings
-    //=========================================================================================================
-
-    void addBinding(const MnaParamBinding& binding);
-    void removeBinding(const QString& targetPath);
-    QList<MnaParamBinding> bindings() const;
-    bool hasBinding(const QString& targetPath) const;
-
-    //=========================================================================================================
-    // Evaluation
-    //=========================================================================================================
-
     /**
-     * Evaluate all bindings whose trigger condition is met.
-     * @param results   Map of nodeId::portName → data (from execution context).
-     * @return Paths whose values changed.
+     * Evaluates every binding that is not "manual" and stores the new values.
+     *
+     * @param[in] results   Values that names and ref() fall back to, e.g. "nodeId::portName" results.
+     *
+     * @return The paths whose value changed.
      */
-    QStringList evaluate(const QMap<QString, QVariant>& results);
+    StringList evaluate(const JsonObject& results);
 
+    //=========================================================================================================
     /**
-     * Evaluate a single expression in the current context.
-     * @param expr      Expression string.
-     * @param results   Map of nodeId::portName → data (from execution context).
-     * @return Computed value.
+     * @param[in] expression   A formula.
+     * @param[in] results      Values that names and ref() fall back to after the parameters.
+     *
+     * @return The value of @p expression, or an undefined value if it cannot be evaluated (unknown name or
+     *         function, syntax error, division by zero).
      */
-    QVariant evaluateExpression(const QString& expr,
-                                const QMap<QString, QVariant>& results) const;
+    JsonValue evaluate_expression(std::string_view expression, const JsonObject& results) const;
 
-    //=========================================================================================================
-    // Serialization
-    //=========================================================================================================
+    /** @return The bindings and the parameters without a binding as a JSON object. */
+    JsonObject to_json() const;
 
-    QJsonObject toJson() const;
-    static MnaParamTree fromJson(const QJsonObject& obj);
+    /** @param[in] json   A tree as written by to_json(). @return The tree. */
+    static MnaParamTree from_json(const JsonObject& json);
 
 private:
-    QMap<QString, QVariant> m_params;
-    QMap<QString, MnaParamBinding> m_bindings;
+    std::map<std::string, JsonValue, std::less<>> m_params;
+    std::map<std::string, MnaParamBinding, std::less<>> m_bindings;
 };
 
 } // namespace mne

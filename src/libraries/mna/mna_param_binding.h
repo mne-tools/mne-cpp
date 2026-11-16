@@ -10,7 +10,7 @@
  * @brief    Formula-driven binding that recomputes one MNA parameter from an expression whenever its triggers fire.
  *
  * @ref mne::MnaParamBinding turns the otherwise static @ref mne::MnaParamTree
- * into a reactive system. Each binding links a @c targetPath
+ * into a reactive system. Each binding links a @c target_path
  * (typically @c nodeId/attrKey) to an @c expression that references
  * upstream results or other parameters through the @c ref("…")
  * helper — for example @c "clamp(ref('noise_est_01/snr') * 0.1,
@@ -19,7 +19,7 @@
  *
  * The @c trigger field selects when the formula is re-evaluated:
  * @c on_change fires whenever any path in @c dependencies updates,
- * @c periodic re-evaluates every @c periodMs (useful for streaming
+ * @c periodic re-evaluates every @c period_ms (useful for streaming
  * pipelines), and @c manual leaves evaluation to explicit user
  * action. JSON/CBOR round-trip is symmetric so bindings survive
  * project save/load without loss of semantics.
@@ -34,14 +34,15 @@
 
 #include "mna_global.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QJsonObject>
-#include <QCborMap>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -52,8 +53,7 @@ namespace mne
 
 //=============================================================================================================
 /**
- * A formula-driven parameter binding: links a target parameter path to an
- * expression that is re-evaluated when a trigger condition is met.
+ * Formula that recomputes one parameter of an @ref MnaParamTree.
  *
  * @brief Dynamic parameter binding for the MNA parameter tree.
  *
@@ -61,16 +61,23 @@ namespace mne
  */
 struct MNASHARED_EXPORT MnaParamBinding
 {
-    QString targetPath;       ///< Parameter to control: "nodeId/attrKey"
-    QString expression;       ///< Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"
-    QString trigger;          ///< "on_change", "periodic", "manual"
-    int periodMs = 0;         ///< Evaluation period when trigger == "periodic" (ignored otherwise)
-    QStringList dependencies; ///< Paths this binding reads from
+    std::string target_path; ///< Parameter to control: "nodeId/attrKey"
+    std::string expression;  ///< Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"
+    std::string trigger;     ///< "on_change", "periodic", "manual"
+    int period_ms = 0;       ///< Evaluation period when trigger == "periodic" (ignored otherwise)
+    StringList dependencies; ///< Paths this binding reads from
 
-    QJsonObject toJson() const;
-    static MnaParamBinding fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaParamBinding fromCbor(const QCborMap& cbor);
+    /** @return The binding as a JSON object. */
+    JsonObject to_json() const;
+
+    /** @param[in] json   A binding as written by to_json(). @return The binding. */
+    static MnaParamBinding from_json(const JsonObject& json);
+
+    /** @return The binding as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A binding as written by to_cbor(). @return The binding. */
+    static MnaParamBinding from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

@@ -26,7 +26,15 @@
 //=============================================================================================================
 
 #include "mna_op_schema.h"
+
 #include "mna_node.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <format>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,70 +46,33 @@ using namespace mne;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool MnaOpSchema::validate(const MnaNode& node, QStringList* errors) const
+StringList MnaOpSchema::validate(const MnaNode& node) const
 {
-    bool valid = true;
-
-    // Check op type matches
-    if (node.opType != opType) {
-        if (errors)
-            errors->append(QString("Op type mismatch: expected '%1', got '%2'").arg(opType, node.opType));
-        return false;
+    if (node.op_type != op_type) {
+        return {std::format("Op type mismatch: expected '{}', got '{}'", op_type, node.op_type)};
     }
 
-    // Check required input ports
-    for (const MnaOpSchemaPort& sp : inputPorts) {
-        if (!sp.required)
+    StringList errors;
+    for (const MnaOpSchemaPort& sp : input_ports) {
+        if (!sp.required) {
             continue;
-        bool found = false;
-        for (const MnaPort& np : node.inputs) {
-            if (np.name == sp.name) {
-                found = true;
-                if (np.dataKind != sp.dataKind) {
-                    if (errors)
-                        errors->append(QString("Input port '%1': expected data kind '%2'")
-                                           .arg(sp.name)
-                                           .arg(static_cast<int>(sp.dataKind)));
-                    valid = false;
-                }
-                break;
-            }
         }
-        if (!found) {
-            if (errors)
-                errors->append(QString("Missing required input port '%1'").arg(sp.name));
-            valid = false;
+        const auto port = std::ranges::find(node.inputs, sp.name, &MnaPort::name);
+        if (port == node.inputs.end()) {
+            errors.push_back(std::format("Missing required input port '{}'", sp.name));
+        } else if (port->data_kind != sp.data_kind) {
+            errors.push_back(std::format("Input port '{}': expected data kind '{}'", sp.name, static_cast<int>(sp.data_kind)));
         }
     }
-
-    // Check required output ports
-    for (const MnaOpSchemaPort& sp : outputPorts) {
-        if (!sp.required)
-            continue;
-        bool found = false;
-        for (const MnaPort& np : node.outputs) {
-            if (np.name == sp.name) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            if (errors)
-                errors->append(QString("Missing required output port '%1'").arg(sp.name));
-            valid = false;
+    for (const MnaOpSchemaPort& sp : output_ports) {
+        if (sp.required && std::ranges::find(node.outputs, sp.name, &MnaPort::name) == node.outputs.end()) {
+            errors.push_back(std::format("Missing required output port '{}'", sp.name));
         }
     }
-
-    // Check required attributes
     for (const MnaOpSchemaAttr& sa : attributes) {
-        if (!sa.required)
-            continue;
-        if (!node.attributes.contains(sa.name)) {
-            if (errors)
-                errors->append(QString("Missing required attribute '%1'").arg(sa.name));
-            valid = false;
+        if (sa.required && !node.attributes.contains(sa.name)) {
+            errors.push_back(std::format("Missing required attribute '{}'", sa.name));
         }
     }
-
-    return valid;
+    return errors;
 }

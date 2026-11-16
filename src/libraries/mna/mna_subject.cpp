@@ -10,7 +10,7 @@
  * @brief    JSON and CBOR codecs for @ref MnaSubject — subject id, FreeSurfer @c $SUBJECTS_DIR link, ordered session list and forward-compatible @c extras.
  *
  * The implementation walks the @ref MnaSession list with the
- * matching session codec and emits @c freeSurferDir as a relative
+ * matching session codec and emits @c freesurfer_dir as a relative
  * POSIX path so projects remain portable between hosts. Any
  * subject-level fields not recognised by this build — demographics,
  * consent flags, clinical metadata — are routed through @c extras
@@ -23,8 +23,7 @@
 
 #include "mna_subject.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -33,86 +32,67 @@
 using namespace mne;
 
 //=============================================================================================================
-// DEFINE METHODS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-QJsonObject MnaSubject::toJson() const
+namespace
 {
-    QJsonObject json = extras;
-    json[QLatin1String("id")] = id;
-    json[QLatin1String("freesurfer_dir")] = freeSurferDir;
 
-    QJsonArray sessArr;
-    for (const MnaSession& s : sessions) {
-        sessArr.append(s.toJson());
-    }
-    json[QLatin1String("sessions")] = sessArr;
+/** @return The JSON form without the sessions, which differ between JSON and CBOR. */
+JsonObject metadata(const MnaSubject& item)
+{
+    JsonObject json = item.extras;
+    json["id"] = item.id;
+    json["freesurfer_dir"] = item.freesurfer_dir;
+    return json;
+}
 
+/** @return The subject described by @p json, without the sessions. */
+MnaSubject from_metadata(const JsonObject& json)
+{
+    MnaSubject item;
+    item.id = json["id"].to_std_string();
+    item.freesurfer_dir = json["freesurfer_dir"].to_std_string();
+    item.extras = json.without({"id", "freesurfer_dir", "sessions"});
+    return item;
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+JsonObject MnaSubject::to_json() const
+{
+    JsonObject json = metadata(*this);
+    json["sessions"] = detail::to_json_array(sessions);
     return json;
 }
 
 //=============================================================================================================
 
-MnaSubject MnaSubject::fromJson(const QJsonObject& json)
+MnaSubject MnaSubject::from_json(const JsonObject& json)
 {
-    MnaSubject subj;
-    subj.id = json[QLatin1String("id")].toString();
-    subj.freeSurferDir = json[QLatin1String("freesurfer_dir")].toString();
-
-    const QJsonArray sessArr = json[QLatin1String("sessions")].toArray();
-    for (const QJsonValue& v : sessArr) {
-        subj.sessions.append(MnaSession::fromJson(v.toObject()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("freesurfer_dir"),
-        QStringLiteral("sessions")};
-    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            subj.extras.insert(it.key(), it.value());
-    }
-
-    return subj;
+    MnaSubject item = from_metadata(json);
+    item.sessions = detail::from_json_array<MnaSession>(json["sessions"]);
+    return item;
 }
 
 //=============================================================================================================
 
-QCborMap MnaSubject::toCbor() const
+CborMap MnaSubject::to_cbor() const
 {
-    QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("id")] = id;
-    cbor[QLatin1String("freesurfer_dir")] = freeSurferDir;
-
-    QCborArray sessArr;
-    for (const MnaSession& s : sessions) {
-        sessArr.append(s.toCbor());
-    }
-    cbor[QLatin1String("sessions")] = sessArr;
-
+    CborMap cbor = CborMap::from_json_object(metadata(*this));
+    cbor.insert("sessions", detail::to_cbor_array(sessions));
     return cbor;
 }
 
 //=============================================================================================================
 
-MnaSubject MnaSubject::fromCbor(const QCborMap& cbor)
+MnaSubject MnaSubject::from_cbor(const CborMap& cbor)
 {
-    MnaSubject subj;
-    subj.id = cbor[QLatin1String("id")].toString();
-    subj.freeSurferDir = cbor[QLatin1String("freesurfer_dir")].toString();
-
-    const QCborArray sessArr = cbor[QLatin1String("sessions")].toArray();
-    for (const QCborValue& v : sessArr) {
-        subj.sessions.append(MnaSession::fromCbor(v.toMap()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("freesurfer_dir"),
-        QStringLiteral("sessions")};
-    QJsonObject cborJson = cbor.toJsonObject();
-    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            subj.extras.insert(it.key(), it.value());
-    }
-
-    return subj;
+    MnaSubject item = from_metadata(cbor.to_json_object({"sessions"}));
+    item.sessions = detail::from_cbor_array<MnaSession>(cbor["sessions"]);
+    return item;
 }

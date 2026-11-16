@@ -25,10 +25,12 @@
  * @ref mne::MnaPortDir "MnaPortDir" and @ref mne::MnaNodeExecMode "MnaNodeExecMode" (Batch/Stream/Ipc/Script)
  * complete the surface needed by the graph executor.
  *
- * The inline @c xxxToString / @c xxxFromString helpers are the single
- * source of truth for serialisation; both spellings (CamelCase from
- * the C++ side and snake_case from the JSON side) are accepted on
- * read to keep the format human-authorable.
+ * The to_string() / xxx_from_string() helpers are the single source of
+ * truth for serialisation; both spellings (CamelCase from the C++ side and
+ * snake_case from the JSON side) are accepted on read to keep the format
+ * human-authorable.
+ *
+ * @ref mne::MnaValues "MnaValues" carries the run-time data between graph nodes.
  */
 
 #ifndef MNA_TYPES_H
@@ -38,7 +40,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include "mna_global.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <any>
+#include <functional>
+#include <map>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -133,186 +145,52 @@ enum class MnaNodeExecMode
 };
 
 //=============================================================================================================
+
+/**
+ * Run-time values flowing between graph nodes, keyed by port name (or "nodeId::portName" in an execution context).
+ * Values are any C++ object, e.g. a std::shared_ptr<FiffRawData>, a double or a std::string; read them with
+ * std::any_cast.
+ */
+using MnaValues = std::map<std::string, std::any, std::less<>>;
+
+//=============================================================================================================
 // HELPER FUNCTIONS
 //=============================================================================================================
 
 /**
- * Convert MnaFileRole to its string representation.
+ * @param[in] role   A file role.
  *
- * @param[in] role   File role to convert.
- *
- * @return Lower-case snake_case name such as "raw" or "source_estimate"; "custom" for unknown values.
+ * @return Its name in MNA files, e.g. "source_estimate".
  */
-inline QString mnaFileRoleToString(MnaFileRole role)
-{
-    switch (role) {
-        case MnaFileRole::Raw:
-            return QStringLiteral("raw");
-        case MnaFileRole::Forward:
-            return QStringLiteral("forward");
-        case MnaFileRole::Inverse:
-            return QStringLiteral("inverse");
-        case MnaFileRole::Covariance:
-            return QStringLiteral("covariance");
-        case MnaFileRole::SourceEstimate:
-            return QStringLiteral("source_estimate");
-        case MnaFileRole::Bem:
-            return QStringLiteral("bem");
-        case MnaFileRole::Surface:
-            return QStringLiteral("surface");
-        case MnaFileRole::Annotation:
-            return QStringLiteral("annotation");
-        case MnaFileRole::Digitizer:
-            return QStringLiteral("digitizer");
-        case MnaFileRole::Transform:
-            return QStringLiteral("transform");
-        case MnaFileRole::SourceSpace:
-            return QStringLiteral("source_space");
-        case MnaFileRole::Evoked:
-            return QStringLiteral("evoked");
-        case MnaFileRole::Event:
-            return QStringLiteral("event");
-        case MnaFileRole::VirtualChannel:
-            return QStringLiteral("virtual_channel");
-        case MnaFileRole::Custom:
-            return QStringLiteral("custom");
-    }
-    return QStringLiteral("custom");
-}
-
-//=============================================================================================================
+MNASHARED_EXPORT std::string_view to_string(MnaFileRole role);
 
 /**
- * Convert a string to MnaFileRole.
+ * @param[in] text   A file role name.
  *
- * @param[in] str   Lower-case snake_case role name as produced by mnaFileRoleToString().
- *
- * @return The matching role, or MnaFileRole::Custom if str is not recognized.
+ * @return The file role, or MnaFileRole::Custom for an unknown name.
  */
-inline MnaFileRole mnaFileRoleFromString(const QString& str)
-{
-    if (str == QLatin1String("raw"))
-        return MnaFileRole::Raw;
-    if (str == QLatin1String("forward"))
-        return MnaFileRole::Forward;
-    if (str == QLatin1String("inverse"))
-        return MnaFileRole::Inverse;
-    if (str == QLatin1String("covariance"))
-        return MnaFileRole::Covariance;
-    if (str == QLatin1String("source_estimate"))
-        return MnaFileRole::SourceEstimate;
-    if (str == QLatin1String("bem"))
-        return MnaFileRole::Bem;
-    if (str == QLatin1String("surface"))
-        return MnaFileRole::Surface;
-    if (str == QLatin1String("annotation"))
-        return MnaFileRole::Annotation;
-    if (str == QLatin1String("digitizer"))
-        return MnaFileRole::Digitizer;
-    if (str == QLatin1String("transform"))
-        return MnaFileRole::Transform;
-    if (str == QLatin1String("source_space"))
-        return MnaFileRole::SourceSpace;
-    if (str == QLatin1String("evoked"))
-        return MnaFileRole::Evoked;
-    if (str == QLatin1String("event"))
-        return MnaFileRole::Event;
-    if (str == QLatin1String("virtual_channel"))
-        return MnaFileRole::VirtualChannel;
-    return MnaFileRole::Custom;
-}
-
-//=============================================================================================================
+MNASHARED_EXPORT MnaFileRole file_role_from_string(std::string_view text);
 
 /**
- * Convert MnaDataKind to its string representation.
+ * @param[in] kind   A data kind.
  *
- * @param[in] kind   Data kind to convert.
- *
- * @return CamelCase name such as "FiffRaw" or "SourceEstimate"; "Custom" for unknown values.
+ * @return Its name in op registries, e.g. "SourceEstimate".
  */
-inline QString mnaDataKindToString(MnaDataKind kind)
-{
-    switch (kind) {
-        case MnaDataKind::FiffRaw:
-            return QStringLiteral("FiffRaw");
-        case MnaDataKind::Forward:
-            return QStringLiteral("Forward");
-        case MnaDataKind::Inverse:
-            return QStringLiteral("Inverse");
-        case MnaDataKind::Covariance:
-            return QStringLiteral("Covariance");
-        case MnaDataKind::SourceEstimate:
-            return QStringLiteral("SourceEstimate");
-        case MnaDataKind::Epochs:
-            return QStringLiteral("Epochs");
-        case MnaDataKind::Evoked:
-            return QStringLiteral("Evoked");
-        case MnaDataKind::Matrix:
-            return QStringLiteral("Matrix");
-        case MnaDataKind::Volume:
-            return QStringLiteral("Volume");
-        case MnaDataKind::Surface:
-            return QStringLiteral("Surface");
-        case MnaDataKind::Bem:
-            return QStringLiteral("Bem");
-        case MnaDataKind::Annotation:
-            return QStringLiteral("Annotation");
-        case MnaDataKind::Label:
-            return QStringLiteral("Label");
-        case MnaDataKind::RealTimeStream:
-            return QStringLiteral("RealTimeStream");
-        case MnaDataKind::Custom:
-            return QStringLiteral("Custom");
-    }
-    return QStringLiteral("Custom");
-}
-
-//=============================================================================================================
+MNASHARED_EXPORT std::string_view to_string(MnaDataKind kind);
 
 /**
- * Convert a string to MnaDataKind.
+ * @param[in] kind   A data kind.
  *
- * @param[in] str   CamelCase or snake_case kind name, e.g. "SourceEstimate" or "source_estimate".
- *
- * @return The matching kind, or MnaDataKind::Custom if str is not recognized.
+ * @return Its name in MNA files, e.g. "source_estimate".
  */
-inline MnaDataKind mnaDataKindFromString(const QString& str)
-{
-    if (str == QLatin1String("FiffRaw") || str == QLatin1String("fiff_raw"))
-        return MnaDataKind::FiffRaw;
-    if (str == QLatin1String("FiffInfo"))
-        return MnaDataKind::Custom; // FiffInfo is a sub-kind of FiffRaw context
-    if (str == QLatin1String("Forward") || str == QLatin1String("forward"))
-        return MnaDataKind::Forward;
-    if (str == QLatin1String("Inverse") || str == QLatin1String("inverse"))
-        return MnaDataKind::Inverse;
-    if (str == QLatin1String("Covariance") || str == QLatin1String("covariance"))
-        return MnaDataKind::Covariance;
-    if (str == QLatin1String("SourceEstimate") || str == QLatin1String("source_estimate"))
-        return MnaDataKind::SourceEstimate;
-    if (str == QLatin1String("Epochs") || str == QLatin1String("epochs"))
-        return MnaDataKind::Epochs;
-    if (str == QLatin1String("Evoked") || str == QLatin1String("evoked"))
-        return MnaDataKind::Evoked;
-    if (str == QLatin1String("Matrix") || str == QLatin1String("matrix"))
-        return MnaDataKind::Matrix;
-    if (str == QLatin1String("Volume") || str == QLatin1String("volume"))
-        return MnaDataKind::Volume;
-    if (str == QLatin1String("Surface") || str == QLatin1String("surface"))
-        return MnaDataKind::Surface;
-    if (str == QLatin1String("Bem") || str == QLatin1String("bem"))
-        return MnaDataKind::Bem;
-    if (str == QLatin1String("Annotation") || str == QLatin1String("annotation"))
-        return MnaDataKind::Annotation;
-    if (str == QLatin1String("Label") || str == QLatin1String("label"))
-        return MnaDataKind::Label;
-    if (str == QLatin1String("RealTimeStream") || str == QLatin1String("real_time_stream"))
-        return MnaDataKind::RealTimeStream;
-    if (str == QLatin1String("FilePath") || str == QLatin1String("DirectoryPath"))
-        return MnaDataKind::Custom;
-    return MnaDataKind::Custom;
-}
+MNASHARED_EXPORT std::string_view data_kind_key(MnaDataKind kind);
+
+/**
+ * @param[in] text   A data kind name in either spelling, e.g. "SourceEstimate" or "source_estimate".
+ *
+ * @return The data kind, or MnaDataKind::Custom for an unknown name.
+ */
+MNASHARED_EXPORT MnaDataKind data_kind_from_string(std::string_view text);
 
 } // namespace mne
 

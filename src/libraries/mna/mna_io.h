@@ -36,11 +36,15 @@
 #include "mna_global.h"
 #include "mna_project.h"
 
+#include <base/error.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <cstddef>
+#include <filesystem>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -51,39 +55,24 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Read/write MNA project files (.mna = JSON, .mnx = CBOR with "MNX1" magic header).
+ * Reads and writes MNA projects: .mna files hold indented JSON, .mnx files the magic bytes "MNX1" and CBOR.
+ * Files of another major schema version are rejected.
+ *
+ * @brief Reader and writer for .mna (JSON) and .mnx (CBOR) project containers.
  *
  * @snippet ex_mna/main.cpp mna_project_save
  */
 class MNASHARED_EXPORT MnaIO
 {
 public:
-    //=========================================================================================================
-    /**
-     * Read an MNA project from file. Dispatches by extension.
-     *
-     * @param[in] path   Path to the .mna or .mnx file.
-     *
-     * @return The deserialized MnaProject.
-     */
-    static MnaProject read(const QString& path);
+    /** @param[in] path   A .mna or .mnx file. @return The project, or why it cannot be read. */
+    static Expected<MnaProject> read(const std::filesystem::path& path);
 
-    //=========================================================================================================
-    /**
-     * Write an MNA project to file. Dispatches by extension.
-     *
-     * @param[in] project   The project to write.
-     * @param[in] path      Path to the .mna or .mnx file.
-     *
-     * @return True if successful.
-     */
-    static bool write(const MnaProject& project, const QString& path);
+    /** @param[in] project   The project. @param[in] path   A .mna or .mnx file. @return Nothing, or why it cannot be written. */
+    static Expected<void> write(const MnaProject& project, const std::filesystem::path& path);
 
-private:
-    static MnaProject readJson(const QString& path);
-    static bool writeJson(const MnaProject& project, const QString& path);
-    static MnaProject readCbor(const QString& path);
-    static bool writeCbor(const MnaProject& project, const QString& path);
+    /** @param[in] project   The project. @return The bytes of a .mnx file, e.g. to offer as a download. */
+    static std::vector<std::byte> to_mnx(const MnaProject& project);
 };
 
 } // namespace mne

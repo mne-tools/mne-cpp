@@ -12,7 +12,7 @@
  * @ref mne::MnaSubject is the root of the per-participant subtree in an
  * MNA project. It binds together all sessions/recordings that
  * belong to one person and pins their structural MRI reconstruction
- * via @c freeSurferDir, a project-relative path to the matching
+ * via @c freesurfer_dir, a project-relative path to the matching
  * @c $SUBJECTS_DIR entry. Keeping that pointer alongside the data
  * means forward solutions, source spaces and parcellations always
  * resolve to the correct anatomy without relying on environment
@@ -37,15 +37,15 @@
 #include "mna_global.h"
 #include "mna_session.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
-#include <QJsonObject>
-#include <QCborMap>
-#include <QSet>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -56,52 +56,28 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Represents a subject (participant) in the project.
+ * @brief One participant in an MNA project with sessions and a link to the FreeSurfer anatomy.
  *
  * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaSubject
 {
-    QString id;                 /**< Subject identifier. */
-    QString freeSurferDir;      /**< Relative path to FreeSurfer SUBJECTS_DIR. */
-    QList<MnaSession> sessions; /**< Sessions for this subject. */
-    QJsonObject extras;         /**< Unknown keys preserved for lossless round-trip. */
+    std::string id;                   /**< Subject identifier. */
+    std::string freesurfer_dir;       /**< Relative path to FreeSurfer SUBJECTS_DIR. */
+    std::vector<MnaSession> sessions; /**< Sessions for this subject. */
+    JsonObject extras;                /**< Unknown keys preserved for lossless round-trip. */
 
-    //=========================================================================================================
-    /**
-     * Serialize to QJsonObject.
-     *
-     * @return JSON object with the subject id, FreeSurfer directory, sessions and preserved extras.
-     */
-    QJsonObject toJson() const;
+    /** @return The subject as a JSON object. */
+    JsonObject to_json() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QJsonObject.
-     *
-     * @param[in] json   JSON object as produced by toJson().
-     *
-     * @return The subject; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaSubject fromJson(const QJsonObject& json);
+    /** @param[in] json   A subject as written by to_json(). @return The subject. */
+    static MnaSubject from_json(const JsonObject& json);
 
-    //=========================================================================================================
-    /**
-     * Serialize to QCborMap.
-     *
-     * @return CBOR map with the subject id, FreeSurfer directory, sessions and preserved extras.
-     */
-    QCborMap toCbor() const;
+    /** @return The subject as a CBOR map. */
+    CborMap to_cbor() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QCborMap.
-     *
-     * @param[in] cbor   CBOR map as produced by toCbor().
-     *
-     * @return The subject; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaSubject fromCbor(const QCborMap& cbor);
+    /** @param[in] cbor   A subject as written by to_cbor(). @return The subject. */
+    static MnaSubject from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

@@ -36,15 +36,15 @@
 #include "mna_global.h"
 #include "mna_file_ref.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
-#include <QJsonObject>
-#include <QCborMap>
-#include <QSet>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -55,51 +55,27 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Groups files belonging to one recording run.
+ * @brief Files of one continuous measurement run in an MNA project.
  *
  * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaRecording
 {
-    QString id;              /**< Recording identifier. */
-    QList<MnaFileRef> files; /**< Files belonging to this recording. */
-    QJsonObject extras;      /**< Unknown keys preserved for lossless round-trip. */
+    std::string id;                /**< Recording identifier. */
+    std::vector<MnaFileRef> files; /**< Files belonging to this recording. */
+    JsonObject extras;             /**< Unknown keys preserved for lossless round-trip. */
 
-    //=========================================================================================================
-    /**
-     * Serialize to QJsonObject.
-     *
-     * @return JSON object with the recording id, its file references and preserved extras.
-     */
-    QJsonObject toJson() const;
+    /** @return The recording as a JSON object. */
+    JsonObject to_json() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QJsonObject.
-     *
-     * @param[in] json   JSON object as produced by toJson().
-     *
-     * @return The recording; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaRecording fromJson(const QJsonObject& json);
+    /** @param[in] json   A recording as written by to_json(). @return The recording. */
+    static MnaRecording from_json(const JsonObject& json);
 
-    //=========================================================================================================
-    /**
-     * Serialize to QCborMap.
-     *
-     * @return CBOR map with the recording id, its file references and preserved extras.
-     */
-    QCborMap toCbor() const;
+    /** @return The recording as a CBOR map. */
+    CborMap to_cbor() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QCborMap.
-     *
-     * @param[in] cbor   CBOR map as produced by toCbor().
-     *
-     * @return The recording; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaRecording fromCbor(const QCborMap& cbor);
+    /** @param[in] cbor   A recording as written by to_cbor(). @return The recording. */
+    static MnaRecording from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

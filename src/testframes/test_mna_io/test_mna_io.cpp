@@ -20,14 +20,30 @@
 #include <mna/mna_port.h>
 #include <mna/mna_types.h>
 
+#include <base/string_utils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCborArray>
+#include <QCborMap>
+#include <QCborValue>
+#include <QDateTime>
+#include <QFile>
 #include <QtTest>
 #include <QObject>
-#include <QTemporaryFile>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <cstdint>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -84,10 +100,19 @@ private slots:
     void testReadNonexistentFile();
     void testWriteInvalidPath();
 
+    // Compatibility with files written and read by Qt
+    void testCborFileIsReadableByQt();
+    void testReadsCborWrittenByQt();
+    void testEmbeddedDataJsonIsStandardBase64();
+
     void cleanupTestCase();
 
 private:
     MnaProject createSampleProject();
+    std::filesystem::path tempPath(const QString& name) const
+    {
+        return path_from_utf8(m_tempDir.filePath(name).toStdString());
+    }
     QTemporaryDir m_tempDir;
 };
 
@@ -105,55 +130,55 @@ MnaProject TestMnaIo::createSampleProject()
     MnaProject project;
     project.name = "TestProject";
     project.description = "A test MNA project for unit testing";
-    project.mnaVersion = MnaProject::CURRENT_SCHEMA_VERSION;
-    project.created = QDateTime::currentDateTimeUtc();
-    project.modified = QDateTime::currentDateTimeUtc();
+    project.mna_version = MnaProject::CURRENT_SCHEMA_VERSION;
+    project.created = mne::UtcTime(std::chrono::milliseconds(1'800'000'000'000));
+    project.modified = mne::UtcTime(std::chrono::milliseconds(1'800'000'000'000));
 
     // Add a subject with a session and recording
     MnaFileRef fileRef;
     fileRef.role = MnaFileRole::Raw;
     fileRef.path = "sub-01/ses-01/meg/sub-01_task-rest_meg.fif";
     fileRef.format = "fif";
-    fileRef.sizeBytes = 123456;
+    fileRef.size_bytes = 123456;
 
     MnaRecording recording;
     recording.id = "rec-01";
-    recording.files.append(fileRef);
+    recording.files.push_back(fileRef);
 
     MnaSession session;
     session.id = "ses-01";
-    session.recordings.append(recording);
+    session.recordings.push_back(recording);
 
     MnaSubject subject;
     subject.id = "sub-01";
-    subject.freeSurferDir = "/data/subjects/sub-01";
-    subject.sessions.append(session);
+    subject.freesurfer_dir = "/data/subjects/sub-01";
+    subject.sessions.push_back(session);
 
-    project.subjects.append(subject);
+    project.subjects.push_back(subject);
 
     // Add a pipeline node
     MnaNode node;
     node.id = "step-01";
-    node.opType = "mne_compute_raw_inverse";
-    node.toolVersion = "2.2.0";
+    node.op_type = "mne_compute_raw_inverse";
+    node.tool_version = "2.2.0";
     node.attributes.insert("method", "dSPM");
     node.attributes.insert("snr", 3.0);
 
     MnaPort inPort;
     inPort.name = "raw";
-    inPort.dataKind = MnaDataKind::Matrix;
+    inPort.data_kind = MnaDataKind::Matrix;
     inPort.direction = MnaPortDir::Input;
-    node.inputs.append(inPort);
+    node.inputs.push_back(inPort);
 
     MnaPort outPort;
     outPort.name = "stc";
-    outPort.dataKind = MnaDataKind::Matrix;
+    outPort.data_kind = MnaDataKind::Matrix;
     outPort.direction = MnaPortDir::Output;
-    node.outputs.append(outPort);
+    node.outputs.push_back(outPort);
 
-    node.executedAt = QDateTime::currentDateTimeUtc();
+    node.executed_at = mne::UtcTime(std::chrono::milliseconds(1'800'000'000'000));
 
-    project.pipeline.append(node);
+    project.pipeline.push_back(node);
 
     return project;
 }
@@ -163,9 +188,9 @@ MnaProject TestMnaIo::createSampleProject()
 void TestMnaIo::testProjectDefault()
 {
     MnaProject project;
-    QVERIFY(project.name.isEmpty());
-    QVERIFY(project.subjects.isEmpty());
-    QVERIFY(project.pipeline.isEmpty());
+    QVERIFY(project.name.empty());
+    QVERIFY(project.subjects.empty());
+    QVERIFY(project.pipeline.empty());
 }
 
 //=============================================================================================================
@@ -175,8 +200,8 @@ void TestMnaIo::testProjectFieldAssignment()
     MnaProject project;
     project.name = "MyProject";
     project.description = "Test description";
-    QCOMPARE(project.name, QString("MyProject"));
-    QCOMPARE(project.description, QString("Test description"));
+    QCOMPARE(project.name, std::string("MyProject"));
+    QCOMPARE(project.description, std::string("Test description"));
 }
 
 //=============================================================================================================
@@ -185,9 +210,9 @@ void TestMnaIo::testSubjectConstruction()
 {
     MnaSubject subject;
     subject.id = "sub-01";
-    subject.freeSurferDir = "/path/to/fs";
-    QCOMPARE(subject.id, QString("sub-01"));
-    QVERIFY(subject.sessions.isEmpty());
+    subject.freesurfer_dir = "/path/to/fs";
+    QCOMPARE(subject.id, std::string("sub-01"));
+    QVERIFY(subject.sessions.empty());
 }
 
 //=============================================================================================================
@@ -196,8 +221,8 @@ void TestMnaIo::testSessionConstruction()
 {
     MnaSession session;
     session.id = "ses-01";
-    QCOMPARE(session.id, QString("ses-01"));
-    QVERIFY(session.recordings.isEmpty());
+    QCOMPARE(session.id, std::string("ses-01"));
+    QVERIFY(session.recordings.empty());
 }
 
 //=============================================================================================================
@@ -206,8 +231,8 @@ void TestMnaIo::testRecordingConstruction()
 {
     MnaRecording recording;
     recording.id = "rec-01";
-    QCOMPARE(recording.id, QString("rec-01"));
-    QVERIFY(recording.files.isEmpty());
+    QCOMPARE(recording.id, std::string("rec-01"));
+    QVERIFY(recording.files.empty());
 }
 
 //=============================================================================================================
@@ -219,11 +244,11 @@ void TestMnaIo::testFileRefConstruction()
     ref.path = "test.fif";
     ref.sha256 = "abc123";
     ref.format = "fif";
-    ref.sizeBytes = 42;
+    ref.size_bytes = 42;
 
     QCOMPARE(ref.role, MnaFileRole::Forward);
-    QCOMPARE(ref.path, QString("test.fif"));
-    QCOMPARE(ref.sizeBytes, static_cast<qint64>(42));
+    QCOMPARE(ref.path, std::string("test.fif"));
+    QCOMPARE(ref.size_bytes, std::int64_t(42));
     QVERIFY(!ref.embedded);
 }
 
@@ -232,16 +257,16 @@ void TestMnaIo::testFileRefConstruction()
 void TestMnaIo::testFileRoleEnumRoundTrip()
 {
     // Test enum ↔ string conversion
-    QList<MnaFileRole> roles = {
+    const std::vector<MnaFileRole> roles = {
         MnaFileRole::Raw, MnaFileRole::Forward, MnaFileRole::Inverse,
         MnaFileRole::Covariance, MnaFileRole::SourceEstimate,
         MnaFileRole::Bem, MnaFileRole::Surface, MnaFileRole::Annotation,
         MnaFileRole::Custom};
 
     for (MnaFileRole role : roles) {
-        QString str = mnaFileRoleToString(role);
-        QVERIFY(!str.isEmpty());
-        MnaFileRole restored = mnaFileRoleFromString(str);
+        const std::string_view str = to_string(role);
+        QVERIFY(!str.empty());
+        MnaFileRole restored = file_role_from_string(str);
         QCOMPARE(restored, role);
     }
 }
@@ -252,26 +277,26 @@ void TestMnaIo::testNodeConstruction()
 {
     MnaNode node;
     node.id = "step-01";
-    node.opType = "filter";
-    node.toolVersion = "1.0";
+    node.op_type = "filter";
+    node.tool_version = "1.0";
     node.attributes.insert("lowpass", 40.0);
 
     MnaPort inPort;
     inPort.name = "raw";
-    inPort.dataKind = MnaDataKind::Matrix;
+    inPort.data_kind = MnaDataKind::Matrix;
     inPort.direction = MnaPortDir::Input;
-    node.inputs.append(inPort);
+    node.inputs.push_back(inPort);
 
     MnaPort outPort;
     outPort.name = "filtered";
-    outPort.dataKind = MnaDataKind::Matrix;
+    outPort.data_kind = MnaDataKind::Matrix;
     outPort.direction = MnaPortDir::Output;
-    node.outputs.append(outPort);
+    node.outputs.push_back(outPort);
 
-    QCOMPARE(node.id, QString("step-01"));
-    QCOMPARE(node.attributes.value("lowpass").toDouble(), 40.0);
-    QCOMPARE(node.inputs.size(), 1);
-    QCOMPARE(node.outputs.size(), 1);
+    QCOMPARE(node.id, std::string("step-01"));
+    QCOMPARE(node.attributes["lowpass"].to_double(), 40.0);
+    QCOMPARE(node.inputs.size(), std::size_t(1));
+    QCOMPARE(node.outputs.size(), std::size_t(1));
 }
 
 //=============================================================================================================
@@ -279,19 +304,19 @@ void TestMnaIo::testNodeConstruction()
 void TestMnaIo::testProjectJsonRoundTrip()
 {
     MnaProject original = createSampleProject();
-    QJsonObject json = original.toJson();
-    MnaProject restored = MnaProject::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaProject restored = MnaProject::from_json(json);
 
     QCOMPARE(restored.name, original.name);
     QCOMPARE(restored.description, original.description);
-    QCOMPARE(restored.mnaVersion, original.mnaVersion);
+    QCOMPARE(restored.mna_version, original.mna_version);
     QCOMPARE(restored.subjects.size(), original.subjects.size());
     QCOMPARE(restored.pipeline.size(), original.pipeline.size());
 
     // Verify nested data survived
     QCOMPARE(restored.subjects[0].id, original.subjects[0].id);
     QCOMPARE(restored.subjects[0].sessions[0].id, original.subjects[0].sessions[0].id);
-    QCOMPARE(restored.pipeline[0].opType, original.pipeline[0].opType);
+    QCOMPARE(restored.pipeline[0].op_type, original.pipeline[0].op_type);
 }
 
 //=============================================================================================================
@@ -300,13 +325,13 @@ void TestMnaIo::testSubjectJsonRoundTrip()
 {
     MnaSubject original;
     original.id = "sub-02";
-    original.freeSurferDir = "/data/fs/sub-02";
+    original.freesurfer_dir = "/data/fs/sub-02";
 
-    QJsonObject json = original.toJson();
-    MnaSubject restored = MnaSubject::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaSubject restored = MnaSubject::from_json(json);
 
     QCOMPARE(restored.id, original.id);
-    QCOMPARE(restored.freeSurferDir, original.freeSurferDir);
+    QCOMPARE(restored.freesurfer_dir, original.freesurfer_dir);
 }
 
 //=============================================================================================================
@@ -318,13 +343,13 @@ void TestMnaIo::testSessionJsonRoundTrip()
 
     MnaRecording rec;
     rec.id = "rec-01";
-    original.recordings.append(rec);
+    original.recordings.push_back(rec);
 
-    QJsonObject json = original.toJson();
-    MnaSession restored = MnaSession::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaSession restored = MnaSession::from_json(json);
 
     QCOMPARE(restored.id, original.id);
-    QCOMPARE(restored.recordings.size(), 1);
+    QCOMPARE(restored.recordings.size(), std::size_t(1));
 }
 
 //=============================================================================================================
@@ -337,13 +362,13 @@ void TestMnaIo::testRecordingJsonRoundTrip()
     MnaFileRef ref;
     ref.role = MnaFileRole::Covariance;
     ref.path = "cov.fif";
-    original.files.append(ref);
+    original.files.push_back(ref);
 
-    QJsonObject json = original.toJson();
-    MnaRecording restored = MnaRecording::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaRecording restored = MnaRecording::from_json(json);
 
     QCOMPARE(restored.id, original.id);
-    QCOMPARE(restored.files.size(), 1);
+    QCOMPARE(restored.files.size(), std::size_t(1));
     QCOMPARE(restored.files[0].role, MnaFileRole::Covariance);
 }
 
@@ -356,16 +381,16 @@ void TestMnaIo::testFileRefJsonRoundTrip()
     original.path = "stc.stc";
     original.sha256 = "deadbeef";
     original.format = "stc";
-    original.sizeBytes = 999999;
+    original.size_bytes = 999999;
     original.embedded = false;
 
-    QJsonObject json = original.toJson();
-    MnaFileRef restored = MnaFileRef::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaFileRef restored = MnaFileRef::from_json(json);
 
     QCOMPARE(restored.role, original.role);
     QCOMPARE(restored.path, original.path);
     QCOMPARE(restored.sha256, original.sha256);
-    QCOMPARE(restored.sizeBytes, original.sizeBytes);
+    QCOMPARE(restored.size_bytes, original.size_bytes);
 }
 
 //=============================================================================================================
@@ -374,39 +399,39 @@ void TestMnaIo::testNodeJsonRoundTrip()
 {
     MnaNode original;
     original.id = "step-02";
-    original.opType = "csd_compute";
-    original.toolVersion = "2.2.0";
+    original.op_type = "csd_compute";
+    original.tool_version = "2.2.0";
     original.attributes.insert("fmin", 7.0);
     original.attributes.insert("fmax", 30.0);
 
     MnaPort in1;
     in1.name = "epochs";
-    in1.dataKind = MnaDataKind::Epochs;
+    in1.data_kind = MnaDataKind::Epochs;
     in1.direction = MnaPortDir::Input;
-    original.inputs.append(in1);
+    original.inputs.push_back(in1);
 
     MnaPort in2;
     in2.name = "noise_cov";
-    in2.dataKind = MnaDataKind::Matrix;
+    in2.data_kind = MnaDataKind::Matrix;
     in2.direction = MnaPortDir::Input;
-    original.inputs.append(in2);
+    original.inputs.push_back(in2);
 
     MnaPort out;
     out.name = "csd";
-    out.dataKind = MnaDataKind::Custom;
+    out.data_kind = MnaDataKind::Custom;
     out.direction = MnaPortDir::Output;
-    original.outputs.append(out);
+    original.outputs.push_back(out);
 
-    original.executedAt = QDateTime::currentDateTimeUtc();
+    original.executed_at = mne::UtcTime(std::chrono::milliseconds(1'800'000'000'000));
 
-    QJsonObject json = original.toJson();
-    MnaNode restored = MnaNode::fromJson(json);
+    JsonObject json = original.to_json();
+    MnaNode restored = MnaNode::from_json(json);
 
     QCOMPARE(restored.id, original.id);
-    QCOMPARE(restored.opType, original.opType);
-    QCOMPARE(restored.inputs.size(), 2);
-    QCOMPARE(restored.outputs.size(), 1);
-    QCOMPARE(restored.attributes.value("fmin").toDouble(), 7.0);
+    QCOMPARE(restored.op_type, original.op_type);
+    QCOMPARE(restored.inputs.size(), std::size_t(2));
+    QCOMPARE(restored.outputs.size(), std::size_t(1));
+    QCOMPARE(restored.attributes["fmin"].to_double(), 7.0);
 }
 
 //=============================================================================================================
@@ -414,8 +439,8 @@ void TestMnaIo::testNodeJsonRoundTrip()
 void TestMnaIo::testProjectCborRoundTrip()
 {
     MnaProject original = createSampleProject();
-    QCborMap cbor = original.toCbor();
-    MnaProject restored = MnaProject::fromCbor(cbor);
+    CborMap cbor = original.to_cbor();
+    MnaProject restored = MnaProject::from_cbor(cbor);
 
     QCOMPARE(restored.name, original.name);
     QCOMPARE(restored.description, original.description);
@@ -428,12 +453,12 @@ void TestMnaIo::testProjectCborRoundTrip()
 void TestMnaIo::testWriteReadJsonFile()
 {
     MnaProject original = createSampleProject();
-    QString filePath = m_tempDir.filePath("test_project.mna");
+    const std::filesystem::path filePath = tempPath("test_project.mna");
 
-    QVERIFY(MnaProject::write(original, filePath));
-    QVERIFY(QFile::exists(filePath));
+    QVERIFY(original.write(filePath));
+    QVERIFY(std::filesystem::exists(filePath));
 
-    MnaProject restored = MnaProject::read(filePath);
+    const MnaProject restored = MnaProject::read(filePath).value();
     QCOMPARE(restored.name, original.name);
     QCOMPARE(restored.subjects.size(), original.subjects.size());
 }
@@ -443,12 +468,12 @@ void TestMnaIo::testWriteReadJsonFile()
 void TestMnaIo::testWriteReadCborFile()
 {
     MnaProject original = createSampleProject();
-    QString filePath = m_tempDir.filePath("test_project.mnx");
+    const std::filesystem::path filePath = tempPath("test_project.mnx");
 
-    QVERIFY(MnaProject::write(original, filePath));
-    QVERIFY(QFile::exists(filePath));
+    QVERIFY(original.write(filePath));
+    QVERIFY(std::filesystem::exists(filePath));
 
-    MnaProject restored = MnaProject::read(filePath);
+    const MnaProject restored = MnaProject::read(filePath).value();
     QCOMPARE(restored.name, original.name);
     QCOMPARE(restored.subjects.size(), original.subjects.size());
 }
@@ -459,10 +484,10 @@ void TestMnaIo::testMnaIoStaticRead()
 {
     // Write with MnaProject, read with MnaIO
     MnaProject original = createSampleProject();
-    QString filePath = m_tempDir.filePath("test_io_read.mna");
-    MnaProject::write(original, filePath);
+    const std::filesystem::path filePath = tempPath("test_io_read.mna");
+    QVERIFY(original.write(filePath));
 
-    MnaProject restored = MnaIO::read(filePath);
+    const MnaProject restored = MnaIO::read(filePath).value();
     QCOMPARE(restored.name, original.name);
 }
 
@@ -472,11 +497,11 @@ void TestMnaIo::testMnaIoStaticWrite()
 {
     // Write with MnaIO, read with MnaProject
     MnaProject original = createSampleProject();
-    QString filePath = m_tempDir.filePath("test_io_write.mna");
+    const std::filesystem::path filePath = tempPath("test_io_write.mna");
 
     QVERIFY(MnaIO::write(original, filePath));
 
-    MnaProject restored = MnaProject::read(filePath);
+    const MnaProject restored = MnaProject::read(filePath).value();
     QCOMPARE(restored.name, original.name);
 }
 
@@ -485,20 +510,20 @@ void TestMnaIo::testMnaIoStaticWrite()
 void TestMnaIo::testEmptyProject()
 {
     MnaProject empty;
-    QJsonObject json = empty.toJson();
-    MnaProject restored = MnaProject::fromJson(json);
+    JsonObject json = empty.to_json();
+    MnaProject restored = MnaProject::from_json(json);
 
-    QVERIFY(restored.subjects.isEmpty());
-    QVERIFY(restored.pipeline.isEmpty());
+    QVERIFY(restored.subjects.empty());
+    QVERIFY(restored.pipeline.empty());
 }
 
 //=============================================================================================================
 
 void TestMnaIo::testReadNonexistentFile()
 {
-    MnaProject project = MnaIO::read("/nonexistent/path/file.mna");
-    // Should return an empty project without crashing
-    QVERIFY(project.name.isEmpty());
+    const Expected<MnaProject> project = MnaIO::read("/nonexistent/path/file.mna");
+    QVERIFY(!project);
+    QCOMPARE(project.error().code, ErrorCode::Io);
 }
 
 //=============================================================================================================
@@ -508,6 +533,76 @@ void TestMnaIo::testWriteInvalidPath()
     MnaProject project = createSampleProject();
     // Writing to an invalid path should return false
     QVERIFY(!MnaIO::write(project, "/nonexistent/directory/file.mna"));
+}
+
+//=============================================================================================================
+
+void TestMnaIo::testCborFileIsReadableByQt()
+{
+    MnaProject project = createSampleProject();
+    project.created = parse_iso8601("2026-11-15T09:30:05.250Z");
+    MnaFileRef& ref = project.subjects[0].sessions[0].recordings[0].files[0];
+    ref.embedded = true;
+    ref.data = {std::byte{0}, std::byte{0xFF}, std::byte{'M'}};
+    const std::filesystem::path path = tempPath("qt_reads.mnx");
+    QVERIFY(project.write(path));
+
+    QFile file(QString::fromStdString(utf8_from_path(path)));
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    QCOMPARE(file.read(4), QByteArray("MNX1"));
+    QCborParserError error;
+    const QCborMap root = QCborValue::fromCbor(file.readAll(), &error).toMap();
+    QCOMPARE(error.error, QCborError::NoError);
+    QCOMPARE(root[QLatin1String("name")].toString(), QStringLiteral("TestProject"));
+    QVERIFY(root[QLatin1String("created")].isDateTime());
+    QCOMPARE(root[QLatin1String("created")].toDateTime(), QDateTime::fromString("2026-11-15T09:30:05.250Z", Qt::ISODateWithMs));
+    const QCborValue data = root[QLatin1String("subjects")][0][QLatin1String("sessions")][0][QLatin1String("recordings")][0][QLatin1String("files")][0][QLatin1String("data")];
+    QVERIFY(data.isByteArray());
+    QCOMPARE(data.toByteArray(), QByteArray("\x00\xFFM", 3));
+}
+
+//=============================================================================================================
+
+void TestMnaIo::testReadsCborWrittenByQt()
+{
+    QCborMap file{{QLatin1String("role"), QStringLiteral("raw")}, {QLatin1String("path"), QStringLiteral("raw.fif")}, {QLatin1String("embedded"), true}, {QLatin1String("data"), QByteArray("\x01\x02", 2)}, {QLatin1String("size_bytes"), 2}};
+    QCborMap recording{{QLatin1String("id"), QStringLiteral("run-01")}, {QLatin1String("files"), QCborArray{file}}};
+    QCborMap session{{QLatin1String("id"), QStringLiteral("ses-01")}, {QLatin1String("recordings"), QCborArray{recording}}};
+    QCborMap subject{{QLatin1String("id"), QStringLiteral("sub-01")}, {QLatin1String("sessions"), QCborArray{session}}};
+    QCborMap root{{QLatin1String("mna_version"), QStringLiteral("1.0")},
+                  {QLatin1String("name"), QStringLiteral("from Qt")},
+                  {QLatin1String("created"), QCborValue(QDateTime::fromString("2025-01-02T03:04:05.006Z", Qt::ISODateWithMs))},
+                  {QLatin1String("subjects"), QCborArray{subject}},
+                  {QLatin1String("future_key"), 42}};
+    const std::filesystem::path path = tempPath("qt_wrote.mnx");
+    QFile out(QString::fromStdString(utf8_from_path(path)));
+    QVERIFY(out.open(QIODevice::WriteOnly));
+    out.write("MNX1");
+    out.write(QCborValue(root).toCbor());
+    out.close();
+
+    const MnaProject project = MnaProject::read(path).value();
+    QCOMPARE(project.name, std::string("from Qt"));
+    QCOMPARE(project.created, parse_iso8601("2025-01-02T03:04:05.006Z"));
+    QCOMPARE(project.extras["future_key"].to_int(), 42);
+    const MnaFileRef& ref = project.subjects.at(0).sessions.at(0).recordings.at(0).files.at(0);
+    QCOMPARE(ref.path, std::string("raw.fif"));
+    QVERIFY(ref.data == (std::vector<std::byte>{std::byte{1}, std::byte{2}}));
+}
+
+//=============================================================================================================
+
+void TestMnaIo::testEmbeddedDataJsonIsStandardBase64()
+{
+    MnaFileRef ref;
+    ref.embedded = true;
+    for (int i = 0; i < 64; ++i) {
+        ref.data.push_back(static_cast<std::byte>(250 + i)); // bytes that differ between base64 and base64url
+    }
+    const QByteArray qtBytes(reinterpret_cast<const char*>(ref.data.data()), qsizetype(ref.data.size()));
+    QCOMPARE(std::string(ref.to_json()["data"].to_string()), qtBytes.toBase64().toStdString());
+    QVERIFY(MnaFileRef::from_json(ref.to_json()).data == ref.data);
+    QVERIFY(MnaFileRef::from_cbor(ref.to_cbor()).data == ref.data);
 }
 
 //=============================================================================================================

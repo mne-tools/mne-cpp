@@ -9,17 +9,17 @@
  * @date     April 2026
  * @brief    Implementation of the @c mna-registry.json manifest reader, drop-in directory merger and registry-to-manifest serialiser.
  *
- * @ref MnaRegistryLoader::loadFile parses one manifest JSON, walks
+ * @ref MnaRegistryLoader::load_file parses one manifest JSON, walks
  * the @c ops array, deserialises each entry into a
  * @ref MnaOpSchema with its port and attribute lists, and calls
- * @ref MnaOpRegistry::registerOp; missing or malformed entries
+ * @ref MnaOpRegistry::register_op; missing or malformed entries
  * are skipped with a warning so a single broken op does not
- * abort the load. @ref loadDirectory loads @c mna-registry.json
+ * abort the load. @ref load_directory loads @c mna-registry.json
  * first, then every @c *.json file under @c mna-registry.d/ in
  * alphabetical order so later files override earlier definitions,
  * which is how plug-in packages extend or shadow built-in ops.
  *
- * @ref saveFile inverts the process: it walks every schema
+ * @ref save_file inverts the process: it walks every schema
  * currently registered with @ref MnaOpRegistry, emits the
  * canonical manifest header (@c mna_registry_version, @c provider)
  * and the @c ops array, and writes the file pretty-printed so the
@@ -31,20 +31,22 @@
 //=============================================================================================================
 
 #include "mna_registry_loader.h"
-#include <base/log.h>
+
 #include "mna_op_registry.h"
 #include "mna_op_schema.h"
-#include "mna_types.h"
+
+#include <base/byte_stream.h>
+#include <base/json.h>
+#include <base/log.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDir>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
+#include <algorithm>
+#include <system_error>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,267 +55,224 @@
 using namespace mne;
 
 //=============================================================================================================
-// STATIC HELPERS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-static QMetaType::Type metaTypeFromString(const QString& str)
+namespace
 {
-    if (str == QLatin1String("string"))
-        return QMetaType::QString;
-    if (str == QLatin1String("double"))
-        return QMetaType::Double;
-    if (str == QLatin1String("float"))
-        return QMetaType::Float;
-    if (str == QLatin1String("int"))
-        return QMetaType::Int;
-    if (str == QLatin1String("bool"))
-        return QMetaType::Bool;
-    if (str == QLatin1String("path"))
-        return QMetaType::QString;
-    return QMetaType::QString;
+
+MnaAttrType attrTypeFromString(std::string_view text)
+{
+    if (text == "double")
+        return MnaAttrType::Double;
+    if (text == "float")
+        return MnaAttrType::Float;
+    if (text == "int")
+        return MnaAttrType::Int;
+    if (text == "bool")
+        return MnaAttrType::Bool;
+    return MnaAttrType::String; // also "string" and "path"
 }
 
-//=============================================================================================================
-
-static QString metaTypeToString(QMetaType::Type type)
+std::string_view attrTypeToString(MnaAttrType type)
 {
     switch (type) {
-        case QMetaType::QString:
-            return QStringLiteral("string");
-        case QMetaType::Double:
-            return QStringLiteral("double");
-        case QMetaType::Float:
-            return QStringLiteral("float");
-        case QMetaType::Int:
-            return QStringLiteral("int");
-        case QMetaType::Bool:
-            return QStringLiteral("bool");
-        default:
-            return QStringLiteral("string");
+        case MnaAttrType::Double:
+            return "double";
+        case MnaAttrType::Float:
+            return "float";
+        case MnaAttrType::Int:
+            return "int";
+        case MnaAttrType::Bool:
+            return "bool";
+        case MnaAttrType::String:
+            break;
     }
+    return "string";
 }
 
-//=============================================================================================================
-
-static MnaOpSchemaPort parsePort(const QJsonObject& obj)
+MnaOpSchemaPort parsePort(const JsonObject& obj)
 {
     MnaOpSchemaPort port;
-    port.name = obj.value(QLatin1String("name")).toString();
-    port.dataKind = mnaDataKindFromString(obj.value(QLatin1String("kind")).toString());
-    port.required = obj.value(QLatin1String("required")).toBool(true);
-    port.description = obj.value(QLatin1String("description")).toString();
+    port.name = obj["name"].to_std_string();
+    port.data_kind = data_kind_from_string(obj["kind"].to_string());
+    port.required = obj["required"].to_bool(true);
+    port.description = obj["description"].to_std_string();
     return port;
 }
 
-//=============================================================================================================
-
-static QJsonObject portToJson(const MnaOpSchemaPort& port)
+JsonObject portToJson(const MnaOpSchemaPort& port)
 {
-    QJsonObject obj;
-    obj[QLatin1String("name")] = port.name;
-    obj[QLatin1String("kind")] = mnaDataKindToString(port.dataKind);
-    obj[QLatin1String("description")] = port.description;
+    JsonObject obj;
+    obj["name"] = port.name;
+    obj["kind"] = to_string(port.data_kind);
+    obj["description"] = port.description;
     if (!port.required)
-        obj[QLatin1String("required")] = false;
+        obj["required"] = false;
     return obj;
 }
 
-//=============================================================================================================
-
-static MnaOpSchemaAttr parseAttr(const QJsonObject& obj)
+MnaOpSchemaAttr parseAttr(const JsonObject& obj)
 {
     MnaOpSchemaAttr attr;
-    attr.name = obj.value(QLatin1String("name")).toString();
-    attr.type = metaTypeFromString(obj.value(QLatin1String("type")).toString());
-    attr.required = obj.value(QLatin1String("required")).toBool(false);
-    attr.description = obj.value(QLatin1String("description")).toString();
-    if (obj.contains(QLatin1String("default")))
-        attr.defaultValue = obj.value(QLatin1String("default")).toVariant();
+    attr.name = obj["name"].to_std_string();
+    attr.type = attrTypeFromString(obj["type"].to_string());
+    attr.required = obj["required"].to_bool(false);
+    attr.description = obj["description"].to_std_string();
+    attr.default_value = obj["default"];
     return attr;
 }
 
-//=============================================================================================================
-
-static QJsonObject attrToJson(const MnaOpSchemaAttr& attr)
+JsonObject attrToJson(const MnaOpSchemaAttr& attr)
 {
-    QJsonObject obj;
-    obj[QLatin1String("name")] = attr.name;
-    obj[QLatin1String("type")] = metaTypeToString(attr.type);
+    JsonObject obj;
+    obj["name"] = attr.name;
+    obj["type"] = attrTypeToString(attr.type);
     if (attr.required)
-        obj[QLatin1String("required")] = true;
-    if (!attr.description.isEmpty())
-        obj[QLatin1String("description")] = attr.description;
-    if (attr.defaultValue.isValid())
-        obj[QLatin1String("default")] = QJsonValue::fromVariant(attr.defaultValue);
+        obj["required"] = true;
+    if (!attr.description.empty())
+        obj["description"] = attr.description;
+    if (!attr.default_value.is_undefined())
+        obj["default"] = attr.default_value;
     return obj;
 }
 
-//=============================================================================================================
+template<class T, class Parse>
+std::vector<T> parseList(const JsonValue& value, Parse parse)
+{
+    std::vector<T> items;
+    for (const JsonValue& item : value.to_array()) {
+        items.push_back(parse(item.to_object()));
+    }
+    return items;
+}
 
-static MnaOpSchema parseOp(const QJsonObject& obj)
+template<class T, class Write>
+JsonArray writeList(const std::vector<T>& items, Write write)
+{
+    JsonArray array;
+    for (const T& item : items) {
+        array.push_back(write(item));
+    }
+    return array;
+}
+
+MnaOpSchema parseOp(const JsonObject& obj)
 {
     MnaOpSchema schema;
-    schema.opType = obj.value(QLatin1String("type")).toString();
-    schema.version = obj.value(QLatin1String("version")).toString();
-    schema.binding = obj.value(QLatin1String("binding")).toString(QStringLiteral("internal"));
-    schema.category = obj.value(QLatin1String("category")).toString();
-    schema.description = obj.value(QLatin1String("description")).toString();
-    schema.library = obj.value(QLatin1String("library")).toString();
-    schema.executable = obj.value(QLatin1String("executable")).toString();
-    schema.cliTemplate = obj.value(QLatin1String("cli_template")).toString();
-
-    const QJsonArray inputs = obj.value(QLatin1String("inputs")).toArray();
-    for (const QJsonValue& v : inputs)
-        schema.inputPorts.append(parsePort(v.toObject()));
-
-    const QJsonArray outputs = obj.value(QLatin1String("outputs")).toArray();
-    for (const QJsonValue& v : outputs)
-        schema.outputPorts.append(parsePort(v.toObject()));
-
-    const QJsonArray params = obj.value(QLatin1String("parameters")).toArray();
-    for (const QJsonValue& v : params)
-        schema.attributes.append(parseAttr(v.toObject()));
-
+    schema.op_type = obj["type"].to_std_string();
+    schema.version = obj["version"].to_std_string();
+    schema.binding = obj["binding"].to_string("internal");
+    schema.category = obj["category"].to_std_string();
+    schema.description = obj["description"].to_std_string();
+    schema.library = obj["library"].to_std_string();
+    schema.executable = obj["executable"].to_std_string();
+    schema.cli_template = obj["cli_template"].to_std_string();
+    schema.input_ports = parseList<MnaOpSchemaPort>(obj["inputs"], parsePort);
+    schema.output_ports = parseList<MnaOpSchemaPort>(obj["outputs"], parsePort);
+    schema.attributes = parseList<MnaOpSchemaAttr>(obj["parameters"], parseAttr);
     return schema;
 }
 
-//=============================================================================================================
-
-static QJsonObject opToJson(const MnaOpSchema& schema)
+JsonObject opToJson(const MnaOpSchema& schema)
 {
-    QJsonObject obj;
-    obj[QLatin1String("type")] = schema.opType;
-    obj[QLatin1String("description")] = schema.description;
-
-    if (!schema.version.isEmpty())
-        obj[QLatin1String("version")] = schema.version;
-    if (!schema.binding.isEmpty())
-        obj[QLatin1String("binding")] = schema.binding;
-    if (!schema.category.isEmpty())
-        obj[QLatin1String("category")] = schema.category;
-    if (!schema.library.isEmpty())
-        obj[QLatin1String("library")] = schema.library;
-    if (!schema.executable.isEmpty())
-        obj[QLatin1String("executable")] = schema.executable;
-    if (!schema.cliTemplate.isEmpty())
-        obj[QLatin1String("cli_template")] = schema.cliTemplate;
-
-    QJsonArray inputs;
-    for (const MnaOpSchemaPort& p : schema.inputPorts)
-        inputs.append(portToJson(p));
-    obj[QLatin1String("inputs")] = inputs;
-
-    QJsonArray outputs;
-    for (const MnaOpSchemaPort& p : schema.outputPorts)
-        outputs.append(portToJson(p));
-    obj[QLatin1String("outputs")] = outputs;
-
-    QJsonArray params;
-    for (const MnaOpSchemaAttr& a : schema.attributes)
-        params.append(attrToJson(a));
-    obj[QLatin1String("parameters")] = params;
-
+    JsonObject obj;
+    obj["type"] = schema.op_type;
+    obj["description"] = schema.description;
+    if (!schema.version.empty())
+        obj["version"] = schema.version;
+    if (!schema.binding.empty())
+        obj["binding"] = schema.binding;
+    if (!schema.category.empty())
+        obj["category"] = schema.category;
+    if (!schema.library.empty())
+        obj["library"] = schema.library;
+    if (!schema.executable.empty())
+        obj["executable"] = schema.executable;
+    if (!schema.cli_template.empty())
+        obj["cli_template"] = schema.cli_template;
+    obj["inputs"] = writeList(schema.input_ports, portToJson);
+    obj["outputs"] = writeList(schema.output_ports, portToJson);
+    obj["parameters"] = writeList(schema.attributes, attrToJson);
     return obj;
 }
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-int MnaRegistryLoader::loadFile(const QString& path, MnaOpRegistry& registry)
+int MnaRegistryLoader::load_file(const std::filesystem::path& path, MnaOpRegistry& registry)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        mne::Log::warning("MnaRegistryLoader: Cannot open {}", path.toStdString());
+    const Expected<std::string> text = read_text_file(path);
+    if (!text) {
+        Log::warning("MnaRegistryLoader: Cannot open {}", utf8_from_path(path));
+        return -1;
+    }
+    JsonParseError parseError;
+    const JsonDocument doc = JsonDocument::from_json(*text, &parseError);
+    if (parseError.error != JsonParseError::NoError) {
+        Log::warning("MnaRegistryLoader: JSON parse error in {} : {}", utf8_from_path(path), parseError.error_string());
+        return -1;
+    }
+    const JsonObject& root = doc.object();
+    if (!root.contains("mna_registry_version")) {
+        Log::warning("MnaRegistryLoader: Missing 'mna_registry_version' in {}", utf8_from_path(path));
         return -1;
     }
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
-    file.close();
-
-    if (parseError.error != QJsonParseError::NoError) {
-        mne::Log::warning("MnaRegistryLoader: JSON parse error in {} : {}", path.toStdString(), parseError.errorString().toStdString());
-        return -1;
-    }
-
-    const QJsonObject root = doc.object();
-
-    // Validate required fields
-    if (!root.contains(QLatin1String("mna_registry_version"))) {
-        mne::Log::warning("MnaRegistryLoader: Missing 'mna_registry_version' in {}", path.toStdString());
-        return -1;
-    }
-
-    const QJsonArray ops = root.value(QLatin1String("ops")).toArray();
     int count = 0;
-
-    for (const QJsonValue& v : ops) {
-        MnaOpSchema schema = parseOp(v.toObject());
-        if (!schema.opType.isEmpty()) {
-            registry.registerOp(schema);
+    for (const JsonValue& op : root["ops"].to_array()) {
+        MnaOpSchema schema = parseOp(op.to_object());
+        if (!schema.op_type.empty()) {
+            registry.register_op(schema);
             ++count;
         }
     }
-
-    mne::Log::info("MnaRegistryLoader: Loaded {} ops from {} (provider: {} )", count, path.toStdString(), (root.value(QLatin1String("provider")).toString()).toStdString());
-
+    Log::info("MnaRegistryLoader: Loaded {} ops from {} (provider: {} )", count, utf8_from_path(path), root["provider"].to_string());
     return count;
 }
 
 //=============================================================================================================
 
-int MnaRegistryLoader::loadDirectory(const QString& registryDir, MnaOpRegistry& registry)
+int MnaRegistryLoader::load_directory(const std::filesystem::path& dir, MnaOpRegistry& registry)
 {
     int total = 0;
-
-    // 1. Load master manifest
-    QString masterPath = registryDir + QStringLiteral("/mna-registry.json");
-    if (QFile::exists(masterPath)) {
-        int n = loadFile(masterPath, registry);
-        if (n > 0)
-            total += n;
+    std::error_code ec;
+    if (const std::filesystem::path master = dir / "mna-registry.json"; std::filesystem::exists(master, ec)) {
+        total += std::max(load_file(master, registry), 0);
     }
 
-    // 2. Load drop-in files from mna-registry.d/
-    QDir dropInDir(registryDir + QStringLiteral("/mna-registry.d"));
-    if (dropInDir.exists()) {
-        QStringList filters;
-        filters << QStringLiteral("*.json");
-        QStringList files = dropInDir.entryList(filters, QDir::Files, QDir::Name);
-        for (const QString& fileName : files) {
-            int n = loadFile(dropInDir.absoluteFilePath(fileName), registry);
-            if (n > 0)
-                total += n;
+    std::vector<std::filesystem::path> dropIns;
+    for (const auto& entry : std::filesystem::directory_iterator(dir / "mna-registry.d", ec)) {
+        if (entry.is_regular_file(ec) && entry.path().extension() == ".json") {
+            dropIns.push_back(entry.path());
         }
     }
-
+    std::ranges::sort(dropIns);
+    for (const std::filesystem::path& file : dropIns) {
+        total += std::max(load_file(file, registry), 0);
+    }
     return total;
 }
 
 //=============================================================================================================
 
-bool MnaRegistryLoader::saveFile(const QString& path,
-                                 const QString& provider,
-                                 const MnaOpRegistry& registry)
+bool MnaRegistryLoader::save_file(const std::filesystem::path& path, std::string_view provider, const MnaOpRegistry& registry)
 {
-    QJsonObject root;
-    root[QLatin1String("mna_registry_version")] = QStringLiteral("1.0");
-    root[QLatin1String("provider")] = provider;
+    JsonObject root;
+    root["mna_registry_version"] = "1.0";
+    root["provider"] = provider;
+    JsonArray ops;
+    for (const std::string& op : registry.registered_ops()) {
+        ops.push_back(opToJson(registry.schema(op)));
+    }
+    root["ops"] = std::move(ops);
 
-    QJsonArray ops;
-    const QStringList opTypes = registry.registeredOps();
-    for (const QString& opType : opTypes)
-        ops.append(opToJson(registry.schema(opType)));
-    root[QLatin1String("ops")] = ops;
-
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly)) {
-        mne::Log::warning("MnaRegistryLoader: Cannot write {}", path.toStdString());
+    if (!write_text_file(path, JsonDocument(root).to_json(JsonDocument::Indented))) {
+        Log::warning("MnaRegistryLoader: Cannot write {}", utf8_from_path(path));
         return false;
     }
-
-    file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
-    file.close();
     return true;
 }

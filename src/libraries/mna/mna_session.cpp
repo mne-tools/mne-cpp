@@ -10,8 +10,8 @@
  * @brief    JSON and CBOR codecs for @ref MnaSession — ordered @ref MnaRecording list plus opaque id and forward-compatible @c extras.
  *
  * Implementation mirrors the rest of the project tree: each
- * recording is serialised through @ref MnaRecording::toJson /
- * @c toCbor, ordering is preserved to keep run numbering stable,
+ * recording is serialised through @ref MnaRecording::to_json /
+ * @c to_cbor, ordering is preserved to keep run numbering stable,
  * and any unknown sidecar metadata supplied by newer tooling is
  * captured into @c extras on read and re-emitted on write so the
  * round-trip stays lossless across mne_mna versions.
@@ -23,8 +23,7 @@
 
 #include "mna_session.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -33,80 +32,65 @@
 using namespace mne;
 
 //=============================================================================================================
-// DEFINE METHODS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-QJsonObject MnaSession::toJson() const
+namespace
 {
-    QJsonObject json = extras;
-    json[QLatin1String("id")] = id;
 
-    QJsonArray recsArr;
-    for (const MnaRecording& r : recordings) {
-        recsArr.append(r.toJson());
-    }
-    json[QLatin1String("recordings")] = recsArr;
+/** @return The JSON form without the recordings, which differ between JSON and CBOR. */
+JsonObject metadata(const MnaSession& item)
+{
+    JsonObject json = item.extras;
+    json["id"] = item.id;
+    return json;
+}
 
+/** @return The session described by @p json, without the recordings. */
+MnaSession from_metadata(const JsonObject& json)
+{
+    MnaSession item;
+    item.id = json["id"].to_std_string();
+    item.extras = json.without({"id", "recordings"});
+    return item;
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+JsonObject MnaSession::to_json() const
+{
+    JsonObject json = metadata(*this);
+    json["recordings"] = detail::to_json_array(recordings);
     return json;
 }
 
 //=============================================================================================================
 
-MnaSession MnaSession::fromJson(const QJsonObject& json)
+MnaSession MnaSession::from_json(const JsonObject& json)
 {
-    MnaSession session;
-    session.id = json[QLatin1String("id")].toString();
-
-    const QJsonArray recsArr = json[QLatin1String("recordings")].toArray();
-    for (const QJsonValue& v : recsArr) {
-        session.recordings.append(MnaRecording::fromJson(v.toObject()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("recordings")};
-    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            session.extras.insert(it.key(), it.value());
-    }
-
-    return session;
+    MnaSession item = from_metadata(json);
+    item.recordings = detail::from_json_array<MnaRecording>(json["recordings"]);
+    return item;
 }
 
 //=============================================================================================================
 
-QCborMap MnaSession::toCbor() const
+CborMap MnaSession::to_cbor() const
 {
-    QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("id")] = id;
-
-    QCborArray recsArr;
-    for (const MnaRecording& r : recordings) {
-        recsArr.append(r.toCbor());
-    }
-    cbor[QLatin1String("recordings")] = recsArr;
-
+    CborMap cbor = CborMap::from_json_object(metadata(*this));
+    cbor.insert("recordings", detail::to_cbor_array(recordings));
     return cbor;
 }
 
 //=============================================================================================================
 
-MnaSession MnaSession::fromCbor(const QCborMap& cbor)
+MnaSession MnaSession::from_cbor(const CborMap& cbor)
 {
-    MnaSession session;
-    session.id = cbor[QLatin1String("id")].toString();
-
-    const QCborArray recsArr = cbor[QLatin1String("recordings")].toArray();
-    for (const QCborValue& v : recsArr) {
-        session.recordings.append(MnaRecording::fromCbor(v.toMap()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("recordings")};
-    QJsonObject cborJson = cbor.toJsonObject();
-    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            session.extras.insert(it.key(), it.value());
-    }
-
-    return session;
+    MnaSession item = from_metadata(cbor.to_json_object({"recordings"}));
+    item.recordings = detail::from_cbor_array<MnaRecording>(cbor["recordings"]);
+    return item;
 }

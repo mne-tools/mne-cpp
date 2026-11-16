@@ -19,9 +19,6 @@
     },
     "lsl": {
       "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
-    },
-    "mna": {
-      "JSON/CBOR": "Project files are JSON and CBOR."
     }
   },
   "ceilings": {
@@ -175,11 +172,9 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1623,
-      "public_header_includes": 84,
-      "modules": [
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "mne": {
       "tokens": 225,

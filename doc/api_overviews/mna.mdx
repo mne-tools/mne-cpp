@@ -5,13 +5,13 @@ sidebar_label: "MNA"
 
 # MNA Library API
 
-The `mne_mna` library (`mne_mna` namespace) implements the MNA graph-execution engine — a framework for defining, validating, serializing, and executing MEG/EEG analysis pipelines as directed acyclic graphs (DAGs). It is the runtime behind the [MNA project format](/docs/manual/mna-format).
+The `mne_mna` library (namespace `mne`) implements the MNA graph-execution engine — a framework for defining, validating, serializing, and executing MEG/EEG analysis pipelines as directed acyclic graphs (DAGs). It is the runtime behind the [MNA project format](/docs/manual/mna-format).
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_mna)
 ```
 
-Dependencies: `mne_base`, Qt6::Core, Eigen3.
+Dependencies: `mne_base` only. The library and its headers use no Qt.
 
 ## Class Inventory
 
@@ -30,24 +30,28 @@ Dependencies: `mne_base`, Qt6::Core, Eigen3.
 | `MnaOpSchemaAttr` | `mna/mna_op_schema.h` | Attribute descriptor within an operation schema |
 | `MnaOpRegistry` | `mna/mna_op_registry.h` | Singleton catalog of registered operation schemas and implementations |
 | `MnaRegistryLoader` | `mna/mna_registry_loader.h` | Loads operator schemas from declarative JSON manifest files |
-| `MnaGraphExecutor` | `mna/mna_graph_executor.h` | Executes the graph in topological order (batch, incremental, single-node) |
+| `MnaGraphExecutor` | `mna/mna_graph_executor.h` | Executes the graph in topological order (batch, incremental, single-node, stream) |
 | `MnaParamTree` | `mna/mna_param_tree.h` | Hierarchical parameter store with formula-driven bindings |
 | `MnaParamBinding` | `mna/mna_param_binding.h` | Dynamic parameter binding (target path → expression + trigger) |
 | `MnaVerification` | `mna/mna_verification.h` | Container for verification checks, results, and provenance |
 | `MnaVerificationCheck` | `mna/mna_verification.h` | Declarative pre/post-condition check |
 | `MnaVerificationResult` | `mna/mna_verification.h` | Outcome of evaluating a verification check |
+| `MnaProvenance` | `mna/mna_verification.h` | Inputs, attributes, build and host of a node's last run |
 | `MnaScript` | `mna/mna_script.h` | Inline script definition (Python, shell, R, MATLAB, Julia) |
 | `MnaIO` | `mna/mna_io.h` | Read/write MNA project files (`.mna` JSON, `.mnx` CBOR) |
 
-### Enumerations (`mna/mna_types.h`)
+### Types (`mna/mna_types.h`)
 
-| Enum | Values |
+| Type | Values |
 |---|---|
 | `MnaFileRole` | `Raw`, `Forward`, `Inverse`, `Covariance`, `SourceEstimate`, `Bem`, `Surface`, `Annotation`, `Digitizer`, `Transform`, `SourceSpace`, `Evoked`, `Custom` |
 | `MnaContainerFormat` | `Json`, `Cbor` |
 | `MnaDataKind` | `FiffRaw`, `Forward`, `Inverse`, `Covariance`, `SourceEstimate`, `Epochs`, `Evoked`, `Matrix`, `Volume`, `Surface`, `Bem`, `Annotation`, `Label`, `RealTimeStream`, `Custom` |
 | `MnaPortDir` | `Input`, `Output` |
 | `MnaNodeExecMode` | `Batch`, `Stream`, `Ipc`, `Script` |
+| `MnaValues` | `std::map<std::string, std::any, std::less<>>`: runtime port values, read with `std::any_cast` |
+
+`to_string(role)`, `file_role_from_string()`, `to_string(kind)`, `data_kind_key(kind)` and `data_kind_from_string()` convert the enumerations to and from their file spellings.
 
 ---
 
@@ -60,90 +64,83 @@ Top-level container. Holds subjects, the processing pipeline, and project metada
 ```cpp
 #include <mna/mna_project.h>
 
-// Create a project
-mne::MnaProject project;
+mne::MnaProject project;           // mna_version, created and modified are set
 project.name        = "audvis_dspm";
 project.description = "dSPM source localization";
-project.mnaVersion  = MnaProject::CURRENT_SCHEMA_VERSION;  // "1.0"
-project.created     = QDateTime::currentDateTimeUtc();
 ```
 
 | Member | Type | Description |
 |---|---|---|
-| `name` | `QString` | Project name |
-| `description` | `QString` | Project description |
-| `mnaVersion` | `QString` | MNA schema version (current: `"1.0"`) |
-| `created` | `QDateTime` | Creation timestamp |
-| `modified` | `QDateTime` | Last modification timestamp |
-| `subjects` | `QList<MnaSubject>` | Subjects in the project |
-| `pipeline` | `QList<MnaNode>` | Processing pipeline nodes |
+| `name` | `std::string` | Project name |
+| `description` | `std::string` | Project description |
+| `mna_version` | `std::string` | MNA schema version (current: `CURRENT_SCHEMA_VERSION`, `"1.0"`) |
+| `created` | `std::optional<UtcTime>` | Creation timestamp |
+| `modified` | `std::optional<UtcTime>` | Last modification timestamp |
+| `subjects` | `std::vector<MnaSubject>` | Subjects in the project |
+| `pipeline` | `std::vector<MnaNode>` | Processing pipeline nodes |
+| `extras` | `JsonObject` | Unknown keys, kept for a lossless round trip |
 
 | Method | Description |
 |---|---|
-| `toJson()` / `fromJson()` | JSON serialization |
-| `toCbor()` / `fromCbor()` | CBOR serialization |
-| `readFromFile(path)` | Read from `.mna` or `.mnx` (delegates to `MnaIO`) |
-| `writeToFile(path)` | Write to `.mna` or `.mnx` (delegates to `MnaIO`) |
+| `to_json()` / `from_json()` | JSON serialization |
+| `to_cbor()` / `from_cbor()` | CBOR serialization |
+| `read(path)` | Read from `.mna` or `.mnx`; returns `Expected<MnaProject>` |
+| `write(path)` | Write to `.mna` or `.mnx`; returns `Expected<void>` |
 
 ### MnaSubject
 
 ```cpp
 mne::MnaSubject subject;
-subject.id = "sample";
-subject.freeSurferDir = "subjects/sample";
+subject.id             = "sample";
+subject.freesurfer_dir = "subjects/sample";
 ```
 
 | Member | Type | Description |
 |---|---|---|
-| `id` | `QString` | Subject identifier |
-| `freeSurferDir` | `QString` | Relative path to FreeSurfer directory |
-| `sessions` | `QList<MnaSession>` | Sessions for this subject |
+| `id` | `std::string` | Subject identifier |
+| `freesurfer_dir` | `std::string` | Relative path to FreeSurfer directory |
+| `sessions` | `std::vector<MnaSession>` | Sessions for this subject |
 
 ### MnaSession
 
-```cpp
-mne::MnaSession session;
-session.id = "01";
-```
-
 | Member | Type | Description |
 |---|---|---|
-| `id` | `QString` | Session identifier |
-| `recordings` | `QList<MnaRecording>` | Recordings in this session |
+| `id` | `std::string` | Session identifier |
+| `recordings` | `std::vector<MnaRecording>` | Recordings in this session |
 
 ### MnaRecording
 
-```cpp
-mne::MnaRecording rec;
-rec.id = "audvis";
-rec.files.append(rawFileRef);
-```
-
 | Member | Type | Description |
 |---|---|---|
-| `id` | `QString` | Recording identifier |
-| `files` | `QList<MnaFileRef>` | Files belonging to this recording |
+| `id` | `std::string` | Recording identifier |
+| `files` | `std::vector<MnaFileRef>` | Files belonging to this recording |
 
 ### MnaFileRef
 
 ```cpp
 mne::MnaFileRef ref;
-ref.role      = MnaFileRole::Raw;
-ref.path      = "data/sample_audvis_raw.fif";
-ref.format    = "fiff";
-ref.sha256    = "a1b2c3...";
-ref.sizeBytes = 123456;
+ref.role   = mne::MnaFileRole::Raw;
+ref.path   = "data/sample_audvis_raw.fif";
+ref.format = "fiff";
+if (auto embedded = ref.embed("/data/sample_audvis_raw.fif"); !embedded) {
+    std::println(stderr, "{}", embedded.error().what());
+}
 ```
 
 | Member | Type | Description |
 |---|---|---|
 | `role` | `MnaFileRole` | Semantic role of the file |
-| `path` | `QString` | Relative POSIX path from project root |
-| `sha256` | `QString` | SHA-256 hash of file contents |
-| `format` | `QString` | File format string (e.g., `"fiff"`, `"stc"`, `"mgh"`) |
-| `sizeBytes` | `qint64` | File size in bytes |
+| `path` | `std::string` | Relative POSIX path from project root |
+| `sha256` | `std::string` | SHA-256 hash of file contents |
+| `format` | `std::string` | File format string (e.g., `"fiff"`, `"stc"`, `"mgh"`) |
+| `size_bytes` | `std::int64_t` | File size in bytes |
 | `embedded` | `bool` | Whether data is embedded in the MNA container |
-| `data` | `QByteArray` | Embedded file data (only when `embedded == true`) |
+| `data` | `std::vector<std::byte>` | Embedded file data (only when `embedded == true`) |
+
+| Method | Description |
+|---|---|
+| `embed(file)` | Read a file into `data`, set `size_bytes` and `embedded` |
+| `extract(file)` | Write `data` to a file |
 
 ---
 
@@ -157,39 +154,39 @@ The graph container manages nodes, ports, connections, and validation:
 #include <mna/mna_graph.h>
 
 mne::MnaGraph graph;
-graph.addNode(readRawNode);
-graph.addNode(filterNode);
-graph.addNode(inverseNode);
+graph.add_node(read_raw);
+graph.add_node(filter);
+graph.add_node(inverse);
 
-// Connect ports
-graph.connect("read_raw_01", "raw",
-              "filter_01",   "raw_input");
-graph.connect("filter_01",   "filtered_raw",
-              "inverse_01",  "raw_input");
+graph.connect("read_raw_01", "raw", "filter_01", "raw_input");
+graph.connect("filter_01", "filtered_raw", "inverse_01", "raw_input");
 
-// Validate
-QStringList errors;
-bool valid = graph.validate(&errors);
+for (const std::string& error : graph.validate()) {
+    std::println(stderr, "{}", error);
+}
 ```
 
 | Method | Description |
 |---|---|
-| `addNode(node)` | Add a node to the graph |
-| `removeNode(nodeId)` | Remove a node by ID |
-| `node(nodeId)` | Access a node by ID (mutable/const) |
+| `add_node(node)` | Add a node to the graph |
+| `remove_node(node_id)` | Remove a node by ID |
+| `node(node_id)` | Access a node by ID; throws `std::out_of_range` for an unknown ID |
+| `find_node(node_id)` | Pointer to a node, or `nullptr` |
 | `nodes()` | Access the full node list |
-| `hasNode(nodeId)` | Check if a node exists |
-| `connect(src, srcPort, dst, dstPort)` | Connect an output port to an input port |
-| `validate(errors)` | Validate acyclicity, port connections, data-kind compatibility, and schema compliance |
-| `topologicalOrder()` | Return nodes in execution order |
-| `toJson()` / `fromJson()` | JSON serialization |
-| `toCbor()` / `fromCbor()` | CBOR serialization |
+| `has_node(node_id)` | Check if a node exists |
+| `connect(src, src_port, dst, dst_port)` | Connect an output port to an input port |
+| `validate()` | Problems with acyclicity, port connections, data kinds and schemas; empty if valid |
+| `topological_sort()` | Node IDs in execution order |
+| `upstream_nodes(id)` / `downstream_nodes(id)` | Nodes a node depends on / that depend on it |
+| `dirty_nodes()` | Nodes that need re-execution |
+| `to_json()` / `from_json()` | JSON serialization |
+| `to_cbor()` / `from_cbor()` | CBOR serialization |
 
 | Member | Type | Description |
 |---|---|---|
-| `graphInputs` | `QList<MnaPort>` | Named, typed graph-level entry points |
-| `graphOutputs` | `QList<MnaPort>` | Named, typed graph-level exit points |
-| `paramTree` | `MnaParamTree` | Hierarchical parameter store |
+| `graph_inputs` | `std::vector<MnaPort>` | Named, typed graph-level entry points |
+| `graph_outputs` | `std::vector<MnaPort>` | Named, typed graph-level exit points |
+| `param_tree` | `MnaParamTree` | Hierarchical parameter store |
 
 ### MnaNode
 
@@ -197,66 +194,46 @@ A single processing step in the graph:
 
 ```cpp
 mne::MnaNode node;
-node.id      = "filter_01";
-node.opType  = "dsp.band_pass_filter";
+node.id         = "filter_01";
+node.op_type    = "dsp.band_pass_filter";
 node.attributes = {{"low_freq", 1.0}, {"high_freq", 40.0}};
-node.execMode = MnaNodeExecMode::Batch;
-
-// Add ports
-MnaPort inPort;
-inPort.name      = "raw_input";
-inPort.dataKind  = MnaDataKind::FiffRaw;
-inPort.direction = MnaPortDir::Input;
-node.inputs.append(inPort);
-
-MnaPort outPort;
-outPort.name      = "filtered_raw";
-outPort.dataKind  = MnaDataKind::FiffRaw;
-outPort.direction = MnaPortDir::Output;
-node.outputs.append(outPort);
+node.inputs.push_back({.name = "raw_input", .data_kind = mne::MnaDataKind::FiffRaw});
+node.outputs.push_back({.name = "filtered_raw", .data_kind = mne::MnaDataKind::FiffRaw,
+                        .direction = mne::MnaPortDir::Output});
 ```
 
 | Member | Type | Description |
 |---|---|---|
-| `id` | `QString` | Unique node identifier |
-| `opType` | `QString` | Operation type (looked up in `MnaOpRegistry`) |
-| `attributes` | `QVariantMap` | Operation parameters |
-| `inputs` | `QList<MnaPort>` | Input ports |
-| `outputs` | `QList<MnaPort>` | Output ports |
-| `execMode` | `MnaNodeExecMode` | Execution mode (`Batch`, `Stream`, `Ipc`, `Script`) |
-| `ipcCommand` | `QString` | External executable (for `Ipc` mode) |
-| `ipcArgs` | `QStringList` | Command-line arguments with `{{placeholder}}` tokens |
-| `ipcWorkDir` | `QString` | Working directory for external process |
-| `ipcTransport` | `QString` | `"stdio"`, `"tcp"`, `"shm"`, `"file"` |
+| `id` | `std::string` | Unique node identifier |
+| `op_type` | `std::string` | Operation type (looked up in `MnaOpRegistry`) |
+| `attributes` | `JsonObject` | Operation parameters |
+| `inputs` | `std::vector<MnaPort>` | Input ports |
+| `outputs` | `std::vector<MnaPort>` | Output ports |
+| `exec_mode` | `MnaNodeExecMode` | Execution mode (`Batch`, `Stream`, `Ipc`, `Script`) |
+| `ipc_command` | `std::string` | External executable (for `Ipc` mode) |
+| `ipc_args` | `StringList` | Command-line arguments with `{{placeholder}}` tokens |
+| `ipc_work_dir` | `std::string` | Working directory for external process |
+| `ipc_transport` | `std::string` | `"stdio"`, `"tcp"`, `"shm"`, `"file"` |
 | `script` | `MnaScript` | Inline source code (for `Script` mode) |
 | `verification` | `MnaVerification` | Pre/post-condition checks and provenance |
-| `toolVersion` | `QString` | Version of tool that last executed this node |
-| `executedAt` | `QDateTime` | Timestamp of last execution |
+| `tool_version` | `std::string` | Version of tool that last executed this node |
+| `executed_at` | `std::optional<UtcTime>` | Timestamp of last execution |
 | `dirty` | `bool` | Whether the node needs re-execution |
 
 ### MnaPort
 
-```cpp
-mne::MnaPort port;
-port.name           = "source_estimate";
-port.dataKind       = MnaDataKind::SourceEstimate;
-port.direction      = MnaPortDir::Output;
-port.sourceNodeId   = "";      // Empty for output ports
-port.sourcePortName = "";
-```
-
 | Member | Type | Description |
 |---|---|---|
-| `name` | `QString` | Port name (unique within a node) |
-| `dataKind` | `MnaDataKind` | Type of data flowing through |
+| `name` | `std::string` | Port name (unique within a node) |
+| `data_kind` | `MnaDataKind` | Type of data flowing through |
 | `direction` | `MnaPortDir` | `Input` or `Output` |
-| `sourceNodeId` | `QString` | Upstream node ID (input ports only) |
-| `sourcePortName` | `QString` | Upstream output port name |
-| `streamProtocol` | `QString` | Real-time protocol: `"fiff-rt"`, `"lsl"`, `"tcp"`, `"shm"` |
-| `streamEndpoint` | `QString` | Protocol-specific address |
-| `streamBufferMs` | `int` | Ring-buffer length in ms (0 = unbounded) |
-| `cachedResultPath` | `QString` | Path to cached result file |
-| `cachedResultHash` | `QString` | SHA-256 for cache invalidation |
+| `source_node_id` | `std::string` | Upstream node ID (input ports only) |
+| `source_port_name` | `std::string` | Upstream output port name |
+| `stream_protocol` | `std::string` | Real-time protocol: `"fiff-rt"`, `"lsl"`, `"tcp"`, `"shm"` |
+| `stream_endpoint` | `std::string` | Protocol-specific address |
+| `stream_buffer_ms` | `int` | Ring-buffer length in ms (0 = unbounded) |
+| `cached_result_path` | `std::string` | Path to cached result file |
+| `cached_result_hash` | `std::string` | SHA-256 for cache invalidation |
 
 ---
 
@@ -270,49 +247,39 @@ Declarative contract for an operation:
 #include <mna/mna_op_schema.h>
 
 mne::MnaOpSchema schema;
-schema.opType      = "dsp.band_pass_filter";
+schema.op_type     = "dsp.band_pass_filter";
 schema.version     = "2.2.0";
 schema.binding     = "internal";
 schema.category    = "preprocessing";
 schema.description = "Apply a band-pass FIR filter";
 schema.library     = "mne_dsp";
-
-MnaOpSchemaPort inPort;
-inPort.name     = "raw_input";
-inPort.dataKind = MnaDataKind::FiffRaw;
-inPort.required = true;
-schema.inputPorts.append(inPort);
-
-MnaOpSchemaAttr attr;
-attr.name         = "low_freq";
-attr.type         = QMetaType::Double;
-attr.required     = true;
-attr.description  = "Lower cutoff frequency in Hz";
-schema.attributes.append(attr);
+schema.input_ports.push_back({.name = "raw_input", .data_kind = mne::MnaDataKind::FiffRaw});
+schema.attributes.push_back({.name = "low_freq", .type = mne::MnaAttrType::Double, .required = true,
+                             .description = "Lower cutoff frequency in Hz"});
 ```
 
 | Method | Description |
 |---|---|
-| `validate(node, errors)` | Check if a node conforms to this schema |
+| `validate(node)` | Ways in which a node does not conform to this schema; empty if it does |
 
 ### MnaOpSchemaPort
 
 | Member | Type | Description |
 |---|---|---|
-| `name` | `QString` | Port name |
-| `dataKind` | `MnaDataKind` | Expected data kind |
+| `name` | `std::string` | Port name |
+| `data_kind` | `MnaDataKind` | Expected data kind |
 | `required` | `bool` | Must be connected? |
-| `description` | `QString` | Human-readable description |
+| `description` | `std::string` | Human-readable description |
 
 ### MnaOpSchemaAttr
 
 | Member | Type | Description |
 |---|---|---|
-| `name` | `QString` | Attribute key |
-| `type` | `QMetaType::Type` | Expected value type |
+| `name` | `std::string` | Attribute key |
+| `type` | `MnaAttrType` | Expected value type: `String`, `Double`, `Float`, `Int`, `Bool` |
 | `required` | `bool` | Must be set? |
-| `defaultValue` | `QVariant` | Default when not set |
-| `description` | `QString` | Human-readable description |
+| `default_value` | `JsonValue` | Default when not set; undefined if there is none |
+| `description` | `std::string` | Human-readable description |
 
 ### MnaOpRegistry
 
@@ -321,32 +288,30 @@ Singleton catalog of all registered operations:
 ```cpp
 #include <mna/mna_op_registry.h>
 
-auto& reg = mne::MnaOpRegistry::instance();
+auto& registry = mne::MnaOpRegistry::instance();
+registry.register_op(schema);
+registry.register_op_func("dsp.band_pass_filter",
+                          [](const mne::MnaValues& inputs, const mne::JsonObject& attributes) {
+                              mne::MnaValues outputs;
+                              // ... std::any_cast the inputs, compute, fill outputs
+                              return outputs;
+                          });
 
-// Register schema + implementation
-reg.registerOp(schema);
-reg.registerOpFunc("dsp.band_pass_filter", myFilterFunc);
-
-// Query
-QStringList allOps = reg.registeredOps();
-bool exists = reg.hasOp("inv.compute_mne");
-auto s = reg.schema("inv.compute_mne");
-auto f = reg.opFunc("inv.compute_mne");
-
-// Load from registry files
-reg.loadRegistryFiles();
+const bool exists = registry.has_op("inv.compute_mne");
+registry.load_registry_files();
 ```
 
 | Method | Description |
 |---|---|
 | `instance()` | Access the singleton |
-| `registerOp(schema)` | Register an operation schema |
-| `hasOp(opType)` | Check if an op type is registered |
-| `schema(opType)` | Get the schema for an op type |
-| `registeredOps()` | List all registered op type strings |
-| `registerOpFunc(opType, func)` | Register an implementation function |
-| `opFunc(opType)` | Get the implementation function |
-| `loadRegistryFiles()` | Load registry files from `resources/mna/` |
+| `register_op(schema)` | Register an operation schema |
+| `has_op(op_type)` | Check if an op type is registered |
+| `schema(op_type)` | The schema for an op type |
+| `registered_ops()` | All registered op type strings |
+| `register_op_func(op_type, func)` | Register an implementation (`OpFunc`) |
+| `op_func(op_type)` | The implementation function |
+| `load_registry_files()` | Load registry files from `resources/mna/` next to the executable |
+| `missing_ops(tools)` | Op types of the given tools that are not registered |
 
 ### MnaRegistryLoader
 
@@ -354,9 +319,9 @@ Loads operator schemas from declarative JSON manifest files:
 
 | Method | Description |
 |---|---|
-| `loadFile(path, registry)` | Load a single manifest file |
-| `loadDirectory(dir, registry)` | Load master manifest + drop-in files from `mna-registry.d/` |
-| `saveFile(path, registry)` | Serialize current registry to a JSON manifest |
+| `load_file(path, registry)` | Load a single manifest file |
+| `load_directory(dir, registry)` | Load master manifest + drop-in files from `mna-registry.d/` |
+| `save_file(path, provider, registry)` | Serialize current registry to a JSON manifest |
 
 ---
 
@@ -368,26 +333,25 @@ Loads operator schemas from declarative JSON manifest files:
 #include <mna/mna_graph_executor.h>
 
 // Full execution
-QVariantMap inputs = {{"raw_file", "/data/sample_audvis_raw.fif"}};
-auto ctx = mne::MnaGraphExecutor::execute(graph, inputs);
+auto context = mne::MnaGraphExecutor::execute(graph, {{"raw_file", std::string("/data/sample_audvis_raw.fif")}});
+if (!context.aborted_node.empty()) {
+    std::println(stderr, "stopped at {}", context.aborted_node);
+}
 
 // Access results
-QVariant stc = ctx.results["inverse_01::source_estimate"];
+const std::any& stc = context.results.at("inverse_01::source_estimate");
 
 // Incremental execution (only dirty nodes)
-auto ctx2 = MnaGraphExecutor::executeIncremental(graph, ctx);
-
-// Single-node execution (for testing)
-QVariantMap nodeInputs = {{"raw_input", rawData}};
-QVariantMap outputs = MnaGraphExecutor::executeNode(myNode, nodeInputs);
+mne::MnaGraphExecutor::execute_incremental(graph, context);
 ```
 
 | Method | Description |
 |---|---|
 | `execute(graph, inputs)` | Execute all nodes in topological order |
-| `executeIncremental(graph, ctx)` | Execute only dirty nodes and dependents |
-| `executeNode(node, inputs)` | Execute a single node |
-| `setProgressCallback(cb)` | Set a per-node progress callback |
+| `execute_incremental(graph, context)` | Execute only dirty nodes and their dependents |
+| `execute_node(node, inputs)` | Execute a single node |
+| `set_progress_callback(callback)` | Set a per-node progress callback |
+| `start_stream(graph, factory)` / `stop_stream(context)` | Run `Stream` nodes as live plugins created by the factory |
 
 #### Context
 
@@ -395,8 +359,9 @@ The execution context (`MnaGraphExecutor::Context`) holds:
 
 | Member | Type | Description |
 |---|---|---|
-| `results` | `QMap<QString, QVariant>` | `nodeId::portName` → data |
-| `graphInputs` | `QVariantMap` | Graph-level inputs populated before execution |
+| `results` | `MnaValues` | `nodeId::portName` → data |
+| `graph_inputs` | `MnaValues` | Graph-level inputs populated before execution |
+| `aborted_node` | `std::string` | Node whose failed `"error"` check stopped the run; empty if it ran to the end |
 
 ---
 
@@ -408,45 +373,46 @@ The execution context (`MnaGraphExecutor::Context`) holds:
 #include <mna/mna_param_tree.h>
 
 mne::MnaParamTree tree;
-tree.setParam("filter_01/low_freq", 1.0);
-tree.setParam("filter_01/high_freq", 40.0);
+tree.set_param("filter_01/low_freq", 1.0);
+tree.set_param("filter_01/high_freq", 40.0);
 
-QVariant val = tree.param("filter_01/low_freq");  // → 1.0
-bool has = tree.hasParam("filter_01/low_freq");    // → true
-QStringList paths = tree.allPaths();
+const double low = tree.param("filter_01/low_freq").to_double();  // 1.0
+const bool has = tree.has_param("filter_01/low_freq");            // true
 ```
 
 | Method | Description |
 |---|---|
-| `setParam(path, value)` | Set a parameter value |
-| `param(path)` | Get a parameter value |
-| `hasParam(path)` | Check if a parameter exists |
-| `allPaths()` | List all parameter paths |
-| `addBinding(binding)` | Add a dynamic binding |
-| `removeBinding(targetPath)` | Remove a binding |
-| `bindings()` | List all bindings |
-| `hasBinding(targetPath)` | Check if a binding exists |
-| `evaluate(results)` | Evaluate all triggered bindings; returns changed paths |
-| `evaluateExpression(expr, results)` | Evaluate a single expression |
+| `set_param(path, value)` | Set a parameter value |
+| `param(path)` | A parameter value; undefined if not set |
+| `has_param(path)` | Check if a parameter exists |
+| `all_paths()` | All parameter paths |
+| `add_binding(binding)` | Add a dynamic binding |
+| `remove_binding(target_path)` | Remove a binding |
+| `bindings()` | All bindings |
+| `has_binding(target_path)` | Check if a binding exists |
+| `evaluate(results)` | Evaluate all `on_change` bindings; returns the changed paths |
+| `evaluate_expression(expr, results)` | Evaluate a single expression; undefined if it cannot be evaluated |
+
+Expressions support numbers, `'text'`, parameter paths, `ref('path')`, `clamp`, `scale`, `threshold`, `lerp`, `+ - * /`, parentheses and comparisons.
 
 ### MnaParamBinding
 
 ```cpp
 mne::MnaParamBinding binding;
-binding.targetPath   = "inverse_01/lambda";
-binding.expression   = "1.0 / pow(ref('inverse_01/snr'), 2)";
+binding.target_path  = "inverse_01/lambda2";
+binding.expression   = "1 / (ref('inverse_01/snr') * ref('inverse_01/snr'))";
 binding.trigger      = "on_change";
 binding.dependencies = {"inverse_01/snr"};
-tree.addBinding(binding);
+tree.add_binding(binding);
 ```
 
 | Member | Type | Description |
 |---|---|---|
-| `targetPath` | `QString` | Parameter to control: `"nodeId/attrKey"` |
-| `expression` | `QString` | Formula string |
-| `trigger` | `QString` | `"on_change"`, `"periodic"`, `"manual"` |
-| `periodMs` | `int` | Period for periodic triggers (ms) |
-| `dependencies` | `QStringList` | Paths this binding reads from |
+| `target_path` | `std::string` | Parameter to control: `"nodeId/attrKey"` |
+| `expression` | `std::string` | Formula string |
+| `trigger` | `std::string` | `"on_change"`, `"periodic"`, `"manual"` |
+| `period_ms` | `int` | Period for periodic triggers (ms) |
+| `dependencies` | `StringList` | Paths this binding reads from |
 
 ---
 
@@ -454,7 +420,7 @@ tree.addBinding(binding);
 
 ### MnaVerification
 
-Container for verification checks, results, and provenance attached to each `MnaNode`.
+Container for verification checks, results (`pre_results`, `post_results`), and provenance attached to each `MnaNode`.
 
 ### MnaVerificationCheck
 
@@ -462,13 +428,13 @@ Declarative pre- or post-condition evaluated by the executor:
 
 | Member | Type | Description |
 |---|---|---|
-| `id` | `QString` | Unique check ID within the node |
-| `description` | `QString` | Human-readable description |
-| `phase` | `QString` | `"pre"` or `"post"` |
-| `expression` | `QString` | Evaluable expression |
+| `id` | `std::string` | Unique check ID within the node |
+| `description` | `std::string` | Human-readable description |
+| `phase` | `std::string` | `"pre"` or `"post"` |
+| `expression` | `std::string` | Evaluable expression |
 | `script` | `MnaScript` | Optional script for complex checks |
-| `severity` | `QString` | `"error"`, `"warning"`, or `"info"` |
-| `onFail` | `QString` | Remediation hint |
+| `severity` | `std::string` | `"error"`, `"warning"`, or `"info"` |
+| `on_fail` | `std::string` | Remediation hint |
 
 ### MnaVerificationResult
 
@@ -476,10 +442,23 @@ Outcome of evaluating a single check:
 
 | Member | Type | Description |
 |---|---|---|
-| `checkId` | `QString` | References `MnaVerificationCheck::id` |
+| `check_id` | `std::string` | References `MnaVerificationCheck::id` |
 | `passed` | `bool` | Whether the check passed |
-| `message` | `QString` | Output or error message |
-| `timestamp` | `QDateTime` | When the check was evaluated |
+| `severity` | `std::string` | Echoed from the check |
+| `message` | `std::string` | Output or error message |
+| `actual_value` | `JsonValue` | The evaluated expression result |
+| `evaluated_at` | `std::optional<UtcTime>` | When the check was evaluated |
+
+### MnaProvenance
+
+| Member | Type | Description |
+|---|---|---|
+| `input_hashes` | `std::map<std::string, std::string>` | Port name → SHA-256 of the input |
+| `resolved_attributes` | `JsonObject` | Attributes after parameter-tree evaluation |
+| `mne_cpp_version`, `compiler_info`, `os_info`, `host_name` | `std::string` | Build and host of the run |
+| `external_tool_version` | `std::string` | Tool version for `Ipc`/`Script` nodes |
+| `started_at`, `finished_at` | `std::optional<UtcTime>` | Run start and end |
+| `wall_time_ms`, `peak_memory_bytes`, `random_seed` | `std::int64_t` | Run statistics |
 
 ---
 
@@ -498,13 +477,13 @@ script.code        = "import mne\nraw = mne.io.read_raw_fif('{{raw_path}}')\nraw
 
 | Member | Type | Description |
 |---|---|---|
-| `language` | `QString` | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
-| `interpreter` | `QString` | Interpreter command; empty = auto-detect |
-| `interpreterArgs` | `QStringList` | Extra args before the script file |
-| `code` | `QString` | The inline source code |
-| `sourceUri` | `QString` | Optional authoring-time reference |
-| `codeSha256` | `QString` | SHA-256 of `code` for integrity |
-| `keepTempFile` | `bool` | Preserve temp script file after execution |
+| `language` | `std::string` | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
+| `interpreter` | `std::string` | Interpreter command; empty = auto-detect |
+| `interpreter_args` | `StringList` | Extra args before the script file |
+| `code` | `std::string` | The inline source code |
+| `source_uri` | `std::string` | Optional authoring-time reference |
+| `code_sha256` | `std::string` | SHA-256 of `code` for integrity |
+| `keep_temp_file` | `bool` | Preserve temp script file after execution |
 
 ---
 
@@ -517,20 +496,21 @@ Read/write MNA project files. Dispatches by file extension:
 ```cpp
 #include <mna/mna_io.h>
 
-// Read
-mne::MnaProject project = mne::MnaIO::read("pipeline.mna");
+auto project = mne::MnaIO::read("pipeline.mna");
+if (!project) {
+    std::println(stderr, "{}", project.error().what());
+    return 1;
+}
 
-// Write JSON
-mne::MnaIO::write(project, "pipeline.mna");
-
-// Write CBOR (compact binary)
-mne::MnaIO::write(project, "pipeline.mnx");
+auto json = mne::MnaIO::write(*project, "pipeline.mna");   // JSON
+auto cbor = mne::MnaIO::write(*project, "pipeline.mnx");   // compact binary
 ```
 
 | Method | Description |
 |---|---|
-| `read(path)` | Read an MNA project from `.mna` (JSON) or `.mnx` (CBOR) |
-| `write(project, path)` | Write an MNA project to `.mna` or `.mnx` |
+| `read(path)` | Read an MNA project from `.mna` (JSON) or `.mnx` (CBOR); returns `Expected<MnaProject>` |
+| `write(project, path)` | Write an MNA project to `.mna` or `.mnx`; returns `Expected<void>` |
+| `to_mnx(project)` | The `.mnx` bytes of a project, without writing a file |
 
 ---
 
@@ -552,7 +532,7 @@ The MNA registry ships with built-in operations covering common workflows:
 | `inv` | `inv.compute_mne` | Compute MNE/dSPM/sLORETA inverse |
 | `inv` | `inv.dipole_fit` | Sequential dipole fitting |
 
-Custom operations can be registered at runtime via `MnaOpRegistry::registerOp()` and `MnaOpRegistry::registerOpFunc()`.
+Custom operations can be registered at runtime via `MnaOpRegistry::register_op()` and `MnaOpRegistry::register_op_func()`.
 
 ## MNE-Python Cross-Reference
 

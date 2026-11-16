@@ -25,8 +25,7 @@
 
 #include "mna_param_binding.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,84 +37,44 @@ using namespace mne;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QJsonObject MnaParamBinding::toJson() const
+JsonObject MnaParamBinding::to_json() const
 {
-    QJsonObject json;
-    json[QStringLiteral("target")] = targetPath;
-    json[QStringLiteral("expression")] = expression;
-    json[QStringLiteral("trigger")] = trigger;
-
-    if (trigger == QStringLiteral("periodic") && periodMs > 0) {
-        json[QStringLiteral("period_ms")] = periodMs;
+    JsonObject json;
+    json["target"] = target_path;
+    json["expression"] = expression;
+    json["trigger"] = trigger;
+    if (trigger == "periodic" && period_ms > 0) {
+        json["period_ms"] = period_ms;
     }
-
-    if (!dependencies.isEmpty()) {
-        QJsonArray arr;
-        for (const QString& dep : dependencies) {
-            arr.append(dep);
-        }
-        json[QStringLiteral("dependencies")] = arr;
+    if (!dependencies.empty()) {
+        json["dependencies"] = JsonArray::from_string_list(dependencies);
     }
-
     return json;
 }
 
 //=============================================================================================================
 
-MnaParamBinding MnaParamBinding::fromJson(const QJsonObject& json)
+MnaParamBinding MnaParamBinding::from_json(const JsonObject& json)
 {
     MnaParamBinding b;
-    b.targetPath = json.value(QStringLiteral("target")).toString();
-    b.expression = json.value(QStringLiteral("expression")).toString();
-    b.trigger = json.value(QStringLiteral("trigger")).toString();
-    b.periodMs = json.value(QStringLiteral("period_ms")).toInt(0);
-
-    const QJsonArray arr = json.value(QStringLiteral("dependencies")).toArray();
-    for (const QJsonValue& v : arr) {
-        b.dependencies.append(v.toString());
-    }
-
+    b.target_path = json["target"].to_std_string();
+    b.expression = json["expression"].to_std_string();
+    b.trigger = json["trigger"].to_std_string();
+    b.period_ms = json["period_ms"].to_int(0);
+    b.dependencies = json["dependencies"].to_array().to_string_list();
     return b;
 }
 
 //=============================================================================================================
 
-QCborMap MnaParamBinding::toCbor() const
+CborMap MnaParamBinding::to_cbor() const
 {
-    QCborMap cbor;
-    cbor.insert(QStringLiteral("target"), targetPath);
-    cbor.insert(QStringLiteral("expression"), expression);
-    cbor.insert(QStringLiteral("trigger"), trigger);
-
-    if (trigger == QStringLiteral("periodic") && periodMs > 0) {
-        cbor.insert(QStringLiteral("period_ms"), periodMs);
-    }
-
-    if (!dependencies.isEmpty()) {
-        QCborArray arr;
-        for (const QString& dep : dependencies) {
-            arr.append(dep);
-        }
-        cbor.insert(QStringLiteral("dependencies"), arr);
-    }
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaParamBinding MnaParamBinding::fromCbor(const QCborMap& cbor)
+MnaParamBinding MnaParamBinding::from_cbor(const CborMap& cbor)
 {
-    MnaParamBinding b;
-    b.targetPath = cbor.value(QStringLiteral("target")).toString();
-    b.expression = cbor.value(QStringLiteral("expression")).toString();
-    b.trigger = cbor.value(QStringLiteral("trigger")).toString();
-    b.periodMs = static_cast<int>(cbor.value(QStringLiteral("period_ms")).toInteger(0));
-
-    const QCborArray arr = cbor.value(QStringLiteral("dependencies")).toArray();
-    for (const QCborValue& v : arr) {
-        b.dependencies.append(v.toString());
-    }
-
-    return b;
+    return from_json(cbor.to_json_object());
 }

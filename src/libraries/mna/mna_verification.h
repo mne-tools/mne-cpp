@@ -38,19 +38,19 @@
 #include "mna_global.h"
 #include "mna_script.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QVariant>
-#include <QVariantMap>
-#include <QMap>
-#include <QList>
-#include <QDateTime>
-#include <QJsonObject>
-#include <QCborMap>
+#include <cstdint>
+#include <map>
+#include <optional>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -59,7 +59,6 @@
 namespace mne
 {
 
-//=============================================================================================================
 /**
  * A declarative check (pre- or post-condition) attached to a graph node.
  * Evaluated by the executor; can warn, abort, or log an informational note.
@@ -70,24 +69,30 @@ namespace mne
  */
 struct MNASHARED_EXPORT MnaVerificationCheck
 {
-    QString id;          ///< Unique check identifier within the node (e.g. "cov_posdef")
-    QString description; ///< Human-readable: "Covariance matrix must be positive-definite"
-    QString phase;       ///< "pre" (before execution) or "post" (after execution)
-    QString expression;  ///< MnaParamTree expression over attributes, inputs and (post) outputs: "rank > 0"
-    MnaScript script;    ///< Optional script for complex checks (exit code 0 = pass).
-                         ///< When script.code is non-empty, the executor runs the script
-                         ///< instead of evaluating `expression`. Supports {{placeholder}}
-                         ///< substitution for node inputs and attributes.
-    QString severity;    ///< "error" (abort), "warning" (log + continue), "info" (always continue)
-    QString onFail;      ///< Optional remediation hint
+    std::string id;          ///< Unique check identifier within the node (e.g. "cov_posdef")
+    std::string description; ///< Human-readable: "Covariance matrix must be positive-definite"
+    std::string phase;       ///< "pre" (before execution) or "post" (after execution)
+    std::string expression;  ///< MnaParamTree expression over attributes, inputs and (post) outputs: "rank > 0"
+    MnaScript script;        ///< Optional script for complex checks (exit code 0 = pass).
+                             ///< When script.code is non-empty, the executor runs the script
+                             ///< instead of evaluating `expression`. Supports {{placeholder}}
+                             ///< substitution for node inputs and attributes.
+    std::string severity;    ///< "error" (abort), "warning" (log + continue), "info" (always continue)
+    std::string on_fail;     ///< Optional remediation hint
 
-    QJsonObject toJson() const;
-    static MnaVerificationCheck fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaVerificationCheck fromCbor(const QCborMap& cbor);
+    /** @return The check as a JSON object. */
+    JsonObject to_json() const;
+
+    /** @param[in] json   A check as written by to_json(). @return The check. */
+    static MnaVerificationCheck from_json(const JsonObject& json);
+
+    /** @return The check as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A check as written by to_cbor(). @return The check. */
+    static MnaVerificationCheck from_cbor(const CborMap& cbor);
 };
 
-//=============================================================================================================
 /**
  * The result of evaluating a single verification check.
  *
@@ -97,20 +102,26 @@ struct MNASHARED_EXPORT MnaVerificationCheck
  */
 struct MNASHARED_EXPORT MnaVerificationResult
 {
-    QString checkId;       ///< References MnaVerificationCheck::id
-    bool passed = false;   ///< true if the expression evaluated to true
-    QString severity;      ///< Echoed from the check definition
-    QString message;       ///< Formatted message: "PASS: ..." or "FAIL [error]: ..."
-    QVariant actualValue;  ///< The evaluated expression result
-    QDateTime evaluatedAt; ///< When this check was evaluated
+    std::string check_id;                ///< References MnaVerificationCheck::id
+    bool passed = false;                 ///< true if the expression evaluated to true
+    std::string severity;                ///< Echoed from the check definition
+    std::string message;                 ///< Formatted message: "PASS: ..." or "FAIL [error]: ..."
+    JsonValue actual_value;              ///< The evaluated expression result
+    std::optional<UtcTime> evaluated_at; ///< When this check was evaluated
 
-    QJsonObject toJson() const;
-    static MnaVerificationResult fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaVerificationResult fromCbor(const QCborMap& cbor);
+    /** @return The result as a JSON object. */
+    JsonObject to_json() const;
+
+    /** @param[in] json   A result as written by to_json(). @return The result. */
+    static MnaVerificationResult from_json(const JsonObject& json);
+
+    /** @return The result as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A result as written by to_cbor(). @return The result. */
+    static MnaVerificationResult from_cbor(const CborMap& cbor);
 };
 
-//=============================================================================================================
 /**
  * Complete provenance snapshot captured after node execution.
  * Records input hashes, resolved parameter values, software versions, and timing.
@@ -121,38 +132,36 @@ struct MNASHARED_EXPORT MnaVerificationResult
  */
 struct MNASHARED_EXPORT MnaProvenance
 {
-    // Input snapshot
-    QMap<QString, QString> inputHashes; ///< portName → SHA-256
+    std::map<std::string, std::string> input_hashes; ///< portName → SHA-256
+    JsonObject resolved_attributes;                  ///< Attributes at execution time (after param-tree evaluation)
 
-    // Resolved attributes at execution time (after param-tree evaluation)
-    QVariantMap resolvedAttributes;
+    std::string mne_cpp_version; ///< e.g. "2.2.0"
+    std::string compiler_info;   ///< e.g. "AppleClang 16.0.0"
+    std::string os_info;         ///< e.g. "macOS 15.4 arm64"
+    std::string host_name;       ///< Machine name (for cluster provenance)
 
-    // Software environment
-    QString mneCppVersion; ///< e.g. "2.2.0"
-    QString qtVersion;     ///< e.g. "6.11.0"
-    QString compilerInfo;  ///< e.g. "AppleClang 16.0.0"
-    QString osInfo;        ///< e.g. "macOS 15.4 arm64"
-    QString hostName;      ///< Machine name (for cluster provenance)
+    std::string external_tool_version; ///< For IPC/Script nodes, e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
 
-    // For IPC/Script nodes
-    QString externalToolVersion; ///< e.g. "FreeSurfer 7.4.1", "Python 3.11.5"
+    std::optional<UtcTime> started_at;  ///< When execution started
+    std::optional<UtcTime> finished_at; ///< When execution finished
+    std::int64_t wall_time_ms = 0;      ///< Wall-clock duration in milliseconds
+    std::int64_t peak_memory_bytes = 0; ///< Peak RSS (if measurable), 0 otherwise
 
-    // Timing
-    QDateTime startedAt;
-    QDateTime finishedAt;
-    qint64 wallTimeMs = 0;      ///< Wall-clock duration in milliseconds
-    qint64 peakMemoryBytes = 0; ///< Peak RSS (if measurable), 0 otherwise
+    std::int64_t random_seed = -1; ///< Seed of stochastic operations; -1 if not applicable
 
-    // Random seed (if stochastic operations were used)
-    qint64 randomSeed = -1; ///< -1 if not applicable
+    /** @return The provenance as a JSON object. */
+    JsonObject to_json() const;
 
-    QJsonObject toJson() const;
-    static MnaProvenance fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaProvenance fromCbor(const QCborMap& cbor);
+    /** @param[in] json   A provenance record as written by to_json(). @return The provenance. */
+    static MnaProvenance from_json(const JsonObject& json);
+
+    /** @return The provenance as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A provenance record as written by to_cbor(). @return The provenance. */
+    static MnaProvenance from_cbor(const CborMap& cbor);
 };
 
-//=============================================================================================================
 /**
  * Top-level verification container attached to each MnaNode.
  * Combines human-readable explanation, declarative checks, evaluation results,
@@ -164,25 +173,23 @@ struct MNASHARED_EXPORT MnaProvenance
  */
 struct MNASHARED_EXPORT MnaVerification
 {
-    /// Human-readable explanation of what this node does and why
-    QString explanation;
+    std::string explanation;                         ///< What this node does and why
+    std::vector<MnaVerificationCheck> checks;        ///< Declarative checks (authored by user, evaluated by executor)
+    std::vector<MnaVerificationResult> pre_results;  ///< Results of pre-execution checks (populated by executor)
+    std::vector<MnaVerificationResult> post_results; ///< Results of post-execution checks (populated by executor)
+    MnaProvenance provenance;                        ///< Complete provenance snapshot (populated by executor)
 
-    /// Declarative checks (authored by user, evaluated by executor)
-    QList<MnaVerificationCheck> checks;
+    /** @return The verification as a JSON object, empty if nothing is set. */
+    JsonObject to_json() const;
 
-    /// Results of pre-execution checks (populated by executor)
-    QList<MnaVerificationResult> preResults;
+    /** @param[in] json   A verification as written by to_json(). @return The verification. */
+    static MnaVerification from_json(const JsonObject& json);
 
-    /// Results of post-execution checks (populated by executor)
-    QList<MnaVerificationResult> postResults;
+    /** @return The verification as a CBOR map, empty if nothing is set. */
+    CborMap to_cbor() const;
 
-    /// Complete provenance snapshot (populated by executor)
-    MnaProvenance provenance;
-
-    QJsonObject toJson() const;
-    static MnaVerification fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaVerification fromCbor(const QCborMap& cbor);
+    /** @param[in] cbor   A verification as written by to_cbor(). @return The verification. */
+    static MnaVerification from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

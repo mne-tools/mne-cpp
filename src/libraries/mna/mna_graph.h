@@ -21,8 +21,8 @@
  * acyclicity, that every required input is connected, that
  * @ref mne::MnaDataKind "MnaDataKind" matches across each edge, and that every node
  * conforms to its @ref mne::MnaOpSchema. (3) @em Scheduling:
- * @c mne::MnaGraph::topologicalSort "topologicalSort", @c mne::MnaGraph::upstreamNodes "upstreamNodes", @c mne::MnaGraph::downstreamNodes "downstreamNodes"
- * and @c mne::MnaGraph::dirtyNodes "dirtyNodes" feed the executor's incremental re-run
+ * @c mne::MnaGraph::topological_sort "topological_sort", @c mne::MnaGraph::upstream_nodes "upstream_nodes", @c mne::MnaGraph::downstream_nodes "downstream_nodes"
+ * and @c mne::MnaGraph::dirty_nodes "dirty_nodes" feed the executor's incremental re-run
  * logic. (4) @em Persistence: lossless JSON and CBOR round-trip
  * mirroring the @ref mne::MnaIO codec choices.
  */
@@ -36,18 +36,19 @@
 
 #include "mna_global.h"
 #include "mna_node.h"
-#include "mna_port.h"
 #include "mna_param_tree.h"
+#include "mna_port.h"
+
+#include <base/cbor.h>
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QList>
-#include <QJsonObject>
-#include <QCborMap>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -67,86 +68,85 @@ namespace mne
 class MNASHARED_EXPORT MnaGraph
 {
 public:
-    MnaGraph();
+    /** @param[in] node   The node to append. */
+    void add_node(MnaNode node);
+
+    /** @param[in] node_id   Id of the node to remove; nothing happens if there is none. */
+    void remove_node(std::string_view node_id);
+
+    /** @param[in] node_id   A node id. @return The node, or nullptr if there is none. */
+    MnaNode* find_node(std::string_view node_id);
+
+    /** @param[in] node_id   A node id. @return The node, or nullptr if there is none. */
+    const MnaNode* find_node(std::string_view node_id) const;
+
+    /** @param[in] node_id   Id of a node of this graph. @return The node; throws std::out_of_range if there is none. */
+    MnaNode& node(std::string_view node_id);
+
+    /** @param[in] node_id   Id of a node of this graph. @return The node; throws std::out_of_range if there is none. */
+    const MnaNode& node(std::string_view node_id) const;
+
+    /** @return The nodes in insertion order. */
+    std::vector<MnaNode>& nodes();
+
+    /** @return The nodes in insertion order. */
+    const std::vector<MnaNode>& nodes() const;
+
+    /** @param[in] node_id   A node id. @return Whether the graph has the node. */
+    bool has_node(std::string_view node_id) const;
+
+    std::vector<MnaPort> graph_inputs;  ///< Named, typed entry points
+    std::vector<MnaPort> graph_outputs; ///< Named, typed exit points
+
+    MnaParamTree param_tree; ///< Hierarchical parameter store with formula-driven bindings
 
     //=========================================================================================================
-    // Node management
-    //=========================================================================================================
-
-    void addNode(const MnaNode& node);
-    void removeNode(const QString& nodeId);
-    MnaNode& node(const QString& nodeId);
-    const MnaNode& node(const QString& nodeId) const;
-    QList<MnaNode>& nodes();
-    const QList<MnaNode>& nodes() const;
-    bool hasNode(const QString& nodeId) const;
-
-    //=========================================================================================================
-    // Graph-level ports
-    //=========================================================================================================
-
-    QList<MnaPort> graphInputs;  ///< Named, typed entry points
-    QList<MnaPort> graphOutputs; ///< Named, typed exit points
-
-    //=========================================================================================================
-    // Parameter tree
-    //=========================================================================================================
-
-    MnaParamTree paramTree; ///< Hierarchical parameter store with formula-driven bindings
-
-    //=========================================================================================================
-    // Connection helper
-    //=========================================================================================================
-
     /**
-     * Connect output port of srcNode to input port of dstNode.
-     * Sets the sourceNodeId and sourcePortName on the destination input port.
-     * @param srcNodeId     Id of the node providing the output.
-     * @param srcPortName   Name of the output port on the source node.
-     * @param dstNodeId     Id of the node receiving the input.
-     * @param dstPortName   Name of the input port on the destination node.
-     * @return true if connection was made, false if ports not found.
+     * Connects an output port of one node to an input port of another by setting the source of the input port.
+     *
+     * @param[in] src_node_id     Id of the node providing the output.
+     * @param[in] src_port_name   Name of the output port on the source node.
+     * @param[in] dst_node_id     Id of the node receiving the input.
+     * @param[in] dst_port_name   Name of the input port on the destination node.
+     *
+     * @return Whether both ports exist and were connected.
      */
-    bool connect(const QString& srcNodeId, const QString& srcPortName,
-                 const QString& dstNodeId, const QString& dstPortName);
+    bool connect(std::string_view src_node_id, std::string_view src_port_name, std::string_view dst_node_id, std::string_view dst_port_name);
 
     //=========================================================================================================
-    // Validation
-    //=========================================================================================================
-
     /**
-     * Validate the graph: acyclicity, port connections, data-kind compatibility,
-     * op schema compliance, required attributes.
-     * @param errors    Optional list to receive error messages.
-     * @return true if valid.
+     * Checks acyclicity, port connections, data-kind compatibility, op schema compliance and required attributes.
+     *
+     * @return The problems found; empty if the graph is valid.
      */
-    bool validate(QStringList* errors = nullptr) const;
+    StringList validate() const;
 
-    //=========================================================================================================
-    // Topological sort
-    //=========================================================================================================
+    /** @return The node ids in an order where every node follows the nodes it reads from; ready nodes by id. */
+    StringList topological_sort() const;
 
-    QStringList topologicalSort() const;
+    /** @param[in] node_id   A node id. @return The nodes it reads from, directly or indirectly, nearest first. */
+    StringList upstream_nodes(std::string_view node_id) const;
 
-    //=========================================================================================================
-    // Dependency queries
-    //=========================================================================================================
+    /** @param[in] node_id   A node id. @return The nodes that read from it, directly or indirectly, nearest first. */
+    StringList downstream_nodes(std::string_view node_id) const;
 
-    QStringList upstreamNodes(const QString& nodeId) const;
-    QStringList downstreamNodes(const QString& nodeId) const;
-    QStringList dirtyNodes() const;
+    /** @return The ids of the nodes that need re-execution. */
+    StringList dirty_nodes() const;
 
-    //=========================================================================================================
-    // Serialization
-    //=========================================================================================================
+    /** @return The graph as a JSON object. */
+    JsonObject to_json() const;
 
-    QJsonObject toJson() const;
-    static MnaGraph fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaGraph fromCbor(const QCborMap& cbor);
+    /** @param[in] json   A graph as written by to_json(). @return The graph. */
+    static MnaGraph from_json(const JsonObject& json);
+
+    /** @return The graph as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A graph as written by to_cbor(). @return The graph. */
+    static MnaGraph from_cbor(const CborMap& cbor);
 
 private:
-    QList<MnaNode> m_nodes;
+    std::vector<MnaNode> m_nodes;
 };
 
 } // namespace mne

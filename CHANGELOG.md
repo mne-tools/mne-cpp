@@ -628,6 +628,45 @@ aliases; replace the old spelling as below.
   executor use them, so `mne_pybridge` no longer links Qt.
 - MNA script and IPC nodes whose program cannot be started report exit code
   -1 and the reason in `stderr`; they reported a made-up exit code before.
+- The `mna` library uses standard C++ only and links just `mne_base`; the
+  `.mna` and `.mnx` files are unchanged. Migration:
+  - All structs hold `std::string`, `std::vector`, `mne::StringList`,
+    `std::optional<mne::UtcTime>` and `std::vector<std::byte>` instead of
+    Qt types. Node attributes, port extras and provenance attributes are
+    `mne::JsonObject`; runtime port values are `mne::MnaValues`
+    (`std::map<std::string, std::any>`, read with `std::any_cast`).
+  - Fields and methods are snake_case: `opType` → `op_type`, `execMode` →
+    `exec_mode`, `dataKind` → `data_kind`, `sizeBytes` → `size_bytes`,
+    `toJson`/`fromJson`/`toCbor`/`fromCbor` → `to_json`/`from_json`/
+    `to_cbor`/`from_cbor`, `addNode` → `add_node`, `paramTree` →
+    `param_tree`, `setParam` → `set_param`, `evaluateExpression` →
+    `evaluate_expression`, and so on.
+  - `mnaFileRoleToString`, `mnaFileRoleFromString`, `mnaDataKindToString`,
+    `mnaDataKindFromString` are `to_string`, `file_role_from_string` and
+    `data_kind_from_string`; `data_kind_key` gives the snake_case file
+    spelling.
+  - `MnaIO::read`/`write` and `MnaProject::read`/`write` take a
+    `std::filesystem::path` and return `mne::Expected`, so the reason of a
+    failure reaches the caller. New `MnaIO::to_mnx()` encodes a project in
+    memory, and `MnaFileRef::embed()`/`extract()` move file content in and
+    out of a project.
+  - `MnaOpSchema::validate()` returns the list of problems instead of
+    filling an out-parameter; attribute types are `MnaAttrType`.
+    `MnaGraph::validate()`, `topological_sort()`, `upstream_nodes()`,
+    `downstream_nodes()` and `dirty_nodes()` return `StringList`;
+    `MnaGraph::node()` throws `std::out_of_range` for an unknown id and
+    `find_node()` returns a pointer or `nullptr`.
+  - `MnaOpRegistry::OpFunc` is
+    `std::function<MnaValues(const MnaValues&, const JsonObject&)>`.
+    `MnaGraphExecutor::set_progress_callback()` takes a plain
+    `std::function`; the stream plugin factory returns
+    `std::shared_ptr<void>`.
+  - `MnaProvenance::qtVersion` is removed; `compiler_info` and `os_info`
+    identify the build.
+- `mne_inverse_pipeline` exits with code 1 when a node aborts the pipeline,
+  and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
+  `mne_mna_bids_converter` report why a project could not be read or
+  written.
 - `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
   UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
   not valid in that encoding. Latin-1 headers from older recorders kept raw

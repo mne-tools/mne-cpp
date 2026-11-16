@@ -18,12 +18,12 @@
  * array whose entries are deserialised into @ref mne::MnaOpSchema
  * instances.
  *
- * @ref mne::MnaRegistryLoader::loadFile "loadFile" handles a single manifest, @ref mne::MnaRegistryLoader::loadDirectory "loadDirectory"
+ * @ref mne::MnaRegistryLoader::load_file "load_file" handles a single manifest, @ref mne::MnaRegistryLoader::load_directory "load_directory"
  * loads the master @c mna-registry.json first and then every
  * @c *.json drop-in from @c mna-registry.d/ in alphabetical order;
  * later files overwrite earlier definitions for the same op type,
  * which is the mechanism plug-ins use to extend or shadow built-in
- * operations. @ref mne::MnaRegistryLoader::saveFile "saveFile" re-emits the current registry to a
+ * operations. @ref mne::MnaRegistryLoader::save_file "save_file" re-emits the current registry to a
  * canonical manifest so a running process can publish the exact
  * op surface it offers.
  */
@@ -38,10 +38,11 @@
 #include "mna_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <filesystem>
+#include <string_view>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -61,11 +62,7 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Loads MNA operation schemas from declarative JSON registry manifests files.
- *
- * Registry files follow the mna-registry.json format with "mna_registry_version",
- * "provider", and "ops" array.  The loader supports a master manifest plus
- * drop-in files from a mna-registry.d/ directory.
+ * Reads op-schema manifests ("mna_registry_version", "provider", "ops") into an @ref MnaOpRegistry.
  *
  * @brief Reads MNA op-schema manifests and feeds them into @ref MnaOpRegistry, with drop-in directory merge support.
  *
@@ -74,39 +71,35 @@ namespace mne
 class MNASHARED_EXPORT MnaRegistryLoader
 {
 public:
+    //=========================================================================================================
     /**
-     * Load a single registry manifest file and register all ops.
+     * @param[in]     path       A manifest file.
+     * @param[in,out] registry   Receives the schemas.
      *
-     * @param[in] path          Path to the JSON manifest file.
-     * @param[in,out] registry  Registry to populate.
-     * @return Number of ops successfully loaded, or -1 on file error.
+     * @return The number of schemas loaded, or -1 if the file cannot be read or is not a manifest.
      */
-    static int loadFile(const QString& path, MnaOpRegistry& registry);
+    static int load_file(const std::filesystem::path& path, MnaOpRegistry& registry);
 
+    //=========================================================================================================
     /**
-     * Load the master manifest plus all drop-in files from a directory.
+     * Loads mna-registry.json and then every *.json in mna-registry.d/ in name order, so drop-ins override.
      *
-     * Loads mna-registry.json first, then all *.json files from
-     * mna-registry.d/ in alphabetical order.  Later files override
-     * earlier entries for the same op type.
+     * @param[in]     dir        The registry directory.
+     * @param[in,out] registry   Receives the schemas.
      *
-     * @param[in] registryDir   Directory containing mna-registry.json.
-     * @param[in,out] registry  Registry to populate.
-     * @return Total number of ops loaded across all files.
+     * @return The number of schemas loaded.
      */
-    static int loadDirectory(const QString& registryDir, MnaOpRegistry& registry);
+    static int load_directory(const std::filesystem::path& dir, MnaOpRegistry& registry);
 
+    //=========================================================================================================
     /**
-     * Serialize current registry schemas to a JSON manifest file.
+     * @param[in] path       The manifest file to write.
+     * @param[in] provider   Who provides the operations.
+     * @param[in] registry   The schemas to write.
      *
-     * @param[in] path      Output file path.
-     * @param[in] provider  Provider name for the manifest header.
-     * @param[in] registry  Registry to serialize.
-     * @return True if writing succeeded.
+     * @return Whether the file was written.
      */
-    static bool saveFile(const QString& path,
-                         const QString& provider,
-                         const MnaOpRegistry& registry);
+    static bool save_file(const std::filesystem::path& path, std::string_view provider, const MnaOpRegistry& registry);
 };
 
 } // namespace mne

@@ -15,7 +15,7 @@
  * @ref MnaParamTree::evaluate iterates over registered bindings,
  * fires those whose trigger condition is met for the supplied
  * execution-context @c results map, calls
- * @ref MnaParamTree::evaluateExpression to compute the new value
+ * @ref MnaParamTree::evaluate_expression to compute the new value
  * via the embedded expression evaluator (with @c ref("…") look-ups
  * resolved against both the param store and the execution results),
  * writes the result back into @c m_params and returns the list of
@@ -29,10 +29,14 @@
 
 #include "mna_param_tree.h"
 
-#include <QJsonArray>
-#include <QRegularExpression>
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
+#include <algorithm>
+#include <charconv>
 #include <cmath>
+#include <optional>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,291 +45,378 @@
 using namespace mne;
 
 //=============================================================================================================
+// DEFINE STATICS AND LOCAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** @return The value as a number: numbers as they are, booleans as 0 or 1, numeric text parsed. */
+std::optional<double> toNumber(const JsonValue& value)
+{
+    if (value.is_number()) {
+        return value.to_double();
+    }
+    if (value.is_bool()) {
+        return value.to_bool() ? 1.0 : 0.0;
+    }
+    if (value.is_string()) {
+        return mne::to_double(value.to_string());
+    }
+    return std::nullopt;
+}
+
+/** Recursive-descent evaluator of one formula; any failure yields an undefined value. */
+class Evaluator
+{
+public:
+    using Lookup = std::function<JsonValue(std::string_view)>;
+
+    Evaluator(std::string_view text, Lookup lookup)
+    : m_text(text)
+    , m_lookup(std::move(lookup))
+    {
+    }
+
+    JsonValue run()
+    {
+        JsonValue value = comparison();
+        skipSpace();
+        return m_pos == m_text.size() ? value : JsonValue(JsonValue::Undefined);
+    }
+
+private:
+    static bool isNameStart(char c)
+    {
+        return std::isalpha(static_cast<unsigned char>(c)) != 0 || c == '_';
+    }
+    static bool isNameChar(char c)
+    {
+        return std::isalnum(static_cast<unsigned char>(c)) != 0 || c == '_' || c == '.' || c == ':' || c == '/';
+    }
+
+    void skipSpace()
+    {
+        while (m_pos < m_text.size() && std::isspace(static_cast<unsigned char>(m_text[m_pos])) != 0) {
+            ++m_pos;
+        }
+    }
+
+    bool accept(std::string_view token)
+    {
+        skipSpace();
+        if (m_text.substr(m_pos).starts_with(token)) {
+            m_pos += token.size();
+            return true;
+        }
+        return false;
+    }
+
+    JsonValue comparison()
+    {
+        JsonValue left = sum();
+        for (const std::string_view op : {">=", "<=", "==", "!=", ">", "<"}) {
+            if (!accept(op)) {
+                continue;
+            }
+            const JsonValue right = sum();
+            if (left.is_undefined() || right.is_undefined()) {
+                return JsonValue(JsonValue::Undefined);
+            }
+            if (left.is_string() && right.is_string() && (op == "==" || op == "!=")) {
+                return (left.to_string() == right.to_string()) == (op == "==");
+            }
+            const std::optional<double> a = toNumber(left);
+            const std::optional<double> b = toNumber(right);
+            if (!a || !b) {
+                return JsonValue(JsonValue::Undefined);
+            }
+            return op == ">=" ? *a >= *b : op == "<=" ? *a <= *b
+                : op == "=="                          ? *a == *b
+                : op == "!="                          ? *a != *b
+                : op == ">"                           ? *a > *b
+                                                      : *a < *b;
+        }
+        return left;
+    }
+
+    JsonValue sum()
+    {
+        JsonValue value = product();
+        for (;;) {
+            const bool plus = accept("+");
+            if (!plus && !accept("-")) {
+                return value;
+            }
+            value = arithmetic(value, product(), plus ? '+' : '-');
+        }
+    }
+
+    JsonValue product()
+    {
+        JsonValue value = unary();
+        for (;;) {
+            const bool times = accept("*");
+            if (!times && !accept("/")) {
+                return value;
+            }
+            value = arithmetic(value, unary(), times ? '*' : '/');
+        }
+    }
+
+    JsonValue unary()
+    {
+        if (accept("-")) {
+            const std::optional<double> v = toNumber(unary());
+            return v ? JsonValue(-*v) : JsonValue(JsonValue::Undefined);
+        }
+        return primary();
+    }
+
+    static JsonValue arithmetic(const JsonValue& left, const JsonValue& right, char op)
+    {
+        const std::optional<double> a = toNumber(left);
+        const std::optional<double> b = toNumber(right);
+        if (left.is_undefined() || right.is_undefined() || !a || !b) {
+            return JsonValue(JsonValue::Undefined);
+        }
+        switch (op) {
+            case '+':
+                return *a + *b;
+            case '-':
+                return *a - *b;
+            case '*':
+                return *a * *b;
+            default:
+                return std::abs(*b) < 1e-15 ? JsonValue(JsonValue::Undefined) : JsonValue(*a / *b);
+        }
+    }
+
+    JsonValue primary()
+    {
+        skipSpace();
+        if (m_pos >= m_text.size()) {
+            return JsonValue(JsonValue::Undefined);
+        }
+        const char c = m_text[m_pos];
+        if (c == '(') {
+            ++m_pos;
+            JsonValue value = comparison();
+            return accept(")") ? value : JsonValue(JsonValue::Undefined);
+        }
+        if (c == '\'') {
+            const std::size_t end = m_text.find('\'', m_pos + 1);
+            if (end == std::string_view::npos) {
+                return JsonValue(JsonValue::Undefined);
+            }
+            JsonValue text(m_text.substr(m_pos + 1, end - m_pos - 1));
+            m_pos = end + 1;
+            return text;
+        }
+        if (std::isdigit(static_cast<unsigned char>(c)) != 0 || c == '.') {
+            double number = 0.0;
+            const auto [next, ec] = std::from_chars(m_text.data() + m_pos, m_text.data() + m_text.size(), number);
+            if (ec != std::errc{}) {
+                return JsonValue(JsonValue::Undefined);
+            }
+            m_pos = static_cast<std::size_t>(next - m_text.data());
+            return number;
+        }
+        if (!isNameStart(c)) {
+            return JsonValue(JsonValue::Undefined);
+        }
+        const std::size_t start = m_pos;
+        while (m_pos < m_text.size() && isNameChar(m_text[m_pos])) {
+            ++m_pos;
+        }
+        const std::string_view name = m_text.substr(start, m_pos - start);
+        if (!accept("(")) {
+            if (name == "true" || name == "false") {
+                return name == "true";
+            }
+            return m_lookup(name);
+        }
+        std::vector<JsonValue> args;
+        if (!accept(")")) {
+            do {
+                args.push_back(comparison());
+            } while (accept(","));
+            if (!accept(")")) {
+                return JsonValue(JsonValue::Undefined);
+            }
+        }
+        return call(name, args);
+    }
+
+    JsonValue call(std::string_view name, const std::vector<JsonValue>& args) const
+    {
+        if (name == "ref") {
+            return args.size() == 1 && args[0].is_string() ? m_lookup(args[0].to_string()) : JsonValue(JsonValue::Undefined);
+        }
+        std::vector<double> x;
+        for (const JsonValue& arg : args) {
+            const std::optional<double> v = toNumber(arg);
+            if (arg.is_undefined() || !v) {
+                return JsonValue(JsonValue::Undefined);
+            }
+            x.push_back(*v);
+        }
+        if (name == "clamp" && x.size() == 3) {
+            return std::clamp(x[0], x[1], x[2]);
+        }
+        if (name == "scale" && x.size() == 2) {
+            return x[0] * x[1];
+        }
+        if (name == "threshold" && x.size() == 4) {
+            return x[0] > x[1] ? x[2] : x[3];
+        }
+        if (name == "lerp" && x.size() == 3) {
+            return x[0] + ((x[1] - x[0]) * x[2]);
+        }
+        return JsonValue(JsonValue::Undefined);
+    }
+
+    std::string_view m_text;
+    std::size_t m_pos = 0;
+    Lookup m_lookup;
+};
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MnaParamTree::MnaParamTree()
+void MnaParamTree::set_param(std::string_view path, JsonValue value)
 {
+    m_params.insert_or_assign(std::string(path), std::move(value));
 }
 
 //=============================================================================================================
 
-void MnaParamTree::setParam(const QString& path, const QVariant& value)
+const JsonValue& MnaParamTree::param(std::string_view path) const
 {
-    m_params.insert(path, value);
+    const auto it = m_params.find(path);
+    return it != m_params.end() ? it->second : JsonValue::undefined_value();
 }
 
 //=============================================================================================================
 
-QVariant MnaParamTree::param(const QString& path) const
-{
-    return m_params.value(path);
-}
-
-//=============================================================================================================
-
-bool MnaParamTree::hasParam(const QString& path) const
+bool MnaParamTree::has_param(std::string_view path) const
 {
     return m_params.contains(path);
 }
 
 //=============================================================================================================
 
-QStringList MnaParamTree::allPaths() const
+StringList MnaParamTree::all_paths() const
 {
-    return m_params.keys();
+    StringList paths;
+    paths.reserve(m_params.size());
+    for (const auto& [path, value] : m_params) {
+        paths.push_back(path);
+    }
+    return paths;
 }
 
 //=============================================================================================================
 
-void MnaParamTree::addBinding(const MnaParamBinding& binding)
+void MnaParamTree::add_binding(const MnaParamBinding& binding)
 {
-    m_bindings.insert(binding.targetPath, binding);
+    m_bindings.insert_or_assign(binding.target_path, binding);
 }
 
 //=============================================================================================================
 
-void MnaParamTree::removeBinding(const QString& targetPath)
+void MnaParamTree::remove_binding(std::string_view target_path)
 {
-    m_bindings.remove(targetPath);
+    if (const auto it = m_bindings.find(target_path); it != m_bindings.end()) {
+        m_bindings.erase(it);
+    }
 }
 
 //=============================================================================================================
 
-QList<MnaParamBinding> MnaParamTree::bindings() const
+std::vector<MnaParamBinding> MnaParamTree::bindings() const
 {
-    return m_bindings.values();
+    std::vector<MnaParamBinding> list;
+    list.reserve(m_bindings.size());
+    for (const auto& [path, binding] : m_bindings) {
+        list.push_back(binding);
+    }
+    return list;
 }
 
 //=============================================================================================================
 
-bool MnaParamTree::hasBinding(const QString& targetPath) const
+bool MnaParamTree::has_binding(std::string_view target_path) const
 {
-    return m_bindings.contains(targetPath);
+    return m_bindings.contains(target_path);
 }
 
 //=============================================================================================================
 
-QStringList MnaParamTree::evaluate(const QMap<QString, QVariant>& results)
+StringList MnaParamTree::evaluate(const JsonObject& results)
 {
-    QStringList changed;
-
-    for (auto it = m_bindings.constBegin(); it != m_bindings.constEnd(); ++it) {
-        const MnaParamBinding& binding = it.value();
-
-        // Skip manual bindings — they require explicit invocation
-        if (binding.trigger == QStringLiteral("manual")) {
+    StringList changed;
+    for (const auto& [path, binding] : m_bindings) {
+        if (binding.trigger == "manual") { // manual bindings need explicit invocation
             continue;
         }
-
-        QVariant newValue = evaluateExpression(binding.expression, results);
-
-        if (newValue.isValid()) {
-            QVariant oldValue = m_params.value(binding.targetPath);
-            if (newValue != oldValue) {
-                m_params.insert(binding.targetPath, newValue);
-                changed.append(binding.targetPath);
-            }
+        JsonValue value = evaluate_expression(binding.expression, results);
+        if (value.is_undefined() || param(path) == value) {
+            continue;
         }
+        m_params.insert_or_assign(path, std::move(value));
+        changed.push_back(path);
     }
-
     return changed;
 }
 
 //=============================================================================================================
 
-QVariant MnaParamTree::evaluateExpression(const QString& expr,
-                                          const QMap<QString, QVariant>& results) const
+JsonValue MnaParamTree::evaluate_expression(std::string_view expression, const JsonObject& results) const
 {
-    // Comparison (verification checks): left OP right, both sides evaluated recursively
-    static const QRegularExpression cmpRe(QStringLiteral("^(.+?)\\s*(>=|<=|==|!=|>|<)\\s*(.+)$"));
-    const QRegularExpressionMatch cmpMatch = cmpRe.match(expr.trimmed());
-    if (cmpMatch.hasMatch()) {
-        const QVariant left = evaluateExpression(cmpMatch.captured(1), results);
-        const QVariant right = evaluateExpression(cmpMatch.captured(3), results);
-        if (!left.isValid() || !right.isValid())
-            return {};
-        const double a = left.toDouble();
-        const double b = right.toDouble();
-        const QString op = cmpMatch.captured(2);
-        return QVariant(op == ">=" ? a >= b : op == "<=" ? a <= b
-                            : op == "=="                 ? a == b
-                            : op == "!="                 ? a != b
-                            : op == ">"                  ? a > b
-                                                         : a < b);
-    }
-    if (expr.trimmed() == QLatin1String("true") || expr.trimmed() == QLatin1String("false"))
-        return QVariant(expr.trimmed() == QLatin1String("true"));
-
-    // Built-in function: ref('path') — look up a parameter or result value
-    static const QRegularExpression refRe(QStringLiteral("ref\\('([^']+)'\\)"));
-
-    // Simple case: bare ref('path')
-    QRegularExpressionMatch refMatch = refRe.match(expr.trimmed());
-    if (refMatch.hasMatch() && refMatch.capturedStart() == 0 && refMatch.capturedEnd() == expr.trimmed().length()) {
-        const QString path = refMatch.captured(1);
-        if (m_params.contains(path)) {
-            return m_params.value(path);
-        }
-        return results.value(path);
-    }
-
-    // Built-in: clamp(value, min, max)
-    static const QRegularExpression clampRe(
-        QStringLiteral("clamp\\((.+),\\s*([\\d.eE+-]+),\\s*([\\d.eE+-]+)\\)"));
-    QRegularExpressionMatch clampMatch = clampRe.match(expr.trimmed());
-    if (clampMatch.hasMatch()) {
-        QVariant inner = evaluateExpression(clampMatch.captured(1).trimmed(), results);
-        if (!inner.isValid())
-            return {};
-        double val = inner.toDouble();
-        double lo = clampMatch.captured(2).toDouble();
-        double hi = clampMatch.captured(3).toDouble();
-        return QVariant(std::clamp(val, lo, hi));
-    }
-
-    // Built-in: scale(value, factor)
-    static const QRegularExpression scaleRe(
-        QStringLiteral("scale\\((.+),\\s*([\\d.eE+-]+)\\)"));
-    QRegularExpressionMatch scaleMatch = scaleRe.match(expr.trimmed());
-    if (scaleMatch.hasMatch()) {
-        QVariant inner = evaluateExpression(scaleMatch.captured(1).trimmed(), results);
-        if (!inner.isValid())
-            return {};
-        double factor = scaleMatch.captured(2).toDouble();
-        return QVariant(inner.toDouble() * factor);
-    }
-
-    // Built-in: threshold(value, thresh, above, below)
-    static const QRegularExpression threshRe(
-        QStringLiteral("threshold\\((.+),\\s*([\\d.eE+-]+),\\s*([\\d.eE+-]+),\\s*([\\d.eE+-]+)\\)"));
-    QRegularExpressionMatch threshMatch = threshRe.match(expr.trimmed());
-    if (threshMatch.hasMatch()) {
-        QVariant inner = evaluateExpression(threshMatch.captured(1).trimmed(), results);
-        if (!inner.isValid())
-            return {};
-        double val = inner.toDouble();
-        double thresh = threshMatch.captured(2).toDouble();
-        double above = threshMatch.captured(3).toDouble();
-        double below = threshMatch.captured(4).toDouble();
-        return QVariant(val > thresh ? above : below);
-    }
-
-    // Built-in: lerp(a, b, t)
-    static const QRegularExpression lerpRe(
-        QStringLiteral("lerp\\(([\\d.eE+-]+),\\s*([\\d.eE+-]+),\\s*(.+)\\)"));
-    QRegularExpressionMatch lerpMatch = lerpRe.match(expr.trimmed());
-    if (lerpMatch.hasMatch()) {
-        double a = lerpMatch.captured(1).toDouble();
-        double b = lerpMatch.captured(2).toDouble();
-        QVariant tVal = evaluateExpression(lerpMatch.captured(3).trimmed(), results);
-        if (!tVal.isValid())
-            return {};
-        double t = tVal.toDouble();
-        return QVariant(a + (b - a) * t);
-    }
-
-    // Try to parse as a simple arithmetic expression with one ref and operators
-    // Pattern: ref('path') * number or number / (ref('path') + number)
-    // For now, handle "expr1 * expr2" and "expr1 / expr2" and "expr1 + expr2"
-    // by simple splitting on top-level operators (no parentheses nesting for now)
-
-    // Numeric literal
-    bool ok = false;
-    double numVal = expr.trimmed().toDouble(&ok);
-    if (ok) {
-        return QVariant(numVal);
-    }
-
-    // Bare name: a parameter or a results entry (checks see a node's ports and attributes by name)
-    static const QRegularExpression nameRe(QStringLiteral("^[A-Za-z_][\\w./:]*$"));
-    if (nameRe.match(expr.trimmed()).hasMatch()) {
-        const QString name = expr.trimmed();
-        return m_params.contains(name) ? m_params.value(name) : results.value(name);
-    }
-
-    // Simple binary: left * right
-    static const QRegularExpression mulRe(QStringLiteral("^(.+)\\s*\\*\\s*([\\d.eE+-]+)$"));
-    QRegularExpressionMatch mulMatch = mulRe.match(expr.trimmed());
-    if (mulMatch.hasMatch()) {
-        QVariant left = evaluateExpression(mulMatch.captured(1).trimmed(), results);
-        if (!left.isValid())
-            return {};
-        double right = mulMatch.captured(2).toDouble();
-        return QVariant(left.toDouble() * right);
-    }
-
-    // Simple binary: number / (expr)
-    static const QRegularExpression divRe(QStringLiteral("^([\\d.eE+-]+)\\s*/\\s*\\((.+)\\)$"));
-    QRegularExpressionMatch divMatch = divRe.match(expr.trimmed());
-    if (divMatch.hasMatch()) {
-        double left = divMatch.captured(1).toDouble();
-        QVariant right = evaluateExpression(divMatch.captured(2).trimmed(), results);
-        if (!right.isValid())
-            return {};
-        double rightVal = right.toDouble();
-        if (std::abs(rightVal) < 1e-15) {
-            return QVariant();
-        }
-        return QVariant(left / rightVal);
-    }
-
-    // Simple binary: expr + number
-    static const QRegularExpression addRe(QStringLiteral("^(.+)\\s*\\+\\s*([\\d.eE+-]+)$"));
-    QRegularExpressionMatch addMatch = addRe.match(expr.trimmed());
-    if (addMatch.hasMatch()) {
-        QVariant left = evaluateExpression(addMatch.captured(1).trimmed(), results);
-        if (!left.isValid())
-            return {};
-        double right = addMatch.captured(2).toDouble();
-        return QVariant(left.toDouble() + right);
-    }
-
-    return QVariant();
+    return Evaluator(expression, [&](std::string_view name) {
+               const auto it = m_params.find(name);
+               return it != m_params.end() ? it->second : results.value(name);
+           })
+        .run();
 }
 
 //=============================================================================================================
 
-QJsonObject MnaParamTree::toJson() const
+JsonObject MnaParamTree::to_json() const
 {
-    QJsonObject json;
-
-    // Bindings
-    QJsonArray bindingsArr;
-    for (auto it = m_bindings.constBegin(); it != m_bindings.constEnd(); ++it) {
-        bindingsArr.append(it.value().toJson());
+    JsonObject json;
+    JsonArray bindingList;
+    for (const auto& [path, binding] : m_bindings) {
+        bindingList.push_back(binding.to_json());
     }
-    json[QStringLiteral("bindings")] = bindingsArr;
+    json["bindings"] = std::move(bindingList);
 
-    // Static parameters (only those without a binding)
-    QJsonObject paramsObj;
-    for (auto it = m_params.constBegin(); it != m_params.constEnd(); ++it) {
-        if (!m_bindings.contains(it.key())) {
-            paramsObj.insert(it.key(), QJsonValue::fromVariant(it.value()));
+    JsonObject params; // only parameters without a binding; bound ones are recomputed
+    for (const auto& [path, value] : m_params) {
+        if (!m_bindings.contains(path)) {
+            params.insert(path, value);
         }
     }
-    if (!paramsObj.isEmpty()) {
-        json[QStringLiteral("parameters")] = paramsObj;
+    if (!params.empty()) {
+        json["parameters"] = std::move(params);
     }
-
     return json;
 }
 
 //=============================================================================================================
 
-MnaParamTree MnaParamTree::fromJson(const QJsonObject& obj)
+MnaParamTree MnaParamTree::from_json(const JsonObject& json)
 {
     MnaParamTree tree;
-
-    const QJsonArray bindingsArr = obj.value(QStringLiteral("bindings")).toArray();
-    for (const QJsonValue& v : bindingsArr) {
-        tree.addBinding(MnaParamBinding::fromJson(v.toObject()));
+    for (const JsonValue& binding : json["bindings"].to_array()) {
+        tree.add_binding(MnaParamBinding::from_json(binding.to_object()));
     }
-
-    const QJsonObject paramsObj = obj.value(QStringLiteral("parameters")).toObject();
-    for (auto it = paramsObj.constBegin(); it != paramsObj.constEnd(); ++it) {
-        tree.setParam(it.key(), it.value().toVariant());
+    for (const auto& [path, value] : json["parameters"].to_object()) {
+        tree.set_param(path, value);
     }
-
     return tree;
 }

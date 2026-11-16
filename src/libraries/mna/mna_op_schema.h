@@ -11,9 +11,9 @@
  *
  * @ref mne::MnaOpSchema is the type information an MNA operation
  * publishes to the rest of the system. It declares the
- * @c opType identifier, version, category and binding mode
+ * @c op_type identifier, version, category and binding mode
  * (@c internal in-process function, @c cli external executable
- * driven by @c cliTemplate, or @c script delegating to an inline
+ * driven by @c cli_template, or @c script delegating to an inline
  * @ref mne::MnaScript), plus the @ref mne::MnaOpSchemaPort and
  * @ref mne::MnaOpSchemaAttr lists that describe expected I/O and
  * parameters with their data kinds, default values and required
@@ -38,15 +38,15 @@
 #include "mna_global.h"
 #include "mna_types.h"
 
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QVariant>
-#include <QMetaType>
-#include <QList>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -64,38 +64,48 @@ struct MnaNode;
 namespace mne
 {
 
+/** Value type of an operation attribute, as named in op registries. */
+enum class MnaAttrType
+{
+    String, ///< "string" (also "path")
+    Double, ///< "double"
+    Float,  ///< "float"
+    Int,    ///< "int"
+    Bool    ///< "bool"
+};
+
 //=============================================================================================================
 /**
- * Port descriptor within an operation schema.
+ * @brief Expected port of an operation.
  *
  * @snippet ex_mna/main.cpp mna_op_schema_validate
  */
 struct MNASHARED_EXPORT MnaOpSchemaPort
 {
-    QString name;         ///< Port name
-    MnaDataKind dataKind; ///< Expected data kind
-    bool required = true; ///< Must be connected?
-    QString description;  ///< Human-readable description
+    std::string name;                            ///< Port name
+    MnaDataKind data_kind = MnaDataKind::Custom; ///< Expected data kind
+    bool required = true;                        ///< Must be connected?
+    std::string description;                     ///< Human-readable description
 };
 
 //=============================================================================================================
 /**
- * Attribute descriptor within an operation schema.
+ * @brief Expected attribute of an operation.
  *
  * @snippet ex_mna/main.cpp mna_op_schema_validate
  */
 struct MNASHARED_EXPORT MnaOpSchemaAttr
 {
-    QString name;          ///< Attribute key
-    QMetaType::Type type;  ///< Expected value type
-    bool required = false; ///< Must be set?
-    QVariant defaultValue; ///< Default when not set
-    QString description;   ///< Human-readable description
+    std::string name;                              ///< Attribute key
+    MnaAttrType type = MnaAttrType::String;        ///< Expected value type
+    bool required = false;                         ///< Must be set?
+    JsonValue default_value{JsonValue::Undefined}; ///< Default when not set; undefined if there is none
+    std::string description;                       ///< Human-readable description
 };
 
 //=============================================================================================================
 /**
- * Contract declaring an operation's expected inputs, outputs, and attributes.
+ * Declarative contract of an operation: ports, attributes and how it is executed.
  *
  * @brief Operation schema for graph validation.
  *
@@ -104,27 +114,28 @@ struct MNASHARED_EXPORT MnaOpSchemaAttr
 class MNASHARED_EXPORT MnaOpSchema
 {
 public:
-    QString opType;      ///< Operation type string
-    QString version;     ///< Version of the operation (e.g. "2.2.0")
-    QString binding;     ///< Binding type: "internal", "cli", or "script"
-    QString category;    ///< Category: "io", "preprocessing", "source_estimation", etc.
-    QString description; ///< What the operation does
-    QString library;     ///< Which library provides the implementation
-    QString executable;  ///< For CLI ops: executable name (e.g. "recon-all")
-    QString cliTemplate; ///< For CLI ops: command template with {{placeholder}} tokens
+    std::string op_type;      ///< Operation type string
+    std::string version;      ///< Version of the operation (e.g. "2.2.0")
+    std::string binding;      ///< Binding type: "internal", "cli", or "script"
+    std::string category;     ///< Category: "io", "preprocessing", "source_estimation", etc.
+    std::string description;  ///< What the operation does
+    std::string library;      ///< Which library provides the implementation
+    std::string executable;   ///< For CLI ops: executable name (e.g. "recon-all")
+    std::string cli_template; ///< For CLI ops: command template with {{placeholder}} tokens
 
-    QList<MnaOpSchemaPort> inputPorts;  ///< Expected input ports
-    QList<MnaOpSchemaPort> outputPorts; ///< Expected output ports
-    QList<MnaOpSchemaAttr> attributes;  ///< Expected attributes
+    std::vector<MnaOpSchemaPort> input_ports;  ///< Expected input ports
+    std::vector<MnaOpSchemaPort> output_ports; ///< Expected output ports
+    std::vector<MnaOpSchemaAttr> attributes;   ///< Expected attributes
 
+    //=========================================================================================================
     /**
-     * Validate that a node conforms to this schema.
+     * Checks a node against this schema: op type, required ports with their data kinds and required attributes.
      *
-     * @param[in] node      Node to validate.
-     * @param[out] errors   Optional list of validation error messages.
-     * @return True if the node conforms to the schema.
+     * @param[in] node   The node.
+     *
+     * @return The problems found; empty if the node complies.
      */
-    bool validate(const MnaNode& node, QStringList* errors = nullptr) const;
+    StringList validate(const MnaNode& node) const;
 };
 
 } // namespace mne

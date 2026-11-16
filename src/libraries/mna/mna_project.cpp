@@ -10,9 +10,9 @@
  * @brief    JSON and CBOR codecs for @ref MnaProject plus @ref read / @ref write thin façades that delegate to @ref MnaIO.
  *
  * The implementation serialises the project metadata
- * (name, description, @c mnaVersion, creation/modification
+ * (name, description, @c mna_version, creation/modification
  * timestamps) followed by the @ref MnaSubject list and the
- * @ref MnaNode pipeline. The @c mnaVersion field is written from
+ * @ref MnaNode pipeline. The @c mna_version field is written from
  * @ref MnaProject::CURRENT_SCHEMA_VERSION so older readers can
  * refuse projects from a future schema, while @c extras carries
  * forward-compatible additions through the round-trip without
@@ -24,10 +24,15 @@
 //=============================================================================================================
 
 #include "mna_project.h"
+
+#include "mna_codec.h"
 #include "mna_io.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -36,151 +41,116 @@
 using namespace mne;
 
 //=============================================================================================================
-// DEFINE METHODS
+// DEFINE STATICS AND LOCAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** CBOR tag of a date and time as ISO 8601 text (RFC 8949 section 3.4.1). */
+constexpr std::uint64_t kDateTimeTag = 0;
+
+/** @return The JSON form without the dates, subjects and pipeline. */
+JsonObject metadata(const MnaProject& project)
+{
+    JsonObject json = project.extras;
+    json["mna_version"] = project.mna_version;
+    json["name"] = project.name;
+    json["description"] = project.description;
+    return json;
+}
+
+/** @return The project described by @p json, without the dates, subjects and pipeline. */
+MnaProject fromMetadata(const JsonObject& json)
+{
+    MnaProject project;
+    project.mna_version = json["mna_version"].to_std_string();
+    project.name = json["name"].to_std_string();
+    project.description = json["description"].to_std_string();
+    project.extras = json.without({"mna_version", "name", "description", "created", "modified", "subjects", "pipeline"});
+    return project;
+}
+
+/** @return A tag 0 date, or text; nothing for anything else. */
+std::optional<UtcTime> timeFromCbor(const CborValue& value)
+{
+    return parse_iso8601(value.is_tag() ? value.tagged_value().to_string() : value.to_string());
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 MnaProject::MnaProject()
-: mnaVersion(CURRENT_SCHEMA_VERSION)
-, created(QDateTime::currentDateTimeUtc())
-, modified(QDateTime::currentDateTimeUtc())
+: mna_version(CURRENT_SCHEMA_VERSION)
+, created(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()))
+, modified(created)
 {
 }
 
 //=============================================================================================================
 
-QJsonObject MnaProject::toJson() const
+JsonObject MnaProject::to_json() const
 {
-    // Start from extras to preserve unknown keys
-    QJsonObject json = extras;
-    json[QLatin1String("mna_version")] = mnaVersion;
-    json[QLatin1String("name")] = name;
-    json[QLatin1String("description")] = description;
-    json[QLatin1String("created")] = created.toString(Qt::ISODate);
-    json[QLatin1String("modified")] = modified.toString(Qt::ISODate);
-
-    QJsonArray subjArr;
-    for (const MnaSubject& s : subjects) {
-        subjArr.append(s.toJson());
-    }
-    json[QLatin1String("subjects")] = subjArr;
-
-    QJsonArray pipeArr;
-    for (const MnaNode& nd : pipeline) {
-        pipeArr.append(nd.toJson());
-    }
-    json[QLatin1String("pipeline")] = pipeArr;
-
+    JsonObject json = metadata(*this);
+    json["created"] = created ? format_iso8601(*created) : std::string();
+    json["modified"] = modified ? format_iso8601(*modified) : std::string();
+    json["subjects"] = detail::to_json_array(subjects);
+    json["pipeline"] = detail::to_json_array(pipeline);
     return json;
 }
 
 //=============================================================================================================
 
-MnaProject MnaProject::fromJson(const QJsonObject& json)
+MnaProject MnaProject::from_json(const JsonObject& json)
 {
-    MnaProject proj;
-    proj.mnaVersion = json[QLatin1String("mna_version")].toString();
-    proj.name = json[QLatin1String("name")].toString();
-    proj.description = json[QLatin1String("description")].toString();
-    proj.created = QDateTime::fromString(json[QLatin1String("created")].toString(), Qt::ISODate);
-    proj.modified = QDateTime::fromString(json[QLatin1String("modified")].toString(), Qt::ISODate);
-
-    const QJsonArray subjArr = json[QLatin1String("subjects")].toArray();
-    for (const QJsonValue& v : subjArr) {
-        proj.subjects.append(MnaSubject::fromJson(v.toObject()));
-    }
-
-    const QJsonArray pipeArr = json[QLatin1String("pipeline")].toArray();
-    for (const QJsonValue& v : pipeArr) {
-        proj.pipeline.append(MnaNode::fromJson(v.toObject()));
-    }
-
-    // Capture unknown keys for lossless round-trip
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("mna_version"), QStringLiteral("name"),
-        QStringLiteral("description"), QStringLiteral("created"),
-        QStringLiteral("modified"), QStringLiteral("subjects"),
-        QStringLiteral("pipeline")};
-    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            proj.extras.insert(it.key(), it.value());
-    }
-
-    return proj;
+    MnaProject project = fromMetadata(json);
+    project.created = parse_iso8601(json["created"].to_string());
+    project.modified = parse_iso8601(json["modified"].to_string());
+    project.subjects = detail::from_json_array<MnaSubject>(json["subjects"]);
+    project.pipeline = detail::from_json_array<MnaNode>(json["pipeline"]);
+    return project;
 }
 
 //=============================================================================================================
 
-QCborMap MnaProject::toCbor() const
+CborMap MnaProject::to_cbor() const
 {
-    // Start from extras to preserve unknown keys
-    QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("mna_version")] = mnaVersion;
-    cbor[QLatin1String("name")] = name;
-    cbor[QLatin1String("description")] = description;
-    cbor[QLatin1String("created")] = QCborValue(created);
-    cbor[QLatin1String("modified")] = QCborValue(modified);
-
-    QCborArray subjArr;
-    for (const MnaSubject& s : subjects) {
-        subjArr.append(s.toCbor());
-    }
-    cbor[QLatin1String("subjects")] = subjArr;
-
-    QCborArray pipeArr;
-    for (const MnaNode& nd : pipeline) {
-        pipeArr.append(nd.toCbor());
-    }
-    cbor[QLatin1String("pipeline")] = pipeArr;
-
+    CborMap cbor = CborMap::from_json_object(metadata(*this));
+    const auto date = [](const std::optional<UtcTime>& time) {
+        return time ? CborValue::tagged(kDateTimeTag, format_iso8601(*time, true)) : CborValue(nullptr);
+    };
+    cbor.insert("created", date(created));
+    cbor.insert("modified", date(modified));
+    cbor.insert("subjects", detail::to_cbor_array(subjects));
+    cbor.insert("pipeline", detail::to_cbor_array(pipeline));
     return cbor;
 }
 
 //=============================================================================================================
 
-MnaProject MnaProject::fromCbor(const QCborMap& cbor)
+MnaProject MnaProject::from_cbor(const CborMap& cbor)
 {
-    MnaProject proj;
-    proj.mnaVersion = cbor[QLatin1String("mna_version")].toString();
-    proj.name = cbor[QLatin1String("name")].toString();
-    proj.description = cbor[QLatin1String("description")].toString();
-    proj.created = cbor[QLatin1String("created")].toDateTime();
-    proj.modified = cbor[QLatin1String("modified")].toDateTime();
-
-    const QCborArray subjArr = cbor[QLatin1String("subjects")].toArray();
-    for (const QCborValue& v : subjArr) {
-        proj.subjects.append(MnaSubject::fromCbor(v.toMap()));
-    }
-
-    const QCborArray pipeArr = cbor[QLatin1String("pipeline")].toArray();
-    for (const QCborValue& v : pipeArr) {
-        proj.pipeline.append(MnaNode::fromCbor(v.toMap()));
-    }
-
-    // Capture unknown keys for lossless round-trip
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("mna_version"), QStringLiteral("name"),
-        QStringLiteral("description"), QStringLiteral("created"),
-        QStringLiteral("modified"), QStringLiteral("subjects"),
-        QStringLiteral("pipeline")};
-    QJsonObject cborJson = cbor.toJsonObject();
-    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            proj.extras.insert(it.key(), it.value());
-    }
-
-    return proj;
+    MnaProject project = fromMetadata(cbor.to_json_object({"subjects", "pipeline"}));
+    project.created = timeFromCbor(cbor["created"]);
+    project.modified = timeFromCbor(cbor["modified"]);
+    project.subjects = detail::from_cbor_array<MnaSubject>(cbor["subjects"]);
+    project.pipeline = detail::from_cbor_array<MnaNode>(cbor["pipeline"]);
+    return project;
 }
 
 //=============================================================================================================
 
-MnaProject MnaProject::read(const QString& path)
+Expected<MnaProject> MnaProject::read(const std::filesystem::path& path)
 {
     return MnaIO::read(path);
 }
 
 //=============================================================================================================
 
-bool MnaProject::write(const MnaProject& project, const QString& path)
+Expected<void> MnaProject::write(const std::filesystem::path& path) const
 {
-    return MnaIO::write(project, path);
+    return MnaIO::write(*this, path);
 }

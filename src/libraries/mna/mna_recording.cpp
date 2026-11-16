@@ -9,8 +9,8 @@
  * @date     April 2026
  * @brief    JSON and CBOR codecs for @ref MnaRecording — ordered @ref MnaFileRef list plus opaque id and forward-compatible @c extras.
  *
- * The implementation defers to @ref MnaFileRef::toJson and the
- * matching @c fromCbor for each file entry, preserving order so
+ * The implementation defers to @ref MnaFileRef::to_json and the
+ * matching @c from_cbor for each file entry, preserving order so
  * the first @c MnaFileRole::Raw element keeps its conventional
  * meaning as the canonical recording artefact. Unknown keys are
  * routed through @c extras on read/write so newer fields added by
@@ -23,8 +23,7 @@
 
 #include "mna_recording.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -33,80 +32,65 @@
 using namespace mne;
 
 //=============================================================================================================
-// DEFINE METHODS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-QJsonObject MnaRecording::toJson() const
+namespace
 {
-    QJsonObject json = extras;
-    json[QLatin1String("id")] = id;
 
-    QJsonArray filesArr;
-    for (const MnaFileRef& f : files) {
-        filesArr.append(f.toJson());
-    }
-    json[QLatin1String("files")] = filesArr;
+/** @return The JSON form without the files, which differ between JSON and CBOR. */
+JsonObject metadata(const MnaRecording& item)
+{
+    JsonObject json = item.extras;
+    json["id"] = item.id;
+    return json;
+}
 
+/** @return The recording described by @p json, without the files. */
+MnaRecording from_metadata(const JsonObject& json)
+{
+    MnaRecording item;
+    item.id = json["id"].to_std_string();
+    item.extras = json.without({"id", "files"});
+    return item;
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+JsonObject MnaRecording::to_json() const
+{
+    JsonObject json = metadata(*this);
+    json["files"] = detail::to_json_array(files);
     return json;
 }
 
 //=============================================================================================================
 
-MnaRecording MnaRecording::fromJson(const QJsonObject& json)
+MnaRecording MnaRecording::from_json(const JsonObject& json)
 {
-    MnaRecording rec;
-    rec.id = json[QLatin1String("id")].toString();
-
-    const QJsonArray filesArr = json[QLatin1String("files")].toArray();
-    for (const QJsonValue& v : filesArr) {
-        rec.files.append(MnaFileRef::fromJson(v.toObject()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("files")};
-    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            rec.extras.insert(it.key(), it.value());
-    }
-
-    return rec;
+    MnaRecording item = from_metadata(json);
+    item.files = detail::from_json_array<MnaFileRef>(json["files"]);
+    return item;
 }
 
 //=============================================================================================================
 
-QCborMap MnaRecording::toCbor() const
+CborMap MnaRecording::to_cbor() const
 {
-    QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("id")] = id;
-
-    QCborArray filesArr;
-    for (const MnaFileRef& f : files) {
-        filesArr.append(f.toCbor());
-    }
-    cbor[QLatin1String("files")] = filesArr;
-
+    CborMap cbor = CborMap::from_json_object(metadata(*this));
+    cbor.insert("files", detail::to_cbor_array(files));
     return cbor;
 }
 
 //=============================================================================================================
 
-MnaRecording MnaRecording::fromCbor(const QCborMap& cbor)
+MnaRecording MnaRecording::from_cbor(const CborMap& cbor)
 {
-    MnaRecording rec;
-    rec.id = cbor[QLatin1String("id")].toString();
-
-    const QCborArray filesArr = cbor[QLatin1String("files")].toArray();
-    for (const QCborValue& v : filesArr) {
-        rec.files.append(MnaFileRef::fromCbor(v.toMap()));
-    }
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("id"), QStringLiteral("files")};
-    QJsonObject cborJson = cbor.toJsonObject();
-    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            rec.extras.insert(it.key(), it.value());
-    }
-
-    return rec;
+    MnaRecording item = from_metadata(cbor.to_json_object({"files"}));
+    item.files = detail::from_cbor_array<MnaFileRef>(cbor["files"]);
+    return item;
 }

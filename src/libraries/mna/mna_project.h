@@ -21,7 +21,7 @@
  * should be computed (operations, parameters, file references and
  * hashes) rather than embedding executable code, so collaborators
  * on different platforms can reproduce the analysis using their
- * own MNE-CPP build. @c mnaVersion / @ref mne::MnaProject::CURRENT_SCHEMA_VERSION "CURRENT_SCHEMA_VERSION"
+ * own MNE-CPP build. @c mna_version / @ref mne::MnaProject::CURRENT_SCHEMA_VERSION "CURRENT_SCHEMA_VERSION"
  * are bumped on breaking schema changes, while @c extras preserves
  * forward-compatible additions so projects written by a newer
  * version round-trip losslessly through an older one.
@@ -35,19 +35,23 @@
 //=============================================================================================================
 
 #include "mna_global.h"
-#include "mna_subject.h"
 #include "mna_node.h"
+#include "mna_subject.h"
+
+#include <base/cbor.h>
+#include <base/error.h>
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
-#include <QDateTime>
-#include <QSharedPointer>
-#include <QJsonObject>
-#include <QCborMap>
+#include <filesystem>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -65,81 +69,37 @@ namespace mne
 class MNASHARED_EXPORT MnaProject
 {
 public:
-    //=========================================================================================================
-    /**
-     * Default constructor.
-     */
+    /** Creates an empty project of the current schema version, created and modified now. */
     MnaProject();
 
-    //=========================================================================================================
+    static constexpr std::string_view CURRENT_SCHEMA_VERSION = "1.0"; /**< Current MNA schema version. */
 
-    static constexpr const char* CURRENT_SCHEMA_VERSION = "1.0"; /**< Current MNA schema version. */
+    std::string name;                 /**< Project name. */
+    std::string description;          /**< Project description. */
+    std::string mna_version;          /**< MNA schema version. */
+    std::optional<UtcTime> created;   /**< Creation timestamp. */
+    std::optional<UtcTime> modified;  /**< Last modification timestamp. */
+    std::vector<MnaSubject> subjects; /**< Subjects in the project. */
+    std::vector<MnaNode> pipeline;    /**< Processing pipeline nodes. */
+    JsonObject extras;                /**< Unknown keys preserved for lossless round-trip. */
 
-    QString name;               /**< Project name. */
-    QString description;        /**< Project description. */
-    QString mnaVersion;         /**< MNA schema version. */
-    QDateTime created;          /**< Creation timestamp. */
-    QDateTime modified;         /**< Last modification timestamp. */
-    QList<MnaSubject> subjects; /**< Subjects in the project. */
-    QList<MnaNode> pipeline;    /**< Processing pipeline nodes. */
-    QJsonObject extras;         /**< Unknown keys preserved for lossless round-trip. */
+    /** @return The project as a JSON object, dates as ISO 8601 text. */
+    JsonObject to_json() const;
 
-    //=========================================================================================================
-    /**
-     * Serialize to QJsonObject.
-     *
-     * @return JSON object with all project fields, subjects, pipeline nodes and preserved extras.
-     */
-    QJsonObject toJson() const;
+    /** @param[in] json   A project as written by to_json(). @return The project; unknown keys go to extras. */
+    static MnaProject from_json(const JsonObject& json);
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QJsonObject.
-     *
-     * @param[in] json   JSON object as produced by toJson().
-     *
-     * @return The project; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaProject fromJson(const QJsonObject& json);
+    /** @return The project as a CBOR map, dates as tag 0 (ISO 8601 with milliseconds). */
+    CborMap to_cbor() const;
 
-    //=========================================================================================================
-    /**
-     * Serialize to QCborMap.
-     *
-     * @return CBOR map with all project fields, subjects, pipeline nodes and preserved extras.
-     */
-    QCborMap toCbor() const;
+    /** @param[in] cbor   A project as written by to_cbor(). @return The project; unknown keys go to extras. */
+    static MnaProject from_cbor(const CborMap& cbor);
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QCborMap.
-     *
-     * @param[in] cbor   CBOR map as produced by toCbor().
-     *
-     * @return The project; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaProject fromCbor(const QCborMap& cbor);
+    /** @param[in] path   A .mna or .mnx file. @return The project, or why it cannot be read. Delegates to MnaIO. */
+    static Expected<MnaProject> read(const std::filesystem::path& path);
 
-    //=========================================================================================================
-    /**
-     * Read an MNA project from file. Delegates to MnaIO.
-     *
-     * @param[in] path   Path to the .mna or .mnx file.
-     *
-     * @return The deserialized MnaProject.
-     */
-    static MnaProject read(const QString& path);
-
-    //=========================================================================================================
-    /**
-     * Write an MNA project to file. Delegates to MnaIO.
-     *
-     * @param[in] project   The project to write.
-     * @param[in] path      Path to the .mna or .mnx file.
-     *
-     * @return True if successful.
-     */
-    static bool write(const MnaProject& project, const QString& path);
+    /** @param[in] path   A .mna or .mnx file. @return Nothing, or why it cannot be written. Delegates to MnaIO. */
+    Expected<void> write(const std::filesystem::path& path) const;
 };
 
 } // namespace mne

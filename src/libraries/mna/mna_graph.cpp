@@ -9,19 +9,19 @@
  * @date     April 2026
  * @brief    Implementation of @ref MnaGraph: node management, port connectivity, schema-aware validation, Kahn topological sort and JSON/CBOR round-trip.
  *
- * The implementation backs the graph with a single @c QList of
+ * The implementation backs the graph with a single @c std::vector of
  * @ref MnaNode and resolves node ids through linear search, which
  * stays cheap at the pipeline sizes MNA targets (tens to hundreds
  * of nodes). @ref MnaGraph::validate walks the node list, queries
- * @ref MnaOpRegistry for each @c opType, runs the per-node
+ * @ref MnaOpRegistry for each @c op_type, runs the per-node
  * @ref MnaOpSchema::validate, then sweeps the inter-node edges to
  * check that every required input port is wired and that the
  * @ref MnaDataKind on both ends agrees.
  *
- * @ref MnaGraph::topologicalSort implements Kahn's algorithm over
- * the input-port @c sourceNodeId references and surfaces an empty
+ * @ref MnaGraph::topological_sort implements Kahn's algorithm over
+ * the input-port @c source_node_id references and surfaces an empty
  * list when a cycle is present, which the validator turns into an
- * explicit error. @ref upstreamNodes / @ref downstreamNodes use a
+ * explicit error. @ref upstream_nodes / @ref downstream_nodes use a
  * @c QQueue-driven BFS to support incremental re-execution, and
  * the JSON / CBOR codecs delegate every nested struct to its own
  * codec so a project survives a round trip without loss.
@@ -32,12 +32,21 @@
 //=============================================================================================================
 
 #include "mna_graph.h"
-#include "mna_op_registry.h"
 
-#include <QJsonArray>
-#include <QCborArray>
-#include <QSet>
-#include <QQueue>
+#include "mna_codec.h"
+#include "mna_op_registry.h"
+#include "mna_op_schema.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <deque>
+#include <format>
+#include <map>
+#include <set>
+#include <stdexcept>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -46,523 +55,324 @@
 using namespace mne;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-MnaGraph::MnaGraph()
+namespace
 {
-}
 
-//=============================================================================================================
-// Node management
-//=============================================================================================================
+/** Edges from each node to the nodes that read from it, ordered by id; edges to unknown nodes are left out. */
+using Adjacency = std::map<std::string, std::set<std::string>, std::less<>>;
 
-void MnaGraph::addNode(const MnaNode& node)
+Adjacency forwardEdges(const std::vector<MnaNode>& nodes)
 {
-    m_nodes.append(node);
-}
-
-//=============================================================================================================
-
-void MnaGraph::removeNode(const QString& nodeId)
-{
-    for (int i = 0; i < m_nodes.size(); ++i) {
-        if (m_nodes[i].id == nodeId) {
-            m_nodes.removeAt(i);
-            return;
-        }
+    Adjacency adj;
+    for (const MnaNode& n : nodes) {
+        adj[n.id];
     }
-}
-
-//=============================================================================================================
-
-MnaNode& MnaGraph::node(const QString& nodeId)
-{
-    for (int i = 0; i < m_nodes.size(); ++i) {
-        if (m_nodes[i].id == nodeId) {
-            return m_nodes[i];
-        }
-    }
-    static MnaNode dummy;
-    return dummy;
-}
-
-//=============================================================================================================
-
-const MnaNode& MnaGraph::node(const QString& nodeId) const
-{
-    for (int i = 0; i < m_nodes.size(); ++i) {
-        if (m_nodes[i].id == nodeId) {
-            return m_nodes[i];
-        }
-    }
-    static const MnaNode dummy;
-    return dummy;
-}
-
-//=============================================================================================================
-
-QList<MnaNode>& MnaGraph::nodes()
-{
-    return m_nodes;
-}
-
-//=============================================================================================================
-
-const QList<MnaNode>& MnaGraph::nodes() const
-{
-    return m_nodes;
-}
-
-//=============================================================================================================
-
-bool MnaGraph::hasNode(const QString& nodeId) const
-{
-    for (const MnaNode& n : m_nodes) {
-        if (n.id == nodeId) {
-            return true;
-        }
-    }
-    return false;
-}
-
-//=============================================================================================================
-// Connection helper
-//=============================================================================================================
-
-bool MnaGraph::connect(const QString& srcNodeId, const QString& srcPortName,
-                       const QString& dstNodeId, const QString& dstPortName)
-{
-    // Verify source node and port exist
-    if (!hasNode(srcNodeId) || !hasNode(dstNodeId)) {
-        return false;
-    }
-
-    const MnaNode& srcNode = node(srcNodeId);
-    bool srcFound = false;
-    for (const MnaPort& p : srcNode.outputs) {
-        if (p.name == srcPortName) {
-            srcFound = true;
-            break;
-        }
-    }
-    if (!srcFound) {
-        return false;
-    }
-
-    // Find and update the destination input port
-    MnaNode& dstNode = node(dstNodeId);
-    for (int i = 0; i < dstNode.inputs.size(); ++i) {
-        if (dstNode.inputs[i].name == dstPortName) {
-            dstNode.inputs[i].sourceNodeId = srcNodeId;
-            dstNode.inputs[i].sourcePortName = srcPortName;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//=============================================================================================================
-// Validation
-//=============================================================================================================
-
-bool MnaGraph::validate(QStringList* errors) const
-{
-    bool valid = true;
-    auto addError = [&](const QString& msg) {
-        valid = false;
-        if (errors) {
-            errors->append(msg);
-        }
-    };
-
-    // Build adjacency for cycle detection
-    QMap<QString, QSet<QString>> adj;
-    QMap<QString, int> inDegree;
-    for (const MnaNode& n : m_nodes) {
-        if (!adj.contains(n.id)) {
-            adj[n.id] = {};
-        }
-        if (!inDegree.contains(n.id)) {
-            inDegree[n.id] = 0;
-        }
-    }
-
-    // Populate adjacency from input port connections
-    for (const MnaNode& n : m_nodes) {
+    for (const MnaNode& n : nodes) {
         for (const MnaPort& p : n.inputs) {
-            if (!p.sourceNodeId.isEmpty()) {
-                if (!adj.contains(p.sourceNodeId)) {
-                    addError(QStringLiteral("Node '%1' input port '%2' references unknown source node '%3'")
-                                 .arg(n.id, p.name, p.sourceNodeId));
-                } else {
-                    if (!adj[p.sourceNodeId].contains(n.id)) {
-                        adj[p.sourceNodeId].insert(n.id);
-                        inDegree[n.id]++;
-                    }
-                }
+            if (const auto it = adj.find(p.source_node_id); !p.source_node_id.empty() && it != adj.end()) {
+                it->second.insert(n.id);
             }
         }
     }
-
-    // Check acyclicity via Kahn's algorithm
-    QQueue<QString> queue;
-    for (auto it = inDegree.constBegin(); it != inDegree.constEnd(); ++it) {
-        if (it.value() == 0) {
-            queue.enqueue(it.key());
-        }
-    }
-
-    int visited = 0;
-    while (!queue.isEmpty()) {
-        QString current = queue.dequeue();
-        visited++;
-        for (const QString& neighbor : adj.value(current)) {
-            inDegree[neighbor]--;
-            if (inDegree[neighbor] == 0) {
-                queue.enqueue(neighbor);
-            }
-        }
-    }
-
-    if (visited != m_nodes.size()) {
-        addError(QStringLiteral("Graph contains a cycle"));
-    }
-
-    // Validate each node against its schema
-    const MnaOpRegistry& registry = MnaOpRegistry::instance();
-    for (const MnaNode& n : m_nodes) {
-        if (!registry.hasOp(n.opType)) {
-            addError(QStringLiteral("Node '%1' has unregistered op type '%2'")
-                         .arg(n.id, n.opType));
-            continue;
-        }
-
-        MnaOpSchema schema = registry.schema(n.opType);
-        QStringList schemaErrors;
-        if (!schema.validate(n, &schemaErrors)) {
-            for (const QString& e : schemaErrors) {
-                addError(QStringLiteral("Node '%1': %2").arg(n.id, e));
-            }
-        }
-
-        // Check that required input ports are connected
-        for (const MnaOpSchemaPort& sp : schema.inputPorts) {
-            if (!sp.required)
-                continue;
-            for (const MnaPort& np : n.inputs) {
-                if (np.name == sp.name && np.sourceNodeId.isEmpty()) {
-                    addError(QStringLiteral("Node '%1': required input port '%2' is not connected")
-                                 .arg(n.id, sp.name));
-                }
-            }
-        }
-    }
-
-    // Check cross-edge dataKind compatibility
-    for (const MnaNode& n : m_nodes) {
-        for (const MnaPort& inp : n.inputs) {
-            if (inp.sourceNodeId.isEmpty() || inp.sourcePortName.isEmpty())
-                continue;
-            // Find source node and output port
-            for (const MnaNode& srcNode : m_nodes) {
-                if (srcNode.id != inp.sourceNodeId)
-                    continue;
-                for (const MnaPort& srcOut : srcNode.outputs) {
-                    if (srcOut.name == inp.sourcePortName) {
-                        if (inp.dataKind != MnaDataKind::Custom &&
-                            srcOut.dataKind != MnaDataKind::Custom &&
-                            inp.dataKind != srcOut.dataKind) {
-                            addError(QStringLiteral("Edge %1.%2 -> %3.%4: data kind mismatch (%5 != %6)")
-                                         .arg(srcNode.id, srcOut.name, n.id, inp.name)
-                                         .arg(static_cast<int>(srcOut.dataKind))
-                                         .arg(static_cast<int>(inp.dataKind)));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return valid;
+    return adj;
 }
 
-//=============================================================================================================
-// Topological sort
-//=============================================================================================================
-
-QStringList MnaGraph::topologicalSort() const
+/** Kahn's algorithm; the result is shorter than the node count if the graph has a cycle. */
+StringList kahn(const Adjacency& adj)
 {
-    // Kahn's algorithm
-    QMap<QString, QSet<QString>> adj;
-    QMap<QString, int> inDegree;
-
-    for (const MnaNode& n : m_nodes) {
-        adj[n.id] = {};
-        inDegree[n.id] = 0;
+    std::map<std::string, int, std::less<>> inDegree;
+    for (const auto& [id, next] : adj) {
+        inDegree[id];
+        for (const std::string& n : next) {
+            ++inDegree[n];
+        }
     }
-
-    for (const MnaNode& n : m_nodes) {
-        for (const MnaPort& p : n.inputs) {
-            if (!p.sourceNodeId.isEmpty() && adj.contains(p.sourceNodeId)) {
-                if (!adj[p.sourceNodeId].contains(n.id)) {
-                    adj[p.sourceNodeId].insert(n.id);
-                    inDegree[n.id]++;
-                }
+    std::deque<std::string> queue;
+    for (const auto& [id, degree] : inDegree) {
+        if (degree == 0) {
+            queue.push_back(id);
+        }
+    }
+    StringList sorted;
+    while (!queue.empty()) {
+        std::string current = std::move(queue.front());
+        queue.pop_front();
+        for (const std::string& n : adj.find(current)->second) {
+            if (--inDegree[n] == 0) {
+                queue.push_back(n);
             }
         }
+        sorted.push_back(std::move(current));
     }
-
-    QQueue<QString> queue;
-    for (auto it = inDegree.constBegin(); it != inDegree.constEnd(); ++it) {
-        if (it.value() == 0) {
-            queue.enqueue(it.key());
-        }
-    }
-
-    QStringList sorted;
-    while (!queue.isEmpty()) {
-        QString current = queue.dequeue();
-        sorted.append(current);
-        for (const QString& neighbor : adj.value(current)) {
-            inDegree[neighbor]--;
-            if (inDegree[neighbor] == 0) {
-                queue.enqueue(neighbor);
-            }
-        }
-    }
-
     return sorted;
 }
 
-//=============================================================================================================
-// Dependency queries
-//=============================================================================================================
-
-QStringList MnaGraph::upstreamNodes(const QString& nodeId) const
+/** Breadth-first walk from the neighbours of @p start. */
+template<class Neighbours>
+StringList walk(std::string_view start, Neighbours neighbours)
 {
-    QStringList upstream;
-    if (!hasNode(nodeId)) {
-        return upstream;
+    StringList order;
+    std::set<std::string, std::less<>> visited;
+    std::deque<std::string> queue;
+    const auto visit = [&](const std::string& id) {
+        if (!id.empty() && visited.insert(id).second) {
+            queue.push_back(id);
+        }
+    };
+    neighbours(start, visit);
+    while (!queue.empty()) {
+        std::string current = std::move(queue.front());
+        queue.pop_front();
+        neighbours(current, visit);
+        order.push_back(std::move(current));
     }
+    return order;
+}
 
-    const MnaNode& n = node(nodeId);
-    QSet<QString> visited;
-    QQueue<QString> queue;
+} // namespace
 
-    for (const MnaPort& p : n.inputs) {
-        if (!p.sourceNodeId.isEmpty() && !visited.contains(p.sourceNodeId)) {
-            visited.insert(p.sourceNodeId);
-            queue.enqueue(p.sourceNodeId);
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+void MnaGraph::add_node(MnaNode node)
+{
+    m_nodes.push_back(std::move(node));
+}
+
+//=============================================================================================================
+
+void MnaGraph::remove_node(std::string_view node_id)
+{
+    if (const auto it = std::ranges::find(m_nodes, node_id, &MnaNode::id); it != m_nodes.end()) {
+        m_nodes.erase(it);
+    }
+}
+
+//=============================================================================================================
+
+MnaNode* MnaGraph::find_node(std::string_view node_id)
+{
+    const auto it = std::ranges::find(m_nodes, node_id, &MnaNode::id);
+    return it != m_nodes.end() ? &*it : nullptr;
+}
+
+//=============================================================================================================
+
+const MnaNode* MnaGraph::find_node(std::string_view node_id) const
+{
+    const auto it = std::ranges::find(m_nodes, node_id, &MnaNode::id);
+    return it != m_nodes.end() ? &*it : nullptr;
+}
+
+//=============================================================================================================
+
+MnaNode& MnaGraph::node(std::string_view node_id)
+{
+    if (MnaNode* n = find_node(node_id)) {
+        return *n;
+    }
+    throw std::out_of_range(std::format("MNA graph has no node '{}'", node_id));
+}
+
+//=============================================================================================================
+
+const MnaNode& MnaGraph::node(std::string_view node_id) const
+{
+    if (const MnaNode* n = find_node(node_id)) {
+        return *n;
+    }
+    throw std::out_of_range(std::format("MNA graph has no node '{}'", node_id));
+}
+
+//=============================================================================================================
+
+std::vector<MnaNode>& MnaGraph::nodes()
+{
+    return m_nodes;
+}
+
+//=============================================================================================================
+
+const std::vector<MnaNode>& MnaGraph::nodes() const
+{
+    return m_nodes;
+}
+
+//=============================================================================================================
+
+bool MnaGraph::has_node(std::string_view node_id) const
+{
+    return find_node(node_id) != nullptr;
+}
+
+//=============================================================================================================
+
+bool MnaGraph::connect(std::string_view src_node_id, std::string_view src_port_name, std::string_view dst_node_id, std::string_view dst_port_name)
+{
+    const MnaNode* src = find_node(src_node_id);
+    MnaNode* dst = find_node(dst_node_id);
+    if (!src || !dst || std::ranges::find(src->outputs, src_port_name, &MnaPort::name) == src->outputs.end()) {
+        return false;
+    }
+    const auto port = std::ranges::find(dst->inputs, dst_port_name, &MnaPort::name);
+    if (port == dst->inputs.end()) {
+        return false;
+    }
+    port->source_node_id = src_node_id;
+    port->source_port_name = src_port_name;
+    return true;
+}
+
+//=============================================================================================================
+
+StringList MnaGraph::validate() const
+{
+    StringList errors;
+
+    for (const MnaNode& n : m_nodes) {
+        for (const MnaPort& p : n.inputs) {
+            if (!p.source_node_id.empty() && !has_node(p.source_node_id)) {
+                errors.push_back(std::format("Node '{}' input port '{}' references unknown source node '{}'", n.id, p.name, p.source_node_id));
+            }
         }
     }
+    if (kahn(forwardEdges(m_nodes)).size() != m_nodes.size()) {
+        errors.emplace_back("Graph contains a cycle");
+    }
 
-    while (!queue.isEmpty()) {
-        QString current = queue.dequeue();
-        upstream.append(current);
-        if (hasNode(current)) {
-            const MnaNode& cn = node(current);
-            for (const MnaPort& p : cn.inputs) {
-                if (!p.sourceNodeId.isEmpty() && !visited.contains(p.sourceNodeId)) {
-                    visited.insert(p.sourceNodeId);
-                    queue.enqueue(p.sourceNodeId);
+    const MnaOpRegistry& registry = MnaOpRegistry::instance();
+    for (const MnaNode& n : m_nodes) {
+        if (!registry.has_op(n.op_type)) {
+            errors.push_back(std::format("Node '{}' has unregistered op type '{}'", n.id, n.op_type));
+            continue;
+        }
+        const MnaOpSchema& schema = registry.schema(n.op_type);
+        for (const std::string& e : schema.validate(n)) {
+            errors.push_back(std::format("Node '{}': {}", n.id, e));
+        }
+        for (const MnaOpSchemaPort& sp : schema.input_ports) {
+            if (!sp.required) {
+                continue;
+            }
+            for (const MnaPort& np : n.inputs) {
+                if (np.name == sp.name && np.source_node_id.empty()) {
+                    errors.push_back(std::format("Node '{}': required input port '{}' is not connected", n.id, sp.name));
                 }
             }
         }
     }
 
-    return upstream;
+    for (const MnaNode& n : m_nodes) {
+        for (const MnaPort& in : n.inputs) {
+            const MnaNode* src = in.source_port_name.empty() ? nullptr : find_node(in.source_node_id);
+            if (!src) {
+                continue;
+            }
+            for (const MnaPort& out : src->outputs) {
+                if (out.name == in.source_port_name && in.data_kind != MnaDataKind::Custom && out.data_kind != MnaDataKind::Custom &&
+                    in.data_kind != out.data_kind) {
+                    errors.push_back(std::format("Edge {}.{} -> {}.{}: data kind mismatch ({} != {})", src->id, out.name, n.id, in.name,
+                                                 static_cast<int>(out.data_kind), static_cast<int>(in.data_kind)));
+                }
+            }
+        }
+    }
+    return errors;
 }
 
 //=============================================================================================================
 
-QStringList MnaGraph::downstreamNodes(const QString& nodeId) const
+StringList MnaGraph::topological_sort() const
 {
-    QStringList downstream;
-    if (!hasNode(nodeId)) {
-        return downstream;
-    }
-
-    // Build forward adjacency
-    QMap<QString, QSet<QString>> adj;
-    for (const MnaNode& n : m_nodes) {
-        adj[n.id] = {};
-    }
-    for (const MnaNode& n : m_nodes) {
-        for (const MnaPort& p : n.inputs) {
-            if (!p.sourceNodeId.isEmpty() && adj.contains(p.sourceNodeId)) {
-                adj[p.sourceNodeId].insert(n.id);
-            }
-        }
-    }
-
-    QSet<QString> visited;
-    QQueue<QString> queue;
-    for (const QString& neighbor : adj.value(nodeId)) {
-        if (!visited.contains(neighbor)) {
-            visited.insert(neighbor);
-            queue.enqueue(neighbor);
-        }
-    }
-
-    while (!queue.isEmpty()) {
-        QString current = queue.dequeue();
-        downstream.append(current);
-        for (const QString& neighbor : adj.value(current)) {
-            if (!visited.contains(neighbor)) {
-                visited.insert(neighbor);
-                queue.enqueue(neighbor);
-            }
-        }
-    }
-
-    return downstream;
+    return kahn(forwardEdges(m_nodes));
 }
 
 //=============================================================================================================
 
-QStringList MnaGraph::dirtyNodes() const
+StringList MnaGraph::upstream_nodes(std::string_view node_id) const
 {
-    QStringList dirty;
+    return walk(node_id, [this](std::string_view id, const auto& visit) {
+        if (const MnaNode* n = find_node(id)) {
+            for (const MnaPort& p : n->inputs) {
+                visit(p.source_node_id);
+            }
+        }
+    });
+}
+
+//=============================================================================================================
+
+StringList MnaGraph::downstream_nodes(std::string_view node_id) const
+{
+    const Adjacency adj = forwardEdges(m_nodes);
+    return walk(node_id, [&adj](std::string_view id, const auto& visit) {
+        if (const auto it = adj.find(id); it != adj.end()) {
+            for (const std::string& next : it->second) {
+                visit(next);
+            }
+        }
+    });
+}
+
+//=============================================================================================================
+
+StringList MnaGraph::dirty_nodes() const
+{
+    StringList dirty;
     for (const MnaNode& n : m_nodes) {
         if (n.dirty) {
-            dirty.append(n.id);
+            dirty.push_back(n.id);
         }
     }
     return dirty;
 }
 
 //=============================================================================================================
-// Serialization
-//=============================================================================================================
 
-QJsonObject MnaGraph::toJson() const
+JsonObject MnaGraph::to_json() const
 {
-    QJsonObject json;
-
-    // Nodes
-    QJsonArray nodesArr;
-    for (const MnaNode& n : m_nodes) {
-        nodesArr.append(n.toJson());
+    JsonObject json;
+    json["nodes"] = detail::to_json_array(m_nodes);
+    if (!graph_inputs.empty()) {
+        json["graph_inputs"] = detail::to_json_array(graph_inputs);
     }
-    json[QStringLiteral("nodes")] = nodesArr;
-
-    // Graph-level inputs
-    if (!graphInputs.isEmpty()) {
-        QJsonArray arr;
-        for (const MnaPort& p : graphInputs) {
-            arr.append(p.toJson());
-        }
-        json[QStringLiteral("graph_inputs")] = arr;
+    if (!graph_outputs.empty()) {
+        json["graph_outputs"] = detail::to_json_array(graph_outputs);
     }
-
-    // Graph-level outputs
-    if (!graphOutputs.isEmpty()) {
-        QJsonArray arr;
-        for (const MnaPort& p : graphOutputs) {
-            arr.append(p.toJson());
-        }
-        json[QStringLiteral("graph_outputs")] = arr;
+    if (JsonObject tree = param_tree.to_json(); !tree.empty()) {
+        json["param_tree"] = std::move(tree);
     }
-
-    // Parameter tree
-    QJsonObject ptJson = paramTree.toJson();
-    if (!ptJson.isEmpty()) {
-        json[QStringLiteral("param_tree")] = ptJson;
-    }
-
     return json;
 }
 
 //=============================================================================================================
 
-MnaGraph MnaGraph::fromJson(const QJsonObject& json)
+MnaGraph MnaGraph::from_json(const JsonObject& json)
 {
     MnaGraph graph;
-
-    const QJsonArray nodesArr = json.value(QStringLiteral("nodes")).toArray();
-    for (const QJsonValue& v : nodesArr) {
-        graph.addNode(MnaNode::fromJson(v.toObject()));
+    graph.m_nodes = detail::from_json_array<MnaNode>(json["nodes"]);
+    graph.graph_inputs = detail::from_json_array<MnaPort>(json["graph_inputs"]);
+    graph.graph_outputs = detail::from_json_array<MnaPort>(json["graph_outputs"]);
+    if (json.contains("param_tree")) {
+        graph.param_tree = MnaParamTree::from_json(json["param_tree"].to_object());
     }
-
-    const QJsonArray giArr = json.value(QStringLiteral("graph_inputs")).toArray();
-    for (const QJsonValue& v : giArr) {
-        graph.graphInputs.append(MnaPort::fromJson(v.toObject()));
-    }
-
-    const QJsonArray goArr = json.value(QStringLiteral("graph_outputs")).toArray();
-    for (const QJsonValue& v : goArr) {
-        graph.graphOutputs.append(MnaPort::fromJson(v.toObject()));
-    }
-
-    if (json.contains(QStringLiteral("param_tree"))) {
-        graph.paramTree = MnaParamTree::fromJson(json.value(QStringLiteral("param_tree")).toObject());
-    }
-
     return graph;
 }
 
 //=============================================================================================================
 
-QCborMap MnaGraph::toCbor() const
+CborMap MnaGraph::to_cbor() const
 {
-    QCborMap cbor;
-
-    QCborArray nodesArr;
-    for (const MnaNode& n : m_nodes) {
-        nodesArr.append(n.toCbor());
-    }
-    cbor.insert(QStringLiteral("nodes"), nodesArr);
-
-    if (!graphInputs.isEmpty()) {
-        QCborArray arr;
-        for (const MnaPort& p : graphInputs) {
-            arr.append(p.toCbor());
-        }
-        cbor.insert(QStringLiteral("graph_inputs"), arr);
-    }
-
-    if (!graphOutputs.isEmpty()) {
-        QCborArray arr;
-        for (const MnaPort& p : graphOutputs) {
-            arr.append(p.toCbor());
-        }
-        cbor.insert(QStringLiteral("graph_outputs"), arr);
-    }
-
-    const QJsonObject ptJson = paramTree.toJson();
-    if (!ptJson.isEmpty()) {
-        cbor.insert(QStringLiteral("param_tree"), QCborValue::fromJsonValue(ptJson));
-    }
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaGraph MnaGraph::fromCbor(const QCborMap& cbor)
+MnaGraph MnaGraph::from_cbor(const CborMap& cbor)
 {
-    MnaGraph graph;
-
-    const QCborArray nodesArr = cbor.value(QStringLiteral("nodes")).toArray();
-    for (const QCborValue& v : nodesArr) {
-        graph.addNode(MnaNode::fromCbor(v.toMap()));
-    }
-
-    const QCborArray giArr = cbor.value(QStringLiteral("graph_inputs")).toArray();
-    for (const QCborValue& v : giArr) {
-        graph.graphInputs.append(MnaPort::fromCbor(v.toMap()));
-    }
-
-    const QCborArray goArr = cbor.value(QStringLiteral("graph_outputs")).toArray();
-    for (const QCborValue& v : goArr) {
-        graph.graphOutputs.append(MnaPort::fromCbor(v.toMap()));
-    }
-
-    if (cbor.contains(QStringLiteral("param_tree"))) {
-        graph.paramTree = MnaParamTree::fromJson(cbor.value(QStringLiteral("param_tree")).toMap().toJsonObject());
-    }
-
-    return graph;
+    return from_json(cbor.to_json_object());
 }

@@ -13,13 +13,13 @@
  * @ref mne::MnaGraph and the live op functions registered with
  * @ref mne::MnaOpRegistry. @ref mne::MnaGraphExecutor::execute "execute" walks the topologically-sorted
  * node list, feeds each one its inputs from the @ref mne::MnaGraphExecutor::Context
- * result map (keyed by @c nodeId::portName) plus the @c graphInputs
+ * result map (keyed by @c nodeId::portName) plus the @c graph_inputs
  * map, invokes the registered op function and stores the outputs
- * back into the context; @ref mne::MnaGraphExecutor::executeIncremental "executeIncremental" restricts the
+ * back into the context; @ref mne::MnaGraphExecutor::execute_incremental "execute_incremental" restricts the
  * walk to dirty nodes and their downstream dependents so a
  * parameter tweak does not re-run the whole pipeline.
  *
- * Stream mode (@ref mne::MnaGraphExecutor::startStream "startStream" / @ref mne::MnaGraphExecutor::stopStream "stopStream") targets MNE Scan:
+ * Stream mode (@ref mne::MnaGraphExecutor::start_stream "start_stream" / @ref mne::MnaGraphExecutor::stop_stream "stop_stream") targets MNE Scan:
  * instead of calling op functions, the executor asks a host-supplied
  * @ref mne::MnaGraphExecutor::PluginFactory "PluginFactory" for a live @c QObject per node, applies
  * @ref mne::MnaParamTree values to the plugin's attributes, and wires
@@ -37,19 +37,22 @@
 
 #include "mna_global.h"
 #include "mna_node.h"
+#include "mna_types.h"
+#include "mna_verification.h"
+
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QMap>
-#include <QVariant>
-#include <QVariantMap>
-#include <QObject>
 #include <functional>
-#include <memory>
 #include <map>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -69,8 +72,12 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Executes a computational graph by traversing nodes in topological order
- * and invoking registered operation functions.
+ * Executes a computational graph by traversing nodes in topological order and invoking registered operation
+ * functions, external programs (IPC nodes) or interpreters (Script nodes).
+ *
+ * Results are stored as "nodeId::portName"; graph inputs as "graph::portName". Checks and parameter bindings see
+ * the scalar values among them (numbers, booleans, text); {{name}} placeholders in IPC arguments and scripts are
+ * replaced by the text of a node input or attribute.
  *
  * @brief Stateless batch and stream-mode runner for an @ref MnaGraph.
  *
@@ -79,121 +86,97 @@ namespace mne
 class MNASHARED_EXPORT MnaGraphExecutor
 {
 public:
-    /**
-     * Execution context — holds intermediate results between nodes.
-     */
+    /** Intermediate results between nodes. */
     struct Context
     {
-        /// nodeId::portName → data (QVariant wrapping domain objects or file paths)
-        QMap<QString, QVariant> results;
-
-        /// Graph-level inputs (populated before execution)
-        QVariantMap graphInputs;
-
-        /// Node whose failed "error" check stopped the run (empty if it ran to the end)
-        QString abortedNode;
+        MnaValues results;        ///< "nodeId::portName" → value
+        MnaValues graph_inputs;   ///< Graph-level inputs (populated before execution)
+        std::string aborted_node; ///< Node whose failed "error" check stopped the run (empty if it ran to the end)
     };
 
-    //=========================================================================================================
     /**
-     * Stream execution context — maps graph nodes to live plugin instances.
+     * Stream execution context: graph nodes and the live plugin instances that run them.
      *
-     * Used by MNE Scan to wire an MnaGraph to running AbstractPlugin objects.
-     * The mna library uses QObject* to avoid depending on MNE Scan libraries;
-     * the host application is responsible for casting to the actual plugin type.
+     * Used by MNE Scan to wire an MnaGraph to running plugins; the host application knows their type.
      */
     struct StreamContext
     {
-        MnaGraph* graph = nullptr;                               ///< The pipeline graph (owned externally)
-        std::map<QString, std::unique_ptr<QObject>> livePlugins; ///< nodeId → owned live plugin (QObject avoids a scan dependency)
-        bool running = false;                                    ///< Whether the stream is active
-        QStringList executionOrder;                              ///< Topological order used for startup/shutdown
+        MnaGraph* graph = nullptr;                                 ///< The pipeline graph (owned externally)
+        std::map<std::string, std::shared_ptr<void>> live_plugins; ///< nodeId → live plugin
+        bool running = false;                                      ///< Whether the stream is active
+        StringList execution_order;                                ///< Topological order used for startup/shutdown
     };
 
+    //=========================================================================================================
     /**
-     * Execute the full graph (all nodes in topological order).
-     * @param graph         The graph to execute.
-     * @param graphInputs   Named inputs fed into graph-level input ports.
-     * @return Execution context with all results.
+     * Executes the full graph in topological order.
+     *
+     * @param[in,out] graph          The graph; parameter bindings and node verification are updated.
+     * @param[in]     graph_inputs   Named inputs fed into graph-level input ports.
+     *
+     * @return The execution context with all results.
      */
-    static Context execute(MnaGraph& graph, const QVariantMap& graphInputs);
-
-    /**
-     * Execute only dirty nodes and their downstream dependents.
-     * @param graph     The graph to execute.
-     * @param existing  Existing context with prior results.
-     * @return Updated context.
-     */
-    static Context executeIncremental(MnaGraph& graph, Context& existing);
-
-    /**
-     * Execute a single node (for testing/debugging).
-     * @param node      The node to execute.
-     * @param inputs    Input data keyed by port name.
-     * @return Output data keyed by port name.
-     */
-    static QVariantMap executeNode(const MnaNode& node,
-                                   const QVariantMap& inputs);
-
-    /// Progress callback type.
-    using ProgressCallback = std::function<void(const QString& nodeId,
-                                                int current, int total)>;
-
-    /**
-     * Set a progress callback invoked for each node execution.
-     * @param cb        Callback receiving the node id and its 1-based index out of the total; an empty callback disables reporting.
-     */
-    static void setProgressCallback(ProgressCallback cb);
+    static Context execute(MnaGraph& graph, const MnaValues& graph_inputs = {});
 
     //=========================================================================================================
-    // Stream-mode execution
-    //=========================================================================================================
-
-    /// Factory callback: given a node's opType, create the corresponding live plugin.
-    /// Returns nullptr if the opType is unknown.  The host app provides this callback.
-    using PluginFactory = std::function<std::unique_ptr<QObject>(const QString& opType)>;
-
     /**
-     * Start stream-mode execution of a graph.
+     * Executes only dirty nodes and their downstream dependents.
      *
-     * 1. Validates the graph
-     * 2. Performs topological sort
-     * 3. For each node, calls @p factory to instantiate a live plugin
-     * 4. Applies MnaParamTree values to node attributes
-     * 5. Wires connections based on port dataKind matching
+     * @param[in,out] graph     The graph.
+     * @param[in,out] context   Prior results; updated with the new ones.
+     */
+    static void execute_incremental(MnaGraph& graph, Context& context);
+
+    //=========================================================================================================
+    /**
+     * Executes a single node.
      *
-     * The mna library does NOT depend on MNE Scan — the host app provides
-     * the factory and is responsible for wiring Qt signal/slot connections
-     * between the returned QObject* instances.
+     * @param[in] node     The node.
+     * @param[in] inputs   Input values keyed by port name.
+     *
+     * @return Output values keyed by port name; IPC and Script nodes give "stdout", "stderr" (std::string) and
+     *         "exit_code" (int, -1 if the program did not run to completion).
+     */
+    static MnaValues execute_node(const MnaNode& node, const MnaValues& inputs);
+
+    /** Receives the id of each node before it runs and its 1-based index out of the total. */
+    using ProgressCallback = std::function<void(std::string_view node_id, int current, int total)>;
+
+    /** @param[in] callback   Progress callback; an empty callback disables reporting. */
+    static void set_progress_callback(ProgressCallback callback);
+
+    /** Creates the live plugin of a node from its op type, or nullptr if the op type is unknown. */
+    using PluginFactory = std::function<std::shared_ptr<void>(std::string_view op_type)>;
+
+    //=========================================================================================================
+    /**
+     * Starts stream-mode execution: validates the graph, sorts it, applies the parameter tree and creates a
+     * live plugin per node. Wiring the plugins together is up to the host application.
      *
      * @param[in,out] graph     The pipeline graph.
-     * @param[in]     factory   Callback that maps opType → live QObject* plugin.
-     * @return Stream context.  Check ctx.running to see if startup succeeded.
-     */
-    static StreamContext startStream(MnaGraph& graph, PluginFactory factory);
-
-    /**
-     * Stop a running stream.  Iterates nodes in reverse topological order
-     * and deletes the live plugin objects.
+     * @param[in]     factory   Creates the live plugin of an op type.
      *
-     * @param[in,out] ctx   The stream context to stop.
+     * @return The stream context; running tells whether startup succeeded.
      */
-    static void stopStream(StreamContext& ctx);
+    static StreamContext start_stream(MnaGraph& graph, const PluginFactory& factory);
+
+    //=========================================================================================================
+    /**
+     * Stops a running stream, releasing the plugins in reverse topological order.
+     *
+     * @param[in,out] context   The stream context.
+     */
+    static void stop_stream(StreamContext& context);
 
 private:
     /** Copies every "nodeId/attrKey" value of the graph's parameter tree into that node's attributes. */
-    static void applyParamTree(MnaGraph& graph);
+    static void apply_param_tree(MnaGraph& graph);
 
-    /**
-     * Runs one node with its verification: pre checks, execution, post checks, provenance.
-     * Returns false if a failed "error" check stops the run.
-     */
-    static bool runNode(MnaGraph& graph, MnaNode& node, Context& ctx);
+    /** Runs one node with its verification; returns false if a failed "error" check stops the run. */
+    static bool run_node(MnaGraph& graph, MnaNode& node, Context& context);
 
     /** Evaluates the node's checks of one phase against its attributes, inputs and outputs. */
-    static QList<MnaVerificationResult> runChecks(const MnaGraph& graph, const MnaNode& node, const QString& phase, const QVariantMap& scope);
-
-    static ProgressCallback s_progressCallback;
+    static std::vector<MnaVerificationResult> run_checks(const MnaGraph& graph, const MnaNode& node, std::string_view phase, const JsonObject& scope);
 };
 
 } // namespace mne

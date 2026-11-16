@@ -30,20 +30,16 @@
 #include <mna/mna_verification.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QCoreApplication>
-#include <QFile>
-#include <QTemporaryDir>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <any>
 #include <cstdlib>
+#include <filesystem>
 #include <format>
+#include <fstream>
 #include <print>
+#include <string>
 #include <string_view>
 
 //=============================================================================================================
@@ -65,13 +61,19 @@ bool expect(bool condition, std::string_view what)
     return condition;
 }
 
-MnaPort port(const QString& name, MnaPortDir direction)
+MnaPort port(std::string name, MnaPortDir direction)
 {
     MnaPort p;
-    p.name = name;
-    p.dataKind = MnaDataKind::Matrix;
+    p.name = std::move(name);
+    p.data_kind = MnaDataKind::Matrix;
     p.direction = direction;
     return p;
+}
+
+double number(const MnaValues& values, std::string_view key)
+{
+    const auto it = values.find(key);
+    return it != values.end() ? std::any_cast<double>(it->second) : 0.0;
 }
 
 } // namespace
@@ -80,14 +82,15 @@ MnaPort port(const QString& name, MnaPortDir direction)
 // MAIN
 //=============================================================================================================
 
-int main(int argc, char* argv[])
+int main()
 {
-    QCoreApplication app(argc, argv);
-    QTemporaryDir dir;
-    bool ok = dir.isValid();
+    std::error_code ec;
+    const std::filesystem::path dir = std::filesystem::temp_directory_path(ec) / "ex_mna";
+    std::filesystem::create_directories(dir, ec);
+    bool ok = !ec;
 
-    QFile registryFile(dir.filePath("ex-registry.json"));
-    ok &= registryFile.open(QIODevice::WriteOnly) && registryFile.write(R"({
+    const std::filesystem::path registryFile = dir / "ex-registry.json";
+    std::ofstream(registryFile) << R"({
   "mna_registry_version": "1.0", "provider": "ex_mna",
   "ops": [
     {"type": "ex_constant", "binding": "internal", "category": "io", "description": "Emit a constant",
@@ -97,39 +100,38 @@ int main(int argc, char* argv[])
      "inputs": [{"name": "in", "kind": "Matrix"}], "outputs": [{"name": "out", "kind": "Matrix"}],
      "parameters": [{"name": "gain", "type": "double", "default": 1.0}, {"name": "offset", "type": "double", "default": 0.0}]}
   ]
-})") > 0;
-    registryFile.close();
+})";
 
     //! [mna_registry_loader_usage]
     MnaOpRegistry& registry = MnaOpRegistry::instance();
-    const int nLoaded = MnaRegistryLoader::loadFile(registryFile.fileName(), registry); // schemas only
-    registry.registerOpFunc("ex_constant", [](const QVariantMap&, const QVariantMap& attrs) -> QVariantMap {
-        return {{"out", attrs.value("value").toDouble()}};
+    const int nLoaded = MnaRegistryLoader::load_file(registryFile, registry); // schemas only
+    registry.register_op_func("ex_constant", [](const MnaValues&, const JsonObject& attrs) -> MnaValues {
+        return {{"out", attrs["value"].to_double()}};
     });
-    registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
-        return {{"out", attrs.value("gain", 1.0).toDouble() * inputs.value("in").toDouble() + attrs.value("offset", 0.0).toDouble()}};
+    registry.register_op_func("ex_affine", [](const MnaValues& inputs, const JsonObject& attrs) -> MnaValues {
+        return {{"out", attrs["gain"].to_double(1.0) * std::any_cast<double>(inputs.at("in")) + attrs["offset"].to_double(0.0)}};
     });
     //! [mna_registry_loader_usage]
-    ok &= expect(nLoaded == 2 && registry.hasOp("ex_affine") && registry.schema("ex_affine").inputPorts.size() == 1 && registry.missingOps({"ex_constant", "ex_affine", "ex_unknown"}) == QStringList({"ex_unknown"}),
-                 "MnaRegistryLoader loads 2 ops; missingOps reports the unknown one");
+    ok &= expect(nLoaded == 2 && registry.has_op("ex_affine") && registry.schema("ex_affine").input_ports.size() == 1 &&
+                     registry.missing_ops({"ex_constant", "ex_affine", "ex_unknown"}) == StringList{"ex_unknown"},
+                 "MnaRegistryLoader loads 2 ops; missing_ops reports the unknown one");
 
     //! [mna_graph_build]
     MnaGraph graph;
     MnaNode source;
     source.id = "source";
-    source.opType = "ex_constant";
+    source.op_type = "ex_constant";
     source.attributes["value"] = 3.0;
-    const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
-    source.outputs.append(sourceOut);
-    graph.addNode(source);
+    source.outputs.push_back(port("out", MnaPortDir::Output)); // name, data kind, direction
+    graph.add_node(source);
 
-    for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {
+    for (const char* id : {"scale", "shift"}) {
         MnaNode node;
         node.id = id;
-        node.opType = "ex_affine";
-        node.inputs.append(port("in", MnaPortDir::Input));
-        node.outputs.append(port("out", MnaPortDir::Output));
-        graph.addNode(node);
+        node.op_type = "ex_affine";
+        node.inputs.push_back(port("in", MnaPortDir::Input));
+        node.outputs.push_back(port("out", MnaPortDir::Output));
+        graph.add_node(std::move(node));
     }
     graph.node("scale").attributes["gain"] = 2.0;
     graph.connect("source", "out", "scale", "in");
@@ -137,38 +139,40 @@ int main(int argc, char* argv[])
     //! [mna_graph_build]
 
     //! [mna_op_schema_validate]
-    QStringList problems;
-    const bool nodeValid = registry.schema("ex_affine").validate(graph.node("scale"), &problems);
+    const StringList problems = registry.schema("ex_affine").validate(graph.node("scale"));
     MnaNode unset = graph.node("source");
     unset.attributes.clear(); // "value" is required
-    const bool unsetValid = registry.schema("ex_constant").validate(unset);
-    const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
-    const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
+    const StringList unsetProblems = registry.schema("ex_constant").validate(unset);
+    const MnaOpSchemaPort& affineIn = registry.schema("ex_affine").input_ports.front();  // "in", Matrix, required
+    const MnaOpSchemaAttr& affineGain = registry.schema("ex_affine").attributes.front(); // "gain", double, default 1
     //! [mna_op_schema_validate]
-    ok &= expect(nodeValid && problems.isEmpty() && !unsetValid && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" && affineGain.defaultValue.toDouble() == 1.0 && graph.validate() && graph.topologicalSort() == QStringList({"source", "scale", "shift"}),
+    ok &= expect(problems.empty() && unsetProblems.size() == 1 && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" &&
+                     affineGain.default_value.to_double() == 1.0 && graph.validate().empty() &&
+                     graph.topological_sort() == StringList{"source", "scale", "shift"},
                  "MnaOpSchema accepts the wired node and rejects a missing required attribute; graph order source -> scale -> shift");
 
     //! [mna_param_tree_binding]
-    graph.paramTree.setParam("shift/offset", 0.5);
+    graph.param_tree.set_param("shift/offset", 0.5);
     MnaParamBinding binding;
-    binding.targetPath = "scale/gain";
+    binding.target_path = "scale/gain";
     binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
     binding.trigger = "on_change";
-    graph.paramTree.addBinding(binding);
+    graph.param_tree.add_binding(binding);
     //! [mna_param_tree_binding]
 
     //! [mna_graph_execute]
-    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
-    const double first = ctx.results.value("shift::out").toDouble(); // "nodeId::port"
-    const double gainAfterFirst = graph.paramTree.param("scale/gain").toDouble();
+    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph);
+    const double first = number(ctx.results, "shift::out"); // "nodeId::port"
+    const double gainAfterFirst = graph.param_tree.param("scale/gain").to_double();
 
     graph.node("source").attributes["value"] = 1.0;
     graph.node("source").dirty = true; // only source and its downstream nodes run again
-    const double second = MnaGraphExecutor::executeIncremental(graph, ctx).results.value("shift::out").toDouble();
+    MnaGraphExecutor::execute_incremental(graph, ctx);
+    const double second = number(ctx.results, "shift::out");
     //! [mna_graph_execute]
     // Before execution the binding has no source::out yet, so gain stays 2: 2 * 3 + 0.5 = 6.5.
     // After it, gain = clamp(3 * 2, 0, 5) = 5, so the incremental run gives 5 * 1 + 0.5 = 5.5 and re-binds gain to 2.
-    ok &= expect(first == 6.5 && gainAfterFirst == 5.0 && second == 5.5 && graph.paramTree.param("scale/gain").toDouble() == 2.0,
+    ok &= expect(first == 6.5 && gainAfterFirst == 5.0 && second == 5.5 && graph.param_tree.param("scale/gain").to_double() == 2.0,
                  std::format("MnaGraphExecutor: shift::out = {:g}, then {:g} after the binding sets gain to {:g}", first, second, gainAfterFirst));
 
     //! [mna_verification_usage]
@@ -180,16 +184,17 @@ int main(int argc, char* argv[])
     positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
     positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
     positive.severity = "error";     // a failed "error" check stops the run
-    checks.checks.append(positive);
+    checks.checks.push_back(positive);
     graph.node("source").attributes["value"] = -2.0;
     graph.node("source").dirty = true;
-    const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
-    const MnaVerificationResult& verdict = checks.postResults.first();
+    MnaGraphExecutor::execute_incremental(graph, ctx);
+    const MnaVerificationResult& verdict = checks.post_results.front();
     const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
     //! [mna_verification_usage]
     // gain is 2 again, so shift::out = 2 * -2 + 0.5 = -3.5 fails the check
-    ok &= expect(!verdict.passed && verdict.actualValue == QVariant(false) && checked.abortedNode == "shift" && checked.results.value("shift::out").toDouble() == -3.5 && provenance.mneCppVersion == MNE_CPP_VERSION && provenance.inputHashes.contains("in"),
-                 "MnaVerification: " + verdict.message.toStdString());
+    ok &= expect(!verdict.passed && verdict.actual_value == JsonValue(false) && ctx.aborted_node == "shift" && number(ctx.results, "shift::out") == -3.5 &&
+                     provenance.mne_cpp_version == MNE_CPP_VERSION && provenance.input_hashes.contains("in"),
+                 "MnaVerification: " + verdict.message);
 
     //! [mna_project_files]
     MnaFileRef raw;
@@ -198,14 +203,14 @@ int main(int argc, char* argv[])
     raw.format = "fiff";
     MnaRecording recording;
     recording.id = "run-01";
-    recording.files.append(raw);
+    recording.files.push_back(raw);
     MnaSession session;
     session.id = "ses-01";
-    session.recordings.append(recording);
+    session.recordings.push_back(recording);
     MnaSubject subject;
     subject.id = "sub-01";
-    subject.freeSurferDir = "subjects/sample";
-    subject.sessions.append(session);
+    subject.freesurfer_dir = "subjects/sample";
+    subject.sessions.push_back(session);
     MnaScript report; // a script node: inline code run by an interpreter
     report.language = "python";
     report.code = "print({{in}})";
@@ -214,17 +219,22 @@ int main(int argc, char* argv[])
     //! [mna_project_save]
     MnaProject project;
     project.name = "ex_mna";
-    project.subjects.append(subject);
+    project.subjects.push_back(subject);
     project.pipeline = graph.nodes();
-    const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
-    const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
-    const bool saved = MnaIO::write(project, jsonPath) && MnaIO::write(project, cborPath);
-    const MnaProject fromJson = MnaIO::read(jsonPath);
-    const MnaProject fromCbor = MnaIO::read(cborPath);
+    const std::filesystem::path jsonPath = dir / "pipeline.mna"; // UTF-8 JSON
+    const std::filesystem::path cborPath = dir / "pipeline.mnx"; // CBOR with an "MNX1" magic
+    const bool saved = project.write(jsonPath) && project.write(cborPath);
+    const Expected<MnaProject> fromJson = MnaProject::read(jsonPath); // or why it cannot be read
+    const Expected<MnaProject> fromCbor = MnaProject::read(cborPath);
     //! [mna_project_save]
-    ok &= expect(saved && fromJson.name == "ex_mna" && fromCbor.subjects.size() == 1 && fromCbor.subjects[0].sessions[0].recordings[0].files[0].path == raw.path && fromJson.pipeline[2].verification.postResults.first().message == verdict.message && report.language == "python" && fromJson.pipeline.size() == 3 && fromCbor.pipeline.size() == 3 && fromCbor.pipeline[1].inputs[0].sourceNodeId == "source" && fromJson.pipeline[1].attributes.value("gain").toDouble() == 2.0,
+    ok &= expect(saved && fromJson && fromCbor && fromJson->name == "ex_mna" && fromCbor->subjects.size() == 1 &&
+                     fromCbor->subjects[0].sessions[0].recordings[0].files[0].path == raw.path &&
+                     fromJson->pipeline[2].verification.post_results.front().message == verdict.message && report.language == "python" &&
+                     fromJson->pipeline.size() == 3 && fromCbor->pipeline.size() == 3 && fromCbor->pipeline[1].inputs[0].source_node_id == "source" &&
+                     fromJson->pipeline[1].attributes["gain"].to_double() == 2.0,
                  "MnaIO round-trips the 3-node pipeline through .mna and .mnx");
 
+    std::filesystem::remove_all(dir, ec);
     std::println("{}", ok ? "All mna checks passed." : "mna checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

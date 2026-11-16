@@ -26,19 +26,21 @@
 //=============================================================================================================
 
 #include "mna_io.h"
-#include <base/log.h>
+
+#include <base/byte_stream.h>
+#include <base/cbor.h>
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QFileInfo>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QCborValue>
-#include <QCborMap>
-#include <QDebug>
+#include <algorithm>
+#include <array>
+#include <span>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,161 +49,90 @@
 using namespace mne;
 
 //=============================================================================================================
-// STATIC CONSTANTS
+// DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
-static const QByteArray MNX_MAGIC = QByteArrayLiteral("MNX1");
-
-//=============================================================================================================
-// DEFINE METHODS
-//=============================================================================================================
-
-MnaProject MnaIO::read(const QString& path)
+namespace
 {
-    const QFileInfo fi(path);
-    const QString suffix = fi.suffix().toLower();
 
-    if (suffix == QLatin1String("mna")) {
-        return readJson(path);
-    } else if (suffix == QLatin1String("mnx")) {
-        return readCbor(path);
+constexpr std::array kMagic{std::byte{'M'}, std::byte{'N'}, std::byte{'X'}, std::byte{'1'}};
+
+/** @return The major number of a version like "1.0". */
+int majorVersion(std::string_view version)
+{
+    return to_int(version.substr(0, version.find('.'))).value_or(0);
+}
+
+/** @return @p project, or an error if its schema version has another major number than this build. */
+Expected<MnaProject> checkVersion(MnaProject project, const std::filesystem::path& path)
+{
+    if (majorVersion(project.mna_version) != majorVersion(MnaProject::CURRENT_SCHEMA_VERSION)) {
+        return fail(ErrorCode::Format, "{} has the incompatible MNA version '{}' (expected major {})", utf8_from_path(path), project.mna_version,
+                    majorVersion(MnaProject::CURRENT_SCHEMA_VERSION));
     }
+    return project;
+}
 
-    mne::Log::warning("[MnaIO::read] Unknown extension: {}", suffix.toStdString());
-    return MnaProject();
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+Expected<MnaProject> MnaIO::read(const std::filesystem::path& path)
+{
+    const std::string extension = to_lower(utf8_from_path(path.extension()));
+    if (extension == ".mna") {
+        const Expected<std::string> text = read_text_file(path);
+        if (!text) {
+            return std::unexpected(text.error());
+        }
+        JsonParseError error;
+        const JsonDocument doc = JsonDocument::from_json(*text, &error);
+        if (error.error != JsonParseError::NoError) {
+            return fail(ErrorCode::Format, "{} is not valid JSON: {} at byte {}", utf8_from_path(path), error.error_string(), error.offset);
+        }
+        return checkVersion(MnaProject::from_json(doc.object()), path);
+    }
+    if (extension == ".mnx") {
+        const Expected<std::vector<std::byte>> bytes = read_file_bytes(path);
+        if (!bytes) {
+            return std::unexpected(bytes.error());
+        }
+        const std::span<const std::byte> data(*bytes);
+        if (data.size() < kMagic.size() || !std::ranges::equal(data.first(kMagic.size()), kMagic)) {
+            return fail(ErrorCode::Format, "{} does not start with the MNX1 magic bytes", utf8_from_path(path));
+        }
+        CborParseError error;
+        const CborValue root = CborValue::from_cbor(data.subspan(kMagic.size()), &error);
+        if (error.error != CborParseError::NoError || !root.is_map()) {
+            return fail(ErrorCode::Format, "{} does not hold a CBOR map: {}", utf8_from_path(path), error.error_string());
+        }
+        return checkVersion(MnaProject::from_cbor(root.to_map()), path);
+    }
+    return fail(ErrorCode::Format, "{} is neither a .mna nor a .mnx file", utf8_from_path(path));
 }
 
 //=============================================================================================================
 
-bool MnaIO::write(const MnaProject& project, const QString& path)
+Expected<void> MnaIO::write(const MnaProject& project, const std::filesystem::path& path)
 {
-    const QFileInfo fi(path);
-    const QString suffix = fi.suffix().toLower();
-
-    if (suffix == QLatin1String("mna")) {
-        return writeJson(project, path);
-    } else if (suffix == QLatin1String("mnx")) {
-        return writeCbor(project, path);
+    const std::string extension = to_lower(utf8_from_path(path.extension()));
+    if (extension == ".mna") {
+        return write_text_file(path, JsonDocument(project.to_json()).to_json(JsonDocument::Indented));
     }
-
-    mne::Log::warning("[MnaIO::write] Unknown extension: {}", suffix.toStdString());
-    return false;
+    if (extension != ".mnx") {
+        return fail(ErrorCode::Format, "{} is neither a .mna nor a .mnx file", utf8_from_path(path));
+    }
+    return write_file_bytes(path, to_mnx(project));
 }
 
 //=============================================================================================================
 
-MnaProject MnaIO::readJson(const QString& path)
+std::vector<std::byte> MnaIO::to_mnx(const MnaProject& project)
 {
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        mne::Log::warning("[MnaIO::readJson] Cannot open file: {}", path.toStdString());
-        return MnaProject();
-    }
-
-    const QByteArray data = file.readAll();
-    file.close();
-
-    QJsonParseError parseError;
-    const QJsonDocument doc = QJsonDocument::fromJson(data, &parseError);
-    if (parseError.error != QJsonParseError::NoError) {
-        mne::Log::warning("[MnaIO::readJson] Parse error: {}", parseError.errorString().toStdString());
-        return MnaProject();
-    }
-
-    const QJsonObject root = doc.object();
-
-    // Version check: reject if major version differs
-    const QString fileVersion = root[QLatin1String("mna_version")].toString();
-    const int fileMajor = fileVersion.section(QLatin1Char('.'), 0, 0).toInt();
-    const int currentMajor = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION).section(QLatin1Char('.'), 0, 0).toInt();
-    if (fileMajor != currentMajor) {
-        mne::Log::warning("[MnaIO::readJson] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
-        return MnaProject();
-    }
-
-    return MnaProject::fromJson(root);
-}
-
-//=============================================================================================================
-
-bool MnaIO::writeJson(const MnaProject& project, const QString& path)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        mne::Log::warning("[MnaIO::writeJson] Cannot open file for writing: {}", path.toStdString());
-        return false;
-    }
-
-    const QJsonDocument doc(project.toJson());
-    const QByteArray data = doc.toJson(QJsonDocument::Indented);
-    const qint64 written = file.write(data);
-    file.close();
-
-    return (written == data.size());
-}
-
-//=============================================================================================================
-
-MnaProject MnaIO::readCbor(const QString& path)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        mne::Log::warning("[MnaIO::readCbor] Cannot open file: {}", path.toStdString());
-        return MnaProject();
-    }
-
-    // Verify magic header
-    const QByteArray magic = file.read(MNX_MAGIC.size());
-    if (magic != MNX_MAGIC) {
-        mne::Log::warning("[MnaIO::readCbor] Invalid magic header in: {}", path.toStdString());
-        file.close();
-        return MnaProject();
-    }
-
-    const QByteArray cborData = file.readAll();
-    file.close();
-
-    const QCborValue cborVal = QCborValue::fromCbor(cborData);
-    if (!cborVal.isMap()) {
-        mne::Log::warning("[MnaIO::readCbor] Root CBOR value is not a map");
-        return MnaProject();
-    }
-
-    const QCborMap root = cborVal.toMap();
-
-    // Version check: reject if major version differs
-    const QString fileVersion = root[QLatin1String("mna_version")].toString();
-    const int fileMajor = fileVersion.section(QLatin1Char('.'), 0, 0).toInt();
-    const int currentMajor = QString::fromLatin1(MnaProject::CURRENT_SCHEMA_VERSION).section(QLatin1Char('.'), 0, 0).toInt();
-    if (fileMajor != currentMajor) {
-        mne::Log::warning("[MnaIO::readCbor] Incompatible major version: {} (expected major {} )", fileVersion.toStdString(), currentMajor);
-        return MnaProject();
-    }
-
-    return MnaProject::fromCbor(root);
-}
-
-//=============================================================================================================
-
-bool MnaIO::writeCbor(const MnaProject& project, const QString& path)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        mne::Log::warning("[MnaIO::writeCbor] Cannot open file for writing: {}", path.toStdString());
-        return false;
-    }
-
-    // Write magic header
-    if (file.write(MNX_MAGIC) != MNX_MAGIC.size()) {
-        mne::Log::warning("[MnaIO::writeCbor] Failed to write magic header");
-        file.close();
-        return false;
-    }
-
-    const QCborValue cborVal(project.toCbor());
-    const QByteArray cborData = cborVal.toCbor();
-    const qint64 written = file.write(cborData);
-    file.close();
-
-    return (written == cborData.size());
+    std::vector<std::byte> bytes(kMagic.begin(), kMagic.end());
+    const CborByteArray cbor = CborValue(project.to_cbor()).to_cbor();
+    bytes.insert(bytes.end(), cbor.begin(), cbor.end());
+    return bytes;
 }

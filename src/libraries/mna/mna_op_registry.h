@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Process-wide singleton catalog mapping @c opType strings to their @ref mne::MnaOpSchema and (for built-in ops) executable implementation.
+ * @brief    Process-wide singleton catalog mapping @c op_type strings to their @ref mne::MnaOpSchema and (for built-in ops) executable implementation.
  *
  * @ref mne::MnaOpRegistry is the lookup table that the rest of the
- * library hits whenever an @c opType string needs to be resolved
+ * library hits whenever an @c op_type string needs to be resolved
  * into something runnable. It stores two parallel maps: one from
  * op type to @ref mne::MnaOpSchema (used by @ref mne::MnaGraph::validate "MnaGraph::validate" and
  * by GUI editors to render attribute forms), and one from op type
@@ -18,11 +18,11 @@
  * the node). External / CLI / Script ops typically only register a
  * schema; in-process ops register both.
  *
- * @ref mne::MnaOpRegistry::loadRegistryFiles "loadRegistryFiles" searches upward from the application
+ * @ref mne::MnaOpRegistry::load_registry_files "load_registry_files" searches upward from the application
  * directory for @c resources/mna/ and asks @ref mne::MnaRegistryLoader
  * to ingest @c mna-registry.json plus every drop-in under
  * @c mna-registry.d/, so new operations can be added without
- * rebuilding the library. @ref mne::MnaOpRegistry::missingOps "missingOps" reports the op types
+ * rebuilding the library. @ref mne::MnaOpRegistry::missing_ops "missing_ops" reports the op types
  * referenced by a loaded project that the current process cannot
  * resolve — the simplest way to detect a stale or partial install.
  */
@@ -36,16 +36,19 @@
 
 #include "mna_global.h"
 #include "mna_op_schema.h"
+#include "mna_types.h"
+
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QVariantMap>
 #include <functional>
+#include <map>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -56,98 +59,56 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Singleton catalog of all registered operation schemas.
+ * Process-wide catalog of operation schemas and, for built-in operations, their implementations.
  *
- * @brief Process-wide lookup from @c opType to @ref MnaOpSchema and implementation function.
+ * @brief Process-wide lookup from @c op_type to @ref MnaOpSchema and implementation function.
  *
  * @snippet ex_mna/main.cpp mna_registry_loader_usage
  */
 class MNASHARED_EXPORT MnaOpRegistry
 {
 public:
-    /// Operation implementation callback type.
-    using OpFunc = std::function<QVariantMap(const QVariantMap& inputs,
-                                             const QVariantMap& attributes)>;
+    /** Implementation of an operation: input values by port name and the node attributes in, output values out. */
+    using OpFunc = std::function<MnaValues(const MnaValues& inputs, const JsonObject& attributes)>;
 
-    /**
-     * Access the singleton instance.
-     *
-     * @return Reference to the process-wide registry.
-     */
+    /** @return The registry, loaded from resources/mna on first use. */
     static MnaOpRegistry& instance();
 
-    /**
-     * Register an operation schema.
-     *
-     * @param[in] schema   Schema to store; replaces any existing schema with the same opType.
-     */
-    void registerOp(const MnaOpSchema& schema);
+    /** @param[in] schema   A schema; replaces the schema of the same op type. */
+    void register_op(const MnaOpSchema& schema);
 
-    /**
-     * Check if an operation type is registered.
-     *
-     * @param[in] opType   Operation type name to look up.
-     *
-     * @return true if a schema is registered for opType, false otherwise.
-     */
-    bool hasOp(const QString& opType) const;
+    /** @param[in] op_type   An op type. @return Whether it has a schema. */
+    bool has_op(std::string_view op_type) const;
 
-    /**
-     * Get the schema for an operation type.
-     *
-     * @param[in] opType   Operation type name to look up.
-     *
-     * @return The registered schema, or a default-constructed schema if opType is unknown.
-     */
-    MnaOpSchema schema(const QString& opType) const;
+    /** @param[in] op_type   An op type. @return Its schema, or an empty schema if there is none. */
+    const MnaOpSchema& schema(std::string_view op_type) const;
 
-    /**
-     * List all registered operation types.
-     *
-     * @return Names of all operation types that have a registered schema.
-     */
-    QStringList registeredOps() const;
+    /** @return The op types with a schema in ascending order. */
+    StringList registered_ops() const;
 
-    /**
-     * Register an implementation function for an operation type.
-     *
-     * @param[in] opType   Operation type name the function implements.
-     * @param[in] func     Callback mapping inputs and attributes to outputs; replaces any existing one.
-     */
-    void registerOpFunc(const QString& opType, OpFunc func);
+    /** @param[in] op_type   An op type. @param[in] func   Its implementation; replaces an earlier one. */
+    void register_op_func(std::string_view op_type, OpFunc func);
 
-    /**
-     * Get the implementation function for an operation type.
-     *
-     * @param[in] opType   Operation type name to look up.
-     *
-     * @return The registered callback, or an empty OpFunc if none is registered.
-     */
-    OpFunc opFunc(const QString& opType) const;
+    /** @param[in] op_type   An op type. @return Its implementation, or an empty function if there is none. */
+    const OpFunc& op_func(std::string_view op_type) const;
 
+    //=========================================================================================================
     /**
-     * Load registry files from the standard resources/mna/ directory.
+     * Loads the schemas of the resources/mna directory found next to the executable, up to five directories
+     * above it, or in the working directory.
      *
-     * Searches upward from the application directory to find resources/mna/,
-     * then loads mna-registry.json and all drop-in files from mna-registry.d/.
-     *
-     * @return Number of ops loaded, or 0 if no registry directory was found.
+     * @return The number of schemas loaded.
      */
-    int loadRegistryFiles();
+    int load_registry_files();
 
-    /**
-     * Return op types referenced in a project that have no registered schema.
-     *
-     * @param[in] pipelineTools  The MNA project to check.
-     * @return List of op type strings with no registered schema.
-     */
-    QStringList missingOps(const QStringList& pipelineTools) const;
+    /** @param[in] tools   Op types a pipeline needs. @return Those without a schema. */
+    StringList missing_ops(const StringList& tools) const;
 
 private:
     MnaOpRegistry();
 
-    QMap<QString, MnaOpSchema> m_schemas;
-    QMap<QString, OpFunc> m_funcs;
+    std::map<std::string, MnaOpSchema, std::less<>> m_schemas;
+    std::map<std::string, OpFunc, std::less<>> m_funcs;
 };
 
 } // namespace mne

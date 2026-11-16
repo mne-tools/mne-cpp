@@ -34,15 +34,15 @@
 #include "mna_global.h"
 #include "mna_recording.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
-#include <QJsonObject>
-#include <QCborMap>
-#include <QSet>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -53,51 +53,27 @@ namespace mne
 
 //=============================================================================================================
 /**
- * Groups recordings belonging to one measurement session.
+ * @brief Recordings of one experimental session of a subject.
  *
  * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaSession
 {
-    QString id;                     /**< Session identifier. */
-    QList<MnaRecording> recordings; /**< Recordings in this session. */
-    QJsonObject extras;             /**< Unknown keys preserved for lossless round-trip. */
+    std::string id;                       /**< Session identifier. */
+    std::vector<MnaRecording> recordings; /**< Recordings in this session. */
+    JsonObject extras;                    /**< Unknown keys preserved for lossless round-trip. */
 
-    //=========================================================================================================
-    /**
-     * Serialize to QJsonObject.
-     *
-     * @return JSON object with the session id, its recordings and preserved extras.
-     */
-    QJsonObject toJson() const;
+    /** @return The session as a JSON object. */
+    JsonObject to_json() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QJsonObject.
-     *
-     * @param[in] json   JSON object as produced by toJson().
-     *
-     * @return The session; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaSession fromJson(const QJsonObject& json);
+    /** @param[in] json   A session as written by to_json(). @return The session. */
+    static MnaSession from_json(const JsonObject& json);
 
-    //=========================================================================================================
-    /**
-     * Serialize to QCborMap.
-     *
-     * @return CBOR map with the session id, its recordings and preserved extras.
-     */
-    QCborMap toCbor() const;
+    /** @return The session as a CBOR map. */
+    CborMap to_cbor() const;
 
-    //=========================================================================================================
-    /**
-     * Deserialize from QCborMap.
-     *
-     * @param[in] cbor   CBOR map as produced by toCbor().
-     *
-     * @return The session; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaSession fromCbor(const QCborMap& cbor);
+    /** @param[in] cbor   A session as written by to_cbor(). @return The session. */
+    static MnaSession from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

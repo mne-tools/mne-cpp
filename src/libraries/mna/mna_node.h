@@ -7,27 +7,27 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    One operation in an MNA graph — opType, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
+ * @brief    One operation in an MNA graph — op_type, typed I/O ports, attributes, execution mode (Batch / Stream / IPC / Script) and provenance.
  *
  * @ref mne::MnaNode is the executable counterpart to a @ref mne::MnaFileRef "MnaFileRef":
  * where the latter records a derived artefact, the node records
- * @em how that artefact is produced. The @c opType string is
+ * @em how that artefact is produced. The @c op_type string is
  * resolved against @ref mne::MnaOpRegistry to obtain the
  * @ref mne::MnaOpSchema (and, for built-in ops, the implementation
  * function) used by @ref mne::MnaGraphExecutor; @c attributes provides
  * the per-call parameter values validated against that schema.
  *
- * The @c execMode field selects one of four executors:
+ * The @c exec_mode field selects one of four executors:
  * @c Batch (default, file-in/file-out), @c Stream (live MNE Scan
  * plugin), @c Ipc (delegates to an external binary via
- * @c ipcCommand / @c ipcArgs / @c ipcTransport), or @c Script
+ * @c ipc_command / @c ipc_args / @c ipc_transport), or @c Script
  * (inline @ref mne::MnaScript run by an interpreter). Each mode reuses
  * the same node fields, so a pipeline can mix all four without
  * structural changes.
  *
  * @c verification carries pre/post checks, explanation text and the
  * full @ref mne::MnaProvenance snapshot captured at execution time;
- * combined with @c toolVersion, @c executedAt and the @c dirty flag
+ * combined with @c tool_version, @c executed_at and the @c dirty flag
  * this is what makes MNA pipelines reproducible and supports
  * incremental re-execution after a parameter edit.
  */
@@ -40,23 +40,22 @@
 //=============================================================================================================
 
 #include "mna_global.h"
-#include "mna_types.h"
 #include "mna_port.h"
 #include "mna_script.h"
+#include "mna_types.h"
 #include "mna_verification.h"
 
+#include <base/cbor.h>
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QStringList>
-#include <QVariantMap>
-#include <QDateTime>
-#include <QJsonObject>
-#include <QCborMap>
-#include <QList>
-#include <QSet>
+#include <optional>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -75,37 +74,40 @@ namespace mne
  */
 struct MNASHARED_EXPORT MnaNode
 {
-    QString id;             ///< Unique node identifier
-    QString opType;         ///< Operation type (looked up in MnaOpRegistry)
-    QVariantMap attributes; ///< Operation parameters
+    std::string id;        ///< Unique node identifier
+    std::string op_type;   ///< Operation type (looked up in MnaOpRegistry)
+    JsonObject attributes; ///< Operation parameters
 
-    QList<MnaPort> inputs;  ///< Input ports
-    QList<MnaPort> outputs; ///< Output ports
+    std::vector<MnaPort> inputs;  ///< Input ports
+    std::vector<MnaPort> outputs; ///< Output ports
 
-    MnaNodeExecMode execMode = MnaNodeExecMode::Batch; ///< Execution mode
+    MnaNodeExecMode exec_mode = MnaNodeExecMode::Batch; ///< Execution mode
 
-    // IPC configuration (used when execMode == Ipc)
-    QString ipcCommand;   ///< External executable command
-    QStringList ipcArgs;  ///< Command-line arguments (supports {{placeholder}} tokens)
-    QString ipcWorkDir;   ///< Working directory for external process
-    QString ipcTransport; ///< "stdio", "tcp", "shm", "file"
+    std::string ipc_command;   ///< External executable command (exec_mode == Ipc)
+    StringList ipc_args;       ///< Command-line arguments (supports {{placeholder}} tokens)
+    std::string ipc_work_dir;  ///< Working directory for external process
+    std::string ipc_transport; ///< "stdio", "tcp", "shm", "file"
 
-    // Script configuration (used when execMode == Script)
-    MnaScript script; ///< Inline source code, interpreter, language
+    MnaScript script; ///< Inline source code, interpreter, language (exec_mode == Script)
 
-    // Verification & provenance
     MnaVerification verification; ///< Explanation, checks, results, and provenance snapshot
 
-    // Execution metadata
-    QString toolVersion;  ///< Version of tool that last executed this node
-    QDateTime executedAt; ///< Timestamp of last execution
-    bool dirty = true;    ///< Whether node needs re-execution
-    QJsonObject extras;   ///< Unknown keys preserved for lossless round-trip
+    std::string tool_version;           ///< Version of tool that last executed this node
+    std::optional<UtcTime> executed_at; ///< Timestamp of last execution
+    bool dirty = true;                  ///< Whether node needs re-execution
+    JsonObject extras;                  ///< Unknown keys preserved for lossless round-trip
 
-    QJsonObject toJson() const;
-    static MnaNode fromJson(const QJsonObject& json);
-    QCborMap toCbor() const;
-    static MnaNode fromCbor(const QCborMap& cbor);
+    /** @return The node as a JSON object. */
+    JsonObject to_json() const;
+
+    /** @param[in] json   A node as written by to_json(). @return The node. */
+    static MnaNode from_json(const JsonObject& json);
+
+    /** @return The node as a CBOR map. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A node as written by to_cbor(). @return The node. */
+    static MnaNode from_cbor(const CborMap& cbor);
 };
 
 } // namespace mne

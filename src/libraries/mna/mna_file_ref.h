@@ -38,15 +38,19 @@
 #include "mna_global.h"
 #include "mna_types.h"
 
+#include <base/cbor.h>
+#include <base/error.h>
+#include <base/json.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QByteArray>
-#include <QJsonObject>
-#include <QCborMap>
-#include <QSet>
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -57,56 +61,55 @@ namespace mne
 
 //=============================================================================================================
 /**
- * A reference to a file within an MNA project.
+ * @brief Reference to a file inside an MNA project, optionally with its content embedded.
+ *
+ * Embedded data is base64 text in .mna (JSON) files and a byte string in .mnx (CBOR) files.
  *
  * @snippet ex_mna/main.cpp mna_project_files
  */
 struct MNASHARED_EXPORT MnaFileRef
 {
     MnaFileRole role = MnaFileRole::Custom; /**< Role of the file. */
-    QString path;                           /**< Relative POSIX path. */
-    QString sha256;                         /**< SHA-256 hash of file contents. */
-    QString format;                         /**< File format: "fiff", "mgh", "stc", etc. */
-    qint64 sizeBytes = 0;                   /**< File size in bytes. */
+    std::string path;                       /**< Relative POSIX path. */
+    std::string sha256;                     /**< SHA-256 hash of file contents. */
+    std::string format;                     /**< File format: "fiff", "mgh", "stc", etc. */
+    std::int64_t size_bytes = 0;            /**< File size in bytes. */
     bool embedded = false;                  /**< Whether data is embedded in the container. */
-    QByteArray data;                        /**< Embedded file data (only when embedded == true). */
-    QJsonObject extras;                     /**< Unknown keys preserved for lossless round-trip. */
+    std::vector<std::byte> data;            /**< Embedded file data (only when embedded == true). */
+    JsonObject extras;                      /**< Unknown keys preserved for lossless round-trip. */
+
+    /** @return The reference as a JSON object, embedded data as base64. */
+    JsonObject to_json() const;
+
+    /** @param[in] json   A reference as written by to_json(). @return The reference. */
+    static MnaFileRef from_json(const JsonObject& json);
+
+    /** @return The reference as a CBOR map, embedded data as a byte string. */
+    CborMap to_cbor() const;
+
+    /** @param[in] cbor   A reference as written by to_cbor(). @return The reference. */
+    static MnaFileRef from_cbor(const CborMap& cbor);
 
     //=========================================================================================================
     /**
-     * Serialize to QJsonObject.
+     * Embeds the content of a file: sets data, size_bytes and embedded; path is left to the caller.
      *
-     * @return JSON object with all fields and preserved extras; embedded data is Base64-encoded.
+     * @param[in] file   The file to read.
+     *
+     * @return Nothing, or why the file cannot be read; the reference is unchanged then.
      */
-    QJsonObject toJson() const;
+    Expected<void> embed(const std::filesystem::path& file);
 
     //=========================================================================================================
     /**
-     * Deserialize from QJsonObject.
+     * Writes the embedded data to a file and turns this into a reference to it: clears data and embedded;
+     * path is left to the caller.
      *
-     * @param[in] json   JSON object as produced by toJson().
+     * @param[in] file   The file to write.
      *
-     * @return The file reference; missing keys take default values and unknown keys go to extras.
+     * @return Nothing, or why the file cannot be written; the reference is unchanged then.
      */
-    static MnaFileRef fromJson(const QJsonObject& json);
-
-    //=========================================================================================================
-    /**
-     * Serialize to QCborMap.
-     *
-     * @return CBOR map with all fields and preserved extras; embedded data is stored as a byte string.
-     */
-    QCborMap toCbor() const;
-
-    //=========================================================================================================
-    /**
-     * Deserialize from QCborMap.
-     *
-     * @param[in] cbor   CBOR map as produced by toCbor().
-     *
-     * @return The file reference; missing keys take default values and unknown keys go to extras.
-     */
-    static MnaFileRef fromCbor(const QCborMap& cbor);
+    Expected<void> extract(const std::filesystem::path& file);
 };
 
 } // namespace mne

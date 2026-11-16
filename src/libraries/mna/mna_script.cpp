@@ -10,10 +10,10 @@
  * @brief    JSON and CBOR codecs for @ref MnaScript including code body, interpreter selection, integrity hash and optional source URI.
  *
  * The implementation writes the script @c code verbatim (after
- * resolving an optional @c sourceUri to the on-disk file at save
- * time), records the SHA-256 in @c codeSha256, and serialises the
- * interpreter command plus @c interpreterArgs in execution order.
- * The @c keepTempFile debug flag and the @c language /
+ * resolving an optional @c source_uri to the on-disk file at save
+ * time), records the SHA-256 in @c code_sha256, and serialises the
+ * interpreter command plus @c interpreter_args in execution order.
+ * The @c keep_temp_file debug flag and the @c language /
  * @c interpreter pair round-trip symmetrically so a project can be
  * re-executed bit-for-bit later. Unknown fields are captured into
  * the standard @c extras pattern used across mne_mna structs.
@@ -25,8 +25,7 @@
 
 #include "mna_script.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,112 +37,54 @@ using namespace mne;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QJsonObject MnaScript::toJson() const
+JsonObject MnaScript::to_json() const
 {
-    QJsonObject json;
-    json[QStringLiteral("language")] = language;
-
-    if (!interpreter.isEmpty()) {
-        json[QStringLiteral("interpreter")] = interpreter;
+    JsonObject json;
+    json["language"] = language;
+    if (!interpreter.empty()) {
+        json["interpreter"] = interpreter;
     }
-
-    if (!interpreterArgs.isEmpty()) {
-        QJsonArray arr;
-        for (const QString& a : interpreterArgs) {
-            arr.append(a);
-        }
-        json[QStringLiteral("interpreter_args")] = arr;
+    if (!interpreter_args.empty()) {
+        json["interpreter_args"] = JsonArray::from_string_list(interpreter_args);
     }
-
-    json[QStringLiteral("code")] = code;
-
-    if (!sourceUri.isEmpty()) {
-        json[QStringLiteral("source_uri")] = sourceUri;
+    json["code"] = code;
+    if (!source_uri.empty()) {
+        json["source_uri"] = source_uri;
     }
-
-    if (!codeSha256.isEmpty()) {
-        json[QStringLiteral("code_sha256")] = codeSha256;
+    if (!code_sha256.empty()) {
+        json["code_sha256"] = code_sha256;
     }
-
-    if (keepTempFile) {
-        json[QStringLiteral("keep_temp_file")] = true;
+    if (keep_temp_file) {
+        json["keep_temp_file"] = true;
     }
-
     return json;
 }
 
 //=============================================================================================================
 
-MnaScript MnaScript::fromJson(const QJsonObject& json)
+MnaScript MnaScript::from_json(const JsonObject& json)
 {
     MnaScript s;
-    s.language = json.value(QStringLiteral("language")).toString();
-    s.interpreter = json.value(QStringLiteral("interpreter")).toString();
-    s.code = json.value(QStringLiteral("code")).toString();
-    s.sourceUri = json.value(QStringLiteral("source_uri")).toString();
-    s.codeSha256 = json.value(QStringLiteral("code_sha256")).toString();
-    s.keepTempFile = json.value(QStringLiteral("keep_temp_file")).toBool(false);
-
-    const QJsonArray arr = json.value(QStringLiteral("interpreter_args")).toArray();
-    for (const QJsonValue& v : arr) {
-        s.interpreterArgs.append(v.toString());
-    }
-
+    s.language = json["language"].to_std_string();
+    s.interpreter = json["interpreter"].to_std_string();
+    s.interpreter_args = json["interpreter_args"].to_array().to_string_list();
+    s.code = json["code"].to_std_string();
+    s.source_uri = json["source_uri"].to_std_string();
+    s.code_sha256 = json["code_sha256"].to_std_string();
+    s.keep_temp_file = json["keep_temp_file"].to_bool(false);
     return s;
 }
 
 //=============================================================================================================
 
-QCborMap MnaScript::toCbor() const
+CborMap MnaScript::to_cbor() const
 {
-    QCborMap cbor;
-    cbor.insert(QStringLiteral("language"), language);
-
-    if (!interpreter.isEmpty()) {
-        cbor.insert(QStringLiteral("interpreter"), interpreter);
-    }
-
-    if (!interpreterArgs.isEmpty()) {
-        QCborArray arr;
-        for (const QString& a : interpreterArgs) {
-            arr.append(a);
-        }
-        cbor.insert(QStringLiteral("interpreter_args"), arr);
-    }
-
-    cbor.insert(QStringLiteral("code"), code);
-
-    if (!sourceUri.isEmpty()) {
-        cbor.insert(QStringLiteral("source_uri"), sourceUri);
-    }
-
-    if (!codeSha256.isEmpty()) {
-        cbor.insert(QStringLiteral("code_sha256"), codeSha256);
-    }
-
-    if (keepTempFile) {
-        cbor.insert(QStringLiteral("keep_temp_file"), true);
-    }
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaScript MnaScript::fromCbor(const QCborMap& cbor)
+MnaScript MnaScript::from_cbor(const CborMap& cbor)
 {
-    MnaScript s;
-    s.language = cbor.value(QStringLiteral("language")).toString();
-    s.interpreter = cbor.value(QStringLiteral("interpreter")).toString();
-    s.code = cbor.value(QStringLiteral("code")).toString();
-    s.sourceUri = cbor.value(QStringLiteral("source_uri")).toString();
-    s.codeSha256 = cbor.value(QStringLiteral("code_sha256")).toString();
-    s.keepTempFile = cbor.value(QStringLiteral("keep_temp_file")).toBool();
-
-    const QCborArray arr = cbor.value(QStringLiteral("interpreter_args")).toArray();
-    for (const QCborValue& v : arr) {
-        s.interpreterArgs.append(v.toString());
-    }
-
-    return s;
+    return from_json(cbor.to_json_object());
 }

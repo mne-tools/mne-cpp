@@ -25,8 +25,7 @@
 
 #include "mna_verification.h"
 
-#include <QJsonArray>
-#include <QCborArray>
+#include "mna_codec.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,444 +37,225 @@ using namespace mne;
 // MnaVerificationCheck
 //=============================================================================================================
 
-QJsonObject MnaVerificationCheck::toJson() const
+JsonObject MnaVerificationCheck::to_json() const
 {
-    QJsonObject json;
-    json[QStringLiteral("id")] = id;
-    json[QStringLiteral("description")] = description;
-    json[QStringLiteral("phase")] = phase;
-    json[QStringLiteral("expression")] = expression;
-    if (!script.code.isEmpty()) {
-        json[QStringLiteral("script")] = script.toJson();
+    JsonObject json;
+    json["id"] = id;
+    json["description"] = description;
+    json["phase"] = phase;
+    json["expression"] = expression;
+    if (!script.code.empty()) {
+        json["script"] = script.to_json();
     }
-    json[QStringLiteral("severity")] = severity;
-    if (!onFail.isEmpty()) {
-        json[QStringLiteral("on_fail")] = onFail;
+    json["severity"] = severity;
+    if (!on_fail.empty()) {
+        json["on_fail"] = on_fail;
     }
     return json;
 }
 
 //=============================================================================================================
 
-MnaVerificationCheck MnaVerificationCheck::fromJson(const QJsonObject& json)
+MnaVerificationCheck MnaVerificationCheck::from_json(const JsonObject& json)
 {
     MnaVerificationCheck c;
-    c.id = json.value(QStringLiteral("id")).toString();
-    c.description = json.value(QStringLiteral("description")).toString();
-    c.phase = json.value(QStringLiteral("phase")).toString();
-    c.expression = json.value(QStringLiteral("expression")).toString();
-    if (json.contains(QStringLiteral("script"))) {
-        c.script = MnaScript::fromJson(json.value(QStringLiteral("script")).toObject());
+    c.id = json["id"].to_std_string();
+    c.description = json["description"].to_std_string();
+    c.phase = json["phase"].to_std_string();
+    c.expression = json["expression"].to_std_string();
+    if (json.contains("script")) {
+        c.script = MnaScript::from_json(json["script"].to_object());
     }
-    c.severity = json.value(QStringLiteral("severity")).toString();
-    c.onFail = json.value(QStringLiteral("on_fail")).toString();
+    c.severity = json["severity"].to_std_string();
+    c.on_fail = json["on_fail"].to_std_string();
     return c;
 }
 
 //=============================================================================================================
 
-QCborMap MnaVerificationCheck::toCbor() const
+CborMap MnaVerificationCheck::to_cbor() const
 {
-    QCborMap cbor;
-    cbor.insert(QStringLiteral("id"), id);
-    cbor.insert(QStringLiteral("description"), description);
-    cbor.insert(QStringLiteral("phase"), phase);
-    cbor.insert(QStringLiteral("expression"), expression);
-    if (!script.code.isEmpty()) {
-        cbor.insert(QStringLiteral("script"), script.toCbor());
-    }
-    cbor.insert(QStringLiteral("severity"), severity);
-    if (!onFail.isEmpty()) {
-        cbor.insert(QStringLiteral("on_fail"), onFail);
-    }
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaVerificationCheck MnaVerificationCheck::fromCbor(const QCborMap& cbor)
+MnaVerificationCheck MnaVerificationCheck::from_cbor(const CborMap& cbor)
 {
-    MnaVerificationCheck c;
-    c.id = cbor.value(QStringLiteral("id")).toString();
-    c.description = cbor.value(QStringLiteral("description")).toString();
-    c.phase = cbor.value(QStringLiteral("phase")).toString();
-    c.expression = cbor.value(QStringLiteral("expression")).toString();
-    if (cbor.contains(QStringLiteral("script"))) {
-        c.script = MnaScript::fromCbor(cbor.value(QStringLiteral("script")).toMap());
-    }
-    c.severity = cbor.value(QStringLiteral("severity")).toString();
-    c.onFail = cbor.value(QStringLiteral("on_fail")).toString();
-    return c;
+    return from_json(cbor.to_json_object());
 }
 
 //=============================================================================================================
 // MnaVerificationResult
 //=============================================================================================================
 
-QJsonObject MnaVerificationResult::toJson() const
+JsonObject MnaVerificationResult::to_json() const
 {
-    QJsonObject json;
-    json[QStringLiteral("check_id")] = checkId;
-    json[QStringLiteral("passed")] = passed;
-    json[QStringLiteral("severity")] = severity;
-    json[QStringLiteral("message")] = message;
-    json[QStringLiteral("actual_value")] = QJsonValue::fromVariant(actualValue);
-    if (evaluatedAt.isValid()) {
-        json[QStringLiteral("evaluated_at")] = evaluatedAt.toString(Qt::ISODateWithMs);
+    JsonObject json;
+    json["check_id"] = check_id;
+    json["passed"] = passed;
+    json["severity"] = severity;
+    json["message"] = message;
+    json["actual_value"] = actual_value.is_undefined() ? JsonValue() : actual_value;
+    if (evaluated_at) {
+        json["evaluated_at"] = format_iso8601(*evaluated_at, true);
     }
     return json;
 }
 
 //=============================================================================================================
 
-MnaVerificationResult MnaVerificationResult::fromJson(const QJsonObject& json)
+MnaVerificationResult MnaVerificationResult::from_json(const JsonObject& json)
 {
     MnaVerificationResult r;
-    r.checkId = json.value(QStringLiteral("check_id")).toString();
-    r.passed = json.value(QStringLiteral("passed")).toBool(false);
-    r.severity = json.value(QStringLiteral("severity")).toString();
-    r.message = json.value(QStringLiteral("message")).toString();
-    r.actualValue = json.value(QStringLiteral("actual_value")).toVariant();
-    r.evaluatedAt = QDateTime::fromString(json.value(QStringLiteral("evaluated_at")).toString(), Qt::ISODateWithMs);
+    r.check_id = json["check_id"].to_std_string();
+    r.passed = json["passed"].to_bool(false);
+    r.severity = json["severity"].to_std_string();
+    r.message = json["message"].to_std_string();
+    r.actual_value = json["actual_value"];
+    r.evaluated_at = parse_iso8601(json["evaluated_at"].to_string());
     return r;
 }
 
 //=============================================================================================================
 
-QCborMap MnaVerificationResult::toCbor() const
+CborMap MnaVerificationResult::to_cbor() const
 {
-    QCborMap cbor;
-    cbor.insert(QStringLiteral("check_id"), checkId);
-    cbor.insert(QStringLiteral("passed"), passed);
-    cbor.insert(QStringLiteral("severity"), severity);
-    cbor.insert(QStringLiteral("message"), message);
-    cbor.insert(QStringLiteral("actual_value"), QCborValue::fromVariant(actualValue));
-    if (evaluatedAt.isValid()) {
-        cbor.insert(QStringLiteral("evaluated_at"), evaluatedAt.toString(Qt::ISODateWithMs));
-    }
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaVerificationResult MnaVerificationResult::fromCbor(const QCborMap& cbor)
+MnaVerificationResult MnaVerificationResult::from_cbor(const CborMap& cbor)
 {
-    MnaVerificationResult r;
-    r.checkId = cbor.value(QStringLiteral("check_id")).toString();
-    r.passed = cbor.value(QStringLiteral("passed")).toBool();
-    r.severity = cbor.value(QStringLiteral("severity")).toString();
-    r.message = cbor.value(QStringLiteral("message")).toString();
-    r.actualValue = cbor.value(QStringLiteral("actual_value")).toVariant();
-    r.evaluatedAt = QDateTime::fromString(cbor.value(QStringLiteral("evaluated_at")).toString(), Qt::ISODateWithMs);
-    return r;
+    return from_json(cbor.to_json_object());
 }
 
 //=============================================================================================================
 // MnaProvenance
 //=============================================================================================================
 
-QJsonObject MnaProvenance::toJson() const
+JsonObject MnaProvenance::to_json() const
 {
-    QJsonObject json;
-
-    if (!inputHashes.isEmpty()) {
-        QJsonObject hashObj;
-        for (auto it = inputHashes.constBegin(); it != inputHashes.constEnd(); ++it) {
-            hashObj.insert(it.key(), it.value());
+    JsonObject json;
+    if (!input_hashes.empty()) {
+        JsonObject hashes;
+        for (const auto& [port, hash] : input_hashes) {
+            hashes.insert(port, hash);
         }
-        json[QStringLiteral("input_hashes")] = hashObj;
+        json["input_hashes"] = std::move(hashes);
     }
-
-    if (!resolvedAttributes.isEmpty()) {
-        QJsonObject attrObj;
-        for (auto it = resolvedAttributes.constBegin(); it != resolvedAttributes.constEnd(); ++it) {
-            attrObj.insert(it.key(), QJsonValue::fromVariant(it.value()));
-        }
-        json[QStringLiteral("resolved_attributes")] = attrObj;
-    }
-
-    if (!mneCppVersion.isEmpty())
-        json[QStringLiteral("mne_cpp_version")] = mneCppVersion;
-    if (!qtVersion.isEmpty())
-        json[QStringLiteral("qt_version")] = qtVersion;
-    if (!compilerInfo.isEmpty())
-        json[QStringLiteral("compiler_info")] = compilerInfo;
-    if (!osInfo.isEmpty())
-        json[QStringLiteral("os_info")] = osInfo;
-    if (!hostName.isEmpty())
-        json[QStringLiteral("host_name")] = hostName;
-    if (!externalToolVersion.isEmpty())
-        json[QStringLiteral("external_tool_version")] = externalToolVersion;
-
-    if (startedAt.isValid())
-        json[QStringLiteral("started_at")] = startedAt.toString(Qt::ISODateWithMs);
-    if (finishedAt.isValid())
-        json[QStringLiteral("finished_at")] = finishedAt.toString(Qt::ISODateWithMs);
-    if (wallTimeMs > 0)
-        json[QStringLiteral("wall_time_ms")] = wallTimeMs;
-    if (peakMemoryBytes > 0)
-        json[QStringLiteral("peak_memory_bytes")] = peakMemoryBytes;
-    if (randomSeed >= 0)
-        json[QStringLiteral("random_seed")] = randomSeed;
-
+    if (!resolved_attributes.empty())
+        json["resolved_attributes"] = resolved_attributes;
+    if (!mne_cpp_version.empty())
+        json["mne_cpp_version"] = mne_cpp_version;
+    if (!compiler_info.empty())
+        json["compiler_info"] = compiler_info;
+    if (!os_info.empty())
+        json["os_info"] = os_info;
+    if (!host_name.empty())
+        json["host_name"] = host_name;
+    if (!external_tool_version.empty())
+        json["external_tool_version"] = external_tool_version;
+    if (started_at)
+        json["started_at"] = format_iso8601(*started_at, true);
+    if (finished_at)
+        json["finished_at"] = format_iso8601(*finished_at, true);
+    if (wall_time_ms > 0)
+        json["wall_time_ms"] = wall_time_ms;
+    if (peak_memory_bytes > 0)
+        json["peak_memory_bytes"] = peak_memory_bytes;
+    if (random_seed >= 0)
+        json["random_seed"] = random_seed;
     return json;
 }
 
 //=============================================================================================================
 
-MnaProvenance MnaProvenance::fromJson(const QJsonObject& json)
+MnaProvenance MnaProvenance::from_json(const JsonObject& json)
 {
     MnaProvenance p;
-
-    const QJsonObject hashObj = json.value(QStringLiteral("input_hashes")).toObject();
-    for (auto it = hashObj.constBegin(); it != hashObj.constEnd(); ++it) {
-        p.inputHashes.insert(it.key(), it.value().toString());
+    for (const auto& [port, hash] : json["input_hashes"].to_object()) {
+        p.input_hashes.emplace(port, hash.to_std_string());
     }
-
-    const QJsonObject attrObj = json.value(QStringLiteral("resolved_attributes")).toObject();
-    for (auto it = attrObj.constBegin(); it != attrObj.constEnd(); ++it) {
-        p.resolvedAttributes.insert(it.key(), it.value().toVariant());
-    }
-
-    p.mneCppVersion = json.value(QStringLiteral("mne_cpp_version")).toString();
-    p.qtVersion = json.value(QStringLiteral("qt_version")).toString();
-    p.compilerInfo = json.value(QStringLiteral("compiler_info")).toString();
-    p.osInfo = json.value(QStringLiteral("os_info")).toString();
-    p.hostName = json.value(QStringLiteral("host_name")).toString();
-    p.externalToolVersion = json.value(QStringLiteral("external_tool_version")).toString();
-
-    p.startedAt = QDateTime::fromString(json.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
-    p.finishedAt = QDateTime::fromString(json.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
-    p.wallTimeMs = static_cast<qint64>(json.value(QStringLiteral("wall_time_ms")).toDouble(0));
-    p.peakMemoryBytes = static_cast<qint64>(json.value(QStringLiteral("peak_memory_bytes")).toDouble(0));
-    p.randomSeed = static_cast<qint64>(json.value(QStringLiteral("random_seed")).toDouble(-1));
-
+    p.resolved_attributes = json["resolved_attributes"].to_object();
+    p.mne_cpp_version = json["mne_cpp_version"].to_std_string();
+    p.compiler_info = json["compiler_info"].to_std_string();
+    p.os_info = json["os_info"].to_std_string();
+    p.host_name = json["host_name"].to_std_string();
+    p.external_tool_version = json["external_tool_version"].to_std_string();
+    p.started_at = parse_iso8601(json["started_at"].to_string());
+    p.finished_at = parse_iso8601(json["finished_at"].to_string());
+    p.wall_time_ms = static_cast<std::int64_t>(json["wall_time_ms"].to_double(0));
+    p.peak_memory_bytes = static_cast<std::int64_t>(json["peak_memory_bytes"].to_double(0));
+    p.random_seed = static_cast<std::int64_t>(json["random_seed"].to_double(-1));
     return p;
 }
 
 //=============================================================================================================
 
-QCborMap MnaProvenance::toCbor() const
+CborMap MnaProvenance::to_cbor() const
 {
-    QCborMap cbor;
-
-    if (!inputHashes.isEmpty()) {
-        QCborMap hashMap;
-        for (auto it = inputHashes.constBegin(); it != inputHashes.constEnd(); ++it) {
-            hashMap.insert(it.key(), it.value());
-        }
-        cbor.insert(QStringLiteral("input_hashes"), hashMap);
-    }
-
-    if (!resolvedAttributes.isEmpty()) {
-        QCborMap attrMap;
-        for (auto it = resolvedAttributes.constBegin(); it != resolvedAttributes.constEnd(); ++it) {
-            attrMap.insert(it.key(), QCborValue::fromVariant(it.value()));
-        }
-        cbor.insert(QStringLiteral("resolved_attributes"), attrMap);
-    }
-
-    if (!mneCppVersion.isEmpty())
-        cbor.insert(QStringLiteral("mne_cpp_version"), mneCppVersion);
-    if (!qtVersion.isEmpty())
-        cbor.insert(QStringLiteral("qt_version"), qtVersion);
-    if (!compilerInfo.isEmpty())
-        cbor.insert(QStringLiteral("compiler_info"), compilerInfo);
-    if (!osInfo.isEmpty())
-        cbor.insert(QStringLiteral("os_info"), osInfo);
-    if (!hostName.isEmpty())
-        cbor.insert(QStringLiteral("host_name"), hostName);
-    if (!externalToolVersion.isEmpty())
-        cbor.insert(QStringLiteral("external_tool_version"), externalToolVersion);
-
-    if (startedAt.isValid())
-        cbor.insert(QStringLiteral("started_at"), startedAt.toString(Qt::ISODateWithMs));
-    if (finishedAt.isValid())
-        cbor.insert(QStringLiteral("finished_at"), finishedAt.toString(Qt::ISODateWithMs));
-    if (wallTimeMs > 0)
-        cbor.insert(QStringLiteral("wall_time_ms"), wallTimeMs);
-    if (peakMemoryBytes > 0)
-        cbor.insert(QStringLiteral("peak_memory_bytes"), peakMemoryBytes);
-    if (randomSeed >= 0)
-        cbor.insert(QStringLiteral("random_seed"), randomSeed);
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaProvenance MnaProvenance::fromCbor(const QCborMap& cbor)
+MnaProvenance MnaProvenance::from_cbor(const CborMap& cbor)
 {
-    MnaProvenance p;
-
-    const QCborMap hashMap = cbor.value(QStringLiteral("input_hashes")).toMap();
-    for (auto it = hashMap.constBegin(); it != hashMap.constEnd(); ++it) {
-        p.inputHashes.insert(it.key().toString(), it.value().toString());
-    }
-
-    const QCborMap attrMap = cbor.value(QStringLiteral("resolved_attributes")).toMap();
-    for (auto it = attrMap.constBegin(); it != attrMap.constEnd(); ++it) {
-        p.resolvedAttributes.insert(it.key().toString(), it.value().toVariant());
-    }
-
-    p.mneCppVersion = cbor.value(QStringLiteral("mne_cpp_version")).toString();
-    p.qtVersion = cbor.value(QStringLiteral("qt_version")).toString();
-    p.compilerInfo = cbor.value(QStringLiteral("compiler_info")).toString();
-    p.osInfo = cbor.value(QStringLiteral("os_info")).toString();
-    p.hostName = cbor.value(QStringLiteral("host_name")).toString();
-    p.externalToolVersion = cbor.value(QStringLiteral("external_tool_version")).toString();
-
-    p.startedAt = QDateTime::fromString(cbor.value(QStringLiteral("started_at")).toString(), Qt::ISODateWithMs);
-    p.finishedAt = QDateTime::fromString(cbor.value(QStringLiteral("finished_at")).toString(), Qt::ISODateWithMs);
-    p.wallTimeMs = cbor.value(QStringLiteral("wall_time_ms")).toInteger(0);
-    p.peakMemoryBytes = cbor.value(QStringLiteral("peak_memory_bytes")).toInteger(0);
-    p.randomSeed = cbor.value(QStringLiteral("random_seed")).toInteger(-1);
-
-    return p;
+    return from_json(cbor.to_json_object());
 }
 
 //=============================================================================================================
 // MnaVerification
 //=============================================================================================================
 
-QJsonObject MnaVerification::toJson() const
+JsonObject MnaVerification::to_json() const
 {
-    QJsonObject json;
-
-    if (!explanation.isEmpty()) {
-        json[QStringLiteral("explanation")] = explanation;
+    JsonObject json;
+    if (!explanation.empty()) {
+        json["explanation"] = explanation;
     }
-
-    if (!checks.isEmpty()) {
-        QJsonArray arr;
-        for (const MnaVerificationCheck& c : checks) {
-            arr.append(c.toJson());
-        }
-        json[QStringLiteral("checks")] = arr;
+    if (!checks.empty()) {
+        json["checks"] = detail::to_json_array(checks);
     }
-
-    if (!preResults.isEmpty()) {
-        QJsonArray arr;
-        for (const MnaVerificationResult& r : preResults) {
-            arr.append(r.toJson());
-        }
-        json[QStringLiteral("pre_results")] = arr;
+    if (!pre_results.empty()) {
+        json["pre_results"] = detail::to_json_array(pre_results);
     }
-
-    if (!postResults.isEmpty()) {
-        QJsonArray arr;
-        for (const MnaVerificationResult& r : postResults) {
-            arr.append(r.toJson());
-        }
-        json[QStringLiteral("post_results")] = arr;
+    if (!post_results.empty()) {
+        json["post_results"] = detail::to_json_array(post_results);
     }
-
-    QJsonObject provObj = provenance.toJson();
-    if (!provObj.isEmpty()) {
-        json[QStringLiteral("provenance")] = provObj;
+    if (JsonObject provenanceJson = provenance.to_json(); !provenanceJson.empty()) {
+        json["provenance"] = std::move(provenanceJson);
     }
-
     return json;
 }
 
 //=============================================================================================================
 
-MnaVerification MnaVerification::fromJson(const QJsonObject& json)
+MnaVerification MnaVerification::from_json(const JsonObject& json)
 {
     MnaVerification v;
-
-    v.explanation = json.value(QStringLiteral("explanation")).toString();
-
-    const QJsonArray checksArr = json.value(QStringLiteral("checks")).toArray();
-    for (const QJsonValue& val : checksArr) {
-        v.checks.append(MnaVerificationCheck::fromJson(val.toObject()));
+    v.explanation = json["explanation"].to_std_string();
+    v.checks = detail::from_json_array<MnaVerificationCheck>(json["checks"]);
+    v.pre_results = detail::from_json_array<MnaVerificationResult>(json["pre_results"]);
+    v.post_results = detail::from_json_array<MnaVerificationResult>(json["post_results"]);
+    if (json.contains("provenance")) {
+        v.provenance = MnaProvenance::from_json(json["provenance"].to_object());
     }
-
-    const QJsonArray preArr = json.value(QStringLiteral("pre_results")).toArray();
-    for (const QJsonValue& val : preArr) {
-        v.preResults.append(MnaVerificationResult::fromJson(val.toObject()));
-    }
-
-    const QJsonArray postArr = json.value(QStringLiteral("post_results")).toArray();
-    for (const QJsonValue& val : postArr) {
-        v.postResults.append(MnaVerificationResult::fromJson(val.toObject()));
-    }
-
-    if (json.contains(QStringLiteral("provenance"))) {
-        v.provenance = MnaProvenance::fromJson(json.value(QStringLiteral("provenance")).toObject());
-    }
-
     return v;
 }
 
 //=============================================================================================================
 
-QCborMap MnaVerification::toCbor() const
+CborMap MnaVerification::to_cbor() const
 {
-    QCborMap cbor;
-
-    if (!explanation.isEmpty()) {
-        cbor.insert(QStringLiteral("explanation"), explanation);
-    }
-
-    if (!checks.isEmpty()) {
-        QCborArray arr;
-        for (const MnaVerificationCheck& c : checks) {
-            arr.append(c.toCbor());
-        }
-        cbor.insert(QStringLiteral("checks"), arr);
-    }
-
-    if (!preResults.isEmpty()) {
-        QCborArray arr;
-        for (const MnaVerificationResult& r : preResults) {
-            arr.append(r.toCbor());
-        }
-        cbor.insert(QStringLiteral("pre_results"), arr);
-    }
-
-    if (!postResults.isEmpty()) {
-        QCborArray arr;
-        for (const MnaVerificationResult& r : postResults) {
-            arr.append(r.toCbor());
-        }
-        cbor.insert(QStringLiteral("post_results"), arr);
-    }
-
-    QCborMap provMap = provenance.toCbor();
-    if (!provMap.isEmpty()) {
-        cbor.insert(QStringLiteral("provenance"), provMap);
-    }
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaVerification MnaVerification::fromCbor(const QCborMap& cbor)
+MnaVerification MnaVerification::from_cbor(const CborMap& cbor)
 {
-    MnaVerification v;
-
-    v.explanation = cbor.value(QStringLiteral("explanation")).toString();
-
-    const QCborArray checksArr = cbor.value(QStringLiteral("checks")).toArray();
-    for (const QCborValue& val : checksArr) {
-        v.checks.append(MnaVerificationCheck::fromCbor(val.toMap()));
-    }
-
-    const QCborArray preArr = cbor.value(QStringLiteral("pre_results")).toArray();
-    for (const QCborValue& val : preArr) {
-        v.preResults.append(MnaVerificationResult::fromCbor(val.toMap()));
-    }
-
-    const QCborArray postArr = cbor.value(QStringLiteral("post_results")).toArray();
-    for (const QCborValue& val : postArr) {
-        v.postResults.append(MnaVerificationResult::fromCbor(val.toMap()));
-    }
-
-    if (cbor.contains(QStringLiteral("provenance"))) {
-        v.provenance = MnaProvenance::fromCbor(cbor.value(QStringLiteral("provenance")).toMap());
-    }
-
-    return v;
+    return from_json(cbor.to_json_object());
 }

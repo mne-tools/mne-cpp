@@ -10,20 +10,20 @@
  * @brief    Implementation of @ref MnaGraphExecutor — batch / incremental graph walk plus MNE-Scan-friendly stream-mode plugin wiring.
  *
  * @ref MnaGraphExecutor::execute first validates the graph, then
- * runs @ref MnaGraph::topologicalSort and visits every node in
+ * runs @ref MnaGraph::topological_sort and visits every node in
  * order. For each node it gathers inputs from the
  * @ref Context::results map keyed by @c srcNodeId::srcPortName,
- * falls back to @ref Context::graphInputs for graph-level entry
- * ports, looks the @c opType up in @ref MnaOpRegistry, invokes
+ * falls back to @ref Context::graph_inputs for graph-level entry
+ * ports, looks the @c op_type up in @ref MnaOpRegistry, invokes
  * the registered @ref MnaOpRegistry::OpFunc with the merged
  * inputs and node attributes, and writes the returned outputs
- * back into the context map. @ref executeIncremental reuses the
+ * back into the context map. @ref execute_incremental reuses the
  * same loop but restricts it to nodes returned by
- * @ref MnaGraph::dirtyNodes and their @ref MnaGraph::downstreamNodes.
+ * @ref MnaGraph::dirty_nodes and their @ref MnaGraph::downstream_nodes.
  *
- * @ref startStream / @ref stopStream provide the MNE Scan
+ * @ref start_stream / @ref stop_stream provide the MNE Scan
  * integration point: the host application supplies a
- * @ref PluginFactory that maps @c opType strings to live
+ * @ref PluginFactory that maps @c op_type strings to live
  * @c QObject plugin instances; the executor instantiates one per
  * node in topological order, applies @ref MnaParamTree values to
  * their attributes, and stores the resulting @ref StreamContext
@@ -37,18 +37,28 @@
 //=============================================================================================================
 
 #include "mna_graph_executor.h"
+
+#include "mna_graph.h"
+#include "mna_op_registry.h"
+
 #include <base/log.h>
 #include <base/process.h>
 #include <base/sha256.h>
 #include <base/string_utils.h>
-#include "mna_graph.h"
-#include "mna_op_registry.h"
 
-#include <QDir>
-#include <QElapsedTimer>
-#include <QTemporaryFile>
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <filesystem>
+#include <format>
+#include <fstream>
+#include <optional>
+#include <random>
+#include <set>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,33 +67,154 @@
 using namespace mne;
 
 //=============================================================================================================
-// STATIC INITIALIZATION
-//=============================================================================================================
-
-MnaGraphExecutor::ProgressCallback MnaGraphExecutor::s_progressCallback;
-
-//=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS
 //=============================================================================================================
 
 namespace
 {
 
-/** Runs @p program and returns stdout, stderr and the exit code (-1 if it did not run to completion). */
-QVariantMap runProgram(const QString& program, const QStringList& args, const QString& workDir = {})
+MnaGraphExecutor::ProgressCallback& progressCallback()
 {
-    std::vector<std::string> arguments;
-    arguments.reserve(static_cast<std::size_t>(args.size()));
-    for (const QString& arg : args)
-        arguments.push_back(arg.toStdString());
-    ProcessOptions options;
-    options.working_dir = path_from_utf8(workDir.toStdString());
-    const ProcessResult process = run_process(path_from_utf8(program.toStdString()), arguments, options);
+    static MnaGraphExecutor::ProgressCallback callback;
+    return callback;
+}
 
-    QVariantMap outputs;
-    outputs.insert(QStringLiteral("stdout"), QString::fromStdString(process.std_out));
-    outputs.insert(QStringLiteral("stderr"), QString::fromStdString(process.started ? process.std_err : process.error));
-    outputs.insert(QStringLiteral("exit_code"), process.exit_code);
+UtcTime now()
+{
+    return std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+}
+
+/** @return A number, boolean, text or JSON value held by @p value as JSON; nothing for other objects. */
+std::optional<JsonValue> scalar(const std::any& value)
+{
+    if (const auto* v = std::any_cast<JsonValue>(&value))
+        return *v;
+    if (const auto* v = std::any_cast<double>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<float>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<int>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<std::int64_t>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<bool>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<std::string>(&value))
+        return JsonValue(*v);
+    if (const auto* v = std::any_cast<const char*>(&value))
+        return JsonValue(*v);
+    return std::nullopt;
+}
+
+/** @return The scalar values of @p values as a JSON object. */
+JsonObject scalars(const MnaValues& values)
+{
+    JsonObject json;
+    for (const auto& [key, value] : values) {
+        if (std::optional<JsonValue> v = scalar(value)) {
+            json.insert(key, std::move(*v));
+        }
+    }
+    return json;
+}
+
+/** @return The text of a scalar JSON value as it is substituted for a placeholder: 3.0 gives "3". */
+std::string text(const JsonValue& value)
+{
+    if (value.is_string())
+        return std::string(value.to_string());
+    if (value.is_bool())
+        return value.to_bool() ? "true" : "false";
+    if (value.is_integer())
+        return std::to_string(value.to_integer());
+    if (value.is_number())
+        return std::format("{}", value.to_double());
+    return {};
+}
+
+/** @return The text of a run-time value; empty for objects that are not scalar. */
+std::string text(const std::any& value)
+{
+    const std::optional<JsonValue> v = scalar(value);
+    return v ? text(*v) : std::string();
+}
+
+/** Replaces every {{name}} in @p subject by the text of the input, else attribute, called name. */
+std::string substitute(std::string subject, const MnaValues& inputs, const JsonObject& attributes)
+{
+    for (const auto& [key, value] : inputs) {
+        for (std::size_t at = 0; (at = subject.find("{{" + key + "}}", at)) != std::string::npos;) {
+            const std::string replacement = text(value);
+            subject.replace(at, key.size() + 4, replacement);
+            at += replacement.size();
+        }
+    }
+    for (const auto& [key, value] : attributes) {
+        for (std::size_t at = 0; (at = subject.find("{{" + key + "}}", at)) != std::string::npos;) {
+            const std::string replacement = text(value);
+            subject.replace(at, key.size() + 4, replacement);
+            at += replacement.size();
+        }
+    }
+    return subject;
+}
+
+/** Runs @p program and returns stdout, stderr and the exit code (-1 if it did not run to completion). */
+MnaValues runProgram(const std::string& program, const StringList& args, const std::string& work_dir = {})
+{
+    ProcessOptions options;
+    options.working_dir = path_from_utf8(work_dir);
+    ProcessResult process = run_process(path_from_utf8(program), args, options);
+
+    MnaValues outputs;
+    outputs["stdout"] = std::move(process.std_out);
+    outputs["stderr"] = process.started ? std::move(process.std_err) : std::move(process.error);
+    outputs["exit_code"] = process.exit_code;
+    return outputs;
+}
+
+/** File extension and default interpreter of a script language. */
+struct Language
+{
+    std::string_view name;
+    std::string_view extension;
+    std::string_view interpreter;
+};
+
+constexpr std::array<Language, 6> kLanguages{{
+    {"python", ".py", "python3"},
+    {"shell", ".sh", "/bin/bash"},
+    {"r", ".R", "Rscript"},
+    {"matlab", ".m", "matlab"},
+    {"octave", ".m", "octave"},
+    {"julia", ".jl", "julia"},
+}};
+
+/** Writes the script to a temporary file, runs its interpreter on it and removes it unless asked to keep it. */
+MnaValues runScript(const MnaScript& script, const MnaValues& inputs, const JsonObject& attributes)
+{
+    const auto* language = std::ranges::find(kLanguages, std::string_view(script.language), &Language::name);
+    const std::string_view extension = language != kLanguages.end() ? language->extension : ".txt";
+    std::string interpreter = script.interpreter;
+    if (interpreter.empty() && language != kLanguages.end()) {
+        interpreter = language->interpreter;
+    }
+
+    std::random_device random;
+    std::error_code ec;
+    const std::filesystem::path file =
+        std::filesystem::temp_directory_path(ec) / std::format("mna_script_{:08x}{:08x}{}", random(), random(), extension);
+    std::ofstream(file, std::ios::binary) << substitute(script.code, inputs, attributes);
+    if (!std::filesystem::exists(file, ec)) {
+        return {{"stderr", std::string("Failed to create temporary script file")}, {"exit_code", -1}};
+    }
+
+    StringList args = script.interpreter_args;
+    args.push_back(utf8_from_path(file));
+    MnaValues outputs = runProgram(interpreter, args);
+    if (!script.keep_temp_file) {
+        std::filesystem::remove(file, ec);
+    }
     return outputs;
 }
 
@@ -93,156 +224,140 @@ QVariantMap runProgram(const QString& program, const QStringList& args, const QS
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph,
-                                                    const QVariantMap& graphInputs)
+MnaGraphExecutor::Context MnaGraphExecutor::execute(MnaGraph& graph, const MnaValues& graph_inputs)
 {
-    Context ctx;
-    ctx.graphInputs = graphInputs;
-
-    // Populate context with graph-level inputs keyed as "graph::portName"
-    for (auto it = graphInputs.constBegin(); it != graphInputs.constEnd(); ++it) {
-        ctx.results.insert(QStringLiteral("graph::") + it.key(), it.value());
+    Context context;
+    context.graph_inputs = graph_inputs;
+    for (const auto& [port, value] : graph_inputs) {
+        context.results.emplace("graph::" + port, value);
     }
 
-    // Evaluate parameter tree bindings before execution
-    graph.paramTree.evaluate(ctx.results);
-    applyParamTree(graph);
+    graph.param_tree.evaluate(scalars(context.results));
+    apply_param_tree(graph);
 
-    const QStringList order = graph.topologicalSort();
-    const int total = order.size();
-
+    const StringList order = graph.topological_sort();
+    const int total = static_cast<int>(order.size());
     for (int i = 0; i < total; ++i) {
-        const QString& nodeId = order[i];
-
-        if (s_progressCallback) {
-            s_progressCallback(nodeId, i + 1, total);
+        const std::string& id = order[static_cast<std::size_t>(i)];
+        if (progressCallback()) {
+            progressCallback()(id, i + 1, total);
         }
-
-        if (!runNode(graph, graph.node(nodeId), ctx)) {
+        if (!run_node(graph, graph.node(id), context)) {
             break;
         }
     }
 
-    // Re-evaluate parameter tree after execution (for on_change bindings)
-    graph.paramTree.evaluate(ctx.results);
-
-    return ctx;
+    graph.param_tree.evaluate(scalars(context.results)); // on_change bindings see the new results
+    return context;
 }
 
 //=============================================================================================================
 
-MnaGraphExecutor::Context MnaGraphExecutor::executeIncremental(MnaGraph& graph,
-                                                               Context& existing)
+void MnaGraphExecutor::execute_incremental(MnaGraph& graph, Context& context)
 {
-    // Find dirty nodes and all their downstream dependents
-    QStringList dirty = graph.dirtyNodes();
-    QSet<QString> toExecute;
-    for (const QString& nodeId : dirty) {
-        toExecute.insert(nodeId);
-        const QStringList downstream = graph.downstreamNodes(nodeId);
-        for (const QString& d : downstream) {
-            toExecute.insert(d);
+    std::set<std::string, std::less<>> pending;
+    for (const std::string& id : graph.dirty_nodes()) {
+        pending.insert(id);
+        for (std::string& downstream : graph.downstream_nodes(id)) {
+            pending.insert(std::move(downstream));
         }
     }
 
-    applyParamTree(graph);
+    apply_param_tree(graph);
 
-    // Get topological order, filter to only those that need execution
-    const QStringList fullOrder = graph.topologicalSort();
-    QStringList order;
-    for (const QString& nodeId : fullOrder) {
-        if (toExecute.contains(nodeId)) {
-            order.append(nodeId);
+    StringList order;
+    for (std::string& id : graph.topological_sort()) {
+        if (pending.contains(id)) {
+            order.push_back(std::move(id));
         }
     }
-
-    const int total = order.size();
-
+    const int total = static_cast<int>(order.size());
     for (int i = 0; i < total; ++i) {
-        const QString& nodeId = order[i];
-
-        if (s_progressCallback) {
-            s_progressCallback(nodeId, i + 1, total);
+        const std::string& id = order[static_cast<std::size_t>(i)];
+        if (progressCallback()) {
+            progressCallback()(id, i + 1, total);
         }
-
-        if (!runNode(graph, graph.node(nodeId), existing)) {
+        if (!run_node(graph, graph.node(id), context)) {
             break;
         }
     }
 
-    graph.paramTree.evaluate(existing.results);
-
-    return existing;
+    graph.param_tree.evaluate(scalars(context.results));
 }
 
 //=============================================================================================================
 
-void MnaGraphExecutor::applyParamTree(MnaGraph& graph)
+void MnaGraphExecutor::apply_param_tree(MnaGraph& graph)
 {
-    for (const QString& path : graph.paramTree.allPaths()) {
-        // Path format: "nodeId/attrKey"
-        const int sep = path.indexOf(QLatin1Char('/'));
-        if (sep > 0 && graph.hasNode(path.left(sep))) {
-            graph.node(path.left(sep)).attributes.insert(path.mid(sep + 1), graph.paramTree.param(path));
+    for (const std::string& path : graph.param_tree.all_paths()) {
+        const std::size_t sep = path.find('/');
+        if (sep == 0 || sep == std::string::npos) {
+            continue;
+        }
+        if (MnaNode* node = graph.find_node(std::string_view(path).substr(0, sep))) {
+            node->attributes.insert(std::string_view(path).substr(sep + 1), graph.param_tree.param(path));
         }
     }
 }
 
 //=============================================================================================================
 
-bool MnaGraphExecutor::runNode(MnaGraph& graph, MnaNode& node, Context& ctx)
+bool MnaGraphExecutor::run_node(MnaGraph& graph, MnaNode& node, Context& context)
 {
-    QVariantMap inputs;
+    MnaValues inputs;
     for (const MnaPort& p : node.inputs) {
-        if (!p.sourceNodeId.isEmpty()) {
-            inputs.insert(p.name, ctx.results.value(p.sourceNodeId + QStringLiteral("::") + p.sourcePortName));
+        if (p.source_node_id.empty()) {
+            continue;
         }
+        const auto it = context.results.find(p.source_node_id + "::" + p.source_port_name);
+        inputs[p.name] = it != context.results.end() ? it->second : std::any();
     }
-    // Checks see the node's attributes and inputs by name, post checks its outputs too.
-    QVariantMap scope = node.attributes;
-    scope.insert(inputs);
+    JsonObject scope = node.attributes; // checks see attributes and inputs by name, post checks the outputs too
+    for (auto& [key, value] : scalars(inputs)) {
+        scope.insert(key, value);
+    }
 
     MnaVerification& verification = node.verification;
     MnaProvenance& provenance = verification.provenance;
     provenance = MnaProvenance();
-    provenance.mneCppVersion = QStringLiteral(MNE_CPP_VERSION);
-    provenance.qtVersion = QString::fromLatin1(qVersion());
-    provenance.osInfo = QString::fromStdString(os_pretty_name() + ' ' + std::string(cpu_architecture()));
-    provenance.hostName = QString::fromStdString(host_name());
-    provenance.resolvedAttributes = node.attributes;
-    for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
-        provenance.inputHashes.insert(it.key(), QString::fromStdString(to_hex(Sha256::hash(it.value().toString().toStdString()))));
+    provenance.mne_cpp_version = MNE_CPP_VERSION;
+    provenance.os_info = os_pretty_name() + ' ' + std::string(cpu_architecture());
+    provenance.host_name = host_name();
+    provenance.resolved_attributes = node.attributes;
+    for (const auto& [port, value] : inputs) {
+        provenance.input_hashes.emplace(port, to_hex(Sha256::hash(text(value))));
     }
 
-    const auto failsHard = [](const QList<MnaVerificationResult>& results) {
-        return std::any_of(results.cbegin(), results.cend(), [](const MnaVerificationResult& r) {
-            return !r.passed && r.severity == QLatin1String("error");
+    const auto failsHard = [](const std::vector<MnaVerificationResult>& results) {
+        return std::ranges::any_of(results, [](const MnaVerificationResult& r) {
+            return !r.passed && r.severity == "error";
         });
     };
-    verification.preResults = runChecks(graph, node, QStringLiteral("pre"), scope);
-    verification.postResults.clear();
-    if (failsHard(verification.preResults)) {
-        ctx.abortedNode = node.id;
+    verification.pre_results = run_checks(graph, node, "pre", scope);
+    verification.post_results.clear();
+    if (failsHard(verification.pre_results)) {
+        context.aborted_node = node.id;
         return false;
     }
 
-    provenance.startedAt = QDateTime::currentDateTimeUtc();
-    QElapsedTimer timer;
-    timer.start();
-    const QVariantMap outputs = executeNode(node, inputs);
-    provenance.wallTimeMs = timer.elapsed();
-    provenance.finishedAt = QDateTime::currentDateTimeUtc();
+    provenance.started_at = now();
+    const auto start = std::chrono::steady_clock::now();
+    MnaValues outputs = execute_node(node, inputs);
+    provenance.wall_time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+    provenance.finished_at = now();
 
-    for (auto it = outputs.constBegin(); it != outputs.constEnd(); ++it) {
-        ctx.results.insert(node.id + QStringLiteral("::") + it.key(), it.value());
+    for (auto& [key, value] : scalars(outputs)) {
+        scope.insert(key, value);
+    }
+    for (auto& [port, value] : outputs) {
+        context.results.insert_or_assign(node.id + "::" + port, std::move(value));
     }
     node.dirty = false;
-    node.executedAt = provenance.finishedAt;
+    node.executed_at = provenance.finished_at;
 
-    scope.insert(outputs);
-    verification.postResults = runChecks(graph, node, QStringLiteral("post"), scope);
-    if (failsHard(verification.postResults)) {
-        ctx.abortedNode = node.id;
+    verification.post_results = run_checks(graph, node, "post", scope);
+    if (failsHard(verification.post_results)) {
+        context.aborted_node = node.id;
         return false;
     }
     return true;
@@ -250,218 +365,113 @@ bool MnaGraphExecutor::runNode(MnaGraph& graph, MnaNode& node, Context& ctx)
 
 //=============================================================================================================
 
-QList<MnaVerificationResult> MnaGraphExecutor::runChecks(const MnaGraph& graph, const MnaNode& node, const QString& phase, const QVariantMap& scope)
+std::vector<MnaVerificationResult> MnaGraphExecutor::run_checks(const MnaGraph& graph, const MnaNode& node, std::string_view phase, const JsonObject& scope)
 {
-    QList<MnaVerificationResult> results;
+    std::vector<MnaVerificationResult> results;
     for (const MnaVerificationCheck& check : node.verification.checks) {
         if (check.phase != phase) {
             continue;
         }
         MnaVerificationResult result;
-        result.checkId = check.id;
+        result.check_id = check.id;
         result.severity = check.severity;
-        result.evaluatedAt = QDateTime::currentDateTimeUtc();
-        if (!check.script.code.isEmpty()) {
-            MnaNode scriptNode = node;
-            scriptNode.execMode = MnaNodeExecMode::Script;
-            scriptNode.script = check.script;
-            const QVariantMap out = executeNode(scriptNode, scope);
-            result.actualValue = out.value(QStringLiteral("exit_code"));
-            result.passed = result.actualValue.toInt() == 0;
+        result.evaluated_at = now();
+        if (!check.script.code.empty()) {
+            MnaValues values;
+            for (const auto& [key, value] : scope) {
+                values.emplace(key, value);
+            }
+            const MnaValues out = runScript(check.script, values, node.attributes);
+            const int exitCode = std::any_cast<int>(out.at("exit_code"));
+            result.actual_value = exitCode;
+            result.passed = exitCode == 0;
         } else {
-            result.actualValue = graph.paramTree.evaluateExpression(check.expression, scope);
-            result.passed = result.actualValue.userType() == QMetaType::Bool && result.actualValue.toBool();
+            result.actual_value = graph.param_tree.evaluate_expression(check.expression, scope);
+            result.passed = result.actual_value.is_bool() && result.actual_value.to_bool();
         }
-        result.message = result.passed ? QStringLiteral("PASS: %1").arg(check.description)
-                                       : QStringLiteral("FAIL [%1]: %2").arg(check.severity, check.description);
-        if (!result.passed && !check.onFail.isEmpty()) {
-            result.message += QStringLiteral(" (%1)").arg(check.onFail);
+        result.message = result.passed ? std::format("PASS: {}", check.description) : std::format("FAIL [{}]: {}", check.severity, check.description);
+        if (!result.passed && !check.on_fail.empty()) {
+            result.message += std::format(" ({})", check.on_fail);
         }
-        results.append(result);
+        results.push_back(std::move(result));
     }
     return results;
 }
 
 //=============================================================================================================
 
-QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
-                                          const QVariantMap& inputs)
+MnaValues MnaGraphExecutor::execute_node(const MnaNode& node, const MnaValues& inputs)
 {
-    // Script execution — inline code via interpreter
-    if (node.execMode == MnaNodeExecMode::Script) {
-        const MnaScript& script = node.script;
-
-        // Determine file extension from language
-        QString ext = QStringLiteral(".txt");
-        if (script.language == QLatin1String("python"))
-            ext = QStringLiteral(".py");
-        else if (script.language == QLatin1String("shell"))
-            ext = QStringLiteral(".sh");
-        else if (script.language == QLatin1String("r"))
-            ext = QStringLiteral(".R");
-        else if (script.language == QLatin1String("matlab"))
-            ext = QStringLiteral(".m");
-        else if (script.language == QLatin1String("octave"))
-            ext = QStringLiteral(".m");
-        else if (script.language == QLatin1String("julia"))
-            ext = QStringLiteral(".jl");
-
-        // Substitute {{placeholder}} tokens in the code
-        QString code = script.code;
-        for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
-            code.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
-                         it.value().toString());
-        }
-        for (auto it = node.attributes.constBegin(); it != node.attributes.constEnd(); ++it) {
-            code.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
-                         it.value().toString());
-        }
-
-        // Write code to temporary file
-        QTemporaryFile tempFile(QDir::tempPath() + QStringLiteral("/mna_script_XXXXXX") + ext);
-        tempFile.setAutoRemove(!script.keepTempFile);
-        if (!tempFile.open()) {
-            QVariantMap outputs;
-            outputs.insert(QStringLiteral("stderr"), QStringLiteral("Failed to create temporary script file"));
-            outputs.insert(QStringLiteral("exit_code"), -1);
-            return outputs;
-        }
-        tempFile.write(code.toUtf8());
-        tempFile.close();
-
-        // Determine interpreter
-        QString interpreter = script.interpreter;
-        if (interpreter.isEmpty()) {
-            if (script.language == QLatin1String("python"))
-                interpreter = QStringLiteral("python3");
-            else if (script.language == QLatin1String("shell"))
-                interpreter = QStringLiteral("/bin/bash");
-            else if (script.language == QLatin1String("r"))
-                interpreter = QStringLiteral("Rscript");
-            else if (script.language == QLatin1String("matlab"))
-                interpreter = QStringLiteral("matlab");
-            else if (script.language == QLatin1String("octave"))
-                interpreter = QStringLiteral("octave");
-            else if (script.language == QLatin1String("julia"))
-                interpreter = QStringLiteral("julia");
-        }
-
-        QStringList args = script.interpreterArgs;
-        args.append(tempFile.fileName());
-
-        return runProgram(interpreter, args);
+    if (node.exec_mode == MnaNodeExecMode::Script) {
+        return runScript(node.script, inputs, node.attributes);
     }
-
-    // IPC execution
-    if (node.execMode == MnaNodeExecMode::Ipc) {
-        // Substitute {{placeholder}} tokens in arguments
-        QStringList resolvedArgs;
-        for (const QString& arg : node.ipcArgs) {
-            QString resolved = arg;
-            for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
-                resolved.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
-                                 it.value().toString());
-            }
-            // Also substitute from attributes
-            for (auto it = node.attributes.constBegin(); it != node.attributes.constEnd(); ++it) {
-                resolved.replace(QStringLiteral("{{") + it.key() + QStringLiteral("}}"),
-                                 it.value().toString());
-            }
-            resolvedArgs.append(resolved);
+    if (node.exec_mode == MnaNodeExecMode::Ipc) {
+        StringList args;
+        args.reserve(node.ipc_args.size());
+        for (const std::string& arg : node.ipc_args) {
+            args.push_back(substitute(arg, inputs, node.attributes));
         }
-
-        QVariantMap outputs = runProgram(node.ipcCommand, resolvedArgs, node.ipcWorkDir);
-
-        // Populate outputs from cached results if specified
+        MnaValues outputs = runProgram(node.ipc_command, args, node.ipc_work_dir);
         for (const MnaPort& p : node.outputs) {
-            if (!p.cachedResultPath.isEmpty()) {
-                outputs.insert(p.name, p.cachedResultPath);
+            if (!p.cached_result_path.empty()) {
+                outputs[p.name] = p.cached_result_path;
             }
         }
-
         return outputs;
     }
-
-    // Look up registered op function
-    const MnaOpRegistry& registry = MnaOpRegistry::instance();
-    MnaOpRegistry::OpFunc func = registry.opFunc(node.opType);
-
-    if (func) {
+    if (const MnaOpRegistry::OpFunc& func = MnaOpRegistry::instance().op_func(node.op_type)) {
         return func(inputs, node.attributes);
     }
-
-    // No implementation registered — return empty
-    return {};
+    return {}; // no implementation registered
 }
 
 //=============================================================================================================
 
-void MnaGraphExecutor::setProgressCallback(ProgressCallback cb)
+void MnaGraphExecutor::set_progress_callback(ProgressCallback callback)
 {
-    s_progressCallback = cb;
+    progressCallback() = std::move(callback);
 }
 
 //=============================================================================================================
-// Stream-mode execution
-//=============================================================================================================
 
-MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
-                                                              PluginFactory factory)
+MnaGraphExecutor::StreamContext MnaGraphExecutor::start_stream(MnaGraph& graph, const PluginFactory& factory)
 {
-    StreamContext ctx;
-    ctx.graph = &graph;
+    StreamContext context;
+    context.graph = &graph;
 
-    // 1. Validate the graph
-    QStringList errors;
-    if (!graph.validate(&errors)) {
-        mne::Log::warning("MnaGraphExecutor::startStream - graph validation failed: {}", errors.join(", ").toStdString());
-        return ctx;
+    if (const StringList errors = graph.validate(); !errors.empty()) {
+        Log::warning("MnaGraphExecutor::start_stream - graph validation failed: {}", join(errors, ", "));
+        return context;
     }
+    context.execution_order = graph.topological_sort();
+    apply_param_tree(graph);
 
-    // 2. Topological sort
-    ctx.executionOrder = graph.topologicalSort();
-
-    // 3. Apply current parameter tree values to node attributes
-    applyParamTree(graph);
-
-    // 4. Instantiate live plugins via factory
-    for (const QString& nodeId : ctx.executionOrder) {
-        const MnaNode& n = graph.node(nodeId);
-        std::unique_ptr<QObject> plugin = factory(n.opType);
+    for (const std::string& id : context.execution_order) {
+        const MnaNode& n = graph.node(id);
+        std::shared_ptr<void> plugin = factory(n.op_type);
         if (!plugin) {
-            mne::Log::warning("MnaGraphExecutor::startStream - factory returned nullptr for opType: {}", n.opType.toStdString());
-            ctx.livePlugins.clear();
-            return ctx;
+            Log::warning("MnaGraphExecutor::start_stream - factory returned nullptr for op type: {}", n.op_type);
+            context.live_plugins.clear();
+            return context;
         }
-        ctx.livePlugins[nodeId] = std::move(plugin);
+        context.live_plugins[id] = std::move(plugin);
     }
-
-    // 5. Wiring: the host application is responsible for connecting
-    //    Qt signals/slots between the QObject* instances based on
-    //    the port connections encoded in each node's input ports.
-    //    The mna library provides the graph topology; the host app
-    //    knows the concrete signal/slot signatures.
-
-    ctx.running = true;
-    return ctx;
+    context.running = true; // wiring the plugins together is up to the host application
+    return context;
 }
 
 //=============================================================================================================
 
-void MnaGraphExecutor::stopStream(StreamContext& ctx)
+void MnaGraphExecutor::stop_stream(StreamContext& context)
 {
-    if (!ctx.running) {
+    if (!context.running) {
         return;
     }
-
-    ctx.running = false;
-
-    // Stop in reverse topological order
-    for (int i = ctx.executionOrder.size() - 1; i >= 0; --i) {
-        ctx.livePlugins.erase(ctx.executionOrder[i]);
+    context.running = false;
+    for (auto it = context.execution_order.rbegin(); it != context.execution_order.rend(); ++it) {
+        context.live_plugins.erase(*it);
     }
-
-    ctx.livePlugins.clear();
-    ctx.executionOrder.clear();
-    ctx.graph = nullptr;
+    context.live_plugins.clear();
+    context.execution_order.clear();
+    context.graph = nullptr;
 }

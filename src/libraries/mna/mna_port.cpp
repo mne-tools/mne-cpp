@@ -12,9 +12,9 @@
  * The implementation converts @ref MnaDataKind and
  * @ref MnaPortDir through the canonical string helpers from
  * @ref mna_types.h so the on-disk vocabulary stays single-source.
- * Stream-related fields (@c streamProtocol, @c streamEndpoint,
- * @c streamBufferMs) and cache-related fields
- * (@c cachedResultPath, @c cachedResultHash) are only written when
+ * Stream-related fields (@c stream_protocol, @c stream_endpoint,
+ * @c stream_buffer_ms) and cache-related fields
+ * (@c cached_result_path, @c cached_result_hash) are only written when
  * non-default so simple file-based projects stay compact, and any
  * unknown attribute is shovelled into @c extras to keep the round
  * trip lossless across mne_mna versions.
@@ -26,6 +26,8 @@
 
 #include "mna_port.h"
 
+#include "mna_codec.h"
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -33,216 +35,65 @@
 using namespace mne;
 
 //=============================================================================================================
-// STATIC HELPERS
-//=============================================================================================================
-
-static QString dataKindToString(MnaDataKind kind)
-{
-    switch (kind) {
-        case MnaDataKind::FiffRaw:
-            return QStringLiteral("fiff_raw");
-        case MnaDataKind::Forward:
-            return QStringLiteral("forward");
-        case MnaDataKind::Inverse:
-            return QStringLiteral("inverse");
-        case MnaDataKind::Covariance:
-            return QStringLiteral("covariance");
-        case MnaDataKind::SourceEstimate:
-            return QStringLiteral("source_estimate");
-        case MnaDataKind::Epochs:
-            return QStringLiteral("epochs");
-        case MnaDataKind::Evoked:
-            return QStringLiteral("evoked");
-        case MnaDataKind::Matrix:
-            return QStringLiteral("matrix");
-        case MnaDataKind::Volume:
-            return QStringLiteral("volume");
-        case MnaDataKind::Surface:
-            return QStringLiteral("surface");
-        case MnaDataKind::Bem:
-            return QStringLiteral("bem");
-        case MnaDataKind::Annotation:
-            return QStringLiteral("annotation");
-        case MnaDataKind::Label:
-            return QStringLiteral("label");
-        case MnaDataKind::RealTimeStream:
-            return QStringLiteral("real_time_stream");
-        case MnaDataKind::Custom:
-            return QStringLiteral("custom");
-    }
-    return QStringLiteral("custom");
-}
-
-//=============================================================================================================
-
-static MnaDataKind dataKindFromString(const QString& str)
-{
-    if (str == QLatin1String("fiff_raw"))
-        return MnaDataKind::FiffRaw;
-    if (str == QLatin1String("forward"))
-        return MnaDataKind::Forward;
-    if (str == QLatin1String("inverse"))
-        return MnaDataKind::Inverse;
-    if (str == QLatin1String("covariance"))
-        return MnaDataKind::Covariance;
-    if (str == QLatin1String("source_estimate"))
-        return MnaDataKind::SourceEstimate;
-    if (str == QLatin1String("epochs"))
-        return MnaDataKind::Epochs;
-    if (str == QLatin1String("evoked"))
-        return MnaDataKind::Evoked;
-    if (str == QLatin1String("matrix"))
-        return MnaDataKind::Matrix;
-    if (str == QLatin1String("volume"))
-        return MnaDataKind::Volume;
-    if (str == QLatin1String("surface"))
-        return MnaDataKind::Surface;
-    if (str == QLatin1String("bem"))
-        return MnaDataKind::Bem;
-    if (str == QLatin1String("annotation"))
-        return MnaDataKind::Annotation;
-    if (str == QLatin1String("label"))
-        return MnaDataKind::Label;
-    if (str == QLatin1String("real_time_stream"))
-        return MnaDataKind::RealTimeStream;
-    return MnaDataKind::Custom;
-}
-
-//=============================================================================================================
-
-static QString portDirToString(MnaPortDir dir)
-{
-    switch (dir) {
-        case MnaPortDir::Input:
-            return QStringLiteral("input");
-        case MnaPortDir::Output:
-            return QStringLiteral("output");
-    }
-    return QStringLiteral("input");
-}
-
-//=============================================================================================================
-
-static MnaPortDir portDirFromString(const QString& str)
-{
-    if (str == QLatin1String("output"))
-        return MnaPortDir::Output;
-    return MnaPortDir::Input;
-}
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QJsonObject MnaPort::toJson() const
+JsonObject MnaPort::to_json() const
 {
-    QJsonObject json = extras;
-    json[QLatin1String("name")] = name;
-    json[QLatin1String("data_kind")] = dataKindToString(dataKind);
-    json[QLatin1String("direction")] = portDirToString(direction);
+    JsonObject json = extras;
+    json["name"] = name;
+    json["data_kind"] = data_kind_key(data_kind);
+    json["direction"] = direction == MnaPortDir::Output ? "output" : "input";
 
-    if (!sourceNodeId.isEmpty())
-        json[QLatin1String("source_node")] = sourceNodeId;
-    if (!sourcePortName.isEmpty())
-        json[QLatin1String("source_port")] = sourcePortName;
+    if (!source_node_id.empty())
+        json["source_node"] = source_node_id;
+    if (!source_port_name.empty())
+        json["source_port"] = source_port_name;
 
-    if (!streamProtocol.isEmpty()) {
-        json[QLatin1String("stream_protocol")] = streamProtocol;
-        json[QLatin1String("stream_endpoint")] = streamEndpoint;
-        json[QLatin1String("stream_buffer_ms")] = streamBufferMs;
+    if (!stream_protocol.empty()) {
+        json["stream_protocol"] = stream_protocol;
+        json["stream_endpoint"] = stream_endpoint;
+        json["stream_buffer_ms"] = stream_buffer_ms;
     }
 
-    if (!cachedResultPath.isEmpty())
-        json[QLatin1String("cached_result")] = cachedResultPath;
-    if (!cachedResultHash.isEmpty())
-        json[QLatin1String("cached_result_hash")] = cachedResultHash;
+    if (!cached_result_path.empty())
+        json["cached_result"] = cached_result_path;
+    if (!cached_result_hash.empty())
+        json["cached_result_hash"] = cached_result_hash;
 
     return json;
 }
 
 //=============================================================================================================
 
-MnaPort MnaPort::fromJson(const QJsonObject& json)
+MnaPort MnaPort::from_json(const JsonObject& json)
 {
     MnaPort port;
-    port.name = json[QLatin1String("name")].toString();
-    port.dataKind = dataKindFromString(json[QLatin1String("data_kind")].toString());
-    port.direction = portDirFromString(json[QLatin1String("direction")].toString());
-    port.sourceNodeId = json[QLatin1String("source_node")].toString();
-    port.sourcePortName = json[QLatin1String("source_port")].toString();
-    port.streamProtocol = json[QLatin1String("stream_protocol")].toString();
-    port.streamEndpoint = json[QLatin1String("stream_endpoint")].toString();
-    port.streamBufferMs = json[QLatin1String("stream_buffer_ms")].toInt(0);
-    port.cachedResultPath = json[QLatin1String("cached_result")].toString();
-    port.cachedResultHash = json[QLatin1String("cached_result_hash")].toString();
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("name"), QStringLiteral("data_kind"),
-        QStringLiteral("direction"), QStringLiteral("source_node"),
-        QStringLiteral("source_port"), QStringLiteral("stream_protocol"),
-        QStringLiteral("stream_endpoint"), QStringLiteral("stream_buffer_ms"),
-        QStringLiteral("cached_result"), QStringLiteral("cached_result_hash")};
-    for (auto it = json.constBegin(); it != json.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            port.extras.insert(it.key(), it.value());
-    }
-
+    port.name = json["name"].to_std_string();
+    port.data_kind = data_kind_from_string(json["data_kind"].to_string());
+    port.direction = json["direction"].to_string() == "output" ? MnaPortDir::Output : MnaPortDir::Input;
+    port.source_node_id = json["source_node"].to_std_string();
+    port.source_port_name = json["source_port"].to_std_string();
+    port.stream_protocol = json["stream_protocol"].to_std_string();
+    port.stream_endpoint = json["stream_endpoint"].to_std_string();
+    port.stream_buffer_ms = json["stream_buffer_ms"].to_int(0);
+    port.cached_result_path = json["cached_result"].to_std_string();
+    port.cached_result_hash = json["cached_result_hash"].to_std_string();
+    port.extras = json.without({"name", "data_kind", "direction", "source_node", "source_port", "stream_protocol",
+                                "stream_endpoint", "stream_buffer_ms", "cached_result", "cached_result_hash"});
     return port;
 }
 
 //=============================================================================================================
 
-QCborMap MnaPort::toCbor() const
+CborMap MnaPort::to_cbor() const
 {
-    QCborMap cbor = QCborMap::fromJsonObject(extras);
-    cbor[QLatin1String("name")] = name;
-    cbor[QLatin1String("data_kind")] = dataKindToString(dataKind);
-    cbor[QLatin1String("direction")] = portDirToString(direction);
-
-    if (!sourceNodeId.isEmpty())
-        cbor[QLatin1String("source_node")] = sourceNodeId;
-    if (!sourcePortName.isEmpty())
-        cbor[QLatin1String("source_port")] = sourcePortName;
-    if (!streamProtocol.isEmpty()) {
-        cbor[QLatin1String("stream_protocol")] = streamProtocol;
-        cbor[QLatin1String("stream_endpoint")] = streamEndpoint;
-        cbor[QLatin1String("stream_buffer_ms")] = streamBufferMs;
-    }
-    if (!cachedResultPath.isEmpty())
-        cbor[QLatin1String("cached_result")] = cachedResultPath;
-    if (!cachedResultHash.isEmpty())
-        cbor[QLatin1String("cached_result_hash")] = cachedResultHash;
-
-    return cbor;
+    return detail::to_cbor_via_json(*this);
 }
 
 //=============================================================================================================
 
-MnaPort MnaPort::fromCbor(const QCborMap& cbor)
+MnaPort MnaPort::from_cbor(const CborMap& cbor)
 {
-    MnaPort port;
-    port.name = cbor[QLatin1String("name")].toString();
-    port.dataKind = dataKindFromString(cbor[QLatin1String("data_kind")].toString());
-    port.direction = portDirFromString(cbor[QLatin1String("direction")].toString());
-    port.sourceNodeId = cbor[QLatin1String("source_node")].toString();
-    port.sourcePortName = cbor[QLatin1String("source_port")].toString();
-    port.streamProtocol = cbor[QLatin1String("stream_protocol")].toString();
-    port.streamEndpoint = cbor[QLatin1String("stream_endpoint")].toString();
-    port.streamBufferMs = cbor[QLatin1String("stream_buffer_ms")].toInteger();
-    port.cachedResultPath = cbor[QLatin1String("cached_result")].toString();
-    port.cachedResultHash = cbor[QLatin1String("cached_result_hash")].toString();
-
-    static const QSet<QString> knownKeys = {
-        QStringLiteral("name"), QStringLiteral("data_kind"),
-        QStringLiteral("direction"), QStringLiteral("source_node"),
-        QStringLiteral("source_port"), QStringLiteral("stream_protocol"),
-        QStringLiteral("stream_endpoint"), QStringLiteral("stream_buffer_ms"),
-        QStringLiteral("cached_result"), QStringLiteral("cached_result_hash")};
-    QJsonObject cborJson = cbor.toJsonObject();
-    for (auto it = cborJson.constBegin(); it != cborJson.constEnd(); ++it) {
-        if (!knownKeys.contains(it.key()))
-            port.extras.insert(it.key(), it.value());
-    }
-
-    return port;
+    return from_json(cbor.to_json_object());
 }

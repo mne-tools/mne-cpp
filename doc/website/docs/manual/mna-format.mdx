@@ -37,10 +37,10 @@ An MNA project follows a hierarchical data model that mirrors the structure of a
 
 ```
 MnaProject
- ├── name, description, mnaVersion, created, modified
+ ├── name, description, mna_version, created, modified
  ├── subjects[]
  │    └── MnaSubject
- │         ├── id, freeSurferDir
+ │         ├── id, freesurfer_dir
  │         └── sessions[]
  │              └── MnaSession
  │                   ├── id
@@ -53,7 +53,7 @@ MnaProject
  │                                       ├── path (relative POSIX)
  │                                       ├── sha256
  │                                       ├── format ("fiff", "stc", "mgh", …)
- │                                       ├── sizeBytes
+ │                                       ├── size_bytes
  │                                       └── embedded (bool + data)
  └── pipeline[]  →  MnaNode[]  (the computational graph)
 ```
@@ -62,7 +62,7 @@ MnaProject
 
 | Class | Purpose |
 |---|---|
-| `MnaProject` | Top-level container. Holds subjects, the processing pipeline, and project metadata. Schema version is stored in `mnaVersion` (current: `"1.0"`). |
+| `MnaProject` | Top-level container. Holds subjects, the processing pipeline, and project metadata. Schema version is stored in `mna_version` (current: `"1.0"`). |
 | `MnaSubject` | Represents a participant. Links to a FreeSurfer `SUBJECTS_DIR` for anatomy. |
 | `MnaSession` | Groups recordings from one measurement session. |
 | `MnaRecording` | Groups files from one recording run (raw, events, head digitization, etc.). |
@@ -95,21 +95,18 @@ The heart of MNA is the **computational graph**: a directed acyclic graph (DAG) 
 `MnaGraph` is the top-level graph container. It holds:
 
 - A list of `MnaNode` objects (the processing steps)
-- Graph-level input and output ports (`graphInputs`, `graphOutputs`)
+- Graph-level input and output ports (`graph_inputs`, `graph_outputs`)
 - A hierarchical parameter tree (`MnaParamTree`)
 - Connection and validation methods
 
 ```cpp
-MnaGraph graph;
-graph.addNode(filterNode);
-graph.addNode(inverseNode);
-graph.connect("filter_01", "filtered_raw",
-              "inverse_01", "raw_input");
+mne::MnaGraph graph;
+graph.add_node(filter);
+graph.add_node(inverse);
+graph.connect("filter_01", "filtered_raw", "inverse_01", "raw_input");
 
-QStringList errors;
-if (!graph.validate(&errors)) {
-    for (const auto& e : errors)
-        qWarning() << e;
+for (const std::string& error : graph.validate()) {
+    std::println(stderr, "{}", error);
 }
 ```
 
@@ -119,12 +116,12 @@ Each node represents a single processing step:
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `QString` | Unique identifier (e.g., `"filter_01"`) |
-| `opType` | `QString` | Operation type looked up in `MnaOpRegistry` (e.g., `"dsp.band_pass_filter"`) |
-| `attributes` | `QVariantMap` | Operation parameters (e.g., `{"low_freq": 1.0, "high_freq": 40.0}`) |
-| `inputs` | `QList<MnaPort>` | Input ports with upstream connections |
-| `outputs` | `QList<MnaPort>` | Output ports |
-| `execMode` | `MnaNodeExecMode` | Execution mode: `Batch`, `Stream`, `Ipc`, or `Script` |
+| `id` | `std::string` | Unique identifier (e.g., `"filter_01"`) |
+| `op_type` | `std::string` | Operation type looked up in `MnaOpRegistry` (e.g., `"dsp.band_pass_filter"`) |
+| `attributes` | `JsonObject` | Operation parameters (e.g., `{"low_freq": 1.0, "high_freq": 40.0}`) |
+| `inputs` | `std::vector<MnaPort>` | Input ports with upstream connections |
+| `outputs` | `std::vector<MnaPort>` | Output ports |
+| `exec_mode` | `MnaNodeExecMode` | Execution mode: `Batch`, `Stream`, `Ipc`, or `Script` |
 | `verification` | `MnaVerification` | Pre/post-condition checks and provenance |
 | `dirty` | `bool` | Whether the node needs re-execution |
 
@@ -134,15 +131,15 @@ Typed input/output slot on a graph node:
 
 | Field | Type | Description |
 |---|---|---|
-| `name` | `QString` | Port name, unique within a node |
-| `dataKind` | `MnaDataKind` | Type of data flowing through (e.g., `FiffRaw`, `Forward`, `SourceEstimate`) |
+| `name` | `std::string` | Port name, unique within a node |
+| `data_kind` | `MnaDataKind` | Type of data flowing through (e.g., `FiffRaw`, `Forward`, `SourceEstimate`) |
 | `direction` | `MnaPortDir` | `Input` or `Output` |
-| `sourceNodeId` | `QString` | Upstream node (for input ports) |
-| `sourcePortName` | `QString` | Upstream output port name |
-| `streamProtocol` | `QString` | For real-time: `"fiff-rt"`, `"lsl"`, `"tcp"`, `"shm"` |
-| `streamEndpoint` | `QString` | Protocol-specific address |
-| `cachedResultPath` | `QString` | Path to cached result file |
-| `cachedResultHash` | `QString` | SHA-256 hash for cache invalidation |
+| `source_node_id` | `std::string` | Upstream node (for input ports) |
+| `source_port_name` | `std::string` | Upstream output port name |
+| `stream_protocol` | `std::string` | For real-time: `"fiff-rt"`, `"lsl"`, `"tcp"`, `"shm"` |
+| `stream_endpoint` | `std::string` | Protocol-specific address |
+| `cached_result_path` | `std::string` | Path to cached result file |
+| `cached_result_hash` | `std::string` | SHA-256 hash for cache invalidation |
 
 ### Data Kinds (`MnaDataKind`)
 
@@ -181,37 +178,37 @@ Every operation type is described by an **operator schema** (`MnaOpSchema`) that
 
 | Field | Type | Description |
 |---|---|---|
-| `opType` | `QString` | Operation type identifier (e.g., `"inv.compute_mne"`) |
-| `version` | `QString` | Schema version (e.g., `"2.2.0"`) |
-| `binding` | `QString` | `"internal"`, `"cli"`, or `"script"` |
-| `category` | `QString` | `"io"`, `"preprocessing"`, `"source_estimation"`, etc. |
-| `description` | `QString` | Human-readable description |
-| `library` | `QString` | Which library provides the implementation |
-| `inputPorts` | `QList<MnaOpSchemaPort>` | Expected input port descriptors |
-| `outputPorts` | `QList<MnaOpSchemaPort>` | Expected output port descriptors |
-| `attributes` | `QList<MnaOpSchemaAttr>` | Expected attribute descriptors with types and defaults |
+| `op_type` | `std::string` | Operation type identifier (e.g., `"inv.compute_mne"`) |
+| `version` | `std::string` | Schema version (e.g., `"2.2.0"`) |
+| `binding` | `std::string` | `"internal"`, `"cli"`, or `"script"` |
+| `category` | `std::string` | `"io"`, `"preprocessing"`, `"source_estimation"`, etc. |
+| `description` | `std::string` | Human-readable description |
+| `library` | `std::string` | Which library provides the implementation |
+| `input_ports` | `std::vector<MnaOpSchemaPort>` | Expected input port descriptors |
+| `output_ports` | `std::vector<MnaOpSchemaPort>` | Expected output port descriptors |
+| `attributes` | `std::vector<MnaOpSchemaAttr>` | Expected attribute descriptors with types and defaults |
 
 ### MnaOpRegistry
 
 The singleton `MnaOpRegistry` maps operation type strings to schemas and implementation functions:
 
 ```cpp
-auto& reg = MnaOpRegistry::instance();
+auto& registry = mne::MnaOpRegistry::instance();
 
 // Register a schema
-reg.registerOp(mySchema);
+registry.register_op(my_schema);
 
 // Register an implementation
-reg.registerOpFunc("custom.my_filter", [](const QVariantMap& inputs,
-                                           const QVariantMap& attrs) -> QVariantMap {
-    // Process inputs using attrs
-    return {{"filtered", result}};
-});
+registry.register_op_func("custom.my_filter",
+                          [](const mne::MnaValues& inputs, const mne::JsonObject& attributes) {
+                              const auto& raw = std::any_cast<const MyData&>(inputs.at("raw"));
+                              return mne::MnaValues{{"filtered", filter(raw, attributes["low_freq"].to_double())}};
+                          });
 
 // Check and invoke
-if (reg.hasOp("dsp.band_pass_filter")) {
-    auto schema = reg.schema("dsp.band_pass_filter");
-    auto func   = reg.opFunc("dsp.band_pass_filter");
+if (registry.has_op("dsp.band_pass_filter")) {
+    const mne::MnaOpSchema& schema = registry.schema("dsp.band_pass_filter");
+    const auto& func = registry.op_func("dsp.band_pass_filter");
 }
 ```
 
@@ -220,7 +217,7 @@ if (reg.hasOp("dsp.band_pass_filter")) {
 Loads operator schemas from declarative JSON registry manifest files:
 
 ```cpp
-MnaRegistryLoader::loadDirectory("resources/mna/", MnaOpRegistry::instance());
+mne::MnaRegistryLoader::load_directory("resources/mna/", mne::MnaOpRegistry::instance());
 ```
 
 The loader supports a master `mna-registry.json` file plus drop-in files from a `mna-registry.d/` subdirectory. Later files override earlier entries for the same operation type.
@@ -232,12 +229,12 @@ The loader supports a master `mna-registry.json` file plus drop-in files from a 
 A hierarchical parameter store where each parameter has a path (`"nodeId/attrKey"`) and an optional dynamic binding:
 
 ```cpp
-MnaParamTree tree;
-tree.setParam("filter_01/low_freq", 1.0);
-tree.setParam("filter_01/high_freq", 40.0);
-tree.setParam("inverse_01/snr", 3.0);
+mne::MnaParamTree tree;
+tree.set_param("filter_01/low_freq", 1.0);
+tree.set_param("filter_01/high_freq", 40.0);
+tree.set_param("inverse_01/snr", 3.0);
 
-QVariant val = tree.param("inverse_01/snr");  // → 3.0
+const double snr = tree.param("inverse_01/snr").to_double();  // 3.0
 ```
 
 ### MnaParamBinding
@@ -246,21 +243,23 @@ Dynamic bindings link a target parameter to a formula that is re-evaluated when 
 
 | Field | Type | Description |
 |---|---|---|
-| `targetPath` | `QString` | Parameter path to control (e.g., `"inverse_01/lambda"`) |
-| `expression` | `QString` | Formula string (e.g., `"clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"`) |
-| `trigger` | `QString` | `"on_change"`, `"periodic"`, or `"manual"` |
-| `periodMs` | `int` | Evaluation period for periodic triggers |
-| `dependencies` | `QStringList` | Paths this binding reads from |
+| `target_path` | `std::string` | Parameter path to control (e.g., `"inverse_01/lambda"`) |
+| `expression` | `std::string` | Formula string (e.g., `"clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)"`) |
+| `trigger` | `std::string` | `"on_change"`, `"periodic"`, or `"manual"` |
+| `period_ms` | `int` | Evaluation period for periodic triggers |
+| `dependencies` | `StringList` | Paths this binding reads from |
 
 ```cpp
-MnaParamBinding binding;
-binding.targetPath  = "inverse_01/lambda";
-binding.expression  = "1.0 / pow(ref('inverse_01/snr'), 2)";
-binding.trigger     = "on_change";
+mne::MnaParamBinding binding;
+binding.target_path  = "inverse_01/lambda";
+binding.expression   = "1 / (ref('inverse_01/snr') * ref('inverse_01/snr'))";
+binding.trigger      = "on_change";
 binding.dependencies = {"inverse_01/snr"};
 
-tree.addBinding(binding);
+tree.add_binding(binding);
 ```
+
+Expressions support numbers, `'text'`, parameter paths, `ref('path')`, `clamp`, `scale`, `threshold`, `lerp`, `+ - * /`, parentheses and comparisons. An expression that names something unknown has no value, and its binding leaves the target unchanged.
 
 ## Execution
 
@@ -269,13 +268,14 @@ tree.addBinding(binding);
 The executor traverses the graph in topological order and invokes the registered operation function for each node:
 
 ```cpp
-QVariantMap graphInputs;
-graphInputs["raw_file"] = "/data/sample_audvis_raw.fif";
-
-auto ctx = MnaGraphExecutor::execute(graph, graphInputs);
+const mne::MnaValues graph_inputs{{"raw_file", std::string("/data/sample_audvis_raw.fif")}};
+auto context = mne::MnaGraphExecutor::execute(graph, graph_inputs);
+if (!context.aborted_node.empty()) {
+    std::println(stderr, "a check of {} failed", context.aborted_node);
+}
 
 // Access results
-QVariant stc = ctx.results["inverse_01::source_estimate"];
+const std::any& stc = context.results.at("inverse_01::source_estimate");
 ```
 
 #### Execution Modes
@@ -283,21 +283,20 @@ QVariant stc = ctx.results["inverse_01::source_estimate"];
 | Mode | Description |
 |---|---|
 | **Full execution** | `execute()` — runs all nodes in topological order |
-| **Incremental execution** | `executeIncremental()` — runs only dirty nodes and their downstream dependents |
-| **Single-node execution** | `executeNode()` — runs one node for testing/debugging |
+| **Incremental execution** | `execute_incremental()` — runs only dirty nodes and their downstream dependents |
+| **Single-node execution** | `execute_node()` — runs one node for testing/debugging |
 
 #### Progress Callback
 
 ```cpp
-MnaGraphExecutor::setProgressCallback(
-    [](const QString& nodeId, int current, int total) {
-        qDebug() << QString("[%1/%2] %3").arg(current).arg(total).arg(nodeId);
-    });
+mne::MnaGraphExecutor::set_progress_callback([](std::string_view node_id, int current, int total) {
+    std::println("[{}/{}] {}", current, total, node_id);
+});
 ```
 
 #### Stream Mode
 
-When a node's `execMode` is `Stream`, the executor connects to the real-time data source specified by the input port's `streamProtocol` and `streamEndpoint`, then continuously processes incoming data buffers. This integrates MNA pipelines with MNE Scan for real-time acquisition and processing.
+When a node's `exec_mode` is `Stream`, `start_stream()` creates a live plugin for it with the application's factory and connects it to the real-time data source specified by the input port's `stream_protocol` and `stream_endpoint`, then continuously processes incoming data buffers. This integrates MNA pipelines with MNE Scan for real-time acquisition and processing.
 
 ## Verification and Provenance
 
@@ -313,13 +312,13 @@ Each node carries a `MnaVerification` block containing:
 
 | Field | Type | Description |
 |---|---|---|
-| `id` | `QString` | Unique check ID within the node (e.g., `"cov_posdef"`) |
-| `description` | `QString` | Human-readable description |
-| `phase` | `QString` | `"pre"` (before execution) or `"post"` (after execution) |
-| `expression` | `QString` | Simple evaluable expression (e.g., `"rank(covariance) > 0"`) |
+| `id` | `std::string` | Unique check ID within the node (e.g., `"cov_posdef"`) |
+| `description` | `std::string` | Human-readable description |
+| `phase` | `std::string` | `"pre"` (before execution) or `"post"` (after execution) |
+| `expression` | `std::string` | Simple evaluable expression (e.g., `"rank > 0"`) |
 | `script` | `MnaScript` | Optional script for complex checks (exit code 0 = pass) |
-| `severity` | `QString` | `"error"` (abort), `"warning"` (log + continue), `"info"` (always continue) |
-| `onFail` | `QString` | Remediation hint shown on failure |
+| `severity` | `std::string` | `"error"` (abort), `"warning"` (log + continue), `"info"` (always continue) |
+| `on_fail` | `std::string` | Remediation hint shown on failure |
 
 ### MnaScript
 
@@ -327,22 +326,22 @@ Inline code that can be embedded in nodes (for `Script` exec mode) or verificati
 
 | Field | Type | Description |
 |---|---|---|
-| `language` | `QString` | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
-| `interpreter` | `QString` | Interpreter command (e.g., `"python3"`); empty = auto-detect |
-| `interpreterArgs` | `QStringList` | Extra args before the script file |
-| `code` | `QString` | The inline source code |
-| `sourceUri` | `QString` | Optional authoring-time reference |
-| `codeSha256` | `QString` | SHA-256 of `code` for integrity verification |
+| `language` | `std::string` | `"python"`, `"shell"`, `"r"`, `"matlab"`, `"octave"`, `"julia"` |
+| `interpreter` | `std::string` | Interpreter command (e.g., `"python3"`); empty = auto-detect |
+| `interpreter_args` | `StringList` | Extra args before the script file |
+| `code` | `std::string` | The inline source code |
+| `source_uri` | `std::string` | Optional authoring-time reference |
+| `code_sha256` | `std::string` | SHA-256 of `code` for integrity verification |
 
 ## Serialization Formats
 
 ### MNA — JSON Text Format
 
-The `.mna` format serializes the project as indented UTF-8 JSON. Every MNA class implements `toJson()` / `fromJson()`:
+The `.mna` format serializes the project as indented UTF-8 JSON. Every MNA class implements `to_json()` / `from_json()`:
 
 ```cpp
-QJsonObject json = project.toJson();
-MnaProject  proj = MnaProject::fromJson(json);
+const mne::JsonObject json = project.to_json();
+const mne::MnaProject copy = mne::MnaProject::from_json(json);
 ```
 
 **Advantages:**
@@ -354,7 +353,7 @@ MnaProject  proj = MnaProject::fromJson(json);
 
 ```json
 {
-  "role": "Event",
+  "role": "custom",
   "path": "events.fif",
   "embedded": true,
   "data": "AAAB..."
@@ -371,24 +370,22 @@ The `.mnx` format is the compact binary counterpart, using [CBOR (RFC 8949)](htt
 Offset  Size  Content
 ──────  ────  ───────────────────────────────────
 0       4     Magic bytes: 0x4D 0x4E 0x58 0x31  ("MNX1")
-4       n     CBOR-encoded QCborMap (the MnaProject)
+4       n     CBOR-encoded map (the MnaProject)
 ```
 
 The magic header allows quick file-type detection without parsing the CBOR payload:
 
 ```cpp
-// Quick check
-QFile f("pipeline.mnx");
-f.open(QIODevice::ReadOnly);
-QByteArray magic = f.read(4);
-bool isMnx = (magic == QByteArrayLiteral("MNX1"));
+std::ifstream file("pipeline.mnx", std::ios::binary);
+std::array<char, 4> magic{};
+const bool is_mnx = file.read(magic.data(), magic.size()) && std::string_view(magic.data(), magic.size()) == "MNX1";
 ```
 
-Every MNA class implements `toCbor()` / `fromCbor()`:
+Every MNA class implements `to_cbor()` / `from_cbor()`:
 
 ```cpp
-QCborMap cbor = project.toCbor();
-MnaProject proj = MnaProject::fromCbor(cbor);
+const mne::CborMap cbor = project.to_cbor();
+const mne::MnaProject copy = mne::MnaProject::from_cbor(cbor);
 ```
 
 **Advantages:**
@@ -401,10 +398,10 @@ MnaProject proj = MnaProject::fromCbor(cbor);
 
 ```cpp
 // JSON serialization (Base64)
-json["data"] = QString::fromLatin1(data.toBase64());
+json["data"] = mne::to_base64(data);
 
 // CBOR serialization (raw bytes, ~33 % smaller for binary payloads)
-cbor["data"] = QCborValue(data);   // native ByteArray
+cbor.insert("data", data);   // byte string
 ```
 
 #### CBOR key reference
@@ -418,8 +415,8 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 | `mna_version` | Text | Schema version, e.g. `"1.0"` |
 | `name` | Text | |
 | `description` | Text | |
-| `created` | Text | ISO 8601 with milliseconds |
-| `modified` | Text | ISO 8601 with milliseconds |
+| `created` | Tag 0 + Text | ISO 8601 date-time with milliseconds (JSON: ISO 8601 text without milliseconds) |
+| `modified` | Tag 0 + Text | ISO 8601 date-time with milliseconds (JSON: ISO 8601 text without milliseconds) |
 | `subjects` | Array | Array of MnaSubject maps |
 | `pipeline` | Array | Array of MnaNode maps |
 
@@ -437,7 +434,7 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 
 | Key | CBOR Type | Notes |
 |---|---|---|
-| `role` | Text | File role as string (`"Raw"`, `"Forward"`, …) |
+| `role` | Text | File role as string (`"raw"`, `"forward"`, `"source_estimate"`, …) |
 | `path` | Text | Relative POSIX path |
 | `sha256` | Text | Hex-encoded SHA-256 |
 | `format` | Text | `"fiff"`, `"stc"`, `"mgh"`, … |
@@ -462,7 +459,7 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 | `script` | Map | MnaScript (Script mode) |
 | `verification` | Map | MnaVerification structure |
 | `tool_version` | Text | Version string |
-| `executed_at` | Text | ISO 8601 timestamp |
+| `executed_at` | Text | ISO 8601 timestamp (seconds) |
 | `dirty` | Boolean | Needs re-execution |
 
 **MnaPort**
@@ -494,19 +491,15 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 
 #### Data type mapping
 
-| C++ / Qt Type | JSON Encoding | CBOR Encoding |
+| C++ Type | JSON Encoding | CBOR Encoding |
 |---|---|---|
-| `QString` | JSON string | CBOR text string |
-| `QDateTime` | ISO 8601 string (`Qt::ISODateWithMs`) | CBOR text string |
-| `QByteArray` (data) | Base64-encoded JSON string | CBOR byte string (major type 2) |
-| `int` / `qint64` | JSON number | CBOR integer |
+| `std::string` | JSON string | CBOR text string |
+| `std::optional<UtcTime>` | ISO 8601 string | CBOR text string (project dates: tag 0) |
+| `std::vector<std::byte>` (data) | Base64-encoded JSON string | CBOR byte string (major type 2) |
+| `int` / `std::int64_t` | JSON number | CBOR integer |
 | `bool` | JSON `true`/`false` | CBOR `true`/`false` |
-| `QVariant` | `QJsonValue::fromVariant()` | `QCborValue::fromVariant()` |
-| `QVariantMap` | `QJsonObject` | `QCborMap` via `fromJsonObject()` |
-
-:::note
-`MnaParamTree` is serialized in the JSON format only. It is omitted from the CBOR representation; parameter bindings are handled at the application layer rather than persisted in `.mnx` files.
-:::
+| `StringList` | JSON array of strings | CBOR array of text strings |
+| `JsonObject` (attributes) | JSON object | CBOR map via `CborMap::from_json_object()` |
 
 #### Size comparison example
 
@@ -523,24 +516,28 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 #include <mna/mna_io.h>
 
 // Read (dispatches by extension: .mna → JSON, .mnx → CBOR)
-MnaProject project = MnaIO::read("pipeline.mnx");
+auto project = mne::MnaIO::read("pipeline.mnx");
+if (!project) {
+    std::println(stderr, "{}", project.error().what());
+    return 1;
+}
 
-// Write JSON
-MnaIO::write(project, "pipeline.mna");
-
-// Write CBOR binary
-MnaIO::write(project, "pipeline.mnx");
+// Write JSON, then CBOR binary
+auto json = mne::MnaIO::write(*project, "pipeline.mna");
+auto cbor = mne::MnaIO::write(*project, "pipeline.mnx");
 ```
+
+`MnaIO::to_mnx(project)` returns the `.mnx` bytes without writing a file.
 
 ### Round-Trip Fidelity
 
-Both formats guarantee **lossless round-trip serialization**. Every MNA struct carries an `extras` field (`QJsonObject`) that captures any JSON/CBOR keys not recognized by the current software version. On serialization, these unknown keys are written back. This means:
+Both formats guarantee **lossless round-trip serialization**. Every MNA struct carries an `extras` field (`JsonObject`) that captures any JSON/CBOR keys not recognized by the current software version. On serialization, these unknown keys are written back. This means:
 
 - A project created by a **newer** MNA version (with additional fields) can be opened and re-saved by an **older** version without losing the new fields
 - **Cross-application round-trips** preserve foreign data: mne_browse, mne_inspect, and mne_scan each only modify the fields they own, leaving everything else intact (enriching mode)
 
 ```
-Original file    →  fromJson()  →  MnaProject  →  toJson()  →  Saved file
+Original file    →  from_json()  →  MnaProject  →  to_json()  →  Saved file
                                    (extras bag)
 All unknown keys ─────────────────────────────────────────────→ All unknown keys preserved
 ```
@@ -549,12 +546,14 @@ All unknown keys ─────────────────────
 
 ```cpp
 // JSON → Binary
-MnaProject proj = MnaIO::read("pipeline.mna");
-MnaIO::write(proj, "pipeline.mnx");
+if (auto project = mne::MnaIO::read("pipeline.mna")) {
+    auto written = mne::MnaIO::write(*project, "pipeline.mnx");
+}
 
 // Binary → JSON
-MnaProject proj = MnaIO::read("pipeline.mnx");
-MnaIO::write(proj, "pipeline.mna");
+if (auto project = mne::MnaIO::read("pipeline.mnx")) {
+    auto written = mne::MnaIO::write(*project, "pipeline.mna");
+}
 ```
 
 Or use the CLI:
@@ -568,14 +567,14 @@ mne_show_mna pipeline.mna --convert mnx   # convert to binary (planned)
 
 ```json
 {
-  "mnaVersion": "1.0",
+  "mna_version": "1.0",
   "name": "audvis_dspm",
   "description": "dSPM source localization of auditory/visual paradigm",
   "created": "2026-04-19T10:00:00Z",
   "subjects": [
     {
       "id": "sample",
-      "freeSurferDir": "subjects/sample",
+      "freesurfer_dir": "subjects/sample",
       "sessions": [
         {
           "id": "01",
@@ -583,9 +582,9 @@ mne_show_mna pipeline.mna --convert mnx   # convert to binary (planned)
             {
               "id": "audvis",
               "files": [
-                { "role": "Raw",        "path": "data/sample_audvis_raw.fif",  "format": "fiff" },
-                { "role": "Forward",    "path": "data/sample_audvis-fwd.fif",  "format": "fiff" },
-                { "role": "Covariance", "path": "data/sample_audvis-cov.fif",  "format": "fiff" }
+                { "role": "raw",        "path": "data/sample_audvis_raw.fif",  "format": "fiff" },
+                { "role": "forward",    "path": "data/sample_audvis-fwd.fif",  "format": "fiff" },
+                { "role": "covariance", "path": "data/sample_audvis-cov.fif",  "format": "fiff" }
               ]
             }
           ]
@@ -596,57 +595,57 @@ mne_show_mna pipeline.mna --convert mnx   # convert to binary (planned)
   "pipeline": [
     {
       "id": "read_raw_01",
-      "opType": "io.read_raw_fif",
+      "op_type": "io.read_raw_fif",
       "attributes": { "path": "data/sample_audvis_raw.fif" },
       "inputs": [],
       "outputs": [
-        { "name": "raw", "dataKind": "FiffRaw", "direction": "Output" }
+        { "name": "raw", "data_kind": "fiff_raw", "direction": "output" }
       ]
     },
     {
       "id": "filter_01",
-      "opType": "dsp.band_pass_filter",
+      "op_type": "dsp.band_pass_filter",
       "attributes": { "low_freq": 1.0, "high_freq": 40.0 },
       "inputs": [
-        { "name": "raw_input", "dataKind": "FiffRaw", "direction": "Input",
-          "sourceNodeId": "read_raw_01", "sourcePortName": "raw" }
+        { "name": "raw_input", "data_kind": "fiff_raw", "direction": "input",
+          "source_node": "read_raw_01", "source_port": "raw" }
       ],
       "outputs": [
-        { "name": "filtered_raw", "dataKind": "FiffRaw", "direction": "Output" }
+        { "name": "filtered_raw", "data_kind": "fiff_raw", "direction": "output" }
       ]
     },
     {
       "id": "read_fwd_01",
-      "opType": "io.read_forward",
+      "op_type": "io.read_forward",
       "attributes": { "path": "data/sample_audvis-fwd.fif" },
       "inputs": [],
       "outputs": [
-        { "name": "forward", "dataKind": "Forward", "direction": "Output" }
+        { "name": "forward", "data_kind": "forward", "direction": "output" }
       ]
     },
     {
       "id": "read_cov_01",
-      "opType": "io.read_covariance",
+      "op_type": "io.read_covariance",
       "attributes": { "path": "data/sample_audvis-cov.fif" },
       "inputs": [],
       "outputs": [
-        { "name": "covariance", "dataKind": "Covariance", "direction": "Output" }
+        { "name": "covariance", "data_kind": "covariance", "direction": "output" }
       ]
     },
     {
       "id": "inverse_01",
-      "opType": "inv.compute_mne",
+      "op_type": "inv.compute_mne",
       "attributes": { "method": "dSPM", "snr": 3.0 },
       "inputs": [
-        { "name": "raw_input", "dataKind": "FiffRaw", "direction": "Input",
-          "sourceNodeId": "filter_01", "sourcePortName": "filtered_raw" },
-        { "name": "forward", "dataKind": "Forward", "direction": "Input",
-          "sourceNodeId": "read_fwd_01", "sourcePortName": "forward" },
-        { "name": "covariance", "dataKind": "Covariance", "direction": "Input",
-          "sourceNodeId": "read_cov_01", "sourcePortName": "covariance" }
+        { "name": "raw_input", "data_kind": "fiff_raw", "direction": "input",
+          "source_node": "filter_01", "source_port": "filtered_raw" },
+        { "name": "forward", "data_kind": "forward", "direction": "input",
+          "source_node": "read_fwd_01", "source_port": "forward" },
+        { "name": "covariance", "data_kind": "covariance", "direction": "input",
+          "source_node": "read_cov_01", "source_port": "covariance" }
       ],
       "outputs": [
-        { "name": "source_estimate", "dataKind": "SourceEstimate", "direction": "Output" }
+        { "name": "source_estimate", "data_kind": "source_estimate", "direction": "output" }
       ],
       "verification": {
         "checks": [
