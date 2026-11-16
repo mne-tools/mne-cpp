@@ -81,8 +81,15 @@ private slots:
 
     void shortDescription()
     {
-        FilterKernel fk("Desc", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
-        QCOMPARE(fk.short_description(), std::string("Cosine  -  100Hz to 0Hz  -  Ord: 64"));
+        // The pass band runs from the lower to the upper edge: 0 to the cutoff for a low-pass, the cutoff to Nyquist for a high-pass
+        const FilterKernel lowPass("Desc", 0, 64, 0.2, 0.0, 0.01, 1000.0, 0);
+        QCOMPARE(lowPass.short_description(), std::string("Cosine  -  0Hz to 100Hz  -  Ord: 64"));
+        QCOMPARE(lowPass.highpass_freq(), 0.0);
+        QCOMPARE(lowPass.lowpass_freq(), 100.0);
+        const FilterKernel highPass("Desc", 1, 64, 0.2, 0.0, 0.01, 1000.0, 0);
+        QCOMPARE(highPass.short_description(), std::string("Cosine  -  100Hz to 500Hz  -  Ord: 64"));
+        QCOMPARE(highPass.highpass_freq(), 100.0);
+        QCOMPARE(highPass.lowpass_freq(), 500.0);
     }
 
     void coefficients()

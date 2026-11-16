@@ -481,13 +481,13 @@ void FilterKernel::design_filter()
 
     switch (m_iFilterType) {
         case 0:
-            m_dLowpassFreq = 0;
-            m_dHighpassFreq = m_dCenterFreq * (m_sFreq / 2);
+            m_dHighpassFreq = 0;
+            m_dLowpassFreq = m_dCenterFreq * (m_sFreq / 2);
             break;
 
         case 1:
-            m_dLowpassFreq = m_dCenterFreq * (m_sFreq / 2);
-            m_dHighpassFreq = 0;
+            m_dHighpassFreq = m_dCenterFreq * (m_sFreq / 2);
+            m_dLowpassFreq = m_sFreq / 2;
             break;
 
         case 2:

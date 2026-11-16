@@ -670,6 +670,12 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- `FilterKernel` reports the pass band of low-pass and high-pass filters the
+  right way round: a 100 Hz low-pass runs from 0 to 100 Hz, a high-pass from
+  its cutoff to the Nyquist frequency. Before, `highpass_freq()` and
+  `lowpass_freq()` were swapped for them, so the description read "100Hz to
+  0Hz" and the filter design view showed a loaded low-pass as *from* 100 *to*
+  0 Hz.
 - `FilterKernel`, `FilterParameter`, `FilterIO` and `ParksMcClellan` use
   standard C++ only. `FilterIO` writes coefficients with all their digits,
   so they read back exactly, keeps spaces in filter names, and rejects a
