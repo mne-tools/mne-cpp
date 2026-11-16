@@ -15,7 +15,9 @@ sidebar_position: 9
 struct mne::MnaFileRef
 ```
 
-A reference to a file within an MNA project.
+Reference to a file inside an MNA project, optionally with its content embedded.
+
+Embedded data is base64 text in .mna (JSON) files and a byte string in .mnx (CBOR) files.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
 MnaFileRef raw;
@@ -24,14 +26,14 @@ raw.path = "sub-01/ses-01/meg/sample_audvis_raw.fif"; // relative POSIX path
 raw.format = "fiff";
 MnaRecording recording;
 recording.id = "run-01";
-recording.files.append(raw);
+recording.files.push_back(raw);
 MnaSession session;
 session.id = "ses-01";
-session.recordings.append(recording);
+session.recordings.push_back(recording);
 MnaSubject subject;
 subject.id = "sub-01";
-subject.freeSurferDir = "subjects/sample";
-subject.sessions.append(session);
+subject.freesurfer_dir = "subjects/sample";
+subject.sessions.push_back(session);
 MnaScript report; // a script node: inline code run by an interpreter
 report.language = "python";
 report.code = "print({{in}})";
@@ -41,55 +43,77 @@ report.code = "print({{in}})";
 
 ## Public Methods
 
-### toJson()
-
-Serialize to QJsonObject.
+### to_json()
 
 **Returns:**
 
-- *QJsonObject* — JSON object with all fields and preserved extras; embedded data is Base64-encoded.
+- *[JsonObject](/docs/api/base/json-object)* — The reference as a JSON object, embedded data as base64.
 
 ---
 
-### toCbor()
-
-Serialize to QCborMap.
+### to_cbor()
 
 **Returns:**
 
-- *QCborMap* — CBOR map with all fields and preserved extras; embedded data is stored as a byte string.
+- *[CborMap](/docs/api/base/cbor-map)* — The reference as a CBOR map, embedded data as a byte string.
+
+---
+
+### embed(file)
+
+Embeds the content of a file: sets data, size_bytes and embedded; path is left to the caller.
+
+**Parameters:**
+
+- **file** : *const std::filesystem::path &*
+  The file to read.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or why the file cannot be read; the reference is unchanged then.
+
+---
+
+### extract(file)
+
+Writes the embedded data to a file and turns this into a reference to it: clears data and embedded; path is left to the caller.
+
+**Parameters:**
+
+- **file** : *const std::filesystem::path &*
+  The file to write.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or why the file cannot be written; the reference is unchanged then.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
-
-Deserialize from QJsonObject.
+### from_json(json)
 
 **Parameters:**
 
-- **json** : *const QJsonObject &*
-  JSON object as produced by `toJson()`.
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A reference as written by `to_json()`.
 
 **Returns:**
 
-- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The file reference; missing keys take default values and unknown keys go to extras.
+- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The reference.
 
 ---
 
-### fromCbor(cbor)
-
-Deserialize from QCborMap.
+### from_cbor(cbor)
 
 **Parameters:**
 
-- **cbor** : *const QCborMap &*
-  CBOR map as produced by `toCbor()`.
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A reference as written by `to_cbor()`.
 
 **Returns:**
 
-- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The file reference; missing keys take default values and unknown keys go to extras.
+- *[MnaFileRef](/docs/api/mna/mna-file-ref)* — The reference.
 
 ---
 
@@ -105,21 +129,21 @@ Deserialize from QCborMap.
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 195"
+````cpp title="src/examples/ex_mna/main.cpp, line 200"
 MnaFileRef raw;
 raw.role = MnaFileRole::Raw;
 raw.path = "sub-01/ses-01/meg/sample_audvis_raw.fif"; // relative POSIX path
 raw.format = "fiff";
 MnaRecording recording;
 recording.id = "run-01";
-recording.files.append(raw);
+recording.files.push_back(raw);
 MnaSession session;
 session.id = "ses-01";
-session.recordings.append(recording);
+session.recordings.push_back(recording);
 MnaSubject subject;
 subject.id = "sub-01";
-subject.freeSurferDir = "subjects/sample";
-subject.sessions.append(session);
+subject.freesurfer_dir = "subjects/sample";
+subject.sessions.push_back(session);
 ````
 
 ## Authors of this file

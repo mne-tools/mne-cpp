@@ -30,11 +30,11 @@ positive.description = "Output is positive";
 positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
 positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
 positive.severity = "error";     // a failed "error" check stops the run
-checks.checks.append(positive);
+checks.checks.push_back(positive);
 graph.node("source").attributes["value"] = -2.0;
 graph.node("source").dirty = true;
-const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
-const MnaVerificationResult& verdict = checks.postResults.first();
+MnaGraphExecutor::execute_incremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.post_results.front();
 const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
 ```
 
@@ -42,21 +42,47 @@ const MnaProvenance& provenance = checks.provenance; // versions, host, input SH
 
 ## Public Methods
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The verification as a JSON object, empty if nothing is set.
 
 ---
 
-### toCbor()
+### to_cbor()
+
+**Returns:**
+
+- *[CborMap](/docs/api/base/cbor-map)* — The verification as a CBOR map, empty if nothing is set.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A verification as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaVerification](/docs/api/mna/mna-verification)* — The verification.
 
 ---
 
-### fromCbor(cbor)
+### from_cbor(cbor)
+
+**Parameters:**
+
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A verification as written by `to_cbor()`.
+
+**Returns:**
+
+- *[MnaVerification](/docs/api/mna/mna-verification)* — The verification.
 
 ---
 
@@ -72,7 +98,7 @@ const MnaProvenance& provenance = checks.provenance; // versions, host, input SH
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 175"
+````cpp title="src/examples/ex_mna/main.cpp, line 179"
 MnaVerification& checks = graph.node("shift").verification;
 checks.explanation = "Adds the offset; the result must stay positive.";
 MnaVerificationCheck positive;
@@ -81,11 +107,11 @@ positive.description = "Output is positive";
 positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
 positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
 positive.severity = "error";     // a failed "error" check stops the run
-checks.checks.append(positive);
+checks.checks.push_back(positive);
 graph.node("source").attributes["value"] = -2.0;
 graph.node("source").dirty = true;
-const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
-const MnaVerificationResult& verdict = checks.postResults.first();
+MnaGraphExecutor::execute_incremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.post_results.front();
 const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
 ````
 

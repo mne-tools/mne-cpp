@@ -15,101 +15,161 @@ sidebar_position: 6
 class mne::MnaParamTree
 ```
 
-Hierarchical parameter store for the MNA graph.
+Hierarchical parameter store keyed by "nodeId/attrKey" paths, with bindings that recompute parameters from formulas.
 
-Each parameter has a path ("nodeId/attrKey") and an optional binding — a formula that recomputes the value whenever a trigger condition is met.
+Formulas combine numbers, true/false, 'text', names (a parameter, else a result), ref('path'), the functions clamp(v, lo, hi), scale(v, f), threshold(v, t, above, below) and lerp(a, b, t), the operators + - * / with parentheses, and one comparison (&gt;= &lt;= == != &gt; &lt;). Names may contain '.', ':' and '/', so put spaces around a division that follows a name.
 
 Path-keyed parameter store with formula-driven dynamic bindings.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
-graph.paramTree.setParam("shift/offset", 0.5);
+graph.param_tree.set_param("shift/offset", 0.5);
 MnaParamBinding binding;
-binding.targetPath = "scale/gain";
+binding.target_path = "scale/gain";
 binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
 binding.trigger = "on_change";
-graph.paramTree.addBinding(binding);
+graph.param_tree.add_binding(binding);
 ```
 
 ---
 
 ## Public Methods
 
-### MnaParamTree()
+### set_param(path, value)
 
----
+**Parameters:**
 
-### setParam(path, value)
+- **path** : *std::string_view*
+  "nodeId/attrKey".
+
+- **value** : *[JsonValue](/docs/api/base/json-value)*
+  The value.
 
 ---
 
 ### param(path)
 
----
+**Parameters:**
 
-### hasParam(path)
+- **path** : *std::string_view*
+  "nodeId/attrKey".
 
----
+**Returns:**
 
-### allPaths()
-
----
-
-### addBinding(binding)
+- *const [JsonValue](/docs/api/base/json-value) &* — The value, or an undefined value if there is none.
 
 ---
 
-### removeBinding(targetPath)
+### has_param(path)
+
+**Parameters:**
+
+- **path** : *std::string_view*
+  "nodeId/attrKey".
+
+**Returns:**
+
+- *bool* — Whether the parameter is set.
+
+---
+
+### all_paths()
+
+**Returns:**
+
+- *StringList* — The paths of all parameters in ascending order.
+
+---
+
+### add_binding(binding)
+
+**Parameters:**
+
+- **binding** : *const [MnaParamBinding](/docs/api/mna/mna-param-binding) &*
+  A binding; replaces the binding of the same target.
+
+---
+
+### remove_binding(target_path)
+
+**Parameters:**
+
+- **target_path** : *std::string_view*
+  Target of the binding to remove.
 
 ---
 
 ### bindings()
 
+**Returns:**
+
+- *std::vector&lt; [MnaParamBinding](/docs/api/mna/mna-param-binding) &gt;* — The bindings, ordered by target path.
+
 ---
 
-### hasBinding(targetPath)
+### has_binding(target_path)
+
+**Parameters:**
+
+- **target_path** : *std::string_view*
+  A parameter path.
+
+**Returns:**
+
+- *bool* — Whether a binding controls it.
 
 ---
 
 ### evaluate(results)
 
-Evaluate all bindings whose trigger condition is met.
+Evaluates every binding that is not "manual" and stores the new values.
 
 **Parameters:**
 
-- **results** : *const QMap&lt; QString, QVariant &gt; &*
-  Map of nodeId::portName → data (from execution context).
+- **results** : *const [JsonObject](/docs/api/base/json-object) &*
+  Values that names and `ref()` fall back to, e.g. "nodeId::portName" results.
 
 **Returns:**
 
-- *QStringList* — Paths whose values changed.
+- *StringList* — The paths whose value changed.
 
 ---
 
-### evaluateExpression(expr, results)
-
-Evaluate a single expression in the current context.
+### evaluate_expression(expression, results)
 
 **Parameters:**
 
-- **expr** : *const QString &*
-  Expression string.
+- **expression** : *std::string_view*
+  A formula.
 
-- **results** : *const QMap&lt; QString, QVariant &gt; &*
-  Map of nodeId::portName → data (from execution context).
+- **results** : *const [JsonObject](/docs/api/base/json-object) &*
+  Values that names and `ref()` fall back to after the parameters.
 
 **Returns:**
 
-- *QVariant* — Computed value.
+- *[JsonValue](/docs/api/base/json-value)* — The value of `expression`, or an undefined value if it cannot be evaluated (unknown name or function, syntax error, division by zero).
 
 ---
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The bindings and the parameters without a binding as a JSON object.
 
 ---
 
 ## Static Methods
 
-### fromJson(obj)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A tree as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaParamTree](/docs/api/mna/mna-param-tree)* — The tree.
 
 ---
 

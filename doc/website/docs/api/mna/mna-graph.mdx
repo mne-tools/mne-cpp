@@ -23,19 +23,18 @@ In-memory DAG of [`MnaNode`](/docs/api/mna/mna-node) operations with validation,
 MnaGraph graph;
 MnaNode source;
 source.id = "source";
-source.opType = "ex_constant";
+source.op_type = "ex_constant";
 source.attributes["value"] = 3.0;
-const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
-source.outputs.append(sourceOut);
-graph.addNode(source);
+source.outputs.push_back(port("out", MnaPortDir::Output)); // name, data kind, direction
+graph.add_node(source);
 
-for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {
+for (const char* id : {"scale", "shift"}) {
     MnaNode node;
     node.id = id;
-    node.opType = "ex_affine";
-    node.inputs.append(port("in", MnaPortDir::Input));
-    node.outputs.append(port("out", MnaPortDir::Output));
-    graph.addNode(node);
+    node.op_type = "ex_affine";
+    node.inputs.push_back(port("in", MnaPortDir::Input));
+    node.outputs.push_back(port("out", MnaPortDir::Output));
+    graph.add_node(std::move(node));
 }
 graph.node("scale").attributes["gain"] = 2.0;
 graph.connect("source", "out", "scale", "in");
@@ -46,110 +45,222 @@ graph.connect("scale", "out", "shift", "in");
 
 ## Public Methods
 
-### MnaGraph()
-
----
-
-### addNode(node)
-
----
-
-### removeNode(nodeId)
-
----
-
-### node(nodeId)
-
----
-
-### node(nodeId)
-
----
-
-### nodes()
-
----
-
-### nodes()
-
----
-
-### hasNode(nodeId)
-
----
-
-### connect(srcNodeId, srcPortName, dstNodeId, dstPortName)
-
-Connect output port of srcNode to input port of dstNode.
-
-Sets the sourceNodeId and sourcePortName on the destination input port.
+### add_node(node)
 
 **Parameters:**
 
-- **srcNodeId** : *const QString &*
+- **node** : *[MnaNode](/docs/api/mna/mna-node)*
+  The node to append.
+
+---
+
+### remove_node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  Id of the node to remove; nothing happens if there is none.
+
+---
+
+### find_node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  A node id.
+
+**Returns:**
+
+- *[MnaNode](/docs/api/mna/mna-node) ** — The node, or nullptr if there is none.
+
+---
+
+### find_node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  A node id.
+
+**Returns:**
+
+- *const [MnaNode](/docs/api/mna/mna-node) ** — The node, or nullptr if there is none.
+
+---
+
+### node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  Id of a node of this graph.
+
+**Returns:**
+
+- *[MnaNode](/docs/api/mna/mna-node) &* — The node; throws std::out_of_range if there is none.
+
+---
+
+### node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  Id of a node of this graph.
+
+**Returns:**
+
+- *const [MnaNode](/docs/api/mna/mna-node) &* — The node; throws std::out_of_range if there is none.
+
+---
+
+### nodes()
+
+**Returns:**
+
+- *std::vector&lt; [MnaNode](/docs/api/mna/mna-node) &gt; &* — The nodes in insertion order.
+
+---
+
+### nodes()
+
+**Returns:**
+
+- *const std::vector&lt; [MnaNode](/docs/api/mna/mna-node) &gt; &* — The nodes in insertion order.
+
+---
+
+### has_node(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  A node id.
+
+**Returns:**
+
+- *bool* — Whether the graph has the node.
+
+---
+
+### connect(src_node_id, src_port_name, dst_node_id, dst_port_name)
+
+Connects an output port of one node to an input port of another by setting the source of the input port.
+
+**Parameters:**
+
+- **src_node_id** : *std::string_view*
   Id of the node providing the output.
 
-- **srcPortName** : *const QString &*
+- **src_port_name** : *std::string_view*
   Name of the output port on the source node.
 
-- **dstNodeId** : *const QString &*
+- **dst_node_id** : *std::string_view*
   Id of the node receiving the input.
 
-- **dstPortName** : *const QString &*
+- **dst_port_name** : *std::string_view*
   Name of the input port on the destination node.
 
 **Returns:**
 
-- *bool* — true if connection was made, false if ports not found.
+- *bool* — Whether both ports exist and were connected.
 
 ---
 
-### validate(errors)
+### validate()
 
-Validate the graph: acyclicity, port connections, data-kind compatibility, op schema compliance, required attributes.
-
-**Parameters:**
-
-- **errors** : *QStringList **
-  Optional list to receive error messages.
+Checks acyclicity, port connections, data-kind compatibility, op schema compliance and required attributes.
 
 **Returns:**
 
-- *bool* — true if valid.
+- *StringList* — The problems found; empty if the graph is valid.
 
 ---
 
-### topologicalSort()
+### topological_sort()
+
+**Returns:**
+
+- *StringList* — The node ids in an order where every node follows the nodes it reads from; ready nodes by id.
 
 ---
 
-### upstreamNodes(nodeId)
+### upstream_nodes(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  A node id.
+
+**Returns:**
+
+- *StringList* — The nodes it reads from, directly or indirectly, nearest first.
 
 ---
 
-### downstreamNodes(nodeId)
+### downstream_nodes(node_id)
+
+**Parameters:**
+
+- **node_id** : *std::string_view*
+  A node id.
+
+**Returns:**
+
+- *StringList* — The nodes that read from it, directly or indirectly, nearest first.
 
 ---
 
-### dirtyNodes()
+### dirty_nodes()
+
+**Returns:**
+
+- *StringList* — The ids of the nodes that need re-execution.
 
 ---
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The graph as a JSON object.
 
 ---
 
-### toCbor()
+### to_cbor()
+
+**Returns:**
+
+- *[CborMap](/docs/api/base/cbor-map)* — The graph as a CBOR map.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A graph as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaGraph](/docs/api/mna/mna-graph)* — The graph.
 
 ---
 
-### fromCbor(cbor)
+### from_cbor(cbor)
+
+**Parameters:**
+
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A graph as written by `to_cbor()`.
+
+**Returns:**
+
+- *[MnaGraph](/docs/api/mna/mna-graph)* — The graph.
 
 ---
 
@@ -165,15 +276,14 @@ Validate the graph: acyclicity, port connections, data-kind compatibility, op sc
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 117"
+````cpp title="src/examples/ex_mna/main.cpp, line 120"
 MnaGraph graph;
 MnaNode source;
 source.id = "source";
-source.opType = "ex_constant";
+source.op_type = "ex_constant";
 source.attributes["value"] = 3.0;
-const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
-source.outputs.append(sourceOut);
-graph.addNode(source);
+source.outputs.push_back(port("out", MnaPortDir::Output)); // name, data kind, direction
+graph.add_node(source);
 ````
 
 ## Authors of this file

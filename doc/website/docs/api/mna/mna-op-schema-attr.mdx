@@ -15,16 +15,15 @@ sidebar_position: 11
 struct mne::MnaOpSchemaAttr
 ```
 
-Attribute descriptor within an operation schema.
+[`Expected`](/docs/api/base/expected) attribute of an operation.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
-QStringList problems;
-const bool nodeValid = registry.schema("ex_affine").validate(graph.node("scale"), &problems);
+const StringList problems = registry.schema("ex_affine").validate(graph.node("scale"));
 MnaNode unset = graph.node("source");
 unset.attributes.clear(); // "value" is required
-const bool unsetValid = registry.schema("ex_constant").validate(unset);
-const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
-const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
+const StringList unsetProblems = registry.schema("ex_constant").validate(unset);
+const MnaOpSchemaPort& affineIn = registry.schema("ex_affine").input_ports.front();  // "in", Matrix, required
+const MnaOpSchemaAttr& affineGain = registry.schema("ex_affine").attributes.front(); // "gain", double, default 1
 ```
 
 ---
@@ -41,12 +40,14 @@ const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 143"
+````cpp title="src/examples/ex_mna/main.cpp, line 144"
 unset.attributes.clear(); // "value" is required
-const bool unsetValid = registry.schema("ex_constant").validate(unset);
-const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
-const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
-ok &= expect(nodeValid && problems.isEmpty() && !unsetValid && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" && affineGain.defaultValue.toDouble() == 1.0 && graph.validate() && graph.topologicalSort() == QStringList({"source", "scale", "shift"}),
+const StringList unsetProblems = registry.schema("ex_constant").validate(unset);
+const MnaOpSchemaPort& affineIn = registry.schema("ex_affine").input_ports.front();  // "in", Matrix, required
+const MnaOpSchemaAttr& affineGain = registry.schema("ex_affine").attributes.front(); // "gain", double, default 1
+ok &= expect(problems.empty() && unsetProblems.size() == 1 && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" &&
+                 affineGain.default_value.to_double() == 1.0 && graph.validate().empty() &&
+                 graph.topological_sort() == StringList{"source", "scale", "shift"},
              "MnaOpSchema accepts the wired node and rejects a missing required attribute; graph order source -> scale -> shift");
 ````
 

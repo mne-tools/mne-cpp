@@ -200,7 +200,12 @@ Appends a member without looking for one with the same key, which makes building
 
 ---
 
-### to_json_object()
+### to_json_object(except)
+
+**Parameters:**
+
+- **except** : *std::initializer_list&lt; std::string_view &gt;*
+  Keys to leave out, e.g. large byte strings that would otherwise become base64 text.
 
 **Returns:**
 

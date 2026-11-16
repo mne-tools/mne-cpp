@@ -23,19 +23,18 @@ Named, typed port on an MNA graph node with upstream link and optional real-time
 MnaGraph graph;
 MnaNode source;
 source.id = "source";
-source.opType = "ex_constant";
+source.op_type = "ex_constant";
 source.attributes["value"] = 3.0;
-const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
-source.outputs.append(sourceOut);
-graph.addNode(source);
+source.outputs.push_back(port("out", MnaPortDir::Output)); // name, data kind, direction
+graph.add_node(source);
 
-for (const QString& id : {QStringLiteral("scale"), QStringLiteral("shift")}) {
+for (const char* id : {"scale", "shift"}) {
     MnaNode node;
     node.id = id;
-    node.opType = "ex_affine";
-    node.inputs.append(port("in", MnaPortDir::Input));
-    node.outputs.append(port("out", MnaPortDir::Output));
-    graph.addNode(node);
+    node.op_type = "ex_affine";
+    node.inputs.push_back(port("in", MnaPortDir::Input));
+    node.outputs.push_back(port("out", MnaPortDir::Output));
+    graph.add_node(std::move(node));
 }
 graph.node("scale").attributes["gain"] = 2.0;
 graph.connect("source", "out", "scale", "in");
@@ -46,21 +45,47 @@ graph.connect("scale", "out", "shift", "in");
 
 ## Public Methods
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The port as a JSON object.
 
 ---
 
-### toCbor()
+### to_cbor()
+
+**Returns:**
+
+- *[CborMap](/docs/api/base/cbor-map)* — The port as a CBOR map.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A port as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaPort](/docs/api/mna/mna-port)* — The port.
 
 ---
 
-### fromCbor(cbor)
+### from_cbor(cbor)
+
+**Parameters:**
+
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A port as written by `to_cbor()`.
+
+**Returns:**
+
+- *[MnaPort](/docs/api/mna/mna-port)* — The port.
 
 ---
 
@@ -76,12 +101,12 @@ graph.connect("scale", "out", "shift", "in");
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 68"
-MnaPort port(const QString& name, MnaPortDir direction)
+````cpp title="src/examples/ex_mna/main.cpp, line 64"
+MnaPort port(std::string name, MnaPortDir direction)
 {
     MnaPort p;
-    p.name = name;
-    p.dataKind = MnaDataKind::Matrix;
+    p.name = std::move(name);
+    p.data_kind = MnaDataKind::Matrix;
     p.direction = direction;
     return p;
 }

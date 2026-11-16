@@ -22,13 +22,13 @@ Holds subjects, pipeline steps, and project metadata.
 ```cpp title="src/examples/ex_mna/main.cpp"
 MnaProject project;
 project.name = "ex_mna";
-project.subjects.append(subject);
+project.subjects.push_back(subject);
 project.pipeline = graph.nodes();
-const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
-const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
-const bool saved = MnaIO::write(project, jsonPath) && MnaIO::write(project, cborPath);
-const MnaProject fromJson = MnaIO::read(jsonPath);
-const MnaProject fromCbor = MnaIO::read(cborPath);
+const std::filesystem::path jsonPath = dir / "pipeline.mna"; // UTF-8 JSON
+const std::filesystem::path cborPath = dir / "pipeline.mnx"; // CBOR with an "MNX1" magic
+const bool saved = project.write(jsonPath) && project.write(cborPath);
+const Expected<MnaProject> fromJson = MnaProject::read(jsonPath); // or why it cannot be read
+const Expected<MnaProject> fromCbor = MnaProject::read(cborPath);
 ```
 
 ---
@@ -37,96 +37,77 @@ const MnaProject fromCbor = MnaIO::read(cborPath);
 
 ### MnaProject()
 
-Default constructor.
+Creates an empty project of the current schema version, created and modified now.
 
 ---
 
-### toJson()
-
-Serialize to QJsonObject.
+### to_json()
 
 **Returns:**
 
-- *QJsonObject* — JSON object with all project fields, subjects, pipeline nodes and preserved extras.
+- *[JsonObject](/docs/api/base/json-object)* — The project as a JSON object, dates as ISO 8601 text.
 
 ---
 
-### toCbor()
-
-Serialize to QCborMap.
+### to_cbor()
 
 **Returns:**
 
-- *QCborMap* — CBOR map with all project fields, subjects, pipeline nodes and preserved extras.
+- *[CborMap](/docs/api/base/cbor-map)* — The project as a CBOR map, dates as tag 0 (ISO 8601 with milliseconds).
+
+---
+
+### write(path)
+
+**Parameters:**
+
+- **path** : *const std::filesystem::path &*
+  A .mna or .mnx file.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or why it cannot be written. Delegates to [`MnaIO`](/docs/api/mna/mna-io).
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
-
-Deserialize from QJsonObject.
+### from_json(json)
 
 **Parameters:**
 
-- **json** : *const QJsonObject &*
-  JSON object as produced by `toJson()`.
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A project as written by `to_json()`.
 
 **Returns:**
 
-- *[MnaProject](/docs/api/mna/mna-project)* — The project; missing keys take default values and unknown keys go to extras.
+- *[MnaProject](/docs/api/mna/mna-project)* — The project; unknown keys go to extras.
 
 ---
 
-### fromCbor(cbor)
-
-Deserialize from QCborMap.
+### from_cbor(cbor)
 
 **Parameters:**
 
-- **cbor** : *const QCborMap &*
-  CBOR map as produced by `toCbor()`.
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A project as written by `to_cbor()`.
 
 **Returns:**
 
-- *[MnaProject](/docs/api/mna/mna-project)* — The project; missing keys take default values and unknown keys go to extras.
+- *[MnaProject](/docs/api/mna/mna-project)* — The project; unknown keys go to extras.
 
 ---
 
 ### read(path)
 
-Read an MNA project from file.
-
-Delegates to [`MnaIO`](/docs/api/mna/mna-io).
-
 **Parameters:**
 
-- **path** : *const QString &*
-  Path to the .mna or .mnx file.
+- **path** : *const std::filesystem::path &*
+  A .mna or .mnx file.
 
 **Returns:**
 
-- *[MnaProject](/docs/api/mna/mna-project)* — The deserialized [`MnaProject`](/docs/api/mna/mna-project).
-
----
-
-### write(project, path)
-
-Write an MNA project to file.
-
-Delegates to [`MnaIO`](/docs/api/mna/mna-io).
-
-**Parameters:**
-
-- **project** : *const [MnaProject](/docs/api/mna/mna-project) &*
-  The project to write.
-
-- **path** : *const QString &*
-  Path to the .mna or .mnx file.
-
-**Returns:**
-
-- *bool* — True if successful.
+- *[Expected](/docs/api/base/expected)&lt; [MnaProject](/docs/api/mna/mna-project) &gt;* — The project, or why it cannot be read. Delegates to [`MnaIO`](/docs/api/mna/mna-io).
 
 ---
 
@@ -142,18 +123,20 @@ Delegates to [`MnaIO`](/docs/api/mna/mna-io).
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 215"
+````cpp title="src/examples/ex_mna/main.cpp, line 220"
 MnaProject project;
 project.name = "ex_mna";
-project.subjects.append(subject);
+project.subjects.push_back(subject);
 project.pipeline = graph.nodes();
-const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
-const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
-const bool saved = MnaIO::write(project, jsonPath) && MnaIO::write(project, cborPath);
-const MnaProject fromJson = MnaIO::read(jsonPath);
-const MnaProject fromCbor = MnaIO::read(cborPath);
-ok &= expect(saved && fromJson.name == "ex_mna" && fromCbor.subjects.size() == 1 && fromCbor.subjects[0].sessions[0].recordings[0].files[0].path == raw.path && fromJson.pipeline[2].verification.postResults.first().message == verdict.message && report.language == "python" && fromJson.pipeline.size() == 3 && fromCbor.pipeline.size() == 3 && fromCbor.pipeline[1].inputs[0].sourceNodeId == "source" && fromJson.pipeline[1].attributes.value("gain").toDouble() == 2.0,
-             "MnaIO round-trips the 3-node pipeline through .mna and .mnx");
+const std::filesystem::path jsonPath = dir / "pipeline.mna"; // UTF-8 JSON
+const std::filesystem::path cborPath = dir / "pipeline.mnx"; // CBOR with an "MNX1" magic
+const bool saved = project.write(jsonPath) && project.write(cborPath);
+const Expected<MnaProject> fromJson = MnaProject::read(jsonPath); // or why it cannot be read
+const Expected<MnaProject> fromCbor = MnaProject::read(cborPath);
+ok &= expect(saved && fromJson && fromCbor && fromJson->name == "ex_mna" && fromCbor->subjects.size() == 1 &&
+                 fromCbor->subjects[0].sessions[0].recordings[0].files[0].path == raw.path &&
+                 fromJson->pipeline[2].verification.post_results.front().message == verdict.message && report.language == "python" &&
+                 fromJson->pipeline.size() == 3 && fromCbor->pipeline.size() == 3 && fromCbor->pipeline[1].inputs[0].source_node_id == "source" &&
 ````
 
 ## Authors of this file

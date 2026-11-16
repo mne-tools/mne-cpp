@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 487,
-    "exported_free_functions": 140,
+    "exported_free_functions": 150,
     "registered_classes": 579,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -485,6 +485,11 @@
       "library": "base"
     },
     {
+      "name": "write_file_bytes",
+      "header": "base/byte_stream.h",
+      "library": "base"
+    },
+    {
       "name": "run_process",
       "header": "base/process.h",
       "library": "base"
@@ -566,6 +571,26 @@
     },
     {
       "name": "to_hex",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "to_base64",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "from_base64",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "format_iso8601",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "parse_iso8601",
       "header": "base/string_utils.h",
       "library": "base"
     },
@@ -913,6 +938,31 @@
       "name": "local_clock",
       "header": "lsl/lsl_stream_info.h",
       "library": "lsl"
+    },
+    {
+      "name": "to_string",
+      "header": "mna/mna_types.h",
+      "library": "mna"
+    },
+    {
+      "name": "file_role_from_string",
+      "header": "mna/mna_types.h",
+      "library": "mna"
+    },
+    {
+      "name": "to_string",
+      "header": "mna/mna_types.h",
+      "library": "mna"
+    },
+    {
+      "name": "data_kind_key",
+      "header": "mna/mna_types.h",
+      "library": "mna"
+    },
+    {
+      "name": "data_kind_from_string",
+      "header": "mna/mna_types.h",
+      "library": "mna"
     },
     {
       "name": "performIcp",

@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 364 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 373 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **Accuracy** `[enum]` in [mne](/docs/api/fiff/)
 - **acq_build_date_time** `[fn]` in [mne](/docs/api/fiff/)
@@ -97,6 +97,8 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **COR_WIDTH** `[var]` in [mne](/docs/api/fiff/) — Width of each COR slice in pixels.
 - **count_annotations** `[fn]` in [mne](/docs/api/fiff/) — Counts annotations by description, like `mne.count_annotations`.
 - **cpu_architecture** `[fn]` in [mne](/docs/api/fiff/)
+- **data_kind_from_string** `[fn]` in [mne](/docs/api/fiff/)
+- **data_kind_key** `[fn]` in [mne](/docs/api/fiff/)
 - **DATA_TYPE** `[var]` in [mne](/docs/api/fiff/) — DATA_TYPE encoding 0000ffff.
 - **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
 - **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
@@ -149,6 +151,7 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fiff_uint_t** `[type]` in [mne](/docs/api/fiff/)
 - **fiff_ulong_t** `[type]` in [mne](/docs/api/fiff/)
 - **fiff_ushort_t** `[type]` in [mne](/docs/api/fiff/)
+- **file_role_from_string** `[fn]` in [mne](/docs/api/fiff/)
 - **filterChannel** `[fn]` in [mne](/docs/api/fiff/) — This function is used to filter row-wise in parallel threads.
 - **filterChpi** `[fn]` in [mne](/docs/api/fiff/) — Remove cHPI excitation signals from MEG data by notch filtering.
 - **filterChpi** `[fn]` in [mne](/docs/api/fiff/) — Overload that attempts to extract cHPI frequencies from [`FiffInfo`](/docs/api/fiff/fiff-info).
@@ -162,6 +165,8 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fitMatchedPoints** `[fn]` in [mne](/docs/api/fiff/) — Corresponding point set registration using quaternions.
 - **fitUser** `[type]` in [mne](/docs/api/fiff/)
 - **fixStimArtifact** `[fn]` in [mne](/docs/api/fiff/) — Repair stimulus artifacts by interpolating or zeroing data around events.
+- **format_iso8601** `[fn]` in [mne](/docs/api/fiff/)
+- **from_base64** `[fn]` in [mne](/docs/api/fiff/)
 - **from_big_endian** `[fn]` in [mne](/docs/api/fiff/)
 - **fromFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Describes a FIFF measurement as a stream.
 - **fromTokens** `[fn]` in [mne](/docs/api/fiff/) — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
@@ -226,15 +231,13 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **MlBackend** `[enum]` in [mne](/docs/api/fiff/) — Available ML back-end engines.
 - **MlDataType** `[enum]` in [mne](/docs/api/fiff/) — Supported data types for tensors.
 - **MlTaskType** `[enum]` in [mne](/docs/api/fiff/) — ML task categories.
+- **MnaAttrType** `[enum]` in [mne](/docs/api/fiff/) — Value type of an operation attribute, as named in op registries.
 - **MnaContainerFormat** `[enum]` in [mne](/docs/api/fiff/) — Supported container formats.
 - **MnaDataKind** `[enum]` in [mne](/docs/api/fiff/) — Describes the kind of data flowing through a graph port.
-- **mnaDataKindFromString** `[fn]` in [mne](/docs/api/fiff/) — Convert a string to `MnaDataKind`.
-- **mnaDataKindToString** `[fn]` in [mne](/docs/api/fiff/) — Convert `MnaDataKind` to its string representation.
 - **MnaFileRole** `[enum]` in [mne](/docs/api/fiff/) — Describes the role a file plays within an MNA project.
-- **mnaFileRoleFromString** `[fn]` in [mne](/docs/api/fiff/) — Convert a string to `MnaFileRole`.
-- **mnaFileRoleToString** `[fn]` in [mne](/docs/api/fiff/) — Convert `MnaFileRole` to its string representation.
 - **MnaNodeExecMode** `[enum]` in [mne](/docs/api/fiff/) — Execution mode for a graph node.
 - **MnaPortDir** `[enum]` in [mne](/docs/api/fiff/) — `Direction` of a port on a graph node.
+- **MnaValues** `[type]` in [mne](/docs/api/fiff/) — Run-time values flowing between graph nodes, keyed by port name (or "nodeId::portName" in an execution context).
 - **MNE_4DV_COMP1** `[var]` in [mne](/docs/api/fiff/) — 4D Neuroimaging 1st-order compensation.
 - **MNE_CH_SELECTION_FILE** `[var]` in [mne](/docs/api/fiff/) — Loaded from file.
 - **MNE_CH_SELECTION_UNKNOWN** `[var]` in [mne](/docs/api/fiff/) — Unknown origin.
@@ -289,6 +292,7 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **operator==** `[fn]` in [mne](/docs/api/fiff/)
 - **operator==** `[fn]` in [mne](/docs/api/fiff/)
 - **os_pretty_name** `[fn]` in [mne](/docs/api/fiff/)
+- **parse_iso8601** `[fn]` in [mne](/docs/api/fiff/)
 - **parse_progress_line** `[fn]` in [mne](/docs/api/fiff/) — Parses a progress line of the form `"[progress] 42.5%"` or `"[progress] 42.5% message"` (case-insensitive tag, surrounding whitespace ignored).
 - **path_from_utf8** `[fn]` in [mne](/docs/api/fiff/)
 - **peakFinder** `[fn]` in [mne](/docs/api/fiff/) — Find peaks in a 1D signal.
@@ -355,11 +359,14 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **swap_long** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long.
 - **swap_longp** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long in place.
 - **swap_short** `[fn]` in [mne](/docs/api/fiff/) — Swap a 16-bit short.
+- **to_base64** `[fn]` in [mne](/docs/api/fiff/)
 - **to_big_endian** `[fn]` in [mne](/docs/api/fiff/)
 - **to_double** `[fn]` in [mne](/docs/api/fiff/)
 - **to_hex** `[fn]` in [mne](/docs/api/fiff/)
 - **to_int** `[fn]` in [mne](/docs/api/fiff/)
 - **to_lower** `[fn]` in [mne](/docs/api/fiff/)
+- **to_string** `[fn]` in [mne](/docs/api/fiff/)
+- **to_string** `[fn]` in [mne](/docs/api/fiff/)
 - **toDLPack** `[fn]` in [mne](/docs/api/fiff/) — Exports one part of `view` as a read-only DLPack tensor of shape channels x samples, without a copy.
 - **toEventMatrix** `[fn]` in [mne](/docs/api/fiff/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
 - **toFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Builds FIFF measurement info for a stream, e.g.
@@ -367,9 +374,11 @@ Index of 364 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **tokenize** `[fn]` in [mne](/docs/api/fiff/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
 - **tokenValues** `[fn]` in [mne](/docs/api/fiff/) — Extract just the continuous values from a token sequence (discarding IDs).
 - **trimmed** `[fn]` in [mne](/docs/api/fiff/)
+- **UtcTime** `[type]` in [mne](/docs/api/fiff/) — A UTC time point with millisecond resolution, e.g.
 - **utf8_from_path** `[fn]` in [mne](/docs/api/fiff/)
 - **vecDefaultWeights** `[var]` in [mne](/docs/api/fiff/)
 - **verify** `[fn]` in [mne](/docs/api/fiff/) — Determines the origin of `target` from loop-back markers against `reference` and verifies the declared clock relation: every marker must imply the same origin within `toleranceTicks`, so drift (a missing or wrong clock connection) is detected instead of producing wrong samples.
 - **write** `[fn]` in [mne](/docs/api/fiff/) — Writes all columns of an Eigen matrix to an output stream: reserves, encodes, commits.
+- **write_file_bytes** `[fn]` in [mne](/docs/api/fiff/) — Replaces a file with the given bytes.
 - **write_matrix** `[fn]` in [mne](/docs/api/fiff/) — Writes a dense matrix as whitespace-separated text, one row per line.
 - **write_text_file** `[fn]` in [mne](/docs/api/fiff/) — Replaces a file with the given text, byte for byte, so "\n" stays LF on every platform.

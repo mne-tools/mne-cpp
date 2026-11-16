@@ -163,6 +163,19 @@ const JsonValue asJson = decoded.to_json_value(); // byte strings become base64u
 
 ---
 
+### from_string_list(list)
+
+**Parameters:**
+
+- **list** : *std::span&lt; const std::string &gt;*
+  Strings.
+
+**Returns:**
+
+- *CborArray* — An array of those strings, like QCborArray::fromStringList().
+
+---
+
 ## Example
 
 - Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.

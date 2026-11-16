@@ -28,11 +28,11 @@ positive.description = "Output is positive";
 positive.phase = "post";         // "pre" sees attributes and inputs, "post" also outputs
 positive.expression = "out > 0"; // or MnaScript code whose exit code 0 passes
 positive.severity = "error";     // a failed "error" check stops the run
-checks.checks.append(positive);
+checks.checks.push_back(positive);
 graph.node("source").attributes["value"] = -2.0;
 graph.node("source").dirty = true;
-const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
-const MnaVerificationResult& verdict = checks.postResults.first();
+MnaGraphExecutor::execute_incremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.post_results.front();
 const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
 ```
 
@@ -40,21 +40,47 @@ const MnaProvenance& provenance = checks.provenance; // versions, host, input SH
 
 ## Public Methods
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The result as a JSON object.
 
 ---
 
-### toCbor()
+### to_cbor()
+
+**Returns:**
+
+- *[CborMap](/docs/api/base/cbor-map)* — The result as a CBOR map.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A result as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaVerificationResult](/docs/api/mna/mna-verification-result)* — The result.
 
 ---
 
-### fromCbor(cbor)
+### from_cbor(cbor)
+
+**Parameters:**
+
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A result as written by `to_cbor()`.
+
+**Returns:**
+
+- *[MnaVerificationResult](/docs/api/mna/mna-verification-result)* — The result.
 
 ---
 
@@ -70,15 +96,16 @@ const MnaProvenance& provenance = checks.provenance; // versions, host, input SH
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 184"
+````cpp title="src/examples/ex_mna/main.cpp, line 188"
 graph.node("source").attributes["value"] = -2.0;
 graph.node("source").dirty = true;
-const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
-const MnaVerificationResult& verdict = checks.postResults.first();
+MnaGraphExecutor::execute_incremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.post_results.front();
 const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
 // gain is 2 again, so shift::out = 2 * -2 + 0.5 = -3.5 fails the check
-ok &= expect(!verdict.passed && verdict.actualValue == QVariant(false) && checked.abortedNode == "shift" && checked.results.value("shift::out").toDouble() == -3.5 && provenance.mneCppVersion == MNE_CPP_VERSION && provenance.inputHashes.contains("in"),
-             "MnaVerification: " + verdict.message.toStdString());
+ok &= expect(!verdict.passed && verdict.actual_value == JsonValue(false) && ctx.aborted_node == "shift" && number(ctx.results, "shift::out") == -3.5 &&
+                 provenance.mne_cpp_version == MNE_CPP_VERSION && provenance.input_hashes.contains("in"),
+             "MnaVerification: " + verdict.message);
 ````
 
 ## Authors of this file

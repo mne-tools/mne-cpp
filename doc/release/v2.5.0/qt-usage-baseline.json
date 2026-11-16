@@ -15,9 +15,6 @@
     },
     "lsl": {
       "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
-    },
-    "mna": {
-      "JSON/CBOR": "Project files are JSON and CBOR."
     }
   },
   "summary": {
@@ -33,9 +30,10 @@
       "inv",
       "math",
       "ml",
+      "mna",
       "report"
     ],
-    "tokens": 11604,
+    "tokens": 9981,
     "gui_outside_design": []
   },
   "libraries": {
@@ -327,23 +325,12 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1623,
-      "by_category": {
-        "containers": 65,
-        "files": 26,
-        "global": 31,
-        "json": 335,
-        "objects_signals": 79,
-        "regex": 19,
-        "strings": 1046,
-        "time": 22
-      },
-      "public_header_includes": 84,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
-      "files": 36,
-      "modules": [
-        "Core"
-      ]
+      "files": 38,
+      "modules": []
     },
     "mne": {
       "tokens": 225,

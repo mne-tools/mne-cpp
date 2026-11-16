@@ -15,38 +15,64 @@ sidebar_position: 13
 struct mne::MnaParamBinding
 ```
 
-A formula-driven parameter binding: links a target parameter path to an expression that is re-evaluated when a trigger condition is met.
+Formula that recomputes one parameter of an [`MnaParamTree`](/docs/api/mna/mna-param-tree).
 
 Dynamic parameter binding for the MNA parameter tree.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
-graph.paramTree.setParam("shift/offset", 0.5);
+graph.param_tree.set_param("shift/offset", 0.5);
 MnaParamBinding binding;
-binding.targetPath = "scale/gain";
+binding.target_path = "scale/gain";
 binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
 binding.trigger = "on_change";
-graph.paramTree.addBinding(binding);
+graph.param_tree.add_binding(binding);
 ```
 
 ---
 
 ## Public Methods
 
-### toJson()
+### to_json()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The binding as a JSON object.
 
 ---
 
-### toCbor()
+### to_cbor()
+
+**Returns:**
+
+- *[CborMap](/docs/api/base/cbor-map)* — The binding as a CBOR map.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
+### from_json(json)
+
+**Parameters:**
+
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A binding as written by `to_json()`.
+
+**Returns:**
+
+- *[MnaParamBinding](/docs/api/mna/mna-param-binding)* — The binding.
 
 ---
 
-### fromCbor(cbor)
+### from_cbor(cbor)
+
+**Parameters:**
+
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A binding as written by `to_cbor()`.
+
+**Returns:**
+
+- *[MnaParamBinding](/docs/api/mna/mna-param-binding)* — The binding.
 
 ---
 
@@ -62,13 +88,13 @@ graph.paramTree.addBinding(binding);
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 152"
-graph.paramTree.setParam("shift/offset", 0.5);
+````cpp title="src/examples/ex_mna/main.cpp, line 155"
+graph.param_tree.set_param("shift/offset", 0.5);
 MnaParamBinding binding;
-binding.targetPath = "scale/gain";
+binding.target_path = "scale/gain";
 binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
 binding.trigger = "on_change";
-graph.paramTree.addBinding(binding);
+graph.param_tree.add_binding(binding);
 ````
 
 ## Authors of this file

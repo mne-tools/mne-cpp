@@ -15,20 +15,18 @@ sidebar_position: 8
 class mne::MnaRegistryLoader
 ```
 
-Loads MNA operation schemas from declarative JSON registry manifests files.
-
-Registry files follow the mna-registry.json format with "mna_registry_version", "provider", and "ops" array. The loader supports a master manifest plus drop-in files from a mna-registry.d/ directory.
+Reads op-schema manifests ("mna_registry_version", "provider", "ops") into an [`MnaOpRegistry`](/docs/api/mna/mna-op-registry).
 
 Reads MNA op-schema manifests and feeds them into [`MnaOpRegistry`](/docs/api/mna/mna-op-registry), with drop-in directory merge support.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
 MnaOpRegistry& registry = MnaOpRegistry::instance();
-const int nLoaded = MnaRegistryLoader::loadFile(registryFile.fileName(), registry); // schemas only
-registry.registerOpFunc("ex_constant", [](const QVariantMap&, const QVariantMap& attrs) -> QVariantMap {
-    return {{"out", attrs.value("value").toDouble()}};
+const int nLoaded = MnaRegistryLoader::load_file(registryFile, registry); // schemas only
+registry.register_op_func("ex_constant", [](const MnaValues&, const JsonObject& attrs) -> MnaValues {
+    return {{"out", attrs["value"].to_double()}};
 });
-registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
-    return {{"out", attrs.value("gain", 1.0).toDouble() * inputs.value("in").toDouble() + attrs.value("offset", 0.0).toDouble()}};
+registry.register_op_func("ex_affine", [](const MnaValues& inputs, const JsonObject& attrs) -> MnaValues {
+    return {{"out", attrs["gain"].to_double(1.0) * std::any_cast<double>(inputs.at("in")) + attrs["offset"].to_double(0.0)}};
 });
 ```
 
@@ -36,62 +34,56 @@ registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVarian
 
 ## Static Methods
 
-### loadFile(path, registry)
-
-Load a single registry manifest file and register all ops.
+### load_file(path, registry)
 
 **Parameters:**
 
-- **path** : *const QString &*
-  Path to the JSON manifest file.
+- **path** : *const std::filesystem::path &*
+  A manifest file.
 
 - **registry** : *[MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
-  Registry to populate.
+  Receives the schemas.
 
 **Returns:**
 
-- *int* — Number of ops successfully loaded, or -1 on file error.
+- *int* — The number of schemas loaded, or -1 if the file cannot be read or is not a manifest.
 
 ---
 
-### loadDirectory(registryDir, registry)
+### load_directory(dir, registry)
 
-Load the master manifest plus all drop-in files from a directory.
-
-Loads mna-registry.json first, then all *.json files from mna-registry.d/ in alphabetical order. Later files override earlier entries for the same op type.
+Loads mna-registry.json and then every *.json in mna-registry.d/ in name order, so drop-ins override.
 
 **Parameters:**
 
-- **registryDir** : *const QString &*
-  Directory containing mna-registry.json.
+- **dir** : *const std::filesystem::path &*
+  The registry directory.
 
 - **registry** : *[MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
-  Registry to populate.
+  Receives the schemas.
 
 **Returns:**
 
-- *int* — Total number of ops loaded across all files.
+- *int* — The number of schemas loaded.
 
 ---
 
-### saveFile(path, provider, registry)
-
-Serialize current registry schemas to a JSON manifest file.
+### save_file(path, provider, registry)
 
 **Parameters:**
 
-- **path** : *const QString &*
-  Output file path.
+- **path** : *const std::filesystem::path &*
+  The manifest file to write.
 
-- **provider** : *const QString &*
-  Provider name for the manifest header.
+- **provider** : *std::string_view*
+  Who provides the operations.
 
 - **registry** : *const [MnaOpRegistry](/docs/api/mna/mna-op-registry) &*
-  Registry to serialize.
+  The schemas to write.
 
 **Returns:**
 
-- *bool* — True if writing succeeded.
+- *bool* — Whether the file was written.
 
 ---
 
@@ -107,17 +99,18 @@ Serialize current registry schemas to a JSON manifest file.
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 104"
+````cpp title="src/examples/ex_mna/main.cpp, line 106"
 MnaOpRegistry& registry = MnaOpRegistry::instance();
-const int nLoaded = MnaRegistryLoader::loadFile(registryFile.fileName(), registry); // schemas only
-registry.registerOpFunc("ex_constant", [](const QVariantMap&, const QVariantMap& attrs) -> QVariantMap {
-    return {{"out", attrs.value("value").toDouble()}};
+const int nLoaded = MnaRegistryLoader::load_file(registryFile, registry); // schemas only
+registry.register_op_func("ex_constant", [](const MnaValues&, const JsonObject& attrs) -> MnaValues {
+    return {{"out", attrs["value"].to_double()}};
 });
-registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
-    return {{"out", attrs.value("gain", 1.0).toDouble() * inputs.value("in").toDouble() + attrs.value("offset", 0.0).toDouble()}};
+registry.register_op_func("ex_affine", [](const MnaValues& inputs, const JsonObject& attrs) -> MnaValues {
+    return {{"out", attrs["gain"].to_double(1.0) * std::any_cast<double>(inputs.at("in")) + attrs["offset"].to_double(0.0)}};
 });
-ok &= expect(nLoaded == 2 && registry.hasOp("ex_affine") && registry.schema("ex_affine").inputPorts.size() == 1 && registry.missingOps({"ex_constant", "ex_affine", "ex_unknown"}) == QStringList({"ex_unknown"}),
-             "MnaRegistryLoader loads 2 ops; missingOps reports the unknown one");
+ok &= expect(nLoaded == 2 && registry.has_op("ex_affine") && registry.schema("ex_affine").input_ports.size() == 1 &&
+                 registry.missing_ops({"ex_constant", "ex_affine", "ex_unknown"}) == StringList{"ex_unknown"},
+             "MnaRegistryLoader loads 2 ops; missing_ops reports the unknown one");
 ````
 
 ## Authors of this file

@@ -15,7 +15,7 @@ sidebar_position: 19
 struct mne::MnaSubject
 ```
 
-Represents a subject (participant) in the project.
+One participant in an MNA project with sessions and a link to the FreeSurfer anatomy.
 
 ```cpp title="src/examples/ex_mna/main.cpp"
 MnaFileRef raw;
@@ -24,14 +24,14 @@ raw.path = "sub-01/ses-01/meg/sample_audvis_raw.fif"; // relative POSIX path
 raw.format = "fiff";
 MnaRecording recording;
 recording.id = "run-01";
-recording.files.append(raw);
+recording.files.push_back(raw);
 MnaSession session;
 session.id = "ses-01";
-session.recordings.append(recording);
+session.recordings.push_back(recording);
 MnaSubject subject;
 subject.id = "sub-01";
-subject.freeSurferDir = "subjects/sample";
-subject.sessions.append(session);
+subject.freesurfer_dir = "subjects/sample";
+subject.sessions.push_back(session);
 MnaScript report; // a script node: inline code run by an interpreter
 report.language = "python";
 report.code = "print({{in}})";
@@ -41,55 +41,47 @@ report.code = "print({{in}})";
 
 ## Public Methods
 
-### toJson()
-
-Serialize to QJsonObject.
+### to_json()
 
 **Returns:**
 
-- *QJsonObject* — JSON object with the subject id, FreeSurfer directory, sessions and preserved extras.
+- *[JsonObject](/docs/api/base/json-object)* — The subject as a JSON object.
 
 ---
 
-### toCbor()
-
-Serialize to QCborMap.
+### to_cbor()
 
 **Returns:**
 
-- *QCborMap* — CBOR map with the subject id, FreeSurfer directory, sessions and preserved extras.
+- *[CborMap](/docs/api/base/cbor-map)* — The subject as a CBOR map.
 
 ---
 
 ## Static Methods
 
-### fromJson(json)
-
-Deserialize from QJsonObject.
+### from_json(json)
 
 **Parameters:**
 
-- **json** : *const QJsonObject &*
-  JSON object as produced by `toJson()`.
+- **json** : *const [JsonObject](/docs/api/base/json-object) &*
+  A subject as written by `to_json()`.
 
 **Returns:**
 
-- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject; missing keys take default values and unknown keys go to extras.
+- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject.
 
 ---
 
-### fromCbor(cbor)
-
-Deserialize from QCborMap.
+### from_cbor(cbor)
 
 **Parameters:**
 
-- **cbor** : *const QCborMap &*
-  CBOR map as produced by `toCbor()`.
+- **cbor** : *const [CborMap](/docs/api/base/cbor-map) &*
+  A subject as written by `to_cbor()`.
 
 **Returns:**
 
-- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject; missing keys take default values and unknown keys go to extras.
+- *[MnaSubject](/docs/api/mna/mna-subject)* — The subject.
 
 ---
 
@@ -105,14 +97,14 @@ Deserialize from QCborMap.
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 202"
+````cpp title="src/examples/ex_mna/main.cpp, line 207"
 MnaSession session;
 session.id = "ses-01";
-session.recordings.append(recording);
+session.recordings.push_back(recording);
 MnaSubject subject;
 subject.id = "sub-01";
-subject.freeSurferDir = "subjects/sample";
-subject.sessions.append(session);
+subject.freesurfer_dir = "subjects/sample";
+subject.sessions.push_back(session);
 MnaScript report; // a script node: inline code run by an interpreter
 report.language = "python";
 report.code = "print({{in}})";

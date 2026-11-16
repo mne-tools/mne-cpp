@@ -15,133 +15,114 @@ sidebar_position: 2
 class mne::MnaGraphExecutor
 ```
 
-Executes a computational graph by traversing nodes in topological order and invoking registered operation functions.
+Executes a computational graph by traversing nodes in topological order and invoking registered operation functions, external programs (IPC nodes) or interpreters (Script nodes).
+
+Results are stored as "nodeId::portName"; graph inputs as "graph::portName". Checks and parameter bindings see the scalar values among them (numbers, booleans, text); \{\{name\}\} placeholders in IPC arguments and scripts are replaced by the text of a node input or attribute.
 
 Stateless batch and stream-mode runner for an [`MnaGraph`](/docs/api/mna/mna-graph).
 
 ```cpp title="src/examples/ex_mna/main.cpp"
-MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
-const double first = ctx.results.value("shift::out").toDouble(); // "nodeId::port"
-const double gainAfterFirst = graph.paramTree.param("scale/gain").toDouble();
+MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph);
+const double first = number(ctx.results, "shift::out"); // "nodeId::port"
+const double gainAfterFirst = graph.param_tree.param("scale/gain").to_double();
 
 graph.node("source").attributes["value"] = 1.0;
 graph.node("source").dirty = true; // only source and its downstream nodes run again
-const double second = MnaGraphExecutor::executeIncremental(graph, ctx).results.value("shift::out").toDouble();
+MnaGraphExecutor::execute_incremental(graph, ctx);
+const double second = number(ctx.results, "shift::out");
 ```
 
 ---
 
 ## Static Methods
 
-### execute(graph, graphInputs)
+### execute(graph, graph_inputs)
 
-Execute the full graph (all nodes in topological order).
+Executes the full graph in topological order.
 
 **Parameters:**
 
 - **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
-  The graph to execute.
+  The graph; parameter bindings and node verification are updated.
 
-- **graphInputs** : *const QVariantMap &*
+- **graph_inputs** : *const MnaValues &*
   Named inputs fed into graph-level input ports.
 
 **Returns:**
 
-- *Context* — Execution context with all results.
+- *Context* — The execution context with all results.
 
 ---
 
-### executeIncremental(graph, existing)
+### execute_incremental(graph, context)
 
-Execute only dirty nodes and their downstream dependents.
+Executes only dirty nodes and their downstream dependents.
 
 **Parameters:**
 
 - **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
-  The graph to execute.
+  The graph.
 
-- **existing** : *Context &*
-  Existing context with prior results.
-
-**Returns:**
-
-- *Context* — Updated context.
+- **context** : *Context &*
+  Prior results; updated with the new ones.
 
 ---
 
-### executeNode(node, inputs)
+### execute_node(node, inputs)
 
-Execute a single node (for testing/debugging).
+Executes a single node.
 
 **Parameters:**
 
 - **node** : *const [MnaNode](/docs/api/mna/mna-node) &*
-  The node to execute.
+  The node.
 
-- **inputs** : *const QVariantMap &*
-  Input data keyed by port name.
+- **inputs** : *const MnaValues &*
+  Input values keyed by port name.
 
 **Returns:**
 
-- *QVariantMap* — Output data keyed by port name.
+- *MnaValues* — Output values keyed by port name; IPC and Script nodes give "stdout", "stderr" (std::string) and "exit_code" (int, -1 if the program did not run to completion).
 
 ---
 
-### setProgressCallback(cb)
-
-Set a progress callback invoked for each node execution.
+### set_progress_callback(callback)
 
 **Parameters:**
 
-- **cb** : *ProgressCallback*
-  Callback receiving the node id and its 1-based index out of the total; an empty callback disables reporting.
+- **callback** : *ProgressCallback*
+  Progress callback; an empty callback disables reporting.
 
 ---
 
-### startStream(graph, factory)
+### start_stream(graph, factory)
 
-Start stream-mode execution of a graph.
+Starts stream-mode execution: validates the graph, sorts it, applies the parameter tree and creates a live plugin per node.
 
-Validates the graph
-
-
-Performs topological sort
-
-
-For each node, calls `factory` to instantiate a live plugin
-
-
-Applies [`MnaParamTree`](/docs/api/mna/mna-param-tree) values to node attributes
-
-
-Wires connections based on port dataKind matching
-
-The mna library does NOT depend on MNE Scan — the host app provides the factory and is responsible for wiring Qt signal/slot connections between the returned QObject* instances.
+Wiring the plugins together is up to the host application.
 
 **Parameters:**
 
 - **graph** : *[MnaGraph](/docs/api/mna/mna-graph) &*
   The pipeline graph.
 
-- **factory** : *PluginFactory*
-  Callback that maps opType → live QObject* plugin.
+- **factory** : *const PluginFactory &*
+  Creates the live plugin of an op type.
 
 **Returns:**
 
-- *StreamContext* — Stream context. Check ctx.running to see if startup succeeded.
+- *StreamContext* — The stream context; running tells whether startup succeeded.
 
 ---
 
-### stopStream(ctx)
+### stop_stream(context)
 
-Stop a running stream.
-
-Iterates nodes in reverse topological order and deletes the live plugin objects.
+Stops a running stream, releasing the plugins in reverse topological order.
 
 **Parameters:**
 
-- **ctx** : *StreamContext &*
-  The stream context to stop.
+- **context** : *StreamContext &*
+  The stream context.
 
 ---
 
@@ -157,10 +138,10 @@ Iterates nodes in reverse topological order and deletes the live plugin objects.
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
-````cpp title="src/examples/ex_mna/main.cpp, line 161"
-MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
-const double first = ctx.results.value("shift::out").toDouble(); // "nodeId::port"
-const double gainAfterFirst = graph.paramTree.param("scale/gain").toDouble();
+````cpp title="src/examples/ex_mna/main.cpp, line 164"
+MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph);
+const double first = number(ctx.results, "shift::out"); // "nodeId::port"
+const double gainAfterFirst = graph.param_tree.param("scale/gain").to_double();
 ````
 
 ## Authors of this file
