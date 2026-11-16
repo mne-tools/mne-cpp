@@ -44,6 +44,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <filesystem>
 #include <format>
 #include <print>
 #include <string_view>
@@ -160,15 +161,15 @@ int main(int argc, char* argv[])
     const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
 
     QTemporaryDir dir;
-    const QString posPath = dir.filePath("head.pos"); // same columns as mne.chpi.write_head_pos
-    const bool posWritten = MaxwellMovementComp::writeHeadPos(posPath, headPos);
-    const std::vector<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
+    const std::filesystem::path posPath = dir.filePath("head.pos").toStdString(); // MaxFilter -headpos format
+    const bool posWritten = MaxwellMovementComp::write_head_pos(posPath, headPos).has_value();
+    const auto posBack = MaxwellMovementComp::read_head_pos(posPath);
     //! [maxwell_movement_comp_usage]
     double moveError = 0.0;
     for (int k = 0; k < std::ssize(meg); ++k) {
         moveError = std::max(moveError, (compensated.row(meg[k]) - cleaned.row(meg[k])).cwiseAbs().maxCoeff());
     }
-    ok &= expect(posWritten && posBack.size() == 1 && moveError < 1e-3 * megIn.cwiseAbs().maxCoeff(),
+    ok &= expect(posWritten && posBack && posBack->size() == 1 && moveError < 1e-3 * megIn.cwiseAbs().maxCoeff(),
                  "MaxwellMovementComp without movement equals SSS; head positions round-trip");
 
     //! [fine_calibration_usage]

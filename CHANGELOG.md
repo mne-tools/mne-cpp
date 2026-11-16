@@ -670,6 +670,16 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- `MaxwellMovementComp` reads and writes MaxFilter head position files
+  (`maxfilter -headpos`) like `mne.chpi.read_head_pos` and
+  `write_head_pos`. Before, it wrote eight columns that MNE-Python cannot
+  read, dropped error and velocity, and wrote a rotation whose quaternion
+  had a negative scalar part as a different rotation. Migration:
+  `readHeadPos(QString)` / `writeHeadPos(QString, ...)` are
+  `read_head_pos(path)` returning `Expected<std::vector<HeadPosEntry>>`
+  (an error for a line without ten values) and `write_head_pos(path, span)`
+  returning `Expected<void>`; `HeadPosEntry` gained `dError` and
+  `dVelocity`.
 - The MNE Scan HPI plugin offers the Neuromag VectorView coil-frequency
   presets again; its preset file has not been installed since the move to
   CMake, so the list was empty. `HpiSettingsView` now has them built in, and

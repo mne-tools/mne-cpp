@@ -15,17 +15,19 @@
 //=============================================================================================================
 
 #include "maxwell_movement_comp.h"
+#include <base/byte_stream.h>
 #include <base/log.h>
+#include <base/string_utils.h>
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <format>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <string_view>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -174,97 +176,60 @@ MatrixXd MaxwellMovementComp::apply(const MatrixXd& matData,
 
 //=============================================================================================================
 
-std::vector<HeadPosEntry> MaxwellMovementComp::readHeadPos(const QString& sPath)
+Expected<std::vector<HeadPosEntry>> MaxwellMovementComp::read_head_pos(const std::filesystem::path& path)
 {
+    const Expected<std::string> text = read_text_file(path);
+    if (!text) {
+        return std::unexpected(text.error());
+    }
     std::vector<HeadPosEntry> positions;
-
-    QFile file(sPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::warning("[MaxwellMovementComp::readHeadPos] Cannot open file: {}", sPath.toStdString());
-        return positions;
-    }
-
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#'))
+    std::string_view rest = *text;
+    for (bool header = true; !rest.empty(); header = false) {
+        const std::size_t end = rest.find('\n');
+        const std::string_view line = rest.substr(0, end);
+        rest = end == std::string_view::npos ? std::string_view() : rest.substr(end + 1);
+        const std::vector<std::string_view> fields = split_whitespace(line);
+        if (header || fields.empty() || fields.front().starts_with('#')) {
             continue;
-
-        QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-        if (parts.size() < 7)
-            continue;
-
-        bool ok = false;
-        HeadPosEntry entry;
-        entry.dTime = parts[0].toDouble(&ok);
-        if (!ok)
-            continue;
-
-        // Quaternion (scalar-last or scalar-first depends on convention)
-        double q1 = parts[1].toDouble(&ok);
-        if (!ok)
-            continue;
-        double q2 = parts[2].toDouble(&ok);
-        if (!ok)
-            continue;
-        double q3 = parts[3].toDouble(&ok);
-        if (!ok)
-            continue;
-
-        double tx = parts[4].toDouble(&ok);
-        if (!ok)
-            continue;
-        double ty = parts[5].toDouble(&ok);
-        if (!ok)
-            continue;
-        double tz = parts[6].toDouble(&ok);
-        if (!ok)
-            continue;
-
-        if (parts.size() >= 8) {
-            entry.dGof = parts[7].toDouble();
         }
-
-        // MNE convention: quaternion stored as (q1, q2, q3) with q0 computed
-        double q0sq = 1.0 - q1 * q1 - q2 * q2 - q3 * q3;
-        double q0 = (q0sq > 0.0) ? std::sqrt(q0sq) : 0.0;
-        entry.rotation = Quaterniond(q0, q1, q2, q3);
-        entry.translation = Vector3d(tx, ty, tz);
-
-        positions.push_back(entry);
+        std::array<double, 10> values{};
+        bool ok = fields.size() == values.size();
+        for (std::size_t k = 0; ok && k < values.size(); ++k) {
+            const std::optional<double> value = to_double(fields[k]);
+            ok = value.has_value();
+            values[k] = value.value_or(0.0);
+        }
+        if (!ok) {
+            return fail(ErrorCode::Format, "{} has no 10 head position values in line \"{}\"", utf8_from_path(path),
+                        line);
+        }
+        HeadPosEntry& entry = positions.emplace_back();
+        entry.dTime = values[0];
+        const Vector3d q(values[1], values[2], values[3]);
+        entry.rotation = Quaterniond(std::sqrt(std::max(0.0, 1.0 - q.squaredNorm())), q.x(), q.y(), q.z());
+        entry.translation = Vector3d(values[4], values[5], values[6]);
+        entry.dGof = values[7];
+        entry.dError = values[8];
+        entry.dVelocity = values[9];
     }
-
-    file.close();
     return positions;
 }
 
 //=============================================================================================================
 
-bool MaxwellMovementComp::writeHeadPos(const QString& sPath,
-                                       const std::vector<HeadPosEntry>& headPos)
+Expected<void> MaxwellMovementComp::write_head_pos(const std::filesystem::path& path,
+                                                   std::span<const HeadPosEntry> headPos)
 {
-    QFile file(sPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::warning("[MaxwellMovementComp::writeHeadPos] Cannot open file: {}", sPath.toStdString());
-        return false;
+    std::string text = " Time       q1       q2       q3       q4       q5       q6       g-value  error    velocity\n";
+    for (const HeadPosEntry& entry : headPos) {
+        // The file holds the quaternion with a non-negative scalar part: q and -q are the same rotation
+        const Quaterniond q = entry.rotation.w() < 0.0 ? Quaterniond(-entry.rotation.coeffs()) : entry.rotation;
+        std::format_to(std::back_inserter(text), " {: 9.3f}", entry.dTime);
+        for (const double value : {q.x(), q.y(), q.z(), entry.translation.x(), entry.translation.y(),
+                                   entry.translation.z(), entry.dGof, entry.dError, entry.dVelocity}) {
+            std::format_to(std::back_inserter(text), " {: 8.5f}", value);
+        }
+        text += '\n';
     }
-
-    QTextStream out(&file);
-    out << "# Head position file\n";
-    out << "# time  q1  q2  q3  tx  ty  tz  gof\n";
-
-    for (const auto& entry : headPos) {
-        // Store quaternion as (q1, q2, q3), dropping q0 (recoverable)
-        out << QString::number(entry.dTime, 'f', 6) << " "
-            << QString::number(entry.rotation.x(), 'f', 6) << " "
-            << QString::number(entry.rotation.y(), 'f', 6) << " "
-            << QString::number(entry.rotation.z(), 'f', 6) << " "
-            << QString::number(entry.translation.x(), 'f', 6) << " "
-            << QString::number(entry.translation.y(), 'f', 6) << " "
-            << QString::number(entry.translation.z(), 'f', 6) << " "
-            << QString::number(entry.dGof, 'f', 6) << "\n";
-    }
-
-    file.close();
-    return true;
+    return write_text_file(path, text);
 }

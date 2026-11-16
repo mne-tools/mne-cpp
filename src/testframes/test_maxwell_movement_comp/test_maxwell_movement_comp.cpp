@@ -10,14 +10,18 @@
  * @brief    Tests for MaxwellMovementComp class.
  */
 
+#include <base/byte_stream.h>
 #include <dsp/maxwell_movement_comp.h>
 
 #include <QtTest>
 #include <QObject>
-#include <QTemporaryFile>
+#include <QTemporaryDir>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <cmath>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 using namespace mne;
 using namespace Eigen;
@@ -27,82 +31,54 @@ class TestMaxwellMovementComp : public QObject
     Q_OBJECT
 
 private slots:
-    void testHeadPosWriteAndRead()
+    void testHeadPosReadsAndWritesMaxFilterFiles()
     {
-        std::vector<HeadPosEntry> positions;
-        for (int i = 0; i < 5; ++i) {
-            HeadPosEntry entry;
-            entry.dTime = 0.1 * i;
-            entry.translation = Vector3d(0.001 * i, 0.002, 0.003);
-            entry.rotation = Quaterniond(AngleAxisd(0.01 * i, Vector3d::UnitZ()));
-            entry.dGof = 0.95 + 0.01 * i;
-            positions.push_back(entry);
-        }
+        // First lines of MNE-testing-data SSS/test_move_anon_raw_subsampled.pos (written by MaxFilter)
+        const std::string maxfilter =
+            " Time       q1       q2       q3       q4       q5       q6       g-value  error    velocity\n"
+            "     9.000  0.07303  0.01133  0.03979  0.00747 -0.01983  0.07468  0.99955  0.00139  0.00177 \n"
+            "    14.620  0.08603  0.01049  0.04267  0.00733 -0.02296  0.07470  0.99942  0.00138  0.00078 \n"
+            "    14.820  0.12113  0.00887  0.04841  0.00723 -0.02991  0.07400  0.99913  0.00117  0.06945 \n";
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        const std::filesystem::path in = dir.filePath(QStringLiteral("in.pos")).toStdString();
+        const std::filesystem::path out = dir.filePath(QStringLiteral("out.pos")).toStdString();
+        QVERIFY(write_text_file(in, maxfilter));
 
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        QVERIFY(tmpFile.open());
-        QString path = tmpFile.fileName();
-        tmpFile.close();
+        const auto positions = MaxwellMovementComp::read_head_pos(in);
+        QVERIFY(positions);
+        QCOMPARE(positions->size(), std::size_t(3));
+        const HeadPosEntry& first = positions->front();
+        QCOMPARE(first.dTime, 9.0);
+        QCOMPARE(first.rotation.vec(), Vector3d(0.07303, 0.01133, 0.03979));
+        QVERIFY(std::abs(first.rotation.norm() - 1.0) < 1e-12);
+        QCOMPARE(first.translation, Vector3d(0.00747, -0.01983, 0.07468));
+        QCOMPARE(first.dGof, 0.99955);
+        QCOMPARE(first.dError, 0.00139);
+        QCOMPARE(first.dVelocity, 0.00177);
 
-        QVERIFY(MaxwellMovementComp::writeHeadPos(path, positions));
+        // Written exactly like mne.chpi.write_head_pos
+        QVERIFY(MaxwellMovementComp::write_head_pos(out, *positions));
+        QCOMPARE(read_text_file(out).value(),
+                 std::string(" Time       q1       q2       q3       q4       q5       q6       g-value  error    velocity\n"
+                             "     9.000  0.07303  0.01133  0.03979  0.00747 -0.01983  0.07468  0.99955  0.00139  0.00177\n"
+                             "    14.620  0.08603  0.01049  0.04267  0.00733 -0.02296  0.07470  0.99942  0.00138  0.00078\n"
+                             "    14.820  0.12113  0.00887  0.04841  0.00723 -0.02991  0.07400  0.99913  0.00117  0.06945\n"));
 
-        std::vector<HeadPosEntry> loaded = MaxwellMovementComp::readHeadPos(path);
-        QCOMPARE(loaded.size(), 5);
+        // A quaternion with a negative scalar part is the same rotation as its negation, which is what the file holds
+        HeadPosEntry turned;
+        turned.rotation = Quaterniond(-0.6, 0.0, 0.0, 0.8);
+        QVERIFY(MaxwellMovementComp::write_head_pos(out, std::vector{turned}));
+        const auto back = MaxwellMovementComp::read_head_pos(out);
+        QVERIFY(back && back->size() == 1);
+        QVERIFY(back->front().rotation.angularDistance(turned.rotation) < 1e-4);
 
-        // Check first entry
-        QVERIFY(std::abs(loaded[0].dTime - 0.0) < 1e-5);
-        QVERIFY(std::abs(loaded[0].translation.y() - 0.002) < 1e-5);
-    }
-
-    void testReadNonexistent()
-    {
-        std::vector<HeadPosEntry> pos = MaxwellMovementComp::readHeadPos("/nonexistent/path.pos");
-        QVERIFY(pos.empty());
-    }
-
-    void testHeadPosRoundTrip()
-    {
-        HeadPosEntry entry;
-        entry.dTime = 1.5;
-        entry.translation = Vector3d(0.01, -0.02, 0.03);
-        entry.rotation = Quaterniond(AngleAxisd(0.1, Vector3d::UnitX()));
-        entry.dGof = 0.99;
-
-        std::vector<HeadPosEntry> positions;
-        positions.push_back(entry);
-
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        QVERIFY(tmpFile.open());
-        QString path = tmpFile.fileName();
-        tmpFile.close();
-
-        MaxwellMovementComp::writeHeadPos(path, positions);
-        std::vector<HeadPosEntry> loaded = MaxwellMovementComp::readHeadPos(path);
-
-        QCOMPARE(loaded.size(), 1);
-        QVERIFY(std::abs(loaded[0].dTime - 1.5) < 1e-5);
-        QVERIFY(std::abs(loaded[0].translation.x() - 0.01) < 1e-5);
-        QVERIFY(std::abs(loaded[0].dGof - 0.99) < 1e-5);
-    }
-
-    void testEmptyHeadPos()
-    {
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        QVERIFY(tmpFile.open());
-        tmpFile.write("# empty\n");
-        tmpFile.close();
-
-        std::vector<HeadPosEntry> pos = MaxwellMovementComp::readHeadPos(tmpFile.fileName());
-        QVERIFY(pos.empty());
-    }
-
-    void testWriteFailsOnBadPath()
-    {
-        std::vector<HeadPosEntry> pos;
-        QVERIFY(!MaxwellMovementComp::writeHeadPos("/nonexistent/dir/file.pos", pos));
+        QVERIFY(write_text_file(in, "# no positions\n"));
+        QVERIFY(MaxwellMovementComp::read_head_pos(in).value().empty());
+        QVERIFY(write_text_file(in, std::string(maxfilter) + "    15.000  0.1  oops\n"));
+        QVERIFY(!MaxwellMovementComp::read_head_pos(in));
+        QVERIFY(!MaxwellMovementComp::read_head_pos("/nonexistent/path.pos"));
+        QVERIFY(!MaxwellMovementComp::write_head_pos("/nonexistent/dir/file.pos", {}));
     }
 
     void testHeadPosEntryDefaults()

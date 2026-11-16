@@ -26,9 +26,12 @@
 
 #include "dsp_global.h"
 
+#include <filesystem>
+#include <span>
 #include <vector>
 #include "sss.h"
 
+#include <base/error.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -57,6 +60,8 @@ struct DSPSHARED_EXPORT HeadPosEntry
     Eigen::Vector3d translation{0, 0, 0};    /**< Translation from device to head (metres). */
     Eigen::Quaterniond rotation{1, 0, 0, 0}; /**< Rotation quaternion (device → head). */
     double dGof = 0.0;                       /**< Goodness of fit for this head position. */
+    double dError = 0.0;                     /**< Mean coil position error (metres). */
+    double dVelocity = 0.0;                  /**< Head velocity (metres per second). */
 };
 
 //=============================================================================================================
@@ -107,28 +112,27 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Read head positions from a file.
+     * @brief Reads a MaxFilter head position file (maxfilter -headpos), like mne.chpi.read_head_pos.
      *
-     * File format: whitespace-separated columns per line:
-     *   time  q1  q2  q3  tx  ty  tz  gof
+     * After a header line, each line holds time, q1 q2 q3 (rotation quaternion without its scalar part),
+     * q4 q5 q6 (translation), goodness of fit, error and velocity; lines starting with '#' are skipped.
      *
-     * @param[in] sPath  Path to head position file.
+     * @param[in] path   Path to the .pos file.
      *
-     * @return List of head position entries.
+     * @return The head positions, or an error if the file cannot be read or a line has another layout.
      */
-    static std::vector<HeadPosEntry> readHeadPos(const QString& sPath);
+    static Expected<std::vector<HeadPosEntry>> read_head_pos(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
-     * @brief Write head positions to a file.
+     * @brief Writes a MaxFilter head position file, like mne.chpi.write_head_pos.
      *
-     * @param[in] sPath    Output file path.
-     * @param[in] headPos  Head positions to write.
+     * @param[in] path      Output file path.
+     * @param[in] headPos   Head positions to write.
      *
-     * @return true if successful.
+     * @return Nothing, or an error if the file cannot be written.
      */
-    static bool writeHeadPos(const QString& sPath,
-                             const std::vector<HeadPosEntry>& headPos);
+    static Expected<void> write_head_pos(const std::filesystem::path& path, std::span<const HeadPosEntry> headPos);
 
 private:
     /**
