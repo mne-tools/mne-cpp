@@ -33,7 +33,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9925,
+    "tokens": 9863,
     "gui_outside_design": []
   },
   "libraries": {
@@ -154,17 +154,17 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6025,
+      "tokens": 6030,
       "by_category": {
         "containers": 477,
         "files": 106,
         "global": 1257,
         "gui": 924,
-        "logging": 49,
+        "logging": 51,
         "objects_signals": 545,
         "other": 1504,
         "regex": 4,
-        "strings": 1125,
+        "strings": 1128,
         "threads": 23,
         "time": 11
       },
@@ -208,19 +208,17 @@
       ]
     },
     "dsp": {
-      "tokens": 383,
+      "tokens": 316,
       "by_category": {
         "containers": 79,
-        "files": 8,
         "global": 119,
-        "objects_signals": 82,
+        "objects_signals": 79,
         "other": 3,
-        "regex": 1,
-        "strings": 70,
+        "strings": 15,
         "threads": 21
       },
-      "public_header_includes": 18,
-      "q_object": 12,
+      "public_header_includes": 14,
+      "q_object": 11,
       "files": 93,
       "modules": [
         "Concurrent",

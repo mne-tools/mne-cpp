@@ -27,9 +27,9 @@ The [`FilterKernel`](/docs/api/dsp/filter-kernel) class provides methods to crea
 
 ```cpp title="src/examples/ex_dsp_filter/main.cpp"
 // Frequencies are normalised to Nyquist (500 Hz): 40 Hz cut-off, 10 Hz transition
-const int typeLpf = FilterKernel::filterTypeIndex("LPF");
-const int cosine = FilterKernel::designMethodIndex("Cosine");
-const int tschebyscheff = FilterKernel::designMethodIndex("Tschebyscheff");
+const int typeLpf = FilterKernel::filter_type_index("LPF");
+const int cosine = FilterKernel::design_method_index("Cosine");
+const int tschebyscheff = FilterKernel::design_method_index("Tschebyscheff");
 FilterKernel lowPass("lp40", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, cosine);
 FilterKernel lowPassPm("lp40pm", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, tschebyscheff);
 ```
@@ -50,7 +50,7 @@ Constructs a [`FilterKernel`](/docs/api/dsp/filter-kernel) object.
 
 **Parameters:**
 
-- **sFilterName** : *const QString &*
+- **sFilterName** : *const std::string &*
   Defines the name of the generated filter.
 
 - **iFilterType** : *int*
@@ -76,7 +76,7 @@ Constructs a [`FilterKernel`](/docs/api/dsp/filter-kernel) object.
 
 ---
 
-### prepareFilter(iDataSize)
+### prepare_filter(iDataSize)
 
 Prepares a filter kernel to be used wiht a specific data block length.
 
@@ -89,7 +89,7 @@ This is favorable to call before filtering, in order to avoid transforming the f
 
 ---
 
-### applyConvFilter(vecData, bKeepOverhead)
+### apply_conv_filter(vecData, bKeepOverhead)
 
 Applies the current filter to the input data using convolution in time domain.
 
@@ -107,7 +107,7 @@ Applies the current filter to the input data using convolution in time domain.
 
 ---
 
-### applyFftFilter(vecData, bKeepOverhead)
+### apply_fft_filter(vecData, bKeepOverhead)
 
 Applies the current filter to the input data using multiplication in frequency domain.
 
@@ -121,131 +121,131 @@ Applies the current filter to the input data using multiplication in frequency d
 
 ---
 
-### getName()
+### name()
 
 ---
 
-### setName(sFilterName)
+### set_name(sFilterName)
 
 ---
 
-### getSamplingFrequency()
+### sampling_frequency()
 
 ---
 
-### setSamplingFrequency(dSFreq)
+### set_sampling_frequency(dSFreq)
 
 ---
 
-### getFilterOrder()
+### filter_order()
 
 ---
 
-### setFilterOrder(iOrder)
+### set_filter_order(iOrder)
 
 ---
 
-### getCenterFrequency()
+### center_frequency()
 
 ---
 
-### setCenterFrequency(dCenterFreq)
+### set_center_frequency(dCenterFreq)
 
 ---
 
-### getBandwidth()
+### bandwidth()
 
 ---
 
-### setBandwidth(dBandwidth)
+### set_bandwidth(dBandwidth)
 
 ---
 
-### getParksWidth()
+### parks_width()
 
 ---
 
-### setParksWidth(dParksWidth)
+### set_parks_width(dParksWidth)
 
 ---
 
-### getHighpassFreq()
+### highpass_freq()
 
 ---
 
-### setHighpassFreq(dHighpassFreq)
+### set_highpass_freq(dHighpassFreq)
 
 ---
 
-### getLowpassFreq()
+### lowpass_freq()
 
 ---
 
-### setLowpassFreq(dLowpassFreq)
+### set_lowpass_freq(dLowpassFreq)
 
 ---
 
-### getCoefficients()
+### coefficients()
 
 ---
 
-### setCoefficients(vecCoeff)
+### set_coefficients(vecCoeff)
 
 ---
 
-### getFftCoefficients()
+### fft_coefficients()
 
 ---
 
-### setFftCoefficients(vecFftCoeff)
+### set_fft_coefficients(vecFftCoeff)
 
 ---
 
-### getDesignMethod()
+### design_method()
 
 ---
 
-### setDesignMethod(iDesignMethod)
+### set_design_method(iDesignMethod)
 
 ---
 
-### getFilterType()
+### filter_type()
 
 ---
 
-### setFilterType(iFilterType)
+### set_filter_type(iFilterType)
 
 ---
 
-### getShortDescription()
+### short_description()
 
 ---
 
 ## Static Methods
 
-### designMethodIndex(sName)
+### design_method_index(sName)
 
 **Parameters:**
 
-- **sName** : *const QString &*
+- **sName** : *std::string_view*
   A design method name, e.g. "Cosine".
 
 **Returns:**
 
-- *int* — The index of the method in m_designMethods, or -1 if there is none of that name.
+- *int* — The index of the method in design_methods, or -1 if there is none of that name.
 
 ---
 
-### filterTypeIndex(sName)
+### filter_type_index(sName)
 
 **Parameters:**
 
-- **sName** : *const QString &*
+- **sName** : *std::string_view*
   A filter type name, e.g. "BPF".
 
 **Returns:**
 
-- *int* — The index of the type in m_filterTypes, or -1 if there is none of that name.
+- *int* — The index of the type in filter_types, or -1 if there is none of that name.
 
 ---
 
@@ -263,17 +263,17 @@ FIR filter design, application and storage with the dsp library.
 
 ````cpp title="src/examples/ex_dsp_filter/main.cpp, line 110"
 // Frequencies are normalised to Nyquist (500 Hz): 40 Hz cut-off, 10 Hz transition
-const int typeLpf = FilterKernel::filterTypeIndex("LPF");
-const int cosine = FilterKernel::designMethodIndex("Cosine");
-const int tschebyscheff = FilterKernel::designMethodIndex("Tschebyscheff");
+const int typeLpf = FilterKernel::filter_type_index("LPF");
+const int cosine = FilterKernel::design_method_index("Cosine");
+const int tschebyscheff = FilterKernel::design_method_index("Tschebyscheff");
 FilterKernel lowPass("lp40", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, cosine);
 FilterKernel lowPassPm("lp40pm", typeLpf, 256, 40.0 / 500.0, 0.0, 10.0 / 500.0, kSFreq, tschebyscheff);
 for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
-    const RowVectorXd taps = kernel->getCoefficients();
+    const RowVectorXd taps = kernel->coefficients();
     const double g10 = gain(taps, 10.0, kSFreq);
     const double g100 = gain(taps, 100.0, kSFreq);
     ok &= expect(std::fabs(g10 - 1.0) < 0.01 && g100 < 0.01,
-                 std::format("{} ({}): |H(10 Hz)| {:g}, |H(100 Hz)| {:g}", kernel->getName().toStdString(), kernel->getDesignMethod().getName().toStdString(), g10, g100));
+                 std::format("{} ({}): |H(10 Hz)| {:g}, |H(100 Hz)| {:g}", kernel->name(), kernel->design_method().name(), g10, g100));
 }
 ````
 
@@ -285,13 +285,13 @@ Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filt
 printf("Filtering...");
 if (mne::filterFile(parser.value(outputOption).toStdU16String(),
                     pRaw,
-                    FilterKernel::filterTypeIndex("BPF"),
+                    FilterKernel::filter_type_index("BPF"),
                     10,
                     10,
                     0.1,
                     pRaw->info.sfreq,
                     1024,
-                    mne::FilterKernel::designMethodIndex("Cosine"),
+                    mne::FilterKernel::design_method_index("Cosine"),
                     picks)) {
     printf("[done]\n");
 } else {

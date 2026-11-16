@@ -207,13 +207,13 @@ int main(int argc, char* argv[])
     printf("Filtering...");
     if (mne::filterFile(parser.value(outputOption).toStdU16String(),
                         pRaw,
-                        FilterKernel::filterTypeIndex("BPF"),
+                        FilterKernel::filter_type_index("BPF"),
                         10,
                         10,
                         0.1,
                         pRaw->info.sfreq,
                         1024,
-                        mne::FilterKernel::designMethodIndex("Cosine"),
+                        mne::FilterKernel::design_method_index("Cosine"),
                         picks)) {
         printf("[done]\n");
     } else {

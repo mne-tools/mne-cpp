@@ -15,65 +15,49 @@ sidebar_position: 74
 class mne::FilterIO
 ```
 
-Processes txt files which hold filter coefficients.
+Reads and writes FIR filters as text: "#key value" lines (sFreq, name, type, order, HPFreq, LPFreq, CenterFreq, DesignMethod, ParksWidth) followed by one coefficient per line.
 
 Processes txt files which hold filter coefficients.
 
 ```cpp title="src/examples/ex_dsp_filter/main.cpp"
 QTemporaryDir dir;
-const QString path = dir.filePath("lp40.txt");
-FilterKernel reloaded;
-const bool written = FilterIO::writeFilter(path, lowPass);
-const bool read = FilterIO::readFilter(path, reloaded);
+const std::filesystem::path path = dir.filePath("lp40.txt").toStdString();
+const bool written = FilterIO::write_filter(path, lowPass).has_value();
+const auto reloaded = FilterIO::read_filter(path); // the taps come back bit for bit
 ```
-
----
-
-## Public Methods
-
-### FilterIO()
-
-Constructs a [`FilterIO`](/docs/api/dsp/filter-io) object.
 
 ---
 
 ## Static Methods
 
-### readFilter(path, filter)
-
-Reads a given txt file and scans it for filter coefficients.
-
-Pls see sample file for file syntax.
+### read_filter(path)
 
 **Parameters:**
 
-- **path** : *QString*
-  holds the file path of the txt file which is to be read.
-
-- **filter** : *[FilterKernel](/docs/api/dsp/filter-kernel) &*
-  holds the filter which the read parameters are to be saved to.
+- **path** : *const std::filesystem::path &*
+  The filter file.
 
 **Returns:**
 
-- *bool* — true if reading was successful, false otherwise.
+- *[Expected](/docs/api/base/expected)&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt;* — The filter, with as many taps as the file has coefficients, or an error if the file cannot be read or holds a value that is no number.
 
 ---
 
-### writeFilter(path, filter)
+### write_filter(path, filter)
 
-Writes a given filter to txt file .
+Writes the coefficients with all the digits they need to be read back exactly.
 
 **Parameters:**
 
-- **path** : *const QString &*
-  holds the file path of the txt file which is to be written to.
+- **path** : *const std::filesystem::path &*
+  The filter file to write.
 
 - **filter** : *const [FilterKernel](/docs/api/dsp/filter-kernel) &*
-  holds the filter which is to be written to file.
+  The filter.
 
 **Returns:**
 
-- *bool* — true if reading was successful, false otherwise.
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or an error if the file cannot be written.
 
 ---
 
@@ -91,13 +75,11 @@ FIR filter design, application and storage with the dsp library.
 
 ````cpp title="src/examples/ex_dsp_filter/main.cpp, line 176"
 QTemporaryDir dir;
-const QString path = dir.filePath("lp40.txt");
-FilterKernel reloaded;
-const bool written = FilterIO::writeFilter(path, lowPass);
-const bool read = FilterIO::readFilter(path, reloaded);
-const double ioErr = (reloaded.getCoefficients() - lowPass.getCoefficients()).cwiseAbs().maxCoeff();
-ok &= expect(written && read && reloaded.getCoefficients().size() == lowPass.getCoefficients().size() && ioErr < 1e-6,
-             std::format("FilterIO round trip keeps {} taps (max error {:g})", reloaded.getCoefficients().size(), ioErr));
+const std::filesystem::path path = dir.filePath("lp40.txt").toStdString();
+const bool written = FilterIO::write_filter(path, lowPass).has_value();
+const auto reloaded = FilterIO::read_filter(path); // the taps come back bit for bit
+ok &= expect(written && reloaded && reloaded->coefficients() == lowPass.coefficients(),
+             std::format("FilterIO round trip keeps all {} taps exactly", lowPass.coefficients().size()));
 ````
 
 ## Authors of this file
