@@ -15,15 +15,16 @@
 //=============================================================================================================
 
 #include "fine_calibration.h"
-#include <base/log.h>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
+#include <base/byte_stream.h>
+#include <base/string_utils.h>
 
-#include <QFile>
-#include <QTextStream>
-#include <QRegularExpression>
+#include <algorithm>
+#include <format>
+#include <iterator>
+#include <optional>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -36,97 +37,84 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FineCalibration FineCalibration::read(const QString& sPath)
+Expected<FineCalibration> FineCalibration::read(const std::filesystem::path& path)
 {
-    FineCalibration cal;
-
-    QFile file(sPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        Log::warning("[FineCalibration::read] Cannot open file: {}", sPath.toStdString());
-        return cal;
+    const Expected<std::string> text = read_text_file(path);
+    if (!text) {
+        return std::unexpected(text.error());
     }
-
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith('#')) {
+    FineCalibration cal;
+    std::string_view rest = *text;
+    while (!rest.empty()) {
+        const std::size_t end = rest.find('\n');
+        const std::string_view line = rest.substr(0, end);
+        rest = end == std::string_view::npos ? std::string_view() : rest.substr(end + 1);
+        const std::vector<std::string_view> parts = split_whitespace(line);
+        if (parts.empty() || parts.front().starts_with('#')) {
             continue;
         }
-
-        const QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
-        if (parts.size() != 14 && parts.size() != 16) {
-            Log::warning("[FineCalibration::read] Skipping malformed line: {}", line.toStdString());
-            continue;
+        std::string_view name = parts.front();
+        if (name.starts_with("MEG")) {
+            name.remove_prefix(3);
         }
-
         FineCalEntry entry;
-        bool ok = false;
-        entry.chNumber = QString(parts[0]).remove(QStringLiteral("MEG")).toInt(&ok);
-        VectorXd values(parts.size() - 1);
-        for (int k = 1; ok && k < parts.size(); ++k) {
-            values(k - 1) = parts[k].toDouble(&ok);
+        VectorXd values(std::ssize(parts) - 1);
+        std::optional<int> number = to_int(name);
+        bool ok = number.has_value() && (parts.size() == 14 || parts.size() == 16);
+        for (Index k = 0; ok && k < values.size(); ++k) {
+            const std::optional<double> value = to_double(parts[static_cast<std::size_t>(k) + 1]);
+            ok = value.has_value();
+            values(k) = value.value_or(0.0);
         }
         if (!ok) {
-            Log::warning("[FineCalibration::read] Skipping malformed line: {}", line.toStdString());
-            continue;
+            return fail(ErrorCode::Format, "{} has no fine calibration of 14 or 16 values in line \"{}\"",
+                        utf8_from_path(path), line);
         }
+        entry.chNumber = *number;
         entry.position = values.head<3>();
         entry.orientation = Map<const Matrix<double, 3, 3, RowMajor>>(values.data() + 3);
         entry.imbalance = values.tail(values.size() - 12);
-
-        cal.addEntry(entry);
+        cal.push_back(entry);
     }
-
-    file.close();
     return cal;
 }
 
 //=============================================================================================================
 
-bool FineCalibration::write(const QString& sPath) const
+Expected<void> FineCalibration::write(const std::filesystem::path& path) const
 {
-    QFile file(sPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        Log::warning("[FineCalibration::write] Cannot open file for writing: {}", sPath.toStdString());
-        return false;
-    }
-
-    QTextStream out(&file);
-    for (const auto& entry : m_entries) {
-        out << QString("%1").arg(entry.chNumber, 4, 10, QChar('0'));
+    std::string text;
+    for (const FineCalEntry& entry : m_entries) {
+        std::format_to(std::back_inserter(text), "{}", entry.chNumber);
         const Matrix<double, 3, 3, RowMajor> axes = entry.orientation;
-        for (const double v : {entry.position(0), entry.position(1), entry.position(2)}) {
-            out << ' ' << QString::number(v, 'f', 6);
+        const auto put = [&text](double value) {
+            std::format_to(std::back_inserter(text), " {:.6f}", value);
+        };
+        for (Index k = 0; k < 3; ++k) {
+            put(entry.position(k));
         }
-        for (int k = 0; k < 9; ++k) {
-            out << ' ' << QString::number(axes.data()[k], 'f', 6);
+        for (Index k = 0; k < 9; ++k) {
+            put(axes.data()[k]);
         }
         for (Index k = 0; k < entry.imbalance.size(); ++k) {
-            out << ' ' << QString::number(entry.imbalance(k), 'f', 6);
+            put(entry.imbalance(k));
         }
-        out << '\n';
+        text += '\n';
     }
-
-    file.close();
-    return true;
+    return write_text_file(path, text);
 }
 
 //=============================================================================================================
 
-bool FineCalibration::findEntry(int chNumber, FineCalEntry& entry) const
+const FineCalEntry* FineCalibration::find(int chNumber) const
 {
-    for (const auto& e : m_entries) {
-        if (e.chNumber == chNumber) {
-            entry = e;
-            return true;
-        }
-    }
-    return false;
+    const auto it = std::ranges::find(m_entries, chNumber, &FineCalEntry::chNumber);
+    return it == m_entries.end() ? nullptr : &*it;
 }
 
 //=============================================================================================================
 
-VectorXd FineCalibration::gainVector() const
+VectorXd FineCalibration::gain_vector() const
 {
     VectorXd gains = VectorXd::Ones(m_entries.size());
     for (int i = 0; i < std::ssize(m_entries); ++i) {
@@ -139,7 +127,7 @@ VectorXd FineCalibration::gainVector() const
 
 //=============================================================================================================
 
-MatrixXd FineCalibration::imbalanceMatrix() const
+MatrixXd FineCalibration::imbalance_matrix() const
 {
     MatrixXd imb = MatrixXd::Zero(m_entries.size(), 3);
     for (int i = 0; i < std::ssize(m_entries); ++i) {

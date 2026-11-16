@@ -680,6 +680,14 @@ aliases; replace the old spelling as below.
   (an error for a line without ten values) and `write_head_pos(path, span)`
   returning `Expected<void>`; `HeadPosEntry` gained `dError` and
   `dVelocity`.
+- `FineCalibration::write` writes bare channel numbers (`113`) like
+  MaxFilter and `mne.preprocessing.write_fine_calibration`, not `0113`, and
+  `read` rejects a line without 14 or 16 values like MNE-Python instead of
+  skipping it. Migration: `read(QString)` / `write(QString)` take a
+  `std::filesystem::path` and return `Expected<FineCalibration>` /
+  `Expected<void>`; `findEntry(n, entry)` is `find(n)` returning a pointer
+  or `nullptr`, `addEntry` is `push_back`, `gainVector` and
+  `imbalanceMatrix` are `gain_vector` and `imbalance_matrix`.
 - The MNE Scan HPI plugin offers the Neuromag VectorView coil-frequency
   presets again; its preset file has not been installed since the move to
   CMake, so the list was empty. `HpiSettingsView` now has them built in, and

@@ -23,6 +23,9 @@
 
 #include "dsp_global.h"
 
+#include <base/error.h>
+
+#include <filesystem>
 #include <vector>
 
 //=============================================================================================================
@@ -30,12 +33,6 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -77,24 +74,24 @@ public:
     /**
      * @brief Read a fine calibration file (.dat format).
      *
-     * Each line has 14 or 16 whitespace-separated columns (see the class description);
-     * lines starting with '#' are comments and malformed lines are skipped.
+     * Each line has 14 or 16 whitespace-separated columns (see the class description); lines starting
+     * with '#' are comments. Channel names "MEG0113" are read as channel number 113.
      *
-     * @param[in] sPath  Path to .dat file.
+     * @param[in] path   Path to the .dat file.
      *
-     * @return FineCalibration with loaded entries.
+     * @return The calibration, or an error if the file cannot be read or a line has another number of columns.
      */
-    static FineCalibration read(const QString& sPath);
+    static Expected<FineCalibration> read(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
-     * @brief Write fine calibration to a .dat file.
+     * @brief Writes a .dat file like MaxFilter: bare channel numbers and values with six decimals.
      *
-     * @param[in] sPath  Output file path.
+     * @param[in] path   Output file path.
      *
-     * @return true if successful.
+     * @return Nothing, or an error if the file cannot be written.
      */
-    bool write(const QString& sPath) const;
+    Expected<void> write(const std::filesystem::path& path) const;
 
     //=========================================================================================================
     /**
@@ -131,14 +128,11 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Find entry by channel number.
+     * @param[in] chNumber   Channel number to find, e.g. 113 for MEG0113.
      *
-     * @param[in] chNumber  Channel number to find.
-     * @param[out] entry    Found entry (if any).
-     *
-     * @return true if found.
+     * @return The entry of that channel, or nullptr.
      */
-    bool findEntry(int chNumber, FineCalEntry& entry) const;
+    const FineCalEntry* find(int chNumber) const;
 
     //=========================================================================================================
     /**
@@ -146,7 +140,7 @@ public:
      *
      * @param[in] entry  Calibration entry appended to the end of the list.
      */
-    void addEntry(const FineCalEntry& entry)
+    void push_back(const FineCalEntry& entry)
     {
         m_entries.push_back(entry);
     }
@@ -158,7 +152,7 @@ public:
      * @return One factor per entry: the single calibration term of a magnetometer
      *         (channel number ending in 1), 1.0 for gradiometers.
      */
-    Eigen::VectorXd gainVector() const;
+    Eigen::VectorXd gain_vector() const;
 
     //=========================================================================================================
     /**
@@ -167,7 +161,7 @@ public:
      * @return Matrix (n_entries × 3): the one or three imbalance terms of each
      *         gradiometer, zero-padded; zero rows for magnetometers.
      */
-    Eigen::MatrixXd imbalanceMatrix() const;
+    Eigen::MatrixXd imbalance_matrix() const;
 
 private:
     std::vector<FineCalEntry> m_entries;

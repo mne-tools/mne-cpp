@@ -178,12 +178,12 @@ int main(int argc, char* argv[])
     magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
     magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
     magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
-    calibration.addEntry(magnetometer);
-    const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
-    const bool calWritten = calibration.write(calPath);
-    const FineCalibration calBack = FineCalibration::read(calPath);
+    calibration.push_back(magnetometer);
+    const std::filesystem::path calPath = dir.filePath("sss_cal.dat").toStdString(); // MaxFilter's format
+    const bool calWritten = calibration.write(calPath).has_value();
+    const auto calBack = FineCalibration::read(calPath);
     //! [fine_calibration_usage]
-    ok &= expect(calWritten && calBack.size() == 1 && calBack.gainVector()(0) == 0.996645 && calBack.entries().front().position.isApprox(magnetometer.position),
+    ok &= expect(calWritten && calBack && calBack->size() == 1 && calBack->gain_vector()(0) == 0.996645 && calBack->find(111)->position.isApprox(magnetometer.position),
                  "FineCalibration round-trips a magnetometer line");
 
     //! [filter_chpi_usage]
