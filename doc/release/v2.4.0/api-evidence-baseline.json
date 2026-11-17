@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 484,
+    "exported_classes": 483,
     "exported_free_functions": 151,
-    "registered_classes": 574,
+    "registered_classes": 573,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 78,
     "registered_stale": 0,
-    "registered_with_test": 246,
+    "registered_with_test": 247,
     "registered_test_unresolved": 0,
-    "registered_with_example": 425,
+    "registered_with_example": 424,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 457,
-    "public_api_units": 576,
-    "example_eligible": 425,
+    "with_snippet": 456,
+    "public_api_units": 575,
+    "example_eligible": 424,
     "example_exempt": 151,
-    "eligible_backed_by_registry_example": 423,
-    "eligible_used_by_some_example": 367,
+    "eligible_backed_by_registry_example": 422,
+    "eligible_used_by_some_example": 366,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -108,13 +108,13 @@
       "with_snippet": 18
     },
     "dsp": {
-      "public": 81,
-      "registered": 81,
-      "with_test": 31,
-      "eligible": 79,
-      "eligible_with_registry_example": 79,
-      "eligible_used_by_example": 79,
-      "with_snippet": 81
+      "public": 80,
+      "registered": 80,
+      "with_test": 32,
+      "eligible": 78,
+      "eligible_with_registry_example": 78,
+      "eligible_used_by_example": 78,
+      "with_snippet": 80
     },
     "fiff": {
       "public": 39,
@@ -3553,6 +3553,7 @@
       ],
       "snippets": [
         "ex_connectivity_metrics/main.cpp#connectivity_settings_setup",
+        "ex_connectivity_metrics/main.cpp#connectivity_frequency_bins",
         "ex_connectivity_metrics/main.cpp#connectivity_calculate"
       ],
       "api_page": "doc/website/docs/api/connectivity/connectivity-settings.mdx",
@@ -3573,12 +3574,11 @@
       "example": "ex_connectivity_metrics",
       "example_state": "built",
       "including_examples": [
-        "ex_connectivity",
         "ex_connectivity_comparison",
         "ex_connectivity_metrics"
       ],
       "snippets": [
-        "ex_connectivity_metrics/main.cpp#abstract_metric_band"
+        "ex_connectivity_metrics/main.cpp#connectivity_calculate"
       ],
       "api_page": "doc/website/docs/api/connectivity/abstract-metric.mdx",
       "python_equiv": null,
@@ -8050,44 +8050,17 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
+      "test": "test_inv_rt_library",
+      "test_resolves": true,
       "example": "ex_dsp_rt",
       "example_state": "built",
       "including_examples": [
-        "ex_connectivity",
         "ex_dsp_rt"
       ],
       "snippets": [
-        "ex_dsp_rt/main.cpp#rt_connectivity_usage",
         "ex_dsp_rt/main.cpp#rt_connectivity_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/rt-connectivity.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "RtConnectivityWorker",
-      "header": "dsp/rt/rt_connectivity.h",
-      "library": "dsp",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_dsp_rt",
-      "example_state": "built",
-      "including_examples": [
-        "ex_connectivity",
-        "ex_dsp_rt"
-      ],
-      "snippets": [
-        "ex_dsp_rt/main.cpp#rt_connectivity_usage",
-        "ex_dsp_rt/main.cpp#rt_connectivity_usage"
-      ],
-      "api_page": "doc/website/docs/api/dsp/rt-connectivity-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

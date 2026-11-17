@@ -63,8 +63,8 @@ The documented classes this example uses most:
 | [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
 | [`InvMinimumNorm`](../../api/inv/inv-minimum-norm.mdx) | Inverse |
 | [`VisualizationInfo`](../../api/connectivity/visualization-info.mdx) | Connectivity |
-| [`AbstractMetric`](../../api/connectivity/abstract-metric.mdx) | Connectivity |
 | [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`ConnectivitySettings`](../../api/connectivity/connectivity-settings.mdx) | Connectivity |
 
 ## Used in the API reference
 
@@ -173,9 +173,6 @@ int main(int argc, char* argv[])
     mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = false;
-    //    AbstractMetric::m_iNumberBinStart = 8;
-    //    AbstractMetric::m_iNumberBinAmount = 4;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Comparison Example");

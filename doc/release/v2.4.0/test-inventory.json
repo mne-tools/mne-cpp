@@ -6287,6 +6287,7 @@
         "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
+        "RtConnectivity",
         "RtInvOp"
       ]
     },
@@ -8262,7 +8263,7 @@
         "test-data"
       ],
       "gui": true,
-      "qskip_sites": 7,
+      "qskip_sites": 8,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

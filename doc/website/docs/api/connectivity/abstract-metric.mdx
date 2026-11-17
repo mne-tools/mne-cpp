@@ -15,20 +15,15 @@ sidebar_position: 8
 class mne::AbstractMetric
 ```
 
-Static base for every estimator in `mne_connectivity`.
-
-Holds the two pieces of global state that the dispatcher (`compute_connectivity`) must set before any metric runs:
-
-- `mne::AbstractMetric::m_bStorageModeIsActive` "m_bStorageModeIsActive" enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
-- `mne::AbstractMetric::m_iNumberBinStart` "m_iNumberBinStart" and `mne::AbstractMetric::m_iNumberBinAmount` "m_iNumberBinAmount" define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
-
-Static control knobs (storage mode, frequency band) shared by all mne_connectivity metrics.
+Common base of the connectivity metrics.
 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
-// Spectral metrics evaluate the bins [start, start + amount); -1 means the full half spectrum.
-AbstractMetric::m_iNumberBinStart = -1;
-AbstractMetric::m_iNumberBinAmount = -1;
-AbstractMetric::m_bStorageModeIsActive = false;
+settings.setConnectivityMethods({"COH", "PLV", "WPLI"});
+std::vector<Network> networks = compute_connectivity(settings);
+for (Network network : networks) {
+    network.set_frequency_range(8.0f, 12.0f); // average the per-bin weights over the alpha band
+    std::println("{} 0-1: {:g}", network.method(), edgeWeight(network, 0, 1));
+}
 ```
 
 ### Inheritance
@@ -78,41 +73,6 @@ Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 - Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
-
-## Used in examples
-
-### [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx)
-
-Benchmark the run time of connectivity methods over channel and sample counts.
-
-````cpp title="src/examples/ex_connectivity_performance/main.cpp, line 135"
-AbstractMetric::m_bStorageModeIsActive = iStorageModeActive;
-AbstractMetric::m_iNumberBinStart = 8;
-AbstractMetric::m_iNumberBinAmount = 4;
-````
-
-### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
-
-Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
-
-````cpp title="src/examples/ex_connectivity/main.cpp, line 97"
-AbstractMetric::m_bStorageModeIsActive = false;
-AbstractMetric::m_iNumberBinStart = 0;
-AbstractMetric::m_iNumberBinAmount = 50;
-````
-
-### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
-
-Connectivity metrics on synthetic data with a known coupling.
-
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 165"
-// Spectral metrics evaluate the bins [start, start + amount); -1 means the full half spectrum.
-AbstractMetric::m_iNumberBinStart = -1;
-AbstractMetric::m_iNumberBinAmount = -1;
-AbstractMetric::m_bStorageModeIsActive = false;
-````
-
-Also used in [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx).
 
 ## Authors of this file
 

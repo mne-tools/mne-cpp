@@ -17,72 +17,79 @@ sidebar_position: 32
 class mne::RtConnectivity
 ```
 
-Real-time connectivity estimation.
+Connectivity networks of the newest trials of a stream, updated trial by trial.
 
-Controller that manages [`RtConnectivityWorker`](/docs/api/dsp/rt-connectivity-worker) for online connectivity computation.
+The networks equal those `mne::compute_connectivity` computes from the trials in the window.
 
 ```cpp title="src/examples/ex_dsp_rt/main.cpp"
-RtConnectivity rtConnectivity;
-MatrixXd online;
-bool connectivityDone = false;
-QObject::connect(&rtConnectivity, &RtConnectivity::newConnectivityResultAvailable,
-                 [&](const std::vector<Network>& networks, const std::shared_ptr<ConnectivitySettings>&) {
-                     online = networks.front().connectivity_matrix();
-                     connectivityDone = true;
-                 });
-rtConnectivity.append(settings); // computed on the worker thread
-```
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtConnectivity
+RtConnectivity rtConnectivity(settings, 5); // networks of the five newest trials
+std::vector<Network> networks;
+for (const MatrixXd& trial : trials) {
+    networks = rtConnectivity.update(trial); // spectra of this trial only; the oldest one drops out
+}
 ```
 
 ---
 
 ## Public Methods
 
-### RtConnectivity(parent)
-
-Creates the real-time connectivity estimation object.
+### RtConnectivity(settings, trials)
 
 **Parameters:**
 
-- **parent** : *QObject **
-  Parent QObject (optional).
+- **settings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings)*
+  Methods, sampling rate, FFT size, window type, frequency bins and node positions; trials it already holds start the window.
+
+- **trials** : *int*
+  Number of newest trials the networks are estimated from; 0 keeps every trial.
 
 ---
 
-### ~RtConnectivity()
+### update(trial)
 
-Destroys the real-time connectivity estimation object.
+Adds a trial, drops the oldest ones beyond the window, and estimates the networks.
 
----
-
-### append(connectivitySettings)
-
-Slot to receive incoming data.
-
-Queues a connectivity estimate on the worker thread. The worker computes on its own snapshot, so the caller may keep changing its settings; move them in to avoid the copy.
+A trial of another size than those in the window starts the window over.
 
 **Parameters:**
 
-- **connectivitySettings** : *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings)*
-  Data to estimate the connectivity from.
+- **trial** : *const Eigen::MatrixXd &*
+  Channels by samples.
+
+**Returns:**
+
+- *std::vector&lt; [Network](/docs/api/connectivity/network) &gt;* — One network per method of the settings.
 
 ---
 
-### restart()
+### networks()
 
-Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+**Returns:**
+
+- *std::vector&lt; [Network](/docs/api/connectivity/network) &gt;* — The networks of the trials in the window, e.g. after the methods changed; none for an empty window.
 
 ---
 
-### stop()
+### set_trial_count(trials)
 
-Stops the thread by interrupting its computation queue, quitting and waiting.
+**Parameters:**
+
+- **trials** : *int*
+  Number of newest trials the networks are estimated from; 0 keeps every trial.
+
+---
+
+### settings()
+
+**Returns:**
+
+- *[ConnectivitySettings](/docs/api/connectivity/connectivity-settings) &* — The settings with the trials of the window, to change the methods, frequency bins or window type; the kept spectra stay valid for a change of methods.
+
+---
+
+### reset()
+
+Forgets every trial.
 
 ---
 
@@ -95,38 +102,22 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 
 ## Used in examples
 
-### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
-
-Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
-
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 68"
-public:
-    ConnectivitySettingsManager(QObject* parent = 0)
-    : QObject(parent)
-    , m_pRtConnectivity(std::make_shared<RtConnectivity>())
-    {
-        QObject::connect(m_pRtConnectivity.get(), &RtConnectivity::newConnectivityResultAvailable,
-                         this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
-````
-
 ### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 250"
-RtConnectivity rtConnectivity;
-MatrixXd online;
-bool connectivityDone = false;
-QObject::connect(&rtConnectivity, &RtConnectivity::newConnectivityResultAvailable,
-                 [&](const std::vector<Network>& networks, const std::shared_ptr<ConnectivitySettings>&) {
-                     online = networks.front().connectivity_matrix();
-                     connectivityDone = true;
-                 });
-rtConnectivity.append(settings); // computed on the worker thread
-const bool connectivityArrived = waitFor(connectivityDone, 10000);
-ok &= expect(connectivityArrived && online.isApprox(offline),
-             std::format("RtConnectivity equals compute_connectivity (coherence {:.3f})", online.size() ? online(0, 1) : 0.0));
-rtConnectivity.stop();
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 252"
+RtConnectivity rtConnectivity(settings, 5); // networks of the five newest trials
+std::vector<Network> networks;
+for (const MatrixXd& trial : trials) {
+    networks = rtConnectivity.update(trial); // spectra of this trial only; the oldest one drops out
+}
+ConnectivitySettings newest = settings;
+newest.append(std::span(trials).last(5));
+const MatrixXd offline = compute_connectivity(newest).front().connectivity_matrix();
+const MatrixXd online = networks.front().connectivity_matrix();
+ok &= expect(online.isApprox(offline),
+             std::format("RtConnectivity equals compute_connectivity of the newest trials (coherence {:.3f})", online(0, 1)));
 ````
 
 ## Authors of this file

@@ -38,6 +38,12 @@ settings.setNodePositions(positions);
 ```
 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+// Spectral metrics evaluate the bins [start, start + count); -1 means the full half spectrum.
+settings.set_frequency_bins(-1, -1);
+settings.set_keep_trial_data(false); // keep them to compute only appended trials next time
+```
+
+```cpp title="src/examples/ex_connectivity_metrics/main.cpp"
 settings.setConnectivityMethods({"COH", "PLV", "WPLI"});
 std::vector<Network> networks = compute_connectivity(settings);
 for (Network network : networks) {
@@ -120,6 +126,51 @@ Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settin
 
 ---
 
+### set_frequency_bins(start, count)
+
+Restricts the spectral metrics to a range of frequency bins of the half spectrum.
+
+Changing it drops the kept per-trial spectra.
+
+**Parameters:**
+
+- **start** : *int*
+  First bin; -1 for the whole spectrum.
+
+- **count** : *int*
+  Number of bins; -1 for the whole spectrum.
+
+---
+
+### frequency_bins()
+
+**Returns:**
+
+- *std::pair&lt; int, int &gt;* — The first frequency bin and the number of bins the spectral metrics use: the whole half spectrum of the FFT size unless a range inside it was set.
+
+---
+
+### set_keep_trial_data(keep)
+
+Keeps the tapered spectra and cross-spectra of each trial, so that the next metric call computes only those of the trials appended since.
+
+Off by default to save memory.
+
+**Parameters:**
+
+- **keep** : *bool*
+  Whether to keep them.
+
+---
+
+### keeps_trial_data()
+
+**Returns:**
+
+- *bool* — Whether the per-trial spectra are kept between metric calls.
+
+---
+
 ### setWindowType(sWindowType)
 
 ---
@@ -164,9 +215,8 @@ Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settin
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 92"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 91"
 ConnectivitySettings m_settings;
-std::shared_ptr<RtConnectivity> m_pRtConnectivity;
 std::vector<Network> m_rawNetworkData; /**< Results as computed. */
 std::vector<Network> m_networkData;    /**< Results averaged over the selected band and normalized. */
 std::map<std::string, Eigen::Vector4i> mColor;
@@ -176,28 +226,28 @@ std::map<std::string, Eigen::Vector4i> mColor;
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 230"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 232"
 // ---------------------------------------------------------------------------------------------------------
-// Connectivity: the same network as compute_connectivity, computed on a worker thread
+// Connectivity: coherence of the newest trials, updated trial by trial
 ConnectivitySettings settings;
-for (int trial = 0; trial < 5; ++trial) {
+settings.setSamplingFrequency(256);
+settings.setFFTSize(256);
+settings.setWindowType("hanning");
+settings.setNodePositions(MatrixX3f::Identity(2, 3));
+settings.setConnectivityMethods({"COH"});
+std::vector<MatrixXd> trials;
+for (int trial = 0; trial < 8; ++trial) {
     MatrixXd data(2, 256);
     for (int t = 0; t < 256; ++t) {
         const double alpha = std::sin(2.0 * kPi * 10.0 * t / 256.0 + trial);
         data(0, t) = alpha + 0.3 * normal(gen) * 1e12;
-        data(1, t) = alpha + 0.3 * normal(gen) * 1e12;
-    }
-    settings.append(data);
-}
-settings.setSamplingFrequency(256);
-settings.setFFTSize(256);
 ````
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 193"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 190"
 ConnectivitySettings conSettings;
 ````
 

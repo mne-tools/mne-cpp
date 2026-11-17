@@ -266,7 +266,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/rt-averaging',
         'api/dsp/rt-averaging-worker',
         'api/dsp/rt-connectivity',
-        'api/dsp/rt-connectivity-worker',
         'api/dsp/rt-cov',
         'api/dsp/rt-inv-op',
         'api/dsp/rt-noise',

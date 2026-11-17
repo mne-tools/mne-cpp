@@ -55,6 +55,8 @@ buffer.pop(second);
 
 Appends `element`.
 
+A push that times out leaves `element` untouched, so an rvalue can be pushed again.
+
 **Parameters:**
 
 - **element** : *U &&*

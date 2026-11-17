@@ -284,7 +284,7 @@ ok &= expect(cov.dim == 366 && cov.nfree == 15972 && cov.bads.size() == 2 && cov
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 201"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 203"
 const FiffCov cov = rtCov.covariance().value_or(FiffCov());
 // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
 ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),

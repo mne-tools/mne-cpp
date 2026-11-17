@@ -199,7 +199,7 @@ Resets the averaged data stored.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 156"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 158"
 RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
 FiffEvokedSet evokedSet;
 QObject::connect(&averager, &RtAveragingWorker::resultReady,

@@ -42,7 +42,7 @@ network.set_visualization_info({.coloring = VisualizationInfo::Coloring::fixed, 
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 202"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 195"
     VisualizationInfo visInfo = m_networkData[i].visualization_info();
     visInfo.coloring = VisualizationInfo::Coloring::fixed;
     visInfo.node_color = mColor[m_networkData[i].method()];
@@ -55,7 +55,7 @@ Sensor- or source-level functional connectivity of averaged MEG/EEG data with a 
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 355"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 352"
     lNetworks[j].set_frequency_range(dFreqMin, dFreqMax);
     lNetworks[j].normalize();
     VisualizationInfo visInfo = lNetworks[j].visualization_info();
@@ -70,7 +70,7 @@ Compare connectivity metrics side by side on the same averaged sensor- or source
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 296"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 295"
 const int hubDegree = network.degree(1);
 const int hubStrongDegree = network.degree(1, EdgeSet::thresholded);
 const double hubStrength = network.strength(1);
