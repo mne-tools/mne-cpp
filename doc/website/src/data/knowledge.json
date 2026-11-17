@@ -2770,7 +2770,7 @@
     {
       "id": "real-time",
       "title": "Real-time processing",
-      "summary": "Worker-based online averaging, covariance, noise spectrum, connectivity, head-position fitting and inverse operators for streaming data.",
+      "summary": "Online averaging, covariance, noise spectrum, connectivity, head-position fitting and inverse operators for streaming data.",
       "manual": [
         {
           "label": "MNE Scan",
@@ -2794,8 +2794,8 @@
           "methods": []
         },
         {
-          "name": "RtInvOp",
-          "url": "/docs/api/dsp/rt-inv-op/",
+          "name": "RtCov",
+          "url": "/docs/api/dsp/rt-cov/",
           "methods": []
         },
         {
