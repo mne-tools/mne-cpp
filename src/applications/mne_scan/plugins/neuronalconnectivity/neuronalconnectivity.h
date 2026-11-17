@@ -34,7 +34,6 @@
 //=============================================================================================================
 
 #include <QMutex>
-#include <QElapsedTimer>
 #include <QPointer>
 
 //=============================================================================================================
@@ -55,11 +54,6 @@ class FiffInfo;
 namespace mne::disp
 {
 class ConnectivitySettingsView;
-}
-
-namespace mne
-{
-class RtConnectivity;
 }
 
 namespace mne::scan
@@ -166,19 +160,18 @@ protected:
 
     //=========================================================================================================
     /**
+     * Hands a trial of the picked channels to the processing thread.
+     *
+     * @param[in] trial   Channels by samples.
+     */
+    void pushTrial(Eigen::MatrixXd trial);
+
+    //=========================================================================================================
+    /**
      * AbstractAlgorithm function
      */
     virtual void run();
 
-    //=========================================================================================================
-    /**
-     * Slot called when a new real-time connectivity estimate is available.
-     *
-     * @param[in] connectivityResults     The new connectivity estimates.
-     * @param[in] connectivitySettings    The settings they were computed from, taken over by this plugin.
-     */
-    void onNewConnectivityResultAvailable(const std::vector<mne::Network>& connectivityResults,
-                                          const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
 
     //=========================================================================================================
     /**
@@ -227,22 +220,19 @@ private:
     qint32 m_iNumberBadChannels; /**< The current number of bad channels. USed to test if new bad channels were selected. */
     float m_fFreqBandLow;        /**< The lower frequency band to average the connectivity weights from. */
     float m_fFreqBandHigh;       /**< The higher frequency band to average the connectivity weights to. */
-    qint32 m_iBlockSize;         /**< The block size of teh last received data block. In frequency bins. */
 
     QString m_sAvrType;                              /**< The average type. */
     std::vector<std::string> m_sConnectivityMethods; /**< The connectivity metric to use. */
 
     QMutex m_mutex; /**< The mutex to guarantee thread safety. */
 
-    QElapsedTimer m_timer; /**< The timer to evaluate performance. */
 
-    mne::ConnectivitySettings m_connectivitySettings; /**< The connectivity settings.*/
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pTrialBuffer; /**< Trials waiting for the processing thread. */
+    bool m_bSettingsChanged = false;                                      /**< Whether the processing thread starts over with new settings. */
+    bool m_bRepublish = false;                                            /**< Whether the processing thread sends the networks again. */
+    mne::ConnectivitySettings m_connectivitySettings;                     /**< The connectivity settings.*/
 
-    std::shared_ptr<mne::CircularBuffer<mne::Network>> m_pCircularBuffer;             /**< The circular buffer holding the connectivity estimates.*/
-    std::shared_ptr<mne::RtConnectivity> m_pRtConnectivity;                           /**< The real-time connectivity estimation object.*/
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                       /**< Fiff measurement info.*/
-    std::shared_ptr<mne::disp::ConnectivitySettingsView> m_pConnectivitySettingsView; /**< The connectivity settings widget which will be added to the Quick Control view. The QuickControlView will not take ownership. Ownership will be managed by the QSharedPointer.*/
-    QAction* m_pActionShowYourWidget;                                                 /**< flag whether thread is running.*/
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
     mne::scan::PluginInputData<mne::scan::RealTimeSourceEstimate>::SPtr m_pRTSEInput;    /**< The RealTimeSourceEstimate input.*/
     mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
@@ -250,13 +240,7 @@ private:
 
     mne::scan::PluginOutputData<mne::scan::RealTimeConnectivityEstimate>::SPtr m_pRTCEOutput; /**< The RealTimeSourceEstimate output.*/
 
-    mne::Network m_connectivityEstimate; /**< The current connectivity estimate.*/
-    Eigen::MatrixX3f m_matNodeVertLeft;  /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f m_matNodeVertRight; /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::MatrixX3f m_matNodeVertComb;  /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
-    Eigen::RowVectorXi m_vecPicks;       /**< The picked data channels. */
-
-    mne::Network m_currentConnectivityResult; /**< The current connectivity result.*/
+    Eigen::RowVectorXi m_vecPicks; /**< The picked data channels. */
 };
 } // NAMESPACE
 

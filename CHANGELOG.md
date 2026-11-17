@@ -726,6 +726,18 @@ aliases; replace the old spelling as below.
   power spectra the phase-lag metric does not compute and divided by an empty
   sum: the MNE Scan connectivity plugin showed wrong coherence after switching
   from a phase-lag metric.
+- `RtConnectivity` is a synchronous streaming estimator with no Qt: it keeps
+  a sliding window of trials, and each `update(trial)` computes only that
+  trial's spectra, takes the oldest trial out of the running sums and returns
+  the networks, which equal those of `compute_connectivity` for the trials in
+  the window. The MNE Scan connectivity plugin runs it on its processing
+  thread: it no longer copies all trials to a worker for every block, nor
+  drops the trials that arrived while the worker was busy when the worker's
+  copy came back. Migration: `RtConnectivity()` plus `append(settings)` and
+  the `newConnectivityResultAvailable` signal → `RtConnectivity(settings,
+  trials)` and `update(trial)`, which returns the networks; `networks()`,
+  `set_trial_count`, `settings()` and `reset()`; `restart`, `stop` and
+  `RtConnectivityWorker` are removed.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each

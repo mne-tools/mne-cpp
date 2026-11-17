@@ -15,9 +15,7 @@
 //=============================================================================================================
 
 #include "rt_connectivity.h"
-#include <base/log.h>
 
-#include <connectivity/connectivitysettings.h>
 #include <connectivity/compute_connectivity.h>
 
 //=============================================================================================================
@@ -25,89 +23,69 @@
 //=============================================================================================================
 
 using namespace mne;
+using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS RtConnectivityWorker
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void RtConnectivityWorker::doWork(const std::shared_ptr<ConnectivitySettings>& connectivitySettings)
+RtConnectivity::RtConnectivity(ConnectivitySettings settings, int trials)
+: m_settings(std::move(settings))
+, m_trials(trials)
 {
-    if (this->thread()->isInterruptionRequested()) {
-        return;
+    m_settings.set_keep_trial_data(true);
+    trim();
+}
+
+//=============================================================================================================
+
+std::vector<Network> RtConnectivity::update(const MatrixXd& trial)
+{
+    if (!m_settings.empty() && (trial.rows() != m_settings.at(0).matData.rows() || trial.cols() != m_settings.at(0).matData.cols())) {
+        m_settings.clearAllData();
     }
+    m_settings.append(trial);
+    trim();
+    return compute_connectivity(m_settings);
+}
 
-    if (connectivitySettings->getConnectivityMethods().empty()) {
-        mne::Log::debug("RtConnectivityWorker::doWork() - Network methods are empty");
-        return;
+//=============================================================================================================
+
+std::vector<Network> RtConnectivity::networks()
+{
+    if (m_settings.empty()) {
+        return {};
     }
-
-    const std::vector<Network> finalNetworks = compute_connectivity(*connectivitySettings);
-
-    emit resultReady(finalNetworks, connectivitySettings);
-}
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS RtConnectivity
-//=============================================================================================================
-
-RtConnectivity::RtConnectivity(QObject* parent)
-: QObject(parent)
-{
-    RtConnectivityWorker* worker = new RtConnectivityWorker;
-    worker->moveToThread(&m_workerThread);
-
-    connect(&m_workerThread, &QThread::finished,
-            worker, &QObject::deleteLater);
-
-    connect(this, &RtConnectivity::operate,
-            worker, &RtConnectivityWorker::doWork);
-
-    connect(worker, &RtConnectivityWorker::resultReady,
-            this, &RtConnectivity::newConnectivityResultAvailable);
-
-    m_workerThread.start();
+    return compute_connectivity(m_settings);
 }
 
 //=============================================================================================================
 
-RtConnectivity::~RtConnectivity()
+void RtConnectivity::set_trial_count(int trials)
 {
-    stop();
+    m_trials = trials;
+    trim();
 }
 
 //=============================================================================================================
 
-void RtConnectivity::append(ConnectivitySettings connectivitySettings)
+ConnectivitySettings& RtConnectivity::settings()
 {
-    emit operate(std::make_shared<ConnectivitySettings>(std::move(connectivitySettings)));
+    return m_settings;
 }
 
 //=============================================================================================================
 
-void RtConnectivity::restart()
+void RtConnectivity::reset()
 {
-    stop();
-
-    RtConnectivityWorker* worker = new RtConnectivityWorker;
-    worker->moveToThread(&m_workerThread);
-
-    connect(&m_workerThread, &QThread::finished,
-            worker, &QObject::deleteLater);
-
-    connect(this, &RtConnectivity::operate,
-            worker, &RtConnectivityWorker::doWork);
-
-    connect(worker, &RtConnectivityWorker::resultReady,
-            this, &RtConnectivity::newConnectivityResultAvailable);
-
-    m_workerThread.start();
+    m_settings.clearAllData();
 }
 
 //=============================================================================================================
 
-void RtConnectivity::stop()
+void RtConnectivity::trim()
 {
-    m_workerThread.requestInterruption();
-    m_workerThread.quit();
-    m_workerThread.wait();
+    if (m_trials > 0 && m_settings.size() > m_trials) {
+        m_settings.removeFirst(m_settings.size() - m_trials);
+    }
 }

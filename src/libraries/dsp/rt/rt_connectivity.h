@@ -7,20 +7,14 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Real-time worker that re-estimates a connectivity network from incoming data epochs.
+ * @brief    Streaming functional connectivity over a sliding window of trials.
  *
- * RtConnectivity drives the mne_connectivity connectivity estimators (coherence,
- * imaginary coherence, phase-locking value, weighted phase-lag index,
- * amplitude envelope correlation, …) from a background @c QThread. Each
- * arriving data block is forwarded to the worker, which updates the
- * windowed connectivity estimate and emits a @ref mne::Network result
- * carrying the current edge weights and node positions ready for
- * visualisation.
- *
- * The actual estimator and its parameters — frequency band, window length,
- * connectivity measure — are configured through a @ref mne::ConnectivitySettings
- * instance, so this header only adds the threading, lifecycle and signal
- * plumbing on top of the existing batch implementation.
+ * RtConnectivity estimates the connectivity networks of @ref mne::compute_connectivity (coherence,
+ * imaginary coherence, PLI, wPLI, dwPLI, USPLI, PLV, correlation, ...) over the newest trials of a stream.
+ * It keeps the tapered spectra and cross-spectra of every trial in the window together with their sums, so
+ * a new trial costs its own spectra plus the final normalization, and the oldest trial is subtracted from
+ * the sums instead of recomputing the rest. It is synchronous: call it from whichever thread receives the
+ * trials.
  */
 
 #ifndef RT_CONNECTIVITY_RTPROCESSING_H
@@ -31,26 +25,13 @@
 //=============================================================================================================
 
 #include "../dsp_global.h"
+
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
-#include <memory>
+#include <Eigen/Core>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
-#include <QThread>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace mne
-{
-class FiffInfo;
-}
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -60,101 +41,68 @@ namespace mne
 {
 
 //=============================================================================================================
-// mne FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
- * Real-time connectivity worker.
+ * @brief Connectivity networks of the newest trials of a stream, updated trial by trial.
  *
- * @brief Background worker thread that computes functional connectivity metrics in real time.
+ * The networks equal those @ref mne::compute_connectivity computes from the trials in the window.
  *
  * @snippet ex_dsp_rt/main.cpp rt_connectivity_usage
  */
-class DSPSHARED_EXPORT RtConnectivityWorker : public QObject
+class DSPSHARED_EXPORT RtConnectivity
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-     * Perform actual connectivity estimation.
-     *
-     * @param[in] connectivitySettings    The trials to estimate from; their spectra are cached in place.
+     * @param[in] settings   Methods, sampling rate, FFT size, window type, frequency bins and node positions;
+     *                       trials it already holds start the window.
+     * @param[in] trials     Number of newest trials the networks are estimated from; 0 keeps every trial.
      */
-    void doWork(const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
+    explicit RtConnectivity(ConnectivitySettings settings, int trials = 0);
 
-signals:
-    void resultReady(const std::vector<mne::Network>& connectivityResults, const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
+    //=========================================================================================================
+    /**
+     * Adds a trial, drops the oldest ones beyond the window, and estimates the networks. A trial of another
+     * size than those in the window starts the window over.
+     *
+     * @param[in] trial   Channels by samples.
+     *
+     * @return One network per method of the settings.
+     */
+    [[nodiscard]] std::vector<Network> update(const Eigen::MatrixXd& trial);
+
+    //=========================================================================================================
+    /**
+     * @return The networks of the trials in the window, e.g. after the methods changed; none for an empty
+     *         window.
+     */
+    [[nodiscard]] std::vector<Network> networks();
+
+    //=========================================================================================================
+    /**
+     * @param[in] trials   Number of newest trials the networks are estimated from; 0 keeps every trial.
+     */
+    void set_trial_count(int trials);
+
+    //=========================================================================================================
+    /**
+     * @return The settings with the trials of the window, to change the methods, frequency bins or window
+     *         type; the kept spectra stay valid for a change of methods.
+     */
+    [[nodiscard]] ConnectivitySettings& settings();
+
+    //=========================================================================================================
+    /**
+     * Forgets every trial.
+     */
+    void reset();
+
+private:
+    void trim();
+
+    ConnectivitySettings m_settings; /**< Settings and the trials of the window. */
+    int m_trials = 0;                /**< Window length in trials; 0 for every trial. */
 };
 
-//=============================================================================================================
-/**
- * Real-time connectivity estimation.
- *
- * @brief Controller that manages RtConnectivityWorker for online connectivity computation.
- *
- * @snippet ex_dsp_rt/main.cpp rt_connectivity_usage
- */
-class DSPSHARED_EXPORT RtConnectivity : public QObject
-{
-    Q_OBJECT
-
-public:
-    //=========================================================================================================
-    /**
-     * Creates the real-time connectivity estimation object.
-     *
-     * @param[in] parent     Parent QObject (optional).
-     */
-    explicit RtConnectivity(QObject* parent = 0);
-
-    //=========================================================================================================
-    /**
-     * Destroys the real-time connectivity estimation object.
-     */
-    ~RtConnectivity();
-
-    //=========================================================================================================
-    /**
-     * Slot to receive incoming data.
-     *
-     * Queues a connectivity estimate on the worker thread. The worker computes on its own
-     * snapshot, so the caller may keep changing its settings; move them in to avoid the copy.
-     *
-     * @param[in] connectivitySettings  Data to estimate the connectivity from.
-     */
-    void append(mne::ConnectivitySettings connectivitySettings);
-
-    //=========================================================================================================
-    /**
-     * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
-     */
-    void restart();
-
-    //=========================================================================================================
-    /**
-     * Stops the thread by interrupting its computation queue, quitting and waiting.
-     */
-    void stop();
-
-protected:
-    QThread m_workerThread; /**< The worker thread. */
-
-signals:
-    /**
-     * Emitted with the estimates and the settings they were computed from, including the
-     * spectra cached during the computation. The worker no longer uses the settings, so a
-     * receiver may move from them instead of copying.
-     */
-    void newConnectivityResultAvailable(const std::vector<mne::Network>& connectivityResults, const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
-
-    void operate(const std::shared_ptr<mne::ConnectivitySettings>& connectivitySettings);
-};
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-} // NAMESPACE
+} // namespace mne
 
 #endif // RT_CONNECTIVITY_RTPROCESSING_H

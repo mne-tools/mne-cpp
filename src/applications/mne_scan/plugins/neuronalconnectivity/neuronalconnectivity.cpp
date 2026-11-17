@@ -17,7 +17,10 @@
 //=============================================================================================================
 
 #include "neuronalconnectivity.h"
+#include <algorithm>
 #include <memory>
+#include <optional>
+#include <utility>
 #include <base/string_utils.h>
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
@@ -57,18 +60,10 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_iNumberBadChannels(0)
 , m_fFreqBandLow(7.0f)
 , m_fFreqBandHigh(13.0f)
-, m_iBlockSize(1)
 , m_sAvrType("1")
-, m_pCircularBuffer(std::make_shared<CircularBuffer<mne::Network>>(40))
-, m_pRtConnectivity(std::make_shared<RtConnectivity>())
-, m_pActionShowYourWidget(nullptr)
+, m_pTrialBuffer(std::make_shared<CircularBuffer<Eigen::MatrixXd>>(40))
 {
     m_connectivitySettings.set_frequency_bins(0, 100);
-    m_connectivitySettings.set_keep_trial_data(true);
-
-    //Init rt connectivity worker
-    connect(m_pRtConnectivity.get(), &RtConnectivity::newConnectivityResultAvailable,
-            this, &NeuronalConnectivity::onNewConnectivityResultAvailable);
 }
 
 //=============================================================================================================
@@ -170,8 +165,6 @@ bool NeuronalConnectivity::start()
 
 bool NeuronalConnectivity::stop()
 {
-    m_pRtConnectivity->restart();
-
     requestInterruption();
     wait(500);
 
@@ -228,42 +221,14 @@ void NeuronalConnectivity::updateSource(mne::scan::Measurement::SPtr pMeasuremen
         }
 
         for (qint32 i = 0; i < pRTSE->getValue().size(); ++i) {
-            // Find out how many samples were used for pre stimulus
-            int iZeroIdx = 0;
-            for (int j = 0; j < pRTSE->getValue()[i]->times.cols(); ++j) {
-                if (pRTSE->getValue()[i]->times(j) >= 0) {
-                    iZeroIdx = j;
-                    //iZeroIdx = j + m_pFiffInfo->sfreq * 0.01; //Cut stimulus artifact, e.g. for median nerve stimulation.
-                    break;
-                }
+            // Only the samples from the stimulus on
+            const auto& stc = *pRTSE->getValue()[i];
+            Eigen::Index iZeroIdx = 0;
+            while (iZeroIdx < stc.times.cols() && stc.times(iZeroIdx) < 0) {
+                ++iZeroIdx;
             }
-
-            m_iBlockSize = pRTSE->getValue().first()->data.cols() - iZeroIdx;
-
-            // Check row and colum integrity and restart if necessary
-            if (m_connectivitySettings.size() != 0) {
-                if (m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
-                    m_connectivitySettings.clearAllData();
-                    m_pRtConnectivity->restart();
-                }
-            }
-
-            // No copy necessary since we do a deep copy in connectivity settings before the measurement
-            // overwrites the matrix
-            m_connectivitySettings.append(pRTSE->getValue()[i]->data.block(0,
-                                                                           iZeroIdx,
-                                                                           pRTSE->getValue()[i]->data.rows(),
-                                                                           pRTSE->getValue()[i]->data.cols() - iZeroIdx));
+            pushTrial(stc.data.rightCols(stc.data.cols() - iZeroIdx));
         }
-
-        //Pop data from buffer
-        if (m_connectivitySettings.size() >= m_iNumberAverages) {
-            m_pRtConnectivity->restart();
-            m_connectivitySettings.removeFirst(m_connectivitySettings.size() - m_iNumberAverages);
-        }
-
-        m_timer.restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
     }
 }
 
@@ -298,40 +263,11 @@ void NeuronalConnectivity::updateRTMSA(mne::scan::Measurement::SPtr pMeasurement
                 m_pFiffInfo = pRTMSA->info();
                 generateNodeVertices();
                 m_iNumberBadChannels = static_cast<int>(m_pFiffInfo->bads.size());
-                m_pRtConnectivity->restart();
             }
 
-            MatrixXd data;
-
-            for (qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                const MatrixXd& t_mat = pRTMSA->getMultiSampleArray()[i];
-                m_iBlockSize = pRTMSA->getMultiSampleArray()[i].cols();
-
-                // Check row and colum integrity and restart if necessary
-                if (m_connectivitySettings.size() != 0) {
-                    if (m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
-                        m_connectivitySettings.clearAllData();
-                        m_pRtConnectivity->restart();
-                    }
-                }
-
-                data.resize(m_vecPicks.cols(), t_mat.cols());
-
-                for (qint32 j = 0; j < m_vecPicks.cols(); ++j) {
-                    data.row(j) = t_mat.row(m_vecPicks[j]);
-                }
-
-                m_connectivitySettings.append(data);
+            for (const MatrixXd& block : pRTMSA->getMultiSampleArray()) {
+                pushTrial(block(m_vecPicks, placeholders::all));
             }
-
-            //Pop data from buffer
-            if (m_connectivitySettings.size() > m_iNumberAverages) {
-                m_pRtConnectivity->restart();
-                m_connectivitySettings.removeFirst(m_connectivitySettings.size() - m_iNumberAverages);
-            }
-
-            m_timer.restart();
-            m_pRtConnectivity->append(m_connectivitySettings);
         }
     }
 }
@@ -379,42 +315,9 @@ void NeuronalConnectivity::updateRTEV(mne::scan::Measurement::SPtr pMeasurement)
         }
 
         if (m_pFiffInfo) {
-            if (!pFiffEvokedSet->evoked.empty()) {
-                m_iBlockSize = pFiffEvokedSet->evoked.front().data.cols();
-            }
-
-            for (int i = 0; i < std::ssize(pFiffEvokedSet->evoked); ++i) {
-                if (pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
-                    const MatrixXd& t_mat = pFiffEvokedSet->evoked.at(i).data;
-
-                    m_iBlockSize = t_mat.cols();
-
-                    // Check row and colum integrity and restart if necessary
-                    if (m_connectivitySettings.size() != 0) {
-                        if (m_iBlockSize != m_connectivitySettings.at(0).matData.cols()) {
-                            m_connectivitySettings.clearAllData();
-                            m_pRtConnectivity->restart();
-                        }
-                    }
-
-                    MatrixXd data;
-                    data.resize(m_vecPicks.cols(), t_mat.cols());
-
-                    for (qint32 j = 0; j < m_vecPicks.cols(); ++j) {
-                        data.row(j) = t_mat.row(m_vecPicks[j]);
-                    }
-
-                    m_connectivitySettings.append(data);
-
-                    //Pop data from buffer
-                    if (m_connectivitySettings.size() > m_iNumberAverages) {
-                        m_pRtConnectivity->restart();
-                        m_connectivitySettings.removeFirst(m_connectivitySettings.size() - m_iNumberAverages);
-                    }
-
-                    m_timer.restart();
-                    m_pRtConnectivity->append(m_connectivitySettings);
-
+            for (const FiffEvoked& evoked : pFiffEvokedSet->evoked) {
+                if (evoked.comment == m_sAvrType) {
+                    pushTrial(evoked.data(m_vecPicks, placeholders::all));
                     break;
                 }
             }
@@ -456,12 +359,20 @@ void NeuronalConnectivity::generateNodeVertices()
         m_vecPicks = m_pFiffInfo->pick_types("mag", false, false, {}, exclude);
     }
 
-    // Set sampling frequency so that the spectrum resolution is updated
+    // The processing thread starts over with the new channels
+    QMutexLocker locker(&m_mutex);
     m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
-
-    //Set node 3D positions to connectivity settings
     m_connectivitySettings.setNodePositions(*m_pFiffInfo, m_vecPicks);
-    m_connectivitySettings.clearAllData();
+    m_bSettingsChanged = true;
+}
+
+//=============================================================================================================
+
+void NeuronalConnectivity::pushTrial(Eigen::MatrixXd trial)
+{
+    // Blocks until the processing thread has room
+    while (!m_pTrialBuffer->push(std::move(trial)) && !isInterruptionRequested()) { // NOLINT(bugprone-use-after-move): a timed-out push does not move
+    }
 }
 
 //=============================================================================================================
@@ -482,42 +393,44 @@ void NeuronalConnectivity::run()
         return;
     }
 
+    std::optional<RtConnectivity> rtConnectivity;
     int skip_count = 0;
-    Network network;
+    MatrixXd trial;
+    std::vector<Network> networks;
 
     while (!isInterruptionRequested()) {
-        //Do processing after skip count has reached limit
-        if ((skip_count % m_iDownSample) == 0) {
-            if (m_pCircularBuffer->pop(network)) {
-                //Send the data to the connected plugins and the online display
-                if (!network.empty()) {
-                    //qDebug()<<"NeuronalConnectivity::run - Total time"<<m_timer.elapsed();
-                    m_mutex.lock();
-                    network.set_frequency_range(m_fFreqBandLow, m_fFreqBandHigh);
-                    m_mutex.unlock();
-                    network.normalize();
+        m_mutex.lock();
+        if (!rtConnectivity || m_bSettingsChanged) {
+            rtConnectivity.emplace(m_connectivitySettings, m_iNumberAverages);
+            m_bSettingsChanged = false;
+        } else {
+            // A new method reuses the kept spectra of the trials in the window
+            rtConnectivity->settings().setConnectivityMethods(m_sConnectivityMethods);
+            rtConnectivity->set_trial_count(m_iNumberAverages);
+        }
+        const float freqLow = m_fFreqBandLow;
+        const float freqHigh = m_fFreqBandHigh;
+        const bool republish = std::exchange(m_bRepublish, false);
+        const int downSample = std::max(1, m_iDownSample);
+        m_mutex.unlock();
 
-                    m_pRTCEOutput->measurementData()->setValue(network);
-                } else {
-                    qDebug() << "NeuronalConnectivity::run - Network is empty";
-                }
+        if (m_pTrialBuffer->pop(trial)) {
+            networks = rtConnectivity->update(trial);
+            if (++skip_count % downSample != 0) {
+                continue;
             }
+        } else if (!republish) {
+            continue;
+        } else if (!rtConnectivity->settings().empty()) {
+            networks = rtConnectivity->networks();
         }
 
-        ++skip_count;
-    }
-}
-
-//=============================================================================================================
-
-void NeuronalConnectivity::onNewConnectivityResultAvailable(const std::vector<Network>& connectivityResults,
-                                                            const std::shared_ptr<ConnectivitySettings>& connectivitySettings)
-{
-    m_connectivitySettings = std::move(*connectivitySettings);
-    m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-
-    for (int i = 0; i < std::ssize(connectivityResults); ++i) {
-        m_pCircularBuffer->push(connectivityResults.at(i));
+        //Send the data to the connected plugins and the online display
+        for (Network network : networks) {
+            network.set_frequency_range(freqLow, freqHigh);
+            network.normalize();
+            m_pRTCEOutput->measurementData()->setValue(network);
+        }
     }
 }
 
@@ -529,18 +442,17 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
         return;
     }
 
+    QMutexLocker locker(&m_mutex);
     m_sConnectivityMethods = {sMetric.toStdString()};
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    if (m_pRtConnectivity && this->isRunning()) {
-        m_pRtConnectivity->restart();
-        m_pRtConnectivity->append(m_connectivitySettings);
-    }
+    m_bRepublish = true;
 }
 
 //=============================================================================================================
 
 void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 {
+    QMutexLocker locker(&m_mutex);
     m_iNumberAverages = iNumberTrials;
 }
 
@@ -548,9 +460,10 @@ void NeuronalConnectivity::onNumberTrialsChanged(int iNumberTrials)
 
 void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 {
+    QMutexLocker locker(&m_mutex);
     if (m_connectivitySettings.getWindowType() != windowType.toStdString()) {
-        m_connectivitySettings.clearIntermediateData();
         m_connectivitySettings.setWindowType(windowType.toStdString());
+        m_bSettingsChanged = true;
     }
 }
 
@@ -559,8 +472,9 @@ void NeuronalConnectivity::onWindowTypeChanged(const QString& windowType)
 void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 {
     if (triggerType != m_sAvrType) {
-        m_connectivitySettings.clearAllData();
+        QMutexLocker locker(&m_mutex);
         m_sAvrType = triggerType;
+        m_bSettingsChanged = true;
     }
 }
 
@@ -568,21 +482,10 @@ void NeuronalConnectivity::onTriggerTypeChanged(const QString& triggerType)
 
 void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHigh)
 {
-    // Convert to frequency bins
-    m_mutex.lock();
+    QMutexLocker locker(&m_mutex);
     m_fFreqBandLow = fFreqLow;
     m_fFreqBandHigh = fFreqHigh;
-    m_mutex.unlock();
-
-    QMutexLocker locker(&m_mutex);
-    if (!m_currentConnectivityResult.empty()) {
-        m_currentConnectivityResult.set_frequency_range(m_fFreqBandLow, m_fFreqBandHigh);
-        //m_currentConnectivityResult.normalize();
-        m_pCircularBuffer->push(m_currentConnectivityResult);
-    }
-
-    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_fFreqBandLow" << m_fFreqBandLow;
-    //qDebug() << "NeuronalConnectivity::onFrequencyBandChanged - m_fFreqBandHigh" << m_fFreqBandHigh;
+    m_bRepublish = true;
 }
 
 //=============================================================================================================

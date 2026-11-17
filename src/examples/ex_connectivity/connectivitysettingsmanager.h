@@ -20,10 +20,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/rt/rt_connectivity.h>
 #include <memory>
 
-#include <connectivity/metrics/abstractmetric.h>
+#include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 #include <map>
@@ -68,10 +67,10 @@ class ConnectivitySettingsManager : public QObject
 public:
     ConnectivitySettingsManager(QObject* parent = 0)
     : QObject(parent)
-    , m_pRtConnectivity(std::make_shared<RtConnectivity>())
     {
-        QObject::connect(m_pRtConnectivity.get(), &RtConnectivity::newConnectivityResultAvailable,
-                         this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
+        // Changing the number of trials computes only the spectra of added trials
+        m_settings.set_keep_trial_data(true);
+        m_settings.set_frequency_bins(0, 50);
 
         // Default frequency range
         m_fFreqBandLow = 7.0f;
@@ -90,7 +89,6 @@ public:
     }
 
     ConnectivitySettings m_settings;
-    std::shared_ptr<RtConnectivity> m_pRtConnectivity;
     std::vector<Network> m_rawNetworkData; /**< Results as computed. */
     std::vector<Network> m_networkData;    /**< Results averaged over the selected band and normalized. */
     std::map<std::string, Eigen::Vector4i> mColor;
@@ -120,11 +118,8 @@ public:
             return;
         }
 
-        m_pRtConnectivity->restart();
-
         m_settings.setConnectivityMethods({sMetric.toStdString()});
-
-        m_pRtConnectivity->append(m_settings);
+        compute();
     }
 
     void onNumberTrialsChanged(int iNumberTrials)
@@ -163,7 +158,7 @@ public:
 
         //qDebug() << "ConnectivitySettingsManager::onNumberTrialsChanged - m_indexList" << m_indexList;
 
-        m_pRtConnectivity->append(m_settings);
+        compute();
 
         //        iTime = timer.elapsed();
         //        qDebug() << "Coherency::computeCoherencyImag timer - Preparation:" << iTime;
@@ -183,11 +178,9 @@ public:
         updateNetworks();
     }
 
-    void onNewConnectivityResultAvailable(const std::vector<Network>& connectivityResults,
-                                          const std::shared_ptr<ConnectivitySettings>& connectivitySettings)
+    void compute()
     {
-        m_settings = std::move(*connectivitySettings);
-        m_rawNetworkData = connectivityResults;
+        m_rawNetworkData = compute_connectivity(m_settings);
         updateNetworks();
     }
 

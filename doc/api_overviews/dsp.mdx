@@ -68,7 +68,7 @@ These classes are designed for streaming data and run in background threads:
 | `RtCov` | Streaming noise covariance that forgets old samples with a half-life | `mne.compute_raw_covariance` | `mne_process_raw --cov` |
 | `RtInvOp` | Streaming MNE / dSPM / sLORETA that follows each new noise covariance | `mne.minimum_norm.apply_inverse_raw` | `mne_inverse_operator` |
 | `RtNoise` | Real-time noise PSD estimation | `mne.time_frequency.psd_array_welch` | — |
-| `RtConnectivity` | Real-time functional connectivity computation | `mne_connectivity` (offline) | — |
+| `RtConnectivity` | Connectivity networks over a sliding window of trials, one trial's spectra per update | `mne_connectivity` (offline) | — |
 
 ## Usage Example
 

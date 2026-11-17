@@ -36,6 +36,8 @@
 
 #include <mainwindow.h>
 
+#include <connectivity/network/network.h>
+#include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimefwdsolution.h>
@@ -88,6 +90,7 @@ private slots:
     void rtClustMneKeepsTransformItCannotRead();
     void rtClustMneLocalizesTheSources_data();
     void rtClustMneLocalizesTheSources();
+    void connectivityFollowsTheStream();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
     void passesTheStreamThrough();
@@ -389,6 +392,44 @@ void TestMneScanPlugins::rtClustMneLocalizesTheSources()
     QCOMPARE(estimate->data.rows(), fwd->nsource);
     QVERIFY(estimate->data.allFinite());
     QCOMPARE(estimate->data.minCoeff() >= 0.0, evoked);
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::connectivityFollowsTheStream()
+{
+    if (!m_info)
+        QSKIP("Sample test data not found");
+
+    std::unique_ptr<AbstractPlugin> plugin = makePlugin("NeuronalConnectivity");
+    QList<QSharedPointer<Network>> networks;
+    QMutex mutex;
+    connect(plugin->getOutputConnectors().first().data(), &PluginOutputConnector::notify, this, [&networks, &mutex](Measurement::SPtr pMeasurement) {
+        if (auto estimate = pMeasurement.dynamicCast<RealTimeConnectivityEstimate>(); estimate && estimate->getValue()) {
+            QMutexLocker locker(&mutex);
+            networks.append(QSharedPointer<Network>::create(*estimate->getValue()));
+        } }, Qt::DirectConnection);
+    QVERIFY(plugin->start());
+
+    // One-second blocks into the sensor input; each gives a network over the newest blocks
+    auto block = QSharedPointer<RealTimeMultiSampleArray>::create();
+    block->initFromFiffInfo(m_info);
+    block->setMultiArraySize(1);
+    PluginInputConnector* input = plugin->getInputConnectors().at(1).data();
+    connect(block.data(), &Measurement::notify, input, [input, &block]() { emit input->notify(block); }, Qt::DirectConnection);
+    const int blockSize = static_cast<int>(m_info->sfreq);
+    for (int from = 0; from + blockSize <= m_data.cols() && from < 12 * blockSize; from += blockSize)
+        block->setValue(m_data.middleCols(from, blockSize));
+    const bool received = QTest::qWaitFor([&]() { QMutexLocker locker(&mutex); return networks.size() >= 12; }, 20000);
+    plugin->stop();
+    QVERIFY(plugin->wait(5000));
+    QVERIFY(received);
+
+    // One node per gradiometer pair (the first of each, unless bad); normalized weights reach 1 at most
+    const Eigen::MatrixXd matrix = networks.last()->connectivity_matrix();
+    QCOMPARE(matrix.rows(), 102);
+    QVERIFY(matrix.allFinite());
+    QVERIFY(std::abs(matrix.cwiseAbs().maxCoeff() - 1.0) < 1e-12);
 }
 
 //=============================================================================================================

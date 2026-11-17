@@ -63,7 +63,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Appends @p element.
+     * Appends @p element. A push that times out leaves @p element untouched, so an rvalue can be pushed again.
      *
      * @param[in] element   The element to append.
      *

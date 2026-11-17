@@ -11,6 +11,8 @@
 
 #include <QtTest/QtTest>
 #include <memory>
+#include <random>
+#include <span>
 #include <QFile>
 #include <QTemporaryFile>
 #include <QThread>
@@ -49,6 +51,7 @@
 #include <dsp/rt/rt_filter.h>
 #include <dsp/filterkernel.h>
 
+#include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
 
 using namespace mne;
@@ -92,7 +95,7 @@ private slots:
     void dipole_fullExercise();
 
     // ---- RT Processing: RtConnectivity ----
-    void rtConnectivity_lifecycle();
+    void rtConnectivity_slidesOverTheNewestTrials();
 
     // ---- RT Processing: RtInvOp ----
     void rtInvOp_matchesTheBatchInverse();
@@ -311,31 +314,62 @@ void TestInvRtLibrary::dipole_fullExercise()
 // RT Processing: RtConnectivity
 //=============================================================================================================
 
-void TestInvRtLibrary::rtConnectivity_lifecycle()
+void TestInvRtLibrary::rtConnectivity_slidesOverTheNewestTrials()
 {
-    RtConnectivity rtConn;
-    rtConn.stop();
-    rtConn.restart();
-    rtConn.stop();
-    QThread::msleep(50);
-
-    // A result must come back across the thread boundary
-    RtConnectivity running;
+    // Two channels share a 10 Hz rhythm with a random phase per trial, a third is noise
+    std::seed_seq seed{5};
+    std::mt19937 rng(seed);
+    std::normal_distribution<double> noise(0.0, 0.3);
+    std::uniform_real_distribution<double> phase(0.0, 2.0 * M_PI);
+    std::vector<MatrixXd> trials;
+    for (int t = 0; t < 12; ++t) {
+        const double phi = phase(rng);
+        MatrixXd trial(3, 128);
+        for (int k = 0; k < trial.cols(); ++k) {
+            const double w = 2.0 * M_PI * 10.0 * k / 128.0;
+            trial(0, k) = std::sin(w + phi) + noise(rng);
+            trial(1, k) = std::sin(w + phi - 0.7) + noise(rng);
+            trial(2, k) = noise(rng);
+        }
+        trials.push_back(trial);
+    }
+    const std::vector<std::string> methods = {"COH", "IMAGCOH", "PLI", "WPLI", "USPLI", "DSWPLI", "PLV", "COR"};
     ConnectivitySettings settings;
-    settings.append(MatrixXd::Random(2, 128));
-    settings.append(MatrixXd::Random(2, 128));
     settings.setSamplingFrequency(128);
     settings.setFFTSize(128);
-    settings.setNodePositions(MatrixX3f::Identity(2, 3));
-    settings.setConnectivityMethods({"COH"});
-    QSignalSpy spy(&running, &RtConnectivity::newConnectivityResultAvailable);
-    running.append(settings);
-    QVERIFY(spy.wait(10000));
-    running.stop();
-    // The worker computes on its own snapshot and hands it back with the trials
-    const auto returned = spy.first().at(1).value<std::shared_ptr<ConnectivitySettings>>();
-    QVERIFY(returned && returned.get() != &settings);
-    QCOMPARE(returned->size(), 2);
+    settings.setWindowType("hanning");
+    settings.set_frequency_bins(8, 5);
+    settings.setNodePositions(MatrixX3f::Zero(3, 3));
+    settings.setConnectivityMethods(methods);
+
+    // Each update gives what compute_connectivity gives for the five newest trials
+    const int window = 5;
+    RtConnectivity rtConnectivity(settings, window);
+    for (std::size_t t = 0; t < trials.size(); ++t) {
+        const std::vector<Network> streamed = rtConnectivity.update(trials[t]);
+        ConnectivitySettings batch = settings;
+        const std::size_t first = t + 1 > window ? t + 1 - window : 0;
+        batch.append(std::span(trials).subspan(first, t + 1 - first));
+        const std::vector<Network> expected = compute_connectivity(batch);
+        QCOMPARE(streamed.size(), methods.size());
+        QCOMPARE(rtConnectivity.settings().size(), static_cast<int>(t + 1 - first));
+        for (std::size_t m = 0; m < methods.size(); ++m) {
+            // The unbiased estimators are undefined, NaN, for a single trial
+            const MatrixXd a = streamed[m].connectivity_matrix();
+            const MatrixXd b = expected[m].connectivity_matrix();
+            QCOMPARE(streamed[m].method(), expected[m].method());
+            QVERIFY((a.array().isNaN() == b.array().isNaN()).all());
+            const double error = (a - b).array().isNaN().select(0.0, (a - b).cwiseAbs()).maxCoeff();
+            QVERIFY2(error < 1e-9, qPrintable(QString("%1 after trial %2: %3").arg(QString::fromStdString(streamed[m].method())).arg(t).arg(error)));
+        }
+    }
+
+    // A longer trial starts the window over
+    MatrixXd longer = MatrixXd::Random(3, 256);
+    QCOMPARE(rtConnectivity.update(longer).size(), methods.size());
+    QCOMPARE(rtConnectivity.settings().size(), 1);
+    rtConnectivity.reset();
+    QVERIFY(rtConnectivity.networks().empty());
 }
 
 //=============================================================================================================

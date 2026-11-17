@@ -141,6 +141,13 @@ void TestCircularBuffer::testMovesMatrices()
     Eigen::MatrixXd b;
     QVERIFY(buffer.pop(b));
     QVERIFY(b.isApprox(a));
+
+    // A push that times out leaves the element it was given, so the caller can retry it
+    CircularBuffer<Eigen::MatrixXd> full(1, 10ms);
+    QVERIFY(full.push(Eigen::MatrixXd(a)));
+    Eigen::MatrixXd retry = a;
+    QVERIFY(!full.push(std::move(retry)));
+    QVERIFY(retry.isApprox(a)); // NOLINT(bugprone-use-after-move,clang-analyzer-cplusplus.Move): a timed-out push does not move
 }
 
 //=============================================================================================================

@@ -61,7 +61,9 @@
 #include <format>
 #include <print>
 #include <random>
+#include <span>
 #include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -228,39 +230,37 @@ int main(int argc, char* argv[])
                  std::format("RtNoise: 25 Hz at {:.4f} dB, 50 Hz at {:.4f} dB match scipy.signal.welch", spectrum(0, 8), spectrum(0, 16)));
 
     // ---------------------------------------------------------------------------------------------------------
-    // Connectivity: the same network as compute_connectivity, computed on a worker thread
+    // Connectivity: coherence of the newest trials, updated trial by trial
     ConnectivitySettings settings;
-    for (int trial = 0; trial < 5; ++trial) {
+    settings.setSamplingFrequency(256);
+    settings.setFFTSize(256);
+    settings.setWindowType("hanning");
+    settings.setNodePositions(MatrixX3f::Identity(2, 3));
+    settings.setConnectivityMethods({"COH"});
+    std::vector<MatrixXd> trials;
+    for (int trial = 0; trial < 8; ++trial) {
         MatrixXd data(2, 256);
         for (int t = 0; t < 256; ++t) {
             const double alpha = std::sin(2.0 * kPi * 10.0 * t / 256.0 + trial);
             data(0, t) = alpha + 0.3 * normal(gen) * 1e12;
             data(1, t) = alpha + 0.3 * normal(gen) * 1e12;
         }
-        settings.append(data);
+        trials.push_back(std::move(data));
     }
-    settings.setSamplingFrequency(256);
-    settings.setFFTSize(256);
-    settings.setWindowType("hanning");
-    settings.setNodePositions(MatrixX3f::Identity(2, 3));
-    settings.setConnectivityMethods({"COH"});
-    const MatrixXd offline = compute_connectivity(settings).front().connectivity_matrix();
 
     //! [rt_connectivity_usage]
-    RtConnectivity rtConnectivity;
-    MatrixXd online;
-    bool connectivityDone = false;
-    QObject::connect(&rtConnectivity, &RtConnectivity::newConnectivityResultAvailable,
-                     [&](const std::vector<Network>& networks, const std::shared_ptr<ConnectivitySettings>&) {
-                         online = networks.front().connectivity_matrix();
-                         connectivityDone = true;
-                     });
-    rtConnectivity.append(settings); // computed on the worker thread
+    RtConnectivity rtConnectivity(settings, 5); // networks of the five newest trials
+    std::vector<Network> networks;
+    for (const MatrixXd& trial : trials) {
+        networks = rtConnectivity.update(trial); // spectra of this trial only; the oldest one drops out
+    }
     //! [rt_connectivity_usage]
-    const bool connectivityArrived = waitFor(connectivityDone, 10000);
-    ok &= expect(connectivityArrived && online.isApprox(offline),
-                 std::format("RtConnectivity equals compute_connectivity (coherence {:.3f})", online.size() ? online(0, 1) : 0.0));
-    rtConnectivity.stop();
+    ConnectivitySettings newest = settings;
+    newest.append(std::span(trials).last(5));
+    const MatrixXd offline = compute_connectivity(newest).front().connectivity_matrix();
+    const MatrixXd online = networks.front().connectivity_matrix();
+    ok &= expect(online.isApprox(offline),
+                 std::format("RtConnectivity equals compute_connectivity of the newest trials (coherence {:.3f})", online(0, 1)));
 
     // ---------------------------------------------------------------------------------------------------------
     // HPI: fit the four coils of the test recording
