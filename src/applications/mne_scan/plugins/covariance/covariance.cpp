@@ -18,6 +18,8 @@
 
 #include "covariance.h"
 #include <memory>
+#include <numbers>
+#include <optional>
 
 #include "FormFiles/covariancesetupwidget.h"
 
@@ -229,21 +231,31 @@ void Covariance::run()
     }
 
     MatrixXd matData;
-    m_mutex.lock();
-    int iEstimationSamples = m_iEstimationSamples;
-    m_mutex.unlock();
-    mne::RtCov rtCov(*m_pFiffInfo);
+    int iEstimationSamples = 0;
+    std::optional<mne::RtCov> rtCov;
+    int newSamples = 0;
 
     // Start processing data
     while (!isInterruptionRequested()) {
         // Get the current data
         if (m_pCircularBuffer->pop(matData)) {
             m_mutex.lock();
-            iEstimationSamples = m_iEstimationSamples;
+            const int samples = m_iEstimationSamples;
             m_mutex.unlock();
+            if (!rtCov || samples != iEstimationSamples) {
+                iEstimationSamples = samples;
+                // An exponential window of this half-life holds iEstimationSamples effective samples
+                rtCov.emplace(*m_pFiffInfo, iEstimationSamples * std::numbers::ln2 / (2.0 * m_pFiffInfo->sfreq));
+                newSamples = 0;
+            }
 
-            if (const std::optional<FiffCov> fiffCov = rtCov.estimate_covariance(matData, iEstimationSamples)) {
-                m_pCovarianceOutput->measurementData()->setValue(*fiffCov);
+            rtCov->update(matData);
+            newSamples += static_cast<int>(matData.cols());
+            if (newSamples >= iEstimationSamples) {
+                if (const std::optional<FiffCov> fiffCov = rtCov->covariance()) {
+                    m_pCovarianceOutput->measurementData()->setValue(*fiffCov);
+                    newSamples = 0;
+                }
             }
         }
     }

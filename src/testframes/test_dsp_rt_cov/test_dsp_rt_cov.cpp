@@ -11,6 +11,9 @@
  */
 
 #include <QtTest/QtTest>
+
+#include <cmath>
+#include <limits>
 #include <memory>
 
 #include <dsp/rt/rt_cov.h>
@@ -23,9 +26,10 @@ using namespace Eigen;
 namespace
 {
 
-std::shared_ptr<FiffInfo> makeSyntheticInfo()
+std::shared_ptr<FiffInfo> makeSyntheticInfo(double sfreq = 0.0)
 {
     std::shared_ptr<FiffInfo> info(new FiffInfo);
+    info->sfreq = sfreq;
 
     for (int i = 0; i < 2; ++i) {
         FiffChInfo ch;
@@ -44,6 +48,16 @@ std::shared_ptr<FiffInfo> makeSyntheticInfo()
     return info;
 }
 
+MatrixXd wave(Index samples)
+{
+    MatrixXd data(2, samples);
+    for (Index t = 0; t < samples; ++t) {
+        data(0, t) = std::sin(0.7 * static_cast<double>(t));
+        data(1, t) = 0.3 * static_cast<double>(t) - std::cos(1.3 * static_cast<double>(t));
+    }
+    return data;
+}
+
 }
 
 class TestDspRtCov : public QObject
@@ -51,15 +65,12 @@ class TestDspRtCov : public QObject
     Q_OBJECT
 
 private slots:
-    void returnsNothingUntilEnoughSamples()
+    void returnsNothingUntilTwoSamples()
     {
         RtCov cov(*makeSyntheticInfo());
-
-        MatrixXd block(2, 2);
-        block << 1.0, 2.0,
-            2.0, 4.0;
-
-        QVERIFY(!cov.estimate_covariance(block, 3));
+        QVERIFY(!cov.covariance());
+        cov.update(MatrixXd::Ones(2, 1));
+        QVERIFY(!cov.covariance());
     }
 
     void computesExpectedRegularizedCovariance()
@@ -69,8 +80,9 @@ private slots:
         MatrixXd block(2, 3);
         block << 1.0, 2.0, 3.0,
             2.0, 4.0, 6.0;
+        cov.update(block);
 
-        const std::optional<FiffCov> result = cov.estimate_covariance(block, 3);
+        const std::optional<FiffCov> result = cov.covariance();
         QVERIFY(result);
         QCOMPARE(result->dim, 2);
         QCOMPARE(result->nfree, 3);
@@ -80,44 +92,110 @@ private slots:
         QVERIFY((result->data - (Matrix2d() << 1.25, 2.0, 2.0, 4.25).finished()).cwiseAbs().maxCoeff() < 1e-9);
     }
 
-    void blocksGiveTheCovarianceOfTheirConcatenation()
+    void blocksGiveTheCovarianceOfTheirConcatenation_data()
     {
-        MatrixXd all(2, 12);
-        for (int t = 0; t < all.cols(); ++t) {
-            all(0, t) = std::sin(0.7 * t);
-            all(1, t) = 0.3 * t - std::cos(1.3 * t);
-        }
-        RtCov whole(*makeSyntheticInfo());
-        const FiffCov expected = whole.estimate_covariance(all, 12).value();
-
-        RtCov blocks(*makeSyntheticInfo());
-        QVERIFY(!blocks.estimate_covariance(all.leftCols(5), 12));
-        QVERIFY(!blocks.estimate_covariance(all.middleCols(5, 4), 12));
-        const std::optional<FiffCov> result = blocks.estimate_covariance(all.rightCols(3), 12);
-        QVERIFY(result);
-        QCOMPARE(result->nfree, 12);
-        QVERIFY((result->data - expected.data).cwiseAbs().maxCoeff() < 1e-12);
+        QTest::addColumn<double>("halfLife");
+        QTest::newRow("all samples") << std::numeric_limits<double>::infinity();
+        QTest::newRow("half-life 4 samples") << 4.0;
     }
 
-    void resetsAfterCompletedEstimate()
+    void blocksGiveTheCovarianceOfTheirConcatenation()
+    {
+        QFETCH(double, halfLife);
+        const MatrixXd all = wave(12);
+        RtCov whole(*makeSyntheticInfo(1.0), halfLife);
+        whole.update(all);
+        const FiffCov expected = whole.covariance().value();
+
+        RtCov blocks(*makeSyntheticInfo(1.0), halfLife);
+        blocks.update(all.leftCols(5));
+        blocks.update(all.middleCols(5, 4));
+        blocks.update(all.rightCols(3));
+        const FiffCov result = blocks.covariance().value();
+        QCOMPARE(result.nfree, expected.nfree);
+        QVERIFY((result.data - expected.data).cwiseAbs().maxCoeff() < 1e-12 * expected.data.cwiseAbs().maxCoeff());
+    }
+
+    void forgettingWeighsSamplesByTheirAge()
+    {
+        // Half-life 0.05 s at 100 Hz: a sample five samples older counts half as much
+        const MatrixXd all = wave(40);
+        RtCov cov(*makeSyntheticInfo(100.0), 0.05);
+        cov.update(all.leftCols(17));
+        cov.update(all.rightCols(23));
+        const FiffCov result = cov.covariance().value();
+
+        // numpy.cov(all, aweights=w) with w = 0.5 ** (age / 5)
+        VectorXd w(all.cols());
+        for (Index t = 0; t < all.cols(); ++t) {
+            w(t) = std::pow(0.5, static_cast<double>(all.cols() - 1 - t) / 5.0);
+        }
+        const double v1 = w.sum();
+        const double v2 = w.squaredNorm();
+        const MatrixXd centred = all.colwise() - all * w / v1;
+        const MatrixXd raw = centred * w.asDiagonal() * centred.transpose() / (v1 - v2 / v1);
+        const MatrixXd expected = raw + MatrixXd::Identity(2, 2) * 0.1 * raw.diagonal().mean();
+        QVERIFY((result.data - expected).cwiseAbs().maxCoeff() < 1e-12 * expected.cwiseAbs().maxCoeff());
+        QCOMPARE(result.nfree, static_cast<int>(std::lround(v1 * v1 / v2)));
+    }
+
+    void followsAChangeInTheNoise()
+    {
+        // Unit variance for 10 s, then variance 9: a 0.1 s half-life has forgotten the first part after 1 s
+        const double sfreq = 1000.0;
+        RtCov tracking(*makeSyntheticInfo(sfreq), 0.1);
+        RtCov everything(*makeSyntheticInfo(sfreq));
+        for (int second = 0; second < 11; ++second) {
+            MatrixXd block = MatrixXd::Zero(2, 1000);
+            for (Index t = 0; t < block.cols(); ++t) {
+                // Deterministic, uncorrelated, zero mean and unit variance per channel
+                block(0, t) = std::sqrt(2.0) * std::sin(2.1 * static_cast<double>(t));
+                block(1, t) = std::sqrt(2.0) * std::cos(2.9 * static_cast<double>(t));
+            }
+            if (second == 10) {
+                block *= 3.0;
+            }
+            tracking.update(block);
+            everything.update(block);
+        }
+        const double variance = tracking.covariance().value().data(0, 0) / 1.1;
+        const double average = everything.covariance().value().data(0, 0) / 1.1;
+        QVERIFY2(std::fabs(variance - 9.0) < 0.1, qPrintable(QString::number(variance)));
+        QVERIFY2(average < 2.0, qPrintable(QString::number(average)));
+    }
+
+    void keepsPrecisionWithALargeOffset()
+    {
+        // 1 nV noise on a 10 mV offset; summing raw outer products loses it to cancellation
+        MatrixXd block = wave(1000) * 1e-9;
+        block.array() += 1e-2;
+        RtCov cov(*makeSyntheticInfo());
+        for (Index start = 0; start < block.cols(); start += 100) {
+            cov.update(block.middleCols(start, 100));
+        }
+        const MatrixXd centred = block.colwise() - block.rowwise().mean();
+        const MatrixXd raw = centred * centred.transpose() / static_cast<double>(block.cols() - 1);
+        const double expected = raw(0, 1);
+        const double result = cov.covariance().value().data(0, 1);
+        QVERIFY2(std::fabs(result - expected) < 1e-6 * std::fabs(expected), qPrintable(QString("%1 vs %2").arg(result).arg(expected)));
+    }
+
+    void resetStartsOver()
     {
         RtCov cov(*makeSyntheticInfo());
-
-        MatrixXd first(2, 3);
-        first << 1.0, 2.0, 3.0,
-            3.0, 2.0, 1.0;
-        QVERIFY(cov.estimate_covariance(first, 3));
-
-        MatrixXd second(2, 1);
-        second << 10.0,
-            20.0;
-        QVERIFY(!cov.estimate_covariance(second, 2));
+        cov.update(wave(10));
+        QVERIFY(cov.covariance());
+        cov.reset();
+        QVERIFY(!cov.covariance());
+        cov.update(MatrixXd::Ones(2, 1));
+        QVERIFY(!cov.covariance());
     }
 
     void needsMeasurementInfo()
     {
         RtCov cov{FiffInfo()};
-        QVERIFY(!cov.estimate_covariance(MatrixXd::Ones(2, 10), 3));
+        cov.update(MatrixXd::Ones(2, 10));
+        QVERIFY(!cov.covariance());
     }
 };
 

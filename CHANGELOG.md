@@ -690,13 +690,19 @@ aliases; replace the old spelling as below.
   on the thread of your choice. The MNE Scan source localization plugin now
   builds the operator on a pool thread and, while one is being built, keeps
   only the newest covariance instead of queueing every estimate.
-- `RtCov` is a plain class with no Qt. It accumulates the channel sums and
-  outer products of every block instead of keeping all blocks until the
-  estimate, so its memory no longer grows with the number of samples.
-  Migration: `RtCov(std::shared_ptr<FiffInfo>)` → `RtCov(const FiffInfo&)`;
-  `estimateCovariance(data, n)` → `estimate_covariance(data, n)`, which
-  returns `std::optional<FiffCov>` instead of an empty `FiffCov` before
-  enough samples have arrived. `RtCovComputeResult` is removed.
+- `RtCov` is a plain class with no Qt that follows the noise as it changes.
+  With a half-life, older samples count exponentially less (the weighted
+  numpy.cov with aweights); without one, every sample counts the same. Each
+  block is one rank update of the running mean and centred scatter, so memory
+  no longer grows with the number of samples, and a large DC offset no longer
+  costs precision: the old sums of raw outer products lost a fifth of a 1 nV
+  covariance on a 10 mV offset. The MNE Scan covariance plugin uses a
+  half-life of about its sample count and keeps estimating instead of
+  starting over after each estimate. Migration:
+  `RtCov(std::shared_ptr<FiffInfo>)` → `RtCov(const FiffInfo&, halfLife)`;
+  `estimateCovariance(data, n)` → `update(data)`, then `covariance()`, which
+  returns `std::optional<FiffCov>`, and `reset()` to start over.
+  `RtCovComputeResult` is removed.
 - Trigger detection (`dsp/rt/rt_detect_trigger.h`) uses standard C++ only.
   The gradient detector subtracted the first sample's value from every
   sample-to-sample change when asked to remove an offset, so on a trigger
