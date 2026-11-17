@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 374 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 375 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **Accuracy** `[enum]` in [mne](/docs/api/fiff/)
 - **acq_build_date_time** `[fn]` in [mne](/docs/api/fiff/)
@@ -114,10 +114,10 @@ Index of 374 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **defaultRowVectorXi** `[var]` in [mne](/docs/api/fiff/)
 - **defaultTris** `[fn]` in [mne](/docs/api/fiff/)
 - **defaultVectorXi** `[var]` in [mne](/docs/api/fiff/)
-- **detectTriggerFlanksGrad** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksGrad** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksMax** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
-- **detectTriggerFlanksMax** `[fn]` in [mne](/docs/api/fiff/) — detectTriggerFlanks detects flanks from a given data matrix in row wise order.
+- **detect_trigger_flanks_grad** `[fn]` in [mne](/docs/api/fiff/) — Finds the samples of one channel whose change from the previous sample reaches a threshold.
+- **detect_trigger_flanks_grad** `[fn]` in [mne](/docs/api/fiff/) — `detect_trigger_flanks_grad()` for several channels.
+- **detect_trigger_flanks_max** `[fn]` in [mne](/docs/api/fiff/) — Finds the samples of one channel whose value reaches a threshold.
+- **detect_trigger_flanks_max** `[fn]` in [mne](/docs/api/fiff/) — `detect_trigger_flanks_max()` for several channels.
 - **dipoleFitFuncs** `[type]` in [mne](/docs/api/fiff/) — Pointer alias for [`dipoleFitFuncsRec`](/docs/api/inv/dipole-fit-funcs-rec), used throughout the dipole fitting module.
 - **Direction** `[enum]` in [mne](/docs/api/fiff/) — Selects which incident edges of a node count.
 - **discard3DPointOutliers** `[fn]` in [mne](/docs/api/fiff/) — Discard outliers compared to a given 3D surface.
@@ -165,6 +165,7 @@ Index of 374 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fitMatchedPoints** `[fn]` in [mne](/docs/api/fiff/) — Corresponding point set registration using quaternions.
 - **fitUser** `[type]` in [mne](/docs/api/fiff/)
 - **fixStimArtifact** `[fn]` in [mne](/docs/api/fiff/) — Repair stimulus artifacts by interpolating or zeroing data around events.
+- **FlankDirection** `[enum]` in [mne](/docs/api/fiff/) — Which flanks the gradient detector finds.
 - **format_iso8601** `[fn]` in [mne](/docs/api/fiff/)
 - **from_base64** `[fn]` in [mne](/docs/api/fiff/)
 - **from_big_endian** `[fn]` in [mne](/docs/api/fiff/)
@@ -363,13 +364,13 @@ Index of 374 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **to_base64** `[fn]` in [mne](/docs/api/fiff/)
 - **to_big_endian** `[fn]` in [mne](/docs/api/fiff/)
 - **to_double** `[fn]` in [mne](/docs/api/fiff/)
+- **to_event_matrix** `[fn]` in [mne](/docs/api/fiff/)
 - **to_hex** `[fn]` in [mne](/docs/api/fiff/)
 - **to_int** `[fn]` in [mne](/docs/api/fiff/)
 - **to_lower** `[fn]` in [mne](/docs/api/fiff/)
 - **to_string** `[fn]` in [mne](/docs/api/fiff/)
 - **to_string** `[fn]` in [mne](/docs/api/fiff/)
 - **toDLPack** `[fn]` in [mne](/docs/api/fiff/) — Exports one part of `view` as a read-only DLPack tensor of shape channels x samples, without a copy.
-- **toEventMatrix** `[fn]` in [mne](/docs/api/fiff/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
 - **toFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Builds FIFF measurement info for a stream, e.g.
 - **tokenIds** `[fn]` in [mne](/docs/api/fiff/) — Extract just the integer token IDs from a token sequence (discarding continuous values).
 - **tokenize** `[fn]` in [mne](/docs/api/fiff/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.

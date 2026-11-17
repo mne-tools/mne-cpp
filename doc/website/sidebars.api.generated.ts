@@ -319,7 +319,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/derivation-rule',
         'api/dsp/dpss-result',
         'api/dsp/epoch-extractor-params',
-        'api/dsp/spectogram-input-data'
+        'api/dsp/spectogram-input-data',
+        'api/dsp/trigger-flank'
       ],
     },
     {

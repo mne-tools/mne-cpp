@@ -71,7 +71,7 @@ e.g. NewParksMcClellan(33, 0.7, 0.2, 0.1, HPF); gives a 33 tap high pass filter 
 
 FIR filter design, application and storage with the dsp library.
 
-````cpp title="src/examples/ex_dsp_filter/main.cpp, line 138"
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 139"
 // Equiripple 65-tap low-pass, corner 0.08 pi (40 Hz at 1 kHz), transition 0.04 pi
 ParksMcClellan parksMcClellan(65, 0.08, 0.0, 0.04, ParksMcClellan::LPF);
 const double pm10 = gain(parksMcClellan.coefficients, 10.0, kSFreq);

@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 487,
+    "exported_classes": 488,
     "exported_free_functions": 151,
-    "registered_classes": 579,
+    "registered_classes": 580,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 80,
     "registered_stale": 0,
     "registered_with_test": 245,
     "registered_test_unresolved": 0,
-    "registered_with_example": 428,
+    "registered_with_example": 429,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 462,
-    "public_api_units": 581,
-    "example_eligible": 428,
+    "with_snippet": 463,
+    "public_api_units": 582,
+    "example_eligible": 429,
     "example_exempt": 153,
-    "eligible_backed_by_registry_example": 426,
-    "eligible_used_by_some_example": 370,
+    "eligible_backed_by_registry_example": 427,
+    "eligible_used_by_some_example": 371,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -108,13 +108,13 @@
       "with_snippet": 18
     },
     "dsp": {
-      "public": 86,
-      "registered": 86,
+      "public": 87,
+      "registered": 87,
       "with_test": 30,
-      "eligible": 82,
-      "eligible_with_registry_example": 82,
-      "eligible_used_by_example": 82,
-      "with_snippet": 86
+      "eligible": 83,
+      "eligible_with_registry_example": 83,
+      "eligible_used_by_example": 83,
+      "with_snippet": 87
     },
     "fiff": {
       "public": 39,
@@ -755,27 +755,27 @@
       "library": "dsp"
     },
     {
-      "name": "toEventMatrix",
+      "name": "to_event_matrix",
       "header": "dsp/rt/rt_detect_trigger.h",
       "library": "dsp"
     },
     {
-      "name": "detectTriggerFlanksMax",
+      "name": "detect_trigger_flanks_max",
       "header": "dsp/rt/rt_detect_trigger.h",
       "library": "dsp"
     },
     {
-      "name": "detectTriggerFlanksMax",
+      "name": "detect_trigger_flanks_max",
       "header": "dsp/rt/rt_detect_trigger.h",
       "library": "dsp"
     },
     {
-      "name": "detectTriggerFlanksGrad",
+      "name": "detect_trigger_flanks_grad",
       "header": "dsp/rt/rt_detect_trigger.h",
       "library": "dsp"
     },
     {
-      "name": "detectTriggerFlanksGrad",
+      "name": "detect_trigger_flanks_grad",
       "header": "dsp/rt/rt_detect_trigger.h",
       "library": "dsp"
     },
@@ -8137,6 +8137,29 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov."
+    },
+    {
+      "name": "TriggerFlank",
+      "header": "dsp/rt/rt_detect_trigger.h",
+      "library": "dsp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": null,
+      "test_resolves": false,
+      "example": "ex_dsp_filter",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_filter"
+      ],
+      "snippets": [
+        "ex_dsp_filter/main.cpp#trigger_detection_usage"
+      ],
+      "api_page": "doc/website/docs/api/dsp/trigger-flank.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "FilterObject",

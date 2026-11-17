@@ -33,7 +33,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9863,
+    "tokens": 9792,
     "gui_outside_design": []
   },
   "libraries": {
@@ -154,9 +154,9 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6030,
+      "tokens": 6027,
       "by_category": {
-        "containers": 477,
+        "containers": 474,
         "files": 106,
         "global": 1257,
         "gui": 924,
@@ -208,16 +208,16 @@
       ]
     },
     "dsp": {
-      "tokens": 316,
+      "tokens": 248,
       "by_category": {
-        "containers": 79,
-        "global": 119,
+        "containers": 24,
+        "global": 111,
         "objects_signals": 79,
-        "other": 3,
-        "strings": 15,
+        "other": 2,
+        "strings": 11,
         "threads": 21
       },
-      "public_header_includes": 14,
+      "public_header_includes": 13,
       "q_object": 11,
       "files": 93,
       "modules": [
