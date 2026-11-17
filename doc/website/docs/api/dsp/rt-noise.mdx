@@ -15,107 +15,51 @@ sidebar_position: 39
 class mne::RtNoise
 ```
 
-Controller that manages [`RtNoiseWorker`](/docs/api/dsp/rt-noise-worker) for real-time noise spectrum estimation.
+Estimates the noise power spectral density of streaming data.
 
 ```cpp title="src/examples/ex_dsp_rt/main.cpp"
-RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
+RtNoise noise(64, info200->sfreq, 10); // 64-point FFT over 10 accumulated blocks
 MatrixXd spectrum;
-QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });
 for (int b = 0; b < 10; ++b) {
-    noiseWorker.doWork(tones.middleCols(64 * b, 64)); // dB re unit^2/Hz, channels x (fft/2 + 1)
+    if (auto psd = noise.estimate_spectrum(tones.middleCols(64 * b, 64))) { // dB re unit^2/Hz, channels x (fft/2 + 1)
+        spectrum = std::move(*psd);
+    }
 }
-```
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtNoise
 ```
 
 ---
 
 ## Public Methods
 
-### RtNoise(iFftLength, pFiffInfo, iDataLength, parent)
-
-Creates the real-time noise estimation object.
+### RtNoise(fftLength, sfreq, blocks)
 
 **Parameters:**
 
-- **iFftLength** : *qint32*
-  Number of samples per FFT window.
+- **fftLength** : *int*
+  Number of samples per FFT segment.
 
-- **pFiffInfo** : *const std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt; &*
-  Associated Fiff Information.
+- **sfreq** : *double*
+  Sampling frequency in Hz.
 
-- **iDataLength** : *qint32*
-  Number of blocks to accumulate before computing.
-
-- **parent** : *QObject **
-  Parent QObject (optional).
+- **blocks** : *int*
+  Number of blocks to accumulate before a spectrum is estimated (at least 1).
 
 ---
 
-### ~RtNoise()
+### estimate_spectrum(data)
 
-Destroys the real-time noise estimation object.
+Adds a block of data and returns the spectrum once enough blocks have arrived.
 
----
-
-### append(matData)
-
-Submit incoming data for noise estimation.
+Blocks may have any number of samples; a block with another number of channels than the blocks before it starts the accumulation over.
 
 **Parameters:**
 
-- **matData** : *const Eigen::MatrixXd &*
-  Data block (channels x samples).
-
----
-
-### isRunning()
-
-Returns whether the worker thread is running.
+- **data** : *const Eigen::MatrixXd &*
+  A block of data, channels by samples.
 
 **Returns:**
 
-- *bool* — True between `start()` and `stop()`, false otherwise.
-
----
-
-### start()
-
-Starts the worker thread.
-
-**Returns:**
-
-- *bool* — true on success.
-
----
-
-### stop()
-
-Stops the worker thread.
-
-**Returns:**
-
-- *bool* — true on success.
-
----
-
-### wait(time)
-
-Blocks until the worker thread has finished, or until the timeout (ms) expires.
-
-**Parameters:**
-
-- **time** : *unsigned long*
-  Timeout in ms; ULONG_MAX waits indefinitely.
-
-**Returns:**
-
-- *bool* — True if the thread finished, false if the timeout expired.
+- *std::optional&lt; Eigen::MatrixXd &gt;* — The PSD in dB re unit^2/Hz, channels by fftLength / 2 + 1 frequencies, once the configured number of blocks has arrived, after which the next estimate starts from nothing; no value before that.
 
 ---
 
@@ -132,17 +76,17 @@ Blocks until the worker thread has finished, or until the timeout (ms) expires.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 231"
-RtNoise rtNoise(64, info200, 10);
-bool noiseDone = false;
-QObject::connect(&rtNoise, &RtNoise::SpecCalculated, [&](const MatrixXd& psd) { noiseDone = psd.topRows(2).isApprox(spectrum.topRows(2)); }); // the empty stim row is -inf dB
-rtNoise.start();
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 220"
+RtNoise noise(64, info200->sfreq, 10); // 64-point FFT over 10 accumulated blocks
+MatrixXd spectrum;
 for (int b = 0; b < 10; ++b) {
-    rtNoise.append(tones.middleCols(64 * b, 64));
+    if (auto psd = noise.estimate_spectrum(tones.middleCols(64 * b, 64))) { // dB re unit^2/Hz, channels x (fft/2 + 1)
+        spectrum = std::move(*psd);
+    }
 }
-ok &= expect(waitFor(noiseDone, 5000), "RtNoise emits the same spectrum from its worker thread");
-rtNoise.stop();
-rtNoise.wait(2000);
+// scipy.signal.welch(x, 200, window=hann(66)[1:-1], nperseg=64, noverlap=0, detrend=False): 25 Hz -9.6521 dB, 50 Hz -29.6587 dB
+ok &= expect(spectrum.cols() == 33 && std::fabs(spectrum(0, 8) + 9.652129129685868) < 1e-6 && std::fabs(spectrum(0, 16) + 29.658719433796943) < 1e-6,
+             std::format("RtNoise: 25 Hz at {:.4f} dB, 50 Hz at {:.4f} dB match scipy.signal.welch", spectrum(0, 8), spectrum(0, 16)));
 ````
 
 ## Authors of this file

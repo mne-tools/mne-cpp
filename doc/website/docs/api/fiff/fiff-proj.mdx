@@ -248,7 +248,7 @@ ok &= expect(eventsWritten && eventsBack.rows() == 25 && eventsBack(0, 0) == 139
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 283"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 273"
 ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
 MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
 FiffInfo projInfo = *hpiInfo;

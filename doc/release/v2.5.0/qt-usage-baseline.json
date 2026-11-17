@@ -33,7 +33,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9786,
+    "tokens": 9757,
     "gui_outside_design": []
   },
   "libraries": {
@@ -208,17 +208,17 @@
       ]
     },
     "dsp": {
-      "tokens": 242,
+      "tokens": 213,
       "by_category": {
-        "containers": 22,
-        "global": 111,
-        "objects_signals": 77,
+        "containers": 18,
+        "global": 100,
+        "objects_signals": 65,
         "other": 2,
         "strings": 11,
-        "threads": 19
+        "threads": 17
       },
-      "public_header_includes": 11,
-      "q_object": 10,
+      "public_header_includes": 10,
+      "q_object": 8,
       "files": 93,
       "modules": [
         "Concurrent",
