@@ -284,7 +284,7 @@ ok &= expect(cov.dim == 366 && cov.nfree == 15972 && cov.bads.size() == 2 && cov
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 197"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 196"
 RtCov rtCov(*info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {

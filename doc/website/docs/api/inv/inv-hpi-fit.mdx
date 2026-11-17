@@ -169,12 +169,12 @@ InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 289"
-hpiWorker.doWork(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer());
-HpiFitResult direct;
-InvHpiFit(updater.getSensors()).fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), direct);
-ok &= expect(workerFit.GoF.size() == 4 && workerFit.GoF.minCoeff() > 0.98 && workerFit.devHeadTrans.trans.isApprox(direct.devHeadTrans.trans, 1e-6f),
-             std::format("RtHpiWorker fits 4 coils (GoF >= {:.4f}) like InvHpiFit", workerFit.GoF.size() ? workerFit.GoF.minCoeff() : 0.0));
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 285"
+InvHpiFit hpiFit(updater.getSensors()); // fit one block; run it on any thread for continuous tracking
+HpiFitResult fit;
+hpiFit.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), fit);
+ok &= expect(fit.GoF.size() == 4 && fit.GoF.minCoeff() > 0.98 && fit.devHeadTrans.from == FIFFV_COORD_DEVICE && fit.devHeadTrans.to == FIFFV_COORD_HEAD,
+             std::format("InvHpiFit fits 4 coils (GoF >= {:.4f}) device to head", fit.GoF.size() ? fit.GoF.minCoeff() : 0.0));
 ````
 
 ### [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx)

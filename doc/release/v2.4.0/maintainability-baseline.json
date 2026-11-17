@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "scripts/quality/audit_maintainability.py",
   "policy": "scripts/quality/maintainability_policy.json",
-  "scanned_files": 1593,
-  "scanned_lines": 409038,
+  "scanned_files": 1591,
+  "scanned_lines": 408642,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -108,11 +108,11 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 901,
-      "files": 103,
+      "total": 899,
+      "files": 102,
       "by_scope": {
         "applications": 782,
-        "libraries": 119
+        "libraries": 117
       },
       "suppressed": [],
       "top": {
@@ -234,7 +234,6 @@
         "src/libraries/disp3D/workers/rtsourcedatacontroller.cpp": 2,
         "src/libraries/dsp/rt/rt_averaging.cpp": 2,
         "src/libraries/dsp/rt/rt_connectivity.cpp": 2,
-        "src/libraries/dsp/rt/rt_hpis.cpp": 2,
         "src/libraries/dsp/rt/rt_inv_op.cpp": 2
       }
     }

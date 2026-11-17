@@ -145,7 +145,7 @@ InvHpiModelParameters hpiModelParameters(vecFreqs,
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 282"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 281"
 InvHpiDataUpdater updater(hpiInfo); // MEG picks, sensor geometry and digitised coil positions
 updater.prepareDataAndProjectors(hpiData, projectors);
 const InvHpiModelParameters model(std::vector<int>({166, 154, 161, 158}), hpiInfo->sfreq, hpiInfo->linefreq, false);

@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 487,
+    "exported_classes": 485,
     "exported_free_functions": 151,
-    "registered_classes": 578,
+    "registered_classes": 576,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 79,
     "registered_stale": 0,
     "registered_with_test": 245,
     "registered_test_unresolved": 0,
-    "registered_with_example": 428,
+    "registered_with_example": 426,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 461,
-    "public_api_units": 580,
-    "example_eligible": 428,
+    "with_snippet": 459,
+    "public_api_units": 578,
+    "example_eligible": 426,
     "example_exempt": 152,
-    "eligible_backed_by_registry_example": 426,
-    "eligible_used_by_some_example": 370,
+    "eligible_backed_by_registry_example": 424,
+    "eligible_used_by_some_example": 368,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -108,13 +108,13 @@
       "with_snippet": 18
     },
     "dsp": {
-      "public": 85,
-      "registered": 85,
+      "public": 83,
+      "registered": 83,
       "with_test": 30,
-      "eligible": 82,
-      "eligible_with_registry_example": 82,
-      "eligible_used_by_example": 82,
-      "with_snippet": 85
+      "eligible": 80,
+      "eligible_with_registry_example": 80,
+      "eligible_used_by_example": 80,
+      "with_snippet": 83
     },
     "fiff": {
       "public": 39,
@@ -8182,54 +8182,6 @@
         "ex_dsp_filter/main.cpp#filter_overlap_add_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/filter-overlap-add.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "RtHpi",
-      "header": "dsp/rt/rt_hpis.h",
-      "library": "dsp",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_dsp_rt",
-      "example_state": "built",
-      "including_examples": [
-        "ex_dsp_rt"
-      ],
-      "snippets": [
-        "ex_dsp_rt/main.cpp#rt_hpi_usage",
-        "ex_dsp_rt/main.cpp#rt_hpi_usage"
-      ],
-      "api_page": "doc/website/docs/api/dsp/rt-hpi.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "RtHpiWorker",
-      "header": "dsp/rt/rt_hpis.h",
-      "library": "dsp",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_dsp_rt",
-      "example_state": "built",
-      "including_examples": [
-        "ex_dsp_rt"
-      ],
-      "snippets": [
-        "ex_dsp_rt/main.cpp#rt_hpi_usage",
-        "ex_dsp_rt/main.cpp#rt_hpi_usage"
-      ],
-      "api_page": "doc/website/docs/api/dsp/rt-hpi-worker.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
