@@ -860,6 +860,7 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
     for (qint32 i = 0; i < sel.cols(); ++i)
         chs.push_back(fwd.info.chs[sel(i)]);
     fwd.info.chs = std::move(chs);
+    fwd.info.ch_names = ch_names;
     fwd.info.nchan = nuse;
 
     StringList bads;

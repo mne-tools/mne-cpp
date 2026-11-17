@@ -91,6 +91,8 @@ private slots:
         // pick_channels should reduce channel count
         QVERIFY(picked.nchan > 0);
         QVERIFY(picked.nchan <= m_fwd.nchan);
+        QVERIFY(picked.info.ch_names == include);
+        QCOMPARE(std::ssize(picked.info.chs), std::ssize(include));
     }
 
     void testPickChannelsByExclude()
@@ -121,6 +123,9 @@ private slots:
         QVERIFY(!megFwd.empty());
         QVERIFY(megFwd.nchan > 0);
         QVERIFY(megFwd.nchan <= m_fwd.nchan);
+        // The measurement info names exactly the picked rows
+        QVERIFY(megFwd.info.ch_names == megFwd.sol.row_names);
+        QCOMPARE(std::ssize(megFwd.info.ch_names), static_cast<std::ptrdiff_t>(megFwd.nchan));
     }
 
     void testPickTypesEeg()

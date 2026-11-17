@@ -690,6 +690,9 @@ aliases; replace the old spelling as below.
   on the thread of your choice. The MNE Scan source localization plugin now
   builds the operator on a pool thread and, while one is being built, keeps
   only the newest covariance instead of queueing every estimate.
+- `MNEForwardSolution::pick_channels` and `pick_types` left the names of every
+  channel in `info.ch_names`, so code matching channels by name against a
+  picked forward solution still found the dropped ones.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each
