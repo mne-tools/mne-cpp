@@ -11217,29 +11217,6 @@
       ]
     },
     {
-      "name": "RtCovComputeResult",
-      "module": "dsp",
-      "header": "dsp/rt/rt_cov.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 42,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov.",
-      "example_used_in": [
-        "ex_dsp_rt/main.cpp#rt_cov_usage"
-      ]
-    },
-    {
       "name": "RtInvOpInput",
       "module": "dsp",
       "header": "dsp/rt/rt_inv_op.h",

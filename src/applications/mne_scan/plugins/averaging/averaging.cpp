@@ -164,7 +164,7 @@ void Averaging::update(mne::scan::Measurement::SPtr pMeasurement)
                 if (m_pRtAve) {
                     // This extra copy is necessary since the referenced data is getting deleted as soon as
                     // m_pRtAve->append() returns. m_pRtAve->append() returns without a copy since it communicates
-                    // via signals with the worker thread of RtCov.
+                    // via signals with the worker thread of RtAveraging.
                     matData = pRTMSA->getMultiSampleArray()[i];
                     m_pRtAve->append(matData);
                 }

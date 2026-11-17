@@ -229,11 +229,10 @@ void Covariance::run()
     }
 
     MatrixXd matData;
-    FiffCov fiffCov;
     m_mutex.lock();
     int iEstimationSamples = m_iEstimationSamples;
     m_mutex.unlock();
-    mne::RtCov rtCov(m_pFiffInfo);
+    mne::RtCov rtCov(*m_pFiffInfo);
 
     // Start processing data
     while (!isInterruptionRequested()) {
@@ -243,9 +242,8 @@ void Covariance::run()
             iEstimationSamples = m_iEstimationSamples;
             m_mutex.unlock();
 
-            fiffCov = rtCov.estimateCovariance(matData, iEstimationSamples);
-            if (!fiffCov.names.empty()) {
-                m_pCovarianceOutput->measurementData()->setValue(fiffCov);
+            if (const std::optional<FiffCov> fiffCov = rtCov.estimate_covariance(matData, iEstimationSamples)) {
+                m_pCovarianceOutput->measurementData()->setValue(*fiffCov);
             }
         }
     }

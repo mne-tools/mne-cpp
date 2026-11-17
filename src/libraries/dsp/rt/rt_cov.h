@@ -9,18 +9,12 @@
  * @date     March 2026
  * @brief    Real-time noise covariance estimation from streaming MEG / EEG data blocks.
  *
- * RtCov maintains a running unbiased estimate of the channel–channel
- * covariance matrix used by linear inverse operators (MNE, dSPM, sLORETA,
- * beamformers). Every incoming block contributes its centred outer product
- * @c X⋅Xᵀ to the accumulator together with the per-block sample count;
- * the final covariance is the weighted sum divided by the total number of
- * samples minus one. Computation is offloaded to a worker @c QThread so
- * the acquisition pipeline never blocks on the dense matrix multiply.
- *
- * The @ref mne::RtCovComputeResult bundle carries both the matrix and the
- * sample count, which lets downstream consumers combine partial estimates,
- * apply rank-corrections, or convert to a @ref mne::FiffCov for
- * persistence and inverse-operator construction.
+ * RtCov estimates the channel–channel noise covariance used by linear inverse operators (MNE, dSPM,
+ * sLORETA, beamformers) from data that arrives block by block. It accumulates the channel sums and the
+ * outer product X⋅Xᵀ of every block, so its memory does not grow with the number of samples; once
+ * enough samples have arrived it returns the unbiased covariance, regularized like
+ * @ref mne::FiffCov::regularize, and starts over. It is synchronous: call it from whichever thread
+ * receives the data.
  */
 
 #ifndef RT_COV_RTPROCESSING_H
@@ -31,32 +25,14 @@
 //=============================================================================================================
 
 #include "../dsp_global.h"
-#include <memory>
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QList>
-#include <QObject>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
 #include <Eigen/Core>
 
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace mne
-{
-class FiffInfo;
-}
+#include <optional>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -66,78 +42,41 @@ namespace mne
 {
 
 //=============================================================================================================
-// mne FORWARD DECLARATIONS
-//=============================================================================================================
-
 /**
- * @brief Bundled output of a real-time covariance computation step containing the covariance matrix and sample count.
- */
-struct RtCovComputeResult
-{
-    Eigen::VectorXd mu;
-    Eigen::MatrixXd matData;
-};
-
-//=============================================================================================================
-/**
- * Real-time covariance worker.
- *
- * @brief Controller that manages background covariance matrix estimation from streaming data.
+ * @brief Estimates the noise covariance of the MEG and EEG channels from streaming data.
  *
  * @snippet ex_dsp_rt/main.cpp rt_cov_usage
  */
-class DSPSHARED_EXPORT RtCov : public QObject
+class DSPSHARED_EXPORT RtCov
 {
-    Q_OBJECT
-
 public:
-    RtCov(const std::shared_ptr<mne::FiffInfo>& pFiffInfo);
+    //=========================================================================================================
+    /**
+     * @param[in] info   Measurement info of the data; its MEG and EEG channels are used.
+     */
+    explicit RtCov(const FiffInfo& info);
 
     //=========================================================================================================
     /**
-     * Perform actual covariance estimation.
+     * Adds a block of data and returns the covariance once enough samples have arrived.
      *
-     * @param[in] matData  Data to estimate the covariance from.
-     * @param[in] iNewMaxSamples Number of samples to accumulate before a covariance is estimated.
+     * @param[in] data         A block of data, all channels of the measurement info by samples.
+     * @param[in] maxSamples   Number of samples to accumulate before a covariance is estimated.
      *
-     * @return Noise covariance of the MEG/EEG channels, or an empty FiffCov while fewer than iNewMaxSamples samples are accumulated or if no FiffInfo was set.
+     * @return The regularized noise covariance of the MEG and EEG channels once at least maxSamples
+     *         samples have arrived, after which the next estimate starts from nothing; no value
+     *         before that, or if the measurement info has no channels.
      */
-    mne::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
-                                    int iNewMaxSamples);
+    std::optional<FiffCov> estimate_covariance(const Eigen::MatrixXd& data, int maxSamples);
 
-protected:
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[in] matData  Data to self multiply with.
-     *
-     * @return   The multiplication result.
-     */
-    static RtCovComputeResult compute(const Eigen::MatrixXd& matData);
-
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[out]   finalResult     The final covariance estimation.
-     * @param[in]   tempResult      The intermediate result from the compute function.
-     */
-    static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult& tempResult);
-
-    int m_iSamples; /**< The number of stored samples. */
-
-    QList<Eigen::MatrixXd> m_lData; /**< The stored data blocks. */
-
-    mne::FiffInfo m_fiffInfo; /**< Holds the fiff measurement information. */
-
-    QVector<int> m_picks; /**< Indices of MEG/EEG channels to include. */
-    bool m_bPicksReady;   /**< Whether picks have been computed. */
+private:
+    FiffInfo m_info;          /**< Measurement info of the data. */
+    std::vector<int> m_picks; /**< MEG and EEG channels. */
+    Eigen::VectorXd m_sum;    /**< Sum of the samples of each picked channel. */
+    Eigen::MatrixXd m_outer;  /**< Sum of the outer products of the samples. */
+    int m_samples = 0;        /**< Number of accumulated samples. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-} // NAMESPACE
+} // namespace mne
 
 #endif // RT_COV_RTPROCESSING_H

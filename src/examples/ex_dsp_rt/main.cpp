@@ -194,10 +194,12 @@ int main(int argc, char* argv[])
     const MatrixXd numpyCov = centred * centred.transpose() / static_cast<double>(covData.cols() - 1); // numpy.cov
 
     //! [rt_cov_usage]
-    RtCov rtCov(info);
+    RtCov rtCov(*info);
     FiffCov cov;
     for (int start = 0; start < covData.cols(); start += 1000) {
-        cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+        if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
+            cov = std::move(*estimate);
+        }
     }
     //! [rt_cov_usage]
     // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
@@ -309,8 +311,8 @@ int main(int argc, char* argv[])
     MatrixXd rawData;
     MatrixXd rawTimes;
     ok &= raw.read_raw_segment(rawData, rawTimes, raw.first_samp, raw.first_samp + 5999);
-    RtCov rawCov(rawInfo);
-    const FiffCov noiseCov = rawCov.estimateCovariance(rawData, 6000);
+    RtCov rawCov(*rawInfo);
+    const FiffCov noiseCov = rawCov.estimate_covariance(rawData, 6000).value_or(FiffCov());
 
     //! [rt_inv_op_usage]
     RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8

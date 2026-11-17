@@ -15,21 +15,8 @@
 //=============================================================================================================
 
 #include "rt_cov.h"
-#include <memory>
+
 #include <base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
-
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -42,130 +29,55 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtCov::RtCov(const std::shared_ptr<mne::FiffInfo>& pFiffInfo)
-: m_iSamples(0)
-, m_fiffInfo(*pFiffInfo)
-, m_bPicksReady(false)
+RtCov::RtCov(const FiffInfo& info)
+: m_info(info)
 {
-}
-
-//=============================================================================================================
-
-FiffCov RtCov::estimateCovariance(const Eigen::MatrixXd& matData,
-                                  int iNewMaxSamples)
-{
-    if (m_fiffInfo.chs.empty()) {
-        mne::Log::warning("[RtCov::estimateCovariance] FiffInfo was not set. Returning empty covariance estimation.");
-        return FiffCov();
-    }
-
-    // Compute picks once: select only MEG and EEG channels
-    if (!m_bPicksReady) {
-        m_picks.clear();
-        for (int i = 0; i < std::ssize(m_fiffInfo.chs); i++) {
-            if (m_fiffInfo.chs.at(i).kind == FIFFV_MEG_CH ||
-                m_fiffInfo.chs.at(i).kind == FIFFV_EEG_CH) {
-                m_picks.append(i);
-            }
+    for (int i = 0; i < std::ssize(m_info.chs); ++i) {
+        if (m_info.chs[i].kind == FIFFV_MEG_CH || m_info.chs[i].kind == FIFFV_EEG_CH) {
+            m_picks.push_back(i);
         }
-        m_bPicksReady = true;
-    }
-
-    // Apply picks: extract only MEG/EEG channel rows
-    if (!m_picks.isEmpty() && m_picks.size() < matData.rows()) {
-        MatrixXd matPicked(m_picks.size(), matData.cols());
-        for (int i = 0; i < m_picks.size(); i++) {
-            matPicked.row(i) = matData.row(m_picks[i]);
-        }
-        m_lData.append(matPicked);
-    } else {
-        m_lData.append(matData);
-    }
-    m_iSamples += matData.cols();
-
-    if (m_iSamples < iNewMaxSamples) {
-        return FiffCov();
-    }
-
-    QFuture<RtCovComputeResult> result = QtConcurrent::mappedReduced(m_lData,
-                                                                     compute,
-                                                                     reduce);
-
-    result.waitForFinished();
-
-    RtCovComputeResult finalResult = result.result();
-
-    //Final computation
-    FiffCov computedCov;
-    computedCov.data = finalResult.matData;
-
-    bool doProj = true;
-
-    if (m_iSamples > 0) {
-        finalResult.mu /= static_cast<float>(m_iSamples);
-        computedCov.data.array() -= m_iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
-        computedCov.data.array() /= (m_iSamples - 1);
-
-        computedCov.kind = FIFFV_MNE_NOISE_COV;
-        computedCov.diag = false;
-        computedCov.dim = computedCov.data.rows();
-
-        // Set names to picked channels only
-        StringList pickedNames;
-        if (!m_picks.isEmpty() && m_picks.size() < static_cast<int>(m_fiffInfo.ch_names.size())) {
-            for (int i = 0; i < m_picks.size(); i++) {
-                pickedNames.push_back(m_fiffInfo.ch_names.at(m_picks[i]));
-            }
-        } else {
-            pickedNames = m_fiffInfo.ch_names;
-        }
-        computedCov.names = pickedNames;
-        computedCov.projs = m_fiffInfo.projs;
-        computedCov.bads = m_fiffInfo.bads;
-        computedCov.nfree = m_iSamples;
-
-        // regularize noise covariance
-        computedCov = computedCov.regularize(m_fiffInfo, 0.05, 0.05, 0.1, doProj, {});
-
-        //            qint32 samples = rawSegment.cols();
-        //            VectorXf mu = rawSegment.rowwise().sum().array() / (float)samples;
-
-        //            MatrixXf noise_covariance = rawSegment * rawSegment.transpose();// noise_covariance == raw_covariance
-        //            noise_covariance.array() -= samples * (mu * mu.transpose()).array();
-        //            noise_covariance.array() /= (samples - 1);
-
-        //            std::cout << "Noise Covariance:\n" << noise_covariance.block(0,0,10,10) << std::endl;
-
-
-        m_lData.clear();
-        m_iSamples = 0;
-
-        return computedCov;
-    } else {
-        mne::Log::warning("[RtCov::estimateCovariance] Number of samples equals zero. Regularization not possible. Returning empty covariance estimation.");
-        return FiffCov();
     }
 }
 
 //=============================================================================================================
 
-RtCovComputeResult RtCov::compute(const MatrixXd& matData)
+std::optional<FiffCov> RtCov::estimate_covariance(const MatrixXd& data, int maxSamples)
 {
-    RtCovComputeResult result;
-    result.mu = matData.rowwise().sum();
-    result.matData = matData * matData.transpose();
-    return result;
-}
-
-//=============================================================================================================
-
-void RtCov::reduce(RtCovComputeResult& finalResult, const RtCovComputeResult& tempResult)
-{
-    if (finalResult.matData.size() == 0 || finalResult.mu.size() == 0) {
-        finalResult.mu = tempResult.mu;
-        finalResult.matData = tempResult.matData;
-    } else {
-        finalResult.mu += tempResult.mu;
-        finalResult.matData += tempResult.matData;
+    if (m_info.chs.empty()) {
+        Log::warning("[RtCov::estimate_covariance] The measurement info has no channels.");
+        return std::nullopt;
     }
+    // Without MEG or EEG channels, or with fewer rows than picks, every row is used
+    const bool picked = !m_picks.empty() && std::ssize(m_picks) < data.rows();
+    const MatrixXd block = picked ? MatrixXd(data(m_picks, placeholders::all)) : data;
+    if (m_samples == 0) {
+        m_sum = block.rowwise().sum();
+        m_outer = block * block.transpose();
+    } else {
+        m_sum += block.rowwise().sum();
+        m_outer.noalias() += block * block.transpose();
+    }
+    m_samples += static_cast<int>(block.cols());
+    if (m_samples < maxSamples || m_samples < 2) {
+        return std::nullopt;
+    }
+
+    FiffCov cov;
+    const VectorXd mean = m_sum / static_cast<double>(m_samples);
+    cov.data = (m_outer - static_cast<double>(m_samples) * mean * mean.transpose()) / static_cast<double>(m_samples - 1);
+    cov.kind = FIFFV_MNE_NOISE_COV;
+    cov.diag = false;
+    cov.dim = static_cast<int>(cov.data.rows());
+    if (picked) {
+        for (const int pick : m_picks) {
+            cov.names.push_back(m_info.ch_names[static_cast<std::size_t>(pick)]);
+        }
+    } else {
+        cov.names = m_info.ch_names;
+    }
+    cov.projs = m_info.projs;
+    cov.bads = m_info.bads;
+    cov.nfree = m_samples;
+    m_samples = 0;
+    return cov.regularize(m_info, 0.05, 0.05, 0.1, true, {});
 }

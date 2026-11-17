@@ -670,6 +670,13 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- `RtCov` is a plain class with no Qt. It accumulates the channel sums and
+  outer products of every block instead of keeping all blocks until the
+  estimate, so its memory no longer grows with the number of samples.
+  Migration: `RtCov(std::shared_ptr<FiffInfo>)` → `RtCov(const FiffInfo&)`;
+  `estimateCovariance(data, n)` → `estimate_covariance(data, n)`, which
+  returns `std::optional<FiffCov>` instead of an empty `FiffCov` before
+  enough samples have arrived. `RtCovComputeResult` is removed.
 - Trigger detection (`dsp/rt/rt_detect_trigger.h`) uses standard C++ only.
   The gradient detector subtracted the first sample's value from every
   sample-to-sample change when asked to remove an offset, so on a trigger
