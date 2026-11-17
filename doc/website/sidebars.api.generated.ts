@@ -268,6 +268,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/rt-connectivity',
         'api/dsp/rt-connectivity-worker',
         'api/dsp/rt-cov',
+        'api/dsp/rt-inv-op',
         'api/dsp/rt-noise',
         'api/dsp/filter-object',
         'api/dsp/annotate-amplitude-params',

@@ -126,6 +126,7 @@ The documented classes this example uses most:
 - [RtConnectivityWorker](../../api/dsp/rt-connectivity-worker.mdx)
 - [RtConnectivity](../../api/dsp/rt-connectivity.mdx)
 - [RtCov](../../api/dsp/rt-cov.mdx)
+- [RtInvOp](../../api/dsp/rt-inv-op.mdx)
 - [RtNoise](../../api/dsp/rt-noise.mdx)
 - [FiffCov](../../api/fiff/fiff-cov.mdx)
 - [FiffEvokedSet](../../api/fiff/fiff-evoked-set.mdx)
@@ -169,6 +170,7 @@ The documented classes this example uses most:
 #include <base/string_utils.h>
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
+#include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_noise.h>
 
 #include <connectivity/compute_connectivity.h>
@@ -198,6 +200,7 @@ The documented classes this example uses most:
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <format>
@@ -438,15 +441,35 @@ int main(int argc, char* argv[])
     MatrixXd rawData;
     MatrixXd rawTimes;
     ok &= raw.read_raw_segment(rawData, rawTimes, raw.first_samp, raw.first_samp + 5999);
-    RtCov rawCov(*rawInfo);
-    rawCov.update(rawData);
-    const FiffCov noiseCov = rawCov.covariance().value_or(FiffCov());
+    const MNEForwardSolution megFwd = fwd->pick_types(true, false);
 
-    // Rebuild the MEG operator for each new covariance estimate, on whichever thread suits the application
-    const MNEInverseOperator inverse(*rawInfo, fwd->pick_types(true, false), noiseCov, 0.2f, 0.8f);
-    // 306 MEG channels in the forward solution, minus the bad MEG2443
-    ok &= expect(inverse.nsource == fwd->nsource && inverse.nchan == 305 && std::ranges::contains(rawInfo->bads, "MEG 2443"),
-                 std::format("The covariance estimate gives a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
+    //! [rt_inv_op_usage]
+    RtCov rtNoise(*rawInfo, 2.0);                                           // noise covariance with a 2 s half-life
+    RtInvOp rtInvOp(*rawInfo, megFwd, {.method = InvEstimateMethod::dSPM}); // forward-only work happens on the first update
+    MatrixXd sources;
+    for (Index start = 0; start + 600 <= rawData.cols(); start += 600) { // 1 s blocks
+        const MatrixXd block = rawData.middleCols(start, 600);
+        rtNoise.update(block);
+        if (const auto cov = rtNoise.covariance(); cov && rtInvOp.update(*cov)) {
+            sources = rtInvOp.apply(block); // dSPM of the normal component, one row per source
+        }
+    }
+    //! [rt_inv_op_usage]
+    ok &= expect(sources.rows() == fwd->nsource && sources.cols() == 600 && sources.allFinite(),
+                 std::format("RtInvOp follows each covariance and estimates {} sources", sources.rows()));
+
+    // A new covariance costs a fraction of rebuilding the operator
+    const FiffCov noiseCov = rtNoise.covariance().value_or(FiffCov());
+    const auto t0 = std::chrono::steady_clock::now();
+    ok &= rtInvOp.update(noiseCov);
+    const auto t1 = std::chrono::steady_clock::now();
+    const MNEInverseOperator inverse(*rawInfo, megFwd, noiseCov, 0.2f, 0.8f);
+    const auto t2 = std::chrono::steady_clock::now();
+    const auto ms = [](auto d) {
+        return std::chrono::duration<double, std::milli>(d).count();
+    };
+    ok &= expect(inverse.nchan == 305 && std::ranges::contains(rawInfo->bads, "MEG 2443"),
+                 std::format("Updating takes {:.0f} ms, rebuilding the {}-channel operator {:.0f} ms", ms(t1 - t0), inverse.nchan, ms(t2 - t1)));
 
     std::println("{}", ok ? "All dsp real-time checks passed." : "dsp real-time checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
