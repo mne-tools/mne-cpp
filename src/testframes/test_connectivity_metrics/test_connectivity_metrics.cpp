@@ -462,6 +462,13 @@ private slots:
         growing.append(trials.back());
         const MatrixXd accumulated = DebiasedSquaredWeightedPhaseLagIndex::calculate(growing).connectivity_matrix();
 
+        // Coherence finds the cross-spectra a phase-lag metric kept and still computes the spectra
+        ConnectivitySettings shared = settingsFor(trials, true);
+        WeightedPhaseLagIndex::calculate(shared);
+        const MatrixXd coherence = Coherence::calculate(shared).connectivity_matrix();
+        ConnectivitySettings alone = settingsFor(trials, false);
+        QVERIFY((coherence - Coherence::calculate(alone).connectivity_matrix()).cwiseAbs().maxCoeff() < 1e-12);
+
         // Another analysis of the whole spectrum leaves the band of the first untouched
         ConnectivitySettings wide = settingsFor(trials, false);
         wide.set_frequency_bins(-1, -1);

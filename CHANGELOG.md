@@ -721,6 +721,11 @@ aliases; replace the old spelling as below.
   `m_iNumberBinAmount` → `settings.set_frequency_bins(start, count)` and
   `settings.frequency_bins()`; `AbstractMetric::m_bStorageModeIsActive` →
   `settings.set_keep_trial_data(keep)` and `settings.keeps_trial_data()`.
+- With the per-trial spectra kept, coherence and imaginary coherence after a
+  phase-lag metric (PLI, wPLI, USPLI, dwPLI) on the same trials skipped the
+  power spectra the phase-lag metric does not compute and divided by an empty
+  sum: the MNE Scan connectivity plugin showed wrong coherence after switching
+  from a phase-lag metric.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each

@@ -220,14 +220,12 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         int binAmount,
                         bool keepTrialData)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
-    if (std::ssize(inputData.vecPairCsd) == iNRows) {
+    // A phase-lag metric may have computed the cross-spectra of the trial already, but not its spectra
+    const bool hasPsd = inputData.matPsd.rows() == iNRows && inputData.matPsd.cols() == binAmount;
+    const bool hasCsd = std::ssize(inputData.vecPairCsd) == iNRows;
+    if (hasPsd && hasCsd) {
         return;
     }
-
 
     // Substract mean, compute tapered spectra and PSD
     // This code was copied and changed modified Utils/Spectra since we do not want to call the function due to time loss.
@@ -236,32 +234,25 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         bNfftEven = true;
     }
 
-    FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    double denomPSD = tapers.second.cwiseAbs2().sum() / 2.0;
-
-    RowVectorXd vecInputFFT, rowData;
-    RowVectorXcd vecTmpFreq;
-
-    MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
-
     int i, j;
 
-    inputData.matPsd = MatrixXd(iNRows, binAmount);
+    if (std::ssize(inputData.vecTapSpectra) != iNRows) {
+        FFT<double> fft;
+        fft.SetFlag(fft.HalfSpectrum);
+        RowVectorXd vecInputFFT, rowData;
+        RowVectorXcd vecTmpFreq;
+        MatrixXcd matTapSpectrum(tapers.first.rows(), iNFreqs);
 
-    for (i = 0; i < iNRows; ++i) {
-        // Substract mean
-        rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
+        inputData.vecTapSpectra.clear();
+        for (i = 0; i < iNRows; ++i) {
+            // Substract mean
+            rowData.array() = inputData.matData.row(i).array() - inputData.matData.row(i).mean();
 
-        // Calculate tapered spectra if not available already
-        if (std::ssize(inputData.vecTapSpectra) != iNRows) {
             for (j = 0; j < tapers.first.rows(); j++) {
                 // Zero padd if necessary. The zero padding in Eigen's FFT is only working for column vectors.
                 if (rowData.cols() < iNfft) {
                     vecInputFFT.setZero(iNfft);
                     vecInputFFT.block(0, 0, 1, rowData.cols()) = rowData.cwiseProduct(tapers.first.row(j));
-                    ;
                 } else {
                     vecInputFFT = rowData.cwiseProduct(tapers.first.row(j));
                 }
@@ -273,35 +264,42 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
             inputData.vecTapSpectra.push_back(matTapSpectrum);
         }
-
-        // Compute PSD (average over tapers if necessary).
-        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0, binStart, inputData.vecTapSpectra.at(i).rows(), binAmount).cwiseAbs2().colwise().sum() / denomPSD;
-
-        // Divide first and last element by 2 due to half spectrum
-        if (binStart == 0) {
-            inputData.matPsd.row(i)(0) /= 2.0;
-        }
-
-        if (bNfftEven && binStart + binAmount >= iNFreqs) {
-            inputData.matPsd.row(i).tail(1) /= 2.0;
-        }
     }
 
-    mutex.lock();
+    if (!hasPsd) {
+        const double denomPSD = tapers.second.cwiseAbs2().sum() / 2.0;
+        inputData.matPsd = MatrixXd(iNRows, binAmount);
 
-    if (matPsdSum.rows() == 0 || matPsdSum.cols() == 0) {
-        matPsdSum = inputData.matPsd;
-    } else {
-        matPsdSum += inputData.matPsd;
+        for (i = 0; i < iNRows; ++i) {
+            // Compute PSD (average over tapers if necessary).
+            inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0, binStart, inputData.vecTapSpectra.at(i).rows(), binAmount).cwiseAbs2().colwise().sum() / denomPSD;
+
+            // Divide first and last element by 2 due to half spectrum
+            if (binStart == 0) {
+                inputData.matPsd.row(i)(0) /= 2.0;
+            }
+
+            if (bNfftEven && binStart + binAmount >= iNFreqs) {
+                inputData.matPsd.row(i).tail(1) /= 2.0;
+            }
+        }
+
+        mutex.lock();
+
+        if (matPsdSum.rows() == 0 || matPsdSum.cols() == 0) {
+            matPsdSum = inputData.matPsd;
+        } else {
+            matPsdSum += inputData.matPsd;
+        }
+
+        mutex.unlock();
     }
-
-    mutex.unlock();
 
     //    iTime = timer.elapsed();
     //    timer.restart();
 
     // Compute CSD
-    if (std::ssize(inputData.vecPairCsd) != iNRows) {
+    if (!hasCsd) {
         inputData.vecPairCsd.clear();
 
         //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
