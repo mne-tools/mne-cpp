@@ -127,13 +127,20 @@ private slots:
     void testFilterAcceptsStandardFileUrls();
 
 private:
+    QTemporaryDir m_workDir; /**< The filter writes its output next to its input, so the input is a copy here. */
     QString m_sampleFifPath;
     bool m_hasFifData = false;
 };
 
 void TestWorkflowIntegration::initTestCase()
 {
-    m_sampleFifPath = sampleRawFifPath();
+    // Other tests read the shared test data while this one runs
+    const QString shared = sampleRawFifPath();
+    QVERIFY(m_workDir.isValid());
+    if (!shared.isEmpty()) {
+        m_sampleFifPath = m_workDir.filePath(QFileInfo(shared).fileName());
+        QVERIFY(QFile::copy(shared, m_sampleFifPath));
+    }
     m_hasFifData = !m_sampleFifPath.isEmpty();
     if (!m_hasFifData) {
         qWarning("sample_audvis_trunc_raw.fif not found — execution tests will be skipped.");

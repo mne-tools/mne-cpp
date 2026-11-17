@@ -708,6 +708,10 @@ aliases; replace the old spelling as below.
 - `Linalg::get_whitener`, used by `FiffCov::prepare_noise_cov`, takes the
   rank from the eigenvalues instead of a second SVD of the covariance: a
   305-channel covariance is prepared in 10 ms instead of 104 ms.
+- The MNE Analyze Studio workflow test filtered the shared test recording and
+  wrote its output into the shared test data, where `test_fiff_rwr`, running
+  in parallel, listed the file and then failed to open it once removed. It
+  now filters a copy in its own temporary directory.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each
