@@ -9,18 +9,14 @@
  * @date     March 2026
  * @brief    Real-time noise power-spectral-density estimation from streaming data blocks.
  *
- * RtNoiseWorker accumulates a configurable number of contiguous data blocks,
- * splits them into complete FFT-length segments and averages their
- * Hann-windowed periodograms into a one-sided PSD in dB re unit^2/Hz, the
- * same estimate as scipy.signal.welch with no overlap and no detrending.
- * Longer accumulation windows trade temporal responsiveness for spectral
- * variance reduction. RtNoise is the QObject
- * front-end that owns the worker, forwards configuration changes, and re-
- * emits the PSD result back on the GUI thread.
+ * RtNoise accumulates a configurable number of contiguous data blocks, splits them into complete
+ * FFT-length segments and averages their Hann-windowed periodograms into a one-sided PSD in dB re
+ * unit^2/Hz, the same estimate as scipy.signal.welch with no overlap and no detrending. Longer
+ * accumulation windows trade temporal responsiveness for spectral variance reduction. It is
+ * synchronous: call it from whichever thread receives the data.
  *
- * This estimate is what feeds the live noise-spectrum display and provides
- * a sanity-check companion to @ref mne::RtCov whenever a quick frequency-domain
- * view of the noise floor is more informative than the full channel–channel
+ * This estimate feeds live noise-spectrum displays and complements @ref mne::RtCov whenever a quick
+ * frequency-domain view of the noise floor is more informative than the full channel–channel
  * covariance matrix.
  */
 
@@ -32,21 +28,11 @@
 //=============================================================================================================
 
 #include "../dsp_global.h"
-#include <memory>
-
-#include <fiff/fiff_info.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QThread>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
 
 #include <Eigen/Core>
+
+#include <optional>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -57,152 +43,45 @@ namespace mne
 
 //=============================================================================================================
 /**
- * @brief Background worker that computes a noise power spectral density estimate from accumulated data blocks.
+ * @brief Estimates the noise power spectral density of streaming data.
  *
  * @snippet ex_dsp_rt/main.cpp rt_noise_usage
  */
-class DSPSHARED_EXPORT RtNoiseWorker : public QObject
+class DSPSHARED_EXPORT RtNoise
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-     * Creates the worker.
-     *
-     * @param[in] iFftLength    FFT length (number of samples per window).
-     * @param[in] pFiffInfo     Associated Fiff Information.
-     * @param[in] iDataLength   Number of blocks to accumulate before computing the spectrum.
+     * @param[in] fftLength   Number of samples per FFT segment.
+     * @param[in] sfreq       Sampling frequency in Hz.
+     * @param[in] blocks      Number of blocks to accumulate before a spectrum is estimated (at least 1).
      */
-    explicit RtNoiseWorker(qint32 iFftLength,
-                           const std::shared_ptr<mne::FiffInfo>& pFiffInfo,
-                           qint32 iDataLength);
+    RtNoise(int fftLength, double sfreq, int blocks = 10);
 
     //=========================================================================================================
     /**
-     * Process one data block, accumulate, and emit the spectrum when enough blocks are collected.
+     * Adds a block of data and returns the spectrum once enough blocks have arrived.
      *
-     * @param[in] matData   The incoming data block (channels x samples).
-     */
-    void doWork(const Eigen::MatrixXd& matData);
-
-signals:
-    /**
-     * Emitted when a new power spectral density matrix is available.
+     * Blocks may have any number of samples; a block with another number of channels than the blocks
+     * before it starts the accumulation over.
      *
-     * @param[out] matSpecData  The computed spectrum (channels x frequency bins) in dB.
+     * @param[in] data   A block of data, channels by samples.
+     *
+     * @return The PSD in dB re unit^2/Hz, channels by fftLength / 2 + 1 frequencies, once the configured
+     *         number of blocks has arrived, after which the next estimate starts from nothing; no value
+     *         before that.
      */
-    void resultReady(const Eigen::MatrixXd& matSpecData);
+    std::optional<Eigen::MatrixXd> estimate_spectrum(const Eigen::MatrixXd& data);
 
 private:
-    static QVector<float> hanning(int N, short itype);
-
-    qint32 m_iFftLength;   /**< FFT window length. */
-    double m_dFs;          /**< Sampling frequency. */
-    qint32 m_iDataLength;  /**< Number of blocks to accumulate. */
-    QVector<float> m_fWin; /**< Hanning window coefficients. */
-
-    int m_iNumOfBlocks = 0;       /**< Total blocks to accumulate. */
-    int m_iBlockSize = 0;         /**< Columns per block. */
-    int m_iSensors = 0;           /**< Number of sensor rows. */
-    int m_iBlockIndex = 0;        /**< Current block write index. */
-    bool m_bFirstBlock = true;    /**< True until first block arrives. */
-    Eigen::MatrixXd m_matCircBuf; /**< Circular accumulation buffer. */
+    int m_fftLength;              /**< Samples per FFT segment. */
+    double m_sfreq;               /**< Sampling frequency in Hz. */
+    int m_blocks;                 /**< Blocks per estimate. */
+    std::vector<double> m_window; /**< Hann window without its zero end points, like hann(fftLength + 2)[1:-1]. */
+    Eigen::MatrixXd m_data;       /**< Accumulated samples. */
+    int m_received = 0;           /**< Blocks in m_data. */
 };
 
-//=============================================================================================================
-/**
- * @brief Controller that manages RtNoiseWorker for real-time noise spectrum estimation.
- *
- * @snippet ex_dsp_rt/main.cpp rt_noise_usage
- */
-class DSPSHARED_EXPORT RtNoise : public QObject
-{
-    Q_OBJECT
-
-public:
-    //=========================================================================================================
-    /**
-     * Creates the real-time noise estimation object.
-     *
-     * @param[in] iFftLength    Number of samples per FFT window.
-     * @param[in] pFiffInfo     Associated Fiff Information.
-     * @param[in] iDataLength   Number of blocks to accumulate before computing.
-     * @param[in] parent        Parent QObject (optional).
-     */
-    explicit RtNoise(qint32 iFftLength,
-                     const std::shared_ptr<mne::FiffInfo>& pFiffInfo,
-                     qint32 iDataLength,
-                     QObject* parent = nullptr);
-
-    //=========================================================================================================
-    /**
-     * Destroys the real-time noise estimation object.
-     */
-    ~RtNoise();
-
-    //=========================================================================================================
-    /**
-     * Submit incoming data for noise estimation.
-     *
-     * @param[in] matData  Data block (channels x samples).
-     */
-    void append(const Eigen::MatrixXd& matData);
-
-    //=========================================================================================================
-    /**
-     * Returns whether the worker thread is running.
-     *
-     * @return True between start() and stop(), false otherwise.
-     */
-    bool isRunning() const;
-
-    //=========================================================================================================
-    /**
-     * Starts the worker thread.
-     *
-     * @return true on success.
-     */
-    bool start();
-
-    //=========================================================================================================
-    /**
-     * Stops the worker thread.
-     *
-     * @return true on success.
-     */
-    bool stop();
-
-    //=========================================================================================================
-    /**
-     * Blocks until the worker thread has finished, or until the timeout (ms) expires.
-     *
-     * @param[in] time  Timeout in ms; ULONG_MAX waits indefinitely.
-     *
-     * @return True if the thread finished, false if the timeout expired.
-     */
-    bool wait(unsigned long time = ULONG_MAX);
-
-signals:
-    /**
-     * Emitted when a new spectrum is available. Forwarded from the worker.
-     */
-    void SpecCalculated(const Eigen::MatrixXd& matSpecData);
-
-    /**
-     * Internal signal to forward data to the worker thread.
-     */
-    void operate(const Eigen::MatrixXd& matData);
-
-private:
-    QThread m_workerThread;    /**< The worker thread. */
-    bool m_bIsRunning = false; /**< Running state flag. */
-};
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-} // NAMESPACE
+} // namespace mne
 
 #endif // RT_NOISE_RTPROCESSING_H

@@ -217,27 +217,17 @@ int main(int argc, char* argv[])
     }
 
     //! [rt_noise_usage]
-    RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
+    RtNoise noise(64, info200->sfreq, 10); // 64-point FFT over 10 accumulated blocks
     MatrixXd spectrum;
-    QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });
     for (int b = 0; b < 10; ++b) {
-        noiseWorker.doWork(tones.middleCols(64 * b, 64)); // dB re unit^2/Hz, channels x (fft/2 + 1)
+        if (auto psd = noise.estimate_spectrum(tones.middleCols(64 * b, 64))) { // dB re unit^2/Hz, channels x (fft/2 + 1)
+            spectrum = std::move(*psd);
+        }
     }
     //! [rt_noise_usage]
     // scipy.signal.welch(x, 200, window=hann(66)[1:-1], nperseg=64, noverlap=0, detrend=False): 25 Hz -9.6521 dB, 50 Hz -29.6587 dB
     ok &= expect(spectrum.cols() == 33 && std::fabs(spectrum(0, 8) + 9.652129129685868) < 1e-6 && std::fabs(spectrum(0, 16) + 29.658719433796943) < 1e-6,
-                 std::format("RtNoiseWorker: 25 Hz at {:.4f} dB, 50 Hz at {:.4f} dB match scipy.signal.welch", spectrum(0, 8), spectrum(0, 16)));
-
-    RtNoise rtNoise(64, info200, 10);
-    bool noiseDone = false;
-    QObject::connect(&rtNoise, &RtNoise::SpecCalculated, [&](const MatrixXd& psd) { noiseDone = psd.topRows(2).isApprox(spectrum.topRows(2)); }); // the empty stim row is -inf dB
-    rtNoise.start();
-    for (int b = 0; b < 10; ++b) {
-        rtNoise.append(tones.middleCols(64 * b, 64));
-    }
-    ok &= expect(waitFor(noiseDone, 5000), "RtNoise emits the same spectrum from its worker thread");
-    rtNoise.stop();
-    rtNoise.wait(2000);
+                 std::format("RtNoise: 25 Hz at {:.4f} dB, 50 Hz at {:.4f} dB match scipy.signal.welch", spectrum(0, 8), spectrum(0, 16)));
 
     // ---------------------------------------------------------------------------------------------------------
     // Connectivity: the same network as compute_connectivity, computed on a worker thread

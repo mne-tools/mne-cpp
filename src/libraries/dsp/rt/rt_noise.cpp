@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    Definition of the RtNoiseWorker and RtNoise classes.
+ * @brief    Definition of the RtNoise class.
  */
 
 //=============================================================================================================
@@ -15,26 +15,14 @@
 //=============================================================================================================
 
 #include "rt_noise.h"
-#include <memory>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
+#include <base/log.h>
 
 #include <unsupported/Eigen/FFT>
 
-//=============================================================================================================
-// STD INCLUDES
-//=============================================================================================================
-
+#include <algorithm>
 #include <cmath>
-#include <utility>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -44,202 +32,65 @@ using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS — RtNoiseWorker
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtNoiseWorker::RtNoiseWorker(qint32 iFftLength,
-                             const std::shared_ptr<FiffInfo>& pFiffInfo,
-                             qint32 iDataLength)
-: m_iFftLength(iFftLength)
-, m_dFs(pFiffInfo->sfreq)
-, m_iDataLength(iDataLength < 1 ? 10 : iDataLength)
+RtNoise::RtNoise(int fftLength, double sfreq, int blocks)
+: m_fftLength(std::max(fftLength, 1))
+, m_sfreq(sfreq)
+, m_blocks(std::max(blocks, 1))
+, m_window(static_cast<std::size_t>(m_fftLength))
 {
-    m_fWin = hanning(m_iFftLength, 0);
+    for (int i = 0; i < m_fftLength; ++i) {
+        m_window[static_cast<std::size_t>(i)] = 0.5 * (1.0 - std::cos(2.0 * std::numbers::pi * (i + 1) / (m_fftLength + 1)));
+    }
 }
 
 //=============================================================================================================
 
-void RtNoiseWorker::doWork(const MatrixXd& matData)
+std::optional<MatrixXd> RtNoise::estimate_spectrum(const MatrixXd& data)
 {
-    if (m_bFirstBlock) {
-        m_iNumOfBlocks = m_iDataLength;
-        m_iBlockSize = static_cast<int>(matData.cols());
-        m_iSensors = static_cast<int>(matData.rows());
-        m_matCircBuf.resize(m_iSensors, static_cast<Eigen::Index>(m_iNumOfBlocks) * m_iBlockSize);
-        m_iBlockIndex = 0;
-        m_bFirstBlock = false;
+    if (m_received > 0 && data.rows() != m_data.rows()) {
+        Log::warning("[RtNoise::estimate_spectrum] The number of channels changed; starting a new estimate.");
+        m_received = 0;
     }
-
-    // Accumulate block into circular buffer
-    m_matCircBuf.block(0, m_iBlockIndex * m_iBlockSize, m_iSensors, m_iBlockSize) = matData;
-
-    m_iBlockIndex++;
-    if (m_iBlockIndex < m_iNumOfBlocks) {
-        return;
+    if (m_received == 0) {
+        m_data = data;
+    } else {
+        m_data.conservativeResize(NoChange, m_data.cols() + data.cols());
+        m_data.rightCols(data.cols()) = data;
     }
-
-    // Enough blocks accumulated — compute spectrum
-    m_iBlockIndex = 0;
-
-    const int iTotalSamples = m_iNumOfBlocks * m_iBlockSize;
-    const int iHalfSpec = m_iFftLength / 2 + 1;
-    const int nb = std::max(1, iTotalSamples / m_iFftLength); // complete segments only
-
-    double winPow = 0.0;
-    for (int k = 0; k < m_iFftLength; ++k) {
-        winPow += static_cast<double>(m_fWin[k]) * m_fWin[k];
+    if (++m_received < m_blocks) {
+        return std::nullopt;
     }
+    m_received = 0;
 
-    MatrixXd sum_psdx = MatrixXd::Zero(m_iSensors, iHalfSpec);
-    RowVectorXd vecDataZeroPad = RowVectorXd::Zero(m_iFftLength);
-    RowVectorXcd vecFreqData(iHalfSpec);
+    const Index halfSpec = m_fftLength / 2 + 1;
+    const Index segments = std::max<Index>(1, m_data.cols() / m_fftLength); // complete segments only
+    double windowPower = 0.0;
+    for (const double w : m_window) {
+        windowPower += w * w;
+    }
+    MatrixXd density = MatrixXd::Zero(m_data.rows(), halfSpec);
+    RowVectorXd segment(m_fftLength);
+    RowVectorXcd spectrum(halfSpec);
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
-
-    for (int n = 0; n < nb; ++n) {
-        const int iOffset = n * m_iFftLength;
-
-        for (int i = 0; i < m_iSensors; ++i) {
-            vecDataZeroPad.setZero();
-            const int iCopyLen = std::min(m_iFftLength, iTotalSamples - iOffset);
-            vecDataZeroPad.head(iCopyLen) = m_matCircBuf.block(i, iOffset, 1, iCopyLen);
-            for (int k = 0; k < m_iFftLength; ++k) {
-                vecDataZeroPad[k] *= m_fWin[k];
+    for (Index n = 0; n < segments; ++n) {
+        const Index offset = n * m_fftLength;
+        const Index length = std::min<Index>(m_fftLength, m_data.cols() - offset);
+        for (Index ch = 0; ch < m_data.rows(); ++ch) {
+            segment.setZero();
+            for (Index k = 0; k < length; ++k) {
+                segment(k) = m_data(ch, offset + k) * m_window[static_cast<std::size_t>(k)];
             }
-            fft.fwd(vecFreqData, vecDataZeroPad);
-
+            fft.fwd(spectrum, segment);
             // One-sided density |X|^2 / (fs * sum w^2), as scipy.signal.welch(scaling="density")
-            for (int j = 0; j < iHalfSpec; ++j) {
-                double spower = std::norm(vecFreqData(j)) / (m_dFs * winPow);
-                if (j > 0 && !(m_iFftLength % 2 == 0 && j == m_iFftLength / 2)) {
-                    spower *= 2.0;
-                }
-                sum_psdx(i, j) += spower;
+            for (Index j = 0; j < halfSpec; ++j) {
+                const bool unpaired = j == 0 || (m_fftLength % 2 == 0 && j == m_fftLength / 2);
+                density(ch, j) += std::norm(spectrum(j)) / (m_sfreq * windowPower) * (unpaired ? 1.0 : 2.0);
             }
         }
     }
-
-    // Convert to dB
-    MatrixXd matResult(m_iSensors, iHalfSpec);
-    for (int i = 0; i < m_iSensors; ++i) {
-        for (int j = 0; j < iHalfSpec; ++j) {
-            matResult(i, j) = 10.0 * std::log10(sum_psdx(i, j) / nb);
-        }
-    }
-
-    emit resultReady(matResult);
-}
-
-//=============================================================================================================
-
-QVector<float> RtNoiseWorker::hanning(int N, short itype)
-{
-    QVector<float> w(N, 0.0f);
-
-    const int n = (itype == 1) ? N - 1 : N;
-
-    if (n % 2 == 0) {
-        const int half = n / 2;
-        for (int i = 0; i < half; ++i) {
-            w[i] = 0.5f * (1.0f - std::cos(2.0f * static_cast<float>(M_PI) * (i + 1) / (n + 1)));
-        }
-        int idx = half - 1;
-        for (int i = half; i < n; ++i) {
-            w[i] = w[idx--];
-        }
-    } else {
-        const int half = (n + 1) / 2;
-        for (int i = 0; i < half; ++i) {
-            w[i] = 0.5f * (1.0f - std::cos(2.0f * static_cast<float>(M_PI) * (i + 1) / (n + 1)));
-        }
-        int idx = half - 2;
-        for (int i = half; i < n; ++i) {
-            w[i] = w[idx--];
-        }
-    }
-
-    if (itype == 1) {
-        for (int i = N - 1; i >= 1; --i) {
-            w[i] = w[i - 1];
-        }
-        w[0] = 0.0f;
-    }
-
-    return w;
-}
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS — RtNoise
-//=============================================================================================================
-
-RtNoise::RtNoise(qint32 iFftLength,
-                 const std::shared_ptr<FiffInfo>& pFiffInfo,
-                 qint32 iDataLength,
-                 QObject* parent)
-: QObject(parent)
-{
-    qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
-
-    auto* worker = new RtNoiseWorker(iFftLength, pFiffInfo, iDataLength);
-    worker->moveToThread(&m_workerThread);
-
-    connect(&m_workerThread, &QThread::finished,
-            worker, &QObject::deleteLater);
-    connect(this, &RtNoise::operate,
-            worker, &RtNoiseWorker::doWork);
-    connect(worker, &RtNoiseWorker::resultReady,
-            this, &RtNoise::SpecCalculated);
-}
-
-//=============================================================================================================
-
-RtNoise::~RtNoise()
-{
-    if (m_bIsRunning) {
-        stop();
-    }
-}
-
-//=============================================================================================================
-
-void RtNoise::append(const MatrixXd& matData)
-{
-    emit operate(matData);
-}
-
-//=============================================================================================================
-
-bool RtNoise::isRunning() const
-{
-    return m_bIsRunning;
-}
-
-//=============================================================================================================
-
-bool RtNoise::start()
-{
-    if (m_workerThread.isRunning()) {
-        m_workerThread.wait();
-    }
-
-    m_bIsRunning = true;
-    m_workerThread.start();
-    return true;
-}
-
-//=============================================================================================================
-
-bool RtNoise::stop()
-{
-    m_bIsRunning = false;
-    m_workerThread.quit();
-    m_workerThread.wait();
-    return true;
-}
-
-//=============================================================================================================
-
-bool RtNoise::wait(unsigned long time)
-{
-    return m_workerThread.wait(time);
+    return (10.0 * (density / static_cast<double>(segments)).array().log10()).matrix();
 }

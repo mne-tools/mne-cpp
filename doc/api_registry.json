@@ -5457,31 +5457,6 @@
       ]
     },
     {
-      "name": "RtNoiseWorker",
-      "module": "dsp",
-      "header": "dsp/rt/rt_noise.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_dsp_rt",
-      "example_snippet": [
-        "ex_dsp_rt/main.cpp#rt_noise_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 40,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "required_data": [
-        "mne-cpp-test-data"
-      ]
-    },
-    {
       "name": "FiffChInfo",
       "module": "fiff",
       "header": "fiff/fiff_ch_info.h",

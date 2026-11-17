@@ -435,66 +435,48 @@ void TestInvRtLibrary::rtAveraging_moreWorkerOps()
 
 void TestInvRtLibrary::rtNoise_hanningWindow()
 {
-    auto pInfo = std::make_shared<FiffInfo>();
-    pInfo->sfreq = 1000.0;
-    pInfo->nchan = 5;
-    for (int i = 0; i < 5; i++) {
-        FiffChInfo ch;
-        ch.ch_name = (QString("MEG%1").arg(i)).toStdString();
-        ch.kind = FIFFV_MEG_CH;
-        pInfo->chs.push_back(ch);
-        pInfo->ch_names.push_back(ch.ch_name);
-    }
-
-    RtNoise rtNoise(256, pInfo, 5);
-
-    MatrixXd data = MatrixXd::Random(5, 100);
-    rtNoise.append(data);
-
-    QVERIFY(!rtNoise.isRunning());
-    rtNoise.stop();
-
     // A unit tone at an exact bin: PSD density times bin width (fs / nfft) recovers its power 1/2 within the Hann leakage
-    RtNoiseWorker worker(256, pInfo, 4);
-    MatrixXd psdDb;
-    connect(&worker, &RtNoiseWorker::resultReady, this, [&](const MatrixXd& m) { psdDb = m; });
+    RtNoise noise(256, 1000.0, 4);
+    std::optional<MatrixXd> psdDb;
     for (int b = 0; b < 4; ++b) {
         MatrixXd block(5, 256);
         for (int t = 0; t < 256; ++t) {
             block.col(t).setConstant(std::sin(2.0 * M_PI * 125.0 * (256 * b + t) / 1000.0));
         }
-        worker.doWork(block);
+        QVERIFY(!psdDb);
+        psdDb = noise.estimate_spectrum(block);
     }
-    QCOMPARE(psdDb.cols(), static_cast<Index>(129));
-    VectorXd power = psdDb.row(0).unaryExpr([](double db) { return std::pow(10.0, db / 10.0); }).transpose();
+    QVERIFY(psdDb);
+    QCOMPARE(psdDb->rows(), static_cast<Index>(5));
+    QCOMPARE(psdDb->cols(), static_cast<Index>(129));
+    VectorXd power = psdDb->row(0).unaryExpr([](double db) { return std::pow(10.0, db / 10.0); }).transpose();
     const double tonePower = power.segment(30, 5).sum() * 1000.0 / 256.0;
     QVERIFY2(std::abs(tonePower - 0.5) < 0.02, qPrintable(QString("tone power %1, expected 0.5").arg(tonePower)));
 }
 
+//=============================================================================================================
+
 void TestInvRtLibrary::rtNoise_lifecycle()
 {
-    auto pInfo = std::make_shared<FiffInfo>();
-    pInfo->sfreq = 600.0;
-    pInfo->nchan = 3;
-    for (int i = 0; i < 3; i++) {
-        FiffChInfo ch;
-        ch.ch_name = (QString("CH%1").arg(i)).toStdString();
-        ch.kind = FIFFV_MEG_CH;
-        pInfo->chs.push_back(ch);
-        pInfo->ch_names.push_back(ch.ch_name);
+    // Blocks of any length: the spectrum of three blocks is the spectrum of their concatenation
+    MatrixXd data(3, 600);
+    for (int t = 0; t < data.cols(); ++t) {
+        data.col(t) << std::sin(0.3 * t), std::cos(0.05 * t * t / 600.0), 0.01 * t;
     }
+    RtNoise whole(128, 600.0, 1);
+    const MatrixXd expected = whole.estimate_spectrum(data).value();
+    RtNoise blocks(128, 600.0, 3);
+    QVERIFY(!blocks.estimate_spectrum(data.leftCols(50)));
+    QVERIFY(!blocks.estimate_spectrum(data.middleCols(50, 300)));
+    const std::optional<MatrixXd> result = blocks.estimate_spectrum(data.rightCols(250));
+    QVERIFY(result);
+    QVERIFY((*result - expected).cwiseAbs().maxCoeff() < 1e-9);
 
-    {
-        RtNoise rtNoise(128, pInfo, 3);
-        for (int j = 0; j < 5; j++) {
-            MatrixXd data = MatrixXd::Random(3, 50);
-            rtNoise.append(data);
-        }
-        rtNoise.start();
-        QThread::msleep(100);
-        rtNoise.stop();
-        rtNoise.wait(2000);
-    }
+    // After a spectrum the next one starts from nothing; a block with other channels starts over
+    QVERIFY(!blocks.estimate_spectrum(data.leftCols(200)));
+    QVERIFY(!blocks.estimate_spectrum(data.topRows(2)));
+    QVERIFY(!blocks.estimate_spectrum(data.topRows(2)));
+    QCOMPARE(blocks.estimate_spectrum(data.topRows(2)).value().rows(), static_cast<Index>(2));
 }
 
 //=============================================================================================================

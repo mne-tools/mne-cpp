@@ -670,6 +670,15 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- `RtNoise` is a synchronous class with no Qt; callers that want a worker
+  thread run it on theirs. It accepts blocks of any length: before, every
+  block had to be as long as the first one, and a block of another length
+  was written past the end of its buffer. Migration:
+  `RtNoise(nfft, std::shared_ptr<FiffInfo>, blocks)` →
+  `RtNoise(nfft, sfreq, blocks)`; `append()` plus the `SpecCalculated`
+  signal → `estimate_spectrum(block)`, which returns
+  `std::optional<Eigen::MatrixXd>`; `start`, `stop`, `wait`, `isRunning` and
+  `RtNoiseWorker` are removed.
 - `RtCov` is a plain class with no Qt. It accumulates the channel sums and
   outer products of every block instead of keeping all blocks until the
   estimate, so its memory no longer grows with the number of samples.
