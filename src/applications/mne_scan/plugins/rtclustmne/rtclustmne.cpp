@@ -17,7 +17,9 @@
 //=============================================================================================================
 
 #include "rtclustmne.h"
+#include <algorithm>
 #include <memory>
+#include <optional>
 #include <base/string_utils.h>
 
 #include "FormFiles/rtclustmnesetupwidget.h"
@@ -34,7 +36,7 @@
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 
-#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <dsp/rt/rt_inv_op.h>
 #include <inv/minimum_norm/inv_cmne.h>
 #include <inv/minimum_norm/inv_cmne_settings.h>
 
@@ -51,7 +53,6 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
-#include <QtConcurrent>
 #include <QDebug>
 
 //=============================================================================================================
@@ -73,7 +74,6 @@ RtClustMne::RtClustMne()
 , m_pCircularEvokedBuffer(std::make_shared<CircularBuffer<mne::FiffEvoked>>(40))
 , m_bEvokedInput(false)
 , m_bRawInput(false)
-, m_bUpdateMinimumNorm(false)
 , m_iNumAverages(1)
 , m_iDownSample(1)
 , m_iTimePointSps(0)
@@ -83,21 +83,12 @@ RtClustMne::RtClustMne()
 , m_sMethod("dSPM")
 , m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif")
 {
-    connect(&m_invOpWatcher, &QFutureWatcher<MNEInverseOperator>::finished, this, [this]() {
-        updateInvOp(m_invOpWatcher.result());
-        if (m_pendingInvOp) {
-            m_invOpWatcher.setFuture(QtConcurrent::run(std::exchange(m_pendingInvOp, {})));
-        }
-    });
 }
 
 //=============================================================================================================
 
 RtClustMne::~RtClustMne()
 {
-    m_future.waitForFinished();
-    m_invOpWatcher.waitForFinished();
-
     if (this->isRunning()) {
         stop();
     }
@@ -202,7 +193,6 @@ void RtClustMne::initPluginControlWidgets()
 
 void RtClustMne::unload()
 {
-    m_future.waitForFinished();
 }
 
 //=============================================================================================================
@@ -354,17 +344,12 @@ void RtClustMne::updateRTFS(mne::scan::Measurement::SPtr pMeasurement)
                     << "Source localization will be slower than with a clustered one.";
         }
 
+        m_pRTSEOutput->measurementData()->setFwdSolution(pRTFS->getValue());
+
+        // The processing thread rebuilds the operator for a new forward solution
+        QMutexLocker locker(&m_qMutex);
         m_pFwd = pRTFS->getValue();
-        m_pRTSEOutput->measurementData()->setFwdSolution(m_pFwd);
-
-        m_qMutex.lock();
         m_pFiffInfoForward = std::make_shared<FiffInfoBase>(m_pFwd->info);
-        m_qMutex.unlock();
-
-        // update inverse operator
-        if (this->isRunning() && m_pNoiseCov) {
-            requestInverseOperator(*m_pNoiseCov);
-        }
     }
 }
 
@@ -429,8 +414,10 @@ void RtClustMne::updateRTC(mne::scan::Measurement::SPtr pMeasurement)
             }
 
             if (this->isRunning()) {
-                m_pNoiseCov = pRTC->getValue();
-                requestInverseOperator(*m_pNoiseCov);
+                // Only the newest covariance waits for the processing thread
+                QMutexLocker locker(&m_qMutex);
+                m_pNoiseCov = std::make_shared<FiffCov>(*pRTC->getValue());
+                m_bNewNoiseCov = true;
             }
         }
     }
@@ -497,43 +484,11 @@ void RtClustMne::updateRTE(mne::scan::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
-void RtClustMne::updateInvOp(const MNEInverseOperator& invOp)
-{
-    QMutexLocker locker(&m_qMutex);
-
-    m_invOp = invOp;
-
-    m_bUpdateMinimumNorm = true;
-}
-
-//=============================================================================================================
-
-void RtClustMne::requestInverseOperator(const FiffCov& noiseCov)
-{
-    if (!m_pFiffInfo || !m_pFwd) {
-        return;
-    }
-    auto compute = [info = m_pFiffInfo, fwd = m_pFwd, noiseCov]() {
-        return MNEInverseOperator(*info, fwd->pick_types(true, false), noiseCov, 0.2f, 0.8f);
-    };
-    // The watcher lives on this object's thread; producers call in on theirs
-    QMetaObject::invokeMethod(this, [this, compute = std::move(compute)]() mutable {
-        if (m_invOpWatcher.isRunning()) {
-            m_pendingInvOp = std::move(compute);
-        } else {
-            m_invOpWatcher.setFuture(QtConcurrent::run(std::move(compute)));
-        } }, Qt::QueuedConnection);
-}
-
-//=============================================================================================================
-
 void RtClustMne::onMethodChanged(const QString& method)
 {
     QMutexLocker locker(&m_qMutex);
 
     m_sMethod = method;
-
-    m_bUpdateMinimumNorm = true;
 }
 
 //=============================================================================================================
@@ -581,135 +536,104 @@ void RtClustMne::run()
         msleep(200);
     }
 
-    // Init parameters
-    qint32 skip_count = 0;
-    FiffEvoked evoked;
+    m_qMutex.lock();
+    const bool bEvokedInput = m_bEvokedInput;
+    const bool bRawInput = m_bRawInput;
+    const FiffInfo info = *m_pFiffInfo;
+    const float tstep = 1.0f / m_pFiffInfoInput->sfreq;
+    // Raw blocks hold every input channel, the operator expects those of m_pFiffInfo
+    std::vector<int> rawPicks;
+    for (const std::string& name : info.ch_names) {
+        rawPicks.push_back(mne::channel_index(m_pFiffInfoInput->ch_names, name));
+    }
+    m_qMutex.unlock();
+
+    // A single raw block is localized at SNR 1, an average at SNR 3 (mne.minimum_norm.apply_inverse)
+    const float lambda2 = bEvokedInput ? 1.0f / 9.0f : 1.0f;
+    std::optional<RtInvOp> rtInvOp;
+    std::shared_ptr<MNEForwardSolution> fwd;
+    QString sMethod;
+    VectorXi vertices;
+    int nVerticesLh = 0;
+    qint32 blockCount = 0;
     MatrixXd matData;
-    MatrixXd matDataResized;
-    qint32 j;
-    int iTimePointSps = 0;
-    int iNumberChannels = 0;
-    int iDownSample = 1;
-    float tstep;
-    float lambda2 = 1.0f / pow(1.0f, 2); //ToDo estimate lambda using covariance
-    InvSourceEstimate sourceEstimate;
-    bool bEvokedInput = false;
-    bool bRawInput = false;
-    bool bUpdateMinimumNorm = false;
-    bool bCmne = false;
-    QString sModelCheckpoint;
-    std::shared_ptr<mne::InvMinimumNorm> pMinimumNorm;
-    StringList lChNamesFiffInfo;
-    StringList lChNamesInvOp;
+    FiffEvoked evoked;
+
+    const auto publish = [&](InvSourceEstimate sourceEstimate, int iTimePointSps) {
+        if (sourceEstimate.empty() || sourceEstimate.data.size() == 0) {
+            return;
+        }
+        if (iTimePointSps >= 0 && iTimePointSps < sourceEstimate.data.cols()) {
+            sourceEstimate = sourceEstimate.reduce(iTimePointSps, 1);
+        }
+        m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
+    };
+    const auto estimate = [&](MatrixXd sources, float tmin) {
+        InvSourceEstimate stc(std::move(sources), vertices, tmin, tstep);
+        stc.nVerticesLh = nVerticesLh;
+        return stc;
+    };
 
     // Start processing data
     while (!isInterruptionRequested()) {
         m_qMutex.lock();
-        iTimePointSps = m_iTimePointSps;
-        bEvokedInput = m_bEvokedInput;
-        bRawInput = m_bRawInput;
-        iDownSample = m_iDownSample;
-        iNumberChannels = static_cast<int>(m_invOp.noise_cov.names.size());
-        tstep = 1.0f / m_pFiffInfoInput->sfreq;
-        lChNamesFiffInfo = m_pFiffInfoInput->ch_names;
-        lChNamesInvOp = m_invOp.noise_cov.names;
-        bUpdateMinimumNorm = m_bUpdateMinimumNorm;
-        bCmne = (m_sMethod == QLatin1String("CMNE"));
-        sModelCheckpoint = m_sModelCheckpoint;
+        const int iTimePointSps = m_iTimePointSps;
+        const int iDownSample = std::max(1, m_iDownSample);
+        const QString sModelCheckpoint = m_sModelCheckpoint;
+        const bool rebuild = m_pFwd && (m_pFwd != fwd || m_sMethod != sMethod);
+        if (rebuild) {
+            fwd = m_pFwd;
+            sMethod = m_sMethod;
+        }
+        std::shared_ptr<FiffCov> pNoiseCov;
+        if (m_pNoiseCov && (rebuild || m_bNewNoiseCov)) {
+            pNoiseCov = m_pNoiseCov;
+            m_bNewNoiseCov = false;
+        }
         m_qMutex.unlock();
+        const bool bCmne = sMethod == QLatin1String("CMNE");
 
-        if (bUpdateMinimumNorm) {
-            m_qMutex.lock();
-            if (!bCmne) {
-                pMinimumNorm = std::make_shared<InvMinimumNorm>(m_invOp, lambda2, m_sMethod.toStdString());
-            } else {
-                pMinimumNorm.reset();
-            }
-            m_bUpdateMinimumNorm = false;
-            m_qMutex.unlock();
-
-            // Set up the inverse according to the parameters.
-            // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-            if (pMinimumNorm) {
-                pMinimumNorm->doInverseSetup(1, true);
-            }
+        if (rebuild) {
+            // CMNE takes the covariances and the gain of a dSPM operator
+            const InvEstimateMethod method = sMethod == QLatin1String("MNE") ? InvEstimateMethod::MNE
+                : sMethod == QLatin1String("sLORETA")                        ? InvEstimateMethod::sLORETA
+                                                                             : InvEstimateMethod::dSPM;
+            rtInvOp.emplace(info, fwd->pick_types(true, false), RtInvOp::Settings{.method = method, .lambda2 = lambda2, .pick_normal = !bEvokedInput});
+            vertices.resize(fwd->src[0].vertno.size() + fwd->src[1].vertno.size());
+            vertices << fwd->src[0].vertno, fwd->src[1].vertno;
+            nVerticesLh = static_cast<int>(fwd->src[0].vertno.size());
+        }
+        if (pNoiseCov && !rtInvOp->update(*pNoiseCov)) {
+            qWarning() << "[RtClustMne::run] The noise covariance gives no inverse operator.";
         }
 
         //Process data from raw data input
-        if (bRawInput && pMinimumNorm) {
-            if (((skip_count % iDownSample) == 0)) {
-                // Get the current raw data
-                if (m_pCircularMatrixBuffer->pop(matData)) {
-                    //Pick the same channels as in the inverse operator
-                    matDataResized.resize(iNumberChannels, matData.cols());
-
-                    for (j = 0; j < iNumberChannels; ++j) {
-                        matDataResized.row(j) = matData.row(mne::channel_index(lChNamesFiffInfo, lChNamesInvOp.at(j)));
-                    }
-
-                    //TODO: Add picking here. See evoked part as input.
-                    sourceEstimate = pMinimumNorm->calculateInverse(matDataResized,
-                                                                    0.0f,
-                                                                    tstep,
-                                                                    true);
-
-                    if (!sourceEstimate.empty()) {
-                        if (iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                            sourceEstimate = sourceEstimate.reduce(iTimePointSps, 1);
-                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                        } else {
-                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                        }
-                    }
-                }
-            } else {
-                m_pCircularMatrixBuffer->pop(matData);
-            }
+        if (bRawInput && m_pCircularMatrixBuffer->pop(matData) && ++blockCount % iDownSample == 0 && rtInvOp && rtInvOp->ready()) {
+            publish(estimate(rtInvOp->apply(matData(rawPicks, placeholders::all)), 0.0f), iTimePointSps);
         }
 
         //Process data from averaging input
-        if (bEvokedInput) {
+        if (bEvokedInput && m_pCircularEvokedBuffer->pop(evoked) && ++blockCount % iDownSample == 0 && rtInvOp && rtInvOp->ready()) {
             if (bCmne) {
-                if (m_pCircularEvokedBuffer->pop(evoked)) {
-                    if (((skip_count % iDownSample) == 0)) {
-                        sourceEstimate = computeCmneInverse(evoked, lambda2, sModelCheckpoint);
-
-                        if (!sourceEstimate.empty()) {
-                            if (iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                                sourceEstimate = sourceEstimate.reduce(iTimePointSps, 1);
-                            }
-                            m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                        }
-                    }
+                publish(computeCmneInverse(evoked, *rtInvOp, lambda2, sModelCheckpoint), iTimePointSps);
+            } else {
+                // Averages that arrived before the channel selection still hold every channel
+                std::vector<int> rows;
+                for (const std::string& name : info.ch_names) {
+                    rows.push_back(mne::channel_index(evoked.info.ch_names, name));
                 }
-            } else if (pMinimumNorm) {
-                if (m_pCircularEvokedBuffer->pop(evoked)) {
-                    // Get the current evoked data
-                    if (((skip_count % iDownSample) == 0)) {
-                        sourceEstimate = pMinimumNorm->calculateInverse(evoked);
-
-                        if (!sourceEstimate.empty()) {
-                            if (iTimePointSps < sourceEstimate.data.cols() && iTimePointSps >= 0) {
-                                sourceEstimate = sourceEstimate.reduce(iTimePointSps, 1);
-                                m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                            } else {
-                                m_pRTSEOutput->measurementData()->setValue(sourceEstimate);
-                            }
-                        }
-                    } else {
-                        m_pCircularEvokedBuffer->pop(evoked);
-                    }
+                if (!std::ranges::contains(rows, -1)) {
+                    publish(estimate(rtInvOp->apply(evoked.data(rows, placeholders::all), evoked.nave), evoked.times.size() > 0 ? evoked.times[0] : 0.0f), iTimePointSps);
                 }
             }
         }
-
-        ++skip_count;
     }
 }
 
 //=============================================================================================================
 
 InvSourceEstimate RtClustMne::computeCmneInverse(const FiffEvoked& evoked,
+                                                 const RtInvOp& inverse,
                                                  float fLambda2,
                                                  const QString& sModelCheckpoint)
 {
@@ -720,31 +644,26 @@ InvSourceEstimate RtClustMne::computeCmneInverse(const FiffEvoked& evoked,
         return stcEmpty;
     }
 
-    std::shared_ptr<MNEForwardSolution> pFwd;
-    Eigen::MatrixXd noiseCov;
-    Eigen::MatrixXd srcCov;
-
-    {
-        QMutexLocker locker(&m_qMutex);
-        pFwd = m_pFwd;
-        noiseCov = m_invOp.noise_cov.data;
-        srcCov = m_invOp.source_cov.data;
+    // The gain, the covariances and the data rows all belong to the operator's channels
+    const FiffCov& noiseCov = inverse.noise_covariance();
+    std::vector<int> rows;
+    for (const std::string& name : noiseCov.names) {
+        rows.push_back(mne::channel_index(evoked.info.ch_names, name));
     }
-
-    if (!pFwd || pFwd->sol.empty() || noiseCov.size() == 0 || srcCov.size() == 0) {
-        qWarning() << "[RtClustMne::computeCmneInverse] Missing forward solution, noise cov or source cov.";
+    if (std::ranges::contains(rows, -1)) {
+        qWarning() << "[RtClustMne::computeCmneInverse] The evoked lacks channels of the inverse operator.";
         return stcEmpty;
     }
 
     InvCMNESettings cmneSettings;
     cmneSettings.onnxModelPath = sModelCheckpoint.toStdString();
     cmneSettings.lambda2 = static_cast<double>(fLambda2);
-    cmneSettings.numSources = static_cast<int>(pFwd->sol.data.cols());
+    cmneSettings.numSources = static_cast<int>(inverse.gain().cols());
 
-    InvCMNEResult res = InvCMNE::compute(evoked.data,
-                                         pFwd->sol.data,
-                                         noiseCov,
-                                         srcCov,
+    InvCMNEResult res = InvCMNE::compute(evoked.data(rows, placeholders::all),
+                                         inverse.gain(),
+                                         noiseCov.data,
+                                         MatrixXd(inverse.source_covariance().asDiagonal()),
                                          cmneSettings);
     return res.stcCmne;
 }

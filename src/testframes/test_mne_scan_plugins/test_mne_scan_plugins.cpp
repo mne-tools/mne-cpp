@@ -86,6 +86,7 @@ private slots:
     void rtFwdRefusesMissingInputFiles_data();
     void rtFwdRefusesMissingInputFiles();
     void rtClustMneKeepsTransformItCannotRead();
+    void rtClustMneLocalizesTheSources_data();
     void rtClustMneLocalizesTheSources();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
@@ -315,8 +316,16 @@ void TestMneScanPlugins::rtClustMneKeepsTransformItCannotRead()
 
 //=============================================================================================================
 
+void TestMneScanPlugins::rtClustMneLocalizesTheSources_data()
+{
+    QTest::addColumn<bool>("evoked");
+    QTest::newRow("raw") << false;
+    QTest::newRow("evoked") << true;
+}
+
 void TestMneScanPlugins::rtClustMneLocalizesTheSources()
 {
+    QFETCH(bool, evoked);
     if (!m_info)
         QSKIP("Sample test data not found");
 
@@ -341,7 +350,25 @@ void TestMneScanPlugins::rtClustMneLocalizesTheSources()
     block->setMultiArraySize(1);
     // The block holds its samples only while it notifies
     connect(block.data(), &Measurement::notify, inputs[0].data(), [input = inputs[0].data(), &block]() { emit input->notify(block); }, Qt::DirectConnection);
-    block->setValue(m_data.leftCols(200));
+    // An average of four trials of stimulus type 3, the plugin's default
+    FiffEvokedSet averages;
+    FiffEvoked average;
+    average.info = *m_info;
+    average.data = m_data.leftCols(200);
+    average.nave = 4;
+    average.comment = "3";
+    average.times = Eigen::RowVectorXf::LinSpaced(200, 0.0f, 199.0f / static_cast<float>(m_info->sfreq));
+    averages.evoked.push_back(average);
+    auto rtes = QSharedPointer<RealTimeEvokedSet>::create();
+    const auto send = [&]() {
+        if (evoked) {
+            rtes->setValue(averages, m_info, {"3"});
+            emit inputs[1]->notify(rtes);
+        } else {
+            block->setValue(m_data.leftCols(200));
+        }
+    };
+    send();
     auto rtc = QSharedPointer<RealTimeCov>::create();
     rtc->setValue(FiffCov((sample + "/sample_audvis-cov.fif").toStdU16String()));
 
@@ -351,15 +378,17 @@ void TestMneScanPlugins::rtClustMneLocalizesTheSources()
         if (!sinceLast.isValid() || sinceLast.elapsed() >= 1000) {
             sinceLast.start();
             emit inputs[2]->notify(rtc);
-            block->setValue(m_data.leftCols(200));
+            send();
         }
         QMutexLocker locker(&mutex);
         return estimate != nullptr; }, 30000);
     plugin->stop();
     QVERIFY(plugin->wait(5000));
     QVERIFY(localized);
-    QCOMPARE(estimate->data.rows(), fwd->nsource); // normal component of each source
+    // The normal component of each source for raw data, the magnitude for an average
+    QCOMPARE(estimate->data.rows(), fwd->nsource);
     QVERIFY(estimate->data.allFinite());
+    QCOMPARE(estimate->data.minCoeff() >= 0.0, evoked);
 }
 
 //=============================================================================================================

@@ -6,7 +6,7 @@
 // test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //
 // Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
-//         RtConnectivity, RtAveraging, RtNoise, filterFile
+//         RtConnectivity, RtInvOp, RtAveraging, RtNoise, filterFile
 //=============================================================================================================
 
 #include <QtTest/QtTest>
@@ -24,7 +24,9 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 
+#include <fiff/fiff_cov.h>
 #include <mne/mne_forward_solution.h>
+#include <mne/mne_inverse_operator.h>
 #include <mne/mne_source_spaces.h>
 
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
@@ -40,6 +42,8 @@
 #include <inv/hpi/inv_signal_model.h>
 
 #include <dsp/rt/rt_connectivity.h>
+#include <dsp/rt/rt_cov.h>
+#include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
 #include <dsp/rt/rt_filter.h>
@@ -89,6 +93,9 @@ private slots:
 
     // ---- RT Processing: RtConnectivity ----
     void rtConnectivity_lifecycle();
+
+    // ---- RT Processing: RtInvOp ----
+    void rtInvOp_matchesTheBatchInverse();
 
     // ---- RT Processing: RtAveraging ----
     void rtAveraging_moreWorkerOps();
@@ -329,6 +336,63 @@ void TestInvRtLibrary::rtConnectivity_lifecycle()
     const auto returned = spy.first().at(1).value<std::shared_ptr<ConnectivitySettings>>();
     QVERIFY(returned && returned.get() != &settings);
     QCOMPARE(returned->size(), 2);
+}
+
+//=============================================================================================================
+// RT Processing: RtInvOp
+//=============================================================================================================
+
+void TestInvRtLibrary::rtInvOp_matchesTheBatchInverse()
+{
+    if (!hasData())
+        QSKIP("Sample test data not found");
+
+    FiffRawData raw(rawPath().toStdString());
+    MatrixXd data;
+    MatrixXd times;
+    QVERIFY(raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + 2999));
+    const MNEForwardSolution fwd = MNEForwardSolution(fwdPath().toStdU16String()).pick_types(true, false);
+    const float lambda2 = 1.0f / 9.0f;
+    struct Case
+    {
+        InvEstimateMethod method;
+        const char* name;
+        int nave;
+        bool pickNormal;
+    };
+    const Case cases[] = {{InvEstimateMethod::MNE, "MNE", 1, true}, {InvEstimateMethod::dSPM, "dSPM", 1, true}, {InvEstimateMethod::sLORETA, "sLORETA", 1, true}, {InvEstimateMethod::dSPM, "dSPM", 4, true}, {InvEstimateMethod::dSPM, "dSPM", 4, false}};
+    std::vector<RtInvOp> streaming;
+    for (const Case& c : cases) {
+        streaming.emplace_back(raw.info, fwd, RtInvOp::Settings{.method = c.method, .lambda2 = lambda2, .pick_normal = c.pickNormal});
+        QVERIFY(!streaming.back().ready());
+    }
+
+    // The stored covariance, then one estimated from the data: the operator follows each
+    RtCov estimate(raw.info);
+    estimate.update(data);
+    const FiffCov covariances[] = {FiffCov((m_sDataPath + "/MEG/sample/sample_audvis-cov.fif").toStdU16String()), estimate.covariance().value()};
+    for (const FiffCov& cov : covariances) {
+        const MNEInverseOperator inverse(raw.info, fwd, cov, 0.2f, 0.8f);
+        for (std::size_t i = 0; i < std::size(cases); ++i) {
+            QVERIFY(streaming[i].update(cov));
+            QVERIFY(streaming[i].ready());
+
+            InvMinimumNorm batch(inverse, lambda2, cases[i].name);
+            batch.doInverseSetup(cases[i].nave, cases[i].pickNormal);
+            const StringList& names = batch.getPreparedInverseOperator().noise_cov.names;
+            MatrixXd picked(std::ssize(names), data.cols());
+            for (Index row = 0; row < picked.rows(); ++row) {
+                picked.row(row) = data.row(channel_index(raw.info.ch_names, names[static_cast<std::size_t>(row)]));
+            }
+            const MatrixXd expected = batch.calculateInverse(picked, 0.0f, 1.0f / raw.info.sfreq, cases[i].pickNormal).data;
+
+            const MatrixXd result = streaming[i].apply(data, cases[i].nave);
+            QCOMPARE(result.rows(), expected.rows());
+            QCOMPARE(result.cols(), expected.cols());
+            const double error = (result - expected).cwiseAbs().maxCoeff() / expected.cwiseAbs().maxCoeff();
+            QVERIFY2(error < 1e-6, qPrintable(QString("%1, nave %2: relative error %3").arg(cases[i].name).arg(cases[i].nave).arg(error)));
+        }
+    }
 }
 
 //=============================================================================================================

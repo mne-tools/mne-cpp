@@ -20,7 +20,6 @@
 //=============================================================================================================
 
 #include "rtclustmne_global.h"
-#include <functional>
 #include <memory>
 
 #include <scShared/Plugins/abstractalgorithm.h>
@@ -33,15 +32,12 @@
 
 #include <inv/inv_source_estimate.h>
 
-#include <mne/mne_inverse_operator.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFile>
-#include <QFuture>
-#include <QFutureWatcher>
 #include <QPointer>
 #include <QSharedPointer>
 
@@ -57,7 +53,7 @@ class MinimumNormSettingsView;
 namespace mne
 {
 class MNEForwardSolution;
-class MNEInverseOperator;
+class RtInvOp;
 }
 
 namespace mne
@@ -180,23 +176,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Slot to update the inverse operator
-     *
-     * @param[in] invOp    The inverse operator to update.
-     */
-    void updateInvOp(const mne::MNEInverseOperator& invOp);
-
-    //=========================================================================================================
-    /**
-     * Computes the MEG inverse operator for a new noise covariance on a pool thread. Callable from any thread;
-     * while one operator is computed, only the newest request waits.
-     *
-     * @param[in] noiseCov   The noise covariance.
-     */
-    void requestInverseOperator(const mne::FiffCov& noiseCov);
-
-    //=========================================================================================================
-    /**
      * Slot to update the real time forward solution
      */
     void updateRTFS(mne::scan::Measurement::SPtr pMeasurement);
@@ -241,38 +220,37 @@ protected:
      * Run the CMNE (Contextual MNE) inverse on a single evoked epoch.
      *
      * @param[in] evoked            The evoked epoch to localize.
+     * @param[in] inverse           The inverse operator whose channels, gain and covariances CMNE uses.
      * @param[in] fLambda2          Tikhonov regularisation (SNR^-2).
      * @param[in] sModelCheckpoint  Absolute path to the LSTM .onnx checkpoint.
      *
      * @return The CMNE-corrected source estimate, or an empty estimate if prerequisites are missing.
      */
     mne::InvSourceEstimate computeCmneInverse(const mne::FiffEvoked& evoked,
+                                              const mne::RtInvOp& inverse,
                                               float fLambda2,
                                               const QString& sModelCheckpoint);
 
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeFwdSolution>> m_pRTFSInput;                               /**< The RealTimeFwdSolution input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSAInput;                         /**< The RealTimeMultiSampleArray input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>> m_pRTESInput;                                 /**< The RealTimeEvoked input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeCov>> m_pRTCInput;                                        /**< The RealTimeCov input.*/
-    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeSourceEstimate>> m_pRTSEOutput;                          /**< The RealTimeSourceEstimate output.*/
-    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;                                         /**< Holds incoming RealTimeMultiSampleArray data.*/
-    std::shared_ptr<mne::CircularBuffer<mne::FiffEvoked>> m_pCircularEvokedBuffer;                                         /**< Holds incoming RealTimeMultiSampleArray data.*/
-    QFutureWatcher<mne::MNEInverseOperator> m_invOpWatcher;                                                                /**< Watches the inverse operator computation. */
-    std::function<mne::MNEInverseOperator()> m_pendingInvOp; /**< Newest operator request, waiting for the running one. */ /**< Real-time inverse operator. */
-    std::shared_ptr<mne::MNEForwardSolution> m_pFwd;                                                                       /**< Forward solution. */
-    std::shared_ptr<mne::FiffCov> m_pNoiseCov;                                                                             /**< Noise Covariance Matrix. */
-    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet;                                                                /**< FsAnnotation set. */
-    std::shared_ptr<mne::FsSurfaceSet> m_pSurfaceSet;                                                                      /**< FsSurface set. */
-    std::shared_ptr<mne::FiffInfoBase> m_pFiffInfoForward;                                                                 /**< Fiff information of the forward solution. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                                                            /**< Fiff information. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfoInput;                                                                       /**< Fiff information of the evoked. */
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeFwdSolution>> m_pRTFSInput;       /**< The RealTimeFwdSolution input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>> m_pRTESInput;         /**< The RealTimeEvoked input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeCov>> m_pRTCInput;                /**< The RealTimeCov input.*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeSourceEstimate>> m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
+    std::shared_ptr<mne::CircularBuffer<mne::FiffEvoked>> m_pCircularEvokedBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwd;                                               /**< Forward solution. */
+    std::shared_ptr<mne::FiffCov> m_pNoiseCov;                                                     /**< Noise Covariance Matrix. */
+    bool m_bNewNoiseCov = false;                                                                   /**< Whether m_pNoiseCov is newer than the operator. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet;                                        /**< FsAnnotation set. */
+    std::shared_ptr<mne::FsSurfaceSet> m_pSurfaceSet;                                              /**< FsSurface set. */
+    std::shared_ptr<mne::FiffInfoBase> m_pFiffInfoForward;                                         /**< Fiff information of the forward solution. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                                    /**< Fiff information. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfoInput;                                               /**< Fiff information of the evoked. */
 
-    bool m_bEvokedInput;       /**< Flag whether an evoked input was received. */
-    bool m_bRawInput;          /**< Flag whether a raw data input was received. */
-    bool m_bUpdateMinimumNorm; /**< Flag whether to update the miniumum norm object. */
+    bool m_bEvokedInput; /**< Flag whether an evoked input was received. */
+    bool m_bRawInput;    /**< Flag whether a raw data input was received. */
 
-    QMutex m_qMutex;        /**< The mutex ensuring thread safety. */
-    QFuture<void> m_future; /**< The future monitoring the clustering. */
+    QMutex m_qMutex; /**< The mutex ensuring thread safety. */
 
     mne::FiffEvoked m_currentEvoked;
     mne::FiffCoordTrans m_mriHeadTrans; /**< the Mri Head transformation. */
@@ -290,8 +268,6 @@ protected:
 
     std::vector<std::string> m_qListCovChNames;   /**< Covariance channel names. */
     std::vector<std::string> m_qListPickChannels; /**< Channels to pick. */
-
-    mne::MNEInverseOperator m_invOp; /**< The inverse operator. */
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);

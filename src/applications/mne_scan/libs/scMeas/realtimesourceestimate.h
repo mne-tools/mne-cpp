@@ -132,7 +132,7 @@ public:
      *
      * @param[in] fwdSolution   the forward solution to set.
      */
-    inline void setFwdSolution(std::shared_ptr<mne::MNEForwardSolution>& fwdSolution);
+    inline void setFwdSolution(const std::shared_ptr<mne::MNEForwardSolution>& fwdSolution);
 
     //=========================================================================================================
     /**
@@ -267,7 +267,7 @@ inline mne::FiffCoordTrans& RealTimeSourceEstimate::getMriHeadTrans()
 }
 //=============================================================================================================
 
-inline void RealTimeSourceEstimate::setFwdSolution(std::shared_ptr<mne::MNEForwardSolution>& fwdSolution)
+inline void RealTimeSourceEstimate::setFwdSolution(const std::shared_ptr<mne::MNEForwardSolution>& fwdSolution)
 {
     QMutexLocker locker(&m_qMutex);
     m_pFwdSolution = fwdSolution;

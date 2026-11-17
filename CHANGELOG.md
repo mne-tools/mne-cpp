@@ -684,12 +684,24 @@ aliases; replace the old spelling as below.
   `InvHpiFit(sensorSet)` and call `fit(data, projectors, model, coilsHead,
   result)` per block on the thread of your choice; the result's
   `devHeadTrans` is already device → head.
-- `RtInvOp`, `RtInvOpWorker` and `RtInvOpInput` (`dsp/rt/rt_inv_op.h`) are
-  removed: they only built an `MNEInverseOperator` on a `QThread`. Migration:
-  `MNEInverseOperator(info, fwd.pick_types(true, false), noiseCov, 0.2f, 0.8f)`
-  on the thread of your choice. The MNE Scan source localization plugin now
-  builds the operator on a pool thread and, while one is being built, keeps
-  only the newest covariance instead of queueing every estimate.
+- `RtInvOp` is a synchronous streaming inverse with no Qt: it computes the
+  MNE, dSPM or sLORETA source estimates of each block and follows each new
+  noise covariance. It does the forward-only work once per channel set and
+  applies the kernel in factored form, so a new covariance costs one
+  channels × channels eigendecomposition plus the noise normalization
+  instead of the SVD of the whitened gain: 130 ms instead of 3.1 s for the
+  305 sample MEG channels and 7928 sources. The estimates equal those of
+  `MNEInverseOperator` and `InvMinimumNorm` to 1e-6. The MNE Scan source
+  localization plugin uses it on its processing thread, so the newest
+  covariance applies to the next block, and localizes averages at SNR 3
+  (lambda2 1/9) as `mne.minimum_norm.apply_inverse` does instead of SNR 1.
+  Its CMNE path now gets the gain, covariances and data of the operator's
+  channels; it got the gain of every forward channel and a source covariance
+  vector where a matrix is expected. Migration: `RtInvOp(info, fwd)` →
+  `RtInvOp(info, fwd, {.method = ..., .lambda2 = ...})`; `append(cov)` and
+  the `invOperatorCalculated` signal → `update(cov)`, then `apply(data, nave)`
+  for the source estimates; `restart`, `stop`, `setFwdSolution` (construct a
+  new one), `RtInvOpWorker` and `RtInvOpInput` are removed.
 - `MNEForwardSolution::pick_channels` and `pick_types` left the names of every
   channel in `info.ch_names`, so code matching channels by name against a
   picked forward solution still found the dropped ones.
