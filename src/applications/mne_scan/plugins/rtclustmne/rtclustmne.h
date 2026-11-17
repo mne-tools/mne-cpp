@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include "rtclustmne_global.h"
+#include <functional>
 #include <memory>
 
 #include <scShared/Plugins/abstractalgorithm.h>
@@ -40,6 +41,7 @@
 
 #include <QFile>
 #include <QFuture>
+#include <QFutureWatcher>
 #include <QPointer>
 #include <QSharedPointer>
 
@@ -71,7 +73,6 @@ class InvMinimumNorm;
 
 namespace mne
 {
-class RtInvOp;
 }
 
 namespace mne
@@ -187,6 +188,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Computes the MEG inverse operator for a new noise covariance on a pool thread. Callable from any thread;
+     * while one operator is computed, only the newest request waits.
+     *
+     * @param[in] noiseCov   The noise covariance.
+     */
+    void requestInverseOperator(const mne::FiffCov& noiseCov);
+
+    //=========================================================================================================
+    /**
      * Slot to update the real time forward solution
      */
     void updateRTFS(mne::scan::Measurement::SPtr pMeasurement);
@@ -240,21 +250,22 @@ protected:
                                               float fLambda2,
                                               const QString& sModelCheckpoint);
 
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeFwdSolution>> m_pRTFSInput;       /**< The RealTimeFwdSolution input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSAInput; /**< The RealTimeMultiSampleArray input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>> m_pRTESInput;         /**< The RealTimeEvoked input.*/
-    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeCov>> m_pRTCInput;                /**< The RealTimeCov input.*/
-    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeSourceEstimate>> m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
-    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
-    std::shared_ptr<mne::CircularBuffer<mne::FiffEvoked>> m_pCircularEvokedBuffer;                 /**< Holds incoming RealTimeMultiSampleArray data.*/
-    std::shared_ptr<mne::RtInvOp> m_pRtInvOp;                                                      /**< Real-time inverse operator. */
-    std::shared_ptr<mne::MNEForwardSolution> m_pFwd;                                               /**< Forward solution. */
-    std::shared_ptr<mne::FiffCov> m_pNoiseCov;                                                     /**< Noise Covariance Matrix. */
-    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet;                                        /**< FsAnnotation set. */
-    std::shared_ptr<mne::FsSurfaceSet> m_pSurfaceSet;                                              /**< FsSurface set. */
-    std::shared_ptr<mne::FiffInfoBase> m_pFiffInfoForward;                                         /**< Fiff information of the forward solution. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                                    /**< Fiff information. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfoInput;                                               /**< Fiff information of the evoked. */
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeFwdSolution>> m_pRTFSInput;                               /**< The RealTimeFwdSolution input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSAInput;                         /**< The RealTimeMultiSampleArray input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeEvokedSet>> m_pRTESInput;                                 /**< The RealTimeEvoked input.*/
+    QSharedPointer<mne::scan::PluginInputData<mne::scan::RealTimeCov>> m_pRTCInput;                                        /**< The RealTimeCov input.*/
+    QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeSourceEstimate>> m_pRTSEOutput;                          /**< The RealTimeSourceEstimate output.*/
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pCircularMatrixBuffer;                                         /**< Holds incoming RealTimeMultiSampleArray data.*/
+    std::shared_ptr<mne::CircularBuffer<mne::FiffEvoked>> m_pCircularEvokedBuffer;                                         /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QFutureWatcher<mne::MNEInverseOperator> m_invOpWatcher;                                                                /**< Watches the inverse operator computation. */
+    std::function<mne::MNEInverseOperator()> m_pendingInvOp; /**< Newest operator request, waiting for the running one. */ /**< Real-time inverse operator. */
+    std::shared_ptr<mne::MNEForwardSolution> m_pFwd;                                                                       /**< Forward solution. */
+    std::shared_ptr<mne::FiffCov> m_pNoiseCov;                                                                             /**< Noise Covariance Matrix. */
+    std::shared_ptr<mne::FsAnnotationSet> m_pAnnotationSet;                                                                /**< FsAnnotation set. */
+    std::shared_ptr<mne::FsSurfaceSet> m_pSurfaceSet;                                                                      /**< FsSurface set. */
+    std::shared_ptr<mne::FiffInfoBase> m_pFiffInfoForward;                                                                 /**< Fiff information of the forward solution. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;                                                                            /**< Fiff information. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfoInput;                                                                       /**< Fiff information of the evoked. */
 
     bool m_bEvokedInput;       /**< Flag whether an evoked input was received. */
     bool m_bRawInput;          /**< Flag whether a raw data input was received. */

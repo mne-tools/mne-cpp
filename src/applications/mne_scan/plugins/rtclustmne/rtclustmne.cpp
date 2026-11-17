@@ -38,7 +38,6 @@
 #include <inv/minimum_norm/inv_cmne.h>
 #include <inv/minimum_norm/inv_cmne_settings.h>
 
-#include <dsp/rt/rt_inv_op.h>
 
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -84,6 +83,12 @@ RtClustMne::RtClustMne()
 , m_sMethod("dSPM")
 , m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif")
 {
+    connect(&m_invOpWatcher, &QFutureWatcher<MNEInverseOperator>::finished, this, [this]() {
+        updateInvOp(m_invOpWatcher.result());
+        if (m_pendingInvOp) {
+            m_invOpWatcher.setFuture(QtConcurrent::run(std::exchange(m_pendingInvOp, {})));
+        }
+    });
 }
 
 //=============================================================================================================
@@ -91,6 +96,7 @@ RtClustMne::RtClustMne()
 RtClustMne::~RtClustMne()
 {
     m_future.waitForFinished();
+    m_invOpWatcher.waitForFinished();
 
     if (this->isRunning()) {
         stop();
@@ -338,8 +344,8 @@ void RtClustMne::updateRTFS(mne::scan::Measurement::SPtr pMeasurement)
 {
     if (QSharedPointer<RealTimeFwdSolution> pRTFS = pMeasurement.dynamicCast<RealTimeFwdSolution>()) {
         //
-        // Both clustered and full source spaces are accepted. Neither RtInvOp
-        // nor MinimumNorm depends on the clustering, they only operate on the
+        // Both clustered and full source spaces are accepted. Neither the inverse
+        // operator nor MinimumNorm depends on the clustering, they only operate on the
         // gain matrix and the covariances. A full source space simply means
         // more sources and therefore a higher computational load.
         //
@@ -356,9 +362,8 @@ void RtClustMne::updateRTFS(mne::scan::Measurement::SPtr pMeasurement)
         m_qMutex.unlock();
 
         // update inverse operator
-        if (this->isRunning() && m_pRtInvOp) {
-            m_pRtInvOp->setFwdSolution(m_pFwd);
-            m_pRtInvOp->append(*m_pNoiseCov);
+        if (this->isRunning() && m_pNoiseCov) {
+            requestInverseOperator(*m_pNoiseCov);
         }
     }
 }
@@ -418,21 +423,14 @@ void RtClustMne::updateRTC(mne::scan::Measurement::SPtr pMeasurement)
         QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
         if (pRTC && this->isRunning()) {
-            // Init Real-Time inverse estimator
-            if (!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
-                m_pRtInvOp = std::make_shared<RtInvOp>(m_pFiffInfo, m_pFwd);
-                connect(m_pRtInvOp.get(), &RtInvOp::invOperatorCalculated,
-                        this, &RtClustMne::updateInvOp);
-            }
-
             //Fiff Information of the covariance
             if (m_qListCovChNames.size() != pRTC->getValue()->names.size()) {
                 m_qListCovChNames = pRTC->getValue()->names;
             }
 
-            if (this->isRunning() && m_pRtInvOp) {
+            if (this->isRunning()) {
                 m_pNoiseCov = pRTC->getValue();
-                m_pRtInvOp->append(*m_pNoiseCov);
+                requestInverseOperator(*m_pNoiseCov);
             }
         }
     }
@@ -506,6 +504,25 @@ void RtClustMne::updateInvOp(const MNEInverseOperator& invOp)
     m_invOp = invOp;
 
     m_bUpdateMinimumNorm = true;
+}
+
+//=============================================================================================================
+
+void RtClustMne::requestInverseOperator(const FiffCov& noiseCov)
+{
+    if (!m_pFiffInfo || !m_pFwd) {
+        return;
+    }
+    auto compute = [info = m_pFiffInfo, fwd = m_pFwd, noiseCov]() {
+        return MNEInverseOperator(*info, fwd->pick_types(true, false), noiseCov, 0.2f, 0.8f);
+    };
+    // The watcher lives on this object's thread; producers call in on theirs
+    QMetaObject::invokeMethod(this, [this, compute = std::move(compute)]() mutable {
+        if (m_invOpWatcher.isRunning()) {
+            m_pendingInvOp = std::move(compute);
+        } else {
+            m_invOpWatcher.setFuture(QtConcurrent::run(std::move(compute)));
+        } }, Qt::QueuedConnection);
 }
 
 //=============================================================================================================

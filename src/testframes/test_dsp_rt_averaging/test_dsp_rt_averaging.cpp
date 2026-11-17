@@ -15,7 +15,6 @@
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
 #include <dsp/rt/rt_connectivity.h>
-#include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_filter.h>
 #include <dsp/rt/rt_detect_trigger.h>
 

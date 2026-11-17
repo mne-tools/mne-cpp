@@ -684,6 +684,12 @@ aliases; replace the old spelling as below.
   `InvHpiFit(sensorSet)` and call `fit(data, projectors, model, coilsHead,
   result)` per block on the thread of your choice; the result's
   `devHeadTrans` is already device → head.
+- `RtInvOp`, `RtInvOpWorker` and `RtInvOpInput` (`dsp/rt/rt_inv_op.h`) are
+  removed: they only built an `MNEInverseOperator` on a `QThread`. Migration:
+  `MNEInverseOperator(info, fwd.pick_types(true, false), noiseCov, 0.2f, 0.8f)`
+  on the thread of your choice. The MNE Scan source localization plugin now
+  builds the operator on a pool thread and, while one is being built, keeps
+  only the newest covariance instead of queueing every estimate.
 - `RtCov` is a plain class with no Qt. It accumulates the channel sums and
   outer products of every block instead of keeping all blocks until the
   estimate, so its memory no longer grows with the number of samples.

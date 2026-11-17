@@ -6,7 +6,7 @@
 // test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //
 // Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
-//         RtConnectivity, RtInvOp, RtAveraging, RtNoise, filterFile
+//         RtConnectivity, RtAveraging, RtNoise, filterFile
 //=============================================================================================================
 
 #include <QtTest/QtTest>
@@ -40,7 +40,6 @@
 #include <inv/hpi/inv_signal_model.h>
 
 #include <dsp/rt/rt_connectivity.h>
-#include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
 #include <dsp/rt/rt_filter.h>
@@ -90,9 +89,6 @@ private slots:
 
     // ---- RT Processing: RtConnectivity ----
     void rtConnectivity_lifecycle();
-
-    // ---- RT Processing: RtInvOp ----
-    void rtInvOp_lifecycle();
 
     // ---- RT Processing: RtAveraging ----
     void rtAveraging_moreWorkerOps();
@@ -333,29 +329,6 @@ void TestInvRtLibrary::rtConnectivity_lifecycle()
     const auto returned = spy.first().at(1).value<std::shared_ptr<ConnectivitySettings>>();
     QVERIFY(returned && returned.get() != &settings);
     QCOMPARE(returned->size(), 2);
-}
-
-//=============================================================================================================
-// RT Processing: RtInvOp
-//=============================================================================================================
-
-void TestInvRtLibrary::rtInvOp_lifecycle()
-{
-    auto pInfo = std::make_shared<FiffInfo>();
-    pInfo->sfreq = 1000.0;
-    pInfo->nchan = 10;
-
-    auto pFwd = std::make_shared<MNEForwardSolution>();
-
-    RtInvOp rtInv(pInfo, pFwd);
-
-    auto pFwd2 = std::make_shared<MNEForwardSolution>();
-    rtInv.setFwdSolution(pFwd2);
-
-    rtInv.stop();
-    rtInv.restart();
-    rtInv.stop();
-    QThread::msleep(50);
 }
 
 //=============================================================================================================

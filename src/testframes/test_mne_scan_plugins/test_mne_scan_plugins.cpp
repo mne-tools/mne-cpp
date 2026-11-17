@@ -38,12 +38,17 @@
 
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
+#include <scMeas/realtimefwdsolution.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimesourceestimate.h>
 #include <scShared/Management/plugininputconnector.h>
 #include <scShared/Management/pluginoutputconnector.h>
 
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
+#include <inv/inv_source_estimate.h>
+#include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -81,6 +86,7 @@ private slots:
     void rtFwdRefusesMissingInputFiles_data();
     void rtFwdRefusesMissingInputFiles();
     void rtClustMneKeepsTransformItCannotRead();
+    void rtClustMneLocalizesTheSources();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
     void passesTheStreamThrough();
@@ -305,6 +311,55 @@ void TestMneScanPlugins::rtClustMneKeepsTransformItCannotRead()
         QTest::mouseClick(button, Qt::LeftButton);
         QCOMPARE(path->text(), choice.endsWith("all-trans.fif") ? choice : before);
     }
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::rtClustMneLocalizesTheSources()
+{
+    if (!m_info)
+        QSKIP("Sample test data not found");
+
+    const QString sample = QFileInfo(m_rawPath).absolutePath();
+    auto fwd = std::make_shared<MNEForwardSolution>((sample + "/../../Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif").toStdU16String());
+    std::unique_ptr<AbstractPlugin> plugin = makePlugin("RtClustMne");
+    const auto inputs = plugin->getInputConnectors();
+    std::shared_ptr<InvSourceEstimate> estimate;
+    QMutex mutex;
+    connect(plugin->getOutputConnectors().first().data(), &PluginOutputConnector::notify, this, [&estimate, &mutex](Measurement::SPtr pMeasurement) {
+        if (auto rtse = pMeasurement.dynamicCast<RealTimeSourceEstimate>(); rtse && !rtse->getValue().isEmpty()) {
+            QMutexLocker locker(&mutex);
+            estimate = rtse->getValue().last();
+        } }, Qt::DirectConnection);
+    QVERIFY(plugin->start());
+
+    auto rtfs = QSharedPointer<RealTimeFwdSolution>::create();
+    rtfs->setValue(fwd);
+    emit inputs[3]->notify(rtfs);
+    auto block = QSharedPointer<RealTimeMultiSampleArray>::create();
+    block->initFromFiffInfo(m_info);
+    block->setMultiArraySize(1);
+    // The block holds its samples only while it notifies
+    connect(block.data(), &Measurement::notify, inputs[0].data(), [input = inputs[0].data(), &block]() { emit input->notify(block); }, Qt::DirectConnection);
+    block->setValue(m_data.leftCols(200));
+    auto rtc = QSharedPointer<RealTimeCov>::create();
+    rtc->setValue(FiffCov((sample + "/sample_audvis-cov.fif").toStdU16String()));
+
+    // Like the covariance plugin, send an estimate and a block each second; the buffer holds 40 blocks
+    QElapsedTimer sinceLast;
+    const bool localized = QTest::qWaitFor([&]() {
+        if (!sinceLast.isValid() || sinceLast.elapsed() >= 1000) {
+            sinceLast.start();
+            emit inputs[2]->notify(rtc);
+            block->setValue(m_data.leftCols(200));
+        }
+        QMutexLocker locker(&mutex);
+        return estimate != nullptr; }, 30000);
+    plugin->stop();
+    QVERIFY(plugin->wait(5000));
+    QVERIFY(localized);
+    QCOMPARE(estimate->data.rows(), fwd->nsource); // normal component of each source
+    QVERIFY(estimate->data.allFinite());
 }
 
 //=============================================================================================================

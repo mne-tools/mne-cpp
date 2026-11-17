@@ -24,7 +24,6 @@ set(SOURCES
   spectrogram.cpp
   sphara.cpp
   rt/rt_cov.cpp
-  rt/rt_inv_op.cpp
   rt/rt_averaging.cpp
   rt/rt_noise.cpp
   rt/rt_filter.cpp
@@ -73,7 +72,6 @@ set(HEADERS
   spectrogram.h
   sphara.h
   rt/rt_cov.h
-  rt/rt_inv_op.h
   rt/rt_averaging.h
   rt/rt_noise.h
   rt/rt_filter.h

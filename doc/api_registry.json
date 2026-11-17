@@ -5332,56 +5332,6 @@
       ]
     },
     {
-      "name": "RtInvOp",
-      "module": "dsp",
-      "header": "dsp/rt/rt_inv_op.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_dsp_rt",
-      "example_snippet": [
-        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 37,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "required_data": [
-        "mne-cpp-test-data"
-      ]
-    },
-    {
-      "name": "RtInvOpWorker",
-      "module": "dsp",
-      "header": "dsp/rt/rt_inv_op.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_dsp_rt",
-      "example_snippet": [
-        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 38,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "required_data": [
-        "mne-cpp-test-data"
-      ]
-    },
-    {
       "name": "RtNoise",
       "module": "dsp",
       "header": "dsp/rt/rt_noise.h",
@@ -11142,29 +11092,6 @@
       ]
     },
     {
-      "name": "RtInvOpInput",
-      "module": "dsp",
-      "header": "dsp/rt/rt_inv_op.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 43,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers.",
-      "example_used_in": [
-        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
-      ]
-    },
-    {
       "name": "StatsClusterResult",
       "module": "sts",
       "header": "sts/sts_cluster.h",
@@ -16409,7 +16336,7 @@
       {
         "id": "real-time",
         "title": "Real-time processing",
-        "summary": "Worker-based online averaging, covariance, noise spectrum, connectivity, head-position fitting and inverse operators for streaming data.",
+        "summary": "Online averaging, covariance, noise spectrum, connectivity, head-position fitting and inverse operators for streaming data.",
         "manual": [
           "manual/scan.mdx",
           "manual/scan-sourceloc.mdx"
@@ -16419,7 +16346,7 @@
         ],
         "classes": [
           "RtAveraging",
-          "RtInvOp",
+          "RtCov",
           "RtConnectivity"
         ],
         "methods": [],

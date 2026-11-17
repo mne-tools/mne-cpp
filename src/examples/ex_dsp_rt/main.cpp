@@ -25,7 +25,6 @@
 #include <base/string_utils.h>
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
-#include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_noise.h>
 
 #include <connectivity/compute_connectivity.h>
@@ -300,21 +299,11 @@ int main(int argc, char* argv[])
     RtCov rawCov(*rawInfo);
     const FiffCov noiseCov = rawCov.estimate_covariance(rawData, 6000).value_or(FiffCov());
 
-    //! [rt_inv_op_usage]
-    RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
-    MNEInverseOperator inverse;
-    bool inverseDone = false;
-    QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverseOperator& op) {
-        inverse = op;
-        inverseDone = true;
-    });
-    rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
-    //! [rt_inv_op_usage]
-    const bool inverseArrived = waitFor(inverseDone, 60000);
+    // Rebuild the MEG operator for each new covariance estimate, on whichever thread suits the application
+    const MNEInverseOperator inverse(*rawInfo, fwd->pick_types(true, false), noiseCov, 0.2f, 0.8f);
     // 306 MEG channels in the forward solution, minus the bad MEG2443
-    ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && std::ranges::contains(rawInfo->bads, "MEG 2443"),
-                 std::format("RtInvOp builds a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
-    rtInvOp.stop();
+    ok &= expect(inverse.nsource == fwd->nsource && inverse.nchan == 305 && std::ranges::contains(rawInfo->bads, "MEG 2443"),
+                 std::format("The covariance estimate gives a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
 
     std::println("{}", ok ? "All dsp real-time checks passed." : "dsp real-time checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
