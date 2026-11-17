@@ -285,10 +285,12 @@ ok &= expect(cov.dim == 366 && cov.nfree == 15972 && cov.bads.size() == 2 && cov
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
 ````cpp title="src/examples/ex_dsp_rt/main.cpp, line 197"
-RtCov rtCov(info);
+RtCov rtCov(*info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {
-    cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+    if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
+        cov = std::move(*estimate);
+    }
 }
 // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
 ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),

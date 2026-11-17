@@ -5,10 +5,10 @@
   "summary": {
     "exported_classes": 488,
     "exported_free_functions": 151,
-    "registered_classes": 580,
+    "registered_classes": 579,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 80,
+    "registered_header_only": 79,
     "registered_stale": 0,
     "registered_with_test": 245,
     "registered_test_unresolved": 0,
@@ -16,10 +16,10 @@
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 463,
-    "public_api_units": 582,
+    "with_snippet": 462,
+    "public_api_units": 581,
     "example_eligible": 429,
-    "example_exempt": 153,
+    "example_exempt": 152,
     "eligible_backed_by_registry_example": 427,
     "eligible_used_by_some_example": 371,
     "examples_on_disk": 80,
@@ -108,13 +108,13 @@
       "with_snippet": 18
     },
     "dsp": {
-      "public": 87,
-      "registered": 87,
+      "public": 86,
+      "registered": 86,
       "with_test": 30,
       "eligible": 83,
       "eligible_with_registry_example": 83,
       "eligible_used_by_example": 83,
-      "with_snippet": 87
+      "with_snippet": 86
     },
     "fiff": {
       "public": 39,
@@ -8114,29 +8114,6 @@
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
-    },
-    {
-      "name": "RtCovComputeResult",
-      "header": "dsp/rt/rt_cov.h",
-      "library": "dsp",
-      "kind": "header-only",
-      "exported": false,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [
-        "ex_dsp_rt"
-      ],
-      "snippets": [
-        "ex_dsp_rt/main.cpp#rt_cov_usage"
-      ],
-      "api_page": "doc/website/docs/api/dsp/rt-cov-compute-result.mdx",
-      "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "registry: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov."
     },
     {
       "name": "TriggerFlank",

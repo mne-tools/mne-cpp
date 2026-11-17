@@ -275,7 +275,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/rt-noise',
         'api/dsp/rt-noise-worker',
         'api/dsp/filter-object',
-        'api/dsp/rt-cov-compute-result',
         'api/dsp/rt-inv-op-input',
         'api/dsp/annotate-amplitude-params',
         'api/dsp/annotate-muscl-params',

@@ -132,7 +132,7 @@ Blocks until the worker thread has finished, or until the timeout (ms) expires.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 229"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 231"
 RtNoise rtNoise(64, info200, 10);
 bool noiseDone = false;
 QObject::connect(&rtNoise, &RtNoise::SpecCalculated, [&](const MatrixXd& psd) { noiseDone = psd.topRows(2).isApprox(spectrum.topRows(2)); }); // the empty stim row is -inf dB

@@ -15,48 +15,46 @@ sidebar_position: 34
 class mne::RtCov
 ```
 
-Real-time covariance worker.
-
-Controller that manages background covariance matrix estimation from streaming data.
+Estimates the noise covariance of the MEG and EEG channels from streaming data.
 
 ```cpp title="src/examples/ex_dsp_rt/main.cpp"
-RtCov rtCov(info);
+RtCov rtCov(*info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {
-    cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+    if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
+        cov = std::move(*estimate);
+    }
 }
-```
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtCov
 ```
 
 ---
 
 ## Public Methods
 
-### RtCov(pFiffInfo)
-
----
-
-### estimateCovariance(matData, iNewMaxSamples)
-
-Perform actual covariance estimation.
+### RtCov(info)
 
 **Parameters:**
 
-- **matData** : *const Eigen::MatrixXd &*
-  Data to estimate the covariance from.
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info)*
+  Measurement info of the data; its MEG and EEG channels are used.
 
-- **iNewMaxSamples** : *int*
+---
+
+### estimate_covariance(data, maxSamples)
+
+Adds a block of data and returns the covariance once enough samples have arrived.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  A block of data, all channels of the measurement info by samples.
+
+- **maxSamples** : *int*
   Number of samples to accumulate before a covariance is estimated.
 
 **Returns:**
 
-- *[FiffCov](/docs/api/fiff/fiff-cov)* — Noise covariance of the MEG/EEG channels, or an empty [`FiffCov`](/docs/api/fiff/fiff-cov) while fewer than iNewMaxSamples samples are accumulated or if no [`FiffInfo`](/docs/api/fiff/fiff-info) was set.
+- *std::optional&lt; [FiffCov](/docs/api/fiff/fiff-cov) &gt;* — The regularized noise covariance of the MEG and EEG channels once at least maxSamples samples have arrived, after which the next estimate starts from nothing; no value before that, or if the measurement info has no channels.
 
 ---
 
@@ -74,10 +72,12 @@ Perform actual covariance estimation.
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
 ````cpp title="src/examples/ex_dsp_rt/main.cpp, line 197"
-RtCov rtCov(info);
+RtCov rtCov(*info);
 FiffCov cov;
 for (int start = 0; start < covData.cols(); start += 1000) {
-    cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+    if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
+        cov = std::move(*estimate);
+    }
 }
 // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
 ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),
