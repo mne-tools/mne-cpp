@@ -107,16 +107,14 @@ void Linalg::get_whitener(MatrixXd& A,
                           VectorXd& eig,
                           MatrixXd& eigvec)
 {
+    // Eigenvalues come in ascending order; for a symmetric matrix they are the singular values up to sign
     SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);
-
     eig = t_eigenSolver.eigenvalues();
     eigvec = t_eigenSolver.eigenvectors().transpose();
 
-    Linalg::sort<double>(eig, eigvec, false);
-    std::int32_t rnk = Linalg::rank(A);
-
-    for (std::int32_t i = 0; i < eig.size() - rnk; ++i)
-        eig(i) = 0;
+    const double threshold = 1e-8 * eig.cwiseAbs().maxCoeff();
+    const auto rnk = static_cast<std::int32_t>((eig.array().abs() > threshold).count());
+    eig.head(eig.size() - rnk).setZero();
 
     if (pca) {
         eigvec = eigvec.bottomRows(rnk).eval(); // eval: resizing eigvec frees the rows being read

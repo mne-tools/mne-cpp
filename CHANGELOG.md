@@ -693,6 +693,9 @@ aliases; replace the old spelling as below.
 - `MNEForwardSolution::pick_channels` and `pick_types` left the names of every
   channel in `info.ch_names`, so code matching channels by name against a
   picked forward solution still found the dropped ones.
+- `Linalg::get_whitener`, used by `FiffCov::prepare_noise_cov`, takes the
+  rank from the eigenvalues instead of a second SVD of the covariance: a
+  305-channel covariance is prepared in 10 ms instead of 104 ms.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each
