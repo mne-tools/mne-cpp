@@ -792,15 +792,14 @@ private slots:
 
         // Rising stim onsets with their codes, as read from the stim channel directly
         const MatrixXi events = deriveStimEvents(raw);
-        QList<QPair<int, double>> expected;
+        std::vector<TriggerFlank> expected;
         for (int row = 0; row < events.rows(); ++row) {
             if (events(row, 1) == 0)
-                expected.append({events(row, 0) - raw.first_samp, events(row, 2)});
+                expected.push_back({static_cast<int>(events(row, 0) - raw.first_samp), static_cast<double>(events(row, 2))});
         }
         QVERIFY(expected.size() > 10);
 
-        const QList<QPair<int, double>> triggers = mne::detectTriggerFlanksMax(data, stiIdx, 0, 0.5, false, 20);
-        QCOMPARE(triggers, expected);
+        QVERIFY(mne::detect_trigger_flanks_max(data, stiIdx, 0, 0.5, false, 20) == expected);
     }
 
     //=========================================================================

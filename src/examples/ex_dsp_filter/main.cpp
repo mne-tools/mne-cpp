@@ -24,6 +24,7 @@
 #include <dsp/filterio.h>
 #include <dsp/filterkernel.h>
 #include <dsp/parksmcclellan.h>
+#include <dsp/rt/rt_detect_trigger.h>
 #include <dsp/rt/rt_filter.h>
 
 #include <disp/plots/helpers/figureexporter.h>
@@ -171,6 +172,16 @@ int main(int argc, char* argv[])
     }
     const double streamErr = (streamed.row(0) - delayedTone).segment(1000, n - 1500).cwiseAbs().maxCoeff();
     ok &= expect(streamErr < 0.02, std::format("overlap-add over 4 blocks equals the delayed 10 Hz tone (max error {:g})", streamErr));
+
+    //! [trigger_detection_usage]
+    MatrixXd stim = MatrixXd::Zero(1, 3000); // a stim channel with code 5 at 0.5 s and code 3 at 2 s, 100 ms each
+    stim.block(0, 500, 1, 100).setConstant(5.0);
+    stim.block(0, 2000, 1, 100).setConstant(3.0);
+    const std::vector<TriggerFlank> onsets = detect_trigger_flanks_max(stim, 0, 0, 0.5, false, 150);
+    const std::vector<TriggerFlank> steps = detect_trigger_flanks_grad(stim, 0, 0, 0.5, FlankDirection::Falling, 150);
+    //! [trigger_detection_usage]
+    ok &= expect(onsets == std::vector<TriggerFlank>{{500, 5.0}, {2000, 3.0}} && steps == std::vector<TriggerFlank>{{600, 5.0}, {2100, 3.0}},
+                 "trigger detection finds the two onsets and their ends");
 
     //! [filter_io_round_trip]
     QTemporaryDir dir;

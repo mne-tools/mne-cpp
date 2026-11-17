@@ -26,8 +26,8 @@ private slots:
         data.block(0, 150, 1, 2).setConstant(5.0);
 
         // The burst length skips the rest of each pulse; the offset index shifts the reported samples
-        const QList<QPair<int, double>> triggers = detectTriggerFlanksMax(data, 0, 1000, 1.0, true, 5);
-        QCOMPARE(triggers, (QList<QPair<int, double>>{{1050, 5.0}, {1150, 5.0}}));
+        const std::vector<TriggerFlank> triggers = detect_trigger_flanks_max(data, 0, 1000, 1.0, true, 5);
+        QVERIFY(triggers == (std::vector<TriggerFlank>{{1050, 5.0}, {1150, 5.0}}));
     }
 
     void testDetectTriggerFlanksMaxMultiChannel()
@@ -36,9 +36,9 @@ private slots:
         data.block(1, 70, 1, 3).setConstant(10.0);
         data(2, 120) = 4.0;
 
-        const QMap<int, QList<QPair<int, double>>> triggers = detectTriggerFlanksMax(data, QList<int>{1, 2}, 0, 1.0, true, 5);
-        QCOMPARE(triggers.value(1), (QList<QPair<int, double>>{{70, 10.0}}));
-        QCOMPARE(triggers.value(2), (QList<QPair<int, double>>{{120, 4.0}}));
+        const auto triggers = detect_trigger_flanks_max(data, std::vector<int>{1, 2}, 0, 1.0, true, 5);
+        QVERIFY(triggers.at(1) == (std::vector<TriggerFlank>{{70, 10.0}}));
+        QVERIFY(triggers.at(2) == (std::vector<TriggerFlank>{{120, 4.0}}));
     }
 
     void testDetectTriggerFlanksGradSingleChannel()
@@ -46,8 +46,13 @@ private slots:
         MatrixXd data = MatrixXd::Zero(1, 200);
         data.block(0, 50, 1, 5).setConstant(10.0);
 
-        const QList<QPair<int, double>> triggers = detectTriggerFlanksGrad(data, 0, 0, 1.0, false, "Rising", 5);
-        QCOMPARE(triggers, (QList<QPair<int, double>>{{50, 10.0}}));
+        const auto triggers = detect_trigger_flanks_grad(data, 0, 0, 1.0, FlankDirection::Rising, 5);
+        QVERIFY(triggers == (std::vector<TriggerFlank>{{50, 10.0}}));
+
+        // A change has no offset: a 2 V step on a line idling at 5 V is found
+        MatrixXd idling = MatrixXd::Constant(1, 200, 5.0);
+        idling.rightCols(100).array() += 2.0;
+        QVERIFY(detect_trigger_flanks_grad(idling, 0, 0, 1.0, FlankDirection::Rising, 5) == (std::vector<TriggerFlank>{{100, 2.0}}));
     }
 
     void testDetectTriggerFlanksGradFalling()
@@ -55,8 +60,8 @@ private slots:
         MatrixXd data = MatrixXd::Constant(1, 200, 10.0);
         data.rightCols(150).setZero();
 
-        const QList<QPair<int, double>> triggers = detectTriggerFlanksGrad(data, 0, 0, 1.0, false, "Falling", 5);
-        QCOMPARE(triggers, (QList<QPair<int, double>>{{50, 10.0}}));
+        const auto triggers = detect_trigger_flanks_grad(data, 0, 0, 1.0, FlankDirection::Falling, 5);
+        QVERIFY(triggers == (std::vector<TriggerFlank>{{50, 10.0}}));
     }
 
     void testDetectTriggerFlanksGradMultiChannel()
@@ -65,9 +70,9 @@ private slots:
         data.block(2, 80, 1, 5).setConstant(10.0);
         data.block(0, 30, 1, 5).setConstant(3.0);
 
-        const QMap<int, QList<QPair<int, double>>> triggers = detectTriggerFlanksGrad(data, QList<int>{2, 0}, 0, 1.0, false, "Rising", 5);
-        QCOMPARE(triggers.value(2), (QList<QPair<int, double>>{{80, 10.0}}));
-        QCOMPARE(triggers.value(0), (QList<QPair<int, double>>{{30, 3.0}}));
+        const auto triggers = detect_trigger_flanks_grad(data, std::vector<int>{2, 0}, 0, 1.0, FlankDirection::Rising, 5);
+        QVERIFY(triggers.at(2) == (std::vector<TriggerFlank>{{80, 10.0}}));
+        QVERIFY(triggers.at(0) == (std::vector<TriggerFlank>{{30, 3.0}}));
     }
 
     void testDetectTriggerFlanksRejectsChannelsOutsideTheData()
@@ -75,44 +80,27 @@ private slots:
         // Row index == rows() is outside the data; for a single-row matrix it would alias the next column
         MatrixXd data = MatrixXd::Zero(1, 200);
         data(0, 100) = 5.0;
-        QVERIFY(detectTriggerFlanksMax(data, 1, 0, 1.0, false, 5).isEmpty());
-        QVERIFY(detectTriggerFlanksGrad(data, 1, 0, 1.0, false, "Rising", 5).isEmpty());
+        QVERIFY(detect_trigger_flanks_max(data, 1, 0, 1.0, false, 5).empty());
+        QVERIFY(detect_trigger_flanks_grad(data, 1, 0, 1.0, FlankDirection::Rising, 5).empty());
 
         // An invalid channel must not stop detection on the channels listed after it
-        const QList<int> channels{1, 0};
-        const auto max = detectTriggerFlanksMax(data, channels, 0, 1.0, false, 5);
-        QVERIFY(max.value(1).isEmpty());
-        QCOMPARE(max.value(0), (QList<QPair<int, double>>{{100, 5.0}}));
-        const auto grad = detectTriggerFlanksGrad(data, channels, 0, 1.0, false, "Rising", 5);
-        QVERIFY(grad.value(1).isEmpty());
-        QCOMPARE(grad.value(0), (QList<QPair<int, double>>{{100, 5.0}}));
+        const std::vector<int> channels{1, 0};
+        const auto max = detect_trigger_flanks_max(data, channels, 0, 1.0, false, 5);
+        QVERIFY(max.at(1).empty());
+        QVERIFY(max.at(0) == (std::vector<TriggerFlank>{{100, 5.0}}));
+        const auto grad = detect_trigger_flanks_grad(data, channels, 0, 1.0, FlankDirection::Rising, 5);
+        QVERIFY(grad.at(1).empty());
+        QVERIFY(grad.at(0) == (std::vector<TriggerFlank>{{100, 5.0}}));
     }
 
     void testToEventMatrix()
     {
-        QMap<int, QList<QPair<int, double>>> mapTriggers;
-        QList<QPair<int, double>> ch0Triggers;
-        ch0Triggers << QPair<int, double>(100, 5.0)
-                    << QPair<int, double>(200, 10.0);
-        mapTriggers[0] = ch0Triggers;
-
-        QList<MatrixXi> events = toEventMatrix(mapTriggers);
-        QCOMPARE(events.size(), 1);
-        QCOMPARE(events[0].rows(), 2);
-        QCOMPARE(events[0].cols(), 3);
-    }
-
-    void testToEventMatrixMultiChannel()
-    {
-        QMap<int, QList<QPair<int, double>>> mapTriggers;
-        QList<QPair<int, double>> ch0, ch1;
-        ch0 << QPair<int, double>(100, 1.0);
-        ch1 << QPair<int, double>(200, 2.0) << QPair<int, double>(300, 2.0);
-        mapTriggers[0] = ch0;
-        mapTriggers[1] = ch1;
-
-        QList<MatrixXi> events = toEventMatrix(mapTriggers);
-        QCOMPARE(events.size(), 2);
+        // One event matrix per channel, in channel order: sample, 0, trigger value
+        const std::map<int, std::vector<TriggerFlank>> triggers{{0, {{100, 5.0}, {200, 10.0}}}, {1, {{300, 2.0}}}};
+        const std::vector<MatrixXi> events = to_event_matrix(triggers);
+        QCOMPARE(events.size(), std::size_t(2));
+        QVERIFY(events[0] == (MatrixXi(2, 3) << 100, 0, 5, 200, 0, 10).finished());
+        QVERIFY(events[1] == (MatrixXi(1, 3) << 300, 0, 2).finished());
     }
 
     // ==================== ParksMcClellan tests ====================

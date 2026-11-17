@@ -816,16 +816,16 @@ void EventModel::getEventsFromNewData()
     }
 
     for (int iChannelIndex : stimChannelIndexList) {
-        QList<QPair<int, double>> detectedTriggerSamples = mne::detectTriggerFlanksMax(mSampleData,
-                                                                                       iChannelIndex,
-                                                                                       0,
-                                                                                       m_dThreshold,
-                                                                                       0);
+        const std::vector<mne::TriggerFlank> detectedTriggerSamples = mne::detect_trigger_flanks_max(mSampleData,
+                                                                                                     iChannelIndex,
+                                                                                                     0,
+                                                                                                     m_dThreshold,
+                                                                                                     0);
 
         QMap<double, QList<int>> mEventsinTypes;
 
-        for (const auto& sample : std::as_const(detectedTriggerSamples)) {
-            mEventsinTypes[sample.second].append(sample.first);
+        for (const mne::TriggerFlank& flank : detectedTriggerSamples) {
+            mEventsinTypes[flank.value].append(flank.sample);
         }
 
         QList<double> keyList = mEventsinTypes.keys();

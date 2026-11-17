@@ -9,17 +9,14 @@
  * @date     March 2026
  * @brief    Threshold and edge-based trigger detection on streaming stim channels.
  *
- * The functions in this header scan the rows of an incoming data matrix —
- * typically the stimulus / digital-trigger channels of a MEG or EEG file —
- * for sign or value transitions and return the sample index and amplitude
- * of every detected flank. @c detectTriggerFlanks uses Eigen's @c maxCoeff
- * over the per-sample derivative to localise rising edges, with optional
- * de-bouncing controlled by a minimum inter-event distance.
+ * The functions in this header scan rows of a data matrix — typically the stimulus / digital-trigger
+ * channels of a MEG or EEG recording — for samples that reach a threshold, either in value
+ * (detect_trigger_flanks_max) or in their sample-to-sample change (detect_trigger_flanks_grad), and
+ * return the sample index and value of every detected flank. After a flank, a burst length of samples
+ * is skipped so that one pulse is reported once.
  *
- * @ref mne::toEventMatrix "toEventMatrix" turns the per-channel @c QMap of detected events into
- * the canonical three-column @c Eigen::MatrixXi event layout (sample,
- * previous code, new code) consumed by the rest of the mne-cpp pipeline
- * (averaging, epoching, annotations).
+ * @ref mne::to_event_matrix "to_event_matrix" turns the detected flanks of each channel into the
+ * three-column event layout (sample, previous value, new value) used by the rest of mne-cpp.
  */
 
 #ifndef RT_DETECT_TRIGGER_RTPROCESSING_H
@@ -31,17 +28,11 @@
 
 #include "../dsp_global.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QPair>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
 #include <Eigen/Core>
+
+#include <map>
+#include <span>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -51,109 +42,114 @@ namespace mne
 {
 
 //=============================================================================================================
-// mne FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=========================================================================================================
 /**
- * Transforms QMap with stored information about events per stim channel to a list of event matrices.
+ * @brief A detected trigger flank: the sample it was found at and the value there.
  *
- * @param[in]       mapTriggers  The QMap to be transformed.
- *
- * @return A list of transformed Eigen matrices.
+ * @snippet ex_dsp_filter/main.cpp trigger_detection_usage
  */
-DSPSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int, QList<QPair<int, double>>> mapTriggers);
+struct DSPSHARED_EXPORT TriggerFlank
+{
+    int sample = 0;     /**< Sample index, including the offset passed to the detector. */
+    double value = 0.0; /**< Channel value (max detector) or sample-to-sample change (gradient detector). */
 
-//=========================================================================================================
-/**
- * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple
- * maxCoeff function implemented by eigen to locate the triggers.
- *
- * @param[in]        data  the data used to find the trigger flanks.
- * @param[in]        lTriggerChannels  The indeces of the trigger channels.
- * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index.
- * @param[in]        dThreshold  the signal threshold value used to find the trigger flank.
- * @param[in]        bRemoveOffset  remove the first sample as offset.
- * @param[in] iBurstLengthSamp  The length in samples which is skipped after a trigger was found.
- *
- * @return     This map holds the indices of the channels which are to be read from data. For each
- *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
- */
-DSPSHARED_EXPORT QMap<int, QList<QPair<int, double>>> detectTriggerFlanksMax(const Eigen::MatrixXd& data,
-                                                                             const QList<int>& lTriggerChannels,
-                                                                             int iOffsetIndex,
-                                                                             double dThreshold,
-                                                                             bool bRemoveOffset,
-                                                                             int iBurstLengthSamp = 100);
+    bool operator==(const TriggerFlank&) const = default;
+};
 
-//=========================================================================================================
-/**
- * detectTriggerFlanks detects flanks from a given data matrix in row wise order. This function uses a simple maxCoeff function implemented by eigen to locate the triggers.
- *
- * @param[in]        data  the data used to find the trigger flanks.
- * @param[in]        iTriggerChannelIdx  the index of the trigger channel in the matrix.
- * @param[in]        iOffsetIndex  the offset index gets added to the found trigger flank index.
- * @param[in]        dThreshold  the signal threshold value used to find the trigger flank.
- * @param[in]        bRemoveOffset  remove the first sample as offset.
- * @param[in] iBurstLengthSamp  The length in samples which is skipped after a trigger was found.
- *
- * @return     This list holds the found trigger indices and corresponding signal values.
- */
-DSPSHARED_EXPORT QList<QPair<int, double>> detectTriggerFlanksMax(const Eigen::MatrixXd& data,
-                                                                  int iTriggerChannelIdx,
-                                                                  int iOffsetIndex,
-                                                                  double dThreshold,
-                                                                  bool bRemoveOffset,
-                                                                  int iBurstLengthSamp = 100);
-
-//=========================================================================================================
-/**
- * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
- *
- * @param[in]    data  the data used to find the trigger flanks.
- * @param[in]    lTriggerChannels  The indeces of the trigger channels.
- * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index.
- * @param[in] dThreshold  the gradient threshold value used to find the trigger flank.
- * @param[in]    bRemoveOffset  remove the first sample as offset.
- * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input.
- * @param[in] iBurstLengthSamp  The length in samples which is skipped after a trigger was found.
- *
- * @return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
- */
-DSPSHARED_EXPORT QMap<int, QList<QPair<int, double>>> detectTriggerFlanksGrad(const Eigen::MatrixXd& data,
-                                                                              const QList<int>& lTriggerChannels,
-                                                                              int iOffsetIndex,
-                                                                              double dThreshold,
-                                                                              bool bRemoveOffset,
-                                                                              const QString& type,
-                                                                              int iBurstLengthSamp = 100);
-
-//=========================================================================================================
-/**
- * detectTriggerFlanksGrad detects flanks from a given data matrix in row wise order. This function uses a simple gradient to locate the triggers.
- *
- * @param[in]    data  the data used to find the trigger flanks.
- * @param[in]    iTriggerChannelIdx  the index of the trigger channel in the matrix.
- * @param[in]    iOffsetIndex  the offset index gets added to the found trigger flank index.
- * @param[in] dThreshold  the gradient threshold value used to find the trigger flank.
- * @param[in]    bRemoveOffset  remove the first sample as offset.
- * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input.
- * @param[in] iBurstLengthSamp  The length in samples which is skipped after a trigger was found.
- *
- * @return     This list holds the found trigger indices and corresponding signal values.
- */
-DSPSHARED_EXPORT QList<QPair<int, double>> detectTriggerFlanksGrad(const Eigen::MatrixXd& data,
-                                                                   int iTriggerChannelIdx,
-                                                                   int iOffsetIndex,
-                                                                   double dThreshold,
-                                                                   bool bRemoveOffset,
-                                                                   const QString& type,
-                                                                   int iBurstLengthSamp = 100);
+/** @brief Which flanks the gradient detector finds. */
+enum class FlankDirection
+{
+    Rising, /**< Increases of at least the threshold. */
+    Falling /**< Decreases of at least the threshold. */
+};
 
 //=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
+/**
+ * @param[in] triggers   Detected flanks by channel index.
+ *
+ * @return One event matrix per channel, in channel order, with rows (sample, 0, value).
+ */
+DSPSHARED_EXPORT std::vector<Eigen::MatrixXi> to_event_matrix(const std::map<int, std::vector<TriggerFlank>>& triggers);
 
-} // NAMESPACE
+//=============================================================================================================
+/**
+ * Finds the samples of one channel whose value reaches a threshold.
+ *
+ * @param[in] data          Data, channels by samples.
+ * @param[in] channel       Row of the trigger channel; a row outside the data finds nothing.
+ * @param[in] offset        Added to every reported sample index, e.g. the first sample of the block.
+ * @param[in] threshold     Value a sample must reach.
+ * @param[in] removeOffset  Whether to compare the value relative to the first sample of the block.
+ * @param[in] burstLength   Samples skipped after each flank.
+ *
+ * @return The detected flanks in sample order.
+ */
+DSPSHARED_EXPORT std::vector<TriggerFlank> detect_trigger_flanks_max(const Eigen::MatrixXd& data,
+                                                                     int channel,
+                                                                     int offset,
+                                                                     double threshold,
+                                                                     bool removeOffset,
+                                                                     int burstLength = 100);
+
+//=============================================================================================================
+/**
+ * detect_trigger_flanks_max() for several channels.
+ *
+ * @param[in] data          Data, channels by samples.
+ * @param[in] channels      Rows of the trigger channels.
+ * @param[in] offset        Added to every reported sample index.
+ * @param[in] threshold     Value a sample must reach.
+ * @param[in] removeOffset  Whether to compare values relative to the first sample of the block.
+ * @param[in] burstLength   Samples skipped after each flank.
+ *
+ * @return The detected flanks of every listed channel, an empty list for a row outside the data.
+ */
+DSPSHARED_EXPORT std::map<int, std::vector<TriggerFlank>> detect_trigger_flanks_max(const Eigen::MatrixXd& data,
+                                                                                    std::span<const int> channels,
+                                                                                    int offset,
+                                                                                    double threshold,
+                                                                                    bool removeOffset,
+                                                                                    int burstLength = 100);
+
+//=============================================================================================================
+/**
+ * Finds the samples of one channel whose change from the previous sample reaches a threshold.
+ *
+ * @param[in] data          Data, channels by samples.
+ * @param[in] channel       Row of the trigger channel; a row outside the data finds nothing.
+ * @param[in] offset        Added to every reported sample index.
+ * @param[in] threshold     Change a sample must reach.
+ * @param[in] direction     Whether to find rising or falling flanks.
+ * @param[in] burstLength   Samples skipped after each flank.
+ *
+ * @return The detected flanks in sample order; the value is the size of the change.
+ */
+DSPSHARED_EXPORT std::vector<TriggerFlank> detect_trigger_flanks_grad(const Eigen::MatrixXd& data,
+                                                                      int channel,
+                                                                      int offset,
+                                                                      double threshold,
+                                                                      FlankDirection direction,
+                                                                      int burstLength = 100);
+
+//=============================================================================================================
+/**
+ * detect_trigger_flanks_grad() for several channels.
+ *
+ * @param[in] data          Data, channels by samples.
+ * @param[in] channels      Rows of the trigger channels.
+ * @param[in] offset        Added to every reported sample index.
+ * @param[in] threshold     Change a sample must reach.
+ * @param[in] direction     Whether to find rising or falling flanks.
+ * @param[in] burstLength   Samples skipped after each flank.
+ *
+ * @return The detected flanks of every listed channel, an empty list for a row outside the data.
+ */
+DSPSHARED_EXPORT std::map<int, std::vector<TriggerFlank>> detect_trigger_flanks_grad(const Eigen::MatrixXd& data,
+                                                                                     std::span<const int> channels,
+                                                                                     int offset,
+                                                                                     double threshold,
+                                                                                     FlankDirection direction,
+                                                                                     int burstLength = 100);
+
+} // namespace mne
 
 #endif // RT_DETECT_TRIGGER_RTPROCESSING_H

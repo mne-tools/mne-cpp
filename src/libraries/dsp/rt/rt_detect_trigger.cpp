@@ -17,219 +17,123 @@
 #include "rt_detect_trigger.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMapIterator>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace Eigen;
 
-//=============================================================================================================
-// DEFINE mne_dsp GLOBAL METHODS
-//=============================================================================================================
-
-QList<MatrixXi> mne::toEventMatrix(QMap<int, QList<QPair<int, double>>> mapTriggers)
+namespace
 {
-    QList<MatrixXi> lMatDetectedTrigger;
 
-    QMapIterator<int, QList<QPair<int, double>>> idx(mapTriggers);
-
-    while (idx.hasNext()) {
-        idx.next();
-        MatrixXi matDetectedTrigger(idx.value().size(), 3);
-
-        for (int i = 0; i < idx.value().size(); ++i) {
-            matDetectedTrigger(i, 0) = idx.value().at(i).first;
-            matDetectedTrigger(i, 1) = 0;
-            matDetectedTrigger(i, 2) = idx.value().at(i).second;
+// Reports every sample of values that reaches the threshold, then skips the rest of the burst
+std::vector<mne::TriggerFlank> find_flanks(const RowVectorXd& values, int offset, double threshold, int burstLength)
+{
+    std::vector<mne::TriggerFlank> flanks;
+    for (Index j = 0; j < values.size(); ++j) {
+        if (values(j) >= threshold) {
+            flanks.push_back({offset + static_cast<int>(j), values(j)});
+            j += burstLength;
         }
-
-        lMatDetectedTrigger << matDetectedTrigger;
     }
+    return flanks;
+}
 
-    return lMatDetectedTrigger;
+bool has_row(const MatrixXd& data, int channel)
+{
+    return channel >= 0 && channel < data.rows();
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+std::vector<MatrixXi> mne::to_event_matrix(const std::map<int, std::vector<TriggerFlank>>& triggers)
+{
+    std::vector<MatrixXi> events;
+    events.reserve(triggers.size());
+    for (const auto& [channel, flanks] : triggers) {
+        MatrixXi& matrix = events.emplace_back(MatrixXi::Zero(std::ssize(flanks), 3));
+        for (Index i = 0; i < matrix.rows(); ++i) {
+            matrix(i, 0) = flanks[static_cast<std::size_t>(i)].sample;
+            matrix(i, 2) = static_cast<int>(flanks[static_cast<std::size_t>(i)].value);
+        }
+    }
+    return events;
 }
 
 //=============================================================================================================
 
-QMap<int, QList<QPair<int, double>>> mne::detectTriggerFlanksMax(const MatrixXd& data,
-                                                                 const QList<int>& lTriggerChannels,
-                                                                 int iOffsetIndex,
-                                                                 double dThreshold,
-                                                                 bool bRemoveOffset,
-                                                                 int iBurstLengthSamp)
+std::vector<mne::TriggerFlank> mne::detect_trigger_flanks_max(const MatrixXd& data,
+                                                              int channel,
+                                                              int offset,
+                                                              double threshold,
+                                                              bool removeOffset,
+                                                              int burstLength)
 {
-    QMap<int, QList<QPair<int, double>>> qMapDetectedTrigger;
-
-    //Find all triggers above threshold in the data block
-    for (int i = 0; i < lTriggerChannels.size(); ++i) {
-        int iChIdx = lTriggerChannels.at(i);
-
-        //Add empty list to map
-        QList<QPair<int, double>> temp;
-        qMapDetectedTrigger.insert(iChIdx, temp);
-
-        //detect the actual triggers in the current data matrix
-        if (iChIdx >= data.rows() || iChIdx < 0) {
-            continue;
-        }
-
-        //Find positive maximum in data vector.
-        for (int j = 0; j < data.cols(); ++j) {
-            double dMatVal = bRemoveOffset ? data(iChIdx, j) - data(iChIdx, 0) : data(iChIdx, j);
-
-            if (dMatVal >= dThreshold) {
-                QPair<int, double> pair;
-                pair.first = iOffsetIndex + j;
-                pair.second = data(iChIdx, j);
-
-                qMapDetectedTrigger[iChIdx].append(pair);
-
-                j += iBurstLengthSamp;
-            }
-        }
+    if (!has_row(data, channel) || data.cols() == 0) {
+        return {};
     }
-
-    return qMapDetectedTrigger;
+    std::vector<TriggerFlank> flanks = find_flanks(removeOffset ? RowVectorXd(data.row(channel).array() - data(channel, 0))
+                                                                : RowVectorXd(data.row(channel)),
+                                                   offset, threshold, burstLength);
+    for (TriggerFlank& flank : flanks) {
+        flank.value = data(channel, flank.sample - offset);
+    }
+    return flanks;
 }
 
 //=============================================================================================================
 
-QList<QPair<int, double>> mne::detectTriggerFlanksMax(const MatrixXd& data,
-                                                      int iTriggerChannelIdx,
-                                                      int iOffsetIndex,
-                                                      double dThreshold,
-                                                      bool bRemoveOffset,
-                                                      int iBurstLengthSamp)
+std::map<int, std::vector<mne::TriggerFlank>> mne::detect_trigger_flanks_max(const MatrixXd& data,
+                                                                             std::span<const int> channels,
+                                                                             int offset,
+                                                                             double threshold,
+                                                                             bool removeOffset,
+                                                                             int burstLength)
 {
-    QList<QPair<int, double>> lDetectedTriggers;
-
-    //Find all triggers above threshold in the data block
-    //detect the actual triggers in the current data matrix
-    if (iTriggerChannelIdx >= data.rows() || iTriggerChannelIdx < 0) {
-        return lDetectedTriggers;
+    std::map<int, std::vector<TriggerFlank>> triggers;
+    for (const int channel : channels) {
+        triggers[channel] = detect_trigger_flanks_max(data, channel, offset, threshold, removeOffset, burstLength);
     }
-
-    //Find positive maximum in data vector.
-    for (int j = 0; j < data.cols(); ++j) {
-        double dMatVal = bRemoveOffset ? data(iTriggerChannelIdx, j) - data(iTriggerChannelIdx, 0) : data(iTriggerChannelIdx, j);
-
-        if (dMatVal >= dThreshold) {
-            QPair<int, double> pair;
-            pair.first = iOffsetIndex + j;
-            pair.second = data(iTriggerChannelIdx, j);
-
-            lDetectedTriggers.append(pair);
-
-            j += iBurstLengthSamp;
-        }
-    }
-
-    return lDetectedTriggers;
+    return triggers;
 }
 
 //=============================================================================================================
 
-QMap<int, QList<QPair<int, double>>> mne::detectTriggerFlanksGrad(const MatrixXd& data,
-                                                                  const QList<int>& lTriggerChannels,
-                                                                  int iOffsetIndex,
-                                                                  double dThreshold,
-                                                                  bool bRemoveOffset,
-                                                                  const QString& type,
-                                                                  int iBurstLengthSamp)
+std::vector<mne::TriggerFlank> mne::detect_trigger_flanks_grad(const MatrixXd& data,
+                                                               int channel,
+                                                               int offset,
+                                                               double threshold,
+                                                               FlankDirection direction,
+                                                               int burstLength)
 {
-    QMap<int, QList<QPair<int, double>>> qMapDetectedTrigger;
-    RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
-
-    //Find all triggers above threshold in the data block
-    for (int i = 0; i < lTriggerChannels.size(); ++i) {
-        int iChIdx = lTriggerChannels.at(i);
-
-        //Add empty list to map
-        QList<QPair<int, double>> temp;
-        qMapDetectedTrigger.insert(iChIdx, temp);
-
-        //detect the actual triggers in the current data matrix
-        if (iChIdx >= data.rows() || iChIdx < 0) {
-            continue;
-        }
-
-        //Compute gradient
-        for (int t = 1; t < tGradient.cols(); t++) {
-            tGradient(t) = data(iChIdx, t) - data(iChIdx, t - 1);
-        }
-
-        // If falling flanks are to be detected flip the gradient's sign
-        if (type == "Falling") {
-            tGradient = tGradient * -1;
-        }
-
-        //Find positive maximum in gradient vector. This position is equal to the rising trigger flank.
-        for (int j = 0; j < tGradient.cols(); ++j) {
-            double dMatVal = bRemoveOffset ? tGradient(j) - data(iChIdx, 0) : tGradient(j);
-
-            if (dMatVal >= dThreshold) {
-                QPair<int, double> pair;
-                pair.first = iOffsetIndex + j;
-                pair.second = tGradient(j);
-
-                qMapDetectedTrigger[iChIdx].append(pair);
-
-                j += iBurstLengthSamp;
-            }
-        }
+    if (!has_row(data, channel)) {
+        return {};
     }
-
-    return qMapDetectedTrigger;
+    RowVectorXd gradient = RowVectorXd::Zero(data.cols());
+    if (data.cols() > 1) {
+        gradient.tail(data.cols() - 1) = data.row(channel).tail(data.cols() - 1) - data.row(channel).head(data.cols() - 1);
+    }
+    if (direction == FlankDirection::Falling) {
+        gradient = -gradient;
+    }
+    return find_flanks(gradient, offset, threshold, burstLength);
 }
 
 //=============================================================================================================
 
-QList<QPair<int, double>> mne::detectTriggerFlanksGrad(const MatrixXd& data,
-                                                       int iTriggerChannelIdx,
-                                                       int iOffsetIndex,
-                                                       double dThreshold,
-                                                       bool bRemoveOffset,
-                                                       const QString& type,
-                                                       int iBurstLengthSamp)
+std::map<int, std::vector<mne::TriggerFlank>> mne::detect_trigger_flanks_grad(const MatrixXd& data,
+                                                                              std::span<const int> channels,
+                                                                              int offset,
+                                                                              double threshold,
+                                                                              FlankDirection direction,
+                                                                              int burstLength)
 {
-    QList<QPair<int, double>> lDetectedTriggers;
-
-    RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
-
-    //detect the actual triggers in the current data matrix
-    if (iTriggerChannelIdx >= data.rows() || iTriggerChannelIdx < 0) {
-        return lDetectedTriggers;
+    std::map<int, std::vector<TriggerFlank>> triggers;
+    for (const int channel : channels) {
+        triggers[channel] = detect_trigger_flanks_grad(data, channel, offset, threshold, direction, burstLength);
     }
-
-    //Compute gradient
-    for (int t = 1; t < tGradient.cols(); ++t) {
-        tGradient(t) = data(iTriggerChannelIdx, t) - data(iTriggerChannelIdx, t - 1);
-    }
-
-    //If falling flanks are to be detected flip the gradient's sign
-    if (type == "Falling") {
-        tGradient = tGradient * -1;
-    }
-
-    //Find all triggers above threshold in the data block
-    for (int j = 0; j < tGradient.cols(); ++j) {
-        double dMatVal = bRemoveOffset ? tGradient(j) - data(iTriggerChannelIdx, 0) : tGradient(j);
-
-        if (dMatVal >= dThreshold) {
-            QPair<int, double> pair;
-            pair.first = iOffsetIndex + j;
-            pair.second = tGradient(j);
-
-            lDetectedTriggers.append(pair);
-
-            j += iBurstLengthSamp;
-        }
-    }
-
-    return lDetectedTriggers;
+    return triggers;
 }

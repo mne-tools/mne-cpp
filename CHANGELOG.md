@@ -670,6 +670,18 @@ aliases; replace the old spelling as below.
   and the MNE Studio MNA skills, MNE Inspect, MNE Browse and
   `mne_mna_bids_converter` report why a project could not be read or
   written.
+- Trigger detection (`dsp/rt/rt_detect_trigger.h`) uses standard C++ only.
+  The gradient detector subtracted the first sample's value from every
+  sample-to-sample change when asked to remove an offset, so on a trigger
+  line idling above 0 V it missed flanks; a change has no offset, and the
+  parameter is gone. Migration: `detectTriggerFlanksMax` /
+  `detectTriggerFlanksGrad` / `toEventMatrix` are
+  `detect_trigger_flanks_max` / `detect_trigger_flanks_grad` /
+  `to_event_matrix`; a flank is a `TriggerFlank{sample, value}` instead of a
+  `QPair<int, double>`, results are `std::vector` and `std::map` instead of
+  `QList` and `QMap`, channel lists are `std::span<const int>`, and the
+  gradient detector takes `FlankDirection::Rising`/`Falling` instead of the
+  strings "Rising"/"Falling" and no `bRemoveOffset`.
 - `FilterKernel` reports the pass band of low-pass and high-pass filters the
   right way round: a 100 Hz low-pass runs from 0 to 100 Hz, a high-pass from
   its cutoff to the Nyquist frequency. Before, `highpass_freq()` and

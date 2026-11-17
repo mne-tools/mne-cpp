@@ -435,9 +435,9 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
             matCorrected = doProj ? MatrixXd(m_matSparseProjMult * matBlock) : matBlock;
         }
 
-        QList<QPair<int, double>> lTriggers;
+        std::vector<mne::TriggerFlank> lTriggers;
         if (m_bTriggerDetectionActive) {
-            lTriggers = mne::detectTriggerFlanksMax(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
+            lTriggers = mne::detect_trigger_flanks_max(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
         }
 
         forWrappedSpan(m_iCurrentSample, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
@@ -453,17 +453,17 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
                 }
             }
 
-            for (const QPair<int, double>& trigger : std::as_const(lTriggers)) {
-                if (trigger.first >= iOffset && trigger.first < iOffset + iLength) {
-                    m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append({iCol + trigger.first - iOffset, trigger.second});
+            for (const mne::TriggerFlank& trigger : lTriggers) {
+                if (trigger.sample >= iOffset && trigger.sample < iOffset + iLength) {
+                    m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append({iCol + trigger.sample - iOffset, trigger.value});
                 }
             }
 
             m_iCurrentSample = iCol + iLength;
         });
 
-        if (!lTriggers.isEmpty()) {
-            m_iDetectedTriggers += lTriggers.size();
+        if (!lTriggers.empty()) {
+            m_iDetectedTriggers += static_cast<int>(lTriggers.size());
             emit triggerDetected(m_iDetectedTriggers, m_qMapDetectedTrigger);
         }
 

@@ -203,12 +203,12 @@ void RtAveragingWorker::setBaselineTo(int toSamp,
 void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
 {
     //Detect trigger
-    QList<QPair<int, double>> lDetectedTriggers = mne::detectTriggerFlanksMax(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
+    const std::vector<TriggerFlank> lDetectedTriggers = mne::detect_trigger_flanks_max(rawSegment, m_iTriggerChIndex, 0, m_fTriggerThreshold, true);
 
     //TODO: This does not permit the same trigger type twice in one data block
-    for (int i = 0; i < lDetectedTriggers.size(); ++i) {
-        if (!m_mapFillingBackBuffer.contains(lDetectedTriggers.at(i).second)) {
-            double dTriggerType = lDetectedTriggers.at(i).second;
+    for (const TriggerFlank& trigger : lDetectedTriggers) {
+        if (!m_mapFillingBackBuffer.contains(trigger.value)) {
+            double dTriggerType = trigger.value;
 
 
             m_mapFillingBackBuffer[dTriggerType] = false;
@@ -243,9 +243,9 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
                 emitEvoked(dTriggerType, lResponsibleTriggerTypes);
             }
         } else {
-            for (int i = 0; i < lDetectedTriggers.size(); ++i) {
-                if (dTriggerType == lDetectedTriggers.at(i).second) {
-                    int iTriggerPos = lDetectedTriggers.at(i).first;
+            for (const TriggerFlank& trigger : lDetectedTriggers) {
+                if (dTriggerType == trigger.value) {
+                    int iTriggerPos = trigger.sample;
 
                     m_mapDataPre[dTriggerType] = matHistoryAndBlock.middleCols(iTriggerPos, m_iPreStimSamples);
 

@@ -154,8 +154,7 @@ private slots:
     void detectTrigger_flatSignal()
     {
         MatrixXd data = MatrixXd::Zero(1, 1000);
-        QList<QPair<int, double>> triggers = detectTriggerFlanksMax(data, 0, 0, 0.5, true);
-        QCOMPARE(triggers.size(), 0);
+        QVERIFY(detect_trigger_flanks_max(data, 0, 0, 0.5, true).empty());
     }
 
     void detectTrigger_singlePulse()
@@ -165,8 +164,7 @@ private slots:
         data(0, 51) = 1.0;
         data(0, 52) = 1.0;
 
-        QList<QPair<int, double>> triggers = detectTriggerFlanksMax(data, 0, 0, 0.5, true);
-        QVERIFY(triggers.size() >= 0);
+        QVERIFY(detect_trigger_flanks_max(data, 0, 0, 0.5, true) == (std::vector<TriggerFlank>{{50, 1.0}}));
     }
 
     void detectTrigger_gradient()
@@ -176,10 +174,8 @@ private slots:
             data(0, i) = (i < 50) ? 0.0 : 1.0;
         }
 
-        QList<int> lTriggerChannels;
-        lTriggerChannels << 0;
-        QMap<int, QList<QPair<int, double>>> mapTriggers = detectTriggerFlanksGrad(data, lTriggerChannels, 0, 0.5, false, "Rising");
-        QVERIFY(mapTriggers.size() >= 0);
+        const auto triggers = detect_trigger_flanks_grad(data, std::vector<int>{0}, 0, 0.5, FlankDirection::Rising);
+        QVERIFY(triggers.at(0) == (std::vector<TriggerFlank>{{50, 1.0}}));
     }
 
     //=========================================================================
