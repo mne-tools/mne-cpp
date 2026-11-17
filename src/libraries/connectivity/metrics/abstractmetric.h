@@ -9,22 +9,10 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Common static knobs shared by every functional-connectivity estimator in @c mne_connectivity.
+ * @brief    Common base of the functional-connectivity estimators in @c mne_connectivity.
  *
- * Every metric in @c mne_connectivity (Coherence, Imaginary Coherence, PLI, wPLI,
- * dwPLI, USPLI, PLV, cross-correlation, Granger Causality, DTF, PDC) reads
- * the same global control flags from @ref mne::AbstractMetric so that the
- * dispatcher in @ref mne::compute_connectivity can decide once - before any FFT runs -
- * whether intermediate per-trial spectra should be cached for reuse
- * (storage mode) and which frequency-bin window the metrics should
- * average over.
- *
- * The frequency-bin window is expressed as @c [m_iNumberBinStart,
- * m_iNumberBinStart + m_iNumberBinAmount). All metrics collapse the
- * spectral output to a single scalar per channel pair by averaging the
- * magnitude (or squared magnitude, depending on the metric) over exactly
- * this window, so callers select an EEG band (e.g. alpha 8-12 Hz) once and
- * every estimator returns a comparable band-limited connectivity matrix.
+ * The frequency bins a spectral metric estimates and whether the per-trial spectra are kept for the next
+ * call belong to each @ref mne::ConnectivitySettings, so independent analyses do not share state.
  */
 
 #ifndef ABSTRACTMETRIC_H
@@ -61,19 +49,9 @@ class Network;
 
 //=============================================================================================================
 /**
- * Static base for every estimator in @c mne_connectivity. Holds the two pieces of
- * global state that the dispatcher (@ref compute_connectivity) must set
- * before any metric runs:
- *  - @c mne::AbstractMetric::m_bStorageModeIsActive "m_bStorageModeIsActive" enables caching of per-trial tapered
- *    spectra and CSDs in @ref ConnectivitySettings::IntermediateTrialData,
- *    which lets a second metric reuse the FFT work done by the first.
- *  - @c mne::AbstractMetric::m_iNumberBinStart "m_iNumberBinStart" and @c mne::AbstractMetric::m_iNumberBinAmount "m_iNumberBinAmount" define the
- *    frequency-bin window over which each metric averages its spectral
- *    output into the single scalar weight stored on each network edge.
+ * @brief Common base of the connectivity metrics.
  *
- * @brief Static control knobs (storage mode, frequency band) shared by all mne_connectivity metrics.
- *
- * @snippet ex_connectivity_metrics/main.cpp abstract_metric_band
+ * @snippet ex_connectivity_metrics/main.cpp connectivity_calculate
  */
 class CONNECTIVITYSHARED_EXPORT AbstractMetric
 {
@@ -83,10 +61,6 @@ public:
      * Constructs a AbstractMetric object.
      */
     explicit AbstractMetric();
-
-    static bool m_bStorageModeIsActive;
-    static int m_iNumberBinStart;
-    static int m_iNumberBinAmount;
 
 protected:
     //=========================================================================================================

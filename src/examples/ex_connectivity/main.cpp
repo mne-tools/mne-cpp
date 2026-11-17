@@ -94,10 +94,6 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     QApplication::addLibraryPath(QApplication::applicationDirPath() + "/../lib");
 
-    AbstractMetric::m_bStorageModeIsActive = false;
-    AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 50;
-
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Example");
     parser.addHelpOption();

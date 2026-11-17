@@ -3440,7 +3440,7 @@
       "test": null,
       "example": "ex_connectivity_metrics",
       "example_snippet": [
-        "ex_connectivity_metrics/main.cpp#abstract_metric_band"
+        "ex_connectivity_metrics/main.cpp#connectivity_calculate"
       ],
       "example_mode": "run",
       "status": "documented",
@@ -3492,6 +3492,7 @@
       "python_url": null,
       "example_snippet": [
         "ex_connectivity_metrics/main.cpp#connectivity_settings_setup",
+        "ex_connectivity_metrics/main.cpp#connectivity_frequency_bins",
         "ex_connectivity_metrics/main.cpp#connectivity_calculate"
       ],
       "example_mode": "run"

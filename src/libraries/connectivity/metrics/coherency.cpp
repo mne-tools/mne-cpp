@@ -87,6 +87,8 @@ void Coherency::calculateAbs(Network& finalNetwork,
     // Initialize vecPsdAvg and vecCsdAvg
     int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    const int binStart = connectivitySettings.frequency_bins().first;
+    const int binAmount = connectivitySettings.frequency_bins().second;
 
     // Compute PSD/CSD for each trial
     QMutex mutex;
@@ -99,7 +101,10 @@ void Coherency::calculateAbs(Network& finalNetwork,
                 iNRows,
                 iNFreqs,
                 iNfft,
-                tapers);
+                tapers,
+                binStart,
+                binAmount,
+                connectivitySettings.keeps_trial_data());
     };
 
     //    iTime = timer.elapsed();
@@ -155,6 +160,8 @@ void Coherency::calculateImag(Network& finalNetwork,
     // Initialize vecPsdAvg and vecCsdAvg
     int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
+    const int binStart = connectivitySettings.frequency_bins().first;
+    const int binAmount = connectivitySettings.frequency_bins().second;
 
     // Compute PSD/CSD for each trial
     QMutex mutex;
@@ -167,7 +174,10 @@ void Coherency::calculateImag(Network& finalNetwork,
                 iNRows,
                 iNFreqs,
                 iNfft,
-                tapers);
+                tapers,
+                binStart,
+                binAmount,
+                connectivitySettings.keeps_trial_data());
     };
 
     //    iTime = timer.elapsed();
@@ -205,7 +215,10 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,
-                        const std::pair<MatrixXd, VectorXd>& tapers)
+                        const std::pair<MatrixXd, VectorXd>& tapers,
+                        int binStart,
+                        int binAmount,
+                        bool keepTrialData)
 {
     //    QElapsedTimer timer;
     //    qint64 iTime = 0;
@@ -235,7 +248,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
     int i, j;
 
-    inputData.matPsd = MatrixXd(iNRows, m_iNumberBinAmount);
+    inputData.matPsd = MatrixXd(iNRows, binAmount);
 
     for (i = 0; i < iNRows; ++i) {
         // Substract mean
@@ -262,14 +275,14 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         }
 
         // Compute PSD (average over tapers if necessary).
-        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(i).rows(), m_iNumberBinAmount).cwiseAbs2().colwise().sum() / denomPSD;
+        inputData.matPsd.row(i) = inputData.vecTapSpectra.at(i).block(0, binStart, inputData.vecTapSpectra.at(i).rows(), binAmount).cwiseAbs2().colwise().sum() / denomPSD;
 
         // Divide first and last element by 2 due to half spectrum
-        if (m_iNumberBinStart == 0) {
+        if (binStart == 0) {
             inputData.matPsd.row(i)(0) /= 2.0;
         }
 
-        if (bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
+        if (bNfftEven && binStart + binAmount >= iNFreqs) {
             inputData.matPsd.row(i).tail(1) /= 2.0;
         }
     }
@@ -292,21 +305,21 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
         inputData.vecPairCsd.clear();
 
         //MatrixXcd matCsd = MatrixXcd(iNRows, iNFreqs);
-        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
+        MatrixXcd matCsd = MatrixXcd(iNRows, binAmount);
 
         double denomCSD = sqrt(tapers.second.cwiseAbs2().sum()) * sqrt(tapers.second.cwiseAbs2().sum()) / 2.0;
 
         for (i = 0; i < iNRows; ++i) {
             for (j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(i).rows(), m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(j).rows(), m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, binStart, inputData.vecTapSpectra.at(i).rows(), binAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, binStart, inputData.vecTapSpectra.at(j).rows(), binAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                if (m_iNumberBinStart == 0) {
+                if (binStart == 0) {
                     matCsd.row(j)(0) /= 2.0;
                 }
 
-                if (bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
+                if (bNfftEven && binStart + binAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
@@ -331,7 +344,7 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
     //    timer.restart();
 
     //Do not store data to save memory
-    if (!m_bStorageModeIsActive) {
+    if (!keepTrialData) {
         inputData.vecPairCsd.clear();
         inputData.vecTapSpectra.clear();
     }

@@ -137,6 +137,9 @@ private:
      * @param[in]   iNFreqs             The number of frequenciy bins.
      * @param[in]   iNfft               The FFT length.
      * @param[in]   tapers              The taper information.
+     * @param[in] binStart              First frequency bin of the half spectrum to use.
+     * @param[in] binAmount             Number of frequency bins to use.
+     * @param[in] keepTrialData         Whether to keep the tapered spectra and cross-spectra of the trial.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,
@@ -145,7 +148,10 @@ private:
                         int iNRows,
                         int iNFreqs,
                         int iNfft,
-                        const std::pair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+                        const std::pair<Eigen::MatrixXd, Eigen::VectorXd>& tapers,
+                        int binStart,
+                        int binAmount,
+                        bool keepTrialData);
 
     //=========================================================================================================
     /**

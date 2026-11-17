@@ -10,9 +10,10 @@
 #include <fiff/fiff_info.h>
 #include <connectivity/network/network.h>
 #include <connectivity/metrics/correlation.h>
-#include <connectivity/metrics/abstractmetric.h>
+#include <connectivity/metrics/coherence.h>
 #include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
 #include <connectivity/metrics/mvar_model.h>
+#include <connectivity/metrics/weightedphaselagindex.h>
 
 #include <cmath>
 #include <random>
@@ -442,33 +443,32 @@ private slots:
             }
             trials.push_back(trial);
         }
-        const auto settingsFor = [sfreq](std::span<const MatrixXd> data) {
+        const auto settingsFor = [sfreq](std::span<const MatrixXd> data, bool keep) {
             ConnectivitySettings settings;
             settings.setSamplingFrequency(static_cast<int>(sfreq));
             settings.setFFTSize(256);
             settings.setWindowType("hanning");
+            settings.set_frequency_bins(24, 4);
+            settings.set_keep_trial_data(keep);
             settings.append(data);
             return settings;
         };
-        const bool storage = AbstractMetric::m_bStorageModeIsActive;
-        const int start = AbstractMetric::m_iNumberBinStart, amount = AbstractMetric::m_iNumberBinAmount;
-        AbstractMetric::m_iNumberBinStart = 24;
-        AbstractMetric::m_iNumberBinAmount = 4;
-
-        AbstractMetric::m_bStorageModeIsActive = false;
-        ConnectivitySettings all = settingsFor(trials);
+        ConnectivitySettings all = settingsFor(trials, false);
         const MatrixXd fresh = DebiasedSquaredWeightedPhaseLagIndex::calculate(all).connectivity_matrix();
 
-        // In storage mode the per-trial spectra are kept, so adding a trial gives what computing all at once gives
-        AbstractMetric::m_bStorageModeIsActive = true;
-        ConnectivitySettings growing = settingsFor(std::span(trials).first(19));
+        // Kept per-trial spectra let an appended trial give what computing all at once gives
+        ConnectivitySettings growing = settingsFor(std::span(trials).first(19), true);
         DebiasedSquaredWeightedPhaseLagIndex::calculate(growing);
         growing.append(trials.back());
         const MatrixXd accumulated = DebiasedSquaredWeightedPhaseLagIndex::calculate(growing).connectivity_matrix();
 
-        AbstractMetric::m_bStorageModeIsActive = storage;
-        AbstractMetric::m_iNumberBinStart = start;
-        AbstractMetric::m_iNumberBinAmount = amount;
+        // Another analysis of the whole spectrum leaves the band of the first untouched
+        ConnectivitySettings wide = settingsFor(trials, false);
+        wide.set_frequency_bins(-1, -1);
+        QCOMPARE(DebiasedSquaredWeightedPhaseLagIndex::calculate(wide).used_freq_bins(), 129);
+        QCOMPARE(all.frequency_bins(), std::make_pair(24, 4));
+        const MatrixXd again = DebiasedSquaredWeightedPhaseLagIndex::calculate(all).connectivity_matrix();
+        QVERIFY((again - fresh).cwiseAbs().maxCoeff() < 1e-12);
 
         QVERIFY2(fresh(0, 1) > 0.9, qPrintable(QString::number(fresh(0, 1))));
         QVERIFY2(std::abs(fresh(0, 2)) < 0.3 && std::abs(fresh(1, 2)) < 0.3, qPrintable(QString("%1 %2").arg(fresh(0, 2)).arg(fresh(1, 2))));

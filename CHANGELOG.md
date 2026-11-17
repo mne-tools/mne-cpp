@@ -712,6 +712,15 @@ aliases; replace the old spelling as below.
   wrote its output into the shared test data, where `test_fiff_rwr`, running
   in parallel, listed the file and then failed to open it once removed. It
   now filters a copy in its own temporary directory.
+- The frequency bins of the spectral connectivity metrics and whether they
+  keep the per-trial spectra belong to each `ConnectivitySettings` instead of
+  being process-wide statics, so two analyses (e.g. two MNE Scan plugins) no
+  longer change each other's band, and a metric no longer resets the band of
+  every other analysis to the whole spectrum. Changing the bins drops the kept
+  spectra. Migration: `AbstractMetric::m_iNumberBinStart` /
+  `m_iNumberBinAmount` → `settings.set_frequency_bins(start, count)` and
+  `settings.frequency_bins()`; `AbstractMetric::m_bStorageModeIsActive` →
+  `settings.set_keep_trial_data(keep)` and `settings.keeps_trial_data()`.
 - `RtCov` is a plain class with no Qt that follows the noise as it changes.
   With a half-life, older samples count exponentially less (the weighted
   numpy.cov with aweights); without one, every sample counts the same. Each

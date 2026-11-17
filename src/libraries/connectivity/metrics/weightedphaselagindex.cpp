@@ -76,7 +76,7 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
         return finalNetwork;
     }
 
-    if (AbstractMetric::m_bStorageModeIsActive == false) {
+    if (!connectivitySettings.keeps_trial_data()) {
         connectivitySettings.clearIntermediateData();
     }
 
@@ -101,20 +101,12 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
     int iNRows = connectivitySettings.at(0).matData.rows();
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
-    // Check if start and bin amount need to be reset to full spectrum
-    if (m_iNumberBinStart == -1 ||
-        m_iNumberBinAmount == -1 ||
-        m_iNumberBinStart > iNFreqs ||
-        m_iNumberBinAmount > iNFreqs ||
-        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
-        Log::debug("WeightedPhaseLagIndex::calculate - Resetting to full spectrum");
-        AbstractMetric::m_iNumberBinStart = 0;
-        AbstractMetric::m_iNumberBinAmount = iNFreqs;
-    }
+    const int binStart = connectivitySettings.frequency_bins().first;
+    const int binAmount = connectivitySettings.frequency_bins().second;
 
     // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
     finalNetwork.set_fft_size(iNFreqs);
-    finalNetwork.set_used_freq_bins(AbstractMetric::m_iNumberBinAmount);
+    finalNetwork.set_used_freq_bins(binAmount);
 
     QMutex mutex;
 
@@ -126,7 +118,10 @@ Network WeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySetti
                 iNRows,
                 iNFreqs,
                 iNfft,
-                tapers);
+                tapers,
+                binStart,
+                binAmount,
+                connectivitySettings.keeps_trial_data());
     };
 
     //    iTime = timer.elapsed();
@@ -159,7 +154,10 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
                                     int iNRows,
                                     int iNFreqs,
                                     int iNfft,
-                                    const std::pair<MatrixXd, VectorXd>& tapers)
+                                    const std::pair<MatrixXd, VectorXd>& tapers,
+                                    int binStart,
+                                    int binAmount,
+                                    bool keepTrialData)
 {
     //    QElapsedTimer timer;
     //    qint64 iTime = 0;
@@ -220,19 +218,19 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
             bNfftEven = true;
         }
 
-        MatrixXcd matCsd = MatrixXcd(iNRows, m_iNumberBinAmount);
+        MatrixXcd matCsd = MatrixXcd(iNRows, binAmount);
 
         for (i = 0; i < iNRows; ++i) {
             for (int j = i; j < iNRows; ++j) {
                 // Compute CSD (average over tapers if necessary)
-                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(i).rows(), m_iNumberBinAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, m_iNumberBinStart, inputData.vecTapSpectra.at(j).rows(), m_iNumberBinAmount).conjugate()).colwise().sum() / denomCSD;
+                matCsd.row(j) = inputData.vecTapSpectra.at(i).block(0, binStart, inputData.vecTapSpectra.at(i).rows(), binAmount).cwiseProduct(inputData.vecTapSpectra.at(j).block(0, binStart, inputData.vecTapSpectra.at(j).rows(), binAmount).conjugate()).colwise().sum() / denomCSD;
 
                 // Divide first and last element by 2 due to half spectrum
-                if (m_iNumberBinStart == 0) {
+                if (binStart == 0) {
                     matCsd.row(j)(0) /= 2.0;
                 }
 
-                if (bNfftEven && m_iNumberBinStart + m_iNumberBinAmount >= iNFreqs) {
+                if (bNfftEven && binStart + binAmount >= iNFreqs) {
                     matCsd.row(j).tail(1) /= 2.0;
                 }
             }
@@ -282,7 +280,7 @@ void WeightedPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData&
     }
 
     //Do not store data to save memory
-    if (!m_bStorageModeIsActive) {
+    if (!keepTrialData) {
         inputData.vecPairCsd.clear();
         inputData.vecPairCsdImagAbs.clear();
         inputData.vecTapSpectra.clear();

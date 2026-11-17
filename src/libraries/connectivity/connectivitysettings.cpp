@@ -270,6 +270,42 @@ int ConnectivitySettings::getFFTSize() const
     return m_iNfft;
 }
 
+//=============================================================================================================
+
+void ConnectivitySettings::set_frequency_bins(int start, int count)
+{
+    if (start != m_binStart || count != m_binCount) {
+        clearIntermediateData();
+        m_binStart = start;
+        m_binCount = count;
+    }
+}
+
+//=============================================================================================================
+
+std::pair<int, int> ConnectivitySettings::frequency_bins() const
+{
+    const int bins = m_iNfft / 2 + 1;
+    if (m_binStart < 0 || m_binCount <= 0 || m_binStart + m_binCount > bins) {
+        return {0, bins};
+    }
+    return {m_binStart, m_binCount};
+}
+
+//=============================================================================================================
+
+void ConnectivitySettings::set_keep_trial_data(bool keep)
+{
+    m_keepTrialData = keep;
+}
+
+//=============================================================================================================
+
+bool ConnectivitySettings::keeps_trial_data() const
+{
+    return m_keepTrialData;
+}
+
 //*******************************************************************************************************
 
 void ConnectivitySettings::setWindowType(std::string sWindowType)

@@ -77,7 +77,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
-    if (AbstractMetric::m_bStorageModeIsActive == false) {
+    if (!connectivitySettings.keeps_trial_data()) {
         connectivitySettings.clearIntermediateData();
     }
 
@@ -102,7 +102,8 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
                 matDist,
                 mutex,
                 iNfft,
-                tapers);
+                tapers,
+                connectivitySettings.keeps_trial_data());
     };
 
     //    iTime = timer.elapsed();
@@ -139,7 +140,8 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
                                MatrixXd& matDist,
                                QMutex& mutex,
                                int iNfft,
-                               const std::pair<MatrixXd, VectorXd>& tapers)
+                               const std::pair<MatrixXd, VectorXd>& tapers,
+                               bool keepTrialData)
 {
     //    QElapsedTimer timer;
     //    qint64 iTime = 0;
@@ -227,7 +229,7 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
     //    iTime = timer.elapsed();
     //    timer.restart();
 
-    if (!m_bStorageModeIsActive) {
+    if (!keepTrialData) {
         inputData.vecTapSpectra.clear();
     }
 }

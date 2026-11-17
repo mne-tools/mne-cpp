@@ -31,8 +31,7 @@
  * This implementation delegates the per-trial FFT, tapering and CSD
  * accumulation to @ref mne::Coherency::calculateAbs "Coherency::calculateAbs", then collapses the result
  * to a scalar per channel pair by averaging |coherency|^2 over the
- * frequency window @c [AbstractMetric::m_iNumberBinStart,
- * m_iNumberBinStart + m_iNumberBinAmount).
+ * frequency bins of @ref mne::ConnectivitySettings::frequency_bins.
  */
 
 #ifndef COHERENCE_H

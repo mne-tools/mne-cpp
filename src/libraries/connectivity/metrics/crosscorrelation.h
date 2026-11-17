@@ -118,12 +118,14 @@ protected:
      * @param[in]   mutex               The mutex used to safely access matDist.
      * @param[in]   iNfft               The FFT length.
      * @param[in]   tapers              The taper information.
+     * @param[in] keepTrialData         Whether to keep the tapered spectra and cross-spectra of the trial.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matDist,
                         QMutex& mutex,
                         int iNfft,
-                        const std::pair<Eigen::MatrixXd, Eigen::VectorXd>& tapers);
+                        const std::pair<Eigen::MatrixXd, Eigen::VectorXd>& tapers,
+                        bool keepTrialData);
 };
 
 //=============================================================================================================

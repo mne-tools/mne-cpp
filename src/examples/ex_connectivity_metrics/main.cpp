@@ -161,12 +161,11 @@ int main(int argc, char* argv[])
     settings.setNodePositions(positions);
     //! [connectivity_settings_setup]
 
-    //! [abstract_metric_band]
-    // Spectral metrics evaluate the bins [start, start + amount); -1 means the full half spectrum.
-    AbstractMetric::m_iNumberBinStart = -1;
-    AbstractMetric::m_iNumberBinAmount = -1;
-    AbstractMetric::m_bStorageModeIsActive = false;
-    //! [abstract_metric_band]
+    //! [connectivity_frequency_bins]
+    // Spectral metrics evaluate the bins [start, start + count); -1 means the full half spectrum.
+    settings.set_frequency_bins(-1, -1);
+    settings.set_keep_trial_data(false); // keep them to compute only appended trials next time
+    //! [connectivity_frequency_bins]
 
     //! [connectivity_calculate]
     settings.setConnectivityMethods({"COH", "PLV", "WPLI"});

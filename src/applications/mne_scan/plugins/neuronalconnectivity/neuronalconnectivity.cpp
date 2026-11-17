@@ -22,7 +22,6 @@
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
 
 #include <connectivity/connectivity.h>
-#include <connectivity/metrics/abstractmetric.h>
 #include <dsp/rt/rt_connectivity.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
@@ -64,9 +63,8 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_pRtConnectivity(std::make_shared<RtConnectivity>())
 , m_pActionShowYourWidget(nullptr)
 {
-    AbstractMetric::m_bStorageModeIsActive = true;
-    AbstractMetric::m_iNumberBinStart = 0;
-    AbstractMetric::m_iNumberBinAmount = 100;
+    m_connectivitySettings.set_frequency_bins(0, 100);
+    m_connectivitySettings.set_keep_trial_data(true);
 
     //Init rt connectivity worker
     connect(m_pRtConnectivity.get(), &RtConnectivity::newConnectivityResultAvailable,

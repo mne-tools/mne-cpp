@@ -92,9 +92,6 @@ int main(int argc, char* argv[])
     mne::Log::install_qt_message_handler();
     QApplication a(argc, argv);
 
-    AbstractMetric::m_bStorageModeIsActive = false;
-    //    AbstractMetric::m_iNumberBinStart = 8;
-    //    AbstractMetric::m_iNumberBinAmount = 4;
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Connectivity Comparison Example");

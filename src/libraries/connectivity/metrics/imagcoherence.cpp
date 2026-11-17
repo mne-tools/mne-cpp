@@ -66,35 +66,19 @@ Network ImagCoherence::calculate(ConnectivitySettings& connectivitySettings)
         return finalNetwork;
     }
 
-    if (AbstractMetric::m_bStorageModeIsActive == false) {
+    if (!connectivitySettings.keeps_trial_data()) {
         connectivitySettings.clearIntermediateData();
     }
 
     finalNetwork.set_sampling_frequency(connectivitySettings.getSamplingFrequency());
 
-    // Check if start and bin amount need to be reset to full spectrum
     int iNfft = connectivitySettings.getFFTSize();
-
-    //    // Check that iNfft >= signal length
-    //    if(iNfft > connectivitySettings.at(0).matData.cols()) {
-    //        iNfft = connectivitySettings.at(0).matData.cols();
-    //    }
-
     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
 
-    if (m_iNumberBinStart == -1 ||
-        m_iNumberBinAmount == -1 ||
-        m_iNumberBinStart > iNFreqs ||
-        m_iNumberBinAmount > iNFreqs ||
-        m_iNumberBinAmount + m_iNumberBinStart > iNFreqs) {
-        mne::Log::debug("ImagCoherence::calculate - Resetting to full spectrum");
-        AbstractMetric::m_iNumberBinStart = 0;
-        AbstractMetric::m_iNumberBinAmount = iNFreqs;
-    }
 
     // Pass information about the FFT length. Use iNFreqs because we only use the half spectrum
     finalNetwork.set_fft_size(iNFreqs);
-    finalNetwork.set_used_freq_bins(AbstractMetric::m_iNumberBinAmount);
+    finalNetwork.set_used_freq_bins(connectivitySettings.frequency_bins().second);
 
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();

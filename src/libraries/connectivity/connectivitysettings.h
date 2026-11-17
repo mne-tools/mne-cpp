@@ -103,6 +103,8 @@ namespace mne
  *
  * @snippet ex_connectivity_metrics/main.cpp connectivity_settings_setup
  *
+ * @snippet ex_connectivity_metrics/main.cpp connectivity_frequency_bins
+ *
  * @snippet ex_connectivity_metrics/main.cpp connectivity_calculate
  */
 class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
@@ -174,6 +176,38 @@ public:
 
     int getFFTSize() const;
 
+    //=========================================================================================================
+    /**
+     * Restricts the spectral metrics to a range of frequency bins of the half spectrum. Changing it drops
+     * the kept per-trial spectra.
+     *
+     * @param[in] start   First bin; -1 for the whole spectrum.
+     * @param[in] count   Number of bins; -1 for the whole spectrum.
+     */
+    void set_frequency_bins(int start, int count);
+
+    //=========================================================================================================
+    /**
+     * @return The first frequency bin and the number of bins the spectral metrics use: the whole half
+     *         spectrum of the FFT size unless a range inside it was set.
+     */
+    [[nodiscard]] std::pair<int, int> frequency_bins() const;
+
+    //=========================================================================================================
+    /**
+     * Keeps the tapered spectra and cross-spectra of each trial, so that the next metric call computes only
+     * those of the trials appended since. Off by default to save memory.
+     *
+     * @param[in] keep   Whether to keep them.
+     */
+    void set_keep_trial_data(bool keep);
+
+    //=========================================================================================================
+    /**
+     * @return Whether the per-trial spectra are kept between metric calls.
+     */
+    [[nodiscard]] bool keeps_trial_data() const;
+
     void setWindowType(std::string sWindowType);
 
     const std::string& getWindowType() const;
@@ -196,9 +230,12 @@ protected:
     std::vector<std::string> m_sConnectivityMethods; /**< The connectivity methods. */
     std::string m_sWindowType;                       /**< The window type used to compute tapered spectra. */
 
-    float m_fSFreq;          /**< The sampling frequency. */
-    int m_iNfft;             /**< The FFT length. Also includes the negativ frequencies. Gets recalculated if the sFreq or spectrum resolution change. */
-    float m_fFreqResolution; /**< The spectrum's resolution. */
+    float m_fSFreq;               /**< The sampling frequency. */
+    int m_binStart = -1;          /**< First frequency bin of the spectral metrics; -1 for all. */
+    int m_binCount = -1;          /**< Number of frequency bins; -1 for all. */
+    bool m_keepTrialData = false; /**< Whether the per-trial spectra are kept between calls. */
+    int m_iNfft;                  /**< The FFT length. Also includes the negativ frequencies. Gets recalculated if the sFreq or spectrum resolution change. */
+    float m_fFreqResolution;      /**< The spectrum's resolution. */
 
     Eigen::MatrixX3f m_matNodePositions; /**< The node position in 3D space. */
 
