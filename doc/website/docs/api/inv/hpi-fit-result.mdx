@@ -44,7 +44,7 @@ hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getH
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 284"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 282"
 InvHpiFit hpiFit(updater.getSensors()); // fit one block; run it on any thread for continuous tracking
 HpiFitResult fit;
 hpiFit.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), fit);

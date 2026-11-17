@@ -20,43 +20,53 @@ class mne::RtCov
 Estimates the noise covariance of the MEG and EEG channels from streaming data.
 
 ```cpp title="src/examples/ex_dsp_rt/main.cpp"
-RtCov rtCov(*info);
-FiffCov cov;
+RtCov rtCov(*info); // every sample counts the same; RtCov(*info, 2.0) forgets with a 2 s half-life
 for (int start = 0; start < covData.cols(); start += 1000) {
-    if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
-        cov = std::move(*estimate);
-    }
+    rtCov.update(covData.middleCols(start, 1000));
 }
+const FiffCov cov = rtCov.covariance().value_or(FiffCov());
 ```
 
 ---
 
 ## Public Methods
 
-### RtCov(info)
+### RtCov(info, halfLife)
 
 **Parameters:**
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  Measurement info of the data; its MEG and EEG channels are used.
+  Measurement info of the data; its MEG and EEG channels are used, or all channels if it has neither.
+
+- **halfLife** : *double*
+  Age in seconds at which a sample counts half as much as the newest one; infinite weighs every sample the same.
 
 ---
 
-### estimate_covariance(data, maxSamples)
+### update(data)
 
-Adds a block of data and returns the covariance once enough samples have arrived.
+Adds a block of data.
+
+A block with a channel count other than the measurement info's or the used channels' is ignored with a warning.
 
 **Parameters:**
 
 - **data** : *const Eigen::MatrixXd &*
-  A block of data, all channels of the measurement info by samples.
+  All channels of the measurement info, or only the used ones, by samples.
 
-- **maxSamples** : *int*
-  Number of samples to accumulate before a covariance is estimated.
+---
+
+### covariance()
 
 **Returns:**
 
-- *std::optional&lt; [FiffCov](/docs/api/fiff/fiff-cov) &gt;* — The regularized noise covariance of the MEG and EEG channels once at least maxSamples samples have arrived, after which the next estimate starts from nothing; no value before that, or if the measurement info has no channels.
+- *std::optional&lt; [FiffCov](/docs/api/fiff/fiff-cov) &gt;* — The noise covariance of the used channels, the weighted equivalent of numpy.cov with aweights, regularized like `mne::FiffCov::regularize`; nfree is the effective number of samples. No value before two samples have arrived.
+
+---
+
+### reset()
+
+Forgets every sample.
 
 ---
 
@@ -74,13 +84,11 @@ Adds a block of data and returns the covariance once enough samples have arrived
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
 ````cpp title="src/examples/ex_dsp_rt/main.cpp, line 195"
-RtCov rtCov(*info);
-FiffCov cov;
+RtCov rtCov(*info); // every sample counts the same; RtCov(*info, 2.0) forgets with a 2 s half-life
 for (int start = 0; start < covData.cols(); start += 1000) {
-    if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
-        cov = std::move(*estimate);
-    }
+    rtCov.update(covData.middleCols(start, 1000));
 }
+const FiffCov cov = rtCov.covariance().value_or(FiffCov());
 // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
 ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),
              std::format("RtCov: covariance of 4000 samples matches numpy.cov off the diagonal ({:.6g})", cov.data(0, 1)));

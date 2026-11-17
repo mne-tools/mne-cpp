@@ -336,13 +336,11 @@ int main(int argc, char* argv[])
     const MatrixXd numpyCov = centred * centred.transpose() / static_cast<double>(covData.cols() - 1); // numpy.cov
 
     //! [rt_cov_usage]
-    RtCov rtCov(*info);
-    FiffCov cov;
+    RtCov rtCov(*info); // every sample counts the same; RtCov(*info, 2.0) forgets with a 2 s half-life
     for (int start = 0; start < covData.cols(); start += 1000) {
-        if (auto estimate = rtCov.estimate_covariance(covData.middleCols(start, 1000), 4000)) { // once 4000 samples arrived
-            cov = std::move(*estimate);
-        }
+        rtCov.update(covData.middleCols(start, 1000));
     }
+    const FiffCov cov = rtCov.covariance().value_or(FiffCov());
     //! [rt_cov_usage]
     // regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
     ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),
@@ -441,7 +439,8 @@ int main(int argc, char* argv[])
     MatrixXd rawTimes;
     ok &= raw.read_raw_segment(rawData, rawTimes, raw.first_samp, raw.first_samp + 5999);
     RtCov rawCov(*rawInfo);
-    const FiffCov noiseCov = rawCov.estimate_covariance(rawData, 6000).value_or(FiffCov());
+    rawCov.update(rawData);
+    const FiffCov noiseCov = rawCov.covariance().value_or(FiffCov());
 
     // Rebuild the MEG operator for each new covariance estimate, on whichever thread suits the application
     const MNEInverseOperator inverse(*rawInfo, fwd->pick_types(true, false), noiseCov, 0.2f, 0.8f);
