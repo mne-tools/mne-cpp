@@ -25,7 +25,6 @@
 #include <base/string_utils.h>
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
-#include <dsp/rt/rt_hpis.h>
 #include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_noise.h>
 
@@ -265,7 +264,7 @@ int main(int argc, char* argv[])
     rtConnectivity.stop();
 
     // ---------------------------------------------------------------------------------------------------------
-    // HPI: fit the four coils of the test recording on the worker and directly
+    // HPI: fit the four coils of the test recording
     FiffRawData hpiRaw((dataDir + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
     const std::shared_ptr<FiffInfo> hpiInfo = std::make_shared<FiffInfo>(hpiRaw.info);
     MatrixXd hpiData;
@@ -283,15 +282,12 @@ int main(int argc, char* argv[])
     updater.prepareDataAndProjectors(hpiData, projectors);
     const InvHpiModelParameters model(std::vector<int>({166, 154, 161, 158}), hpiInfo->sfreq, hpiInfo->linefreq, false);
 
-    RtHpiWorker hpiWorker(updater.getSensors());
-    HpiFitResult workerFit;
-    QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });
-    hpiWorker.doWork(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer());
+    InvHpiFit hpiFit(updater.getSensors()); // fit one block; run it on any thread for continuous tracking
+    HpiFitResult fit;
+    hpiFit.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), fit);
     //! [rt_hpi_usage]
-    HpiFitResult direct;
-    InvHpiFit(updater.getSensors()).fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), direct);
-    ok &= expect(workerFit.GoF.size() == 4 && workerFit.GoF.minCoeff() > 0.98 && workerFit.devHeadTrans.trans.isApprox(direct.devHeadTrans.trans, 1e-6f),
-                 std::format("RtHpiWorker fits 4 coils (GoF >= {:.4f}) like InvHpiFit", workerFit.GoF.size() ? workerFit.GoF.minCoeff() : 0.0));
+    ok &= expect(fit.GoF.size() == 4 && fit.GoF.minCoeff() > 0.98 && fit.devHeadTrans.from == FIFFV_COORD_DEVICE && fit.devHeadTrans.to == FIFFV_COORD_HEAD,
+                 std::format("InvHpiFit fits 4 coils (GoF >= {:.4f}) device to head", fit.GoF.size() ? fit.GoF.minCoeff() : 0.0));
 
     // ---------------------------------------------------------------------------------------------------------
     // Inverse operator from the sample forward solution and the covariance of the sample raw data

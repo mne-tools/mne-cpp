@@ -1137,13 +1137,6 @@
     "src/libraries/dsp/rt/rt_detect_trigger.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/libraries/dsp/rt/rt_hpis.cpp": {
-      "performance-unnecessary-value-param": 3
-    },
-    "src/libraries/dsp/rt/rt_hpis.h": {
-      "modernize-use-nullptr": 1,
-      "modernize-use-override": 1
-    },
     "src/libraries/dsp/rt/rt_inv_op.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1

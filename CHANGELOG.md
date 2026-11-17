@@ -679,6 +679,11 @@ aliases; replace the old spelling as below.
   signal → `estimate_spectrum(block)`, which returns
   `std::optional<Eigen::MatrixXd>`; `start`, `stop`, `wait`, `isRunning` and
   `RtNoiseWorker` are removed.
+- `RtHpi` and `RtHpiWorker` (`dsp/rt/rt_hpis.h`) are removed: they only ran
+  `InvHpiFit::fit` on a `QThread`. Migration: construct
+  `InvHpiFit(sensorSet)` and call `fit(data, projectors, model, coilsHead,
+  result)` per block on the thread of your choice; the result's
+  `devHeadTrans` is already device → head.
 - `RtCov` is a plain class with no Qt. It accumulates the channel sums and
   outer products of every block instead of keeping all blocks until the
   estimate, so its memory no longer grows with the number of samples.

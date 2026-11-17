@@ -6,7 +6,7 @@
 // test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //
 // Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
-//         RtConnectivity, RtHpi, RtInvOp, RtAveraging, RtNoise, filterFile
+//         RtConnectivity, RtInvOp, RtAveraging, RtNoise, filterFile
 //=============================================================================================================
 
 #include <QtTest/QtTest>
@@ -40,7 +40,6 @@
 #include <inv/hpi/inv_signal_model.h>
 
 #include <dsp/rt/rt_connectivity.h>
-#include <dsp/rt/rt_hpis.h>
 #include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
@@ -91,9 +90,6 @@ private slots:
 
     // ---- RT Processing: RtConnectivity ----
     void rtConnectivity_lifecycle();
-
-    // ---- RT Processing: RtHpi ----
-    void rtHpi_lifecycle();
 
     // ---- RT Processing: RtInvOp ----
     void rtInvOp_lifecycle();
@@ -337,30 +333,6 @@ void TestInvRtLibrary::rtConnectivity_lifecycle()
     const auto returned = spy.first().at(1).value<std::shared_ptr<ConnectivitySettings>>();
     QVERIFY(returned && returned.get() != &settings);
     QCOMPARE(returned->size(), 2);
-}
-
-//=============================================================================================================
-// RT Processing: RtHpi
-//=============================================================================================================
-
-void TestInvRtLibrary::rtHpi_lifecycle()
-{
-    InvSensorSet sensorSet;
-    RtHpi rtHpi(sensorSet);
-
-    InvHpiModelParameters hpiParams;
-    rtHpi.setModelParameters(hpiParams);
-
-    MatrixXd projMat = MatrixXd::Identity(10, 10);
-    rtHpi.setProjectionMatrix(projMat);
-
-    MatrixXd coilsHead = MatrixXd::Zero(4, 3);
-    rtHpi.setHpiDigitizer(coilsHead);
-
-    rtHpi.stop();
-    rtHpi.restart();
-    rtHpi.stop();
-    QThread::msleep(50);
 }
 
 //=============================================================================================================

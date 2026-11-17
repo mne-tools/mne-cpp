@@ -27,7 +27,6 @@ set(SOURCES
   rt/rt_inv_op.cpp
   rt/rt_averaging.cpp
   rt/rt_noise.cpp
-  rt/rt_hpis.cpp
   rt/rt_filter.cpp
   rt/rt_connectivity.cpp
   rt/rt_detect_trigger.cpp
@@ -77,7 +76,6 @@ set(HEADERS
   rt/rt_inv_op.h
   rt/rt_averaging.h
   rt/rt_noise.h
-  rt/rt_hpis.h
   rt/rt_filter.h
   rt/rt_detect_trigger.h
   rt/rt_connectivity.h

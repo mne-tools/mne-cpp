@@ -5332,56 +5332,6 @@
       ]
     },
     {
-      "name": "RtHpi",
-      "module": "dsp",
-      "header": "dsp/rt/rt_hpis.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_dsp_rt",
-      "example_snippet": [
-        "ex_dsp_rt/main.cpp#rt_hpi_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 35,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "required_data": [
-        "mne-cpp-test-data"
-      ]
-    },
-    {
-      "name": "RtHpiWorker",
-      "module": "dsp",
-      "header": "dsp/rt/rt_hpis.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_dsp_rt",
-      "example_snippet": [
-        "ex_dsp_rt/main.cpp#rt_hpi_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 36,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "required_data": [
-        "mne-cpp-test-data"
-      ]
-    },
-    {
       "name": "RtInvOp",
       "module": "dsp",
       "header": "dsp/rt/rt_inv_op.h",
