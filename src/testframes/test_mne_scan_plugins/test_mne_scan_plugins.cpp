@@ -401,6 +401,8 @@ void TestMneScanPlugins::connectivityFollowsTheStream()
     if (!m_info)
         QSKIP("Sample test data not found");
 
+    // The default correlation has no frequency bins, so no frequency band applies to it
+    QTest::failOnWarning(QRegularExpression("frequency bins has not been set"));
     std::unique_ptr<AbstractPlugin> plugin = makePlugin("NeuronalConnectivity");
     QList<QSharedPointer<Network>> networks;
     QMutex mutex;

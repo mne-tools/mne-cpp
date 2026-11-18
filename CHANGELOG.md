@@ -694,6 +694,9 @@ aliases; replace the old spelling as below.
   `set_coil_frequencies`, `order_coil_frequencies`, `set_info`, `set_window`,
   `set_max_error` and `reset()`; `restart`, `stop` and `RtHpiWorker` are
   removed.
+- The MNE Scan connectivity plugin no longer warns on every network of a
+  time-domain metric such as correlation, which has no frequency band to
+  select, and computes each trial with the settings current when it arrives.
 - `HpiFitResult` starts without head movement: `bIsLargeHeadMovement`,
   `fHeadMovementDistance` and `fHeadMovementAngle` were left uninitialized.
 - `RtInvOp` is a synchronous streaming inverse with no Qt: it computes the

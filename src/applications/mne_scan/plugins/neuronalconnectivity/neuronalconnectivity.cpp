@@ -399,6 +399,9 @@ void NeuronalConnectivity::run()
     std::vector<Network> networks;
 
     while (!isInterruptionRequested()) {
+        // Settings are taken after the wait, so a trial never meets those from before it arrived
+        const bool popped = m_pTrialBuffer->pop(trial);
+
         m_mutex.lock();
         if (!rtConnectivity || m_bSettingsChanged) {
             rtConnectivity.emplace(m_connectivitySettings, m_iNumberAverages);
@@ -414,7 +417,7 @@ void NeuronalConnectivity::run()
         const int downSample = std::max(1, m_iDownSample);
         m_mutex.unlock();
 
-        if (m_pTrialBuffer->pop(trial)) {
+        if (popped) {
             networks = rtConnectivity->update(trial);
             if (++skip_count % downSample != 0) {
                 continue;
@@ -427,7 +430,10 @@ void NeuronalConnectivity::run()
 
         //Send the data to the connected plugins and the online display
         for (Network network : networks) {
-            network.set_frequency_range(freqLow, freqHigh);
+            // Time-domain metrics such as correlation have no frequency bins to select
+            if (network.used_freq_bins() > 0) {
+                network.set_frequency_range(freqLow, freqHigh);
+            }
             network.normalize();
             m_pRTCEOutput->measurementData()->setValue(network);
         }
