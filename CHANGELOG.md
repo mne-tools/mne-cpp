@@ -684,6 +684,8 @@ aliases; replace the old spelling as below.
   `InvHpiFit(sensorSet)` and call `fit(data, projectors, model, coilsHead,
   result)` per block on the thread of your choice; the result's
   `devHeadTrans` is already device → head.
+- `HpiFitResult` starts without head movement: `bIsLargeHeadMovement`,
+  `fHeadMovementDistance` and `fHeadMovementAngle` were left uninitialized.
 - `RtInvOp` is a synchronous streaming inverse with no Qt: it computes the
   MNE, dSPM or sLORETA source estimates of each block and follows each new
   noise covariance. It does the forward-only work once per channel set and

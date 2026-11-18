@@ -22,6 +22,9 @@
 #include <base/string_utils.h>
 #include <vector>
 #include <math.h>
+#include <cstddef>
+#include <cstring>
+#include <new>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -79,7 +82,8 @@ private slots:
     void testFit_basic_error();    // compare error to specified value
     void testFit_advanced_error(); // compare error to specified value
     void testCheckForUpdate();
-    void testFindOrder();   // test with all possible frequency oders
+    void testFindOrder(); // test with all possible frequency oders
+    void testFitResultStartsWithoutMovement();
     void cleanupTestCase(); // clean-up at the end
 
 private:
@@ -632,6 +636,20 @@ void TestHpiFit::testFindOrder()
 
     /// assert
     QVERIFY(vecResultExpected == vecResultActual);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testFitResultStartsWithoutMovement()
+{
+    // Construct over 0xFF bytes so a member the constructor skips cannot read as zero by chance
+    alignas(HpiFitResult) std::byte storage[sizeof(HpiFitResult)];
+    std::memset(storage, 0xFF, sizeof storage);
+    const auto* result = new (storage) HpiFitResult;
+    QVERIFY(!result->bIsLargeHeadMovement);
+    QCOMPARE(result->fHeadMovementDistance, 0.0f);
+    QCOMPARE(result->fHeadMovementAngle, 0.0f);
+    result->~HpiFitResult();
 }
 
 //=============================================================================================================

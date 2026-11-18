@@ -112,9 +112,9 @@ struct HpiFitResult
     std::vector<double> errorDistances;
     Eigen::VectorXd GoF;
     std::filesystem::path digitizerFile;
-    bool bIsLargeHeadMovement;
-    float fHeadMovementDistance;
-    float fHeadMovementAngle;
+    bool bIsLargeHeadMovement = false;
+    float fHeadMovementDistance = 0.0f;
+    float fHeadMovementAngle = 0.0f;
 };
 
 //=============================================================================================================
