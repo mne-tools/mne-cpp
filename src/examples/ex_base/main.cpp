@@ -27,6 +27,7 @@
 #include <base/sha256.h>
 #include <base/string_utils.h>
 #include <base/thread_pool.h>
+#include <base/xml.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -148,6 +149,21 @@ int main()
     //! [json_usage]
     ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
                  "JsonDocument parsed, edited and wrote the configuration");
+
+    //! [xml_usage]
+    // Qt:   QXmlStreamReader xml(&file);
+    //       while (!xml.atEnd()) if (xml.readNext() == QXmlStreamReader::StartElement && xml.name() == u"sensor") ...
+    const Expected<XmlElement> layout = parse_xml(R"(<sensors><sensor id="1"><name>Fp1</name><x>-27.5</x></sensor></sensors>)");
+    std::string firstSensor;
+    if (layout) {
+        for (const XmlElement& sensor : layout->children) // XmlElement::child() finds the first one by local name
+            if (sensor.local_name() == "sensor" && sensor.child("name"))
+                firstSensor = firstSensor.empty() ? sensor.child("name")->text : firstSensor;
+    } else {
+        Log::warning("{}", layout.error().what()); // the line where the document is not well formed
+    }
+    //! [xml_usage]
+    ok &= expect(firstSensor == "Fp1" && layout && *layout->children.front().attribute("id") == "1", "parse_xml read the sensor layout");
 
     //! [cbor_usage]
     // Qt:   QCborMap header;

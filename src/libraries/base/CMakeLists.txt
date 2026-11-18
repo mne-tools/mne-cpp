@@ -36,6 +36,7 @@ set(SOURCES
   cbor.cpp
   json.cpp
   json_stream_parser.cpp
+  xml.cpp
   log.cpp
   process.cpp
   sha256.cpp
@@ -53,6 +54,7 @@ set(HEADERS
   cbor.h
   json.h
   json_stream_parser.h
+  xml.h
   log.h
   process.h
   sha256.h

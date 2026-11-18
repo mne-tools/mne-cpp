@@ -633,6 +633,11 @@ aliases; replace the old spelling as below.
   addresses (`mne::HardwareAddress`) of the running network interfaces that
   are neither loopback nor point-to-point, in interface order, the
   counterpart of `QNetworkInterface::hardwareAddress()`.
+- New `mne::parse_xml()` and `mne::read_xml_file()` with `mne::XmlElement`
+  (`base/xml.h`): reads a well-formed XML document into an element tree
+  (name, attributes, text, children), the counterpart of
+  `QXmlStreamReader`. Malformed documents give a `Format` error with the
+  line; UTF-8 and ISO-8859-1 documents are read.
 - MNA script and IPC nodes whose program cannot be started report exit code
   -1 and the reason in `stderr`; they reported a made-up exit code before.
 - The `mna` library uses standard C++ only and links just `mne_base`; the
