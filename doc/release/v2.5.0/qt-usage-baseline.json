@@ -25,6 +25,7 @@
       "bids",
       "channels",
       "com",
+      "connectivity",
       "decoding",
       "dsp",
       "fs",
@@ -34,7 +35,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9544,
+    "tokens": 9489,
     "gui_outside_design": []
   },
   "libraries": {
@@ -133,18 +134,12 @@
       "modules": []
     },
     "connectivity": {
-      "tokens": 55,
-      "by_category": {
-        "global": 5,
-        "threads": 50
-      },
-      "public_header_includes": 9,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 41,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "modules": []
     },
     "decoding": {
       "tokens": 0,

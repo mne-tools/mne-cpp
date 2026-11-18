@@ -23,7 +23,7 @@ class mne::PhaseLagIndex
 
 Computes the Phase Lag Index of Stam, Nolte & Daffertshofer (2007).
 
-For every channel pair the estimator averages `sign`(Im(S_\{xy\}(f))) across DPSS-tapered trial spectra and returns the magnitude of that average. Zero-lag mixing (volume conduction, common reference) yields sign = 0 and is rejected; consistently lagged or leading interactions yield magnitudes close to 1. The per-trial accumulation is parallelised over trials via `QtConcurrent` and reduced under a single `QMutex`.
+For every channel pair the estimator averages `sign`(Im(S_\{xy\}(f))) across DPSS-tapered trial spectra and returns the magnitude of that average. Zero-lag mixing (volume conduction, common reference) yields sign = 0 and is rejected; consistently lagged or leading interactions yield magnitudes close to 1. The per-trial accumulation is parallelised over trials on the global [`ThreadPool`](/docs/api/base/thread-pool) and reduced under a single mutex.
 
 Phase Lag Index estimator (Stam et al. 2007); rejects zero-lag volume-conduction mixing.
 

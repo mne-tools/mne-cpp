@@ -17,7 +17,7 @@ class mne::CrossCorrelation
 
 Computes the time-lagged cross-correlation between every channel pair via the inverse FFT of the DPSS-tapered cross-spectrum, and reduces it to the maximum absolute correlation over the lag axis.
 
-Per-trial computations are dispatched through `QtConcurrent::mapped` and accumulated under a single `QMutex`. The estimator is broadband and does not reject zero-lag mixing, but - unlike [`Correlation`](/docs/api/connectivity/correlation) - is sensitive to delayed coupling because the lag axis is searched.
+Per-trial computations run on the global [`ThreadPool`](/docs/api/base/thread-pool) and are accumulated under a single mutex. The estimator is broadband and does not reject zero-lag mixing, but - unlike [`Correlation`](/docs/api/connectivity/correlation) - is sensitive to delayed coupling because the lag axis is searched.
 
 Time-lagged cross-correlation estimator; broadband, sensitive to delayed coupling.
 
