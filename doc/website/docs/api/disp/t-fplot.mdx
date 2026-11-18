@@ -110,7 +110,7 @@ Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
 ````cpp title="src/examples/ex_disp/main.cpp, line 186"
 //tf plot example: spectrogram of the same channel
-MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
+MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, raw.info.sfreq * 0.2);
 TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0));
 ````
 

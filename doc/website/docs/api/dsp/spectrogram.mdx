@@ -18,14 +18,14 @@ class mne::Spectrogram
 Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
 
 ```cpp title="src/examples/ex_dsp_spectral/main.cpp"
-const MatrixXd spectrogram = Spectrogram::makeSpectrogram(signal.transpose(), 64); // frequency bins x samples
+const MatrixXd spectrogram = Spectrogram::make_spectrogram(signal.transpose(), 64); // frequency bins x samples
 ```
 
 ---
 
 ## Static Methods
 
-### makeSpectrogram(signal, windowSize)
+### make_spectrogram(signal, windowSize)
 
 Calculates the spectrogram (tf-representation) of a given signal.
 
@@ -34,8 +34,8 @@ Calculates the spectrogram (tf-representation) of a given signal.
 - **signal** : *Eigen::VectorXd*
   input-signal to calculate spectrogram of.
 
-- **windowSize** : *std::int32_t*
-  width of the Gaussian window in samples (trades time against frequency resolution).
+- **windowSize** : *int*
+  width of the Gaussian window in samples (trades time against frequency resolution); 0 for a fifteenth of the signal.
 
 **Returns:**
 
@@ -57,7 +57,7 @@ Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
 ````cpp title="src/examples/ex_disp/main.cpp, line 186"
 //tf plot example: spectrogram of the same channel
-MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
+MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, raw.info.sfreq * 0.2);
 TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0));
 ````
 
@@ -66,7 +66,7 @@ TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0))
 Spectral and filtering tools of the dsp library on signals with known content.
 
 ````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 169"
-const MatrixXd spectrogram = Spectrogram::makeSpectrogram(signal.transpose(), 64); // frequency bins x samples
+const MatrixXd spectrogram = Spectrogram::make_spectrogram(signal.transpose(), 64); // frequency bins x samples
 ok &= expect(spectrogram.cols() == n && spectrogram.rows() > 0 && spectrogram.allFinite(),
              std::format("spectrogram is {} x {} and finite", spectrogram.rows(), spectrogram.cols()));
 ````
@@ -78,9 +78,14 @@ Spectrogram of one evoked channel shown as a time-frequency plot.
 ````cpp title="src/examples/ex_tf_plot/main.cpp, line 77"
 //tf plot
 VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
-MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
+MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 ````
 
 ## Authors of this file
 
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Martin Henfling &lt;martin.henfling@tu-ilmenau.de&gt;
+- Lars Debor &lt;Lars.Debor@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

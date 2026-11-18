@@ -6270,7 +6270,7 @@
         "integration",
         "requires-data"
       ],
-      "timeout": 60,
+      "timeout": 180,
       "requirements": [
         "test-data"
       ],

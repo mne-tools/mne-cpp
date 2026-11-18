@@ -63,7 +63,7 @@ Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^\{-1\}, T
 
 Apply the fitted regression to remove EOG artifacts in-place.
 
-Subtracts beta times the demeaned EOG from the channels `fit()` regressed. `fit()` must be called first.
+Subtracts beta times the demeaned EOG from the channels `fit()` regressed, found by name in `info`. `fit()` must be called first; data missing a fitted channel stays unchanged.
 
 **Parameters:**
 
@@ -71,7 +71,7 @@ Subtracts beta times the demeaned EOG from the channels `fit()` regressed. `fit(
   Data matrix (n_channels x n_times). Modified in-place.
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  Measurement info.
+  Measurement info of the data.
 
 ---
 

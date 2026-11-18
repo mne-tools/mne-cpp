@@ -269,7 +269,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/rt-cov',
         'api/dsp/rt-inv-op',
         'api/dsp/rt-noise',
-        'api/dsp/filter-object',
         'api/dsp/annotate-amplitude-params',
         'api/dsp/annotate-muscl-params',
         'api/dsp/bad-channels-maxwell-params',
@@ -312,7 +311,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/derivation-rule',
         'api/dsp/dpss-result',
         'api/dsp/epoch-extractor-params',
-        'api/dsp/spectogram-input-data',
         'api/dsp/trigger-flank'
       ],
     },

@@ -26,6 +26,7 @@
       "channels",
       "com",
       "decoding",
+      "dsp",
       "fs",
       "inv",
       "math",
@@ -33,7 +34,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9571,
+    "tokens": 9544,
     "gui_outside_design": []
   },
   "libraries": {
@@ -208,20 +209,12 @@
       ]
     },
     "dsp": {
-      "tokens": 27,
-      "by_category": {
-        "containers": 8,
-        "global": 13,
-        "strings": 1,
-        "threads": 5
-      },
-      "public_header_includes": 1,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 93,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "modules": []
     },
     "fiff": {
       "tokens": 50,

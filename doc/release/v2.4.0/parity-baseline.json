@@ -3360,7 +3360,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Spectrogram::makeSpectrogram",
+      "mne_cpp": "Spectrogram::make_spectrogram",
       "python": "mne.time_frequency.stft",
       "claimed": "partial",
       "equivalence": null,
