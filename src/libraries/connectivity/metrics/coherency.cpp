@@ -118,16 +118,15 @@ void Coherency::calculateAbs(Network& finalNetwork,
     //    timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
-    std::function<void(std::pair<int, MatrixXcd>&)> computePSDCSDLambda = [&](std::pair<int, MatrixXcd>& pairInput) {
-        computePSDCSDAbs(mutex,
-                         finalNetwork,
-                         pairInput,
-                         connectivitySettings.getIntermediateSumData().matPsdSum);
-    };
-
-    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
-                                                   computePSDCSDLambda);
-    resultCSDPSD.waitForFinished();
+    const MatrixXd& matPsdSum = connectivitySettings.getIntermediateSumData().matPsdSum;
+    const auto rows = QtConcurrent::blockingMapped<std::vector<std::vector<NetworkEdge>>>(
+        connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, false); });
+    for (const std::vector<NetworkEdge>& row : rows) {
+        for (const NetworkEdge& edge : row) {
+            finalNetwork.add_edge(edge);
+        }
+    }
 
     //    iTime = timer.elapsed();
     //    timer.restart();
@@ -191,16 +190,15 @@ void Coherency::calculateImag(Network& finalNetwork,
     //    timer.restart();
 
     // Compute CSD/sqrt(PSD_X * PSD_Y)
-    std::function<void(std::pair<int, MatrixXcd>&)> computePSDCSDLambda = [&](std::pair<int, MatrixXcd>& pairInput) {
-        computePSDCSDImag(mutex,
-                          finalNetwork,
-                          pairInput,
-                          connectivitySettings.getIntermediateSumData().matPsdSum);
-    };
-
-    QFuture<void> resultCSDPSD = QtConcurrent::map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
-                                                   computePSDCSDLambda);
-    resultCSDPSD.waitForFinished();
+    const MatrixXd& matPsdSum = connectivitySettings.getIntermediateSumData().matPsdSum;
+    const auto rows = QtConcurrent::blockingMapped<std::vector<std::vector<NetworkEdge>>>(
+        connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, true); });
+    for (const std::vector<NetworkEdge>& row : rows) {
+        for (const NetworkEdge& edge : row) {
+            finalNetwork.add_edge(edge);
+        }
+    }
 
     //    iTime = timer.elapsed();
     //    timer.restart();
@@ -353,10 +351,9 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
 
 //=============================================================================================================
 
-void Coherency::computePSDCSDAbs(QMutex& mutex,
-                                 Network& finalNetwork,
-                                 const std::pair<int, MatrixXcd>& pairInput,
-                                 const MatrixXd& matPsdSum)
+std::vector<NetworkEdge> Coherency::rowEdges(const std::pair<int, MatrixXcd>& pairInput,
+                                             const MatrixXd& matPsdSum,
+                                             bool imaginary)
 {
     MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
     RowVectorXd rowPsdSum = matPsdSum.row(pairInput.first);
@@ -366,44 +363,14 @@ void Coherency::computePSDCSDAbs(QMutex& mutex,
     }
 
     // Average. Note that the number of trials cancel each other out.
-    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp.cwiseSqrt());
+    const MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp.cwiseSqrt());
 
-    MatrixXd matWeight;
-    int j;
-    int i = pairInput.first;
-
-    for (j = i; j < matCohy.rows(); ++j) {
-        matWeight = matCohy.row(j).cwiseAbs().transpose();
-        NetworkEdge edge(i, j, std::move(matWeight));
-        const QMutexLocker locker(&mutex);
-        finalNetwork.add_edge(std::move(edge));
+    const int i = pairInput.first;
+    std::vector<NetworkEdge> edges;
+    edges.reserve(static_cast<std::size_t>(std::max<Eigen::Index>(matCohy.rows() - i, 0)));
+    for (int j = i; j < matCohy.rows(); ++j) {
+        MatrixXd matWeight = imaginary ? MatrixXd(matCohy.row(j).imag().transpose()) : MatrixXd(matCohy.row(j).cwiseAbs().transpose());
+        edges.emplace_back(i, j, std::move(matWeight));
     }
-}
-
-//=============================================================================================================
-
-void Coherency::computePSDCSDImag(QMutex& mutex,
-                                  Network& finalNetwork,
-                                  const std::pair<int, MatrixXcd>& pairInput,
-                                  const MatrixXd& matPsdSum)
-{
-    MatrixXd matPSDtmp(matPsdSum.rows(), matPsdSum.cols());
-    RowVectorXd rowPsdSum = matPsdSum.row(pairInput.first);
-
-    for (int j = 0; j < matPSDtmp.rows(); ++j) {
-        matPSDtmp.row(j) = rowPsdSum.cwiseProduct(matPsdSum.row(j));
-    }
-
-    MatrixXcd matCohy = pairInput.second.cwiseQuotient(matPSDtmp.cwiseSqrt());
-
-    MatrixXd matWeight;
-    int j;
-    int i = pairInput.first;
-
-    for (j = i; j < matCohy.rows(); ++j) {
-        matWeight = matCohy.row(j).imag().transpose();
-        NetworkEdge edge(i, j, std::move(matWeight));
-        const QMutexLocker locker(&mutex);
-        finalNetwork.add_edge(std::move(edge));
-    }
+    return edges;
 }

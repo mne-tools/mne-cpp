@@ -77,7 +77,7 @@
       "modules": []
     },
     "connectivity": {
-      "tokens": 55,
+      "tokens": 47,
       "public_header_includes": 9,
       "modules": [
         "Concurrent",

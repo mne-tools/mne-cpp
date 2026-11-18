@@ -481,6 +481,34 @@ private slots:
         QVERIFY2(std::abs(fresh(0, 2)) < 0.3 && std::abs(fresh(1, 2)) < 0.3, qPrintable(QString("%1 %2").arg(fresh(0, 2)).arg(fresh(1, 2))));
         QVERIFY2((accumulated - fresh).cwiseAbs().maxCoeff() < 1e-9, qPrintable(QString::number((accumulated - fresh).cwiseAbs().maxCoeff())));
     }
+
+    void testCoherenceListsEdgesInNodeOrder()
+    {
+        // The rows of the cross-spectra are reduced in parallel; the edges must still come out row by row
+        const int channels = 24;
+        MatrixXd data(channels, 256);
+        for (int i = 0; i < channels; ++i)
+            for (int k = 0; k < data.cols(); ++k)
+                data(i, k) = std::sin(0.05 * (i + 1) * k) + std::cos(0.013 * (k + 3 * i));
+        for (const std::string method : {"COH", "IMAGCOH"}) {
+            ConnectivitySettings settings;
+            settings.setSamplingFrequency(1000);
+            settings.setFFTSize(256);
+            settings.setWindowType("hanning");
+            settings.setConnectivityMethods({method});
+            for (int trial = 0; trial < 4; ++trial)
+                settings.append(data);
+            const std::vector<Network> networks = compute_connectivity(settings);
+            QCOMPARE(networks.size(), std::size_t(1));
+            const std::vector<NetworkEdge>& edges = networks.front().edges();
+            QCOMPARE(edges.size(), std::size_t(channels * (channels - 1) / 2));
+            for (std::size_t k = 1; k < edges.size(); ++k) {
+                const auto previous = std::make_pair(edges[k - 1].source(), edges[k - 1].target());
+                const auto current = std::make_pair(edges[k].source(), edges[k].target());
+                QVERIFY2(previous < current, qPrintable(QString("%1 edge %2").arg(QString::fromStdString(method)).arg(k)));
+            }
+        }
+    }
 };
 
 QTEST_GUILESS_MAIN(TestConnectivityMetrics)

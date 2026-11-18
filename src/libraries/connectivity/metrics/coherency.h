@@ -49,6 +49,7 @@
 
 #include "abstractmetric.h"
 #include "../connectivitysettings.h"
+#include "../network/networkedge.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -155,16 +156,12 @@ private:
 
     //=========================================================================================================
     /**
-     * Computes the PSD and CSD. This function gets called in parallel.
+     * Returns the edges of one row of the cross-spectra, coherency weighted by @p weight. This function gets
+     * called in parallel; the caller adds the rows to the network in order.
      */
-    static void computePSDCSDAbs(QMutex& mutex,
-                                 Network& finalNetwork,
-                                 const std::pair<int, Eigen::MatrixXcd>& pairInput,
-                                 const Eigen::MatrixXd& matPsdSum);
-    static void computePSDCSDImag(QMutex& mutex,
-                                  Network& finalNetwork,
-                                  const std::pair<int, Eigen::MatrixXcd>& pairInput,
-                                  const Eigen::MatrixXd& matPsdSum);
+    static std::vector<NetworkEdge> rowEdges(const std::pair<int, Eigen::MatrixXcd>& pairInput,
+                                             const Eigen::MatrixXd& matPsdSum,
+                                             bool imaginary);
 };
 
 //=============================================================================================================

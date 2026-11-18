@@ -709,6 +709,10 @@ aliases; replace the old spelling as below.
   `Spectrogram::make_spectrogram`; `SpectogramInputData`, `FilterObject` and
   `filterChannel` are removed; `computeFilteredAverage` takes the event type
   as `int`.
+- Coherence and imaginary coherence list the edges of the network row by row,
+  like every other metric. Before, the rows were added by parallel tasks in
+  whatever order they finished, so `Network::edges()[k]` was a different
+  channel pair from run to run.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from
