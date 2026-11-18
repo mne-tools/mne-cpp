@@ -63,37 +63,43 @@ void EogRegression::fit(const MatrixXd& data,
                         const FiffInfo& info,
                         const StringList& eogChannels)
 {
-    m_vecEogIndices.clear();
-    m_vecTargetIndices.clear();
     m_bFitted = false;
+    m_eogNames.clear();
+    m_targetNames.clear();
+    std::vector<int> eog;
+    std::vector<int> targets;
 
     if (eogChannels.empty()) {
         for (int i = 0; i < std::ssize(info.chs); ++i) {
             if (info.chs[i].kind == FIFFV_EOG_CH && !mne::has_channel(info.bads, info.ch_names[i]))
-                m_vecEogIndices.push_back(i);
+                eog.push_back(i);
         }
     } else {
         for (const std::string& name : eogChannels) {
             const int idx = static_cast<int>(mne::channel_index(info.ch_names, name));
             if (idx >= 0)
-                m_vecEogIndices.push_back(idx);
+                eog.push_back(idx);
             else
                 Log::warning("[EogRegression::fit] EOG channel not found: {}", name);
         }
     }
-    if (m_vecEogIndices.empty()) {
+    if (eog.empty()) {
         Log::warning("[EogRegression::fit] No EOG channels found. Data will not be modified.");
         return;
     }
 
     // mne's default picks: the good data channels
     for (const int i : info.pick_data_channels(info.bads))
-        m_vecTargetIndices.push_back(i);
+        targets.push_back(i);
 
     // Least squares on the time-demeaned signals, as mne.preprocessing.EOGRegression
-    const MatrixXd E = demeanedRows(data, m_vecEogIndices);
-    const MatrixXd T = demeanedRows(data, m_vecTargetIndices);
+    const MatrixXd E = demeanedRows(data, eog);
+    const MatrixXd T = demeanedRows(data, targets);
     m_matBeta = (E * E.transpose()).ldlt().solve(E * T.transpose()).transpose();
+    for (const int i : eog)
+        m_eogNames.push_back(info.ch_names[i]);
+    for (const int i : targets)
+        m_targetNames.push_back(info.ch_names[i]);
     m_bFitted = true;
 }
 
@@ -102,15 +108,25 @@ void EogRegression::fit(const MatrixXd& data,
 void EogRegression::apply(MatrixXd& data,
                           const FiffInfo& info) const
 {
-    Q_UNUSED(info)
-
     if (!m_bFitted) {
         Log::warning("[EogRegression::apply] Not fitted yet. Call fit() first.");
         return;
     }
-    const MatrixXd E = demeanedRows(data, m_vecEogIndices);
-    for (int i = 0; i < std::ssize(m_vecTargetIndices); ++i)
-        data.row(m_vecTargetIndices[i]) -= m_matBeta.row(i) * E;
+    std::vector<int> eog;
+    std::vector<int> targets;
+    for (const auto& [names, rows] : {std::pair(&m_eogNames, &eog), std::pair(&m_targetNames, &targets)}) {
+        for (const std::string& name : *names) {
+            const int row = static_cast<int>(mne::channel_index(info.ch_names, name));
+            if (row < 0 || row >= data.rows()) {
+                Log::warning("[EogRegression::apply] The fitted channel {} is missing from the data.", name);
+                return;
+            }
+            rows->push_back(row);
+        }
+    }
+    const MatrixXd E = demeanedRows(data, eog);
+    for (int i = 0; i < std::ssize(targets); ++i)
+        data.row(targets[i]) -= m_matBeta.row(i) * E;
 }
 
 //=============================================================================================================

@@ -88,11 +88,11 @@ public:
     /**
      * @brief Apply the fitted regression to remove EOG artifacts in-place.
      *
-     * Subtracts beta times the demeaned EOG from the channels fit() regressed.
-     * fit() must be called first.
+     * Subtracts beta times the demeaned EOG from the channels fit() regressed, found by name in @p info.
+     * fit() must be called first; data missing a fitted channel stays unchanged.
      *
      * @param[in,out] data   Data matrix (n_channels x n_times). Modified in-place.
-     * @param[in]     info   Measurement info.
+     * @param[in]     info   Measurement info of the data.
      */
     void apply(Eigen::MatrixXd& data,
                const mne::FiffInfo& info) const;
@@ -131,10 +131,10 @@ public:
     }
 
 private:
-    Eigen::MatrixXd m_matBeta;           /**< Regression coefficients (n_targets x n_eog). */
-    std::vector<int> m_vecEogIndices;    /**< Indices of EOG channels in the data matrix. */
-    std::vector<int> m_vecTargetIndices; /**< Indices of the regressed data channels. */
-    bool m_bFitted = false;              /**< Whether fit() has been called. */
+    Eigen::MatrixXd m_matBeta;     /**< Regression coefficients (n_targets x n_eog). */
+    mne::StringList m_eogNames;    /**< Names of the fitted EOG channels. */
+    mne::StringList m_targetNames; /**< Names of the regressed data channels. */
+    bool m_bFitted = false;        /**< Whether fit() has been called. */
 };
 
 } // namespace mne

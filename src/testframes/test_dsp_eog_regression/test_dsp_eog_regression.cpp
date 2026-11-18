@@ -408,6 +408,36 @@ private slots:
 
         QVERIFY(data1.isApprox(data2, 1e-12));
     }
+
+    void testApplyFindsTheChannelsByName()
+    {
+        // Like mne.preprocessing.EOGRegression.apply, the fitted channels are looked up in the info of the data
+        FiffInfo info = makeTestInfo();
+        const MatrixXd original = makeTestData();
+        MatrixXd expected = original;
+        EogRegression reg;
+        reg.fit(expected, info);
+        reg.apply(expected, info);
+
+        const std::vector<int> order = {4, 2, 0, 3, 1};
+        FiffInfo reorderedInfo = info;
+        MatrixXd data(5, original.cols());
+        for (int i = 0; i < 5; ++i) {
+            reorderedInfo.chs[i] = info.chs[order[i]];
+            reorderedInfo.ch_names[i] = info.ch_names[order[i]];
+            data.row(i) = original.row(order[i]);
+        }
+        reg.apply(data, reorderedInfo);
+        for (int i = 0; i < 5; ++i)
+            QVERIFY2(data.row(i).isApprox(expected.row(order[i]), 1e-12), reorderedInfo.ch_names[i].c_str());
+
+        // A fitted channel missing from the data leaves the data unchanged
+        FiffInfo missing = reorderedInfo;
+        missing.ch_names[0] = missing.chs[0].ch_name = "OTHER";
+        const MatrixXd before = data;
+        reg.apply(data, missing);
+        QCOMPARE(data, before);
+    }
 };
 
 //=============================================================================================================
