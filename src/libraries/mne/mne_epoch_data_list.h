@@ -26,6 +26,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <string>
@@ -103,7 +104,7 @@ public:
                                        const Eigen::MatrixXi& events,
                                        float tmin,
                                        float tmax,
-                                       qint32 event,
+                                       std::int32_t event,
                                        const std::map<std::string, double>& mapReject,
                                        const mne::StringList& lExcludeChs = {},
                                        const Eigen::RowVectorXi& picks = Eigen::RowVectorXi());
@@ -217,7 +218,7 @@ public:
                                           const Eigen::MatrixXi& matEvents,
                                           float fTMinS,
                                           float fTMaxS,
-                                          qint32 eventType,
+                                          std::int32_t eventType,
                                           bool bApplyBaseline,
                                           float fTBaselineFromS,
                                           float fTBaselineToS,

@@ -9,7 +9,7 @@
  * @date     March 2026
  * @brief    Container pairing the left and right cortical source spaces of a subject.
  *
- * @ref mne::MNESourceSpaces wraps the @c QList of
+ * @ref mne::MNESourceSpaces wraps the list of
  * @ref mne::MNESourceSpace objects that form a complete cortical source space
  * as written by @c mne_setup_source_space (one entry per hemisphere, or
  * additional entries for discrete / volume source spaces). It is the
@@ -29,6 +29,7 @@
 #include "mne_global.h"
 #include "mne_hemisphere.h"
 
+#include <cstdint>
 #include <string_view>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_stream.h>
@@ -216,7 +217,7 @@ public:
      *
      * @return number of stored hemispheres.
      */
-    inline qint32 size() const;
+    inline std::int32_t size() const;
 
     //=========================================================================================================
     /**
@@ -260,7 +261,7 @@ public:
      *
      * @return Reference to the source space at the given index.
      */
-    MNESourceSpace& operator[](qint32 idx);
+    MNESourceSpace& operator[](std::int32_t idx);
 
     //=========================================================================================================
     /**
@@ -270,7 +271,7 @@ public:
      *
      * @return Const reference to the source space at the given index.
      */
-    const MNESourceSpace& operator[](qint32 idx) const;
+    const MNESourceSpace& operator[](std::int32_t idx) const;
 
     //=========================================================================================================
     /**
@@ -300,7 +301,7 @@ public:
      *
      * @return Pointer to MNEHemisphere, or nullptr if the element is not a hemisphere.
      */
-    MNEHemisphere* hemisphereAt(qint32 idx);
+    MNEHemisphere* hemisphereAt(std::int32_t idx);
 
     //=========================================================================================================
     /**
@@ -310,7 +311,7 @@ public:
      *
      * @return Const pointer to MNEHemisphere, or nullptr if the element is not a hemisphere.
      */
-    const MNEHemisphere* hemisphereAt(qint32 idx) const;
+    const MNEHemisphere* hemisphereAt(std::int32_t idx) const;
 
     //=========================================================================================================
     /**
@@ -320,7 +321,7 @@ public:
      *
      * @return shared_ptr to the MNESourceSpace.
      */
-    std::shared_ptr<MNESourceSpace>& at(qint32 idx);
+    std::shared_ptr<MNESourceSpace>& at(std::int32_t idx);
 
     //=========================================================================================================
     /**
@@ -330,7 +331,7 @@ public:
      *
      * @return const shared_ptr to the MNESourceSpace.
      */
-    const std::shared_ptr<MNESourceSpace>& at(qint32 idx) const;
+    const std::shared_ptr<MNESourceSpace>& at(std::int32_t idx) const;
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -357,9 +358,9 @@ inline bool MNESourceSpaces::empty() const
 
 //=============================================================================================================
 
-inline qint32 MNESourceSpaces::size() const
+inline std::int32_t MNESourceSpaces::size() const
 {
-    return static_cast<qint32>(m_sourceSpaces.size());
+    return static_cast<std::int32_t>(m_sourceSpaces.size());
 }
 
 //=============================================================================================================
@@ -368,7 +369,7 @@ inline bool operator==(const MNESourceSpaces& a, const MNESourceSpaces& b)
 {
     if (a.size() != b.size())
         return false;
-    for (qint32 i = 0; i < a.size(); ++i) {
+    for (std::int32_t i = 0; i < a.size(); ++i) {
         // Compare as hemispheres if both elements are hemispheres
         auto* ha = dynamic_cast<const MNEHemisphere*>(&a[i]);
         auto* hb = dynamic_cast<const MNEHemisphere*>(&b[i]);

@@ -13,7 +13,7 @@
  * @ref mne::MNEFilterDef and the completion callback that the
  * legacy raw-browser filter worker thread needs to run a filter on one
  * FIFF data buffer asynchronously. Kept POD-like so it can be passed
- * across @c QThread boundaries without ownership headaches.
+ * across thread boundaries without ownership headaches.
  */
 
 #ifndef FILTERTHREADARG_H

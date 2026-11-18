@@ -23,6 +23,7 @@
 
 #include "mne_epoch_data_list.h"
 #include <fiff/fiff_ch_name.h>
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 
@@ -71,7 +72,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
                                               const MatrixXi& events,
                                               float tmin,
                                               float tmax,
-                                              qint32 event,
+                                              std::int32_t event,
                                               const std::map<std::string, double>& mapReject,
                                               const StringList& lExcludeChs,
                                               const RowVectorXi& picks)
@@ -79,8 +80,8 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     MNEEpochDataList data;
 
     // Select the desired events
-    qint32 count = 0;
-    qint32 p;
+    std::int32_t count = 0;
+    std::int32_t p;
     MatrixXi selected = MatrixXi::Zero(1, events.rows());
     for (p = 0; p < events.rows(); ++p) {
         if (events(p, 1) == 0 && events(p, 2) == event) {
@@ -124,7 +125,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
         if (raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picksNew)) {
             if (p == 0) {
                 times.resize(1, to - from + 1);
-                for (qint32 i = 0; i < times.cols(); ++i)
+                for (std::int32_t i = 0; i < times.cols(); ++i)
                     times(0, i) = static_cast<float>(from - event_samp + i) / raw.info.sfreq;
             }
 
@@ -411,7 +412,7 @@ FiffEvoked MNEEpochDataList::computeAverage(const FiffRawData& raw,
                                             const MatrixXi& matEvents,
                                             float fTMinS,
                                             float fTMaxS,
-                                            qint32 eventType,
+                                            std::int32_t eventType,
                                             bool bApplyBaseline,
                                             float fTBaselineFromS,
                                             float fTBaselineToS,

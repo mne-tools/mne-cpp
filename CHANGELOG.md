@@ -727,6 +727,9 @@ aliases; replace the old spelling as below.
   `mne::ThreadPool` instead of `QtConcurrent`. Migration: `fwd_eeg_sphere_model.h`
   and `fwd_eeg_sphere_layer.h` no longer include `<QDebug>`; programs that got
   Qt through `mne_fwd` link it themselves.
+- The mne library no longer uses or links Qt itself; its public headers spell
+  `qint32` as `std::int32_t` (the same type, so callers compile unchanged).
+  Programs that got Qt through `mne_mne` link it themselves.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

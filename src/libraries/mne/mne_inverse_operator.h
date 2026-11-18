@@ -33,6 +33,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include <cstdint>
 #include <memory>
 
 #include <string>
@@ -81,11 +82,11 @@ namespace mne
  */
 struct RegionMTOut
 {
-    Eigen::VectorXi roiIdx; /**< Per-source cluster assignment indices. */
-    Eigen::MatrixXd ctrs;   /**< Cluster centroids (nClusters x features). */
-    Eigen::VectorXd sumd;   /**< Sum of distances to the assigned centroid. */
-    Eigen::MatrixXd D;      /**< Distance matrix (nSources x nClusters). */
-    qint32 iLabelIdxOut;    /**< Label index carried through from the input. */
+    Eigen::VectorXi roiIdx;    /**< Per-source cluster assignment indices. */
+    Eigen::MatrixXd ctrs;      /**< Cluster centroids (nClusters x features). */
+    Eigen::VectorXd sumd;      /**< Sum of distances to the assigned centroid. */
+    Eigen::MatrixXd D;         /**< Distance matrix (nSources x nClusters). */
+    std::int32_t iLabelIdxOut; /**< Label index carried through from the input. */
 };
 
 //=========================================================================================================
@@ -96,9 +97,9 @@ struct RegionMT
 {
     Eigen::MatrixXd matRoiMT;     /**< Reshaped gain matrix (sources x sensors*3). */
     Eigen::MatrixXd matRoiMTOrig; /**< Original gain matrix (sensors x sources*3). */
-    qint32 nClusters;             /**< Number of clusters for this region. */
+    std::int32_t nClusters;       /**< Number of clusters for this region. */
     Eigen::VectorXi idcs;         /**< Source-space indices for this region. */
-    qint32 iLabelIdxIn;           /**< Label index passed through to the output. */
+    std::int32_t iLabelIdxIn;     /**< Label index passed through to the output. */
     std::string sDistMeasure;     /**< Distance metric: "cityblock" or "sqeuclidean". */
 
     /**
@@ -217,7 +218,7 @@ public:
      * @return Clustered kernel matrix.
      */
     Eigen::MatrixXd cluster_kernel(const mne::FsAnnotationSet& annotationSet,
-                                   qint32 clusterSize,
+                                   std::int32_t clusterSize,
                                    Eigen::MatrixXd& D,
                                    const std::string& method = "cityblock") const;
 
@@ -282,7 +283,7 @@ public:
      *
      * @return A prepared copy of the inverse operator ready for apply_inverse.
      */
-    MNEInverseOperator prepare_inverse_operator(qint32 nave,
+    MNEInverseOperator prepare_inverse_operator(std::int32_t nave,
                                                 float lambda2,
                                                 bool dSPM,
                                                 bool sLORETA = false) const;

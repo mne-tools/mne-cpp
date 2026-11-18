@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include "mne_source_spaces.h"
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 
@@ -93,7 +94,7 @@ Expected<MNEHemisphere> read_source_space(FiffStream& stream, const std::shared_
     }
 
     p_Hemisphere.rr = t_pTag->to_float_matrix().transpose();
-    qint32 rows_rr = p_Hemisphere.rr.rows();
+    std::int32_t rows_rr = p_Hemisphere.rr.rows();
 
     if (rows_rr != p_Hemisphere.np) {
         return fail(ErrorCode::Format, "a source space in {} has a vertex count that does not match its vertices", name);
@@ -105,7 +106,7 @@ Expected<MNEHemisphere> read_source_space(FiffStream& stream, const std::shared_
     }
 
     p_Hemisphere.nn = t_pTag->to_float_matrix().transpose();
-    qint32 rows_nn = p_Hemisphere.nn.rows();
+    std::int32_t rows_nn = p_Hemisphere.nn.rows();
 
     if (rows_nn != p_Hemisphere.np) {
         return fail(ErrorCode::Format, "a source space in {} has a normal count that does not match its vertices", name);
@@ -346,7 +347,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
 {
     MNESourceSpaces selectedSrc(*this);
 
-    for (qint32 h = 0; h < 2; ++h) {
+    for (std::int32_t h = 0; h < 2; ++h) {
         auto& srcSpace = *selectedSrc.m_sourceSpaces[h];
         const auto& origSpace = *this->m_sourceSpaces[h];
         auto* selHemi = dynamic_cast<MNEHemisphere*>(&srcSpace);
@@ -355,7 +356,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
         VectorXi selVertices;
 
         //get vertices indeces for new selection
-        qint32 iSize = 0;
+        std::int32_t iSize = 0;
         for (const auto& label : p_qListLabels) {
             if (label.hemi == h) {
                 VectorXi currentSelection;
@@ -374,7 +375,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
 
         srcSpace.inuse = VectorXi::Zero(srcSpace.np);
 
-        for (qint32 i = 0; i < selVertices.size(); ++i) {
+        for (std::int32_t i = 0; i < selVertices.size(); ++i) {
             newVertno[i] = origSpace.vertno[selVertices[i]];
             srcSpace.inuse[newVertno[i]] = 1;
         }
@@ -386,17 +387,17 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
         // Tris
         //
         VectorXi idx_select = VectorXi::Zero(origSpace.use_itris.rows());
-        for (qint32 i = 0; i < 3; ++i) {
+        for (std::int32_t i = 0; i < 3; ++i) {
             VectorXi tri_dim = origSpace.use_itris.col(i);
             VectorXi idx_dim;
             Linalg::intersect(tri_dim, newVertno, idx_dim);
 
-            for (qint32 j = 0; j < idx_dim.size(); ++j)
+            for (std::int32_t j = 0; j < idx_dim.size(); ++j)
                 idx_select[idx_dim[j]] = 1;
         }
 
-        qint32 countSel = 0;
-        for (qint32 i = 0; i < idx_select.size(); ++i)
+        std::int32_t countSel = 0;
+        for (std::int32_t i = 0; i < idx_select.size(); ++i)
             if (idx_select[i] == 1)
                 ++countSel;
 
@@ -408,7 +409,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
         VectorXd use_tri_area_new(countSel);
 
         countSel = 0;
-        for (qint32 i = 0; i < idx_select.size(); ++i) {
+        for (std::int32_t i = 0; i < idx_select.size(); ++i) {
             if (idx_select[i] == 1) {
                 use_tris_new.row(countSel) = origSpace.use_itris.row(i);
                 if (origHemi && selHemi) {
@@ -428,7 +429,7 @@ MNESourceSpaces MNESourceSpaces::pick_regions(const std::vector<FsLabel>& p_qLis
             // patch_inds is indexed by used source, so it must follow the selection
             if (origHemi && origHemi->patch_inds.size() == origSpace.nuse) {
                 selHemi->patch_inds.resize(selVertices.size());
-                for (qint32 i = 0; i < selVertices.size(); ++i)
+                for (std::int32_t i = 0; i < selVertices.size(); ++i)
                     selHemi->patch_inds[i] = origHemi->patch_inds[selVertices[i]];
             }
         }
@@ -524,9 +525,9 @@ void MNESourceSpaces::write_to_stream(FiffStream& stream) const
 
 //=============================================================================================================
 
-MNESourceSpace& MNESourceSpaces::operator[](qint32 idx)
+MNESourceSpace& MNESourceSpaces::operator[](std::int32_t idx)
 {
-    if (static_cast<qint32>(m_sourceSpaces.size()) > idx)
+    if (static_cast<std::int32_t>(m_sourceSpaces.size()) > idx)
         return *m_sourceSpaces[idx];
     else {
         Log::warning("Warning: Index out of bound! Returning last element.");
@@ -536,9 +537,9 @@ MNESourceSpace& MNESourceSpaces::operator[](qint32 idx)
 
 //=============================================================================================================
 
-const MNESourceSpace& MNESourceSpaces::operator[](qint32 idx) const
+const MNESourceSpace& MNESourceSpaces::operator[](std::int32_t idx) const
 {
-    if (static_cast<qint32>(m_sourceSpaces.size()) > idx)
+    if (static_cast<std::int32_t>(m_sourceSpaces.size()) > idx)
         return *m_sourceSpaces[idx];
     else {
         Log::warning("Warning: Index out of bound! Returning last element.");
@@ -576,32 +577,32 @@ const MNESourceSpace& MNESourceSpaces::operator[](std::string_view idt) const
 
 //=============================================================================================================
 
-MNEHemisphere* MNESourceSpaces::hemisphereAt(qint32 idx)
+MNEHemisphere* MNESourceSpaces::hemisphereAt(std::int32_t idx)
 {
-    if (idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
+    if (idx >= 0 && idx < static_cast<std::int32_t>(m_sourceSpaces.size()))
         return dynamic_cast<MNEHemisphere*>(m_sourceSpaces[idx].get());
     return nullptr;
 }
 
 //=============================================================================================================
 
-const MNEHemisphere* MNESourceSpaces::hemisphereAt(qint32 idx) const
+const MNEHemisphere* MNESourceSpaces::hemisphereAt(std::int32_t idx) const
 {
-    if (idx >= 0 && idx < static_cast<qint32>(m_sourceSpaces.size()))
+    if (idx >= 0 && idx < static_cast<std::int32_t>(m_sourceSpaces.size()))
         return dynamic_cast<const MNEHemisphere*>(m_sourceSpaces[idx].get());
     return nullptr;
 }
 
 //=============================================================================================================
 
-std::shared_ptr<MNESourceSpace>& MNESourceSpaces::at(qint32 idx)
+std::shared_ptr<MNESourceSpace>& MNESourceSpaces::at(std::int32_t idx)
 {
     return m_sourceSpaces.at(idx);
 }
 
 //=============================================================================================================
 
-const std::shared_ptr<MNESourceSpace>& MNESourceSpaces::at(qint32 idx) const
+const std::shared_ptr<MNESourceSpace>& MNESourceSpaces::at(std::int32_t idx) const
 {
     return m_sourceSpaces.at(idx);
 }

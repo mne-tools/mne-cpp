@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include "mne_named_matrix.h"
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 #include <fiff/fiff_constants.h>
@@ -125,8 +126,8 @@ std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream& stream,
     StringList rownames;
     int ncol = 0;
     int nrow = 0;
-    qint32 ndim;
-    std::vector<qint32> dims;
+    std::int32_t ndim;
+    std::vector<std::int32_t> dims;
     MatrixXf data;
     std::optional<FiffTag> t_pTag;
     bool dataFound = false;

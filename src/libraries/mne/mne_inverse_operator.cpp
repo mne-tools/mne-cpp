@@ -26,6 +26,7 @@
 
 #include "mne_inverse_operator.h"
 #include <fiff/fiff_ch_name.h>
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 #include <base/thread_pool.h>
@@ -99,7 +100,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
             // noisenorm is diagonal, one entry per source.
             tripletList.clear();
             tripletList.reserve(src_sel.size());
-            for (qint32 i = 0; i < src_sel.size(); ++i)
+            for (std::int32_t i = 0; i < src_sel.size(); ++i)
                 tripletList.push_back(T(i, i, noise_norm.coeff(src_sel[i], src_sel[i])));
 
             noise_norm = SparseMatrix<double>(src_sel.size(), src_sel.size());
@@ -109,7 +110,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
         if (source_ori == FIFFV_MNE_FREE_ORI) {
             VectorXi src_sel_new(src_sel.size() * 3);
 
-            for (qint32 i = 0; i < src_sel.size(); ++i) {
+            for (std::int32_t i = 0; i < src_sel.size(); ++i) {
                 src_sel_new[i * 3] = src_sel[i] * 3;
                 src_sel_new[i * 3 + 1] = src_sel[i] * 3 + 1;
                 src_sel_new[i * 3 + 2] = src_sel[i] * 3 + 2;
@@ -118,7 +119,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
         }
 
         // src_sel is ascending with src_sel[i] >= i, so in-place compaction is safe.
-        for (qint32 i = 0; i < src_sel.size(); ++i) {
+        for (std::int32_t i = 0; i < src_sel.size(); ++i) {
             t_eigen_leads.row(i) = t_eigen_leads.row(src_sel[i]);
             t_source_cov.row(i) = t_source_cov.row(src_sel[i]);
         }
@@ -139,15 +140,15 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
         }
 
         // keep only the normal components
-        qint32 count = 0;
-        for (qint32 i = 2; i < t_eigen_leads.rows(); i += 3) {
+        std::int32_t count = 0;
+        for (std::int32_t i = 2; i < t_eigen_leads.rows(); i += 3) {
             t_eigen_leads.row(count) = t_eigen_leads.row(i);
             ++count;
         }
         t_eigen_leads.conservativeResize(count, t_eigen_leads.cols());
 
         count = 0;
-        for (qint32 i = 2; i < t_source_cov.rows(); i += 3) {
+        for (std::int32_t i = 2; i < t_source_cov.rows(); i += 3) {
             t_source_cov.row(count) = t_source_cov.row(i);
             ++count;
         }
@@ -156,7 +157,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
 
     tripletList.clear();
     tripletList.reserve(reginv.rows());
-    for (qint32 i = 0; i < reginv.rows(); ++i)
+    for (std::int32_t i = 0; i < reginv.rows(); ++i)
         tripletList.push_back(T(i, i, reginv(i, 0)));
     SparseMatrix<double> t_reginv(reginv.rows(), reginv.rows());
     t_reginv.setFromTriplets(tripletList.begin(), tripletList.end());
@@ -180,7 +181,7 @@ bool MNEInverseOperator::assemble_kernel(const FsLabel& label,
 
         std::vector<T> tripletList2;
         tripletList2.reserve(t_source_cov.rows());
-        for (qint32 i = 0; i < t_source_cov.rows(); ++i)
+        for (std::int32_t i = 0; i < t_source_cov.rows(); ++i)
             tripletList2.push_back(T(i, i, sqrt(t_source_cov(i, 0))));
         SparseMatrix<double> t_sourceCov(t_source_cov.rows(), t_source_cov.rows());
         t_sourceCov.setFromTriplets(tripletList2.begin(), tripletList2.end());
@@ -207,7 +208,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo& measInfo) const
     if (this->eigen_fields.col_names.size() != this->noise_cov.names.size())
         t_bContains = false;
     else {
-        for (qint32 i = 0; i < static_cast<int>(this->noise_cov.names.size()); ++i) {
+        for (std::int32_t i = 0; i < static_cast<int>(this->noise_cov.names.size()); ++i) {
             if (inv_ch_names[i] != this->noise_cov.names[i]) {
                 t_bContains = false;
                 break;
@@ -223,11 +224,11 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo& measInfo) const
     StringList data_ch_names = measInfo.ch_names;
 
     StringList missing_ch_names;
-    for (qint32 i = 0; i < static_cast<int>(inv_ch_names.size()); ++i)
+    for (std::int32_t i = 0; i < static_cast<int>(inv_ch_names.size()); ++i)
         if (!mne::has_channel(data_ch_names, inv_ch_names[i]))
             missing_ch_names.push_back(inv_ch_names[i]);
 
-    qint32 n_missing = static_cast<int>(missing_ch_names.size());
+    std::int32_t n_missing = static_cast<int>(missing_ch_names.size());
 
     if (n_missing > 0) {
         Log::critical("{} channels in inverse operator are not present in the data ( {} )", n_missing, missing_ch_names);
@@ -239,7 +240,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo& measInfo) const
 
 //=============================================================================================================
 
-MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const std::string& p_sMethod) const
+MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationSet, std::int32_t p_iClusterSize, MatrixXd& p_D, const std::string& p_sMethod) const
 {
     Log::info("Cluster kernel using {}.\n", p_sMethod);
 
@@ -261,15 +262,15 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
     //
     // Assemble input data
     //
-    qint32 offset;
+    std::int32_t offset;
 
     MatrixXd t_MT_new;
 
-    for (qint32 h = 0; h < this->src.size(); ++h) {
+    for (std::int32_t h = 0; h < this->src.size(); ++h) {
         offset = 0;
 
         if (h > 0)
-            for (qint32 j = 0; j < h; ++j)
+            for (std::int32_t j = 0; j < h; ++j)
                 offset += this->src[j].nuse;
 
         if (h == 0)
@@ -283,16 +284,16 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
         // Get label ids for every vertex
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
-        for (qint32 i = 0; i < vertno_labeled.rows(); ++i)
+        for (std::int32_t i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
-        //Qt Concurrent List
+        // Work items of the parallel clustering
         std::vector<RegionMT> m_qListRegionMTIn;
 
         //
         // Generate cluster input data
         //
-        for (qint32 i = 0; i < label_ids.rows(); ++i) {
+        for (std::int32_t i = 0; i < label_ids.rows(); ++i) {
             if (label_ids[i] != 0) {
                 const std::string& curr_name = t_CurrentColorTable.struct_names[static_cast<std::size_t>(i)]; //obj.label2AtlasName(label(i));
                 Log::info("\tCluster {} / {} {}...", i + 1, label_ids.rows(), curr_name);
@@ -301,10 +302,10 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
                 // Get source space indeces
                 //
                 VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
-                qint32 c = 0;
+                std::int32_t c = 0;
 
                 //Select ROIs //change this use label info with a hash tabel
-                for (qint32 j = 0; j < vertno_labeled.rows(); ++j) {
+                for (std::int32_t j = 0; j < vertno_labeled.rows(); ++j) {
                     if (vertno_labeled[j] == label_ids[i]) {
                         idcs[c] = j;
                         ++c;
@@ -315,11 +316,11 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
                 //get selected MT
                 MatrixXd t_MT(p_outMT.rows(), idcs.rows() * 3);
 
-                for (qint32 j = 0; j < idcs.rows(); ++j)
+                for (std::int32_t j = 0; j < idcs.rows(); ++j)
                     t_MT.block(0, j * 3, t_MT.rows(), 3) = p_outMT.block(0, (idcs[j] + offset) * 3, t_MT.rows(), 3);
 
-                qint32 nSens = t_MT.rows();
-                qint32 nSources = t_MT.cols() / 3;
+                std::int32_t nSens = t_MT.rows();
+                std::int32_t nSources = t_MT.cols() / 3;
 
                 if (nSources > 0) {
                     RegionMT t_sensMT;
@@ -335,8 +336,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
                     // Reshape Input data -> sources rows; sensors columns
                     t_sensMT.matRoiMT = MatrixXd(t_MT.cols() / 3, 3 * nSens);
 
-                    for (qint32 j = 0; j < nSens; ++j)
-                        for (qint32 k = 0; k < t_sensMT.matRoiMT.rows(); ++k)
+                    for (std::int32_t j = 0; j < nSens; ++j)
+                        for (std::int32_t k = 0; k < t_sensMT.matRoiMT.rows(); ++k)
                             t_sensMT.matRoiMT.block(k, j * 3, 1, 3) = t_MT.block(j, k * 3, 1, 3);
 
                     t_sensMT.sDistMeasure = p_sMethod;
@@ -361,8 +362,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
         //
         MatrixXd t_MT_partial;
 
-        qint32 nClusters;
-        qint32 nSens;
+        std::int32_t nClusters;
+        std::int32_t nSens;
         std::vector<RegionMT>::const_iterator itIn;
         itIn = m_qListRegionMTIn.begin();
         for (auto itOut = res.cbegin(); itOut != res.cend(); ++itOut) {
@@ -373,18 +374,18 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
             //
             // Assign the centroid for each cluster to the partial G
             //
-            for (qint32 j = 0; j < nSens; ++j)
-                for (qint32 k = 0; k < nClusters; ++k)
+            for (std::int32_t j = 0; j < nSens; ++j)
+                for (std::int32_t k = 0; k < nClusters; ++k)
                     t_MT_partial.block(j, k * 3, 1, 3) = itOut->ctrs.block(k, j * 3, 1, 3);
 
             //
             // Get cluster indices and their distances to the centroid
             //
-            for (qint32 j = 0; j < nClusters; ++j) {
+            for (std::int32_t j = 0; j < nClusters; ++j) {
                 VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
                 VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
-                qint32 nClusterIdcs = 0;
-                for (qint32 k = 0; k < itOut->roiIdx.rows(); ++k) {
+                std::int32_t nClusterIdcs = 0;
+                for (std::int32_t k = 0; k < itOut->roiIdx.rows(); ++k) {
                     if (itOut->roiIdx[k] == j) {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
                         clusterDistance[nClusterIdcs] = itOut->D(k, j);
@@ -395,7 +396,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
                 clusterDistance.conservativeResize(nClusterIdcs);
 
                 VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
-                for (qint32 k = 0; k < clusterVertnos.size(); ++k)
+                for (std::int32_t k = 0; k < clusterVertnos.size(); ++k)
                     clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
 
                 t_qListMNEClusterInfo[h].clusterVertnos.push_back(clusterVertnos);
@@ -418,8 +419,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
     //
     // Cluster operator D (sources x clusters)
     //
-    qint32 totalNumOfClust = 0;
-    for (qint32 h = 0; h < 2; ++h)
+    std::int32_t totalNumOfClust = 0;
+    for (std::int32_t h = 0; h < 2; ++h)
         totalNumOfClust += t_qListMNEClusterInfo[h].clusterVertnos.size();
 
     if (isFixedOrient())
@@ -429,10 +430,10 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
 
     std::vector<VectorXi> t_vertnos = src.get_vertno();
 
-    qint32 currentCluster = 0;
-    for (qint32 h = 0; h < 2; ++h) {
+    std::int32_t currentCluster = 0;
+    for (std::int32_t h = 0; h < 2; ++h) {
         int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
-        for (qint32 i = 0; i < std::ssize(t_qListMNEClusterInfo[h].clusterVertnos); ++i) {
+        for (std::int32_t i = 0; i < std::ssize(t_qListMNEClusterInfo[h].clusterVertnos); ++i) {
             VectorXi idx_sel;
             Linalg::intersect(t_vertnos[h], t_qListMNEClusterInfo[h].clusterVertnos[i], idx_sel);
 
@@ -440,12 +441,12 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
 
             double selectWeight = 1.0 / idx_sel.size();
             if (isFixedOrient()) {
-                for (qint32 j = 0; j < idx_sel.size(); ++j)
+                for (std::int32_t j = 0; j < idx_sel.size(); ++j)
                     p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
             } else {
-                qint32 clustOffset = currentCluster * 3;
-                for (qint32 j = 0; j < idx_sel.size(); ++j) {
-                    qint32 idx_sel_Offset = idx_sel(j) * 3;
+                std::int32_t clustOffset = currentCluster * 3;
+                for (std::int32_t j = 0; j < idx_sel.size(); ++j) {
+                    std::int32_t idx_sel_Offset = idx_sel(j) * 3;
                     //x
                     p_D(idx_sel_Offset, clustOffset) = selectWeight;
                     //y
@@ -521,7 +522,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     FiffInfo gain_info;
     MatrixXd gain;
     MatrixXd whitener;
-    qint32 n_nzero;
+    std::int32_t n_nzero;
     FiffCov p_outNoiseCov;
     forward.prepare_forward(info, p_noise_cov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
 
@@ -552,8 +553,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
                 Log::warning("Warning: For a fixed-orientation inverse, the forward solution must be surface-oriented. Skipping fixed conversion.\n");
             } else {
                 // Convert to the fixed orientation forward solution now
-                qint32 count = 0;
-                for (qint32 i = 2; i < p_depth_prior.data.rows(); i += 3) {
+                std::int32_t count = 0;
+                for (std::int32_t i = 2; i < p_depth_prior.data.rows(); i += 3) {
                     p_depth_prior.data.row(count) = p_depth_prior.data.row(i);
                     gain.col(count) = gain.col(i);
                     ++count;
@@ -602,7 +603,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     Log::info("\tAdjusting source covariance matrix.\n");
     RowVectorXd source_std = p_source_cov.data.array().sqrt().transpose();
 
-    for (qint32 i = 0; i < gain.rows(); ++i)
+    for (std::int32_t i = 0; i < gain.rows(); ++i)
         gain.row(i) = gain.row(i).array() * source_std.array();
 
     double trace_GRGT = (gain * gain.transpose()).trace();
@@ -638,15 +639,15 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     Log::info("\tlargest singular value = {:f}\n", p_sing.maxCoeff());
     Log::info("\tscaling factor to adjust the trace = {:f}\n", trace_GRGT);
 
-    qint32 p_nave = 1.0;
+    std::int32_t p_nave = 1.0;
 
     // Handle methods
     bool has_meg = false;
     bool has_eeg = false;
 
     RowVectorXd ch_idx(info.chs.size());
-    qint32 count = 0;
-    for (qint32 i = 0; i < std::ssize(info.chs); ++i) {
+    std::int32_t count = 0;
+    for (std::int32_t i = 0; i < std::ssize(info.chs); ++i) {
         if (mne::has_channel(gain_info.ch_names, info.chs[i].ch_name)) {
             ch_idx[count] = i;
             ++count;
@@ -654,7 +655,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     }
     ch_idx.conservativeResize(count);
 
-    for (qint32 i = 0; i < ch_idx.size(); ++i) {
+    for (std::int32_t i = 0; i < ch_idx.size(); ++i) {
         const std::string ch_type = info.channel_type(ch_idx[i]);
         if (ch_type == "eeg")
             has_eeg = true;
@@ -662,7 +663,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
             has_meg = true;
     }
 
-    qint32 p_iMethods;
+    std::int32_t p_iMethods;
 
     if (has_eeg && has_meg)
         p_iMethods = FIFFV_MNE_MEG_EEG;
@@ -703,7 +704,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
 
 //=============================================================================================================
 
-MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, float lambda2, bool dSPM, bool sLORETA) const
+MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(std::int32_t nAve, float lambda2, bool dSPM, bool sLORETA) const
 {
     if (nAve <= 0) {
         Log::critical("The number of averages should be positive\n");
@@ -734,7 +735,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, flo
     //   Create the projection operator
     //
 
-    qint32 ncomp = FiffProj::make_projector(inv.projs, inv.noise_cov.names, inv.proj);
+    std::int32_t ncomp = FiffProj::make_projector(inv.projs, inv.noise_cov.names, inv.proj);
     if (ncomp > 0)
         Log::info("\tCreated an SSP operator (subspace dimension = {})\n", ncomp);
 
@@ -743,7 +744,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, flo
     //
     inv.whitener = MatrixXd::Zero(inv.noise_cov.dim, inv.noise_cov.dim);
 
-    qint32 nnzero, k;
+    std::int32_t nnzero, k;
     if (inv.noise_cov.diag == 0) {
         //
         //   Omit the zeroes due to projection. The eigenvalues are sorted per channel type, not
@@ -816,7 +817,7 @@ MNEInverseOperator MNEInverseOperator::prepare_inverse_operator(qint32 nAve, flo
         typedef Eigen::Triplet<double> T;
         std::vector<T> tripletList;
         tripletList.reserve(noise_norm_new.size());
-        for (qint32 i = 0; i < noise_norm_new.size(); ++i)
+        for (std::int32_t i = 0; i < noise_norm_new.size(); ++i)
             tripletList.push_back(T(i, i, noiseNormInv[i]));
 
         inv.noisenorm = SparseMatrix<double>(noise_norm_new.size(), noise_norm_new.size());
@@ -973,7 +974,7 @@ Expected<MNEInverseOperator> MNEInverseOperator::read(const std::filesystem::pat
         return std::unexpected(sourceSpaces.error());
     }
     inv.src = std::move(*sourceSpaces);
-    for (qint32 k = 0; k < inv.src.size(); ++k)
+    for (std::int32_t k = 0; k < inv.src.size(); ++k)
         inv.src[k].id = inv.src[k].find_source_space_hemi();
     //
     //   Get the MRI <-> head coordinate transformation

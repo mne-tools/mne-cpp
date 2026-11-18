@@ -29,6 +29,7 @@
 
 #include "mne_global.h"
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -76,7 +77,7 @@ struct RegionDataOut
     Eigen::VectorXd sumd;   /**< Sums of the distances to the centroid. */
     Eigen::MatrixXd D;      /**< Distances to the centroid. */
 
-    qint32 iLabelIdxOut; /**< FsLabel ID. */
+    std::int32_t iLabelIdxOut; /**< FsLabel ID. */
 };
 
 //=========================================================================================================
@@ -93,10 +94,10 @@ struct RegionData
 
     Eigen::MatrixXd matRoiGOrig; /**< Region gain matrix sensors x sources(x,y,z)*/
 
-    qint32 nClusters; /**< Number of clusters within this region. */
+    std::int32_t nClusters; /**< Number of clusters within this region. */
 
     Eigen::VectorXi idcs;     /**< Get source space indeces. */
-    qint32 iLabelIdxIn;       /**< FsLabel ID. */
+    std::int32_t iLabelIdxIn; /**< FsLabel ID. */
     std::string sDistMeasure; /**< "cityblock" or "sqeuclidean". */
 
     RegionDataOut cluster() const
@@ -113,10 +114,10 @@ struct RegionData
 
             // Centroids of the original gain: all channels, not only those the whitener kept
             Eigen::MatrixXd newCtrs = Eigen::MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), this->matRoiG.cols());
-            for (qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c) {
-                qint32 num = 0;
+            for (std::int32_t c = 0; c < p_RegionDataOut.ctrs.rows(); ++c) {
+                std::int32_t num = 0;
 
-                for (qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx) {
+                for (std::int32_t idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx) {
                     if (c == p_RegionDataOut.roiIdx[idx]) {
                         newCtrs.row(c) += this->matRoiG.row(idx); //just take whitened to get indeces calculate centroids using the original matrix
                         ++num;
@@ -207,7 +208,7 @@ public:
      * @return clustered MNE forward solution.
      */
     MNEForwardSolution cluster_forward_solution(const mne::FsAnnotationSet& p_AnnotationSet,
-                                                qint32 p_iClusterSize,
+                                                std::int32_t p_iClusterSize,
                                                 Eigen::MatrixXd& p_D = defaultD,
                                                 const mne::FiffCov& p_pNoise_cov = defaultCov,
                                                 const mne::FiffInfo& p_pInfo = defaultInfo,
@@ -332,7 +333,7 @@ public:
                          Eigen::MatrixXd& gain,
                          mne::FiffCov& p_outNoiseCov,
                          Eigen::MatrixXd& p_outWhitener,
-                         qint32& p_outNumNonZero) const;
+                         std::int32_t& p_outNumNonZero) const;
 
     //=========================================================================================================
     /**
@@ -397,7 +398,7 @@ public:
      *
      * @return reduced MNE forward solution.
      */
-    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, Eigen::MatrixXd& p_D) const;
+    MNEForwardSolution reduce_forward_solution(std::int32_t p_iNumDipoles, Eigen::MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**

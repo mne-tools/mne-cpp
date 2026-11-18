@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "mne_event_list.h"
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 
@@ -132,8 +133,8 @@ std::optional<MNEEventList> MNEEventList::read_fif(const std::filesystem::path& 
         return std::nullopt;
     }
     // Written as signed or unsigned integers; both have the same bit pattern.
-    const auto* values = reinterpret_cast<const qint32*>(tag->data());
-    const int nevent = static_cast<int>(tag->size() / (3 * sizeof(qint32)));
+    const auto* values = reinterpret_cast<const std::int32_t*>(tag->data());
+    const int nevent = static_cast<int>(tag->size() / (3 * sizeof(std::int32_t)));
     MNEEventList list;
     list.events.resize(nevent);
     for (int k = 0; k < nevent; ++k) {
@@ -209,14 +210,14 @@ bool MNEEventList::write_fif(const std::filesystem::path& path, int offset) cons
     if (!stream) {
         return false;
     }
-    std::vector<qint32> values;
+    std::vector<std::int32_t> values;
     values.reserve(3 * events.size());
     std::string comments;
     bool anyComment = false;
     for (const MNEEvent& event : events) {
         values.push_back(event.sample + offset);
-        values.push_back(static_cast<qint32>(event.from));
-        values.push_back(static_cast<qint32>(event.to));
+        values.push_back(static_cast<std::int32_t>(event.from));
+        values.push_back(static_cast<std::int32_t>(event.to));
         comments += latin1_from_utf8(event.comment);
         comments += '\0';
         anyComment = anyComment || !event.comment.empty();

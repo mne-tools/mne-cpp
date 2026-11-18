@@ -22,6 +22,7 @@
 
 #include "mne_forward_solution.h"
 #include <fiff/fiff_ch_name.h>
+#include <cstdint>
 #include <memory>
 #include <base/log.h>
 #include <base/thread_pool.h>
@@ -315,7 +316,7 @@ Expected<void> MNEForwardSolution::write(const std::filesystem::path& path) cons
 //=============================================================================================================
 
 MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotationSet& p_AnnotationSet,
-                                                                qint32 p_iClusterSize,
+                                                                std::int32_t p_iClusterSize,
                                                                 MatrixXd& p_D,
                                                                 const FiffCov& p_pNoise_cov,
                                                                 const FiffInfo& p_pInfo,
@@ -347,7 +348,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         FiffInfo p_outFwdInfo;
         FiffCov p_outNoiseCov;
         MatrixXd p_outWhitener;
-        qint32 p_outNumNonZero;
+        std::int32_t p_outNumNonZero;
         //do whitening with noise cov
         this->prepare_forward(p_pInfo, p_pNoise_cov, false, p_outFwdInfo, t_G_Whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
         Log::info("\tWhitening the forward solution.");
@@ -359,18 +360,18 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
     //
     // Assemble input data
     //
-    qint32 count;
-    qint32 offset;
+    std::int32_t count;
+    std::int32_t offset;
 
     MatrixXd t_G_new;
 
-    for (qint32 h = 0; h < this->src.size(); ++h) {
+    for (std::int32_t h = 0; h < this->src.size(); ++h) {
         count = 0;
         offset = 0;
 
         // Offset for continuous indexing;
         if (h > 0)
-            for (qint32 j = 0; j < h; ++j)
+            for (std::int32_t j = 0; j < h; ++j)
                 offset += this->src[j].nuse;
 
         if (h == 0)
@@ -386,7 +387,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
 
         //ToDo make this more universal -> using FsLabel instead of annotations - obsolete when using Labels
-        for (qint32 i = 0; i < vertno_labeled.rows(); ++i)
+        for (std::int32_t i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
         std::vector<RegionData> regionDataIn;
@@ -394,7 +395,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         //
         // Generate cluster input data
         //
-        for (qint32 i = 0; i < label_ids.rows(); ++i) {
+        for (std::int32_t i = 0; i < label_ids.rows(); ++i) {
             if (label_ids[i] != 0) {
                 const std::string& curr_name = t_CurrentColorTable.struct_names[static_cast<std::size_t>(i)]; //obj.label2AtlasName(label(i));
                 Log::info("\tCluster {} / {} {}...", i + 1, label_ids.rows(), curr_name);
@@ -403,10 +404,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                 // Get source space indeces
                 //
                 VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
-                qint32 c = 0;
+                std::int32_t c = 0;
 
                 //Select ROIs //change this use label info with a hash tabel
-                for (qint32 j = 0; j < vertno_labeled.rows(); ++j) {
+                for (std::int32_t j = 0; j < vertno_labeled.rows(); ++j) {
                     if (vertno_labeled[j] == label_ids[i]) {
                         idcs[c] = j;
                         ++c;
@@ -418,14 +419,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                 MatrixXd t_G(this->sol.data.rows(), idcs.rows() * 3);
                 MatrixXd t_G_Whitened_Roi(t_G_Whitened.rows(), idcs.rows() * 3);
 
-                for (qint32 j = 0; j < idcs.rows(); ++j) {
+                for (std::int32_t j = 0; j < idcs.rows(); ++j) {
                     t_G.block(0, j * 3, t_G.rows(), 3) = this->sol.data.block(0, (idcs[j] + offset) * 3, t_G.rows(), 3);
                     if (t_bUseWhitened)
                         t_G_Whitened_Roi.block(0, j * 3, t_G_Whitened_Roi.rows(), 3) = t_G_Whitened.block(0, (idcs[j] + offset) * 3, t_G_Whitened_Roi.rows(), 3);
                 }
 
-                qint32 nSens = t_G.rows();
-                qint32 nSources = t_G.cols() / 3;
+                std::int32_t nSens = t_G.rows();
+                std::int32_t nSources = t_G.cols() / 3;
 
                 if (nSources > 0) {
                     RegionData t_sensG;
@@ -440,16 +441,16 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
 
                     // Reshape Input data -> sources rows; sensors columns
                     t_sensG.matRoiG = MatrixXd(t_G.cols() / 3, 3 * nSens);
-                    for (qint32 j = 0; j < nSens; ++j) {
-                        for (qint32 k = 0; k < t_sensG.matRoiG.rows(); ++k)
+                    for (std::int32_t j = 0; j < nSens; ++j) {
+                        for (std::int32_t k = 0; k < t_sensG.matRoiG.rows(); ++k)
                             t_sensG.matRoiG.block(k, j * 3, 1, 3) = t_G.block(j, k * 3, 1, 3);
                     }
                     // The whitened gain only has the channels prepare_forward() kept, so fewer rows than t_G
                     if (t_bUseWhitened) {
-                        const qint32 nSensWhitened = static_cast<qint32>(t_G_Whitened_Roi.rows());
+                        const std::int32_t nSensWhitened = static_cast<std::int32_t>(t_G_Whitened_Roi.rows());
                         t_sensG.matRoiGWhitened = MatrixXd(t_G_Whitened_Roi.cols() / 3, 3 * nSensWhitened);
-                        for (qint32 j = 0; j < nSensWhitened; ++j) {
-                            for (qint32 k = 0; k < t_sensG.matRoiGWhitened.rows(); ++k)
+                        for (std::int32_t j = 0; j < nSensWhitened; ++j) {
+                            for (std::int32_t k = 0; k < t_sensG.matRoiGWhitened.rows(); ++k)
                                 t_sensG.matRoiGWhitened.block(k, j * 3, 1, 3) = t_G_Whitened_Roi.block(j, k * 3, 1, 3);
                         }
                     }
@@ -478,8 +479,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         //
         MatrixXd t_G_partial;
 
-        qint32 nClusters;
-        qint32 nSens;
+        std::int32_t nClusters;
+        std::int32_t nSens;
         auto itIn = regionDataIn.cbegin();
         for (auto itOut = res.cbegin(); itOut != res.cend(); ++itOut) {
             nClusters = itOut->ctrs.rows();
@@ -490,23 +491,23 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
             // Assign the centroid for each cluster to the partial G
             //
             //ToDo change this use indeces found with whitened data
-            for (qint32 j = 0; j < nSens; ++j)
-                for (qint32 k = 0; k < nClusters; ++k)
+            for (std::int32_t j = 0; j < nSens; ++j)
+                for (std::int32_t k = 0; k < nClusters; ++k)
                     t_G_partial.block(j, k * 3, 1, 3) = itOut->ctrs.block(k, j * 3, 1, 3);
 
             //
             // Get cluster indizes and its distances to the centroid
             //
-            for (qint32 j = 0; j < nClusters; ++j) {
+            for (std::int32_t j = 0; j < nClusters; ++j) {
                 VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
                 VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
                 MatrixX3f clusterSource_rr = MatrixX3f::Zero(itOut->roiIdx.rows(), 3);
-                qint32 nClusterIdcs = 0;
-                for (qint32 k = 0; k < itOut->roiIdx.rows(); ++k) {
+                std::int32_t nClusterIdcs = 0;
+                for (std::int32_t k = 0; k < itOut->roiIdx.rows(); ++k) {
                     if (itOut->roiIdx[k] == j) {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
 
-                        const qint32 hemiOffset = h == 0 ? 0 : this->src[0].nuse;
+                        const std::int32_t hemiOffset = h == 0 ? 0 : this->src[0].nuse;
                         clusterSource_rr.row(nClusterIdcs) = this->source_rr.row(hemiOffset + itIn->idcs[k]);
                         clusterDistance[nClusterIdcs] = itOut->D(k, j);
                         ++nClusterIdcs;
@@ -517,7 +518,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                 clusterDistance.conservativeResize(nClusterIdcs);
 
                 VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
-                for (qint32 k = 0; k < clusterVertnos.size(); ++k)
+                for (std::int32_t k = 0; k < clusterVertnos.size(); ++k)
                     clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
 
                 p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.push_back(clusterVertnos);
@@ -535,11 +536,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                 t_G_new.block(0, t_G_new.cols() - t_G_partial.cols(), t_G_new.rows(), t_G_partial.cols()) = t_G_partial;
 
                 // Map the centroids to the closest rr
-                for (qint32 k = 0; k < nClusters; ++k) {
+                for (std::int32_t k = 0; k < nClusters; ++k) {
                     double sqec = sqrt((itIn->matRoiGOrig.block(0, 0, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k * 3, t_G_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
-                    qint32 j_min = 0;
-                    for (qint32 j = 1; j < itIn->idcs.rows(); ++j) {
+                    std::int32_t j_min = 0;
+                    for (std::int32_t j = 1; j < itIn->idcs.rows(); ++j) {
                         sqec = sqrt((itIn->matRoiGOrig.block(0, j * 3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k * 3, t_G_partial.rows(), 3)).array().pow(2).sum());
 
                         if (sqec < sqec_min) {
@@ -549,7 +550,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
                     }
 
                     // Take the closest coordinates
-                    qint32 sel_idx = itIn->idcs[j_min];
+                    std::int32_t sel_idx = itIn->idcs[j_min];
 
                     p_fwdOut.src.hemisphereAt(h)->cluster_info.centroidVertno.push_back(this->src[h].vertno[sel_idx]);
                     p_fwdOut.src.hemisphereAt(h)->cluster_info.centroidSource_rr.push_back(this->src[h].rr.row(this->src[h].vertno[sel_idx]));
@@ -577,8 +578,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
     //
     // Cluster operator D (sources x clusters)
     //
-    qint32 totalNumOfClust = 0;
-    for (qint32 h = 0; h < 2; ++h)
+    std::int32_t totalNumOfClust = 0;
+    for (std::int32_t h = 0; h < 2; ++h)
         totalNumOfClust += p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size();
 
     if (this->isFixedOrient())
@@ -588,10 +589,10 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
 
     std::vector<VectorXi> t_vertnos = this->src.get_vertno();
 
-    qint32 currentCluster = 0;
-    for (qint32 h = 0; h < 2; ++h) {
+    std::int32_t currentCluster = 0;
+    for (std::int32_t h = 0; h < 2; ++h) {
         int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
-        for (qint32 i = 0; i < std::ssize(p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos); ++i) {
+        for (std::int32_t i = 0; i < std::ssize(p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos); ++i) {
             VectorXi idx_sel;
             Linalg::intersect(t_vertnos[h], p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos[i], idx_sel);
 
@@ -599,12 +600,12 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
 
             double selectWeight = 1.0 / idx_sel.size();
             if (this->isFixedOrient()) {
-                for (qint32 j = 0; j < idx_sel.size(); ++j)
+                for (std::int32_t j = 0; j < idx_sel.size(); ++j)
                     p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
             } else {
-                qint32 clustOffset = currentCluster * 3;
-                for (qint32 j = 0; j < idx_sel.size(); ++j) {
-                    qint32 idx_sel_Offset = idx_sel(j) * 3;
+                std::int32_t clustOffset = currentCluster * 3;
+                for (std::int32_t j = 0; j < idx_sel.size(); ++j) {
+                    std::int32_t idx_sel_Offset = idx_sel(j) * 3;
                     //x
                     p_D(idx_sel_Offset, clustOffset) = selectWeight;
                     //y
@@ -630,12 +631,12 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
 
 //=============================================================================================================
 
-MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
+MNEForwardSolution MNEForwardSolution::reduce_forward_solution(std::int32_t p_iNumDipoles, MatrixXd& p_D) const
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     bool isFixed = p_fwdOut.isFixedOrient();
-    qint32 np = isFixed ? p_fwdOut.sol.data.cols() : p_fwdOut.sol.data.cols() / 3;
+    std::int32_t np = isFixed ? p_fwdOut.sol.data.cols() : p_fwdOut.sol.data.cols() / 3;
 
     if (p_iNumDipoles > np)
         return p_fwdOut;
@@ -644,19 +645,19 @@ MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipo
 
     float t_fStep = static_cast<float>(np) / static_cast<float>(p_iNumDipoles);
 
-    for (qint32 i = 0; i < p_iNumDipoles; ++i) {
+    for (std::int32_t i = 0; i < p_iNumDipoles; ++i) {
         float t_fCurrent = static_cast<float>(i) * t_fStep;
         sel[i] = static_cast<int>(std::floor(t_fCurrent));
     }
 
     if (isFixed) {
         p_D = MatrixXd::Zero(p_fwdOut.sol.data.cols(), p_iNumDipoles);
-        for (qint32 i = 0; i < p_iNumDipoles; ++i)
+        for (std::int32_t i = 0; i < p_iNumDipoles; ++i)
             p_D(sel[i], i) = 1;
     } else {
         p_D = MatrixXd::Zero(p_fwdOut.sol.data.cols(), p_iNumDipoles * 3);
-        for (qint32 i = 0; i < p_iNumDipoles; ++i)
-            for (qint32 j = 0; j < 3; ++j)
+        for (std::int32_t i = 0; i < p_iNumDipoles; ++i)
+            for (std::int32_t j = 0; j < 3; ++j)
                 p_D((sel[i] * 3) + j, (i * 3) + j) = 1;
     }
 
@@ -667,7 +668,7 @@ MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipo
 
     MatrixX3f nn(p_iNumDipoles, 3);
 
-    for (qint32 i = 0; i < p_iNumDipoles; ++i) {
+    for (std::int32_t i = 0; i < p_iNumDipoles; ++i) {
         rr.row(i) = this->source_rr.row(sel(i));
         nn.row(i) = this->source_nn.row(sel(i));
     }
@@ -701,10 +702,10 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
         const double minNonZero = (d.array() != 0.0).select(d.array(), std::numeric_limits<double>::infinity()).minCoeff();
         d = (d.array() == 0.0).select(minNonZero, d.array());
     } else {
-        qint32 n_pos = G.cols() / 3;
+        std::int32_t n_pos = G.cols() / 3;
         d = VectorXd::Zero(n_pos);
         MatrixXd Gk;
-        for (qint32 k = 0; k < n_pos; ++k) {
+        for (std::int32_t k = 0; k < n_pos; ++k) {
             Gk = G.block(0, 3 * k, G.rows(), 3);
             JacobiSVD<MatrixXd> svd(Gk.transpose() * Gk);
             d[k] = svd.singularValues().maxCoeff();
@@ -716,7 +717,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
         Log::info("\tPatch areas taken into account in the depth weighting");
     }
 
-    qint32 n_limit;
+    std::int32_t n_limit;
     VectorXd w = d.cwiseInverse();
     VectorXd ws = w;
     VectorXd wpp;
@@ -724,18 +725,18 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
     double weight_limit = pow(limit, 2);
     if (!limit_depth_chs) {
         // match old mne-python behavor
-        qint32 ind = 0;
+        std::int32_t ind = 0;
         ws.minCoeff(&ind);
         n_limit = ind;
         limit = ws[ind] * weight_limit;
     } else {
         // match C code behavior
         limit = ws[ws.size() - 1];
-        qint32 ind = 0;
+        std::int32_t ind = 0;
         n_limit = d.size();
         if (ws[ws.size() - 1] > weight_limit * ws[0]) {
             double th = weight_limit * ws[0];
-            for (qint32 i = 0; i < ws.size(); ++i) {
+            for (std::int32_t i = 0; i < ws.size(); ++i) {
                 if (ws[i] > th) {
                     ind = i;
                     break;
@@ -751,7 +752,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
     Log::info("\tscale = {:g} exp = {:g}", scale, exp);
 
     VectorXd t_w = w.array() / limit;
-    for (qint32 i = 0; i < t_w.size(); ++i)
+    for (std::int32_t i = 0; i < t_w.size(); ++i)
         t_w[i] = t_w[i] > 1 ? 1 : t_w[i];
     wpp = t_w.array().pow(exp);
 
@@ -760,9 +761,9 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
         depth_prior.data = wpp;
     else {
         depth_prior.data.resize(wpp.rows() * 3, 1);
-        qint32 idx = 0;
+        std::int32_t idx = 0;
         double v;
-        for (qint32 i = 0; i < wpp.rows(); ++i) {
+        for (std::int32_t i = 0; i < wpp.rows(); ++i) {
             idx = i * 3;
             v = wpp[i];
             depth_prior.data(idx, 0) = v;
@@ -784,7 +785,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
 FiffCov MNEForwardSolution::compute_orient_prior(float loose)
 {
     bool is_fixed_ori = this->isFixedOrient();
-    qint32 n_sources = this->sol.data.cols();
+    std::int32_t n_sources = this->sol.data.cols();
 
     if (0 <= loose && loose <= 1) {
         if (loose < 1 && !this->surf_ori) {
@@ -809,7 +810,7 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
     orient_prior.data = VectorXd::Ones(n_sources);
     if (!is_fixed_ori && (0 <= loose && loose <= 1)) {
         Log::info("\tApplying loose dipole orientations. Loose value of {:f}.", loose);
-        for (qint32 i = 0; i < n_sources; i += 3)
+        for (std::int32_t i = 0; i < n_sources; i += 3)
             orient_prior.data.block(i, 0, 2, 1).array() *= loose;
 
         orient_prior.kind = FIFFV_MNE_ORIENT_PRIOR_COV;
@@ -851,13 +852,13 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
 
     StringList ch_names;
     ch_names.reserve(nuse);
-    for (qint32 i = 0; i < sel.cols(); ++i)
+    for (std::int32_t i = 0; i < sel.cols(); ++i)
         ch_names.push_back(fwd.sol.row_names[sel(i)]);
     fwd.nchan = nuse;
 
     std::vector<FiffChInfo> chs;
     chs.reserve(nuse);
-    for (qint32 i = 0; i < sel.cols(); ++i)
+    for (std::int32_t i = 0; i < sel.cols(); ++i)
         chs.push_back(fwd.info.chs[sel(i)]);
     fwd.info.chs = std::move(chs);
     fwd.info.ch_names = ch_names;
@@ -877,7 +878,7 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
         fwd.sol_grad.data = newData;
         fwd.sol_grad.nrow = nuse;
         StringList row_names;
-        for (qint32 i = 0; i < sel.cols(); ++i)
+        for (std::int32_t i = 0; i < sel.cols(); ++i)
             row_names.push_back(fwd.sol_grad.row_names[sel(i)]);
         fwd.sol_grad.row_names = row_names;
     }
@@ -891,7 +892,7 @@ MNEForwardSolution MNEForwardSolution::pick_regions(const std::vector<FsLabel>& 
 {
     VectorXi selVertices;
 
-    qint32 iSize = 0;
+    std::int32_t iSize = 0;
     for (const auto& label : p_qListLabels) {
         VectorXi currentSelection;
         this->src.label_src_vertno_sel(label, currentSelection);
@@ -906,7 +907,7 @@ MNEForwardSolution MNEForwardSolution::pick_regions(const std::vector<FsLabel>& 
     MNEForwardSolution selectedFwd(*this);
 
     MatrixX3f rr(selVertices.size(), 3);
-    for (qint32 i = 0; i < selVertices.size(); ++i)
+    for (std::int32_t i = 0; i < selVertices.size(); ++i)
         rr.row(i) = selectedFwd.source_rr.row(selVertices[i]);
 
     // Free orientation stores three normals and three gain columns per source.
@@ -914,7 +915,7 @@ MNEForwardSolution MNEForwardSolution::pick_regions(const std::vector<FsLabel>& 
 
     MatrixX3f nn(selSolIdcs.size(), 3);
     MatrixXd G(selectedFwd.sol.data.rows(), selSolIdcs.size());
-    for (qint32 i = 0; i < selSolIdcs.size(); ++i) {
+    for (std::int32_t i = 0; i < selSolIdcs.size(); ++i) {
         nn.row(i) = selectedFwd.source_nn.row(selSolIdcs[i]);
         G.col(i) = selectedFwd.sol.data.col(selSolIdcs[i]);
     }
@@ -938,7 +939,7 @@ MNEForwardSolution MNEForwardSolution::pick_types(bool meg, bool eeg, const Stri
     RowVectorXi sel = info.pick_types(meg, eeg, false, include, exclude);
 
     StringList include_ch_names;
-    for (qint32 i = 0; i < sel.cols(); ++i)
+    for (std::int32_t i = 0; i < sel.cols(); ++i)
         include_ch_names.push_back(info.ch_names[sel[i]]);
 
     return this->pick_channels(include_ch_names);
@@ -953,18 +954,18 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
                                          MatrixXd& gain,
                                          FiffCov& p_outNoiseCov,
                                          MatrixXd& p_outWhitener,
-                                         qint32& p_outNumNonZero) const
+                                         std::int32_t& p_outNumNonZero) const
 {
     StringList fwd_ch_names, ch_names;
-    for (qint32 i = 0; i < std::ssize(this->info.chs); ++i)
+    for (std::int32_t i = 0; i < std::ssize(this->info.chs); ++i)
         fwd_ch_names.push_back(this->info.chs[i].ch_name);
 
     ch_names.clear();
-    for (qint32 i = 0; i < std::ssize(p_info.chs); ++i)
+    for (std::int32_t i = 0; i < std::ssize(p_info.chs); ++i)
         if (!mne::has_channel(p_info.bads, p_info.chs[i].ch_name) && !mne::has_channel(p_noise_cov.bads, p_info.chs[i].ch_name) && mne::has_channel(p_noise_cov.names, p_info.chs[i].ch_name) && mne::has_channel(fwd_ch_names, p_info.chs[i].ch_name))
             ch_names.push_back(p_info.chs[i].ch_name);
 
-    qint32 n_chan = static_cast<int>(ch_names.size());
+    std::int32_t n_chan = static_cast<int>(ch_names.size());
     Log::info("Computing inverse operator with {} channels.", n_chan);
 
     //
@@ -975,7 +976,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
     //   Omit the zeroes due to projection
     p_outNumNonZero = 0;
     VectorXi t_vecNonZero = VectorXi::Zero(n_chan);
-    for (qint32 i = 0; i < p_outNoiseCov.eig.rows(); ++i) {
+    for (std::int32_t i = 0; i < p_outNoiseCov.eig.rows(); ++i) {
         if (p_outNoiseCov.eig[i] > 0) {
             t_vecNonZero[p_outNumNonZero] = i;
             ++p_outNumNonZero;
@@ -988,13 +989,13 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
         if (p_pca) {
             // Rows of eigvec are the eigenvectors: one whitened component per non-zero eigenvalue (mne _get_whitener)
             p_outWhitener = MatrixXd(p_outNumNonZero, n_chan);
-            for (qint32 i = 0; i < p_outNumNonZero; ++i)
+            for (std::int32_t i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener.row(i) = p_outNoiseCov.eigvec.row(t_vecNonZero[i]) / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
             Log::info("\tReducing data rank to {}.", p_outNumNonZero);
         } else {
             Log::info("Creating non pca whitener.");
             p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
-            for (qint32 i = 0; i < p_outNumNonZero; ++i)
+            for (std::int32_t i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener(t_vecNonZero[i], t_vecNonZero[i]) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
             // Rows of eigvec are the eigenvectors: W = diag(1/sqrt(eig)) * eigvec
             p_outWhitener *= p_outNoiseCov.eigvec;
@@ -1003,10 +1004,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
 
     VectorXi fwd_idx = VectorXi::Zero(ch_names.size());
     VectorXi info_idx = VectorXi::Zero(ch_names.size());
-    qint32 idx;
-    qint32 count_fwd_idx = 0;
-    qint32 count_info_idx = 0;
-    for (qint32 i = 0; i < static_cast<int>(ch_names.size()); ++i) {
+    std::int32_t idx;
+    std::int32_t count_fwd_idx = 0;
+    std::int32_t count_info_idx = 0;
+    for (std::int32_t i = 0; i < static_cast<int>(ch_names.size()); ++i) {
         idx = mne::channel_index(fwd_ch_names, ch_names[i]);
         if (idx > -1) {
             fwd_idx[count_fwd_idx] = idx;
@@ -1022,7 +1023,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
     info_idx.conservativeResize(count_info_idx);
 
     gain.resize(count_fwd_idx, this->sol.data.cols());
-    for (qint32 i = 0; i < count_fwd_idx; ++i)
+    for (std::int32_t i = 0; i < count_fwd_idx; ++i)
         gain.row(i) = this->sol.data.row(fwd_idx[i]);
 
     p_outFwdInfo = p_info.pick_info(info_idx);
@@ -1070,7 +1071,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     }
     MNESourceSpaces& t_SourceSpace = *sourceSpaces;
 
-    for (qint32 k = 0; k < t_SourceSpace.size(); ++k)
+    for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k)
         t_SourceSpace[k].id = t_SourceSpace[k].find_source_space_hemi();
 
     //
@@ -1081,7 +1082,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
         bads = t_pStream.read_bad_channels(t_pStream.dirtree());
         if (bads.size() > 0) {
             Log::info("\t{} bad channels ( ", bads.size());
-            for (qint32 i = 0; i < static_cast<int>(bads.size()); ++i)
+            for (std::int32_t i = 0; i < static_cast<int>(bads.size()); ++i)
                 Log::info("\"{}\" ", bads[i]);
             Log::info(") read");
         }
@@ -1186,9 +1187,9 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     }
 
     //
-    qint32 nuse = 0;
+    std::int32_t nuse = 0;
     t_SourceSpace.transform_source_space_to(fwd.coord_frame, fwd.mri_head_t);
-    for (qint32 k = 0; k < t_SourceSpace.size(); ++k)
+    for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k)
         nuse += t_SourceSpace[k].nuse;
 
     if (nuse != fwd.nsource) {
@@ -1206,8 +1207,8 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
         nuse = 0;
         fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
         fwd.source_nn = MatrixXf::Zero(fwd.nsource, 3);
-        for (qint32 k = 0; k < t_SourceSpace.size(); ++k) {
-            for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q) {
+        for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k) {
+            for (std::int32_t q = 0; q < t_SourceSpace[k].nuse; ++q) {
                 fwd.source_rr.row(nuse + q) = t_SourceSpace[k].rr.row(t_SourceSpace[k].vertno(q));
                 if (patchNormals) {
                     auto* hemi = t_SourceSpace.hemisphereAt(k);
@@ -1236,7 +1237,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
             if (!fwd.sol_grad.empty()) {
                 SparseMatrix<double> t_matKron;
                 SparseMatrix<double> t_eye(3, 3);
-                for (qint32 i = 0; i < 3; ++i)
+                for (std::int32_t i = 0; i < 3; ++i)
                     t_eye.insert(i, i) = 1.0f;
                 t_matKron = kroneckerProduct(fix_rot, t_eye); //kron(fix_rot,eye(3));
                 fwd.sol_grad.data *= t_matKron;
@@ -1251,8 +1252,8 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
         Log::info("\tCartesian source orientations...");
         nuse = 0;
         fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
-        for (qint32 k = 0; k < t_SourceSpace.size(); ++k) {
-            for (qint32 q = 0; q < t_SourceSpace[k].nuse; ++q)
+        for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k) {
+            for (std::int32_t q = 0; q < t_SourceSpace[k].nuse; ++q)
                 fwd.source_rr.block(q + nuse, 0, 1, 3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q), 0, 1, 3);
 
             nuse += t_SourceSpace[k].nuse;
@@ -1270,7 +1271,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     //
     StringList exclude_bads = options.exclude;
     if (bads.size() > 0) {
-        for (qint32 k = 0; k < static_cast<int>(bads.size()); ++k)
+        for (std::int32_t k = 0; k < static_cast<int>(bads.size()); ++k)
             if (std::none_of(exclude_bads.begin(), exclude_bads.end(), [&](const std::string& e) { return mne::iequals(e, bads[k]); }))
                 exclude_bads.push_back(bads[k]);
     }
@@ -1370,21 +1371,21 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd& G, const FiffInfo& info)
 
     RowVectorXi sel = info.pick_types(std::string("grad"));
     if (sel.size() > 0) {
-        for (qint32 i = 0; i < sel.size(); ++i)
+        for (std::int32_t i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
         Log::info("\t{} planar channels", sel.size());
     } else {
         sel = info.pick_types(std::string("mag"));
         if (sel.size() > 0) {
-            for (qint32 i = 0; i < sel.size(); ++i)
+            for (std::int32_t i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
             Log::info("\t{} magnetometer or axial gradiometer channels", sel.size());
         } else {
             sel = info.pick_types(false, true);
             if (sel.size() > 0) {
-                for (qint32 i = 0; i < sel.size(); ++i)
+                for (std::int32_t i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
                 Log::info("\t{} EEG channels", sel.size());
@@ -1400,7 +1401,7 @@ void MNEForwardSolution::convert_to_surf_ori()
 {
     if (this->surf_ori || this->isFixedOrient())
         return;
-    qint32 nuse = 0;
+    std::int32_t nuse = 0;
     //
     //   Rotate the local source coordinate systems
     //
@@ -1413,21 +1414,21 @@ void MNEForwardSolution::convert_to_surf_ori()
         Log::info("\tAverage patch normals will be employed in the rotation to the local surface coordinates...");
     }
 
-    qint32 pp = 0;
+    std::int32_t pp = 0;
     this->source_rr = MatrixXf::Zero(this->nsource, 3);
     this->source_nn = MatrixXf::Zero(this->nsource * 3, 3);
 
     // A clustered source sits at its centroid; its vertno holds the label id
-    const auto vertexOf = [this](qint32 k, qint32 q) {
+    const auto vertexOf = [this](std::int32_t k, std::int32_t q) {
         auto* hemi = src.hemisphereAt(k);
         return hemi && hemi->isClustered() ? hemi->cluster_info.centroidVertno[q] : src[k].vertno(q);
     };
 
-    for (qint32 k = 0; k < src.size(); ++k) {
-        for (qint32 q = 0; q < src[k].nuse; ++q)
+    for (std::int32_t k = 0; k < src.size(); ++k) {
+        for (std::int32_t q = 0; q < src[k].nuse; ++q)
             this->source_rr.block(q + nuse, 0, 1, 3) = src[k].rr.block(vertexOf(k, q), 0, 1, 3);
 
-        for (qint32 p = 0; p < src[k].nuse; ++p) {
+        for (std::int32_t p = 0; p < src[k].nuse; ++p) {
             //
             //  Project out the surface normal and compute SVD
             //
@@ -1436,7 +1437,7 @@ void MNEForwardSolution::convert_to_surf_ori()
                 auto* hemiK = src.hemisphereAt(k);
                 VectorXi t_vIdx = hemiK->pinfo[hemiK->patch_inds[p]];
                 Matrix3Xf t_nn(3, t_vIdx.size());
-                for (qint32 i = 0; i < t_vIdx.size(); ++i)
+                for (std::int32_t i = 0; i < t_vIdx.size(); ++i)
                     t_nn.col(i) = src[k].nn.block(t_vIdx[i], 0, 1, 3).transpose();
                 nn = t_nn.rowwise().sum();
                 nn.array() /= nn.norm();
@@ -1469,7 +1470,7 @@ void MNEForwardSolution::convert_to_surf_ori()
     if (!this->sol_grad.empty()) {
         SparseMatrix<double> t_matKron;
         SparseMatrix<double> t_eye(3, 3);
-        for (qint32 i = 0; i < 3; ++i)
+        for (std::int32_t i = 0; i < 3; ++i)
             t_eye.insert(i, i) = 1.0f;
         t_matKron = kroneckerProduct(surf_rot, t_eye); //kron(surf_rot,eye(3));
         this->sol_grad.data *= t_matKron;
@@ -1486,8 +1487,8 @@ void MNEForwardSolution::to_fixed_ori()
         Log::warning("Cannot convert to fixed orientation: requires surface-oriented, free-orientation forward solution");
         return;
     }
-    qint32 count = 0;
-    for (qint32 i = 2; i < this->sol.data.cols(); i += 3) {
+    std::int32_t count = 0;
+    for (std::int32_t i = 2; i < this->sol.data.cols(); i += 3) {
         this->sol.data.col(count) = this->sol.data.col(i);
         if (this->source_nn.rows() == this->sol.data.cols())
             this->source_nn.row(count) = this->source_nn.row(i);

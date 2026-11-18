@@ -26,6 +26,7 @@
 #include "mne_bem_surface.h"
 #include <base/log.h>
 
+#include <cstdint>
 #include <vector>
 
 //=============================================================================================================
@@ -113,8 +114,8 @@ bool MNEBemSurface::addTriangleData()
     Vector3d a, b;
     int k = 0;
     float size = 0;
-    for (qint32 i = 0; i < this->ntri; ++i) {
-        for (qint32 j = 0; j < 3; ++j) {
+    for (std::int32_t i = 0; i < this->ntri; ++i) {
+        for (std::int32_t j = 0; j < 3; ++j) {
             k = this->itris(i, j);
 
             r(j, 0) = this->rr(k, 0);
@@ -216,9 +217,9 @@ bool MNEBemSurface::addVertexNormals()
     //
     this->nn = NormalsT::Zero(this->np, 3);
 
-    for (qint32 p = 0; p < this->ntri; ++p) //check each triangle
+    for (std::int32_t p = 0; p < this->ntri; ++p) //check each triangle
     {
-        for (qint32 j = 0; j < 3; ++j) {
+        for (std::int32_t j = 0; j < 3; ++j) {
             int nodenr;
             nodenr = this->itris(p, j);                //find the corners(nodes) of the triangles
             this->nn(nodenr, 0) += this->tri_nn(p, 0); //add the triangle normal to the nodenormal
@@ -228,7 +229,7 @@ bool MNEBemSurface::addVertexNormals()
     }
 
     // normalize
-    for (qint32 p = 0; p < this->np; ++p) {
+    for (std::int32_t p = 0; p < this->np; ++p) {
         const float size = this->nn.row(p).norm();
         if (size > 0.0f)
             this->nn.row(p) /= size;

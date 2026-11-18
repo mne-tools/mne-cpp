@@ -31,6 +31,7 @@
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_evoked.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <string_view>
 #include <vector>
@@ -87,7 +88,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
     else {
         for (b1 = 0; b1 / currentSfreq + tmin < bmin; b1++)
             ;
-        b1 = qBound(0, b1, current->np);
+        b1 = std::clamp(b1, 0, current->np);
     }
     if (bmax < tmin)
         b2 = 0;
@@ -96,7 +97,7 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
     else {
         for (b2 = current->np; b2 / currentSfreq + tmin > bmax; b2--)
             ;
-        b2 = qBound(0, b2, current->np);
+        b2 = std::clamp(b2, 0, current->np);
     }
 
     Eigen::MatrixXf& bdata = current->data;

@@ -168,12 +168,9 @@
       "modules": []
     },
     "mne": {
-      "tokens": 225,
+      "tokens": 2,
       "public_header_includes": 0,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "modules": []
     },
     "mri": {
       "tokens": 2,
