@@ -18,7 +18,7 @@
  * pointer and the index range it owns, the coil set in the right
  * coordinate frame, the field/grad callback to invoke, and a write-back
  * view into the shared output matrix — so the dispatcher can hand it
- * straight to a QThreadPool::start() and recover linear speed-up on
+ * straight to a worker of the thread pool and recover linear speed-up on
  * multi-core hosts.
  *
  * Refactored from @c fwdThreadArgRec in MNE-C @c compute_forward.c.

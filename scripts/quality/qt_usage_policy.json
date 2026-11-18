@@ -128,12 +128,9 @@
       "modules": []
     },
     "fwd": {
-      "tokens": 9,
-      "public_header_includes": 2,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "ieeg": {
       "tokens": 0,

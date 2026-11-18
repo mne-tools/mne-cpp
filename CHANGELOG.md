@@ -722,6 +722,11 @@ aliases; replace the old spelling as below.
   (`PhaseLagIndex::compute` and the like) take a `std::mutex&` instead of a
   `QMutex&`; call `qRegisterMetaType<mne::Network>()` yourself before sending
   a `Network` through a queued Qt connection.
+- The forward library no longer uses or links Qt itself. The MEG and EEG
+  field computations run their source-space slices on the global
+  `mne::ThreadPool` instead of `QtConcurrent`. Migration: `fwd_eeg_sphere_model.h`
+  and `fwd_eeg_sphere_layer.h` no longer include `<QDebug>`; programs that got
+  Qt through `mne_fwd` link it themselves.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

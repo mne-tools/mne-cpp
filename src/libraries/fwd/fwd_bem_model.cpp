@@ -38,11 +38,10 @@
 
 #include <base/string_utils.h>
 
-#include <QFile>
-#include <QList>
-#include <QThread>
-#include <QtConcurrent>
-#include <QDebug>
+#include <base/thread_pool.h>
+
+#include <string_view>
+#include <thread>
 
 // MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
 // so define it here only for the toolchains that do not.
@@ -118,15 +117,15 @@ namespace mne
 struct FrameNameRec
 {
     int frame;
-    const QString name;
+    std::string_view name;
 };
 
 }
 
-const QString mne_coord_frame_name_40(int frame)
+std::string_view mne_coord_frame_name_40(int frame)
 
 {
-    static mne::FrameNameRec frames[] = {
+    static const mne::FrameNameRec frames[] = {
         {FIFFV_COORD_UNKNOWN, "unknown"},
         {FIFFV_COORD_DEVICE, "MEG device"},
         {FIFFV_COORD_ISOTRAK, "isotrak"},
@@ -352,7 +351,6 @@ int FwdBemModel::fwd_bem_load_solution(const std::filesystem::path& name, int be
      * Load the potential solution matrix and attach it to the model
      */
 {
-    QFile file(name);
     FiffStream stream(name);
 
     std::shared_ptr<FiffDirNode> bem_node;
@@ -406,8 +404,8 @@ int FwdBemModel::fwd_bem_load_solution(const std::filesystem::path& name, int be
             stream.close();
             return FAIL;
         }
-        qint32 ndim;
-        std::vector<qint32> dims;
+        std::int32_t ndim;
+        std::vector<std::int32_t> dims;
         t_pTag->matrix_dimensions(ndim, dims);
 
         if (ndim != 2) {
@@ -486,7 +484,7 @@ std::unique_ptr<MNESourceSpace> FwdBemModel::make_guesses(MNESurface* guess_surf
             return res;
         guess_surf = sphere_owner.get();
     } else {
-        mne::Log::info("Guess surface ({} = {}) is in {} coordinates", guess_surf->id, FwdBemModel::fwd_bem_explain_surface(guess_surf->id), mne_coord_frame_name_40(guess_surf->coord_frame).toStdString());
+        mne::Log::info("Guess surface ({} = {}) is in {} coordinates", guess_surf->id, FwdBemModel::fwd_bem_explain_surface(guess_surf->id), mne_coord_frame_name_40(guess_surf->coord_frame));
     }
     mne::Log::info("Filtering (grid = {:6.0f} mm)...", 1000 * grid);
     res = MNESourceSpace::make_volume_source_space(*guess_surf, grid, exclude, mindist);
@@ -2572,7 +2570,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     StringList names; /* Channel names */
     void* client;
     std::unique_ptr<FwdThreadArg> one_arg;
-    int nproc = QThread::idealThreadCount();
+    const int nproc = static_cast<int>(std::thread::hardware_concurrency());
     StringList emptyList;
 
     auto cleanup_fail = [&]() {
@@ -2702,8 +2700,8 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         /*
         * Ready to start the threads & Wait for them to complete
         */
-        QtConcurrent::blockingMap(args, [](std::unique_ptr<FwdThreadArg>& a) {
-            meg_eeg_fwd_one_source_space(a.get());
+        ThreadPool::global().parallel_for(0, args.size(), [&args](std::size_t i) {
+            meg_eeg_fwd_one_source_space(args[i].get());
         });
         /*
         * Check the results
@@ -2790,7 +2788,7 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
     StringList names; /* Channel names */
     void* client;
     std::unique_ptr<FwdThreadArg> one_arg;
-    int nproc = QThread::idealThreadCount();
+    const int nproc = static_cast<int>(std::thread::hardware_concurrency());
     StringList emptyList;
     /*
        * Count the sources
@@ -2894,8 +2892,8 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
         /*
         * Ready to start the threads & Wait for them to complete
         */
-        QtConcurrent::blockingMap(args, [](std::unique_ptr<FwdThreadArg>& a) {
-            meg_eeg_fwd_one_source_space(a.get());
+        ThreadPool::global().parallel_for(0, args.size(), [&args](std::size_t i) {
+            meg_eeg_fwd_one_source_space(args[i].get());
         });
         /*
         * Check the results
