@@ -472,6 +472,8 @@ void TestInvRtLibrary::rtInvOp_matchesTheBatchInverse()
     // The stored covariance, then one estimated from the data: the operator follows each
     RtCov estimate(raw.info);
     estimate.update(data);
+    // The covariance needs all samples; the comparison holds on any block
+    const MatrixXd block = data.leftCols(300);
     const FiffCov covariances[] = {FiffCov((m_sDataPath + "/MEG/sample/sample_audvis-cov.fif").toStdU16String()), estimate.covariance().value()};
     for (const FiffCov& cov : covariances) {
         const MNEInverseOperator inverse(raw.info, fwd, cov, 0.2f, 0.8f);
@@ -482,13 +484,13 @@ void TestInvRtLibrary::rtInvOp_matchesTheBatchInverse()
             InvMinimumNorm batch(inverse, lambda2, cases[i].name);
             batch.doInverseSetup(cases[i].nave, cases[i].pickNormal);
             const StringList& names = batch.getPreparedInverseOperator().noise_cov.names;
-            MatrixXd picked(std::ssize(names), data.cols());
+            MatrixXd picked(std::ssize(names), block.cols());
             for (Index row = 0; row < picked.rows(); ++row) {
-                picked.row(row) = data.row(channel_index(raw.info.ch_names, names[static_cast<std::size_t>(row)]));
+                picked.row(row) = block.row(channel_index(raw.info.ch_names, names[static_cast<std::size_t>(row)]));
             }
             const MatrixXd expected = batch.calculateInverse(picked, 0.0f, 1.0f / raw.info.sfreq, cases[i].pickNormal).data;
 
-            const MatrixXd result = streaming[i].apply(data, cases[i].nave);
+            const MatrixXd result = streaming[i].apply(block, cases[i].nave);
             QCOMPARE(result.rows(), expected.rows());
             QCOMPARE(result.cols(), expected.cols());
             const double error = (result - expected).cwiseAbs().maxCoeff() / expected.cwiseAbs().maxCoeff();

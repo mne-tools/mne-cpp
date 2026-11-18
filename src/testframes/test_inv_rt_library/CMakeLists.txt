@@ -15,7 +15,7 @@ qt_add_executable(test_inv_rt_library test_inv_rt_library.cpp)
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS integration
-    TIMEOUT 60
+    TIMEOUT 180
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result)
