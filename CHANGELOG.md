@@ -679,11 +679,21 @@ aliases; replace the old spelling as below.
   signal → `estimate_spectrum(block)`, which returns
   `std::optional<Eigen::MatrixXd>`; `start`, `stop`, `wait`, `isRunning` and
   `RtNoiseWorker` are removed.
-- `RtHpi` and `RtHpiWorker` (`dsp/rt/rt_hpis.h`) are removed: they only ran
-  `InvHpiFit::fit` on a `QThread`. Migration: construct
-  `InvHpiFit(sensorSet)` and call `fit(data, projectors, model, coilsHead,
-  result)` per block on the thread of your choice; the result's
-  `devHeadTrans` is already device → head.
+- `RtHpi` (`dsp/rt/rt_hpi.h`, was `rt_hpis.h`) tracks the head position of a
+  stream with no Qt: it keeps the newest `window` samples, fits the HPI coils
+  every `hop` new samples, so the position is current to within one hop
+  instead of one window, and starts each fit from the last accepted position.
+  A fit with a mean coil error above `max_error` is returned but neither moves
+  the head nor seeds the next fit; with fewer than three coil frequencies
+  nothing is fitted. The MNE Scan HPI plugin uses it and fits every half
+  window. Migration: `RtHpi(sensorSet)` plus `setModelParameters`,
+  `setProjectionMatrix`, `setHpiDigitizer`, `append(data)` and the
+  `newHpiFitResultAvailable` signal → `RtHpi(info, {.coil_frequencies,
+  .window, .hop, .max_error})` and `update(data)`, which returns the fit when
+  one is due; `accepted(fit)`, `head_transform()`, `set_projectors`,
+  `set_coil_frequencies`, `order_coil_frequencies`, `set_info`, `set_window`,
+  `set_max_error` and `reset()`; `restart`, `stop` and `RtHpiWorker` are
+  removed.
 - `HpiFitResult` starts without head movement: `bIsLargeHeadMovement`,
   `fHeadMovementDistance` and `fHeadMovementAngle` were left uninitialized.
 - `RtInvOp` is a synchronous streaming inverse with no Qt: it computes the

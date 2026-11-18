@@ -5308,6 +5308,31 @@
       ]
     },
     {
+      "name": "RtHpi",
+      "module": "dsp",
+      "header": "dsp/rt/rt_hpi.h",
+      "origin": "mne-python + custom",
+      "mne_c_tool": null,
+      "mne_python": "mne.chpi.compute_head_pos",
+      "sklearn": null,
+      "test": "test_inv_rt_library",
+      "example": "ex_dsp_rt",
+      "example_snippet": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 33,
+      "guide": null,
+      "python_equiv": "mne.chpi.compute_head_pos",
+      "python_url": null,
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
+    },
+    {
       "name": "RtInvOp",
       "module": "dsp",
       "header": "dsp/rt/rt_inv_op.h",

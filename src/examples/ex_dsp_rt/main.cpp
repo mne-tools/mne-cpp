@@ -25,6 +25,7 @@
 #include <base/string_utils.h>
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
+#include <dsp/rt/rt_hpi.h>
 #include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_noise.h>
 
@@ -35,9 +36,6 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
-#include <inv/hpi/inv_hpi_data_updater.h>
-#include <inv/hpi/inv_hpi_fit.h>
-#include <inv/hpi/inv_hpi_model_parameters.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 
@@ -59,6 +57,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <format>
+#include <optional>
 #include <print>
 #include <random>
 #include <span>
@@ -263,30 +262,25 @@ int main(int argc, char* argv[])
                  std::format("RtConnectivity equals compute_connectivity of the newest trials (coherence {:.3f})", online(0, 1)));
 
     // ---------------------------------------------------------------------------------------------------------
-    // HPI: fit the four coils of the test recording
+    // HPI: track the head from the four coils of the test recording
     FiffRawData hpiRaw((dataDir + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
     const std::shared_ptr<FiffInfo> hpiInfo = std::make_shared<FiffInfo>(hpiRaw.info);
     MatrixXd hpiData;
     MatrixXd hpiTimes;
-    ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
-    MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
-    FiffInfo projInfo = *hpiInfo;
-    for (FiffProj& proj : projInfo.projs) {
-        proj.active = true;
+    ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 1999);
+
+    //! [rt_hpi_usage]
+    // Fit the newest 400 samples every 200 samples, each fit starting from the last good head position
+    RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
+    std::optional<HpiFitResult> fit;
+    for (Index start = 0; start < hpiData.cols(); start += 100) {
+        if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+            fit = std::move(newest);
+        }
     }
-    projInfo.make_projector(projectors);
-
     //! [rt_hpi_usage]
-    InvHpiDataUpdater updater(hpiInfo); // MEG picks, sensor geometry and digitised coil positions
-    updater.prepareDataAndProjectors(hpiData, projectors);
-    const InvHpiModelParameters model(std::vector<int>({166, 154, 161, 158}), hpiInfo->sfreq, hpiInfo->linefreq, false);
-
-    InvHpiFit hpiFit(updater.getSensors()); // fit one block; run it on any thread for continuous tracking
-    HpiFitResult fit;
-    hpiFit.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), fit);
-    //! [rt_hpi_usage]
-    ok &= expect(fit.GoF.size() == 4 && fit.GoF.minCoeff() > 0.98 && fit.devHeadTrans.from == FIFFV_COORD_DEVICE && fit.devHeadTrans.to == FIFFV_COORD_HEAD,
-                 std::format("InvHpiFit fits 4 coils (GoF >= {:.4f}) device to head", fit.GoF.size() ? fit.GoF.minCoeff() : 0.0));
+    ok &= expect(fit && rtHpi.accepted(*fit) && fit->GoF.minCoeff() > 0.98 && fit->devHeadTrans.from == FIFFV_COORD_DEVICE && fit->devHeadTrans.to == FIFFV_COORD_HEAD,
+                 std::format("RtHpi tracks the head from 4 coils (GoF >= {:.4f})", fit ? fit->GoF.minCoeff() : 0.0));
 
     // ---------------------------------------------------------------------------------------------------------
     // Inverse operator from the sample forward solution and the covariance of the sample raw data

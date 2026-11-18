@@ -6,7 +6,7 @@
 // test_inv_rt_library.cpp -- Tests for the Inverse and RT Processing libraries
 //
 // Covers: InvDipoleFitSettings, InvRapMusic, InvDipole, InvDipolePair,
-//         RtConnectivity, RtInvOp, RtAveraging, RtNoise, filterFile
+//         RtConnectivity, RtHpi, RtInvOp, RtAveraging, RtNoise, filterFile
 //=============================================================================================================
 
 #include <QtTest/QtTest>
@@ -23,6 +23,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_constants.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 
@@ -39,12 +40,14 @@
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/hpi/inv_hpi_model_parameters.h>
 #include <inv/hpi/inv_sensor_set.h>
+#include <inv/hpi/inv_hpi_data_updater.h>
 #include <inv/hpi/inv_hpi_fit.h>
 #include <inv/hpi/inv_hpi_fit_data.h>
 #include <inv/hpi/inv_signal_model.h>
 
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
+#include <dsp/rt/rt_hpi.h>
 #include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
@@ -96,6 +99,9 @@ private slots:
 
     // ---- RT Processing: RtConnectivity ----
     void rtConnectivity_slidesOverTheNewestTrials();
+
+    // ---- RT Processing: RtHpi ----
+    void rtHpi_fitsTheNewestWindowFromTheLastPose();
 
     // ---- RT Processing: RtInvOp ----
     void rtInvOp_matchesTheBatchInverse();
@@ -370,6 +376,71 @@ void TestInvRtLibrary::rtConnectivity_slidesOverTheNewestTrials()
     QCOMPARE(rtConnectivity.settings().size(), 1);
     rtConnectivity.reset();
     QVERIFY(rtConnectivity.networks().empty());
+}
+
+//=============================================================================================================
+// RT Processing: RtHpi
+//=============================================================================================================
+
+void TestInvRtLibrary::rtHpi_fitsTheNewestWindowFromTheLastPose()
+{
+    if (!hasData())
+        QSKIP("Sample test data not found");
+    FiffRawData raw((m_sDataPath + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
+    MatrixXd data;
+    MatrixXd times;
+    QVERIFY(raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + 1999));
+    auto info = std::make_shared<FiffInfo>(raw.info);
+    const std::vector<int> freqs = {166, 154, 161, 158};
+    const InvHpiModelParameters model(freqs, info->sfreq, info->linefreq, false);
+
+    // The batch fit of each window, started from the last accepted fit
+    const auto reference = [&](Index end, HpiFitResult start) {
+        InvHpiDataUpdater updater(info);
+        updater.prepareDataAndProjectors(data.middleCols(end - 400, 400), MatrixXd::Identity(info->nchan, info->nchan));
+        InvHpiFit(updater.getSensors()).fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), false, start);
+        return start;
+    };
+    HpiFitResult initial;
+    initial.devHeadTrans = info->dev_head_t;
+    initial.devHeadTrans.from = FIFFV_COORD_DEVICE;
+    initial.devHeadTrans.to = FIFFV_COORD_HEAD;
+    initial.errorDistances.assign(freqs.size(), 0.0);
+
+    for (const double maxError : {0.01, 0.0}) {
+        // 100-sample blocks; a 400-sample window fitted every 200 samples
+        RtHpi rtHpi(info, {.coil_frequencies = freqs, .window = 400, .hop = 200, .max_error = maxError});
+        HpiFitResult last = initial;
+        int fits = 0;
+        for (Index start = 0; start < data.cols(); start += 100) {
+            const std::optional<HpiFitResult> fit = rtHpi.update(data.middleCols(start, 100));
+            const Index end = start + 100;
+            QCOMPARE(fit.has_value(), end >= 400 && end % 200 == 0);
+            if (!fit) {
+                continue;
+            }
+            ++fits;
+            const HpiFitResult expected = reference(end, last);
+            QVERIFY(fit->devHeadTrans.trans.isApprox(expected.devHeadTrans.trans, 1e-5f));
+            QVERIFY(fit->GoF.isApprox(expected.GoF, 1e-6));
+            QCOMPARE(rtHpi.accepted(*fit), maxError > 0.0);
+            if (rtHpi.accepted(*fit)) {
+                last = *fit;
+            }
+            // A rejected fit leaves the head where it was
+            QVERIFY(rtHpi.head_transform().trans.isApprox(last.devHeadTrans.trans));
+        }
+        QCOMPARE(fits, 9);
+        QVERIFY(last.GoF.size() == 0 || last.GoF.minCoeff() > 0.98);
+    }
+
+    // A block longer than the window fits its newest samples; fewer than three coils fit nothing
+    RtHpi longBlock(info, {.coil_frequencies = freqs, .window = 400, .hop = 200});
+    const std::optional<HpiFitResult> fit = longBlock.update(data.leftCols(1000));
+    QVERIFY(fit && fit->devHeadTrans.trans.isApprox(reference(1000, initial).devHeadTrans.trans, 1e-5f));
+    RtHpi twoCoils(info, {.coil_frequencies = {166, 154}, .window = 400, .hop = 200});
+    QVERIFY(!twoCoils.update(data.leftCols(400)));
+    QVERIFY(!twoCoils.update(data.topRows(3)));
 }
 
 //=============================================================================================================

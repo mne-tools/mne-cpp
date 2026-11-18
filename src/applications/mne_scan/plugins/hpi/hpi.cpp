@@ -27,8 +27,7 @@
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
-#include <inv/hpi/inv_hpi_fit.h>
-#include <inv/hpi/inv_hpi_data_updater.h>
+#include <dsp/rt/rt_hpi.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_digitizer_data.h>
@@ -40,6 +39,9 @@
 #include <QDir>
 #include <QDebug>
 #include <cmath>
+#include <filesystem>
+#include <numeric>
+#include <optional>
 #include <utility>
 
 //=============================================================================================================
@@ -541,135 +543,76 @@ void Hpi::run()
         return;
     }
 
-    // init hpi fit
-    InvHpiModelParameters hpiModelParameters(m_vCoilFreqs,
-                                             m_pFiffInfo->sfreq,
-                                             m_pFiffInfo->linefreq,
-                                             false);
-    HpiFitResult fitResult;
-    fitResult.hpiFreqs = m_vCoilFreqs;
-    fitResult.errorDistances.assign(m_vCoilFreqs.size(), 0.0);
-    fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
-    fitResult.devHeadTrans.from = 1;
-    fitResult.devHeadTrans.to = 4;
-
-    FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
-
-    InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(m_pFiffInfo);
-    InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
-
-    double dErrorMax = 0.0;
-    double dMeanErrorDist = 0.0;
-    double dMeanGoF = 0.0;
-    double dAllowedMovement = 0.0;
-    double dAllowedRotation = 0.0;
-    double dMovement = 0.0;
-    double dRotation = 0.0;
-
-    int iDataIndexCounter = 0;
-    MatrixXd matData;
-
     m_mutex.lock();
     int fittingWindowSize = m_iFittingWindowSize;
+    // A fit every half window keeps the head position current
+    RtHpi rtHpi(m_pFiffInfo, {.coil_frequencies = m_vCoilFreqs, .window = fittingWindowSize, .hop = fittingWindowSize / 2, .max_error = m_dAllowedMeanErrorDist});
     m_mutex.unlock();
-
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
-    bool bOrder = false;
+    FiffCoordTrans transDevHeadRef = rtHpi.head_transform();
+    MatrixXd matData;
+    bool singlePending = false;
 
     while (!isInterruptionRequested()) {
+        if (!m_pCircularBuffer->pop(matData)) {
+            continue;
+        }
+
         m_mutex.lock();
         if (fittingWindowSize != m_iFittingWindowSize) {
             fittingWindowSize = m_iFittingWindowSize;
             qInfo().noquote().nospace() << "Fitting window size: " << fittingWindowSize;
-            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
-            iDataIndexCounter = 0;
+            rtHpi.set_window(fittingWindowSize, fittingWindowSize / 2);
         }
+        // A single fit or a frequency ordering keeps the data coming until its fit is done
+        if (m_bDoSingleHpi && !singlePending) {
+            rtHpi.reset();
+            singlePending = true;
+        }
+        if (m_bDoFreqOrder) {
+            rtHpi.order_coil_frequencies();
+        }
+        rtHpi.set_coil_frequencies(m_vCoilFreqs);
+        rtHpi.set_projectors(m_matCompProjectors);
+        rtHpi.set_info(m_pFiffInfo);
+        rtHpi.set_max_error(m_dAllowedMeanErrorDist);
+        const double dAllowedMovement = m_dAllowedMovement;
+        const double dAllowedRotation = m_dAllowedRotation;
+        const std::filesystem::path digitizerFile = mne::path_from_utf8(m_sFilePathDigitzers.toStdString());
         m_mutex.unlock();
 
-        //pop matrix
-        if (m_pCircularBuffer->pop(matData)) {
-            if (iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
-                iDataIndexCounter += matData.cols();
-            } else {
-                m_mutex.lock();
-                if (m_bDoSingleHpi) {
-                    m_bDoSingleHpi = false;
-                    fitResult = HpiFitResult();
-                }
-                fitResult.digitizerFile = mne::path_from_utf8(m_sFilePathDigitzers.toStdString());
-                m_mutex.unlock();
+        std::optional<HpiFitResult> fitResult = rtHpi.update(matData);
+        if (!fitResult || fitResult->errorDistances.empty()) {
+            continue;
+        }
+        fitResult->digitizerFile = digitizerFile;
+        // The fit assigns the frequencies to the coils when asked to
+        m_mutex.lock();
+        m_vCoilFreqs = rtHpi.coil_frequencies();
+        m_bDoSingleHpi = false;
+        m_bDoFreqOrder = false;
+        m_mutex.unlock();
+        singlePending = false;
 
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols() - iDataIndexCounter) =
-                    matData.block(0, 0, matData.rows(), matDataMerged.cols() - iDataIndexCounter);
+        const double dMeanErrorDist = std::accumulate(fitResult->errorDistances.begin(), fitResult->errorDistances.end(), .0) / static_cast<double>(fitResult->errorDistances.size());
+        emit errorsChanged(QVector<double>(fitResult->errorDistances.begin(), fitResult->errorDistances.end()), dMeanErrorDist);
+        emit gofChanged(fitResult->GoF, fitResult->GoF.mean());
 
-                m_mutex.lock();
-                hpiModelParameters = InvHpiModelParameters(m_vCoilFreqs,
-                                                           m_pFiffInfo->sfreq,
-                                                           m_pFiffInfo->linefreq,
-                                                           false);
-                hpiDataUpdater.checkForUpdate(m_pFiffInfo);
-                HPI.checkForUpdate(hpiDataUpdater.getSensors());
+        if (rtHpi.accepted(*fitResult)) {
+            emit devHeadTransAvailable(fitResult->devHeadTrans);
 
-                hpiDataUpdater.prepareDataAndProjectors(matDataMerged, m_matCompProjectors);
-                bOrder = m_bDoFreqOrder;
-                m_bDoFreqOrder = false;
-                m_mutex.unlock();
+            // check for large head movement
+            const double dMovement = transDevHeadRef.translation_to(fitResult->devHeadTrans.trans);
+            const double dRotation = transDevHeadRef.angle_to(fitResult->devHeadTrans.trans);
+            emit movementResultsChanged(dMovement, dRotation);
 
-                // Perform actual fitting
-                HPI.fit(hpiDataUpdater.getProjectedData(),
-                        hpiDataUpdater.getProjectors(),
-                        hpiModelParameters,
-                        hpiDataUpdater.getHpiDigitizer(),
-                        bOrder,
-                        fitResult);
-
-                if (bOrder) {
-                    m_mutex.lock();
-                    m_vCoilFreqs = fitResult.hpiFreqs;
-                    m_mutex.unlock();
-                }
-
-                //Check if the error meets distance requirement
-                if (!fitResult.errorDistances.empty()) {
-                    dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / static_cast<double>(fitResult.errorDistances.size());
-                    dMeanGoF = fitResult.GoF.mean();
-
-                    emit errorsChanged(QVector<double>(fitResult.errorDistances.begin(), fitResult.errorDistances.end()), dMeanErrorDist);
-                    emit gofChanged(fitResult.GoF, dMeanGoF);
-
-                    m_mutex.lock();
-                    dErrorMax = m_dAllowedMeanErrorDist;
-                    m_mutex.unlock();
-                    if (dMeanErrorDist < dErrorMax) {
-                        //If fit was good, set newly calculated transformation matrix to fiff info
-                        emit devHeadTransAvailable(fitResult.devHeadTrans);
-
-                        // check for large head movement
-                        dMovement = transDevHeadRef.translation_to(fitResult.devHeadTrans.trans);
-                        dRotation = transDevHeadRef.angle_to(fitResult.devHeadTrans.trans);
-
-                        emit movementResultsChanged(dMovement, dRotation);
-
-                        fitResult.fHeadMovementDistance = dMovement;
-                        fitResult.fHeadMovementAngle = dRotation;
-                        fitResult.bIsLargeHeadMovement = false;
-
-                        m_mutex.lock();
-                        dAllowedMovement = m_dAllowedMovement;
-                        dAllowedRotation = m_dAllowedRotation;
-                        m_mutex.unlock();
-                        if (dMovement > dAllowedMovement || dRotation > dAllowedRotation) {
-                            fitResult.bIsLargeHeadMovement = true;
-                            transDevHeadRef = fitResult.devHeadTrans;
-                        }
-
-                        m_pHpiOutput->measurementData()->setValue(fitResult);
-                    }
-                }
-
-                iDataIndexCounter = 0;
+            fitResult->fHeadMovementDistance = static_cast<float>(dMovement);
+            fitResult->fHeadMovementAngle = static_cast<float>(dRotation);
+            fitResult->bIsLargeHeadMovement = dMovement > dAllowedMovement || dRotation > dAllowedRotation;
+            if (fitResult->bIsLargeHeadMovement) {
+                transDevHeadRef = fitResult->devHeadTrans;
             }
+
+            m_pHpiOutput->measurementData()->setValue(*fitResult);
         }
     }
 }
