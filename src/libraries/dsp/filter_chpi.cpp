@@ -139,16 +139,10 @@ void mne::filterChpi(MatrixXd& data,
                      double sfreq,
                      const FilterChpiParams& params)
 {
-    // Attempt to extract HPI coil frequencies from FiffInfo.
-    // The HPI frequency information may be stored in various FIFF blocks
-    // (FIFFB_HPI_MEAS, FIFFB_HPI_SUBSYSTEM), but the FiffInfo C++ struct
-    // does not currently expose a parsed list of HPI excitation frequencies.
-    // This overload is provided for API completeness; users should prefer
-    // passing frequencies explicitly.
-    Q_UNUSED(data)
-    Q_UNUSED(info)
-    Q_UNUSED(sfreq)
-    Q_UNUSED(params)
-
-    Log::warning("filterChpi: Automatic cHPI frequency extraction from FiffInfo is not yet implemented. Please provide frequencies explicitly via the hpiFreqs parameter.");
+    if (info.hpi_coil_freqs.empty()) {
+        Log::warning("filterChpi: The measurement info has no HPI coil frequencies; pass them explicitly.");
+        return;
+    }
+    const std::vector<double> hpiFreqs(info.hpi_coil_freqs.begin(), info.hpi_coil_freqs.end());
+    filterChpi(data, info, sfreq, hpiFreqs, params);
 }

@@ -699,6 +699,13 @@ aliases; replace the old spelling as below.
   the row numbers of the fitted data and ignored the info, so data with
   another channel order was corrected on the wrong channels. Data missing a
   fitted channel is left unchanged with a warning.
+- `EogRegression::apply()` finds the fitted channels by name in the info of
+  the data, like `mne.preprocessing.EOGRegression.apply`. Before, it reused
+  the row numbers of the fitted data and ignored the info, so data with
+  another channel order was corrected on the wrong channels. Data missing a
+  fitted channel is left unchanged with a warning.
+- `filterChpi(data, info, sfreq)` removes the HPI coil frequencies of the
+  measurement info (`FiffInfo::hpi_coil_freqs`); before, it only warned.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

@@ -84,15 +84,12 @@ DSPSHARED_EXPORT void filterChpi(Eigen::MatrixXd& data,
 
 //=============================================================================================================
 /**
- * @brief Overload that attempts to extract cHPI frequencies from FiffInfo.
+ * @brief Removes the excitation frequencies of the HPI coils in the measurement info.
  *
- * Tries to read HPI coil frequencies from the FiffInfo metadata. Because the FiffInfo
- * HPI frequency storage varies across file versions, this overload may not always succeed.
- * If frequencies cannot be determined, a warning is logged and no filtering is applied.
- * In that case, use the explicit-frequency overload instead.
+ * Without HPI coil frequencies in the info, a warning is logged and the data stays unchanged.
  *
  * @param[in,out] data    Data matrix (n_channels x n_times). Modified in-place.
- * @param[in]     info    Measurement info.
+ * @param[in]     info    Measurement info with the HPI coil frequencies.
  * @param[in]     sfreq   Sampling frequency in Hz.
  * @param[in]     params  Filtering parameters.
  */

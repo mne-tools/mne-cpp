@@ -314,9 +314,9 @@ void TestDspFilterChpi::testInvalidFrequency()
 
 void TestDspFilterChpi::testAutoDetectFallback()
 {
-    // Auto-detect overload with no HPI info → warning, no change
+    // The overload without frequencies takes those of the HPI coils in the info
     const double sfreq = 1000.0;
-    const int nSamples = 1000;
+    const int nSamples = 10000;
     FiffInfo info = makeFiffInfo(2, 0);
 
     MatrixXd data(2, nSamples);
@@ -326,9 +326,12 @@ void TestDspFilterChpi::testAutoDetectFallback()
     MatrixXd dataCopy = data;
 
     filterChpi(data, info, sfreq);
-
-    // Should be unchanged (auto-detect not implemented)
     QVERIFY(data.isApprox(dataCopy, 1e-15));
+
+    info.hpi_coil_freqs = {83.0f, 143.0f};
+    filterChpi(data, info, sfreq);
+    QVERIFY(10.0 * std::log10(powerAtFreq(dataCopy.row(0), 143.0, sfreq) / powerAtFreq(data.row(0), 143.0, sfreq)) > 40.0);
+    QVERIFY(10.0 * std::log10(powerAtFreq(dataCopy.row(1), 83.0, sfreq) / powerAtFreq(data.row(1), 83.0, sfreq)) > 40.0);
 }
 
 //=============================================================================================================
