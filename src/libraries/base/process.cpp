@@ -28,18 +28,26 @@
 
 #if defined(_WIN32)
 #include <cwchar>
+#include <winsock2.h>
 #include <windows.h>
+#include <iphlpapi.h>
 #elif !defined(__EMSCRIPTEN__)
 #include <cerrno>
 #include <csignal>
 #include <fcntl.h>
+#include <ifaddrs.h>
+#include <net/if.h>
 #include <poll.h>
 #include <spawn.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #if defined(__APPLE__)
+#include <net/if_dl.h>
 #include <sys/sysctl.h>
+#elif defined(__linux__)
+#include <netpacket/packet.h>
+#include <sys/socket.h>
 #endif
 extern char** environ; // NOLINT(readability-redundant-declaration): not declared by every libc header
 #endif
@@ -502,4 +510,57 @@ std::string_view mne::cpu_architecture()
 #else
     return "unknown";
 #endif
+}
+
+//=============================================================================================================
+
+std::vector<HardwareAddress> mne::hardware_addresses()
+{
+    std::vector<HardwareAddress> addresses;
+    const auto add = [&addresses](const unsigned char* bytes, std::size_t length) {
+        if (length != 6)
+            return;
+        HardwareAddress address{};
+        std::copy_n(bytes, address.size(), address.begin());
+        if (std::ranges::any_of(address, [](std::uint8_t b) { return b != 0; }))
+            addresses.push_back(address);
+    };
+#if defined(_WIN32)
+    ULONG size = 16 * 1024;
+    std::vector<unsigned char> buffer;
+    ULONG status = ERROR_BUFFER_OVERFLOW;
+    for (int attempt = 0; attempt < 3 && status == ERROR_BUFFER_OVERFLOW; ++attempt) {
+        buffer.resize(size);
+        status = GetAdaptersAddresses(AF_UNSPEC, GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER, nullptr, reinterpret_cast<IP_ADAPTER_ADDRESSES*>(buffer.data()), &size);
+    }
+    if (status != NO_ERROR)
+        return addresses;
+    for (const IP_ADAPTER_ADDRESSES* adapter = reinterpret_cast<const IP_ADAPTER_ADDRESSES*>(buffer.data()); adapter; adapter = adapter->Next) {
+        if (adapter->OperStatus != IfOperStatusUp || adapter->IfType == IF_TYPE_SOFTWARE_LOOPBACK || adapter->IfType == IF_TYPE_PPP)
+            continue;
+        add(adapter->PhysicalAddress, adapter->PhysicalAddressLength);
+    }
+#elif defined(__APPLE__) || defined(__linux__)
+    ifaddrs* list = nullptr;
+    if (getifaddrs(&list) != 0)
+        return addresses;
+    for (const ifaddrs* entry = list; entry; entry = entry->ifa_next) {
+        const unsigned int flags = entry->ifa_flags;
+        if (!entry->ifa_addr || !(flags & IFF_UP) || !(flags & IFF_RUNNING) || (flags & IFF_LOOPBACK) || (flags & IFF_POINTOPOINT))
+            continue;
+#if defined(__APPLE__)
+        if (entry->ifa_addr->sa_family == AF_LINK) {
+            const auto* link = reinterpret_cast<const sockaddr_dl*>(entry->ifa_addr);
+            add(reinterpret_cast<const unsigned char*>(LLADDR(link)), link->sdl_alen);
+        }
+#else
+        if (entry->ifa_addr->sa_family == AF_PACKET) {
+            const auto* link = reinterpret_cast<const sockaddr_ll*>(entry->ifa_addr);
+            add(link->sll_addr, link->sll_halen);
+        }
+#endif
+    }
+    freeifaddrs(list);
+#endif
+    return addresses;
 }

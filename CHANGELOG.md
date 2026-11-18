@@ -629,6 +629,10 @@ aliases; replace the old spelling as below.
   counterpart of `QProcess`; `host_name()`, `os_pretty_name()` and
   `cpu_architecture()` replace `QSysInfo`. `PythonRunner` and the MNA graph
   executor use them, so `mne_pybridge` no longer links Qt.
+- New `mne::hardware_addresses()` (`base/process.h`): the 48-bit hardware
+  addresses (`mne::HardwareAddress`) of the running network interfaces that
+  are neither loopback nor point-to-point, in interface order, the
+  counterpart of `QNetworkInterface::hardwareAddress()`.
 - MNA script and IPC nodes whose program cannot be started report exit code
   -1 and the reason in `stderr`; they reported a made-up exit code before.
 - The `mna` library uses standard C++ only and links just `mne_base`; the

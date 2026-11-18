@@ -129,6 +129,7 @@
     "z",
     "Threads::Threads",
     "avrt",
+    "iphlpapi",
     "ws2_32"
   ],
   "ignored_variables": [

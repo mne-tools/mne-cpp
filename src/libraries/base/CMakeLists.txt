@@ -80,6 +80,11 @@ target_link_libraries(${PROJECT_NAME}
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${ZLIB_TARGET})
 
+if(WIN32)
+  # GetAdaptersAddresses() for hardware_addresses()
+  target_link_libraries(${PROJECT_NAME} PRIVATE iphlpapi)
+endif()
+
 # The public headers use std::expected and std::format.
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 

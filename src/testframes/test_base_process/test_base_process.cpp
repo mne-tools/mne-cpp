@@ -21,6 +21,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QNetworkInterface>
 #include <QOperatingSystemVersion>
 #include <QSysInfo>
 #include <QtTest>
@@ -33,6 +34,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -125,6 +127,7 @@ private slots:
     void reportsAMissingProgram();
     void reportsACrash();
     void describesTheHostLikeQSysInfo();
+    void listsTheHardwareAddressesLikeQNetworkInterface();
 };
 
 //=============================================================================================================
@@ -265,6 +268,25 @@ int main(int argc, char* argv[])
     QCoreApplication app(argc, argv);
     TestBaseProcess test;
     return QTest::qExec(&test, argc, argv);
+}
+
+//=============================================================================================================
+
+void TestBaseProcess::listsTheHardwareAddressesLikeQNetworkInterface()
+{
+    std::vector<std::string> expected;
+    for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
+        const QNetworkInterface::InterfaceFlags flags = iface.flags();
+        if (!flags.testFlag(QNetworkInterface::IsUp) || !flags.testFlag(QNetworkInterface::IsRunning) || flags.testFlag(QNetworkInterface::IsLoopBack) || flags.testFlag(QNetworkInterface::IsPointToPoint))
+            continue;
+        const QString address = iface.hardwareAddress();
+        if (address.count(u':') == 5 && address != QStringLiteral("00:00:00:00:00:00"))
+            expected.push_back(address.toUpper().toStdString());
+    }
+    std::vector<std::string> ours;
+    for (const HardwareAddress& address : hardware_addresses())
+        ours.push_back(std::format("{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}", address[0], address[1], address[2], address[3], address[4], address[5]));
+    QCOMPARE(ours, expected);
 }
 
 #include "test_base_process.moc"
