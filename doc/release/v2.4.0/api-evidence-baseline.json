@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 483,
+    "exported_classes": 484,
     "exported_free_functions": 151,
-    "registered_classes": 573,
+    "registered_classes": 574,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 78,
     "registered_stale": 0,
-    "registered_with_test": 247,
+    "registered_with_test": 248,
     "registered_test_unresolved": 0,
-    "registered_with_example": 424,
+    "registered_with_example": 425,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 97,
+    "registered_with_python_equiv": 98,
     "registered_without_api_page": 0,
-    "with_snippet": 456,
-    "public_api_units": 575,
-    "example_eligible": 424,
+    "with_snippet": 457,
+    "public_api_units": 576,
+    "example_eligible": 425,
     "example_exempt": 151,
-    "eligible_backed_by_registry_example": 422,
-    "eligible_used_by_some_example": 366,
+    "eligible_backed_by_registry_example": 423,
+    "eligible_used_by_some_example": 367,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -108,13 +108,13 @@
       "with_snippet": 18
     },
     "dsp": {
-      "public": 80,
-      "registered": 80,
-      "with_test": 32,
-      "eligible": 78,
-      "eligible_with_registry_example": 78,
-      "eligible_used_by_example": 78,
-      "with_snippet": 80
+      "public": 81,
+      "registered": 81,
+      "with_test": 33,
+      "eligible": 79,
+      "eligible_with_registry_example": 79,
+      "eligible_used_by_example": 79,
+      "with_snippet": 81
     },
     "fiff": {
       "public": 39,
@@ -8160,6 +8160,29 @@
       "exempt_reason": null
     },
     {
+      "name": "RtHpi",
+      "header": "dsp/rt/rt_hpi.h",
+      "library": "dsp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_inv_rt_library",
+      "test_resolves": true,
+      "example": "ex_dsp_rt",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_rt"
+      ],
+      "snippets": [
+        "ex_dsp_rt/main.cpp#rt_hpi_usage"
+      ],
+      "api_page": "doc/website/docs/api/dsp/rt-hpi.mdx",
+      "python_equiv": "mne.chpi.compute_head_pos",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "RtInvOp",
       "header": "dsp/rt/rt_inv_op.h",
       "library": "dsp",
@@ -10506,7 +10529,6 @@
       "example": "ex_inv_hpi",
       "example_state": "built",
       "including_examples": [
-        "ex_dsp_rt",
         "ex_hpiFit",
         "ex_inv_hpi"
       ],
@@ -10531,7 +10553,6 @@
       "example": null,
       "example_state": "none",
       "including_examples": [
-        "ex_dsp_rt",
         "ex_hpiFit",
         "ex_inv_hpi"
       ],
@@ -10557,7 +10578,6 @@
       "example": "ex_inv_hpi",
       "example_state": "built",
       "including_examples": [
-        "ex_dsp_rt",
         "ex_hpiFit",
         "ex_inv_hpi"
       ],
@@ -10583,7 +10603,6 @@
       "example": "ex_inv_hpi",
       "example_state": "built",
       "including_examples": [
-        "ex_dsp_rt",
         "ex_hpiFit",
         "ex_inv_hpi"
       ],
@@ -10678,7 +10697,6 @@
       "example": "ex_inv_hpi",
       "example_state": "built",
       "including_examples": [
-        "ex_dsp_rt",
         "ex_inv_hpi"
       ],
       "snippets": [

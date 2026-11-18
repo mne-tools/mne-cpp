@@ -106,7 +106,7 @@ Forgets every trial.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 252"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 251"
 RtConnectivity rtConnectivity(settings, 5); // networks of the five newest trials
 std::vector<Network> networks;
 for (const MatrixXd& trial : trials) {
@@ -122,4 +122,9 @@ ok &= expect(online.isApprox(offline),
 
 ## Authors of this file
 
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Andreas Griesshammer &lt;ag@fieldlineinc.com&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

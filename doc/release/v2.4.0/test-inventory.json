@@ -6275,7 +6275,7 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 9,
+      "qskip_sites": 10,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
@@ -6288,6 +6288,7 @@
       },
       "registry_classes": [
         "RtConnectivity",
+        "RtHpi",
         "RtInvOp"
       ]
     },

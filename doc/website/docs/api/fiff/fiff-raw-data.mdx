@@ -347,20 +347,14 @@ ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround(
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 265"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 264"
 // ---------------------------------------------------------------------------------------------------------
-// HPI: fit the four coils of the test recording
+// HPI: track the head from the four coils of the test recording
 FiffRawData hpiRaw((dataDir + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
 const std::shared_ptr<FiffInfo> hpiInfo = std::make_shared<FiffInfo>(hpiRaw.info);
 MatrixXd hpiData;
 MatrixXd hpiTimes;
-ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
-MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
-FiffInfo projInfo = *hpiInfo;
-for (FiffProj& proj : projInfo.projs) {
-    proj.active = true;
-}
-projInfo.make_projector(projectors);
+ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 1999);
 ````
 
 ### [ex_acq_record](../../examples/acq/ex_acq_record.mdx)

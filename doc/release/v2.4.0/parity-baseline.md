@@ -20,7 +20,7 @@ tested, not that its output was compared with MNE-Python.
 |---|---:|
 | equivalent | 139 |
 | exceeds | 0 |
-| implemented | 126 |
+| implemented | 127 |
 | partial | 95 |
 
 Equivalence claims without static cross-validation: none
@@ -31,9 +31,9 @@ Equivalence claims without static cross-validation: none
 |---|---:|---:|---:|
 | cross-validated-static | 32 | 142 | 174 |
 | cross-validated-live | 0 | 0 | 0 |
-| tested | 64 | 121 | 185 |
+| tested | 65 | 121 | 186 |
 | unverified | 1 | 0 | 1 |
-| **all claims** | 97 | 263 | 360 |
+| **all claims** | 98 | 263 | 361 |
 
 `cross-validated-live` tests call whatever `mne` is installed, so they are neither pinned nor deterministic.
 

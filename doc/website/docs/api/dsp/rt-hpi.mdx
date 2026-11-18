@@ -1,0 +1,192 @@
+---
+id: rt-hpi
+title: "mne::RtHpi"
+sidebar_label: RtHpi
+sidebar_position: 33
+---
+
+# RtHpi
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/rt/rt_hpi.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/rt/rt_hpi.h)
+
+:::info[Python equivalent]
+`mne.chpi.compute_head_pos` in MNE-Python.
+:::
+
+`#include <dsp/rt_hpi.h>`
+
+```cpp
+class mne::RtHpi
+```
+
+Head position of a streaming MEG recording, fitted from its HPI coils over a sliding window.
+
+```cpp title="src/examples/ex_dsp_rt/main.cpp"
+// Fit the newest 400 samples every 200 samples, each fit starting from the last good head position
+RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
+std::optional<HpiFitResult> fit;
+for (Index start = 0; start < hpiData.cols(); start += 100) {
+    if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+        fit = std::move(newest);
+    }
+}
+```
+
+---
+
+## Public Methods
+
+### RtHpi(info, settings)
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info with the MEG channels, the digitized HPI coils and the initial device to head transformation.
+
+- **settings** : *Settings*
+  Coil frequencies and the sliding window.
+
+---
+
+### update(data)
+
+Adds a block of data and fits the newest window once a hop of new samples has arrived.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  All channels of the measurement info by samples.
+
+**Returns:**
+
+- *std::optional&lt; [HpiFitResult](/docs/api/inv/hpi-fit-result) &gt;* — The fit of the newest window, accepted or not, if one was due; none if fewer than three coil frequencies are set or the data has another channel count.
+
+---
+
+### accepted(fit)
+
+**Parameters:**
+
+- **fit** : *const [HpiFitResult](/docs/api/inv/hpi-fit-result) &*
+  A fit returned by `update()`.
+
+**Returns:**
+
+- *bool* — Whether the fit was accepted as the new head position.
+
+---
+
+### set_max_error(maxError)
+
+**Parameters:**
+
+- **maxError** : *double*
+  Mean coil error in m up to which a fit is accepted.
+
+---
+
+### head_transform()
+
+**Returns:**
+
+- *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &* — The device to head transformation of the last accepted fit, or the initial one.
+
+---
+
+### set_projectors(projectors)
+
+**Parameters:**
+
+- **projectors** : *Eigen::MatrixXd*
+  SSP and compensation projectors, all channels by all channels; identity by default.
+
+---
+
+### set_coil_frequencies(frequencies)
+
+**Parameters:**
+
+- **frequencies** : *std::vector&lt; int &gt;*
+  HPI coil frequencies in Hz.
+
+---
+
+### coil_frequencies()
+
+**Returns:**
+
+- *const std::vector&lt; int &gt; &* — The coil frequencies, reordered to the digitized coils after `order_coil_frequencies()`.
+
+---
+
+### order_coil_frequencies()
+
+Assigns the coil frequencies to the digitized coils on the next fit.
+
+---
+
+### set_info(info)
+
+Takes over changed bad channels of the measurement info.
+
+**Parameters:**
+
+- **info** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info of the data.
+
+---
+
+### set_window(window, hop)
+
+**Parameters:**
+
+- **window** : *int*
+  Samples per fit.
+
+- **hop** : *int*
+  New samples between fits; at most the window.
+
+---
+
+### reset()
+
+Forgets the buffered samples and starts the next fit without a head position.
+
+---
+
+## Example
+
+- Start here: [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx) — DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+- Full source: [`src/examples/ex_dsp_rt/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt/main.cpp)
+- Build target: `ex_dsp_rt` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Used in examples
+
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 273"
+// Fit the newest 400 samples every 200 samples, each fit starting from the last good head position
+RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
+std::optional<HpiFitResult> fit;
+for (Index start = 0; start < hpiData.cols(); start += 100) {
+    if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+        fit = std::move(newest);
+    }
+}
+ok &= expect(fit && rtHpi.accepted(*fit) && fit->GoF.minCoeff() > 0.98 && fit->devHeadTrans.from == FIFFV_COORD_DEVICE && fit->devHeadTrans.to == FIFFV_COORD_HEAD,
+             std::format("RtHpi tracks the head from 4 coils (GoF >= {:.4f})", fit ? fit->GoF.minCoeff() : 0.0));
+````
+
+## Authors of this file
+
+- Chiran Doshi &lt;chiran.doshi@childrens.harvard.edu&gt;
+- Limin Sun &lt;limin.sun@childrens.harvard.edu&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Ruben Doerfel &lt;doerfelruben@aol.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

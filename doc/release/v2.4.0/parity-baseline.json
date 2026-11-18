@@ -25,17 +25,17 @@
     "lock_mismatch": []
   },
   "summary": {
-    "claims": 360,
+    "claims": 361,
     "by_evidence": {
       "cross-validated-static": 174,
       "cross-validated-live": 0,
-      "tested": 185,
+      "tested": 186,
       "unverified": 1
     },
     "by_claim": {
       "equivalent": 139,
       "exceeds": 0,
-      "implemented": 126,
+      "implemented": 127,
       "partial": 95
     },
     "equivalence_without_static_evidence": [],
@@ -43,7 +43,7 @@
       "classes": {
         "cross-validated-static": 32,
         "cross-validated-live": 0,
-        "tested": 64,
+        "tested": 65,
         "unverified": 1
       },
       "parity": {
@@ -972,6 +972,15 @@
       "equivalence": null,
       "test": null,
       "evidence": "unverified"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "RtHpi",
+      "python": "mne.chpi.compute_head_pos",
+      "claimed": "implemented",
+      "equivalence": null,
+      "test": "test_inv_rt_library",
+      "evidence": "tested"
     },
     {
       "source": "classes",

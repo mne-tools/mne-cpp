@@ -83,7 +83,7 @@ Forgets every sample.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 199"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 198"
 RtCov rtCov(*info); // every sample counts the same; RtCov(*info, 2.0) forgets with a 2 s half-life
 for (int start = 0; start < covData.cols(); start += 1000) {
     rtCov.update(covData.middleCols(start, 1000));
@@ -97,3 +97,9 @@ ok &= expect(cov.dim == 2 && cov.names == StringList{"MEG 0111", "MEG 0121"} && 
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Christof Pieloth &lt;pieloth@labp.htwk-leipzig.de&gt;
+- Felix Arndt &lt;Felix.Arndt@tu-ilmenau.de&gt;

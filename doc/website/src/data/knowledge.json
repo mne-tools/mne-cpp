@@ -793,7 +793,6 @@
       "library": "dsp",
       "libraries": [
         "connectivity",
-        "inv",
         "dsp",
         "mne",
         "fiff",

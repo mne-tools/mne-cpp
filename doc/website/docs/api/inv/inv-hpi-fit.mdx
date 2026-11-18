@@ -165,18 +165,6 @@ InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
 InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 ````
 
-### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
-
-DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
-
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 284"
-InvHpiFit hpiFit(updater.getSensors()); // fit one block; run it on any thread for continuous tracking
-HpiFitResult fit;
-hpiFit.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), fit);
-ok &= expect(fit.GoF.size() == 4 && fit.GoF.minCoeff() > 0.98 && fit.devHeadTrans.from == FIFFV_COORD_DEVICE && fit.devHeadTrans.to == FIFFV_COORD_HEAD,
-             std::format("InvHpiFit fits 4 coils (GoF >= {:.4f}) device to head", fit.GoF.size() ? fit.GoF.minCoeff() : 0.0));
-````
-
 ### [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx)
 
 Inverse library: continuous head position (HPI) fitting.

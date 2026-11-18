@@ -245,7 +245,7 @@ Reset the data processing in the real-time worker.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 163"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 162"
     averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
 }
 // Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
@@ -260,3 +260,10 @@ ok &= expect(avgOk, "RtAveragingWorker: 4 epochs average to 2.5 after the trigge
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Felix Arndt &lt;Felix.Arndt@tu-ilmenau.de&gt;
+- Lars Debor &lt;Lars.Debor@tu-ilmenau.de&gt;
+- Limin Sun &lt;limin.sun@childrens.harvard.edu&gt;
