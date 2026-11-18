@@ -41,13 +41,6 @@ Network::Network(std::string method, double threshold)
 , m_weight_range(std::numeric_limits<double>::max(), 0.0)
 , m_threshold(threshold)
 {
-    // Registered once for queued signal/slot connections, not on every construction
-    static const bool registered = [] {
-        qRegisterMetaType<mne::Network>();
-        qRegisterMetaType<std::vector<mne::Network>>();
-        return true;
-    }();
-    Q_UNUSED(registered)
 }
 
 //=============================================================================================================

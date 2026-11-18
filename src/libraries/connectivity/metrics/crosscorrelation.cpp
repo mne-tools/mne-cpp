@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include "crosscorrelation.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 
 #include <utility>
@@ -25,13 +26,6 @@
 #include "../network/network.h"
 
 #include <math/spectral.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -62,10 +56,6 @@ CrossCorrelation::CrossCorrelation()
 
 Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
 #ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
 #endif
@@ -94,7 +84,7 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
     std::pair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iSignalLength, connectivitySettings.getWindowType());
 
     // Compute the cross correlation in parallel
-    QMutex mutex;
+    std::mutex mutex;
     MatrixXd matDist;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
@@ -105,20 +95,11 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
                 tapers,
                 connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Calculate connectivity matrix over epochs and average afterwards
-    QFuture<void> resultMat = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                                computeLambda);
-    resultMat.waitForFinished();
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
 
     matDist /= connectivitySettings.size();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     //Add edges to network
     int j;
 
@@ -127,10 +108,6 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
             finalNetwork.add_edge(NetworkEdge(i, j, MatrixXd::Constant(1, 1, matDist(i, j))));
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     return finalNetwork;
 }
 
@@ -138,15 +115,11 @@ Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 
 void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                MatrixXd& matDist,
-                               QMutex& mutex,
+                               std::mutex& mutex,
                                int iNfft,
                                const std::pair<MatrixXd, VectorXd>& tapers,
                                bool keepTrialData)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     // Calculate tapered spectra if not available already
     RowVectorXd vecInputFFT, rowData;
     RowVectorXcd vecResultFreq;
@@ -186,10 +159,6 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
             inputData.vecTapSpectra.push_back(matTapSpectrum);
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Perform multiplication and transform back to time domain to find max XCOR coefficient
     // Note that the result in time domain is mirrored around the center of the data (compared to Matlab)
     MatrixXd matDistTrial = MatrixXd::Zero(iNRows, iNRows);
@@ -210,25 +179,17 @@ void CrossCorrelation::compute(ConnectivitySettings::IntermediateTrialData& inpu
             matDistTrial(i, j) = vecInputFFT(idx);
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Sum up weights
-    mutex.lock();
+    {
+        const std::lock_guard lock(mutex);
 
-    if (matDist.rows() != matDistTrial.rows() || matDist.cols() != matDistTrial.cols()) {
-        matDist.resize(matDistTrial.rows(), matDistTrial.cols());
-        matDist.setZero();
+        if (matDist.rows() != matDistTrial.rows() || matDist.cols() != matDistTrial.cols()) {
+            matDist.resize(matDistTrial.rows(), matDistTrial.cols());
+            matDist.setZero();
+        }
+
+        matDist += matDistTrial;
     }
-
-    matDist += matDistTrial;
-
-    mutex.unlock();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     if (!keepTrialData) {
         inputData.vecTapSpectra.clear();
     }

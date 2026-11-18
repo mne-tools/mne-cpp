@@ -51,10 +51,10 @@
 #include "../connectivitysettings.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QMutex>
+#include <mutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -136,7 +136,7 @@ protected:
                         std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
                         std::vector<std::pair<int, Eigen::MatrixXd>>& vecPairCsdImagAbsSum,
                         std::vector<std::pair<int, Eigen::MatrixXd>>& vecPairCsdImagSqrdSum,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,

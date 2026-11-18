@@ -52,10 +52,10 @@
 #include "../connectivitysettings.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QMutex>
+#include <mutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -135,7 +135,7 @@ protected:
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
                         std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdNormalizedSum,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,

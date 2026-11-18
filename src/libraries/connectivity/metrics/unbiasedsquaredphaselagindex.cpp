@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "unbiasedsquaredphaselagindex.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 
 #include <vector>
@@ -27,13 +28,6 @@
 #include "../network/network.h"
 
 #include <math/spectral.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,10 +58,6 @@ UnbiasedSquaredPhaseLagIndex::UnbiasedSquaredPhaseLagIndex()
 
 Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     Network finalNetwork("USPLI");
 
     if (connectivitySettings.empty()) {
@@ -107,7 +97,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
     finalNetwork.set_fft_size(iNFreqs);
     finalNetwork.set_used_freq_bins(binAmount);
 
-    QMutex mutex;
+    std::mutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
@@ -122,25 +112,12 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
                 binAmount,
                 connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Compute DSWPLV in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                             computeLambda);
-    result.waitForFinished();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
     // Compute USPLI
     computeUSPLI(connectivitySettings,
                  finalNetwork);
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     return finalNetwork;
 }
 
@@ -149,7 +126,7 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                            std::vector<std::pair<int, MatrixXcd>>& vecPairCsdSum,
                                            std::vector<std::pair<int, MatrixXd>>& vecPairCsdImagSignSum,
-                                           QMutex& mutex,
+                                           std::mutex& mutex,
                                            int iNRows,
                                            int iNFreqs,
                                            int iNfft,
@@ -231,36 +208,36 @@ void UnbiasedSquaredPhaseLagIndex::compute(ConnectivitySettings::IntermediateTri
             inputData.vecPairCsdImagSign.push_back(std::pair<int, MatrixXd>(i, matCsd.imag().cwiseSign()));
         }
 
-        mutex.lock();
+        {
+            const std::lock_guard lock(mutex);
 
-        if (vecPairCsdSum.empty()) {
-            vecPairCsdSum = inputData.vecPairCsd;
-            vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
-        } else {
-            for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
-                vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+            if (vecPairCsdSum.empty()) {
+                vecPairCsdSum = inputData.vecPairCsd;
+                vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+            } else {
+                for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                    vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                    vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                }
             }
         }
-
-        mutex.unlock();
     } else {
         if (inputData.vecPairCsdImagSign.empty()) {
             for (i = 0; i < std::ssize(inputData.vecPairCsd); ++i) {
                 inputData.vecPairCsdImagSign.push_back(std::pair<int, MatrixXd>(i, inputData.vecPairCsd.at(i).second.imag().cwiseSign()));
             }
 
-            mutex.lock();
+            {
+                const std::lock_guard lock(mutex);
 
-            if (vecPairCsdImagSignSum.empty()) {
-                vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
-            } else {
-                for (int j = 0; j < std::ssize(vecPairCsdImagSignSum); ++j) {
-                    vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                if (vecPairCsdImagSignSum.empty()) {
+                    vecPairCsdImagSignSum = inputData.vecPairCsdImagSign;
+                } else {
+                    for (int j = 0; j < std::ssize(vecPairCsdImagSignSum); ++j) {
+                        vecPairCsdImagSignSum[j].second += inputData.vecPairCsdImagSign.at(j).second;
+                    }
                 }
             }
-
-            mutex.unlock();
         }
     }
 

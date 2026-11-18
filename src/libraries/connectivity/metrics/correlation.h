@@ -27,8 +27,8 @@
  * @ref mne::CrossCorrelation, @ref mne::Coherence or one of the phase-based
  * estimators.
  *
- * Trials are processed in parallel through @c QtConcurrent::mappedReduced;
- * the per-trial correlation matrices are summed in @ref mne::Correlation::reduce "reduce" and divided
+ * Trials are processed in parallel on the global @ref mne::ThreadPool;
+ * the per-trial correlation matrices are summed in trial order in @ref mne::Correlation::reduce "reduce" and divided
  * by the number of trials at the end to obtain the trial-averaged result.
  */
 
@@ -72,8 +72,8 @@ class Network;
  * Computes the trial-averaged Pearson correlation coefficient between every
  * channel pair from the raw time-domain trial data.
  *
- * Per-trial correlation matrices are computed in parallel via
- * @c QtConcurrent::mappedReduced and summed in @ref reduce. The result is
+ * Per-trial correlation matrices are computed in parallel on the
+ * global @ref mne::ThreadPool and summed in @ref reduce. The result is
  * a symmetric matrix in @c [-1, 1]; it is broadband, zero-lag and does
  * not reject volume conduction, so it is mainly useful as a baseline
  * against the spectral and phase-based estimators.

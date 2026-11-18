@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "debiasedsquaredweightedphaselagindex.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 
 #include <vector>
@@ -27,13 +28,6 @@
 #include "../network/network.h"
 
 #include <math/spectral.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,10 +58,6 @@ DebiasedSquaredWeightedPhaseLagIndex::DebiasedSquaredWeightedPhaseLagIndex()
 
 Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     Network finalNetwork("DSWPLI");
 
     if (connectivitySettings.empty()) {
@@ -107,7 +97,7 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
     finalNetwork.set_fft_size(iNFreqs);
     finalNetwork.set_used_freq_bins(binAmount);
 
-    QMutex mutex;
+    std::mutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         return compute(inputData,
@@ -123,25 +113,12 @@ Network DebiasedSquaredWeightedPhaseLagIndex::calculate(ConnectivitySettings& co
                        binAmount,
                        connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Compute DSWPLI in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                             computeLambda);
-    result.waitForFinished();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
     // Compute DSWPLI
     computeDSWPLI(connectivitySettings,
                   finalNetwork);
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     return finalNetwork;
 }
 
@@ -151,7 +128,7 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivitySettings::Interme
                                                    std::vector<std::pair<int, MatrixXcd>>& vecPairCsdSum,
                                                    std::vector<std::pair<int, MatrixXd>>& vecPairCsdImagAbsSum,
                                                    std::vector<std::pair<int, MatrixXd>>& vecPairCsdImagSqrdSum,
-                                                   QMutex& mutex,
+                                                   std::mutex& mutex,
                                                    int iNRows,
                                                    int iNFreqs,
                                                    int iNfft,
@@ -234,38 +211,38 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivitySettings::Interme
             inputData.vecPairCsdImagAbs.push_back(std::pair<int, MatrixXd>(i, matCsd.imag().cwiseAbs()));
         }
 
-        mutex.lock();
+        {
+            const std::lock_guard lock(mutex);
 
-        if (vecPairCsdSum.empty()) {
-            vecPairCsdSum = inputData.vecPairCsd;
-            vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
-            vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
-        } else {
-            for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
-                vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
-                vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+            if (vecPairCsdSum.empty()) {
+                vecPairCsdSum = inputData.vecPairCsd;
+                vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
+                vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+            } else {
+                for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                    vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                    vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
+                    vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+                }
             }
         }
-
-        mutex.unlock();
     } else {
         if (inputData.vecPairCsdImagSqrd.empty()) {
             for (i = 0; i < std::ssize(inputData.vecPairCsd); ++i) {
                 inputData.vecPairCsdImagSqrd.push_back(std::pair<int, MatrixXd>(i, inputData.vecPairCsd.at(i).second.imag().array().square()));
             }
 
-            mutex.lock();
+            {
+                const std::lock_guard lock(mutex);
 
-            if (vecPairCsdImagSqrdSum.empty()) {
-                vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
-            } else {
-                for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                    vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
+                if (vecPairCsdImagSqrdSum.empty()) {
+                    vecPairCsdImagSqrdSum = inputData.vecPairCsdImagSqrd;
+                } else {
+                    for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                        vecPairCsdImagSqrdSum[j].second += inputData.vecPairCsdImagSqrd.at(j).second;
+                    }
                 }
             }
-
-            mutex.unlock();
         }
 
         if (inputData.vecPairCsdImagAbs.empty()) {
@@ -273,17 +250,17 @@ void DebiasedSquaredWeightedPhaseLagIndex::compute(ConnectivitySettings::Interme
                 inputData.vecPairCsdImagAbs.push_back(std::pair<int, MatrixXd>(i, inputData.vecPairCsd.at(i).second.imag().cwiseAbs()));
             }
 
-            mutex.lock();
+            {
+                const std::lock_guard lock(mutex);
 
-            if (vecPairCsdImagAbsSum.empty()) {
-                vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
-            } else {
-                for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                    vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+                if (vecPairCsdImagAbsSum.empty()) {
+                    vecPairCsdImagAbsSum = inputData.vecPairCsdImagAbs;
+                } else {
+                    for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                        vecPairCsdImagAbsSum[j].second += inputData.vecPairCsdImagAbs.at(j).second;
+                    }
                 }
             }
-
-            mutex.unlock();
         }
     }
 

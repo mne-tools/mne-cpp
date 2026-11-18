@@ -53,10 +53,10 @@
 #include "../connectivitysettings.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QMutex>
+#include <mutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -90,7 +90,7 @@ class Network;
  * average. Zero-lag mixing (volume conduction, common reference) yields
  * sign = 0 and is rejected; consistently lagged or leading interactions
  * yield magnitudes close to 1. The per-trial accumulation is parallelised
- * over trials via @c QtConcurrent and reduced under a single @c QMutex.
+ * over trials on the global @ref mne::ThreadPool and reduced under a single mutex.
  *
  * @brief Phase Lag Index estimator (Stam et al. 2007); rejects zero-lag volume-conduction mixing.
  *
@@ -135,7 +135,7 @@ protected:
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
                         std::vector<std::pair<int, Eigen::MatrixXd>>& vecPairCsdImagSignSum,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,

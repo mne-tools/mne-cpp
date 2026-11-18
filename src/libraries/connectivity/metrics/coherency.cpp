@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "coherency.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 
 #include <vector>
@@ -27,13 +28,6 @@
 #include "../network/network.h"
 
 #include <math/spectral.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,10 +59,6 @@ Coherency::Coherency()
 void Coherency::calculateAbs(Network& finalNetwork,
                              ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     if (connectivitySettings.empty()) {
         Log::debug("Coherency::calculateReal - Input data is empty");
         return;
@@ -91,7 +81,7 @@ void Coherency::calculateAbs(Network& finalNetwork,
     const int binAmount = connectivitySettings.frequency_bins().second;
 
     // Compute PSD/CSD for each trial
-    QMutex mutex;
+    std::mutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
@@ -106,30 +96,17 @@ void Coherency::calculateAbs(Network& finalNetwork,
                 binAmount,
                 connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                             computeLambda);
-    result.waitForFinished();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     const MatrixXd& matPsdSum = connectivitySettings.getIntermediateSumData().matPsdSum;
-    const auto rows = QtConcurrent::blockingMapped<std::vector<std::vector<NetworkEdge>>>(
-        connectivitySettings.getIntermediateSumData().vecPairCsdSum,
-        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, false); });
+    const auto rows = ThreadPool::global().parallel_map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                                                        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, false); });
     for (const std::vector<NetworkEdge>& row : rows) {
         for (const NetworkEdge& edge : row) {
             finalNetwork.add_edge(edge);
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
 }
 
 //=============================================================================================================
@@ -137,10 +114,6 @@ void Coherency::calculateAbs(Network& finalNetwork,
 void Coherency::calculateImag(Network& finalNetwork,
                               ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     if (connectivitySettings.empty()) {
         Log::debug("Coherency::calculateImag - Input data is empty");
         return;
@@ -163,7 +136,7 @@ void Coherency::calculateImag(Network& finalNetwork,
     const int binAmount = connectivitySettings.frequency_bins().second;
 
     // Compute PSD/CSD for each trial
-    QMutex mutex;
+    std::mutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
@@ -178,30 +151,17 @@ void Coherency::calculateImag(Network& finalNetwork,
                 binAmount,
                 connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                             computeLambda);
-    result.waitForFinished();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
     // Compute CSD/sqrt(PSD_X * PSD_Y)
     const MatrixXd& matPsdSum = connectivitySettings.getIntermediateSumData().matPsdSum;
-    const auto rows = QtConcurrent::blockingMapped<std::vector<std::vector<NetworkEdge>>>(
-        connectivitySettings.getIntermediateSumData().vecPairCsdSum,
-        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, true); });
+    const auto rows = ThreadPool::global().parallel_map(connectivitySettings.getIntermediateSumData().vecPairCsdSum,
+                                                        [&matPsdSum](const std::pair<int, MatrixXcd>& pairInput) { return rowEdges(pairInput, matPsdSum, true); });
     for (const std::vector<NetworkEdge>& row : rows) {
         for (const NetworkEdge& edge : row) {
             finalNetwork.add_edge(edge);
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
 }
 
 //=============================================================================================================
@@ -209,7 +169,7 @@ void Coherency::calculateImag(Network& finalNetwork,
 void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         MatrixXd& matPsdSum,
                         std::vector<std::pair<int, MatrixXcd>>& vecPairCsdSum,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,
@@ -282,20 +242,16 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
             }
         }
 
-        mutex.lock();
+        {
+            const std::lock_guard lock(mutex);
 
-        if (matPsdSum.rows() == 0 || matPsdSum.cols() == 0) {
-            matPsdSum = inputData.matPsd;
-        } else {
-            matPsdSum += inputData.matPsd;
+            if (matPsdSum.rows() == 0 || matPsdSum.cols() == 0) {
+                matPsdSum = inputData.matPsd;
+            } else {
+                matPsdSum += inputData.matPsd;
+            }
         }
-
-        mutex.unlock();
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Compute CSD
     if (!hasCsd) {
         inputData.vecPairCsd.clear();
@@ -323,30 +279,23 @@ void Coherency::compute(ConnectivitySettings::IntermediateTrialData& inputData,
             inputData.vecPairCsd.push_back(std::pair<int, MatrixXcd>(i, matCsd));
         }
 
-        mutex.lock();
+        {
+            const std::lock_guard lock(mutex);
 
-        if (vecPairCsdSum.empty()) {
-            vecPairCsdSum = inputData.vecPairCsd;
-        } else {
-            for (j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+            if (vecPairCsdSum.empty()) {
+                vecPairCsdSum = inputData.vecPairCsd;
+            } else {
+                for (j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                    vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                }
             }
         }
-
-        mutex.unlock();
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     //Do not store data to save memory
     if (!keepTrialData) {
         inputData.vecPairCsd.clear();
         inputData.vecTapSpectra.clear();
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
 }
 
 //=============================================================================================================

@@ -713,6 +713,15 @@ aliases; replace the old spelling as below.
   like every other metric. Before, the rows were added by parallel tasks in
   whatever order they finished, so `Network::edges()[k]` was a different
   channel pair from run to run.
+- The connectivity library no longer uses or links Qt itself. The metrics run
+  their trials on the global `mne::ThreadPool` instead of `QtConcurrent`, and
+  correlation sums the trials in trial order, so it gives the same result on
+  every run. `Network` and `ConnectivitySettings` are no longer registered
+  with `QMetaType`. Programs that got Qt through `mne_connectivity` link it
+  themselves. Migration: the protected per-trial helpers of the metrics
+  (`PhaseLagIndex::compute` and the like) take a `std::mutex&` instead of a
+  `QMutex&`; call `qRegisterMetaType<mne::Network>()` yourself before sending
+  a `Network` through a queued Qt connection.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

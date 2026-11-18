@@ -52,10 +52,10 @@
 #include "../network/networkedge.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QMutex>
+#include <mutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -145,7 +145,7 @@ private:
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,
                         std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNRows,
                         int iNFreqs,
                         int iNfft,

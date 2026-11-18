@@ -77,12 +77,9 @@
       "modules": []
     },
     "connectivity": {
-      "tokens": 47,
-      "public_header_includes": 9,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "decoding": {
       "tokens": 0,

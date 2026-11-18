@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "phaselockingvalue.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 
 #include <vector>
@@ -27,13 +28,6 @@
 #include "../network/network.h"
 
 #include <math/spectral.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,10 +58,6 @@ PhaseLockingValue::PhaseLockingValue()
 
 Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     Network finalNetwork("PLV");
 
     if (connectivitySettings.empty()) {
@@ -106,7 +96,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
     finalNetwork.set_fft_size(iNFreqs);
     finalNetwork.set_used_freq_bins(binAmount);
 
-    QMutex mutex;
+    std::mutex mutex;
 
     std::function<void(ConnectivitySettings::IntermediateTrialData&)> computeLambda = [&](ConnectivitySettings::IntermediateTrialData& inputData) {
         compute(inputData,
@@ -121,25 +111,12 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
                 binAmount,
                 connectivitySettings.keeps_trial_data());
     };
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Compute PLV in parallel for all trials
-    QFuture<void> result = QtConcurrent::map(connectivitySettings.getTrialData(),
-                                             computeLambda);
-    result.waitForFinished();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
+    auto& items = connectivitySettings.getTrialData();
+    ThreadPool::global().parallel_for(0, items.size(), [&](std::size_t k) { computeLambda(items[k]); });
     // Compute PLV
     computePLV(connectivitySettings,
                finalNetwork);
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     return finalNetwork;
 }
 
@@ -148,7 +125,7 @@ Network PhaseLockingValue::calculate(ConnectivitySettings& connectivitySettings)
 void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inputData,
                                 std::vector<std::pair<int, Eigen::MatrixXcd>>& vecPairCsdSum,
                                 std::vector<std::pair<int, MatrixXcd>>& vecPairCsdNormalizedSum,
-                                QMutex& mutex,
+                                std::mutex& mutex,
                                 int iNRows,
                                 int iNFreqs,
                                 int iNfft,
@@ -228,36 +205,36 @@ void PhaseLockingValue::compute(ConnectivitySettings::IntermediateTrialData& inp
             inputData.vecPairCsdNormalized.push_back(std::pair<int, MatrixXcd>(i, matCsd.cwiseQuotient(matCsd.cwiseAbs())));
         }
 
-        mutex.lock();
+        {
+            const std::lock_guard lock(mutex);
 
-        if (vecPairCsdSum.empty()) {
-            vecPairCsdSum = inputData.vecPairCsd;
-            vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
-        } else {
-            for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
-                vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
-                vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+            if (vecPairCsdSum.empty()) {
+                vecPairCsdSum = inputData.vecPairCsd;
+                vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
+            } else {
+                for (int j = 0; j < std::ssize(vecPairCsdSum); ++j) {
+                    vecPairCsdSum[j].second += inputData.vecPairCsd.at(j).second;
+                    vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+                }
             }
         }
-
-        mutex.unlock();
     } else {
         if (inputData.vecPairCsdNormalized.empty()) {
             for (i = 0; i < iNRows; ++i) {
                 inputData.vecPairCsdNormalized.push_back(std::pair<int, MatrixXcd>(i, inputData.vecPairCsd.at(i).second.cwiseQuotient(inputData.vecPairCsd.at(i).second.cwiseAbs())));
             }
 
-            mutex.lock();
+            {
+                const std::lock_guard lock(mutex);
 
-            if (vecPairCsdNormalizedSum.empty()) {
-                vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
-            } else {
-                for (int j = 0; j < std::ssize(vecPairCsdNormalizedSum); ++j) {
-                    vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+                if (vecPairCsdNormalizedSum.empty()) {
+                    vecPairCsdNormalizedSum = inputData.vecPairCsdNormalized;
+                } else {
+                    for (int j = 0; j < std::ssize(vecPairCsdNormalizedSum); ++j) {
+                        vecPairCsdNormalizedSum[j].second += inputData.vecPairCsdNormalized.at(j).second;
+                    }
                 }
             }
-
-            mutex.unlock();
         }
     }
 

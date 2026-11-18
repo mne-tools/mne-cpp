@@ -9,7 +9,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January 2018
- * @brief    Implementation of @ref mne::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel via @c QtConcurrent::mappedReduced.
+ * @brief    Implementation of @ref mne::Correlation - trial-averaged zero-lag Pearson correlation between every channel pair, run in parallel on the global thread pool.
  */
 
 //=============================================================================================================
@@ -17,18 +17,11 @@
 //=============================================================================================================
 
 #include "correlation.h"
+#include <base/thread_pool.h>
 #include <base/log.h>
 #include "../network/networknode.h"
 #include "../network/networkedge.h"
 #include "../network/network.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QElapsedTimer>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,10 +52,6 @@ Correlation::Correlation()
 
 Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
 {
-    //    QElapsedTimer timer;
-    //    qint64 iTime = 0;
-    //    timer.start();
-
     Network finalNetwork("COR");
 
     if (connectivitySettings.empty()) {
@@ -75,20 +64,17 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
     add_nodes(finalNetwork, rows, connectivitySettings.getNodePositions());
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     // Calculate connectivity matrix over epochs and average afterwards
     //    double dScalingStep = 1.0/matDataList.size();
     //    dataTemp.matInputData = dScalingStep * (i+1) * matDataList.at(i);
 
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(connectivitySettings.getTrialData(),
-                                                              compute,
-                                                              reduce);
-    resultMat.waitForFinished();
-
-    MatrixXd matDist = resultMat.result() / connectivitySettings.size();
+    // Summed in trial order, so the result does not depend on which task finishes first
+    const std::vector<MatrixXd> trialMatrices = ThreadPool::global().parallel_map(connectivitySettings.getTrialData(), compute);
+    MatrixXd matDist;
+    for (const MatrixXd& trialMatrix : trialMatrices) {
+        reduce(matDist, trialMatrix);
+    }
+    matDist /= connectivitySettings.size();
 
     //    MatrixXd matDist;
 
@@ -97,10 +83,6 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
     //    }
 
     //    matDist /= connectivitySettings.size();
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     //Add edges to network
     int j;
 
@@ -109,10 +91,6 @@ Network Correlation::calculate(ConnectivitySettings& connectivitySettings)
             finalNetwork.add_edge(NetworkEdge(i, j, MatrixXd::Constant(1, 1, matDist(i, j))));
         }
     }
-
-    //    iTime = timer.elapsed();
-    //    timer.restart();
-
     return finalNetwork;
 }
 

@@ -17,13 +17,9 @@
 #include "mvar_model.h"
 #include <base/log.h>
 
+#include <algorithm>
+#include <numbers>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtMath>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -93,7 +89,7 @@ std::vector<MatrixXcd> MvarModel::transferFunction(const VectorXd& freqs) const
         MatrixXcd matA = matI;
 
         for (int k = 0; k < m_order; ++k) {
-            const double phase = -2.0 * M_PI * freqs(fi) * (k + 1);
+            const double phase = -2.0 * std::numbers::pi * freqs(fi) * (k + 1);
             const std::complex<double> expVal = std::exp(j * phase);
             matA -= m_coeffs[k].cast<std::complex<double>>() * expVal;
         }
@@ -184,7 +180,7 @@ int MvarModel::selectOrderBIC(const MatrixXd& data, int maxOrder) const
     const int nSamples = static_cast<int>(data.cols());
 
     // Limit max order to avoid underdetermined systems
-    maxOrder = qMin(maxOrder, nSamples / (nCh + 1));
+    maxOrder = std::min(maxOrder, nSamples / (nCh + 1));
     if (maxOrder < 1) {
         maxOrder = 1;
     }

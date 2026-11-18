@@ -46,10 +46,10 @@
 #include "../connectivitysettings.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QMutex>
+#include <mutex>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -80,8 +80,8 @@ class Network;
  * the inverse FFT of the DPSS-tapered cross-spectrum, and reduces it to
  * the maximum absolute correlation over the lag axis.
  *
- * Per-trial computations are dispatched through @c QtConcurrent::mapped
- * and accumulated under a single @c QMutex. The estimator is broadband
+ * Per-trial computations run on the global @ref mne::ThreadPool
+ * and are accumulated under a single mutex. The estimator is broadband
  * and does not reject zero-lag mixing, but - unlike @ref Correlation -
  * is sensitive to delayed coupling because the lag axis is searched.
  *
@@ -122,7 +122,7 @@ protected:
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matDist,
-                        QMutex& mutex,
+                        std::mutex& mutex,
                         int iNfft,
                         const std::pair<Eigen::MatrixXd, Eigen::VectorXd>& tapers,
                         bool keepTrialData);
