@@ -27,7 +27,10 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <base/circular_buffer.h>
 
+#include <dsp/rt/rt_averaging.h>
 #include <fiff/fiff_evoked_set.h>
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -37,11 +40,6 @@ namespace mne::scan
 {
 class RealTimeMultiSampleArray;
 class RealTimeEvokedSet;
-}
-
-namespace mne
-{
-class RtAveraging;
 }
 
 //=============================================================================================================
@@ -151,14 +149,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Change the state of the artifact rejection based on variance
-     *
-     * @param[in] state     the new state.
-     */
-    void onChangeArtifactVarianceReductionActive(bool state);
-
-    //=========================================================================================================
-    /**
      * Change the baseline from value
      *
      * @param[in] fromMS     the new baseline from value in seconds.
@@ -183,16 +173,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Append new FiffEvokedSet to the buffer
-     *
-     * @param[in] evokedSet                  The new FiffEvokedSet.
-     * @param[in] lResponsibleTriggerTypes   List of all trigger types which lead to the recent emit of a new evoked set.
-     */
-    void onNewEvokedSet(const mne::FiffEvokedSet& evokedSet,
-                        const QStringList& lResponsibleTriggerTypes);
-
-    //=========================================================================================================
-    /**
      * Reset the averaging plugin and delete all currently stored data
      *
      * @param[in] state     the new state.
@@ -205,15 +185,19 @@ private:
     mne::scan::PluginInputData<mne::scan::RealTimeMultiSampleArray>::SPtr m_pAveragingInput; /**< The RealTimeSampleArray of the Averaging input.*/
     mne::scan::PluginOutputData<mne::scan::RealTimeEvokedSet>::SPtr m_pAveragingOutput;      /**< The RealTimeEvoked of the Averaging output.*/
 
-    std::shared_ptr<mne::CircularBuffer<mne::FiffEvokedSet>> m_pCircularBuffer; /**< Holds incoming fiff evoked sets. */
+    void applyBaseline();
 
-    QMutex m_qMutex; /**< Provides access serialization between threads. */
+    std::shared_ptr<mne::CircularBuffer<Eigen::MatrixXd>> m_pBlockBuffer; /**< Incoming data blocks. */
+
+    QMutex m_qMutex; /**< Guards the fiff info and the averaging settings. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff measurement info.*/
 
-    std::shared_ptr<mne::RtAveraging> m_pRtAve; /**< Real-time average object. */
-
-    QStringList m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
+    mne::RtAveraging::Settings m_settings; /**< Averaging settings, taken over by the processing thread. */
+    bool m_bSettingsChanged = false;       /**< Whether m_settings changed since the processing thread took them. */
+    bool m_bResetRequested = false;        /**< Whether the processing thread drops its epochs. */
+    bool m_bBaselineActive = false;        /**< Whether the baseline interval is subtracted. */
+    std::pair<float, float> m_baseline;    /**< Baseline interval in seconds. */
 
     QMap<QString, int> m_mapStimChsIndexNames; /**< The currently available stim channels and their corresponding index in the data. */
 

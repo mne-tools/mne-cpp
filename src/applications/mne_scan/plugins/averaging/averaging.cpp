@@ -26,13 +26,15 @@
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 
-#include <dsp/rt/rt_averaging.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+#include <optional>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,11 +53,18 @@ using namespace Eigen;
 namespace
 {
 
-std::map<std::string, double> toStdThresholds(const QMap<QString, double>& thresholds)
+// The artifact view adds an "Active" switch to the peak-to-peak limits; no limits switch the rejection off
+std::map<std::string, double> toRejection(const QMap<QString, double>& thresholds)
 {
     std::map<std::string, double> result;
-    for (auto it = thresholds.cbegin(); it != thresholds.cend(); ++it)
-        result.emplace(it.key().toStdString(), it.value());
+    if (thresholds.value("Active", 0.0) == 0.0) {
+        return result;
+    }
+    for (auto it = thresholds.cbegin(); it != thresholds.cend(); ++it) {
+        if (it.key() != "Active") {
+            result.emplace(it.key().toStdString(), it.value());
+        }
+    }
     return result;
 }
 
@@ -66,7 +75,7 @@ std::map<std::string, double> toStdThresholds(const QMap<QString, double>& thres
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pCircularBuffer(std::make_shared<mne::CircularBuffer<mne::FiffEvokedSet>>(40))
+: m_pBlockBuffer(std::make_shared<mne::CircularBuffer<MatrixXd>>(40))
 {
 }
 
@@ -142,6 +151,7 @@ void Averaging::update(mne::scan::Measurement::SPtr pMeasurement)
     if (QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Fiff information
         if (!m_pFiffInfo) {
+            QMutexLocker locker(&m_qMutex);
             m_pFiffInfo = pRTMSA->info();
 
             // Init the stim channels
@@ -156,18 +166,9 @@ void Averaging::update(mne::scan::Measurement::SPtr pMeasurement)
             initPluginControlWidgets();
         }
 
-        // Append new data
-        MatrixXd matData;
-
-        if (m_pFiffInfo) {
-            for (qint32 i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-                if (m_pRtAve) {
-                    // This extra copy is necessary since the referenced data is getting deleted as soon as
-                    // m_pRtAve->append() returns. m_pRtAve->append() returns without a copy since it communicates
-                    // via signals with the worker thread of RtAveraging.
-                    matData = pRTMSA->getMultiSampleArray()[i];
-                    m_pRtAve->append(matData);
-                }
+        // The buffer keeps a copy, since the measurement reuses its blocks
+        for (const MatrixXd& block : pRTMSA->getMultiSampleArray()) {
+            while (!m_pBlockBuffer->push(block) && !isInterruptionRequested()) {
             }
         }
     }
@@ -243,7 +244,7 @@ void Averaging::initPluginControlWidgets()
 
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
-        // Init RtAveraging
+        // Init the averaging settings
         int iCurrentStimChIdx = m_mapStimChsIndexNames.value(pAveragingSettingsView->getCurrentStimCh());
 
         if (!m_mapStimChsIndexNames.contains(pAveragingSettingsView->getCurrentStimCh())) {
@@ -251,27 +252,16 @@ void Averaging::initPluginControlWidgets()
             iCurrentStimChIdx = m_mapStimChsIndexNames.first();
         }
 
-        // Init Real-Time average
-        int iPreStimSamples = (static_cast<float>(pAveragingSettingsView->getPreStimMSeconds()) / 1000) * m_pFiffInfo->sfreq;
-        int iPostStimSamples = (static_cast<float>(pAveragingSettingsView->getPostStimMSeconds()) / 1000) * m_pFiffInfo->sfreq;
-        int iBaselineFromSamples = (static_cast<float>(pAveragingSettingsView->getBaselineFromSeconds()) / 1000) * m_pFiffInfo->sfreq;
-        int iBaselineToSamples = (static_cast<float>(pAveragingSettingsView->getBaselineToSeconds()) / 1000) * m_pFiffInfo->sfreq;
-
-        m_pRtAve = std::make_shared<RtAveraging>(pAveragingSettingsView->getNumAverages(),
-                                                 iPreStimSamples,
-                                                 iPostStimSamples,
-                                                 pAveragingSettingsView->getBaselineFromSeconds(),
-                                                 pAveragingSettingsView->getBaselineToSeconds(),
-                                                 iCurrentStimChIdx,
-                                                 m_pFiffInfo);
-
-        connect(m_pRtAve.get(), &RtAveraging::evokedStim,
-                this, &Averaging::onNewEvokedSet);
-
-        m_pRtAve->setBaselineFrom(iBaselineFromSamples, pAveragingSettingsView->getBaselineFromSeconds());
-        m_pRtAve->setBaselineTo(iBaselineToSamples, pAveragingSettingsView->getBaselineToSeconds());
-        m_pRtAve->setBaselineActive(pAveragingSettingsView->getDoBaselineCorrection());
-        m_pRtAve->setArtifactReduction(toStdThresholds(pArtifactSettingsView->getThresholdMap()));
+        QMutexLocker locker(&m_qMutex);
+        m_settings.pre_stim = static_cast<int>(pAveragingSettingsView->getPreStimMSeconds() / 1000.0 * m_pFiffInfo->sfreq);
+        m_settings.post_stim = static_cast<int>(pAveragingSettingsView->getPostStimMSeconds() / 1000.0 * m_pFiffInfo->sfreq);
+        m_settings.trigger_channel = iCurrentStimChIdx;
+        m_settings.averages = pAveragingSettingsView->getNumAverages();
+        m_settings.reject = toRejection(pArtifactSettingsView->getThresholdMap());
+        m_baseline = {static_cast<float>(pAveragingSettingsView->getBaselineFromSeconds()) / 1000.0f,
+                      static_cast<float>(pAveragingSettingsView->getBaselineToSeconds()) / 1000.0f};
+        m_bBaselineActive = pAveragingSettingsView->getDoBaselineCorrection();
+        applyBaseline();
 
         m_bPluginControlWidgetsInit = true;
     }
@@ -282,9 +272,8 @@ void Averaging::initPluginControlWidgets()
 void Averaging::onChangeNumAverages(qint32 numAve)
 {
     QMutexLocker locker(&m_qMutex);
-    if (m_pRtAve) {
-        m_pRtAve->setAverageNumber(numAve);
-    }
+    m_settings.averages = numAve;
+    m_bSettingsChanged = true;
 }
 
 //=============================================================================================================
@@ -292,10 +281,8 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 void Averaging::onChangeStimChannel(const QString& sStimCh)
 {
     QMutexLocker locker(&m_qMutex);
-
-    if (m_pRtAve) {
-        m_pRtAve->setTriggerChIndx(m_mapStimChsIndexNames[sStimCh]);
-    }
+    m_settings.trigger_channel = m_mapStimChsIndexNames.value(sStimCh, -1);
+    m_bSettingsChanged = true;
 }
 
 //=============================================================================================================
@@ -308,14 +295,11 @@ void Averaging::onChangePreStim(qint32 mseconds)
         return;
     }
 
-    int iPreStimSamples = (static_cast<float>(mseconds) / 1000) * m_pFiffInfo->sfreq;
+    m_settings.pre_stim = static_cast<int>(mseconds / 1000.0 * m_pFiffInfo->sfreq);
+    m_bSettingsChanged = true;
 
     if (m_pAveragingOutput) {
-        m_pAveragingOutput->measurementData()->setNumPreStimSamples(iPreStimSamples);
-    }
-
-    if (m_pRtAve) {
-        m_pRtAve->setPreStim(iPreStimSamples, mseconds);
+        m_pAveragingOutput->measurementData()->setNumPreStimSamples(m_settings.pre_stim);
     }
 }
 
@@ -329,11 +313,8 @@ void Averaging::onChangePostStim(qint32 mseconds)
         return;
     }
 
-    int iPostStimSamples = (static_cast<float>(mseconds) / 1000) * m_pFiffInfo->sfreq;
-
-    if (m_pRtAve) {
-        m_pRtAve->setPostStim(iPostStimSamples, mseconds);
-    }
+    m_settings.post_stim = static_cast<int>(mseconds / 1000.0 * m_pFiffInfo->sfreq);
+    m_bSettingsChanged = true;
 }
 
 //=============================================================================================================
@@ -341,10 +322,8 @@ void Averaging::onChangePostStim(qint32 mseconds)
 void Averaging::onChangeArtifactThreshold(const QMap<QString, double>& mapThresholds)
 {
     QMutexLocker locker(&m_qMutex);
-
-    if (m_pRtAve) {
-        m_pRtAve->setArtifactReduction(toStdThresholds(mapThresholds));
-    }
+    m_settings.reject = toRejection(mapThresholds);
+    m_bSettingsChanged = true;
 }
 
 //=============================================================================================================
@@ -352,16 +331,8 @@ void Averaging::onChangeArtifactThreshold(const QMap<QString, double>& mapThresh
 void Averaging::onChangeBaselineFrom(qint32 fromMS)
 {
     QMutexLocker locker(&m_qMutex);
-
-    if (!m_pFiffInfo) {
-        return;
-    }
-
-    int iBaselineFromSamples = (static_cast<float>(fromMS) / 1000) * m_pFiffInfo->sfreq;
-
-    if (m_pRtAve) {
-        m_pRtAve->setBaselineFrom(iBaselineFromSamples, fromMS);
-    }
+    m_baseline.first = static_cast<float>(fromMS) / 1000.0f;
+    applyBaseline();
 }
 
 //=============================================================================================================
@@ -369,16 +340,8 @@ void Averaging::onChangeBaselineFrom(qint32 fromMS)
 void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 {
     QMutexLocker locker(&m_qMutex);
-
-    if (!m_pFiffInfo) {
-        return;
-    }
-
-    int iBaselineToSamples = (static_cast<float>(toMSeconds) / 1000) * m_pFiffInfo->sfreq;
-
-    if (m_pRtAve) {
-        m_pRtAve->setBaselineTo(iBaselineToSamples, toMSeconds);
-    }
+    m_baseline.second = static_cast<float>(toMSeconds) / 1000.0f;
+    applyBaseline();
 }
 
 //=============================================================================================================
@@ -386,28 +349,16 @@ void Averaging::onChangeBaselineTo(qint32 toMSeconds)
 void Averaging::onChangeBaselineActive(bool state)
 {
     QMutexLocker locker(&m_qMutex);
-    if (m_pRtAve) {
-        m_pRtAve->setBaselineActive(state);
-    }
+    m_bBaselineActive = state;
+    applyBaseline();
 }
 
 //=============================================================================================================
 
-void Averaging::onNewEvokedSet(const mne::FiffEvokedSet& evokedSet,
-                               const QStringList& lResponsibleTriggerTypes)
+void Averaging::applyBaseline()
 {
-    if (!this->isRunning()) {
-        return;
-    }
-
-    while (!m_pCircularBuffer->push(evokedSet)) {
-        //Do nothing until the circular buffer is ready to accept new data again
-    }
-
-    emit evokedSetChanged(evokedSet);
-
-    QMutexLocker locker(&m_qMutex);
-    m_lResponsibleTriggerTypes = lResponsibleTriggerTypes;
+    m_settings.baseline = m_bBaselineActive ? FiffEvoked::Baseline(m_baseline) : std::nullopt;
+    m_bSettingsChanged = true;
 }
 
 //=============================================================================================================
@@ -416,29 +367,43 @@ void Averaging::onResetAverage(bool state)
 {
     Q_UNUSED(state)
     QMutexLocker locker(&m_qMutex);
-
-    if (m_pRtAve) {
-        m_pRtAve->reset();
-    }
+    m_bResetRequested = true;
 }
 
 //=============================================================================================================
 
 void Averaging::run()
 {
-    mne::FiffEvokedSet evokedSet;
-    QStringList lResponsibleTriggerTypes;
+    std::optional<RtAveraging> averaging;
+    MatrixXd block;
 
     while (!isInterruptionRequested()) {
-        if (m_pCircularBuffer->pop(evokedSet)) {
-            m_qMutex.lock();
-            lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;
-            m_qMutex.unlock();
-
-            m_pAveragingOutput->measurementData()->setValue(evokedSet,
-                                                            m_pFiffInfo,
-                                                            lResponsibleTriggerTypes);
+        if (!m_pBlockBuffer->pop(block)) {
+            continue;
         }
+
+        m_qMutex.lock();
+        if (!averaging) {
+            averaging.emplace(m_pFiffInfo, m_settings);
+        } else if (m_bSettingsChanged) {
+            averaging->set_settings(m_settings);
+        }
+        m_bSettingsChanged = false;
+        if (std::exchange(m_bResetRequested, false)) {
+            averaging->reset();
+        }
+        m_qMutex.unlock();
+
+        const std::vector<int> changed = averaging->update(block);
+        if (changed.empty()) {
+            continue;
+        }
+        QStringList lResponsibleTriggerTypes;
+        for (const int code : changed) {
+            lResponsibleTriggerTypes << QString::number(code);
+        }
+        m_pAveragingOutput->measurementData()->setValue(averaging->evoked(), m_pFiffInfo, lResponsibleTriggerTypes);
+        emit evokedSetChanged(averaging->evoked());
     }
 }
 

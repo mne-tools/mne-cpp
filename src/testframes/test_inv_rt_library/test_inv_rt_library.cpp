@@ -107,7 +107,7 @@ private slots:
     void rtInvOp_matchesTheBatchInverse();
 
     // ---- RT Processing: RtAveraging ----
-    void rtAveraging_moreWorkerOps();
+    void rtAveraging_averagesTheNewestEpochs();
 
     // ---- RT Processing: RtNoise ----
     void rtNoise_hanningWindow();
@@ -139,9 +139,6 @@ private slots:
     void filter_applyWithChannelSelection();
 
     // ---- RtNoise extras (from coverage_push) ----
-
-    // ---- RtAveragingWorker extras (from coverage_push) ----
-    void rtAveragingWorker_doWork();
 
     // ---- FilterOverlapAdd (from coverage_push) ----
     void filterOverlapAdd_calculate();
@@ -504,43 +501,43 @@ void TestInvRtLibrary::rtInvOp_matchesTheBatchInverse()
 // RT Processing: RtAveraging
 //=============================================================================================================
 
-void TestInvRtLibrary::rtAveraging_moreWorkerOps()
+void TestInvRtLibrary::rtAveraging_averagesTheNewestEpochs()
 {
-    auto pInfo = std::make_shared<FiffInfo>();
+    std::shared_ptr<FiffInfo> pInfo(new FiffInfo());
     pInfo->sfreq = 1000.0;
-    pInfo->nchan = 10;
-    for (int i = 0; i < 10; i++) {
-        FiffChInfo ch;
-        ch.ch_name = (QString("Ch%1").arg(i)).toStdString();
-        if (i == 9) {
-            ch.kind = FIFFV_STIM_CH;
-            ch.ch_name = "STI 014";
-        } else {
-            ch.kind = FIFFV_MEG_CH;
-        }
-        pInfo->chs.push_back(ch);
-        pInfo->ch_names.push_back(ch.ch_name);
+    FiffChInfo chData;
+    chData.ch_name = "MEG 0111";
+    chData.kind = FIFFV_MEG_CH;
+    chData.unit = FIFF_UNIT_T;
+    chData.range = 1.0;
+    chData.cal = 1.0;
+    FiffChInfo chTrig;
+    chTrig.ch_name = "STI 014";
+    chTrig.kind = FIFFV_STIM_CH;
+    chTrig.range = 1.0;
+    chTrig.cal = 1.0;
+    pInfo->chs.push_back(chData);
+    pInfo->chs.push_back(chTrig);
+    pInfo->nchan = 2;
+    pInfo->ch_names.push_back("MEG 0111");
+    pInfo->ch_names.push_back("STI 014");
+    RtAveraging averaging(pInfo, {.pre_stim = 50, .post_stim = 100, .trigger_channel = 1, .averages = 2});
+    int updates = 0;
+    for (int block = 0; block < 5; ++block) {
+        MatrixXd data = MatrixXd::Zero(2, 200);
+        for (int j = 0; j < 200; ++j)
+            data(0, j) = std::sin(2.0 * M_PI * 10.0 * j / 1000.0);
+        if (block % 2 == 0)
+            data(1, 100) = 5.0;
+        updates += static_cast<int>(averaging.update(data).size());
     }
-
-    RtAveraging rtAvg(10, 100, 200, 0, 50, 9, pInfo);
-
-    rtAvg.setAverageNumber(20);
-    rtAvg.setPreStim(150, 150);
-    rtAvg.setPostStim(250, 250);
-    rtAvg.setTriggerChIndx(9);
-
-    std::map<std::string, double> thresholds;
-    thresholds["eeg"] = 100e-6;
-    thresholds["mag"] = 4000e-15;
-    rtAvg.setArtifactReduction(thresholds);
-
-    rtAvg.setBaselineActive(true);
-    rtAvg.setBaselineFrom(0, 0);
-    rtAvg.setBaselineTo(50, 50);
-
-    rtAvg.reset();
-    rtAvg.stop();
-    QThread::msleep(50);
+    // Three epochs, two averaged: the epoch of the stationary sine is samples 50..199 of any block
+    QCOMPARE(updates, 3);
+    const FiffEvoked& evoked = averaging.evoked().evoked.front();
+    QCOMPARE(evoked.comment, "5");
+    QCOMPARE(evoked.nave, 2);
+    for (int k = 0; k < 150; ++k)
+        QVERIFY(std::fabs(evoked.data(0, k) - std::sin(2.0 * M_PI * 10.0 * (50 + k) / 1000.0)) < 1e-12);
 }
 
 //=============================================================================================================
@@ -847,50 +844,6 @@ void TestInvRtLibrary::filter_applyWithChannelSelection()
 //=============================================================================================================
 // RtNoise extras (from coverage_push)
 //=============================================================================================================
-
-//=============================================================================================================
-// RtAveragingWorker extras (from coverage_push)
-//=============================================================================================================
-
-void TestInvRtLibrary::rtAveragingWorker_doWork()
-{
-    std::shared_ptr<FiffInfo> pInfo(new FiffInfo());
-    pInfo->sfreq = 1000.0;
-    FiffChInfo chData;
-    chData.ch_name = "MEG 0111";
-    chData.kind = FIFFV_MEG_CH;
-    chData.unit = FIFF_UNIT_T;
-    chData.range = 1.0;
-    chData.cal = 1.0;
-    FiffChInfo chTrig;
-    chTrig.ch_name = "STI 014";
-    chTrig.kind = FIFFV_STIM_CH;
-    chTrig.range = 1.0;
-    chTrig.cal = 1.0;
-    pInfo->chs.push_back(chData);
-    pInfo->chs.push_back(chTrig);
-    pInfo->nchan = 2;
-    pInfo->ch_names.push_back("MEG 0111");
-    pInfo->ch_names.push_back("STI 014");
-    quint32 preStim = 50, postStim = 100;
-    mne::RtAveragingWorker worker(2, preStim, postStim, 0, 0, 1, pInfo);
-    QList<FiffEvokedSet> results;
-    connect(&worker, &mne::RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
-    for (int block = 0; block < 5; ++block) {
-        MatrixXd data = MatrixXd::Zero(2, 200);
-        for (int j = 0; j < 200; ++j)
-            data(0, j) = std::sin(2.0 * M_PI * 10.0 * j / 1000.0);
-        if (block % 2 == 0)
-            data(1, 100) = 5.0;
-        worker.doWork(data);
-    }
-    // Three epochs, two averaged: the epoch of the stationary sine is samples 50..199 of any block
-    QCOMPARE(results.size(), 3);
-    const FiffEvoked& evoked = results.last().evoked.front();
-    QCOMPARE(evoked.nave, 2);
-    for (int k = 0; k < 150; ++k)
-        QVERIFY(std::fabs(evoked.data(0, k) - std::sin(2.0 * M_PI * 10.0 * (50 + k) / 1000.0)) < 1e-12);
-}
 
 //=============================================================================================================
 // FilterOverlapAdd (from coverage_push)

@@ -694,6 +694,26 @@ aliases; replace the old spelling as below.
   `set_coil_frequencies`, `order_coil_frequencies`, `set_info`, `set_window`,
   `set_max_error` and `reset()`; `restart`, `stop` and `RtHpiWorker` are
   removed.
+- `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
+  cuts an epoch at every onset of the stim channel and returns the event
+  codes whose moving mean of the newest `averages` epochs changed, read from
+  `evoked()`. The running sum costs one epoch per update instead of summing
+  the whole window, and is summed up afresh once per window so it does not
+  drift. Fixes of the streamed result: a second onset of a code before its
+  epoch was complete, an onset on the first sample of a block, and a pulse
+  longer than 100 samples were lost or counted twice; an epoch whose
+  pre-stimulus part lies before the first sample was averaged with zeros
+  and is now dropped, like `mne.Epochs`. Another window length, baseline or
+  rejection updates the evoked responses at once. Event codes are integers.
+  The MNE Scan averaging plugin runs it on its processing thread, and each
+  evoked set travels with the codes that changed it. Migration:
+  `RtAveraging(numAverages, pre, post, baselineFromMs, baselineToMs,
+  triggerRow, info)` plus `append`, the `evokedStim` signal and the setters →
+  `RtAveraging(info, {.pre_stim, .post_stim, .trigger_channel,
+  .trigger_threshold, .averages, .baseline, .reject})`, `update(block)`,
+  `evoked()`, `settings()`, `set_settings()` and `reset()`; the baseline is
+  in seconds and `reject` holds peak-to-peak limits without an `Active` key;
+  `restart`, `stop` and `RtAveragingWorker` are removed.
 - The MNE Scan connectivity plugin no longer warns on every network of a
   time-domain metric such as correlation, which has no frequency band to
   select, and computes each trial with the settings current when it arrives.

@@ -11,8 +11,7 @@
  *
  * Each worker is fed blocks the way MNE Scan feeds it and its result is
  * compared with a closed form, NumPy/SciPy 1.15 (scipy.signal.welch) or the
- * corresponding offline call. The threaded front ends are driven through
- * their signals with a bounded event loop. Exits non-zero on any mismatch.
+ * corresponding offline call. Exits non-zero on any mismatch.
  */
 
 //=============================================================================================================
@@ -45,9 +44,7 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QEventLoop>
 #include <QFile>
-#include <QTimer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -84,22 +81,6 @@ bool expect(bool condition, std::string_view what)
 {
     std::println("{} {}", condition ? "  ok  " : "  FAIL", what);
     return condition;
-}
-
-/** Runs the event loop until @p done is true or @p msec elapse; returns @p done. */
-bool waitFor(const bool& done, int msec)
-{
-    QEventLoop loop;
-    QTimer poll;
-    QObject::connect(&poll, &QTimer::timeout, &loop, [&] {
-        if (done) {
-            loop.quit();
-        }
-    });
-    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
-    poll.start(5);
-    loop.exec();
-    return done;
 }
 
 /** Two MEG magnetometers and one stimulus channel at @p sfreq. */
@@ -144,43 +125,31 @@ int main(int argc, char* argv[])
     // Averaging: every block holds one trigger at sample 50; epoch k carries amplitude k on MEG0111
     const std::shared_ptr<FiffInfo> info = makeInfo(1000.0);
     const int nBlocks = 4;
-    QList<MatrixXd> blocks;
+    std::vector<MatrixXd> blocks;
     for (int k = 1; k <= nBlocks; ++k) {
         MatrixXd block = MatrixXd::Zero(3, 200);
         block.row(0).segment(50, 100).setConstant(k);
         block.row(1).setConstant(-2.0);
         block(2, 50) = 1.0; // trigger code 1
-        blocks.append(block);
+        blocks.push_back(block);
     }
 
-    //! [rt_averaging_worker_usage]
-    RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
-    FiffEvokedSet evokedSet;
-    QObject::connect(&averager, &RtAveragingWorker::resultReady,
-                     [&](const FiffEvokedSet& set, const QStringList&) { evokedSet = set; });
+    //! [rt_averaging_usage]
+    // 20 samples before and 80 from each onset on stim row 2, the mean of the newest 10 epochs per event code
+    RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 2, .averages = 10});
     for (const MatrixXd& block : blocks) {
-        averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
+        for (const int code : averaging.update(block)) {
+            std::println("event {}: {} epochs averaged", code, averaging.evoked().evoked.front().nave);
+        }
     }
-    //! [rt_averaging_worker_usage]
+    //! [rt_averaging_usage]
     // Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
-    bool avgOk = evokedSet.evoked.size() == 1;
+    bool avgOk = averaging.evoked().evoked.size() == 1;
     if (avgOk) {
-        const FiffEvoked& evoked = evokedSet.evoked.front();
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
         avgOk = evoked.nave == nBlocks && evoked.data.cols() == 100 && evoked.comment == "1" && std::fabs(evoked.data(0, 30) - 2.5) < 1e-12 && std::fabs(evoked.data(0, 10)) < 1e-12 && std::fabs(evoked.data(1, 60) + 2.0) < 1e-12 && std::fabs(evoked.times(20)) < 1e-6;
     }
-    ok &= expect(avgOk, "RtAveragingWorker: 4 epochs average to 2.5 after the trigger, 0 before it");
-
-    //! [rt_averaging_usage]
-    RtAveraging threaded(10, 20, 80, 0, 0, 2, info); // owns the worker thread
-    bool averaged = false;
-    QObject::connect(&threaded, &RtAveraging::evokedStim,
-                     [&](const FiffEvokedSet& set, const QStringList&) { averaged = set.evoked.front().nave == nBlocks; });
-    for (const MatrixXd& block : blocks) {
-        threaded.append(block);
-    }
-    //! [rt_averaging_usage]
-    ok &= expect(waitFor(averaged, 5000), "RtAveraging delivers the 4-epoch average on the caller's thread");
-    threaded.stop();
+    ok &= expect(avgOk, "RtAveraging: 4 epochs average to 2.5 after the trigger, 0 before it");
 
     // ---------------------------------------------------------------------------------------------------------
     // Covariance: 4000 correlated samples of the two MEG channels

@@ -9,6 +9,7 @@
 #include <format>
 #include <algorithm>
 #include <cmath>
+#include <random>
 
 #include <base/log.h>
 
@@ -175,66 +176,140 @@ private slots:
     {
         // 1 kHz, trigger row 1; pre-stimulus 1.0 on the MEG channel, post-stimulus k for epoch k = 1..4
         std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
-        RtAveragingWorker worker(10, 20, 80, -20, -5, 1, info);
-        worker.setBaselineActive(true);
-        FiffEvokedSet result;
-        connect(&worker, &RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { result = set; });
+        RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 1, .averages = 10, .baseline = std::pair(-0.020f, -0.005f)});
         for (int k = 1; k <= 4; ++k) {
             MatrixXd block = MatrixXd::Zero(2, 200);
             block.row(0).setConstant(1.0);
             block.row(0).segment(50, 100).setConstant(k);
             block(1, 50) = 1.0;
-            worker.doWork(block);
+            QCOMPARE(averaging.update(block), std::vector<int>{1});
         }
 
-        QCOMPARE(result.evoked.size(), 1);
-        const FiffEvoked& evoked = result.evoked.front();
+        QCOMPARE(averaging.evoked().evoked.size(), 1);
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
         QCOMPARE(evoked.nave, 4);
+        QCOMPARE(evoked.comment, "1");
         // Sample i is at (i - pre) / sfreq, like mne.Epochs times
         QCOMPARE(evoked.times.size(), 100);
         for (int i = 0; i < evoked.times.size(); ++i)
             QVERIFY2(std::fabs(evoked.times(i) - (i - 20) / 1000.0f) < 1e-6f, qPrintable(QString::number(i)));
         QCOMPARE(evoked.first, -20);
         QCOMPARE(evoked.last, 79);
-        // The constructor's baseline is given in ms and may lie before the stimulus
         QCOMPARE(evoked.baseline.first, -0.020f);
         QCOMPARE(evoked.baseline.second, -0.005f);
         QVERIFY(std::fabs(evoked.data(0, 10)) < 1e-12);
         QVERIFY(std::fabs(evoked.data(0, 60) - 1.5) < 1e-12);
+
+        // Without a baseline the same epochs average to the raw values at once
+        RtAveraging::Settings settings = averaging.settings();
+        settings.baseline.reset();
+        averaging.set_settings(settings);
+        QCOMPARE(averaging.evoked().evoked.front().nave, 4);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 10) - 1.0) < 1e-12);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 60) - 2.5) < 1e-12);
     }
 
-    void rtAveraging_settersReachTheWorkerThread()
+    void rtAveraging_settingsKeepOrDropTheEpochs()
     {
         std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
-        RtAveraging avg(10, 20, 80, 0, 0, 1, info);
-        QList<FiffEvokedSet> results;
-        connect(&avg, &RtAveraging::evokedStim, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
-
-        avg.setPreStim(10, 10);
-        avg.setPostStim(40, 40);
-        avg.setAverageNumber(2);
+        RtAveraging averaging(info, {.pre_stim = 10, .post_stim = 40, .trigger_channel = 1, .averages = 3});
         for (int k = 1; k <= 3; ++k) {
             MatrixXd block = MatrixXd::Zero(2, 200);
             block.row(0).segment(50, 100).setConstant(k);
             block(1, 50) = 1.0;
-            avg.append(block);
+            QCOMPARE(averaging.update(block), std::vector<int>{1});
         }
-        QTRY_COMPARE_WITH_TIMEOUT(results.size(), 3, 5000);
-        const FiffEvoked& evoked = results.last().evoked.front();
-        QCOMPARE(evoked.data.cols(), 50);
-        QCOMPARE(evoked.nave, 2);
-        QVERIFY(std::fabs(evoked.data(0, 20) - 2.5) < 1e-12);
+        QCOMPARE(averaging.evoked().evoked.front().data.cols(), 50);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 2.0) < 1e-12);
 
-        // A reset drops the collected epochs
-        avg.reset();
+        // Fewer averages keep the newest epochs
+        RtAveraging::Settings settings = averaging.settings();
+        settings.averages = 2;
+        averaging.set_settings(settings);
+        QCOMPARE(averaging.evoked().evoked.front().nave, 2);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 2.5) < 1e-12);
+
+        // Another epoch length drops them
+        settings.post_stim = 30;
+        averaging.set_settings(settings);
+        QVERIFY(averaging.evoked().evoked.empty());
         MatrixXd block = MatrixXd::Zero(2, 200);
         block.row(0).segment(50, 100).setConstant(7.0);
         block(1, 50) = 1.0;
-        avg.append(block);
-        QTRY_COMPARE_WITH_TIMEOUT(results.size(), 4, 5000);
-        QCOMPARE(results.last().evoked.front().nave, 1);
-        QVERIFY(std::fabs(results.last().evoked.front().data(0, 20) - 7.0) < 1e-12);
-        avg.stop();
+        QCOMPARE(averaging.update(block), std::vector<int>{1});
+        QCOMPARE(averaging.evoked().evoked.front().nave, 1);
+        QCOMPARE(averaging.evoked().evoked.front().data.cols(), 40);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 7.0) < 1e-12);
+
+        averaging.reset();
+        QVERIFY(averaging.evoked().evoked.empty());
+    }
+
+    void rtAveraging_countsEveryOnsetOnce()
+    {
+        // The MEG channel carries the onset sample, so each epoch averages to its own trigger time
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 5, .post_stim = 60, .trigger_channel = 1, .averages = 100});
+        MatrixXd stream = MatrixXd::Zero(2, 1000);
+        stream.row(0) = RowVectorXd::LinSpaced(1000, 0.0, 999.0);
+        // Two onsets of one code 30 samples apart, a pulse longer than 100 samples, a code change
+        // without a return to zero, and a pulse that starts on the first sample of a block
+        const std::vector<std::pair<int, int>> pulses{{100, 110}, {130, 140}, {300, 520}, {600, 640}, {800, 820}};
+        for (const auto& [from, to] : pulses)
+            stream.row(1).segment(from, to - from).setConstant(2.0);
+        stream.row(1).segment(620, 20).setConstant(3.0);
+        std::vector<int> changed;
+        for (int start = 0; start < stream.cols(); start += 100) {
+            for (int code : averaging.update(stream.middleCols(start, 100)))
+                changed.push_back(code);
+        }
+        // The epochs at 100 and 130 complete in the same block
+        QCOMPARE(changed, (std::vector<int>{2, 2, 2, 2}));
+
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
+        QCOMPARE(evoked.nave, 5);
+        const double meanOnset = (100.0 + 130.0 + 300.0 + 600.0 + 800.0) / 5.0;
+        QVERIFY(std::fabs(evoked.data(0, 5) - meanOnset) < 1e-9);
+    }
+
+    void rtAveraging_skipsIncompleteAndRejectedEpochs()
+    {
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 30, .trigger_channel = 1, .averages = 10, .reject = {{"mag", 4e-12}}});
+        MatrixXd stream = MatrixXd::Zero(2, 400);
+        // The first onset lacks pre-stimulus data, the second carries a 5 pT jump
+        for (int onset : {10, 100, 200})
+            stream(1, onset) = 1.0;
+        stream(0, 110) = 5e-12;
+        stream.row(0).segment(200, 30).array() += 1e-12;
+        for (int start = 0; start < stream.cols(); start += 40)
+            (void)averaging.update(stream.middleCols(start, std::min<int>(40, static_cast<int>(stream.cols()) - start)));
+
+        QCOMPARE(averaging.evoked().evoked.size(), 1);
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
+        QCOMPARE(evoked.nave, 1);
+        QVERIFY(std::fabs(evoked.data(0, 20) - 1e-12) < 1e-24);
+    }
+
+    void rtAveraging_movingWindowStaysExact()
+    {
+        // A long run of a short window must equal the mean of the newest epochs
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 0, .post_stim = 10, .trigger_channel = 1, .averages = 3});
+        std::seed_seq seed{7}; // fixed on purpose: the check needs reproducible amplitudes
+        std::mt19937 gen(seed);
+        std::uniform_real_distribution<double> amplitude(-1e6, 1e6);
+        std::vector<double> amplitudes;
+        for (int k = 0; k < 500; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 20);
+            amplitudes.push_back(k % 10 == 0 ? amplitude(gen) : amplitude(gen) * 1e-6);
+            block.row(0).setConstant(amplitudes.back());
+            block(1, 5) = 1.0;
+            (void)averaging.update(block);
+        }
+        const double expected = (amplitudes[497] + amplitudes[498] + amplitudes[499]) / 3.0;
+        QCOMPARE(averaging.evoked().evoked.front().nave, 3);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 0) - expected) < 1e-12 * std::fabs(expected) + 1e-15);
     }
 
     //=========================================================================
@@ -263,7 +338,7 @@ private slots:
 
         const int pre = 50;
         const int post = 100;
-        const int block = 200;
+        const int block = 173;
         const MatrixXi events = deriveStimEvents(raw);
         const int code = events(0, 2);
         MatrixXd expected = MatrixXd::Zero(data.rows(), pre + post);
@@ -278,14 +353,12 @@ private slots:
         QVERIFY(nave > 3);
         expected /= nave;
 
-        RtAveragingWorker worker(1000, pre, post, 0, 0, stiIdx, info);
-        FiffEvokedSet result;
-        connect(&worker, &RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { result = set; });
-        for (int start = 0; start + block <= data.cols(); start += block)
-            worker.doWork(data.middleCols(start, block));
+        RtAveraging averaging(info, {.pre_stim = pre, .post_stim = post, .trigger_channel = stiIdx, .averages = 1000});
+        for (int start = 0; start < data.cols(); start += block)
+            (void)averaging.update(data.middleCols(start, std::min<Index>(block, data.cols() - start)));
 
         FiffEvoked evoked;
-        for (const FiffEvoked& candidate : std::as_const(result.evoked)) {
+        for (const FiffEvoked& candidate : averaging.evoked().evoked) {
             if (candidate.comment == QString::number(code))
                 evoked = candidate;
         }
