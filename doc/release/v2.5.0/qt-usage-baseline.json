@@ -29,13 +29,14 @@
       "decoding",
       "dsp",
       "fs",
+      "fwd",
       "inv",
       "math",
       "ml",
       "mna",
       "report"
     ],
-    "tokens": 9489,
+    "tokens": 9257,
     "gui_outside_design": []
   },
   "libraries": {
@@ -240,20 +241,12 @@
       "modules": []
     },
     "fwd": {
-      "tokens": 9,
-      "by_category": {
-        "files": 1,
-        "global": 2,
-        "strings": 2,
-        "threads": 4
-      },
-      "public_header_includes": 2,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 27,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "modules": []
     },
     "ieeg": {
       "tokens": 0,
@@ -316,17 +309,14 @@
       "modules": []
     },
     "mne": {
-      "tokens": 225,
+      "tokens": 2,
       "by_category": {
-        "global": 225
+        "global": 2
       },
       "public_header_includes": 0,
       "q_object": 0,
       "files": 109,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "modules": []
     },
     "mri": {
       "tokens": 2,

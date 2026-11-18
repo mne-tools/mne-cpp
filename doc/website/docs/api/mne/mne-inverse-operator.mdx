@@ -155,7 +155,7 @@ Groups source-space points within each parcellation label using [`KMeans`](/docs
 - **annotationSet** : *const [FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
   Annotation set for left and right hemisphere.
 
-- **clusterSize** : *qint32*
+- **clusterSize** : *std::int32_t*
   Maximum number of sources per cluster.
 
 - **D** : *Eigen::MatrixXd &*
@@ -208,7 +208,7 @@ Scales covariances by the number of averages, builds the regularised pseudo-inve
 
 **Parameters:**
 
-- **nave** : *qint32*
+- **nave** : *std::int32_t*
   Number of averages (scales the noise covariance).
 
 - **lambda2** : *float*

@@ -91,7 +91,7 @@ The clustering is done by using the provided annotations
 - **p_AnnotationSet** : *const [FsAnnotationSet](/docs/api/fs/fs-annotation-set) &*
   [`FsAnnotation`](/docs/api/fs/fs-annotation) set containing the annotation of left & right hemisphere.
 
-- **p_iClusterSize** : *qint32*
+- **p_iClusterSize** : *std::int32_t*
   Maximal cluster size per roi.
 
 - **p_D** : *Eigen::MatrixXd &*
@@ -245,7 +245,7 @@ Prepare forward for assembling the inverse operator.
 - **p_outWhitener** : *Eigen::MatrixXd &*
   Whitener.
 
-- **p_outNumNonZero** : *qint32 &*
+- **p_outNumNonZero** : *std::int32_t &*
   the rank (non zeros).
 
 ---
@@ -279,7 +279,7 @@ reduces the forward solution and stores the result to p_fwdOut.
 
 **Parameters:**
 
-- **p_iNumDipoles** : *qint32*
+- **p_iNumDipoles** : *std::int32_t*
   Desired number of dipoles.
 
 - **p_D** : *Eigen::MatrixXd &*
