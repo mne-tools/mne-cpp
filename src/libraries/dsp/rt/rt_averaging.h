@@ -1,12 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     rt_averaging.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.1.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Felix Arndt <Felix.Arndt@tu-ilmenau.de>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Limin Sun <limin.sun@childrens.harvard.edu>
+ * @since    0.1.3
+ * @date     July, 2012
  * @brief    Real-time stimulus-locked averaging worker producing running evoked responses.
  *
  * RtAveragingWorker accumulates fixed-length epochs around trigger events
