@@ -113,12 +113,9 @@
       ]
     },
     "dsp": {
-      "tokens": 27,
-      "public_header_includes": 1,
-      "modules": [
-        "Concurrent",
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "fiff": {
       "tokens": 50,

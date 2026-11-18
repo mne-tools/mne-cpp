@@ -40,6 +40,7 @@
 #include <cmath>
 #include <algorithm>
 #include <iterator>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -68,11 +69,11 @@ std::vector<int> goodChannelsOfKind(const FiffInfo& info, int kind)
 
 // Adapted from mne.preprocessing.ssp._compute_exg_proj (MNE-Python, BSD-3-Clause).
 std::vector<FiffProj> exgProjectors(const MatrixXd& data, const FiffInfo& info, double sf, const std::vector<int>& events,
-                                    const ArtifactDetectProjParams& p, const QString& mode)
+                                    const ArtifactDetectProjParams& p, const std::string& mode)
 {
     std::vector<FiffProj> projs = info.projs;
     if (events.empty()) {
-        Log::warning("[ArtifactDetect] No {} events found", mode.toStdString());
+        Log::warning("[ArtifactDetect] No {} events found", mode);
         return projs;
     }
 
@@ -129,7 +130,7 @@ std::vector<FiffProj> exgProjectors(const MatrixXd& data, const FiffInfo& info, 
         }
     }
     if (nave == 0) {
-        Log::warning("[ArtifactDetect] No good {} epochs found", mode.toStdString());
+        Log::warning("[ArtifactDetect] No good {} epochs found", mode);
         return projs;
     }
 
@@ -140,7 +141,7 @@ std::vector<FiffProj> exgProjectors(const MatrixXd& data, const FiffInfo& info, 
     evoked.times = RowVectorXf::LinSpaced(last - first + 1, static_cast<float>(first / sf), static_cast<float>(last / sf));
     std::vector<FiffProj> exg = FiffProj::compute_from_evoked(evoked, p.nGrad, p.nMag, p.nEeg);
     for (FiffProj& proj : exg) {
-        proj.desc = mode.toStdString() + "-" + proj.desc;
+        proj.desc = mode + "-" + proj.desc;
     }
     std::ranges::move(exg, std::back_inserter(projs));
     return projs;

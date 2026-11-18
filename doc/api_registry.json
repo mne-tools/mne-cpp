@@ -11070,29 +11070,6 @@
       "python_url": null
     },
     {
-      "name": "FilterObject",
-      "module": "dsp",
-      "header": "dsp/rt/rt_filter.h",
-      "origin": "mne-python + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 41,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there.",
-      "example_used_in": [
-        "ex_dsp_filter/main.cpp#filter_data_usage"
-      ]
-    },
-    {
       "name": "StatsClusterResult",
       "module": "sts",
       "header": "sts/sts_cluster.h",
@@ -11884,29 +11861,6 @@
       "guide": null,
       "python_equiv": null,
       "python_url": null
-    },
-    {
-      "name": "SpectogramInputData",
-      "module": "dsp",
-      "header": "dsp/spectrogram.h",
-      "origin": "mne-c + custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": null,
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 86,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there.",
-      "example_used_in": [
-        "ex_dsp_spectral/main.cpp#spectrogram_make"
-      ]
     },
     {
       "name": "SurfaceLaplacianResult",
@@ -15701,7 +15655,7 @@
       {
         "python": "mne.time_frequency.stft",
         "status": "partial",
-        "mne_cpp": "Spectrogram::makeSpectrogram",
+        "mne_cpp": "Spectrogram::make_spectrogram",
         "note": "Gaussian-window magnitude only; no complex output/istft",
         "test": "test_dsp_spectrogram"
       },

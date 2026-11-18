@@ -1,12 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     spectrogram.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Martin Henfling <martin.henfling@tu-ilmenau.de>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     September, 2015
  * @brief    Gaussian-windowed short-time Fourier transform (STFT) spectrogram.
  *
  * Spectrogram slides a Gaussian window of user-defined size along a 1-D
@@ -17,12 +22,9 @@
  * sharper frequency localisation at the expense of temporal blur, and
  * narrower windows do the opposite.
  *
- * The implementation parallelises across windowed segments via Qt Concurrent's
- * map–reduce pattern; @ref mne::SpectogramInputData carries the per-window
- * parameters and @c mne::Spectrogram::reduce "Spectrogram::reduce" sums the partial spectrograms back
- * into the final matrix. Use this when a single global STFT view is
- * sufficient — for multitaper or wavelet representations see
- * @ref mne::MultitaperTfr and @ref mne::MorletTfr.
+ * The windows are computed in parallel on the global thread pool, each straight into its column of
+ * the result. Use this when a single global STFT view is sufficient — for multitaper or wavelet
+ * representations see @ref mne::MultitaperTfr and @ref mne::MorletTfr.
  */
 
 #ifndef SPECTROGRAM_H
@@ -40,7 +42,6 @@
 
 #include <Eigen/Core>
 
-#include <cstdint>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -48,17 +49,6 @@
 
 namespace mne
 {
-
-/**
- * @brief Input parameters for short-time Fourier transform spectrogram computation.
- */
-struct SpectogramInputData
-{
-    Eigen::VectorXd vecInputData;
-    std::uint32_t iRangeLow;
-    std::uint32_t iRangeHigh;
-    std::int32_t window_size;
-};
 
 /**
  * @brief Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
@@ -73,48 +63,14 @@ public:
      * Calculates the spectrogram (tf-representation) of a given signal
      *
      * @param[in] signal         input-signal to calculate spectrogram of.
-     * @param[in] windowSize     width of the Gaussian window in samples (trades time against frequency resolution).
+     * @param[in] windowSize     width of the Gaussian window in samples (trades time against frequency resolution);
+     *                           0 for a fifteenth of the signal.
      *
      * @return Power |STFT|^2, N/2 x N for a signal of N samples: row k is the FFT bin at k * sfreq / N Hz,
      *         column j the window centred on sample j.
      */
-    static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
-                                           std::int32_t windowSize);
-
-private:
-    //=========================================================================================================
-    /**
-     * Calculates a gaussean window function
-     *
-     * @param[in] sample_count   number of samples.
-     * @param[in] scale          window width.
-     * @param[in] translation    translation of the window among a signal.
-     *
-     * @return samples of window-vector.
-     */
-    static Eigen::VectorXd gaussWindow(std::int32_t sample_count,
-                                       double scale,
-                                       std::uint32_t translation);
-
-    //=========================================================================================================
-    /**
-     * Calculates the spectogram matrix for a given input data matrix.
-     *
-     * @param[in] data       The input data.
-     *
-     * @return               The spectogram matrix.
-     */
-    static Eigen::MatrixXd compute(const SpectogramInputData& data);
-
-    //=========================================================================================================
-    /**
-     * Sums up (reduces) the in parallel processed spectogram matrix.
-     *
-     * @param[out] resultData    The result data.
-     * @param[in] data          The incoming, temporary result data.
-     */
-    static void reduce(Eigen::MatrixXd& resultData,
-                       const Eigen::MatrixXd& data);
+    static Eigen::MatrixXd make_spectrogram(Eigen::VectorXd signal,
+                                            int windowSize = 0);
 };
 } //namespace
 

@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 
     //tf plot
     VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
-    MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
+    MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 
     TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet, p_FiffEvoked.times(0));
     tfplot.setTitle(QString("%1, %2").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));

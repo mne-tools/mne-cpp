@@ -26,16 +26,11 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QHash>
-
-//=============================================================================================================
 // C++ INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <map>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -110,19 +105,17 @@ XdawnResult Xdawn::fit(const std::vector<MNEEpochData>& epochs,
 
     nComponents = std::max(1, std::min(nComponents, nCh));
 
-    QHash<int, MatrixXd> classSums;
-    QHash<int, int> classCounts;
+    std::map<int, MatrixXd> classSums;
+    std::map<int, int> classCounts;
     MatrixXd targetSum = MatrixXd::Zero(nCh, nSamp);
     int nTarget = 0;
 
     for (int idx : goodIdx) {
         const MNEEpochData& ep = epochs[idx];
-        if (!classSums.contains(ep.event)) {
-            classSums.insert(ep.event, MatrixXd::Zero(nCh, nSamp));
-            classCounts.insert(ep.event, 0);
+        auto [sum, added] = classSums.try_emplace(ep.event, ep.epoch);
+        if (!added) {
+            sum->second += ep.epoch;
         }
-
-        classSums[ep.event] += ep.epoch;
         classCounts[ep.event] += 1;
 
         if (ep.event == iTargetEvent) {
@@ -143,14 +136,14 @@ XdawnResult Xdawn::fit(const std::vector<MNEEpochData>& epochs,
     long long nNoiseSamples = 0;
     long long nDataSamples = 0;
 
-    QHash<int, MatrixXd> classMeans;
-    for (auto it = classSums.constBegin(); it != classSums.constEnd(); ++it) {
-        classMeans.insert(it.key(), it.value() / static_cast<double>(classCounts.value(it.key())));
+    // The sums become the class means
+    for (auto& [event, sum] : classSums) {
+        sum /= static_cast<double>(classCounts[event]);
     }
 
     for (int idx : goodIdx) {
         const MNEEpochData& ep = epochs[idx];
-        const MatrixXd residual = ep.epoch - classMeans.value(ep.event);
+        const MatrixXd residual = ep.epoch - classSums.at(ep.event);
 
         dataCov += ep.epoch * ep.epoch.transpose();
         noiseCov += residual * residual.transpose();

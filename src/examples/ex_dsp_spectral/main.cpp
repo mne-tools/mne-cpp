@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
                  std::format("Morlet power at 20/35/55 Hz: {:g} / {:g} / {:g}", middle(0), middle(1), middle(2)));
 
     //! [spectrogram_make]
-    const MatrixXd spectrogram = Spectrogram::makeSpectrogram(signal.transpose(), 64); // frequency bins x samples
+    const MatrixXd spectrogram = Spectrogram::make_spectrogram(signal.transpose(), 64); // frequency bins x samples
     //! [spectrogram_make]
     ok &= expect(spectrogram.cols() == n && spectrogram.rows() > 0 && spectrogram.allFinite(),
                  std::format("spectrogram is {} x {} and finite", spectrogram.rows(), spectrogram.cols()));

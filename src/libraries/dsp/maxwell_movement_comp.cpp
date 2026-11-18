@@ -137,8 +137,8 @@ MatrixXd MaxwellMovementComp::apply(const MatrixXd& matData,
             iEnd = nSamples;
         }
 
-        iStart = qBound(0, iStart, nSamples);
-        iEnd = qBound(iStart, iEnd, nSamples);
+        iStart = std::clamp(iStart, 0, nSamples);
+        iEnd = std::clamp(iEnd, iStart, nSamples);
         if (iStart >= iEnd)
             continue;
 

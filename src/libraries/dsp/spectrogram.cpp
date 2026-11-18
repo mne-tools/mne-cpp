@@ -1,13 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     spectrogram.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
- * @brief    Definition of spectrogram class.
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Martin Henfling <martin.henfling@tu-ilmenau.de>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     September, 2015
+ * @brief    Definition of the Spectrogram class.
  */
 
 //=============================================================================================================
@@ -16,25 +21,13 @@
 
 #include "spectrogram.h"
 
-#include <vector>
+#include <base/thread_pool.h>
 
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
+#include <algorithm>
 #include <cmath>
+#include <numbers>
 
-#include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QElapsedTimer>
-#include <QThread>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,96 +40,35 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, std::int32_t windowSize = 0)
+MatrixXd Spectrogram::make_spectrogram(VectorXd signal, int windowSize)
 {
-    //QElapsedTimer timer;
-    //timer.start();
-
+    const Index n = signal.size();
+    MatrixXd tf(n / 2, n);
+    if (n == 0) {
+        return tf;
+    }
     signal.array() -= signal.mean();
-    std::vector<SpectogramInputData> lData;
-    int iThreadSize = QThread::idealThreadCount() * 2;
-    int iStepsSize = signal.rows() / iThreadSize;
-    int iResidual = signal.rows() % iThreadSize;
+    const Index defaultWindow = std::max<Index>(1, n / 15); // whole samples
+    const double scale = static_cast<double>(windowSize > 0 ? windowSize : defaultWindow);
+    const double norm = std::pow(2.0, 0.25) / std::sqrt(scale);
+    const ArrayXd samples = ArrayXd::LinSpaced(n, 0.0, static_cast<double>(n - 1));
 
-    SpectogramInputData dataTemp;
-    dataTemp.vecInputData = signal;
-    dataTemp.window_size = windowSize;
-    if (dataTemp.window_size == 0) {
-        dataTemp.window_size = signal.rows() / 15;
-    }
-
-    for (int i = 0; i < iThreadSize; ++i) {
-        dataTemp.iRangeLow = i * iStepsSize;
-        dataTemp.iRangeHigh = i * iStepsSize + iStepsSize;
-        lData.push_back(dataTemp);
-    }
-
-    dataTemp.iRangeLow = iThreadSize * iStepsSize;
-    dataTemp.iRangeHigh = iThreadSize * iStepsSize + iResidual;
-    lData.push_back(dataTemp);
-
-    QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
-                                                              compute,
-                                                              reduce);
-    resultMat.waitForFinished();
-
-    return resultMat.result();
-}
-
-//=============================================================================================================
-
-VectorXd Spectrogram::gaussWindow(std::int32_t sample_count, double scale, std::uint32_t translation)
-{
-    VectorXd gauss = VectorXd::Zero(sample_count);
-
-    for (std::int32_t n = 0; n < sample_count; n++) {
-        double t = (double(n) - translation) / scale;
-        gauss[n] = exp(-M_PI * pow(t, 2)) * pow(sqrt(scale), (-1)) * pow(double(2), (0.25));
-    }
-
-    return gauss;
-}
-
-//=============================================================================================================
-
-MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
-{
 #ifdef EIGEN_FFTW_DEFAULT
     fftw_make_planner_thread_safe();
 #endif
-
-    Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows() / 2, inputData.vecInputData.rows());
-    VectorXd envelope, windowed_sig, real_coeffs;
-    VectorXcd fft_win_sig;
-    std::int32_t window_size = inputData.window_size;
-
-    for (std::uint32_t translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
-        envelope = gaussWindow(inputData.vecInputData.rows(), window_size, translate);
-
-        windowed_sig = VectorXd::Zero(inputData.vecInputData.rows());
-        fft_win_sig = VectorXcd::Zero(inputData.vecInputData.rows());
-
-        windowed_sig = inputData.vecInputData.array() * envelope.array();
-
-        fft.fwd(fft_win_sig, windowed_sig);
-
-        real_coeffs = fft_win_sig.segment(0, inputData.vecInputData.rows() / 2).array().abs2();
-
-        tf_matrix.col(translate) = real_coeffs;
-    }
-
-    return tf_matrix;
-}
-
-//=============================================================================================================
-
-void Spectrogram::reduce(MatrixXd& resultData,
-                         const MatrixXd& data)
-{
-    if (resultData.size() == 0) {
-        resultData = data;
-    } else {
-        resultData += data;
-    }
+    ThreadPool& pool = ThreadPool::global();
+    const Index chunks = std::min<Index>(n, 4 * static_cast<Index>(pool.thread_count()) + 1);
+    pool.parallel_for(0, static_cast<std::size_t>(chunks), [&](std::size_t chunk) {
+        Eigen::FFT<double> fft;
+        VectorXd windowed(n);
+        VectorXcd spectrum(n);
+        const Index first = n * static_cast<Index>(chunk) / chunks;
+        const Index last = n * (static_cast<Index>(chunk) + 1) / chunks;
+        for (Index j = first; j < last; ++j) {
+            windowed = signal.array() * (((samples - static_cast<double>(j)) / scale).square() * -std::numbers::pi).exp() * norm;
+            fft.fwd(spectrum, windowed);
+            tf.col(j) = spectrum.head(n / 2).cwiseAbs2();
+        }
+    });
+    return tf;
 }

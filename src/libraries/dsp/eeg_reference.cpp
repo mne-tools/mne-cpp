@@ -26,12 +26,6 @@
 #include <fiff/fiff_file.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSet>
-
-//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -247,10 +241,10 @@ void mne::setBipolarReference(MatrixXd& data,
     }
 
     // Collect the set of original channels involved
-    QSet<int> bipolarOriginals;
+    std::vector<bool> bipolarOriginals(info.chs.size(), false);
     for (int i = 0; i < nPairs; ++i) {
-        bipolarOriginals.insert(anodeIdx[i]);
-        bipolarOriginals.insert(cathodeIdx[i]);
+        bipolarOriginals[anodeIdx[i]] = true;
+        bipolarOriginals[cathodeIdx[i]] = true;
     }
 
     // Build bipolar data rows
@@ -274,7 +268,7 @@ void mne::setBipolarReference(MatrixXd& data,
         // Keep only non-bipolar-original rows + append bipolar rows
         std::vector<int> keepIdx;
         for (int i = 0; i < static_cast<int>(data.rows()); ++i) {
-            if (!bipolarOriginals.contains(i)) {
+            if (!bipolarOriginals[i]) {
                 keepIdx.push_back(i);
             }
         }

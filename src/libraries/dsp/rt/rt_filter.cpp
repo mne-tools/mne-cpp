@@ -21,6 +21,7 @@
 #include "rt_filter.h"
 #include <memory>
 #include <base/log.h>
+#include <base/thread_pool.h>
 
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_file.h>
@@ -34,6 +35,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include <algorithm>
 #include <cmath>
 #include <utility>
 
@@ -308,56 +310,35 @@ MatrixXd mne::filterDataBlock(const MatrixXd& matData,
     FilterKernel filterKernelSetup = filterKernel;
     filterKernelSetup.prepare_filter(matData.cols());
 
-    // Do the concurrent filtering
     RowVectorXi vecPicksNew = vecPicks;
     if (vecPicksNew.cols() == 0) {
         vecPicksNew = RowVectorXi::LinSpaced(matData.rows(), 0, matData.rows() - 1);
     }
 
-    // Generate QList structure which can be handled by the QConcurrent framework
-    QList<FilterObject> timeData;
+    // Channels that are not filtered are delayed by half the filter order like the filtered ones
+    MatrixXd matDataOut = MatrixXd::Zero(matData.rows(), matData.cols() + iOrder);
+    matDataOut.middleCols(iOrder / 2, matData.cols()) = matData;
 
-    // Only select channels specified in vecPicksNew
-    FilterObject data;
-    for (qint32 i = 0; i < vecPicksNew.cols(); ++i) {
-        data.filterKernel = filterKernelSetup;
-        data.iRow = vecPicksNew[i];
-        data.vecData = matData.row(vecPicksNew[i]);
-        timeData.append(data);
-    }
-
-    // Copy in data from last data block. This is necessary in order to also delay channels which are not filtered
-    MatrixXd matDataOut(matData.rows(), matData.cols() + iOrder);
-    matDataOut.setZero();
-    matDataOut.block(0, iOrder / 2, matData.rows(), matData.cols()) = matData;
-
-    if (bUseThreads) {
-        QFuture<void> future = QtConcurrent::map(timeData,
-                                                 filterChannel);
-        future.waitForFinished();
-    } else {
-        for (int i = 0; i < timeData.size(); ++i) {
-            filterChannel(timeData[i]);
+    const Index channels = vecPicksNew.cols();
+    ThreadPool& pool = ThreadPool::global();
+    const Index chunks = bUseThreads ? std::min<Index>(channels, static_cast<Index>(pool.thread_count()) + 1) : 1;
+    auto filterChunk = [&](std::size_t chunk) {
+        // Each chunk filters with its own kernel, whose FFT buffers are not shared
+        FilterKernel kernel = filterKernelSetup;
+        RowVectorXd row;
+        for (Index i = channels * static_cast<Index>(chunk) / chunks; i < channels * (static_cast<Index>(chunk) + 1) / chunks; ++i) {
+            row = matData.row(vecPicksNew[i]);
+            kernel.apply_fft_filter(row, true);
+            matDataOut.row(vecPicksNew[i]) = row;
         }
-    }
-
-    // Do the overlap add method and store in matDataOut
-    RowVectorXd tempData;
-
-    for (int r = 0; r < timeData.size(); r++) {
-        // Write the newly calculated filtered data to the filter data matrix. This data has a delay of iOrder/2 in front and back
-        matDataOut.row(timeData.at(r).iRow) = timeData.at(r).vecData;
+    };
+    if (chunks > 1) {
+        pool.parallel_for(0, static_cast<std::size_t>(chunks), filterChunk);
+    } else if (channels > 0) {
+        filterChunk(0);
     }
 
     return matDataOut;
-}
-
-//=============================================================================================================
-
-void mne::filterChannel(mne::FilterObject& channelDataTime)
-{
-    //channelDataTime.vecData = channelDataTime.first.at(i).applyConvFilter(channelDataTime.vecData, true);
-    channelDataTime.filterKernel.apply_fft_filter(channelDataTime.vecData, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
 }
 
 //=============================================================================================================
@@ -522,7 +503,7 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
                                        const MatrixXi& matEvents,
                                        float fTMinS,
                                        float fTMaxS,
-                                       qint32 eventType,
+                                       int eventType,
                                        bool bApplyBaseline,
                                        float fTBaselineFromS,
                                        float fTBaselineToS,
@@ -534,8 +515,8 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
     MNEEpochDataList lstEpochDataList;
 
     // Select the desired events
-    qint32 count = 0;
-    qint32 p;
+    int count = 0;
+    int p;
     MatrixXi selected = MatrixXi::Zero(1, matEvents.rows());
     for (p = 0; p < matEvents.rows(); ++p) {
         if (matEvents(p, 1) == 0 && matEvents(p, 2) == eventType) {
@@ -580,7 +561,7 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
 
             if (p == 0) {
                 times.resize(1, to - from + 1);
-                for (qint32 i = 0; i < times.cols(); ++i)
+                for (int i = 0; i < times.cols(); ++i)
                     times(0, i) = (static_cast<float>(from - event_samp + i)) / raw.info.sfreq;
             }
 
@@ -614,7 +595,7 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
     Log::info("[MNEEpochDataList::readEpochs] Read a total of {} epochs of type {} and marked {} for rejection.", lstEpochDataList.size(), eventType, dropCount);
 
     if (bApplyBaseline) {
-        QPair<float, float> baselinePair(fTBaselineFromS, fTBaselineToS);
+        std::pair<float, float> baselinePair(fTBaselineFromS, fTBaselineToS);
         lstEpochDataList.applyBaselineCorrection(baselinePair);
     }
 
@@ -629,7 +610,6 @@ FiffEvoked mne::computeFilteredAverage(const FiffRawData& raw,
     FiffEvoked evoked = lstEpochDataList.average(raw.info,
                                                  first,
                                                  first + static_cast<fiff_int_t>(lstEpochDataList.front()->epoch.cols()) - 1);
-    evoked.baseline = bApplyBaseline ? QPair<float, float>(fTBaselineFromS, fTBaselineToS)
-                                     : QPair<float, float>(0.0f, 0.0f);
+    evoked.baseline = bApplyBaseline ? std::pair(fTBaselineFromS, fTBaselineToS) : std::pair(0.0f, 0.0f);
     return evoked;
 }

@@ -17,15 +17,10 @@
  * design back-ends so an incoming raw data file or live data block can be
  * low-pass, high-pass, band-pass or notch-filtered in place with a single
  * call. @ref mne::filterFile "filterFile" streams a @ref mne::FiffRawData source through
- * a user-designed kernel and writes the filtered output to an arbitrary
- * @c QIODevice, optionally parallelising the per-channel overlap-add work
- * with Qt Concurrent.
- *
- * The companion @ref mne::FilterObject struct bundles the FIR coefficients with
- * the per-channel @c iRow and a contiguous @c vecData buffer so independent
- * channels can be filtered in parallel without sharing mutable state. All
- * cutoff and transition values are specified in Hz — normalisation against
- * the sampling rate happens inside the design call.
+ * a user-designed kernel and writes the filtered output to a FIFF file, optionally
+ * filtering the channels in parallel on the global thread pool. All cutoff and
+ * transition values are specified in Hz — normalisation against the sampling rate
+ * happens inside the design call.
  */
 
 #ifndef RT_FILTER_RT_H
@@ -46,12 +41,6 @@
 
 #include <map>
 #include <string>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -75,16 +64,6 @@ class FiffRawData;
 
 namespace mne
 {
-
-/**
- * @brief Lightweight filter configuration holding kernel coefficients and overlap-add state for one channel.
- */
-struct FilterObject
-{
-    mne::FilterKernel filterKernel;
-    int iRow;
-    Eigen::RowVectorXd vecData;
-};
 
 //=========================================================================================================
 /**
@@ -204,14 +183,6 @@ DSPSHARED_EXPORT Eigen::MatrixXd filterDataBlock(const Eigen::MatrixXd& matData,
 
 //=========================================================================================================
 /**
- * This function is used to filter row-wise in parallel threads
- *
- * @param[in] channelDataTime  The channel data to perform the filtering on.
- */
-DSPSHARED_EXPORT void filterChannel(FilterObject& channelDataTime);
-
-//=========================================================================================================
-/**
  * Computes the filtered average for given fiff raw data.
  * Reads epochs, filters each one, applies baseline correction and artifact rejection,
  * then returns the averaged evoked response.
@@ -235,7 +206,7 @@ DSPSHARED_EXPORT mne::FiffEvoked computeFilteredAverage(const mne::FiffRawData& 
                                                         const Eigen::MatrixXi& matEvents,
                                                         float fTMinS,
                                                         float fTMaxS,
-                                                        qint32 eventType,
+                                                        int eventType,
                                                         bool bApplyBaseline,
                                                         float fTBaselineFromS,
                                                         float fTBaselineToS,
