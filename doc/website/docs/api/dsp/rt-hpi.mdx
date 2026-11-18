@@ -167,7 +167,7 @@ Forgets the buffered samples and starts the next fit without a head position.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 273"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 242"
 // Fit the newest 400 samples every 200 samples, each fit starting from the last good head position
 RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
 std::optional<HpiFitResult> fit;

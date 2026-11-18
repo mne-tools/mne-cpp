@@ -143,7 +143,7 @@ Rebuilds the operator for a new noise covariance.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 296"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 265"
 RtCov rtNoise(*rawInfo, 2.0);                                           // noise covariance with a 2 s half-life
 RtInvOp rtInvOp(*rawInfo, megFwd, {.method = InvEstimateMethod::dSPM}); // forward-only work happens on the first update
 MatrixXd sources;

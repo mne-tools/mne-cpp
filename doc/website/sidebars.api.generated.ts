@@ -264,7 +264,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/dsp/simulate',
         'api/dsp/filter-overlap-add',
         'api/dsp/rt-averaging',
-        'api/dsp/rt-averaging-worker',
         'api/dsp/rt-connectivity',
         'api/dsp/rt-hpi',
         'api/dsp/rt-cov',

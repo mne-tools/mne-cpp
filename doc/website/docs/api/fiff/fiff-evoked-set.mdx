@@ -289,26 +289,6 @@ For each row (channel), the mean of the samples in [bminSamp, bminSamp+nBase) is
 
 ## Used in examples
 
-### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
-
-DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
-
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 157"
-RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
-FiffEvokedSet evokedSet;
-QObject::connect(&averager, &RtAveragingWorker::resultReady,
-                 [&](const FiffEvokedSet& set, const QStringList&) { evokedSet = set; });
-for (const MatrixXd& block : blocks) {
-    averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
-}
-// Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
-bool avgOk = evokedSet.evoked.size() == 1;
-if (avgOk) {
-    const FiffEvoked& evoked = evokedSet.evoked.front();
-    avgOk = evoked.nave == nBlocks && evoked.data.cols() == 100 && evoked.comment == "1" && std::fabs(evoked.data(0, 30) - 2.5) < 1e-12 && std::fabs(evoked.data(0, 10)) < 1e-12 && std::fabs(evoked.data(1, 60) + 2.0) < 1e-12 && std::fabs(evoked.times(20)) < 1e-6;
-}
-````
-
 ### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
 
 Inverse library: equivalent current dipole fitting in a sphere model.
@@ -341,7 +321,16 @@ ok &= expect(evokedSet.evoked.size() == 4 && leftAuditory.comment == "Left Audit
              "FiffEvokedSet/FiffEvoked: 4 conditions; Left Auditory averages 55 epochs over 421 samples");
 ````
 
-Also used in [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx), [ex_evoked_grad_amp](../../examples/mne/ex_evoked_grad_amp.mdx), [ex_find_evoked](../../examples/mne/ex_find_evoked.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+### [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx)
+
+Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
+
+````cpp title="src/examples/ex_cancel_noise/main.cpp, line 74"
+//generate FiffEvokedSet
+FiffEvokedSet p_FiffEvokedSet(parser.value(evokedFileOption).toStdU16String());
+````
+
+Also used in [ex_evoked_grad_amp](../../examples/mne/ex_evoked_grad_amp.mdx), [ex_find_evoked](../../examples/mne/ex_find_evoked.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
 
 ## Authors of this file
 

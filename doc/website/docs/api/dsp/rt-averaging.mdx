@@ -17,218 +17,85 @@ sidebar_position: 30
 class mne::RtAveraging
 ```
 
-Real-time averaging.
+Streaming stimulus-locked averaging.
 
-Controller that manages [`RtAveragingWorker`](/docs/api/dsp/rt-averaging-worker) for online epoch averaging with baseline correction.
+An onset is a sample at which the stim channel reaches the trigger threshold from below; its value rounded to an integer is the event code. Like `mne.Epochs`, an epoch whose pre-stimulus part lies before the first sample is dropped, and an epoch exceeding a peak-to-peak limit is rejected.
+
+Moving mean of the newest epochs of every event code, updated with each block.
 
 ```cpp title="src/examples/ex_dsp_rt/main.cpp"
-RtAveraging threaded(10, 20, 80, 0, 0, 2, info); // owns the worker thread
-bool averaged = false;
-QObject::connect(&threaded, &RtAveraging::evokedStim,
-                 [&](const FiffEvokedSet& set, const QStringList&) { averaged = set.evoked.front().nave == nBlocks; });
+// 20 samples before and 80 from each onset on stim row 2, the mean of the newest 10 epochs per event code
+RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 2, .averages = 10});
 for (const MatrixXd& block : blocks) {
-    threaded.append(block);
+    for (const int code : averaging.update(block)) {
+        std::println("event {}: {} epochs averaged", code, averaging.evoked().evoked.front().nave);
+    }
 }
-```
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- RtAveraging
 ```
 
 ---
 
 ## Public Methods
 
-### RtAveraging(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromMSecs, iBaselineToMSecs, iTriggerIndex, pFiffInfo, parent)
-
-Creates the real-time averaging object.
+### RtAveraging(info, settings)
 
 **Parameters:**
 
-- **numAverages** : *quint32*
-  Number of evkos to average.
+- **info** : *std::shared_ptr&lt; const [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
+  Measurement info of the data.
 
-- **iPreStimSamples** : *quint32*
-  Number of samples averaged before the stimulus.
-
-- **iPostStimSamples** : *quint32*
-  Number of samples averaged after the stimulus (including the stimulus).
-
-- **iBaselineFromMSecs** : *qint32*
-  Start of baseline area which was/is used for correction in msecs.
-
-- **iBaselineToMSecs** : *qint32*
-  End of baseline area which was/is used for correction in msecs.
-
-- **iTriggerIndex** : *quint32*
-  Row in dex of channel which is to be scanned for triggers.
-
-- **pFiffInfo** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
-  Associated Fiff Information.
-
-- **parent** : *QObject **
-  Parent QObject (optional).
+- **settings** : *Settings*
+  Epoch definition, window length, baseline and rejection.
 
 ---
 
-### ~RtAveraging()
+### update(block)
 
-Destroys the real-time averaging object.
-
----
-
-### append(data)
-
-Slot to receive incoming data.
+Cuts the epochs of the onsets in the block and averages those that are complete.
 
 **Parameters:**
 
-- **data** : *const Eigen::MatrixXd &*
-  Data to calculate the average from.
+- **block** : *Eigen::MatrixXd*
+  All channels of the measurement info by samples.
+
+**Returns:**
+
+- *std::vector&lt; int &gt;* — The ascending event codes whose evoked response changed.
 
 ---
 
-### restart(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromMSecs, iBaselineToMSecs, iTriggerIndex, pFiffInfo)
+### evoked()
 
-Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
+**Returns:**
+
+- *const [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) &* — The evoked response of every event code seen so far, its comment the event code.
+
+---
+
+### settings()
+
+**Returns:**
+
+- *const Settings &* — The current settings, with the epoch length and the averages raised to their minimum.
+
+---
+
+### set_settings(settings)
+
+Applies new settings.
+
+Another epoch definition drops all epochs; another window length, baseline or rejection keeps the averaged epochs and updates the evoked responses at once.
 
 **Parameters:**
 
-- **numAverages** : *quint32*
-  Number of evkos to average.
-
-- **iPreStimSamples** : *quint32*
-  Number of samples averaged before the stimulus.
-
-- **iPostStimSamples** : *quint32*
-  Number of samples averaged after the stimulus (including the stimulus).
-
-- **iBaselineFromMSecs** : *qint32*
-  Start of baseline area which was/is used for correction in msecs.
-
-- **iBaselineToMSecs** : *qint32*
-  End of baseline area which was/is used for correction in msecs.
-
-- **iTriggerIndex** : *quint32*
-  Row in dex of channel which is to be scanned for triggers.
-
-- **pFiffInfo** : *std::shared_ptr&lt; [FiffInfo](/docs/api/fiff/fiff-info) &gt;*
-  Associated Fiff Information.
-
----
-
-### stop()
-
-Stops the thread by interrupting its computation queue, quitting and waiting.
-
----
-
-### setAverageNumber(numAve)
-
-Sets the number of averages.
-
-**Parameters:**
-
-- **numAve** : *qint32*
-  new number of averages.
-
----
-
-### setPreStim(samples, secs)
-
-Sets the number of pre stimulus samples.
-
-**Parameters:**
-
-- **samples** : *qint32*
-  new number of pre stimulus samples.
-
-- **secs** : *qint32*
-  new number of pre stimulus seconds.
-
----
-
-### setPostStim(samples, secs)
-
-Sets the number of post stimulus samples.
-
-**Parameters:**
-
-- **samples** : *qint32*
-  new number of post stimulus samples.
-
-- **secs** : *qint32*
-  new number of pre stimulus seconds.
-
----
-
-### setTriggerChIndx(idx)
-
-Sets the index of the trigger channel which is to be scanned fo triggers.
-
-**Parameters:**
-
-- **idx** : *qint32*
-  trigger channel index.
-
----
-
-### setArtifactReduction(mapThresholds)
-
-Sets the artifact reduction.
-
-**Parameters:**
-
-- **mapThresholds** : *const std::map&lt; std::string, double &gt; &*
-  The new map including the current thresholds for the channels.
-
----
-
-### setBaselineActive(activate)
-
-Sets the baseline correction on or off.
-
-**Parameters:**
-
-- **activate** : *bool*
-  activate baseline correction.
-
----
-
-### setBaselineFrom(fromSamp, fromMSec)
-
-Sets the from mSeconds of the baseline area.
-
-**Parameters:**
-
-- **fromSamp** : *int*
-  from of baseline area in samples.
-
-- **fromMSec** : *int*
-  from of baseline area in mSeconds.
-
----
-
-### setBaselineTo(toSamp, toMSec)
-
-Sets the to mSeconds of the baseline area.
-
-**Parameters:**
-
-- **toSamp** : *int*
-  to of baseline area in samples.
-
-- **toMSec** : *int*
-  to of baseline area in mSeconds.
+- **settings** : *Settings*
+  The new settings.
 
 ---
 
 ### reset()
 
-Reset the data processing in the real-time worker.
+Drops all epochs and evoked responses and starts a new stream.
 
 ---
 
@@ -245,16 +112,20 @@ Reset the data processing in the real-time worker.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 162"
-    averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 138"
+// 20 samples before and 80 from each onset on stim row 2, the mean of the newest 10 epochs per event code
+RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 2, .averages = 10});
+for (const MatrixXd& block : blocks) {
+    for (const int code : averaging.update(block)) {
+        std::println("event {}: {} epochs averaged", code, averaging.evoked().evoked.front().nave);
+    }
 }
 // Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
-bool avgOk = evokedSet.evoked.size() == 1;
+bool avgOk = averaging.evoked().evoked.size() == 1;
 if (avgOk) {
-    const FiffEvoked& evoked = evokedSet.evoked.front();
+    const FiffEvoked& evoked = averaging.evoked().evoked.front();
     avgOk = evoked.nave == nBlocks && evoked.data.cols() == 100 && evoked.comment == "1" && std::fabs(evoked.data(0, 30) - 2.5) < 1e-12 && std::fabs(evoked.data(0, 10)) < 1e-12 && std::fabs(evoked.data(1, 60) + 2.0) < 1e-12 && std::fabs(evoked.times(20)) < 1e-6;
 }
-ok &= expect(avgOk, "RtAveragingWorker: 4 epochs average to 2.5 after the trigger, 0 before it");
 ````
 
 ## Authors of this file

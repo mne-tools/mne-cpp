@@ -67,7 +67,7 @@ These classes are designed for streaming data and run in background threads:
 | Class | Description | MNE-Python | MNE-C |
 |---|---|---|---|
 | `FilterOverlapAdd` | Real-time FIR filtering via FFT overlap-add convolution | `mne.io.Raw.filter` (batch) | `mne_process_raw` |
-| `RtAveraging` | Real-time epoch averaging with baseline correction | `mne.Evoked` (offline) | `mne_process_raw --ave` |
+| `RtAveraging` | Streaming moving average of the newest epochs per event code | `mne.Evoked` (offline) | `mne_process_raw --ave` |
 | `RtCov` | Streaming noise covariance that forgets old samples with a half-life | `mne.compute_raw_covariance` | `mne_process_raw --cov` |
 | `RtInvOp` | Streaming MNE / dSPM / sLORETA that follows each new noise covariance | `mne.minimum_norm.apply_inverse_raw` | `mne_inverse_operator` |
 | `RtHpi` | Head position from the HPI coils, fitted over a sliding window from the last good position | `mne.chpi.compute_head_pos` | — |
