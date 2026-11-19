@@ -298,6 +298,17 @@ class TestExternalDependencies(AuditTestCase):
         policy = self.policy([("core", ["mne_math"])], allowed_external=["Eigen3::Eigen"])
         self.assertEqual([], self.evaluate(policy))
 
+    def test_qt_outside_a_qt_layer_fails(self) -> None:
+        self.add_library("fiff", external="Qt6::Core")
+        policy = self.policy([("io", ["mne_fiff"])], allowed_external=["Qt::Core"])
+        self.assertIn("DEP022", self.evaluate(policy))
+
+    def test_qt_in_a_qt_layer_passes(self) -> None:
+        self.add_library("disp", external="Qt6::Widgets")
+        policy = self.policy([("visualization", ["mne_disp"])], allowed_external=["Qt::Widgets"],
+                             qt_layers=["visualization"])
+        self.assertEqual([], self.evaluate(policy))
+
     def test_unknown_variable_warns_but_does_not_fail(self) -> None:
         self.add_library("math", external="${MYSTERY_LIBS}")
         policy = self.policy([("core", ["mne_math"])])

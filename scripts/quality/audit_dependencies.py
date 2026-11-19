@@ -462,8 +462,22 @@ def check_external(graph: dict[str, Library], policy: dict[str, Any]) -> list[Fi
     allowed = set(policy.get("allowed_external", []))
     ignored_variables = set(policy.get("ignored_variables", []))
 
+    qt_layers = set(policy.get("qt_layers", []))
+    qt_libraries = {lib for layer in policy.get("layers", []) if layer["name"] in qt_layers
+                    for lib in layer["libraries"]}
+
     for name, library in sorted(graph.items()):
         for dependency in library.external:
+            if dependency.startswith("Qt::") and name not in qt_libraries:
+                findings.append(
+                    error(
+                        "DEP022",
+                        library.cmake_path,
+                        f"'{name}' links '{dependency}', but only the layers in 'qt_layers' may use Qt: "
+                        "library users must never be forced to use Qt.",
+                    )
+                )
+                continue
             if dependency in allowed:
                 continue
             findings.append(

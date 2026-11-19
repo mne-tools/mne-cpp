@@ -110,6 +110,9 @@ aliases; replace the old spelling as below.
   tests and installs the libraries with Qt hidden from CMake and builds a
   consumer against the install tree; CI runs it on Linux, macOS and Windows,
   and the SDK consumer of the Qt builds no longer has Qt on its prefix path.
+  The dependency audit refuses a Qt link outside the display layers
+  (`DEP022`, `qt_layers` in `dependency_policy.json`) and allows only the Qt
+  modules the display libraries use.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
