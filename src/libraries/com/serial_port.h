@@ -5,7 +5,7 @@
  *
  * @file     serial_port.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November, 2026
  * @brief    A raw 8N1 serial port without flow control, for devices that talk over RS-232 or USB-serial.
  */

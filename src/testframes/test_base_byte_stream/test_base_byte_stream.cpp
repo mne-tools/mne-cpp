@@ -383,6 +383,7 @@ void TestUtilsByteStream::textFilesRoundTripExactly()
     const auto unwritable = write_text_file(path.parent_path() / "no" / "dir.txt", text);
     QVERIFY(!unwritable && unwritable.error().code == ErrorCode::Io);
     std::vector<std::byte> bytes;
+    bytes.reserve(256);
     for (int i = 0; i < 256; ++i) {
         bytes.push_back(static_cast<std::byte>(i));
     }

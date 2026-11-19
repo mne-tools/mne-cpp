@@ -5,7 +5,7 @@
  *
  * @file     tmsi_simulator.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    A simulated TMSi Refa: a synthetic:// session digitised in the SDK's 32-bit channel format.
  */

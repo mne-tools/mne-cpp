@@ -5,7 +5,7 @@
  *
  * @file     test_base_thread_pool.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests ThreadPool and benchmarks it against QtConcurrent.
  */

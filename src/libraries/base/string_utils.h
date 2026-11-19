@@ -5,7 +5,7 @@
  *
  * @file     string_utils.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Text and path helpers in standard C++ for the QString calls the libraries use most.
  *

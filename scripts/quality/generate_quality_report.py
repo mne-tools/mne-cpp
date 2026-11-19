@@ -52,8 +52,8 @@ import render_quality_pages  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v2.4.0"
-# The Qt usage report tracks a v2.5.0 gate (G13), so it lives with that release.
-QT_RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v2.5.0"
+# The Qt usage report tracks a v3.0.0 gate (G13), so it lives with that release.
+QT_RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v3.0.0"
 
 # Gate thresholds as recorded in doc/dev-notes/v2.4.0-requirements.md (G2, G3).
 THRESHOLDS = {

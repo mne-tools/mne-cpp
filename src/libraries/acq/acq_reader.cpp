@@ -5,7 +5,7 @@
  *
  * @file     acq_reader.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqReader definitions: zero-copy acquire/release with exact loss accounting.
  */

@@ -5,7 +5,7 @@
  *
  * @file     fiff_evoked_file.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Internal reader shared by FiffEvoked::read and FiffEvokedSet::read; not installed.
  */

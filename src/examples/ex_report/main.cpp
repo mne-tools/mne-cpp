@@ -5,7 +5,7 @@
  *
  * @file     main.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Report library: summarise an analysis run, figures included, as a self-contained HTML page.
  *

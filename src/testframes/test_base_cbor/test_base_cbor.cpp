@@ -5,7 +5,7 @@
  *
  * @file     test_base_cbor.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests the CBOR classes against Qt's: encoded bytes, decoding, JSON conversion and malformed input.
  */

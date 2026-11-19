@@ -5,7 +5,7 @@
  *
  * @file     tcp_socket.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November, 2026
  * @brief    A blocking TCP client connection with timeouts, for devices and servers that send their data over TCP.
  */

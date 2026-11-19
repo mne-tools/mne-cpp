@@ -5,7 +5,7 @@
  *
  * @file     acq_eigen.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Optional header-only Eigen adapters for mne_acq: zero-copy maps, read() and write() with Eigen matrices.
  *

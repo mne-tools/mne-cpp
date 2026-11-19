@@ -5,7 +5,7 @@
  *
  * @file     rtserver_connector_global.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Export macro of the mne_rt_server connector interface library.
  */

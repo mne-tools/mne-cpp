@@ -5,7 +5,7 @@
  *
  * @file     acq_device.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqDevice: an opened device, file or network endpoint with its input and output streams (control path).
  *

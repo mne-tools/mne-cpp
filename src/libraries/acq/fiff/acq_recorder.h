@@ -5,7 +5,7 @@
  *
  * @file     acq_recorder.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqRecorder: records any stream to FIFF (optionally as BIDS) while it is acquired.
  *

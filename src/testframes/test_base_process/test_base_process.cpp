@@ -5,7 +5,7 @@
  *
  * @file     test_base_process.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests run_process() by running this executable as the child, and the host description against QSysInfo.
  */

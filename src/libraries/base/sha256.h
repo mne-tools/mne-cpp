@@ -5,7 +5,7 @@
  *
  * @file     sha256.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    SHA-256 (FIPS 180-4) in standard C++, the counterpart of QCryptographicHash::Sha256.
  */

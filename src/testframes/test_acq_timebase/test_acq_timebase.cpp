@@ -5,7 +5,7 @@
  *
  * @file     test_acq_timebase.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests for sample-exact clock domains: mapSampleExact(), verify() and the host-time clock model.
  *

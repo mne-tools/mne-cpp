@@ -5,7 +5,7 @@
  *
  * @file     acq_recorder.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqRecorder: crash-safe FIFF recording of a stream with aligned, double-buffered direct I/O.
  *

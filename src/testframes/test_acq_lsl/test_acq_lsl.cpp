@@ -5,7 +5,7 @@
  *
  * @file     test_acq_lsl.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests for the lsl:// source on both paths, against outlets of liblsl, pylsl and the in-tree LSL.
  *

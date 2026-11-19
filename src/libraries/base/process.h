@@ -5,7 +5,7 @@
  *
  * @file     process.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Runs external programs and describes the host, the standard C++ counterpart of QProcess, QSysInfo and
  *           the hardware addresses of QNetworkInterface.

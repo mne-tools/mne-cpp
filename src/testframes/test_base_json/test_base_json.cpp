@@ -5,7 +5,7 @@
  *
  * @file     test_base_json.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests the JSON classes against Qt's and the stream parser on input split at every byte.
  */

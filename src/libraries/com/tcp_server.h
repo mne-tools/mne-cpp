@@ -5,7 +5,7 @@
  *
  * @file     tcp_server.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    A listening TCP socket that accepts connections with a timeout, for programs that serve data over TCP.
  */

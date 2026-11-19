@@ -5,7 +5,7 @@
  *
  * @file     brainflow_backend.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    brainflow:// : any board BrainFlow supports, through BrainFlow's library when it is installed.
  *

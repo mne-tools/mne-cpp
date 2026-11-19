@@ -5,7 +5,7 @@
  *
  * @file     acq_fiff_replay.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    The fiff:// backend: native-format FIFF replay with pacing, looping and trigger events.
  */

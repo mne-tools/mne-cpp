@@ -5,7 +5,7 @@
  *
  * @file     main.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Python bridge: run a script with arguments and progress reporting, and read a matrix NumPy prints.
  *

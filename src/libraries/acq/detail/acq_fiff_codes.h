@@ -5,7 +5,7 @@
  *
  * @file     acq_fiff_codes.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    FIFF channel kinds and units as numbers, and their AcqChannelKind and AcqUnit, without the FIFF library.
  */

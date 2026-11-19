@@ -5,7 +5,7 @@
  *
  * @file     streaming_board_backend.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    streaming_board:// : the samples a BrainFlow session streams with add_streamer, without BrainFlow.
  *

@@ -5,7 +5,7 @@
  *
  * @file     test_base_sha256.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests Sha256 against the FIPS 180-4 test vectors and Qt's QCryptographicHash.
  */

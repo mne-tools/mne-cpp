@@ -5,7 +5,7 @@
  *
  * @file     acq_shared_library.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Runtime loading of third-party device libraries (liblsl, BrainFlow, vendor SDKs) without linking them.
  */

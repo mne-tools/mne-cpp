@@ -5,7 +5,7 @@
  *
  * @file     error.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Error and Expected: why a reader or writer failed, as a value or as an exception.
  *

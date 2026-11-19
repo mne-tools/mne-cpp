@@ -5,7 +5,7 @@
  *
  * @file     json_stream_parser.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Push parser for JSON that arrives in pieces, e.g. NDJSON or concatenated documents from a socket.
  *

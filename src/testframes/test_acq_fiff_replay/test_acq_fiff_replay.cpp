@@ -5,7 +5,7 @@
  *
  * @file     test_acq_fiff_replay.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests for the fiff:// source: native formats bit-exact to FiffRawData, skips, events, looping,
  *           start offset, pacing, parameter errors and a recording of a replay.

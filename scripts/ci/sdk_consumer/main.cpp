@@ -5,7 +5,7 @@
  *
  * @file     main.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Downstream consumer of an installed MNE-CPP SDK: acquire, filter and describe one second of data.
  *

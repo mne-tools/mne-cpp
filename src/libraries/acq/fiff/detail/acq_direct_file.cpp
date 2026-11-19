@@ -5,7 +5,7 @@
  *
  * @file     acq_direct_file.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqDirectFile: O_DIRECT, FILE_FLAG_NO_BUFFERING or F_NOCACHE writes with a buffered fallback.
  */

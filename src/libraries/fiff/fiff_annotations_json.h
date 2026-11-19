@@ -5,7 +5,7 @@
  *
  * @file     fiff_annotations_json.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    JSON form of annotation channel names and extras, shared by the FIFF and JSON annotation files (internal).
  */

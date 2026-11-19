@@ -5,7 +5,7 @@
  *
  * @file     test_mne_acq_tool.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Command-line tests of every mne_acq subcommand, with the output checked against the source itself.
  */

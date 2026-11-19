@@ -5,7 +5,7 @@
  *
  * @file     lsl_protocol.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Wire format of the Lab Streaming Layer as liblsl 1.10+ speaks it (internal to mne_lsl).
  *

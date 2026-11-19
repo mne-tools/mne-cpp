@@ -5,7 +5,7 @@
  *
  * @file     test_acq_dlpack.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests for acq_dlpack.h: tensor descriptors per format, layout and memory kind, and a NumPy round trip.
  */

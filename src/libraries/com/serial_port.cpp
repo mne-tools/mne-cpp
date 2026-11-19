@@ -5,7 +5,7 @@
  *
  * @file     serial_port.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November, 2026
  * @brief    SerialPort on termios (POSIX) and the communications API (Windows).
  */

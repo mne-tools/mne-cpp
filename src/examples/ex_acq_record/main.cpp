@@ -5,7 +5,7 @@
  *
  * @file     main.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
  *

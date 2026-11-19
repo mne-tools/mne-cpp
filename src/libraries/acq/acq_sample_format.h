@@ -5,7 +5,7 @@
  *
  * @file     acq_sample_format.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Native sample formats and memory layouts stored in an acquisition ring.
  *

@@ -5,7 +5,7 @@
  *
  * @file     gusbamp_simulator.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Simulated g.USBamps: a synthetic:// session in the transfers of the g.USBamp API.
  */

@@ -5,7 +5,7 @@
  *
  * @file     thread_pool.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Fixed-size worker pool with futures and blocking parallel loops, in standard C++.
  */

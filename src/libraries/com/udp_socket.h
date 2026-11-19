@@ -5,7 +5,7 @@
  *
  * @file     udp_socket.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November, 2026
  * @brief    A UDP socket bound to a local port or a multicast group, for devices that send their data as datagrams.
  */

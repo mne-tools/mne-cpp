@@ -5,7 +5,7 @@
  *
  * @file     test_rt_server_fiff_replay.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Loopback test of mne_rt_server's FIFF simulator: the buffers a client receives equal the file.
  *

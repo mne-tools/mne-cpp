@@ -5,7 +5,7 @@
  *
  * @file     acq_ring_memory.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Ring memory from the operating system: alignment, huge pages, NUMA binding and locking.
  */

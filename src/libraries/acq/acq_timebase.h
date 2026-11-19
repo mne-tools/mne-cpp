@@ -5,7 +5,7 @@
  *
  * @file     acq_timebase.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqTimebase: sample-exact relation between streams that share a hardware clock (clock domain).
  *

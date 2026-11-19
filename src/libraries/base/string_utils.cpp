@@ -5,7 +5,7 @@
  *
  * @file     string_utils.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Definition of the text and path helpers in base/string_utils.h.
  */

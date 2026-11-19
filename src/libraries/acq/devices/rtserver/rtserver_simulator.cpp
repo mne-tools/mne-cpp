@@ -5,7 +5,7 @@
  *
  * @file     rtserver_simulator.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November, 2026
  * @brief    An mne_rt_server whose connector replays a simulated Neuromag recording.
  */

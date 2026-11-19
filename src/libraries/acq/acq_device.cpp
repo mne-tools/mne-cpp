@@ -5,7 +5,7 @@
  *
  * @file     acq_device.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqDevice definitions: the life cycle of an opened source around its backend.
  */

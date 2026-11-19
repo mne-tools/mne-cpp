@@ -5,7 +5,7 @@
  *
  * @file     acq_stream_info.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    AcqStreamInfo: direction, format, layout, rate and per-channel description of one stream.
  *

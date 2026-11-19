@@ -5,7 +5,7 @@
  *
  * @file     acq_dlpack.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Optional, header-only DLPack export of acquisition views (zero copy to NumPy, PyTorch, CuPy, ...).
  *

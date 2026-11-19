@@ -5,7 +5,7 @@
  *
  * @file     acq_synthetic_backend.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Registration of the synthetic:// source, a seeded oddball EEG/MEG generator.
  */

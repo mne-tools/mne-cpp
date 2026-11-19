@@ -5,7 +5,7 @@
  *
  * @file     test_acq_thread.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.5.0
+ * @since    3.0.0
  * @date     November 2026
  * @brief    Tests for thread pinning, priority and NUMA node CPUs, directly and through a backend's URI.
  */
