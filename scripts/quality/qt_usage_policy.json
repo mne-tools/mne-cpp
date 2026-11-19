@@ -127,9 +127,7 @@
     "ieeg": {
       "tokens": 0,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "inv": {
       "tokens": 0,
@@ -182,9 +180,7 @@
     "sts": {
       "tokens": 0,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     }
   }
 }

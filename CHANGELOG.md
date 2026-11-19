@@ -784,7 +784,8 @@ aliases; replace the old spelling as below.
 - The acquisition FIFF bridge (`mne_acq_fiff`) no longer uses or links Qt:
   the recorder and the FIFF replay source write and read with standard C++
   streams and buffers.
-- The MRI library (`mne_mri`) no longer links Qt.
+- The MRI, iEEG and statistics libraries (`mne_mri`, `mne_ieeg`, `mne_sts`) no
+  longer link Qt.
 - `mne_base` no longer links Qt, so the libraries that do not use Qt
   themselves load without it. Without a sink, `mne::Log` prints every
   message itself (results to stdout, diagnostics to stderr, the log file

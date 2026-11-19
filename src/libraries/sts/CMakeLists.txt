@@ -5,15 +5,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_sts LANGUAGES CXX)
 
-#Handle qt uic, moc, rrc automatically
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 set(SOURCES
     sts_ttest.cpp
     sts_ftest.cpp
@@ -42,9 +33,6 @@ mne_warn_on_narrowing(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
 set(MNE_LIBS_REQUIRED 
     mne_base
     mne_math
@@ -52,7 +40,6 @@ set(MNE_LIBS_REQUIRED
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
     Skigen::Skigen)
