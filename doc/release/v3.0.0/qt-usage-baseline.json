@@ -36,10 +36,11 @@
       "mna",
       "mne",
       "mri",
+      "pybridge",
       "report",
       "sts"
     ],
-    "tokens": 8934,
+    "tokens": 8932,
     "gui_outside_design": []
   },
   "libraries": {
@@ -288,10 +289,8 @@
       "modules": []
     },
     "pybridge": {
-      "tokens": 2,
-      "by_category": {
-        "other": 2
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 5,

@@ -19,11 +19,13 @@ Test-frame convenience class for cross-validating MNE-CPP outputs against MNE-Py
 
 ```cpp
 PythonTestHelper py;
-GUARD_PYTHON(py.is_available(), "MNE-Python not available");
+if (!py.is_available()) {
+    // skip the test, or fail it when PythonTestHelper::is_python_required()
+}
 
 // Run a Python snippet that prints a reference value
 const std::optional<double> norm = py.eval_double("import numpy as np; print(np.linalg.norm(np.ones(10)))");
-QVERIFY(norm && std::abs(*norm - cppNorm) < 1e-12);
+const bool matches = norm && std::abs(*norm - cppNorm) < 1e-12;
 ```
 
 Each `eval` call honours its timeout; a run that exceeds it is killed and reported as failed.
