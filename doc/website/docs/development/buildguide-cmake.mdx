@@ -178,6 +178,8 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 | `BUILD_ALL` | `OFF` | Enable apps, examples, and tests |
 | `WASM` | `OFF` | Configure for WebAssembly (see [WebAssembly](wasm.mdx)) |
 
+`mne_base` compresses with the system's zlib. Where there is none (as on a plain Windows machine), CMake downloads the zlib release pinned by `MNE_CPP_ZLIB_VERSION` and `MNE_CPP_ZLIB_SHA256` at configure time and builds it into the library; for an offline build, set `FETCHCONTENT_SOURCE_DIR_MNECPP_ZLIB` to an unpacked zlib source tree.
+
 
 ### Via Qt Creator
 

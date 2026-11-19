@@ -127,10 +127,7 @@ QByteArray makeSyntheticNifti(int nx, int ny, int nz, float dx, float dy, float 
 bool writeGz(const QString& path, const QByteArray& raw)
 {
     // Compress in memory with a gzip wrapper (MAX_WBITS + 16), mirroring the
-    // library's inflateInit2(&strm, MAX_WBITS + 16) decoder. We deliberately
-    // avoid the gz* file helpers (gzopen/gzwrite/gzclose): Qt's bundled zlib
-    // (ZlibPrivate, used when no system zlib is present, e.g. on Windows CI)
-    // omits those file-I/O symbols, while deflate* is always available.
+    // library's inflateInit2(&strm, MAX_WBITS + 16) decoder.
     z_stream strm;
     std::memset(&strm, 0, sizeof(strm));
     if (deflateInit2(&strm, 6, Z_DEFLATED, MAX_WBITS + 16, 8, Z_DEFAULT_STRATEGY) != Z_OK) {

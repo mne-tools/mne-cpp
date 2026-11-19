@@ -98,6 +98,12 @@ aliases; replace the old spelling as below.
   `FIFFLIB::same_channel(a, b)` and find them with
   `FIFFLIB::channel_index(names, name)` or `has_channel` (`fiff_ch_name.h`)
   instead of `==`, `BASELIB::indexOf` or stripping spaces.
+- `mne_base` no longer falls back to Qt's private zlib (`Qt::ZlibPrivate`)
+  when the system has no zlib. It downloads the zlib release pinned by
+  `MNE_CPP_ZLIB_VERSION` (1.4, checked against `MNE_CPP_ZLIB_SHA256`) at
+  configure time instead and links it statically, so configuring the libraries
+  does not need Qt. Offline builds set `FETCHCONTENT_SOURCE_DIR_MNECPP_ZLIB`
+  to an unpacked zlib source tree.
 - `mne_utils` is gone. Its contents moved to `mne_base`, `mne_math`,
   `mne_channels`, `mne_pybridge`, `mne_report` and `mne_com`, so each library
   has one purpose and one namespace.

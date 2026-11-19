@@ -10,21 +10,42 @@ project(mne_base
 
 find_package(Threads REQUIRED)
 
-# Try system ZLIB first, fall back to Qt's bundled zlib
+# zlib: the system's, or else the pinned release downloaded at configure time and built as a static library.
+# Offline builds set FETCHCONTENT_SOURCE_DIR_MNECPP_ZLIB to an unpacked zlib source tree.
+set(MNE_CPP_ZLIB_VERSION "1.4" CACHE STRING "zlib release built when the system has no zlib")
+set(MNE_CPP_ZLIB_SHA256 "02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584"
+    CACHE STRING "SHA-256 of the zlib release tarball")
 find_package(ZLIB QUIET)
 if(ZLIB_FOUND)
     set(ZLIB_TARGET ZLIB::ZLIB)
-    message(STATUS "mne_base: Using system ZLIB")
+    message(STATUS "mne_base: Using system ZLIB ${ZLIB_VERSION_STRING}")
 else()
-    find_package(QT NAMES Qt6 Qt5 QUIET COMPONENTS Core)
-    find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS ZlibPrivate)
-    if(TARGET Qt${QT_VERSION_MAJOR}::ZlibPrivate)
-        set(ZLIB_TARGET Qt${QT_VERSION_MAJOR}::ZlibPrivate)
-        message(STATUS "mne_base: Using Qt bundled ZLIB")
-    else()
-        message(FATAL_ERROR "Could not find ZLIB (neither system nor Qt bundled). "
-            "Please install zlib development packages.")
-    endif()
+    include(FetchContent)
+    FetchContent_Declare(mnecpp_zlib
+        URL "https://github.com/madler/zlib/releases/download/v${MNE_CPP_ZLIB_VERSION}/zlib-${MNE_CPP_ZLIB_VERSION}.tar.gz"
+        URL_HASH SHA256=${MNE_CPP_ZLIB_SHA256}
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        # Populate only: zlib's own CMake project would add its shared library, tests and install rules.
+        SOURCE_SUBDIR do-not-configure)
+    FetchContent_MakeAvailable(mnecpp_zlib)
+    enable_language(C)
+    set(_zlib_sources adler32.c compress.c crc32.c deflate.c gzclose.c gzlib.c gzread.c gzwrite.c infback.c
+                      inffast.c inflate.c inftrees.c trees.c uncompr.c zutil.c)
+    list(TRANSFORM _zlib_sources PREPEND "${mnecpp_zlib_SOURCE_DIR}/")
+    add_library(mnecpp_zlib STATIC ${_zlib_sources})
+    unset(_zlib_sources)
+    # Third-party code: none of MNE-CPP's warning flags (or -Werror) apply.
+    set_target_properties(mnecpp_zlib PROPERTIES
+        COMPILE_OPTIONS "$<IF:$<C_COMPILER_ID:MSVC>,/W0,-w>"
+        DISABLE_PRECOMPILE_HEADERS ON
+        POSITION_INDEPENDENT_CODE ON)
+    target_compile_definitions(mnecpp_zlib PRIVATE
+        $<IF:$<C_COMPILER_ID:MSVC>,_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE,Z_HAVE_UNISTD_H>)
+    target_include_directories(mnecpp_zlib PUBLIC "$<BUILD_INTERFACE:${mnecpp_zlib_SOURCE_DIR}>")
+    # A static mne_base passes zlib on to its users, so the archive is part of the SDK.
+    install(TARGETS mnecpp_zlib ${MNE_CPP_EXPORT_SET} ARCHIVE DESTINATION lib COMPONENT sdk)
+    set(ZLIB_TARGET mnecpp_zlib)
+    message(STATUS "mne_base: Using zlib ${MNE_CPP_ZLIB_VERSION} built from source (no system zlib)")
 endif()
 
 set(SOURCES

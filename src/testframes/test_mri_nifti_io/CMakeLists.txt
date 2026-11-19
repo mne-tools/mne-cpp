@@ -13,12 +13,11 @@ set(QT_REQUIRED_COMPONENTS Core Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# System zlib (re-used for synthesising a .nii.gz fixture inside the test).
-find_package(ZLIB QUIET)
-if(NOT ZLIB_FOUND)
-    find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ZlibPrivate)
-    set(ZLIB_TARGET Qt${QT_VERSION_MAJOR}::ZlibPrivate)
+# The zlib mne_base uses (re-used for synthesising a .nii.gz fixture inside the test).
+if(TARGET mnecpp_zlib)
+    set(ZLIB_TARGET mnecpp_zlib)
 else()
+    find_package(ZLIB REQUIRED)
     set(ZLIB_TARGET ZLIB::ZLIB)
 endif()
 
