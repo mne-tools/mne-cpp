@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include "../../tools/preprocessing/mne_anonymize/fiffanonymizer.h"
 #include "../../tools/preprocessing/mne_anonymize/settingscontrollercl.h"
@@ -145,7 +146,7 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 }
 
 //=============================================================================================================

@@ -29,6 +29,7 @@
 
 #include <dsp/spectrogram.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // Eigen
@@ -69,7 +70,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

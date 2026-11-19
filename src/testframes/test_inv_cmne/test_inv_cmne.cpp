@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <inv/minimum_norm/inv_cmne.h>
+#include <base/log_qt.h>
 #include <inv/minimum_norm/inv_cmne_settings.h>
 
 //=============================================================================================================
@@ -94,6 +95,7 @@ private:
 
 void TestInvCmne::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
 }
 
 //=============================================================================================================

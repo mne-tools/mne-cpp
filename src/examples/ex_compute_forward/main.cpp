@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -64,7 +65,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     QElapsedTimer timer0, timer1, timer2, timer3, timer4;

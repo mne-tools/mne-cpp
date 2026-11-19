@@ -23,6 +23,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -128,7 +129,7 @@ bool TestMneFlashBem::hasFreeSurfer()
 
 void TestMneFlashBem::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
 

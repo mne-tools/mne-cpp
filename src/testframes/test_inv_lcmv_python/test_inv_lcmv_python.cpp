@@ -41,6 +41,7 @@
 
 #include <inv/beamformer/inv_lcmv.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <inv/beamformer/inv_dics.h>
 #include <inv/beamformer/inv_beamformer.h>
 #include <inv/inv_source_estimate.h>
@@ -117,6 +118,7 @@ private:
 
 void TestInvLcmvPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QFile fwdFile(base + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile covFile(base + "/MEG/sample/sample_audvis-cov.fif");

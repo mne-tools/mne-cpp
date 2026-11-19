@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <memory>
 
 #include <mne/mne_msh_display_surface_set.h>
@@ -75,7 +76,7 @@ TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
 
 void TestMneMshDisplaySurfaceSet::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     //qDebug() << "dEpsilon" << dEpsilon;
 
     //Read the results produced with MNE-CPP

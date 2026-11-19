@@ -31,6 +31,7 @@
 
 #include <mne/mne_process_description.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
@@ -184,7 +185,7 @@ static void printHelp()
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_process_raw");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -24,6 +24,7 @@
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <cmath>
 
@@ -57,7 +58,7 @@ static double imageRmse(const QImage& a, const QImage& b)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     app.setApplicationName("mne_screenshot_regression");
 

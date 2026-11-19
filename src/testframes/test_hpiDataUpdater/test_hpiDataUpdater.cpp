@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <memory>
 #include <base/string_utils.h>
 #include <iostream>
@@ -97,7 +98,7 @@ TestHpiDataUpdater::TestHpiDataUpdater()
 
 void TestHpiDataUpdater::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 

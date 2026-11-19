@@ -13,6 +13,7 @@
 
 #include <QtTest/QtTest>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -58,6 +59,7 @@ private slots:
 
     void initTestCase()
     {
+        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
         m_sDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         m_sFwdFile = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         m_sRawFile = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";

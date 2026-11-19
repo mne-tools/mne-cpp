@@ -21,6 +21,7 @@
 #include <memory>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,7 +58,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_forward_solution");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

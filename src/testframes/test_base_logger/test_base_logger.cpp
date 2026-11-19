@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -116,7 +117,7 @@ QString TestUtilsLogger::readLog() const
 void TestUtilsLogger::initTestCase()
 {
     QFile::remove(m_sLogFile);
-    Log::install_qt_message_handler();
+    install_qt_message_handler();
     // The default follows the MNE_LOG_LEVEL build option; these tests need every level.
     Log::set_level(Log::Level::Debug);
 }
@@ -177,6 +178,17 @@ void TestUtilsLogger::testRoutesDiagnosticsToStderr()
     QVERIFY(err.str().find("test-logger-warn-stream") != std::string::npos);
     QVERIFY(err.str().find("test-logger-crit-stream") != std::string::npos);
     QVERIFY(err.str().find("test-logger-info") == std::string::npos);
+
+    // Without a sink, library messages are printed the same way, with no Qt involved
+    std::cout.rdbuf(out.rdbuf());
+    std::cerr.rdbuf(err.rdbuf());
+    Log::info("test-logger-direct-info");
+    Log::warning("test-logger-direct-warn");
+    std::cout.rdbuf(oldOut);
+    std::cerr.rdbuf(oldErr);
+    QVERIFY(out.str().find("test-logger-direct-info") != std::string::npos);
+    QVERIFY(err.str().find("test-logger-direct-warn") != std::string::npos);
+    QVERIFY(out.str().find("test-logger-direct-warn") == std::string::npos);
 }
 
 //=============================================================================================================
@@ -185,10 +197,12 @@ void TestUtilsLogger::testLogForwardsEveryLevelToQt()
 {
     g_qtMessages.clear();
     const QtMessageHandler previous = qInstallMessageHandler(recordQtMessage);
+    const Log::Sink previousSink = forward_log_to_qt();
     Log::debug("log-debug");
     Log::info("log-info");
     Log::warning("log-warning \xc3\xa4");
     Log::critical("log-critical");
+    Log::set_sink(previousSink);
     qInstallMessageHandler(previous);
 
     const std::vector<std::pair<QtMsgType, QString>> expected = {
@@ -209,6 +223,7 @@ void TestUtilsLogger::testLogCaptureSwallowsAndRecords()
 {
     g_qtMessages.clear();
     const QtMessageHandler previous = qInstallMessageHandler(recordQtMessage);
+    const Log::Sink previousSink = forward_log_to_qt();
     {
         LogCapture capture;
         Log::warning("disk almost full");
@@ -226,6 +241,7 @@ void TestUtilsLogger::testLogCaptureSwallowsAndRecords()
         QVERIFY(capture.entries().empty());
     }
     Log::warning("after capture");
+    Log::set_sink(previousSink);
     qInstallMessageHandler(previous);
 
     // Captured messages never reach Qt; once the capture is gone, forwarding resumes.
@@ -266,14 +282,14 @@ void TestUtilsLogger::testLogCustomSink()
     QCOMPARE(seen[0], std::string("3:boom 3 of 4.0"));
     QCOMPARE(seen[1], std::string("0:trace"));
 
-    // An empty sink restores forwarding to Qt.
-    g_qtMessages.clear();
-    const QtMessageHandler handler = qInstallMessageHandler(recordQtMessage);
+    // An empty sink restores printing.
+    std::ostringstream out;
+    std::streambuf* oldOut = std::cout.rdbuf(out.rdbuf());
     Log::set_sink([](Log::Level, std::string_view) {});
     Log::set_sink({});
-    Log::info("forwarded");
-    qInstallMessageHandler(handler);
-    QCOMPARE(g_qtMessages.size(), std::size_t(1));
+    Log::info("printed");
+    std::cout.rdbuf(oldOut);
+    QVERIFY(out.str().find("printed") != std::string::npos);
 }
 
 //=============================================================================================================

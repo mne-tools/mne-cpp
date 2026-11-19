@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 #include <fiff/fiff_cov.h>
@@ -161,7 +162,7 @@ TestFiffCov::TestFiffCov()
 
 void TestFiffCov::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     qDebug() << "Epsilon" << dEpsilon;
     //Read the results produced with MNE-CPP
     covLoaded = FiffCov((QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif").toStdU16String());

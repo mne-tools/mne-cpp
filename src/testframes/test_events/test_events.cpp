@@ -16,6 +16,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <events/eventmanager.h>
 
 //=============================================================================================================
@@ -114,7 +115,7 @@ TestEvents::TestEvents()
 
 void TestEvents::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     qInfo() << "TestEvents: Starting EventManager unit tests";
 }
 

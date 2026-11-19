@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <dsp/annotate_artifact.h>
+#include <base/log_qt.h>
 #include <dsp/firfilter.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
@@ -139,6 +140,11 @@ class TestDspAnnotateArtifact : public QObject
     Q_OBJECT
 
 private slots:
+    void initTestCase()
+    {
+        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
+    }
+
     void testMusclZscoreMatchesPython_data();
     void testMusclZscoreMatchesPython();
     void testMusclZscoreCleanData();

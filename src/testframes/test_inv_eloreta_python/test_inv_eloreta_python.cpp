@@ -45,6 +45,7 @@
 
 #include <inv/inv_convenience.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
@@ -126,6 +127,7 @@ QString TestInvEloretaPython::data(const QString& file)
 
 void TestInvEloretaPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString fwdPath = data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(fwdPath)) {
         QSKIP("Reference forward solution not found");

@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <disp/viewers/abstractview.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <disp/viewers/hpisettingsview.h>
 #include <disp/viewers/coregsettingsview.h>
 #include <disp/viewers/artifactsettingsview.h>
@@ -703,6 +704,7 @@ private slots:
 
 void TestDispViewers2::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QApplication::processEvents();
 }
 

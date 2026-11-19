@@ -34,6 +34,7 @@
 
 #include <mne/mne_forward_solution.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
@@ -138,6 +139,7 @@ FsLabel TestMneLabelPython::label(const QString& name) const
 
 void TestMneLabelPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString fwdPath = dataPath("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(fwdPath)) {
         QSKIP("Forward solution not found");

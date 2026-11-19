@@ -785,6 +785,20 @@ aliases; replace the old spelling as below.
   the recorder and the FIFF replay source write and read with standard C++
   streams and buffers.
 - The MRI library (`mne_mri`) no longer links Qt.
+- `mne_base` no longer links Qt, so the libraries that do not use Qt
+  themselves load without it. Without a sink, `mne::Log` prints every
+  message itself (results to stdout, diagnostics to stderr, the log file
+  and colours as before) instead of handing it to Qt's message handler; the
+  new `Log::print()` prints a message that way. The Qt bridge is the
+  header-only `base/log_qt.h` for Qt programs: `install_qt_message_handler()`
+  sends Qt's own messages through `Log`, `forward_log_to_qt()` makes Qt's
+  message handler the sink of `Log`. MNE Analyze and MNE Browse forward
+  library messages to their log windows. Migration:
+  `Log::install_qt_message_handler()` → `mne::install_qt_message_handler()`
+  from `base/log_qt.h`; code that read library messages through Qt
+  (`QTest::ignoreMessage`, `QTest::failOnWarning`, a custom
+  `qInstallMessageHandler`) calls `mne::forward_log_to_qt()` first, or uses
+  `mne::LogCapture`.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

@@ -22,6 +22,7 @@
 #include <disp3D/scene/multimodalscene.h>
 #include <disp3D/scene/pickresult.h>
 #include <ieeg/ieeg_implantation.h>
+#include <base/log_qt.h>
 #include <mri/mri_types.h>
 
 //=============================================================================================================
@@ -93,6 +94,7 @@ private slots:
 
 void TestElectrodesPlugin::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     // No-op; constructor used per test.
 }
 

@@ -20,6 +20,7 @@
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -101,7 +102,7 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_smooth");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

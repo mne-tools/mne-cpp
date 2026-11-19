@@ -31,6 +31,7 @@
 //=============================================================================================================
 
 #include <mne/mne_source_space.h>
+#include <base/log_qt.h>
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_patch_info.h>
@@ -112,6 +113,7 @@ private:
 
 void TestMneSourceSpaceOpsPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem";
     m_srcPath = base + "/sample-oct-6-src.fif";
     m_bemPath = base + "/sample-5120-bem.fif";

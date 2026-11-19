@@ -29,6 +29,7 @@
 #include <fiff/fiff_ctf_comp.h>
 #include <fiff/fiff_cov.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -131,7 +132,7 @@ private:
 
 void TestFiffCoverage::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));

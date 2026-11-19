@@ -23,6 +23,7 @@
 #include <mna/mna_types.h>
 #include <base/json.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -70,7 +71,7 @@ static std::string humanSize(std::uintmax_t bytes)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_show_mna"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));

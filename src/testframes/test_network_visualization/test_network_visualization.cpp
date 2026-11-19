@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <connectivity/network/network.h>
 
@@ -147,7 +148,7 @@ TestNetworkVisualization::TestNetworkVisualization()
 
 void TestNetworkVisualization::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     m_fullNet4 = buildTestNetwork(4);
     m_fullNet10 = buildTestNetwork(10);

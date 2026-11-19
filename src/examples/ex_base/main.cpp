@@ -78,8 +78,7 @@ int main()
     bool ok = true;
 
     //! [log_file_usage]
-    Log::install_qt_message_handler();  // console output
-    Log::set_file(dir / "example.log"); // and a plain-text copy
+    Log::set_file(dir / "example.log"); // printed to the console, and a plain-text copy here
     Log::info("logging to {}", utf8_from_path(Log::file()));
     //! [log_file_usage]
     Log::set_file({});

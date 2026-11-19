@@ -18,6 +18,7 @@
 #include <mne/mne.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -278,7 +279,7 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

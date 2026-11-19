@@ -16,9 +16,9 @@
  * @brief    Logging: a std::format facade with a replaceable sink, the console and file writer, and a capture sink for tests.
  *
  * Libraries report through @ref mne::Log, whose interface is standard C++ only. By default every
- * message is forwarded to Qt's message handler, so Qt widgets and QtTest see it too; applications install
- * @ref mne::Log::install_qt_message_handler to print it, results to stdout and diagnostics to stderr,
- * optionally mirrored to a log file. @ref mne::LogCapture records messages for the lifetime of a scope.
+ * message is printed, results to stdout and diagnostics to stderr, optionally mirrored to a log file;
+ * a sink set with @ref mne::Log::set_sink receives them instead. @ref mne::LogCapture records messages for
+ * the lifetime of a scope. Qt programs connect Log and Qt's message handler with base/log_qt.h.
  */
 
 #ifndef BASE_LOG_H
@@ -61,7 +61,7 @@ namespace mne
 class BASESHARED_EXPORT Log
 {
 public:
-    /** Severity, matching Qt's debug, info, warning and critical messages. */
+    /** Severity: debug, info, warning and critical, like Qt's message types. */
     enum class Level
     {
         Debug,
@@ -163,23 +163,26 @@ public:
     /**
      * Replaces the sink.
      *
-     * @param[in] sink   The new sink; an empty one restores forwarding to Qt's message handler.
+     * @param[in] sink   The new sink; an empty one restores printing (see print()).
      *
-     * @return The sink that was installed before, empty if messages were forwarded to Qt.
+     * @return The sink that was installed before, empty if messages were printed.
      */
     static Sink set_sink(Sink sink);
 
     //=========================================================================================================
     /**
-     * Installs the Qt message handler that prints every Qt message, and so every forwarded Log message,
-     * at or above level(): results to stdout, diagnostics to stderr, with coloured level tags when
-     * built with MNE_LOG_MODE=FORMATTED.
+     * Prints a message the way Log does without a sink: results (debug, info) to stdout, diagnostics
+     * (warning, critical) to stderr, with coloured level tags when built with MNE_LOG_MODE=FORMATTED, and
+     * to the log file if one is set. Ignores level() and the sink.
+     *
+     * @param[in] level     Severity.
+     * @param[in] message   UTF-8 text.
      */
-    static void install_qt_message_handler();
+    static void print(Level level, std::string_view message);
 
     /**
-     * Additionally writes every message printed by install_qt_message_handler() to a log file, appended,
-     * one timestamped and level-tagged line per message.
+     * Additionally writes every printed message to a log file, appended, one timestamped and
+     * level-tagged line per message.
      *
      * @param[in] path   The log file; an empty path stops file logging.
      *

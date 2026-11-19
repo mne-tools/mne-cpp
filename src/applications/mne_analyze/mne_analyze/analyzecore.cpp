@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include <functional>
+#include <base/log_qt.h>
 #include <QSplashScreen>
 #include "analyzecore.h"
 #include "mainwindow.h"
@@ -116,6 +117,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     // Setup log window
     appMainWindowHandler = m_pMainWindow;
     previousMessageHandler = qInstallMessageHandler(customMessageHandler);
+    mne::forward_log_to_qt(); // library messages appear in the log window too
 
     // Initialize cmd line inputs if provided by the user
     parseCmdLineInputs();
@@ -125,6 +127,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
 AnalyzeCore::~AnalyzeCore()
 {
+    mne::Log::set_sink({});
     qInstallMessageHandler(previousMessageHandler);
 }
 

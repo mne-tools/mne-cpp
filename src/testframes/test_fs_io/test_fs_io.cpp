@@ -16,6 +16,7 @@
 #include <QDataStream>
 
 #include <fs/fs_surface.h>
+#include <base/log_qt.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
 #include <fs/fs_annotationset.h>
@@ -116,6 +117,11 @@ private:
     }
 
 private slots:
+    void initTestCase()
+    {
+        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
+    }
+
 
     //=========================================================================
     // FsSurface - default & clear

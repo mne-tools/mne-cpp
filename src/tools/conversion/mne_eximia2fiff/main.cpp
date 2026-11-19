@@ -21,6 +21,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -155,7 +156,7 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_eximia2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

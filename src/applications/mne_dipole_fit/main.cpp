@@ -20,6 +20,7 @@
 #include <inv/dipole_fit/inv_dipole_fit.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <mne/mne_bem.h>
 
@@ -82,7 +83,7 @@ int main(int argc, char* argv[])
             break;
         }
     }
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     std::unique_ptr<QCoreApplication> app;
     if (guiRequested) {
         app = std::make_unique<QApplication>(argc, argv);

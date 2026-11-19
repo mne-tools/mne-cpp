@@ -22,6 +22,7 @@
 #include <disp/plots/lineplot.h>
 #include <math/spectral.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <mne/mne.h>
 
 //=============================================================================================================
@@ -60,7 +61,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Generate input data

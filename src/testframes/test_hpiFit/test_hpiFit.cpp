@@ -20,6 +20,7 @@
 #include <iostream>
 #include <memory>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <vector>
 #include <math.h>
 #include <cstddef>
@@ -112,6 +113,7 @@ TestHpiFit::TestHpiFit()
 
 void TestHpiFit::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists

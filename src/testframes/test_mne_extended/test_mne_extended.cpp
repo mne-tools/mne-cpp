@@ -16,6 +16,7 @@
 #include <QTemporaryDir>
 
 #include <mne/mne.h>
+#include <base/log_qt.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_hemisphere.h>
@@ -40,6 +41,11 @@ private:
     }
 
 private slots:
+    void initTestCase()
+    {
+        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
+    }
+
 
     //=========================================================================
     // MNENamedMatrix

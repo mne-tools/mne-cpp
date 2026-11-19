@@ -12,6 +12,7 @@
 #include <random>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <dsp/rt/rt_averaging.h>
 #include <dsp/rt/rt_noise.h>
@@ -164,7 +165,7 @@ private:
 private slots:
     void initTestCase()
     {
-        mne::Log::install_qt_message_handler();
+        mne::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;

@@ -13,6 +13,7 @@
  */
 
 #include <writetofile/writetofile.h>
+#include <base/log_qt.h>
 #include <memory>
 #include <writetofile/FormFiles/writetofilestatuswidget.h>
 
@@ -38,6 +39,11 @@ class TestWriteToFileStatus : public QObject
     Q_OBJECT
 
 private slots:
+    void initTestCase()
+    {
+        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
+    }
+
     void formatHelpers_produceExpectedStrings();
     void emitRecordingStatus_isRepeatableAndMonotonic();
     void statusWidget_reflectsLatestSummary();

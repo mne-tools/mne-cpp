@@ -29,6 +29,7 @@
 #include "flashbem.h"
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +64,7 @@ using namespace MNEFLASHBEM;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_flash_bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

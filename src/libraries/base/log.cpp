@@ -27,14 +27,6 @@
 #include "string_utils.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QString>
-#include <QUtf8StringView>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -106,7 +98,7 @@ std::string timestamp()
     return std::format("{}.{:03}", date.data(), millis);
 }
 
-void print(Log::Level level, std::string_view text)
+void printToConsole(Log::Level level, std::string_view text)
 {
     const auto index = static_cast<std::size_t>(level);
     // Results go to stdout and diagnostics to stderr, so piped tool output stays parseable.
@@ -133,53 +125,10 @@ void print(Log::Level level, std::string_view text)
     stream.flush();
 }
 
-void qtMessageHandler(QtMsgType type, const QMessageLogContext& /*context*/, const QString& message)
-{
-    Log::Level level = Log::Level::Debug;
-    switch (type) {
-        case QtDebugMsg:
-            level = Log::Level::Debug;
-            break;
-        case QtInfoMsg:
-            level = Log::Level::Info;
-            break;
-        case QtWarningMsg:
-            level = Log::Level::Warning;
-            break;
-        case QtCriticalMsg:
-        case QtFatalMsg:
-            level = Log::Level::Critical;
-            break;
-    }
-    if (type != QtFatalMsg && !Log::enabled(level)) {
-        return;
-    }
-    print(level, message.toStdString());
-}
-
 SinkSlot& sinkSlot()
 {
     static SinkSlot slot;
     return slot;
-}
-
-void forwardToQt(Log::Level level, std::string_view message)
-{
-    const QUtf8StringView text(message);
-    switch (level) {
-        case Log::Level::Debug:
-            qDebug().noquote() << text;
-            break;
-        case Log::Level::Info:
-            qInfo().noquote() << text;
-            break;
-        case Log::Level::Warning:
-            qWarning().noquote() << text;
-            break;
-        case Log::Level::Critical:
-            qCritical().noquote() << text;
-            break;
-    }
 }
 
 } // namespace
@@ -210,7 +159,7 @@ void Log::write(Level level, std::string_view message)
     if (sink) {
         (*sink)(level, message);
     } else {
-        forwardToQt(level, message);
+        printToConsole(level, message);
     }
 }
 
@@ -247,9 +196,9 @@ Log::Sink Log::set_sink(Sink sink)
 
 //=============================================================================================================
 
-void Log::install_qt_message_handler()
+void Log::print(Level level, std::string_view message)
 {
-    qInstallMessageHandler(qtMessageHandler);
+    printToConsole(level, message);
 }
 
 //=============================================================================================================

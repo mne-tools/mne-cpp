@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include "mne_rt_server.h"
 
@@ -59,7 +60,7 @@ Q_IMPORT_PLUGIN(FiffSimulator)
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

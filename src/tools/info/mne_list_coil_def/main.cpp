@@ -19,6 +19,7 @@
 #include <fwd/fwd_coil.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -82,7 +83,7 @@ static QString accuracyName(int acc)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_coil_def");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

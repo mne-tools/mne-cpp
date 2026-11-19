@@ -31,6 +31,7 @@
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -134,7 +135,7 @@ private:
 
 void TestMneInvCoverage::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));

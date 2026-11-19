@@ -21,6 +21,7 @@
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <iostream>
 #include <QCommandLineParser>
@@ -53,7 +54,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

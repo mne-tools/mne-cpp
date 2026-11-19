@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
@@ -132,7 +133,7 @@ private slots:
 
 void TestInvLoreta::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     m_bDataLoaded = false;
 
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";

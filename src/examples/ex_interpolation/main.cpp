@@ -30,6 +30,7 @@
 #include <fiff/fiff_constants.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,7 +68,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

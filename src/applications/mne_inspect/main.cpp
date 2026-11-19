@@ -18,6 +18,7 @@
 #include <QCommandLineParser>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include "app/mainwindow.h"
 
@@ -34,7 +35,7 @@
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("MNE Inspect");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

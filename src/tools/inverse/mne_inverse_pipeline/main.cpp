@@ -25,6 +25,7 @@
 #include <mna/mna_op_registry.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -59,7 +60,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName(QStringLiteral("mne_inverse_pipeline"));
     QCoreApplication::setApplicationVersion(QStringLiteral(PROGRAM_VERSION));
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     //
     // Command-line parsing

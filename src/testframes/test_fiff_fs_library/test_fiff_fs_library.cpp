@@ -19,6 +19,7 @@
 
 #include <base/base_global.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 // FIFF
 #include <fiff/fiff.h>
@@ -259,7 +260,7 @@ private slots:
 
 void TestFiffFsLibrary::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;

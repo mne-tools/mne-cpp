@@ -7,6 +7,7 @@
 #include <Eigen/Dense>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <inv/dipole_fit/inv_ecd.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
@@ -50,7 +51,7 @@ private:
 private slots:
     void initTestCase()
     {
-        mne::Log::install_qt_message_handler();
+        mne::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
@@ -222,17 +223,14 @@ private slots:
     {
         InvDipoleFitSettings settings;
         // Without a measurement file the settings are rejected
-        static QStringList criticals;
-        criticals.clear();
-        const QtMessageHandler previous = qInstallMessageHandler([](QtMsgType type, const QMessageLogContext&, const QString& msg) {
-            if (type == QtCriticalMsg)
-                criticals << msg;
-        });
-        const bool accepted = settings.checkIntegrity();
-        qInstallMessageHandler(previous);
+        bool accepted = true;
+        {
+            LogCapture capture;
+            accepted = settings.checkIntegrity();
+            QCOMPARE(capture.count(Log::Level::Critical), 1);
+            QCOMPARE(capture.count(Log::Level::Critical, "Data file name missing"), 1);
+        }
         QVERIFY(!accepted);
-        QCOMPARE(criticals.size(), 1);
-        QVERIFY(criticals.first().startsWith("Data file name missing"));
 
         // Checked again for every fit: the data file's projections are added once
         settings.measname = "data-ave.fif";

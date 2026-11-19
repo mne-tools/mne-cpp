@@ -32,6 +32,7 @@
 #include <mne/mne_inverse_operator.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -67,7 +68,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_map_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -20,6 +20,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -174,7 +175,7 @@ static bool computeHeadTransform(const DigPoint& nasion, const DigPoint& lpa, co
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf_dig2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -16,6 +16,7 @@
 
 #include <math/sphere.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -100,7 +101,7 @@ TestSphere::TestSphere()
 
 void TestSphere::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 }
 
 //=============================================================================================================

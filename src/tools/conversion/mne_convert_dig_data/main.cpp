@@ -21,6 +21,7 @@
 #include <fiff/fiff_dir_entry.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -197,7 +198,7 @@ static bool writeHpts(const QString& filename, const QList<DigPt>& points)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_dig_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

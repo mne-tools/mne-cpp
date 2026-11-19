@@ -25,6 +25,7 @@
 #include <Eigen/Dense>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -162,7 +163,7 @@ private slots:
 
 void TestMneRawProjComp::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),

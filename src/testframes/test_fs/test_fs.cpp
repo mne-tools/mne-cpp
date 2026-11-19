@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
@@ -124,7 +125,7 @@ TestFS::TestFS()
 
 void TestFS::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     qInfo() << "TestFS: Starting FreeSurfer library unit tests";
 }
 

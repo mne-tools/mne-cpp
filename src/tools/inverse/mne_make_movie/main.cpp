@@ -23,6 +23,7 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -215,7 +216,7 @@ static QImage renderFrame(const FsSurface& surf,
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_movie");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <algorithm>
 
@@ -159,7 +160,7 @@ TestFiffRWR::TestFiffRWR()
 
 void TestFiffRWR::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     qDebug() << "dEpsilon" << dEpsilon;
 
     QVERIFY(m_tempDir.isValid());

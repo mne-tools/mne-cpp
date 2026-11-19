@@ -24,6 +24,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -163,7 +164,7 @@ std::string fixFile(const QString& path, bool fix32)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_fix_stim14");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

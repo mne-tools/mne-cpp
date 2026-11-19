@@ -19,6 +19,7 @@
 //=============================================================================================================
 
 #include <connectivity/connectivity.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -116,6 +117,7 @@ int main(int argc, char* argv[])
 #endif
 
     qInstallMessageHandler(customMessageHandler);
+    mne::forward_log_to_qt();
     QCoreApplication a(argc, argv);
 
     m_sCurrentDir = QCoreApplication::applicationDirPath();

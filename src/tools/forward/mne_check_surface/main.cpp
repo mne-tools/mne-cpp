@@ -19,6 +19,7 @@
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -190,7 +191,7 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_check_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

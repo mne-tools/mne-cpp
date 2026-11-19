@@ -31,6 +31,7 @@
 #include <fs/fs_surfaceset.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -328,7 +329,7 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -16,6 +16,7 @@
 //=============================================================================================================
 
 #include <stdio.h>
+#include <base/log_qt.h>
 #include "Windows/mainwindow.h"
 #include "Utils/info.h"
 
@@ -115,6 +116,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(customMessageHandler);
+    mne::forward_log_to_qt(); // library messages reach the log window too
     QApplication a(argc, argv);
 
     //set application settings

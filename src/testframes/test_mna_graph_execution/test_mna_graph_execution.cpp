@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <mna/mna_graph.h>
+#include <base/log_qt.h>
 #include <mna/mna_graph_executor.h>
 #include <mna/mna_op_registry.h>
 #include <mna/mna_node.h>
@@ -196,6 +197,7 @@ private:
 
 void TestMnaGraphExecution::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     registerTestOps();
 }
 

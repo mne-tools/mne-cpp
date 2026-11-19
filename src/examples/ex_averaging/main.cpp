@@ -28,6 +28,7 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
@@ -67,7 +68,7 @@ int main(int argc, char* argv[])
 
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

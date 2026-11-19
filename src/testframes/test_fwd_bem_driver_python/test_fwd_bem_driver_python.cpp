@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include <fwd/fwd_bem_model.h>
+#include <base/log_qt.h>
 #include <fwd/fwd_coil_set.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -121,6 +122,7 @@ private slots:
 
 void TestFwdBemDriverPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString dir = QStringLiteral(MNE_FWD_BEM_DRIVER_DATA_DIR);
     m_gain = readMatrix(dir + "/gain.txt");
     const MatrixXd geo = readMatrix(dir + "/geometry.txt");

@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <averaging/averaging.h>
+#include <base/log_qt.h>
 #include <babymeg/babymeg.h>
 #include <brainamp/brainamp.h>
 #include <brainflowboard/brainflowboard.h>
@@ -122,6 +123,7 @@ private:
 
 void TestMneScanPlugins::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QStandardPaths::setTestModeEnabled(true);
     QSettings("MNECPP").clear();
     m_rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";

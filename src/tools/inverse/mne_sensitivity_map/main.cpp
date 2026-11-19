@@ -17,6 +17,7 @@
 #include <mne/mne_forward_solution.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,7 +54,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_sensitivity_map");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

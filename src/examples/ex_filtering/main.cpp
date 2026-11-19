@@ -26,6 +26,7 @@
 
 #include <dsp/filterkernel.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <dsp/rt/rt_filter.h>
 
@@ -59,7 +60,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

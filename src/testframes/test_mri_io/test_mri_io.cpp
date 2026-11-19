@@ -24,6 +24,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <mri/mri_types.h>
 #include <mri/mri_vol_data.h>
@@ -250,7 +251,7 @@ QString TestMriIO::findSubjectsDir()
 
 void TestMriIO::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
 

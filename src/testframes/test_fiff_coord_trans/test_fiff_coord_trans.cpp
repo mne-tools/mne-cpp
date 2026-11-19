@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
@@ -82,7 +83,7 @@ TestFiffCoordTrans::TestFiffCoordTrans()
 
 void TestFiffCoordTrans::initTestCase()
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     QVERIFY(m_tempDir.isValid());
     const std::string testPath = m_tempDir.filePath("test-trans.fif").toStdString();

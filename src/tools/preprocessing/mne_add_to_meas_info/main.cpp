@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,7 +49,7 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_to_meas_info");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

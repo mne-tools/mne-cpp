@@ -30,6 +30,7 @@
 
 #include <math/matrix_io.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <fwd/fwd_coil_set.h>
 
@@ -70,7 +71,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 

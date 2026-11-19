@@ -20,6 +20,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -88,7 +89,7 @@ static const char* spaceTypeName(int type)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

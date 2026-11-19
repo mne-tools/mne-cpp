@@ -25,6 +25,7 @@
 #include <fiff/fiff_types.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,7 +61,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_label_ssp");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

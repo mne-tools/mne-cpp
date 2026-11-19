@@ -29,6 +29,7 @@
 #include <scShared/Plugins/abstractplugin.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -114,7 +115,7 @@ int main(int argc, char* argv[])
     Q_INIT_RESOURCE(tmsi);
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
 
     // Enable crisp fractional scaling on high-DPI monitors. Must be set before
     // the QApplication is constructed. (Qt6 enables high-DPI pixmaps by default.)

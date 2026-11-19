@@ -19,6 +19,7 @@
 #include <vector>
 #include <fiff/fiff_file.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -178,7 +179,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_insert_4D_comp");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

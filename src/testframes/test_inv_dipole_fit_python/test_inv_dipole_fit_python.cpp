@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include <inv/dipole_fit/inv_dipole_fit.h>
+#include <base/log_qt.h>
 #include <inv/dipole_fit/inv_dipole_fit_data.h>
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
@@ -205,6 +206,7 @@ private:
 
 void TestInvDipoleFitPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     m_sampleAve = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
     QVERIFY2(QFile::exists(m_sampleAve), "test data missing");
     QVERIFY(m_dir.isValid());

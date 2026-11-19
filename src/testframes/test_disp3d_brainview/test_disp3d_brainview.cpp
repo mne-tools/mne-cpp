@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <disp3D/view/brainview.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <disp3D/view/brainrenderer.h>
 #include <rhi/qrhi.h>
 #include <disp3D/renderable/polylineobject.h>
@@ -347,6 +348,7 @@ private slots:
 
 void TestDisp3dBrainView::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     // BrainView persists its layout in QSettings: without an organisation the Windows registry backend stores nothing
     QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP-Tests"));
     QCoreApplication::setApplicationName(QStringLiteral("test_disp3d_brainview"));

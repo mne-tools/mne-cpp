@@ -8,10 +8,6 @@ project(mne_base
   LANGUAGES CXX
 )
 
-# Qt Core only: Log forwards to Qt's message handler by default.
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Threads REQUIRED)
 
 # Try system ZLIB first, fall back to Qt's bundled zlib
@@ -20,6 +16,7 @@ if(ZLIB_FOUND)
     set(ZLIB_TARGET ZLIB::ZLIB)
     message(STATUS "mne_base: Using system ZLIB")
 else()
+    find_package(QT NAMES Qt6 Qt5 QUIET COMPONENTS Core)
     find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS ZlibPrivate)
     if(TARGET Qt${QT_VERSION_MAJOR}::ZlibPrivate)
         set(ZLIB_TARGET Qt${QT_VERSION_MAJOR}::ZlibPrivate)
@@ -56,6 +53,7 @@ set(HEADERS
   json_stream_parser.h
   xml.h
   log.h
+  log_qt.h
   process.h
   sha256.h
   string_utils.h
@@ -72,14 +70,10 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
     Threads::Threads
   PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
     ${ZLIB_TARGET})
 
 if(WIN32)

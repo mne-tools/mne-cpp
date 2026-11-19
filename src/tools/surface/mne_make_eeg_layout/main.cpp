@@ -19,6 +19,7 @@
 #include <fiff/fiff_raw_data.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -77,7 +78,7 @@ static void azimuthalProjection(const Vector3f& pos, const Vector3f& center,
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_eeg_layout");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -39,6 +39,7 @@
 
 #include <math/linalg.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <iostream>
 
@@ -81,7 +82,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

@@ -20,6 +20,7 @@
 
 #include <dsp/spectrogram.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <disp/plots/tfplot.h>
 #include <disp/plots/helpers/figureexporter.h>
@@ -55,7 +56,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

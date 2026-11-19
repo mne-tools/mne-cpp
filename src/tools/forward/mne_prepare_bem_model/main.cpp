@@ -20,6 +20,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,7 +49,7 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_prepare_bem_model");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

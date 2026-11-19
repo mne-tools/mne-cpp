@@ -18,6 +18,7 @@
 #include <fiff/fiff_evoked.h>
 #include <base/string_utils.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,7 +52,7 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_change_nave");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

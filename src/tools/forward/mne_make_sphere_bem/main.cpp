@@ -18,6 +18,7 @@
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -111,7 +112,7 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
 
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_sphere_bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

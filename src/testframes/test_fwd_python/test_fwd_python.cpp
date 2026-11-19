@@ -38,6 +38,7 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_coord_trans.h>
 #include <base/string_utils.h>
+#include <base/log_qt.h>
 #include <mne/mne_forward_solution.h>
 #include <fs/fs_label.h>
 
@@ -132,6 +133,7 @@ QString TestFwdPython::data(const QString& file)
 
 void TestFwdPython::initTestCase()
 {
+    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString refPath = data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(refPath)) {
         QSKIP("Reference forward solution not found");
