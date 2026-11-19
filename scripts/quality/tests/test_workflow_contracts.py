@@ -36,7 +36,40 @@ def _workflow_texts() -> dict[str, str]:
     return {p.relative_to(REPO_ROOT).as_posix(): p.read_text(encoding="utf-8") for p in files}
 
 
+_KEY_VALUE = re.compile(r"^(\s*)(- )?[\w.-]+:\s+(\S.*)$")
+
+
+def _plain_scalars_with_colon(text: str) -> list[int]:
+    """Lines whose unquoted value contains ': ', which YAML rejects ("mapping values are not allowed").
+
+    A workflow that does not parse fails without running a single job, so this keeps the check that actionlint
+    does in CI available to the bare interpreter of the lint jobs (no PyYAML).
+    """
+    bad: list[int] = []
+    block_indent: int | None = None
+    for number, line in enumerate(text.splitlines(), start=1):
+        indent = len(line) - len(line.lstrip())
+        if block_indent is not None:
+            if not line.strip() or indent > block_indent:
+                continue
+            block_indent = None
+        match = _KEY_VALUE.match(line)
+        if match is None:
+            continue
+        value = match.group(3).split(" #", 1)[0].rstrip()
+        if value[0] in "|>":
+            block_indent = len(match.group(1)) + (2 if match.group(2) else 0)
+        elif value[0] not in "'\"[{" and ": " in value:
+            bad.append(number)
+    return bad
+
+
 class WorkflowContracts(unittest.TestCase):
+    def test_workflows_have_no_unquoted_colon_values(self) -> None:
+        for name, text in _workflow_texts().items():
+            with self.subTest(workflow=name):
+                self.assertEqual(_plain_scalars_with_colon(text), [])
+
     def test_tool_pins_match_the_scripts(self) -> None:
         texts = "\n".join(_workflow_texts().values())
         self.assertEqual(set(re.findall(r"clang-format==([\d.]+)", texts)), {check_format.CLANG_FORMAT_VERSION})

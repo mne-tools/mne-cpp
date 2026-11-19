@@ -98,6 +98,9 @@ aliases; replace the old spelling as below.
   `FIFFLIB::same_channel(a, b)` and find them with
   `FIFFLIB::channel_index(names, name)` or `has_channel` (`fiff_ch_name.h`)
   instead of `==`, `BASELIB::indexOf` or stripping spaces.
+- The pull request, staging and main workflows run again: a step name with
+  an unquoted `mne::` made the shared test workflow invalid YAML, so every
+  run failed before starting a job. The quality unit tests reject such values.
 - `mne_base` no longer falls back to Qt's private zlib (`Qt::ZlibPrivate`)
   when the system has no zlib. It downloads the zlib release pinned by
   `MNE_CPP_ZLIB_VERSION` (1.4, checked against `MNE_CPP_ZLIB_SHA256`) at

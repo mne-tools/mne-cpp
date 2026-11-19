@@ -253,7 +253,7 @@ jobs:
         cmake --build build -j "$(sysctl -n hw.logicalcpu)"
 
     # All libraries share the namespace mne, so two of them can define the same function.
-    - name: Check that no mne:: symbol is defined by two libraries
+    - name: "Check that no mne:: symbol is defined by two libraries"
       if: runner.os != 'Windows'
       run: python3 scripts/quality/check_duplicate_symbols.py out/Release/lib
 
