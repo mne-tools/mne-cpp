@@ -248,36 +248,55 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 ##==============================================================================
-find_package(QT NAMES Qt6 Qt5)
-message("QT_DIR - ${QT_DIR}")
+## Qt: only the display libraries, applications, CLI tools, plugins and the QtTest tests need it
 
-# ── Pre-find all Qt components once ──────────────────────────────────────────
-# Qt6::Gui (pulled in transitively by Widgets) checks for WrapVulkanHeaders
-# every time find_package(Qt6 …) is called.  Since 40+ subdirectory
-# CMakeLists.txt each call find_package, the warning
-#   "Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)"
-# would be printed dozens of times.  Finding all required components here
-# makes the subdirectory calls no-ops and prints the warning at most once.
+option(MNE_BUILD_QT "Build the Qt-based parts: display libraries, applications, CLI tools, plugins and Qt tests/examples" ON)
 
-# Define required Qt components for MNE-CPP (Qt6 only, no OpenGL, require GuiPrivate for QRhi)
-set(_MNE_QT_COMPONENTS Core Concurrent Gui Multimedia Network Widgets Svg Xml)
-if(NOT WASM)
-  list(APPEND _MNE_QT_COMPONENTS PrintSupport)
-endif()
-if(QT_VERSION_MAJOR EQUAL 6)
+if(MNE_BUILD_QT)
+  # ── Pre-find all Qt components once ────────────────────────────────────────
+  # Qt6::Gui (pulled in transitively by Widgets) checks for WrapVulkanHeaders
+  # every time find_package(Qt6 …) is called.  Since 40+ subdirectory
+  # CMakeLists.txt each call find_package, the warning
+  #   "Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)"
+  # would be printed dozens of times.  Finding all required components here
+  # makes the subdirectory calls no-ops and prints the warning at most once.
+
+  # Define required Qt components for MNE-CPP (Qt6 only, no OpenGL, require GuiPrivate for QRhi)
+  set(_MNE_QT_COMPONENTS Core Concurrent Gui Multimedia Network Widgets Svg Xml)
+  if(NOT WASM)
+    list(APPEND _MNE_QT_COMPONENTS PrintSupport)
+  endif()
   list(APPEND _MNE_QT_COMPONENTS ShaderTools GuiPrivate)
+  if(BUILD_TESTS)
+    list(APPEND _MNE_QT_COMPONENTS Test)
+  endif()
+  set(QT_NO_PRIVATE_MODULE_WARNING ON)
+  # Without Qt the Qt-based parts are skipped; a Qt that lacks a component MNE-CPP needs is an error.
+  find_package(Qt6 QUIET COMPONENTS Core)
+  if(Qt6_FOUND)
+    find_package(Qt6 REQUIRED COMPONENTS ${_MNE_QT_COMPONENTS})
+    # The subdirectories spell find_package(QT NAMES Qt6 Qt5) and Qt${QT_VERSION_MAJOR}::...
+    find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
+    message(STATUS "[MNE-CPP] Qt ${Qt6_VERSION} found in ${Qt6_DIR}")
+  else()
+    message(WARNING
+      "[MNE-CPP] Qt 6 was not found, so MNE_BUILD_QT is switched off for this configuration: only the "
+      "Qt-free libraries, their examples and tests are built. To build the display libraries, applications, "
+      "CLI tools and plugins as well, put Qt 6 on CMAKE_PREFIX_PATH (./init.sh downloads it). "
+      "Pass -DMNE_BUILD_QT=OFF to build without Qt on purpose.")
+    set(MNE_BUILD_QT OFF)
+  endif()
+  unset(_MNE_QT_COMPONENTS)
 endif()
-if(BUILD_TESTS)
-  list(APPEND _MNE_QT_COMPONENTS Test)
+
+if(NOT MNE_BUILD_QT)
+  message(STATUS "[MNE-CPP] MNE_BUILD_QT is OFF: building the Qt-free libraries, examples and tests only "
+                 "(no disp, disp3D, applications, CLI tools, plugins or QtTest tests)")
 endif()
-list(REMOVE_DUPLICATES _MNE_QT_COMPONENTS)
-set(QT_NO_PRIVATE_MODULE_WARNING ON)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${_MNE_QT_COMPONENTS})
-unset(_MNE_QT_COMPONENTS)
 
 # CMAKE_INSTALL_RPATH_USE_LINK_PATH skips directories inside the project, such as the Qt init.sh downloads into src/external
 set(MNE_QT_RPATH "")
-if(NOT WIN32 AND NOT WASM)
+if(MNE_BUILD_QT AND NOT WIN32 AND NOT WASM)
   get_filename_component(_mne_qt_lib_dir "${QT_DIR}/../.." ABSOLUTE)
   string(FIND "${_mne_qt_lib_dir}/" "${CMAKE_SOURCE_DIR}/" _mne_qt_pos)
   if(_mne_qt_pos EQUAL 0)
@@ -421,11 +440,12 @@ endif()
 
 add_subdirectory(libraries)
 
-if(BUILD_APPLICATIONS)
+# The applications (with their plugins) and the CLI tools are Qt programs.
+if(MNE_BUILD_QT AND BUILD_APPLICATIONS)
   add_subdirectory(applications)
 endif()
 
-if(BUILD_APPLICATIONS AND BUILD_TOOLS)
+if(MNE_BUILD_QT AND BUILD_APPLICATIONS AND BUILD_TOOLS)
   add_subdirectory(tools)
 endif()
 
@@ -509,6 +529,10 @@ foreach(_dir IN LISTS _mnecpp_dirs)
     endforeach()
 endforeach()
 unset(_mnecpp_dirs)
+set(MNECPP_QT_PACKAGE "")
+if(MNE_BUILD_QT)
+    set(MNECPP_QT_PACKAGE Qt${QT_VERSION_MAJOR})
+endif()
 
 # Generate MNE-CPPConfig.cmake from template
 configure_package_config_file(

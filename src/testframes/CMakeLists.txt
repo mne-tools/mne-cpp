@@ -38,6 +38,12 @@ endif()
 
 add_subdirectory(test_mne_testing_helper)
 
+# The tests below are QtTest programs. Without Qt, the Qt-free examples registered as tests in
+# src/examples cover the libraries.
+if(NOT MNE_BUILD_QT)
+  return()
+endif()
+
 add_subdirectory(test_coregistration)
 
 add_subdirectory(test_lsl)

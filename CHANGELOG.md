@@ -98,6 +98,20 @@ aliases; replace the old spelling as below.
   `FIFFLIB::same_channel(a, b)` and find them with
   `FIFFLIB::channel_index(names, name)` or `has_channel` (`fiff_ch_name.h`)
   instead of `==`, `BASELIB::indexOf` or stripping spaces.
+- The libraries build, install and link without Qt. `MNE_BUILD_QT` (default
+  `ON`) builds the Qt-based parts: `mne_disp`, `mne_disp3D`, the applications
+  with their plugins, the CLI tools and the QtTest tests and examples. With
+  `-DMNE_BUILD_QT=OFF`, or when CMake does not find Qt (it says so and
+  switches the option off), every other library is built and installed with
+  the examples that use the libraries only, which then run as the tests. The
+  installed `MNE-CPPConfig.cmake` looks for Qt only for `disp` and `disp3D`,
+  so `find_package(MNE-CPP COMPONENTS ...)` of any other component needs no
+  Qt, also from an SDK built with Qt. `scripts/ci/qt_free_sdk.sh` builds,
+  tests and installs the libraries with Qt hidden from CMake and builds a
+  consumer against the install tree.
+  Migration: a downstream project that relied on MNE-CPP's package to bring
+  Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
+  `find_package(Qt6 ...)` itself.
 - The pull request, staging and main workflows run again: a step name with
   an unquoted `mne::` made the shared test workflow invalid YAML, so every
   run failed before starting a job. The quality unit tests reject such values.

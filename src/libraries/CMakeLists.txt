@@ -92,9 +92,11 @@ add_subdirectory(ml)
 add_subdirectory(decoding)
 add_subdirectory(sts)
 
-add_subdirectory(disp)
-
-add_subdirectory(disp3D)
+# The display libraries are Qt by design.
+if(MNE_BUILD_QT)
+  add_subdirectory(disp)
+  add_subdirectory(disp3D)
+endif()
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/MnePrecompiledHeaders.cmake)
 mne_precompile_headers(${CMAKE_CURRENT_SOURCE_DIR})

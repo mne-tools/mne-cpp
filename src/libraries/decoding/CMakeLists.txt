@@ -5,10 +5,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_decoding LANGUAGES CXX)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
 set(SOURCES
   decoding_csp.cpp
   decoding_spoc.cpp

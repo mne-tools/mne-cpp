@@ -12,8 +12,9 @@
 #    target_link_libraries(my_app PRIVATE MNE-CPP::mne_fiff MNE-CPP::mne_dsp MNE-CPP::mne_acq)
 #
 #  Components are library names with or without the mne_ prefix. Only the Qt modules the requested
-#  libraries and their MNE-CPP dependencies use are looked up, so headless components (e.g. fiff, dsp,
-#  acq) need neither Qt Gui nor Qt Widgets. Without COMPONENTS every library is requested.
+#  libraries and their MNE-CPP dependencies use are looked up; only the display libraries (disp, disp3D)
+#  use Qt, so every other component is found without Qt. An SDK built with MNE_BUILD_QT=OFF contains
+#  no Qt-based library at all. Without COMPONENTS every library is requested.
 #
 #  Legacy variables (for compatibility with non-target-based projects):
 #    MNE_CPP_FOUND          - TRUE
@@ -28,6 +29,7 @@ include(CMakeFindDependencyMacro)
 # Generated from each library's link libraries: MNE-CPP libraries, Qt modules and Eigen it uses.
 @MNECPP_COMPONENT_MAP@
 set(_mnecpp_all @MNECPP_LIBRARIES@)
+set(_mnecpp_qt_package "@MNECPP_QT_PACKAGE@")
 
 set(_mnecpp_queue "")
 foreach(_c IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
@@ -66,7 +68,7 @@ list(REMOVE_DUPLICATES _mnecpp_qt)
 # mne_acq uses std::thread primitives (semaphores) and links Threads::Threads.
 find_dependency(Threads)
 if(_mnecpp_qt)
-    find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS ${_mnecpp_qt})
+    find_dependency(${_mnecpp_qt_package} COMPONENTS ${_mnecpp_qt})
 endif()
 # Eigen is header-only, bundled with MNE-CPP and installed alongside it.
 if(_mnecpp_eigen AND NOT TARGET Eigen3::Eigen)
@@ -80,7 +82,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/MNECPPTargets.cmake")
 foreach(_lib IN LISTS _mnecpp_needed)
     set(_iface "")
     foreach(_module IN LISTS _mnecpp_qt_${_lib})
-        list(APPEND _iface Qt@QT_VERSION_MAJOR@::${_module})
+        list(APPEND _iface ${_mnecpp_qt_package}::${_module})
     endforeach()
     if(_mnecpp_eigen_${_lib})
         list(APPEND _iface Eigen3::Eigen)
@@ -101,6 +103,7 @@ unset(_mnecpp_all)
 unset(_mnecpp_queue)
 unset(_mnecpp_needed)
 unset(_mnecpp_qt)
+unset(_mnecpp_qt_package)
 unset(_mnecpp_eigen)
 unset(_iface)
 
