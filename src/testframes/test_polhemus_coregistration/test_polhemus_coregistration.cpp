@@ -155,6 +155,7 @@ private slots:
     void registration_requiresAllFiducials();
 
     void sessionState_roundTrip();
+    void sessionState_keepsTheStations();
 
     void liveTracking_stationsMirrorTipAndGimbalGuard();
     void liveCapture_fiducialsHeadShapeVertexAndButton();
@@ -506,6 +507,37 @@ void TestPolhemusCoregistration::registration_requiresAllFiducials()
     coreg.restoreSessionState(settings, QString());
     QVERIFY(!coreg.hasAllPenFiducials());
     QVERIFY(!coreg.computeRegistration());
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::sessionState_keepsTheStations()
+{
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+
+    // Every station comes back, the probe station included
+    PolhemusCoregistration first;
+    first.setTrackerStation(4);
+    first.setPenStation(5);
+    first.setProbeStation(7);
+    QSettings saved(tmpDir.path() + "/stations.ini", QSettings::IniFormat);
+    first.saveSessionState(saved);
+    PolhemusCoregistration second;
+    second.restoreSessionState(saved);
+    QCOMPARE(second.trackerStation(), 4);
+    QCOMPARE(second.penStation(), 5);
+    QCOMPARE(second.probeStation(), 7);
+
+    // A state without stations leaves the default assignment, not pen and tracker swapped
+    QSettings partial(tmpDir.path() + "/partial.ini", QSettings::IniFormat);
+    partial.setValue("polhemus/mirrorX", true);
+    partial.sync();
+    PolhemusCoregistration third;
+    third.restoreSessionState(partial);
+    QCOMPARE(third.trackerStation(), 2);
+    QCOMPARE(third.penStation(), 1);
+    QCOMPARE(third.probeStation(), 3);
 }
 
 //=============================================================================================================

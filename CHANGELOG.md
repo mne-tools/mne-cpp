@@ -750,6 +750,10 @@ aliases; replace the old spelling as below.
   `FiffCov` and `FiffEvokedSet` are no longer registered with `QMetaType`
   (Qt 6 registers types of signal arguments itself); programs that got Qt
   through `mne_fiff` link it themselves.
+- The session state of `PolhemusCoregistration` keeps the probe station, and
+  restoring a state without stations keeps the current assignment. Before,
+  the probe station was lost and a missing entry swapped pen and tracker
+  (station 1 became the tracker).
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

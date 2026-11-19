@@ -1109,6 +1109,7 @@ void PolhemusCoregistration::saveSessionState(QSettings& settings, const QString
     // Stations & axis mirror
     settings.setValue("trackerStation", m_trackerStation);
     settings.setValue("penStation", m_penStation);
+    settings.setValue("probeStation", m_probeStation);
     settings.setValue("mirrorX", m_mirrorX);
     settings.setValue("mirrorY", m_mirrorY);
 
@@ -1196,8 +1197,9 @@ bool PolhemusCoregistration::restoreSessionState(QSettings& settings, const QStr
     }
 
     // Stations & axis mirror
-    m_trackerStation = settings.value("trackerStation", 1).toInt();
-    m_penStation = settings.value("penStation", 2).toInt();
+    m_trackerStation = settings.value("trackerStation", m_trackerStation).toInt();
+    m_penStation = settings.value("penStation", m_penStation).toInt();
+    m_probeStation = settings.value("probeStation", m_probeStation).toInt();
     m_mirrorX = settings.value("mirrorX", false).toBool();
     m_mirrorY = settings.value("mirrorY", false).toBool();
 
