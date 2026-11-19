@@ -61,7 +61,8 @@ endif()
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS integration
-    TIMEOUT 120)
+    TIMEOUT 120
+    REQUIRES_TARGETS mne_surf2bem)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

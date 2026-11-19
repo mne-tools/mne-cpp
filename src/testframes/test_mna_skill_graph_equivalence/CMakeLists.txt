@@ -15,6 +15,16 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 enable_testing()
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    REQUIRES_TARGETS mne_analyze_studio_core mne_analyze_studio_source_estimation_skill mne_analyze_studio_temporal_filter_skill)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES test_mna_skill_graph_equivalence.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -51,12 +61,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
-
-mne_add_test(${PROJECT_NAME}
-    LABELS integration
-    TIMEOUT 60
-    REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)
 
 # Ensure runtime can find the shared libs we link against.
 if(APPLE)

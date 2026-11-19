@@ -15,6 +15,16 @@ set(QT_REQUIRED_COMPONENTS Core Network Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    REQUIRES_TARGETS mne_analyze_studio_core)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES
     test_studio_neuro_kernel.cpp
     ../../applications/mne_analyze_studio/neuro_kernel/neurokernelservice.cpp
@@ -49,11 +59,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-mne_add_test(${PROJECT_NAME}
-    LABELS integration
-    TIMEOUT 60
-    REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

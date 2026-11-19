@@ -116,6 +116,14 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- A build with tests but without applications (`-DBUILD_APPLICATIONS=OFF
+  -DBUILD_TESTS=ON`) configures, builds and passes. 95 tests and
+  examples linked `mne_events`, a library of MNE Analyze that none of them
+  used; the tests built on MNE Analyze Studio and MNE Scan libraries, and
+  `test_mne_surf2bem`, now skip themselves where those are not built, and
+  `mne_doc_shots` is built only with the application cores it links. The test
+  inventory check rejects a test (`TI015`) or example (`TI016`) that depends on
+  an application or tool target without such a guard.
 - The pull request, staging and main workflows run again: a step name with
   an unquoted `mne::` made the shared test workflow invalid YAML, so every
   run failed before starting a job. The quality unit tests reject such values.

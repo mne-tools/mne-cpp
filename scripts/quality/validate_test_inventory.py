@@ -97,6 +97,18 @@ _ADD_TEST_CALL_RE = re.compile(r"\b(?:mne_)?add_test\s*\(", re.IGNORECASE)
 _ADD_TEST_NAME_RE = re.compile(r"\badd_test\s*\(\s*NAME\s+([^\s)]+)", re.IGNORECASE)
 # cmake/MneTesting.cmake; its first argument is the test name.
 _MNE_ADD_TEST_RE = re.compile(r"\bmne_add_test\s*\(", re.IGNORECASE)
+# A word that may name a target: not a path component, file name or option value.
+_WORD_RE = re.compile(r"(?<![\w/.-])[A-Za-z_][A-Za-z0-9_]*(?![\w/.-])")
+_RETURN_WHEN_SKIPPED_RE = re.compile(r"\bif\s*\(\s*MNE_TEST_SKIPPED\s*\)\s*return\s*\(\s*\)", re.IGNORECASE)
+_IF_TARGET_BLOCK_RE = re.compile(r"\bif\s*\(\s*TARGET\s+[^)]*\).*?\bendif\s*\(\s*\)", re.IGNORECASE | re.DOTALL)
+_REQUIRES_TARGETS_ARGS_RE = re.compile(
+    r"\bREQUIRES_TARGETS\b[^)]*?(?=\b(?:LABELS|TIMEOUT|COMMAND|WORKING_DIRECTORY|ENVIRONMENT|REQUIRES_DATA"
+    r"|PLATFORMS|SKIP_REASON)\b|\))")
+_IF_RE = re.compile(r"^\s*if\s*\(", re.IGNORECASE)
+_ENDIF_RE = re.compile(r"^\s*endif\s*\(", re.IGNORECASE)
+_TARGET_DEFINITION_RE = re.compile(
+    r"\b(?:add_library|add_executable|qt_add_executable|qt_add_library|qt_add_plugin)\s*\(\s*([^\s)]+)",
+    re.IGNORECASE)
 _MNE_ADD_TEST_KEYWORDS = frozenset(
     {
         "LABELS",
@@ -159,6 +171,10 @@ class TestEntry:
     guarded_registration: bool = False
     placeholder_assertions: int = 0
     shared_scratch_files: list[str] = field(default_factory=list)
+    words: set[str] = field(default_factory=set)
+    requires_targets: list[str] = field(default_factory=list)
+    returns_when_skipped: bool = False
+    guarded_in_root: bool = False
 
     @property
     def cmake_path(self) -> str:
@@ -196,6 +212,58 @@ def parse_mne_add_test(arguments: str) -> tuple[str, list[str], int | None]:
         elif keyword == "TIMEOUT" and token.isdigit():
             timeout = int(token)
     return name, labels, timeout
+
+
+def _drop_target_guarded_lists(text: str) -> str:
+    """Remove the lists a ``foreach()`` walks only to use each entry under ``if(TARGET ${entry})``."""
+    for variable in set(re.findall(r"\bif\s*\(\s*TARGET\s+\$\{(\w+)\}", text, re.IGNORECASE)):
+        lists = re.findall(rf"\bforeach\s*\(\s*{variable}\s+IN\s+LISTS\s+(\w+)", text, re.IGNORECASE)
+        text = re.sub(rf"\bforeach\s*\(\s*{variable}\s+IN\s+ITEMS\b[^)]*\)", "", text, flags=re.IGNORECASE)
+        for name in lists:
+            text = re.sub(rf"\bset\s*\(\s*{name}\b[^)]*\)", "", text, flags=re.IGNORECASE)
+    return text
+
+
+def parse_requires_targets(arguments: str) -> list[str]:
+    """The ``REQUIRES_TARGETS`` of one ``mne_add_test()`` call."""
+    targets: list[str] = []
+    keyword = None
+    for token in re.findall(r'"[^"]*"|[^\s"]+', arguments)[1:]:
+        if token in _MNE_ADD_TEST_KEYWORDS:
+            keyword = token
+        elif keyword == "REQUIRES_TARGETS":
+            targets.append(token.strip('"'))
+    return targets
+
+
+def parse_guarded_directories(root_cmake: Path) -> set[str]:
+    """Test directories the root file adds inside an ``if()`` block."""
+    guarded: set[str] = set()
+    depth = 0
+    for line in strip_cmake_comments(root_cmake.read_text(encoding="utf-8")).splitlines():
+        if _IF_RE.match(line):
+            depth += 1
+        elif _ENDIF_RE.match(line):
+            depth = max(depth - 1, 0)
+        elif depth:
+            guarded.update(_ADD_SUBDIRECTORY_RE.findall(line))
+    return guarded
+
+
+def application_targets(src_dir: Path) -> set[str]:
+    """Targets defined under src/applications and src/tools, which a build without them lacks."""
+    targets: set[str] = set()
+    for top in ("applications", "tools"):
+        for cmake in sorted((src_dir / top).rglob("CMakeLists.txt")):
+            text = strip_cmake_comments(cmake.read_text(encoding="utf-8"))
+            project = _PROJECT_RE.search(text)
+            for name in _TARGET_DEFINITION_RE.findall(text):
+                if name == "${PROJECT_NAME}":
+                    if project:
+                        targets.add(project.group(1))
+                elif "$" not in name:
+                    targets.add(name)
+    return targets
 
 
 def parse_registered_directories(root_cmake: Path) -> list[str]:
@@ -247,8 +315,16 @@ def parse_leaf(directory: Path) -> TestEntry:
             value = int(timeout_match.group(1))
             timeout = value if timeout is None else max(timeout, value)
 
+    entry.returns_when_skipped = bool(_RETURN_WHEN_SKIPPED_RE.search(text))
     for call in _MNE_ADD_TEST_RE.finditer(text):
-        name, call_labels, call_timeout = parse_mne_add_test(_call_arguments(text, call.end() - 1))
+        arguments = _call_arguments(text, call.end() - 1)
+        entry.requires_targets += parse_requires_targets(arguments)
+    # Target names outside REQUIRES_TARGETS and outside if(TARGET ...) blocks are what the build depends on.
+    unguarded = _REQUIRES_TARGETS_ARGS_RE.sub("", _IF_TARGET_BLOCK_RE.sub("", _drop_target_guarded_lists(text)))
+    entry.words = set(_WORD_RE.findall(unguarded))
+    for call in _MNE_ADD_TEST_RE.finditer(text):
+        arguments = _call_arguments(text, call.end() - 1)
+        name, call_labels, call_timeout = parse_mne_add_test(arguments)
         entry.add_test_names.append(name)
         labels.extend(call_labels)
         if call_timeout is not None:
@@ -265,12 +341,15 @@ def collect_inventory(testframes_dir: Path, root_cmake: Path) -> tuple[dict[str,
     registered_set = set(registered)
     missing_directories = [d for d in registered if not (testframes_dir / d / "CMakeLists.txt").is_file()]
 
+    guarded = parse_guarded_directories(root_cmake)
+
     entries: dict[str, TestEntry] = {}
     for child in sorted(testframes_dir.iterdir()):
         if not child.is_dir() or not child.name.startswith(TEST_DIR_PREFIX):
             continue
         entry = parse_leaf(child)
         entry.registered = child.name in registered_set
+        entry.guarded_in_root = child.name in guarded
         entries[child.name] = entry
 
     return entries, missing_directories
@@ -433,6 +512,52 @@ def check_conditional_registration(entries: dict[str, TestEntry], policy: dict[s
                 )
             )
 
+    return findings
+
+
+def check_application_targets(entries: dict[str, TestEntry], app_targets: set[str]) -> list[Finding]:
+    """A test built on an application or tool target must skip itself where that target is not built.
+
+    Without BUILD_APPLICATIONS (or without Qt) those targets do not exist: a generator expression naming one
+    stops the configure step, and a link to one fails the build.
+    """
+    findings: list[Finding] = []
+    for name, entry in sorted(entries.items()):
+        if not entry.registered or entry.guarded_in_root:
+            continue
+        used = sorted((entry.words & app_targets) - {entry.name})
+        if not used:
+            continue
+        # Requiring the application target is enough; its own dependencies come with it.
+        declared = [t for t in entry.requires_targets if t in app_targets or "${" in t]
+        if not declared or not entry.returns_when_skipped:
+            findings.append(
+                error(
+                    "TI015",
+                    entry.cmake_path,
+                    f"'{name}' uses {', '.join(used)} from src/applications or src/tools, which a build "
+                    "without applications does not have. Name them in mne_add_test(... REQUIRES_TARGETS) "
+                    "and return() if(MNE_TEST_SKIPPED) before building, or drop the dependency.",
+                )
+            )
+    return findings
+
+
+def check_example_application_targets(examples_dir: Path, app_targets: set[str]) -> list[Finding]:
+    """Examples show the libraries; one built on an application or tool target breaks builds without them."""
+    findings: list[Finding] = []
+    for cmake in sorted(examples_dir.glob("*/CMakeLists.txt")):
+        text = strip_cmake_comments(cmake.read_text(encoding="utf-8"))
+        used = sorted(set(_WORD_RE.findall(_IF_TARGET_BLOCK_RE.sub("", text))) & app_targets)
+        if used:
+            findings.append(
+                error(
+                    "TI016",
+                    display_path(cmake),
+                    f"example '{cmake.parent.name}' uses {', '.join(used)} from src/applications or src/tools, "
+                    "which a build without applications does not have; examples may use the libraries only.",
+                )
+            )
     return findings
 
 
@@ -806,6 +931,9 @@ def run(args: argparse.Namespace) -> int:
     findings += check_registration(entries, missing_directories, policy)
     findings += check_add_test(entries)
     findings += check_conditional_registration(entries, policy)
+    app_targets = application_targets(testframes_dir.parent)
+    findings += check_application_targets(entries, app_targets)
+    findings += check_example_application_targets(testframes_dir.parent / "examples", app_targets)
     findings += check_output_directory_overrides(entries)
     findings += check_shared_scratch_files(entries)
     findings += check_names(entries)

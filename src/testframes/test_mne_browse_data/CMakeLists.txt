@@ -71,7 +71,6 @@ set(MNE_LIBS_REQUIRED
     mne_fs
     mne_base
     mne_math
-    mne_events
     mne_disp
 )
 

@@ -17,6 +17,16 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration parity
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    REQUIRES_TARGETS anShared mne_events)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES
     test_anshared_models.cpp
 )
@@ -49,12 +59,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src/applications/mne_analyze/libs
 )
-
-mne_add_test(${PROJECT_NAME}
-    LABELS integration parity
-    TIMEOUT 60
-    REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_finalize_executable(${PROJECT_NAME})

@@ -35,7 +35,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fiff
     mne_base
     mne_math
-    mne_events
     Eigen3::Eigen
 )
 

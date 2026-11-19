@@ -13,6 +13,16 @@ set(QT_REQUIRED_COMPONENTS Core Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    REQUIRES_TARGETS mne_analyze_studio_core)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES test_mne_analyze_studio_scene_jsonrpc.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -23,8 +33,3 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     mne_analyze_studio_core)
 
-mne_add_test(${PROJECT_NAME}
-    LABELS integration
-    TIMEOUT 60
-    REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)

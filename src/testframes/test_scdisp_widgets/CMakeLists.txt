@@ -17,6 +17,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
+mne_add_test(${PROJECT_NAME}
+    LABELS unit gui
+    TIMEOUT 60
+    REQUIRES_TARGETS scDisp scMeas scShared)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES
     test_scdisp_widgets.cpp
 )
@@ -41,10 +49,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
 )
-
-mne_add_test(${PROJECT_NAME}
-    LABELS unit gui
-    TIMEOUT 60)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_finalize_executable(${PROJECT_NAME})

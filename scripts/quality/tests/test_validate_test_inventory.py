@@ -199,6 +199,104 @@ class TestMneAddTest(ValidatorTestCase):
         self.assertEqual(60, entries["test_alpha"].timeout)
 
 
+class TestApplicationTargets(ValidatorTestCase):
+    """Tests built on application or tool targets must skip themselves in a build without applications."""
+
+    APP = {"mne_studio_core"}
+    LINK = "target_link_libraries(${PROJECT_NAME} PRIVATE mne_fiff mne_studio_core)\n"
+
+    def check(self, extra: str, *, guarded: bool = False) -> list[str]:
+        self.fixture.add_test_dir("test_alpha", extra=extra)
+        entries, _ = self.fixture.collect()
+        entries["test_alpha"].guarded_in_root = guarded
+        return self.codes(vti.check_application_targets(entries, self.APP))
+
+    def test_unguarded_link_to_an_application_target_fails(self) -> None:
+        self.assertEqual(["TI015"], self.check(self.LINK + "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)"))
+
+    def test_generator_expression_naming_an_application_target_fails(self) -> None:
+        self.assertEqual(["TI015"], self.check(
+            "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)\n"
+            "set_tests_properties(${PROJECT_NAME} PROPERTIES ENVIRONMENT PATH=$<TARGET_FILE_DIR:mne_studio_core>)"))
+
+    def test_required_target_without_early_return_fails(self) -> None:
+        self.assertEqual(["TI015"], self.check(
+            self.LINK + "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60 REQUIRES_TARGETS mne_studio_core)"))
+
+    def test_required_target_with_early_return_passes(self) -> None:
+        self.assertEqual([], self.check(
+            "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60 REQUIRES_TARGETS mne_studio_core)\n"
+            "if(MNE_TEST_SKIPPED)\n    return()\nendif()\n" + self.LINK))
+
+    def test_use_inside_if_target_passes(self) -> None:
+        self.assertEqual([], self.check(
+            "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)\n"
+            "if(TARGET mne_studio_core)\n    add_dependencies(${PROJECT_NAME} mne_studio_core)\nendif()"))
+
+    def test_list_walked_under_if_target_passes(self) -> None:
+        self.assertEqual([], self.check(
+            "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)\n"
+            "set(TOOLS mne_studio_core)\nforeach(TOOL IN LISTS TOOLS)\n"
+            "    if(TARGET ${TOOL})\n        add_dependencies(${PROJECT_NAME} ${TOOL})\n    endif()\nendforeach()"))
+
+    def test_source_path_through_an_application_directory_passes(self) -> None:
+        self.assertEqual([], self.check(
+            "target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/applications/mne_studio_core/a.cpp)\n"
+            "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)"))
+
+    def test_test_added_inside_an_if_in_the_root_passes(self) -> None:
+        self.assertEqual([], self.check(self.LINK + "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)",
+                                        guarded=True))
+
+    def test_root_if_blocks_are_read(self) -> None:
+        root = self.fixture.testframes / "CMakeLists.txt"
+        root.write_text("add_subdirectory(test_a)\nif(BUILD_X)\n  add_subdirectory(test_b)\nendif()\n",
+                        encoding="utf-8")
+        self.assertEqual({"test_b"}, vti.parse_guarded_directories(root))
+
+    def test_application_and_tool_targets_are_collected(self) -> None:
+        src = self.root / "src"
+        (src / "applications" / "app").mkdir(parents=True)
+        (src / "applications" / "app" / "CMakeLists.txt").write_text(
+            "project(mne_app)\nqt_add_executable(${PROJECT_NAME} main.cpp)\nadd_library(app_core STATIC a.cpp)\n",
+            encoding="utf-8")
+        (src / "tools" / "t").mkdir(parents=True)
+        (src / "tools" / "t" / "CMakeLists.txt").write_text("add_executable(mne_tool main.cpp)\n", encoding="utf-8")
+        self.assertEqual({"mne_app", "app_core", "mne_tool"}, vti.application_targets(src))
+
+
+class TestExampleApplicationTargets(ValidatorTestCase):
+    def write_example(self, body: str) -> Path:
+        examples = self.root / "src" / "examples"
+        (examples / "ex_alpha").mkdir(parents=True)
+        (examples / "ex_alpha" / "CMakeLists.txt").write_text(
+            "project(ex_alpha)\nadd_executable(ex_alpha main.cpp)\n" + body, encoding="utf-8")
+        return examples
+
+    def test_example_linking_an_application_target_fails(self) -> None:
+        examples = self.write_example("target_link_libraries(ex_alpha PRIVATE mne_fiff mne_studio_core)\n")
+        self.assertEqual(["TI016"], self.codes(vti.check_example_application_targets(examples, {"mne_studio_core"})))
+
+    def test_example_using_libraries_only_passes(self) -> None:
+        examples = self.write_example("target_link_libraries(ex_alpha PRIVATE mne_fiff)\n")
+        self.assertEqual([], vti.check_example_application_targets(examples, {"mne_studio_core"}))
+
+
+class TestDocShotsGuard(unittest.TestCase):
+    """doc_shots links the application cores; doc/CMakeLists.txt adds it only where they are built."""
+
+    def test_every_application_target_doc_shots_links_guards_its_subdirectory(self) -> None:
+        repo = _THIS_DIR.parents[2]
+        app_targets = vti.application_targets(repo / "src")
+        shots = vti.strip_cmake_comments((repo / "doc" / "tools" / "doc_shots" / "CMakeLists.txt").read_text())
+        linked = set(vti._WORD_RE.findall(vti._IF_TARGET_BLOCK_RE.sub("", shots))) & app_targets
+        guard = vti.strip_cmake_comments((repo / "doc" / "CMakeLists.txt").read_text())
+        guard = guard[:guard.index("add_subdirectory(tools/doc_shots)")]
+        self.assertTrue(linked)
+        self.assertIn("if(NOT TARGET ${", guard)
+        self.assertEqual(sorted(linked - set(vti._WORD_RE.findall(guard))), [])
+
+
 class TestLabels(ValidatorTestCase):
     def _with_labels(self, labels: str) -> dict:
         self.fixture.add_test_dir(

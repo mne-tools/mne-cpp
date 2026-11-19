@@ -13,6 +13,16 @@ set(QT_REQUIRED_COMPONENTS Core Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    REQUIRES_TARGETS mne_analyze_studio_core mne_analyze_studio_temporal_filter_skill)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES test_mne_analyze_studio_workflow_integration.cpp)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -40,8 +50,3 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 endif()
 
 enable_testing()
-mne_add_test(${PROJECT_NAME}
-    LABELS integration
-    TIMEOUT 60
-    REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)

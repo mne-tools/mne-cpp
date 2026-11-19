@@ -38,7 +38,6 @@ set(MNE_LIBS_REQUIRED
   mne_mri
   mne_base
     mne_math
-  mne_events
   mne_disp
   mne_disp3D
 )

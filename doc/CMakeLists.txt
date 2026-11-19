@@ -30,10 +30,18 @@ else()
 endif()
 
 # Documentation screenshot generator (compiled C++ tool, NOT a user-facing CLI
-# tool — lives here rather than src/tools/).  Only built when the full C++
-# library tree with its Qt display libraries is available (TARGET mne_disp
-# acts as the sentinel; it is missing when MNE_BUILD_QT is OFF).
+# tool — lives here rather than src/tools/).  It links the MNE Inspect and MNE
+# Align application cores, so it is built only where those are (not without
+# applications or without Qt, MNE_BUILD_QT=OFF).
 option(BUILD_MNE_DOC_SHOTS "Build MNE documentation screenshot generator" ON)
-if(BUILD_MNE_DOC_SHOTS AND NOT WASM AND TARGET mne_disp)
+set(_mne_doc_shots_apps mne_inspect_app_core mne_inspect_demo_fixtures inspect_electrodes inspect_mri_slices
+                        mne_align_app_core mne_align_demo_fixtures)
+set(_mne_doc_shots_ready ON)
+foreach(_mne_doc_shots_app IN LISTS _mne_doc_shots_apps)
+    if(NOT TARGET ${_mne_doc_shots_app})
+        set(_mne_doc_shots_ready OFF)
+    endif()
+endforeach()
+if(BUILD_MNE_DOC_SHOTS AND NOT WASM AND _mne_doc_shots_ready)
     add_subdirectory(tools/doc_shots)
 endif()

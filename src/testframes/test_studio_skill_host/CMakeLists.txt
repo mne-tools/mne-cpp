@@ -14,6 +14,14 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Test)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Test)
 
+mne_add_test(${PROJECT_NAME}
+    LABELS integration
+    TIMEOUT 60
+    REQUIRES_TARGETS mne_analyze_studio_core mne_analyze_studio_temporal_filter_skill)
+if(MNE_TEST_SKIPPED)
+    return()
+endif()
+
 set(SOURCES
     test_studio_skill_host.cpp
     ../../applications/mne_analyze_studio/skill_host/skillhostservice.cpp
@@ -51,9 +59,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-mne_add_test(${PROJECT_NAME}
-    LABELS integration
-    TIMEOUT 60)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
