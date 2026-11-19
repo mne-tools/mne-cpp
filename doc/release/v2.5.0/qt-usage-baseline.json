@@ -20,6 +20,7 @@
       "acq",
       "acq/devices",
       "acq/devices/polhemus",
+      "acq/fiff",
       "bids",
       "channels",
       "com",
@@ -33,9 +34,10 @@
       "math",
       "ml",
       "mna",
+      "mri",
       "report"
     ],
-    "tokens": 9122,
+    "tokens": 9101,
     "gui_outside_design": []
   },
   "libraries": {
@@ -64,18 +66,12 @@
       "modules": []
     },
     "acq/fiff": {
-      "tokens": 19,
-      "by_category": {
-        "files": 2,
-        "global": 7,
-        "strings": 10
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 9,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "acq/lsl": {
       "tokens": 0,
@@ -298,17 +294,12 @@
       "modules": []
     },
     "mri": {
-      "tokens": 2,
-      "by_category": {
-        "files": 1,
-        "strings": 1
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 14,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "pybridge": {
       "tokens": 2,
