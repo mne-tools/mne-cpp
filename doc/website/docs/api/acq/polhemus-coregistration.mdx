@@ -21,7 +21,9 @@ It takes the station poses and stylus button presses of a polhemus:// stream (`o
 
 - A continuously updated device-to-world transform (from the tracker station + user-supplied calibration offset).
 - An [`AcquiredPoints`](/docs/api/acq/acquired-points) store filled by explicit capture calls or automatically on pen-button press.
-- The computed head–device transform after `computeRegistration`.
+- The computed head–device transform after `compute_registration`.
+
+Events (new poses, button presses, calibration progress) reach the caller through the callbacks of a `Listener`; a Qt application forwards them as signals.
 
 ```cpp title="src/examples/ex_acq_polhemus/main.cpp"
 PolhemusCoregistration coreg; // station 1 = pen, station 2 = head tracker
@@ -49,77 +51,73 @@ while (penAt.size() < 3) {
         for (std::size_t e = 0; e < block.events().size(); ++e) {
             if (block.events()[e].sample == block.firstSample() + i && penAt.size() < 3) { // a stylus button press
                 const FiducialId id = fiducials[penAt.size()];
-                coreg.captureCurrentPenPositionAsFiducial(id);
-                penAt.push_back(coreg.penPosition());
-                coreg.setModelFiducial(id, truth * coreg.penPosition());
+                coreg.capture_current_pen_position_as_fiducial(id);
+                penAt.push_back(coreg.pen_position());
+                coreg.set_model_fiducial(id, truth * coreg.pen_position());
             }
         }
     }
 }
 device->close();
-const bool registered = penAt.size() == 3 && coreg.computeRegistration();
-```
-
-### Inheritance
-
-```mermaid
-classDiagram
-    QObject <|-- PolhemusCoregistration
+const bool registered = penAt.size() == 3 && coreg.compute_registration();
 ```
 
 ---
 
 ## Public Methods
 
-### PolhemusCoregistration(parent)
+### set_listener(listener)
+
+Sets the callbacks for the events of this session.
+
+**Parameters:**
+
+- **listener** : *Listener*
+  The callbacks; empty ones are skipped.
 
 ---
 
-### ~PolhemusCoregistration()
+### set_tracker_station(station)
 
 ---
 
-### setTrackerStation(station)
+### set_pen_station(station)
 
 ---
 
-### setPenStation(station)
+### set_probe_station(station)
 
 ---
 
-### setProbeStation(station)
+### tracker_station()
 
 ---
 
-### trackerStation()
+### pen_station()
 
 ---
 
-### penStation()
+### probe_station()
 
 ---
 
-### probeStation()
+### set_pen_tip_offset(offset)
 
 ---
 
-### setPenTipOffset(offset)
+### pen_tip_offset()
 
 ---
 
-### penTipOffset()
+### set_tip_offset_enabled(on)
 
 ---
 
-### setTipOffsetEnabled(on)
+### tip_offset_enabled()
 
 ---
 
-### tipOffsetEnabled()
-
----
-
-### setAxisMirror(mirrorX, mirrorY)
+### set_axis_mirror(mirror_x, mirror_y)
 
 Negate X and/or Y of incoming Polhemus positions.
 
@@ -127,43 +125,43 @@ The Polhemus Fastrak coordinate system depends on the physical placement and ori
 
 **Parameters:**
 
-- **mirrorX** : *bool*
+- **mirror_x** : *bool*
   True to negate the X coordinate of incoming positions.
 
-- **mirrorY** : *bool*
+- **mirror_y** : *bool*
   True to negate the Y coordinate of incoming positions.
 
 ---
 
-### mirrorX()
+### mirror_x()
 
 ---
 
-### mirrorY()
+### mirror_y()
 
 ---
 
-### startPivotCalibration()
+### start_pivot_calibration()
 
 ---
 
-### cancelPivotCalibration()
+### cancel_pivot_calibration()
 
 ---
 
-### pivotState()
+### pivot_state()
 
 ---
 
-### pivotSampleCount()
+### pivot_sample_count()
 
 ---
 
-### pivotResidualMm()
+### pivot_residual_mm()
 
 ---
 
-### setTrackerToDeviceOffset(translation, rotation)
+### set_tracker_to_device_offset(translation, rotation)
 
 Set the rigid offset from the tracker sensor body frame to the device frame.
 
@@ -177,15 +175,15 @@ Set the rigid offset from the tracker sensor body frame to the device frame.
 
 ---
 
-### trackerToDeviceTranslation()
+### tracker_to_device_translation()
 
 ---
 
-### trackerToDeviceRotation()
+### tracker_to_device_rotation()
 
 ---
 
-### captureOpticalCalibSample()
+### capture_optical_calib_sample()
 
 Record one calibration sample (current tracker pose + current pen position).
 
@@ -195,7 +193,7 @@ Record one calibration sample (current tracker pose + current pen position).
 
 ---
 
-### opticalCalibSampleCount()
+### optical_calib_sample_count()
 
 **Returns:**
 
@@ -203,13 +201,13 @@ Record one calibration sample (current tracker pose + current pen position).
 
 ---
 
-### clearOpticalCalibSamples()
+### clear_optical_calib_samples()
 
 Discard all calibration samples and reset the optical calibration.
 
 ---
 
-### captureObjectiveCenter()
+### capture_objective_center()
 
 Capture the current pen position as the objective lens center.
 
@@ -221,7 +219,7 @@ Touch the pen stylus to the center of the OPMI objective lens while the tracker 
 
 ---
 
-### hasObjectiveCenter()
+### has_objective_center()
 
 **Returns:**
 
@@ -229,23 +227,23 @@ Touch the pen stylus to the center of the OPMI objective lens while the tracker 
 
 ---
 
-### clearObjectiveCenter()
+### clear_objective_center()
 
 Clear the captured objective center.
 
 ---
 
-### objectiveCenterLocal()
+### objective_center_local()
 
 Captured objective center in tracker body frame (metres).
 
 **Returns:**
 
-- *Eigen::Vector3f* — Objective center in the tracker body frame in metres; only meaningful if `hasObjectiveCenter()` is true.
+- *Eigen::Vector3f* — Objective center in the tracker body frame in metres; only meaningful if `has_objective_center()` is true.
 
 ---
 
-### solveOpticalCalibration()
+### solve_optical_calibration()
 
 Fit a 3D line through the focus points in tracker-local frame.
 
@@ -257,7 +255,7 @@ Requires at least 2 samples. Computes the optical axis direction and the optical
 
 ---
 
-### setKnownTrackerToObjectiveDistance(metres)
+### set_known_tracker_to_objective_distance(metres)
 
 Set the known perpendicular distance from tracker sensor to the objective center (metres).
 
@@ -270,11 +268,11 @@ When nonzero, the solver constrains the optical center to lie at this distance f
 
 ---
 
-### knownTrackerToObjectiveDistance()
+### known_tracker_to_objective_distance()
 
 ---
 
-### opticalCalibrationValid()
+### optical_calibration_valid()
 
 **Returns:**
 
@@ -282,17 +280,17 @@ When nonzero, the solver constrains the optical center to lie at this distance f
 
 ---
 
-### opticalAxisLocal()
+### optical_axis_local()
 
 `Direction` of the optical axis in the tracker body frame (unit vector).
 
 **Returns:**
 
-- *Eigen::Vector3f* — Unit optical-axis direction in the tracker body frame; only meaningful if `opticalCalibrationValid()` is true.
+- *Eigen::Vector3f* — Unit optical-axis direction in the tracker body frame; only meaningful if `optical_calibration_valid()` is true.
 
 ---
 
-### opticalCenterLocal()
+### optical_center_local()
 
 Position of the optical center in the tracker body frame (metres).
 
@@ -302,7 +300,7 @@ Position of the optical center in the tracker body frame (metres).
 
 ---
 
-### opticalCalibResidualMm()
+### optical_calib_residual_mm()
 
 RMS residual of the last optical calibration (mm).
 
@@ -312,7 +310,7 @@ RMS residual of the last optical calibration (mm).
 
 ---
 
-### opticalCalibDepthSpreadMm()
+### optical_calib_depth_spread_mm()
 
 Depth spread of calibration samples along the optical axis (mm).
 
@@ -322,7 +320,7 @@ Depth spread of calibration samples along the optical axis (mm).
 
 ---
 
-### applyOpticalAxisFineAdjust(targetWorldPos, correctionDeg)
+### apply_optical_axis_fine_adjust(targetWorldPos, correctionDeg)
 
 Fine-adjust the optical axis so it passes through a known world-frame point (e.g.
 
@@ -344,7 +342,7 @@ The correction rotates `m_opticalAxisLocal` in the tracker body frame so that a 
 
 ---
 
-### opticalFineAdjustApplied()
+### optical_fine_adjust_applied()
 
 **Returns:**
 
@@ -352,7 +350,7 @@ The correction rotates `m_opticalAxisLocal` in the tracker body frame so that a 
 
 ---
 
-### opticalFineAdjustDeg()
+### optical_fine_adjust_deg()
 
 **Returns:**
 
@@ -360,13 +358,13 @@ The correction rotates `m_opticalAxisLocal` in the tracker body frame so that a 
 
 ---
 
-### clearOpticalFineAdjust()
+### clear_optical_fine_adjust()
 
 Undo the last fine adjustment, restoring the original solved axis.
 
 ---
 
-### opticalRayInWorld(origin, direction)
+### optical_ray_in_world(origin, direction)
 
 Compute the current optical axis ray in Polhemus world frame.
 
@@ -384,7 +382,7 @@ Compute the current optical axis ray in Polhemus world frame.
 
 ---
 
-### opticalUpInWorld(up)
+### optical_up_in_world(up)
 
 Returns the "up" direction of the optical path in world coordinates.
 
@@ -435,63 +433,67 @@ Takes a stylus button press (event code 1 of a polhemus:// stream) at the pose o
 
 ---
 
-### acquiredPoints()
+### acquired_points()
 
 ---
 
-### captureCurrentPenPositionAsFiducial(id)
+### acquired_points()
 
 ---
 
-### captureCurrentPenPositionAsHeadShape()
+### capture_current_pen_position_as_fiducial(id)
 
 ---
 
-### setModelFiducial(id, posInModel)
+### capture_current_pen_position_as_head_shape()
 
 ---
 
-### hasModelFiducial(id)
+### set_model_fiducial(id, posInModel)
 
 ---
 
-### hasAllModelFiducials()
+### has_model_fiducial(id)
 
 ---
 
-### modelFiducial(id)
+### has_all_model_fiducials()
 
 ---
 
-### hasAllPenFiducials()
+### model_fiducial(id)
 
 ---
 
-### setModelVertex(pos)
+### has_all_pen_fiducials()
 
 ---
 
-### hasModelVertex()
+### set_model_vertex(pos)
 
 ---
 
-### modelVertex()
+### has_model_vertex()
 
 ---
 
-### captureCurrentPenPositionAsVertex()
+### model_vertex()
 
 ---
 
-### hasPenVertex()
+### capture_current_pen_position_as_vertex()
 
 ---
 
-### penVertex()
+### has_pen_vertex()
 
 ---
 
-### computeRegistration()
+### pen_vertex()
+
+---
+
+### compute_registration()
 
 Compute the head→device rigid transform from the three captured fiducials (NAS, LPA, RPA).
 
@@ -501,63 +503,78 @@ Compute the head→device rigid transform from the three captured fiducials (NAS
 
 ---
 
-### resetRegistration()
+### reset_registration()
 
-Reset the registration state (headToWorld, headToDevice) to identity.
+Reset the registration state (head_to_world, head_to_device) to identity.
 
 Call this when the user clears all fiducials.
 
 ---
 
-### saveSessionState(settings, prefix)
+### session_state()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — Stations, fiducials, calibrations and the registration, to store and give to `restore_session_state()`.
 
 ---
 
-### restoreSessionState(settings, prefix)
+### restore_session_state(state)
+
+Restores a state from `session_state()`; entries it lacks keep their current values.
+
+**Parameters:**
+
+- **state** : *const [JsonObject](/docs/api/base/json-object) &*
+  The stored state.
+
+**Returns:**
+
+- *bool* — Whether it holds a valid registration.
 
 ---
 
-### registrationValid()
+### registration_valid()
 
 ---
 
-### deviceToWorld()
+### device_to_world()
 
 ---
 
-### headToWorld()
+### head_to_world()
 
 ---
 
-### headToDevice()
+### head_to_device()
 
 ---
 
-### worldToModel()
+### world_to_model()
 
 ---
 
-### penPosition()
+### pen_position()
 
 ---
 
-### penOrientation()
+### pen_orientation()
 
 ---
 
-### haveLivePenPosition()
+### have_live_pen_position()
 
 ---
 
-### probePosition()
+### probe_position()
 
 ---
 
-### probeOrientation()
+### probe_orientation()
 
 ---
 
-### haveLiveProbePosition()
+### have_live_probe_position()
 
 ---
 

@@ -19,6 +19,7 @@
     "qt_free": [
       "acq",
       "acq/devices",
+      "acq/devices/polhemus",
       "bids",
       "channels",
       "com",
@@ -34,7 +35,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9207,
+    "tokens": 9122,
     "gui_outside_design": []
   },
   "libraries": {
@@ -55,20 +56,12 @@
       "modules": []
     },
     "acq/devices/polhemus": {
-      "tokens": 85,
-      "by_category": {
-        "containers": 3,
-        "files": 10,
-        "global": 2,
-        "objects_signals": 40,
-        "strings": 30
-      },
-      "public_header_includes": 6,
-      "q_object": 2,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
+      "q_object": 0,
       "files": 9,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "acq/fiff": {
       "tokens": 19,
