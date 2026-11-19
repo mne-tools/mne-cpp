@@ -12,7 +12,7 @@ Qt identifiers in code with comments, string literals and `#include` lines remov
 | `acq/devices/polhemus` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `acq/fiff` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `acq/lsl` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `base` | ZlibPrivate | 10 | 3 | 0 | 0 | 0 | 1 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 |
+| `base` | — | 10 | 3 | 0 | 0 | 0 | 1 | 0 | 6 | 0 | 0 | 0 | 0 | 0 | 3 | 0 | 0 |
 | `bids` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `channels` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `com` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
@@ -40,4 +40,4 @@ Qt identifiers in code with comments, string literals and `#include` lines remov
 
 | Library | Use | Reason |
 |---|---|---|
-| `base` | Core | base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt (zlib falls back to Qt's copy only when the system has none). |
+| `base` | Core | base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt. |

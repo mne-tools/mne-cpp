@@ -8,7 +8,7 @@
   ],
   "kept": {
     "base": {
-      "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt (zlib falls back to Qt's copy only when the system has none)."
+      "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt."
     }
   },
   "summary": {
@@ -94,9 +94,7 @@
       "public_header_includes": 3,
       "q_object": 0,
       "files": 27,
-      "modules": [
-        "ZlibPrivate"
-      ]
+      "modules": []
     },
     "bids": {
       "tokens": 0,
