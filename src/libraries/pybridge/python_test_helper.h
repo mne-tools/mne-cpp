@@ -13,9 +13,9 @@
  * @c has_package() lookups so a test can announce that it needs e.g. @c sklearn, and @c eval shorthands that run
  * a snippet and parse its stdout into a number, vector or matrix.
  *
- * The companion @c GUARD_PYTHON / @c GUARD_PYTHON_PACKAGE macros @c QSKIP a test cleanly when Python is missing on
- * developer machines but escalate to @c QFAIL when @c MNE_REQUIRE_PYTHON=true, so CI runs can never silently skip
- * cross-language regression coverage. They expand to QtTest macros and are meant for QtTest test cases only.
+ * The helper is independent of any test framework: a test decides itself whether to skip or fail when
+ * @c is_available() is false, and @c is_python_required() tells it whether CI demands Python
+ * (@c MNE_REQUIRE_PYTHON=true).
  */
 
 #ifndef PYBRIDGELIB_PYTHON_TEST_HELPER_H
@@ -45,38 +45,6 @@
 #include <string_view>
 
 //=============================================================================================================
-// DEFINE MACROS
-//=============================================================================================================
-
-/**
- * @brief Skips (or fails) the current QtTest slot if a condition does not hold.
- *
- * Without @c MNE_REQUIRE_PYTHON the slot is skipped with a clear message; with @c MNE_REQUIRE_PYTHON=true it fails,
- * so a missing Python installation is never silently ignored in CI.
- *
- * @param available  Condition, e.g. @c helper.is_available().
- * @param reason     Message, anything a @c std::string can be constructed from.
- */
-#define GUARD_PYTHON(available, reason)                                                  \
-    do {                                                                                 \
-        if (!(available)) {                                                              \
-            const std::string guardReason_(reason);                                      \
-            if (mne::PythonTestHelper::is_python_required())                             \
-                QFAIL(("HARD FAIL (MNE_REQUIRE_PYTHON=true): " + guardReason_).c_str()); \
-            QSKIP(("SKIP: " + guardReason_).c_str());                                    \
-        }                                                                                \
-    } while (0)
-
-/**
- * @brief Skips (or fails) the current QtTest slot if a Python package is missing.
- *
- * @param helper       A @ref mne::PythonTestHelper.
- * @param packageName  Module name, e.g. "sklearn".
- */
-#define GUARD_PYTHON_PACKAGE(helper, packageName) \
-    GUARD_PYTHON((helper).has_package(packageName), std::string("Python package '") + (packageName) + "' not available")
-
-//=============================================================================================================
 // DEFINE NAMESPACE mne
 //=============================================================================================================
 
@@ -89,11 +57,13 @@ namespace mne
  *
  * @code
  *   PythonTestHelper py;
- *   GUARD_PYTHON(py.is_available(), "MNE-Python not available");
+ *   if (!py.is_available()) {
+ *       // skip the test, or fail it when PythonTestHelper::is_python_required()
+ *   }
  *
  *   // Run a Python snippet that prints a reference value
  *   const std::optional<double> norm = py.eval_double("import numpy as np; print(np.linalg.norm(np.ones(10)))");
- *   QVERIFY(norm && std::abs(*norm - cppNorm) < 1e-12);
+ *   const bool matches = norm && std::abs(*norm - cppNorm) < 1e-12;
  * @endcode
  *
  * Each @c eval call honours its timeout; a run that exceeds it is killed and reported as failed.

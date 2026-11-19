@@ -70,6 +70,15 @@ Eigen::MatrixXd mDataFromFile;
 QVERIFY(mne::read_matrix(mDataFromFile, mne::PythonTestHelper::test_data_path() / "Result" / "<yourFile>.txt"));
 ```
 
+A test that compares against MNE-Python at run time guards its slots with `GUARD_PYTHON` from the test frames' `common/python_guard.h`: it skips the slot when Python is missing and fails it when `MNE_REQUIRE_PYTHON=true`, as in CI.
+
+```cpp
+#include "../common/python_guard.h"
+
+mne::PythonTestHelper py;
+GUARD_PYTHON(py.is_available(), "MNE-Python not available");
+```
+
 All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data). In case you need to add new data open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data first.
 
 ### compareValue()

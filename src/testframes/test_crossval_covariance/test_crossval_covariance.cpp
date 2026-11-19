@@ -36,6 +36,8 @@
 #include <fiff/fiff_raw_data.h>
 #include <math/matrix_io.h>
 #include <pybridge/python_test_helper.h>
+
+#include "../common/python_guard.h"
 #include <base/string_utils.h>
 
 //=============================================================================================================

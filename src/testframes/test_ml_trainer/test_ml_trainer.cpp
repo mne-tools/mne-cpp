@@ -20,6 +20,8 @@
 #include <ml/ml_trainer.h>
 #include <pybridge/python_runner.h>
 #include <pybridge/python_test_helper.h>
+
+#include "../common/python_guard.h"
 #endif
 
 //=============================================================================================================
