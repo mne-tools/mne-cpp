@@ -34,11 +34,12 @@
       "math",
       "ml",
       "mna",
+      "mne",
       "mri",
       "report",
       "sts"
     ],
-    "tokens": 8936,
+    "tokens": 8934,
     "gui_outside_design": []
   },
   "libraries": {
@@ -271,10 +272,8 @@
       "modules": []
     },
     "mne": {
-      "tokens": 2,
-      "by_category": {
-        "global": 2
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 109,
