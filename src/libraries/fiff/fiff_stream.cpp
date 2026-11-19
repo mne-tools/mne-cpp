@@ -72,7 +72,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <cstdint>
 
 //=============================================================================================================
@@ -438,7 +437,7 @@ bool FiffStream::close()
 
 //=============================================================================================================
 
-std::shared_ptr<FiffDirNode> FiffStream::make_subtree(const std::vector<FiffDirEntry>& dentry, qsizetype current)
+std::shared_ptr<FiffDirNode> FiffStream::make_subtree(const std::vector<FiffDirEntry>& dentry, std::ptrdiff_t current)
 {
     std::shared_ptr<FiffDirNode> defaultNode;
     auto node = std::make_shared<FiffDirNode>();

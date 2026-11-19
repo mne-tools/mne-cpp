@@ -53,7 +53,7 @@ public:
     static mne::Expected<FiffEvokedFile> open(const std::filesystem::path& path);
 
     /** @return The number of evoked data sets. */
-    qsizetype size() const
+    std::size_t size() const
     {
         return m_sets.size();
     }

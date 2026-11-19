@@ -31,7 +31,6 @@
 #include "fiff_explain.h"
 #include <cstdint>
 
-#include <QString>
 //#include "fiff_ctf_comp.h"
 //#include "fiff_proj.h"
 //#include "fiff_info.h"
@@ -158,20 +157,19 @@ bool FiffDirNode::has_kind(fiff_int_t p_kind) const
 //=============================================================================================================
 
 // MNE-C fiff_explain / fiff_explain_block: names padded to a fixed column
-static QString explained(int kind, const std::string& name, int width)
+static std::string explained(int kind, const std::string& name, int width)
 {
-    return name.empty() ? QStringLiteral("Cannot explain: %1").arg(kind)
-                        : QStringLiteral("%1 = %2").arg(kind).arg(QString::fromStdString(name), -width);
+    return name.empty() ? std::format("Cannot explain: {}", kind) : std::format("{} = {:<{}}", kind, name, width);
 }
 
 //=============================================================================================================
 
-void FiffDirNode::print(QTextStream& out, int indent) const
+void FiffDirNode::print(std::ostream& out, int indent) const
 {
-    const QString pad(indent, QLatin1Char(' '));
+    const std::string pad(static_cast<std::size_t>(std::max(indent, 0)), ' ');
     out << pad << explained(type, FiffExplain::block(type), 14) << " { ";
     if (!id.empty()) {
-        out << QString::asprintf("\t%d.%d 0x%x%x %d %d ", id.version >> 16, id.version & 0xFFFF, id.machid[0], id.machid[1], id.time.secs, id.time.usecs);
+        out << std::format("\t{}.{} 0x{:x}{:x} {} {} ", id.version >> 16, id.version & 0xFFFF, static_cast<unsigned>(id.machid[0]), static_cast<unsigned>(id.machid[1]), id.time.secs, id.time.usecs);
     }
     out << '\n';
 

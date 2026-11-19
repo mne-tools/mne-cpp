@@ -48,7 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -78,8 +77,6 @@ FiffCov::FiffCov()
 , dim(-1)
 , nfree(-1)
 {
-    qRegisterMetaType<std::shared_ptr<mne::FiffCov>>();
-    qRegisterMetaType<mne::FiffCov>();
 }
 
 //=============================================================================================================
@@ -474,8 +471,8 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
 
         // Baseline subtraction
         if (doBaseline) {
-            int bminIdx = qMax(0, bminSamp);
-            int bmaxIdx = qMin(static_cast<int>(epochData.cols()) - 1, bmaxSamp);
+            int bminIdx = std::max(0, bminSamp);
+            int bmaxIdx = std::min(static_cast<int>(epochData.cols()) - 1, bmaxSamp);
             if (bmaxIdx >= bminIdx) {
                 int nBase = bmaxIdx - bminIdx + 1;
                 for (int c = 0; c < nchan; ++c) {

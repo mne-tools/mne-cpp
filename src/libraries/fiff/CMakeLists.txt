@@ -6,14 +6,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_fiff LANGUAGES CXX)
 
-#Handle qt uic, moc, rrc automatically
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
-
-set(QT_REQUIRED_COMPONENTS Core Network)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 set(SOURCES
     fiff_tag.cpp
     fiff_coord_trans.cpp
@@ -92,14 +84,15 @@ set(HEADERS
     fiff_byte_swap.h
 )
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+# MNE-C's tag, block, unit and channel-kind names, behind FiffExplain, compiled in as bytes
+set(FIFF_EXPLANATIONS_TXT "${CMAKE_CURRENT_SOURCE_DIR}/resources/fiff_explanations.txt")
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${FIFF_EXPLANATIONS_TXT}")
+file(READ "${FIFF_EXPLANATIONS_TXT}" FIFF_EXPLANATIONS_HEX HEX)
+string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," FIFF_EXPLANATIONS_BYTES "${FIFF_EXPLANATIONS_HEX}")
+configure_file(resources/fiff_explanations.cpp.in "${CMAKE_CURRENT_BINARY_DIR}/fiff_explanations.cpp" @ONLY)
+list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/fiff_explanations.cpp")
 
-# MNE-C's tag, block, unit and channel-kind names, behind FiffExplain
-qt_add_resources(${PROJECT_NAME} "fiff_explanations"
-  PREFIX "/fiff"
-  BASE resources
-  FILES resources/fiff_explanations.txt
-)
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 set(FFTW_LIBS "")
 
@@ -119,16 +112,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
 set(MNE_LIBS_REQUIRED 
     mne_base
     mne_math
 )
 
-# The public headers include Qt
-target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen

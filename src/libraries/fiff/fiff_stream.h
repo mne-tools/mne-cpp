@@ -291,7 +291,7 @@ public:
      *
      * @return The block, or null if a tag cannot be read.
      */
-    std::shared_ptr<FiffDirNode> make_subtree(const std::vector<FiffDirEntry>& dentry, qsizetype current);
+    std::shared_ptr<FiffDirNode> make_subtree(const std::vector<FiffDirEntry>& dentry, std::ptrdiff_t current);
 
     //=========================================================================================================
     /**

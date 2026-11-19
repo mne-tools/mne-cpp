@@ -26,8 +26,6 @@
 
 #include <base/string_utils.h>
 
-#include <QtGlobal>
-
 #include <algorithm>
 #include <array>
 #include <bit>

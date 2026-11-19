@@ -101,7 +101,7 @@ std::vector<FiffProj> pcaProjectors(const MatrixXd& data, const std::vector<int>
         sub.row(c) = data.row(chIdx[c]);
     }
     const JacobiSVD<MatrixXd> svd(sub, ComputeThinU);
-    const int nComp = qMin(nVec, static_cast<int>(svd.matrixU().cols()));
+    const int nComp = std::min(nVec, static_cast<int>(svd.matrixU().cols()));
     for (int v = 0; v < nComp; ++v) {
         FiffProj proj;
         proj.kind = FIFFV_PROJ_ITEM_FIELD;

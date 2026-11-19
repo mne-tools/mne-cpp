@@ -40,6 +40,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point_set.h>
 
+#include <sstream>
 #include <cmath>
 #include <cstring>
 #include <memory>
@@ -564,10 +565,9 @@ void TestFiffStreamPython::printsDirectoryTree()
     FiffStream stream(QString(QStringLiteral(MNE_CTF_COMP_DATA_DIR "/ctf_grade0_raw.fif")).toStdU16String());
     QVERIFY(stream.open());
 
-    QString text;
-    QTextStream out(&text);
+    std::ostringstream out;
     stream.dirtree()->print(out);
-    out.flush();
+    const QString text = QString::fromStdString(out.str());
 
     // Every line is whole: a block with its id, one run of equal tag kinds, or a closing brace (MNE-C fiff_dir_tree)
     const QRegularExpression blockLine(QStringLiteral(R"(^( *)(\d+) = (.+?) +\{ (\t\d+\.\d+ 0x[0-9a-f]+ -?\d+ -?\d+ )?$)"));

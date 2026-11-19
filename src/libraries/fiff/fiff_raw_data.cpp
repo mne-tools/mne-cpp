@@ -226,8 +226,6 @@ void FiffRawData::clear()
 }
 
 //=============================================================================================================
-#include <QElapsedTimer>
-#include <QDebug>
 #include <cstdint>
 bool FiffRawData::read_raw_segment(MatrixXd& data,
                                    MatrixXd& times,
@@ -916,7 +914,7 @@ bool FiffRawData::save(const std::filesystem::path& path,
     int blockSamples = decim * blockSize;
 
     for (int samp = firstSamp; samp <= lastSamp; samp += blockSamples) {
-        int nsamp = qMin(blockSamples, lastSamp - samp + 1);
+        int nsamp = std::min(blockSamples, lastSamp - samp + 1);
 
         MatrixXd segData;
         MatrixXd segTimes;

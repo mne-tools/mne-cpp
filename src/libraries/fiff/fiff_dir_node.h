@@ -46,9 +46,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QTextStream>
 
 #include <memory>
+#include <ostream>
 #include <optional>
 #include <span>
 #include <vector>
@@ -170,7 +170,7 @@ public:
      * @param[in] out        Stream to print to.
      * @param[in] indent     Indentation of this block.
      */
-    void print(QTextStream& out, int indent = 0) const;
+    void print(std::ostream& out, int indent = 0) const;
 
     //=========================================================================================================
     /**

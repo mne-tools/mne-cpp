@@ -28,12 +28,7 @@
 #include <Eigen/SVD>
 
 #include <cmath>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtMath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,15 +67,15 @@ MatrixXd InvTfMxne::buildGaborDictionary(int iNSamples, int iNFreqs,
         }
 
         // Gaussian window width: ~3 cycles at this frequency
-        double sigma = 3.0 / (2.0 * M_PI * freq);
+        double sigma = 3.0 / (2.0 * std::numbers::pi * freq);
 
         double tCenter = timeVec(iNSamples / 2);
 
         for (int t = 0; t < iNSamples; ++t) {
             double dt = timeVec(t) - tCenter;
             double envelope = std::exp(-0.5 * dt * dt / (sigma * sigma));
-            dict(2 * f, t) = envelope * std::cos(2.0 * M_PI * freq * timeVec(t));
-            dict(2 * f + 1, t) = envelope * std::sin(2.0 * M_PI * freq * timeVec(t));
+            dict(2 * f, t) = envelope * std::cos(2.0 * std::numbers::pi * freq * timeVec(t));
+            dict(2 * f + 1, t) = envelope * std::sin(2.0 * std::numbers::pi * freq * timeVec(t));
         }
 
         // Normalize each atom to unit norm

@@ -739,6 +739,17 @@ aliases; replace the old spelling as below.
 - The mne library no longer uses or links Qt itself; its public headers spell
   `qint32` as `std::int32_t` (the same type, so callers compile unchanged).
   Programs that got Qt through `mne_mne` link it themselves.
+- The fiff library no longer uses or links Qt, so `mne_fiff`, `mne_mne`,
+  `mne_fwd`, `mne_dsp` and `mne_connectivity` load without Qt. The machine
+  identifier of a new file ID comes from `mne::hardware_addresses()` and
+  skips interfaces without a hardware address instead of giving up on the
+  first one; BrainVision CapTrak and EGI montages are read with
+  `mne::read_xml_file()`; the `FiffExplain` table is compiled in by CMake
+  instead of a Qt resource. Migration: `FiffDirNode::print(QTextStream&)` →
+  `print(std::ostream&)`; `FiffEvokedFile::size()` returns `std::size_t`;
+  `FiffCov` and `FiffEvokedSet` are no longer registered with `QMetaType`
+  (Qt 6 registers types of signal arguments itself); programs that got Qt
+  through `mne_fiff` link it themselves.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

@@ -23,6 +23,7 @@
 
 #include "fiff_id.h"
 #include <base/log.h>
+#include <base/process.h>
 
 #include <format>
 #include <string>
@@ -31,10 +32,9 @@
 #include "fiff_file.h"
 
 #ifndef __EMSCRIPTEN__
-#include <QNetworkInterface>
 #endif
-#include <QDateTime>
 
+#include <chrono>
 #include <ctime>
 #include <cstdint>
 
@@ -98,7 +98,7 @@ FiffId FiffId::new_file_id()
      * are randomized to insure uniqueness.
      */
     {
-        id.time.secs = QDateTime::currentMSecsSinceEpoch() / 1000;
+        id.time.secs = static_cast<fiff_int_t>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count());
         id.time.usecs = rand() % 1000;
     }
     return id;
@@ -119,40 +119,16 @@ void FiffId::clear()
 
 bool FiffId::get_machid(int* fixed_id)
 {
-    QStringList possibleHardwareAdresses;
     fixed_id[0] = 0;
     fixed_id[1] = 0;
-
-#ifndef __EMSCRIPTEN__
-    const QList<QNetworkInterface> ifaces = QNetworkInterface::allInterfaces();
-
-    if (!ifaces.empty()) {
-        for (int i = 0; i < std::ssize(ifaces); ++i) {
-            unsigned int flags = ifaces[i].flags();
-            bool isLoopback = static_cast<bool>(flags & QNetworkInterface::IsLoopBack);
-            bool isP2P = static_cast<bool>(flags & QNetworkInterface::IsPointToPoint);
-            bool isRunning = static_cast<bool>(flags & QNetworkInterface::IsRunning);
-            // If this interface isn't running, we don't care about it
-            if (!isRunning)
-                continue;
-            // We only want valid interfaces that aren't loopback/virtual and not point to point
-            if (!ifaces[i].isValid() || isLoopback || isP2P)
-                continue;
-            possibleHardwareAdresses << ifaces[i].hardwareAddress();
-        }
-        if (possibleHardwareAdresses.size() > 0) {
-            // We take the first address as machine identifier
-            QStringList hexPresentation = possibleHardwareAdresses[0].split(":");
-            if (hexPresentation.size() == 6) {
-                fixed_id[0] = QString(hexPresentation[0] + hexPresentation[1] + hexPresentation[2]).toInt(nullptr, 16);
-                fixed_id[1] = QString(hexPresentation[3] + hexPresentation[4] + hexPresentation[5]).toInt(nullptr, 16);
-                return true;
-            }
-        }
-    }
-#endif
-
-    return false;
+    // The first running interface that is neither loopback nor point-to-point, three bytes of its address per word
+    const std::vector<HardwareAddress> addresses = hardware_addresses();
+    if (addresses.empty())
+        return false;
+    const HardwareAddress& mac = addresses.front();
+    fixed_id[0] = (mac[0] << 16) | (mac[1] << 8) | mac[2];
+    fixed_id[1] = (mac[3] << 16) | (mac[4] << 8) | mac[5];
+    return true;
 }
 
 //=============================================================================================================

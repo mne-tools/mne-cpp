@@ -55,7 +55,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 #include <cstdint>
 
 //=============================================================================================================
@@ -71,8 +70,6 @@ using namespace Eigen;
 
 FiffEvokedSet::FiffEvokedSet()
 {
-    qRegisterMetaType<mne::FiffEvokedSet>();
-    qRegisterMetaType<std::shared_ptr<mne::FiffEvokedSet>>();
 }
 
 //=============================================================================================================
@@ -194,7 +191,7 @@ Expected<FiffEvokedSet> FiffEvokedSet::read(const std::filesystem::path& path,
         sets.push_back(*found);
     }
     if (conditions.empty()) {
-        sets.resize(static_cast<std::size_t>(file->size()));
+        sets.resize(file->size());
         std::iota(sets.begin(), sets.end(), 0);
     }
 
@@ -238,7 +235,7 @@ FiffEvokedSet FiffEvokedSet::computeGrandAverage(const std::vector<FiffEvokedSet
 
     int nCat = static_cast<int>(evokedSets.front().evoked.size());
     for (const FiffEvokedSet& eset : evokedSets) {
-        nCat = qMin(nCat, static_cast<int>(eset.evoked.size()));
+        nCat = std::min(nCat, static_cast<int>(eset.evoked.size()));
     }
 
     for (int j = 0; j < nCat; ++j) {

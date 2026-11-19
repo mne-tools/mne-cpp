@@ -20,9 +20,8 @@
 #include <string>
 #include <unordered_map>
 
-#include <QFile>
-#include <QRegularExpression>
-#include <QTextStream>
+#include <charconv>
+#include <string_view>
 #include <cstdint>
 
 //=============================================================================================================
@@ -35,11 +34,11 @@ using namespace mne;
 // STATIC HELPERS
 //=============================================================================================================
 
-// Q_INIT_RESOURCE must not be expanded inside a namespace; static builds need it.
-static void initFiffExplanationsResource()
+namespace mne::detail
 {
-    Q_INIT_RESOURCE(fiff_explanations);
-}
+extern const unsigned char fiff_explanations_text[]; // generated from resources/fiff_explanations.txt
+extern const std::size_t fiff_explanations_size;
+} // namespace mne::detail
 
 namespace
 {
@@ -62,22 +61,44 @@ std::uint64_t key(int exclass, int kind)
 const std::unordered_map<std::uint64_t, std::string>& explanations()
 {
     static const std::unordered_map<std::uint64_t, std::string> table = [] {
-        initFiffExplanationsResource();
         std::unordered_map<std::uint64_t, std::string> entries;
-        QFile file(QStringLiteral(":/fiff/fiff_explanations.txt"));
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            mne::Log::warning("[FiffExplain] the built-in explanation table is missing");
-            return entries;
-        }
+        const std::string_view text(reinterpret_cast<const char*>(detail::fiff_explanations_text), detail::fiff_explanations_size);
         // <class> <kind> "<text>"; the first entry of a duplicated class/kind wins, inner spaces collapse as in MNE-C
-        const QRegularExpression line(QStringLiteral(R"(^\s*(\d+)\s+(-?\d+)\s+"([^"]*)\")"));
-        QTextStream in(&file);
-        while (!in.atEnd()) {
-            const QRegularExpressionMatch m = line.match(in.readLine());
-            const std::uint64_t k = m.hasMatch() ? key(m.captured(1).toInt(), m.captured(2).toInt()) : 0;
-            if (m.hasMatch()) {
-                entries.try_emplace(k, m.captured(3).simplified().toStdString());
+        for (std::size_t start = 0; start < text.size();) {
+            const std::size_t end = std::min(text.find('\n', start), text.size());
+            const std::string_view line = text.substr(start, end - start);
+            start = end + 1;
+            int exclass = 0;
+            int kind = 0;
+            const char* at = line.data() + std::min(line.find_first_not_of(" \t\r"), line.size());
+            const char* last = line.data() + line.size();
+            auto [afterClass, classError] = std::from_chars(at, last, exclass);
+            if (classError != std::errc() || *at == '-' || afterClass == last || (*afterClass != ' ' && *afterClass != '\t'))
+                continue;
+            at = afterClass;
+            while (at != last && (*at == ' ' || *at == '\t'))
+                ++at;
+            auto [afterKind, kindError] = std::from_chars(at, last, kind);
+            if (kindError != std::errc() || afterKind == last || (*afterKind != ' ' && *afterKind != '\t'))
+                continue;
+            at = afterKind;
+            while (at != last && (*at == ' ' || *at == '\t'))
+                ++at;
+            const std::string_view rest(at, static_cast<std::size_t>(last - at));
+            const std::size_t close = rest.find('"', 1);
+            if (!rest.starts_with('"') || close == std::string_view::npos)
+                continue;
+            std::string explanation;
+            for (const char c : rest.substr(1, close - 1)) {
+                const bool space = c == ' ' || c == '\t' || c == '\r' || c == '\v' || c == '\f';
+                if (!space)
+                    explanation += c;
+                else if (!explanation.empty() && explanation.back() != ' ')
+                    explanation += ' ';
             }
+            if (!explanation.empty() && explanation.back() == ' ')
+                explanation.pop_back();
+            entries.try_emplace(key(exclass, kind), std::move(explanation));
         }
         return entries;
     }();

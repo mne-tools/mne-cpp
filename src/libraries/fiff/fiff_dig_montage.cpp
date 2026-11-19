@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "fiff_dig_montage.h"
+#include <base/xml.h>
 #include <base/log.h>
 
 #include "fiff_constants.h"
@@ -22,9 +23,6 @@
 
 #include <base/string_utils.h>
 
-#include <QFile>
-#include <QXmlStreamReader>
-#include <QtGlobal>
 
 #include <algorithm>
 #include <array>
@@ -230,26 +228,28 @@ FiffDigMontage makeDigMontage(Montage montage)
 
 using XmlRecord = std::map<std::string, std::string, std::less<>>;
 
-// The text of each child element of every <element> in an XML file (namespaces ignored).
-Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& path, QStringView element)
+// The records of every element named @p element, outside other records, in document order.
+void collectXmlRecords(const XmlElement& node, std::string_view element, std::vector<XmlRecord>& records)
 {
-    QFile file(QString::fromStdU16String(path.u16string()));
-    if (!file.open(QIODevice::ReadOnly))
-        return fail(ErrorCode::Io, "cannot read {}", mne::utf8_from_path(path));
-    QXmlStreamReader xml(&file);
-    std::vector<XmlRecord> records;
-    while (!xml.atEnd()) {
-        if (xml.readNext() != QXmlStreamReader::StartElement || xml.name() != element)
-            continue;
-        XmlRecord record;
-        while (xml.readNextStartElement()) {
-            std::string key = xml.name().toString().toStdString();
-            record.insert_or_assign(std::move(key), xml.readElementText(QXmlStreamReader::SkipChildElements).toStdString());
-        }
-        records.push_back(std::move(record));
+    if (node.local_name() != element) {
+        for (const XmlElement& child : node.children)
+            collectXmlRecords(child, element, records);
+        return;
     }
-    if (xml.hasError())
-        return fail(ErrorCode::Format, "{}: {}", mne::utf8_from_path(path), xml.errorString().toStdString());
+    XmlRecord record;
+    for (const XmlElement& child : node.children)
+        record.insert_or_assign(std::string(child.local_name()), child.text);
+    records.push_back(std::move(record));
+}
+
+// The text of each child element of every <element> in an XML file (namespaces ignored).
+Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& path, std::string_view element)
+{
+    const Expected<XmlElement> root = read_xml_file(path);
+    if (!root)
+        return std::unexpected(root.error());
+    std::vector<XmlRecord> records;
+    collectXmlRecords(*root, element, records);
     return records;
 }
 
@@ -356,7 +356,7 @@ Expected<MatrixX3d> FiffDigMontage::read_polhemus_fastscan(const std::filesystem
 
 Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::path& path)
 {
-    const Expected<std::vector<XmlRecord>> electrodes = readXmlRecords(path, u"CapTrakElectrode");
+    const Expected<std::vector<XmlRecord>> electrodes = readXmlRecords(path, "CapTrakElectrode");
     if (!electrodes)
         return std::unexpected(electrodes.error());
     Montage montage;
@@ -383,7 +383,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::pat
 
 Expected<FiffDigMontage> FiffDigMontage::read_egi(const std::filesystem::path& path)
 {
-    const Expected<std::vector<XmlRecord>> sensors = readXmlRecords(path, u"sensor");
+    const Expected<std::vector<XmlRecord>> sensors = readXmlRecords(path, "sensor");
     if (!sensors)
         return std::unexpected(sensors.error());
     Montage montage;

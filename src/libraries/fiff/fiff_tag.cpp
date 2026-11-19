@@ -89,7 +89,7 @@ bool FiffTag::matrix_dimensions(std::int32_t& p_ndim, std::vector<std::int32_t>&
     // index outside the tag, so the trailer has to fit and a dense matrix has to fit before it.
     //
     const std::int32_t* t_pInt32 = reinterpret_cast<const std::int32_t*>(this->data());
-    const qsizetype nInts = this->size() / 4;
+    const std::ptrdiff_t nInts = this->size() / 4;
     const std::int32_t ndim = t_pInt32[nInts - 1];
     const int coding = fiff_type_matrix_coding(this->type);
     const bool sparse = coding == FIFFTS_MC_CCS || coding == FIFFTS_MC_RCS;
@@ -103,7 +103,7 @@ bool FiffTag::matrix_dimensions(std::int32_t& p_ndim, std::vector<std::int32_t>&
 
     std::vector<std::int32_t> dims;
     std::int64_t nValues = 1;
-    for (qsizetype i = nInts - nTrailer; i < nInts - 1; ++i) {
+    for (std::ptrdiff_t i = nInts - nTrailer; i < nInts - 1; ++i) {
         if (t_pInt32[i] < 0)
             return false;
         dims.push_back(t_pInt32[i]);
