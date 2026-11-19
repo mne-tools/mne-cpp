@@ -121,6 +121,18 @@ inline bool would_block(const std::error_code& error) noexcept
 
 inline constexpr auto kInvalidHandle = static_cast<Handle>(kInvalid);
 
+/** Puts @p s into non-blocking mode; reads and writes then wait in wait_for(). */
+inline bool set_non_blocking(Native s) noexcept
+{
+#ifdef _WIN32
+    u_long on = 1;
+    return ioctlsocket(s, FIONBIO, &on) == 0;
+#else
+    const int flags = ::fcntl(s, F_GETFL, 0);
+    return flags >= 0 && ::fcntl(s, F_SETFL, flags | O_NONBLOCK) == 0;
+#endif
+}
+
 } // namespace mne::detail
 
 #endif // COM_DETAIL_SOCKET_PLATFORM_H

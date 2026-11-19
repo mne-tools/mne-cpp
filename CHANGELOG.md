@@ -229,6 +229,13 @@ aliases; replace the old spelling as below.
   default route, which differ behind a VPN (BrainFlow's streamer sends on
   the first, its receiver listens on the second); `send_to` sends a
   datagram, to a group through the interface of the default route.
+- `mne_com` serves too: `mne::TcpServer` listens and accepts connections
+  with a timeout; `TcpSocket::read_some()` reads what has arrived,
+  `is_open()` and `close()`; `UdpSocket::receive_from()` reports the
+  sender (`mne::UdpDatagram`) so a service can answer it, `bind(..., shared)`
+  lets several services share a port, `join_group()` joins further groups
+  on a chosen interface, `set_multicast_interface()` picks the interface
+  multicast leaves through, and datagrams can go to the broadcast address.
 - Device URI schemes may contain `_`, as BrainFlow's `streaming_board://`
   does.
 - The BrainFlow MNE Scan plugin is back as a client of `brainflow://`: it

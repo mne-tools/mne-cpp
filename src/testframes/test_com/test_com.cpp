@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include <com/serial_port.h>
+#include <com/tcp_server.h>
 #include <com/tcp_socket.h>
 #include <com/udp_socket.h>
 
@@ -114,9 +115,12 @@ private slots:
     void tcpReadTimesOutWithoutConsuming();
     void tcpReportsAHalfAnswerAndAClosedPeer();
     void tcpConnectFails();
+    void tcpServerAcceptsAndReadsWhatArrived();
     void udpReceivesDatagrams();
     void udpSharesAMulticastGroup();
     void udpBindFails();
+    void udpAnswersTheSender();
+    void udpSharesAPortAndBroadcasts();
     void serialExchangesBytes();
     void serialOpenFails();
     void serialDrainsOnClose();
@@ -209,6 +213,45 @@ void TestCom::tcpConnectFails()
 
 //=============================================================================================================
 
+void TestCom::tcpServerAcceptsAndReadsWhatArrived()
+{
+    auto server = TcpServer::listen("127.0.0.1", 0);
+    QVERIFY2(server, server ? "" : server.error().message().c_str());
+    QVERIFY(server->port() > 0);
+    QVERIFY(server->accept(0ms).error() == std::errc::timed_out);
+    QVERIFY(TcpServer::listen("localhost", 0).error() == std::errc::invalid_argument);
+
+    auto client = TcpSocket::connect("127.0.0.1", server->port(), 1s);
+    QVERIFY(client);
+    auto peer = server->accept(1s);
+    QVERIFY2(peer, peer ? "" : peer.error().message().c_str());
+    QVERIFY(peer->is_open());
+
+    // read_some takes what has arrived, not a fixed size
+    const std::string_view hello = "hello";
+    QVERIFY(!client->write(std::as_bytes(std::span(hello))));
+    std::array<std::byte, 64> buffer{};
+    std::size_t total = 0;
+    while (total < hello.size()) {
+        const auto got = peer->read_some(std::span(buffer).subspan(total), 1s);
+        QVERIFY2(got, got ? "" : got.error().message().c_str());
+        total += *got;
+    }
+    QCOMPARE(total, hello.size());
+    QCOMPARE(std::string(reinterpret_cast<const char*>(buffer.data()), total), std::string(hello));
+    QVERIFY(peer->read_some(buffer, 0ms).error() == std::errc::timed_out);
+
+    // Both directions; a closed peer is reported, a closed socket is no longer open
+    QVERIFY(!peer->write(std::as_bytes(std::span(hello))));
+    std::array<std::byte, 5> answer{};
+    QVERIFY(!client->read(answer, 1s));
+    client->close();
+    QVERIFY(!client->is_open());
+    QVERIFY(peer->read_some(buffer, 1s).error() == std::errc::connection_reset);
+}
+
+//=============================================================================================================
+
 void TestCom::udpReceivesDatagrams()
 {
 #ifdef _WIN32
@@ -280,6 +323,65 @@ void TestCom::udpBindFails()
     auto taken = UdpSocket::bind("127.0.0.1", 0);
     QVERIFY(taken);
     QVERIFY(UdpSocket::bind("127.0.0.1", taken->port()).error() == std::errc::address_in_use);
+}
+
+//=============================================================================================================
+
+void TestCom::udpAnswersTheSender()
+{
+    auto server = UdpSocket::bind("127.0.0.1", 0);
+    auto client = UdpSocket::bind("127.0.0.1", 0);
+    QVERIFY(server && client);
+    const std::array query = {std::byte{'?'}};
+    QVERIFY(!client->send_to(query, "127.0.0.1", server->port()));
+    std::array<std::byte, 8> buffer{};
+    const auto datagram = server->receive_from(buffer, 1s);
+    QVERIFY2(datagram, datagram ? "" : datagram.error().message().c_str());
+    QCOMPARE(datagram->size, std::size_t(1));
+    QCOMPARE(datagram->address, std::string("127.0.0.1"));
+    QCOMPARE(datagram->port, client->port());
+
+    const std::array reply = {std::byte{'!'}, std::byte{'!'}};
+    QVERIFY(!server->send_to(reply, datagram->address, datagram->port));
+    const auto size = client->receive(buffer, 1s);
+    QVERIFY(size);
+    QCOMPARE(*size, reply.size());
+    QVERIFY(server->receive_from(buffer, 0ms).error() == std::errc::timed_out);
+}
+
+//=============================================================================================================
+
+void TestCom::udpSharesAPortAndBroadcasts()
+{
+    // Services on one machine share a port they all listen on, each a member of the group
+    const std::string group = "239.255.43.22";
+    auto first = UdpSocket::bind("0.0.0.0", 0, true);
+    QVERIFY2(first, first ? "" : first.error().message().c_str());
+    auto second = UdpSocket::bind("0.0.0.0", first->port(), true);
+    QVERIFY2(second, second ? "" : second.error().message().c_str());
+    QVERIFY(UdpSocket::bind("0.0.0.0", first->port()).error() == std::errc::address_in_use);
+    for (UdpSocket* member : {&*first, &*second}) {
+        QVERIFY(!member->join_group(group));
+    }
+    QVERIFY(first->join_group("10.0.0.1") == std::errc::invalid_argument); // no group
+    QVERIFY(first->join_group(group, "nowhere") == std::errc::invalid_argument);
+
+    auto sender = UdpSocket::bind("0.0.0.0", 0);
+    QVERIFY(sender);
+    QVERIFY(!sender->set_multicast_interface());
+    QVERIFY(sender->set_multicast_interface("nowhere") == std::errc::invalid_argument);
+    const std::array datagram = {std::byte{4}, std::byte{2}};
+    QVERIFY(!sender->send_to(datagram, group, first->port()));
+    std::array<std::byte, 8> buffer{};
+    for (UdpSocket* member : {&*first, &*second}) {
+        const auto got = member->receive_from(buffer, 1s);
+        QVERIFY2(got, got ? "" : got.error().message().c_str());
+        QCOMPARE(got->size, datagram.size());
+        QVERIFY(!got->address.empty()); // the port may differ where a network filter relays multicast
+    }
+
+    // Broadcasting is allowed
+    QVERIFY(!sender->send_to(datagram, "255.255.255.255", first->port()));
 }
 
 //=============================================================================================================

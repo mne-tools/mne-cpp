@@ -79,7 +79,27 @@ public:
      */
     std::error_code read(std::span<std::byte> buffer, std::chrono::milliseconds timeout);
 
+    //=========================================================================================================
+    /**
+     * Reads what has arrived, up to @p buffer.size() bytes.
+     *
+     * @param[out] buffer    Destination.
+     * @param[in]  timeout   Maximum wait for the first byte; 0 only takes what has arrived.
+     *
+     * @return The number of bytes read (at least one), timed_out if nothing arrived, connection_reset if the peer
+     *         closed the connection, or the system's error.
+     */
+    [[nodiscard]] std::expected<std::size_t, std::error_code> read_some(std::span<std::byte> buffer, std::chrono::milliseconds timeout);
+
+    /** @return Whether the socket holds a connection; one the peer closed is still open until a read reports it. */
+    [[nodiscard]] bool is_open() const noexcept;
+
+    /** Closes the connection; nothing happens if there is none. */
+    void close() noexcept;
+
 private:
+    friend class TcpServer;
+
 #ifdef _WIN32
     std::uintptr_t m_socket = ~std::uintptr_t{0};
 #else

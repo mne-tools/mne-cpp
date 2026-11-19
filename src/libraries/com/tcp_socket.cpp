@@ -29,27 +29,6 @@ using namespace mne;
 using namespace mne::detail;
 
 //=============================================================================================================
-// STATIC HELPERS
-//=============================================================================================================
-
-namespace
-{
-
-/** Puts @p s into non-blocking mode; reads and writes then wait in wait_for(). */
-bool set_non_blocking(Native s) noexcept
-{
-#ifdef _WIN32
-    u_long on = 1;
-    return ioctlsocket(s, FIONBIO, &on) == 0;
-#else
-    const int flags = ::fcntl(s, F_GETFL, 0);
-    return flags >= 0 && ::fcntl(s, F_SETFL, flags | O_NONBLOCK) == 0;
-#endif
-}
-
-} // namespace
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -197,4 +176,52 @@ std::error_code TcpSocket::read(std::span<std::byte> buffer, std::chrono::millis
         buffer = buffer.subspan(static_cast<std::size_t>(got));
     }
     return {};
+}
+
+//=============================================================================================================
+
+std::expected<std::size_t, std::error_code> TcpSocket::read_some(std::span<std::byte> buffer, std::chrono::milliseconds timeout)
+{
+    const auto s = static_cast<Native>(m_socket);
+    while (true) {
+        const int ready = wait_for(s, POLLIN, timeout);
+        if (ready == 0) {
+            return std::unexpected(std::make_error_code(std::errc::timed_out));
+        }
+        if (ready < 0) {
+            return std::unexpected(last_error());
+        }
+#ifdef _WIN32
+        const int got = ::recv(s, reinterpret_cast<char*>(buffer.data()), static_cast<int>(buffer.size()), 0);
+#else
+        const auto got = ::recv(s, buffer.data(), buffer.size(), 0);
+#endif
+        if (got == 0) {
+            return std::unexpected(std::make_error_code(std::errc::connection_reset));
+        }
+        if (got < 0) {
+            const std::error_code error = last_error();
+            if (would_block(error)) {
+                continue;
+            }
+            return std::unexpected(error);
+        }
+        return static_cast<std::size_t>(got);
+    }
+}
+
+//=============================================================================================================
+
+bool TcpSocket::is_open() const noexcept
+{
+    return m_socket != kInvalidHandle;
+}
+
+//=============================================================================================================
+
+void TcpSocket::close() noexcept
+{
+    if (m_socket != kInvalidHandle) {
+        close_native(static_cast<Native>(std::exchange(m_socket, kInvalidHandle)));
+    }
 }

@@ -8,6 +8,7 @@ project(mne_com LANGUAGES CXX)
 
 set(SOURCES
     serial_port.cpp
+    tcp_server.cpp
     tcp_socket.cpp
     udp_socket.cpp
 )
@@ -19,6 +20,7 @@ set(PRIVATE_HEADERS
 set(HEADERS
     com_global.h
     serial_port.h
+    tcp_server.h
     tcp_socket.h
     udp_socket.h
 )
