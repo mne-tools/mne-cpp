@@ -167,7 +167,7 @@ struct TriangleProjection
     }
 
     /** Nearest point on the three triangle sides (MNE-C nearest_triangle_point edge search). */
-    double nearestEdge(double& pOut, double& qOut) const
+    double nearestEdge(double& edgeP, double& edgeQ) const
     {
         const double sides[3][2] = {
             {std::clamp(p + 0.5 * q * c / a, 0.0, 1.0), 0.0},
@@ -181,8 +181,8 @@ struct TriangleProjection
             const double d = edgeDistance(p0, q0);
             if (d < best) {
                 best = d;
-                pOut = p0;
-                qOut = q0;
+                edgeP = p0;
+                edgeQ = q0;
             }
         }
         return best;
