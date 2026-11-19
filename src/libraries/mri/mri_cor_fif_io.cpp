@@ -41,7 +41,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -86,7 +85,6 @@ bool MriCorFifIO::write(const std::string& fileName,
     //   /FIFFB_MRI
     //
 
-    QFile file(QString::fromStdString(fileName));
     auto stream = FiffStream::start_file(fileName);
 
     if (!stream) {

@@ -784,6 +784,7 @@ aliases; replace the old spelling as below.
 - The acquisition FIFF bridge (`mne_acq_fiff`) no longer uses or links Qt:
   the recorder and the FIFF replay source write and read with standard C++
   streams and buffers.
+- The MRI library (`mne_mri`) no longer links Qt.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from
