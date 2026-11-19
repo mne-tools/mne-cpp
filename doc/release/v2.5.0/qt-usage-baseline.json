@@ -7,12 +7,6 @@
     "disp3D"
   ],
   "kept": {
-    "bids": {
-      "JSON": "Sidecars are JSON; QJsonDocument instead of a new dependency."
-    },
-    "lsl": {
-      "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
-    },
     "base": {
       "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt (zlib falls back to Qt's copy only when the system has none)."
     }
@@ -24,6 +18,7 @@
       "acq/devices",
       "acq/devices/polhemus",
       "acq/fiff",
+      "acq/lsl",
       "bids",
       "channels",
       "com",
@@ -35,6 +30,7 @@
       "fwd",
       "ieeg",
       "inv",
+      "lsl",
       "math",
       "ml",
       "mna",
@@ -42,7 +38,7 @@
       "report",
       "sts"
     ],
-    "tokens": 9103,
+    "tokens": 8936,
     "gui_outside_design": []
   },
   "libraries": {
@@ -84,9 +80,7 @@
       "public_header_includes": 0,
       "q_object": 0,
       "files": 3,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "base": {
       "tokens": 10,
@@ -123,7 +117,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 8,
+      "files": 10,
       "modules": []
     },
     "connectivity": {
@@ -245,22 +239,12 @@
       "modules": []
     },
     "lsl": {
-      "tokens": 167,
-      "by_category": {
-        "containers": 6,
-        "global": 30,
-        "network": 53,
-        "other": 4,
-        "strings": 71,
-        "time": 3
-      },
-      "public_header_includes": 3,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 12,
-      "modules": [
-        "Core",
-        "Network"
-      ]
+      "modules": []
     },
     "math": {
       "tokens": 0,

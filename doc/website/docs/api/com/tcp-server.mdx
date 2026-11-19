@@ -1,0 +1,129 @@
+---
+id: tcp-server
+title: "mne::TcpServer"
+sidebar_label: TcpServer
+sidebar_position: 4
+---
+
+# TcpServer
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Communication Library &nbsp;·&nbsp; **Source:** [`com/tcp_server.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/com/tcp_server.h)
+
+`#include <com/tcp_server.h>`
+
+```cpp
+class mne::TcpServer
+```
+
+A listening TCP socket; move-only, closed on destruction.
+
+Accepted connections are [`TcpSocket`](/docs/api/com/tcp-socket) objects.
+
+```cpp title="src/examples/ex_com/main.cpp"
+auto listening = TcpServer::listen("127.0.0.1", 0); // 0: the system chooses the port
+auto client = TcpSocket::connect("127.0.0.1", listening ? listening->port() : 0, 500ms);
+auto connection = listening ? listening->accept(500ms) : std::unexpected(listening.error());
+std::size_t request = 0;
+if (client && connection && !client->write(std::as_bytes(std::span(std::string_view("hello"))))) {
+    std::array<std::byte, 64> buffer{};
+    const auto got = connection->read_some(buffer, 500ms); // what has arrived, at most 64 bytes
+    request = got ? *got : 0;
+}
+```
+
+---
+
+## Public Methods
+
+### TcpServer()
+
+---
+
+### ~TcpServer()
+
+---
+
+### TcpServer(other)
+
+---
+
+### operator=(other)
+
+---
+
+### TcpServer()
+
+---
+
+### operator=()
+
+---
+
+### port()
+
+**Returns:**
+
+- *std::uint16_t* — The local port the server listens on.
+
+---
+
+### accept(timeout)
+
+**Parameters:**
+
+- **timeout** : *std::chrono::milliseconds*
+  Maximum wait for a client; 0 only takes one that is already waiting.
+
+**Returns:**
+
+- *std::expected&lt; [TcpSocket](/docs/api/com/tcp-socket), std::error_code &gt;* — The next connection, timed_out if none came, or the system's error.
+
+---
+
+## Static Methods
+
+### listen(address, port)
+
+**Parameters:**
+
+- **address** : *const std::string &*
+  Local IPv4 address to listen on, e.g. 0.0.0.0 for all.
+
+- **port** : *std::uint16_t*
+  Local port; 0 lets the system choose one.
+
+**Returns:**
+
+- *std::expected&lt; TcpServer, std::error_code &gt;* — The listening socket, invalid_argument for an address that is no IPv4 address, or the system's error (e.g. address_in_use).
+
+---
+
+## Example
+
+- Start here: [ex_com](../../examples/com/ex_com.mdx) — Communication library: receive datagrams and talk to a TCP server with timeouts.
+- Full source: [`src/examples/ex_com/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_com/main.cpp)
+- Build target: `ex_com` (runs under CTest)
+
+## Used in examples
+
+### [ex_com](../../examples/com/ex_com.mdx)
+
+Communication library: receive datagrams and talk to a TCP server with timeouts.
+
+````cpp title="src/examples/ex_com/main.cpp, line 108"
+std::println("TCP: serve a client and answer what it sends");
+auto listening = TcpServer::listen("127.0.0.1", 0); // 0: the system chooses the port
+auto client = TcpSocket::connect("127.0.0.1", listening ? listening->port() : 0, 500ms);
+auto connection = listening ? listening->accept(500ms) : std::unexpected(listening.error());
+std::size_t request = 0;
+if (client && connection && !client->write(std::as_bytes(std::span(std::string_view("hello"))))) {
+    std::array<std::byte, 64> buffer{};
+    const auto got = connection->read_some(buffer, 500ms); // what has arrived, at most 64 bytes
+    request = got ? *got : 0;
+}
+ok &= expect(request > 0 && request <= 5, "the server read the request of its client");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

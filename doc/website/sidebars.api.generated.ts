@@ -547,7 +547,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       items: [
         'api/com/serial-port',
         'api/com/tcp-socket',
-        'api/com/udp-socket'
+        'api/com/udp-socket',
+        'api/com/tcp-server',
+        'api/com/udp-datagram'
       ],
     },
     {

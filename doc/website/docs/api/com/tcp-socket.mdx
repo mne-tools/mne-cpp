@@ -83,6 +83,38 @@ Reads exactly `buffer.size()` bytes.
 
 ---
 
+### read_some(buffer, timeout)
+
+Reads what has arrived, up to `buffer.size()` bytes.
+
+**Parameters:**
+
+- **buffer** : *std::span&lt; std::byte &gt;*
+  Destination.
+
+- **timeout** : *std::chrono::milliseconds*
+  Maximum wait for the first byte; 0 only takes what has arrived.
+
+**Returns:**
+
+- *std::expected&lt; std::size_t, std::error_code &gt;* — The number of bytes read (at least one), timed_out if nothing arrived, connection_reset if the peer closed the connection, or the system's error.
+
+---
+
+### is_open()
+
+**Returns:**
+
+- *bool* — Whether the socket holds a connection; one the peer closed is still open until a read reports it.
+
+---
+
+### close()
+
+Closes the connection; nothing happens if there is none.
+
+---
+
 ## Static Methods
 
 ### connect(host, port, timeout)
@@ -116,15 +148,18 @@ Reads exactly `buffer.size()` bytes.
 
 Communication library: receive datagrams and talk to a TCP server with timeouts.
 
-````cpp title="src/examples/ex_com/main.cpp, line 107"
-std::println("TCP: nothing serves port 1 of this machine");
-auto server = TcpSocket::connect("127.0.0.1", 1, 500ms);
-if (!server) {
-    std::println("no server: {}", server.error().message());
+````cpp title="src/examples/ex_com/main.cpp, line 108"
+std::println("TCP: serve a client and answer what it sends");
+auto listening = TcpServer::listen("127.0.0.1", 0); // 0: the system chooses the port
+auto client = TcpSocket::connect("127.0.0.1", listening ? listening->port() : 0, 500ms);
+auto connection = listening ? listening->accept(500ms) : std::unexpected(listening.error());
+std::size_t request = 0;
+if (client && connection && !client->write(std::as_bytes(std::span(std::string_view("hello"))))) {
+    std::array<std::byte, 64> buffer{};
+    const auto got = connection->read_some(buffer, 500ms); // what has arrived, at most 64 bytes
+    request = got ? *got : 0;
 }
-ok &= expect(!server, "connecting fails with the system's reason");
-ok &= expect(TcpSocket::connect("no-such-host.invalid", 4217, 500ms).error() == std::errc::host_unreachable,
-             "an unknown host is host_unreachable");
+ok &= expect(request > 0 && request <= 5, "the server read the request of its client");
 ````
 
 ## Authors of this file

@@ -1,0 +1,45 @@
+---
+id: udp-datagram
+title: "mne::UdpDatagram"
+sidebar_label: UdpDatagram
+sidebar_position: 5
+---
+
+# UdpDatagram
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Communication Library &nbsp;·&nbsp; **Source:** [`com/udp_socket.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/com/udp_socket.h)
+
+`#include <com/udp_socket.h>`
+
+```cpp
+struct mne::UdpDatagram
+```
+
+Size and sender of a datagram received with `UdpSocket::receive_from()`.
+
+```cpp title="src/examples/ex_com/main.cpp"
+auto service = UdpSocket::bind("127.0.0.1", 0);
+auto asking = UdpSocket::bind("127.0.0.1", 0);
+std::string answer;
+if (service && asking && !asking->send_to(std::as_bytes(std::span(std::string_view("?"))), "127.0.0.1", service->port())) {
+    std::array<std::byte, 64> query{};
+    const auto from = service->receive_from(query, 500ms); // size, address and port of the sender
+    if (from && !service->send_to(std::as_bytes(std::span(std::string_view("here"))), from->address, from->port)) {
+        std::array<std::byte, 64> reply{};
+        const auto replySize = asking->receive(reply, 500ms);
+        answer.assign(reinterpret_cast<const char*>(reply.data()), replySize ? *replySize : 0);
+    }
+}
+```
+
+---
+
+## Example
+
+- Start here: [ex_com](../../examples/com/ex_com.mdx) — Communication library: receive datagrams and talk to a TCP server with timeouts.
+- Full source: [`src/examples/ex_com/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_com/main.cpp)
+- Build target: `ex_com` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

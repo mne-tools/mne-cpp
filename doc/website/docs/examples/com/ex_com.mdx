@@ -32,13 +32,16 @@ The documented classes this example uses most:
 | Class | Library |
 |---|---|
 | [`TcpSocket`](../../api/com/tcp-socket.mdx) | Communication |
-| [`SerialPort`](../../api/com/serial-port.mdx) | Communication |
 | [`UdpSocket`](../../api/com/udp-socket.mdx) | Communication |
+| [`SerialPort`](../../api/com/serial-port.mdx) | Communication |
+| [`TcpServer`](../../api/com/tcp-server.mdx) | Communication |
 
 ## Used in the API reference
 
 - [SerialPort](../../api/com/serial-port.mdx)
+- [TcpServer](../../api/com/tcp-server.mdx)
 - [TcpSocket](../../api/com/tcp-socket.mdx)
+- [UdpDatagram](../../api/com/udp-datagram.mdx)
 - [UdpSocket](../../api/com/udp-socket.mdx)
 
 ## Source
@@ -66,6 +69,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 #include <com/serial_port.h>
+#include <com/tcp_server.h>
 #include <com/tcp_socket.h>
 #include <com/udp_socket.h>
 
@@ -151,6 +155,37 @@ int main()
     //! [udp_usage]
     ok &= expect(size && *size == 12, "one datagram of 12 bytes arrives");
     ok &= expect(udp->receive(datagram, 50ms).error() == std::errc::timed_out, "no second one: timed_out");
+
+    std::println("TCP: serve a client and answer what it sends");
+    //! [tcp_server_usage]
+    auto listening = TcpServer::listen("127.0.0.1", 0); // 0: the system chooses the port
+    auto client = TcpSocket::connect("127.0.0.1", listening ? listening->port() : 0, 500ms);
+    auto connection = listening ? listening->accept(500ms) : std::unexpected(listening.error());
+    std::size_t request = 0;
+    if (client && connection && !client->write(std::as_bytes(std::span(std::string_view("hello"))))) {
+        std::array<std::byte, 64> buffer{};
+        const auto got = connection->read_some(buffer, 500ms); // what has arrived, at most 64 bytes
+        request = got ? *got : 0;
+    }
+    //! [tcp_server_usage]
+    ok &= expect(request > 0 && request <= 5, "the server read the request of its client");
+
+    std::println("UDP: answer whoever sent a datagram");
+    //! [udp_reply_usage]
+    auto service = UdpSocket::bind("127.0.0.1", 0);
+    auto asking = UdpSocket::bind("127.0.0.1", 0);
+    std::string answer;
+    if (service && asking && !asking->send_to(std::as_bytes(std::span(std::string_view("?"))), "127.0.0.1", service->port())) {
+        std::array<std::byte, 64> query{};
+        const auto from = service->receive_from(query, 500ms); // size, address and port of the sender
+        if (from && !service->send_to(std::as_bytes(std::span(std::string_view("here"))), from->address, from->port)) {
+            std::array<std::byte, 64> reply{};
+            const auto replySize = asking->receive(reply, 500ms);
+            answer.assign(reinterpret_cast<const char*>(reply.data()), replySize ? *replySize : 0);
+        }
+    }
+    //! [udp_reply_usage]
+    ok &= expect(answer == "here", "the service answered the sender of the query");
 
     std::println("TCP: nothing serves port 1 of this machine");
     //! [tcp_usage]

@@ -56,6 +56,39 @@ const auto size = udp->receive(datagram, 1s);
 
 ---
 
+### join_group(group, interface_address)
+
+Joins a multicast group in addition to one given to `bind()`.
+
+**Parameters:**
+
+- **group** : *const std::string &*
+  Multicast group (224.0.0.0 to 239.255.255.255).
+
+- **interface_address** : *const std::string &*
+  IPv4 address of the local interface, e.g. 127.0.0.1 for loopback; empty for the interface the system chooses.
+
+**Returns:**
+
+- *std::error_code* — Empty, invalid_argument for an address that is no IPv4 address, or the system's error.
+
+---
+
+### set_multicast_interface(interface_address)
+
+Chooses the interface that datagrams to multicast groups leave through; they also reach the members on this machine.
+
+**Parameters:**
+
+- **interface_address** : *const std::string &*
+  IPv4 address of the local interface, e.g. 127.0.0.1; empty for the interface of the default route.
+
+**Returns:**
+
+- *std::error_code* — Empty, invalid_argument for an address that is no IPv4 address, or the system's error.
+
+---
+
 ### port()
 
 **Returns:**
@@ -80,11 +113,31 @@ const auto size = udp->receive(datagram, 1s);
 
 ---
 
+### receive_from(buffer, timeout)
+
+As `receive()`, with the sender, e.g.
+
+to answer it.
+
+**Parameters:**
+
+- **buffer** : *std::span&lt; std::byte &gt;*
+  Destination; a longer datagram is cut.
+
+- **timeout** : *std::chrono::milliseconds*
+  Maximum wait; 0 only takes a datagram that has arrived.
+
+**Returns:**
+
+- *std::expected&lt; [UdpDatagram](/docs/api/com/udp-datagram), std::error_code &gt;* — Size and sender of the next datagram, timed_out if none arrived, or the system's error.
+
+---
+
 ### send_to(datagram, address, port)
 
 Sends one datagram.
 
-To a multicast group it leaves through the interface of the default route and also reaches the members on this machine.
+To a multicast group it leaves through the interface of the default route, or the one set with `set_multicast_interface()`, and also reaches the members on this machine; 255.255.255.255 is the broadcast address of the local network.
 
 **Parameters:**
 
@@ -105,7 +158,7 @@ To a multicast group it leaves through the interface of the default route and al
 
 ## Static Methods
 
-### bind(address, port)
+### bind(address, port, shared)
 
 **Parameters:**
 
@@ -114,6 +167,9 @@ To a multicast group it leaves through the interface of the default route and al
 
 - **port** : *std::uint16_t*
   Local port; 0 lets the system choose one.
+
+- **shared** : *bool*
+  Whether other sockets on this machine may bind the same port too, e.g. several services listening for the same queries; always so for a multicast group.
 
 **Returns:**
 
@@ -133,7 +189,7 @@ To a multicast group it leaves through the interface of the default route and al
 
 Communication library: receive datagrams and talk to a TCP server with timeouts.
 
-````cpp title="src/examples/ex_com/main.cpp, line 93"
+````cpp title="src/examples/ex_com/main.cpp, line 94"
 std::println("UDP: a device sends datagrams to a port");
 auto udp = UdpSocket::bind("127.0.0.1", 0); // 0: the system chooses the port
 if (!udp) {
