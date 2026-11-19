@@ -754,6 +754,9 @@ aliases; replace the old spelling as below.
   restoring a state without stations keeps the current assignment. Before,
   the probe station was lost and a missing entry swapped pen and tracker
   (station 1 became the tracker).
+- The session state of `PolhemusCoregistration` stores each fiducial under
+  its own name. Before, the LPA was stored as `NAS`, the NAS as `RPA` and the
+  RPA as `CZ`; a state written by hand or another tool was read shifted.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

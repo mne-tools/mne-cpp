@@ -1114,15 +1114,16 @@ void PolhemusCoregistration::saveSessionState(QSettings& settings, const QString
     settings.setValue("mirrorY", m_mirrorY);
 
     // Pen fiducials
-    const char* fidNames[] = {"LPA", "NAS", "RPA", "CZ"};
-    for (int i = 0; i < 4; ++i) {
+    // Indexed by FiducialId (LPA = 1, NAS = 2, RPA = 3)
+    const char* fidNames[] = {"", "LPA", "NAS", "RPA"};
+    for (int i = 1; i < 4; ++i) {
         settings.setValue(QString("hasPenFid/%1").arg(fidNames[i]), m_hasPenFid[i]);
         if (m_hasPenFid[i])
             saveVec3(settings, QString("penFid/%1").arg(fidNames[i]), m_penFid[i]);
     }
 
     // Model fiducials
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 1; i < 4; ++i) {
         settings.setValue(QString("hasModelFid/%1").arg(fidNames[i]), m_hasModelFid[i]);
         if (m_hasModelFid[i])
             saveVec3(settings, QString("modelFid/%1").arg(fidNames[i]), m_modelFid[i]);
@@ -1204,15 +1205,16 @@ bool PolhemusCoregistration::restoreSessionState(QSettings& settings, const QStr
     m_mirrorY = settings.value("mirrorY", false).toBool();
 
     // Pen fiducials
-    const char* fidNames[] = {"LPA", "NAS", "RPA", "CZ"};
-    for (int i = 0; i < 4; ++i) {
+    // Indexed by FiducialId (LPA = 1, NAS = 2, RPA = 3)
+    const char* fidNames[] = {"", "LPA", "NAS", "RPA"};
+    for (int i = 1; i < 4; ++i) {
         m_hasPenFid[i] = settings.value(QString("hasPenFid/%1").arg(fidNames[i]), false).toBool();
         if (m_hasPenFid[i])
             m_penFid[i] = loadVec3(settings, QString("penFid/%1").arg(fidNames[i]));
     }
 
     // Model fiducials
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 1; i < 4; ++i) {
         m_hasModelFid[i] = settings.value(QString("hasModelFid/%1").arg(fidNames[i]), false).toBool();
         if (m_hasModelFid[i])
             m_modelFid[i] = loadVec3(settings, QString("modelFid/%1").arg(fidNames[i]));

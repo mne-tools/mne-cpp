@@ -156,6 +156,7 @@ private slots:
 
     void sessionState_roundTrip();
     void sessionState_keepsTheStations();
+    void sessionState_namesTheFiducials();
 
     void liveTracking_stationsMirrorTipAndGimbalGuard();
     void liveCapture_fiducialsHeadShapeVertexAndButton();
@@ -301,25 +302,19 @@ void TestPolhemusCoregistration::seedFiducials(PolhemusCoregistration& coreg,
                                                const QVector3D& modelNas,
                                                const QVector3D& modelRpa)
 {
-    // Index 0..2 of the stored arrays, named the way the persistence code
-    // names them. Note these labels do not line up with FiducialId, which
-    // starts at LPA = 1; save and load agree with each other, which is what
-    // matters and what sessionState_roundTrip pins down.
-    settings.setValue("hasPenFid/LPA", false);
+    settings.setValue("hasPenFid/LPA", true);
     settings.setValue("hasPenFid/NAS", true);
     settings.setValue("hasPenFid/RPA", true);
-    settings.setValue("hasPenFid/CZ", true);
-    writeVec3(settings, "penFid/NAS", penLpa);
-    writeVec3(settings, "penFid/RPA", penNas);
-    writeVec3(settings, "penFid/CZ", penRpa);
+    writeVec3(settings, "penFid/LPA", penLpa);
+    writeVec3(settings, "penFid/NAS", penNas);
+    writeVec3(settings, "penFid/RPA", penRpa);
 
-    settings.setValue("hasModelFid/LPA", false);
+    settings.setValue("hasModelFid/LPA", true);
     settings.setValue("hasModelFid/NAS", true);
     settings.setValue("hasModelFid/RPA", true);
-    settings.setValue("hasModelFid/CZ", true);
-    writeVec3(settings, "modelFid/NAS", modelLpa);
-    writeVec3(settings, "modelFid/RPA", modelNas);
-    writeVec3(settings, "modelFid/CZ", modelRpa);
+    writeVec3(settings, "modelFid/LPA", modelLpa);
+    writeVec3(settings, "modelFid/NAS", modelNas);
+    writeVec3(settings, "modelFid/RPA", modelRpa);
 
     settings.sync();
 
@@ -497,11 +492,11 @@ void TestPolhemusCoregistration::registration_requiresAllFiducials()
 
     // Only two of the three captured, which is not enough to fix a rigid
     // transform and must be refused rather than fitted.
+    settings.setValue("hasPenFid/LPA", true);
     settings.setValue("hasPenFid/NAS", true);
-    settings.setValue("hasPenFid/RPA", true);
-    settings.setValue("hasPenFid/CZ", false);
-    writeVec3(settings, "penFid/NAS", QVector3D(-0.075f, 0.0f, 0.0f));
-    writeVec3(settings, "penFid/RPA", QVector3D(0.0f, 0.095f, 0.0f));
+    settings.setValue("hasPenFid/RPA", false);
+    writeVec3(settings, "penFid/LPA", QVector3D(-0.075f, 0.0f, 0.0f));
+    writeVec3(settings, "penFid/NAS", QVector3D(0.0f, 0.095f, 0.0f));
     settings.sync();
 
     coreg.restoreSessionState(settings, QString());
@@ -538,6 +533,31 @@ void TestPolhemusCoregistration::sessionState_keepsTheStations()
     QCOMPARE(third.trackerStation(), 2);
     QCOMPARE(third.penStation(), 1);
     QCOMPARE(third.probeStation(), 3);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::sessionState_namesTheFiducials()
+{
+    // A fiducial captured as LPA is stored under LPA, not under the name of the next one
+    PolhemusCoregistration coreg;
+    const QVector3D lpa(-0.075f, 0.0f, 0.0f), nas(0.0f, 0.095f, 0.0f), rpa(0.075f, 0.0f, 0.0f);
+    for (const auto& [id, pos] : {std::pair{FiducialId::LPA, lpa}, std::pair{FiducialId::NAS, nas}, std::pair{FiducialId::RPA, rpa}}) {
+        feed(coreg, 1, pos, QQuaternion());
+        QVERIFY(coreg.captureCurrentPenPositionAsFiducial(id));
+        coreg.setModelFiducial(id, toEigen(pos));
+    }
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    QSettings saved(tmpDir.path() + "/names.ini", QSettings::IniFormat);
+    coreg.saveSessionState(saved, QString());
+    for (const auto& [name, pos] : {std::pair{"LPA", lpa}, std::pair{"NAS", nas}, std::pair{"RPA", rpa}}) {
+        QVERIFY2(saved.value(QString("hasPenFid/%1").arg(name)).toBool(), name);
+        QCOMPARE(saved.value(QString("penFid/%1/x").arg(name)).toFloat(), pos.x());
+        QCOMPARE(saved.value(QString("penFid/%1/y").arg(name)).toFloat(), pos.y());
+        QCOMPARE(saved.value(QString("modelFid/%1/x").arg(name)).toFloat(), pos.x());
+    }
+    QVERIFY(!saved.contains("hasPenFid/CZ"));
 }
 
 //=============================================================================================================
