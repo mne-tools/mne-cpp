@@ -30,11 +30,9 @@
       "modules": []
     },
     "acq/devices/polhemus": {
-      "tokens": 85,
-      "public_header_includes": 6,
-      "modules": [
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "acq/fiff": {
       "tokens": 19,

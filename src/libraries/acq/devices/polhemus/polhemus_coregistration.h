@@ -21,8 +21,8 @@
  *             head-surface points to build up an @ref AcquiredPoints store.
  *
  *           After capturing all three fiducials the caller invokes
- *           @ref computeRegistration to obtain the head→device rigid
- *           transform (@ref headToDevice). This matrix can be used
+ *           @ref compute_registration to obtain the head→device rigid
+ *           transform (@ref head_to_device). This matrix can be used
  *           directly by a neuro-navigation pipeline.
  *
  *           The head coordinate frame follows the standard MEG/EEG convention:
@@ -32,7 +32,7 @@
  *             - +Z superior (up).
  *
  *           The tracker-to-device calibration offset
- *           (@ref setTrackerToDeviceOffset) describes the rigid transform
+ *           (@ref set_tracker_to_device_offset) describes the rigid transform
  *           from the tracker sensor body frame to the device frame.
  *           It is determined once by a pivot-calibration procedure and
  *           stored in the application settings.
@@ -48,16 +48,17 @@
 #include "acq_polhemus_global.h"
 #include "acquired_points.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QObject>
-#include <QSettings>
+#include <base/json.h>
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <functional>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -76,35 +77,67 @@ namespace mne
  *     station + user-supplied calibration offset).
  *   - An @ref AcquiredPoints store filled by explicit capture calls or
  *     automatically on pen-button press.
- *   - The computed head–device transform after @ref computeRegistration.
+ *   - The computed head–device transform after @ref compute_registration.
+ *
+ * Events (new poses, button presses, calibration progress) reach the caller through the callbacks of a
+ * @ref Listener; a Qt application forwards them as signals.
  *
  * @snippet ex_acq_polhemus/main.cpp polhemus_coregistration_usage
  */
-class ACQPOLHEMUSSHARED_EXPORT PolhemusCoregistration : public QObject
+class ACQPOLHEMUSSHARED_EXPORT PolhemusCoregistration
 {
-    Q_OBJECT
-
 public:
-    explicit PolhemusCoregistration(QObject* parent = nullptr);
-    ~PolhemusCoregistration() override = default;
+    enum class PivotState
+    {
+        Idle,
+        WaitingForStart,
+        Collecting,
+        Done
+    };
+
+    /**
+     * @brief The events of a coregistration session; empty callbacks are skipped.
+     */
+    struct Listener
+    {
+        std::function<void(const Eigen::Matrix4f& device_to_world)> device_pose_changed;                                /**< New tracker pose. */
+        std::function<void(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation)> pen_pose_changed;   /**< New pen pose. */
+        std::function<void(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation)> probe_pose_changed; /**< New probe pose. */
+        std::function<void(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation)> pen_button_pressed; /**< Pen button pressed. */
+        std::function<void()> registration_changed;                                                                     /**< Registration computed, reset or restored. */
+        std::function<void(PivotState state)> pivot_state_changed;                                                      /**< Pivot calibration state. */
+        std::function<void(const Eigen::Vector3f& offset, float residual_mm)> pivot_calibration_done;                   /**< Pivot calibration solved. */
+        std::function<void(int sample_count, float angular_span_deg)> pivot_sample_collected;                           /**< Pivot sample taken. */
+        std::function<void()> optical_calibration_changed;                                                              /**< Optical calibration changed. */
+    };
+
+    /**
+     * Sets the callbacks for the events of this session.
+     *
+     * @param[in] listener   The callbacks; empty ones are skipped.
+     */
+    void set_listener(Listener listener)
+    {
+        m_listener = std::move(listener);
+    }
 
     //=========================================================================================================
     // Station assignment
     //=========================================================================================================
 
-    void setTrackerStation(int station);
-    void setPenStation(int station);
-    void setProbeStation(int station);
+    void set_tracker_station(int station);
+    void set_pen_station(int station);
+    void set_probe_station(int station);
 
-    int trackerStation() const
+    int tracker_station() const
     {
         return m_trackerStation;
     }
-    int penStation() const
+    int pen_station() const
     {
         return m_penStation;
     }
-    int probeStation() const
+    int probe_station() const
     {
         return m_probeStation;
     }
@@ -113,19 +146,19 @@ public:
     // Pen tip offset (sensor body frame → tip)
     //=========================================================================================================
 
-    void setPenTipOffset(const Eigen::Vector3f& offset)
+    void set_pen_tip_offset(const Eigen::Vector3f& offset)
     {
         m_penTipOffset = offset;
     }
-    Eigen::Vector3f penTipOffset() const
+    Eigen::Vector3f pen_tip_offset() const
     {
         return m_penTipOffset;
     }
-    void setTipOffsetEnabled(bool on)
+    void set_tip_offset_enabled(bool on)
     {
         m_tipOffsetEnabled = on;
     }
-    bool tipOffsetEnabled() const
+    bool tip_offset_enabled() const
     {
         return m_tipOffsetEnabled;
     }
@@ -143,19 +176,19 @@ public:
      * expected neuroscience convention, enable the corresponding mirror
      * flags here.
      *
-     * @param[in] mirrorX True to negate the X coordinate of incoming positions.
-     * @param[in] mirrorY True to negate the Y coordinate of incoming positions.
+     * @param[in] mirror_x True to negate the X coordinate of incoming positions.
+     * @param[in] mirror_y True to negate the Y coordinate of incoming positions.
      */
-    void setAxisMirror(bool mirrorX, bool mirrorY)
+    void set_axis_mirror(bool mirror_x, bool mirror_y)
     {
-        m_mirrorX = mirrorX;
-        m_mirrorY = mirrorY;
+        m_mirrorX = mirror_x;
+        m_mirrorY = mirror_y;
     }
-    bool mirrorX() const
+    bool mirror_x() const
     {
         return m_mirrorX;
     }
-    bool mirrorY() const
+    bool mirror_y() const
     {
         return m_mirrorY;
     }
@@ -164,25 +197,17 @@ public:
     // Pivot calibration — determine pen tip offset by pivoting pen around its tip
     //=========================================================================================================
 
-    enum class PivotState
-    {
-        Idle,
-        WaitingForStart,
-        Collecting,
-        Done
-    };
-
-    void startPivotCalibration();
-    void cancelPivotCalibration();
-    PivotState pivotState() const
+    void start_pivot_calibration();
+    void cancel_pivot_calibration();
+    PivotState pivot_state() const
     {
         return m_pivotState;
     }
-    int pivotSampleCount() const
+    int pivot_sample_count() const
     {
         return static_cast<int>(m_pivotPositions.size());
     }
-    float pivotResidualMm() const
+    float pivot_residual_mm() const
     {
         return m_pivotResidualMm;
     }
@@ -198,14 +223,14 @@ public:
      * @param translation  Translation in metres, expressed in the tracker body frame.
      * @param rotation     Rotation from tracker body frame to device frame.
      */
-    void setTrackerToDeviceOffset(const Eigen::Vector3f& translation,
-                                  const Eigen::Quaternionf& rotation);
+    void set_tracker_to_device_offset(const Eigen::Vector3f& translation,
+                                      const Eigen::Quaternionf& rotation);
 
-    Eigen::Vector3f trackerToDeviceTranslation() const
+    Eigen::Vector3f tracker_to_device_translation() const
     {
         return m_offsetTranslation;
     }
-    Eigen::Quaternionf trackerToDeviceRotation() const
+    Eigen::Quaternionf tracker_to_device_rotation() const
     {
         return m_offsetRotation;
     }
@@ -216,34 +241,34 @@ public:
     //
     // Workflow:
     //   1. Move the OPMI to a position, aim at a point on the head surface,
-    //      mark the focus point with the stylus pen → captureOpticalCalibSample().
+    //      mark the focus point with the stylus pen → capture_optical_calib_sample().
     //   2. Repeat at 2–3 different positions / focal distances.
-    //   3. Call solveOpticalCalibration() to fit a 3D line through the focus
+    //   3. Call solve_optical_calibration() to fit a 3D line through the focus
     //      points in the tracker's local frame, yielding the optical axis
     //      direction and the optical center offset from the tracker.
     //=========================================================================================================
 
     struct OpticalCalibSample
     {
-        Eigen::Vector3f trackerPos = Eigen::Vector3f::Zero();           ///< Tracker position in world frame (metres).
-        Eigen::Quaternionf trackerOri = Eigen::Quaternionf::Identity(); ///< Tracker orientation in world frame.
-        Eigen::Vector3f focusPoint = Eigen::Vector3f::Zero();           ///< Stylus focus point in world frame (metres).
+        Eigen::Vector3f tracker_pos = Eigen::Vector3f::Zero();           ///< Tracker position in world frame (metres).
+        Eigen::Quaternionf tracker_ori = Eigen::Quaternionf::Identity(); ///< Tracker orientation in world frame.
+        Eigen::Vector3f focus_point = Eigen::Vector3f::Zero();           ///< Stylus focus point in world frame (metres).
     };
 
     /**
      * @brief Record one calibration sample (current tracker pose + current pen position).
      * @return @c true if both pen and tracker data are available, @c false otherwise.
      */
-    bool captureOpticalCalibSample();
+    bool capture_optical_calib_sample();
 
     /** @return Number of calibration samples recorded so far. */
-    int opticalCalibSampleCount() const
+    int optical_calib_sample_count() const
     {
         return static_cast<int>(m_opticalCalibSamples.size());
     }
 
     /** Discard all calibration samples and reset the optical calibration. */
-    void clearOpticalCalibSamples();
+    void clear_optical_calib_samples();
 
     /**
      * @brief Capture the current pen position as the objective lens center.
@@ -255,23 +280,23 @@ public:
      *
      * @return @c true on success, @c false if pen or tracker data unavailable.
      */
-    bool captureObjectiveCenter();
+    bool capture_objective_center();
 
     /** @return Whether an objective center has been captured. */
-    bool hasObjectiveCenter() const
+    bool has_objective_center() const
     {
         return m_hasObjectiveCenter;
     }
 
     /** Clear the captured objective center. */
-    void clearObjectiveCenter();
+    void clear_objective_center();
 
     /**
      * Captured objective center in tracker body frame (metres).
      *
-     * @return Objective center in the tracker body frame in metres; only meaningful if hasObjectiveCenter() is true.
+     * @return Objective center in the tracker body frame in metres; only meaningful if has_objective_center() is true.
      */
-    Eigen::Vector3f objectiveCenterLocal() const
+    Eigen::Vector3f objective_center_local() const
     {
         return m_objectiveCenterLocal;
     }
@@ -284,7 +309,7 @@ public:
      *
      * @return @c true on success; @c false if insufficient or degenerate data.
      */
-    bool solveOpticalCalibration();
+    bool solve_optical_calibration();
 
     /**
      * @brief Set the known perpendicular distance from tracker sensor to
@@ -296,17 +321,17 @@ public:
      *
      * @param[in] metres Tracker-to-objective distance in metres; 0 disables the constraint.
      */
-    void setKnownTrackerToObjectiveDistance(float metres)
+    void set_known_tracker_to_objective_distance(float metres)
     {
         m_knownTrackerToObjectiveDist = metres;
     }
-    float knownTrackerToObjectiveDistance() const
+    float known_tracker_to_objective_distance() const
     {
         return m_knownTrackerToObjectiveDist;
     }
 
     /** @return Whether a valid optical calibration has been computed. */
-    bool opticalCalibrationValid() const
+    bool optical_calibration_valid() const
     {
         return m_opticalCalibValid;
     }
@@ -314,9 +339,9 @@ public:
     /**
      * Direction of the optical axis in the tracker body frame (unit vector).
      *
-     * @return Unit optical-axis direction in the tracker body frame; only meaningful if opticalCalibrationValid() is true.
+     * @return Unit optical-axis direction in the tracker body frame; only meaningful if optical_calibration_valid() is true.
      */
-    Eigen::Vector3f opticalAxisLocal() const
+    Eigen::Vector3f optical_axis_local() const
     {
         return m_opticalAxisLocal;
     }
@@ -326,7 +351,7 @@ public:
      *
      * @return Optical center in the tracker body frame in metres.
      */
-    Eigen::Vector3f opticalCenterLocal() const
+    Eigen::Vector3f optical_center_local() const
     {
         return m_opticalCenterLocal;
     }
@@ -336,7 +361,7 @@ public:
      *
      * @return RMS distance of the focus points from the fitted optical axis in millimetres.
      */
-    float opticalCalibResidualMm() const
+    float optical_calib_residual_mm() const
     {
         return m_opticalCalibResidualMm;
     }
@@ -346,7 +371,7 @@ public:
      *
      * @return Extent of the calibration focus points along the optical axis in millimetres.
      */
-    float opticalCalibDepthSpreadMm() const
+    float optical_calib_depth_spread_mm() const
     {
         return m_opticalCalibDepthSpreadMm;
     }
@@ -364,23 +389,23 @@ public:
      * @return @c true on success; @c false if calibration or tracker data
      *         is unavailable, or the correction would exceed 10°.
      */
-    bool applyOpticalAxisFineAdjust(const Eigen::Vector3f& targetWorldPos,
-                                    float& correctionDeg);
+    bool apply_optical_axis_fine_adjust(const Eigen::Vector3f& targetWorldPos,
+                                        float& correctionDeg);
 
     /** @return Whether a fine adjustment has been applied. */
-    bool opticalFineAdjustApplied() const
+    bool optical_fine_adjust_applied() const
     {
         return m_opticalFineAdjustApplied;
     }
 
     /** @return The angle of the last fine adjustment (degrees). */
-    float opticalFineAdjustDeg() const
+    float optical_fine_adjust_deg() const
     {
         return m_opticalFineAdjustDeg;
     }
 
     /** Undo the last fine adjustment, restoring the original solved axis. */
-    void clearOpticalFineAdjust();
+    void clear_optical_fine_adjust();
 
     /**
      * @brief Compute the current optical axis ray in Polhemus world frame.
@@ -389,7 +414,7 @@ public:
      * @param[out] direction  Ray direction (optical axis in world frame, unit vector).
      * @return @c true if tracker data and calibration are available.
      */
-    bool opticalRayInWorld(Eigen::Vector3f& origin, Eigen::Vector3f& direction) const;
+    bool optical_ray_in_world(Eigen::Vector3f& origin, Eigen::Vector3f& direction) const;
 
     /**
      * Returns the "up" direction of the optical path in world coordinates.
@@ -400,7 +425,7 @@ public:
      * @param[out] up  Unit vector pointing "up" in the microscope view.
      * @return @c true if tracker data and calibration are available.
      */
-    bool opticalUpInWorld(Eigen::Vector3f& up) const;
+    bool optical_up_in_world(Eigen::Vector3f& up) const;
 
     //=========================================================================================================
     // Digitizer input
@@ -428,53 +453,57 @@ public:
     // Digitized-point store
     //=========================================================================================================
 
-    AcquiredPoints* acquiredPoints() const
+    AcquiredPoints& acquired_points()
     {
-        return m_pPoints;
+        return m_points;
+    }
+    const AcquiredPoints& acquired_points() const
+    {
+        return m_points;
     }
 
     //=========================================================================================================
     // Explicit capture API
     //=========================================================================================================
 
-    bool captureCurrentPenPositionAsFiducial(FiducialId id);
-    bool captureCurrentPenPositionAsHeadShape();
+    bool capture_current_pen_position_as_fiducial(FiducialId id);
+    bool capture_current_pen_position_as_head_shape();
 
     //=========================================================================================================
     // Model (BEM / FIFF) fiducials — target landmarks for SVD coregistration
     //=========================================================================================================
 
-    void setModelFiducial(FiducialId id, const Eigen::Vector3f& posInModel);
-    bool hasModelFiducial(FiducialId id) const;
-    bool hasAllModelFiducials() const;
-    Eigen::Vector3f modelFiducial(FiducialId id) const;
+    void set_model_fiducial(FiducialId id, const Eigen::Vector3f& posInModel);
+    bool has_model_fiducial(FiducialId id) const;
+    bool has_all_model_fiducials() const;
+    Eigen::Vector3f model_fiducial(FiducialId id) const;
 
-    bool hasAllPenFiducials() const;
+    bool has_all_pen_fiducials() const;
 
     //=========================================================================================================
     // Vertex (CZ / top of head) — 4th reference point for orientation validation
     //=========================================================================================================
 
-    void setModelVertex(const Eigen::Vector3f& pos)
+    void set_model_vertex(const Eigen::Vector3f& pos)
     {
         m_modelVertex = pos;
         m_hasModelVertex = true;
     }
-    bool hasModelVertex() const
+    bool has_model_vertex() const
     {
         return m_hasModelVertex;
     }
-    Eigen::Vector3f modelVertex() const
+    Eigen::Vector3f model_vertex() const
     {
         return m_modelVertex;
     }
 
-    bool captureCurrentPenPositionAsVertex();
-    bool hasPenVertex() const
+    bool capture_current_pen_position_as_vertex();
+    bool has_pen_vertex() const
     {
         return m_hasPenVertex;
     }
-    Eigen::Vector3f penVertex() const
+    Eigen::Vector3f pen_vertex() const
     {
         return m_penVertex;
     }
@@ -490,22 +519,32 @@ public:
      * @return @c true on success; @c false if any fiducial is missing or the
      *         fiducials are degenerate (collinear).
      */
-    bool computeRegistration();
+    bool compute_registration();
 
     /**
-     * @brief Reset the registration state (headToWorld, headToDevice) to identity.
+     * @brief Reset the registration state (head_to_world, head_to_device) to identity.
      *        Call this when the user clears all fiducials.
      */
-    void resetRegistration();
+    void reset_registration();
 
     //=========================================================================================================
     // Session persistence — save/restore registration state across app restarts
     //=========================================================================================================
 
-    void saveSessionState(QSettings& settings, const QString& prefix = QStringLiteral("polhemus")) const;
-    bool restoreSessionState(QSettings& settings, const QString& prefix = QStringLiteral("polhemus"));
+    /**
+     * @return Stations, fiducials, calibrations and the registration, to store and give to restore_session_state().
+     */
+    JsonObject session_state() const;
 
-    bool registrationValid() const
+    /**
+     * Restores a state from session_state(); entries it lacks keep their current values.
+     *
+     * @param[in] state   The stored state.
+     * @return Whether it holds a valid registration.
+     */
+    bool restore_session_state(const JsonObject& state);
+
+    bool registration_valid() const
     {
         return m_registrationValid;
     }
@@ -514,62 +553,51 @@ public:
     // Current state accessors
     //=========================================================================================================
 
-    Eigen::Matrix4f deviceToWorld() const
+    Eigen::Matrix4f device_to_world() const
     {
         return m_deviceToWorld;
     }
-    Eigen::Matrix4f headToWorld() const
+    Eigen::Matrix4f head_to_world() const
     {
         return m_headToWorld;
     }
-    Eigen::Matrix4f headToDevice() const
+    Eigen::Matrix4f head_to_device() const
     {
         return m_headToDevice;
     }
-    Eigen::Matrix4f worldToModel() const
+    Eigen::Matrix4f world_to_model() const
     {
         return m_worldToModel;
     }
-    Eigen::Vector3f penPosition() const
+    Eigen::Vector3f pen_position() const
     {
         return m_penPosition;
     }
-    Eigen::Quaternionf penOrientation() const
+    Eigen::Quaternionf pen_orientation() const
     {
         return m_penOrientation;
     }
-    bool haveLivePenPosition() const
+    bool have_live_pen_position() const
     {
         return m_havePenPos;
     }
 
-    Eigen::Vector3f probePosition() const
+    Eigen::Vector3f probe_position() const
     {
         return m_probePosition;
     }
-    Eigen::Quaternionf probeOrientation() const
+    Eigen::Quaternionf probe_orientation() const
     {
         return m_probeOrientation;
     }
-    bool haveLiveProbePosition() const
+    bool have_live_probe_position() const
     {
         return m_haveProbePos;
     }
 
-signals:
-    void devicePoseChanged(const Eigen::Matrix4f& deviceToWorld);
-    void penPoseChanged(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation);
-    void probePoseChanged(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation);
-    void penButtonPressed(const Eigen::Vector3f& position, const Eigen::Quaternionf& orientation);
-    void registrationChanged();
-    void pivotStateChanged(PolhemusCoregistration::PivotState state);
-    void pivotCalibrationDone(const Eigen::Vector3f& offset, float residualMm);
-    void pivotSampleCollected(int sampleCount, float angularSpanDeg);
-    void opticalCalibrationChanged();
-
 private:
-    Eigen::Matrix4f buildDevicePose(const Eigen::Vector3f& trackerPos,
-                                    const Eigen::Quaternionf& trackerOri) const;
+    Eigen::Matrix4f buildDevicePose(const Eigen::Vector3f& tracker_pos,
+                                    const Eigen::Quaternionf& tracker_ori) const;
     Eigen::Matrix4f buildHeadFrame() const;
 
     int m_trackerStation = 2;
@@ -583,7 +611,8 @@ private:
     bool m_mirrorX = false; // negate X of incoming Polhemus positions
     bool m_mirrorY = false; // negate Y of incoming Polhemus positions
 
-    AcquiredPoints* m_pPoints = nullptr;
+    AcquiredPoints m_points;
+    Listener m_listener;
 
     Eigen::Vector3f m_penPosition = Eigen::Vector3f::Zero();
     Eigen::Quaternionf m_penOrientation = Eigen::Quaternionf::Identity();

@@ -17,8 +17,7 @@
 
 #include <acq/devices/polhemus/acquired_points.h>
 
-#include <QString>
-#include <QVector>
+#include <vector>
 
 namespace MNEALIGN
 {
@@ -30,7 +29,7 @@ namespace MNEALIGN
  * realistic for an adult head: NAS forward, LPA / RPA symmetric on
  * the ears.
  */
-QVector<mne::DigitizedPoint> demoFiducials();
+std::vector<mne::DigitizedPoint> demoFiducials();
 
 //=============================================================================================================
 /**
@@ -41,7 +40,7 @@ QVector<mne::DigitizedPoint> demoFiducials();
  *
  * @param[in] count   Number of EEG points to return (clamped to 0..8).
  */
-QVector<mne::DigitizedPoint> demoEegCap(int count = 8);
+std::vector<mne::DigitizedPoint> demoEegCap(int count = 8);
 
 //=============================================================================================================
 /**
@@ -50,7 +49,7 @@ QVector<mne::DigitizedPoint> demoEegCap(int count = 8);
  *
  * @param[in] count   Number of HSP points to return (>= 0).
  */
-QVector<mne::DigitizedPoint> demoHeadShape(int count = 40);
+std::vector<mne::DigitizedPoint> demoHeadShape(int count = 40);
 
 //=============================================================================================================
 /**
@@ -58,7 +57,7 @@ QVector<mne::DigitizedPoint> demoHeadShape(int count = 40);
  * EEG cap + 40 HSP points. Convenience helper used by the Verify / Save
  * / Done screenshots where every category should be populated.
  */
-QVector<mne::DigitizedPoint> demoFullDigitisation();
+std::vector<mne::DigitizedPoint> demoFullDigitisation();
 
 //=============================================================================================================
 /**
@@ -66,7 +65,7 @@ QVector<mne::DigitizedPoint> demoFullDigitisation();
  * Only one @c pointsChanged signal is emitted (after the final point).
  */
 void applyTo(mne::AcquiredPoints* store,
-             const QVector<mne::DigitizedPoint>& points);
+             const std::vector<mne::DigitizedPoint>& points);
 
 } // namespace MNEALIGN
 

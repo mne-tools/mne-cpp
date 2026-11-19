@@ -24,7 +24,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include "align_points.h"
 #include "digitizer.h"
 
 #include <channels/standard_montage.h>
@@ -89,7 +89,7 @@ public:
      * @param[in] digitizer   Polhemus connection (not owned, may be null).
      * @param[in] parent      Parent widget.
      */
-    AlignWizard(mne::AcquiredPoints* acquired,
+    AlignWizard(AlignPoints* acquired,
                 Digitizer* digitizer,
                 QWidget* parent = nullptr);
 
@@ -247,7 +247,7 @@ private:
     /** @return next un-captured EEG label, or empty string when complete. */
     QString nextEegLabel(int* outIdent) const;
 
-    mne::AcquiredPoints* m_pPoints = nullptr;
+    AlignPoints* m_pPoints = nullptr;
     Digitizer* m_pDigitizer = nullptr;
 
     QString m_bemPath;

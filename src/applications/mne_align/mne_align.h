@@ -22,7 +22,7 @@
 #include <QMainWindow>
 #include <QPointer>
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include "align_points.h"
 #include "digitizer.h"
 
 //=============================================================================================================
@@ -85,7 +85,7 @@ public:
     Align3DView* view3d() const;
 
     /** @return The shared digitised-point store (never null after construction). */
-    mne::AcquiredPoints* points() const
+    AlignPoints* points() const
     {
         return m_pPoints;
     }
@@ -118,7 +118,7 @@ private:
     void loadSettings();
     void saveSettings();
 
-    mne::AcquiredPoints* m_pPoints = nullptr;
+    AlignPoints* m_pPoints = nullptr;
     Digitizer* m_pDigitizer = nullptr;
 
     QPointer<QSplitter> m_pSplitter;

@@ -53,7 +53,7 @@ MneAlign::MneAlign(QWidget* parent)
     setWindowTitle(QStringLiteral("MNE Align"));
     resize(1100, 720);
 
-    m_pPoints = new AcquiredPoints(this);
+    m_pPoints = new AlignPoints(this);
     m_pDigitizer = new Digitizer(this);
 
     buildUi();
@@ -133,7 +133,7 @@ void MneAlign::buildUi()
         connect(m_pView3d, &Align3DView::surfacePointDoubleClicked,
                 m_pWizard, &AlignWizard::onSurfaceDoubleClicked);
         // Push updated tracker→MRI transform to the wizard whenever points change
-        connect(m_pPoints, &AcquiredPoints::pointsChanged, this, [this] {
+        connect(m_pPoints, &AlignPoints::pointsChanged, this, [this] {
             if (m_pWizard && m_pView3d)
                 m_pWizard->setTrackerTransform(m_pView3d->trackerToMri());
         });
@@ -420,7 +420,7 @@ void MneAlign::onWizardSaveDigitisation(const QString& outPath)
         switch (p.kind) {
             case PointKind::Fiducial:
                 dig.kind = FIFFV_POINT_CARDINAL;
-                dig.ident = p.identNumber;
+                dig.ident = p.ident_number;
                 break;
             case PointKind::Eeg:
                 dig.kind = FIFFV_POINT_EEG;
@@ -499,12 +499,12 @@ void MneAlign::onIcpFit()
     }
 
     // Require all 3 twin fiducials and all 3 captured fiducials
-    if (!m_pPoints->hasAllTwinFiducials()) {
+    if (!m_pPoints->has_all_twin_fiducials()) {
         QMessageBox::warning(this, windowTitle(),
                              QStringLiteral("Twin fiducials incomplete. Click NAS, LPA, RPA on the BEM surface in Step 1."));
         return;
     }
-    if (!m_pPoints->hasFiducial(FiducialId::NAS) || !m_pPoints->hasFiducial(FiducialId::LPA) || !m_pPoints->hasFiducial(FiducialId::RPA)) {
+    if (!m_pPoints->has_fiducial(FiducialId::NAS) || !m_pPoints->has_fiducial(FiducialId::LPA) || !m_pPoints->has_fiducial(FiducialId::RPA)) {
         QMessageBox::warning(this, windowTitle(),
                              QStringLiteral("Captured fiducials incomplete. Capture NAS, LPA, RPA with the pen in Step 2."));
         return;
@@ -523,11 +523,11 @@ void MneAlign::onIcpFit()
 
     // Build point cloud from all captured points (raw tracker space)
     const auto& pts = m_pPoints->points();
-    if (pts.isEmpty())
+    if (pts.empty())
         return;
 
-    Eigen::MatrixXf cloud(pts.size(), 3);
-    for (int i = 0; i < pts.size(); ++i) {
+    Eigen::MatrixXf cloud(static_cast<Eigen::Index>(pts.size()), 3);
+    for (int i = 0; i < static_cast<int>(pts.size()); ++i) {
         cloud(i, 0) = pts[i].position.x();
         cloud(i, 1) = pts[i].position.y();
         cloud(i, 2) = pts[i].position.z();
@@ -563,10 +563,10 @@ void MneAlign::onIcpFit()
     // Per-fiducial residuals in head space (after applying refined transform).
     QVector<QPair<QString, float>> residuals;
     auto residualFor = [&](FiducialId id, const QString& label) {
-        if (!m_pPoints->hasFiducial(id) || !m_pPoints->hasTwinFiducial(id))
+        if (!m_pPoints->has_fiducial(id) || !m_pPoints->has_twin_fiducial(id))
             return;
-        const QVector3D cap = toQt(m_pPoints->fiducial(id));        // device space
-        const QVector3D mriRef = toQt(m_pPoints->twinFiducial(id)); // MRI space
+        const QVector3D cap = toQt(m_pPoints->fiducial(id));         // device space
+        const QVector3D mriRef = toQt(m_pPoints->twin_fiducial(id)); // MRI space
         const QVector3D mriPred = (refinedHeadToMri * deviceToHead).map(cap);
         residuals.append({label, (mriPred - mriRef).length()});
     };

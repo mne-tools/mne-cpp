@@ -51,6 +51,7 @@ set(MNE_ALIGN_CORE_HEADERS
     align_wizard.h
     align_3d_view.h
     qt_conversions.h
+    align_points.h
 )
 
 add_library(mne_align_app_core STATIC

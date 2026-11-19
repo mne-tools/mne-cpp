@@ -54,6 +54,9 @@
 #include <QString>
 #include <QVector>
 
+#include <algorithm>
+#include <vector>
+
 using MNEALIGN::AlignStep;
 using MNEALIGN::MneAlign;
 using mne::DigitizedPoint;
@@ -64,7 +67,7 @@ namespace DOCSHOTS
 namespace
 {
 
-void appendCapture(QVector<DigitizedPoint>& target, const QJsonObject& spec)
+void appendCapture(std::vector<DigitizedPoint>& target, const QJsonObject& spec)
 {
     const QString kind = spec.value(QStringLiteral("kind")).toString().toLower();
     const int count = spec.value(QStringLiteral("count")).toInt(0);
@@ -72,14 +75,15 @@ void appendCapture(QVector<DigitizedPoint>& target, const QJsonObject& spec)
         return;
 
     if (kind == QLatin1String("fiducial")) {
-        const QVector<DigitizedPoint> fids = MNEALIGN::demoFiducials();
-        const int n = qMin(count, fids.size());
-        for (int i = 0; i < n; ++i)
-            target.append(fids.at(i));
+        const std::vector<DigitizedPoint> fids = MNEALIGN::demoFiducials();
+        const std::size_t n = std::min(static_cast<std::size_t>(count), fids.size());
+        target.insert(target.end(), fids.begin(), fids.begin() + static_cast<std::ptrdiff_t>(n));
     } else if (kind == QLatin1String("eeg")) {
-        target += MNEALIGN::demoEegCap(count);
+        const std::vector<DigitizedPoint> eeg = MNEALIGN::demoEegCap(count);
+        target.insert(target.end(), eeg.begin(), eeg.end());
     } else if (kind == QLatin1String("hsp")) {
-        target += MNEALIGN::demoHeadShape(count);
+        const std::vector<DigitizedPoint> hsp = MNEALIGN::demoHeadShape(count);
+        target.insert(target.end(), hsp.begin(), hsp.end());
     }
 }
 
@@ -108,7 +112,7 @@ bool renderMneAlignApp(const ShotSpec& spec,
 
     // Compose the demo digitisation session from the manifest setup before
     // we hand it to the live AcquiredPoints store.
-    QVector<DigitizedPoint> session;
+    std::vector<DigitizedPoint> session;
 
     if (setup.value(QStringLiteral("load_demo_digitisation")).toString() == QLatin1String("demo")) {
         session = MNEALIGN::demoFullDigitisation();
@@ -118,7 +122,7 @@ bool renderMneAlignApp(const ShotSpec& spec,
         appendCapture(session, setup.value(QStringLiteral("simulate_capture")).toObject());
     }
 
-    if (!session.isEmpty()) {
+    if (!session.empty()) {
         MNEALIGN::applyTo(mw.points(), session);
     }
 

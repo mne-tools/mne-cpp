@@ -36,7 +36,7 @@
 
 #include <Eigen/Geometry>
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include "align_points.h"
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -94,7 +94,7 @@ public:
      * @param[in] acquired   Shared digitised-point store (not owned).
      * @param[in] parent     Parent widget.
      */
-    explicit Align3DView(mne::AcquiredPoints* acquired, QWidget* parent = nullptr);
+    explicit Align3DView(AlignPoints* acquired, QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -243,7 +243,7 @@ private:
     void recomputeAlignment();
     void applyViewConfiguration();
 
-    mne::AcquiredPoints* m_pPoints = nullptr;
+    AlignPoints* m_pPoints = nullptr;
     std::unique_ptr<mne::disp::MultimodalScene> m_pScene;
     std::shared_ptr<mne::MNEBem> m_pBem;
     int m_cameraPreset = 1;

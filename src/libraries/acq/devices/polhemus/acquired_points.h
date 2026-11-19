@@ -9,10 +9,11 @@
  * @date     May 2026
  * @brief    Shared digitised-point store for Polhemus digitizer sessions.
  *
- *           Plain Qt model object passed by reference between the wizard,
+ *           Plain model object passed by reference between the wizard,
  *           the 3-D view, and the FIFF exporter. Points are stored in
  *           head/sensor frame metres exactly as received from the
- *           Polhemus Fastrak.
+ *           Polhemus Fastrak. A change callback tells the owner when the
+ *           points change; a Qt application turns it into a signal.
  */
 
 #ifndef ACQ_ACQUIRED_POINTS_H
@@ -24,16 +25,17 @@
 
 #include "acq_polhemus_global.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-#include <QObject>
-#include <QString>
-#include <QVector>
-
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <functional>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -79,8 +81,8 @@ enum class FiducialId
 struct ACQPOLHEMUSSHARED_EXPORT DigitizedPoint
 {
     PointKind kind = PointKind::HeadShape;
-    QString label;                                      ///< Human label ("NAS", "Cz", "HSP-42", …).
-    int identNumber = 0;                                ///< 1-based id used by FIFF on export.
+    std::string label;                                  ///< Human label ("NAS", "Cz", "HSP-42", …).
+    int ident_number = 0;                               ///< 1-based id used by FIFF on export.
     Eigen::Vector3f position = Eigen::Vector3f::Zero(); ///< Position in metres, sensor frame.
 };
 
@@ -90,32 +92,37 @@ struct ACQPOLHEMUSSHARED_EXPORT DigitizedPoint
  *
  * The wizard hands one of these to the 3-D view (for visualisation) and
  * later to the export step (for FIFF write). Single-threaded, no locking.
+ * Every change calls the callback set with set_on_changed().
  *
  * @snippet ex_acq_polhemus/main.cpp acquired_points_usage
  */
-class ACQPOLHEMUSSHARED_EXPORT AcquiredPoints : public QObject
+class ACQPOLHEMUSSHARED_EXPORT AcquiredPoints
 {
-    Q_OBJECT
 public:
-    explicit AcquiredPoints(QObject* parent = nullptr)
-    : QObject(parent)
+    /**
+     * Sets the function called after every change of the points or twin fiducials, e.g. to emit a Qt signal.
+     *
+     * @param[in] on_changed   The callback; empty for none.
+     */
+    void set_on_changed(std::function<void()> on_changed)
     {
+        m_on_changed = std::move(on_changed);
     }
 
-    const QVector<DigitizedPoint>& points() const
+    const std::vector<DigitizedPoint>& points() const
     {
         return m_points;
     }
 
     /**
-     * Append a new point and emit @c mne::AcquiredPoints::pointsChanged "pointsChanged".
+     * Append a new point and report the change.
      *
      * @param[in] p Captured point to append.
      */
     void append(const DigitizedPoint& p)
     {
-        m_points.append(p);
-        emit pointsChanged();
+        m_points.push_back(p);
+        notify_changed();
     }
 
     /**
@@ -123,12 +130,12 @@ public:
      *
      * @param[in] kind Point kind whose most recent entry is removed.
      */
-    void undoLast(PointKind kind)
+    void undo_last(PointKind kind)
     {
-        for (qsizetype i = m_points.size() - 1; i >= 0; --i) {
-            if (m_points[i].kind == kind) {
-                m_points.removeAt(i);
-                emit pointsChanged();
+        for (auto it = m_points.rbegin(); it != m_points.rend(); ++it) {
+            if (it->kind == kind) {
+                m_points.erase(std::next(it).base());
+                notify_changed();
                 return;
             }
         }
@@ -137,10 +144,10 @@ public:
     /** Drop every captured point. */
     void clear()
     {
-        if (m_points.isEmpty())
+        if (m_points.empty())
             return;
         m_points.clear();
-        emit pointsChanged();
+        notify_changed();
     }
 
     /** Convenience accessor: returns the captured fiducial position for
@@ -153,7 +160,7 @@ public:
     Eigen::Vector3f fiducial(FiducialId id) const
     {
         for (const auto& p : m_points) {
-            if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
+            if (p.kind == PointKind::Fiducial && p.ident_number == static_cast<int>(id)) {
                 return p.position;
             }
         }
@@ -167,10 +174,10 @@ public:
      *
      * @return True if the fiducial has been captured, false otherwise.
      */
-    bool hasFiducial(FiducialId id) const
+    bool has_fiducial(FiducialId id) const
     {
         for (const auto& p : m_points) {
-            if (p.kind == PointKind::Fiducial && p.identNumber == static_cast<int>(id)) {
+            if (p.kind == PointKind::Fiducial && p.ident_number == static_cast<int>(id)) {
                 return true;
             }
         }
@@ -182,14 +189,10 @@ public:
      *
      * @param[in] id Fiducial whose captured points are all removed.
      */
-    void removeFiducial(FiducialId id)
+    void remove_fiducial(FiducialId id)
     {
-        for (qsizetype i = m_points.size() - 1; i >= 0; --i) {
-            if (m_points[i].kind == PointKind::Fiducial && m_points[i].identNumber == static_cast<int>(id)) {
-                m_points.removeAt(i);
-            }
-        }
-        emit pointsChanged();
+        std::erase_if(m_points, [id](const DigitizedPoint& p) { return p.kind == PointKind::Fiducial && p.ident_number == static_cast<int>(id); });
+        notify_changed();
     }
 
     /**
@@ -197,12 +200,12 @@ public:
      *
      * @return True if NAS, LPA, and RPA have all been captured.
      */
-    bool hasAllFiducials() const
+    bool has_all_fiducials() const
     {
-        return hasFiducial(FiducialId::NAS) && hasFiducial(FiducialId::LPA) && hasFiducial(FiducialId::RPA);
+        return has_fiducial(FiducialId::NAS) && has_fiducial(FiducialId::LPA) && has_fiducial(FiducialId::RPA);
     }
 
-    int countOf(PointKind kind) const
+    int count_of(PointKind kind) const
     {
         int n = 0;
         for (const auto& p : m_points)
@@ -211,52 +214,59 @@ public:
         return n;
     }
 
-    void setPosition(int index, const Eigen::Vector3f& pos)
+    /**
+     * Moves a point without reporting it; call notify_changed() after a batch of moves.
+     *
+     * @param[in] index   Index of the point in points().
+     * @param[in] pos     New position in metres.
+     */
+    void set_position(int index, const Eigen::Vector3f& pos)
     {
-        if (index >= 0 && index < m_points.size())
-            m_points[index].position = pos;
+        if (index >= 0 && index < static_cast<int>(m_points.size()))
+            m_points[static_cast<std::size_t>(index)].position = pos;
     }
 
-    void emitChanged()
+    /** Calls the change callback. */
+    void notify_changed() const
     {
-        emit pointsChanged();
+        if (m_on_changed)
+            m_on_changed();
     }
 
     // ── Twin (BEM-space) fiducials — clicked on digital twin surface ──
 
-    void setTwinFiducial(FiducialId id, const Eigen::Vector3f& pos)
+    void set_twin_fiducial(FiducialId id, const Eigen::Vector3f& pos)
     {
-        m_twinFiducials[static_cast<int>(id)] = pos;
-        emit pointsChanged();
+        m_twin_fiducials[static_cast<int>(id)] = pos;
+        notify_changed();
     }
 
-    void clearTwinFiducial(FiducialId id)
+    void clear_twin_fiducial(FiducialId id)
     {
-        m_twinFiducials.remove(static_cast<int>(id));
-        emit pointsChanged();
+        m_twin_fiducials.erase(static_cast<int>(id));
+        notify_changed();
     }
 
-    bool hasTwinFiducial(FiducialId id) const
+    bool has_twin_fiducial(FiducialId id) const
     {
-        return m_twinFiducials.contains(static_cast<int>(id));
+        return m_twin_fiducials.contains(static_cast<int>(id));
     }
 
-    Eigen::Vector3f twinFiducial(FiducialId id) const
+    Eigen::Vector3f twin_fiducial(FiducialId id) const
     {
-        return m_twinFiducials.value(static_cast<int>(id), Eigen::Vector3f::Zero());
+        const auto it = m_twin_fiducials.find(static_cast<int>(id));
+        return it == m_twin_fiducials.end() ? Eigen::Vector3f::Zero() : it->second;
     }
 
-    bool hasAllTwinFiducials() const
+    bool has_all_twin_fiducials() const
     {
-        return hasTwinFiducial(FiducialId::NAS) && hasTwinFiducial(FiducialId::LPA) && hasTwinFiducial(FiducialId::RPA);
+        return has_twin_fiducial(FiducialId::NAS) && has_twin_fiducial(FiducialId::LPA) && has_twin_fiducial(FiducialId::RPA);
     }
-
-signals:
-    void pointsChanged();
 
 private:
-    QVector<DigitizedPoint> m_points;
-    QMap<int, Eigen::Vector3f> m_twinFiducials; ///< BEM-space fiducials keyed by FiducialId
+    std::vector<DigitizedPoint> m_points;
+    std::map<int, Eigen::Vector3f> m_twin_fiducials; ///< BEM-space fiducials keyed by FiducialId
+    std::function<void()> m_on_changed;
 };
 
 } // namespace mne

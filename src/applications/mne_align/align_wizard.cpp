@@ -13,6 +13,7 @@
 #include "align_wizard.h"
 #include "qt_conversions.h"
 
+#include <format>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -90,7 +91,7 @@ QString systemLabel(StandardMontage::System sys)
 
 //=============================================================================================================
 
-AlignWizard::AlignWizard(AcquiredPoints* acquired,
+AlignWizard::AlignWizard(AlignPoints* acquired,
                          Digitizer* digitizer,
                          QWidget* parent)
 : QStackedWidget(parent)
@@ -113,7 +114,7 @@ AlignWizard::AlignWizard(AcquiredPoints* acquired,
         connect(m_pDigitizer, &Digitizer::penButtonPressed,
                 this, &AlignWizard::onPenButtonPressed);
     }
-    connect(m_pPoints, &AcquiredPoints::pointsChanged,
+    connect(m_pPoints, &AlignPoints::pointsChanged,
             this, &AlignWizard::onAcquiredChanged);
 
     onAcquiredChanged();
@@ -364,12 +365,12 @@ void AlignWizard::onSurfaceDoubleClicked(const QVector3D& worldPos)
         return;
 
     // Place the currently selected twin fiducial
-    m_pPoints->setTwinFiducial(m_selectedTwinFid, toEigen(worldPos));
+    m_pPoints->set_twin_fiducial(m_selectedTwinFid, toEigen(worldPos));
     refreshSetupTwinUi();
 
     // Auto-advance to next unset fiducial
     for (FiducialId id : kFiducialOrder) {
-        if (!m_pPoints->hasTwinFiducial(id)) {
+        if (!m_pPoints->has_twin_fiducial(id)) {
             m_selectedTwinFid = id;
             if (m_pTwinNasBtn)
                 m_pTwinNasBtn->setChecked(id == FiducialId::NAS);
@@ -389,12 +390,12 @@ void AlignWizard::refreshSetupTwinUi()
 
     QString html;
     for (FiducialId id : kFiducialOrder) {
-        const bool have = m_pPoints->hasTwinFiducial(id);
+        const bool have = m_pPoints->has_twin_fiducial(id);
         const bool selected = (id == m_selectedTwinFid);
         const QString mark = have ? QStringLiteral("✔") : QStringLiteral("○");
         QString posStr;
         if (have) {
-            const QVector3D p = toQt(m_pPoints->twinFiducial(id));
+            const QVector3D p = toQt(m_pPoints->twin_fiducial(id));
             posStr = QStringLiteral(" (%1, %2, %3)")
                          .arg(p.x(), 0, 'f', 4)
                          .arg(p.y(), 0, 'f', 4)
@@ -481,7 +482,7 @@ QWidget* AlignWizard::buildFiducialsPage()
 FiducialId AlignWizard::nextFiducial(bool* allDone) const
 {
     for (FiducialId id : kFiducialOrder) {
-        if (!m_pPoints->hasFiducial(id)) {
+        if (!m_pPoints->has_fiducial(id)) {
             if (allDone)
                 *allDone = false;
             return id;
@@ -499,7 +500,7 @@ void AlignWizard::refreshFiducialUi()
 
     QString html;
     for (FiducialId id : kFiducialOrder) {
-        const bool have = m_pPoints->hasFiducial(id);
+        const bool have = m_pPoints->has_fiducial(id);
         const bool selected = (id == m_selectedFiducial);
         const QString mark = have ? QStringLiteral("✔") : QStringLiteral("○");
         const QString style = selected ? QStringLiteral(" style='color:#FFD700;'") : QString();
@@ -516,7 +517,7 @@ void AlignWizard::refreshFiducialUi()
             QStringLiteral("Capture %1").arg(fiducialName(m_selectedFiducial)));
     }
     if (m_pFidUndoBtn) {
-        m_pFidUndoBtn->setEnabled(m_pPoints->countOf(PointKind::Fiducial) > 0);
+        m_pFidUndoBtn->setEnabled(m_pPoints->count_of(PointKind::Fiducial) > 0);
     }
 }
 
@@ -528,20 +529,20 @@ void AlignWizard::onCaptureFiducial()
     const FiducialId target = m_selectedFiducial;
 
     // Remove existing capture of this fiducial if re-recording
-    if (m_pPoints->hasFiducial(target)) {
-        m_pPoints->removeFiducial(target);
+    if (m_pPoints->has_fiducial(target)) {
+        m_pPoints->remove_fiducial(target);
     }
 
     DigitizedPoint p;
     p.kind = PointKind::Fiducial;
-    p.label = fiducialName(target);
-    p.identNumber = static_cast<int>(target);
+    p.label = fiducialName(target).toStdString();
+    p.ident_number = static_cast<int>(target);
     p.position = toEigen(m_lastLivePos);
     m_pPoints->append(p);
 
     // Auto-advance to next uncaptured fiducial
     for (FiducialId id : kFiducialOrder) {
-        if (!m_pPoints->hasFiducial(id)) {
+        if (!m_pPoints->has_fiducial(id)) {
             m_selectedFiducial = id;
             if (m_pFidNasBtn)
                 m_pFidNasBtn->setChecked(id == FiducialId::NAS);
@@ -557,7 +558,7 @@ void AlignWizard::onCaptureFiducial()
 
 void AlignWizard::onUndoFiducial()
 {
-    m_pPoints->undoLast(PointKind::Fiducial);
+    m_pPoints->undo_last(PointKind::Fiducial);
 }
 
 //=============================================================================================================
@@ -598,7 +599,7 @@ QWidget* AlignWizard::buildEegCapPage()
 QString AlignWizard::nextEegLabel(int* outIdent) const
 {
     const QStringList names = electrodeNames(m_capSystem);
-    const int captured = m_pPoints->countOf(PointKind::Eeg);
+    const int captured = m_pPoints->count_of(PointKind::Eeg);
     if (captured >= names.size()) {
         if (outIdent)
             *outIdent = 0;
@@ -615,7 +616,7 @@ void AlignWizard::refreshEegUi()
         return;
 
     const QStringList names = electrodeNames(m_capSystem);
-    const int captured = m_pPoints->countOf(PointKind::Eeg);
+    const int captured = m_pPoints->count_of(PointKind::Eeg);
 
     if (m_pEegList->count() != names.size()) {
         m_pEegList->clear();
@@ -660,15 +661,15 @@ void AlignWizard::onCaptureEeg()
 
     DigitizedPoint p;
     p.kind = PointKind::Eeg;
-    p.label = name;
-    p.identNumber = ident;
+    p.label = name.toStdString();
+    p.ident_number = ident;
     p.position = toEigen(m_lastLivePos);
     m_pPoints->append(p);
 }
 
 void AlignWizard::onUndoEeg()
 {
-    m_pPoints->undoLast(PointKind::Eeg);
+    m_pPoints->undo_last(PointKind::Eeg);
 }
 
 //=============================================================================================================
@@ -711,7 +712,7 @@ void AlignWizard::refreshHeadShapeUi()
 {
     if (!m_pHspCountLabel)
         return;
-    const int n = m_pPoints->countOf(PointKind::HeadShape);
+    const int n = m_pPoints->count_of(PointKind::HeadShape);
     m_pHspCountLabel->setText(QStringLiteral("Captured head-shape points: <b>%1</b>").arg(n));
     if (m_pHspCaptureBtn)
         m_pHspCaptureBtn->setEnabled(m_haveLive);
@@ -723,18 +724,18 @@ void AlignWizard::onCaptureHsp()
 {
     if (!m_haveLive)
         return;
-    const int n = m_pPoints->countOf(PointKind::HeadShape);
+    const int n = m_pPoints->count_of(PointKind::HeadShape);
     DigitizedPoint p;
     p.kind = PointKind::HeadShape;
-    p.label = QStringLiteral("HSP-%1").arg(n + 1);
-    p.identNumber = n + 1;
+    p.label = std::format("HSP-{}", n + 1);
+    p.ident_number = n + 1;
     p.position = toEigen(m_lastLivePos);
     m_pPoints->append(p);
 }
 
 void AlignWizard::onUndoHsp()
 {
-    m_pPoints->undoLast(PointKind::HeadShape);
+    m_pPoints->undo_last(PointKind::HeadShape);
 }
 
 //=============================================================================================================
@@ -839,9 +840,9 @@ QWidget* AlignWizard::buildSavePage()
 void AlignWizard::refreshSaveUi()
 {
     if (m_pSaveSummaryLabel) {
-        const int nFid = m_pPoints->countOf(PointKind::Fiducial);
-        const int nEeg = m_pPoints->countOf(PointKind::Eeg);
-        const int nHsp = m_pPoints->countOf(PointKind::HeadShape);
+        const int nFid = m_pPoints->count_of(PointKind::Fiducial);
+        const int nEeg = m_pPoints->count_of(PointKind::Eeg);
+        const int nHsp = m_pPoints->count_of(PointKind::HeadShape);
         m_pSaveSummaryLabel->setText(
             QStringLiteral("BEM: <b>%1</b><br>"
                            "Cap: <b>%2</b><br>"
@@ -866,10 +867,10 @@ void AlignWizard::refreshSaveUi()
         }
     }
     if (m_pSaveTransBtn) {
-        m_pSaveTransBtn->setEnabled(m_pPoints->hasAllTwinFiducials() && m_pPoints->hasFiducial(FiducialId::NAS) && m_pPoints->hasFiducial(FiducialId::LPA) && m_pPoints->hasFiducial(FiducialId::RPA));
+        m_pSaveTransBtn->setEnabled(m_pPoints->has_all_twin_fiducials() && m_pPoints->has_fiducial(FiducialId::NAS) && m_pPoints->has_fiducial(FiducialId::LPA) && m_pPoints->has_fiducial(FiducialId::RPA));
     }
     if (m_pSaveDigiBtn) {
-        m_pSaveDigiBtn->setEnabled(m_pPoints->countOf(PointKind::Fiducial) > 0 || m_pPoints->countOf(PointKind::Eeg) > 0 || m_pPoints->countOf(PointKind::HeadShape) > 0);
+        m_pSaveDigiBtn->setEnabled(m_pPoints->count_of(PointKind::Fiducial) > 0 || m_pPoints->count_of(PointKind::Eeg) > 0 || m_pPoints->count_of(PointKind::HeadShape) > 0);
     }
 }
 
@@ -902,9 +903,9 @@ void AlignWizard::refreshDoneUi()
 {
     if (!m_pDoneLabel)
         return;
-    const int nFid = m_pPoints->countOf(PointKind::Fiducial);
-    const int nEeg = m_pPoints->countOf(PointKind::Eeg);
-    const int nHsp = m_pPoints->countOf(PointKind::HeadShape);
+    const int nFid = m_pPoints->count_of(PointKind::Fiducial);
+    const int nEeg = m_pPoints->count_of(PointKind::Eeg);
+    const int nHsp = m_pPoints->count_of(PointKind::HeadShape);
 
     QString html = QStringLiteral(
                        "<b>BEM:</b> %1<br>"
@@ -1013,21 +1014,21 @@ void AlignWizard::onLoadDigiFiff()
                     default:
                         continue;
                 }
-                p.identNumber = static_cast<int>(id);
-                p.label = (id == FiducialId::LPA) ? QStringLiteral("LPA")
-                    : (id == FiducialId::NAS)     ? QStringLiteral("NAS")
-                                                  : QStringLiteral("RPA");
+                p.ident_number = static_cast<int>(id);
+                p.label = (id == FiducialId::LPA) ? "LPA"
+                    : (id == FiducialId::NAS)     ? "NAS"
+                                                  : "RPA";
                 break;
             }
             case FIFFV_POINT_EEG:
                 p.kind = PointKind::Eeg;
-                p.identNumber = eegIdent++;
-                p.label = QStringLiteral("EEG-%1").arg(p.identNumber);
+                p.ident_number = eegIdent++;
+                p.label = std::format("EEG-{}", p.ident_number);
                 break;
             case FIFFV_POINT_EXTRA:
                 p.kind = PointKind::HeadShape;
-                p.identNumber = hspIdent++;
-                p.label = QStringLiteral("HSP-%1").arg(p.identNumber);
+                p.ident_number = hspIdent++;
+                p.label = std::format("HSP-{}", p.ident_number);
                 break;
             default:
                 // Skip HPI / ECG / unknown for now.

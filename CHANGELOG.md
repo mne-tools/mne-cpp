@@ -757,6 +757,29 @@ aliases; replace the old spelling as below.
 - The session state of `PolhemusCoregistration` stores each fiducial under
   its own name. Before, the LPA was stored as `NAS`, the NAS as `RPA` and the
   RPA as `CZ`; a state written by hand or another tool was read shifted.
+- The Polhemus coregistration library (`mne_acq_polhemus`) no longer uses or
+  links Qt. `AcquiredPoints` and `PolhemusCoregistration` are plain classes
+  with snake_case members; events arrive through callbacks, and the session
+  state is a `mne::JsonObject`. MNE Align wraps the points in a QObject
+  (`AlignPoints`) that turns the change callback into its `pointsChanged`
+  signal. Migration:
+  - `AcquiredPoints`: `pointsChanged` signal → `set_on_changed(callback)`;
+    `emitChanged()` → `notify_changed()`; `points()` returns
+    `std::vector<DigitizedPoint>`; `hasFiducial`, `countOf`, `undoLast`,
+    `removeFiducial`, `hasAllFiducials`, `setPosition`, `setTwinFiducial`,
+    `clearTwinFiducial`, `hasTwinFiducial`, `twinFiducial`,
+    `hasAllTwinFiducials` → `has_fiducial`, `count_of`, `undo_last`, … .
+    `DigitizedPoint::label` is `std::string`, `identNumber` → `ident_number`.
+  - `PolhemusCoregistration`: no `QObject` parent; every member is
+    snake_case (`computeRegistration()` → `compute_registration()`,
+    `penPosition()` → `pen_position()`, …); `acquiredPoints()` returning a
+    pointer → `acquired_points()` returning a reference; the nine signals →
+    the members of `PolhemusCoregistration::Listener`, set with
+    `set_listener()`; `saveSessionState(QSettings&, prefix)` /
+    `restoreSessionState(QSettings&, prefix)` → `session_state()` /
+    `restore_session_state(const JsonObject&)`;
+    `OpticalCalibSample::trackerPos`, `trackerOri`, `focusPoint` →
+    `tracker_pos`, `tracker_ori`, `focus_point`.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

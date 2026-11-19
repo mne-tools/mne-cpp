@@ -7,12 +7,7 @@ project(mne_acq_polhemus
   LANGUAGES CXX
 )
 
-set(CMAKE_AUTOMOC ON)
-
 # Head-device coregistration of digitized points; the digitizer itself is polhemus:// in mne_acq_devices.
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
   polhemus_coregistration.cpp
@@ -30,10 +25,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURR
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
-    Qt${QT_VERSION_MAJOR}::Core
+    mne_base
   PRIVATE
-    Eigen3::Eigen
-    mne_base)
+    Eigen3::Eigen)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ACQ_POLHEMUS_LIBRARY)
 

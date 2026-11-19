@@ -14,7 +14,10 @@
 
 #include "align_demo_fixtures.h"
 
-#include <QtMath>
+#include <algorithm>
+#include <cmath>
+#include <format>
+#include <iterator>
 
 namespace MNEALIGN
 {
@@ -24,36 +27,36 @@ using mne::DigitizedPoint;
 using mne::FiducialId;
 using mne::PointKind;
 
-QVector<DigitizedPoint> demoFiducials()
+std::vector<DigitizedPoint> demoFiducials()
 {
-    QVector<DigitizedPoint> out;
+    std::vector<DigitizedPoint> out;
     out.reserve(3);
 
     DigitizedPoint nas;
     nas.kind = PointKind::Fiducial;
-    nas.label = QStringLiteral("NAS");
-    nas.identNumber = static_cast<int>(FiducialId::NAS);
+    nas.label = "NAS";
+    nas.ident_number = static_cast<int>(FiducialId::NAS);
     nas.position = Eigen::Vector3f(0.000f, 0.095f, 0.005f);
-    out.append(nas);
+    out.push_back(nas);
 
     DigitizedPoint lpa;
     lpa.kind = PointKind::Fiducial;
-    lpa.label = QStringLiteral("LPA");
-    lpa.identNumber = static_cast<int>(FiducialId::LPA);
+    lpa.label = "LPA";
+    lpa.ident_number = static_cast<int>(FiducialId::LPA);
     lpa.position = Eigen::Vector3f(-0.080f, 0.000f, 0.000f);
-    out.append(lpa);
+    out.push_back(lpa);
 
     DigitizedPoint rpa;
     rpa.kind = PointKind::Fiducial;
-    rpa.label = QStringLiteral("RPA");
-    rpa.identNumber = static_cast<int>(FiducialId::RPA);
+    rpa.label = "RPA";
+    rpa.ident_number = static_cast<int>(FiducialId::RPA);
     rpa.position = Eigen::Vector3f(0.080f, 0.000f, 0.000f);
-    out.append(rpa);
+    out.push_back(rpa);
 
     return out;
 }
 
-QVector<DigitizedPoint> demoEegCap(int count)
+std::vector<DigitizedPoint> demoEegCap(int count)
 {
     // Eight cardinal 10-20 positions on a 95 mm sphere centred at the
     // head origin. Values are loosely realistic; exact geometry is not
@@ -74,26 +77,26 @@ QVector<DigitizedPoint> demoEegCap(int count)
         {"O2", Eigen::Vector3f(0.035f, -0.085f, 0.025f)},
     };
 
-    const int n = qBound(0, count, static_cast<int>(sizeof(kEntries) / sizeof(kEntries[0])));
-    QVector<DigitizedPoint> out;
-    out.reserve(n);
+    const int n = std::clamp(count, 0, static_cast<int>(std::size(kEntries)));
+    std::vector<DigitizedPoint> out;
+    out.reserve(static_cast<std::size_t>(n));
     for (int i = 0; i < n; ++i) {
         DigitizedPoint p;
         p.kind = PointKind::Eeg;
-        p.label = QString::fromLatin1(kEntries[i].label);
-        p.identNumber = i + 1;
+        p.label = kEntries[i].label;
+        p.ident_number = i + 1;
         p.position = kEntries[i].pos;
-        out.append(p);
+        out.push_back(p);
     }
     return out;
 }
 
-QVector<DigitizedPoint> demoHeadShape(int count)
+std::vector<DigitizedPoint> demoHeadShape(int count)
 {
-    QVector<DigitizedPoint> out;
+    std::vector<DigitizedPoint> out;
     if (count <= 0)
         return out;
-    out.reserve(count);
+    out.reserve(static_cast<std::size_t>(count));
 
     constexpr float kRadius = 0.095f; // 95 mm head sphere
     for (int i = 0; i < count; ++i) {
@@ -104,27 +107,26 @@ QVector<DigitizedPoint> demoHeadShape(int count)
 
         DigitizedPoint p;
         p.kind = PointKind::HeadShape;
-        p.label = QStringLiteral("HSP-%1").arg(i + 1);
-        p.identNumber = i + 1;
+        p.label = std::format("HSP-{}", i + 1);
+        p.ident_number = i + 1;
         p.position = Eigen::Vector3f(
             kRadius * std::sin(phi) * std::cos(th),
             kRadius * std::sin(phi) * std::sin(th),
             kRadius * std::cos(phi));
-        out.append(p);
+        out.push_back(p);
     }
     return out;
 }
 
-QVector<DigitizedPoint> demoFullDigitisation()
+std::vector<DigitizedPoint> demoFullDigitisation()
 {
-    QVector<DigitizedPoint> out;
-    out += demoFiducials();
-    out += demoEegCap(8);
-    out += demoHeadShape(40);
+    std::vector<DigitizedPoint> out;
+    for (const std::vector<DigitizedPoint>& part : {demoFiducials(), demoEegCap(8), demoHeadShape(40)})
+        out.insert(out.end(), part.begin(), part.end());
     return out;
 }
 
-void applyTo(AcquiredPoints* store, const QVector<DigitizedPoint>& points)
+void applyTo(AcquiredPoints* store, const std::vector<DigitizedPoint>& points)
 {
     if (!store)
         return;

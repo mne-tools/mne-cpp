@@ -43,7 +43,7 @@ constexpr FiducialId kFiducialOrder[] = {FiducialId::NAS, FiducialId::LPA, Fiduc
 
 //=============================================================================================================
 
-Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
+Align3DView::Align3DView(AlignPoints* acquired, QWidget* parent)
 : QWidget(parent)
 , m_pPoints(acquired)
 , m_pScene(std::make_unique<MultimodalScene>())
@@ -75,7 +75,7 @@ Align3DView::Align3DView(AcquiredPoints* acquired, QWidget* parent)
     rebuildDigitizerLayer();
 
     if (m_pPoints) {
-        connect(m_pPoints, &AcquiredPoints::pointsChanged,
+        connect(m_pPoints, &AlignPoints::pointsChanged,
                 this, &Align3DView::onPointsChanged);
     }
 }
@@ -301,10 +301,10 @@ void Align3DView::onPointsChanged()
 void Align3DView::rebuildAcquiredLayer()
 {
     m_pScene->removeLayer(QString::fromLatin1(kAcquiredLayerId));
-    if (!m_pPoints || m_pPoints->points().isEmpty())
+    if (!m_pPoints || m_pPoints->points().empty())
         return;
 
-    auto snapshot = std::make_shared<QVector<DigitizedPoint>>(m_pPoints->points());
+    auto snapshot = std::make_shared<std::vector<DigitizedPoint>>(m_pPoints->points());
 
     SceneLayer layer;
     layer.id = QString::fromLatin1(kAcquiredLayerId);
@@ -353,7 +353,7 @@ void Align3DView::rebuildDigitizerLayer()
 
     m_pBrainView->clearSensors();
 
-    if (!m_pPoints || m_pPoints->points().isEmpty()) {
+    if (!m_pPoints || m_pPoints->points().empty()) {
         return;
     }
 
@@ -373,15 +373,15 @@ void Align3DView::rebuildDigitizerLayer()
         switch (pt.kind) {
             case PointKind::Fiducial:
                 dig.kind = FIFFV_POINT_CARDINAL;
-                dig.ident = pt.identNumber;
+                dig.ident = pt.ident_number;
                 break;
             case PointKind::Eeg:
                 dig.kind = FIFFV_POINT_EEG;
-                dig.ident = pt.identNumber;
+                dig.ident = pt.ident_number;
                 break;
             case PointKind::HeadShape:
                 dig.kind = FIFFV_POINT_EXTRA;
-                dig.ident = pt.identNumber;
+                dig.ident = pt.ident_number;
                 break;
         }
         fiffPts.push_back(dig);
@@ -408,8 +408,8 @@ void Align3DView::rebuildStaticMarkers()
         QColor(0, 0, 220), // RPA — blue
     };
     for (int i = 0; i < 3; ++i) {
-        if (m_pPoints->hasTwinFiducial(kFiducialOrder[i])) {
-            markers.append({toQt(m_pPoints->twinFiducial(kFiducialOrder[i])),
+        if (m_pPoints->has_twin_fiducial(kFiducialOrder[i])) {
+            markers.append({toQt(m_pPoints->twin_fiducial(kFiducialOrder[i])),
                             kTwinColors[i], kFidRadius});
         }
     }
@@ -429,7 +429,7 @@ void Align3DView::rebuildStaticMarkers()
         switch (pt.kind) {
             case PointKind::Fiducial: {
                 // Color per identity so captured NAS/LPA/RPA are visually distinct
-                const int idx = qBound(0, pt.identNumber - 1, 2); // FiducialId 1..3 → 0..2
+                const int idx = qBound(0, pt.ident_number - 1, 2); // FiducialId 1..3 → 0..2
                 markers.append({pos, kCapFidColors[idx], kCapFidRadius});
                 break;
             }
@@ -463,9 +463,9 @@ void Align3DView::recomputeAlignment()
     // FiffCoordTrans::from_cardinal_points.  With fewer points we fall
     // back to a progressive translation/rotation.
 
-    const bool hasCapNas = m_pPoints->hasFiducial(FiducialId::NAS);
-    const bool hasCapLpa = m_pPoints->hasFiducial(FiducialId::LPA);
-    const bool hasCapRpa = m_pPoints->hasFiducial(FiducialId::RPA);
+    const bool hasCapNas = m_pPoints->has_fiducial(FiducialId::NAS);
+    const bool hasCapLpa = m_pPoints->has_fiducial(FiducialId::LPA);
+    const bool hasCapRpa = m_pPoints->has_fiducial(FiducialId::RPA);
 
     if (hasCapNas && hasCapLpa && hasCapRpa) {
         // All 3 captured → proper Neuromag HEAD frame definition
@@ -497,14 +497,14 @@ void Align3DView::recomputeAlignment()
     QVector<QVector3D> mriPts;  // twin fiducials in MRI space
 
     for (FiducialId id : kFiducialOrder) {
-        const bool hasCap = m_pPoints->hasFiducial(id);
-        const bool hasTwin = m_pPoints->hasTwinFiducial(id);
+        const bool hasCap = m_pPoints->has_fiducial(id);
+        const bool hasTwin = m_pPoints->has_twin_fiducial(id);
         if (hasCap && hasTwin) {
             // Transform captured fiducial into HEAD space
             const QVector3D capDev = toQt(m_pPoints->fiducial(id));
             const QVector3D capHead = m_deviceToHead.map(capDev);
             headPts.append(capHead);
-            mriPts.append(toQt(m_pPoints->twinFiducial(id)));
+            mriPts.append(toQt(m_pPoints->twin_fiducial(id)));
         }
     }
 
