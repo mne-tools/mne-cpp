@@ -197,7 +197,7 @@ Cuts the file to, or extends it with zeros to, `size` bytes; the position moves 
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 104"
+````cpp title="src/examples/ex_base/main.cpp, line 103"
     auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
     out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
     out->write_big_endian(samples.data(), samples.size());

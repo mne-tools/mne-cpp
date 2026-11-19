@@ -56,7 +56,7 @@ const JsonValue asJson = decoded.to_json_value(); // byte strings become base64u
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 174"
+````cpp title="src/examples/ex_base/main.cpp, line 173"
 CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
 header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
 const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()

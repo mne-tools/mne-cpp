@@ -269,7 +269,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
 
 Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them.
 
-````cpp title="src/examples/ex_make_inverse_operator/main.cpp, line 106"
+````cpp title="src/examples/ex_make_inverse_operator/main.cpp, line 107"
 // Compute inverse solution
 InvMinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method.toStdString());
 InvSourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
@@ -279,7 +279,7 @@ InvSourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/main.cpp, line 302"
+````cpp title="src/examples/ex_connectivity/main.cpp, line 303"
 // Compute inverse solution
 InvMinimumNorm minimumNorm(inverse_operator, lambda2, method.toStdString());
 minimumNorm.doInverseSetup(1, true);

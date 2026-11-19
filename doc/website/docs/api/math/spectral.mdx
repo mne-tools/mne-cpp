@@ -212,7 +212,7 @@ Calculates a hanning window of given length.
 
 Multitaper spectra, power spectral density and cross-spectral density of random test signals.
 
-````cpp title="src/examples/ex_spectral/main.cpp, line 80"
+````cpp title="src/examples/ex_spectral/main.cpp, line 81"
 //Generate hanning window
 QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNSamples, "hanning");
 MatrixXd matTaps = tapers.first;

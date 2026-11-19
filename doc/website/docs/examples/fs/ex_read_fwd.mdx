@@ -114,7 +114,6 @@ The documented classes this example uses most:
 | [`FsAnnotation`](../../api/fs/fs-annotation.mdx) | FreeSurfer |
 | [`FsAnnotationSet`](../../api/fs/fs-annotation-set.mdx) | FreeSurfer |
 | [`FsSurface`](../../api/fs/fs-surface.mdx) | FreeSurfer |
-| [`Log`](../../api/base/log.mdx) | Base |
 
 ## Source
 
@@ -144,6 +143,7 @@ The documented classes this example uses most:
 #include <fs/fs_annotationset.h>
 #include <math/matrix_io.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -175,7 +175,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

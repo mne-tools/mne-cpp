@@ -43,7 +43,6 @@ The documented classes this example uses most:
 |---|---|
 | [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
 | [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
-| [`Log`](../../api/base/log.mdx) | Base |
 
 ## Source
 
@@ -85,6 +84,7 @@ The documented classes this example uses most:
 #include "mne/mne_project_to_surface.h"
 
 #include <base/log.h>
+#include <base/log_qt.h>
 #include <base/string_utils.h>
 #include "mne/mne_icp.h"
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

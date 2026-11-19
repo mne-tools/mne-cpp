@@ -528,7 +528,8 @@
       "libraries": [
         "connectivity",
         "mne",
-        "fiff"
+        "fiff",
+        "base"
       ],
       "tasks": [
         "connectivity"

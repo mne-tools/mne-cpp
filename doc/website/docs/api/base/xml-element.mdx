@@ -81,7 +81,7 @@ if (layout) {
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 154"
+````cpp title="src/examples/ex_base/main.cpp, line 153"
 // Qt:   QXmlStreamReader xml(&file);
 //       while (!xml.atEnd()) if (xml.readNext() == QXmlStreamReader::StartElement && xml.name() == u"sensor") ...
 const Expected<XmlElement> layout = parse_xml(R"(<sensors><sensor id="1"><name>Fp1</name><x>-27.5</x></sensor></sensors>)");

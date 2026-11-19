@@ -12,6 +12,9 @@
     },
     "lsl": {
       "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
+    },
+    "base": {
+      "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt (zlib falls back to Qt's copy only when the system has none)."
     }
   },
   "summary": {
@@ -37,7 +40,7 @@
       "mri",
       "report"
     ],
-    "tokens": 9101,
+    "tokens": 9103,
     "gui_outside_design": []
   },
   "libraries": {
@@ -84,16 +87,16 @@
       ]
     },
     "base": {
-      "tokens": 8,
+      "tokens": 10,
       "by_category": {
+        "global": 1,
         "logging": 6,
-        "strings": 2
+        "strings": 3
       },
-      "public_header_includes": 0,
+      "public_header_includes": 3,
       "q_object": 0,
-      "files": 26,
+      "files": 27,
       "modules": [
-        "Core",
         "ZlibPrivate"
       ]
     },

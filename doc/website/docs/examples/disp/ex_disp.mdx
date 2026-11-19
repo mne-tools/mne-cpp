@@ -70,7 +70,6 @@ The documented classes this example uses most:
 | [`Plot`](../../api/disp/plot.mdx) | Visualization |
 | [`TFplot`](../../api/disp/t-fplot.mdx) | Visualization |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
-| [`Log`](../../api/base/log.mdx) | Base |
 | [`Spectrogram`](../../api/dsp/spectrogram.mdx) | Signal Processing |
 
 ## Used in the API reference
@@ -117,6 +116,7 @@ The documented classes this example uses most:
 
 #include <dsp/spectrogram.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // Eigen
@@ -157,7 +157,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

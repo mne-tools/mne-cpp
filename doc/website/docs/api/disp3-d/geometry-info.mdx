@@ -162,7 +162,7 @@ ok &= expect(projected == Vector2i(0, 15) && distances->rows() == 16 && (*distan
 
 Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
 
-````cpp title="src/examples/ex_interpolation/main.cpp, line 122"
+````cpp title="src/examples/ex_interpolation/main.cpp, line 123"
 //projecting with MEG
 qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
 VectorXi mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);

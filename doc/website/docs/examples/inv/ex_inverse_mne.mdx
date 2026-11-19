@@ -118,7 +118,6 @@ The documented classes this example uses most:
 | [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
 | [`InvMinimumNorm`](../../api/inv/inv-minimum-norm.mdx) | Inverse |
 | [`LinePlot`](../../api/disp/line-plot.mdx) | Visualization |
-| [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEInverseOperator`](../../api/mne/mne-inverse-operator.mdx) | MNE Core |
 
 ## Source
@@ -160,6 +159,7 @@ The documented classes this example uses most:
 #include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
@@ -195,7 +195,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication app(argc, argv);
 
     // Command Line Parser

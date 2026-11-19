@@ -104,11 +104,9 @@ The documented classes this example uses most:
 |---|---|
 | [`FiffCtfComp`](../../api/fiff/fiff-ctf-comp.mdx) | FIFF I/O |
 | [`FiffEvokedSet`](../../api/fiff/fiff-evoked-set.mdx) | FIFF I/O |
-| [`Log`](../../api/base/log.mdx) | Base |
 
 ## Used in the API reference
 
-- [Log](../../api/base/log.mdx)
 - [FiffCtfComp](../../api/fiff/fiff-ctf-comp.mdx)
 - [FiffEvokedSet](../../api/fiff/fiff-evoked-set.mdx)
 
@@ -140,6 +138,7 @@ The documented classes this example uses most:
 #include <math.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
@@ -174,7 +173,7 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser

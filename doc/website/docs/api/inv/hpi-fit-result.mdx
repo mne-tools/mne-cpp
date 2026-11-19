@@ -44,7 +44,7 @@ hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getH
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 206"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 207"
 HpiFitResult hpiFitResult;
 HPI.fit(matProjectedData, matPreparedProjectors, hpiModelParameters, matCoilsHead, true, hpiFitResult);
 hpiModelParameters = InvHpiModelParameters(hpiFitResult.hpiFreqs,

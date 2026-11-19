@@ -331,7 +331,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 405"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 406"
 MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 ````
 
@@ -339,7 +339,7 @@ MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f)
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/main.cpp, line 296"
+````cpp title="src/examples/ex_connectivity/main.cpp, line 297"
 MNEInverseOperator inverse_operator(raw.info,
                                     t_clusteredFwd,
                                     noise_cov,

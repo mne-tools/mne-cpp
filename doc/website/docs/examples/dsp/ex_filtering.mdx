@@ -108,7 +108,6 @@ The documented classes this example uses most:
 |---|---|
 | [`FilterKernel`](../../api/dsp/filter-kernel.mdx) | Signal Processing |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
-| [`Log`](../../api/base/log.mdx) | Base |
 
 ## Used in the API reference
 
@@ -147,6 +146,7 @@ The documented classes this example uses most:
 
 #include <dsp/filterkernel.h>
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <dsp/rt/rt_filter.h>
 
@@ -180,7 +180,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

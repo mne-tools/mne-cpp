@@ -12,7 +12,7 @@ Benchmark the run time of connectivity methods over channel and sample counts.
 
 <ExampleFacts name="ex_connectivity_performance" />
 
-**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
+**Libraries:** [Connectivity](../../api/connectivity/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Base](../../api/base/index.mdx)
 
 ## Background
 
@@ -62,6 +62,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 #include <connectivity/connectivity.h>
+#include <base/log_qt.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -159,6 +160,7 @@ int main(int argc, char* argv[])
 #endif
 
     qInstallMessageHandler(customMessageHandler);
+    mne::forward_log_to_qt();
     QCoreApplication a(argc, argv);
 
     m_sCurrentDir = QCoreApplication::applicationDirPath();

@@ -74,7 +74,6 @@ The documented classes this example uses most:
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
 | [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
 | [`ImageSc`](../../api/disp/image-sc.mdx) | Visualization |
-| [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochDataList`](../../api/mne/mne-epoch-data-list.mdx) | MNE Core |
 
 ## Source
@@ -118,6 +117,7 @@ The documented classes this example uses most:
 #include <disp/plots/imagesc.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -150,7 +150,7 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

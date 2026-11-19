@@ -78,12 +78,10 @@ The documented classes this example uses most:
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
 | [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
 | [`LinePlot`](../../api/disp/line-plot.mdx) | Visualization |
-| [`Log`](../../api/base/log.mdx) | Base |
 | [`MNEEpochDataList`](../../api/mne/mne-epoch-data-list.mdx) | MNE Core |
 
 ## Used in the API reference
 
-- [Log](../../api/base/log.mdx)
 - [MNEEpochDataList](../../api/mne/mne-epoch-data-list.mdx)
 
 ## Source
@@ -121,6 +119,7 @@ The documented classes this example uses most:
 #include <mne/mne_epoch_data_list.h>
 
 #include <base/log.h>
+#include <base/log_qt.h>
 
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
@@ -160,7 +159,7 @@ int main(int argc, char* argv[])
 
 #endif
 
-    mne::Log::install_qt_message_handler();
+    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
