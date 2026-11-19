@@ -208,12 +208,12 @@ The documented classes this example uses most:
 #include <QCommandLineParser>
 #include <QFile>
 #include <QTemporaryDir>
-#include <QTextStream>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <sstream>
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
@@ -393,16 +393,15 @@ int main(int argc, char* argv[])
     // The block tree of a transform file, as MNE-C fiff_dir_tree prints it, with the names of tags and units
     FiffStream transStream(QString(dir + "/all-trans.fif").toStdU16String());
     transStream.open();
-    QString tree;
-    QTextStream treeOut(&tree);
-    transStream.dirtree()->print(treeOut);
+    std::ostringstream tree;
+    transStream.dirtree()->print(tree);
     transStream.close();
     const std::string transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
     const std::string gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
     //! [fiff_explain_usage]
     // mne.io.show_fiff(all-trans.fif): FIFFB_ROOT holding file ID (printed as the block id), dir pointer, free list,
     // 2 transforms and a NOP
-    const QStringList treeLines = tree.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const QStringList treeLines = QString::fromStdString(tree.str()).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     ok &= expect(treeLines.size() == 6 && treeLines[0].startsWith("999 = root") && treeLines[3] == "  222 = transform       [2]" && treeLines[5] == "}" && transformTag == "transform" && gradiometerUnit == "fT/m",
                  "FiffExplain/FiffDirNode::print: the tree of all-trans.fif lists the blocks and tags mne.io.show_fiff shows");
 

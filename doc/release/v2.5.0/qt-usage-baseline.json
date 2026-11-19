@@ -10,9 +10,6 @@
     "bids": {
       "JSON": "Sidecars are JSON; QJsonDocument instead of a new dependency."
     },
-    "fiff": {
-      "Sockets": "FiffStream also streams over a QTcpSocket for the real-time protocol."
-    },
     "lsl": {
       "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
     }
@@ -28,6 +25,7 @@
       "connectivity",
       "decoding",
       "dsp",
+      "fiff",
       "fs",
       "fwd",
       "inv",
@@ -36,7 +34,7 @@
       "mna",
       "report"
     ],
-    "tokens": 9257,
+    "tokens": 9207,
     "gui_outside_design": []
   },
   "libraries": {
@@ -104,7 +102,7 @@
       },
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 24,
+      "files": 26,
       "modules": [
         "Core",
         "ZlibPrivate"
@@ -213,24 +211,12 @@
       "modules": []
     },
     "fiff": {
-      "tokens": 50,
-      "by_category": {
-        "containers": 1,
-        "files": 8,
-        "global": 15,
-        "network": 5,
-        "other": 3,
-        "regex": 2,
-        "strings": 15,
-        "time": 1
-      },
-      "public_header_includes": 1,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 72,
-      "modules": [
-        "Core",
-        "Network"
-      ]
+      "modules": []
     },
     "fs": {
       "tokens": 0,

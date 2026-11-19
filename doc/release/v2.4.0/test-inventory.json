@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 285,
+    "directories": 286,
     "registration": {
-      "unconditional": 273,
+      "unconditional": 274,
       "conditional": 9,
       "unregistered": 3
     },
@@ -52,6 +52,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -144,6 +145,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -236,6 +238,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -328,6 +331,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -420,6 +424,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -512,6 +517,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -1710,6 +1716,40 @@
       },
       "registry_classes": [
         "ThreadPool"
+      ]
+    },
+    {
+      "name": "test_base_xml",
+      "cmake": "src/testframes/test_base_xml/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_base_xml"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "XmlElement"
       ]
     },
     {

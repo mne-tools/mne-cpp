@@ -494,7 +494,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/cbor-parse-error',
         'api/base/sha256',
         'api/base/process-options',
-        'api/base/process-result'
+        'api/base/process-result',
+        'api/base/xml-element'
       ],
     },
     {

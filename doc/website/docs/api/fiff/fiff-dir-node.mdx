@@ -32,9 +32,8 @@ stream.close();
 // The block tree of a transform file, as MNE-C fiff_dir_tree prints it, with the names of tags and units
 FiffStream transStream(QString(dir + "/all-trans.fif").toStdU16String());
 transStream.open();
-QString tree;
-QTextStream treeOut(&tree);
-transStream.dirtree()->print(treeOut);
+std::ostringstream tree;
+transStream.dirtree()->print(tree);
 transStream.close();
 const std::string transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
 const std::string gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
@@ -142,7 +141,7 @@ Prints this block and its sub-blocks like MNE-C's fiff_dir_tree: one line per bl
 
 **Parameters:**
 
-- **out** : *QTextStream &*
+- **out** : *std::ostream &*
   Stream to print to.
 
 - **indent** : *int*

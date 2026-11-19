@@ -1,0 +1,101 @@
+---
+id: xml-element
+title: "mne::XmlElement"
+sidebar_label: XmlElement
+sidebar_position: 89
+---
+
+# XmlElement
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/xml.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/xml.h)
+
+`#include <base/xml.h>`
+
+```cpp
+struct mne::XmlElement
+```
+
+One element of an XML document with its attributes, text and child elements.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QXmlStreamReader xml(&file);
+//       while (!xml.atEnd()) if (xml.readNext() == QXmlStreamReader::StartElement && xml.name() == u"sensor") ...
+const Expected<XmlElement> layout = parse_xml(R"(<sensors><sensor id="1"><name>Fp1</name><x>-27.5</x></sensor></sensors>)");
+std::string firstSensor;
+if (layout) {
+    for (const XmlElement& sensor : layout->children) // XmlElement::child() finds the first one by local name
+        if (sensor.local_name() == "sensor" && sensor.child("name"))
+            firstSensor = firstSensor.empty() ? sensor.child("name")->text : firstSensor;
+} else {
+    Log::warning("{}", layout.error().what()); // the line where the document is not well formed
+}
+```
+
+---
+
+## Public Methods
+
+### local_name()
+
+**Returns:**
+
+- *std::string_view* — The name without its namespace prefix, like QXmlStreamReader::name().
+
+---
+
+### attribute(name)
+
+**Parameters:**
+
+- **name** : *std::string_view*
+  Qualified name of the attribute.
+
+**Returns:**
+
+- *const std::string ** — The value of the attribute, nullptr if the element has none of that name.
+
+---
+
+### child(local)
+
+**Parameters:**
+
+- **local** : *std::string_view*
+  Local name of the child.
+
+**Returns:**
+
+- *const [XmlElement](/docs/api/base/xml-element) ** — The first child element with that local name, nullptr if there is none.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 154"
+// Qt:   QXmlStreamReader xml(&file);
+//       while (!xml.atEnd()) if (xml.readNext() == QXmlStreamReader::StartElement && xml.name() == u"sensor") ...
+const Expected<XmlElement> layout = parse_xml(R"(<sensors><sensor id="1"><name>Fp1</name><x>-27.5</x></sensor></sensors>)");
+std::string firstSensor;
+if (layout) {
+    for (const XmlElement& sensor : layout->children) // XmlElement::child() finds the first one by local name
+        if (sensor.local_name() == "sensor" && sensor.child("name"))
+            firstSensor = firstSensor.empty() ? sensor.child("name")->text : firstSensor;
+} else {
+    Log::warning("{}", layout.error().what()); // the line where the document is not well formed
+}
+ok &= expect(firstSensor == "Fp1" && layout && *layout->children.front().attribute("id") == "1", "parse_xml read the sensor layout");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

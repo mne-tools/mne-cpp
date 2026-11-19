@@ -23,6 +23,7 @@ ProcessOptions options;
 options.timeout = std::chrono::seconds(5); // killed if it takes longer
 const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
 Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
+Log::info("{} network interface(s) with a hardware address", hardware_addresses().size()); // QNetworkInterface
 ```
 
 ---
@@ -39,12 +40,13 @@ Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture()
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 192"
+````cpp title="src/examples/ex_base/main.cpp, line 208"
 // Qt:   QProcess p; p.start("python3", {"--version"}); p.waitForFinished(5000); p.readAllStandardOutput();
 ProcessOptions options;
 options.timeout = std::chrono::seconds(5); // killed if it takes longer
 const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
 Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
+Log::info("{} network interface(s) with a hardware address", hardware_addresses().size()); // QNetworkInterface
 ok &= expect(!host_name().empty() && !os_pretty_name().empty() && (python.started || !python.error.empty()),
              "run_process ran a program and the host was described");
 ````

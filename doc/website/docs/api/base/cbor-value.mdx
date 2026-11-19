@@ -442,7 +442,7 @@ Pointers other than text would silently become booleans.
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 157"
+````cpp title="src/examples/ex_base/main.cpp, line 173"
 //       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
 CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
 header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary

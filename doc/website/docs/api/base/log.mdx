@@ -199,7 +199,7 @@ Additionally writes every message printed by `install_qt_message_handler()` to a
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 80"
+````cpp title="src/examples/ex_base/main.cpp, line 81"
 Log::install_qt_message_handler();  // console output
 Log::set_file(dir / "example.log"); // and a plain-text copy
 Log::info("logging to {}", utf8_from_path(Log::file()));

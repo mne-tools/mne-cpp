@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 483,
-    "exported_free_functions": 150,
-    "registered_classes": 571,
+    "exported_classes": 484,
+    "exported_free_functions": 153,
+    "registered_classes": 572,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 76,
     "registered_stale": 0,
-    "registered_with_test": 248,
+    "registered_with_test": 249,
     "registered_test_unresolved": 0,
-    "registered_with_example": 424,
+    "registered_with_example": 425,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 98,
     "registered_without_api_page": 0,
-    "with_snippet": 454,
-    "public_api_units": 573,
-    "example_eligible": 424,
+    "with_snippet": 455,
+    "public_api_units": 574,
+    "example_eligible": 425,
     "example_exempt": 149,
-    "eligible_backed_by_registry_example": 422,
-    "eligible_used_by_some_example": 366,
+    "eligible_backed_by_registry_example": 423,
+    "eligible_used_by_some_example": 367,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 49
     },
     "base": {
-      "public": 23,
-      "registered": 23,
-      "with_test": 23,
-      "eligible": 23,
-      "eligible_with_registry_example": 23,
-      "eligible_used_by_example": 21,
-      "with_snippet": 23
+      "public": 24,
+      "registered": 24,
+      "with_test": 24,
+      "eligible": 24,
+      "eligible_with_registry_example": 24,
+      "eligible_used_by_example": 22,
+      "with_snippet": 24
     },
     "bids": {
       "public": 14,
@@ -510,6 +510,11 @@
       "library": "base"
     },
     {
+      "name": "hardware_addresses",
+      "header": "base/process.h",
+      "library": "base"
+    },
+    {
       "name": "trimmed",
       "header": "base/string_utils.h",
       "library": "base"
@@ -607,6 +612,16 @@
     {
       "name": "resource_path",
       "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "parse_xml",
+      "header": "base/xml.h",
+      "library": "base"
+    },
+    {
+      "name": "read_xml_file",
+      "header": "base/xml.h",
       "library": "base"
     },
     {
@@ -2928,6 +2943,29 @@
         "ex_base/main.cpp#thread_pool_usage"
       ],
       "api_page": "doc/website/docs/api/base/thread-pool.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "XmlElement",
+      "header": "base/xml.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_xml",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#xml_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/xml-element.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

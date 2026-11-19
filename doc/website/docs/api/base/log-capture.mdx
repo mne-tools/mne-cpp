@@ -87,7 +87,7 @@ Forgets the messages recorded so far.
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 94"
+````cpp title="src/examples/ex_base/main.cpp, line 95"
 LogCapture capture; // in a test: record instead of printing
 Log::warning("channel MEG 0113 is flat");
 const int flat = capture.count(Log::Level::Warning, "flat");

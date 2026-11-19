@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 282,
+      "registered": 283,
       "conditional": 9,
       "unregistered": 3,
       "without_labels": 0,
@@ -54,6 +54,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -91,6 +92,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -128,6 +130,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -165,6 +168,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -202,6 +206,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -239,6 +244,7 @@
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
+          "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
           "test_dsp_rt_averaging",
@@ -277,12 +283,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 573,
+      "public_api_units": 574,
       "exported_not_registered": 2,
-      "example_eligible": 424,
+      "example_eligible": 425,
       "eligible_backed_percent": 99.53,
-      "snippets": 454,
-      "registered_test_percent": 43.43
+      "snippets": 455,
+      "registered_test_percent": 43.53
     },
     "G4_screenshots": {
       "referenced_images": 19,

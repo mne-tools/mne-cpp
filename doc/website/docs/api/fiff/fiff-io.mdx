@@ -158,7 +158,7 @@ Reads the measurement info of a file.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 278"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 277"
 FiffIO io(QString(dir + "/sample_audvis-ave.fif").toStdU16String()); // detects what the file holds (raw, evoked, fwd, ...)
 ok &= expect(io.evoked.size() == 4 && io.raw.empty(), "FiffIO finds the 4 evoked sets in an -ave.fif file");
 ````

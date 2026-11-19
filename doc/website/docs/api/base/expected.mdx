@@ -71,6 +71,27 @@ classDiagram
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 154"
+// Qt:   QXmlStreamReader xml(&file);
+//       while (!xml.atEnd()) if (xml.readNext() == QXmlStreamReader::StartElement && xml.name() == u"sensor") ...
+const Expected<XmlElement> layout = parse_xml(R"(<sensors><sensor id="1"><name>Fp1</name><x>-27.5</x></sensor></sensors>)");
+std::string firstSensor;
+if (layout) {
+    for (const XmlElement& sensor : layout->children) // XmlElement::child() finds the first one by local name
+        if (sensor.local_name() == "sensor" && sensor.child("name"))
+            firstSensor = firstSensor.empty() ? sensor.child("name")->text : firstSensor;
+} else {
+    Log::warning("{}", layout.error().what()); // the line where the document is not well formed
+}
+ok &= expect(firstSensor == "Fp1" && layout && *layout->children.front().attribute("id") == "1", "parse_xml read the sensor layout");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
