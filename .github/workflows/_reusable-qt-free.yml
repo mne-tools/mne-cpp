@@ -1,0 +1,77 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ---------------------------------------------------------------------------
+# Reusable workflow: the libraries without Qt
+# Called by pull-request.yml, staging.yml and main.yml.
+# No Qt is downloaded: scripts/ci/qt_free_sdk.sh configures MNE-CPP with
+# find_package(Qt6) disabled (MNE_BUILD_QT switches itself off), builds and
+# tests the Qt-free libraries, examples and tests, installs the SDK, checks
+# that nothing installed refers to Qt and builds scripts/ci/sdk_consumer
+# against the install tree alone. On Windows there is no system zlib, so the
+# pinned zlib release is built as well.
+# ---------------------------------------------------------------------------
+name: Reusable Qt-free SDK
+
+on:
+  workflow_call:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  QtFreeSDK:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    # <print> needs libstdc++ 14; the runner defaults to GCC 13.
+    - name: Use GCC 14 (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        echo "CC=gcc-14" >> "$GITHUB_ENV"
+        echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh max
+
+    - name: Download Eigen package (Linux|MacOS)
+      if: runner.os != 'Windows'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "$EIGEN_VERSION" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Clone Skigen (Linux|MacOS)
+      if: runner.os != 'Windows'
+      run: ./scripts/ci/clone_skigen.sh
+
+    - name: Download Eigen package (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+
+    - name: Clone Skigen (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: call scripts\ci\clone_skigen.bat
+
+    - name: Build, test, install and consume the Qt-free SDK
+      shell: bash
+      run: ./scripts/ci/qt_free_sdk.sh "$RUNNER_TEMP/qt-free" -DMNE_WARNINGS_AS_ERRORS=ON -DUSE_ONNXRUNTIME=OFF

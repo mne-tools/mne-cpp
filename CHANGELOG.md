@@ -108,7 +108,8 @@ aliases; replace the old spelling as below.
   so `find_package(MNE-CPP COMPONENTS ...)` of any other component needs no
   Qt, also from an SDK built with Qt. `scripts/ci/qt_free_sdk.sh` builds,
   tests and installs the libraries with Qt hidden from CMake and builds a
-  consumer against the install tree.
+  consumer against the install tree; CI runs it on Linux, macOS and Windows,
+  and the SDK consumer of the Qt builds no longer has Qt on its prefix path.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.

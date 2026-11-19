@@ -29,6 +29,7 @@ Common build and test logic is extracted into reusable workflows to avoid duplic
 |----------|--------|---------|
 | Reusable Build | [_reusable-build.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/_reusable-build.yml) | Cross-platform build parameterized by Qt version |
 | Reusable Tests | [_reusable-tests.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/_reusable-tests.yml) | Test execution with configurable code coverage (Codecov upload, threshold check, or plain) |
+| Reusable Qt-free SDK | [_reusable-qt-free.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/_reusable-qt-free.yml) | Builds, tests and installs the libraries with Qt hidden from CMake on Linux, macOS and Windows, and builds a consumer project against the install tree alone (`scripts/ci/qt_free_sdk.sh`) |
 
 These are called by the main pipeline workflows using `workflow_call`.
 
@@ -38,8 +39,9 @@ When a contributor opens or updates a pull request targeting `staging` (or `main
 
 1. The static **quality gates**.
 2. **Builds and tests** with the **maximum** supported Qt version on Linux, macOS, and Windows, and with the **minimum** supported Qt version on Linux, via the reusable test workflow (without coverage uploads).
-3. **Builds the documentation** to verify it compiles without errors.
-4. **Builds WebAssembly** (without deploying it).
+3. **Builds, tests and installs the libraries without Qt** and builds a consumer project against that SDK, on Linux, macOS, and Windows.
+4. **Builds the documentation** to verify it compiles without errors.
+5. **Builds WebAssembly** (without deploying it).
 
 The PR cannot be merged until all matrix jobs pass. This ensures that every change is validated on Linux, macOS, and Windows before it reaches the `staging` branch.
 
@@ -49,6 +51,7 @@ The PR cannot be merged until all matrix jobs pass. This ensures that every chan
 
 - The static **quality gates**
 - Tests with **code coverage** on all platforms — enforcing a minimum threshold (50%) and detecting coverage regressions — plus tests against the minimum Qt version on all platforms
+- The libraries **without Qt**: build, tests, install and a consumer project
 - The **documentation gate** (API docs, screenshots, website build)
 - The **WebAssembly build** (the dev deployment waits for the release run)
 

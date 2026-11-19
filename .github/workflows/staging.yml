@@ -278,6 +278,13 @@ jobs:
     permissions:
       contents: read
 
+  # ── The libraries without Qt: build, test, install, consume ─────────────
+  QtFreeSDK:
+    if: ${{ !inputs.release_only }}
+    uses: ./.github/workflows/_reusable-qt-free.yml
+    permissions:
+      contents: read
+
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04

@@ -66,6 +66,11 @@ jobs:
     if: ${{ github.event_name != 'push' || github.repository != 'mne-tools/mne-cpp' }}
     uses: ./.github/workflows/_reusable-sanitizers.yml
 
+  # ── The libraries without Qt: build, test, install, consume ─────────────
+  QtFreeSDK:
+    if: ${{ github.event_name != 'push' || github.repository != 'mne-tools/mne-cpp' }}
+    uses: ./.github/workflows/_reusable-qt-free.yml
+
   # ── mne_acq performance against the base commit (Linux) ──────────────────
   AcqBench:
     if: ${{ github.event_name != 'push' || github.repository != 'mne-tools/mne-cpp' }}

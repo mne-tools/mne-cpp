@@ -302,8 +302,9 @@ jobs:
     # by name.  --no-tests=error makes an empty suite a failure rather than a
     # silent success.  Passed-test output is kept (CTest trims it to 1 KB by
     # default) so QSKIP reasons reach the JUnit file and the run summary.
-    # Install the SDK and build a separate project against it with find_package. Only the SDK prefix and
-    # Qt are on the prefix path, so files the SDK fails to install are not found in the source tree.
+    # Install the SDK and build a separate project against it with find_package. Only the SDK prefix is on
+    # the prefix path, so files the SDK fails to install are not found in the source tree, and the Qt-free
+    # components it uses must not need Qt.
     - name: Build and run an SDK consumer (Linux|MacOS)
       if: runner.os != 'Windows'
       run: |
@@ -311,7 +312,7 @@ jobs:
           cmake --install build --prefix "$RUNNER_TEMP/mne-cpp-sdk" --component "$component"
         done
         env -u CMAKE_PREFIX_PATH cmake -S scripts/ci/sdk_consumer -B "$RUNNER_TEMP/sdk-consumer" \
-          -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/mne-cpp-sdk;$QT_ROOT_DIR"
+          -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/mne-cpp-sdk"
         cmake --build "$RUNNER_TEMP/sdk-consumer"
         ctest --test-dir "$RUNNER_TEMP/sdk-consumer" --output-on-failure --no-tests=error
 
@@ -330,7 +331,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         }
         $env:CMAKE_PREFIX_PATH = $null
-        cmake -S scripts/ci/sdk_consumer -B $consumer "-DCMAKE_PREFIX_PATH=$sdk;$env:QT_ROOT_DIR"
+        cmake -S scripts/ci/sdk_consumer -B $consumer "-DCMAKE_PREFIX_PATH=$sdk"
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         cmake --build $consumer --config Release
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

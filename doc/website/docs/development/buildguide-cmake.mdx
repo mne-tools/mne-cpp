@@ -201,7 +201,8 @@ This builds all libraries except `mne_disp` and `mne_disp3D`, and the examples t
 with `BUILD_TESTS=ON` those examples run as tests. The unit tests use QtTest and are built with Qt only.
 The installed `MNE-CPPConfig.cmake` neither looks for Qt nor passes it on to your targets.
 `scripts/ci/qt_free_sdk.sh` does all of this with Qt hidden from CMake, checks that nothing installed
-refers to Qt and builds `scripts/ci/sdk_consumer` against the install tree.
+refers to Qt and builds `scripts/ci/sdk_consumer` against the install tree; CI runs it on Linux, macOS and
+Windows.
 
 ### Via Qt Creator
 

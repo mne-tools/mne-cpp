@@ -105,6 +105,16 @@ class WorkflowContracts(unittest.TestCase):
                 self.assertIn("uses: ./.github/workflows/_reusable-sanitizers.yml",
                               (WORKFLOWS / name).read_text(encoding="utf-8"))
 
+    def test_qt_free_sdk_runs_on_pull_requests_staging_and_main(self) -> None:
+        job = (WORKFLOWS / "_reusable-qt-free.yml").read_text(encoding="utf-8")
+        self.assertIn("scripts/ci/qt_free_sdk.sh", job)
+        self.assertNotIn("--kind qt", job)
+        self.assertNotIn("continue-on-error", job)
+        for name in ("pull-request.yml", "staging.yml", "main.yml"):
+            with self.subTest(workflow=name):
+                self.assertIn("uses: ./.github/workflows/_reusable-qt-free.yml",
+                              (WORKFLOWS / name).read_text(encoding="utf-8"))
+
     def test_feature_branches_run_the_pull_request_checks_on_push(self) -> None:
         text = (WORKFLOWS / "pull-request.yml").read_text(encoding="utf-8")
         self.assertRegex(text, r"\n  push:\n    branches:\n      - 'feature/\*\*'\n")

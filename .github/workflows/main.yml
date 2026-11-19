@@ -85,6 +85,11 @@ jobs:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     uses: ./.github/workflows/_reusable-sanitizers.yml
 
+  # ── The libraries without Qt: build, test, install, consume ─────────────
+  QtFreeSDK:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    uses: ./.github/workflows/_reusable-qt-free.yml
+
   # ── Doxygen API documentation (production) ───────────────────────────────
   Doxygen:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
