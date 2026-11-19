@@ -2,18 +2,11 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-# mne_acq_fiff: the FIFF and BIDS bridge of mne_acq (FiffInfo conversion, AcqRecorder). It is the only part
-# of the acquisition library that depends on Qt; mne_acq itself stays standard C++.
+# mne_acq_fiff: the FIFF and BIDS bridge of mne_acq (FiffInfo conversion, AcqRecorder).
 cmake_minimum_required(VERSION 3.14)
 project(mne_acq_fiff
   LANGUAGES CXX
 )
-
-set(CMAKE_AUTOMOC ON)
-
-set(QT_REQUIRED_COMPONENTS Core)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
   acq_fiff.cpp
@@ -37,13 +30,9 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${PRIVATE_HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
 # FiffInfo appears in acq_fiff.h, so its clients need mne_fiff too.
 target_link_libraries(${PROJECT_NAME} PUBLIC mne_acq mne_fiff mne_base)
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  ${QT_REQUIRED_COMPONENT_LIBS}
   mne_bids
   Eigen3::Eigen)
 

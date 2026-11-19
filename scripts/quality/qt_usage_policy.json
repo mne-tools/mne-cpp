@@ -35,11 +35,9 @@
       "modules": []
     },
     "acq/fiff": {
-      "tokens": 19,
+      "tokens": 0,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "acq/lsl": {
       "tokens": 0,

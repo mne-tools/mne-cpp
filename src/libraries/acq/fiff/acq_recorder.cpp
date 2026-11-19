@@ -47,6 +47,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <span>
 #include <deque>
 #include <filesystem>
 #include <limits>
@@ -59,8 +60,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QBuffer>
-#include <QByteArray>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -285,13 +284,13 @@ void putStim(std::byte* at, Pack pack, std::int32_t value)
 
 /** FIFF tags written by FiffStream into memory. */
 template<typename Write>
-QByteArray fiffTags(Write&& write)
+std::vector<std::byte> fiffTags(Write&& write)
 {
     auto bytes = std::make_unique<mne::MemoryByteStream>();
     const mne::MemoryByteStream& written = *bytes;
     FiffStream stream(std::move(bytes));
     write(stream);
-    return QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
+    return written.data();
 }
 
 std::string lockName(AcqLockState lock)
@@ -365,12 +364,12 @@ void seal(Block& block, std::size_t used)
     block.padTag = pad;
 }
 
-std::unique_ptr<Block> metadataBlock(const QByteArray& tags)
+std::unique_ptr<Block> metadataBlock(std::span<const std::byte> tags)
 {
     auto block = std::make_unique<Block>();
-    block->buffer = std::make_unique<AcqAlignedBuffer>(sealedBytes(static_cast<std::size_t>(tags.size())));
-    std::memcpy(block->buffer->data(), tags.constData(), static_cast<std::size_t>(tags.size()));
-    seal(*block, static_cast<std::size_t>(tags.size()));
+    block->buffer = std::make_unique<AcqAlignedBuffer>(sealedBytes(tags.size()));
+    std::memcpy(block->buffer->data(), tags.data(), tags.size());
+    seal(*block, tags.size());
     return block;
 }
 
@@ -539,7 +538,7 @@ struct AcqRecorder::Impl
             tags->write_int(FIFF_REF_FILE_NUM, &number);
             tags->end_block(FIFFB_REF);
         }
-        auto block = metadataBlock(QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size())));
+        auto block = metadataBlock(written.data());
         block->file = index;
         block->opensFile = true;
         return block;
@@ -564,7 +563,7 @@ struct AcqRecorder::Impl
     /** End of a part: link to the next part, end of the raw data, and for the last part the annotations. */
     std::unique_ptr<Block> trailer(bool last)
     {
-        const QByteArray bytes = fiffTags([&](FiffStream& tags) {
+        const std::vector<std::byte> bytes = fiffTags([&](FiffStream& tags) {
             if (!last) {
                 tags.start_block(FIFFB_REF);
                 const fiff_int_t role = FIFFV_ROLE_NEXT_FILE;
@@ -592,7 +591,7 @@ struct AcqRecorder::Impl
 
     std::unique_ptr<Block> firstPartAnnotations()
     {
-        const QByteArray bytes = fiffTags([&](FiffStream& tags) {
+        const std::vector<std::byte> bytes = fiffTags([&](FiffStream& tags) {
             tags.write_annotations(annotations(), measDate);
             tags.end_block(FIFFB_MEAS);
         });

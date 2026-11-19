@@ -30,8 +30,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QBuffer>
-#include <QByteArray>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -87,7 +85,7 @@ int coilType(const AcqChannelInfo& channel, int kind)
     return FIFFV_COIL_NONE;
 }
 
-QByteArray serialize(const FiffInfo& info)
+std::vector<std::byte> serialize(const FiffInfo& info)
 {
     // The blocks of the source file are not copied: the payload must not depend on files elsewhere.
     FiffInfo copy = info;
@@ -97,7 +95,7 @@ QByteArray serialize(const FiffInfo& info)
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(std::move(memory), copy, cals, defaultMatrixXi, false);
     stream->finish_writing_raw();
-    return QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
+    return written.data();
 }
 
 bool deserialize(const std::vector<std::byte>& data, FiffInfo& info)
@@ -152,11 +150,9 @@ AcqStreamInfo mne::fromFiffInfo(const FiffInfo& info, AcqSampleFormat format)
         channel.fiff = fiff;
         stream.channels.push_back(std::move(channel));
     }
-    const QByteArray bytes = serialize(info);
     AcqExtension extension;
     extension.schema = kMeasInfoSchema;
-    extension.data.resize(static_cast<std::size_t>(bytes.size()));
-    std::memcpy(extension.data.data(), bytes.constData(), extension.data.size());
+    extension.data = serialize(info);
     stream.extensions.push_back(std::move(extension));
     return stream;
 }

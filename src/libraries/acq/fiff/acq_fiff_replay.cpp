@@ -22,6 +22,8 @@
 #include "../acq_thread.h"
 #include "../detail/acq_uri_params.h"
 
+#include <base/string_utils.h>
+
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
@@ -37,6 +39,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -47,7 +51,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFile>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +68,7 @@ namespace
 
 using Clock = std::chrono::steady_clock;
 
-constexpr qint64 kTagHeaderBytes = 16; // kind, type, size, next
+constexpr std::streamoff kTagHeaderBytes = 16; // kind, type, size, next
 
 struct Config
 {
@@ -253,14 +256,13 @@ private:
     FiffReplayBackend(const Config& config, std::string uri)
     : m_config(config)
     , m_uri(std::move(uri))
-    , m_file(QString::fromStdString(config.path))
     {
     }
 
     /** Reads the measurement info and the buffer directory, scans the trigger channel, creates the stream. */
     AcqError load()
     {
-        if (!m_file.exists()) {
+        if (!std::filesystem::exists(mne::path_from_utf8(m_config.path))) {
             return {AcqErrorCode::DeviceNotFound, "fiff://" + m_config.path + ": no such file"};
         }
         auto raw = FiffRawData::read(m_config.path);
@@ -326,12 +328,15 @@ private:
         const FiffRawDir& dir = m_raw.rawdir[index];
         if (dir.ent.kind != -1) {
             const auto bytes = static_cast<std::size_t>(dir.nsamp) * m_frameBytes;
-            if (!m_file.isOpen() && !m_file.open(QIODevice::ReadOnly)) {
-                return {AcqErrorCode::DeviceIo, "cannot open " + m_config.path};
+            if (!m_file.is_open()) {
+                m_file.open(mne::path_from_utf8(m_config.path), std::ios::binary);
+                if (!m_file.is_open()) {
+                    return {AcqErrorCode::DeviceIo, "cannot open " + m_config.path};
+                }
             }
-            if (!m_file.seek(static_cast<qint64>(dir.ent.pos) + kTagHeaderBytes) ||
-                m_file.read(reinterpret_cast<char*>(m_bytes.data()), static_cast<qint64>(bytes)) !=
-                    static_cast<qint64>(bytes)) {
+            m_file.clear();
+            if (!m_file.seekg(static_cast<std::streamoff>(dir.ent.pos) + kTagHeaderBytes) ||
+                !m_file.read(reinterpret_cast<char*>(m_bytes.data()), static_cast<std::streamsize>(bytes))) {
                 return {AcqErrorCode::DeviceIo, "cannot read data buffer " + std::to_string(index) + " of " + m_config.path};
             }
             toHostOrder(m_bytes.data(), bytes / m_sampleBytes, m_sampleBytes);
@@ -530,7 +535,7 @@ private:
 
     Config m_config;
     std::string m_uri;
-    QFile m_file;
+    std::ifstream m_file;
     FiffRawData m_raw;
     std::vector<std::uint64_t> m_starts; // first file sample of every buffer, relative to first_samp
     std::vector<std::byte> m_bytes;      // the loaded buffer in host byte order
