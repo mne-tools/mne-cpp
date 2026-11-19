@@ -2,7 +2,7 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-# mne_acq_lsl: the lsl:// source. liblsl is loaded at runtime; the in-tree mne_lsl (Qt) is the fallback.
+# mne_acq_lsl: the lsl:// source. liblsl is loaded at runtime; the in-tree mne_lsl is the fallback.
 cmake_minimum_required(VERSION 3.14)
 project(mne_acq_lsl
   LANGUAGES CXX
@@ -22,9 +22,7 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC mne_acq)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
-target_link_libraries(${PROJECT_NAME} PRIVATE mne_lsl Qt${QT_VERSION_MAJOR}::Core) # mne_lsl's headers include QtCore
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_lsl)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ACQ_LSL_LIBRARY)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON)

@@ -7,15 +7,6 @@ project(mne_lsl
   LANGUAGES CXX
 )
 
-#Handle qt uic, moc, rrc automatically
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(QT_REQUIRED_COMPONENTS Core Network)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-
 set(SOURCES
   lsl_stream_info.cpp
   lsl_stream_inlet.cpp
@@ -37,13 +28,10 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} lsl_protocol.h)
 
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
-set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
-
-# The public headers include Qt
-target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS})
+# Sockets of mne_com; lsl_protocol.h (internal, not installed) includes its UdpSocket
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  mne_base)
+  mne_base
+  mne_com)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_LSL_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 

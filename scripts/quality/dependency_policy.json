@@ -3,7 +3,7 @@
   "layers": [
     {
       "name": "base",
-      "description": "Logging, error results, byte streams, string and path helpers, threads; depends on the standard library, zlib and Qt Core only.",
+      "description": "Logging, error results, byte streams, string and path helpers, threads; depends on the standard library and zlib only.",
       "libraries": [
         "mne_base"
       ]
@@ -13,17 +13,17 @@
       "description": "Numerics and transport primitives (TCP, UDP and serial transports among them) built only on the base library or on the standard library alone.",
       "libraries": [
         "mne_math",
-        "mne_lsl",
         "mne_acq",
         "mne_com"
       ]
     },
     {
       "name": "support",
-      "description": "Cross-cutting services used by everything above: the Python bridge and HTML reports.",
+      "description": "Cross-cutting services used by everything above: the Python bridge, HTML reports and the Lab Streaming Layer on the transports of mne_com.",
       "libraries": [
         "mne_pybridge",
-        "mne_report"
+        "mne_report",
+        "mne_lsl"
       ]
     },
     {

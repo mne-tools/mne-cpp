@@ -22,22 +22,23 @@
 #include <base/log.h>
 #include "lsl_protocol.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QByteArray>
-#include <QElapsedTimer>
-#include <QHostInfo>
-#include <QNetworkDatagram>
-#include <QTcpSocket>
-#include <QUdpSocket>
+#include <base/process.h>
+#include <base/string_utils.h>
+#include <com/tcp_socket.h>
+#include <com/udp_socket.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <array>
+#include <chrono>
 #include <cmath>
+#include <format>
+#include <span>
+#include <string>
+#include <string_view>
 #include <limits>
 #include <stdexcept>
 
@@ -51,7 +52,21 @@ using namespace mne::detail;
 namespace
 {
 
-constexpr int kConnectMs = 5000;
+constexpr std::chrono::milliseconds kConnect{5000};
+
+using Clock = std::chrono::steady_clock;
+
+std::span<const std::byte> bytes(std::string_view text)
+{
+    return std::as_bytes(std::span(text));
+}
+
+
+/** @return The time left until @p deadline, at least zero. */
+std::chrono::milliseconds left(Clock::time_point deadline)
+{
+    return std::max(std::chrono::ceil<std::chrono::milliseconds>(deadline - Clock::now()), std::chrono::milliseconds(0));
+}
 
 std::runtime_error failure(const std::string& what)
 {
@@ -80,37 +95,33 @@ public:
 
     void openStream()
     {
-        if (m_pSocket) {
+        if (m_socket.is_open()) {
             return;
         }
-        const QString host = QString::fromStdString(m_info.data_host());
-        const auto port = static_cast<quint16>(m_info.data_port());
-        if (host.isEmpty() || port == 0) {
+        const std::string& host = m_info.data_host();
+        const int port = m_info.data_port();
+        if (host.empty() || port <= 0 || port > 65535) {
             throw failure("Invalid data host or port in stream_info");
         }
         if (m_info.channel_format() == ChannelFormat::Undefined || m_info.channel_count() <= 0) {
             throw failure("stream_info has no channel format or channels");
         }
-        m_pSocket = std::make_unique<QTcpSocket>();
-        m_pSocket->connectToHost(host, port);
-        if (!m_pSocket->waitForConnected(kConnectMs)) {
-            const std::string error = m_pSocket->errorString().toStdString();
-            m_pSocket.reset();
-            throw failure("Failed to connect to outlet: " + error);
+        auto connection = TcpSocket::connect(host, static_cast<std::uint16_t>(port), kConnect);
+        if (!connection) {
+            throw failure("Failed to connect to outlet: " + connection.error().message());
         }
+        m_socket = std::move(*connection);
         // The outlet buffers this many samples for us (liblsl: 360 s, or 36000 samples for irregular streams).
-        const auto bufferSamples = static_cast<qlonglong>(m_info.nominal_srate() > 0.0 ? 360.0 * m_info.nominal_srate() : 36000.0);
-        const QByteArray request = "LSL:streamfeed/110 " + QByteArray::fromStdString(m_info.uid()) +
-            "\r\nNative-Byte-Order: " + byteOrderName() +
+        const auto bufferSamples = static_cast<long long>(m_info.nominal_srate() > 0.0 ? 360.0 * m_info.nominal_srate() : 36000.0);
+        const std::string request = "LSL:streamfeed/110 " + m_info.uid() + "\r\nNative-Byte-Order: " + byteOrderName() +
             "\r\nEndian-Performance: 0\r\nHas-IEEE754-Floats: 1\r\nSupports-Subnormals: 1\r\nValue-Size: " +
-            QByteArray::number(static_cast<qulonglong>(valueSize(m_info.channel_format()))) +
-            "\r\nData-Protocol-Version: 110\r\nMax-Buffer-Length: " + QByteArray::number(bufferSamples) +
-            "\r\nMax-Chunk-Length: 0\r\nHostname: " +
-            QHostInfo::localHostName().toUtf8() + "\r\nSource-Id: " + QByteArray::fromStdString(m_info.source_id()) +
-            "\r\nSession-Id: default\r\n\r\n";
-        m_pSocket->write(request);
-        m_pSocket->flush();
+            std::to_string(valueSize(m_info.channel_format())) + "\r\nData-Protocol-Version: 110\r\nMax-Buffer-Length: " +
+            std::to_string(bufferSamples) + "\r\nMax-Chunk-Length: 0\r\nHostname: " + host_name() + "\r\nSource-Id: " +
+            m_info.source_id() + "\r\nSession-Id: default\r\n\r\n";
         try {
+            if (const std::error_code error = m_socket.write(bytes(request))) {
+                throw failure("Failed to send the request: " + error.message());
+            }
             readHeaders();
             checkTestPatterns();
         } catch (...) {
@@ -121,28 +132,18 @@ public:
 
     void closeStream()
     {
-        if (m_pSocket) {
-            if (m_pSocket->state() == QAbstractSocket::ConnectedState) {
-                m_pSocket->disconnectFromHost();
-                if (m_pSocket->state() != QAbstractSocket::UnconnectedState) {
-                    m_pSocket->waitForDisconnected(1000);
-                }
-            }
-            m_pSocket.reset();
-        }
+        m_socket.close();
         m_buffer.clear();
         m_pos = 0;
     }
 
     bool readPending()
     {
-        if (!m_pSocket) {
+        if (!m_socket.is_open()) {
             return false;
         }
-        if (m_pSocket->bytesAvailable() > 0 || m_pSocket->waitForReadyRead(0)) {
-            m_buffer.append(m_pSocket->readAll());
-        }
-        qsizetype pos = m_pos;
+        receive(std::chrono::milliseconds(0));
+        std::size_t pos = m_pos;
         std::uint8_t tag = 0;
         double timestamp = 0.0;
         return m_reader.read(m_buffer, pos, tag, timestamp, m_values) == 1;
@@ -154,10 +155,10 @@ public:
         if (timestamps != nullptr) {
             timestamps->clear();
         }
-        if (!m_pSocket) {
+        if (!m_socket.is_open()) {
             return chunk;
         }
-        readPending();
+        receive(std::chrono::milliseconds(0));
         std::uint8_t tag = 0;
         double timestamp = 0.0;
         int result = 0;
@@ -174,7 +175,7 @@ public:
             return chunk;
         }
         if (m_pos > (1 << 20)) {
-            m_buffer.remove(0, m_pos);
+            m_buffer.erase(0, m_pos);
             m_pos = 0;
         }
         return chunk;
@@ -182,105 +183,115 @@ public:
 
     double timeCorrection(double timeout)
     {
-        const auto port = static_cast<quint16>(m_info.service_port());
-        if (port == 0 || m_info.data_host().empty()) {
+        const int port = m_info.service_port();
+        if (port <= 0 || port > 65535 || m_info.data_host().empty()) {
             return std::numeric_limits<double>::quiet_NaN();
         }
-        QUdpSocket socket;
-        if (!detail::bindQuerySocket(socket, 0)) {
+        auto socket = detail::bindQuerySocket(0);
+        if (!socket) {
             return std::numeric_limits<double>::quiet_NaN();
         }
-        const quint16 localPort = socket.localPort();
-        const QHostAddress host(QString::fromStdString(m_info.data_host()));
         constexpr int kProbes = 8;
         double bestRtt = std::numeric_limits<double>::infinity();
         double best = std::numeric_limits<double>::quiet_NaN();
-        QElapsedTimer timer;
-        timer.start();
-        const auto budget = static_cast<qint64>(timeout * 1000.0);
-        for (int wave = 0; wave < kProbes && timer.elapsed() < budget; ++wave) {
+        const Clock::time_point deadline = Clock::now() + std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(timeout));
+        std::array<std::byte, 512> buffer{};
+        for (int wave = 0; wave < kProbes && Clock::now() < deadline; ++wave) {
             const double t0 = local_clock();
-            socket.writeDatagram("LSL:timedata\r\n" + QByteArray::number(wave) + " " + QByteArray::number(t0, 'g', 17) + "\r\n",
-                                 host, port);
-            const qint64 waitUntil = std::min(budget, timer.elapsed() + 100);
+            const std::string probe = std::format("LSL:timedata\r\n{} {:.17g}\r\n", wave, t0);
+            if (socket->send_to(bytes(probe), m_info.data_host(), static_cast<std::uint16_t>(port))) {
+                break;
+            }
+            const Clock::time_point waitUntil = std::min(deadline, Clock::now() + std::chrono::milliseconds(100));
             bool answered = false;
-            while (!answered && timer.elapsed() < waitUntil) {
-                if (!detail::waitForDatagrams(socket, localPort, static_cast<int>(waitUntil - timer.elapsed()))) {
+            while (!answered && Clock::now() < waitUntil) {
+                const auto datagram = socket->receive_from(buffer, left(waitUntil));
+                if (!datagram) {
                     continue;
                 }
-                while (socket.hasPendingDatagrams()) {
-                    const double t3 = local_clock();
-                    const QList<QByteArray> reply = socket.receiveDatagram().data().trimmed().split(' ');
-                    if (reply.size() != 4 || reply[0].toInt() != wave) {
-                        continue;
-                    }
-                    const double t1 = reply[2].toDouble();
-                    const double t2 = reply[3].toDouble();
-                    const double rtt = (t3 - t0) - (t2 - t1);
-                    if (rtt < bestRtt) {
-                        bestRtt = rtt;
-                        best = -((t1 - t0) + (t2 - t3)) / 2.0; // remote clock minus local clock, negated
-                    }
-                    answered = true;
+                const double t3 = local_clock();
+                const std::vector<std::string> reply = split(trimmed(std::string_view(reinterpret_cast<const char*>(buffer.data()), datagram->size)), ' ');
+                if (reply.size() != 4 || to_int(reply[0]) != wave) {
+                    continue;
                 }
+                const double t1 = to_double(reply[2]).value_or(std::numeric_limits<double>::quiet_NaN());
+                const double t2 = to_double(reply[3]).value_or(std::numeric_limits<double>::quiet_NaN());
+                const double rtt = (t3 - t0) - (t2 - t1);
+                if (rtt < bestRtt) {
+                    bestRtt = rtt;
+                    best = -((t1 - t0) + (t2 - t3)) / 2.0; // remote clock minus local clock, negated
+                }
+                answered = true;
             }
         }
         return best;
     }
 
 private:
+    /** Appends what has arrived within @p timeout to m_buffer; closes the stream if the outlet went away. */
+    bool receive(std::chrono::milliseconds timeout)
+    {
+        std::array<std::byte, 65536> chunk{};
+        bool any = false;
+        while (true) {
+            const auto got = m_socket.read_some(chunk, any ? std::chrono::milliseconds(0) : timeout);
+            if (!got) {
+                if (got.error() != std::errc::timed_out) {
+                    m_socket.close();
+                }
+                return any;
+            }
+            m_buffer.append(reinterpret_cast<const char*>(chunk.data()), *got);
+            any = true;
+        }
+    }
+
     /** Reads the response headers; the bytes after them start the sample stream. */
     void readHeaders()
     {
-        QByteArray data;
-        QElapsedTimer timer;
-        timer.start();
-        qsizetype end = -1;
-        while ((end = data.indexOf("\r\n\r\n")) < 0) {
-            if (timer.elapsed() > kConnectMs || data.size() > 65536 ||
-                (m_pSocket->bytesAvailable() == 0 && !m_pSocket->waitForReadyRead(static_cast<int>(kConnectMs - timer.elapsed())))) {
+        const Clock::time_point deadline = Clock::now() + kConnect;
+        std::size_t end = std::string::npos;
+        while ((end = m_buffer.find("\r\n\r\n")) == std::string::npos) {
+            if (Clock::now() >= deadline || m_buffer.size() > 65536 || !m_socket.is_open() || !receive(left(deadline))) {
                 throw failure("Timeout waiting for the outlet's response");
             }
-            data.append(m_pSocket->readAll());
         }
-        const QList<QByteArray> lines = data.left(end).split('\n');
-        const QList<QByteArray> status = lines.value(0).trimmed().split(' ');
-        if (status.size() < 2 || !status[0].startsWith("LSL/") || status[1] != "200") {
-            throw failure("Outlet refused the stream: " + lines.value(0).trimmed().toStdString());
+        const std::vector<std::string> lines = split(std::string_view(m_buffer).substr(0, end), '\n');
+        const std::vector<std::string> status = split(trimmed(lines.front()), ' ');
+        if (status.size() < 2 || !status[0].starts_with("LSL/") || status[1] != "200") {
+            throw failure("Outlet refused the stream: " + std::string(trimmed(lines.front())));
         }
         bool reverse = false;
-        for (const QByteArray& line : lines) {
-            const qsizetype colon = line.indexOf(':');
-            if (colon < 0) {
+        for (const std::string& line : lines) {
+            const std::size_t colon = line.find(':');
+            if (colon == std::string::npos) {
                 continue;
             }
-            const QByteArray key = line.left(colon).trimmed();
-            const QByteArray value = line.mid(colon + 1).trimmed();
+            const std::string key(trimmed(std::string_view(line).substr(0, colon)));
+            const std::string value(trimmed(std::string_view(line).substr(colon + 1)));
             if (key == "Byte-Order") {
                 reverse = value != byteOrderName();
-            } else if (key == "Data-Protocol-Version" && value.toInt() != kProtocolVersion) {
-                throw failure("Outlet speaks data protocol " + value.toStdString() + "; 110 is supported");
+            } else if (key == "Data-Protocol-Version" && to_int(value) != kProtocolVersion) {
+                throw failure("Outlet speaks data protocol " + value + "; 110 is supported");
             }
         }
         m_reader = SampleReader(m_info.channel_format(), m_info.channel_count(), reverse);
-        m_buffer = data.mid(end + 4);
+        m_buffer.erase(0, end + 4);
         m_pos = 0;
     }
 
     /** Reads the two test-pattern samples and checks them against the protocol's values. */
     void checkTestPatterns()
     {
-        QElapsedTimer timer;
-        timer.start();
+        const Clock::time_point deadline = Clock::now() + kConnect;
         for (const int offset : {4, 2}) {
             std::uint8_t tag = 0;
             double timestamp = 0.0;
             int result = 0;
             while ((result = m_reader.read(m_buffer, m_pos, tag, timestamp, m_values)) == 0) {
-                if (timer.elapsed() > kConnectMs || !m_pSocket->waitForReadyRead(static_cast<int>(kConnectMs - timer.elapsed()))) {
+                if (Clock::now() >= deadline || !m_socket.is_open() || !receive(left(deadline))) {
                     throw failure("Timeout waiting for the test-pattern samples");
                 }
-                m_buffer.append(m_pSocket->readAll());
             }
             bool match = result == 1 && tag == kTagTransmitted && timestamp == kTestPatternTime;
             for (std::size_t k = 0; match && k < m_values.size(); ++k) {
@@ -302,13 +313,13 @@ private:
         return m_info.nominal_srate() > 0.0 ? m_lastTimestamp + 1.0 / m_info.nominal_srate() : m_lastTimestamp;
     }
 
-    stream_info m_info;                    /**< The stream info for this inlet. */
-    std::unique_ptr<QTcpSocket> m_pSocket; /**< TCP socket of the stream feed; null while closed. */
-    SampleReader m_reader;                 /**< Decoder for the negotiated format and byte order. */
-    QByteArray m_buffer;                   /**< Received bytes not yet decoded, from m_pos on. */
-    qsizetype m_pos = 0;                   /**< Read position in m_buffer. */
-    std::vector<double> m_values;          /**< Scratch for one decoded sample. */
-    double m_lastTimestamp = 0.0;          /**< Timestamp of the last decoded sample. */
+    stream_info m_info;           /**< The stream info for this inlet. */
+    TcpSocket m_socket;           /**< TCP connection of the stream feed; closed while not streaming. */
+    SampleReader m_reader;        /**< Decoder for the negotiated format and byte order. */
+    std::string m_buffer;         /**< Received bytes not yet decoded, from m_pos on. */
+    std::size_t m_pos = 0;        /**< Read position in m_buffer. */
+    std::vector<double> m_values; /**< Scratch for one decoded sample. */
+    double m_lastTimestamp = 0.0; /**< Timestamp of the last decoded sample. */
 };
 
 //=============================================================================================================

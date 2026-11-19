@@ -11,12 +11,6 @@
   ],
   "kept": {
     "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
-    "bids": {
-      "JSON": "Sidecars are JSON; QJsonDocument instead of a new dependency."
-    },
-    "lsl": {
-      "Sockets": "The LSL wire protocol runs over QUdpSocket and QTcpSocket."
-    },
     "base": {
       "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt (zlib falls back to Qt's copy only when the system has none)."
     }
@@ -45,9 +39,7 @@
     "acq/lsl": {
       "tokens": 0,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "base": {
       "tokens": 10,
@@ -135,12 +127,9 @@
       "modules": []
     },
     "lsl": {
-      "tokens": 167,
-      "public_header_includes": 3,
-      "modules": [
-        "Core",
-        "Network"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "math": {
       "tokens": 0,

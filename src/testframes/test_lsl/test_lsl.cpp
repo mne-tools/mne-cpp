@@ -24,9 +24,6 @@
 
 #include <QtTest/QtTest>
 #include <QThread>
-#include <QNetworkDatagram>
-#include <QNetworkInterface>
-#include <QUdpSocket>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -35,6 +32,11 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <array>
+#include <chrono>
+#include <span>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -129,7 +131,6 @@ private slots:
     void testResolveStreamNoMatch();
     void testResolveStreamsMultipleOutlets();
     void testOutletAnswersGroupQueryOnLoopback();
-    void testWaitForDatagramsKeepsSocketBound();
 
     //=========================================================================================================
     // Build info tests
@@ -856,55 +857,24 @@ void TestLsl::testResolveStreamsMultipleOutlets()
 void TestLsl::testOutletAnswersGroupQueryOnLoopback()
 {
     // Outlets share the discovery port, so only a group query reaches all of them; loopback works on every host.
-    QNetworkInterface loopback;
-    for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
-        if (iface.flags().testFlag(QNetworkInterface::IsLoopBack) && iface.flags().testFlag(QNetworkInterface::IsUp)) {
-            loopback = iface;
-        }
-    }
-    if (!loopback.isValid()) {
-        QSKIP("No loopback interface");
-    }
     stream_info info("LoopGroup", "EEG", 1, 100.0, ChannelFormat::Float32, "loopgroup");
     stream_outlet outlet(info);
 
-    QUdpSocket socket;
-    QVERIFY(detail::bindQuerySocket(socket, 0));
-    const quint16 port = socket.localPort();
-    socket.setMulticastInterface(loopback);
-    const QByteArray query = "LSL:shortinfo\r\nsource_id='loopgroup'\r\n" + QByteArray::number(port) + " 42\r\n";
+    auto socket = detail::bindQuerySocket(0);
+    QVERIFY(socket);
+    if (socket->set_multicast_interface(detail::kLoopback)) {
+        QSKIP("No multicast on the loopback interface");
+    }
+    const std::string query = "LSL:shortinfo\r\nsource_id='loopgroup'\r\n" + std::to_string(socket->port()) + " 42\r\n";
+    std::array<std::byte, 65536> buffer{};
     bool answered = false;
     for (int attempt = 0; attempt < 10 && !answered; ++attempt) {
-        socket.writeDatagram(query, detail::discoveryGroups().front(), detail::kDiscoveryPort);
-        if (detail::waitForDatagrams(socket, port, 300)) {
-            answered = socket.receiveDatagram().data().startsWith("42\r\n");
+        QVERIFY(!socket->send_to(std::as_bytes(std::span(query)), detail::discoveryGroups().front(), detail::kDiscoveryPort));
+        if (const auto reply = socket->receive_from(buffer, std::chrono::milliseconds(300))) {
+            answered = std::string_view(reinterpret_cast<const char*>(buffer.data()), reply->size).starts_with("42\r\n");
         }
     }
     QVERIFY(answered);
-}
-
-//=============================================================================================================
-
-void TestLsl::testWaitForDatagramsKeepsSocketBound()
-{
-    QUdpSocket socket;
-    QVERIFY(detail::bindQuerySocket(socket, 0));
-    const quint16 port = socket.localPort();
-    QUdpSocket sender;
-    QVERIFY(!detail::waitForDatagrams(socket, port, 50));
-
-    sender.writeDatagram("one", QHostAddress::LocalHost, port);
-    QVERIFY(detail::waitForDatagrams(socket, port, 2000));
-    QCOMPARE(socket.receiveDatagram().data(), QByteArray("one"));
-
-    // QAbstractSocket::waitForReadyRead closes the socket on any error but a timeout; replies must still arrive.
-    socket.close();
-    QVERIFY(!detail::waitForDatagrams(socket, port, 50));
-    QCOMPARE(socket.state(), QAbstractSocket::BoundState);
-    QCOMPARE(socket.localPort(), port);
-    sender.writeDatagram("two", QHostAddress::LocalHost, port);
-    QVERIFY(detail::waitForDatagrams(socket, port, 2000));
-    QCOMPARE(socket.receiveDatagram().data(), QByteArray("two"));
 }
 
 //=============================================================================================================

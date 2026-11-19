@@ -21,19 +21,20 @@
 #include "lsl_stream_info.h"
 #include "lsl_protocol.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QHostInfo>
-#include <QUuid>
-#include <QXmlStreamReader>
+#include <base/process.h>
+#include <base/string_utils.h>
+#include <base/xml.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <array>
 #include <chrono>
+#include <mutex>
+#include <cstdint>
+#include <format>
+#include <random>
 #include <sstream>
 
 //=============================================================================================================
@@ -49,6 +50,22 @@ using namespace mne::detail;
 
 namespace
 {
+
+/** @return A random (version 4) UUID in lower-case hex with dashes, as liblsl gives every stream. */
+std::string randomUuid()
+{
+    static std::mt19937_64 generator{std::random_device{}()};
+    static std::mutex mutex;
+    std::array<std::uint64_t, 2> words{};
+    {
+        const std::lock_guard lock(mutex);
+        words = {generator(), generator()};
+    }
+    words[0] = (words[0] & ~std::uint64_t{0xF000}) | std::uint64_t{0x4000};           // version 4
+    words[1] = (words[1] & ~(std::uint64_t{0xC} << 60)) | (std::uint64_t{0x8} << 60); // RFC 4122 variant
+    return std::format("{:08x}-{:04x}-{:04x}-{:04x}-{:012x}", words[0] >> 32, (words[0] >> 16) & 0xFFFF, words[0] & 0xFFFF,
+                       words[1] >> 48, words[1] & 0xFFFFFFFFFFFFULL);
+}
 
 std::string escaped(const std::string& text)
 {
@@ -118,8 +135,8 @@ stream_info::stream_info(const std::string& name,
 , m_nominal_srate(nominal_srate)
 , m_channel_format(channel_format)
 , m_source_id(source_id)
-, m_uid(QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString())
-, m_hostname(QHostInfo::localHostName().toStdString())
+, m_uid(randomUuid())
+, m_hostname(host_name())
 , m_data_port(0)
 , m_created_at(local_clock())
 {
@@ -262,45 +279,40 @@ std::string stream_info::to_string() const
 stream_info stream_info::from_string(const std::string& data)
 {
     stream_info info;
-    QXmlStreamReader xml(QByteArray::fromStdString(data));
-    if (!xml.readNextStartElement() || xml.name() != QLatin1String("info")) {
+    const Expected<XmlElement> root = parse_xml(data);
+    if (!root || root->local_name() != "info") {
         return {};
     }
-    while (xml.readNextStartElement()) {
-        const QString key = xml.name().toString();
-        if (key == QLatin1String("desc")) {
-            xml.skipCurrentElement();
-            continue;
-        }
-        const QString text = xml.readElementText(QXmlStreamReader::SkipChildElements);
-        const std::string value = text.toStdString();
-        if (key == QLatin1String("name")) {
+    for (const XmlElement& element : root->children) {
+        const std::string_view key = element.local_name();
+        const std::string& value = element.text;
+        if (key == "name") {
             info.m_name = value;
-        } else if (key == QLatin1String("type")) {
+        } else if (key == "type") {
             info.m_type = value;
-        } else if (key == QLatin1String("channel_count")) {
-            info.m_channel_count = text.toInt();
-        } else if (key == QLatin1String("channel_format")) {
+        } else if (key == "channel_count") {
+            info.m_channel_count = to_int(value).value_or(0);
+        } else if (key == "channel_format") {
             info.m_channel_format = formatFromName(value);
-        } else if (key == QLatin1String("source_id")) {
+        } else if (key == "source_id") {
             info.m_source_id = value;
-        } else if (key == QLatin1String("nominal_srate")) {
-            info.m_nominal_srate = text.toDouble();
-        } else if (key == QLatin1String("created_at")) {
-            info.m_created_at = text.toDouble();
-        } else if (key == QLatin1String("uid")) {
+        } else if (key == "nominal_srate") {
+            info.m_nominal_srate = to_double(value).value_or(0.0);
+        } else if (key == "created_at") {
+            info.m_created_at = to_double(value).value_or(0.0);
+        } else if (key == "uid") {
             info.m_uid = value;
-        } else if (key == QLatin1String("hostname")) {
+        } else if (key == "hostname") {
             info.m_hostname = value;
-        } else if (key == QLatin1String("v4data_port")) {
-            info.m_data_port = text.toInt();
-        } else if (key == QLatin1String("v4service_port")) {
-            info.m_service_port = text.toInt();
-        } else if (key == QLatin1String("v4address") && !value.empty()) {
+        } else if (key == "v4data_port") {
+            info.m_data_port = to_int(value).value_or(0);
+        } else if (key == "v4service_port") {
+            info.m_service_port = to_int(value).value_or(0);
+        } else if (key == "v4address" && !value.empty()) {
             info.m_data_host = value;
         }
     }
-    if (xml.hasError() || info.m_name.empty()) {
+    if (info.m_name.empty()) {
         return {};
     }
     return info;

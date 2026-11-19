@@ -21,20 +21,14 @@
 #include "lsl_stream_discovery.h"
 #include "lsl_protocol.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QHostAddress>
-#include <QNetworkDatagram>
-#include <QUdpSocket>
-#include <QVariant>
+#include <com/udp_socket.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <random>
 #include <set>
@@ -59,42 +53,39 @@ constexpr std::chrono::milliseconds kResend{500};
 std::vector<stream_info> resolve(const std::string& predicate, double timeout, std::size_t minimum = 0)
 {
     std::vector<stream_info> results;
-    QUdpSocket socket;
-    if (!detail::bindQuerySocket(socket, 0)) {
+    auto socket = detail::bindQuerySocket(0);
+    if (!socket) {
         return results;
     }
-    const auto port = socket.localPort();
-    const QByteArray id = QByteArray::fromStdString(std::to_string(std::random_device{}()));
-    const QByteArray query = "LSL:shortinfo\r\n" + QByteArray::fromStdString(predicate) + "\r\n" +
-        QByteArray::number(port) + " " + id + "\r\n";
-    const QByteArray prefix = id + "\r\n";
+    const std::string id = std::to_string(std::random_device{}());
+    const std::string query = "LSL:shortinfo\r\n" + predicate + "\r\n" + std::to_string(socket->port()) + " " + id + "\r\n";
+    const std::string prefix = id + "\r\n";
 
     std::set<std::string> seen;
+    std::array<std::byte, 65536> buffer{};
     using Clock = std::chrono::steady_clock;
     const Clock::time_point deadline =
         Clock::now() + std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(timeout));
     Clock::time_point nextSend = Clock::now();
     while (Clock::now() < deadline && (minimum == 0 || results.size() < minimum)) {
         if (Clock::now() >= nextSend) {
-            sendQuery(socket, query);
+            sendQuery(*socket, query);
             nextSend = Clock::now() + kResend;
         }
         const auto wait = std::chrono::ceil<std::chrono::milliseconds>(std::min(deadline, nextSend) - Clock::now());
-        detail::waitForDatagrams(socket, port, static_cast<int>(std::max<std::chrono::milliseconds::rep>(wait.count(), 0)));
-        while (socket.hasPendingDatagrams()) {
-            const auto datagram = socket.receiveDatagram();
-            const auto data = datagram.data();
-            if (!data.startsWith(prefix)) {
-                continue;
+        auto datagram = socket->receive_from(buffer, std::max(wait, std::chrono::milliseconds(0)));
+        while (datagram) {
+            const std::string_view data(reinterpret_cast<const char*>(buffer.data()), datagram->size);
+            if (data.starts_with(prefix)) {
+                stream_info info = stream_info::from_string(std::string(data.substr(prefix.size())));
+                if (!info.uid().empty() && seen.insert(info.uid()).second) {
+                    if (info.data_host().empty()) {
+                        info.set_data_host(datagram->address);
+                    }
+                    results.push_back(std::move(info));
+                }
             }
-            stream_info info = stream_info::from_string(data.mid(prefix.size()).toStdString());
-            if (info.uid().empty() || !seen.insert(info.uid()).second) {
-                continue;
-            }
-            if (info.data_host().empty()) {
-                info.set_data_host(hostText(datagram.senderAddress()));
-            }
-            results.push_back(std::move(info));
+            datagram = socket->receive_from(buffer, std::chrono::milliseconds(0));
         }
     }
     return results;

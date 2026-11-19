@@ -16,14 +16,15 @@
 
 #include "lsl_protocol.h"
 
+#include <base/log.h>
+
 #include <algorithm>
 #include <bit>
 #include <cmath>
 #include <cstring>
+#include <span>
 #include <sstream>
 
-#include <QNetworkInterface>
-#include <QVariant>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -40,7 +41,7 @@ namespace
 {
 
 template<typename T>
-void appendValue(QByteArray& out, T value)
+void appendValue(std::string& out, T value)
 {
     out.append(reinterpret_cast<const char*>(&value), sizeof(T));
 }
@@ -100,17 +101,6 @@ bool field(const stream_info& info, const std::string& key, std::string& value)
     return true;
 }
 
-#ifndef QT_NO_NETWORKINTERFACE
-QNetworkInterface loopbackInterface()
-{
-    for (const auto& iface : QNetworkInterface::allInterfaces()) {
-        if (iface.type() == QNetworkInterface::Loopback) {
-            return iface;
-        }
-    }
-    return {};
-}
-#endif
 
 } // namespace
 
@@ -118,48 +108,52 @@ QNetworkInterface loopbackInterface()
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-std::vector<QHostAddress> mne::detail::discoveryTargets()
+std::vector<std::string> mne::detail::discoveryTargets()
 {
-    return {QHostAddress(QStringLiteral("239.255.172.215")), QHostAddress(QStringLiteral("224.0.0.183")),
-            QHostAddress(QHostAddress::Broadcast), QHostAddress(QHostAddress::LocalHost)};
+    return {"239.255.172.215", "224.0.0.183", "255.255.255.255", kLoopback};
 }
 
 //=============================================================================================================
 
-std::vector<QHostAddress> mne::detail::discoveryGroups()
+std::vector<std::string> mne::detail::discoveryGroups()
 {
-    return {QHostAddress(QStringLiteral("239.255.172.215")), QHostAddress(QStringLiteral("224.0.0.183"))};
+    return {"239.255.172.215", "224.0.0.183"};
 }
 
 //=============================================================================================================
 
-void mne::detail::joinDiscoveryGroups([[maybe_unused]] QUdpSocket& socket)
+void mne::detail::joinDiscoveryGroups(UdpSocket& socket)
 {
-#ifndef QT_NO_NETWORKINTERFACE // WebAssembly has no multicast
-    const auto loopback = loopbackInterface();
-    for (const auto& group : discoveryGroups()) {
-        socket.joinMulticastGroup(group);
-        if (loopback.isValid()) {
-            socket.joinMulticastGroup(group, loopback);
+    // Either interface may lack a multicast route (WebAssembly has none at all); one membership is enough
+    int joined = 0;
+    for (const std::string& group : discoveryGroups()) {
+        for (const std::string& networkInterface : {std::string(), std::string(kLoopback)}) {
+            joined += socket.join_group(group, networkInterface) ? 0 : 1;
         }
     }
-#endif
+    if (joined == 0) {
+        Log::debug("[lsl] No discovery group could be joined; only queries by broadcast and to localhost arrive");
+    }
 }
 
 //=============================================================================================================
 
-void mne::detail::sendQuery(QUdpSocket& socket, const QByteArray& query)
+void mne::detail::sendQuery(UdpSocket& socket, std::string_view query)
 {
-    for (const auto& target : discoveryTargets()) {
-        socket.writeDatagram(query, target, kDiscoveryPort);
+    const auto bytes = std::as_bytes(std::span(query));
+    int sent = 0;
+    if (!socket.set_multicast_interface()) {
+        for (const std::string& target : discoveryTargets()) {
+            sent += socket.send_to(bytes, target, kDiscoveryPort) ? 0 : 1;
+        }
     }
-#ifndef QT_NO_NETWORKINTERFACE
-    if (const auto loopback = loopbackInterface(); loopback.isValid()) {
-        socket.setMulticastInterface(loopback);
-        socket.writeDatagram(query, discoveryGroups().front(), kDiscoveryPort);
-        socket.setMulticastInterface({});
+    // Over loopback a group query reaches every local outlet, which share the discovery port
+    if (!socket.set_multicast_interface(kLoopback)) {
+        sent += socket.send_to(bytes, discoveryGroups().front(), kDiscoveryPort) ? 0 : 1;
     }
-#endif
+    if (sent == 0) {
+        Log::debug("[lsl] The query could not be sent anywhere");
+    }
 }
 
 //=============================================================================================================
@@ -258,7 +252,7 @@ double mne::detail::testPatternValue(ChannelFormat format, int k, int offset) no
 
 //=============================================================================================================
 
-void mne::detail::appendSample(QByteArray& out, ChannelFormat format, const std::vector<double>& values, double timestamp,
+void mne::detail::appendSample(std::string& out, ChannelFormat format, const std::vector<double>& values, double timestamp,
                                bool deduced)
 {
     if (deduced) {
@@ -294,7 +288,7 @@ void mne::detail::appendSample(QByteArray& out, ChannelFormat format, const std:
                 const std::string s = text.str();
                 appendValue(out, std::uint8_t(1));
                 appendValue(out, static_cast<std::uint8_t>(s.size()));
-                out.append(s.data(), static_cast<qsizetype>(s.size()));
+                out.append(s);
                 break;
             }
             default:
@@ -314,13 +308,13 @@ SampleReader::SampleReader(ChannelFormat format, int channels, bool reverseBytes
 
 //=============================================================================================================
 
-int SampleReader::read(const QByteArray& data, qsizetype& pos, std::uint8_t& tag, double& timestamp,
+int SampleReader::read(std::string_view data, std::size_t& pos, std::uint8_t& tag, double& timestamp,
                        std::vector<double>& values) const
 {
-    const char* base = data.constData();
-    qsizetype at = pos;
-    const auto need = [&](qsizetype n) {
-        return data.size() - at >= n;
+    const char* base = data.data();
+    std::size_t at = pos;
+    const auto need = [&](std::uint64_t n) {
+        return data.size() >= at && data.size() - at >= n;
     };
     if (!need(1)) {
         return 0;
@@ -357,18 +351,18 @@ int SampleReader::read(const QByteArray& data, qsizetype& pos, std::uint8_t& tag
                 length = loadValue<std::uint64_t>(base + at, m_reverse);
             }
             at += lengthSize;
-            if (!need(static_cast<qsizetype>(length))) {
+            if (!need(length)) {
                 return 0;
             }
             v = std::strtod(std::string(base + at, static_cast<std::size_t>(length)).c_str(), nullptr);
-            at += static_cast<qsizetype>(length);
+            at += static_cast<std::size_t>(length);
         }
     } else {
-        const auto size = static_cast<qsizetype>(valueSize(m_format));
+        const std::size_t size = valueSize(m_format);
         if (size == 0) {
             return -1;
         }
-        if (!need(size * m_channels)) {
+        if (!need(size * static_cast<std::size_t>(m_channels))) {
             return 0;
         }
         for (double& v : values) {
@@ -442,43 +436,7 @@ bool mne::detail::matchesQuery(const stream_info& info, const std::string& predi
 
 //=============================================================================================================
 
-std::string mne::detail::hostText(const QHostAddress& address)
+std::expected<UdpSocket, std::error_code> mne::detail::bindQuerySocket(std::uint16_t port)
 {
-    bool mapped = false;
-    const quint32 v4 = address.toIPv4Address(&mapped);
-    return (mapped ? QHostAddress(v4) : address).toString().toStdString();
-}
-
-//=============================================================================================================
-
-bool mne::detail::bindQuerySocket(QUdpSocket& socket, quint16 port)
-{
-    if (!socket.bind(QHostAddress::AnyIPv4, port)) {
-        return false;
-    }
-#ifndef Q_OS_WASM
-    socket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
-    socket.setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
-#endif
-    return true;
-}
-
-//=============================================================================================================
-
-bool mne::detail::waitForDatagrams(QUdpSocket& socket, quint16 port, int ms)
-{
-    if (socket.state() != QAbstractSocket::BoundState && !bindQuerySocket(socket, port)) {
-        return false;
-    }
-    if (socket.hasPendingDatagrams()) {
-        return true;
-    }
-    if (ms > 0) {
-        socket.waitForReadyRead(ms);
-    }
-    if (socket.state() != QAbstractSocket::BoundState) {
-        bindQuerySocket(socket, port);
-        return false;
-    }
-    return socket.hasPendingDatagrams();
+    return UdpSocket::bind("0.0.0.0", port);
 }

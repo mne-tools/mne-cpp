@@ -807,6 +807,14 @@ aliases; replace the old spelling as below.
   (`QTest::ignoreMessage`, `QTest::failOnWarning`, a custom
   `qInstallMessageHandler`) calls `mne::forward_log_to_qt()` first, or uses
   `mne::LogCapture`.
+- The LSL library (`mne_lsl`) and the `lsl://` source (`mne_acq_lsl`) no
+  longer use or link Qt. Outlets, inlets, discovery and time correction run
+  on the sockets of `mne_com`, stream infos are parsed with
+  `mne::parse_xml()`, and new streams get their UUID and host name without
+  Qt; the wire protocol is unchanged and still interoperates with liblsl.
+  `mne_lsl` moves from the core to the support layer of the dependency
+  policy, above `mne_com`.
+  With this, no library outside `disp` and `disp3D` links Qt.
 - `RtAveraging` is a synchronous streaming average with no Qt: `update(block)`
   cuts an epoch at every onset of the stim channel and returns the event
   codes whose moving mean of the newest `averages` epochs changed, read from

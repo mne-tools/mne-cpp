@@ -14,8 +14,8 @@
  * @ref mne::resolve_streams) and represents a one-way TCP
  * connection to the corresponding outlet, of this library or of
  * liblsl, speaking liblsl's data protocol 1.10. The class wraps the
- * @c QTcpSocket plumbing and the sample decoding behind a PIMPL so
- * that the public header pulls in no Qt network symbols.
+ * TCP connection (mne_com's @c TcpSocket) and the sample decoding behind a
+ * PIMPL so that the public header pulls in no socket headers.
  *
  * The data path is intentionally chunked rather than
  * sample-at-a-time: @ref mne::stream_inlet::samples_available "samples_available" drains pending bytes off
@@ -60,7 +60,7 @@ namespace mne
 //=============================================================================================================
 
 /**
- * @brief PIMPL backend of stream_inlet that owns the QTcpSocket and the per-sample reassembly buffer.
+ * @brief PIMPL backend of stream_inlet that owns the TCP connection and the per-sample reassembly buffer.
  */
 class StreamInletPrivate;
 

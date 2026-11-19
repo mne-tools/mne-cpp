@@ -28,18 +28,15 @@
 #include "lsl_global.h"
 #include "lsl_stream_info.h"
 
+#include <com/udp_socket.h>
+
 #include <cstddef>
 #include <cstdint>
+#include <expected>
 #include <string>
+#include <string_view>
+#include <system_error>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QByteArray>
-#include <QHostAddress>
-#include <QUdpSocket>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::detail
@@ -48,32 +45,33 @@
 namespace mne::detail
 {
 
-inline constexpr quint16 kDiscoveryPort = 16571;       /**< UDP port outlets listen on for queries. */
+inline constexpr std::uint16_t kDiscoveryPort = 16571; /**< UDP port outlets listen on for queries. */
 inline constexpr int kProtocolVersion = 110;           /**< Data protocol version spoken. */
 inline constexpr double kTestPatternTime = 123456.789; /**< Timestamp of the two test-pattern samples. */
 inline constexpr std::uint8_t kTagDeduced = 1;         /**< Sample tag: timestamp deduced from the rate. */
 inline constexpr std::uint8_t kTagTransmitted = 2;     /**< Sample tag: an 8-byte timestamp follows. */
+inline constexpr const char* kLoopback = "127.0.0.1";  /**< IPv4 address of the loopback interface. */
 
 /** @return The addresses a resolver sends its queries to (IPv4 multicast groups, broadcast, localhost). */
-std::vector<QHostAddress> discoveryTargets();
+std::vector<std::string> discoveryTargets();
 
 /** @return The multicast groups an outlet joins to hear queries. */
-LSLSHARED_EXPORT std::vector<QHostAddress> discoveryGroups();
+LSLSHARED_EXPORT std::vector<std::string> discoveryGroups();
 
 /**
  * Joins the discovery groups on the default and the loopback interface; outlets on one host share the port.
  *
- * @param[in, out] socket   The bound discovery socket.
+ * @param[in, out] socket   The discovery socket, bound to the discovery port with sharing.
  */
-void joinDiscoveryGroups(QUdpSocket& socket);
+void joinDiscoveryGroups(UdpSocket& socket);
 
 /**
  * Sends @p query to every discovery target and, over loopback, to a group, which reaches every local outlet.
  *
- * @param[in, out] socket   A socket bound with bindQuerySocket().
+ * @param[in, out] socket   The query socket.
  * @param[in]      query    The query datagram.
  */
-void sendQuery(QUdpSocket& socket, const QByteArray& query);
+void sendQuery(UdpSocket& socket, std::string_view query);
 
 /**
  * @param[in] format   Channel format.
@@ -114,13 +112,13 @@ double testPatternValue(ChannelFormat format, int k, int offset) noexcept;
 /**
  * Appends one sample in host byte order.
  *
- * @param[in, out] out         Destination.
+ * @param[in, out] out         Destination bytes.
  * @param[in] format           Channel format; values are converted (integers rounded, strings as decimal text).
  * @param[in] values           One value per channel.
  * @param[in] timestamp        Timestamp in local_clock() seconds; ignored if @p deduced.
  * @param[in] deduced          Whether the receiver deduces the timestamp from the previous sample and the rate.
  */
-void appendSample(QByteArray& out, ChannelFormat format, const std::vector<double>& values, double timestamp, bool deduced);
+void appendSample(std::string& out, ChannelFormat format, const std::vector<double>& values, double timestamp, bool deduced);
 
 /** Incremental decoder of the sample stream after the response headers. */
 class SampleReader
@@ -140,7 +138,7 @@ public:
      *
      * @return 1 for a decoded sample, 0 if the sample is not complete yet, -1 for a malformed sample.
      */
-    int read(const QByteArray& data, qsizetype& pos, std::uint8_t& tag, double& timestamp, std::vector<double>& values) const;
+    int read(std::string_view data, std::size_t& pos, std::uint8_t& tag, double& timestamp, std::vector<double>& values) const;
 
 private:
     ChannelFormat m_format = ChannelFormat::Undefined;
@@ -158,33 +156,13 @@ private:
 bool matchesQuery(const stream_info& info, const std::string& predicate);
 
 /**
- * @param[in] address   Sender address of a datagram.
+ * Binds a socket for sending queries and receiving their replies on all interfaces.
  *
- * @return @p address as text, plain IPv4 where it is an IPv4-mapped IPv6 address.
+ * @param[in] port   Local port, 0 for any.
+ *
+ * @return The socket, or why it could not be bound.
  */
-std::string hostText(const QHostAddress& address);
-
-/**
- * Binds @p socket for sending queries and receiving their replies (multicast TTL 1, loopback on).
- *
- * @param[in, out] socket   The socket.
- * @param[in]      port     Local port, 0 for any.
- *
- * @return Whether the socket is bound.
- */
-LSLSHARED_EXPORT bool bindQuerySocket(QUdpSocket& socket, quint16 port);
-
-/**
- * Waits up to @p ms for a datagram on @p socket. QAbstractSocket::waitForReadyRead closes the socket on any error
- * but a timeout; the socket is bound to @p port again then, so replies to queries already sent still arrive.
- *
- * @param[in, out] socket   A socket bound with bindQuerySocket().
- * @param[in]      port     Its local port.
- * @param[in]      ms       Maximum wait in milliseconds.
- *
- * @return Whether a datagram is pending.
- */
-LSLSHARED_EXPORT bool waitForDatagrams(QUdpSocket& socket, quint16 port, int ms);
+LSLSHARED_EXPORT std::expected<UdpSocket, std::error_code> bindQuerySocket(std::uint16_t port);
 
 } // namespace mne::detail
 

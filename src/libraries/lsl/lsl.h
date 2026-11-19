@@ -9,7 +9,7 @@
  * @date     February 2026
  * @brief    Umbrella include header that exposes the full mne_lsl public surface in a single import.
  *
- * mne_lsl is mne-cpp's in-tree, Qt-based reimplementation of the Lab
+ * mne_lsl is mne-cpp's in-tree, standard-C++ reimplementation of the Lab
  * Streaming Layer (LSL) client API. It is designed as an ABI- and
  * source-compatible drop-in replacement for the public subset of liblsl's
  * @c lsl_cpp.h header, so acquisition plug-ins and analysis tools can

@@ -11,7 +11,7 @@
  *
  * A @ref mne::stream_outlet is the producer counterpart of
  * @ref mne::stream_inlet "stream_inlet": instantiating it immediately binds a
- * @c QTcpServer on an OS-assigned port (which is written back into
+ * TCP server on an OS-assigned port (which is written back into
  * the contained @ref mne::stream_info so callers can read it via
  * @ref mne::stream_outlet::info "info"), starts a background worker that answers
  * liblsl discovery and time-correction queries by UDP, and serves
@@ -20,7 +20,7 @@
  *
  * The public API is the standard LSL @c push_sample / @c push_chunk
  * pair plus @c have_consumers for back-pressure decisions in
- * acquisition loops. As with the inlet, all Qt network and threading
+ * acquisition loops. As with the inlet, all socket and threading
  * machinery is hidden behind a PIMPL so this header stays
  * lightweight and the implementation is free to evolve (for example,
  * to add IPv6 or a peer-discovery cache)
@@ -57,7 +57,7 @@ namespace mne
 //=============================================================================================================
 
 /**
- * @brief PIMPL backend of stream_outlet that owns the QTcpServer, the UDP query responders and the producer-side sample queue.
+ * @brief PIMPL backend of stream_outlet that owns the TCP server, the UDP query responders and the producer-side sample queue.
  */
 class StreamOutletPrivate;
 
