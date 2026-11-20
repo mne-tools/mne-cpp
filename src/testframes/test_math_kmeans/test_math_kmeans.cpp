@@ -499,8 +499,11 @@ private slots:
     void testClusterStart()
     {
         // "cluster" seeds from a preliminary clustering of a 10 % subsample, then clusters all points
-        // A fixed seed makes every replicate, including the preliminary clustering, reproducible
-        KMeans kmeans("sqeuclidean", "cluster", 5, "drop", true, 100);
+        // A fixed seed makes every replicate, including the preliminary clustering, reproducible.
+        // Which draws a seed gives depends on the standard library's distributions, and a quarter of the
+        // replicates end in a local minimum that merges two blobs, so enough replicates find the blobs
+        // whichever library draws them
+        KMeans kmeans("sqeuclidean", "cluster", 20, "drop", true, 100);
         kmeans.seed(7);
         MatrixXd X = generateBlobs(40, 3);
         VectorXi idx;
@@ -508,7 +511,7 @@ private slots:
         VectorXd sumD;
         QVERIFY(kmeans.calculate(X, 3, idx, C, sumD, D));
         for (int run = 0; run < 3; ++run) {
-            KMeans again("sqeuclidean", "cluster", 5, "drop", true, 100);
+            KMeans again("sqeuclidean", "cluster", 20, "drop", true, 100);
             again.seed(7);
             VectorXi idxAgain;
             MatrixXd CAgain, DAgain;
