@@ -31,6 +31,8 @@
 
 #include "../disp3D_global.h"
 
+#include <fs/fs_label.h> // complete: the exported class's implicit destructor destroys the label vectors
+
 #include <QObject>
 #include <QMutex>
 #include <QSharedPointer>
@@ -41,15 +43,6 @@
 #include <vector>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-namespace mne
-{
-class FsLabel;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE

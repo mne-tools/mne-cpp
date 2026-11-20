@@ -116,6 +116,10 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- 3D View builds with MSVC again: the real-time source interpolation worker
+  kept FreeSurfer labels in vectors of a type its header only declared, which
+  MSVC rejects in an exported class. A quality test finds exported classes
+  that hold forward-declared types without declaring their destructor.
 - The Windows build and test run get further: MNE Analyze's `EventGroup`
   defines its destructor in the events library, so the events test links
   with MSVC; the real-time DSP and FIFF sniffer examples, `mne_map_data` and
