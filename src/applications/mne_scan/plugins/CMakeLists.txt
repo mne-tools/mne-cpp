@@ -19,6 +19,11 @@ if(WIN32)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_scan_plugins)
 endif()
 
+# Hidden by default as on Windows, so a class that the tests or other modules use without exporting it
+# fails to link on every platform, not only with MSVC
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 set(CMAKE_STATIC_LIBRARY_PREFIX "")
 

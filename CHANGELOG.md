@@ -98,6 +98,12 @@ aliases; replace the old spelling as below.
   `FIFFLIB::same_channel(a, b)` and find them with
   `FIFFLIB::channel_index(names, name)` or `has_channel` (`fiff_ch_name.h`)
   instead of `==`, `BASELIB::indexOf` or stripping spaces.
+- The test of the MNE Scan plugins links with MSVC again: it used the
+  EEGoSports and TMSI impedance widgets and electrode items, which their
+  plugins did not export. The plugins now hide what they do not export on
+  every platform, as Windows does, so such a test fails on macOS and Linux
+  too; the connector templates that MNE Scan casts across plugins keep one
+  type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
 - The libraries need nothing beyond Eigen and the standard library, so they
   can also be built for embedded targets: Skigen is no longer a dependency.
   The Ledoit-Wolf and OAS shrinkage and the Factor Analysis EM of `mne_sts`

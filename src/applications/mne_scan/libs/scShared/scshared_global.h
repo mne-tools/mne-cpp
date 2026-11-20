@@ -32,4 +32,12 @@
 #define SCSHAREDSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+// The connector templates are instantiated in every plugin and cast across them (dynamic_cast), so their type
+// information must be one per process also when a plugin hides its symbols. MSVC compares type names instead.
+#if defined(_MSC_VER) || defined(STATICBUILD)
+#define SCSHARED_TEMPLATE_VISIBLE
+#else
+#define SCSHARED_TEMPLATE_VISIBLE __attribute__((visibility("default")))
+#endif
+
 #endif // SCSHARED_GLOBAL_H

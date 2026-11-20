@@ -19,6 +19,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "tmsi_global.h"
+
 #include <iostream>
 
 //=============================================================================================================
@@ -44,7 +46,7 @@ namespace TMSIPLUGIN
  *
  * @brief The TMSIElectrodeItem class provides a new data structure for impedance values.
  */
-class TMSIElectrodeItem : public QGraphicsItem
+class TMSISHARED_EXPORT TMSIElectrodeItem : public QGraphicsItem
 {
 public:
     //=========================================================================================================

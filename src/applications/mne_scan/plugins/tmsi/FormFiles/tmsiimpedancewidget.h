@@ -19,6 +19,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../tmsi_global.h"
+
 #include <channels/layoutloader.h>
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
@@ -66,7 +68,7 @@ class TMSI;
  *
  * @brief The TMSIImpedanceWidget class provides the TMSIImpedanceWidget configuration window.
  */
-class TMSIImpedanceWidget : public QWidget
+class TMSISHARED_EXPORT TMSIImpedanceWidget : public QWidget
 {
     Q_OBJECT
 

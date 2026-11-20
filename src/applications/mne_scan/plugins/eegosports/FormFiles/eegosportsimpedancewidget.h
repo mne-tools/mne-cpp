@@ -21,6 +21,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "../eegosports_global.h"
+
 #include <channels/layoutloader.h>
 #include "../eegosportselectrodeitem.h"
 #include "../eegosportsimpedancescene.h"
@@ -75,7 +77,7 @@ class EEGoSports;
  *
  * @brief The EEGoSportsImpedanceWidget class provides the EEGoSportsImpedanceWidget configuration window.
  */
-class EEGoSportsImpedanceWidget : public QWidget
+class EEGOSPORTSSHARED_EXPORT EEGoSportsImpedanceWidget : public QWidget
 {
     Q_OBJECT
 

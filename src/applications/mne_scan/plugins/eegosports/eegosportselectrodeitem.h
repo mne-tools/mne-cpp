@@ -20,6 +20,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "eegosports_global.h"
+
 #include <iostream>
 
 //=============================================================================================================
@@ -45,7 +47,7 @@ namespace EEGOSPORTSPLUGIN
  *
  * @brief The EEGoSportsElectrodeItem class provides a new data structure for impedance values.
  */
-class EEGoSportsElectrodeItem : public QGraphicsItem
+class EEGOSPORTSSHARED_EXPORT EEGoSportsElectrodeItem : public QGraphicsItem
 {
 public:
     //=========================================================================================================

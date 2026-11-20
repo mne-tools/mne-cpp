@@ -32,7 +32,7 @@ namespace mne::scan
 {
 
 template<class T>
-class PluginInputData : public PluginInputConnector
+class SCSHARED_TEMPLATE_VISIBLE PluginInputData : public PluginInputConnector
 {
 public:
     typedef void (*callback_function)(QSharedPointer<T>); /**< Callback function type. */

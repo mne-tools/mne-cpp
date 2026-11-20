@@ -41,7 +41,7 @@ namespace mne::scan
  * @brief PluginOutputConnector with specified Measurement
  */
 template<class T>
-class PluginOutputData : public PluginOutputConnector
+class SCSHARED_TEMPLATE_VISIBLE PluginOutputData : public PluginOutputConnector
 {
 public:
     typedef QSharedPointer<PluginOutputData<T>> SPtr;            /**< Shared pointer type for PluginOutputData. */
