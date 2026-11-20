@@ -1042,7 +1042,7 @@ bool BrainView::savePng(const QString& path, int width, int height,
 {
     // Realise the widget off-screen — QRhi init still runs because
     // the widget is technically "shown", but no window-manager surface
-    // is created.  Same pattern as skigen-plot Figure::save().
+    // is created.
     setAttribute(Qt::WA_DontShowOnScreen, true);
     resize(width, height);
 

@@ -1053,7 +1053,7 @@ def iter_in_scope(repo_root: Path) -> list[Path]:
             if d in _PRUNE_DIRS or d.startswith("build-") or d.startswith("build_"):
                 prune.append(d)
                 continue
-            # Prune the giant src/external/skigen tree explicitly.
+            # Prune the third-party trees under src/external.
             if rel_parts == ("src",) and d == "external":
                 prune.append(d)
                 continue

@@ -82,8 +82,6 @@ jobs:
           --kind eigen \
           --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh

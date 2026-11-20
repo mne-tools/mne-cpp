@@ -30,8 +30,7 @@ EOF
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 
-# Central source of truth for external dependency versions (Eigen, ONNX,
-# Skigen). The env file owns the version data; this script owns the policy
+# Central source of truth for external dependency versions (Eigen, ONNX). The env file owns the version data; this script owns the policy
 # (e.g. ONNX is opt-in locally). CLI flags below still override the versions.
 EXTERNAL_DEPS_ENV="${SCRIPT_DIR}/external_deps.env"
 if [[ -f "${EXTERNAL_DEPS_ENV}" ]]; then
@@ -292,28 +291,5 @@ echo "  Eigen: ${EIGEN_DIR}"
 if [[ -n "${ONNXRUNTIME_VERSION}" ]]; then
     echo "  ONNX Runtime: ${ONNXRUNTIME_DIR}"
 fi
-
-# ── Skigen — scikit-learn algorithms on Eigen (header-only) ──────────────
-# Ref is resolved from the central config src/external/external_deps.env.
-# Local setup defaults to the pinned release tag; override for co-development:
-#   SKIGEN_REF=staging ./src/external/init.sh   (track the dev branch)
-#   SKIGEN_REF=v1.0.0  ./src/external/init.sh   (any explicit tag/branch)
-SKIGEN_REF_CONFIG="${SCRIPT_DIR}/external_deps.env"
-if [[ -f "${SKIGEN_REF_CONFIG}" ]]; then
-    # shellcheck disable=SC1090
-    source "${SKIGEN_REF_CONFIG}"
-fi
-SKIGEN_VERSION="${SKIGEN_REF:-${SKIGEN_RELEASE_REF:-v1.1.0}}"
-SKIGEN_DIR="${SCRIPT_DIR}/skigen"
-if [[ ! -d "${SKIGEN_DIR}" ]]; then
-    echo "Cloning skigen (${SKIGEN_VERSION})..."
-    git clone --branch "${SKIGEN_VERSION}" \
-        https://github.com/skigen-project/skigen.git "${SKIGEN_DIR}"
-else
-    echo "Checking out skigen ${SKIGEN_VERSION}..."
-    git -C "${SKIGEN_DIR}" fetch --tags origin || true
-    git -C "${SKIGEN_DIR}" checkout "${SKIGEN_VERSION}" || true
-fi
-echo "  Skigen: ${SKIGEN_DIR} (${SKIGEN_VERSION})"
 
 echo "  CMake prefix hint: ${QT_DIR};${EIGEN_DIR}"

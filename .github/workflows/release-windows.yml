@@ -68,9 +68,6 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
-    - name: Clone Skigen
-      shell: cmd
-      run: call scripts\ci\clone_skigen.bat --release
     - name: Configure and compile MNE-CPP
       run: |
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -180,9 +177,6 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
-    - name: Clone Skigen
-      shell: cmd
-      run: call scripts\ci\clone_skigen.bat --release
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

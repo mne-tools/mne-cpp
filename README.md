@@ -54,7 +54,7 @@ Libraries
 | **Ieeg** | Intracranial EEG — sEEG/ECoG implantations from BIDS, bipolar re-referencing, contact values painted onto the cortex |
 | **Disp3D** | 3D brain visualization (Metal / Vulkan / D3D / OpenGL via Qt RHI) |
 
-All libraries depend on [Qt](https://www.qt.io/), [Eigen](http://eigen.tuxfamily.org/), and [skigen](https://github.com/skigen-project/skigen) (header-only scikit-learn-equivalent algorithms backing ML/decoding). See the [API documentation](https://mne-cpp.github.io/docs/api/) and the [examples](https://mne-cpp.github.io/docs/examples/).
+The libraries need only [Eigen](http://eigen.tuxfamily.org/) and the C++ standard library; [Qt](https://www.qt.io/) is needed only by the display libraries and the applications. See the [API documentation](https://mne-cpp.github.io/docs/api/) and the [examples](https://mne-cpp.github.io/docs/examples/).
 
 Development
 -----------
@@ -74,7 +74,7 @@ git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
 cmake --build build\developer-dynamic --parallel
 ```
 
-`init` downloads Qt, Eigen, and skigen into `src/external/`, then configures CMake. Run `./init.sh --help` for all options (linkage, build type, custom Qt path, etc.).
+`init` downloads Qt and Eigen into `src/external/`, then configures CMake. Run `./init.sh --help` for all options (linkage, build type, custom Qt path, etc.).
 
 ### Requirements
 

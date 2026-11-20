@@ -117,7 +117,6 @@
     "Qt::Widgets",
     "Qt::ShaderTools",
     "Eigen3::Eigen",
-    "Skigen::Skigen",
     "onnxruntime::onnxruntime",
     "ZLIB::ZLIB",
     "zlibstatic",

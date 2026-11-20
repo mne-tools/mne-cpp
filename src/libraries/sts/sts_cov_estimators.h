@@ -26,10 +26,9 @@
  * @c (cov, parameter) pair; the auto-selector additionally returns the
  * index of the winning method.
  *
- * The Ledoit-Wolf and OAS back-ends are thin wrappers over the
- * scikit-learn-compatible @c Skigen::LedoitWolf and @c Skigen::OAS
- * classes so the resulting covariances are numerically identical to
- * those produced by MNE-Python.
+ * Ledoit-Wolf and OAS follow scikit-learn's @c LedoitWolf and @c OAS
+ * (which MNE-Python uses), so the resulting covariances match those
+ * produced by MNE-Python.
  *
  * References: Ledoit & Wolf (2004), J. Multivariate Anal. 88(2);
  * Chen, Wiesel, Eldar & Hero (2010), IEEE TSP 58(10);

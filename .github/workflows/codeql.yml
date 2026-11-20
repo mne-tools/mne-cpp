@@ -86,9 +86,6 @@ jobs:
           --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
     # Initialize CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4

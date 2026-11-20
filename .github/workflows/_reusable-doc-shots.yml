@@ -70,9 +70,6 @@ jobs:
           --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
 
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
     # Only the screenshot tool and what it links or loads (app cores, MNE Scan plugins).
     - name: Build mne_doc_shots
       run: |

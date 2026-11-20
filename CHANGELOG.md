@@ -98,6 +98,16 @@ aliases; replace the old spelling as below.
   `FIFFLIB::same_channel(a, b)` and find them with
   `FIFFLIB::channel_index(names, name)` or `has_channel` (`fiff_ch_name.h`)
   instead of `==`, `BASELIB::indexOf` or stripping spaces.
+- The libraries need nothing beyond Eigen and the standard library, so they
+  can also be built for embedded targets: Skigen is no longer a dependency.
+  The Ledoit-Wolf and OAS shrinkage and the Factor Analysis EM of `mne_sts`
+  and the Local Outlier Factor of `mne_dsp` are implemented in those
+  libraries (adapted from Skigen; the results agree to 1e-12) and work on the
+  `(n_channels, n_samples)` data directly instead of a transposed copy.
+  `init.sh`/`init.bat` and CI no longer clone Skigen, `SKIGEN_RELEASE_REF` and
+  `SKIGEN_DEV_REF` are gone from `src/external/external_deps.env`, and the
+  dependency audit refuses a `Skigen::Skigen` link. Migration: delete an old
+  `src/external/skigen` clone.
 - The libraries build, install and link without Qt. `MNE_BUILD_QT` (default
   `ON`) builds the Qt-based parts: `mne_disp`, `mne_disp3D`, the applications
   with their plugins, the CLI tools and the QtTest tests and examples. With

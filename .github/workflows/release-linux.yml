@@ -90,8 +90,6 @@ jobs:
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh --release
     - name: Configure and compile MNE-CPP
       run: |
         ./scripts/build/build_project.sh -- -DUSE_ONNXRUNTIME=ON
@@ -182,8 +180,6 @@ jobs:
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh --release
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

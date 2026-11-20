@@ -427,23 +427,6 @@ if(USE_ONNXRUNTIME)
 endif()
 
 ##==============================================================================
-## Skigen — header-only ML library (scikit-learn algorithms on Eigen)
-
-set(SKIGEN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(SKIGEN_BUILD_BENCHMARKS OFF CACHE BOOL "" FORCE)
-set(SKIGEN_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/skigen/CMakeLists.txt")
-    add_subdirectory(external/skigen)
-    message(STATUS "[MNE-CPP] Skigen found at external/skigen")
-else()
-    message(WARNING
-        "[MNE-CPP] Skigen not found at external/skigen.\n"
-        "Clone it with: git clone --branch v1.1.0 https://github.com/skigen-project/skigen.git src/external/skigen"
-    )
-endif()
-
-##==============================================================================
 ## Add subdirectories
 
 add_subdirectory(libraries)

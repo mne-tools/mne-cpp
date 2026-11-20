@@ -222,39 +222,6 @@ if defined ONNXRUNTIME_VERSION (
     echo   ONNX Runtime: %ONNXRUNTIME_DIR%
 )
 
-rem ── Skigen — scikit-learn algorithms on Eigen (header-only) ──
-rem Ref is resolved from the central config scripts\ci\skigen_ref.env.
-rem Local setup defaults to the pinned release tag; override for co-development:
-rem   set SKIGEN_REF=staging  (track the dev branch) before running init.bat
-rem   set SKIGEN_REF=v1.0.0   (any explicit tag/branch)
-set "SKIGEN_REF_CONFIG=%SCRIPT_DIR%\..\..\scripts\ci\skigen_ref.env"
-set "SKIGEN_RELEASE_REF="
-set "SKIGEN_DEV_REF="
-if exist "%SKIGEN_REF_CONFIG%" (
-    for /f "usebackq tokens=1,2 delims==" %%A in ("%SKIGEN_REF_CONFIG%") do (
-        set "skigen_key=%%A"
-        set "skigen_key=!skigen_key: =!"
-        if not "!skigen_key!"=="" if not "!skigen_key:~0,1!"=="#" set "%%A=%%B"
-    )
-)
-if defined SKIGEN_REF (
-    set "SKIGEN_VERSION=%SKIGEN_REF%"
-) else if defined SKIGEN_RELEASE_REF (
-    set "SKIGEN_VERSION=%SKIGEN_RELEASE_REF%"
-) else (
-    set "SKIGEN_VERSION=v1.1.0"
-)
-set "SKIGEN_DIR=%SCRIPT_DIR%\skigen"
-if not exist "%SKIGEN_DIR%" (
-    echo Cloning skigen ^(!SKIGEN_VERSION!^)...
-    git clone --branch !SKIGEN_VERSION! https://github.com/skigen-project/skigen.git "%SKIGEN_DIR%"
-) else (
-    echo Checking out skigen !SKIGEN_VERSION!...
-    git -C "%SKIGEN_DIR%" fetch --tags origin 2>nul
-    git -C "%SKIGEN_DIR%" checkout !SKIGEN_VERSION! 2>nul
-)
-echo   Skigen: %SKIGEN_DIR% ^(!SKIGEN_VERSION!^)
-
 exit /b 0
 
 :usage_ok

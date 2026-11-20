@@ -109,9 +109,6 @@ jobs:
           --version "$ONNXRUNTIME_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
 
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
     - name: Configure and build
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release \

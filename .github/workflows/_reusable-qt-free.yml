@@ -55,10 +55,6 @@ jobs:
           --version "$EIGEN_VERSION" \
           --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
 
-    - name: Clone Skigen (Linux|MacOS)
-      if: runner.os != 'Windows'
-      run: ./scripts/ci/clone_skigen.sh
-
     - name: Download Eigen package (Windows)
       if: runner.os == 'Windows'
       shell: cmd
@@ -66,11 +62,6 @@ jobs:
         GH_TOKEN: ${{ github.token }}
       run: |
         call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
-
-    - name: Clone Skigen (Windows)
-      if: runner.os == 'Windows'
-      shell: cmd
-      run: call scripts\ci\clone_skigen.bat
 
     - name: Build, test, install and consume the Qt-free SDK
       shell: bash

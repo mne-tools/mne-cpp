@@ -80,8 +80,6 @@ jobs:
             --kind eigen \
             --version "$EIGEN_VERSION" \
             --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-      - name: Clone Skigen
-        run: ./scripts/ci/clone_skigen.sh
       - name: Coverity scan
         run: |
           ./scripts/test/coverity_scan.sh "$COVTOKEN"

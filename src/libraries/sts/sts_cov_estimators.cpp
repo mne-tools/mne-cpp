@@ -9,11 +9,11 @@
  * @date     April 2026
  * @brief    Implementation of the regularised covariance estimators declared in sts_cov_estimators.h.
  *
- * Ledoit-Wolf and OAS forward to @c Skigen::LedoitWolf and @c Skigen::OAS
- * after transposing the input so the @c (n_channels, n_samples) mne_sts
- * convention is mapped onto the @c (n_samples, n_features) layout that
- * Skigen expects; the analytic shrinkage coefficients are returned
- * alongside the resulting covariance.
+ * Ledoit-Wolf and OAS compute scikit-learn's analytic shrinkage
+ * coefficients directly on the @c (n_channels, n_samples) data and return
+ * them alongside the resulting covariance. They, and the Factor-Analysis
+ * EM, were adapted from Skigen (MIT, Copyright (c) 2026 The Skigen
+ * Contributors), so that mne_sts needs nothing beyond Eigen.
  *
  * The diagonal-fixed estimator adds
  * @f$\lambda \cdot \mathrm{tr}(C)/p \cdot I@f$ to the sample covariance.
@@ -37,18 +37,13 @@
 #include "sts_cov_estimators.h"
 
 //=============================================================================================================
-// SKIGEN INCLUDES
-//=============================================================================================================
-
-#include <Skigen/Covariance>
-#include <Skigen/Decomposition>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
+#include <numbers>
 #include <numeric>
 #include <random>
 #include <vector>
@@ -67,25 +62,69 @@ using namespace mne;
 using namespace Eigen;
 
 //=============================================================================================================
+// DEFINE STATICS AND LOCAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+constexpr double kTiny = 1e-30;
+
+/** Shrinks the sample covariance towards its mean eigenvalue: (1 - alpha) S + alpha mu I. */
+MatrixXd shrunk(const MatrixXd& S, double alpha)
+{
+    MatrixXd cov = (1.0 - alpha) * S;
+    cov.diagonal().array() += alpha * S.trace() / static_cast<double>(S.rows());
+    return cov;
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::ledoitWolf(const MatrixXd& matData)
 {
-    // matData is (p × n), already zero-centred; skigen expects (n × p)
-    Skigen::LedoitWolf<double> lw(/*assume_centered=*/true);
-    lw.fit(matData.transpose());
-    return {lw.covariance(), lw.shrinkage()};
+    const auto p = static_cast<double>(matData.rows());
+    const auto n = static_cast<double>(matData.cols());
+
+    // Sample covariance (1/n, as in the paper and scikit-learn); matData is zero-centred
+    const MatrixXd S = (matData * matData.transpose()) / n;
+    const double mu = S.trace() / p;
+
+    // delta = ||S - mu I||_F^2 / p
+    MatrixXd diff = S;
+    diff.diagonal().array() -= mu;
+    const double delta = diff.squaredNorm() / p;
+    if (delta < kTiny) {
+        return {S, 0.0};
+    }
+
+    // beta = sum_k ||x_k x_k^T - S||_F^2 / (n^2 p) = (sum_k |x_k|^4 - n ||S||_F^2) / (n^2 p)
+    const double sumSquaredNorms = matData.colwise().squaredNorm().array().square().sum();
+    const double beta = (sumSquaredNorms - n * S.squaredNorm()) / (n * n * p);
+
+    const double alpha = std::clamp(beta / delta, 0.0, 1.0);
+    return {shrunk(S, alpha), alpha};
 }
 
 //=============================================================================================================
 
 std::pair<MatrixXd, double> StsCovEstimators::oas(const MatrixXd& matData)
 {
-    // matData is (p × n), already zero-centred; skigen expects (n × p)
-    Skigen::OAS<double> oas_est(/*assume_centered=*/true);
-    oas_est.fit(matData.transpose());
-    return {oas_est.covariance(), oas_est.shrinkage()};
+    const auto p = static_cast<double>(matData.rows());
+    const auto n = static_cast<double>(matData.cols());
+
+    const MatrixXd S = (matData * matData.transpose()) / n;
+    const double mu = S.trace() / p;
+
+    // Chen et al. (2010) as corrected in scikit-learn: with alpha = ||S||_F^2 / p^2,
+    // rho = (alpha + mu^2) / ((n + 1) (alpha - mu^2 / p))
+    const double alpha = S.squaredNorm() / (p * p);
+    const double den = (n + 1.0) * (alpha - mu * mu / p);
+    const double rho = std::abs(den) > kTiny ? std::clamp((alpha + mu * mu) / den, 0.0, 1.0) : 1.0;
+    return {shrunk(S, rho), rho};
 }
 
 //=============================================================================================================
@@ -155,10 +194,46 @@ std::pair<MatrixXd, double> StsCovEstimators::factorAnalysis(const MatrixXd& mat
                                                              int iMaxIter,
                                                              double dTol)
 {
-    // matData is (p × n), already zero-centred; skigen expects (n × p)
-    Skigen::FactorAnalysis<double> fa(iNFactors, iMaxIter, dTol);
-    fa.fit(matData.transpose());
-    return {fa.covariance(), fa.log_likelihood()};
+    const Index p = matData.rows();
+    const auto n = static_cast<double>(matData.cols());
+
+    // Centred like scikit-learn's FactorAnalysis, which does not assume zero-mean data
+    const MatrixXd centred = matData.colwise() - matData.rowwise().mean();
+    const MatrixXd S = (centred * centred.transpose()) / n;
+
+    int k = iNFactors > 0 ? iNFactors : std::max(1, static_cast<int>(std::min<Index>(matData.cols(), p)) / 2);
+    k = std::min(k, static_cast<int>(p) - 1);
+
+    // EM of Rubin & Thayer (1982) in the whitened form: W = Psi^1/2 V_k (Lambda_k - I)^1/2
+    VectorXd psi = S.diagonal();
+    MatrixXd W;
+    MatrixXd sigma;
+    double logLikelihood = 0.0;
+    double previous = -std::numeric_limits<double>::infinity();
+    for (int iter = 0; iter < iMaxIter; ++iter) {
+        const VectorXd psiInvSqrt = psi.array().max(kTiny).inverse().sqrt();
+        const SelfAdjointEigenSolver<MatrixXd> whitened(psiInvSqrt.asDiagonal() * S * psiInvSqrt.asDiagonal());
+        const VectorXd scale = (whitened.eigenvalues().tail(k).array() - 1.0).max(0.0).sqrt();
+        W = psi.array().sqrt().matrix().asDiagonal() * whitened.eigenvectors().rightCols(k) * scale.asDiagonal();
+
+        sigma = W * W.transpose();
+        psi = (S - sigma).diagonal().array().max(kTiny);
+        sigma.diagonal() += psi;
+
+        const SelfAdjointEigenSolver<MatrixXd> model(sigma);
+        const VectorXd evals = model.eigenvalues().array().max(kTiny);
+        const MatrixXd sigmaInv = model.eigenvectors() * evals.array().inverse().matrix().asDiagonal() * model.eigenvectors().transpose();
+        logLikelihood = -0.5 * n * (static_cast<double>(p) * std::log(2.0 * std::numbers::pi) + evals.array().log().sum() + (sigmaInv * S).trace());
+        if (std::abs(logLikelihood - previous) < dTol) {
+            break;
+        }
+        previous = logLikelihood;
+    }
+
+    if (W.size() == 0) { // no iteration: the initial model
+        sigma = psi.asDiagonal();
+    }
+    return {sigma, logLikelihood};
 }
 
 //=============================================================================================================
@@ -187,7 +262,7 @@ double StsCovEstimators::gaussianLogLikelihood(const MatrixXd& matTestData,
     double trInvS = (covInv * Stest).trace();
 
     // Average log-likelihood per sample
-    return -0.5 * (static_cast<double>(p) * std::log(2.0 * M_PI) + logDet + trInvS);
+    return -0.5 * (static_cast<double>(p) * std::log(2.0 * std::numbers::pi) + logDet + trInvS);
 }
 
 //=============================================================================================================

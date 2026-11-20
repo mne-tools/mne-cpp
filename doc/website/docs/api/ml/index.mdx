@@ -8,7 +8,7 @@ sidebar_position: 0
 # Machine Learning Library
 
 **Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/ml`
-The `mne_ml` library (`mne_ml` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators (scalers, linear models, covariance shrinkage) come from the external skigen library. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
+The `mne_ml` library (`mne_ml` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators live in the libraries that use them, such as the covariance shrinkage in `mne_sts` and the Local Outlier Factor in `mne_dsp`. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_ml)

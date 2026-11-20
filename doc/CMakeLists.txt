@@ -6,9 +6,8 @@
 # Doxygen against doc/Doxyfile to emit the XML AST consumed by
 # scripts/doxy2mdx/doxy2mdx.py.
 #
-# Note: skigen (vendored under src/external/skigen) defines its own
-# `docs_api` target, so ours carries the `mne_cpp_` prefix to coexist with
-# it inside a single configure tree.
+# The `mne_cpp_` prefix keeps the target apart from a `docs_api` target of a
+# project that includes MNE-CPP.
 
 # Allow this directory to be configured standalone (handy for CI jobs
 # that only build docs and skip the heavy C++ tree); when included via
