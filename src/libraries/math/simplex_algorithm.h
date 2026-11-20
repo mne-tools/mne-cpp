@@ -164,7 +164,7 @@ T SimplexAlgorithm::tryit(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& p,
 
     Eigen::Matrix<T, Eigen::Dynamic, 1> ptry(ndim);
 
-    fac1 = (T(1) - fac) / ndim;
+    fac1 = (T(1) - fac) / static_cast<T>(ndim);
     fac2 = fac1 - fac;
 
     ptry = psum * fac1 - p.row(ihi).transpose() * fac2;

@@ -356,7 +356,7 @@ inline int InvRapMusic::getRank(const MatrixXT& p_matSigma)
     int t_iRank;
     //if once a singularvalue is smaller than epsilon = 10^-5 the following values are also smaller
     // -> because Singular values are ordered
-    for (t_iRank = p_matSigma.rows() - 1; t_iRank > 0; t_iRank--)
+    for (t_iRank = static_cast<int>(p_matSigma.rows()) - 1; t_iRank > 0; t_iRank--)
         if (p_matSigma(t_iRank, t_iRank) > 0.00001)
             break;
 

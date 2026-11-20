@@ -127,27 +127,27 @@ public:
 
     void on_string(std::string_view value) override
     {
-        add(JsonValue(value));
+        add(value);
     }
 
     void on_integer(std::int64_t value) override
     {
-        add(JsonValue(value));
+        add(value);
     }
 
     void on_number(double value) override
     {
-        add(JsonValue(value));
+        add(value);
     }
 
     void on_bool(bool value) override
     {
-        add(JsonValue(value));
+        add(value);
     }
 
     void on_null() override
     {
-        add(JsonValue());
+        add(nullptr);
     }
 
     /** @return The document whose root just closed. */
@@ -176,12 +176,14 @@ private:
         std::size_t firstKey;
     };
 
-    void add(JsonValue&& value)
+    /** Constructs the value where it is stored; moving a JsonValue temporary trips GCC's -Wmaybe-uninitialized. */
+    template<typename T>
+    void add(T value)
     {
         if (m_frames.empty()) {
-            m_root = std::move(value);
+            m_root = JsonValue(value);
         } else {
-            m_values.push_back(std::move(value));
+            m_values.emplace_back(value);
         }
     }
 

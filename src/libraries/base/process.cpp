@@ -517,7 +517,7 @@ std::string_view mne::cpu_architecture()
 std::vector<HardwareAddress> mne::hardware_addresses()
 {
     std::vector<HardwareAddress> addresses;
-    const auto add = [&addresses](const unsigned char* bytes, std::size_t length) {
+    [[maybe_unused]] const auto add = [&addresses](const unsigned char* bytes, std::size_t length) {
         if (length != 6)
             return;
         HardwareAddress address{};

@@ -116,6 +116,19 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The libraries build again with the compilers CI uses. Including Qt used to
+  switch off MSVC's warnings about implicit narrowing (C4244), members without
+  dll-interface (C4251, C4275), assignments in conditions (C4706) and forcing
+  values to bool (C4800) and to set `/utf-8`; the Qt-free libraries lost both.
+  The build now sets them itself, with `_CRT_SECURE_NO_WARNINGS`, and the
+  public headers no longer narrow implicitly in inline code (`fiff_cov.h`,
+  `linalg.h`, `simplex_algorithm.h`, `inv_rap_music.h`, the `float` defaults of
+  `MNEForwardSolution::compute_orient_prior` and `MNEIcp`), so MSVC users of
+  the SDK see no such warnings either. GCC 14 rejected a redundant `std::move`
+  in the CBOR parser, a false `-Wmaybe-uninitialized` in the JSON stream
+  parser and designated initializers of `MNEForwardSolution::ReadOptions` and
+  `RtAveraging::Settings` that left members without defaults; WebAssembly
+  rejected an unused helper of `hardware_addresses()`.
 - `test_api_registry` reads the registry from the source tree it was
   configured from; it used to look for the repository above its own binary and
   failed when `BINARY_OUTPUT_DIRECTORY` was outside the repository.

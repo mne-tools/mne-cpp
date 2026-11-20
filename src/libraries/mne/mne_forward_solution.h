@@ -159,8 +159,8 @@ public:
     {
         bool force_fixed = false;  /**< Convert a free-orientation solution to fixed orientations. */
         bool surf_ori = false;     /**< Use surface-based source coordinates. */
-        StringList include;        /**< Keep only these channels; empty keeps all. */
-        StringList exclude;        /**< Drop these channels. */
+        StringList include{};      /**< Keep only these channels; empty keeps all. */
+        StringList exclude{};      /**< Drop these channels. */
         bool exclude_bads = false; /**< Drop the channels marked bad in the file; mne.read_forward_solution keeps them. */
     };
 
@@ -222,7 +222,7 @@ public:
      *
      * @return Orientation priors.
      */
-    mne::FiffCov compute_orient_prior(float loose = 0.2);
+    mne::FiffCov compute_orient_prior(float loose = 0.2f);
 
     //=========================================================================================================
     /**

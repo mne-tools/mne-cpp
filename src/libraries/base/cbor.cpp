@@ -342,7 +342,7 @@ private:
         if (!is_utf8(bytes)) {
             return fail(CborParseError::InvalidUtf8String, start);
         }
-        return std::move(bytes);
+        return bytes;
     }
 
     bool append_chunk(std::string& bytes, std::uint64_t length, std::size_t start)

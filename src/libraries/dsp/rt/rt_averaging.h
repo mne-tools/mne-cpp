@@ -69,13 +69,13 @@ public:
     /** @brief Epoch definition, window length, baseline and rejection. */
     struct Settings
     {
-        int pre_stim = 0;                     /**< Samples before the onset. */
-        int post_stim = 1;                    /**< Samples from the onset on, at least one. */
-        int trigger_channel = -1;             /**< Row of the stim channel in the data. */
-        double trigger_threshold = 0.5;       /**< Value the stim channel reaches at an onset. */
-        int averages = 1;                     /**< Newest epochs averaged per event code, at least one. */
-        FiffEvoked::Baseline baseline;        /**< Interval in seconds around the onset whose mean is subtracted. */
-        std::map<std::string, double> reject; /**< Peak-to-peak limits per channel type (mag, grad, eeg, eog). */
+        int pre_stim = 0;                       /**< Samples before the onset. */
+        int post_stim = 1;                      /**< Samples from the onset on, at least one. */
+        int trigger_channel = -1;               /**< Row of the stim channel in the data. */
+        double trigger_threshold = 0.5;         /**< Value the stim channel reaches at an onset. */
+        int averages = 1;                       /**< Newest epochs averaged per event code, at least one. */
+        FiffEvoked::Baseline baseline{};        /**< Interval in seconds around the onset whose mean is subtracted. */
+        std::map<std::string, double> reject{}; /**< Peak-to-peak limits per channel type (mag, grad, eeg, eog). */
     };
 
     //=========================================================================================================

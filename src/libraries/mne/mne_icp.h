@@ -82,7 +82,7 @@ MNESHARED_EXPORT bool performIcp(const std::shared_ptr<mne::MNEProjectToSurface>
                                  float& fRMSE,
                                  bool bScale = false,
                                  int iMaxIter = 20,
-                                 float fTol = 0.001,
+                                 float fTol = 0.001f,
                                  const Eigen::VectorXf& vecWeights = vecDefaultWeights);
 
 //=========================================================================================================

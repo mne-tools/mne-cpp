@@ -221,7 +221,7 @@ Expected<int> FiffEvokedFile::find(const FiffEvoked::Condition& condition, fiff_
 
 Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& baseline, bool proj)
 {
-    FiffInfo info = this->info;
+    FiffInfo evokedInfo = this->info;
     const std::string& file = m_file;
     FiffEvoked p_FiffEvoked;
     std::shared_ptr<FiffDirNode> my_evoked = m_sets[set];
@@ -292,17 +292,17 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
         if (std::ssize(chs) != nchan) {
             return fail(ErrorCode::Format, "{} channels but {} channel definitions in {}", nchan, chs.size(), file);
         }
-        info.chs = chs;
-        info.nchan = nchan;
+        evokedInfo.chs = chs;
+        evokedInfo.nchan = nchan;
         Log::info("\tFound channel information in evoked data. nchan = {}\n", nchan);
         if (sfreq > 0.0f)
-            info.sfreq = sfreq;
+            evokedInfo.sfreq = sfreq;
     }
     std::int32_t nsamp = last - first + 1;
     Log::info("\tFound the data of interest:\n");
-    Log::info("\t\tt = {:10.2f} ... {:10.2f} ms ({})\n", 1000 * static_cast<float>(first) / info.sfreq, 1000 * static_cast<float>(last) / info.sfreq, comment);
-    if (info.comps.size() > 0)
-        Log::info("\t\t{} CTF compensation matrices available\n", info.comps.size());
+    Log::info("\t\tt = {:10.2f} ... {:10.2f} ms ({})\n", 1000 * static_cast<float>(first) / evokedInfo.sfreq, 1000 * static_cast<float>(last) / evokedInfo.sfreq, comment);
+    if (evokedInfo.comps.size() > 0)
+        Log::info("\t\t{} CTF compensation matrices available\n", evokedInfo.comps.size());
 
     //
     // Read the data in the aspect block
@@ -338,8 +338,8 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
     Log::info("\t\tnave = {} - aspect type = {}\n", nave, aspect_kind);
 
     std::int32_t nepoch = static_cast<int>(epoch.size());
-    if (nepoch != 1 && nepoch != info.nchan) {
-        return fail(ErrorCode::Format, "{} epoch tags for {} channels in {}", nepoch, info.nchan, file);
+    if (nepoch != 1 && nepoch != evokedInfo.nchan) {
+        return fail(ErrorCode::Format, "{} epoch tags for {} channels in {}", nepoch, evokedInfo.nchan, file);
     }
     MatrixXd all_data;
     if (nepoch == 1) {
@@ -351,7 +351,7 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
         //
         //   May need a transpose if the number of channels is one
         //
-        if (all_data.cols() == 1 && info.nchan == 1)
+        if (all_data.cols() == 1 && evokedInfo.nchan == 1)
             all_data.transposeInPlace();
     } else {
         //
@@ -374,32 +374,32 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
     //   Calibrate
     //
     Log::info("\n\tPreprocessing...\n");
-    Log::info("\t{} channels remain after picking\n", info.nchan);
+    Log::info("\t{} channels remain after picking\n", evokedInfo.nchan);
 
     using T = Eigen::Triplet<double>;
     std::vector<T> tripletList;
-    tripletList.reserve(info.nchan);
-    for (k = 0; k < info.nchan; ++k)
-        tripletList.push_back(T(k, k, info.chs[k].cal));
-    SparseMatrix<double> cals(info.nchan, info.nchan);
+    tripletList.reserve(evokedInfo.nchan);
+    for (k = 0; k < evokedInfo.nchan; ++k)
+        tripletList.push_back(T(k, k, evokedInfo.chs[k].cal));
+    SparseMatrix<double> cals(evokedInfo.nchan, evokedInfo.nchan);
     cals.setFromTriplets(tripletList.begin(), tripletList.end());
 
     all_data = cals * all_data;
 
     RowVectorXf times = RowVectorXf(last - first + 1);
     for (k = 0; k < times.size(); ++k)
-        times[k] = static_cast<float>(first + k) / info.sfreq;
+        times[k] = static_cast<float>(first + k) / evokedInfo.sfreq;
 
     //
     // Set up projection
     //
-    if (info.projs.size() == 0 || !proj) {
+    if (evokedInfo.projs.size() == 0 || !proj) {
         Log::info("\tNo projector specified for these data.\n");
         p_FiffEvoked.proj = MatrixXd();
     } else {
         //   Create the projector
         MatrixXd projection;
-        std::int32_t nproj = info.make_projector(projection);
+        std::int32_t nproj = evokedInfo.make_projector(projection);
         if (nproj == 0) {
             Log::warning("\tThe projection vectors do not apply to these channels\n");
             p_FiffEvoked.proj = MatrixXd();
@@ -409,7 +409,7 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
         }
 
         //   The projection items have been activated
-        FiffProj::activate_projs(info.projs);
+        FiffProj::activate_projs(evokedInfo.projs);
     }
 
     if (p_FiffEvoked.proj.rows() > 0) {
@@ -418,7 +418,7 @@ Expected<FiffEvoked> FiffEvokedFile::read(int set, const FiffEvoked::Baseline& b
     }
 
     // Put it all together
-    p_FiffEvoked.info = info;
+    p_FiffEvoked.info = evokedInfo;
     p_FiffEvoked.nave = nave;
     p_FiffEvoked.aspect_kind = aspect_kind;
     p_FiffEvoked.first = first;

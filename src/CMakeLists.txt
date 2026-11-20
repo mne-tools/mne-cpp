@@ -122,8 +122,16 @@ endif()
 # is generated for libraries, applications, and CLI tools.
 
 if(MSVC)
-  add_compile_options(/EHsc /MP)
+  # Sources and strings are UTF-8; Qt used to set this for the targets that linked it.
+  add_compile_options(/EHsc /MP /utf-8)
   add_compile_definitions(_USE_MATH_DEFINES)
+  # getenv, strcpy, strncpy and the other standard C functions are fine to use.
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+  # The warnings Qt's qcompilerdetection.h switches off in every file that includes Qt, which until 3.0 was every
+  # file of MNE-CPP: implicit narrowing (C4244, Eigen::Index to int all over the FIFF code, unchecked on the Clang
+  # and GCC side too), members and bases without dll-interface (C4251, C4275), assignment in a condition (C4706)
+  # and forcing a value to bool (C4800). The Qt-free libraries keep compiling under the same rules.
+  add_compile_options(/wd4244 /wd4251 /wd4275 /wd4706 /wd4800)
 endif()
 
 # Warning policy. Enable a strict-but-reasonable warning set on our own sources

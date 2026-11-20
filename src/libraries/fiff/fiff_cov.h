@@ -293,22 +293,22 @@ inline std::ostream& operator<<(std::ostream& out, const mne::FiffCov& p_FiffCov
 
     out << "\tdata " << p_FiffCov.data.rows() << " x " << p_FiffCov.data.cols() << ":\n\t";
     if (t_bIsShort) {
-        std::int32_t nrows = p_FiffCov.data.rows() > 6 ? 6 : p_FiffCov.data.rows();
-        std::int32_t ncols = p_FiffCov.data.cols() > 6 ? 6 : p_FiffCov.data.cols();
-        for (std::int32_t i = 0; i < nrows / 2; ++i) {
-            for (std::int32_t j = 0; j < ncols / 2; ++j)
+        Eigen::Index nrows = p_FiffCov.data.rows() > 6 ? 6 : p_FiffCov.data.rows();
+        Eigen::Index ncols = p_FiffCov.data.cols() > 6 ? 6 : p_FiffCov.data.cols();
+        for (Eigen::Index i = 0; i < nrows / 2; ++i) {
+            for (Eigen::Index j = 0; j < ncols / 2; ++j)
                 out << p_FiffCov.data(i, j) << " ";
             out << "... ";
-            for (std::int32_t j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
+            for (Eigen::Index j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
                 out << p_FiffCov.data(i, j) << " ";
             out << "\n\t";
         }
         out << "...\n\t";
-        for (std::int32_t i = p_FiffCov.data.rows() - nrows / 2; i < p_FiffCov.data.rows(); ++i) {
-            for (std::int32_t j = 0; j < ncols / 2; ++j)
+        for (Eigen::Index i = p_FiffCov.data.rows() - nrows / 2; i < p_FiffCov.data.rows(); ++i) {
+            for (Eigen::Index j = 0; j < ncols / 2; ++j)
                 out << p_FiffCov.data(i, j) << " ";
             out << "... ";
-            for (std::int32_t j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
+            for (Eigen::Index j = p_FiffCov.data.cols() - ncols / 2; j < p_FiffCov.data.cols(); ++j)
                 out << p_FiffCov.data(i, j) << " ";
             out << "\n\t";
         }
@@ -316,45 +316,45 @@ inline std::ostream& operator<<(std::ostream& out, const mne::FiffCov& p_FiffCov
     }
     //Projectors
     out << "\tprojectors " << p_FiffCov.projs.size() << ":\n";
-    for (std::int32_t i = 0; i < std::ssize(p_FiffCov.projs); ++i)
+    for (Eigen::Index i = 0; i < std::ssize(p_FiffCov.projs); ++i)
         out << "\t" << p_FiffCov.projs[i];
 
     //Bads
     out << "\tbads " << p_FiffCov.bads.size() << ":\n\t";
-    for (std::int32_t i = 0; i < static_cast<int>(p_FiffCov.bads.size()); ++i)
+    for (Eigen::Index i = 0; i < static_cast<int>(p_FiffCov.bads.size()); ++i)
         out << p_FiffCov.bads[i].c_str() << " ";
 
     out << "\n\tfree: " << p_FiffCov.nfree << std::endl;
 
     out << "\teig " << p_FiffCov.eig.size() << ":\n\t";
     if (t_bIsShort) {
-        std::int32_t nrows = p_FiffCov.eig.size() > 6 ? 6 : p_FiffCov.eig.size();
-        for (std::int32_t i = 0; i < nrows / 2; ++i)
+        Eigen::Index nrows = p_FiffCov.eig.size() > 6 ? 6 : p_FiffCov.eig.size();
+        for (Eigen::Index i = 0; i < nrows / 2; ++i)
             out << p_FiffCov.eig[i] << " ";
         out << "... ";
-        for (std::int32_t i = p_FiffCov.eig.size() - nrows / 2; i < p_FiffCov.eig.size(); ++i)
+        for (Eigen::Index i = p_FiffCov.eig.size() - nrows / 2; i < p_FiffCov.eig.size(); ++i)
             out << p_FiffCov.eig[i] << " ";
         out << "\n\t";
     }
 
     out << "\n\teigvec " << p_FiffCov.eigvec.rows() << " x " << p_FiffCov.eigvec.cols() << ":\n\t";
     if (t_bIsShort) {
-        std::int32_t nrows = p_FiffCov.eigvec.rows() > 6 ? 6 : p_FiffCov.eigvec.rows();
-        std::int32_t ncols = p_FiffCov.eigvec.cols() > 6 ? 6 : p_FiffCov.eigvec.cols();
-        for (std::int32_t i = 0; i < nrows / 2; ++i) {
-            for (std::int32_t j = 0; j < ncols / 2; ++j)
+        Eigen::Index nrows = p_FiffCov.eigvec.rows() > 6 ? 6 : p_FiffCov.eigvec.rows();
+        Eigen::Index ncols = p_FiffCov.eigvec.cols() > 6 ? 6 : p_FiffCov.eigvec.cols();
+        for (Eigen::Index i = 0; i < nrows / 2; ++i) {
+            for (Eigen::Index j = 0; j < ncols / 2; ++j)
                 out << p_FiffCov.eigvec(i, j) << " ";
             out << "... ";
-            for (std::int32_t j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
+            for (Eigen::Index j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
                 out << p_FiffCov.eigvec(i, j) << " ";
             out << "\n\t";
         }
         out << "...\n\t";
-        for (std::int32_t i = p_FiffCov.eigvec.rows() - nrows / 2; i < p_FiffCov.eigvec.rows(); ++i) {
-            for (std::int32_t j = 0; j < ncols / 2; ++j)
+        for (Eigen::Index i = p_FiffCov.eigvec.rows() - nrows / 2; i < p_FiffCov.eigvec.rows(); ++i) {
+            for (Eigen::Index j = 0; j < ncols / 2; ++j)
                 out << p_FiffCov.eigvec(i, j) << " ";
             out << "... ";
-            for (std::int32_t j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
+            for (Eigen::Index j = p_FiffCov.eigvec.cols() - ncols / 2; j < p_FiffCov.eigvec.cols(); ++j)
                 out << p_FiffCov.eigvec(i, j) << " ";
             out << "\n\t";
         }
