@@ -14,8 +14,8 @@
  *             4. No entry with `skigen_candidate: true` AND `status: "done"`
  *                lacks a non-empty `skigen_target`.
  *
- *           The repository root is discovered by walking up from the test binary
- *           location and looking for `CMakeLists.txt` containing `project(mne-cpp`.
+ *           The repository root is the source tree the test was configured from (MNE_REPO_ROOT),
+ *           so the test also runs when BINARY_OUTPUT_DIRECTORY is outside the repository.
  */
 //=============================================================================================================
 
@@ -26,7 +26,6 @@
 #include <QJsonValue>
 #include <QFile>
 #include <QDir>
-#include <QCoreApplication>
 
 //=============================================================================================================
 
@@ -40,23 +39,9 @@ private:
 
     bool discoverRepoRoot()
     {
-        QDir dir(QCoreApplication::applicationDirPath());
-        for (int i = 0; i < 12; ++i) {
-            const QString cmake = dir.absoluteFilePath("CMakeLists.txt");
-            QFile f(cmake);
-            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                const QByteArray data = f.read(4096);
-                f.close();
-                if (data.contains("mne_cpp_root")) {
-                    m_repoRoot = dir.absolutePath();
-                    return true;
-                }
-            }
-            if (!dir.cdUp()) {
-                break;
-            }
-        }
-        return false;
+        // The source tree this test was configured from; the binary may be written anywhere.
+        m_repoRoot = QStringLiteral(MNE_REPO_ROOT);
+        return QFile::exists(m_repoRoot + "/doc/api_registry.json");
     }
 
     bool loadRegistry()

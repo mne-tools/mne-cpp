@@ -30,6 +30,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   ${QT_REQUIRED_COMPONENT_LIBS}
 )
 
+# The registry and the trees it names live in the source tree, wherever the binaries are written.
+cmake_path(SET MNE_REPO_ROOT NORMALIZE "${CMAKE_CURRENT_SOURCE_DIR}/../../..")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_REPO_ROOT="${MNE_REPO_ROOT}")
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
   WIN32_EXECUTABLE FALSE
   MACOSX_BUNDLE FALSE

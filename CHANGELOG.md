@@ -116,6 +116,9 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- `test_api_registry` reads the registry from the source tree it was
+  configured from; it used to look for the repository above its own binary and
+  failed when `BINARY_OUTPUT_DIRECTORY` was outside the repository.
 - A build with tests but without applications (`-DBUILD_APPLICATIONS=OFF
   -DBUILD_TESTS=ON`) configures, builds and passes. 95 tests and
   examples linked `mne_events`, a library of MNE Analyze that none of them
