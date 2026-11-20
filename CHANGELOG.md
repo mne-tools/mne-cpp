@@ -124,8 +124,8 @@ aliases; replace the old spelling as below.
   defines its destructor in the events library, so the events test links
   with MSVC; the real-time DSP and FIFF sniffer examples, `mne_map_data` and
   a label test no longer hide locals or narrow `size_t`; and the base example
-  closes its log file before it removes its directory, which Windows refused
-  (the example now checks that the removal succeeds).
+  closes its log file and its byte stream before it removes its directory,
+  which Windows refused (the example now checks that the removal succeeds).
 - The BrainAmp and EEGoSports MNE Scan plugins export their classes again on
   Windows: their export macro waited for a definition that no build set, so
   the plugins declared their own classes as imported. A quality test now

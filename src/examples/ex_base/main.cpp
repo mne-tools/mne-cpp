@@ -38,6 +38,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iterator>
 #include <optional>
@@ -115,6 +116,7 @@ int main()
     in->read_big_endian(back.data(), back.size());
     //! [byte_stream_usage]
     ok &= expect(back == samples && in->at_end(), "FileByteStream read back the big-endian samples");
+    in.reset(); // Windows does not remove an open file
 
     //! [memory_byte_stream_usage]
     MemoryByteStream memory;
@@ -230,6 +232,6 @@ int main()
 
     std::error_code removeError;
     std::filesystem::remove_all(dir, removeError);
-    ok &= expect(!removeError, "the example's files were removed");
+    ok &= expect(!removeError, std::format("the example's files were removed{}", removeError ? ": " + removeError.message() : std::string()));
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
