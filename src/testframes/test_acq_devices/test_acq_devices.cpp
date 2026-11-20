@@ -1271,6 +1271,9 @@ void TestAcqDevices::initTestCase()
     QVERIFY(register_natus_scheme().ok());
     QVERIFY(register_babymeg_scheme().ok());
     QVERIFY(register_brainflow_scheme().ok());
+    QVERIFY(register_streaming_board_scheme().ok());
+    QVERIFY(register_brainflow_file_scheme().ok());
+    QVERIFY(register_device_schemes().ok());
 }
 
 //=============================================================================================================

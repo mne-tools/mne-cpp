@@ -116,6 +116,11 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The sanitizer job (`scripts/ci/sanitizers`) builds again: it compiled
+  `test_acq_devices` without `mne_acq_devices` and its stand-in SDK
+  libraries. In that static build the test found no `streaming_board://` or
+  `brainflow_file://` source, because it registered every scheme but those
+  two by hand; it registers them and checks `register_device_schemes()`.
 - The libraries build again with the compilers CI uses. Including Qt used to
   switch off MSVC's warnings about implicit narrowing (C4244), members without
   dll-interface (C4251, C4275), assignments in conditions (C4706) and forcing
