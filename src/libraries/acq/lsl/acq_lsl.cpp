@@ -41,6 +41,7 @@
 #include <string>
 #include <thread>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -797,9 +798,34 @@ private:
     }
 
     /** Clock model for the sample just committed (@p sample, LSL time @p timestamp), or arrival time without one. */
+    /**
+     * Reads the steady clock and the local LSL clock as one instant: the steady reading between two LSL readings,
+     * against their midpoint, of the narrowest of a few tries. A thread preempted between two separate readings
+     * would otherwise shift the mapping by the time it waited.
+     */
+    std::pair<std::int64_t, double> sameInstant() const
+    {
+        std::pair<std::int64_t, double> best{0, std::numeric_limits<double>::quiet_NaN()};
+        double width = std::numeric_limits<double>::infinity();
+        for (int attempt = 0; attempt < 3; ++attempt) {
+            const double before = m_link->localClock();
+            const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count();
+            const double after = m_link->localClock();
+            if (!(after - before < width)) {
+                continue;
+            }
+            width = after - before;
+            best = {steady, 0.5 * (before + after)};
+        }
+        if (width == std::numeric_limits<double>::infinity()) { // no LSL clock
+            best.first = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count();
+        }
+        return best;
+    }
+
     void publishClock(std::uint64_t sample, double timestamp, bool refresh)
     {
-        const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now().time_since_epoch()).count();
+        const auto [steady, local] = sameInstant();
         AcqClockModel clock;
         clock.sfreq = m_sfreq;
         clock.anchorSample = sample;
@@ -807,7 +833,6 @@ private:
             std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
                 .count() -
             steady;
-        const double local = m_link->localClock();
         if (timestamp == timestamp && local == local) {
             if (refresh) {
                 m_correction = m_link->timeCorrection();

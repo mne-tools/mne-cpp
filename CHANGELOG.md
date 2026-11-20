@@ -116,6 +116,12 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- `lsl://` maps LSL time to the host clock from one instant: it reads the
+  steady clock between two LSL clock readings and takes their midpoint, the
+  narrowest of three tries. It read them one after the other, so a reader
+  thread preempted in between shifted the stream's clock by the wait (5.6 ms
+  on a loaded CI runner). `test_acq_lsl` computes its expected values the same
+  way.
 - The `run_mna_graph` skill of MNE Analyze Studio reads its graph inputs from
   a JSON document it keeps alive; it iterated over the members of a temporary
   that compilers before C++23's lifetime extension (GCC 14) destroy first.

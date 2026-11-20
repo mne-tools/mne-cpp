@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <limits>
 #include <memory>
 #include <string>
 #include <thread>
@@ -172,6 +173,30 @@ std::vector<double> drain(AcqReader& reader, std::size_t frames)
     return out;
 }
 
+/**
+ * @return steady_clock minus @p localClock, in nanoseconds, from readings taken as one instant: the steady reading
+ *         between two clock readings against their midpoint, the narrowest of a few tries, so that a preempted test
+ *         thread does not shift the expected value.
+ */
+template<typename LocalClock>
+double steadyMinusLocalNs(LocalClock localClock)
+{
+    double best = 0;
+    double width = std::numeric_limits<double>::infinity();
+    for (int attempt = 0; attempt < 5; ++attempt) {
+        const double before = localClock();
+        const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                std::chrono::steady_clock::now().time_since_epoch())
+                                .count();
+        const double after = localClock();
+        if (after - before < width) {
+            width = after - before;
+            best = static_cast<double>(steady) - 0.5 * (before + after) * 1e9;
+        }
+    }
+    return best;
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -298,10 +323,7 @@ void TestAcqLsl::readsLiblslOutlets()
     // The clock maps stream samples to the LSL timestamps of the outlet (same host: correction ~0).
     const AcqClockModel clock = reader->stream().clock();
     QCOMPARE(clock.source, AcqClockSource::Lsl);
-    const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::steady_clock::now().time_since_epoch())
-                            .count();
-    const double expected = static_cast<double>(steady) + (stamps[clock.anchorSample] - m_lsl->localClock()) * 1e9;
+    const double expected = steadyMinusLocalNs([&] { return m_lsl->localClock(); }) + stamps[clock.anchorSample] * 1e9;
     QVERIFY2(std::abs(static_cast<double>(clock.anchorHostNs) - expected) < 5e6,
              qPrintable(QString("clock off by %1 ms").arg((static_cast<double>(clock.anchorHostNs) - expected) / 1e6)));
 
@@ -410,10 +432,7 @@ void TestAcqLsl::readsInTreeOutlet()
     const AcqClockModel clock = reader->stream().clock();
     QCOMPARE(clock.source, AcqClockSource::Lsl);
     const double stamp = pushed - static_cast<double>(chunk.size() - 1 - clock.anchorSample) / kSfreq;
-    const auto steady = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            std::chrono::steady_clock::now().time_since_epoch())
-                            .count();
-    const double want = static_cast<double>(steady) + (stamp - mne::local_clock()) * 1e9;
+    const double want = steadyMinusLocalNs([] { return mne::local_clock(); }) + stamp * 1e9;
     QVERIFY2(std::abs(static_cast<double>(clock.anchorHostNs) - want) < 5e6,
              qPrintable(QString("clock off by %1 ms").arg((static_cast<double>(clock.anchorHostNs) - want) / 1e6)));
     device->close();
