@@ -122,7 +122,8 @@ QJsonObject RunMnaGraphSkill::executeSkill(const WorkflowNode& nodeState)
 
     const QByteArray inputsJson = QJsonDocument(nodeState.parameters.value("graph_inputs").toObject()).toJson(QJsonDocument::Compact);
     MnaValues graphInputs;
-    for (const auto& [key, value] : JsonDocument::from_json(inputsJson.toStdString()).object()) {
+    const JsonDocument inputsDocument = JsonDocument::from_json(inputsJson.toStdString());
+    for (const auto& [key, value] : inputsDocument.object()) {
         graphInputs.emplace(key, value);
     }
 

@@ -116,6 +116,9 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The `run_mna_graph` skill of MNE Analyze Studio reads its graph inputs from
+  a JSON document it keeps alive; it iterated over the members of a temporary
+  that compilers before C++23's lifetime extension (GCC 14) destroy first.
 - The libraries build with MSVC, GCC 14 and Emscripten, checked locally now
   against MSVC's standard library and with GCC 14 (the oldest compiler the build
   guide supports). The JSON and CBOR containers export their functions one by
