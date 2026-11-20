@@ -244,7 +244,7 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
        * Just put it together
        */
     if (fresh) {
-        target.filename = name;
+        target.filename = utf8_from_path(name);
         target.meas_id = id;
         /*
          * Getting starting time from measurement ID is not too accurate...

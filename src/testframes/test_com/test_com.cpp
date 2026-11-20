@@ -413,7 +413,7 @@ void TestCom::serialExchangesBytes()
     QCOMPARE(::read(device, command.data(), command.size()), ssize_t(2));
     QCOMPARE(std::string(command.data(), 2), std::string("C\r"));
 
-    ::write(device, "01 1.0\r\n", 8);
+    QCOMPARE(::write(device, "01 1.0\r\n", 8), ssize_t(8));
     auto got = port->read(buffer, 1s);
     QVERIFY(got);
     QCOMPARE(std::string(buffer.data(), *got), std::string("01 1.0\r\n"));

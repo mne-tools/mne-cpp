@@ -231,7 +231,7 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo& measInfo) const
     std::int32_t n_missing = static_cast<int>(missing_ch_names.size());
 
     if (n_missing > 0) {
-        Log::critical("{} channels in inverse operator are not present in the data ( {} )", n_missing, missing_ch_names);
+        Log::critical("{} channels in inverse operator are not present in the data ( {} )", n_missing, join(missing_ch_names, " "));
         return false;
     }
 

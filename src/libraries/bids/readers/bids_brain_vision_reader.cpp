@@ -75,7 +75,8 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(
  */
 std::string decodeText(std::string bytes)
 {
-    static const std::regex codepagePattern("^\\s*Codepage\\s*=\\s*(\\S+)", std::regex::icase | std::regex::multiline);
+    // A line start without std::regex::multiline, which MSVC's library does not have
+    static const std::regex codepagePattern("(?:^|\\n)[ \\t]*Codepage[ \\t]*=[ \\t]*(\\S+)", std::regex::icase);
     std::smatch codepage;
     const bool ansi = std::regex_search(bytes, codepage, codepagePattern) && codepage[1] == "ANSI";
     if (!ansi && mne::is_utf8(bytes)) {

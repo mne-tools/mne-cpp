@@ -152,7 +152,7 @@ std::optional<MNEDerivSet> MNEDerivSet::read(const std::filesystem::path& path)
                 return std::nullopt;
             }
             auto deriv = std::make_unique<MNEDeriv>();
-            deriv->filename = path;
+            deriv->filename = utf8_from_path(path);
             deriv->deriv_data = std::move(data);
             set.derivs.push_back(std::move(deriv));
         }

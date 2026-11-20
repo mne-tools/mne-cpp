@@ -26,6 +26,8 @@
 
 #include "mne_global.h"
 
+#include <fiff/fiff_ch_info.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -58,7 +60,6 @@ inline constexpr auto MNE_COV_CH_EEG = 2;      /**< EEG [V]. */
 namespace mne
 {
 class FiffSparseMatrix;
-class FiffChInfo;
 }
 
 //=============================================================================================================

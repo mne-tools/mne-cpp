@@ -193,7 +193,7 @@ constexpr std::array<Language, 6> kLanguages{{
 /** Writes the script to a temporary file, runs its interpreter on it and removes it unless asked to keep it. */
 MnaValues runScript(const MnaScript& script, const MnaValues& inputs, const JsonObject& attributes)
 {
-    const auto* language = std::ranges::find(kLanguages, std::string_view(script.language), &Language::name);
+    const auto language = std::ranges::find(kLanguages, std::string_view(script.language), &Language::name);
     const std::string_view extension = language != kLanguages.end() ? language->extension : ".txt";
     std::string interpreter = script.interpreter;
     if (interpreter.empty() && language != kLanguages.end()) {

@@ -21,6 +21,7 @@
 #include "mne_raw_info.h"
 #include <memory>
 #include <base/log.h>
+#include <base/string_utils.h>
 
 #include <vector>
 
@@ -361,7 +362,7 @@ int MNERawInfo::load(const std::filesystem::path& name, int allow_maxshield, std
        * Ready to put everything together
        */
     info = std::make_unique<MNERawInfo>();
-    info->filename = name;
+    info->filename = utf8_from_path(name);
     info->nchan = nchan;
     info->chInfo = chs;
     info->coord_frame = FIFFV_COORD_DEVICE;

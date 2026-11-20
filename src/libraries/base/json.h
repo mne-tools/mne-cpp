@@ -115,7 +115,7 @@ struct BASESHARED_EXPORT JsonParseError
  *
  * @snippet ex_base/main.cpp json_usage
  */
-class BASESHARED_EXPORT JsonArray
+class JsonArray
 {
 public:
     using value_type = JsonValue;
@@ -149,7 +149,7 @@ public:
     const JsonValue& at(std::size_t i) const noexcept;
 
     /** @copydoc at() */
-    const JsonValue& operator[](std::size_t i) const noexcept;
+    BASESHARED_EXPORT const JsonValue& operator[](std::size_t i) const noexcept;
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
      *
      * @return The element at @p i to be changed in place; out of range, a scratch value whose changes are dropped.
      */
-    JsonValue& operator[](std::size_t i) noexcept;
+    BASESHARED_EXPORT JsonValue& operator[](std::size_t i) noexcept;
 
     /** @return The first element, or an undefined value if the array is empty. */
     const JsonValue& first() const noexcept;
@@ -203,10 +203,10 @@ public:
      *
      * @return The removed element, or an undefined value if @p i is out of range.
      */
-    JsonValue take_at(std::size_t i);
+    BASESHARED_EXPORT JsonValue take_at(std::size_t i);
 
     /** @param[in] value   A value. @return Whether an element equals @p value. */
-    bool contains(const JsonValue& value) const;
+    BASESHARED_EXPORT bool contains(const JsonValue& value) const;
 
     /** @param[in] capacity   Number of elements to allocate room for. */
     void reserve(std::size_t capacity);
@@ -228,13 +228,13 @@ public:
     const_iterator cend() const noexcept;
 
     /** @param[in] other   Another array. @return Whether both hold equal elements in the same order. */
-    bool operator==(const JsonArray& other) const;
+    BASESHARED_EXPORT bool operator==(const JsonArray& other) const;
 
     /** @param[in] list   Strings. @return An array of those strings, like QJsonArray::fromStringList(). */
-    static JsonArray from_string_list(std::span<const std::string> list);
+    BASESHARED_EXPORT static JsonArray from_string_list(std::span<const std::string> list);
 
     /** @return The elements as strings; elements that are not strings become empty text. */
-    std::vector<std::string> to_string_list() const;
+    BASESHARED_EXPORT std::vector<std::string> to_string_list() const;
 
 private:
     std::vector<JsonValue> m_values; /**< The elements. */
@@ -250,7 +250,7 @@ private:
  *
  * @snippet ex_base/main.cpp json_usage
  */
-class BASESHARED_EXPORT JsonObject
+class JsonObject
 {
 public:
     class Member;
@@ -263,7 +263,7 @@ public:
     JsonObject() = default;
 
     /** @param[in] members   Key-value pairs, e.g. JsonObject{{"name", "MEG 0113"}, {"kind", 1}}; later duplicates win. */
-    JsonObject(std::initializer_list<std::pair<std::string_view, JsonValue>> members);
+    BASESHARED_EXPORT JsonObject(std::initializer_list<std::pair<std::string_view, JsonValue>> members);
 
     /** @return The number of members. */
     std::size_t size() const noexcept;
@@ -281,7 +281,7 @@ public:
     bool empty() const noexcept;
 
     /** @return The keys in ascending byte order. */
-    std::vector<std::string> keys() const;
+    BASESHARED_EXPORT std::vector<std::string> keys() const;
 
     /** @param[in] key   A key. @return Whether the object has a member called @p key. */
     bool contains(std::string_view key) const noexcept;
@@ -295,7 +295,7 @@ public:
     const JsonValue& value(std::string_view key) const noexcept;
 
     /** @copydoc value() */
-    const JsonValue& operator[](std::string_view key) const noexcept;
+    BASESHARED_EXPORT const JsonValue& operator[](std::string_view key) const noexcept;
 
     //=========================================================================================================
     /**
@@ -303,7 +303,7 @@ public:
      *
      * @return The value of the member called @p key to be changed in place; a null member is added if there is none.
      */
-    JsonValue& operator[](std::string_view key);
+    BASESHARED_EXPORT JsonValue& operator[](std::string_view key);
 
     //=========================================================================================================
     /**
@@ -314,10 +314,10 @@ public:
      *
      * @return The member.
      */
-    iterator insert(std::string_view key, JsonValue value);
+    BASESHARED_EXPORT iterator insert(std::string_view key, JsonValue value);
 
     /** @param[in] key   Key of the member to remove; nothing happens if there is none. */
-    void remove(std::string_view key);
+    BASESHARED_EXPORT void remove(std::string_view key);
 
     //=========================================================================================================
     /**
@@ -325,19 +325,19 @@ public:
      *
      * @return The value of the removed member, or an undefined value if there is none.
      */
-    JsonValue take(std::string_view key);
+    BASESHARED_EXPORT JsonValue take(std::string_view key);
 
     /** @param[in] key   A key. @return The member called @p key, or end(). */
-    iterator find(std::string_view key) noexcept;
+    BASESHARED_EXPORT iterator find(std::string_view key) noexcept;
 
     /** @param[in] key   A key. @return The member called @p key, or end(). */
-    const_iterator find(std::string_view key) const noexcept;
+    BASESHARED_EXPORT const_iterator find(std::string_view key) const noexcept;
 
     /** @param[in] key   A key. @return The member called @p key, or const_end(). */
     const_iterator const_find(std::string_view key) const noexcept;
 
     /** @param[in] it   A member of this object. @return The member after it. */
-    iterator erase(const_iterator it);
+    BASESHARED_EXPORT iterator erase(const_iterator it);
 
     /** @param[in] capacity   Number of members to allocate room for. */
     void reserve(std::size_t capacity);
@@ -346,7 +346,7 @@ public:
     void clear() noexcept;
 
     /** @param[in] keys   Keys to leave out. @return A copy of this object without the members called @p keys. */
-    JsonObject without(std::initializer_list<std::string_view> keys) const;
+    BASESHARED_EXPORT JsonObject without(std::initializer_list<std::string_view> keys) const;
 
     iterator begin() noexcept;
     iterator end() noexcept;
@@ -358,7 +358,7 @@ public:
     const_iterator const_end() const noexcept;
 
     /** @param[in] other   Another object. @return Whether both hold the same keys with equal values. */
-    bool operator==(const JsonObject& other) const;
+    BASESHARED_EXPORT bool operator==(const JsonObject& other) const;
 
 private:
     friend struct JsonAccess;
@@ -367,7 +367,7 @@ private:
     /**
      * Sorts members appended out of order by key, keeping the last of duplicate keys, as the parser needs.
      */
-    void sort_members();
+    BASESHARED_EXPORT void sort_members();
 
     std::vector<Member> m_members; /**< The members, sorted by key. */
 };
@@ -381,7 +381,7 @@ private:
  *
  * @snippet ex_base/main.cpp json_usage
  */
-class BASESHARED_EXPORT JsonValue
+class JsonValue
 {
 public:
     /** The JSON type, with the names and values of QJsonValue::Type; integers report Double, as in Qt 6. */
@@ -397,13 +397,13 @@ public:
     };
 
     /** @param[in] type   The type; the value is null, false, 0, empty or undefined accordingly. */
-    JsonValue(Type type = Null);
+    BASESHARED_EXPORT JsonValue(Type type = Null);
 
     /** Constructs null. */
-    JsonValue(std::nullptr_t) noexcept;
+    BASESHARED_EXPORT JsonValue(std::nullptr_t) noexcept;
 
     /** @param[in] value   A boolean. */
-    JsonValue(bool value) noexcept;
+    BASESHARED_EXPORT JsonValue(bool value) noexcept;
 
     /** @param[in] value   An integer; unsigned values beyond std::int64_t become doubles. */
     template<std::integral T>
@@ -415,28 +415,28 @@ public:
     JsonValue(T value) noexcept;
 
     /** @param[in] value   Null-terminated UTF-8 text. */
-    JsonValue(const char* value);
+    BASESHARED_EXPORT JsonValue(const char* value);
 
     /** @param[in] value   UTF-8 text. */
-    JsonValue(std::string_view value);
+    BASESHARED_EXPORT JsonValue(std::string_view value);
 
     /** @param[in] value   UTF-8 text. */
-    JsonValue(const std::string& value);
+    BASESHARED_EXPORT JsonValue(const std::string& value);
 
     /** @param[in] value   UTF-8 text, moved in. */
-    JsonValue(std::string&& value) noexcept;
+    BASESHARED_EXPORT JsonValue(std::string&& value) noexcept;
 
     /** @param[in] value   An array. */
-    JsonValue(const JsonArray& value);
+    BASESHARED_EXPORT JsonValue(const JsonArray& value);
 
     /** @param[in] value   An array, moved in. */
-    JsonValue(JsonArray&& value) noexcept;
+    BASESHARED_EXPORT JsonValue(JsonArray&& value) noexcept;
 
     /** @param[in] value   An object. */
-    JsonValue(const JsonObject& value);
+    BASESHARED_EXPORT JsonValue(const JsonObject& value);
 
     /** @param[in] value   An object, moved in. */
-    JsonValue(JsonObject&& value) noexcept;
+    BASESHARED_EXPORT JsonValue(JsonObject&& value) noexcept;
 
     /** Pointers other than text would silently become booleans. */
     JsonValue(const void*) = delete;
@@ -463,7 +463,7 @@ public:
      *
      * @return The number if it is a whole number within the range of int, else @p defaultValue, like QJsonValue::toInt().
      */
-    int to_int(int defaultValue = 0) const noexcept;
+    BASESHARED_EXPORT int to_int(int defaultValue = 0) const noexcept;
 
     //=========================================================================================================
     /**
@@ -472,7 +472,7 @@ public:
      * @return The number if it is a whole number within the range of std::int64_t, else @p defaultValue,
      *         like QJsonValue::toInteger().
      */
-    std::int64_t to_integer(std::int64_t defaultValue = 0) const noexcept;
+    BASESHARED_EXPORT std::int64_t to_integer(std::int64_t defaultValue = 0) const noexcept;
 
     /** @param[in] defaultValue   Fallback. @return The number as double, or @p defaultValue if the value is not a number. */
     double to_double(double defaultValue = 0.0) const noexcept;
@@ -490,16 +490,16 @@ public:
     std::string to_std_string() const;
 
     /** @return The array, or an empty array if the value is not one. */
-    const JsonArray& to_array() const noexcept;
+    BASESHARED_EXPORT const JsonArray& to_array() const noexcept;
 
     /** @param[in] defaultValue   Fallback. @return A copy of the array, or @p defaultValue if the value is not one. */
-    JsonArray to_array(const JsonArray& defaultValue) const;
+    BASESHARED_EXPORT JsonArray to_array(const JsonArray& defaultValue) const;
 
     /** @return The object, or an empty object if the value is not one. */
-    const JsonObject& to_object() const noexcept;
+    BASESHARED_EXPORT const JsonObject& to_object() const noexcept;
 
     /** @param[in] defaultValue   Fallback. @return A copy of the object, or @p defaultValue if the value is not one. */
-    JsonObject to_object(const JsonObject& defaultValue) const;
+    BASESHARED_EXPORT JsonObject to_object(const JsonObject& defaultValue) const;
 
     //=========================================================================================================
     /**
@@ -507,7 +507,7 @@ public:
      *
      * @return The member called @p key if the value is an object with one, else an undefined value.
      */
-    const JsonValue& operator[](std::string_view key) const noexcept;
+    BASESHARED_EXPORT const JsonValue& operator[](std::string_view key) const noexcept;
 
     //=========================================================================================================
     /**
@@ -515,7 +515,7 @@ public:
      *
      * @return The element at @p i if the value is an array that long, else an undefined value.
      */
-    const JsonValue& operator[](std::size_t i) const noexcept;
+    BASESHARED_EXPORT const JsonValue& operator[](std::size_t i) const noexcept;
 
     //=========================================================================================================
     /**
@@ -523,10 +523,10 @@ public:
      *
      * @return Whether both have the same type and content; numbers compare by value, so 1 equals 1.0, as in Qt.
      */
-    bool operator==(const JsonValue& other) const;
+    BASESHARED_EXPORT bool operator==(const JsonValue& other) const;
 
     /** @return The shared undefined value that lookups return when nothing is found. */
-    static const JsonValue& undefined_value() noexcept;
+    BASESHARED_EXPORT static const JsonValue& undefined_value() noexcept;
 
 private:
     friend struct JsonAccess;

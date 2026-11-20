@@ -83,7 +83,7 @@ constexpr std::array<DataKindName, 15> kDataKinds{{
 
 const DataKindName& entry(MnaDataKind kind)
 {
-    const auto* it = std::ranges::find(kDataKinds, kind, &DataKindName::kind);
+    const auto it = std::ranges::find(kDataKinds, kind, &DataKindName::kind);
     return it != kDataKinds.end() ? *it : kDataKinds.back();
 }
 
@@ -95,7 +95,7 @@ const DataKindName& entry(MnaDataKind kind)
 
 std::string_view mne::to_string(MnaFileRole role)
 {
-    const auto* it = std::ranges::find(kFileRoles, role, &std::pair<MnaFileRole, std::string_view>::first);
+    const auto it = std::ranges::find(kFileRoles, role, &std::pair<MnaFileRole, std::string_view>::first);
     return it != kFileRoles.end() ? it->second : "custom";
 }
 
@@ -103,7 +103,7 @@ std::string_view mne::to_string(MnaFileRole role)
 
 MnaFileRole mne::file_role_from_string(std::string_view text)
 {
-    const auto* it = std::ranges::find(kFileRoles, text, &std::pair<MnaFileRole, std::string_view>::second);
+    const auto it = std::ranges::find(kFileRoles, text, &std::pair<MnaFileRole, std::string_view>::second);
     return it != kFileRoles.end() ? it->first : MnaFileRole::Custom;
 }
 
@@ -125,7 +125,7 @@ std::string_view mne::data_kind_key(MnaDataKind kind)
 
 MnaDataKind mne::data_kind_from_string(std::string_view text)
 {
-    const auto* it = std::ranges::find_if(kDataKinds, [&](const DataKindName& e) {
+    const auto it = std::ranges::find_if(kDataKinds, [&](const DataKindName& e) {
         return e.name == text || e.key == text;
     });
     return it != kDataKinds.end() ? it->kind : MnaDataKind::Custom;

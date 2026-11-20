@@ -293,7 +293,7 @@ std::unique_ptr<FwdBemModel> FwdBemModel::fwd_bem_load_surfaces(const std::files
     }
     auto m = std::make_unique<FwdBemModel>();
 
-    m->surf_name = name;
+    m->surf_name = utf8_from_path(name);
     m->nsurf = nkind;
     m->surfs = std::move(surfs);
     m->sigma = sigma_tmp;
@@ -425,7 +425,7 @@ int FwdBemModel::fwd_bem_load_solution(const std::filesystem::path& name, int be
         nSolutions = dims[1];
     }
     fwd_bem_free_solution();
-    sol_name = name;
+    sol_name = utf8_from_path(name);
     solution = t_pTag->to_float_matrix().transpose();
     this->nsol = nSolutions;
     this->bem_method = method;

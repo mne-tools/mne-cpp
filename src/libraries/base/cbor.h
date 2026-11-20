@@ -106,7 +106,7 @@ struct BASESHARED_EXPORT CborParseError
  *
  * @snippet ex_base/main.cpp cbor_usage
  */
-class BASESHARED_EXPORT CborArray
+class CborArray
 {
 public:
     using value_type = CborValue;
@@ -116,42 +116,42 @@ public:
     CborArray() = default;
 
     /** @param[in] values   The elements, e.g. CborArray{1, "two", CborByteArray{}}. */
-    CborArray(std::initializer_list<CborValue> values);
+    BASESHARED_EXPORT CborArray(std::initializer_list<CborValue> values);
 
     /** @return The number of elements. */
-    std::size_t size() const noexcept;
+    BASESHARED_EXPORT std::size_t size() const noexcept;
 
     /** @return Whether there are no elements. */
-    bool empty() const noexcept;
+    BASESHARED_EXPORT bool empty() const noexcept;
 
     /** @param[in] i   An index. @return The element at @p i, or an undefined value if out of range. */
-    const CborValue& at(std::size_t i) const noexcept;
+    BASESHARED_EXPORT const CborValue& at(std::size_t i) const noexcept;
 
     /** @param[in] i   An index. @return The element at @p i, or an undefined value if out of range. */
-    const CborValue& operator[](std::size_t i) const noexcept;
+    BASESHARED_EXPORT const CborValue& operator[](std::size_t i) const noexcept;
 
     /** @param[in] value   Appended at the end. */
-    void append(CborValue value);
+    BASESHARED_EXPORT void append(CborValue value);
 
     /** @param[in] capacity   Number of elements to make room for. */
-    void reserve(std::size_t capacity);
+    BASESHARED_EXPORT void reserve(std::size_t capacity);
 
-    iterator begin() noexcept;
-    iterator end() noexcept;
-    const_iterator begin() const noexcept;
-    const_iterator end() const noexcept;
+    BASESHARED_EXPORT iterator begin() noexcept;
+    BASESHARED_EXPORT iterator end() noexcept;
+    BASESHARED_EXPORT const_iterator begin() const noexcept;
+    BASESHARED_EXPORT const_iterator end() const noexcept;
 
     /** @param[in] other   Another array. @return Whether both hold equal elements in the same order. */
-    bool operator==(const CborArray& other) const;
+    BASESHARED_EXPORT bool operator==(const CborArray& other) const;
 
     /** @param[in] array   A JSON array. @return The same elements as CBOR, like QCborArray::fromJsonArray(). */
-    static CborArray from_json_array(const JsonArray& array);
+    BASESHARED_EXPORT static CborArray from_json_array(const JsonArray& array);
 
     /** @return The elements as JSON, converted as CborValue::to_json_value() does. */
-    JsonArray to_json_array() const;
+    BASESHARED_EXPORT JsonArray to_json_array() const;
 
     /** @param[in] list   Strings. @return An array of those strings, like QCborArray::fromStringList(). */
-    static CborArray from_string_list(std::span<const std::string> list);
+    BASESHARED_EXPORT static CborArray from_string_list(std::span<const std::string> list);
 
 private:
     std::vector<CborValue> m_values; /**< The elements. */
@@ -165,7 +165,7 @@ private:
  *
  * @snippet ex_base/main.cpp cbor_usage
  */
-class BASESHARED_EXPORT CborMap
+class CborMap
 {
 public:
     using value_type = std::pair<std::string, CborValue>;
@@ -175,31 +175,31 @@ public:
     CborMap() = default;
 
     /** @param[in] members   The members in order, e.g. CborMap{{"name", "x"}, {"size", 3}}. */
-    CborMap(std::initializer_list<value_type> members);
+    BASESHARED_EXPORT CborMap(std::initializer_list<value_type> members);
 
     /** @return The number of members. */
-    std::size_t size() const noexcept;
+    BASESHARED_EXPORT std::size_t size() const noexcept;
 
     /** @return Whether there are no members. */
-    bool empty() const noexcept;
+    BASESHARED_EXPORT bool empty() const noexcept;
 
     /** @param[in] key   A key. @return Whether a member has that key. */
-    bool contains(std::string_view key) const noexcept;
+    BASESHARED_EXPORT bool contains(std::string_view key) const noexcept;
 
     /** @param[in] key   A key. @return The value of the first member with that key, or an undefined value. */
-    const CborValue& value(std::string_view key) const noexcept;
+    BASESHARED_EXPORT const CborValue& value(std::string_view key) const noexcept;
 
     /** @param[in] key   A key. @return The value of the first member with that key, or an undefined value. */
-    const CborValue& operator[](std::string_view key) const noexcept;
+    BASESHARED_EXPORT const CborValue& operator[](std::string_view key) const noexcept;
 
     /** @param[in] key   A key. @return The value of the member with that key, appended as undefined if missing. */
-    CborValue& operator[](std::string_view key);
+    BASESHARED_EXPORT CborValue& operator[](std::string_view key);
 
     /**
      * @param[in] key     A key.
      * @param[in] value   Replaces the value of the member with that key, or is appended with it.
      */
-    void insert(std::string_view key, CborValue value);
+    BASESHARED_EXPORT void insert(std::string_view key, CborValue value);
 
     //=========================================================================================================
     /**
@@ -209,27 +209,27 @@ public:
      * @param[in] key     A key not yet in the map.
      * @param[in] value   Its value.
      */
-    void append(std::string key, CborValue value);
+    BASESHARED_EXPORT void append(std::string key, CborValue value);
 
     /** @param[in] key   Every member with that key is removed. */
-    void remove(std::string_view key);
+    BASESHARED_EXPORT void remove(std::string_view key);
 
     /** @return The keys in order. */
-    std::vector<std::string> keys() const;
+    BASESHARED_EXPORT std::vector<std::string> keys() const;
 
     /** @param[in] capacity   Number of members to make room for. */
-    void reserve(std::size_t capacity);
+    BASESHARED_EXPORT void reserve(std::size_t capacity);
 
-    iterator begin() noexcept;
-    iterator end() noexcept;
-    const_iterator begin() const noexcept;
-    const_iterator end() const noexcept;
+    BASESHARED_EXPORT iterator begin() noexcept;
+    BASESHARED_EXPORT iterator end() noexcept;
+    BASESHARED_EXPORT const_iterator begin() const noexcept;
+    BASESHARED_EXPORT const_iterator end() const noexcept;
 
     /** @param[in] other   Another map. @return Whether both hold equal members in the same order. */
-    bool operator==(const CborMap& other) const;
+    BASESHARED_EXPORT bool operator==(const CborMap& other) const;
 
     /** @param[in] object   A JSON object. @return The same members as CBOR, like QCborMap::fromJsonObject(). */
-    static CborMap from_json_object(const JsonObject& object);
+    BASESHARED_EXPORT static CborMap from_json_object(const JsonObject& object);
 
     //=========================================================================================================
     /**
@@ -237,7 +237,7 @@ public:
      *
      * @return The members as JSON, converted as CborValue::to_json_value() does; later duplicate keys win.
      */
-    JsonObject to_json_object(std::initializer_list<std::string_view> except = {}) const;
+    BASESHARED_EXPORT JsonObject to_json_object(std::initializer_list<std::string_view> except = {}) const;
 
 private:
     std::vector<value_type> m_members; /**< The members in insertion order. */

@@ -116,6 +116,17 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The libraries build with MSVC, GCC 14 and Emscripten, checked locally now
+  against MSVC's standard library and with GCC 14 (the oldest compiler the build
+  guide supports). The JSON and CBOR containers export their functions one by
+  one: exporting the whole class made MSVC instantiate their vectors while the
+  element type was still incomplete. `std::filesystem::path` is converted to
+  UTF-8 with `mne::utf8_from_path` where a `std::string` takes it (on Windows a
+  path is not a `std::string`), headers include `FiffChInfo` where exported
+  classes hold it, the BrainVision codepage pattern no longer needs
+  `std::regex::multiline` (missing in MSVC's library), and `mne::executable_dir()`
+  compiles for WebAssembly. A missing channel in `MNEInverseOperator` is logged
+  without formatting a `std::vector`, which libstdc++ 14 cannot.
 - `test_com` skips its two multicast cases on a host without a route for
   multicast, such as the macOS CI runners, instead of failing them.
 - The sanitizer job (`scripts/ci/sanitizers`) builds again: it compiled

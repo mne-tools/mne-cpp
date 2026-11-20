@@ -337,10 +337,11 @@ std::string mne::to_hex(std::span<const std::byte> data)
 std::filesystem::path mne::executable_dir()
 {
     static const std::filesystem::path dir = [] {
-        std::error_code error;
 #if defined(__EMSCRIPTEN__)
         return std::filesystem::path("/");
-#elif defined(__APPLE__)
+#else
+        std::error_code error;
+#if defined(__APPLE__)
         std::uint32_t size = 0;
         _NSGetExecutablePath(nullptr, &size);
         std::string buffer(size, '\0');
@@ -360,6 +361,7 @@ std::filesystem::path mne::executable_dir()
         const std::filesystem::path exe = std::filesystem::read_symlink("/proc/self/exe", error);
 #endif
         return error ? std::filesystem::path() : exe.parent_path();
+#endif
     }();
     return dir;
 }

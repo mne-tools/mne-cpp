@@ -400,7 +400,9 @@ void append_value(std::vector<std::byte>& out, T value, bool big = false)
     if (big) {
         std::reverse(bytes.begin(), bytes.end());
     }
-    out.insert(out.end(), bytes.begin(), bytes.end());
+    for (const std::byte b : bytes) { // insert() of the range trips GCC 14's -Wstringop-overflow at -O3
+        out.push_back(b);
+    }
 }
 
 /** Appends a FIFF tag whose data are words (or a channel record's words and name). */

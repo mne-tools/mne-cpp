@@ -31,6 +31,7 @@
 
 #include <vector>
 #include "inv_sensor_set.h"
+#include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 
@@ -41,7 +42,6 @@
 namespace mne
 {
 class FiffInfo;
-class FiffChInfo;
 class FiffDigPointSet;
 }
 

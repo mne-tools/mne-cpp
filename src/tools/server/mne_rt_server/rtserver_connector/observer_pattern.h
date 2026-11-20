@@ -104,7 +104,8 @@ public:
         if (!m_notifyEnabled) {
             return;
         }
-        const std::vector<IObserver*> observers = m_observers;
+        std::vector<IObserver*> observers; // a copy: assign() rather than the copy constructor, which trips GCC 14's -Warray-bounds at -O3
+        observers.assign(m_observers.begin(), m_observers.end());
         for (IObserver* observer : observers) {
             observer->update(this);
         }

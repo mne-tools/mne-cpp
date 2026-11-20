@@ -66,6 +66,9 @@ namespace
 {
 
 constexpr std::size_t kChunk = 65536;
+
+#if !defined(__EMSCRIPTEN__) // WebAssembly cannot start processes
+
 constexpr std::chrono::milliseconds kPoll{20};
 
 /** Hands output to the callback or appends it to the result. */
@@ -78,6 +81,8 @@ void deliver(const ProcessOptions& options, ProcessResult& result, ProcessChanne
     else
         (channel == ProcessChannel::StdOut ? result.std_out : result.std_err).append(data);
 }
+
+#endif
 
 #if defined(_WIN32)
 

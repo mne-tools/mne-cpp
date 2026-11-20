@@ -279,8 +279,10 @@ void TestInvLcmvPython::timeCoursesMatch()
     std::vector<InvSourceEstimate> stcs{InvLCMV::applyLCMV(m_evoked, filters),
                                         InvLCMV::applyLCMVRaw(m_evoked.data, 0.5f, tstep, filters),
                                         InvDICS::applyDICS(m_evoked.data, 0.5f, tstep, dics)};
-    stcs.append_range(InvLCMV::applyLCMVEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, filters));
-    stcs.append_range(InvDICS::applyDICSEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, dics));
+    for (auto&& epochs : {InvLCMV::applyLCMVEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, filters),
+                          InvDICS::applyDICSEpochs({m_evoked.data, m_evoked.data}, 0.5f, tstep, dics)}) {
+        stcs.insert(stcs.end(), epochs.begin(), epochs.end()); // append_range needs libstdc++ 15
+    }
     QCOMPARE(stcs.size(), std::size_t{7});
 
     for (int i = 0; i < std::ssize(stcs); ++i) {

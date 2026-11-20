@@ -1247,7 +1247,7 @@ MNERawData* MNERawData::open_file_comp(const std::filesystem::path& name,
         return nullptr;
 
     data = std::make_unique<MNERawData>();
-    data->filename = name;
+    data->filename = utf8_from_path(name);
     data->stream = std::move(stream);
     data->info = std::move(info);
     /*

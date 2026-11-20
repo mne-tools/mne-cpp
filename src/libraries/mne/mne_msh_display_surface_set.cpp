@@ -20,6 +20,7 @@
 
 #include "mne_msh_display_surface_set.h"
 #include <base/log.h>
+#include <base/string_utils.h>
 
 #include "mne_msh_display_surface.h"
 #include "mne_surface.h"
@@ -158,7 +159,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
     result->drawable[1] = true;
 
     auto* pThis = result->surfs[0].get();
-    pThis->filename = pathLh;
+    pThis->filename = utf8_from_path(pathLh);
     static_cast<MNESurfaceOrVolume&>(*pThis) = std::move(static_cast<MNESurfaceOrVolume&>(*left));
     pThis->id = SURF_LEFT_HEMI;
     pThis->subj = subject_id;
@@ -169,7 +170,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
     pThis->setup_curvature_colors();
 
     pThis = result->surfs[1].get();
-    pThis->filename = pathRh;
+    pThis->filename = utf8_from_path(pathRh);
     static_cast<MNESurfaceOrVolume&>(*pThis) = std::move(static_cast<MNESurfaceOrVolume&>(*right));
     pThis->id = SURF_RIGHT_HEMI;
     pThis->subj = subject_id;
@@ -209,7 +210,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const std::filesystem::path& filepa
     }
 
     auto newSurf = std::make_unique<MNEMshDisplaySurface>();
-    newSurf->filename = filepath;
+    newSurf->filename = utf8_from_path(filepath);
     //newSurf->time_loaded = time(nullptr); //Comment out due to unknown timestamp function ToDo
     static_cast<MNESurfaceOrVolume&>(*newSurf) = std::move(static_cast<MNESurfaceOrVolume&>(*surf));
     newSurf->id = kind;
