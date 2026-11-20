@@ -382,13 +382,13 @@ int MNERawInfo::load(const std::filesystem::path& name, int allow_maxshield, std
     for (k = 0; k < raw->nent(); k++) {
         if (raw->dir[k].kind == FIFF_DATA_BUFFER) {
             if (raw->dir[k].type == FIFFT_DAU_PACK16 || raw->dir[k].type == FIFFT_SHORT)
-                info->buf_size = raw->dir[k].size / (nchan * sizeof(fiff_short_t));
+                info->buf_size = static_cast<int>(raw->dir[k].size / (nchan * sizeof(fiff_short_t)));
             else if (raw->dir[k].type == FIFFT_FLOAT)
-                info->buf_size = raw->dir[k].size / (nchan * sizeof(fiff_float_t));
+                info->buf_size = static_cast<int>(raw->dir[k].size / (nchan * sizeof(fiff_float_t)));
             else if (raw->dir[k].type == FIFFT_INT)
-                info->buf_size = raw->dir[k].size / (nchan * sizeof(fiff_int_t));
+                info->buf_size = static_cast<int>(raw->dir[k].size / (nchan * sizeof(fiff_int_t)));
             else if (raw->dir[k].type == FIFFT_DOUBLE)
-                info->buf_size = raw->dir[k].size / (nchan * sizeof(double));
+                info->buf_size = static_cast<int>(raw->dir[k].size / (nchan * sizeof(double)));
             else {
                 mne::Log::critical("We are not prepared to handle raw data type: {}", raw->dir[k].type);
                 stream.close();

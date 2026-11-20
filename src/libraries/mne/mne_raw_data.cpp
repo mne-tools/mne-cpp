@@ -575,7 +575,7 @@ void MNERawData::setup_filter_bufs()
         filt_bufs[k].ch_filtered = Eigen::VectorXi::Zero(this->info->nchan);
         filt_bufs[k].comp_status = MNE_CTFV_NOGRAD;
     }
-    nring_buf = approx_ring_buf_size / ((2 * filter->taper_size + filter->size) * static_cast<std::size_t>(this->info->nchan) * sizeof(float));
+    nring_buf = static_cast<int>(approx_ring_buf_size / ((2 * filter->taper_size + filter->size) * static_cast<std::size_t>(this->info->nchan) * sizeof(float)));
     this->filt_ring = std::make_unique<RingBuffer>(nring_buf);
     add_filter_response(&highpass_effective);
 
@@ -1368,13 +1368,13 @@ MNERawData* MNERawData::open_file_comp(const std::filesystem::path& name,
         const FiffDirEntry& dir = data->bufs[k].ent;
         if (dir.kind == FIFF_DATA_BUFFER) {
             if (dir.type == FIFFT_DAU_PACK16 || dir.type == FIFFT_SHORT)
-                data->bufs[k].ns = dir.size / (data->info->nchan * sizeof(fiff_dau_pack16_t));
+                data->bufs[k].ns = static_cast<int>(dir.size / (data->info->nchan * sizeof(fiff_dau_pack16_t)));
             else if (dir.type == FIFFT_FLOAT)
-                data->bufs[k].ns = dir.size / (data->info->nchan * sizeof(fiff_float_t));
+                data->bufs[k].ns = static_cast<int>(dir.size / (data->info->nchan * sizeof(fiff_float_t)));
             else if (dir.type == FIFFT_INT)
-                data->bufs[k].ns = dir.size / (data->info->nchan * sizeof(fiff_int_t));
+                data->bufs[k].ns = static_cast<int>(dir.size / (data->info->nchan * sizeof(fiff_int_t)));
             else if (dir.type == FIFFT_DOUBLE)
-                data->bufs[k].ns = dir.size / (data->info->nchan * sizeof(double));
+                data->bufs[k].ns = static_cast<int>(dir.size / (data->info->nchan * sizeof(double)));
             else {
                 mne::Log::critical("We are not prepared to handle raw data type: {}", dir.type);
                 return nullptr;
@@ -1410,7 +1410,7 @@ MNERawData* MNERawData::open_file_comp(const std::filesystem::path& name,
     /*
        * Initialize the raw data buffers
        */
-    nbuf = approx_ring_buf_size / (data->info->buf_size * static_cast<std::size_t>(data->info->nchan) * sizeof(float));
+    nbuf = static_cast<int>(approx_ring_buf_size / (data->info->buf_size * static_cast<std::size_t>(data->info->nchan) * sizeof(float)));
     data->ring = std::make_unique<RingBuffer>(nbuf);
     /*
        * Initialize the filter buffers

@@ -1092,7 +1092,13 @@ public:
 private:
     void send(std::string_view text) const
     {
-        static_cast<void>(::write(m_master, text.data(), text.size()));
+        for (std::size_t done = 0; done < text.size();) {
+            const ssize_t n = ::write(m_master, text.data() + done, text.size() - done);
+            if (n <= 0) {
+                return; // the device under test then sees no answer and the test fails on that
+            }
+            done += static_cast<std::size_t>(n);
+        }
     }
 
     void serve()

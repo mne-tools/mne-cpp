@@ -421,7 +421,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
     //
     std::int32_t totalNumOfClust = 0;
     for (std::int32_t h = 0; h < 2; ++h)
-        totalNumOfClust += t_qListMNEClusterInfo[h].clusterVertnos.size();
+        totalNumOfClust += static_cast<std::int32_t>(t_qListMNEClusterInfo[h].clusterVertnos.size());
 
     if (isFixedOrient())
         p_D = MatrixXd::Zero(p_outMT.cols(), totalNumOfClust);

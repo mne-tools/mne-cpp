@@ -608,8 +608,10 @@ void MainWindow::openInFileDialog()
     auto fileContentReady = [&](const QString& filePath, const QByteArray& fileContent) {
         if (!filePath.isNull()) {
             QFile fileIn(m_sDefaultWasmInFile);
-            fileIn.open(QIODevice::WriteOnly);
-            fileIn.write(fileContent);
+            if (!fileIn.open(QIODevice::WriteOnly) || fileIn.write(fileContent) != fileContent.size()) {
+                qWarning() << "Could not store" << filePath << "in the browser's file system";
+                return;
+            }
             fileIn.close();
 
             m_fiInFile.setFile(m_sDefaultWasmInFile);
@@ -687,10 +689,11 @@ void MainWindow::outputFileReady()
     //    qDebug() << "file out:" << m_fiOutFile.absoluteFilePath();
     //    qDebug() << "fileout size: " << QString::number(fileOut.size());
 
-    fileOut.open(QIODevice::ReadWrite);
-    QByteArray outFileContent;
-
-    outFileContent = fileOut.readAll();
+    if (!fileOut.open(QIODevice::ReadOnly)) {
+        qWarning() << "Could not read the anonymized file" << fileOut.fileName();
+        return;
+    }
+    const QByteArray outFileContent = fileOut.readAll();
 
     //    qDebug() << "fileout size (after read): " << QString::number(fileOut.size());
 

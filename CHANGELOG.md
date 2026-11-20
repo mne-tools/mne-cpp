@@ -116,6 +116,13 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- More of what only CI's compilers reject, now also checked locally: MSVC's
+  narrowing of `size_t` (C4267) in the MNE-C raw-data buffer sizes and cluster
+  counts, names that hide a local or a member (C4456, C4458) in `BidsRawData`
+  and `MNEChSelection`, glibc's unchecked `write()` and a `qint64*` passed as
+  `std::int64_t*` (different types on Linux) in tests, and stale API uses in
+  the WebAssembly-only code of MNE Browse, MNE Analyze, MNE Inspect and MNE
+  Anonymize (which now reports a file it cannot write or read in the browser).
 - `lsl://` maps LSL time to the host clock from one instant: it reads the
   steady clock between two LSL clock readings and takes their midpoint, the
   narrowest of three tries. It read them one after the other, so a reader

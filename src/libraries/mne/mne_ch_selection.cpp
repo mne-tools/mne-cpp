@@ -51,8 +51,8 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
 {
     chspick = chdef;
     chspick_nospace = chdef;
-    for (auto& name : chspick_nospace)
-        std::erase(name, ' ');
+    for (auto& channel : chspick_nospace)
+        std::erase(channel, ' ');
     const int nchan = this->nchan();
 
     pick.setConstant(nchan, -1);

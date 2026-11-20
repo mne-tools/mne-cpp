@@ -2718,7 +2718,7 @@ void MainWindow::openFile()
                 mne::FiffRawData raw(wasmRawBytes());
                 MatrixXi events;
                 QString detectedEventSource;
-                if (!raw.isEmpty() && detectFallbackStimEvents(raw, events, detectedEventSource) && events.rows() > 0) {
+                if (!raw.empty() && detectFallbackStimEvents(raw, events, detectedEventSource) && events.rows() > 0) {
                     m_pEventWindow->getEventModel()->setEventMatrix(events, false);
                     statusBar()->showMessage(detectedEventSource, 5000);
                 }

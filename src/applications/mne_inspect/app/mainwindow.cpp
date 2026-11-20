@@ -1185,8 +1185,8 @@ void MainWindow::setupConnections()
             else if (fn.contains("orig"))
                 type = "orig";
 
-            FsSurface surf(path);
-            if (!surf.isEmpty()) {
+            FsSurface surf(path.toStdU16String());
+            if (!surf.empty()) {
                 m_model->addSurface("User", hemi, type, surf);
                 m_surfGroup->setEnabled(true);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
@@ -1244,8 +1244,8 @@ void MainWindow::setupConnections()
             QString fn = QFileInfo(path).fileName();
             QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
 
-            FsAnnotation annot(path);
-            if (!annot.isEmpty()) {
+            FsAnnotation annot(path.toStdU16String());
+            if (!annot.empty()) {
                 m_model->addAnnotation("User", hemi, annot);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Annotation));
             }

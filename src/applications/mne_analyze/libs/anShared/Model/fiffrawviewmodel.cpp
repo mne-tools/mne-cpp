@@ -228,6 +228,7 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
     }
 #ifdef WASMBUILD
     // The browser offers the bytes as a download; sPath has no meaning there.
+    Q_UNUSED(sPath)
     const QString target = QDir::temp().filePath(getModelName());
 #else
     const QString& target = sPath;

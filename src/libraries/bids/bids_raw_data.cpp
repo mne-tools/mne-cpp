@@ -506,10 +506,10 @@ bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& 
     std::string dataFileName;
     std::string markerFileName;
     for (const std::string& line : mne::split(*vhdrContent, '\n')) {
-        if (const auto value = headerValue(line, "DataFile="))
-            dataFileName = *value;
-        else if (const auto value = headerValue(line, "MarkerFile="))
-            markerFileName = *value;
+        if (const auto data = headerValue(line, "DataFile="))
+            dataFileName = *data;
+        else if (const auto marker = headerValue(line, "MarkerFile="))
+            markerFileName = *marker;
     }
 
     const std::filesystem::path srcDir = std::filesystem::absolute(srcVhdr).parent_path();

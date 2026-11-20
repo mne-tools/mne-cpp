@@ -24,6 +24,12 @@
 #include <QtTest>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -164,15 +170,15 @@ void TestFiffByteSwap::testSwapIntpKnown()
 
 void TestFiffByteSwap::testSwapLongIdentity()
 {
-    qint64 val = Q_INT64_C(0x0102030405060708);
+    std::int64_t val = INT64_C(0x0102030405060708);
     QCOMPARE(swap_long(swap_long(val)), val);
 }
 
 void TestFiffByteSwap::testSwapLongKnown()
 {
-    qint64 val = Q_INT64_C(0x0102030405060708);
-    qint64 swapped = swap_long(val);
-    QCOMPARE(swapped, Q_INT64_C(0x0807060504030201));
+    std::int64_t val = INT64_C(0x0102030405060708);
+    std::int64_t swapped = swap_long(val);
+    QCOMPARE(swapped, INT64_C(0x0807060504030201));
 }
 
 //=============================================================================================================
@@ -181,8 +187,8 @@ void TestFiffByteSwap::testSwapLongKnown()
 
 void TestFiffByteSwap::testSwapLongpIdentity()
 {
-    qint64 val = Q_INT64_C(0x0102030405060708);
-    qint64 copy = val;
+    std::int64_t val = INT64_C(0x0102030405060708);
+    std::int64_t copy = val;
     swap_longp(&copy);
     swap_longp(&copy);
     QCOMPARE(copy, val);
@@ -190,9 +196,9 @@ void TestFiffByteSwap::testSwapLongpIdentity()
 
 void TestFiffByteSwap::testSwapLongpKnown()
 {
-    qint64 val = Q_INT64_C(0x0102030405060708);
+    std::int64_t val = INT64_C(0x0102030405060708);
     swap_longp(&val);
-    QCOMPARE(val, Q_INT64_C(0x0807060504030201));
+    QCOMPARE(val, INT64_C(0x0807060504030201));
 }
 
 //=============================================================================================================

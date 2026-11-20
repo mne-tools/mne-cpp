@@ -580,7 +580,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
     //
     std::int32_t totalNumOfClust = 0;
     for (std::int32_t h = 0; h < 2; ++h)
-        totalNumOfClust += p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size();
+        totalNumOfClust += static_cast<std::int32_t>(p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size());
 
     if (this->isFixedOrient())
         p_D = MatrixXd::Zero(this->sol.data.cols(), totalNumOfClust);
