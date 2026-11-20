@@ -300,8 +300,7 @@ void TestCom::udpSharesAMulticastGroup()
     QVERIFY(sender);
     const std::array datagram = {std::byte{1}, std::byte{2}, std::byte{3}};
     const std::error_code sent = sender->send_to(datagram, group, first->port());
-    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable
-        || sent == std::errc::address_not_available) {
+    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable || sent == std::errc::address_not_available) {
         QSKIP("this host has no route for multicast");
     }
     QVERIFY2(!sent, sent.message().c_str());
@@ -378,8 +377,7 @@ void TestCom::udpSharesAPortAndBroadcasts()
     QVERIFY(sender->set_multicast_interface("nowhere") == std::errc::invalid_argument);
     const std::array datagram = {std::byte{4}, std::byte{2}};
     const std::error_code sent = sender->send_to(datagram, group, first->port());
-    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable
-        || sent == std::errc::address_not_available) {
+    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable || sent == std::errc::address_not_available) {
         QSKIP("this host has no route for multicast");
     }
     QVERIFY2(!sent, sent.message().c_str());
