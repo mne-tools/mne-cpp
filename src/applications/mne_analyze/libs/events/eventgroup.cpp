@@ -67,6 +67,14 @@ EventGroup::EventGroup(const EventGroup& g)
 
 //=============================================================================================================
 
+EventGroup::~EventGroup() = default;
+
+//=============================================================================================================
+
+EventGroup& EventGroup::operator=(const EventGroup& g) = default;
+
+//=============================================================================================================
+
 EventGroup::EventGroup(const detail::EventGroupINT& g)
 : id(g.getId())
 , name(g.getName())

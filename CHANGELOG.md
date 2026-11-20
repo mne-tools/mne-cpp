@@ -116,6 +116,12 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The Windows build and test run get further: MNE Analyze's `EventGroup`
+  defines its destructor in the events library, so the events test links
+  with MSVC; the real-time DSP and FIFF sniffer examples, `mne_map_data` and
+  a label test no longer hide locals or narrow `size_t`; and the base example
+  closes its log file before it removes its directory, which Windows refused
+  (the example now checks that the removal succeeds).
 - The BrainAmp and EEGoSports MNE Scan plugins export their classes again on
   Windows: their export macro waited for a definition that no build set, so
   the plugins declared their own classes as imported. A quality test now

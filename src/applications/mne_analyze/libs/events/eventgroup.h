@@ -120,6 +120,23 @@ struct EVENTS_EXPORT EventGroup
      */
     EventGroup(const detail::EventGroupINT& g);
 
+    //=========================================================================================================
+    /**
+     * Defined in the library, so that a client that destroys a group must link it on every platform, as
+     * MSVC already requires for the implicit one.
+     */
+    ~EventGroup();
+
+    //=========================================================================================================
+    /**
+     * EventGroup copy assignment.
+     *
+     * @param [in] g rhs EventGroup
+     *
+     * @return This group.
+     */
+    EventGroup& operator=(const EventGroup& g);
+
     idNum id;         /**< Id of the event group. */
     std::string name; /**< Name of the event group. */
     RgbColor color;   /**< Color of the event. */

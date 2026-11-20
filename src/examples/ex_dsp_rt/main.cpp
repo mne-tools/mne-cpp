@@ -243,8 +243,8 @@ int main(int argc, char* argv[])
     RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
     std::optional<HpiFitResult> fit;
     for (Index start = 0; start < hpiData.cols(); start += 100) {
-        if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
-            fit = std::move(newest);
+        if (auto latest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+            fit = std::move(latest);
         }
     }
     //! [rt_hpi_usage]
@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
     for (Index start = 0; start + 600 <= rawData.cols(); start += 600) { // 1 s blocks
         const MatrixXd block = rawData.middleCols(start, 600);
         rtNoise.update(block);
-        if (const auto cov = rtNoise.covariance(); cov && rtInvOp.update(*cov)) {
+        if (const auto noiseCov = rtNoise.covariance(); noiseCov && rtInvOp.update(*noiseCov)) {
             sources = rtInvOp.apply(block); // dSPM of the normal component, one row per source
         }
     }

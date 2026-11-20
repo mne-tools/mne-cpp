@@ -319,7 +319,7 @@ void TestMneLabelPython::clusterForward_invariants()
     int nAssigned = 0;
     for (int h = 0; h < 2; ++h) {
         const MNEClusterInfo& info = c.src.hemisphereAt(h)->cluster_info;
-        nClusters += info.clusterVertnos.size();
+        nClusters += static_cast<int>(info.clusterVertnos.size());
         QCOMPARE(info.centroidVertno.size(), info.clusterVertnos.size());
         for (int k = 0; k < std::ssize(info.clusterVertnos); ++k) {
             nAssigned += static_cast<int>(info.clusterVertnos[k].size());

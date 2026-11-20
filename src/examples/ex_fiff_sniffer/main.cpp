@@ -107,8 +107,6 @@ int main(int argc, char* argv[])
             mne::FiffInfo FifInfo;
             std::shared_ptr<mne::FiffDirNode> DirNode;
 
-            mne::FiffDigitizerData digData;
-
             if (stream.read_meas_info(stream.dirtree(), FifInfo, DirNode)) {
                 mne::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
 

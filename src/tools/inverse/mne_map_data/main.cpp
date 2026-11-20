@@ -160,12 +160,12 @@ int main(int argc, char* argv[])
     MNEInverseOperator invOp;
     if (!invFile.isEmpty()) {
         qInfo("Loading inverse operator: %s", qPrintable(invFile));
-        auto read = MNEInverseOperator::read(invFile.toStdU16String());
-        if (!read) {
-            qCritical("%s", read.error().what());
+        auto invRead = MNEInverseOperator::read(invFile.toStdU16String());
+        if (!invRead) {
+            qCritical("%s", invRead.error().what());
             return 1;
         }
-        invOp = std::move(*read);
+        invOp = std::move(*invRead);
     } else {
         qInfo("Computing inverse operator from forward solution...");
 

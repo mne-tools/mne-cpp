@@ -44,6 +44,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     analyze_events
+    mne_events
     anShared
     mne_disp
     mne_mne
