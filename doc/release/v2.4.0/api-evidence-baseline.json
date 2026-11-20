@@ -3,12 +3,12 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 485,
-    "exported_free_functions": 152,
+    "exported_classes": 481,
+    "exported_free_functions": 213,
     "registered_classes": 574,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 77,
+    "registered_header_only": 81,
     "registered_stale": 0,
     "registered_with_test": 251,
     "registered_test_unresolved": 0,
@@ -487,6 +487,311 @@
     {
       "name": "write_file_bytes",
       "header": "base/byte_stream.h",
+      "library": "base"
+    },
+    {
+      "name": "CborArray",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "size",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "empty",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "at",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "append",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "reserve",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "begin",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "end",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "begin",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "end",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "from_json_array",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "to_json_array",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "from_string_list",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "CborMap",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "size",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "empty",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "contains",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "value",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "insert",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "append",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "remove",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "keys",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "reserve",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "begin",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "end",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "begin",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "end",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "from_json_object",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "to_json_object",
+      "header": "base/cbor.h",
+      "library": "base"
+    },
+    {
+      "name": "take_at",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "contains",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "from_string_list",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_string_list",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonObject",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "keys",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "insert",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "remove",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "take",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "find",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "find",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "erase",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "without",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "sort_members",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_int",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_integer",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_array",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_array",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_object",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "to_object",
+      "header": "base/json.h",
+      "library": "base"
+    },
+    {
+      "name": "undefined_value",
+      "header": "base/json.h",
       "library": "base"
     },
     {
@@ -2378,8 +2683,8 @@
       "name": "CborArray",
       "header": "base/cbor.h",
       "library": "base",
-      "kind": "exported-class",
-      "exported": true,
+      "kind": "header-only",
+      "exported": false,
       "registered": true,
       "registry_status": "documented",
       "test": "test_base_cbor",
@@ -2404,8 +2709,8 @@
       "name": "CborMap",
       "header": "base/cbor.h",
       "library": "base",
-      "kind": "exported-class",
-      "exported": true,
+      "kind": "header-only",
+      "exported": false,
       "registered": true,
       "registry_status": "documented",
       "test": "test_base_cbor",
@@ -2549,8 +2854,8 @@
       "name": "JsonArray",
       "header": "base/json.h",
       "library": "base",
-      "kind": "exported-class",
-      "exported": true,
+      "kind": "header-only",
+      "exported": false,
       "registered": true,
       "registry_status": "documented",
       "test": "test_base_json",
@@ -2657,8 +2962,8 @@
       "name": "JsonValue",
       "header": "base/json.h",
       "library": "base",
-      "kind": "exported-class",
-      "exported": true,
+      "kind": "header-only",
+      "exported": false,
       "registered": true,
       "registry_status": "documented",
       "test": "test_base_json",
