@@ -116,7 +116,7 @@ Starts a new, empty message.
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 198"
+````cpp title="src/examples/ex_base/main.cpp, line 202"
 // Qt:   QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha256).toHex()
 const std::string fingerprint = to_hex(Sha256::hash("abc"));
 Sha256 incremental; // or feed a large file block by block

@@ -26,8 +26,8 @@ Head position of a streaming MEG recording, fitted from its HPI coils over a sli
 RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
 std::optional<HpiFitResult> fit;
 for (Index start = 0; start < hpiData.cols(); start += 100) {
-    if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
-        fit = std::move(newest);
+    if (auto latest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+        fit = std::move(latest);
     }
 }
 ```
@@ -172,8 +172,8 @@ DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI 
 RtHpi rtHpi(hpiInfo, {.coil_frequencies = {166, 154, 161, 158}, .window = 400, .hop = 200});
 std::optional<HpiFitResult> fit;
 for (Index start = 0; start < hpiData.cols(); start += 100) {
-    if (auto newest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
-        fit = std::move(newest);
+    if (auto latest = rtHpi.update(hpiData.middleCols(start, 100))) { // a fit once a hop has arrived
+        fit = std::move(latest);
     }
 }
 ok &= expect(fit && rtHpi.accepted(*fit) && fit->GoF.minCoeff() > 0.98 && fit->devHeadTrans.from == FIFFV_COORD_DEVICE && fit->devHeadTrans.to == FIFFV_COORD_HEAD,

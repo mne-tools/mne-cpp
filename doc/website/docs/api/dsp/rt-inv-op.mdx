@@ -28,7 +28,7 @@ MatrixXd sources;
 for (Index start = 0; start + 600 <= rawData.cols(); start += 600) { // 1 s blocks
     const MatrixXd block = rawData.middleCols(start, 600);
     rtNoise.update(block);
-    if (const auto cov = rtNoise.covariance(); cov && rtInvOp.update(*cov)) {
+    if (const auto noiseCov = rtNoise.covariance(); noiseCov && rtInvOp.update(*noiseCov)) {
         sources = rtInvOp.apply(block); // dSPM of the normal component, one row per source
     }
 }
@@ -150,7 +150,7 @@ MatrixXd sources;
 for (Index start = 0; start + 600 <= rawData.cols(); start += 600) { // 1 s blocks
     const MatrixXd block = rawData.middleCols(start, 600);
     rtNoise.update(block);
-    if (const auto cov = rtNoise.covariance(); cov && rtInvOp.update(*cov)) {
+    if (const auto noiseCov = rtNoise.covariance(); noiseCov && rtInvOp.update(*noiseCov)) {
         sources = rtInvOp.apply(block); // dSPM of the normal component, one row per source
     }
 }

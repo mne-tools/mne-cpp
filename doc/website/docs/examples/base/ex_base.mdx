@@ -117,6 +117,7 @@ The documented classes this example uses most:
 #include <print>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 //=============================================================================================================
@@ -155,8 +156,11 @@ int main()
     Log::info("logging to {}", utf8_from_path(Log::file()));
     //! [log_file_usage]
     Log::set_file({});
-    std::ifstream logFile(dir / "example.log");
-    const std::string logText{std::istreambuf_iterator<char>(logFile), {}};
+    std::string logText;
+    {
+        std::ifstream logFile(dir / "example.log"); // closed before the directory is removed, which Windows refuses while it is open
+        logText.assign(std::istreambuf_iterator<char>(logFile), {});
+    }
     ok &= expect(logText.find("logging to") != std::string::npos, "Log wrote the message to the log file");
 
     //! [log_usage]
@@ -297,7 +301,9 @@ int main()
     //! [circular_buffer_usage]
     ok &= expect(first == 1.0 && second == 2.0 && buffer.size() == 1, "CircularBuffer pops in FIFO order, one element left");
 
-    std::filesystem::remove_all(dir);
+    std::error_code removeError;
+    std::filesystem::remove_all(dir, removeError);
+    ok &= expect(!removeError, "the example's files were removed");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
