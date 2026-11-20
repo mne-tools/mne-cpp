@@ -213,7 +213,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "FiffDigPointSet(QIODevice&), FiffDigitizerData",
+      "mne_cpp": "FiffDigPointSet::read, FiffDigitizerData",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -237,7 +237,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+      "mne_cpp": "mne::EDFReader / mne_edf2fiff (CLI)",
       "note": "24-bit BDF samples",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -249,7 +249,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
+      "mne_cpp": "mne::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -273,7 +273,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+      "mne_cpp": "mne::EDFReader / mne_edf2fiff (CLI)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -297,7 +297,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "FiffRawData",
+      "mne_cpp": "FiffRawData::read",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -369,7 +369,7 @@
       "kind": "function",
       "domain": "io",
       "status": "partial",
-      "mne_cpp": "BidsRawData::createReader",
+      "mne_cpp": "BidsRawData::create_reader",
       "note": "dispatch for BrainVision/EDF/BDF only",
       "evidence": "parity-record",
       "equivalence": ""
@@ -897,7 +897,7 @@
       "kind": "class",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "Label (FSLIB)",
+      "mne_cpp": "Label (mne)",
       "note": "cortical ROI",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -933,7 +933,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::addReferenceChannels",
+      "mne_cpp": "mne::addReferenceChannels",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -945,7 +945,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FiffAnnotationEventUtils",
+      "mne_cpp": "mne::annotations_from_events",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1017,7 +1017,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FiffAnnotations",
+      "mne_cpp": "mne::count_annotations",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1041,7 +1041,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FiffAnnotationEventUtils",
+      "mne_cpp": "mne::events_from_annotations",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1137,7 +1137,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FiffAnnotations",
+      "mne_cpp": "FiffAnnotations::read",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1161,7 +1161,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "Label::read (FSLIB)",
+      "mne_cpp": "Label::read (mne)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1173,7 +1173,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
+      "mne_cpp": "mne_annot2labels (CLI) / mne",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1233,7 +1233,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::setBipolarReference",
+      "mne_cpp": "mne::setBipolarReference",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1245,7 +1245,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::setEegReference",
+      "mne_cpp": "mne::setEegReference",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1269,7 +1269,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "MNELIB::MNEBem::transform",
+      "mne_cpp": "mne::MNEBem::transform",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1317,7 +1317,7 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
+      "mne_cpp": "mne::FiffProj::compute_from_raw",
       "note": "event-locked epochs only; no continuous segmenting",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1329,7 +1329,7 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "MATHLIB::Linalg::rank",
+      "mne_cpp": "mne::Linalg::rank",
       "note": "matrix rank; no per-type/info/SSP handling",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1341,7 +1341,7 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB::FsAtlasLookup::load",
+      "mne_cpp": "mne::FsAtlasLookup::load",
       "note": "loads aseg; no listing of present labels",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1377,7 +1377,7 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
+      "mne_cpp": "mne (partial)",
       "note": "MNI transform limited",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1461,7 +1461,7 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
+      "mne_cpp": "mne (partial)",
       "note": "split limited",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1593,7 +1593,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::annotateAmplitude",
+      "mne_cpp": "mne::annotateAmplitude",
       "note": "scalar thresholds for all data channels; BAD_ACQ_SKIP spans not skipped; a channel bad for both reasons listed once",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1605,7 +1605,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::annotateMusclZscore",
+      "mne_cpp": "mne::annotateMusclZscore",
       "note": "automatic channel-type choice only",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1629,7 +1629,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::SurfaceLaplacian::compute",
+      "mne_cpp": "mne::SurfaceLaplacian::compute",
       "note": "data matrix plus positions; no Info conversion",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1641,7 +1641,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "SSS basis (DSPLIB)",
+      "mne_cpp": "SSS basis (mne)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1725,7 +1725,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "Infomax ICA (DSPLIB)",
+      "mne_cpp": "Infomax ICA (mne)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1737,7 +1737,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::peakFinderMne",
+      "mne_cpp": "mne::peakFinderMne",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -1761,7 +1761,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::FineCalibration::write",
+      "mne_cpp": "mne::FineCalibration::write",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1773,7 +1773,7 @@
       "kind": "class",
       "domain": "preprocessing",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::EogRegression",
+      "mne_cpp": "mne::EogRegression",
       "note": "matrix input; no Epochs/Evoked, picks argument, proj handling or saving",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1785,7 +1785,7 @@
       "kind": "class",
       "domain": "preprocessing",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
+      "mne_cpp": "mne::ICA::run/excludeComponents, ExtendedInfomax",
       "note": "stateless functions; no info-aware object or save",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1821,7 +1821,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::findBadChannelsMaxwell",
+      "mne_cpp": "mne::findBadChannelsMaxwell",
       "note": "robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1857,7 +1857,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "partial",
-      "mne_cpp": "SSS/tSSS (DSPLIB)",
+      "mne_cpp": "SSS/tSSS (mne)",
       "note": "no movement compensation",
       "evidence": "parity-record",
       "equivalence": ""
@@ -1869,7 +1869,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::EogRegression::fitApply",
+      "mne_cpp": "mne::EogRegression::fitApply",
       "note": "matrix input; no betas input or output",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2097,7 +2097,7 @@
       "kind": "class",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "MNELIB::MNELayout",
+      "mne_cpp": "mne::MNELayout",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2121,7 +2121,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "LayoutMaker::makeLayout (CLI)",
+      "mne_cpp": "LayoutMaker::make_layout (CLI)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2133,7 +2133,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
+      "mne_cpp": "mne::FiffDigMontage::read_captrak",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2145,7 +2145,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
+      "mne_cpp": "mne::FiffDigMontage::read_neuroscan_dat",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2157,7 +2157,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
+      "mne_cpp": "mne::FiffDigMontage::read_egi",
       "note": "positions in metres; mne.channels.read_dig_egi keeps the file's centimetres",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2169,7 +2169,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB dig I/O",
+      "mne_cpp": "mne dig I/O",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2193,7 +2193,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
+      "mne_cpp": "mne::FiffDigMontage::read_localite",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2205,7 +2205,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
+      "mne_cpp": "mne::FiffDigMontage::read_polhemus_isotrak",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2217,7 +2217,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "DISPLIB layout I/O",
+      "mne_cpp": "mne::disp layout I/O",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2229,7 +2229,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
+      "mne_cpp": "mne::FiffDigMontage::read_polhemus_fastscan",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2253,7 +2253,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FiffDigPointSet::transformToHead",
+      "mne_cpp": "FiffDigPointSet::transform_to_head",
       "note": "Fiducials must be present (no sphere-projected fallback).",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2277,7 +2277,7 @@
       "kind": "class",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet",
+      "mne_cpp": "mne::FiffDigPointSet",
       "note": "no channel-name→position montage API",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2289,7 +2289,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::ChannelDerivation::apply",
+      "mne_cpp": "mne::ChannelDerivation::apply",
       "note": "weighted sums only; no median/std",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2301,7 +2301,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "MNELIB::fitMatchedPoints",
+      "mne_cpp": "mne::fitMatchedPoints",
       "note": "rigid point fit; no montage-HPI extraction",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2313,7 +2313,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
+      "mne_cpp": "mne::StatsAdjacency::fromChannelPositions",
       "note": "distance threshold (3x median nearest neighbour), not mne's Delaunay or system templates",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2325,7 +2325,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::LayoutMaker::makeLayout",
+      "mne_cpp": "mne::LayoutMaker::make_layout",
       "note": "projects 3-D points; no direct 2-D input",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2337,7 +2337,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "FiffDigPointSet(QList<FiffDigPoint>)",
+      "mne_cpp": "FiffDigPointSet(std::vector<FiffDigPoint>)",
       "note": "no name→position mapping",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2349,7 +2349,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
+      "mne_cpp": "mne::StandardMontage::montage",
       "note": "standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2361,7 +2361,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
+      "mne_cpp": "mne::LayoutLoader::read_elc",
       "note": ".elc only; no .sfp/.loc/.bvef",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2373,7 +2373,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::SelectionIO::readMNESelFile",
+      "mne_cpp": "mne::SelectionIO::read_sel",
       "note": "reads .sel; no name filter or space fixing",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2385,7 +2385,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "SelectionIO::readMNESelFile",
+      "mne_cpp": "SelectionIO::read_sel",
       "note": "reads .sel; no name filter or space fixing",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2613,7 +2613,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
+      "mne_cpp": "mne::FiffEpochs::concatenateEpochs",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2649,7 +2649,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "RTPROCESSINGLIB event detection",
+      "mne_cpp": "FiffEvents::find_events",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2673,7 +2673,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "mne_cpp": "mne::FiffEpochs::makeFixedLengthEpochs",
       "note": "matrix input; no reject_by_annotation",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2733,7 +2733,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FiffEvents::read, read_from_fif, read_from_ascii",
+      "mne_cpp": "FiffEvents::read, read_fif, read_ascii",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2745,7 +2745,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FiffEvents::write_to_fif, write_to_ascii",
+      "mne_cpp": "FiffEvents::write, write_fif, write_ascii",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2757,7 +2757,7 @@
       "kind": "class",
       "domain": "epochs",
       "status": "partial",
-      "mne_cpp": "MNELIB::MNEEpochDataList",
+      "mne_cpp": "mne::MNEEpochDataList",
       "note": "no crop/resample/save/metadata",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2769,7 +2769,7 @@
       "kind": "class",
       "domain": "epochs",
       "status": "partial",
-      "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "mne_cpp": "mne::MNEEpochData, mne::FiffEpochs::makeFixedLengthEpochs",
       "note": "no info/events-bearing array constructor",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2865,7 +2865,7 @@
       "kind": "function",
       "domain": "cov",
       "status": "partial",
-      "mne_cpp": "INVLIB::computeWhitener",
+      "mne_cpp": "mne::compute_whitener",
       "note": "builds whitener; not applied to evoked",
       "evidence": "parity-record",
       "equivalence": ""
@@ -2889,7 +2889,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "INVLIB::applyForward",
+      "mne_cpp": "mne::apply_forward",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -2937,7 +2937,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "INVLIB::applyForward",
+      "mne_cpp": "mne::apply_forward",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3093,7 +3093,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "FWDLIB BEM",
+      "mne_cpp": "mne BEM",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3105,7 +3105,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
+      "mne_cpp": "mne_list_bem (CLI) / mne",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3141,7 +3141,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "MNELIB::MNEBem::write",
+      "mne_cpp": "mne::MNEBem::write",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3177,7 +3177,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "partial",
-      "mne_cpp": "INVLIB::applyForward",
+      "mne_cpp": "mne::apply_forward",
       "note": "returns evoked-shaped data, no Raw object",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3189,7 +3189,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "partial",
-      "mne_cpp": "INVLIB::applyForward",
+      "mne_cpp": "mne::apply_forward",
       "note": "returns evoked-shaped data, no Raw object",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3201,7 +3201,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "partial",
-      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "mne_cpp": "mne::FwdFieldMap::computeMegMapping/computeEegMapping",
       "note": "mapping matrices; no evoked/trans/subject wrapper",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3249,7 +3249,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "partial",
-      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "mne_cpp": "mne::FwdFieldMap::computeMegMapping/computeEegMapping",
       "note": "mapping matrices; no evoked/trans/subject wrapper",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3297,7 +3297,7 @@
       "kind": "class",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "ECD (INVERSELIB)",
+      "mne_cpp": "ECD (mne)",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3429,7 +3429,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
+      "mne_cpp": "mne::InvLCMV::makeLCMVResolutionMatrix",
       "note": "builds the LCMV filter from fwd/info/cov itself",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3513,7 +3513,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "INVLIB::applyInverseEpochs",
+      "mne_cpp": "mne::apply_inverse_epochs",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3549,7 +3549,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "INVLIB::estimateSnr",
+      "mne_cpp": "mne::estimate_snr",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -3669,7 +3669,7 @@
       "kind": "class",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
+      "mne_cpp": "mne::InvVolumeSourceEstimate",
       "note": "no NIfTI export",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3681,7 +3681,7 @@
       "kind": "class",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvBeamformer",
+      "mne_cpp": "mne::InvBeamformer",
       "note": "no save/read",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3741,7 +3741,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvTfMxne::compute",
+      "mne_cpp": "mne::InvTfMxne::compute",
       "note": "dictionary of 2*nFreqs atoms at one time point, not mne's STFT Gabor frame; no whitening/depth/loose",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3753,7 +3753,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::computeSourcePsd",
+      "mne_cpp": "mne::compute_source_psd",
       "note": "takes an STC; no raw→inverse→PSD pipeline",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3765,7 +3765,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
+      "mne_cpp": "mne::InvResolutionMatrix::getCtf/getCtfs",
       "note": "raw rows only; no mode/n_comp/norm summaries or STC output",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3777,7 +3777,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
+      "mne_cpp": "mne::InvResolutionMatrix::getPsf/getPsfs",
       "note": "raw columns only; no mode/n_comp/norm summaries or STC output",
       "evidence": "parity-record",
       "equivalence": ""
@@ -3789,7 +3789,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
+      "mne_cpp": "mne::InvResolutionMatrix::peakLocalisationError/spatialSpread",
       "note": "peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4041,7 +4041,7 @@
       "kind": "function",
       "domain": "source_space",
       "status": "implemented",
-      "mne_cpp": "FWDLIB helmet surface",
+      "mne_cpp": "mne helmet surface",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -4197,7 +4197,7 @@
       "kind": "function",
       "domain": "source_space",
       "status": "partial",
-      "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
+      "mne_cpp": "mne::SourceMorph::compute, MNEMorphMap::compute",
       "note": "nearest-neighbour surface only; no smoothing/volume",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4341,7 +4341,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::Dpss::compute",
+      "mne_cpp": "mne::Dpss::compute",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -4353,7 +4353,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "implemented",
-      "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
+      "mne_cpp": "mne::Spectral::calculateFFTFreqs",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -4401,7 +4401,7 @@
       "kind": "class",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::CsdResult",
+      "mne_cpp": "mne::CsdResult",
       "note": "no channel names/pick/IO",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4437,7 +4437,7 @@
       "kind": "class",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+      "mne_cpp": "mne::WelchPsdResult, MultitaperPsdResult",
       "note": "PSD and frequencies only; no Info, plotting or I/O",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4449,7 +4449,7 @@
       "kind": "class",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+      "mne_cpp": "mne::WelchPsdResult, MultitaperPsdResult",
       "note": "PSD and frequencies only; no Info, plotting or I/O",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4545,7 +4545,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
+      "mne_cpp": "mne::MultitaperPsd::compute",
       "note": "normalization='full' only, no adaptive weights or fmin/fmax",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4557,7 +4557,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::WelchPsd::compute",
+      "mne_cpp": "mne::WelchPsd::compute",
       "note": "overlap as a fraction, n_per_seg = n_fft, mean average only, no fmin/fmax",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4569,7 +4569,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "Spectrogram::makeSpectrogram",
+      "mne_cpp": "Spectrogram::make_spectrogram",
       "note": "Gaussian-window magnitude only; no complex output/istft",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4593,7 +4593,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
+      "mne_cpp": "mne::MultitaperTfr::computeArray",
       "note": "power for one epoch; no complex/ITC/decim",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4617,7 +4617,7 @@
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
+      "mne_cpp": "mne::MultitaperTfr::computeArray",
       "note": "matrix input; no Epochs/Evoked, averaging or ITC",
       "evidence": "parity-record",
       "equivalence": ""
@@ -4869,7 +4869,7 @@
       "kind": "class",
       "domain": "decoding",
       "status": "implemented",
-      "mne_cpp": "UTILSLIB::Xdawn::fit/apply",
+      "mne_cpp": "mne::Xdawn::fit/apply",
       "note": "",
       "evidence": "parity-record",
       "equivalence": ""
@@ -5121,7 +5121,7 @@
       "kind": "function",
       "domain": "stats",
       "status": "implemented",
-      "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
+      "mne_cpp": "mne::StatsMcCorrection::bonferroni",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -5133,7 +5133,7 @@
       "kind": "function",
       "domain": "stats",
       "status": "implemented",
-      "mne_cpp": "STSLIB::StatsAdjacency::combine",
+      "mne_cpp": "mne::StatsAdjacency::combine",
       "note": "integer dimensions via StatsAdjacency::chain",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -5157,7 +5157,7 @@
       "kind": "function",
       "domain": "stats",
       "status": "implemented",
-      "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
+      "mne_cpp": "mne::StatsMcCorrection::fdr",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -5193,7 +5193,7 @@
       "kind": "function",
       "domain": "stats",
       "status": "implemented",
-      "mne_cpp": "STSLIB::StatsTtest::permutation",
+      "mne_cpp": "mne::StatsTtest::permutation",
       "note": "",
       "evidence": "parity-record",
       "equivalence": "equivalent"
@@ -5325,7 +5325,7 @@
       "kind": "function",
       "domain": "simulation",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::simulateEvoked",
+      "mne_cpp": "mne::simulateEvoked",
       "note": "no iir_filter; STC rows must equal forward columns",
       "evidence": "parity-record",
       "equivalence": ""
@@ -5337,7 +5337,7 @@
       "kind": "function",
       "domain": "simulation",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::simulateStc",
+      "mne_cpp": "mne::simulateStc",
       "note": "caller picks vertices; fixed Gaussian envelopes",
       "evidence": "parity-record",
       "equivalence": ""
@@ -5349,7 +5349,7 @@
       "kind": "function",
       "domain": "simulation",
       "status": "partial",
-      "mne_cpp": "UTILSLIB::simulateStcFromWaveforms",
+      "mne_cpp": "mne::simulateStcFromWaveforms",
       "note": "vertex list + waveforms; no labels/src/value_fun",
       "evidence": "parity-record",
       "equivalence": ""
