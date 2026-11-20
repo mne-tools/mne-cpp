@@ -116,6 +116,11 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- The BrainAmp and EEGoSports MNE Scan plugins export their classes again on
+  Windows: their export macro waited for a definition that no build set, so
+  the plugins declared their own classes as imported. A quality test now
+  checks that the build defines every plugin's and application's export
+  macro.
 - More of what only CI's compilers reject, now also checked locally: MSVC's
   narrowing of `size_t` (C4267) in the MNE-C raw-data buffer sizes and cluster
   counts, names that hide a local or a member (C4456, C4458) in `BidsRawData`
