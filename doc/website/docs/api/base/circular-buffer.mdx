@@ -132,7 +132,7 @@ Drops all elements.
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 222"
+````cpp title="src/examples/ex_base/main.cpp, line 224"
 CircularBuffer<double> buffer(4); // one thread pushes, another pops
 buffer.push(std::array{1.0, 2.0, 3.0});
 double first = 0.0;

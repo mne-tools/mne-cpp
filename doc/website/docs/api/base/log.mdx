@@ -208,7 +208,7 @@ Additionally writes every printed message to a log file, appended, one timestamp
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 82"
+````cpp title="src/examples/ex_base/main.cpp, line 83"
 Log::set_file(dir / "example.log"); // printed to the console, and a plain-text copy here
 Log::info("logging to {}", utf8_from_path(Log::file()));
 Log::set_file({});

@@ -197,7 +197,7 @@ Cuts the file to, or extends it with zeros to, `size` bytes; the position moves 
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 107"
+````cpp title="src/examples/ex_base/main.cpp, line 108"
     auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
     out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
     out->write_big_endian(samples.data(), samples.size());
@@ -208,6 +208,7 @@ in->read_big_endian(count);
 std::vector<float> back(static_cast<std::size_t>(count));
 in->read_big_endian(back.data(), back.size());
 ok &= expect(back == samples && in->at_end(), "FileByteStream read back the big-endian samples");
+in.reset(); // Windows does not remove an open file
 ````
 
 ## Authors of this file

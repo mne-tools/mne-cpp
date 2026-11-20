@@ -232,7 +232,7 @@ after a corrupt line of NDJSON; the options, handler, callback and the queue of 
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 189"
+````cpp title="src/examples/ex_base/main.cpp, line 191"
 JsonStreamParser stream; // NDJSON from a socket, split anywhere
 std::vector<double> latencies;
 stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });
