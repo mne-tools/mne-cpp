@@ -116,6 +116,8 @@ aliases; replace the old spelling as below.
   Migration: a downstream project that relied on MNE-CPP's package to bring
   Qt along (for example `Qt6::Core` through `MNE-CPP::mne_fiff`) calls
   `find_package(Qt6 ...)` itself.
+- `test_com` skips its two multicast cases on a host without a route for
+  multicast, such as the macOS CI runners, instead of failing them.
 - The sanitizer job (`scripts/ci/sanitizers`) builds again: it compiled
   `test_acq_devices` without `mne_acq_devices` and its stand-in SDK
   libraries. In that static build the test found no `streaming_board://` or

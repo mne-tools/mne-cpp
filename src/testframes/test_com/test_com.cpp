@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <system_error>
 #include <thread>
 
 #ifndef _WIN32
@@ -298,7 +299,12 @@ void TestCom::udpSharesAMulticastGroup()
     auto sender = UdpSocket::bind("0.0.0.0", 0);
     QVERIFY(sender);
     const std::array datagram = {std::byte{1}, std::byte{2}, std::byte{3}};
-    QVERIFY(!sender->send_to(datagram, group, first->port()));
+    const std::error_code sent = sender->send_to(datagram, group, first->port());
+    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable
+        || sent == std::errc::address_not_available) {
+        QSKIP("this host has no route for multicast");
+    }
+    QVERIFY2(!sent, sent.message().c_str());
     std::array<std::byte, 8> buffer{};
     for (UdpSocket* member : {&*first, &*second}) {
         const auto size = member->receive(buffer, 1s);
@@ -371,7 +377,12 @@ void TestCom::udpSharesAPortAndBroadcasts()
     QVERIFY(!sender->set_multicast_interface());
     QVERIFY(sender->set_multicast_interface("nowhere") == std::errc::invalid_argument);
     const std::array datagram = {std::byte{4}, std::byte{2}};
-    QVERIFY(!sender->send_to(datagram, group, first->port()));
+    const std::error_code sent = sender->send_to(datagram, group, first->port());
+    if (sent == std::errc::network_unreachable || sent == std::errc::host_unreachable
+        || sent == std::errc::address_not_available) {
+        QSKIP("this host has no route for multicast");
+    }
+    QVERIFY2(!sent, sent.message().c_str());
     std::array<std::byte, 8> buffer{};
     for (UdpSocket* member : {&*first, &*second}) {
         const auto got = member->receive_from(buffer, 1s);
