@@ -123,12 +123,13 @@ aliases; replace the old spelling as below.
   It used to resize through the path, which Windows refuses while the stream
   has the file open, so FIFF writing could not drop an old directory there,
   and which hit another file once the open one had been renamed.
-- The acquisition benchmark gate no longer fails on a slow stretch of the
-  shared runner: a metric more than 20 % worse than the base is measured in
-  five more alternating runs of both builds and fails only if the best of
-  all ten is still worse. Ring and sustained-throughput metrics had failed
-  at random between commits that did not touch `mne_acq`. `acq-bench.json`
-  now keeps every run's value.
+- The acquisition benchmark gate no longer fails on the slow and fast phases
+  of the shared runner, which moved ring, DMA and sustained throughput by up
+  to 2x for both builds alike and failed commits that did not touch
+  `mne_acq`. A gated metric compares the median over the rounds of head
+  relative to base within a round (both run back to back), not the best of
+  each; a regression must also show in five further rounds before it fails.
+  `acq-bench.json` keeps every run's value.
 - Every include sits under the banner of its kind: INCLUDES (the file's own
   header, then headers next to the file, then MNE-CPP and other headers),
   QT INCLUDES, EIGEN INCLUDES and STL INCLUDES, in that order; 980 files had

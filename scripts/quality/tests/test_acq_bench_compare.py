@@ -92,6 +92,20 @@ class TestAcqBenchCompare(unittest.TestCase):
         self.assertEqual({r["name"]: r["status"] for r in rows}, {"ring_1": "REGRESSION", "op_cost": "ok"})
         self.assertEqual(rounds, 10)
 
+    def test_a_rare_fast_run_of_the_base_is_no_regression(self) -> None:
+        # CI run 44904077618: the base hit the machine's fast phase in two of ten rounds, the head in none.
+        # Each round runs both builds back to back, so the ratio within a round cancels the phase.
+        base = iter([1.51, 1.14, 1.08, 1.16, 1.75, 1.46, 1.26, 1.15, 1.19, 1.76])
+        head = iter([1.25, 1.09, 1.19, 1.18, 1.2, 1.09, 1.23, 1.16, 1.19, 1.12])
+
+        def bench(binary: str, quick: bool) -> list[dict]:
+            return run({"ring_dma": next(base if binary == "base" else head)})
+
+        rows, rounds = compare.gate("base", "head", runs=5, confirm_runs=5, tolerance=0.2, quick=False, bench=bench)
+        self.assertEqual(rows[0]["status"], "ok")
+        self.assertEqual(rounds, 5)
+        self.assertEqual((rows[0]["base"], rows[0]["head"]), (1.75, 1.25))  # the best values are still reported
+
     def test_no_second_round_without_a_regression(self) -> None:
         rows, rounds = compare.gate("base", "head", runs=3, confirm_runs=5, tolerance=0.2, quick=False,
                                     bench=lambda binary, quick: run({"ring_1": 4.4}))

@@ -12,9 +12,10 @@
 """Runs mne_acq_bench of a base and a head build alternately and fails on a regression.
 
 Absolute numbers on shared CI machines drift by tens of percent between runs, so the two builds are run
-interleaved on the same machine and each metric keeps its best value. A shared machine also has slow minutes that
-can catch every run of one build, so a regression must show again after further runs of both before it fails;
-the JSON keeps every run's value for the analysis of a failure. Throughput, per-call cost and converter
+interleaved on the same machine, a round running both back to back. A gated metric compares the median over the
+rounds of head relative to base within a round, because a shared machine has slow and fast phases that meet both
+builds of a round but not every round alike; the best values are reported. A regression must show again after
+further rounds before it fails, and the JSON keeps every run's value for the analysis of a failure. Throughput, per-call cost and converter
 rates are gated: head may be at most ``--tolerance`` worse than base. Wake-up latencies and CPU time depend on the
 scheduler of the machine and are compared only for the report. Any metric that has a target (e.g. a p99 wake-up
 latency, a paced rate) must also meet it, whatever the base did.
@@ -60,8 +61,30 @@ def best_of(runs: list[list[dict]]) -> dict[str, dict]:
     return best
 
 
-def compare(base: dict[str, dict], head: dict[str, dict], tolerance: float) -> list[dict]:
-    """One row per head metric with its status: ok, REGRESSION, LOST, TARGET (missed), report or new."""
+def paired_change(name: str, base_runs: list[list[dict]], head_runs: list[list[dict]]) -> float | None:
+    """Median over the rounds of head relative to base within the round, as a change of head; None without pairs.
+
+    The two builds of a round run back to back, so a slow or fast phase of a shared machine meets both."""
+    ratios = []
+    for b_metrics, h_metrics in zip(base_runs, head_runs):
+        b = next((m["value"] for m in b_metrics if m["name"] == name), None)
+        h = next((m["value"] for m in h_metrics if m["name"] == name), None)
+        if b is not None and h is not None and b > 0 and h > 0:
+            ratios.append(h / b)
+    if not ratios:
+        return None
+    ratios.sort()
+    middle = len(ratios) // 2
+    median = ratios[middle] if len(ratios) % 2 else (ratios[middle - 1] + ratios[middle]) / 2
+    return median - 1.0
+
+
+def compare(base: dict[str, dict], head: dict[str, dict], tolerance: float,
+            base_runs: list[list[dict]] | None = None, head_runs: list[list[dict]] | None = None) -> list[dict]:
+    """One row per head metric with its status: ok, REGRESSION, LOST, TARGET (missed), report or new.
+
+    With the runs of both builds, a gated metric is judged by the median ratio within the rounds; the best values
+    are reported either way."""
     rows = []
     for name, h in head.items():
         b = base.get(name)
@@ -73,6 +96,9 @@ def compare(base: dict[str, dict], head: dict[str, dict], tolerance: float) -> l
         else:
             higher = h["better"] == "higher"
             change = (h["value"] - b["value"]) / b["value"]
+            if base_runs and head_runs:
+                paired = paired_change(name, base_runs, head_runs)
+                change = change if paired is None else paired
             row["change"] = change
             worse = -change if higher else change
             if name.startswith(REPORT_ONLY_PREFIXES):
@@ -107,10 +133,17 @@ def gate(base: str, head: str, runs: int, confirm_runs: int, tolerance: float, q
     base_runs: list = []
     head_runs: list = []
     alternate(base, head, runs, quick, bench, base_runs, head_runs)
-    rows = compare(best_of(base_runs), best_of(head_runs), tolerance)
+    rows = compare(best_of(base_runs), best_of(head_runs), tolerance, base_runs, head_runs)
     if confirm_runs > 0 and any(r["status"] == "REGRESSION" for r in rows):
+        first = {r["name"]: r["status"] for r in rows}
         alternate(base, head, confirm_runs, quick, bench, base_runs, head_runs)
-        rows = compare(best_of(base_runs), best_of(head_runs), tolerance)
+        confirm = {r["name"]: r["status"] for r in compare(best_of(base_runs[runs:]), best_of(head_runs[runs:]), tolerance,
+                                                           base_runs[runs:], head_runs[runs:])}
+        rows = compare(best_of(base_runs), best_of(head_runs), tolerance, base_runs, head_runs)
+        for r in rows:
+            # A regression must show in the first rounds and again in the further ones
+            if r["status"] in ("REGRESSION", "ok"):
+                r["status"] = "REGRESSION" if first.get(r["name"]) == confirm.get(r["name"]) == "REGRESSION" else "ok"
     for r in rows:
         r["base_runs"] = per_run(base_runs, r["name"])
         r["head_runs"] = per_run(head_runs, r["name"])
