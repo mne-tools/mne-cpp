@@ -252,7 +252,8 @@ void TestBaseProcess::describesTheHostLikeQSysInfo()
     QVERIFY2(ours.starts_with("macOS ") && qt.find(ours.substr(6)) != std::string::npos, (ours + " vs " + qt).c_str());
     QVERIFY(ours.substr(6).starts_with(std::to_string(version.majorVersion()) + '.' + std::to_string(version.minorVersion())));
 #else
-    QVERIFY2(ours.find(QSysInfo::productVersion().toStdString()) != std::string::npos, (ours + " vs " + qt).c_str());
+    // "Windows Server 2025 (10.0.26100)" vs "Windows Server 2025 Version 24H2"
+    QVERIFY2(qt.starts_with(ours.substr(0, ours.find(" ("))), (ours + " vs " + qt).c_str());
 #endif
 }
 

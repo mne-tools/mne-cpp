@@ -909,9 +909,9 @@ void TestAcqRecorder::recordsBids()
     QVERIFY(splitRecorder->stop().ok());
     const auto files = splitRecorder->files();
     QVERIFY(files.size() >= 2);
-    QCOMPARE(QString::fromStdString(files[0]),
+    QCOMPARE(QDir::fromNativeSeparators(QString::fromStdString(files[0])),
              splitRoot + QStringLiteral("/sub-02/meg/sub-02_task-rest_run-01_split-01_meg.fif"));
-    QCOMPARE(QString::fromStdString(files[1]),
+    QCOMPARE(QDir::fromNativeSeparators(QString::fromStdString(files[1])),
              splitRoot + QStringLiteral("/sub-02/meg/sub-02_task-rest_run-01_split-02_meg.fif"));
     QVERIFY(!QFileInfo::exists(splitRoot + QStringLiteral("/sub-02/meg/sub-02_task-rest_run-01_meg.fif")));
 }
