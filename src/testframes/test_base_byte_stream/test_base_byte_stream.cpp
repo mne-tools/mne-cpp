@@ -100,6 +100,7 @@ private slots:
     void fileStreamRoundTripAndModes();
     void fileStreamFailsOnMissingFile();
     void fileStreamCloseWritesAndEnds();
+    void fileStreamResizesTheFileItHasOpen();
     void readFileBytesPlainAndGzip();
     void textFilesRoundTripExactly();
     void benchmarkReadBigEndianFloats_data();
@@ -332,6 +333,30 @@ void TestUtilsByteStream::fileStreamCloseWritesAndEnds()
     MemoryByteStream memory;
     memory.close();
     QVERIFY(memory.reopen());
+}
+
+//=============================================================================================================
+
+void TestUtilsByteStream::fileStreamResizesTheFileItHasOpen()
+{
+    // Cutting a file goes through the open file, not its path: Windows refuses to resize a file through its path
+    // while the stream holds it, and the path may by now name another file or none.
+    QTemporaryDir dir;
+    const std::filesystem::path path = path_from_utf8(dir.filePath(QStringLiteral("open.bin")).toStdString());
+    const std::filesystem::path moved = path_from_utf8(dir.filePath(QStringLiteral("moved.bin")).toStdString());
+    auto stream = FileByteStream::open(path, FileByteStream::Mode::Write);
+    QVERIFY(stream);
+    QVERIFY(stream->write_big_endian(std::int64_t{1}) && stream->write_big_endian(std::int64_t{2}));
+    QVERIFY(stream->flush());
+    std::error_code error;
+    std::filesystem::rename(path, moved, error);
+    if (error) {
+        QSKIP("this file system does not rename an open file");
+    }
+    QVERIFY(stream->resize(8));
+    QCOMPARE(stream->size(), std::uint64_t(8));
+    stream.reset();
+    QCOMPARE(std::filesystem::file_size(moved), std::uintmax_t(8));
 }
 
 //=============================================================================================================

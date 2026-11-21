@@ -19,6 +19,12 @@
 
 #include <zlib.h>
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
@@ -52,6 +58,18 @@ bool seekFile(std::FILE* file, std::uint64_t position)
     return fseeko(file, static_cast<off_t>(position), SEEK_SET) == 0;
 #endif
 }
+
+/** Sets the length of the open @p file; through its path, Windows refuses while the file is open. */
+bool truncateFile(std::FILE* file, std::uint64_t size)
+{
+#ifdef _WIN32
+    return _chsize_s(_fileno(file), static_cast<long long>(size)) == 0;
+#else
+    return ftruncate(fileno(file), static_cast<off_t>(size)) == 0;
+#endif
+}
+
+//=============================================================================================================
 
 std::FILE* openFile(const std::filesystem::path& path, FileByteStream::Mode mode)
 {
@@ -270,9 +288,7 @@ bool FileByteStream::resize(std::uint64_t size)
     if (!m_file || m_mode == Mode::Read || !flush()) {
         return false;
     }
-    std::error_code ec;
-    std::filesystem::resize_file(m_path, size, ec);
-    if (ec) {
+    if (!truncateFile(m_file, size)) {
         return false;
     }
     m_size = size;

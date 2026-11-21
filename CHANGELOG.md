@@ -104,6 +104,10 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- `FileByteStream::resize()` cuts the file through the stream's own handle.
+  It used to resize through the path, which Windows refuses while the stream
+  has the file open, so FIFF writing could not drop an old directory there,
+  and which hit another file once the open one had been renamed.
 - The acquisition benchmark gate no longer fails on a slow stretch of the
   shared runner: a metric more than 20 % worse than the base is measured in
   five more alternating runs of both builds and fails only if the best of
