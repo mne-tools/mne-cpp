@@ -691,7 +691,7 @@
         "python"
       ],
       "gui": false,
-      "qskip_sites": 17,
+      "qskip_sites": 18,
       "spawns_processes": true,
       "ci_excluded_on": [],
       "ci": {
