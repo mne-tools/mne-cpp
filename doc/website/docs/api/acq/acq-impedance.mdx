@@ -57,7 +57,7 @@ if (!reader || !device->start().ok()) {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 206"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 213"
     for (const AcqImpedance& z : *impedances) {
         if (z.ohms > kMaxImpedanceOhms) {
             std::printf("  check electrode %s: %.0f kOhm\n",

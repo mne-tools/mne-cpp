@@ -365,7 +365,7 @@ Refactored: make_projection (dipole_fit_setup.c)
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 288"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 289"
 // The file stores its 4 SSP projectors as inactive; make_projection switches them on
 std::unique_ptr<MNEProjOp> proj = MNEProjOp::make_projection({rawFile.fileName().toStdU16String()}, rawInfo.chInfo).value();
 proj->assign_channels(mneRaw->ch_names);

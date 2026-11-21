@@ -69,8 +69,8 @@ It is exercised by:
 // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
 auto skull = MNESurface::read_bem_surface2(bemPath.toStdU16String(), FIFFV_BEM_SURF_ID_BRAIN, true);
 skull->compute_surface_cm();
-const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * M_PI);
-const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * M_PI);
+const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * std::numbers::pi);
+const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * std::numbers::pi);
 
 // The same surface as an MNE-C viewer display surface
 MNEMshDisplaySurfaceSet display;

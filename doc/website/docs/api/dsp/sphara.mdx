@@ -17,7 +17,7 @@ class; the functions live directly in the library namespace.
 
 `#include <dsp/sphara.h>`
 
-SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
+SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2016-2026 MNE-CPP Authors.
 
 SPHARA represents a discrete EEG / MEG sensor montage as a triangulated manifold and decomposes its spatial degrees of freedom into the eigen- functions of the discrete Laplace–Beltrami operator on that mesh. Truncating the expansion at the lowest `iNBaseFct` harmonics suppresses high spatial frequencies that are dominated by sensor noise and reference artefacts, giving a denoising / smoothing projector that is the spatial-domain analogue of a low-pass filter.
 
@@ -73,4 +73,8 @@ Constructs a SPHARA operator.
 
 ## Authors of this file
 
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

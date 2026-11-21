@@ -48,7 +48,7 @@ if (uri == "--list") {
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 100"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 103"
 AcqParameterInfo info;
 QLineEdit* edit = nullptr;
 QCheckBox* check = nullptr;
@@ -59,7 +59,7 @@ QComboBox* combo = nullptr;
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 183"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 190"
         std::printf("%s://  %s\n", scheme.scheme.c_str(), scheme.description.c_str());
         for (const AcqParameterInfo& parameter : scheme.parameters) {
             std::printf("    %-9s %-7s %-6s %s\n", parameter.name.c_str(), parameter.type.c_str(),

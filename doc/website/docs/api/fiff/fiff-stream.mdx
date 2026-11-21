@@ -1274,7 +1274,7 @@ ok &= expect(opened && measNodes.size() == 1 && nchan && *nchan->to_int() == 376
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 103"
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 96"
 mne::FiffStream stream(std::make_unique<mne::MemoryByteStream>(std::move(bytes)));
 stream.set_little_endian(littleEndian);
 ````

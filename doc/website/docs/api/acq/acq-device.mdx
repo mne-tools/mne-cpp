@@ -230,7 +230,7 @@ Opens a source through [`AcqDeviceRegistry`](/docs/api/acq/acq-device-registry),
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 167"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 170"
 m_settings->setFrameShape(QFrame::NoFrame);
 m_uri = new QLineEdit;
 m_uri->setReadOnly(true);
@@ -241,7 +241,7 @@ m_uri->setToolTip("The source URI built from the settings; mne_acq and AcqDevice
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 70"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 77"
 auto device = AcqDevice::open(uri);
 if (!device) {
     std::fprintf(stderr, "%s\n", device.error().text().c_str());
@@ -262,7 +262,7 @@ while (recorder->isRecording()) { // a session of fixed duration ends the stream
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 197"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 204"
 auto device = AcqDevice::open(uri);
 if (!device) {
     std::fprintf(stderr, "Cannot open %s: %s\n", uri.c_str(), device.error().text().c_str());

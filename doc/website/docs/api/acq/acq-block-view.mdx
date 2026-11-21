@@ -112,7 +112,7 @@ classDiagram
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 296"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 303"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();
@@ -133,7 +133,7 @@ for (std::size_t e = 0; e < samples.events().size(); ++e) {
 
 Polhemus digitiser: stream stylus poses, register fiducials captured with the button, collect points.
 
-````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 88"
+````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 96"
 const AcqBlockView& block = **view;
 std::vector<float> frames(kWidth * block.sampleCount());
 if (!decode(block, AcqMatrixRef<float>::columnMajor(frames.data(), kWidth, block.sampleCount())).ok()) {

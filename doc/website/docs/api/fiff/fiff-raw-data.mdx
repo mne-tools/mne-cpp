@@ -347,7 +347,7 @@ ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround(
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 233"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 232"
 // ---------------------------------------------------------------------------------------------------------
 // HPI: track the head from the four coils of the test recording
 FiffRawData hpiRaw((dataDir + "/MEG/sample/test_hpiFit_raw.fif").toStdString());
@@ -361,7 +361,7 @@ ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 99"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 106"
 FiffRawData raw(QString::fromStdString(path).toStdString());
 const FiffDeviceInfo& recorded = raw.info.device_info; // backend, device and source id of the recording
 std::printf("%s: %d channels, samples %d to %d, device %s '%s' (%s)\n", path.c_str(), raw.info.nchan,

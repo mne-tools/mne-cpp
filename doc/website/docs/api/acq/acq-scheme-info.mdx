@@ -48,7 +48,7 @@ if (uri == "--list") {
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 153"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 156"
 // Device
 m_devices = new QListWidget;
 for (const AcqSchemeInfo& scheme : m_schemes) {
@@ -69,7 +69,7 @@ m_settings->setWidgetResizable(true);
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 181"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 188"
     const AcqDeviceRegistry& registry = AcqDeviceRegistry::instance();
     for (const AcqSchemeInfo& scheme : registry.schemes()) {
         std::printf("%s://  %s\n", scheme.scheme.c_str(), scheme.description.c_str());

@@ -110,7 +110,7 @@ if (client && connection && !client->write(std::as_bytes(std::span(std::string_v
 
 Communication library: receive datagrams and talk to a TCP server with timeouts.
 
-````cpp title="src/examples/ex_com/main.cpp, line 108"
+````cpp title="src/examples/ex_com/main.cpp, line 107"
 std::println("TCP: serve a client and answer what it sends");
 auto listening = TcpServer::listen("127.0.0.1", 0); // 0: the system chooses the port
 auto client = TcpSocket::connect("127.0.0.1", listening ? listening->port() : 0, 500ms);

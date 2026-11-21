@@ -37,7 +37,7 @@ const bool lossless = recorded.lost == 0 && recorded.eventsLost == 0 && recorded
 
 Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
-````cpp title="src/examples/ex_acq_performance/main.cpp, line 756"
+````cpp title="src/examples/ex_acq_performance/main.cpp, line 759"
     const AcqStreamStats produced = input->stream().stats();
     const AcqReaderStats recorded = recorder->stats();
     const bool lossless = recorded.lost == 0 && recorded.eventsLost == 0 && recorded.delivered == produced.committed;

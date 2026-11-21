@@ -382,7 +382,7 @@ ok &= expect(events.num_events() == 25 && events.events.row(0) == RowVector3i(13
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 230"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 231"
 QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 const FiffEvents events = FiffEvents::find_events(raw).value(); // rising edges on STI 014
@@ -402,7 +402,7 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 212"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 210"
     events = FiffEvents::read_fif(t_sEventName.toStdU16String()).value().events;
     printf("Events read from %s\n", t_sEventName.toUtf8().constData());
 } else {

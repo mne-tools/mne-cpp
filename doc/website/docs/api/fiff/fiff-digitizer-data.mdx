@@ -112,7 +112,7 @@ ok &= expect(digData.nfids() == 3 && (Map<Vector3f>(digData.mri_fids[0].r) - Vec
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 143"
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 136"
             const FiffDigitizerData& digData = *read;
             std::cout << "Digitizer data found.\n";
             std::cout << "Number of digitizer points: " << digData.points.size() << "\n";

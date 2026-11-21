@@ -1446,7 +1446,7 @@ Returns one row per cardinal dipole direction (x, y, z).
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 124"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 123"
 auto bem = FwdBemModel::fwd_bem_load_homog_surface((data + "/subjects/sample/bem/sample-5120-bem.fif").toStdU16String());
 bem->fwd_bem_load_recompute_solution((data + "/subjects/sample/bem/sample-5120-bem-sol.fif").toStdU16String(), FWD_BEM_LINEAR_COLL, 0);
 bem->fwd_bem_set_head_mri_t(FiffCoordTrans((data + "/MEG/sample/all-trans.fif").toStdU16String(), FIFFV_COORD_MRI, FIFFV_COORD_HEAD));

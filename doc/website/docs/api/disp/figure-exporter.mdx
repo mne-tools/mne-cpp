@@ -93,7 +93,7 @@ Writes `image` as the next figure.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 223"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 224"
 // Written only when MNE_CPP_FIGURE_DIR names a directory
 FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
 FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
@@ -122,7 +122,7 @@ tfplot.show();
 
 Multitaper spectra, power spectral density and cross-spectral density of random test signals.
 
-````cpp title="src/examples/ex_spectral/main.cpp, line 152"
+````cpp title="src/examples/ex_spectral/main.cpp, line 153"
 FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
 FigureExporter::save(plotPsd, "psd", "PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide.");
 FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains.");

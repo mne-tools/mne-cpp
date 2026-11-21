@@ -124,7 +124,7 @@ Waits for bytes and reads what is there, at most `buffer.size()`.
 
 Communication library: receive datagrams and talk to a TCP server with timeouts.
 
-````cpp title="src/examples/ex_com/main.cpp, line 155"
+````cpp title="src/examples/ex_com/main.cpp, line 154"
 ok &= expect(SerialPort::open("/no/such/port", 9600).error() == std::errc::no_such_file_or_directory,
              "a missing port is no_such_file_or_directory");
 ````

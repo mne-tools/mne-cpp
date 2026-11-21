@@ -160,7 +160,7 @@ Compares two 4x4 transformation matrices by evaluating their rotation and transl
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 182"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 183"
 InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
 InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 ````
@@ -169,7 +169,7 @@ InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 109"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 108"
 updater.prepareDataAndProjectors(segment, MatrixXd::Identity(info->nchan, info->nchan));
 // The coil frequencies are known but not their order; the first fit with bOrderFrequencies finds it.
 const InvHpiModelParameters model(std::vector<int>({154, 158, 161, 166}), info->sfreq, info->linefreq, true);

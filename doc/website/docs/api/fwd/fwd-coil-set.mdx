@@ -224,7 +224,7 @@ Read a coil definitions from file.
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 115"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 114"
 auto templates = FwdCoilSet::read_coil_defs(coilDefs.toStdU16String()); // integration points per coil type
 auto coils = templates->create_meg_coils(meg, static_cast<int>(meg.size()), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
 const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates

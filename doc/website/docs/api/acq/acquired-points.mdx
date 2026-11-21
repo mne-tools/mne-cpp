@@ -185,7 +185,7 @@ Calls the change callback.
 
 Polhemus digitiser: stream stylus poses, register fiducials captured with the button, collect points.
 
-````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 118"
+````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 126"
 AcquiredPoints points;
 int changes = 0;
 points.set_on_changed([&changes] { ++changes; }); // a Qt application emits a signal here

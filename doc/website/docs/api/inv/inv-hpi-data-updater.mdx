@@ -112,7 +112,7 @@ inline get functions for private member variables.
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 108"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 107"
 InvHpiDataUpdater updater(info); // good MEG channels, their sensors and the digitised coil positions
 updater.prepareDataAndProjectors(segment, MatrixXd::Identity(info->nchan, info->nchan));
 // The coil frequencies are known but not their order; the first fit with bOrderFrequencies finds it.
@@ -132,7 +132,7 @@ const Vector3d reference = maxfilter.block<1, 3>(0, 4).transpose();
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 182"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 183"
 InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
 InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 ````

@@ -279,7 +279,7 @@ ok &= expect(both.size() == 2 && both[0].rr().rows() == 155407, std::format("FsS
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 120"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 121"
 FsSurfaceSet t_surfSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(surfOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
 FsAnnotationSet t_annotationSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(annotOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
 ````

@@ -231,7 +231,7 @@ ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data.nrow == 1 && pca.da
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 430"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 431"
 const std::filesystem::path eveName = tmp.filePath("audvis-eve.fif").toStdU16String();
 const bool eventsWritten = events.write_fif(eveName).has_value();
 const MatrixXi eventsBack = FiffEvents::read(eveName).value().events;

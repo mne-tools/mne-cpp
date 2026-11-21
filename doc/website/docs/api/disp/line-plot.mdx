@@ -24,7 +24,7 @@ QVector<double> x;
 QVector<double> y;
 for (int i = 0; i <= 100; ++i) {
     x.append(i / 100.0);
-    y.append(std::sin(2.0 * M_PI * x.last()));
+    y.append(std::sin(2.0 * std::numbers::pi * x.last()));
 }
 LinePlot line(x, y, "sin(2 pi t)");
 line.setXLabel("t [s]");
@@ -199,7 +199,7 @@ Returns the number of series in the plot.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 157"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 158"
 LinePlot line(x, y, "sin(2 pi t)");
 line.setXLabel("t [s]");
 line.setYLabel("amplitude");
@@ -219,7 +219,7 @@ for (int py = 0; py < lineImage.height(); ++py) {
 
 Multitaper spectra, power spectral density and cross-spectral density of random test signals.
 
-````cpp title="src/examples/ex_spectral/main.cpp, line 96"
+````cpp title="src/examples/ex_spectral/main.cpp, line 97"
 //Plot hanning window
 VectorXd hann = matTaps.row(0).transpose();
 LinePlot plotWindow(toVector(hann), "Hanning window");

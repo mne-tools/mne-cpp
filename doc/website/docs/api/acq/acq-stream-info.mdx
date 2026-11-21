@@ -63,7 +63,7 @@ for (std::size_t c = 0; c < kChannels; ++c) {
 
 Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
-````cpp title="src/examples/ex_acq_performance/main.cpp, line 659"
+````cpp title="src/examples/ex_acq_performance/main.cpp, line 662"
 AcqStreamInfo inInfo;
 inInfo.name = "neural";
 inInfo.format = AcqSampleFormat::Int16;
@@ -83,7 +83,7 @@ outInfo.name = "stim";
 
 Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 
-````cpp title="src/examples/ex_acq_scope/main.cpp, line 182"
+````cpp title="src/examples/ex_acq_scope/main.cpp, line 185"
 Trace(const AcqStreamInfo& info, std::size_t extraRows)
 : title(QString("%1  %2 Hz").arg(QString::fromStdString(info.name)).arg(info.sfreq).toStdString())
 , sfreq(info.sfreq)

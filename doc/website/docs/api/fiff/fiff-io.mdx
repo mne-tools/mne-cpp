@@ -167,7 +167,7 @@ ok &= expect(io.evoked.size() == 4 && io.raw.empty(), "FiffIO finds the 4 evoked
 
 Read the data sets of a FIFF file through the generic FiffIO interface and write its raw data back to disk.
 
-````cpp title="src/examples/ex_fiff_io/main.cpp, line 67"
+````cpp title="src/examples/ex_fiff_io/main.cpp, line 74"
 FiffIO p_fiffIO(files);
 ````
 
@@ -175,7 +175,7 @@ FiffIO p_fiffIO(files);
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 111"
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 104"
 mne::FiffIO p_fiffIO(parser.value(inputOption).toStdU16String());
 ````
 

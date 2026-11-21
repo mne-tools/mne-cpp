@@ -60,7 +60,7 @@ std::printf("recorded %llu samples (%llu lost) and %llu events in %llu buffers, 
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 335"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 338"
         static_cast<void>(m_recorder->stop());
         const AcqRecorderStats stats = m_recorder->stats();
         m_recorder.reset();
@@ -74,7 +74,7 @@ Pick an acquisition device or its simulator, watch it, record it to FIFF and pla
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 91"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 98"
 const AcqRecorderStats stats = recorder->stats();
 std::printf("recorded %llu samples (%llu lost) and %llu events in %llu buffers, %.1f MB, direct I/O %s\n",
             static_cast<unsigned long long>(stats.samples), static_cast<unsigned long long>(stats.lost),

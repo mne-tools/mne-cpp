@@ -52,7 +52,7 @@ for (std::size_t e = 0; e < view->events().size(); ++e) {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 246"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 253"
 const std::size_t maxView = capacity - length;
 std::vector<float> history(capacity * frame);
 std::vector<float> block(maxView * frame);
@@ -70,7 +70,7 @@ std::uint64_t received = 0;
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 584"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 587"
     const auto width = static_cast<std::uint64_t>(m_width);
     std::erase_if(m_events, [&](const AcqEvent& e) { return e.sample + width < m_next; }); // overwritten
     QVector<ChannelRhiView::EventMarker> markers;
@@ -91,7 +91,7 @@ if (ended) {
 
 Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
-````cpp title="src/examples/ex_acq_performance/main.cpp, line 428"
+````cpp title="src/examples/ex_acq_performance/main.cpp, line 431"
             AcqEvent marker;
             marker.sample = s;
             marker.duration = kSpikeWidth;

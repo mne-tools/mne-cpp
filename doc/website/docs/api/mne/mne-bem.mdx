@@ -260,7 +260,7 @@ Reads the BEM surfaces from an open FIFF stream.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 148"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 149"
 const QString bemPath = data + "/subjects/sample/bem/sample-5120-bem.fif";
 MNEBem bem(bemPath.toStdU16String()); // one MNEBemSurface per BEM layer
 const MNEBemSurface& innerSkull = bem[0];
@@ -273,7 +273,7 @@ ok &= expect(bem.size() == 1 && innerSkull.id == FIFFV_BEM_SURF_ID_BRAIN && inne
 
 Read a BEM model from FIFF, write it back and verify the round trip.
 
-````cpp title="src/examples/ex_read_bem/main.cpp, line 75"
+````cpp title="src/examples/ex_read_bem/main.cpp, line 78"
 // Read the BEM
 MNEBem t_Bem(parser.value(bemFileInOption).toStdU16String());
 ````

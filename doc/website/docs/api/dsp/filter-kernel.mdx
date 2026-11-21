@@ -281,7 +281,7 @@ for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
 
 Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
 
-````cpp title="src/examples/ex_filtering/main.cpp, line 87"
+````cpp title="src/examples/ex_filtering/main.cpp, line 89"
 printf("Filtering...");
 if (mne::filterFile(parser.value(outputOption).toStdU16String(),
                     pRaw,
@@ -313,4 +313,12 @@ ok &= expect(smooth.size() == tones.size() && std::fabs(kept - 1.0) < 0.02 && re
 
 ## Authors of this file
 
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Florian Schlembach &lt;fschlembach@web.de&gt;
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Matti Hamalainen &lt;msh@nmr.mgh.harvard.edu&gt;
+- Jens Haueisen &lt;jens.haueisen@tu-ilmenau.de&gt;
+- Ruben Doerfel &lt;doerfelruben@aol.com&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;
+- Juan GPC &lt;jgarciaprieto@mgh.harvard.edu&gt;
+- Christof Pieloth &lt;pieloth@labp.htwk-leipzig.de&gt;

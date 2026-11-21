@@ -215,7 +215,7 @@ Off by default to save memory.
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 91"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 94"
 ConnectivitySettings m_settings;
 std::vector<Network> m_rawNetworkData; /**< Results as computed. */
 std::vector<Network> m_networkData;    /**< Results averaged over the selected band and normalized. */
@@ -226,7 +226,7 @@ std::map<std::string, Eigen::Vector4i> mColor;
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 200"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 199"
 // ---------------------------------------------------------------------------------------------------------
 // Connectivity: coherence of the newest trials, updated trial by trial
 ConnectivitySettings settings;
@@ -247,7 +247,7 @@ for (int trial = 0; trial < 8; ++trial) {
 
 Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
-````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 191"
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 188"
 ConnectivitySettings conSettings;
 ````
 

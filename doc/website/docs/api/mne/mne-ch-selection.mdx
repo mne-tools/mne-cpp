@@ -135,7 +135,7 @@ Create a user selection of the given channel names (MNE-C `mne_ch_selection_thes
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 273"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 274"
 MNEChSelection sel; // channel names are stored without spaces
 sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);

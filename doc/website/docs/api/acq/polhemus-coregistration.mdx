@@ -590,7 +590,7 @@ Restores a state from `session_state()`; entries it lacks keep their current val
 
 Polhemus digitiser: stream stylus poses, register fiducials captured with the button, collect points.
 
-````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 77"
+````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 85"
 PolhemusCoregistration coreg; // station 1 = pen, station 2 = head tracker
 // Model fiducials are the pen fiducials turned 90 deg about z and moved 5 cm in x; the registration must find that transform
 const Eigen::Affine3f truth = Eigen::Translation3f(0.05f, 0.0f, 0.0f) * Eigen::AngleAxisf(0.5f * static_cast<float>(EIGEN_PI), Eigen::Vector3f::UnitZ());

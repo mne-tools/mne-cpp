@@ -95,8 +95,25 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 #include <acq/acq.h>
-
 #include <disp/plots/helpers/figureexporter.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QApplication>
+#include <QFont>
+#include <QImage>
+#include <QLabel>
+#include <QPainter>
+#include <QPolygonF>
+#include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <array>
@@ -112,20 +129,6 @@ The documented classes this example uses most:
 #include <string>
 #include <thread>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QApplication>
-#include <QFont>
-#include <QImage>
-#include <QLabel>
-#include <QPainter>
-#include <QPolygonF>
-#include <QTimer>
-#include <QVBoxLayout>
-#include <QWidget>
 
 //=============================================================================================================
 // USED NAMESPACES

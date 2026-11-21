@@ -189,7 +189,7 @@ To a multicast group it leaves through the interface of the default route, or th
 
 Communication library: receive datagrams and talk to a TCP server with timeouts.
 
-````cpp title="src/examples/ex_com/main.cpp, line 94"
+````cpp title="src/examples/ex_com/main.cpp, line 93"
 std::println("UDP: a device sends datagrams to a port");
 auto udp = UdpSocket::bind("127.0.0.1", 0); // 0: the system chooses the port
 if (!udp) {

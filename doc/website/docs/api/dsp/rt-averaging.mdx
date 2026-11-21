@@ -112,7 +112,7 @@ Drops all epochs and evoked responses and starts a new stream.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 138"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 137"
 // 20 samples before and 80 from each onset on stim row 2, the mean of the newest 10 epochs per event code
 RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 2, .averages = 10});
 for (const MatrixXd& block : blocks) {

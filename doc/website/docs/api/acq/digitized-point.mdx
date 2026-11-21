@@ -41,7 +41,7 @@ const DigitizedPoint& kept = points.points().front(); // kind, label, FIFF ident
 
 Polhemus digitiser: stream stylus poses, register fiducials captured with the button, collect points.
 
-````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 121"
+````cpp title="src/examples/ex_acq_polhemus/main.cpp, line 129"
 points.append({PointKind::HeadShape, "HSP-1", 1, Eigen::Vector3f(0.0f, 0.08f, 0.05f)});
 points.append({PointKind::Eeg, "Cz", 1, Eigen::Vector3f(0.0f, 0.0f, 0.09f)});
 points.undo_last(PointKind::HeadShape);

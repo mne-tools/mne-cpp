@@ -76,7 +76,7 @@ Blocks may have any number of samples; a block with another number of channels t
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 188"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 187"
 RtNoise noise(64, info200->sfreq, 10); // 64-point FFT over 10 accumulated blocks
 MatrixXd spectrum;
 for (int b = 0; b < 10; ++b) {

@@ -60,7 +60,7 @@ std::printf("recorded %llu samples (%llu lost) and %llu events in %llu buffers, 
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 481"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 484"
                                          m_hasSimulator && m_simulate->isChecked() ? "_sim" : "",
                                          QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss").toStdString());
     m_path = m_folder / name;
@@ -81,7 +81,7 @@ m_sfreq = info->sfreq;
 
 Record an acquisition source to FIFF and to a BIDS dataset while it runs, and read the file back.
 
-````cpp title="src/examples/ex_acq_record/main.cpp, line 75"
+````cpp title="src/examples/ex_acq_record/main.cpp, line 82"
 AcqRecorderOptions options;
 options.device = device->description(); // device and URI go into the file's measurement info
 const std::string path = QDir(directory).filePath("oddball_raw.fif").toStdString();

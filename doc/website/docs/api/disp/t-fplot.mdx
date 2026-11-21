@@ -95,7 +95,7 @@ Plots all frequency bins.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 214"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 215"
 MatrixXd tf = MatrixXd::Zero(50, 100);  // 100 samples at 100 Hz: 50 frequency rows of 1 Hz x 100 times
 tf.middleRows(20, 10).setConstant(1.0); // power in the 20-29 Hz bins
 TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
@@ -118,7 +118,7 @@ TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0))
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 110"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 113"
 std::shared_ptr<TFplot> m_pTfPlot;
 Eigen::MatrixXd m_matEvoked;
 Eigen::MatrixXd m_matEvokedSource;

@@ -116,7 +116,7 @@ while (average[kTarget].count < kEnoughTargets) {
 
 Live multi-channel, multi-rate scope of a streaming source with a closed-loop stimulator on the same clock.
 
-````cpp title="src/examples/ex_acq_scope/main.cpp, line 254"
+````cpp title="src/examples/ex_acq_scope/main.cpp, line 257"
         const std::size_t n = view->sampleCount();
         const std::uint64_t first = view->firstSample();
         shared.lost.fetch_add(view->lost(), std::memory_order_relaxed);
@@ -135,7 +135,7 @@ Live multi-channel, multi-rate scope of a streaming source with a closed-loop st
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 296"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 303"
 // Native samples to volts in one pass, whatever the device's format and layout.
 const AcqBlockView& samples = **view;
 const std::size_t n = samples.sampleCount();
@@ -156,7 +156,7 @@ for (std::size_t e = 0; e < samples.events().size(); ++e) {
 
 Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
-````cpp title="src/examples/ex_acq_performance/main.cpp, line 546"
+````cpp title="src/examples/ex_acq_performance/main.cpp, line 549"
                 // encode() handles a pulse that crosses the end of the ring (two parts).
                 AcqConvertOptions raw;
                 raw.scaling = AcqScaling::Raw;

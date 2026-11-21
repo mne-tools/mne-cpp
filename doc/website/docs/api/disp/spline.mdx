@@ -163,7 +163,7 @@ Sets the label of the y axis.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 142"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 143"
 Spline spline(nullptr, "Amplitude spline");
 spline.setData(classLimits, counts);
 spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
@@ -176,7 +176,7 @@ ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its c
 
 Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
-````cpp title="src/examples/ex_histogram/main.cpp, line 209"
+````cpp title="src/examples/ex_histogram/main.cpp, line 210"
 //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
 Spline* displayObj = new Spline(0, QString("%1 of %2 clustered sources at 100 ms").arg(method).arg(sourceEstimateData.size()));
 //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");

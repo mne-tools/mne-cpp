@@ -258,7 +258,7 @@ ok &= expect(smooth.size() == tones.size() && std::fabs(kept - 1.0) < 0.02 && re
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 267"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 274"
 // ERPs live below 30 Hz: low-pass like mne.filter.filter_data, then correct the baseline.
 const Eigen::MatrixXd filtered = FirFilter::filterData(raw, info->sfreq, -1.0, kLowPassHz);
 for (std::size_t e = 0; e < eeg.size(); ++e) {

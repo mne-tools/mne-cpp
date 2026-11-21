@@ -55,7 +55,7 @@ const FiffCov noiseCov = FiffCov::compute_from_epochs(raw, events.events, {1, 2}
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 395"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 396"
 covDescFile.close();
 std::optional<CovDescription> covariance = MNEDescriptionParser::read_covariance(covDescPath.toStdU16String());
 covariance->rej.megGradReject = covariance->rej.megMagReject = covariance->rej.eogReject = 0.0f; // EEG limit only

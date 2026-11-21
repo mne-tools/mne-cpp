@@ -285,7 +285,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 231"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 232"
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 const FiffEvents events = FiffEvents::find_events(raw).value(); // rising edges on STI 014
 // Epochs of event 1 from -100 to 300 ms, no rejection
@@ -304,7 +304,7 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
-````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 110"
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 113"
 std::shared_ptr<TFplot> m_pTfPlot;
 Eigen::MatrixXd m_matEvoked;
 Eigen::MatrixXd m_matEvokedSource;
@@ -315,7 +315,7 @@ mne::MNEEpochDataList epochs;
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 154"
+````cpp title="src/examples/ex_averaging/main.cpp, line 155"
 FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
                                                      events,
                                                      fTMin,

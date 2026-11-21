@@ -77,7 +77,7 @@ if (auto at = mapSampleExact(inClock, outClock, s, kStimDelayTicks)) {
 
 Closed-loop acquisition and stimulation with mne_acq, and its sustained throughput per device class.
 
-````cpp title="src/examples/ex_acq_performance/main.cpp, line 518"
+````cpp title="src/examples/ex_acq_performance/main.cpp, line 521"
 const AcqTimebase inClock = reader.stream().timebase();
 const AcqTimebase outClock = stimulator.stream().timebase();
 bool above = false;

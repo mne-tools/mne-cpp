@@ -52,7 +52,7 @@ classDiagram
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 249"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 250"
         qInfo() << "Iteration" << i << "Of" << vecTime.size()
                 << " Duration " << fTimer << "ms"
                 << " Error" << hpiFitResult.errorDistances[0] * 1000 << hpiFitResult.errorDistances[1] * 1000 << hpiFitResult.errorDistances[2] * 1000 << hpiFitResult.errorDistances[3] * 1000
@@ -69,7 +69,7 @@ qInfo() << "Iterations:" << vecTime.size()
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 223"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 221"
         printf("Error while read events.\n");
         return 0;
     }
@@ -90,7 +90,7 @@ Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parc
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 235"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 234"
         printf("Error while read events.\n");
         return 0;
     }

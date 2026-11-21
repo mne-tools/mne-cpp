@@ -64,7 +64,7 @@ dipfit function is adapted from Fieldtrip Software.
 
 Inverse library: continuous head position (HPI) fitting.
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp, line 135"
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 134"
 // One coil's magnetic-dipole fit, as InvHpiFit runs it per coil: seeded 5 mm off the fitted position.
 const MatrixXd coilsDevice = fit.devHeadTrans.apply_inverse_trans(updater.getHpiDigitizer().cast<float>()).cast<double>();
 InvHpiFitData coilFit;
