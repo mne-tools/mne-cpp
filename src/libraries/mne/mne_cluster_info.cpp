@@ -62,7 +62,7 @@ void MNEClusterInfo::clear()
 
 bool MNEClusterInfo::write(const std::filesystem::path& p_sFileName) const
 {
-    std::ofstream out(p_sFileName);
+    std::ofstream out(p_sFileName, std::ios::binary);
     if (!out) {
         mne::Log::warning("MNEClusterInfo::write - Cannot open {}", mne::utf8_from_path(p_sFileName));
         return false;
@@ -93,7 +93,7 @@ bool MNEClusterInfo::write(const std::filesystem::path& p_sFileName) const
     // Next to the main file: <dir>/centroids_<name>
     std::filesystem::path centroidsPath = p_sFileName;
     centroidsPath.replace_filename("centroids_" + p_sFileName.filename().string());
-    std::ofstream centroids(centroidsPath);
+    std::ofstream centroids(centroidsPath, std::ios::binary);
     for (const std::int32_t vertno : centroidVertno)
         centroids << vertno << ", ";
     return static_cast<bool>(centroids.flush());

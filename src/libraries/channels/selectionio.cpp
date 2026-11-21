@@ -108,7 +108,7 @@ bool SelectionIO::write_sel(const std::filesystem::path& path, std::span<const C
 {
     if (!has_extension(path, ".sel"))
         return false;
-    std::ofstream file(path);
+    std::ofstream file(path, std::ios::binary);
     if (!file) {
         Log::debug("Cannot write the selection file {}", path.string());
         return false;
@@ -133,7 +133,7 @@ bool SelectionIO::write_mon(const std::filesystem::path& directory, std::span<co
             return false;
         }
         const std::filesystem::path fileName = path_from_utf8(group.name + ".mon");
-        std::ofstream file(directory / fileName);
+        std::ofstream file(directory / fileName, std::ios::binary);
         if (!file) {
             Log::debug("Cannot write the montage file {}", (directory / fileName).string());
             return false;

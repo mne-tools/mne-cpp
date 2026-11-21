@@ -74,7 +74,7 @@ namespace mne
 template<typename Derived>
 bool write_matrix(const Eigen::DenseBase<Derived>& matrix, const std::filesystem::path& path, std::string_view description = {})
 {
-    std::ofstream file(path);
+    std::ofstream file(path, std::ios::binary);
     if (!file) {
         mne::Log::warning("write_matrix: cannot open {} for writing", path.string());
         return false;

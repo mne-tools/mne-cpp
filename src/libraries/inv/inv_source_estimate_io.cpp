@@ -100,7 +100,7 @@ bool InvSourceEstimateIO::write_csv(const InvSourceEstimate& stc,
         return false;
     }
 
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     if (!out) {
         mne::Log::warning("[InvSourceEstimateIO::write_csv] Cannot open: {}", path.string());
         return false;
@@ -191,7 +191,7 @@ bool InvSourceEstimateIO::write_matrix(const InvSourceEstimate& stc,
         return false;
     }
 
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     if (!out) {
         mne::Log::warning("[InvSourceEstimateIO::write_matrix] Cannot open: {}", path.string());
         return false;

@@ -165,7 +165,7 @@ std::vector<DerivationRule> ChannelDerivation::readDefinitionFile(const std::fil
 
 bool ChannelDerivation::writeDefinitionFile(const std::filesystem::path& path, const std::vector<DerivationRule>& rules)
 {
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     if (!out) {
         Log::warning("ChannelDerivation::writeDefinitionFile - cannot open: {}", utf8_from_path(path));
         return false;

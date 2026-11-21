@@ -207,7 +207,7 @@ bool Log::set_file(const std::filesystem::path& path)
 {
     std::ofstream file;
     if (!path.empty()) {
-        file.open(path, std::ios::app);
+        file.open(path, std::ios::app | std::ios::binary); // LF line ends on every platform
         if (!file) {
             return false;
         }

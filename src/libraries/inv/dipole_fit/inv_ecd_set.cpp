@@ -232,7 +232,7 @@ bool InvEcdSet::save_dipoles_dip(const std::filesystem::path& path) const
     if (path.empty() || this->size() == 0) {
         return true;
     }
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     if (!out) {
         mne::Log::critical("Not able to write to: {}", path.string());
         return false;

@@ -121,7 +121,7 @@ bool LayoutMaker::write_lout(const std::filesystem::path& path,
                              const StringList& names,
                              const LayoutOptions& options)
 {
-    std::ofstream file(path);
+    std::ofstream file(path, std::ios::binary);
     if (!file) {
         Log::critical("Cannot open the layout file {}", path.string());
         return false;

@@ -109,6 +109,10 @@ aliases; replace the old spelling as below.
   read twice at once (reading an evoked file with its projections crashed),
   and a file held by a `QFile` or `QTemporaryFile` could not be written
   (`filterFile`, `mne_cov2proj`, `mne_make_source_space`).
+- Text files written by the libraries (events, selections, layouts, matrices,
+  dipoles, source-estimate CSV, cluster info, the log file) end their lines
+  with LF on Windows too, like the files of MNE-C, MNE-Python and FreeSurfer;
+  a quality test refuses a text-mode `std::ofstream` in the libraries.
 - `PythonRunner` hands out the lines of a Python child without the CR that
   Python on Windows writes before each LF, in `std_out`, `std_err`, the line
   callback and the progress parser; results compared with `"5"` or matrices

@@ -399,7 +399,7 @@ void ComputeFwd::initFwd()
 
     if (m_pSettings->filter_spaces) {
         if (!m_pSettings->mindistoutname.empty()) {
-            filteredFile.open(mne::path_from_utf8(m_pSettings->mindistoutname));
+            filteredFile.open(mne::path_from_utf8(m_pSettings->mindistoutname), std::ios::binary);
             if (!filteredFile) {
                 mne::Log::critical("{}", m_pSettings->mindistoutname);
                 return;

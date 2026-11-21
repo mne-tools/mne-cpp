@@ -190,7 +190,7 @@ Expected<void> FiffEvents::write_fif(const std::filesystem::path& path) const
 
 Expected<void> FiffEvents::write_ascii(const std::filesystem::path& path, float sfreq) const
 {
-    std::ofstream out(path);
+    std::ofstream out(path, std::ios::binary);
     if (!out) {
         return fail(ErrorCode::Io, "cannot write {}", mne::utf8_from_path(path));
     }
