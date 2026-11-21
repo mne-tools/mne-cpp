@@ -1,12 +1,20 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     filterkernel.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Felix Arndt <Felix.Arndt@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     February 2014
  * @brief    Contains all FilterKernel.
  */
 

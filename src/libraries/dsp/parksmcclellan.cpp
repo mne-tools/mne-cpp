@@ -1,12 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     parksmcclellan.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     February 2014
  * @brief    Definition of the ParksMcClellan class: Remez exchange design of linear-phase FIR filters.
  */
 

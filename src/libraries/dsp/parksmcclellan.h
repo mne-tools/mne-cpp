@@ -1,12 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     parksmcclellan.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     February 2014
  * @brief    Parks–McClellan equiripple FIR design via the Remez exchange algorithm.
  *
  * The Parks–McClellan algorithm computes the optimal linear-phase FIR filter

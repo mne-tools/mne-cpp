@@ -1,12 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     cosinefilter.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     November 2014
  * @brief    Frequency-domain cosine-tapered (raised-cosine) FIR filter design.
  *
  * CosineFilter assembles an FIR magnitude response directly in the frequency

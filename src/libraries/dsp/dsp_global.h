@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     dsp_global.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @since    0.1.0
+ * @date     July 2012
  * @brief    Export macro of mne_dsp — Digital signal processing (filtering, spectrograms, real-time averaging, HPI, noise reduction).
  *
  * @c DSPSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by

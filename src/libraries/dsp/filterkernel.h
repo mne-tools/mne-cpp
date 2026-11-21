@@ -1,12 +1,20 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     filterkernel.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @since    0.1.0
+ * @date     February 2014
  * @brief    Linear-phase FIR filter kernel with overlap-add FFT convolution back-end.
  *
  * FilterKernel is the core FIR engine of the DSP library: it owns the impulse
