@@ -43,6 +43,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDir>
 #include <QtTest>
 #include <QObject>
 #include <QFile>
@@ -129,7 +130,8 @@ private:
 void TestCrossvalCovariance::initTestCase()
 {
     // --- Paths ---
-    m_sDataPath = QString::fromStdString(mne::utf8_from_path(PythonTestHelper::test_data_path())) + "/";
+    // Forward slashes: the path goes into Python string literals, where a backslash starts an escape
+    m_sDataPath = QDir::fromNativeSeparators(QString::fromStdString(mne::utf8_from_path(PythonTestHelper::test_data_path()))) + "/";
     m_sRawFile = m_sDataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
 
     QVERIFY2(QFile::exists(m_sRawFile),
