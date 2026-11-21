@@ -109,7 +109,13 @@ aliases; replace the old spelling as below.
   The Ledoit-Wolf and OAS shrinkage and the Factor Analysis EM of `mne_sts`
   and the Local Outlier Factor of `mne_dsp` are implemented in those
   libraries (adapted from Skigen; the results agree to 1e-12) and work on the
-  `(n_channels, n_samples)` data directly instead of a transposed copy.
+  `(n_channels, n_samples)` data directly instead of a transposed copy. They
+  are header templates on the scalar type, so an embedded target estimates
+  float data in float: `ledoit_wolf_covariance()`, `oas_covariance()` and
+  `factor_analysis_covariance()` (which also returns the loadings, the noise
+  variances and the iterations) in `sts/sts_cov_estimators.h`, and
+  `local_outlier_factor()` in `dsp/bad_channels_lof.h`. `StsCovEstimators`
+  and `computeLofScores()` call them in double precision.
   `init.sh`/`init.bat` and CI no longer clone Skigen, `SKIGEN_RELEASE_REF` and
   `SKIGEN_DEV_REF` are gone from `src/external/external_deps.env`, and the
   dependency audit refuses a `Skigen::Skigen` link. Migration: delete an old

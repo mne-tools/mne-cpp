@@ -268,6 +268,20 @@ private slots:
                  qPrintable(QString("Expected flat EEG4 in bads, got: %1").arg(QString::fromStdString(mne::join(bads, ", ")))));
     }
 
+    void testLocalOutlierFactorInFloat()
+    {
+        // An embedded target scores float features in float, close to the double scores
+        MatrixXd features = MatrixXd::Random(30, 3);
+        features.row(7) *= 25.0;
+        const VectorXd scores = computeLofScores(features, 5);
+        const VectorXf scoresF = local_outlier_factor(features.cast<float>().eval(), 5);
+        QVERIFY((scoresF.cast<double>() - scores).cwiseAbs().maxCoeff() < 1e-4);
+        Index worst = 0;
+        scoresF.maxCoeff(&worst);
+        QCOMPARE(worst, Index(7));
+        QVERIFY(local_outlier_factor(features, 30).isOnes()); // not fewer samples than neighbours
+    }
+
     void cleanupTestCase()
     {
     }

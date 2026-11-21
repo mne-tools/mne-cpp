@@ -2997,6 +2997,52 @@
       "python_url": null
     },
     {
+      "name": "ShrunkCovariance",
+      "module": "sts",
+      "header": "sts/sts_cov_estimators.h",
+      "origin": "sklearn",
+      "mne_c_tool": null,
+      "mne_python": "mne.cov (compute_covariance methods)",
+      "sklearn": "sklearn.covariance.LedoitWolf, OAS (assume_centered=True)",
+      "test": "test_sts_cov_estimators",
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage"
+      ],
+      "example_mode": "run",
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Result of ledoit_wolf_covariance() and oas_covariance(), header templates on float or double.",
+      "documented": true,
+      "sidebar_position": 11,
+      "guide": null,
+      "python_equiv": "mne.cov (compute_covariance methods)",
+      "python_url": null
+    },
+    {
+      "name": "FactorAnalysisCovariance",
+      "module": "sts",
+      "header": "sts/sts_cov_estimators.h",
+      "origin": "sklearn",
+      "mne_c_tool": null,
+      "mne_python": "mne.cov (compute_covariance methods)",
+      "sklearn": "sklearn.decomposition.FactorAnalysis",
+      "test": "test_sts_cov_estimators",
+      "example": "ex_sts_statistics",
+      "example_snippet": [
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage"
+      ],
+      "example_mode": "run",
+      "status": "done",
+      "skigen_candidate": false,
+      "notes": "Result of factor_analysis_covariance(), a header template on float or double: covariance, loadings, noise variances, log-likelihood, iterations.",
+      "documented": true,
+      "sidebar_position": 12,
+      "guide": null,
+      "python_equiv": "mne.cov (compute_covariance methods)",
+      "python_url": null
+    },
+    {
       "name": "StatsCluster",
       "module": "sts",
       "header": "sts/sts_cluster.h",

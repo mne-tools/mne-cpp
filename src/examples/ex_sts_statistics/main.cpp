@@ -145,6 +145,17 @@ int main(int argc, char* argv[])
     ok &= expectRow(covOas.row(0), {0.5037989001234694, 0.29085091438365596, -0.06132398797245758}, 1e-12, "OAS covariance row 0 = sklearn");
     ok &= expect(method >= 0 && method <= 5 && covBest.rows() == 3, "autoSelect returns a 3 x 3 covariance and a method index 0-5");
 
+    //! [sts_cov_templates_usage]
+    // The estimators are templates on the scalar type: float data, as on an embedded target, stays float
+    const MatrixXf dataF = data.cast<float>();
+    const ShrunkCovariance<float> lwF = ledoit_wolf_covariance(dataF);
+    const FactorAnalysisCovariance<double> fa = factor_analysis_covariance(data, 1); // W W^T + diag(psi), one factor
+    //! [sts_cov_templates_usage]
+    ok &= expect(std::fabs(lwF.shrinkage - shrinkLw) < 1e-5 && (lwF.covariance.cast<double>() - covLw).cwiseAbs().maxCoeff() < 1e-5,
+                 std::format("ledoit_wolf_covariance in float: shrinkage {:g}", lwF.shrinkage));
+    ok &= expect(fa.loadings.rows() == 3 && fa.loadings.cols() == 1 && (fa.covariance - fa.covariance.transpose()).norm() < 1e-12,
+                 std::format("factor_analysis_covariance: 3 x 1 loadings after {} iterations", fa.iterations));
+
     //! [stats_adjacency_usage]
     // Two triangles sharing the edge 1-2 form a 4-vertex mesh
     MatrixX3i tris(2, 3);

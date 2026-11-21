@@ -97,6 +97,10 @@ private slots:
     // Log-likelihood tests
     void testGaussianLogLikelihoodFinite();
 
+    // Templates
+    void testTemplatesEstimateInFloat();
+    void testFactorAnalysisModelParts();
+
     void cleanupTestCase();
 
 private:
@@ -471,6 +475,45 @@ void TestStsCovEstimators::testGaussianLogLikelihoodFinite()
              qPrintable(QString("Log-likelihood=%1, expected finite").arg(ll)));
     QVERIFY2(ll < 0.0,
              qPrintable(QString("Log-likelihood=%1, expected negative").arg(ll)));
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testTemplatesEstimateInFloat()
+{
+    // An embedded target estimates float data in float, close to the double estimate
+    const MatrixXd data = generateGaussianData(12, 300);
+    const MatrixXf dataF = data.cast<float>();
+
+    const ShrunkCovariance<float> lw = ledoit_wolf_covariance(dataF);
+    const ShrunkCovariance<float> oas = oas_covariance(dataF);
+    const FactorAnalysisCovariance<float> fa = factor_analysis_covariance(dataF, 3, 30, 0.0f); // the same iterations in both
+    const auto [lwRef, alphaRef] = StsCovEstimators::ledoitWolf(data);
+    const auto [oasRef, rhoRef] = StsCovEstimators::oas(data);
+    const MatrixXd faRef = factor_analysis_covariance(data, 3, 30, 0.0).covariance;
+
+    QVERIFY((lw.covariance.cast<double>() - lwRef).norm() < 1e-4 * lwRef.norm());
+    QVERIFY(std::abs(lw.shrinkage - alphaRef) < 1e-4);
+    QVERIFY((oas.covariance.cast<double>() - oasRef).norm() < 1e-4 * oasRef.norm());
+    QVERIFY(std::abs(oas.shrinkage - rhoRef) < 1e-4);
+    QVERIFY((fa.covariance.cast<double>() - faRef).norm() < 1e-3 * faRef.norm());
+}
+
+//=============================================================================================================
+
+void TestStsCovEstimators::testFactorAnalysisModelParts()
+{
+    const MatrixXd data = generateGaussianData(8, 400);
+    const FactorAnalysisCovariance<double> fa = factor_analysis_covariance(data, 2);
+
+    QCOMPARE(fa.loadings.rows(), 8);
+    QCOMPARE(fa.loadings.cols(), 2);
+    QVERIFY(fa.iterations >= 1 && fa.iterations <= 200);
+    QVERIFY((fa.noise_variance.array() > 0.0).all());
+    MatrixXd model = fa.loadings * fa.loadings.transpose();
+    model.diagonal() += fa.noise_variance;
+    QVERIFY(model.isApprox(fa.covariance, 1e-12));
+    QCOMPARE(fa.log_likelihood, StsCovEstimators::factorAnalysis(data, 2).second);
 }
 
 //=============================================================================================================

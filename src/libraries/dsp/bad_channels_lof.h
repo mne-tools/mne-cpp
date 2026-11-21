@@ -45,6 +45,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cstddef>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -99,9 +102,76 @@ DSPSHARED_EXPORT mne::StringList findBadChannelsLof(const Eigen::MatrixXd& data,
 
 //=============================================================================================================
 /**
+ * @brief Local Outlier Factor of every sample, as scikit-learn's @c LocalOutlierFactor computes it.
+ *
+ * Breunig et al. (2000): the ratio of the neighbours' mean local reachability density to the sample's own,
+ * from the @p n_neighbors nearest samples by Euclidean distance. A header template, so float features on an
+ * embedded target are scored in float. Adapted from Skigen (MIT, Copyright (c) 2026 The Skigen
+ * Contributors).
+ *
+ * @param[in] features      Feature matrix, n_samples x n_features.
+ * @param[in] n_neighbors   Number of neighbours; all ones are returned unless it is below n_samples.
+ *
+ * @return The factor of each sample, n_samples; values well above 1 mark outliers.
+ */
+template<class Derived>
+Eigen::Matrix<typename Derived::Scalar, Eigen::Dynamic, 1> local_outlier_factor(const Eigen::MatrixBase<Derived>& features, int n_neighbors)
+{
+    using Scalar = typename Derived::Scalar;
+    using Vector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+    const Eigen::Index n = features.rows();
+    const Eigen::Index k = n_neighbors;
+    if (k < 1 || n <= k) {
+        return Vector::Ones(n);
+    }
+
+    Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> dist = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>::Zero(n, n);
+    for (Eigen::Index i = 0; i < n; ++i) {
+        for (Eigen::Index j = i + 1; j < n; ++j) {
+            dist(i, j) = dist(j, i) = (features.row(i) - features.row(j)).norm();
+        }
+    }
+
+    // The k nearest neighbours of each sample, itself excluded, and its k-distance
+    std::vector<Eigen::Index> neighbours(static_cast<std::size_t>(n * k));
+    Vector kDistance(n);
+    std::vector<Eigen::Index> order(static_cast<std::size_t>(n));
+    for (Eigen::Index i = 0; i < n; ++i) {
+        std::iota(order.begin(), order.end(), Eigen::Index(0));
+        std::sort(order.begin(), order.end(), [&dist, i](Eigen::Index a, Eigen::Index b) { return dist(i, a) < dist(i, b); });
+        std::copy_n(order.begin() + 1, k, neighbours.begin() + i * k);
+        kDistance(i) = dist(i, order[static_cast<std::size_t>(k)]);
+    }
+    const auto neighbour = [&neighbours, k](Eigen::Index i, Eigen::Index j) {
+        return neighbours[static_cast<std::size_t>(i * k + j)];
+    };
+
+    // Local reachability density, then the ratio of the neighbours' densities to the sample's own
+    constexpr Scalar tiny = Scalar(1e-30);
+    Vector lrd(n);
+    for (Eigen::Index i = 0; i < n; ++i) {
+        Scalar reach = 0;
+        for (Eigen::Index j = 0; j < k; ++j) {
+            reach += std::max(kDistance(neighbour(i, j)), dist(i, neighbour(i, j)));
+        }
+        lrd(i) = reach > tiny ? static_cast<Scalar>(k) / reach : Scalar(1);
+    }
+    Vector lof(n);
+    for (Eigen::Index i = 0; i < n; ++i) {
+        Scalar neighbourLrd = 0;
+        for (Eigen::Index j = 0; j < k; ++j) {
+            neighbourLrd += lrd(neighbour(i, j));
+        }
+        lof(i) = lrd(i) > tiny ? neighbourLrd / static_cast<Scalar>(k) / lrd(i) : Scalar(1);
+    }
+    return lof;
+}
+
+//=============================================================================================================
+/**
  * @brief Compute LOF scores for a feature matrix.
  *
- * Pure algorithmic LOF implementation operating on feature vectors.
+ * local_outlier_factor() in double precision.
  *
  * @param[in] features   Feature matrix (n_points x n_features).
  * @param[in] k          Number of neighbours.
