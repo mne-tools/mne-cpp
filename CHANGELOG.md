@@ -118,8 +118,11 @@ aliases; replace the old spelling as below.
   and `computeLofScores()` call them in double precision.
   `init.sh`/`init.bat` and CI no longer clone Skigen, `SKIGEN_RELEASE_REF` and
   `SKIGEN_DEV_REF` are gone from `src/external/external_deps.env`, and the
-  dependency audit refuses a `Skigen::Skigen` link. Migration: delete an old
-  `src/external/skigen` clone.
+  dependency audit refuses a `Skigen::Skigen` link. The API registry no
+  longer records Skigen ports: `skigen_candidate` and `skigen_target` are
+  gone from `doc/api_registry.json`, `validate_api_registry.py` rejects them
+  and no longer cross-checks a Skigen registry (`--skigen-registry` is gone).
+  Migration: delete an old `src/external/skigen` clone.
 - The libraries build, install and link without Qt. `MNE_BUILD_QT` (default
   `ON`) builds the Qt-based parts: `mne_disp`, `mne_disp3D`, the applications
   with their plugins, the CLI tools and the QtTest tests and examples. With

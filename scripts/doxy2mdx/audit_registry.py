@@ -116,7 +116,7 @@ def make_stub(name: str, module: str, header: str, position: int, origin: str) -
     return {
         "name": name, "module": module, "header": header, "origin": origin,
         "mne_c_tool": None, "mne_python": None, "sklearn": None, "test": None, "example": None,
-        "status": "documented", "skigen_candidate": False, "documented": True,
+        "status": "documented", "documented": True,
         "sidebar_position": position, "guide": None, "python_equiv": None, "python_url": None,
     }
 

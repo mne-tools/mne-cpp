@@ -240,5 +240,14 @@ class TestRepositoryRegistry(unittest.TestCase):
         self.assertEqual(policy["example_debt"]["ceiling"], len(policy["example_debt"]["names"]))
 
 
+
+class TestRetiredFields(unittest.TestCase):
+    def test_skigen_port_fields_are_rejected(self) -> None:
+        ok, issues = validator.validate_no_retired_fields({"classes": [dict(GOOD, skigen_candidate=False)]})
+        self.assertFalse(ok)
+        self.assertEqual(issues, ["'Widget': retired field 'skigen_candidate'"])
+        self.assertTrue(validator.validate_no_retired_fields({"classes": [GOOD]})[0])
+
+
 if __name__ == "__main__":
     unittest.main()

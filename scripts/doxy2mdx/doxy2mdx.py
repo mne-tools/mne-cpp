@@ -6,7 +6,7 @@
 doxy2mdx.py — Convert Doxygen XML output to Docusaurus MDX pages for
 MNE-CPP's public API reference.
 
-Ported from src/external/skigen/doc/doxygen2mdx.py and adapted to:
+Ported from Skigen's doc/doxygen2mdx.py and adapted to:
   * MNE-CPP's mne:: and mne::disp:: namespaced compound names.
   * Qt-specific Q_SIGNALS: / Q_SLOTS: sections.
   * SPDX-style author headers.

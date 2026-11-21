@@ -11,8 +11,7 @@
  *             1. JSON is well-formed and has a `classes` array.
  *             2. Every `header` path exists under `src/libraries/`.
  *             3. Every `test` directory (when not null) exists under `src/testframes/`.
- *             4. No entry with `skigen_candidate: true` AND `status: "done"`
- *                lacks a non-empty `skigen_target`.
+ *             4. No entry carries the retired Skigen port fields `skigen_candidate` and `skigen_target`.
  *
  *           The repository root is the source tree the test was configured from (MNE_REPO_ROOT),
  *           so the test also runs when BINARY_OUTPUT_DIRECTORY is outside the repository.
@@ -123,24 +122,20 @@ private slots:
         QCOMPARE(missing, 0);
     }
 
-    void testSkigenTargetPresence()
+    void testNoRetiredSkigenFields()
     {
         const QJsonArray classes = m_registry.object().value("classes").toArray();
-        int violations = 0;
+        int retired = 0;
         for (const QJsonValue& val : classes) {
-            if (!val.isObject())
-                continue;
             const QJsonObject cls = val.toObject();
-            const bool skigenCand = cls.value("skigen_candidate").toBool(false);
-            const QString status = cls.value("status").toString();
-            const QString target = cls.value("skigen_target").toString();
-            if (skigenCand && status == "done" && target.isEmpty()) {
-                qWarning() << "Violation:" << cls.value("name").toString()
-                           << "has skigen_candidate=true, status=done, but no skigen_target";
-                ++violations;
+            for (const char* field : {"skigen_candidate", "skigen_target"}) {
+                if (cls.contains(QLatin1String(field))) {
+                    qWarning() << cls.value("name").toString() << "carries the retired field" << field;
+                    ++retired;
+                }
             }
         }
-        QCOMPARE(violations, 0);
+        QCOMPARE(retired, 0);
     }
 };
 

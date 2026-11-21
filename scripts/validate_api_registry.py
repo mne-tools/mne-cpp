@@ -10,11 +10,10 @@ Enforces the following invariants:
 1. JSON is well-formed.
 2. Every 'header' path exists under 'src/libraries/' (relative).
 3. Every 'test' (when not null) corresponds to a directory under 'src/testframes/'.
-4. No entry with skigen_candidate: true AND status: "done" lacks a skigen_target.
+4. No entry carries the retired Skigen port fields (skigen_candidate, skigen_target).
 5. Example evidence: example targets, snippets, modes, data,
    screenshots and exemptions; eligible entries without an example are errors
    unless listed in the shrink-only example_debt of api_evidence_policy.json.
-6. Cross-reference with src/external/skigen/doc/api_registry.json if present.
 
 Exit codes:
   0 - all validations passed
@@ -88,17 +87,17 @@ def validate_tests(repo_root: Path, registry: Dict[str, Any]) -> Tuple[bool, Lis
     return (len(missing) == 0, missing)
 
 
-def validate_skigen_targets(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
-    issues: List[str] = []
-    for cls in registry.get("classes", []):
-        skigen_cand = cls.get("skigen_candidate", False)
-        status = cls.get("status")
-        has_target = bool(cls.get("skigen_target"))
-        if skigen_cand and status == "done" and not has_target:
-            issues.append(
-                f"'{cls.get('name', 'UNNAMED')}': skigen_candidate=true, "
-                f"status=done, but no skigen_target"
-            )
+RETIRED_FIELDS = ("skigen_candidate", "skigen_target")
+
+
+def validate_no_retired_fields(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """MNE-CPP implements its estimators itself, so no entry records a Skigen port any more."""
+    issues = [
+        f"'{cls.get('name', 'UNNAMED')}': retired field '{field}'"
+        for cls in registry.get("classes", [])
+        for field in RETIRED_FIELDS
+        if field in cls
+    ]
     return (len(issues) == 0, issues)
 
 
@@ -428,47 +427,9 @@ def validate_examples(repo_root: Path, registry: Dict[str, Any],
     return (len(issues) == 0, issues, stats)
 
 
-def validate_skigen_cross_reference(
-    repo_root: Path,
-    mne_cpp_registry: Dict[str, Any],
-    skigen_path: Optional[Path],
-    strict: bool,
-) -> Tuple[bool, List[str]]:
-    issues: List[str] = []
-    if skigen_path is None:
-        skigen_path = repo_root / "src" / "external" / "skigen" / "doc" / "api_registry.json"
-    if not skigen_path.exists():
-        print(f"NOTE: skigen registry not found at {skigen_path}; skipping cross-reference.")
-        return (True, [])
-    skigen_reg = load_json(skigen_path)
-    if skigen_reg is False:
-        return (False, [f"Failed to parse skigen registry at {skigen_path}"])
-    if skigen_reg is None:
-        return (True, [])
-    skigen_classes = {c.get("name", "") for c in skigen_reg.get("classes", [])}
-    for cls in mne_cpp_registry.get("classes", []):
-        skigen_target = cls.get("skigen_target")
-        if not skigen_target:
-            continue
-        parts = skigen_target.split("::")
-        if len(parts) >= 2:
-            target_class = parts[-1].split()[0]
-            if target_class not in skigen_classes:
-                issues.append(
-                    f"Drift: '{cls.get('name')}' references skigen_target "
-                    f"'{skigen_target}', but '{target_class}' not in skigen registry"
-                )
-    if issues and strict:
-        return (False, issues)
-    for issue in issues:
-        print(f"WARNING: {issue}")
-    return (True, issues)
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate doc/api_registry.json")
     parser.add_argument("--registry", type=Path, default=None)
-    parser.add_argument("--skigen-registry", type=Path, default=None)
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
@@ -489,13 +450,13 @@ def main() -> int:
     all_passed = True
     total = len(registry.get("classes", []))
 
-    print("[1/8] JSON well-formed...")
+    print("[1/7] JSON well-formed...")
     if not validate_json_wellformed(registry):
         all_passed = False
     else:
         print("  OK")
 
-    print("[2/8] Header paths under src/libraries/...")
+    print("[2/7] Header paths under src/libraries/...")
     ok, missing = validate_headers(repo_root, registry)
     if not ok:
         all_passed = False
@@ -504,7 +465,7 @@ def main() -> int:
     else:
         print(f"  OK ({total} entries)")
 
-    print("[3/8] Test directories under src/testframes/...")
+    print("[3/7] Test directories under src/testframes/...")
     ok, missing = validate_tests(repo_root, registry)
     if not ok:
         all_passed = False
@@ -514,8 +475,8 @@ def main() -> int:
         with_tests = sum(1 for c in registry.get("classes", []) if c.get("test"))
         print(f"  OK ({with_tests} entries with test)")
 
-    print("[4/8] skigen_target presence on done candidates...")
-    ok, issues = validate_skigen_targets(registry)
+    print("[4/7] no retired Skigen port fields...")
+    ok, issues = validate_no_retired_fields(registry)
     if not ok:
         all_passed = False
         for i in issues:
@@ -523,7 +484,7 @@ def main() -> int:
     else:
         print("  OK")
 
-    print("[5/8] documented flag + sidebar invariants...")
+    print("[5/7] documented flag + sidebar invariants...")
     ok, issues = validate_documented_flag(registry)
     if not ok:
         all_passed = False
@@ -534,7 +495,7 @@ def main() -> int:
                         if c.get("documented", False))
         print(f"  OK ({doc_count} documented entries)")
 
-    print("[6/8] Parity block invariants...")
+    print("[6/7] Parity block invariants...")
     ok, issues = validate_parity_block(registry, repo_root)
     if not ok:
         all_passed = False
@@ -544,7 +505,7 @@ def main() -> int:
         parity_count = len(registry.get("parity", {}).get("records", []))
         print(f"  OK ({parity_count} parity records)")
 
-    print("[7/8] Example evidence...")
+    print("[7/7] Example evidence...")
     policy = load_json(repo_root / EVIDENCE_POLICY) or {}
     manifest = load_json(repo_root / SCREENSHOT_MANIFEST) or {}
     ok, issues, stats = validate_examples(repo_root, registry, policy, manifest)
@@ -556,10 +517,6 @@ def main() -> int:
         print(f"  OK ({stats['backed']} of {stats['eligible']} eligible entries backed, "
               f"{stats['debt']} in example_debt, {stats['exempt']} exempt)")
 
-    print("[8/8] Cross-reference with skigen registry...")
-    ok, _ = validate_skigen_cross_reference(repo_root, registry, args.skigen_registry, args.strict)
-    if not ok:
-        all_passed = False
     print()
 
     if all_passed:

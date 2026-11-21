@@ -2,7 +2,7 @@
 
 Converts the XML emitted by `doc/Doxyfile` into one MDX page
 per registered public class plus a sidebar fragment consumed by
-`doc/website/sidebars.ts`.  Port of `src/external/skigen/doc/doxygen2mdx.py`,
+`doc/website/sidebars.ts`.  Port of Skigen's `doc/doxygen2mdx.py`,
 adapted for MNE-CPP's `mne::` and `mne::disp::` namespaces, Qt
 `Q_SIGNALS:` / `Q_SLOTS:` sections, SPDX author headers, and
 the existing `doc/api_registry.json`.
