@@ -37,6 +37,7 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <mutex>
 #include <utility>
 
@@ -74,10 +75,29 @@ struct Console
     std::ofstream file;
 };
 
+/**
+ * Holds a @p T that is never destroyed: Qt and other libraries still log while the program exits, after static
+ * destruction began (a QApplication left alive when QCommandLineParser calls exit()).
+ */
+template<class T>
+union Immortal
+{
+    Immortal()
+    {
+        std::construct_at(&value);
+    }
+    ~Immortal()
+    {
+    } // NOLINT(modernize-use-equals-default): deleted for this union; leaving the value alive is the point
+    Immortal(const Immortal&) = delete;
+    Immortal& operator=(const Immortal&) = delete;
+    T value;
+};
+
 Console& console()
 {
-    static Console instance;
-    return instance;
+    static Immortal<Console> instance; // every line is flushed when written, so nothing is lost
+    return instance.value;
 }
 
 constexpr std::array<std::string_view, 4> kTags{"DEBUG", "INFO", "WARN", "CRIT"};
@@ -127,8 +147,8 @@ void printToConsole(Log::Level level, std::string_view text)
 
 SinkSlot& sinkSlot()
 {
-    static SinkSlot slot;
-    return slot;
+    static Immortal<SinkSlot> slot;
+    return slot.value;
 }
 
 } // namespace

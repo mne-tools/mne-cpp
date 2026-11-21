@@ -16,6 +16,7 @@
 
 #include <base/log.h>
 #include <base/log_qt.h>
+#include <base/process.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -31,6 +32,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdlib>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -50,6 +53,19 @@ namespace
 {
 
 std::vector<std::pair<QtMsgType, QString>> g_qtMessages;
+std::filesystem::path g_self;
+
+constexpr const char* kLogAtExit = "--log-at-exit";
+
+/** What this executable does when started with --log-at-exit: log from an exit handler, after the statics are gone. */
+int logAtExit()
+{
+    // Registered before Log's statics are built, so it runs after they were destroyed, like Qt tearing down a
+    // QApplication that the program left behind when QCommandLineParser called exit()
+    std::atexit([] { Log::warning("late message from an exit handler"); });
+    Log::info("logging works");
+    return 0;
+}
 
 void recordQtMessage(QtMsgType type, const QMessageLogContext&, const QString& message)
 {
@@ -83,6 +99,7 @@ private slots:
     void testLogCustomSink();
     void testLogCaptureFromManyThreads();
     void testLogLevelSkipsFormatting();
+    void testLogsAfterStaticDestruction();
     void cleanupTestCase();
 
 private:
@@ -361,6 +378,16 @@ void TestUtilsLogger::testLogLevelSkipsFormatting()
 
 //=============================================================================================================
 
+void TestUtilsLogger::testLogsAfterStaticDestruction()
+{
+    const ProcessResult result = run_process(g_self, std::vector<std::string>{kLogAtExit});
+    QVERIFY2(result.started, result.error.c_str());
+    QVERIFY2(!result.crashed && result.exit_code == 0, result.std_err.c_str());
+    QVERIFY(result.std_err.find("late message from an exit handler") != std::string::npos);
+}
+
+//=============================================================================================================
+
 void TestUtilsLogger::cleanupTestCase()
 {
     Log::set_file({});
@@ -372,5 +399,13 @@ void TestUtilsLogger::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestUtilsLogger)
+int main(int argc, char* argv[])
+{
+    g_self = std::filesystem::absolute(path_from_utf8(argv[0]));
+    if (argc > 1 && std::string_view(argv[1]) == kLogAtExit) {
+        return logAtExit();
+    }
+    TestUtilsLogger test;
+    return QTest::qExec(&test, argc, argv);
+}
 #include "test_base_logger.moc"

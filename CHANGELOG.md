@@ -104,6 +104,10 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- `Log` keeps working while the program exits: a message that Qt or another
+  library logged after static destruction had begun locked a destroyed mutex
+  and aborted the program (`mne_anonymize --help` with Qt 6.10 on macOS,
+  where `QCommandLineParser` exits with the `QApplication` still alive).
 - On Windows, `FileByteStream` opens files shared, as on the other
   platforms: it locked out every other handle, so a FIFF file could not be
   read twice at once (reading an evoked file with its projections crashed),
