@@ -218,12 +218,15 @@ ProcessResult mne::run_process(const std::filesystem::path& program, std::span<c
 {
     ProcessResult result;
     using Clock = std::chrono::steady_clock;
-    const auto deadline = options.timeout ? std::optional(Clock::now() + *options.timeout) : std::nullopt;
+    // No std::optional: GCC's -Wmaybe-uninitialized misreads one that is set on both branches
+    const bool hasDeadline = options.timeout.has_value();
+    const Clock::time_point deadline = Clock::now() + std::chrono::duration_cast<Clock::duration>(options.timeout.value_or(std::chrono::milliseconds(0)));
     std::array<char, kChunk> buffer{};
 
 #if defined(__EMSCRIPTEN__)
     static_cast<void>(program);
     static_cast<void>(args);
+    static_cast<void>(hasDeadline);
     static_cast<void>(deadline);
     static_cast<void>(buffer);
     result.error = "processes are not available in WebAssembly";
@@ -295,7 +298,7 @@ ProcessResult mne::run_process(const std::filesystem::path& program, std::span<c
         drain(errRead, ProcessChannel::StdErr, options, result, buffer);
         if (WaitForSingleObject(info.hProcess, static_cast<DWORD>(kPoll.count())) == WAIT_OBJECT_0)
             break;
-        if (deadline && Clock::now() >= *deadline) {
+        if (hasDeadline && Clock::now() >= deadline) {
             TerminateProcess(info.hProcess, 1);
             WaitForSingleObject(info.hProcess, INFINITE);
             result.timed_out = true;
@@ -391,7 +394,7 @@ ProcessResult mne::run_process(const std::filesystem::path& program, std::span<c
             }
         }
         exited = waitpid(pid, &status, WNOHANG) == pid;
-        if (!exited && deadline && Clock::now() >= *deadline) {
+        if (!exited && hasDeadline && Clock::now() >= deadline) {
             kill(pid, SIGKILL);
             while (waitpid(pid, &status, 0) < 0 && errno == EINTR) {
             }

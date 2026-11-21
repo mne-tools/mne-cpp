@@ -108,6 +108,9 @@ aliases; replace the old spelling as below.
   library logged after static destruction had begun locked a destroyed mutex
   and aborted the program (`mne_anonymize --help` with Qt 6.10 on macOS,
   where `QCommandLineParser` exits with the `QApplication` still alive).
+- `run_process()` builds with GCC's `-Wmaybe-uninitialized` in the coverage
+  configuration; it held its deadline in a `std::optional` that GCC 14
+  misread.
 - On Windows, `FileByteStream` opens files shared, as on the other
   platforms: it locked out every other handle, so a FIFF file could not be
   read twice at once (reading an evoked file with its projections crashed),
