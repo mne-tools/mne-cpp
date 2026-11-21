@@ -17,7 +17,7 @@ else()
     add_executable(${PROJECT_NAME} test_acq_devices.cpp)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test mne_acq_devices)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test mne_acq_devices mne_com)
 
 # A stand-in for the eego SDK library, loaded by the eego:// driver under test
 add_library(eego_sdk_stub SHARED eego_sdk_stub.cpp)

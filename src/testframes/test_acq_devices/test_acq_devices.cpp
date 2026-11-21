@@ -18,6 +18,7 @@
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
 #include <acq/devices/acq_devices.h>
+#include <com/udp_socket.h>
 #if !defined(_WIN32)
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -3240,24 +3241,21 @@ void TestAcqDevices::testStreamingBoardMatchesBrainFlow()
     const int port = ntohs(to.sin_port);
 
     if (address != QStringLiteral("127.0.0.1")) {
-        // A plain socket in the group must hear another process first; managed firewalls drop that for unsigned programs
-        const int member = ::socket(AF_INET, SOCK_DGRAM, 0);
-        const int on = 1;
-        ::setsockopt(member, SOL_SOCKET, SO_REUSEPORT, &on, sizeof(on));
-        sockaddr_in local{};
-        local.sin_family = AF_INET;
-        local.sin_port = htons(static_cast<std::uint16_t>(port));
-        ip_mreq membership{};
-        ::inet_pton(AF_INET, address.toLatin1().constData(), &membership.imr_multiaddr);
-        QVERIFY(::bind(member, reinterpret_cast<sockaddr*>(&local), sizeof(local)) == 0);
-        QVERIFY(::setsockopt(member, IPPROTO_IP, IP_ADD_MEMBERSHIP, &membership, sizeof(membership)) == 0);
-        QProcess::execute(python, {QStringLiteral("-c"), QStringLiteral("import socket; socket.socket(socket.AF_INET, socket.SOCK_DGRAM)"
-                                                                        ".sendto(b'x', ('%1', %2))")
-                                                             .arg(address)
-                                                             .arg(port)});
-        pollfd ready{member, POLLIN, 0};
-        const bool heard = ::poll(&ready, 1, 1000) > 0;
-        ::close(member);
+        // A member of the group, joined the way the backend joins, must hear another process first; managed firewalls
+        // drop that for unsigned programs, and hosts without a multicast route cannot join at all
+        bool heard = false;
+        {
+            auto member = mne::UdpSocket::bind(address.toStdString(), static_cast<std::uint16_t>(port), true);
+            if (!member) {
+                QSKIP(qPrintable(QStringLiteral("this machine cannot join %1: %2").arg(address, QString::fromStdString(member.error().message()))));
+            }
+            QProcess::execute(python, {QStringLiteral("-c"), QStringLiteral("import socket; socket.socket(socket.AF_INET, socket.SOCK_DGRAM)"
+                                                                            ".sendto(b'x', ('%1', %2))")
+                                                                 .arg(address)
+                                                                 .arg(port)});
+            std::array<std::byte, 16> datagram{};
+            heard = member->receive(datagram, 1000ms).has_value();
+        }
         if (!heard) {
             QSKIP("this machine drops multicast datagrams from other programs");
         }
