@@ -104,6 +104,10 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- `PythonRunner` hands out the lines of a Python child without the CR that
+  Python on Windows writes before each LF, in `std_out`, `std_err`, the line
+  callback and the progress parser; results compared with `"5"` or matrices
+  parsed from the output failed on Windows.
 - `FileByteStream::resize()` cuts the file through the stream's own handle.
   It used to resize through the path, which Windows refuses while the stream
   has the file open, so FIFF writing could not drop an old directory there,

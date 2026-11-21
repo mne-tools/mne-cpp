@@ -337,6 +337,9 @@ PythonRunnerResult PythonRunner::execute(const StringList& args) const
     std::array<std::string, 2> pending;
     std::array<std::string, 2> collected;
     const auto dispatch = [&](PythonChannel channel, std::string_view line) {
+        if (line.ends_with('\r')) {
+            line.remove_suffix(1); // Python on Windows ends text lines with CR LF
+        }
         std::string& out = collected[channel == PythonChannel::StdOut ? 0 : 1];
         if (!out.empty()) {
             out += '\n';

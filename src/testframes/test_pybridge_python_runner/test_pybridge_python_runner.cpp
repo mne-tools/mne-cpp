@@ -62,6 +62,7 @@ private slots:
     void testRunCodeExitCode();
     void testRunCodeTimeout();
     void testRunCodeArgumentsAndMultiline();
+    void testRunCodeWindowsLineEnds();
     void testRunCodeEnvironmentVars();
     void testIsPackageAvailable();
     void testCallbacks();
@@ -192,6 +193,27 @@ void TestPythonRunner::testRunCodeArgumentsAndMultiline()
                                                         {"2"});
     QVERIFY(result.success);
     QCOMPARE(result.std_out, std::string("6"));
+}
+
+//=============================================================================================================
+
+void TestPythonRunner::testRunCodeWindowsLineEnds()
+{
+    GUARD_PYTHON(m_bPythonAvailable, "Python not available");
+
+    // Python on Windows writes text with CR LF; the lines come back without the CR, as on the other platforms
+    std::vector<std::string> lines;
+    PythonRunner python = runner();
+    python.set_line_callback([&lines](PythonChannel, std::string_view line) { lines.emplace_back(line); });
+    python.set_progress_callback([](float, std::string_view) {});
+    const PythonRunnerResult result = python.run_code("import sys\n"
+                                                      "sys.stdout.buffer.write(b'[progress] 50% half\\r\\n7\\r\\n')\n"
+                                                      "sys.stderr.buffer.write(b'error msg\\r\\n')");
+    QVERIFY(result.success);
+    QCOMPARE(result.std_out, std::string("[progress] 50% half\n7"));
+    QCOMPARE(result.std_err, std::string("error msg"));
+    QCOMPARE(lines, (std::vector<std::string>{"[progress] 50% half", "7", "error msg"}));
+    QCOMPARE(result.progress_pct, 50.0f);
 }
 
 //=============================================================================================================
