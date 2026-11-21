@@ -26,6 +26,7 @@
 #include "fwd_eeg_sphere_model.h"
 #include "fwd_eeg_sphere_model_set.h"
 
+#include <cmath>
 #include <numbers>
 
 #include <Eigen/Core>
@@ -568,7 +569,7 @@ bool FwdEegSphereModel::fwd_eeg_spherepot_vec(const Eigen::Vector3f& rd_in, cons
         } /* All electrodes done */
     } /* All equivalent dipoles done */
     /*
-   * Finish by scaling by 1/(4*M_PI);
+   * Finish by scaling by 1/(4*std::numbers::pi);
    */
     for (k = 0; k < neeg; k++) {
         Vval_vec(0, k) = fact * Vval_vec(0, k);
@@ -745,7 +746,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot(const Eigen::Vector3f& rd_in,
         } /* All electrodes done */
     } /* All equivalent dipoles done */
     /*
-   * Finish by scaling by 1/(4*M_PI);
+   * Finish by scaling by 1/(4*std::numbers::pi);
    */
     for (k = 0; k < neeg; k++)
         Vval[k] = fact * Vval[k];

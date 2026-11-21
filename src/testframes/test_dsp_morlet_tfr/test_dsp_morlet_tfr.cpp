@@ -27,6 +27,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,7 +79,7 @@ static RowVectorXd makeSine(double dFreq, double dSFreq, int nSamples, double dA
 {
     RowVectorXd v(nSamples);
     for (int n = 0; n < nSamples; ++n)
-        v[n] = dAmpl * std::sin(2.0 * M_PI * dFreq * n / dSFreq);
+        v[n] = dAmpl * std::sin(2.0 * std::numbers::pi * dFreq * n / dSFreq);
     return v;
 }
 
@@ -184,7 +186,7 @@ void TestMorletTfr::testMoreCyclesBetterFrequencyResolution()
     // Two close frequencies
     RowVectorXd sig(nSamp);
     for (int n = 0; n < nSamp; ++n)
-        sig[n] = std::sin(2.0 * M_PI * 20.0 * n / dSFreq) + std::sin(2.0 * M_PI * 25.0 * n / dSFreq);
+        sig[n] = std::sin(2.0 * std::numbers::pi * 20.0 * n / dSFreq) + std::sin(2.0 * std::numbers::pi * 25.0 * n / dSFreq);
 
     RowVectorXd freqs = RowVectorXd::LinSpaced(20, 10.0, 40.0);
 
@@ -215,7 +217,7 @@ void TestMorletTfr::testFewerCyclesBetterTimeResolution()
     // 20 Hz burst from onsetSmp to end (long enough that both wavelets reach full power)
     RowVectorXd sig = RowVectorXd::Zero(nSamp);
     for (int n = onsetSmp; n < nSamp - 200; ++n)
-        sig[n] = std::sin(2.0 * M_PI * 20.0 * n / dSFreq);
+        sig[n] = std::sin(2.0 * std::numbers::pi * 20.0 * n / dSFreq);
 
     RowVectorXd freqs(1);
     freqs << 20.0;
@@ -309,7 +311,7 @@ void TestMorletTfr::testPowerMatchesMnePython()
     RowVectorXd x(500);
     for (int n = 0; n < x.size(); ++n) {
         const double t = n / sfreq;
-        x[n] = std::sin(2.0 * M_PI * 10.0 * t) + 0.5 * std::sin(2.0 * M_PI * 23.0 * t + 0.3) + 0.2 * t;
+        x[n] = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.5 * std::sin(2.0 * std::numbers::pi * 23.0 * t + 0.3) + 0.2 * t;
     }
     RowVectorXd freqs(3);
     freqs << 10.0, 15.0, 23.0;

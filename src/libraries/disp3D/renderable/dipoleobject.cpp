@@ -19,6 +19,7 @@
 #include <cmath>
 #include <QQuaternion>
 #include <QRandomGenerator>
+#include <numbers>
 
 namespace mne::disp
 {
@@ -160,7 +161,7 @@ void DipoleObject::createGeometry()
 
     // Rim vertices
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
 
@@ -196,7 +197,7 @@ void DipoleObject::createGeometry()
     vertices.push_back(baseCenter); // 1
 
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
 
@@ -211,7 +212,7 @@ void DipoleObject::createGeometry()
     }
 
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi * i / segments;
         float x = radius * cos(angle);
         float z = radius * sin(angle);
         vertices.push_back({x, 0, z, 0, -1, 0}); // Base rim

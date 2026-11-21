@@ -43,6 +43,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -249,7 +250,7 @@ private slots:
 
         MatrixXd data(nSrc, nTimes);
         for (int t = 0; t < nTimes; ++t) {
-            data(0, t) = std::sin(2.0 * M_PI * targetFreq * t / sfreq);
+            data(0, t) = std::sin(2.0 * std::numbers::pi * targetFreq * t / sfreq);
         }
 
         VectorXi verts(1);
@@ -370,7 +371,7 @@ private slots:
 
         MatrixXd data(nSrc, nTimes);
         for (int t = 0; t < nTimes; ++t) {
-            data(0, t) = std::sin(2.0 * M_PI * 10.0 * t / sfreq);
+            data(0, t) = std::sin(2.0 * std::numbers::pi * 10.0 * t / sfreq);
         }
         VectorXi verts(1);
         verts << 0;

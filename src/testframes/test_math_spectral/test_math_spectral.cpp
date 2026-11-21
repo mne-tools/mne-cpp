@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <math/spectral.h>
 #include <cmath>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -190,7 +191,7 @@ private slots:
         double fSine = 100.0;
         RowVectorXd data(N);
         for (int i = 0; i < N; ++i) {
-            data(i) = std::sin(2.0 * M_PI * fSine * i / sFreq);
+            data(i) = std::sin(2.0 * std::numbers::pi * fSine * i / sFreq);
         }
 
         QPair<MatrixXd, VectorXd> tapResult = Spectral::generateTapers(N, "hanning");

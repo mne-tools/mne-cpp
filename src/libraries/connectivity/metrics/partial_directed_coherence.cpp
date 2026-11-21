@@ -29,6 +29,8 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -102,7 +104,7 @@ Network PartialDirectedCoherence::calculate(ConnectivitySettings& connectivitySe
                 // Compute A(f) at this frequency
                 MatrixXcd matAf = matI;
                 for (int k = 0; k < p; ++k) {
-                    const double phase = -2.0 * M_PI * vecFreqs(fi) * (k + 1);
+                    const double phase = -2.0 * std::numbers::pi * vecFreqs(fi) * (k + 1);
                     matAf -= coeffs[k].cast<std::complex<double>>() * std::exp(jImag * phase);
                 }
 

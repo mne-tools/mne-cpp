@@ -104,6 +104,11 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- `M_PI` is replaced by `std::numbers::pi` everywhere, so no file defines
+  `_USE_MATH_DEFINES` before `<math.h>` any more and the build no longer
+  defines it for MSVC: a C++ standard library without the POSIX constants,
+  as on embedded targets, compiles MNE-CPP. Code that used `M_PI` through an
+  MNE-CPP header defines it itself or uses `std::numbers::pi`.
 - The libraries need nothing beyond Eigen and the standard library, so they
   can also be built for embedded targets: Skigen is no longer a dependency.
   The Ledoit-Wolf and OAS shrinkage and the Factor Analysis EM of `mne_sts`

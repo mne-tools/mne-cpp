@@ -124,7 +124,6 @@ endif()
 if(MSVC)
   # Sources and strings are UTF-8; Qt used to set this for the targets that linked it.
   add_compile_options(/EHsc /MP /utf-8)
-  add_compile_definitions(_USE_MATH_DEFINES)
   # getenv, strcpy, strncpy and the other standard C functions are fine to use.
   add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
   # The warnings Qt's qcompilerdetection.h switches off in every file that includes Qt, which until 3.0 was every

@@ -32,6 +32,8 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -152,7 +154,7 @@ void TestSignalModel::testFitData_basic_4coils()
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc - 1) * 1.0 / hpiModelParameters.iSampleFreq();
 
     for (int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array());
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2 * iNumCoils, iNchan);
@@ -204,7 +206,7 @@ void TestSignalModel::testFitData_basic_5coils()
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc - 1) * 1.0 / hpiModelParameters.iSampleFreq();
 
     for (int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array());
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2 * iNumCoils, iNchan);
@@ -261,7 +263,7 @@ void TestSignalModel::testFitData_advanced_4coils()
     VectorXd vecTime2 = vecTime;
     vecTime2.fill(1);
     for (int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpLine * sin(2 * M_PI * 60 * vecTime.array()) + dAmpLine / 2 * sin(2 * M_PI * 60 * 2 * vecTime.array()) + dAmpLine / 3 * sin(2 * M_PI * 60 * 3 * vecTime.array()) + dAmpLine * VectorXd::LinSpaced(iSamLoc, -0.5, 0.5).array() + dAmpLine * vecTime2.array();
+        matSimData.row(i) = dAmpSine * sin(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpLine * sin(2 * std::numbers::pi * 60 * vecTime.array()) + dAmpLine / 2 * sin(2 * std::numbers::pi * 60 * 2 * vecTime.array()) + dAmpLine / 3 * sin(2 * std::numbers::pi * 60 * 3 * vecTime.array()) + dAmpLine * VectorXd::LinSpaced(iSamLoc, -0.5, 0.5).array() + dAmpLine * vecTime2.array();
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2 * iNumCoils, iNchan);
@@ -313,7 +315,7 @@ void TestSignalModel::testFitData_advanced_5coils()
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc - 1) * 1.0 / hpiModelParameters.iSampleFreq();
 
     for (int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * M_PI * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpLine * sin(2 * M_PI * 60 * vecTime.array()) + dAmpLine / 2 * sin(2 * M_PI * 60 * 2 * vecTime.array()) + dAmpLine / 3 * sin(2 * M_PI * 60 * 3 * vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpCosine * cos(2 * std::numbers::pi * hpiModelParameters.vecHpiFreqs()[i] * vecTime.array()) + dAmpLine * sin(2 * std::numbers::pi * 60 * vecTime.array()) + dAmpLine / 2 * sin(2 * std::numbers::pi * 60 * 2 * vecTime.array()) + dAmpLine / 3 * sin(2 * std::numbers::pi * 60 * 3 * vecTime.array());
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2 * iNumCoils, iNchan);

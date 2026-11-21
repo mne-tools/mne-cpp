@@ -35,13 +35,8 @@
 #include <math/sphere.h>
 
 #include <Eigen/Geometry>
-
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -344,7 +339,7 @@ void MNEMshDisplaySurface::calculate_digitizer_distances(mne::FiffDigitizerData&
             constexpr bool bUseSolidAngleSign = false;
             if (bUseSolidAngleSign && !do_approx) {
                 Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(digPoints.row(nactive).data());
-                if (sum_solids(pt) / (4 * M_PI) > 0.9)
+                if (sum_solids(pt) / (4 * std::numbers::pi) > 0.9)
                     dig.dist(k) = -std::fabs(dig.dist(k));
                 else
                     dig.dist(k) = std::fabs(dig.dist(k));

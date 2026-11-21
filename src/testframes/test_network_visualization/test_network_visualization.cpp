@@ -30,6 +30,8 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,7 +56,7 @@ static Network buildTestNetwork(int nNodes)
     // Create nodes on a circle (radius 50 mm, simulating brain scale)
     const float radius = 0.05f; // 50 mm in metres
     for (int i = 0; i < nNodes; ++i) {
-        const float angle = 2.0f * static_cast<float>(M_PI) * static_cast<float>(i) / static_cast<float>(nNodes);
+        const float angle = 2.0f * static_cast<float>(std::numbers::pi) * static_cast<float>(i) / static_cast<float>(nNodes);
         net.add_node(Vector3f(radius * std::cos(angle), radius * std::sin(angle), 0.0f));
     }
 

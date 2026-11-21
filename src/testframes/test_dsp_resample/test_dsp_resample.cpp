@@ -27,6 +27,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -46,7 +48,7 @@ RowVectorXd makeSine(double freqHz, double sFreq, int nSamples)
 {
     RowVectorXd v(nSamples);
     for (int i = 0; i < nSamples; ++i)
-        v(i) = std::sin(2.0 * M_PI * freqHz * i / sFreq);
+        v(i) = std::sin(2.0 * std::numbers::pi * freqHz * i / sFreq);
     return v;
 }
 
@@ -56,7 +58,7 @@ double dftMagnitude(const RowVectorXd& sig, double sFreq, double freqHz)
     const int N = sig.size();
     double re = 0.0, im = 0.0;
     for (int n = 0; n < N; ++n) {
-        double angle = 2.0 * M_PI * freqHz * n / sFreq;
+        double angle = 2.0 * std::numbers::pi * freqHz * n / sFreq;
         re += sig(n) * std::cos(angle);
         im -= sig(n) * std::sin(angle);
     }

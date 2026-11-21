@@ -11,6 +11,7 @@
 #include <dsp/filterkernel.h>
 #include <dsp/parksmcclellan.h>
 #include <dsp/cosinefilter.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -140,7 +141,7 @@ private slots:
         auto gain = [&h](double hz) {
             std::complex<double> response = 0.0;
             for (Index t = 0; t < h.size(); ++t) {
-                response += h(t) * std::polar(1.0, -2.0 * M_PI * hz * static_cast<double>(t) / 1000.0);
+                response += h(t) * std::polar(1.0, -2.0 * std::numbers::pi * hz * static_cast<double>(t) / 1000.0);
             }
             return std::abs(response);
         };
@@ -173,7 +174,7 @@ private slots:
         auto amplitude = [&](double hz) {
             RowVectorXd data(n);
             for (int t = 0; t < n; ++t) {
-                data(t) = std::sin(2.0 * M_PI * hz * t / sFreq);
+                data(t) = std::sin(2.0 * std::numbers::pi * hz * t / sFreq);
             }
             notch.prepare_filter(n);
             notch.apply_fft_filter(data);

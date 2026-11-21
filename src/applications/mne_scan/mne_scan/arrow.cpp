@@ -23,6 +23,7 @@
 #include <QPen>
 #include <QPainter>
 #include <QPainterPath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -121,8 +122,8 @@ void Arrow::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
     QPointF nearEnd = m_bezierPath.pointAtPercent(0.97);
     qreal angle = qAtan2(-(endPt.y() - nearEnd.y()), endPt.x() - nearEnd.x());
 
-    QPointF arrowP1 = endPt + QPointF(qSin(angle + M_PI / 3.0) * arrowSize, qCos(angle + M_PI / 3.0) * arrowSize);
-    QPointF arrowP2 = endPt + QPointF(qSin(angle + M_PI - M_PI / 3.0) * arrowSize, qCos(angle + M_PI - M_PI / 3.0) * arrowSize);
+    QPointF arrowP1 = endPt + QPointF(qSin(angle + std::numbers::pi / 3.0) * arrowSize, qCos(angle + std::numbers::pi / 3.0) * arrowSize);
+    QPointF arrowP2 = endPt + QPointF(qSin(angle + std::numbers::pi - std::numbers::pi / 3.0) * arrowSize, qCos(angle + std::numbers::pi - std::numbers::pi / 3.0) * arrowSize);
 
     arrowHead.clear();
     arrowHead << endPt << arrowP1 << arrowP2;

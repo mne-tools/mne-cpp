@@ -24,6 +24,8 @@
 #include <QQuaternion>
 #include <QVector3D>
 #include <QtMath>
+#include <cmath>
+#include <numbers>
 
 namespace mne::disp
 {
@@ -110,7 +112,7 @@ void PolylineObject::createSegmentGeometry()
     std::vector<quint32> indices;
 
     for (int i = 0; i < iSegments; ++i) {
-        const float fAngle = 2.0f * static_cast<float>(M_PI) * static_cast<float>(i) / static_cast<float>(iSegments);
+        const float fAngle = 2.0f * static_cast<float>(std::numbers::pi) * static_cast<float>(i) / static_cast<float>(iSegments);
         const float x = std::cos(fAngle);
         const float z = std::sin(fAngle);
 

@@ -16,12 +16,6 @@
 
 #include "cosinefilter.h"
 
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 
 #include <algorithm>
 
@@ -34,6 +28,8 @@
 //#endif
 
 #include <unsupported/Eigen/FFT>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,7 +68,7 @@ CosineFilter::CosineFilter(int fftLength,
     int k, s, w;
     int resp_size = fftLength / 2 + 1; //Take half because we are not interested in the conjugate complex part of the spectrum
 
-    double pi4 = M_PI / 4.0;
+    double pi4 = std::numbers::pi / 4.0;
     float mult, add, c;
 
     RowVectorXcd filterFreqResp = RowVectorXcd::Ones(resp_size);

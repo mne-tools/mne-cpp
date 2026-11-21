@@ -42,18 +42,10 @@
 #include <math/sphere.h>
 
 
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
-
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
 #include <algorithm>
-
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,7 +64,6 @@ constexpr int OK = 0;
 [[maybe_unused]] constexpr int Y = 1;
 [[maybe_unused]] constexpr int Z = 2;
 [[maybe_unused]] constexpr int NNEIGHBORS = 26;
-
 
 //============================= make_volume_source_space.c =============================
 

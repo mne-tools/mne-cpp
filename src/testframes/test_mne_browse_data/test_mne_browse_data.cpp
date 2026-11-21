@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -1176,7 +1178,7 @@ void TestMneBrowseData::testFilterOperatorApplyFFTFilter()
     RowVectorXd signal = RowVectorXd::Zero(nSamples);
     for (int i = 0; i < nSamples; ++i) {
         double t = static_cast<double>(i) / sFreq;
-        signal(i) = std::sin(2.0 * M_PI * 10.0 * t) + std::sin(2.0 * M_PI * 100.0 * t);
+        signal(i) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + std::sin(2.0 * std::numbers::pi * 100.0 * t);
     }
 
     RowVectorXd filtered = filter.applyFFTFilter(signal);
@@ -1186,8 +1188,8 @@ void TestMneBrowseData::testFilterOperatorApplyFFTFilter()
     const auto amplitude = [&](double freq) {
         double re = 0.0, im = 0.0;
         for (int i = nSamples / 4; i < 3 * nSamples / 4; ++i) {
-            re += filtered(i) * std::cos(2.0 * M_PI * freq * i / sFreq);
-            im += filtered(i) * std::sin(2.0 * M_PI * freq * i / sFreq);
+            re += filtered(i) * std::cos(2.0 * std::numbers::pi * freq * i / sFreq);
+            im += filtered(i) * std::sin(2.0 * std::numbers::pi * freq * i / sFreq);
         }
         return 4.0 * std::hypot(re, im) / nSamples;
     };

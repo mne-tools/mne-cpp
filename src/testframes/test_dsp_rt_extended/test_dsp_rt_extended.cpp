@@ -9,6 +9,7 @@
 #include <dsp/parksmcclellan.h>
 #include <dsp/filterkernel.h>
 #include <dsp/rt/rt_filter.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -292,8 +293,8 @@ private slots:
         MatrixXd data(nCh, nSamples);
         for (int i = 0; i < nSamples; ++i) {
             double t = i / sFreq;
-            data(0, i) = std::sin(2.0 * M_PI * 10.0 * t) +
-                std::sin(2.0 * M_PI * 200.0 * t);
+            data(0, i) = std::sin(2.0 * std::numbers::pi * 10.0 * t) +
+                std::sin(2.0 * std::numbers::pi * 200.0 * t);
             data(1, i) = data(0, i);
             data(2, i) = data(0, i);
         }

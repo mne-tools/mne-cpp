@@ -51,6 +51,7 @@
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -215,7 +216,7 @@ MatrixXd DecodingSsd::bandpassFilter(const MatrixXd& data,
     filter_order = std::min(filter_order, 128);
 
     const int half = filter_order / 2;
-    const double pi = M_PI;
+    const double pi = std::numbers::pi;
 
     // Windowed-sinc coefficients
     VectorXd h(filter_order + 1);

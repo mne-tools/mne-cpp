@@ -39,6 +39,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -104,10 +105,10 @@ MatrixXd muscleData()
         const double t = s / 1000.0;
         double burst = 0.0;
         for (const auto& b : bursts)
-            burst += b[2] * std::clamp(std::min(t - b[0], b[1] - t) / 0.02, 0.0, 1.0) * std::sin(2.0 * M_PI * 120.0 * t);
+            burst += b[2] * std::clamp(std::min(t - b[0], b[1] - t) / 0.02, 0.0, 1.0) * std::sin(2.0 * std::numbers::pi * 120.0 * t);
         for (int c = 0; c < 4; ++c) {
             for (int k = 0; k < 8; ++k)
-                data(c, s) += 1e-12 * std::sin(2.0 * M_PI * freqs[k] * t + 0.7 * c + 1.3 * k);
+                data(c, s) += 1e-12 * std::sin(2.0 * std::numbers::pi * freqs[k] * t + 0.7 * c + 1.3 * k);
             data(c, s) += burst;
         }
     }
@@ -122,7 +123,7 @@ MatrixXd makeCleanSine(int nCh, int nSamples, double sfreq, double freqHz = 10.0
     MatrixXd data = MatrixXd::Zero(nCh, nSamples);
     for (int s = 0; s < nSamples; ++s) {
         const double t = static_cast<double>(s) / sfreq;
-        const double val = std::sin(2.0 * M_PI * freqHz * t);
+        const double val = std::sin(2.0 * std::numbers::pi * freqHz * t);
         for (int ch = 0; ch < nCh; ++ch)
             data(ch, s) = val;
     }
@@ -254,7 +255,7 @@ void TestDspAnnotateArtifact::testAmplitudeMatchesPython()
     MatrixXd data(6, n);
     for (int k = 0; k < 6; ++k)
         for (int i = 0; i < n; ++i)
-            data(k, i) = 2e-5 * std::sin(2.0 * M_PI * (5 + k) * i / sfreq + k);
+            data(k, i) = 2e-5 * std::sin(2.0 * std::numbers::pi * (5 + k) * i / sfreq + k);
     const auto alternate = [&data](int row, int from, int to) {
         for (int i = from; i < to; ++i)
             data(row, i) += (i % 2) ? 1e-3 : -1e-3;

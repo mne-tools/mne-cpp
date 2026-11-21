@@ -34,6 +34,7 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,7 +62,7 @@ private slots:
         const int n = 300;
         VectorXd data(n);
         for (int i = 0; i < n; ++i) {
-            data(i) = std::sin(2.0 * M_PI * 3.0 * static_cast<double>(i) / static_cast<double>(n));
+            data(i) = std::sin(2.0 * std::numbers::pi * 3.0 * static_cast<double>(i) / static_cast<double>(n));
         }
 
         auto peaks = peakFinder(data);
@@ -180,7 +181,7 @@ private slots:
     {
         VectorXd data(100);
         for (int i = 0; i < 100; ++i) {
-            data(i) = std::sin(2.0 * M_PI * 5.0 * static_cast<double>(i) / 100.0);
+            data(i) = std::sin(2.0 * std::numbers::pi * 5.0 * static_cast<double>(i) / 100.0);
         }
 
         auto peaks = peakFinder(data);

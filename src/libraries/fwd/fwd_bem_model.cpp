@@ -43,14 +43,10 @@
 #include <string_view>
 #include <thread>
 
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 
 #include <Eigen/Dense>
+#include <cmath>
+#include <numbers>
 
 static const Eigen::Vector3f Qx(1.0f, 0.0f, 0.0f);
 static const Eigen::Vector3f Qy(0.0f, 1.0f, 0.0f);
@@ -521,7 +517,7 @@ void FwdBemModel::lin_pot_coeff(const Eigen::Vector3f& from, MNETriangle& to, Ei
     double beta[3], bbeta[3];
     int j, k;
     double n2, area2;
-    static const double solid_eps = 4.0 * M_PI / 1.0E6;
+    static const double solid_eps = 4.0 * std::numbers::pi / 1.0E6;
     /*
        * Corners with origin at from (float → double)
        */
@@ -608,7 +604,7 @@ void FwdBemModel::correct_auto_elements(MNESurface& surf, Eigen::MatrixXf& mat)
     int ntri = surf.ntri;
     int nmemb;
     int j, k;
-    float pi2 = static_cast<float>(2.0 * M_PI);
+    float pi2 = static_cast<float>(2.0 * std::numbers::pi);
     MNETriangle* tri;
 
 #ifdef SIMPLE
@@ -792,7 +788,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution()
 
 Eigen::MatrixXf FwdBemModel::fwd_bem_multi_solution(Eigen::MatrixXf& solids, const Eigen::MatrixXf* gamma, int nsurf, const Eigen::VectorXi& ntri)
 /*
-          * Invert I - solids/(2*M_PI)
+          * Invert I - solids/(2*std::numbers::pi)
           * Take deflation into account
           * The matrix is destroyed after inversion
           * This is the general multilayer case
@@ -800,7 +796,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_multi_solution(Eigen::MatrixXf& solids, con
 {
     int j, k, p, q;
     float defl;
-    float pi2 = static_cast<float>(1.0 / (2 * M_PI));
+    float pi2 = static_cast<float>(1.0 / (2 * std::numbers::pi));
     float mult;
     int joff, koff, jup, kup, ntot;
 
@@ -833,7 +829,7 @@ Eigen::MatrixXf FwdBemModel::fwd_bem_multi_solution(Eigen::MatrixXf& solids, con
 
 Eigen::MatrixXf FwdBemModel::fwd_bem_homog_solution(Eigen::MatrixXf& solids, int ntri)
 /*
-          * Invert I - solids/(2*M_PI)
+          * Invert I - solids/(2*std::numbers::pi)
           * Take deflation into account
           * The matrix is destroyed after inversion
           * This is the homogeneous model case
@@ -914,7 +910,7 @@ int FwdBemModel::fwd_bem_check_solids(const Eigen::MatrixXf& angles, int ntri1, 
         sum = 0;
         for (k = 0; k < ntri2; k++)
             sum = sum + angles(j, k);
-        sums[j] = sum / (2 * M_PI);
+        sums[j] = sum / (2 * std::numbers::pi);
     }
     for (j = 0; j < ntri1; j++)
         /*
@@ -1157,7 +1153,7 @@ float FwdBemModel::fwd_bem_inf_pot(const Eigen::Vector3f& rd, const Eigen::Vecto
 {
     Eigen::Vector3f diff = rp - rd;
     float diff2 = diff.squaredNorm();
-    return Q.dot(diff) / (4.0 * M_PI * diff2 * std::sqrt(diff2));
+    return Q.dot(diff) / (4.0 * std::numbers::pi * diff2 * std::sqrt(diff2));
 }
 
 //=============================================================================================================
@@ -2206,7 +2202,7 @@ float FwdBemModel::fwd_bem_inf_pot_der(const Eigen::Vector3f& rd, const Eigen::V
     float diff5 = diff3 * diff2;
 
     float res = 3 * Q.dot(diff) * comp.dot(diff) / diff5 - comp.dot(Q) / diff3;
-    return res / (4.0 * M_PI);
+    return res / (4.0 * std::numbers::pi);
 }
 
 //=============================================================================================================

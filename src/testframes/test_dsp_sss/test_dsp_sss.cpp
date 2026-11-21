@@ -19,6 +19,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -33,7 +34,7 @@ static FiffInfo makeSyntheticMegInfo(int nSensors, double radius = 0.12)
 
     // Distribute sensors roughly uniformly on a sphere of given radius using
     // the Fibonacci lattice (golden-angle spiral).
-    const double golden = M_PI * (3.0 - std::sqrt(5.0)); // golden angle
+    const double golden = std::numbers::pi * (3.0 - std::sqrt(5.0)); // golden angle
 
     for (int i = 0; i < nSensors; ++i) {
         double y = 1.0 - (static_cast<double>(i) / (nSensors - 1)) * 2.0;

@@ -68,6 +68,8 @@
 #include <mne/mne_msh_picked.h>
 
 #include <fwd/fwd_bem_model.h>
+#include <cmath>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -924,7 +926,7 @@ void TestMneLibrary::displaySurf_alignFiducials()
     for (const FiffDigPoint& fid : mriDig.points)
         if (fid.ident == FIFFV_POINT_NASION)
             nasionHead = s * (mriHead.topLeftCorner<3, 3>() * Map<const Vector3f>(fid.r) + mriHead.topRightCorner<3, 1>());
-    const Matrix3f tilt = AngleAxisf(static_cast<float>(tiltDeg * M_PI / 180.0), Vector3f::UnitX()).toRotationMatrix();
+    const Matrix3f tilt = AngleAxisf(static_cast<float>(tiltDeg * std::numbers::pi / 180.0), Vector3f::UnitX()).toRotationMatrix();
     auto toHead = [&](const Vector3f& rMri) {
         const Vector3f h = s * (mriHead.topLeftCorner<3, 3>() * rMri + mriHead.topRightCorner<3, 1>());
         return Vector3f(tilt * (h - nasionHead) + nasionHead);
@@ -968,7 +970,7 @@ void TestMneLibrary::displaySurf_alignFiducials()
         QVERIFY2(std::abs(scales[0] - headScale) < 0.03, qPrintable(QString::number(scales[0])));
 
     if (tiltDeg > 0.0) {
-        const double before = 1e3 * tiltDeg * M_PI / 180.0 * 0.1;
+        const double before = 1e3 * tiltDeg * std::numbers::pi / 180.0 * 0.1;
         const double surfRmsMm = 1e3 * surf->rms_digitizer_distance(headDig);
         QVERIFY2(surfRmsMm < tolMm, qPrintable(QString("surface rms %1 mm (tilt displaces ~%2 mm)").arg(surfRmsMm).arg(before)));
         return;
@@ -1018,7 +1020,7 @@ void TestMneLibrary::displaySurf_alignment()
         FiffDigPoint pt;
         pt.kind = FIFFV_POINT_EXTRA;
         pt.ident = i;
-        float theta = (float)i / 10 * 2.0f * (float)M_PI;
+        float theta = (float)i / 10 * 2.0f * (float)std::numbers::pi;
         pt.r[0] = 0.08f * cosf(theta);
         pt.r[1] = 0.08f * sinf(theta);
         pt.r[2] = 0.06f;
@@ -1729,7 +1731,7 @@ void TestMneLibrary::bemSurface_sumSolids()
     Vector3f inside(surf->cm[0], surf->cm[1], surf->cm[2]);
     double total = surf->sum_solids(inside);
     qDebug() << "Sum of solid angles from CM:" << total;
-    QVERIFY(std::abs(std::abs(total) - 4.0 * M_PI) < 1.0);
+    QVERIFY(std::abs(std::abs(total) - 4.0 * std::numbers::pi) < 1.0);
 }
 
 void TestMneLibrary::bemSurface_triangleCoords()

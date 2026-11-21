@@ -29,6 +29,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -70,13 +71,13 @@ RowVectorXd Resample::buildKernel(int p, int q, int iNZeros)
     RowVectorXd h(L);
     for (int k = 0; k < L; ++k) {
         double n = k - halfLen;
-        double win = 0.54 - 0.46 * std::cos(2.0 * M_PI * k / (L - 1)); // Hamming
+        double win = 0.54 - 0.46 * std::cos(2.0 * std::numbers::pi * k / (L - 1)); // Hamming
 
         if (std::abs(n) < 1e-10) {
             h(k) = 2.0 * fc * win;
         } else {
             // sinc(2*fc*n) * 2*fc  =  sin(2π*fc*n) / (π*n)
-            h(k) = std::sin(2.0 * M_PI * fc * n) / (M_PI * n) * win;
+            h(k) = std::sin(2.0 * std::numbers::pi * fc * n) / (std::numbers::pi * n) * win;
         }
     }
 

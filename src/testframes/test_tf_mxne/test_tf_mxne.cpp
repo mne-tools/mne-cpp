@@ -16,6 +16,7 @@
 #include <QObject>
 #include <Eigen/Core>
 #include <cmath>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -55,8 +56,8 @@ private slots:
 
         // Active sources at indices 3 and 15
         for (int t = 0; t < nTimes; ++t) {
-            X(3, t) = 5.0 * std::sin(2.0 * M_PI * 10.0 * t / 200.0);
-            X(15, t) = 3.0 * std::cos(2.0 * M_PI * 20.0 * t / 200.0);
+            X(3, t) = 5.0 * std::sin(2.0 * std::numbers::pi * 10.0 * t / 200.0);
+            X(15, t) = 3.0 * std::cos(2.0 * std::numbers::pi * 20.0 * t / 200.0);
         }
 
         MatrixXd M = G * X;

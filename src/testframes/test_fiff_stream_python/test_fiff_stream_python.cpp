@@ -61,6 +61,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/SparseCore>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -125,7 +126,7 @@ void TestFiffStreamPython::initTestCase()
     QVERIFY(m_dir.isValid());
     m_path = m_dir.filePath("stream-roundtrip.fif");
 
-    m_rot = AngleAxisf(static_cast<float>(M_PI / 6.0), Vector3f::UnitZ()).toRotationMatrix();
+    m_rot = AngleAxisf(static_cast<float>(std::numbers::pi / 6.0), Vector3f::UnitZ()).toRotationMatrix();
     m_move = Vector3f(0.01f, 0.02f, 0.03f);
 
     {

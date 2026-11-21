@@ -39,6 +39,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -68,8 +69,8 @@ static FiffInfo createSyntheticMegInfo(int nChannels = 102)
         ch.unit = FIFF_UNIT_T;
 
         // Distribute on a hemisphere of radius 0.12 m
-        double theta = M_PI * 0.4 * (static_cast<double>(i) / nChannels);
-        double phi = 2.0 * M_PI * i * 0.618033988749895; // golden angle
+        double theta = std::numbers::pi * 0.4 * (static_cast<double>(i) / nChannels);
+        double phi = 2.0 * std::numbers::pi * i * 0.618033988749895; // golden angle
 
         double r = 0.12;
         double x = r * std::sin(theta) * std::cos(phi);
@@ -123,7 +124,7 @@ private slots:
         MatrixXd data(nCh, nTimes);
         for (int i = 0; i < nCh; ++i) {
             for (int t = 0; t < nTimes; ++t) {
-                data(i, t) = 1e-12 * std::sin(2.0 * M_PI * 10.0 * t / 1000.0 + i * 0.1);
+                data(i, t) = 1e-12 * std::sin(2.0 * std::numbers::pi * 10.0 * t / 1000.0 + i * 0.1);
             }
         }
 
@@ -149,7 +150,7 @@ private slots:
         MatrixXd data(nCh, nTimes);
         for (int i = 0; i < nCh; ++i) {
             for (int t = 0; t < nTimes; ++t) {
-                data(i, t) = 1e-12 * std::sin(2.0 * M_PI * 10.0 * t / 1000.0 + i * 0.1);
+                data(i, t) = 1e-12 * std::sin(2.0 * std::numbers::pi * 10.0 * t / 1000.0 + i * 0.1);
             }
         }
 

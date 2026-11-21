@@ -28,6 +28,8 @@
 
 #include <QtTest>
 #include <QObject>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -73,7 +75,7 @@ void TestSurfaceLaplacian::initTestCase()
     const double golden = (1.0 + std::sqrt(5.0)) / 2.0;
     for (int i = 0; i < m_nCh; ++i) {
         double theta = std::acos(1.0 - static_cast<double>(i) / static_cast<double>(m_nCh));
-        double phi = 2.0 * M_PI * static_cast<double>(i) / golden;
+        double phi = 2.0 * std::numbers::pi * static_cast<double>(i) / golden;
         // Scale to head-like radius (~0.085 m)
         double r = 0.085;
         m_positions(i, 0) = r * std::sin(theta) * std::cos(phi);

@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <unsupported/Eigen/FFT>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -204,8 +205,8 @@ RowVectorXd FirFilter::designMne(double dSFreq, double dLFreq, double dHFreq)
         RowVectorXd step(nStep);
         for (int n = 0; n < nStep; ++n) {
             const double m = n - (nStep - 1) / 2.0;
-            const double sinc = m == 0.0 ? 1.0 : std::sin(M_PI * cutoff * m) / (M_PI * cutoff * m);
-            const double window = nStep > 1 ? 0.54 - 0.46 * std::cos(2.0 * M_PI * n / (nStep - 1)) : 1.0;
+            const double sinc = m == 0.0 ? 1.0 : std::sin(std::numbers::pi * cutoff * m) / (std::numbers::pi * cutoff * m);
+            const double window = nStep > 1 ? 0.54 - 0.46 * std::cos(2.0 * std::numbers::pi * n / (nStep - 1)) : 1.0;
             step(n) = cutoff * sinc * window;
         }
         step /= step.sum();
@@ -237,7 +238,7 @@ RowVectorXd FirFilter::firwin2(int nTaps, const std::vector<double>& freq, const
             ++k;
         const double span = freq[k + 1] - freq[k];
         const double g = span > 0.0 ? gain[k] + (gain[k + 1] - gain[k]) * (x - freq[k]) / span : gain[k + 1];
-        const double phase = -(nTaps - 1) / 2.0 * M_PI * x;
+        const double phase = -(nTaps - 1) / 2.0 * std::numbers::pi * x;
         fx(i) = g * std::complex<double>(std::cos(phase), std::sin(phase));
     }
     FFT<double> fft;
@@ -248,7 +249,7 @@ RowVectorXd FirFilter::firwin2(int nTaps, const std::vector<double>& freq, const
     const double a0 = window == FirWindow::Hamming ? 0.54 : 0.5;
     RowVectorXd h(nTaps);
     for (int n = 0; n < nTaps; ++n) {
-        const double w = nTaps > 1 ? a0 - (1.0 - a0) * std::cos(2.0 * M_PI * n / (nTaps - 1)) : 1.0;
+        const double w = nTaps > 1 ? a0 - (1.0 - a0) * std::cos(2.0 * std::numbers::pi * n / (nTaps - 1)) : 1.0;
         h(n) = full(n) * w;
     }
     return h;

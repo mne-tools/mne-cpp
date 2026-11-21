@@ -35,6 +35,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -65,7 +66,7 @@ static MatrixXd generateSsdData(int nChannels = 6, double sfreq = 256.0,
     // Inject stronger 10 Hz signal on channel 0
     for (int t = 0; t < nTimes; ++t) {
         double time = static_cast<double>(t) / sfreq;
-        data(0, t) += 10.0 * std::sin(2.0 * M_PI * 10.0 * time);
+        data(0, t) += 10.0 * std::sin(2.0 * std::numbers::pi * 10.0 * time);
     }
 
     return data;

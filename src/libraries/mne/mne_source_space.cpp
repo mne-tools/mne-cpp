@@ -56,13 +56,9 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <cmath>
+#include <numbers>
 
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 
 using mne::FiffCoordTrans;
 
@@ -1521,7 +1517,7 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                 /*
                 * Check that the source is inside the inner skull surface
                 */
-                tot_angle = surf.sum_solids(r1) / (4 * M_PI);
+                tot_angle = surf.sum_solids(r1) / (4 * std::numbers::pi);
                 if (std::fabs(tot_angle - 1.0) > 1e-5) {
                     omit_outside++;
                     s->inuse[p1] = 0;
@@ -1586,7 +1582,7 @@ void MNESourceSpace::filter_source_space(FilterThreadArg* arg)
             /*
            * Check that the source is inside the inner skull surface
            */
-            tot_angle = surf->sum_solids(r1) / (4 * M_PI);
+            tot_angle = surf->sum_solids(r1) / (4 * std::numbers::pi);
             if (std::fabs(tot_angle - 1.0) > 1e-5) {
                 omit_outside++;
                 a->s->inuse[p1] = 0;

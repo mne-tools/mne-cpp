@@ -37,6 +37,8 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -125,7 +127,7 @@ bool SurfaceChecks::isCompleteSurface(const MNEBemSurface& surf)
     //
     // Sum of solid angles from the center should be 4*pi for a complete surface
     //
-    double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
+    double totAngle = sumSolids(cm, surf) / (4.0 * std::numbers::pi);
     if (fabs(totAngle - 1.0) > 1e-5) {
         qCritical() << "FsSurface" << getNameOf(surf.id) << "is not complete"
                     << "(sum of solid angles =" << totAngle << "* 4*PI instead).";
@@ -140,7 +142,7 @@ bool SurfaceChecks::isInside(const MNEBemSurface& from, const MNEBemSurface& to)
 {
     for (int k = 0; k < from.np; ++k) {
         Vector3f pt = from.rr.row(k);
-        double totAngle = sumSolids(pt, to) / (4.0 * M_PI);
+        double totAngle = sumSolids(pt, to) / (4.0 * std::numbers::pi);
         if (fabs(totAngle - 1.0) > 1e-5) {
             qCritical() << "FsSurface" << getNameOf(from.id)
                         << "is not completely inside surface" << getNameOf(to.id)

@@ -28,6 +28,8 @@
 
 #include <QtTest>
 #include <QObject>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -243,8 +245,8 @@ void TestDspCsd::testMultitaperMatchesMnePython()
     MatrixXd data(2, 256);
     for (int n = 0; n < data.cols(); ++n) {
         const double t = n / sfreq;
-        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
-        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+        data(0, n) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.3 * std::cos(2.0 * std::numbers::pi * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * std::numbers::pi * 10.0 * t + 0.7) + 0.1 * t;
     }
 
     const CsdResult r = Csd::computeMultitaper(data, sfreq);
@@ -287,8 +289,8 @@ void TestDspCsd::testFourierMatchesMnePython()
     MatrixXd data(2, 512);
     for (int n = 0; n < data.cols(); ++n) {
         const double t = n / sfreq;
-        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
-        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+        data(0, n) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.3 * std::cos(2.0 * std::numbers::pi * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * std::numbers::pi * 10.0 * t + 0.7) + 0.1 * t;
     }
 
     const CsdResult r = Csd::computeFourier(data, sfreq, 0.0, 50.0, 128, 0.5);
@@ -364,8 +366,8 @@ void TestDspCsd::testMorletMatchesMnePython()
     MatrixXd data(2, 400);
     for (int n = 0; n < data.cols(); ++n) {
         const double t = n / sfreq;
-        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t);
-        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+        data(0, n) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.3 * std::cos(2.0 * std::numbers::pi * 23.0 * t);
+        data(1, n) = 0.5 * std::sin(2.0 * std::numbers::pi * 10.0 * t + 0.7) + 0.1 * t;
     }
     RowVectorXd frequencies(2);
     frequencies << 10.0, 23.0;

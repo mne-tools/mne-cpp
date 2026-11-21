@@ -46,6 +46,7 @@
 #include <format>
 #include <print>
 #include <string_view>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
     QVector<double> y;
     for (int i = 0; i <= 100; ++i) {
         x.append(i / 100.0);
-        y.append(std::sin(2.0 * M_PI * x.last()));
+        y.append(std::sin(2.0 * std::numbers::pi * x.last()));
     }
     LinePlot line(x, y, "sin(2 pi t)");
     line.setXLabel("t [s]");

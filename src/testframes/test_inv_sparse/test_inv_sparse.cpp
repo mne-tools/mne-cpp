@@ -29,6 +29,8 @@
 
 #include <QtTest>
 #include <QObject>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -97,7 +99,7 @@ void TestInvSparse::createSyntheticForwardProblem(
     for (int idx : activeIndices) {
         if (idx < nSources) {
             for (int t = 0; t < nTimes; ++t) {
-                sourceActivity(idx, t) = 5.0 * std::sin(2.0 * M_PI * 10.0 * t / nTimes);
+                sourceActivity(idx, t) = 5.0 * std::sin(2.0 * std::numbers::pi * 10.0 * t / nTimes);
             }
         }
     }

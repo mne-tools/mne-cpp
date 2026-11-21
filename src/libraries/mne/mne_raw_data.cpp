@@ -40,13 +40,8 @@
 #include <iterator>
 #include <string>
 #include <string_view>
-
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -282,7 +277,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef& filte
     int highpass_widths, lowpass_widths;
     float lowpass, highpass, lowpass_width, highpass_width;
     float* freq_resp;
-    float pi4 = static_cast<float>(M_PI / 4.0);
+    float pi4 = static_cast<float>(std::numbers::pi / 4.0);
     float mult, add, c;
 
     resp_size = (filter.size + 2 * filter.taper_size) / 2 + 1;

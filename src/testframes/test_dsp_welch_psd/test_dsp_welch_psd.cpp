@@ -27,6 +27,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,7 +78,7 @@ static RowVectorXd makeSine(double dFreq, double dSFreq, int nSamples)
 {
     RowVectorXd v(nSamples);
     for (int n = 0; n < nSamples; ++n)
-        v[n] = std::sin(2.0 * M_PI * dFreq * n / dSFreq);
+        v[n] = std::sin(2.0 * std::numbers::pi * dFreq * n / dSFreq);
     return v;
 }
 
@@ -174,7 +176,7 @@ void TestWelchPsd::testTwoSinePeaks()
 
     RowVectorXd sig(nSamp);
     for (int n = 0; n < nSamp; ++n)
-        sig[n] = std::sin(2.0 * M_PI * 50.0 * n / dSFreq) + std::sin(2.0 * M_PI * 200.0 * n / dSFreq);
+        sig[n] = std::sin(2.0 * std::numbers::pi * 50.0 * n / dSFreq) + std::sin(2.0 * std::numbers::pi * 200.0 * n / dSFreq);
 
     RowVectorXd psd = WelchPsd::computeVector(sig, dSFreq, nfft, 0.5);
     RowVectorXd freqs = WelchPsd::freqAxis(nfft, dSFreq);
@@ -296,8 +298,8 @@ void TestWelchPsd::testMatchesMnePython()
     MatrixXd x(2, 1000);
     for (int i = 0; i < 1000; ++i) {
         const double t = i / 250.0;
-        x(0, i) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5 + 0.2 * t;
-        x(1, i) = 0.5 * std::sin(2.0 * M_PI * 40.0 * t + 0.7) - 0.1 * t;
+        x(0, i) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.3 * std::cos(2.0 * std::numbers::pi * 23.0 * t) + 0.5 + 0.2 * t;
+        x(1, i) = 0.5 * std::sin(2.0 * std::numbers::pi * 40.0 * t + 0.7) - 0.1 * t;
     }
     const WelchPsdResult r = WelchPsd::compute(x, 250.0, nfft, overlap, static_cast<WelchPsd::WindowType>(window),
                                                RowVectorXi(), removeDc);

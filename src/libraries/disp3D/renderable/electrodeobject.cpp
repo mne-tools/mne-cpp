@@ -28,6 +28,8 @@
 #include <limits>
 #include <map>
 #include <vector>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,7 +94,7 @@ void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
     std::vector<MeshVertex> mv;
     std::vector<uint32_t> idx;
     for (int i = 0; i < kSides; ++i) {
-        const float a = 2.0f * float(M_PI) * float(i) / float(kSides);
+        const float a = 2.0f * float(std::numbers::pi) * float(i) / float(kSides);
         const float x = std::cos(a), z = std::sin(a);
         mv.push_back({x, 0.5f, z, x, 0, z});
         mv.push_back({x, -0.5f, z, x, 0, z});
@@ -106,7 +108,7 @@ void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
         const uint32_t centre = uint32_t(mv.size());
         mv.push_back({0, y, 0, 0, y * 2.0f, 0});
         for (int i = 0; i < kSides; ++i) {
-            const float a = 2.0f * float(M_PI) * float(i) / float(kSides);
+            const float a = 2.0f * float(std::numbers::pi) * float(i) / float(kSides);
             mv.push_back({std::cos(a), y, std::sin(a), 0, y * 2.0f, 0});
         }
         for (int i = 0; i < kSides; ++i) {

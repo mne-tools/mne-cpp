@@ -17,6 +17,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -430,15 +431,15 @@ private slots:
         std::seed_seq seed{3};
         std::mt19937 rng(seed);
         std::normal_distribution<double> noise(0.0, 0.1);
-        std::uniform_real_distribution<double> phase(0.0, 2.0 * M_PI);
+        std::uniform_real_distribution<double> phase(0.0, 2.0 * std::numbers::pi);
         std::vector<MatrixXd> trials;
         for (int t = 0; t < 20; ++t) {
             const double phi = phase(rng);
             MatrixXd trial(3, 200);
             for (int k = 0; k < 200; ++k) {
-                const double w = 2.0 * M_PI * 10.0 * k / sfreq;
+                const double w = 2.0 * std::numbers::pi * 10.0 * k / sfreq;
                 trial(0, k) = std::sin(w + phi) + noise(rng);
-                trial(1, k) = std::sin(w + phi - M_PI / 2.0) + noise(rng);
+                trial(1, k) = std::sin(w + phi - std::numbers::pi / 2.0) + noise(rng);
                 trial(2, k) = noise(rng);
             }
             trials.push_back(trial);

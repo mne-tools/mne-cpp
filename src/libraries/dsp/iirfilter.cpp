@@ -26,6 +26,7 @@
 #include <cmath>
 #include <complex>
 #include <algorithm>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,7 +39,7 @@ using namespace Eigen;
 // CONSTANTS
 //=============================================================================================================
 
-static constexpr double PI = M_PI;
+static constexpr double PI = std::numbers::pi;
 
 //=============================================================================================================
 // PRIVATE HELPERS

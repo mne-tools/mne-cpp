@@ -16,6 +16,7 @@
 #include <cmath>
 
 #include <dsp/ica.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -67,8 +68,8 @@ private slots:
         const int nCh = 2;
         MatrixXd sources(nCh, N);
         for (int i = 0; i < N; ++i) {
-            sources(0, i) = std::sin(2.0 * M_PI * 5.0 * i / 1000.0);
-            sources(1, i) = std::sin(2.0 * M_PI * 13.0 * i / 1000.0);
+            sources(0, i) = std::sin(2.0 * std::numbers::pi * 5.0 * i / 1000.0);
+            sources(1, i) = std::sin(2.0 * std::numbers::pi * 13.0 * i / 1000.0);
         }
 
         // Random mixing matrix
@@ -126,9 +127,9 @@ private slots:
         const int nCh = 3;
         MatrixXd sources(nCh, N);
         for (int i = 0; i < N; ++i) {
-            sources(0, i) = std::sin(2 * M_PI * 50.0 * i / 1000.0); // "artifact" at 50 Hz
-            sources(1, i) = std::sin(2 * M_PI * 10.0 * i / 1000.0);
-            sources(2, i) = std::sin(2 * M_PI * 3.0 * i / 1000.0);
+            sources(0, i) = std::sin(2 * std::numbers::pi * 50.0 * i / 1000.0); // "artifact" at 50 Hz
+            sources(1, i) = std::sin(2 * std::numbers::pi * 10.0 * i / 1000.0);
+            sources(2, i) = std::sin(2 * std::numbers::pi * 3.0 * i / 1000.0);
         }
         MatrixXd A(nCh, nCh);
         A << 1.0, 0.3, 0.1,

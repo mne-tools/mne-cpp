@@ -61,6 +61,7 @@
 #include <inv/inv_source_estimate.h>
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
+#include <numbers>
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -1649,7 +1650,7 @@ void MainWindow::createToolBar()
             double phase = k * 1.0;
             path.moveTo(4, sz / 2);
             for (int x = 4; x <= sz - 4; ++x) {
-                double t = double(x - 4) / (sz - 8) * 2.0 * M_PI;
+                double t = double(x - 4) / (sz - 8) * 2.0 * std::numbers::pi;
                 double y = sz / 2 + (sz / 4) * std::sin(t + phase) * (1.0 - 0.2 * k);
                 path.lineTo(x, y);
             }

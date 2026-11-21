@@ -57,6 +57,8 @@
 
 #include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
+#include <cmath>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -324,13 +326,13 @@ void TestInvRtLibrary::rtConnectivity_slidesOverTheNewestTrials()
     std::seed_seq seed{5};
     std::mt19937 rng(seed);
     std::normal_distribution<double> noise(0.0, 0.3);
-    std::uniform_real_distribution<double> phase(0.0, 2.0 * M_PI);
+    std::uniform_real_distribution<double> phase(0.0, 2.0 * std::numbers::pi);
     std::vector<MatrixXd> trials;
     for (int t = 0; t < 12; ++t) {
         const double phi = phase(rng);
         MatrixXd trial(3, 128);
         for (int k = 0; k < trial.cols(); ++k) {
-            const double w = 2.0 * M_PI * 10.0 * k / 128.0;
+            const double w = 2.0 * std::numbers::pi * 10.0 * k / 128.0;
             trial(0, k) = std::sin(w + phi) + noise(rng);
             trial(1, k) = std::sin(w + phi - 0.7) + noise(rng);
             trial(2, k) = noise(rng);
@@ -529,7 +531,7 @@ void TestInvRtLibrary::rtAveraging_averagesTheNewestEpochs()
     for (int block = 0; block < 5; ++block) {
         MatrixXd data = MatrixXd::Zero(2, 200);
         for (int j = 0; j < 200; ++j)
-            data(0, j) = std::sin(2.0 * M_PI * 10.0 * j / 1000.0);
+            data(0, j) = std::sin(2.0 * std::numbers::pi * 10.0 * j / 1000.0);
         if (block % 2 == 0)
             data(1, 100) = 5.0;
         updates += static_cast<int>(averaging.update(data).size());
@@ -540,7 +542,7 @@ void TestInvRtLibrary::rtAveraging_averagesTheNewestEpochs()
     QCOMPARE(evoked.comment, "5");
     QCOMPARE(evoked.nave, 2);
     for (int k = 0; k < 150; ++k)
-        QVERIFY(std::fabs(evoked.data(0, k) - std::sin(2.0 * M_PI * 10.0 * (50 + k) / 1000.0)) < 1e-12);
+        QVERIFY(std::fabs(evoked.data(0, k) - std::sin(2.0 * std::numbers::pi * 10.0 * (50 + k) / 1000.0)) < 1e-12);
 }
 
 //=============================================================================================================
@@ -555,7 +557,7 @@ void TestInvRtLibrary::rtNoise_hanningWindow()
     for (int b = 0; b < 4; ++b) {
         MatrixXd block(5, 256);
         for (int t = 0; t < 256; ++t) {
-            block.col(t).setConstant(std::sin(2.0 * M_PI * 125.0 * (256 * b + t) / 1000.0));
+            block.col(t).setConstant(std::sin(2.0 * std::numbers::pi * 125.0 * (256 * b + t) / 1000.0));
         }
         QVERIFY(!psdDb);
         psdDb = noise.estimate_spectrum(block);
@@ -674,7 +676,7 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
     // rotation about z plus a 5 mm shift. Coil k oscillates at hpiFreqs[perm[k]].
     MatrixXd matCoilsHead(4, 3);
     matCoilsHead << 0.07, 0.0, 0.05, -0.07, 0.0, 0.05, 0.0, 0.08, 0.04, 0.0, -0.06, 0.07;
-    const double angle = 10.0 * M_PI / 180.0;
+    const double angle = 10.0 * std::numbers::pi / 180.0;
     Matrix4f devHead = Matrix4f::Identity();
     devHead.topLeftCorner<3, 3>() << std::cos(angle), -std::sin(angle), 0, std::sin(angle), std::cos(angle), 0, 0, 0, 1;
     devHead.topRightCorner<3, 1>() << 0.003f, -0.002f, 0.004f;
@@ -707,7 +709,7 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
     for (int k = 0; k < 4; ++k) {
         const double f = hpiFreqs[perm[k]];
         // Coil 1 carries cosine, the others sine, so both amplitude branches are used.
-        const RowVectorXd phase = 2.0 * M_PI * f * t;
+        const RowVectorXd phase = 2.0 * std::numbers::pi * f * t;
         const RowVectorXd wave = k == 1 ? RowVectorXd(phase.array().cos()) : RowVectorXd(phase.array().sin());
         matData += field(matCoilsDev.row(k).transpose(), 1e-8 * moments[k]) * wave;
     }

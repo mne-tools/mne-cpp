@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <cmath>
 #include <complex>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -437,7 +438,7 @@ VectorXcd SessionFilter::frequencyResponse(int iPoints) const
 
     ensureDesigned();
     for (int index = 0; index < response.size(); ++index) {
-        const double omega = M_PI * static_cast<double>(index) / static_cast<double>(response.size() - 1);
+        const double omega = std::numbers::pi * static_cast<double>(index) / static_cast<double>(response.size() - 1);
         response(index) = evalIirResponse(m_iirSections, omega);
     }
 
@@ -464,7 +465,7 @@ VectorXd SessionFilter::phaseResponse(int iPoints) const
     const VectorXcd complexResponse = frequencyResponse(iPoints);
     VectorXd phase(complexResponse.size());
     for (int index = 0; index < complexResponse.size(); ++index) {
-        phase(index) = std::arg(complexResponse(index)) * 180.0 / M_PI;
+        phase(index) = std::arg(complexResponse(index)) * 180.0 / std::numbers::pi;
     }
 
     return phase;

@@ -20,6 +20,7 @@
 
 #include <QQuaternion>
 #include <cmath>
+#include <numbers>
 
 using namespace mne;
 using namespace mne::disp;
@@ -255,7 +256,7 @@ void NetworkObject::createEdgeGeometry()
 
     // Side vertices: top ring (2..2+segments-1), bottom ring (2+segments..2+2*segments-1)
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
+        float angle = 2.0f * static_cast<float>(std::numbers::pi) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
 
@@ -271,7 +272,7 @@ void NetworkObject::createEdgeGeometry()
     // Top cap vertices (for proper normals)
     int topCapStart = static_cast<int>(vertices.size());
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
+        float angle = 2.0f * static_cast<float>(std::numbers::pi) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
         vertices.push_back({x, halfHeight, z, 0, 1, 0});
@@ -280,7 +281,7 @@ void NetworkObject::createEdgeGeometry()
     // Bottom cap vertices
     int botCapStart = static_cast<int>(vertices.size());
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
+        float angle = 2.0f * static_cast<float>(std::numbers::pi) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
         vertices.push_back({x, -halfHeight, z, 0, -1, 0});

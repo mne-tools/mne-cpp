@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <complex>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -29,7 +30,7 @@ VectorXd makeSignal(int nSamples, int periodSamples)
 {
     VectorXd signal(nSamples);
     for (int i = 0; i < nSamples; ++i) {
-        signal(i) = std::sin(2.0 * M_PI * static_cast<double>(i) / static_cast<double>(periodSamples));
+        signal(i) = std::sin(2.0 * std::numbers::pi * static_cast<double>(i) / static_cast<double>(periodSamples));
     }
     return signal;
 }
@@ -105,8 +106,8 @@ void TestDspSpectrogram::make_spectrogram_everyColumnIsTheWindowedSpectrum()
             std::complex<double> bin = 0.0;
             for (int t = 0; t < n; ++t) {
                 const double u = (t - j) / scale;
-                const double window = std::exp(-M_PI * u * u) * std::pow(2.0, 0.25) / std::sqrt(scale);
-                bin += signal(t) * window * std::polar(1.0, -2.0 * M_PI * k * t / n);
+                const double window = std::exp(-std::numbers::pi * u * u) * std::pow(2.0, 0.25) / std::sqrt(scale);
+                bin += signal(t) * window * std::polar(1.0, -2.0 * std::numbers::pi * k * t / n);
             }
             QVERIFY2(std::abs(spec(k, j) - std::norm(bin)) <= 1e-9 * (1.0 + std::norm(bin)), qPrintable(QString("bin %1, column %2").arg(k).arg(j)));
         }

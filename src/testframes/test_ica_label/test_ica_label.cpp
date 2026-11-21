@@ -35,6 +35,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,13 +94,13 @@ void TestIcaLabel::initTestCase()
     for (int t = 0; t < nSamples; ++t) {
         double time = static_cast<double>(t) / m_sFreq;
         // Brain component: 10 Hz sine
-        m_sources(0, t) = std::sin(2.0 * M_PI * 10.0 * time) + noise(gen);
+        m_sources(0, t) = std::sin(2.0 * std::numbers::pi * 10.0 * time) + noise(gen);
         // EOG reference
-        m_eogRef(0, t) = std::sin(2.0 * M_PI * 0.5 * time) + noise(gen) * 0.1;
+        m_eogRef(0, t) = std::sin(2.0 * std::numbers::pi * 0.5 * time) + noise(gen) * 0.1;
         // EOG-like component (highly correlated)
         m_sources(1, t) = m_eogRef(0, t) * 2.0 + noise(gen) * 0.05;
         // ECG reference
-        m_ecgRef(0, t) = std::sin(2.0 * M_PI * 1.2 * time) + noise(gen) * 0.1;
+        m_ecgRef(0, t) = std::sin(2.0 * std::numbers::pi * 1.2 * time) + noise(gen) * 0.1;
         // ECG-like component
         m_sources(2, t) = m_ecgRef(0, t) * 1.5 + noise(gen) * 0.05;
     }
@@ -164,7 +165,7 @@ void TestIcaLabel::testMaxAbsCorrelation()
 {
     VectorXd a(100), b(100);
     for (int i = 0; i < 100; ++i) {
-        a[i] = std::sin(2.0 * M_PI * i / 100.0);
+        a[i] = std::sin(2.0 * std::numbers::pi * i / 100.0);
         b[i] = a[i] * 2.0 + 0.01;
     }
 
@@ -182,7 +183,7 @@ void TestIcaLabel::testMuscleScore()
     // Low-frequency signal should have low muscle score
     VectorXd lowFreq(500);
     for (int i = 0; i < 500; ++i)
-        lowFreq[i] = std::sin(2.0 * M_PI * 5.0 * i / 250.0);
+        lowFreq[i] = std::sin(2.0 * std::numbers::pi * 5.0 * i / 250.0);
 
     double score = MlIcaLabel::muscleScore(lowFreq, 250.0);
     QVERIFY2(score < 0.5, qPrintable(QString("Muscle score %1 >= 0.5 for low freq").arg(score)));
@@ -221,10 +222,10 @@ void TestIcaLabel::testMultipleArtifacts()
     MatrixXd sources(4, 500);
     for (int t = 0; t < 500; ++t) {
         double time = static_cast<double>(t) / m_sFreq;
-        sources(0, t) = std::sin(2.0 * M_PI * 10.0 * time); // brain
-        sources(1, t) = m_eogRef(0, t) * 3.0;               // EOG 1
-        sources(2, t) = m_eogRef(0, t) * -2.5;              // EOG 2 (anti-correlated)
-        sources(3, t) = m_ecgRef(0, t) * 2.0;               // ECG
+        sources(0, t) = std::sin(2.0 * std::numbers::pi * 10.0 * time); // brain
+        sources(1, t) = m_eogRef(0, t) * 3.0;                           // EOG 1
+        sources(2, t) = m_eogRef(0, t) * -2.5;                          // EOG 2 (anti-correlated)
+        sources(3, t) = m_ecgRef(0, t) * 2.0;                           // ECG
     }
 
     std::vector<IcaLabelResult> labels = MlIcaLabel::classify(sources, m_eogRef, m_ecgRef, m_sFreq);

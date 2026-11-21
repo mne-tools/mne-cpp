@@ -20,12 +20,6 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
 #include <ctime>
 #include <cstdlib>
 #include <Eigen/Dense>
@@ -65,6 +59,7 @@
 #include <QCommandLineParser>
 #include <QFile>
 #include <QSet>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,7 +82,7 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
     sineWaveResultOriginal.resize(iterateAmount + 1);
     Eigen::VectorXd sineWaveResult = sineWaveResultOriginal.transpose();
     double sineResult;
-    double omega = 2.0 * M_PI;
+    double omega = 2.0 * std::numbers::pi;
     int iterateCount = 0;
     for (double step = xNow; step < xEnd; step += xStep) {
         sineResult = amplitude * (sin(omega * step));

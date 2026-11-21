@@ -61,6 +61,8 @@
 #include <QtTest>
 #include <QCoreApplication>
 #include <QTemporaryDir>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 
@@ -479,7 +481,7 @@ void TestToolConversionExtended::testComputeHeadTransformRotated()
     // Apply a known rotation to standard fiducials and verify transform
     DigPoint nasion, lpa, rpa;
     // Rotated 45° around Z
-    float c = std::cos(M_PI / 4), s = std::sin(M_PI / 4);
+    float c = std::cos(std::numbers::pi / 4), s = std::sin(std::numbers::pi / 4);
     nasion.r[0] = -0.08f * s;
     nasion.r[1] = 0.08f * c;
     nasion.r[2] = 0.0f;

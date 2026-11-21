@@ -36,6 +36,7 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -112,18 +113,18 @@ private:
 
         // EOG1: 1 Hz sine (6 complete cycles in 600 samples at 100 Hz)
         for (int t = 0; t < nTimes; ++t) {
-            data(3, t) = std::sin(2.0 * M_PI * 1.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
+            data(3, t) = std::sin(2.0 * std::numbers::pi * 1.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
         }
 
         // EOG2: 3 Hz sine (18 complete cycles)
         for (int t = 0; t < nTimes; ++t) {
-            data(4, t) = std::sin(2.0 * M_PI * 3.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
+            data(4, t) = std::sin(2.0 * std::numbers::pi * 3.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
         }
 
         // Clean sine wave base signal at 5 Hz (30 complete cycles)
         RowVectorXd cleanSine(nTimes);
         for (int t = 0; t < nTimes; ++t) {
-            cleanSine(t) = std::sin(2.0 * M_PI * 5.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
+            cleanSine(t) = std::sin(2.0 * std::numbers::pi * 5.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
         }
 
         // Channel 0 (MEG1): clean sine only
@@ -159,12 +160,12 @@ private slots:
         const int n = 500;
         MatrixXd data = MatrixXd::Zero(6, n);
         for (int t = 0; t < n; ++t) {
-            const double eog1 = std::sin(2 * M_PI * t / 97.0) + 0.3 + 0.2 * std::sin(2 * M_PI * t / 13.0);
-            const double eog2 = std::cos(2 * M_PI * t / 41.0) - 0.1;
+            const double eog1 = std::sin(2 * std::numbers::pi * t / 97.0) + 0.3 + 0.2 * std::sin(2 * std::numbers::pi * t / 13.0);
+            const double eog2 = std::cos(2 * std::numbers::pi * t / 41.0) - 0.1;
             data(4, t) = eog1;
             data(5, t) = eog2;
-            data(0, t) = 0.5 * std::sin(2 * M_PI * t / 7.0) + 0.8 * eog1 + 2.0;
-            data(1, t) = 0.4 * std::cos(2 * M_PI * t / 11.0) + 0.3 * eog1 - 0.6 * eog2 - 1.0;
+            data(0, t) = 0.5 * std::sin(2 * std::numbers::pi * t / 7.0) + 0.8 * eog1 + 2.0;
+            data(1, t) = 0.4 * std::cos(2 * std::numbers::pi * t / 11.0) + 0.3 * eog1 - 0.6 * eog2 - 1.0;
             data(2, t) = 0.7 * eog2 + std::sin(t / 5.0);
             data(3, t) = (t / 50) % 2;
         }
@@ -208,7 +209,7 @@ private slots:
         // Reconstruct the clean sine used in makeTestData
         RowVectorXd cleanSine(nTimes);
         for (int t = 0; t < nTimes; ++t) {
-            cleanSine(t) = std::sin(2.0 * M_PI * 5.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
+            cleanSine(t) = std::sin(2.0 * std::numbers::pi * 5.0 * static_cast<double>(t) / static_cast<double>(nTimes / 6));
         }
         double rmsBefore = rms(RowVectorXd(data.row(1) - cleanSine));
 

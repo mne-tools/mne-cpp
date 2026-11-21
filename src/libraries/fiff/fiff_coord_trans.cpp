@@ -33,14 +33,6 @@
 #include <base/log.h>
 #include <base/string_utils.h>
 
-
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
-#include <math.h>
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -55,6 +47,8 @@
 #include <fstream>
 #include <sstream>
 #include <cstdint>
+#include <numbers>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -347,7 +341,7 @@ float FiffCoordTrans::angle_to(const Eigen::MatrixX4f& mTransDest) const
 
     quatCompare = quat * quatNew.inverse();
     fAngle = quat.angularDistance(quatNew);
-    fAngle = fAngle * 180 / M_PI;
+    fAngle = fAngle * 180 / std::numbers::pi;
 
     return fAngle;
 }

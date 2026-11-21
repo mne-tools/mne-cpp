@@ -23,6 +23,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -304,10 +305,10 @@ private slots:
             for (double c : {1.7, 5.2, 9.9})
                 blink += std::exp(-(t - c) * (t - c) / (2 * 0.06 * 0.06));
             for (int k = 0; k < 3; ++k)
-                data(k, i) = 1e-12 * beat * (1 + 0.1 * k) + 1e-13 * std::sin(2 * M_PI * (0.5 + k) * t);
-            data(3, i) = 1e-3 * beat + 1e-4 * std::sin(2 * M_PI * 0.3 * t) + 2e-5 * std::sin(2 * M_PI * 50 * t);
-            data(4, i) = 2e-4 * blink + 1e-5 * std::sin(2 * M_PI * 0.2 * t);
-            data(5, i) = -0.3e-4 * blink + 3e-6 * std::cos(2 * M_PI * 3 * t);
+                data(k, i) = 1e-12 * beat * (1 + 0.1 * k) + 1e-13 * std::sin(2 * std::numbers::pi * (0.5 + k) * t);
+            data(3, i) = 1e-3 * beat + 1e-4 * std::sin(2 * std::numbers::pi * 0.3 * t) + 2e-5 * std::sin(2 * std::numbers::pi * 50 * t);
+            data(4, i) = 2e-4 * blink + 1e-5 * std::sin(2 * std::numbers::pi * 0.2 * t);
+            data(5, i) = -0.3e-4 * blink + 3e-6 * std::cos(2 * std::numbers::pi * 3 * t);
         }
         FiffInfo info;
         const QStringList names{"M1", "M2", "M3", "ECG", "EOG1", "EOG2"};

@@ -32,6 +32,7 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -62,7 +63,7 @@ double bandPower(const RowVectorXd& sig, double sFreq, double fLow, double fHigh
 
         double re = 0.0, im = 0.0;
         for (int n = 0; n < N; ++n) {
-            double angle = 2.0 * M_PI * k * n / static_cast<double>(N);
+            double angle = 2.0 * std::numbers::pi * k * n / static_cast<double>(N);
             re += sig(n) * std::cos(angle);
             im -= sig(n) * std::sin(angle);
         }
@@ -78,7 +79,7 @@ RowVectorXd makeSine(double freqHz, double sFreq, int nSamples)
 {
     RowVectorXd v(nSamples);
     for (int i = 0; i < nSamples; ++i)
-        v(i) = std::sin(2.0 * M_PI * freqHz * i / sFreq);
+        v(i) = std::sin(2.0 * std::numbers::pi * freqHz * i / sFreq);
     return v;
 }
 
@@ -185,7 +186,7 @@ void TestDspFirFilter::filterDataZeroDouble_matchesMnePython()
     MatrixXd x(1, n);
     for (int i = 0; i < n; ++i) {
         const double t = i / 100.0;
-        x(0, i) = std::sin(2.0 * M_PI * 8.0 * t) + 0.5 * std::sin(2.0 * M_PI * 30.0 * t) + 0.3 * t + 0.2 * std::cos(2.0 * M_PI * 1.5 * t);
+        x(0, i) = std::sin(2.0 * std::numbers::pi * 8.0 * t) + 0.5 * std::sin(2.0 * std::numbers::pi * 30.0 * t) + 0.3 * t + 0.2 * std::cos(2.0 * std::numbers::pi * 1.5 * t);
     }
     const MatrixXd y = FirFilter::filterDataZeroDouble(x, 100.0, 5.0, 20.0, hamming ? FirFilter::FirWindow::Hamming : FirFilter::FirWindow::Hann);
     const double got[] = {y.cwiseAbs().sum(), y(0, 3), y(0, 113), y(0, n / 2 + 7), y(0, n - 2)};
@@ -406,7 +407,7 @@ void TestDspFirFilter::parksMcClellan_passTypes()
     const auto gain = [](const Eigen::RowVectorXd& h, double w) {
         std::complex<double> sum = 0.0;
         for (Eigen::Index n = 0; n < h.size(); ++n)
-            sum += h(n) * std::polar(1.0, -M_PI * w * static_cast<double>(n));
+            sum += h(n) * std::polar(1.0, -std::numbers::pi * w * static_cast<double>(n));
         return std::abs(sum);
     };
     for (double w : pass)

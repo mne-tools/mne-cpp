@@ -37,6 +37,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -117,7 +119,7 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
           qPrintable(nameOf(surf.id)),
           1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
-    double totAngle = sumSolids(cm, surf) / (4.0 * M_PI);
+    double totAngle = sumSolids(cm, surf) / (4.0 * std::numbers::pi);
     if (fabs(totAngle - 1.0) > 1e-5) {
         qInfo("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)",
               qPrintable(nameOf(surf.id)), totAngle);
@@ -137,7 +139,7 @@ static bool checkNesting(const QVector<MNEBemSurface>& surfs)
 
         // Test first vertex of inner surface against outer
         Vector3f pt = surfs[j + 1].rr.row(0);
-        double totAngle = sumSolids(pt, surfs[j]) / (4.0 * M_PI);
+        double totAngle = sumSolids(pt, surfs[j]) / (4.0 * std::numbers::pi);
         if (fabs(totAngle - 1.0) > 1e-5) {
             qInfo("Checking that %s is inside %s... [FAILED]",
                   qPrintable(inner), qPrintable(outer));

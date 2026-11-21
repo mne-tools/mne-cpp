@@ -27,6 +27,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -49,7 +51,7 @@ MatrixXd makeSineMatrix(int nCh, int nSamp, double sFreq, double freqHz)
     for (int ch = 0; ch < nCh; ++ch) {
         double phase = ch * 0.1; // small phase offset so channels are distinct but correlated
         for (int t = 0; t < nSamp; ++t)
-            m(ch, t) = std::sin(2.0 * M_PI * freqHz * t / sFreq + phase);
+            m(ch, t) = std::sin(2.0 * std::numbers::pi * freqHz * t / sFreq + phase);
     }
     return m;
 }
@@ -144,11 +146,11 @@ void TestDspBadChannelDetect::detectHighVariance_identifiesNoisyChannel()
     MatrixXd data(nCh, nSamp);
     for (int ch = 0; ch < nCh; ++ch)
         for (int t = 0; t < nSamp; ++t)
-            data(ch, t) = 1e-12 * std::sin(2.0 * M_PI * 10.0 * t / 1000.0);
+            data(ch, t) = 1e-12 * std::sin(2.0 * std::numbers::pi * 10.0 * t / 1000.0);
 
     // Channel 5: large noise (1000x higher amplitude)
     for (int t = 0; t < nSamp; ++t)
-        data(5, t) = 1e-9 * std::sin(2.0 * M_PI * 50.0 * t / 1000.0 + 0.7);
+        data(5, t) = 1e-9 * std::sin(2.0 * std::numbers::pi * 50.0 * t / 1000.0 + 0.7);
 
     auto bad = BadChannelDetect::detectHighVariance(data, 4.0);
     QVERIFY(std::ranges::contains(bad, 5));

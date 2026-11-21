@@ -30,6 +30,8 @@
 
 #include <QtTest>
 #include <QObject>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -93,7 +95,7 @@ MatrixXd TestDspMultitaper::generateSinusoidal(int nChannels, int nSamples, doub
         for (int s = 0; s < nSamples; ++s) {
             double t = s / sfreq;
             for (double freq : frequencies) {
-                data(ch, s) += std::sin(2.0 * M_PI * freq * t);
+                data(ch, s) += std::sin(2.0 * std::numbers::pi * freq * t);
             }
         }
     }
@@ -203,7 +205,7 @@ void TestDspMultitaper::testTfrArrayMatchesMnePython()
     MatrixXd data(2, 500);
     for (int n = 0; n < 500; ++n) {
         const double t = n / sfreq;
-        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.5 * std::sin(2.0 * M_PI * 23.0 * t + 0.3) + 0.2 * t;
+        data(0, n) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.5 * std::sin(2.0 * std::numbers::pi * 23.0 * t + 0.3) + 0.2 * t;
     }
     data.row(1) = 0.5 * data.row(0).reverse();
 
@@ -246,8 +248,8 @@ void TestDspMultitaper::testPsdMatchesMnePython()
     MatrixXd data(2, 256);
     for (int n = 0; n < data.cols(); ++n) {
         const double t = n / sfreq;
-        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
-        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+        data(0, n) = std::sin(2.0 * std::numbers::pi * 10.0 * t) + 0.3 * std::cos(2.0 * std::numbers::pi * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * std::numbers::pi * 10.0 * t + 0.7) + 0.1 * t;
     }
 
     const MultitaperPsdResult r = MultitaperPsd::compute(data, sfreq);
@@ -326,8 +328,8 @@ void TestDspMultitaper::testPsdMultiChannel()
     MatrixXd data(2, nSamples);
     for (int s = 0; s < nSamples; ++s) {
         double t = s / sfreq;
-        data(0, s) = std::sin(2.0 * M_PI * 20.0 * t);
-        data(1, s) = std::sin(2.0 * M_PI * 50.0 * t);
+        data(0, s) = std::sin(2.0 * std::numbers::pi * 20.0 * t);
+        data(1, s) = std::sin(2.0 * std::numbers::pi * 50.0 * t);
     }
 
     MultitaperPsdResult result = MultitaperPsd::compute(data, sfreq);

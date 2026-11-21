@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -88,8 +89,8 @@ double powerAtFreq(const RowVectorXd& row, double freq, double sfreq)
     double sinSum = 0.0;
     for (int n = 0; n < N; ++n) {
         const double t = static_cast<double>(n) / sfreq;
-        cosSum += row(n) * std::cos(2.0 * M_PI * freq * t);
-        sinSum += row(n) * std::sin(2.0 * M_PI * freq * t);
+        cosSum += row(n) * std::cos(2.0 * std::numbers::pi * freq * t);
+        sinSum += row(n) * std::sin(2.0 * std::numbers::pi * freq * t);
     }
     return (cosSum * cosSum + sinSum * sinSum) / (static_cast<double>(N) * static_cast<double>(N));
 }
@@ -102,7 +103,7 @@ RowVectorXd sineTone(double freq, double sfreq, int nSamples, double amplitude =
     RowVectorXd row(nSamples);
     for (int n = 0; n < nSamples; ++n) {
         const double t = static_cast<double>(n) / sfreq;
-        row(n) = amplitude * std::sin(2.0 * M_PI * freq * t);
+        row(n) = amplitude * std::sin(2.0 * std::numbers::pi * freq * t);
     }
     return row;
 }

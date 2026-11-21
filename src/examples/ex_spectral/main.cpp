@@ -37,6 +37,7 @@
 
 #include <QApplication>
 #include <QtMath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,13 +70,13 @@ int main(int argc, char* argv[])
     double dSampFreq = 23.0;
     MatrixXd inputData = MatrixXd::Random(2, iNSamples);
     for (int n = 0; n < iNSamples; n++) {
-        inputData(0, n) += 10.0 * sin(2.0 * M_PI * 10. * n / iNSamples);
-        inputData(0, n) += 10.0 * sin(2.0 * M_PI * 100. * n / iNSamples);
-        inputData(0, n) += 10.0 * sin(2.0 * M_PI * 200. * n / iNSamples);
+        inputData(0, n) += 10.0 * sin(2.0 * std::numbers::pi * 10. * n / iNSamples);
+        inputData(0, n) += 10.0 * sin(2.0 * std::numbers::pi * 100. * n / iNSamples);
+        inputData(0, n) += 10.0 * sin(2.0 * std::numbers::pi * 200. * n / iNSamples);
 
-        inputData(1, n) += 10.0 * sin(2.0 * M_PI * 50. * n / iNSamples);
-        inputData(1, n) += 10.0 * sin(2.0 * M_PI * 100. * n / iNSamples);
-        inputData(1, n) += 10.0 * sin(2.0 * M_PI * 150. * n / iNSamples);
+        inputData(1, n) += 10.0 * sin(2.0 * std::numbers::pi * 50. * n / iNSamples);
+        inputData(1, n) += 10.0 * sin(2.0 * std::numbers::pi * 100. * n / iNSamples);
+        inputData(1, n) += 10.0 * sin(2.0 * std::numbers::pi * 150. * n / iNSamples);
     }
 
     //Generate hanning window

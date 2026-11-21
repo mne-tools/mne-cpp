@@ -16,6 +16,7 @@
 #include <cmath>
 
 #include <dsp/iirfilter.h>
+#include <numbers>
 
 using namespace mne;
 using namespace Eigen;
@@ -31,7 +32,7 @@ static double bandPower(const RowVectorXd& sig, double freqLow, double freqHigh,
         if (freq >= freqLow && freq <= freqHigh) {
             double re = 0.0, im = 0.0;
             for (int n = 0; n < N; ++n) {
-                double angle = 2.0 * M_PI * k * n / N;
+                double angle = 2.0 * std::numbers::pi * k * n / N;
                 re += sig(n) * std::cos(angle);
                 im -= sig(n) * std::sin(angle);
             }
@@ -127,7 +128,7 @@ private slots:
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * fLow * i / fs) + std::sin(2 * M_PI * fHi * i / fs);
+            sig(i) = std::sin(2 * std::numbers::pi * fLow * i / fs) + std::sin(2 * std::numbers::pi * fHi * i / fs);
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);
@@ -152,8 +153,8 @@ private slots:
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * 5.0 * i / fs) // stopband (5 Hz)
-                + std::sin(2 * M_PI * 200.0 * i / fs); // passband (200 Hz)
+            sig(i) = std::sin(2 * std::numbers::pi * 5.0 * i / fs) // stopband (5 Hz)
+                + std::sin(2 * std::numbers::pi * 200.0 * i / fs); // passband (200 Hz)
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);
@@ -177,9 +178,9 @@ private slots:
 
         RowVectorXd sig(N);
         for (int i = 0; i < N; ++i) {
-            sig(i) = std::sin(2 * M_PI * 0.05 * i / fs) // below passband (0.05 Hz)
-                + std::sin(2 * M_PI * 10.0 * i / fs)    // inside passband (10 Hz)
-                + std::sin(2 * M_PI * 200.0 * i / fs);  // above passband (200 Hz)
+            sig(i) = std::sin(2 * std::numbers::pi * 0.05 * i / fs) // below passband (0.05 Hz)
+                + std::sin(2 * std::numbers::pi * 10.0 * i / fs)    // inside passband (10 Hz)
+                + std::sin(2 * std::numbers::pi * 200.0 * i / fs);  // above passband (200 Hz)
         }
 
         RowVectorXd filtered = IirFilter::applyZeroPhase(sig, sos);

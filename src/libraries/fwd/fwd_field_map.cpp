@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -49,10 +50,10 @@ using namespace mne;
 namespace
 {
 
-constexpr int kNCoeff = 100;                     // Legendre polynomial terms
-constexpr double kMegConst = 4e-14 * M_PI;       // mu_0^2 / (4*pi)
-constexpr double kEegConst = 1.0 / (4.0 * M_PI); // 1 / (4*pi)
-constexpr double kEegIntradScale = 0.7;          // EEG integration radius scale
+constexpr int kNCoeff = 100;                                 // Legendre polynomial terms
+constexpr double kMegConst = 4e-14 * std::numbers::pi;       // mu_0^2 / (4*pi)
+constexpr double kEegConst = 1.0 / (4.0 * std::numbers::pi); // 1 / (4*pi)
+constexpr double kEegIntradScale = 0.7;                      // EEG integration radius scale
 
 constexpr float kGradStd = 5e-13f; // gradiometer noise std (5 fT/cm)
 constexpr float kMagStd = 20e-15f; // magnetometer noise std (20 fT)

@@ -38,6 +38,7 @@
 
 #include <random>
 #include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -110,7 +111,7 @@ MatrixX3f TestSphere::generateSpherePoints(const Vector3f& center, float radius,
 {
     MatrixX3f points(nPoints, 3);
     std::mt19937 gen(seed);
-    std::uniform_real_distribution<float> dist_theta(0.0f, 2.0f * static_cast<float>(M_PI));
+    std::uniform_real_distribution<float> dist_theta(0.0f, 2.0f * static_cast<float>(std::numbers::pi));
     std::uniform_real_distribution<float> dist_phi(-1.0f, 1.0f);
 
     for (int i = 0; i < nPoints; ++i) {

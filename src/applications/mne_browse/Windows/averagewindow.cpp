@@ -40,6 +40,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <numbers>
 
 
 //*************************************************************************************************************
@@ -1048,7 +1049,7 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
         cx /= n;
         cy /= n;
         for (int k = 0; k < n; ++k) {
-            double angle = 2.0 * M_PI * k / n - M_PI / 2.0; // Start from top
+            double angle = 2.0 * std::numbers::pi * k / n - std::numbers::pi / 2.0; // Start from top
             selItem.m_qpChannelPosition[group.indices[k]] =
                 QPointF(cx + radius * std::cos(angle),
                         cy + radius * std::sin(angle));

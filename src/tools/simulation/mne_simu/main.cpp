@@ -44,6 +44,8 @@
 //=============================================================================================================
 
 #include <random>
+#include <cmath>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -155,7 +157,7 @@ int main(int argc, char* argv[])
     VectorXd sourceSignal(nSamples);
     for (int t = 0; t < nSamples; ++t) {
         double time = t / sfreq;
-        sourceSignal(t) = sin(2.0 * M_PI * signalFreq * time);
+        sourceSignal(t) = sin(2.0 * std::numbers::pi * signalFreq * time);
     }
 
     // Compute simulated sensor data: data = gain * signal

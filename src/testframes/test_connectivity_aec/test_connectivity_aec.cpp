@@ -35,6 +35,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,10 +80,10 @@ void TestConnectivityAec::initTestCase()
     m_data = MatrixXd(m_nSig, m_nSamples);
     for (int t = 0; t < m_nSamples; ++t) {
         double time = static_cast<double>(t) / 100.0;
-        m_data(0, t) = std::sin(2.0 * M_PI * 10.0 * time);
-        m_data(1, t) = std::sin(2.0 * M_PI * 10.0 * time + 0.1); // Slightly phase-shifted
-        m_data(2, t) = std::sin(2.0 * M_PI * 25.0 * time);       // Different frequency
-        m_data(3, t) = std::cos(2.0 * M_PI * 10.0 * time);       // Same freq, 90° shift
+        m_data(0, t) = std::sin(2.0 * std::numbers::pi * 10.0 * time);
+        m_data(1, t) = std::sin(2.0 * std::numbers::pi * 10.0 * time + 0.1); // Slightly phase-shifted
+        m_data(2, t) = std::sin(2.0 * std::numbers::pi * 25.0 * time);       // Different frequency
+        m_data(3, t) = std::cos(2.0 * std::numbers::pi * 10.0 * time);       // Same freq, 90° shift
     }
 }
 
@@ -181,7 +182,7 @@ void TestConnectivityAec::testHilbertEnvelope()
     // Envelope of a sinusoid should be approximately constant (≈ 1)
     VectorXd signal(m_nSamples);
     for (int t = 0; t < m_nSamples; ++t)
-        signal[t] = std::sin(2.0 * M_PI * 10.0 * t / 100.0);
+        signal[t] = std::sin(2.0 * std::numbers::pi * 10.0 * t / 100.0);
 
     VectorXd env = ConnectivityAec::hilbertEnvelope(signal);
 

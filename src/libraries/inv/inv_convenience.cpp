@@ -52,6 +52,7 @@
 #include <limits>
 #include <numeric>
 #include <vector>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -79,7 +80,7 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
 
     // Apply Hann window
     for (int i = 0; i < copyLen; ++i) {
-        double w = 0.5 * (1.0 - std::cos(2.0 * M_PI * i / (copyLen - 1)));
+        double w = 0.5 * (1.0 - std::cos(2.0 * std::numbers::pi * i / (copyLen - 1)));
         segment(i) *= w;
     }
 
@@ -90,7 +91,7 @@ VectorXd computeRowPsd(const VectorXd& row, int nFft, double sfreq)
     for (int f = 0; f < nFreqs; ++f) {
         double re = 0.0, im = 0.0;
         for (int t = 0; t < nFft; ++t) {
-            double angle = -2.0 * M_PI * f * t / nFft;
+            double angle = -2.0 * std::numbers::pi * f * t / nFft;
             re += segment(t) * std::cos(angle);
             im += segment(t) * std::sin(angle);
         }

@@ -31,11 +31,6 @@
 #include "inv_hpi_model_parameters.h"
 
 
-// MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
-// so define it here only for the toolchains that do not.
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
-#endif
 #include <cmath>
 #include <vector>
 #include <numeric>
@@ -56,6 +51,7 @@
 //=============================================================================================================
 
 #include <base/thread_pool.h>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -539,7 +535,7 @@ bool InvHpiFit::compareTransformation(const MatrixX4f& mDevHeadT,
 
     // Compare Rotation
     float fAngle = quat.angularDistance(quatNew);
-    fAngle = fAngle * 180 / M_PI;
+    fAngle = fAngle * 180 / std::numbers::pi;
 
     // Compare translation
     float fMove = (vTrans - vTransDest).norm();

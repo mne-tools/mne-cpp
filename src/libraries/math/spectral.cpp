@@ -45,6 +45,7 @@
 #include <future>
 #include <thread>
 #include <vector>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -261,7 +262,7 @@ MatrixXd Spectral::hanningWindow(int iSignalLength)
 
     //Main step of building the hanning window
     for (int n = 0; n < iSignalLength; n++) {
-        matHann(0, n) = 0.5 - 0.5 * cos(2.0 * M_PI * n / (iSignalLength - 1.0));
+        matHann(0, n) = 0.5 - 0.5 * cos(2.0 * std::numbers::pi * n / (iSignalLength - 1.0));
     }
     matHann.array() /= matHann.row(0).norm();
 

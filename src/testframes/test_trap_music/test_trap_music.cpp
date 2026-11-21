@@ -37,6 +37,7 @@
 
 #include <cmath>
 #include <random>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -91,8 +92,8 @@ void TestTrapMusic::initTestCase()
     m_sourcePos = MatrixXd::Zero(m_nSrc, 3);
     for (int i = 0; i < m_nSrc; ++i) {
         // Place on a sphere
-        double theta = M_PI * i / m_nSrc;
-        double phi = 2.0 * M_PI * (i * 1.618);
+        double theta = std::numbers::pi * i / m_nSrc;
+        double phi = 2.0 * std::numbers::pi * (i * 1.618);
         m_sourcePos(i, 0) = 0.07 * std::sin(theta) * std::cos(phi);
         m_sourcePos(i, 1) = 0.07 * std::sin(theta) * std::sin(phi);
         m_sourcePos(i, 2) = 0.07 * std::cos(theta);
@@ -142,8 +143,8 @@ void TestTrapMusic::testTwoSources()
 
     VectorXd ts1(nTimes), ts2(nTimes);
     for (int t = 0; t < nTimes; ++t) {
-        ts1[t] = std::sin(2.0 * M_PI * 10.0 * t / 100.0);
-        ts2[t] = std::cos(2.0 * M_PI * 7.0 * t / 100.0);
+        ts1[t] = std::sin(2.0 * std::numbers::pi * 10.0 * t / 100.0);
+        ts2[t] = std::cos(2.0 * std::numbers::pi * 7.0 * t / 100.0);
     }
 
     MatrixXd lfSrc1 = m_leadField.block(0, srcIdx1 * 3, m_nCh, 3);
@@ -191,7 +192,7 @@ void TestTrapMusic::testCorrelationAboveThreshold()
     int nTimes = 50;
     Vector3d orient(0.0, 0.0, 1.0);
 
-    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * M_PI).array().sin();
+    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * std::numbers::pi).array().sin();
     MatrixXd lfSrc = m_leadField.block(0, srcIdx * 3, m_nCh, 3);
     MatrixXd data = lfSrc * orient * ts.transpose();
 
@@ -239,7 +240,7 @@ void TestTrapMusic::testFixedOrient()
     int srcIdx = 8;
     int nTimes = 50;
 
-    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * M_PI).array().sin();
+    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * std::numbers::pi).array().sin();
     MatrixXd data = lfFixed.col(srcIdx) * ts.transpose();
 
     InvTrapMusic trap(1, 0.5);
@@ -301,7 +302,7 @@ void TestTrapMusic::testSourcePosition()
     int nTimes = 50;
     Vector3d orient(1.0, 0.0, 0.0);
 
-    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * M_PI).array().sin();
+    VectorXd ts = VectorXd::LinSpaced(nTimes, 0.0, 2.0 * std::numbers::pi).array().sin();
     MatrixXd lfSrc = m_leadField.block(0, srcIdx * 3, m_nCh, 3);
     MatrixXd data = lfSrc * orient * ts.transpose();
 
