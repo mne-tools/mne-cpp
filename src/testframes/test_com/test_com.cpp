@@ -211,7 +211,7 @@ void TestCom::tcpReportsAHalfAnswerAndAClosedPeer()
 
 void TestCom::tcpConnectFails()
 {
-    auto refused = TcpSocket::connect("127.0.0.1", 1, 1s);
+    auto refused = TcpSocket::connect("127.0.0.1", 1, 5s); // Windows retries a refused connection for about 2 s
     QVERIFY(!refused);
     QVERIFY(refused.error() == std::errc::connection_refused);
     auto unknown = TcpSocket::connect("no-such-host.invalid", 4217, 1s);

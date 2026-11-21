@@ -32,6 +32,7 @@
 #include <QDataStream>
 #include <QDir>
 #include <QFile>
+#include <QLibrary>
 #include <QPluginLoader>
 #include <QProcess>
 #include <QTcpServer>
@@ -303,6 +304,9 @@ void TestRtServerFiffReplay::pluginSharesTheConnectorType()
         QSKIP("mne_rt_server plugins not built");
     }
     for (const QString& name : files) {
+        if (!QLibrary::isLibrary(name)) { // the import libraries and export files next to a Windows plugin
+            continue;
+        }
         QPluginLoader loader(plugins.absoluteFilePath(name));
         QObject* instance = loader.instance();
         if (instance == nullptr) {

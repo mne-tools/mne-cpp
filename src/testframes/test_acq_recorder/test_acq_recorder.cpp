@@ -37,6 +37,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -858,7 +859,7 @@ void TestAcqRecorder::recordsBids()
     QVERIFY(recorder->stop().ok());
 
     const QString fif = root + QStringLiteral("/sub-01/ses-1/meg/sub-01_ses-1_task-oddball_meg.fif");
-    QCOMPARE(QString::fromStdString(recorder->files().front()), fif);
+    QCOMPARE(QDir::fromNativeSeparators(QString::fromStdString(recorder->files().front())), fif); // Windows joins with '\\'
     for (const char* sidecar : {"/dataset_description.json", "/sub-01/ses-1/meg/sub-01_ses-1_task-oddball_meg.json",
                                 "/sub-01/ses-1/meg/sub-01_ses-1_task-oddball_channels.tsv",
                                 "/sub-01/ses-1/meg/sub-01_ses-1_task-oddball_events.tsv"}) {
