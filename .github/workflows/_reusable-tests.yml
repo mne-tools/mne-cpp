@@ -172,33 +172,34 @@ jobs:
       run: |
         python -c "import mne; mne.datasets.sample.data_path()"
 
-    # ── Compiler cache (Linux|MacOS) ───────────────────────────────────────
+    # ── Compiler cache ─────────────────────────────────────────────────────
     # One entry per OS/Qt/coverage configuration, capped by CCACHE_MAXSIZE.
     # Only callers that pass save_ccache write it, and then delete the entries
     # they supersede, so the total stays at a few hundred MB per configuration
     # instead of growing with every run and evicting the other Actions caches.
-    - name: Set up ccache (Linux|MacOS)
-      if: runner.os != 'Windows'
+    - name: Set up ccache
       shell: bash
       run: |
         if [ "$RUNNER_OS" = "Linux" ]; then
           sudo apt-get install -q ccache
-        else
+        elif [ "$RUNNER_OS" = "macOS" ]; then
           brew install ccache
+        else
+          choco install --no-progress -y ccache ninja
         fi
         {
           echo "CCACHE_DIR=$RUNNER_TEMP/ccache"
           echo "CCACHE_BASEDIR=$GITHUB_WORKSPACE"
           echo "CCACHE_COMPILERCHECK=content"
-          echo "CCACHE_MAXSIZE=400M"
+          # MSVC objects are about twice the size of GCC's and Clang's
+          echo "CCACHE_MAXSIZE=${{ runner.os == 'Windows' && '800M' || '400M' }}"
           echo "CMAKE_C_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache"
           # Coverage only changes the compile on Linux, so macOS shares one key.
           echo "CCACHE_KEY_PREFIX=ccache-v1-${{ matrix.os }}-qt${{ inputs.qt_version }}-cov${{ runner.os == 'Linux' && inputs.with_code_coverage }}-"
         } >> "$GITHUB_ENV"
 
-    - name: Restore ccache (Linux|MacOS)
-      if: runner.os != 'Windows'
+    - name: Restore ccache
       uses: actions/cache/restore@v5
       with:
         path: ${{ runner.temp }}/ccache
@@ -257,18 +258,24 @@ jobs:
         $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
         cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON
+        # Ninja compiles the files of a target in parallel, msbuild only the targets. ccache cannot cache an MSVC
+        # compile that uses a precompiled header or writes a .pdb, so neither is used here.
+        cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON `
+              -DMNE_PRECOMPILED_HEADERS=OFF -DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=Embedded
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         cmake --build build --config Release --parallel
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        ccache --show-stats
 
-    - name: Save ccache (Linux|MacOS)
-      if: runner.os != 'Windows' && inputs.save_ccache
+    - name: Save ccache
+      if: inputs.save_ccache
       uses: actions/cache/save@v5
       with:
         path: ${{ runner.temp }}/ccache
         key: ${{ env.CCACHE_KEY_PREFIX }}${{ github.run_id }}
 
-    - name: Prune superseded ccache entries (Linux|MacOS)
-      if: runner.os != 'Windows' && inputs.save_ccache
+    - name: Prune superseded ccache entries
+      if: inputs.save_ccache
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
