@@ -1068,8 +1068,11 @@ Eigen::Vector3f vec3FromJson(const JsonValue& v)
 JsonValue mat4ToJson(const Eigen::Matrix4f& m)
 {
     JsonArray a;
-    for (int i = 0; i < 16; ++i)
-        a.append(static_cast<double>(m.data()[i]));
+    for (int i = 0; i < 16; ++i) {
+        // A named value: moving a JsonValue temporary into the array trips GCC 14's -Wmaybe-uninitialized at -O1
+        const JsonValue value(static_cast<double>(m.data()[i]));
+        a.append(value);
+    }
     return a;
 }
 
