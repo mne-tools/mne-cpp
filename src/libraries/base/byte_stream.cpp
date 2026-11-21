@@ -21,6 +21,7 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <share.h>
 #else
 #include <unistd.h>
 #endif
@@ -75,8 +76,9 @@ std::FILE* openFile(const std::filesystem::path& path, FileByteStream::Mode mode
 {
 #ifdef _WIN32
     const auto* flags = mode == FileByteStream::Mode::Read ? L"rb" : (mode == FileByteStream::Mode::Write ? L"w+b" : L"r+b");
-    std::FILE* file = nullptr;
-    return _wfopen_s(&file, path.c_str(), flags) == 0 ? file : nullptr;
+    // Shared like a POSIX file: _wfopen_s would lock out every other handle, so a second reader of the same FIFF
+    // file, or a QFile or QTemporaryFile that holds it, could not open it
+    return _wfsopen(path.c_str(), flags, _SH_DENYNO);
 #else
     const auto* flags = mode == FileByteStream::Mode::Read ? "rb" : (mode == FileByteStream::Mode::Write ? "w+b" : "r+b");
     return std::fopen(path.c_str(), flags);
