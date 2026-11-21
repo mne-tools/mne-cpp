@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Dependency Guard
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Fails pull requests from outside contributors that add or change external
+# dependencies (FetchContent, ExternalProject, submodules, package manifests)
+# or CI workflows, until a maintainer adds the `dependency-approved` label.
+#
+# Runs on pull_request_target so it reports before a maintainer approves the
+# fork's CI. It never checks out or executes the pull request's code: it only
+# reads the list of changed files and the diff through the API.
+# ═══════════════════════════════════════════════════════════════════════════
+name: Dependency Guard
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches:
+      - staging
+      - main
+
+permissions:
+  pull-requests: read
+
+jobs:
+  Guard:
+    if: ${{ !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for dependency and CI changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'dependency-approved') }}
+        run: |
+          set -euo pipefail
+          findings=""
+
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
+          sensitive=$(printf '%s\n' "$files" | grep -E '^(\.github/|\.gitmodules$|cmake/)|(^|/)(vcpkg\.json|conanfile\.(txt|py)|requirements[^/]*\.txt|pyproject\.toml|package(-lock)?\.json)$' || true)
+          if [ -n "$sensitive" ]; then
+            findings+="Changed CI or dependency files:"$'\n'"$sensitive"$'\n\n'
+          fi
+
+          added=$(gh pr diff "$PR" --repo "$REPO" \
+            | grep -E '^\+[^+]' \
+            | grep -iE 'FetchContent_(Declare|MakeAvailable)|ExternalProject_Add|CPMAddPackage|GIT_REPOSITORY|URL[[:space:]]+"?https?://|file\(DOWNLOAD' || true)
+          if [ -n "$added" ]; then
+            findings+="Added external dependency declarations:"$'\n'"$added"$'\n'
+          fi
+
+          if [ -z "$findings" ]; then
+            echo "No dependency or CI changes."
+            exit 0
+          fi
+
+          {
+            echo "## Dependency Guard"
+            echo '```'
+            echo "$findings"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "$findings"
+
+          if [ "$APPROVED" = "true" ]; then
+            echo "Approved by a maintainer via the 'dependency-approved' label."
+            exit 0
+          fi
+          echo "::error::This pull request adds or changes external dependencies or CI. A maintainer must review it and add the 'dependency-approved' label. See CONTRIBUTING.md."
+          exit 1
