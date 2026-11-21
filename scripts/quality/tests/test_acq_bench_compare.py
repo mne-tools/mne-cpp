@@ -70,5 +70,33 @@ class TestAcqBenchCompare(unittest.TestCase):
         self.assertEqual(rows, {"wake_spin_p99": "TARGET", "ring_1": "TARGET", "ring_2": "ok"})
 
 
+    def test_a_regression_must_survive_a_second_round(self) -> None:
+        # A shared runner has slow minutes: the head's first rounds all landed in one, the later ones did not
+        calls = {"base": 0, "head": 0}
+
+        def bench(binary: str, quick: bool) -> list[dict]:
+            calls[binary] += 1
+            slow = binary == "head" and calls[binary] <= 5
+            return run({"ring_1": 2.2 if slow else 4.4})
+
+        rows, rounds = compare.gate("base", "head", runs=5, confirm_runs=5, tolerance=0.2, quick=False, bench=bench)
+        self.assertEqual(rows[0]["status"], "ok")
+        self.assertEqual(rounds, 10)
+        self.assertEqual(rows[0]["head_runs"], [2.2] * 5 + [4.4] * 5)
+
+    def test_a_lasting_regression_still_fails(self) -> None:
+        def bench(binary: str, quick: bool) -> list[dict]:
+            return run({"ring_1": 2.2 if binary == "head" else 4.4, "op_cost": 50})
+
+        rows, rounds = compare.gate("base", "head", runs=5, confirm_runs=5, tolerance=0.2, quick=False, bench=bench)
+        self.assertEqual({r["name"]: r["status"] for r in rows}, {"ring_1": "REGRESSION", "op_cost": "ok"})
+        self.assertEqual(rounds, 10)
+
+    def test_no_second_round_without_a_regression(self) -> None:
+        rows, rounds = compare.gate("base", "head", runs=3, confirm_runs=5, tolerance=0.2, quick=False,
+                                    bench=lambda binary, quick: run({"ring_1": 4.4}))
+        self.assertEqual(rounds, 3)
+
+
 if __name__ == "__main__":
     unittest.main()

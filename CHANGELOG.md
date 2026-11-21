@@ -104,6 +104,12 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- The acquisition benchmark gate no longer fails on a slow stretch of the
+  shared runner: a metric more than 20 % worse than the base is measured in
+  five more alternating runs of both builds and fails only if the best of
+  all ten is still worse. Ring and sustained-throughput metrics had failed
+  at random between commits that did not touch `mne_acq`. `acq-bench.json`
+  now keeps every run's value.
 - Every include sits under the banner of its kind: INCLUDES (the file's own
   header, then headers next to the file, then MNE-CPP and other headers),
   QT INCLUDES, EIGEN INCLUDES and STL INCLUDES, in that order; 980 files had

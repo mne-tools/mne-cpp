@@ -12,7 +12,9 @@
 """Runs mne_acq_bench of a base and a head build alternately and fails on a regression.
 
 Absolute numbers on shared CI machines drift by tens of percent between runs, so the two builds are run
-interleaved on the same machine and each metric keeps its best value. Throughput, per-call cost and converter
+interleaved on the same machine and each metric keeps its best value. A shared machine also has slow minutes that
+can catch every run of one build, so a regression must show again after further runs of both before it fails;
+the JSON keeps every run's value for the analysis of a failure. Throughput, per-call cost and converter
 rates are gated: head may be at most ``--tolerance`` worse than base. Wake-up latencies and CPU time depend on the
 scheduler of the machine and are compared only for the report. Any metric that has a target (e.g. a p99 wake-up
 latency, a paced rate) must also meet it, whatever the base did.
@@ -86,23 +88,50 @@ def compare(base: dict[str, dict], head: dict[str, dict], tolerance: float) -> l
     return rows
 
 
+def alternate(base: str, head: str, rounds: int, quick: bool, bench, base_runs: list, head_runs: list) -> None:
+    """Runs both builds @p rounds times, alternating which goes first, so neither always meets a warmer machine."""
+    for _ in range(rounds):
+        order = [(base, base_runs), (head, head_runs)]
+        for binary, runs in order if (len(base_runs) + len(head_runs)) % 4 == 0 else reversed(order):
+            runs.append(bench(binary, quick))
+
+
+def per_run(runs: list[list[dict]], name: str) -> list[float]:
+    return [m["value"] for metrics in runs for m in metrics if m["name"] == name]
+
+
+def gate(base: str, head: str, runs: int, confirm_runs: int, tolerance: float, quick: bool,
+         bench=run_bench) -> tuple[list[dict], int]:
+    """The comparison and the rounds it took. A regression must also show after @p confirm_runs more rounds,
+    over the best of all of them: a shared runner has slow minutes that can catch every run of one build."""
+    base_runs: list = []
+    head_runs: list = []
+    alternate(base, head, runs, quick, bench, base_runs, head_runs)
+    rows = compare(best_of(base_runs), best_of(head_runs), tolerance)
+    if confirm_runs > 0 and any(r["status"] == "REGRESSION" for r in rows):
+        alternate(base, head, confirm_runs, quick, bench, base_runs, head_runs)
+        rows = compare(best_of(base_runs), best_of(head_runs), tolerance)
+    for r in rows:
+        r["base_runs"] = per_run(base_runs, r["name"])
+        r["head_runs"] = per_run(head_runs, r["name"])
+    return rows, len(head_runs)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--base", required=True, help="mne_acq_bench of the base commit")
     parser.add_argument("--head", required=True, help="mne_acq_bench of the commit under test")
     parser.add_argument("--runs", type=int, default=5, help="alternating runs per build (default 5)")
+    parser.add_argument("--confirm-runs", type=int, default=5,
+                        help="further alternating runs per build when a metric regresses (default 5)")
     parser.add_argument("--tolerance", type=float, default=0.2, help="allowed relative slowdown (default 0.2)")
     parser.add_argument("--quick", action="store_true", help="pass --quick to the suite")
     parser.add_argument("--json", help="write the comparison as JSON")
     args = parser.parse_args(argv)
 
-    base_runs, head_runs = [], []
-    for i in range(args.runs):
-        # Alternate the order too, so neither build always runs on a warmer or cooler machine.
-        order = [(args.base, base_runs), (args.head, head_runs)]
-        for binary, runs in order if i % 2 == 0 else reversed(order):
-            runs.append(run_bench(binary, args.quick))
-    rows = compare(best_of(base_runs), best_of(head_runs), args.tolerance)
+    rows, rounds = gate(args.base, args.head, args.runs, args.confirm_runs, args.tolerance, args.quick)
+    if rounds > args.runs:
+        print(f"A metric regressed after {args.runs} runs per build; {rounds} runs per build decide.")
 
     print(f"{'metric':36} {'base':>12} {'head':>12} {'change':>8}  status")
     for r in rows:
