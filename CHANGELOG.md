@@ -113,6 +113,8 @@ aliases; replace the old spelling as below.
   dipoles, source-estimate CSV, cluster info, the log file) end their lines
   with LF on Windows too, like the files of MNE-C, MNE-Python and FreeSurfer;
   a quality test refuses a text-mode `std::ofstream` in the libraries.
+- `os_pretty_name()` names Windows Server by its year, like QSysInfo
+  (`Windows Server 2025 (10.0.26100)`); it reported Windows 11.
 - `PythonRunner` hands out the lines of a Python child without the CR that
   Python on Windows writes before each LF, in `std_out`, `std_err`, the line
   callback and the progress parser; results compared with `"5"` or matrices

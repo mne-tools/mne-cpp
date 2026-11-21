@@ -51,6 +51,7 @@ extern char** environ; // NOLINT(readability-redundant-declaration): not declare
 #include <format>
 #include <fstream>
 #include <system_error>
+#include <tuple>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -451,24 +452,24 @@ std::string mne::host_name()
 std::string mne::os_pretty_name()
 {
 #if defined(_WIN32)
-    struct VersionInfo
-    {
-        ULONG size;
-        ULONG major;
-        ULONG minor;
-        ULONG build;
-        ULONG platform;
-        std::array<WCHAR, 128> servicePack;
-    };
     // RtlGetVersion reports the real version; GetVersionEx is capped by the application manifest
-    using RtlGetVersion = LONG(WINAPI*)(VersionInfo*);
-    VersionInfo version{sizeof(VersionInfo), 0, 0, 0, 0, {}};
+    using RtlGetVersion = LONG(WINAPI*)(OSVERSIONINFOEXW*);
+    OSVERSIONINFOEXW version{};
+    version.dwOSVersionInfoSize = sizeof(version);
     if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll")) {
         if (auto get = reinterpret_cast<RtlGetVersion>(reinterpret_cast<void*>(GetProcAddress(ntdll, "RtlGetVersion"))))
             get(&version);
     }
-    const ULONG product = version.major == 10 && version.build >= 22000 ? 11 : version.major;
-    return std::format("Windows {} ({}.{}.{})", product, version.major, version.minor, version.build);
+    const auto [major, minor, build] = std::tuple(version.dwMajorVersion, version.dwMinorVersion, version.dwBuildNumber);
+    if (version.wProductType != VER_NT_WORKSTATION && major == 10) {
+        // Server releases are named by year, told apart by their build, as QSysInfo does
+        const char* year = build >= 26100 ? "2025" : build >= 20348 ? "2022"
+            : build >= 17763                                        ? "2019"
+                                                                    : "2016";
+        return std::format("Windows Server {} ({}.{}.{})", year, major, minor, build);
+    }
+    const ULONG product = major == 10 && build >= 22000 ? 11 : major;
+    return std::format("Windows {} ({}.{}.{})", product, major, minor, build);
 #elif defined(__APPLE__)
     std::array<char, 64> version{};
     std::size_t size = version.size();
