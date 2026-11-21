@@ -386,7 +386,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/sts/stats-ttest',
         'api/sts/stats-cluster-result',
         'api/sts/stats-ftest-result',
-        'api/sts/stats-ttest-result'
+        'api/sts/stats-ttest-result',
+        'api/sts/shrunk-covariance',
+        'api/sts/factor-analysis-covariance'
       ],
     },
     {

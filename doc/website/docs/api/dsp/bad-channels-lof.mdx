@@ -69,6 +69,30 @@ Computes features for each channel (standard deviation, kurtosis, max absolute a
 
 ---
 
+### local_outlier_factor(features, n_neighbors)
+
+```cpp
+Eigen::Matrix< Derived::Scalar, Eigen::Dynamic, 1 > local_outlier_factor(const Eigen::MatrixBase< Derived > & features, int n_neighbors);
+```
+
+Local Outlier Factor of every sample, as scikit-learn's `LocalOutlierFactor` computes it.
+
+Breunig et al. (2000): the ratio of the neighbours' mean local reachability density to the sample's own, from the `n_neighbors` nearest samples by Euclidean distance. A header template, so float features on an embedded target are scored in float. Adapted from Skigen (MIT, Copyright (c) 2026 The Skigen Contributors).
+
+**Parameters:**
+
+- **features** : *const Eigen::MatrixBase&lt; Derived &gt; &*
+  Feature matrix, n_samples x n_features.
+
+- **n_neighbors** : *int*
+  Number of neighbours; all ones are returned unless it is below n_samples.
+
+**Returns:**
+
+- *Eigen::Matrix&lt; Derived::Scalar, Eigen::Dynamic, 1 &gt;* — The factor of each sample, n_samples; values well above 1 mark outliers.
+
+---
+
 ### computeLofScores(features, k)
 
 ```cpp
@@ -77,7 +101,7 @@ Eigen::VectorXd computeLofScores(const Eigen::MatrixXd & features, int k);
 
 Compute LOF scores for a feature matrix.
 
-Pure algorithmic LOF implementation operating on feature vectors.
+`local_outlier_factor()` in double precision.
 
 **Parameters:**
 

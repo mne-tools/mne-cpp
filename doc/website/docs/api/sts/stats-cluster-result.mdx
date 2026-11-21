@@ -55,7 +55,7 @@ const int effectCluster = clusters.matClusterIds(3, 0);
 
 Statistics library on small literal data sets with known answers.
 
-````cpp title="src/examples/ex_sts_statistics/main.cpp, line 178"
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 189"
 const StatsClusterResult clusters = StatsCluster::permutationTest(condA, condB, chain, 500);
 // Cluster ids are negative where A < B; |id| - 1 indexes vecClusterStats and vecClusterPvals
 const int effectCluster = clusters.matClusterIds(3, 0);

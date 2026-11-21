@@ -5,23 +5,23 @@
   "summary": {
     "exported_classes": 481,
     "exported_free_functions": 213,
-    "registered_classes": 574,
+    "registered_classes": 576,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 81,
+    "registered_header_only": 83,
     "registered_stale": 0,
-    "registered_with_test": 251,
+    "registered_with_test": 253,
     "registered_test_unresolved": 0,
-    "registered_with_example": 427,
+    "registered_with_example": 429,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 98,
+    "registered_with_python_equiv": 100,
     "registered_without_api_page": 0,
-    "with_snippet": 457,
-    "public_api_units": 576,
-    "example_eligible": 427,
+    "with_snippet": 459,
+    "public_api_units": 578,
+    "example_eligible": 429,
     "example_exempt": 149,
-    "eligible_backed_by_registry_example": 425,
-    "eligible_used_by_some_example": 369,
+    "eligible_backed_by_registry_example": 427,
+    "eligible_used_by_some_example": 371,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -234,13 +234,13 @@
       "with_snippet": 1
     },
     "sts": {
-      "public": 10,
-      "registered": 10,
-      "with_test": 6,
-      "eligible": 10,
-      "eligible_with_registry_example": 10,
-      "eligible_used_by_example": 10,
-      "with_snippet": 10
+      "public": 12,
+      "registered": 12,
+      "with_test": 8,
+      "eligible": 12,
+      "eligible_with_registry_example": 12,
+      "eligible_used_by_example": 12,
+      "with_snippet": 12
     }
   },
   "exported_free_functions": [
@@ -14641,6 +14641,56 @@
       "exempt_reason": null
     },
     {
+      "name": "FactorAnalysisCovariance",
+      "header": "sts/sts_cov_estimators.h",
+      "library": "sts",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "done",
+      "test": "test_sts_cov_estimators",
+      "test_resolves": true,
+      "example": "ex_sts_statistics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_sts_statistics"
+      ],
+      "snippets": [
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
+        "ex_sts_statistics/main.cpp#sts_cov_estimators_usage"
+      ],
+      "api_page": "doc/website/docs/api/sts/factor-analysis-covariance.mdx",
+      "python_equiv": "mne.cov (compute_covariance methods)",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ShrunkCovariance",
+      "header": "sts/sts_cov_estimators.h",
+      "library": "sts",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "done",
+      "test": "test_sts_cov_estimators",
+      "test_resolves": true,
+      "example": "ex_sts_statistics",
+      "example_state": "built",
+      "including_examples": [
+        "ex_sts_statistics"
+      ],
+      "snippets": [
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
+        "ex_sts_statistics/main.cpp#sts_cov_estimators_usage"
+      ],
+      "api_page": "doc/website/docs/api/sts/shrunk-covariance.mdx",
+      "python_equiv": "mne.cov (compute_covariance methods)",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "StsCovEstimators",
       "header": "sts/sts_cov_estimators.h",
       "library": "sts",
@@ -14656,6 +14706,8 @@
         "ex_sts_statistics"
       ],
       "snippets": [
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
+        "ex_sts_statistics/main.cpp#sts_cov_templates_usage",
         "ex_sts_statistics/main.cpp#sts_cov_estimators_usage"
       ],
       "api_page": "doc/website/docs/api/sts/sts-cov-estimators.mdx",

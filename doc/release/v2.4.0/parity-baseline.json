@@ -25,17 +25,17 @@
     "lock_mismatch": []
   },
   "summary": {
-    "claims": 361,
+    "claims": 363,
     "by_evidence": {
       "cross-validated-static": 174,
       "cross-validated-live": 0,
-      "tested": 186,
+      "tested": 188,
       "unverified": 1
     },
     "by_claim": {
       "equivalent": 139,
       "exceeds": 0,
-      "implemented": 127,
+      "implemented": 129,
       "partial": 95
     },
     "equivalence_without_static_evidence": [],
@@ -43,7 +43,7 @@
       "classes": {
         "cross-validated-static": 32,
         "cross-validated-live": 0,
-        "tested": 65,
+        "tested": 67,
         "unverified": 1
       },
       "parity": {
@@ -836,6 +836,24 @@
     {
       "source": "classes",
       "mne_cpp": "StsCovEstimators",
+      "python": "mne.cov (compute_covariance methods)",
+      "claimed": "implemented",
+      "equivalence": null,
+      "test": "test_sts_cov_estimators",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "ShrunkCovariance",
+      "python": "mne.cov (compute_covariance methods)",
+      "claimed": "implemented",
+      "equivalence": null,
+      "test": "test_sts_cov_estimators",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "FactorAnalysisCovariance",
       "python": "mne.cov (compute_covariance methods)",
       "claimed": "implemented",
       "equivalence": null,

@@ -1,0 +1,59 @@
+---
+id: factor-analysis-covariance
+title: "mne::FactorAnalysisCovariance"
+sidebar_label: FactorAnalysisCovariance
+sidebar_position: 12
+---
+
+# FactorAnalysisCovariance
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Statistics Library &nbsp;·&nbsp; **Source:** [`sts/sts_cov_estimators.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/sts/sts_cov_estimators.h)
+
+:::info[Python equivalent]
+`mne.cov (compute_covariance methods)` in MNE-Python.
+:::
+
+`#include <sts/sts_cov_estimators.h>`
+
+```cpp
+template <class Scalar>
+struct mne::FactorAnalysisCovariance
+```
+
+A Factor-Analysis model of a covariance, $W W^\top + \Psi$.
+
+```cpp title="src/examples/ex_sts_statistics/main.cpp"
+// The estimators are templates on the scalar type: float data, as on an embedded target, stays float
+const MatrixXf dataF = data.cast<float>();
+const ShrunkCovariance<float> lwF = ledoit_wolf_covariance(dataF);
+const FactorAnalysisCovariance<double> fa = factor_analysis_covariance(data, 1); // W W^T + diag(psi), one factor
+```
+
+---
+
+## Example
+
+- Start here: [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx) — Statistics library on small literal data sets with known answers.
+- Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
+- Build target: `ex_sts_statistics` (runs under CTest)
+
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 149"
+// The estimators are templates on the scalar type: float data, as on an embedded target, stays float
+const MatrixXf dataF = data.cast<float>();
+const ShrunkCovariance<float> lwF = ledoit_wolf_covariance(dataF);
+const FactorAnalysisCovariance<double> fa = factor_analysis_covariance(data, 1); // W W^T + diag(psi), one factor
+ok &= expect(std::fabs(lwF.shrinkage - shrinkLw) < 1e-5 && (lwF.covariance.cast<double>() - covLw).cwiseAbs().maxCoeff() < 1e-5,
+             std::format("ledoit_wolf_covariance in float: shrinkage {:g}", lwF.shrinkage));
+ok &= expect(fa.loadings.rows() == 3 && fa.loadings.cols() == 1 && (fa.covariance - fa.covariance.transpose()).norm() < 1e-12,
+             std::format("factor_analysis_covariance: 3 x 1 loadings after {} iterations", fa.iterations));
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
