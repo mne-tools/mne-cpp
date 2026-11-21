@@ -1,16 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2017-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_dir_node.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>
  * @since    0.1.0
- * @date     January 2017
+ * @date     July 2012
  * @brief    Recursive node of the parsed FIFF block tree (FIFFB_* hierarchy with directory entries and children).
  *
  * A FIFF file is a flat tag stream bracketed by @c FIFFB_BLOCK_START /

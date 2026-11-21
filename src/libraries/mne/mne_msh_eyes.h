@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     mne_msh_eyes.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     April 2017
  * @brief    Mesh-viewer camera state (position, focal point, up vector, field of view).
  *
  * @ref mne::MNEMshEyes captures the camera parameters that the

@@ -1,12 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     spectral.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Daniel Strohmeier <daniel.strohmeier@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     March 2018
  * @brief    FFT, multi-taper combination and PSD/CSD assembly kernels.
  *
  * Implements the static estimators declared in @ref spectral.h. Each

@@ -1,12 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     warp.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Jana Kiesel <jana.kiesel@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     November 2015
  * @brief    Thin-plate-spline 3-D warp from landmark correspondences.
  *
  * @ref mne::Warp implements Bookstein's thin-plate spline (TPS), the

@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2020-2026 MNE-CPP Authors
  *
  * @file     mne_icp.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
- * @date     March 2026
+ * @date     July 2020
  * @brief    Iterative Closest Point alignment between MEG digitiser points and an MRI head surface.
  *
  * Free functions for the point-to-surface ICP used by mne-cpp's coregistration

@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     plot.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     July 2018
+ * @date     June 2013
  * @brief    Implementation of the Plot vector-plot widget (auto-range and polyline painting).
  */
 

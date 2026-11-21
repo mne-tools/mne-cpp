@@ -1,12 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     inv_guess_data.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Johannes Behrens <behrens@neoscan-solutions.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     December 2016
  * @brief    Implementation of the initial-guess grid generation and forward-field pre-computation.
  *
  * Implements the constructors that either load a precomputed guess

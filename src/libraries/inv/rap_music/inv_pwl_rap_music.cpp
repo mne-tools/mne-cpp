@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     inv_pwl_rap_music.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     July 2013
  * @brief    Implementation of the Powell-accelerated RAP-MUSIC variant.
  *
  * Implements the Powell direction-set search over the leadfield grid,

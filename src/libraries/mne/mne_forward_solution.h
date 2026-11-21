@@ -1,12 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     mne_forward_solution.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+ * @since    0.1.0
+ * @date     July 2012
  * @brief    Forward solution (gain matrix mapping source dipoles to sensor measurements).
  *
  * @ref mne::MNEForwardSolution is the in-memory representation of an

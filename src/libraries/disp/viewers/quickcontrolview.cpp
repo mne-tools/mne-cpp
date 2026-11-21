@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     quickcontrolview.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Limin Sun <limin.sun@childrens.harvard.edu>
  * @since    0.1.0
- * @date     July 2018
+ * @date     June 2015
  * @brief    Implementation of the QuickControlView floating settings container.
  */
 

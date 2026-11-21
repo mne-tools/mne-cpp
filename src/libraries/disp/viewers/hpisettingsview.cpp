@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2020-2026 MNE-CPP Authors
+ * Copyright (c) 2017-2026 MNE-CPP Authors
  *
  * @file     hpisettingsview.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
@@ -11,7 +11,7 @@
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     March 2020
+ * @date     March 2017
  * @brief    Implementation of the HpiSettingsView HPI configuration panel.
  */
 

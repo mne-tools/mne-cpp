@@ -1,13 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2020-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     bidsview.cpp
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.7
- * @date     October 2020
+ * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Wayne Mead <wayne.mead@uth.tmc.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     August 2018
  * @brief    Implementation of the BidsView BIDS tree viewer.
  */
 

@@ -1,12 +1,13 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     linalg.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
- * @date     March 2026
+ * @date     July 2012
  * @brief    Static linear-algebra helpers: SVD-based conditioning, block-diagonal assembly, sorted index pairs.
  *
  * @ref mne::Linalg collects the dense / sparse Eigen primitives

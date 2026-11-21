@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * @file     fiff_file_sharer.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    2.0.0
- * @date     March 2026
+ * @date     March 2021
  * @brief    Implementation of @ref FiffFileSharer.
  */
 

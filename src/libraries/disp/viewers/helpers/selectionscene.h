@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     selectionscene.h
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     July 2018
+ * @date     October 2014
  * @brief    QGraphicsScene of the sensor-layout dots used by @ref mne::disp::ChannelSelectionView for interactive channel picking.
  *
  * SelectionScene places one @ref mne::disp::SelectionSceneItem per sensor at the

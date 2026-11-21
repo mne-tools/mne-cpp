@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     filterdesignview.h
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
- * @date     December 2018
+ * @date     August 2014
  * @brief    Interactive FIR / IIR filter design GUI with a live magnitude / phase preview.
  *
  * FilterDesignView is the largest settings panel in mne_disp: it lets

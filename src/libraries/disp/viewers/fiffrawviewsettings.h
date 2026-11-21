@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2019-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     fiffrawviewsettings.h
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     November 2019
+ * @date     July 2018
  * @brief    Display-style settings for the FIFF raw browser (zoom, time window, signal / background colours).
  *
  * FiffRawViewSettings centralises the visual knobs of

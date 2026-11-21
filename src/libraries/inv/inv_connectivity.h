@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2025-2026 MNE-CPP Authors
  *
  * @file     inv_connectivity.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
- * @date     March 2026
+ * @date     June 2025
  * @brief    Lightweight pairwise source-connectivity container that travels alongside a source estimate.
  *
  * @ref mne::InvConnectivity stores one @c N×N connectivity matrix

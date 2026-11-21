@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2017-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     fwd_eeg_sphere_layer.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     March 2017
+ * @date     December 2016
  * @brief    Single concentric spherical shell (radius + conductivity) of a multi-layer EEG head model.
  *
  * The classic four-shell de Munck / Berg-Scherg head model approximates

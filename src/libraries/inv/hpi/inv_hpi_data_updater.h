@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * @file     inv_hpi_data_updater.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    2.0.0
- * @date     March 2026
+ * @date     December 2021
  * @brief    Pre-processing front-end for HPI fitting — re-shapes raw MEG data, projectors and digitised coils into per-fit inputs.
  *
  * @ref mne::InvHpiDataUpdater isolates everything that has to

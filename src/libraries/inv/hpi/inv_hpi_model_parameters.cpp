@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2022-2026 MNE-CPP Authors
  *
  * @file     inv_hpi_model_parameters.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    2.0.0
- * @date     March 2026
+ * @date     February 2022
  * @brief    Implementation of @ref mne::InvHpiModelParameters (value semantics, equality, coil-count computation).
  *
  * Implements the parameter-list constructor, the copy / assignment /

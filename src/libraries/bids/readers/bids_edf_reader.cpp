@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2019-2026 MNE-CPP Authors
  *
  * @file     bids_edf_reader.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.1.0
- * @date     March 2026
+ * @date     March 2019
  * @brief    Implementation of @ref mne::EDFReader — European Data Format (EDF / EDF+) parser behind @ref mne::AbstractFormatReader.
  */
 

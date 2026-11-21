@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2017-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     fwd_types.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     March 2017
+ * @date     December 2016
  * @brief    std::function aliases for the generic dipole field / potential / field-gradient callbacks driving the source-space loop.
  *
  * The compute_forward driver iterates over every dipole position in a

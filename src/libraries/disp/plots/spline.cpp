@@ -1,16 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     spline.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>
  * @since    0.1.0
- * @date     July 2018
+ * @date     April 2016
  * @brief    Implementation of the Spline histogram widget (spline interpolation, threshold markers, click signals).
  */
 

@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2013-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_io.h
- * @author   Florian Schlembach <fschlembach@web.de>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     November 2013
+ * @date     July 2012
  * @brief    High-level convenience reader/writer that loads a whole FIFF measurement file into mne_fiff containers in one call.
  *
  * Most callers want to open a FIFF file and immediately get back a

@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2025-2026 MNE-CPP Authors
  *
  * @file     inv_types.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
- * @date     March 2026
+ * @date     June 2025
  * @brief    Strongly-typed enumerations that tag a source estimate with the inverse method, source-space type, and orientation constraint that produced it.
  *
  * Defines @ref mne::InvEstimateMethod (MNE, dSPM, sLORETA, eLORETA,

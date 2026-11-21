@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2017-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     fwd_coil_set.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     March 2017
+ * @date     December 2016
  * @brief    FwdCoilSet implementation — @c coil_def.dat template parser plus the @c create_meg_coils / @c create_eeg_els factories that turn FIFF channel descriptions into integration-ready FwdCoil arrays.
  */
 

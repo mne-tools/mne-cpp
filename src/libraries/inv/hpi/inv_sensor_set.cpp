@@ -1,12 +1,14 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2021-2026 MNE-CPP Authors
  *
  * @file     inv_sensor_set.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    2.0.0
- * @date     March 2026
+ * @date     November 2021
  * @brief    Implementation of @ref mne::InvSensorSet and the @c FwdCoilSet → @c InvSensorSet builder.
  *
  * Implements the @c FwdCoilSet → @c InvSensorSet conversion (sizing

@@ -1,12 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2022-2026 MNE-CPP Authors
  *
  * @file     inv_hpi_model_parameters.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    2.0.0
- * @date     March 2026
+ * @date     February 2022
  * @brief    Immutable configuration for the HPI signal model — coil drive frequencies, sample rate, line frequency and model variant.
  *
  * @ref mne::InvHpiModelParameters captures the four quantities that

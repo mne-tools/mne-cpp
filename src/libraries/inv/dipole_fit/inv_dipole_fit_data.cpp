@@ -1,12 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     inv_dipole_fit_data.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    2.0.0
- * @date     March 2026
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Johannes Behrens <behrens@neoscan-solutions.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     December 2016
  * @brief    Implementation of the dipole-fit workspace setup, noise-covariance scaling and forward-function selection.
  *
  * Implements @c setup_dipole_fit_data (read forward model, channel

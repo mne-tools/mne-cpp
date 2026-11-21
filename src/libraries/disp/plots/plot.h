@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2013-2026 MNE-CPP Authors
  *
  * @file     plot.h
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
@@ -9,7 +9,7 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     July 2018
+ * @date     June 2013
  * @brief    MATLAB-style line plot for an Eigen vector, built on @ref mne::disp::Graph.
  *
  * Plot turns an @c Eigen::VectorXd into an axis-labelled 2-D line

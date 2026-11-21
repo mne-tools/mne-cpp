@@ -1,15 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     tfplot.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+ *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     July 2018
+ * @date     September 2015
  * @brief    Time-frequency power image of a spectrogram, with time and frequency axes and a colour bar.
  *
  * TFplot accepts a spectrogram as produced by @c mne::Spectrogram::make_spectrogram (rows = the

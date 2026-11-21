@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     averagesceneitem.h
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Wayne F. Mead <isk@imsorrykun.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
- * @date     July 2018
+ * @date     October 2014
  * @brief    QGraphicsObject painting one channel's averaged evoked trace at its sensor position.
  *
  * AverageSceneItem is a fixed-size mini-plot drawn for every channel

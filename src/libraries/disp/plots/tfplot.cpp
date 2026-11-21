@@ -1,14 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     tfplot.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+ *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>
  * @since    0.1.0
- * @date     July 2018
+ * @date     September 2015
  * @brief    Implementation of TFplot: crops a spectrogram to a frequency band and labels its axes.
  */
 

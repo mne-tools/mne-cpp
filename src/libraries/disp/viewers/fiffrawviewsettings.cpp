@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2019-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     fiffrawviewsettings.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     November 2019
+ * @date     July 2018
  * @brief    Implementation of the FiffRawViewSettings raw-display style panel.
  */
 

@@ -1,18 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2013-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_io.cpp
- * @author   Florian Schlembach <fschlembach@web.de>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Florian Schlembach <fschlembach@web.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
- * @date     November 2013
+ * @date     July 2012
  * @brief    Implementation of @ref FiffIO: one-call FIFF reader/writer that dispatches to the right specialized loader per top-level block.
  *
  * Sniffs the FIFF block tree, instantiates @ref FiffRawData /

@@ -1,14 +1,19 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2020-2026 MNE-CPP Authors
+ * Copyright (c) 2018-2026 MNE-CPP Authors
  *
  * @file     bidsview.h
- * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ * @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.7
- * @date     October 2020
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Wayne Mead <wayne.mead@uth.tmc.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     August 2018
  * @brief    Tree view of the BIDS dataset hierarchy backed by @ref mne::disp::BidsViewModel.
  *
  * BidsView wraps a @c QTreeView around a @ref mne::disp::BidsViewModel so the

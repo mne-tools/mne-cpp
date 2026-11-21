@@ -1,16 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     averagesceneitem.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Wayne F. Mead <isk@imsorrykun.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>
  * @since    0.1.0
- * @date     July 2018
+ * @date     October 2014
  * @brief    Implementation of the AverageSceneItem per-channel evoked-trace graphics item.
  */
 

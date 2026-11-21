@@ -1,15 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     frequencyspectrumdelegate.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Limin Sun <limin.sun@childrens.harvard.edu>
  * @since    0.1.0
- * @date     July 2018
+ * @date     May 2014
  * @brief    QAbstractItemDelegate painting one row of the @ref mne::disp::SpectrumView as a horizontal frequency band.
  *
  * FrequencySpectrumDelegate reads the per-row FFT amplitudes from

@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2019-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     rtfiffrawviewdelegate.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Wayne F. Mead <isk@imsorrykun.com>;
+ *           Wayne Mead <wayne.mead@uth.tmc.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Limin Sun <limin.sun@childrens.harvard.edu>
  * @since    0.1.0
- * @date     November 2019
+ * @date     May 2014
  * @brief    Implementation of the RtFiffRawViewDelegate per-channel trace painter.
  */
 

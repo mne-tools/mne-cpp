@@ -1,16 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2013-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_evoked.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Florian Schlembach <fschlembach@web.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
- * @date     March 2013
+ * @date     July 2012
  * @brief    Single averaged evoked response: time axis, samples, baseline, channel info and processing history.
  *
  * @ref mne::FiffEvoked is one averaged response as written under a

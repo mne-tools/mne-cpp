@@ -1,15 +1,17 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2016-2026 MNE-CPP Authors
  *
  * @file     bar.cpp
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Ricky Tjen <ricky270@student.sgu.ac.id>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     July 2018
+ * @date     April 2016
  * @brief    Implementation of the Bar histogram widget (axis layout and bar drawing).
  *
  * Computes the per-bin pixel rectangles from the class limits and paints

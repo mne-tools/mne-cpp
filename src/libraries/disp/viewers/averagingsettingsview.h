@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2018-2026 MNE-CPP Authors
+ * Copyright (c) 2015-2026 MNE-CPP Authors
  *
  * @file     averagingsettingsview.h
- * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
- * @date     September 2018
+ * @date     September 2015
  * @brief    Settings panel driving the on-line / off-line averaging engine (pre/post stim, baseline, artefact thresholds).
  *
  * AveragingSettingsView exposes the parameters needed to compute event

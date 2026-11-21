@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2019-2026 MNE-CPP Authors
+ * Copyright (c) 2014-2026 MNE-CPP Authors
  *
  * @file     rtfiffrawviewmodel.cpp
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Robert Dicamillo <rd521@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     November 2019
+ * @date     May 2014
  * @brief    Implementation of the RtFiffRawViewModel ring-buffer table model.
  */
 

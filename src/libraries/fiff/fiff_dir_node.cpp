@@ -1,16 +1,18 @@
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
- * Copyright (c) 2017-2026 MNE-CPP Authors
+ * Copyright (c) 2012-2026 MNE-CPP Authors
  *
  * @file     fiff_dir_node.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Eric Larson <larson.eric.d@gmail.com>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Florian Schlembach <fschlembach@web.de>
  * @since    0.1.0
- * @date     January 2017
+ * @date     July 2012
  * @brief    Implementation of @ref FiffDirNode: builds the FIFFB_* block tree from the parsed directory and walks it for typed lookups.
  *
  * @ref FiffDirNode::make_dir_tree assembles the tree once after the
