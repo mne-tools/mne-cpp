@@ -26,21 +26,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <cstdint>
-#include <map>
-#include <memory>
-#include <string>
+#include "mne_global.h"
+#include "mne_epoch_data.h"
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_raw_data.h>
 
-#include "mne_global.h"
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <string>
 #include <vector>
 #include <utility>
-#include "mne_epoch_data.h"
-
-#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne

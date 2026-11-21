@@ -20,9 +20,6 @@
 //=============================================================================================================
 
 #include <inv/hpi/inv_hpi_data_updater.h>
-#include <memory>
-
-#include <vector>
 #include <inv/hpi/inv_hpi_fit.h>
 #include <inv/hpi/inv_hpi_fit_data.h>
 #include <inv/hpi/inv_hpi_model_parameters.h>
@@ -44,6 +41,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
+#include <vector>
 #include <cmath>
 #include <cstdlib>
 #include <format>

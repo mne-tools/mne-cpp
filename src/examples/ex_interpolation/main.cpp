@@ -22,13 +22,9 @@
 
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_bem.h>
-
-#include <iostream>
-
 #include <disp3D/helpers/geometryinfo.h>
 #include <disp3D/helpers/interpolation.h>
 #include <fiff/fiff_constants.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -40,6 +36,12 @@
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
 #include <QDateTime>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES

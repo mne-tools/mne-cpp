@@ -15,15 +15,24 @@
 //=============================================================================================================
 
 #include "sourceestimateoverlay.h"
+
 #include "renderable/brainsurface.h"
 #include "core/rendertypes.h"
-
-#include <disp/plots/helpers/colormap.h>
 #include "helpers/interpolation.h"
 #include "helpers/geometryinfo.h"
+#include <disp/plots/helpers/colormap.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QFile>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <cmath>
 
 namespace mne::disp

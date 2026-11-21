@@ -15,10 +15,14 @@
 //=============================================================================================================
 
 #include "stcloadingworker.h"
-#include "renderable/brainsurface.h"
 
+#include "renderable/brainsurface.h"
 #include "helpers/interpolation.h"
 #include "helpers/geometryinfo.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QFile>
 #include <QDebug>

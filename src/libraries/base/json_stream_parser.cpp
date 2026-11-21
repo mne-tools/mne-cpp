@@ -20,6 +20,14 @@
 
 #include "json_stream_parser.h"
 
+#if defined(_LIBCPP_VERSION)
+#include <clocale>
+#include <cstdlib>
+#ifdef __APPLE__
+#include <xlocale.h>
+#endif
+#endif
+
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
@@ -28,14 +36,6 @@
 #include <charconv>
 #include <cmath>
 #include <utility>
-
-#if defined(_LIBCPP_VERSION)
-#include <clocale>
-#include <cstdlib>
-#ifdef __APPLE__
-#include <xlocale.h>
-#endif
-#endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne

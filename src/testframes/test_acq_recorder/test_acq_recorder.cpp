@@ -23,24 +23,11 @@
 #include <acq/acq_stream.h>
 #include <acq/fiff/acq_fiff.h>
 #include <acq/fiff/acq_recorder.h>
-
 #include <fiff/fiff_annotations.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
-
-#include <algorithm>
-#include <atomic>
-#include <chrono>
-#include <cmath>
-#include <cstdio>
-#include <cstring>
-#include <limits>
-#include <string>
-#include <thread>
-#include <vector>
-
 #if !defined(_WIN32)
 #include <csignal>
 #include <sys/resource.h>
@@ -64,6 +51,21 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <limits>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

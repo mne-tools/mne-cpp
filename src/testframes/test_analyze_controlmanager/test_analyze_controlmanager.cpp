@@ -15,17 +15,19 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/controlmanager/controlmanager.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/event.h>
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Utils/types.h>
-
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
 #include <QCheckBox>
@@ -34,6 +36,10 @@
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QSpinBox>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <cstring>
 #include <memory>

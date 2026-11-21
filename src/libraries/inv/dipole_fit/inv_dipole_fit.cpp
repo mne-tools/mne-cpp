@@ -21,11 +21,16 @@
 //=============================================================================================================
 
 #include "inv_dipole_fit.h"
+
+#include "inv_guess_data.h"
 #include <base/log.h>
 #include <base/string_utils.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_types.h>
-#include "inv_guess_data.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 #include <vector>

@@ -16,16 +16,6 @@
 
 #include "process.h"
 
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <algorithm>
-#include <array>
-#include <format>
-#include <fstream>
-#include <system_error>
-
 #if defined(_WIN32)
 #include <cwchar>
 #include <winsock2.h>
@@ -51,6 +41,16 @@
 #endif
 extern char** environ; // NOLINT(readability-redundant-declaration): not declared by every libc header
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <format>
+#include <fstream>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES

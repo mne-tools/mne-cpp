@@ -14,14 +14,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QtTest>
-
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 #include <mne/mne_ch_selection.h>
 #include <mne/mne_types.h>
 #include <mne/mne_filter_def.h>
 #include <mne/mne_process_description.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtTest>
 
 using namespace mne;
 

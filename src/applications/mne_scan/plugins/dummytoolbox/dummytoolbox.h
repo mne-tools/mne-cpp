@@ -21,15 +21,10 @@
 //=============================================================================================================
 
 #include "dummytoolbox_global.h"
-#include <memory>
-
 #include "FormFiles/dummysetupwidget.h"
 #include "FormFiles/dummyyourwidget.h"
-
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <base/circular_buffer.h>
-
-#include <Eigen/Core>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff.h>
 
@@ -40,6 +35,18 @@
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
 #include <QDebug>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

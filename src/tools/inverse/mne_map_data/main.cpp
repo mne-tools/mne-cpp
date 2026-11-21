@@ -19,18 +19,15 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
-#include <memory>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
-
 #include <mne/mne.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <base/string_utils.h>
@@ -50,6 +47,12 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

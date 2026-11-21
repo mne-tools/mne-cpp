@@ -18,7 +18,6 @@
 //=============================================================================================================
 
 #include "realtimemultisamplearraywidget.h"
-#include <memory>
 
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/channelselectionview.h>
@@ -31,11 +30,8 @@
 #include <disp/viewers/spharasettingsview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/triggerdetectionview.h>
-
 #include <scMeas/realtimemultisamplearray.h>
-
 #include <dsp/filterkernel.h>
-
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -50,6 +46,12 @@
 #include <QSettings>
 #include <QToolBar>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

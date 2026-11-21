@@ -21,17 +21,17 @@
 //=============================================================================================================
 
 #include "mne_forward_solution.h"
+
 #include <fiff/fiff_ch_name.h>
-#include <cstdint>
-#include <memory>
 #include <base/log.h>
 #include <base/thread_pool.h>
-
-#include <vector>
-
 #include <base/string_utils.h>
-
 #include <fiff/fiff_coord_trans.h>
+#include <fs/fs_colortable.h>
+#include <fs/fs_label.h>
+#include <fs/fs_surfaceset.h>
+#include <math/linalg.h>
+#include <math/kmeans.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,13 +43,12 @@
 #include <unsupported/Eigen/KroneckerProduct>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
-#include <fs/fs_colortable.h>
-#include <fs/fs_label.h>
-#include <fs/fs_surfaceset.h>
-#include <math/linalg.h>
-#include <math/kmeans.h>
-
+#include <cstdint>
+#include <memory>
+#include <vector>
 #include <algorithm>
 
 //=============================================================================================================

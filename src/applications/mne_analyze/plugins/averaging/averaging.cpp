@@ -17,15 +17,12 @@
 //=============================================================================================================
 
 #include "averaging.h"
-#include <memory>
 
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
-
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
-
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/averagingsettingsview.h>
@@ -36,18 +33,13 @@
 #include <disp/viewers/averagelayoutview.h>
 #include <disp/viewers/butterflyview.h>
 #include <disp/viewers/scalingview.h>
-
 #include <disp/viewers/helpers/selectionsceneitem.h>
-
 #include <dsp/filterkernel.h>
 #include <dsp/rt/rt_filter.h>
-
 #include <mne/mne_epoch_data_list.h>
-
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
-
 #include <events/eventmanager.h>
 
 //=============================================================================================================
@@ -57,6 +49,12 @@
 #include <QDebug>
 #include <QTabWidget>
 #include <QtConcurrent/QtConcurrent>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

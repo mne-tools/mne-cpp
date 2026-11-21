@@ -18,17 +18,18 @@
 //=============================================================================================================
 
 #include "fiff_dir_node.h"
-#include <memory>
-
-#include <vector>
 #include "fiff_evoked.h"
 #include "fiff_info.h"
 #include "fiff_stream.h"
-
 #include <base/error.h>
-
 #include <base/string_utils.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 #include <filesystem>
 #include <string>
 

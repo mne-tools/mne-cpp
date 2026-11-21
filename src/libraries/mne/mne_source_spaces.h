@@ -28,22 +28,25 @@
 
 #include "mne_global.h"
 #include "mne_hemisphere.h"
-
-#include <cstdint>
-#include <string_view>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_stream.h>
 #include <base/error.h>
-
-#include <filesystem>
-#include <memory>
-#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <string_view>
+#include <filesystem>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

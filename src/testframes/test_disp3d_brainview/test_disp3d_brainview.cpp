@@ -18,7 +18,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <disp3D/view/brainview.h>
 #include <base/string_utils.h>
 #include <base/log_qt.h>
@@ -61,7 +60,6 @@
 #include <disp/plots/helpers/colormap.h>
 #include <inv/inv_source_estimate.h>
 #include <disp3D/core/viewstate.h>
-
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans_set.h>
@@ -72,8 +70,8 @@
 #include <fs/fs_label.h>
 #include <fs/fs_surface.h>
 #include <mne/mne_bem.h>
-
-#include <Eigen/Core>
+#include <private/qguiapplication_p.h>
+#include <qpa/qplatformintegration.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -83,10 +81,20 @@
 #include <QApplication>
 #include <QOffscreenSurface>
 #include <QSettings>
-#include <private/qguiapplication_p.h>
-#include <qpa/qplatformintegration.h>
 #include <QVector3D>
 #include <QQuaternion>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
 
 //=============================================================================================================
 // USED NAMESPACES

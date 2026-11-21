@@ -15,13 +15,15 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/events/events.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-
 #include <disp/viewers/triggerdetectionview.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
 #include <QCheckBox>
@@ -33,6 +35,10 @@
 #include <QSpinBox>
 #include <QTableView>
 #include <QThreadPool>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <map>
 #include <memory>

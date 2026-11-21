@@ -17,18 +17,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "rtfiffrawviewmodel.h"
-#include <memory>
 
-#include <vector>
 #include <base/string_utils.h>
-
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
-
 #include <math/matrix_io.h>
-
 #include <dsp/sphara.h>
 #include <dsp/rt/rt_detect_trigger.h>
 
@@ -46,6 +40,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <memory>
+#include <vector>
 #include <iostream>
 
 //=============================================================================================================

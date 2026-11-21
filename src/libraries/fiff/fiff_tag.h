@@ -94,19 +94,18 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include <string>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-
-#include <algorithm>
-#include <cstddef>
-#include <optional>
-#include <span>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <string>
+#include <algorithm>
+#include <cstddef>
+#include <optional>
+#include <span>
 #include <iostream>
 #include <memory>
 #include <vector>

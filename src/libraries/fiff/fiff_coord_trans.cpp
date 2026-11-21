@@ -23,13 +23,10 @@
 //=============================================================================================================
 
 #include "fiff_coord_trans.h"
-#include <memory>
-#include <base/log.h>
 
 #include "fiff_stream.h"
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
-
 #include <base/log.h>
 #include <base/string_utils.h>
 
@@ -43,6 +40,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <format>
 #include <fstream>
 #include <sstream>

@@ -16,12 +16,11 @@
 //=============================================================================================================
 
 #include "channeldataview.h"
-#include <memory>
+
 #include "helpers/channeldatamodel.h"
 #include "helpers/channellabelpanel.h"
 #include "helpers/channelrhiview.h"
 #include "helpers/timerulerwidget.h"
-
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -33,13 +32,19 @@
 #include <QScrollBar>
 #include <QToolButton>
 #include <QKeyEvent>
-#include <algorithm>
-#include <numeric>
 #include <QResizeEvent>
 #include <QSettings>
 #include <QLabel>
 #include <QPainter>
 #include <QtMath>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <algorithm>
+#include <numeric>
 
 //=============================================================================================================
 // USED NAMESPACES

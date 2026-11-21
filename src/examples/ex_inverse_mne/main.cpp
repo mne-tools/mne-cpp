@@ -16,24 +16,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
 #include <math.h>
-
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff_evoked_set.h>
 #include <mne/mne_inverse_operator.h>
-
 #include <fiff/fiff_evoked.h>
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -44,6 +34,13 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -31,17 +31,7 @@
 #include <acq/fiff/acq_fiff_replay.h>
 #include <acq/fiff/acq_recorder.h>
 #include <acq/lsl/acq_lsl.h>
-
 #include <disp/viewers/channeldataview.h>
-
-#include <algorithm>
-#include <array>
-#include <chrono>
-#include <filesystem>
-#include <format>
-#include <memory>
-#include <optional>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,6 +57,19 @@
 #include <QTimer>
 #include <QUrl>
 #include <QVBoxLayout>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <filesystem>
+#include <format>
+#include <memory>
+#include <optional>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

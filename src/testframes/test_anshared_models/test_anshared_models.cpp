@@ -42,13 +42,10 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Management/communicator.h>
-
 #include <dsp/filterkernel.h>
 #include <fiff/fiff_events.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
-
-#include <cmath>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,6 +56,12 @@
 #include <QFile>
 #include <QScopedPointer>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES

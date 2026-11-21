@@ -21,15 +21,12 @@
 
 #include "hpisettingsview.h"
 
+#include "ui_hpisettingsview.h"
 #include <base/byte_stream.h>
 #include <base/log.h>
 #include <base/string_utils.h>
-
-#include "ui_hpisettingsview.h"
-
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_stream.h>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,6 +36,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES

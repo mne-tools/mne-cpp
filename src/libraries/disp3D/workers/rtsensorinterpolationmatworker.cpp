@@ -14,23 +14,31 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "rtsensorinterpolationmatworker.h"
 
-#include <vector>
-#include <base/string_utils.h>
 #include "../scene/sensorfieldmapper.h"
+#include <base/string_utils.h>
 #include <fwd/fwd_field_map.h>
-
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_coil_set.h>
 #include <fs/fs_surface.h>
 
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
 #include <QVector3D>
 #include <QMatrix4x4>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <vector>
 #include <cmath>
 
 using namespace mne;

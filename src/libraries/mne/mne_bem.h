@@ -30,14 +30,16 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include <memory>
 #include "mne_bem_surface.h"
-
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_stream.h>
-
 #include <base/error.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <filesystem>
 #include <span>
 #include <vector>

@@ -18,20 +18,14 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
-#include <memory>
+
 #include "FormFiles/rtfwdsetupwidget.h"
-
 #include <disp/viewers/fwdsettingsview.h>
-
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
-
 #include <inv/hpi/inv_hpi_fit.h>
-
 #include <fs/fs_annotationset.h>
-
 #include <mne/mne_forward_solution.h>
-
 #include <base/string_utils.h>
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
@@ -50,6 +44,12 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

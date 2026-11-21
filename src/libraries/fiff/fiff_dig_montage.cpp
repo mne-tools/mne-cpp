@@ -15,14 +15,16 @@
 //=============================================================================================================
 
 #include "fiff_dig_montage.h"
-#include <base/xml.h>
-#include <base/log.h>
 
 #include "fiff_constants.h"
 #include "fiff_dig_point.h"
-
+#include <base/xml.h>
+#include <base/log.h>
 #include <base/string_utils.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <array>

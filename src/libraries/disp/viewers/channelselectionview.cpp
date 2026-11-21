@@ -18,19 +18,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "channelselectionview.h"
-#include <memory>
+
 #include "ui_channelselectionview.h"
 #include "helpers/selectionsceneitem.h"
 #include "helpers/channelinfomodel.h"
 #include "helpers/selectionscene.h"
-
 #include <fiff/fiff_constants.h>
 #include <mne/mne_layout.h>
 #include <channels/selectionio.h>
 #include <channels/layoutmaker.h>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +43,13 @@
 #include <QKeyEvent>
 #include <QSignalBlocker>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
 #include <filesystem>
 #include <optional>
 #include <utility>

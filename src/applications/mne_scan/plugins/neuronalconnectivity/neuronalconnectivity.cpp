@@ -17,28 +17,33 @@
 //=============================================================================================================
 
 #include "neuronalconnectivity.h"
-#include <algorithm>
-#include <memory>
-#include <optional>
-#include <utility>
-#include <base/string_utils.h>
-#include "FormFiles/neuronalconnectivitysetupwidget.h"
 
+#include "FormFiles/neuronalconnectivitysetupwidget.h"
+#include <base/string_utils.h>
 #include <connectivity/connectivity.h>
 #include <dsp/rt/rt_connectivity.h>
-
 #include <disp/viewers/connectivitysettingsview.h>
-
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimeevokedset.h>
-
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_bem.h>
 
-#include <disp/viewers/connectivitysettingsview.h>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
+#include <optional>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES

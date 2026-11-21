@@ -15,16 +15,20 @@
 //=============================================================================================================
 
 #include "compute_fwd.h"
-#include <fstream>
-#include <memory>
 
-#include <vector>
 #include <mne/mne_forward_solution.h>
-
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <base/log.h>
 #include <base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <fstream>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

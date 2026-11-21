@@ -29,9 +29,7 @@
 //=============================================================================================================
 
 #include "../inv_global.h"
-
-#include <vector>
-
+#include "inv_dipole_forward.h"
 #include <fiff/fiff_types.h>
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_proj_op.h>
@@ -39,7 +37,6 @@
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_bem_model.h>
 #include <fwd/fwd_comp_data.h>
-#include "inv_dipole_forward.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -51,8 +48,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <vector>
 #include <ostream>
-
 #include <memory>
 
 namespace mne

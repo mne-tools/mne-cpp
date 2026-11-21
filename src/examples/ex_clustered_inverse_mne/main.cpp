@@ -21,19 +21,14 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
-
 #include <fiff/fiff_evoked.h>
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
-
 #include <math/linalg.h>
 #include <base/log.h>
 #include <base/log_qt.h>
-
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -44,6 +39,12 @@
 #include <QDir>
 #include <QSet>
 #include <QVector3D>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES

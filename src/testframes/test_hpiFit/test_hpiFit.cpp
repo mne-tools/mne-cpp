@@ -16,29 +16,16 @@
 // INCLUDES
 //=============================================================================================================
 
-
-#include <iostream>
-#include <memory>
 #include <base/string_utils.h>
 #include <base/log_qt.h>
-#include <vector>
 #include <math.h>
-#include <cstddef>
-#include <cstring>
-#include <new>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
-
 #include <inv/hpi/inv_hpi_fit.h>
 #include <inv/hpi/inv_hpi_data_updater.h>
 #include <inv/hpi/inv_sensor_set.h>
-
-
 #include <fwd/fwd_coil_set.h>
-
-#include <Eigen/Dense>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,6 +36,23 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QtTest>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <memory>
+#include <vector>
+#include <cstddef>
+#include <cstring>
+#include <new>
 
 //=============================================================================================================
 // USED NAMESPACES

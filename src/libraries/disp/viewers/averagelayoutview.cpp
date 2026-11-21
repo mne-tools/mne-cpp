@@ -18,14 +18,12 @@
 //=============================================================================================================
 
 #include "averagelayoutview.h"
-#include <memory>
 
 #include "helpers/averagescene.h"
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
 #include "helpers/averagesceneitem.h"
 #include "helpers/selectionsceneitem.h"
-
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -40,6 +38,11 @@
 #include <QGraphicsItem>
 #include <QSettings>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

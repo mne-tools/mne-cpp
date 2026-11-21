@@ -22,15 +22,12 @@
 //=============================================================================================================
 
 #include "inv_minimum_norm.h"
-#include <base/log.h>
 
+#include <base/log.h>
 #include <inv/inv_source_estimate.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_proj.h>
 #include <math/linalg.h>
-
-#include <cmath>
-#include <algorithm>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -40,6 +37,13 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/SVD>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <algorithm>
 
 //=============================================================================================================
 // USED NAMESPACES

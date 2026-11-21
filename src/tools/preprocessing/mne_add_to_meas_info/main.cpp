@@ -17,9 +17,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
-
-#include <vector>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -32,6 +29,12 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

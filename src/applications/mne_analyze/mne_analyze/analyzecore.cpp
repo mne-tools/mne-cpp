@@ -19,21 +19,27 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <functional>
-#include <base/log_qt.h>
-#include <QSplashScreen>
 #include "analyzecore.h"
+
 #include "mainwindow.h"
 #include "../libs/anShared/Plugins/abstractplugin.h"
 #include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/pluginmanager.h"
 #include "../libs/anShared/Management/eventmanager.h"
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QSplashScreen>
 #include <QtWidgets>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <functional>
 
 //=============================================================================================================
 // Eigen INCLUDES

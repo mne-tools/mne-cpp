@@ -27,6 +27,11 @@
 #include <base/log.h>
 #include <base/json.h>
 #include <base/string_utils.h>
+#include <ml/ml_onnx_model.h>
+#include <ml/ml_tensor.h>
+#ifndef WASMBUILD
+#include <ml/ml_trainer.h>
+#endif
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -38,22 +43,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
-
 #include <algorithm>
 #include <filesystem>
 #include <format>
 #include <limits>
-
-//=============================================================================================================
-// MNE-CPP INCLUDES
-//=============================================================================================================
-
-#include <ml/ml_onnx_model.h>
-#include <ml/ml_tensor.h>
-
-#ifndef WASMBUILD
-#include <ml/ml_trainer.h>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

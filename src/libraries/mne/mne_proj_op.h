@@ -24,15 +24,8 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-
-#include <filesystem>
-#include <ostream>
-#include <span>
-#include <string>
-#include <vector>
 #include "mne_named_matrix.h"
 #include "mne_proj_item.h"
-
 #include <base/error.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_stream.h>
@@ -44,6 +37,15 @@
 
 #include <Eigen/Core>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <ostream>
+#include <span>
+#include <string>
+#include <vector>
 #include <memory>
 
 //=============================================================================================================

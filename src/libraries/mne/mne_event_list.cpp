@@ -15,12 +15,8 @@
 //=============================================================================================================
 
 #include "mne_event_list.h"
-#include <cstdint>
-#include <memory>
+
 #include <base/log.h>
-
-#include <vector>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
@@ -30,6 +26,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
+#include <vector>
 #include <algorithm>
 #include <charconv>
 #include <cmath>

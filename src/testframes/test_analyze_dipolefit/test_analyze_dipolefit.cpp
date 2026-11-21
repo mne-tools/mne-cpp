@@ -20,15 +20,17 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/dipolefit/dipolefit.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-
 #include <inv/dipole_fit/inv_dipole_fit.h>
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
 #include <QCheckBox>
@@ -36,6 +38,10 @@
 #include <QDockWidget>
 #include <QPushButton>
 #include <QSpinBox>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

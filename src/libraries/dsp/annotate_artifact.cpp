@@ -15,13 +15,10 @@
 //=============================================================================================================
 
 #include "annotate_artifact.h"
-#include <base/log.h>
 
-#include <vector>
-#include <utility>
 #include "connectivity_aec.h"
 #include "firfilter.h"
-
+#include <base/log.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_constants.h>
 
@@ -29,6 +26,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <vector>
+#include <utility>
 #include <cmath>
 #include <algorithm>
 

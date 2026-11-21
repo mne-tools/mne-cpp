@@ -18,10 +18,17 @@
 //=============================================================================================================
 
 #include "mainwindow.h"
-#include <memory>
 
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_stream.h>
+#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <inv/inv_source_estimate.h>
+#include <base/byte_stream.h>
+#include <base/string_utils.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QBuffer>
 #include <QApplication>
@@ -49,19 +56,20 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <QFileInfo>
-
 #include <QJsonObject>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <chrono>
 #include <cmath>
 #include <set>
 #include <algorithm>
 #include <functional>
-
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
-#include <base/byte_stream.h>
-#include <base/string_utils.h>
 #include <numbers>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES

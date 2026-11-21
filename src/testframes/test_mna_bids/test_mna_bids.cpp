@@ -26,15 +26,7 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
-
 #include <base/string_utils.h>
-
-#include <cstddef>
-#include <cstdint>
-#include <filesystem>
-#include <format>
-#include <string>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,6 +40,17 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QCoreApplication>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstddef>
+#include <cstdint>
+#include <filesystem>
+#include <format>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

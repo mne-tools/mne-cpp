@@ -19,10 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <fwd/fwd.h>
-
-#include <vector>
 #include <base/string_utils.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
@@ -41,6 +38,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <vector>
 #include <cmath>
 #include <cstdlib>
 #include <memory>

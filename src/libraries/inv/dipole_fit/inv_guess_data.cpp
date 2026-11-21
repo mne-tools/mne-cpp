@@ -22,15 +22,19 @@
 //=============================================================================================================
 
 #include "inv_guess_data.h"
-#include <base/log.h>
-#include <base/string_utils.h>
+
 #include "inv_dipole_fit_data.h"
 #include "inv_dipole_forward.h"
+#include <base/log.h>
+#include <base/string_utils.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_source_space.h>
-
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <cassert>
 #include <memory>

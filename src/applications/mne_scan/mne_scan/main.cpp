@@ -18,24 +18,15 @@
 
 #include "mainsplashscreen.h"
 #include "mainwindow.h"
-
 #include <scMeas/measurementtypes.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/numeric.h>
-
 #include <scShared/Management/pluginconnectorconnection.h>
 #include <scShared/Management/pluginoutputdata.h>
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Plugins/abstractplugin.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +37,12 @@
 #include <QSharedPointer>
 #include <QStandardPaths>
 #include <QDir>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // USED NAMESPACES

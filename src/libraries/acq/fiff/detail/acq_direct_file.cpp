@@ -16,10 +16,6 @@
 
 #include "acq_direct_file.h"
 
-#include <cerrno>
-#include <cstring>
-#include <memory>
-
 #if defined(_WIN32)
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -30,6 +26,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cerrno>
+#include <cstring>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

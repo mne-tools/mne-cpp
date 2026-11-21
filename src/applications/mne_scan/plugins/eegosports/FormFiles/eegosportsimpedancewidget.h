@@ -22,12 +22,10 @@
 //=============================================================================================================
 
 #include "../eegosports_global.h"
-
-#include <channels/layoutloader.h>
 #include "../eegosportselectrodeitem.h"
 #include "../eegosportsimpedancescene.h"
 #include "disp/plots/helpers/colormap.h"
-
+#include <channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================
@@ -39,6 +37,10 @@
 #include <QGraphicsScene>
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

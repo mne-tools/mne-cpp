@@ -17,18 +17,12 @@
 //=============================================================================================================
 
 #include "covariance.h"
-#include <memory>
-#include <numbers>
-#include <optional>
 
 #include "FormFiles/covariancesetupwidget.h"
-
 #include <disp/viewers/covariancesettingsview.h>
-
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>
 #include <dsp/rt/rt_cov.h>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
 
@@ -39,6 +33,14 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 #include <QtWidgets>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <numbers>
+#include <optional>
 
 //=============================================================================================================
 // USED NAMESPACES

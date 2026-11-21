@@ -16,17 +16,21 @@
 
 #include "acq_shared_library.h"
 
-#include <algorithm>
-#include <cctype>
-#include <cstdio>
-#include <cstdlib>
-#include <utility>
-
 #if defined(_WIN32)
 #include <windows.h>
 #else
 #include <dlfcn.h>
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES

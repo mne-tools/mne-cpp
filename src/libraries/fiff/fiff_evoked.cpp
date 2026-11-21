@@ -21,27 +21,29 @@
 //=============================================================================================================
 
 #include "fiff_evoked.h"
+
 #include "fiff_ch_name.h"
-#include <memory>
-#include <base/log.h>
-
-#include <vector>
-#include <utility>
-
-#include <base/log.h>
-#include <base/string_utils.h>
 #include "fiff_stream.h"
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
 #include "fiff_evoked_file.h"
-
+#include <base/log.h>
+#include <base/string_utils.h>
 #include <math/numerics.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
+#include <utility>
 #include <cmath>
 #include <format>
 #include <iterator>
 #include <string_view>
 #include <cstdint>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================

@@ -20,15 +20,17 @@
 //=============================================================================================================
 
 #include "polhemus_transport.h"
-
 #include "../acq_devices.h"
 #include "../transport_error.h"
 #include "../../acq_backend.h"
 #include "../../acq_device_registry.h"
 #include "../../acq_thread.h"
 #include "../../detail/acq_uri_params.h"
-
 #include <com/serial_port.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <array>

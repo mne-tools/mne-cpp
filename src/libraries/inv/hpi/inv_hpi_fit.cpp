@@ -23,22 +23,17 @@
 //=============================================================================================================
 
 #include "inv_hpi_fit.h"
-#include <base/log.h>
+
 #include "inv_hpi_fit_data.h"
 #include "inv_sensor_set.h"
 #include "inv_hpi_data_updater.h"
 #include "inv_signal_model.h"
 #include "inv_hpi_model_parameters.h"
-
-
-#include <cmath>
-#include <vector>
-#include <numeric>
+#include <base/log.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_dig_point_set.h>
-#include <fstream>
-
 #include <fwd/fwd_coil_set.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -47,10 +42,13 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <base/thread_pool.h>
+#include <cmath>
+#include <vector>
+#include <numeric>
+#include <fstream>
 #include <numbers>
 
 //=============================================================================================================

@@ -22,38 +22,39 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/fwd_types.h>
-#include <memory>
-#include <base/log.h>
-
 #include "inv_dipole_fit_data.h"
 
-#include <vector>
 #include "inv_guess_data.h"
+#include "inv_ecd.h"
+#include <fwd/fwd_types.h>
+#include <base/log.h>
 #include <mne/mne_meas_data.h>
 #include <mne/mne_meas_data_set.h>
 #include <mne/mne_proj_item.h>
 #include <mne/mne_cov_matrix.h>
-#include "inv_ecd.h"
-
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_bem_model.h>
 #include <mne/mne_surface.h>
-
 #include <fwd/fwd_comp_data.h>
-
 #include <math/simplex_algorithm.h>
 #include <math/sphere.h>
-#include <base/log.h>
 #include <base/string_utils.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Dense>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
+#include <memory>
+#include <vector>
 #include <sstream>
-
 #include <cassert>
 #include <cmath>
 

@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-
 #include "brainview.h"
+
 #include "brainrenderer.h"
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
@@ -30,15 +30,22 @@
 #include "geometry/meshfactory.h"
 #include "model/braintreemodel.h"
 #include "model/items/surfacetreeitem.h"
-
-#include <rhi/qrhi.h>
 #include "model/items/bemtreeitem.h"
 #include "model/items/sensortreeitem.h"
 #include "model/items/dipoletreeitem.h"
 #include "model/items/sourcespacetreeitem.h"
 #include "model/items/digitizertreeitem.h"
+#include <rhi/qrhi.h>
+#include <mne/mne_bem.h>
+#include <mne/mne_source_spaces.h>
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_constants.h>
+#include <connectivity/network/network.h>
 
-#include <Eigen/Dense>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QMatrix4x4>
 #include <QDebug>
 #include <QLabel>
@@ -56,14 +63,19 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <algorithm>
 #include <cmath>
-
-#include <mne/mne_bem.h>
-#include <mne/mne_source_spaces.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_constants.h>
-#include <connectivity/network/network.h>
 
 using namespace mne;
 

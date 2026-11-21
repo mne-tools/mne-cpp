@@ -18,25 +18,32 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_ch_name.h>
-#include <memory>
-#include <base/log.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_tag.h>
-
 #include "mne_proj_op.h"
+
 #include "mne_proj_item.h"
 #include "mne_cov_matrix.h"
 #include "mne_named_vector.h"
 #include "mne_named_matrix.h"
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_ch_name.h>
+#include <base/log.h>
+#include <base/string_utils.h>
+#include <fiff/fiff_tag.h>
 
-#include <algorithm>
-#include <sstream>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Core>
 #include <Eigen/SVD>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <algorithm>
+#include <sstream>
 #include <string_view>
 #include <vector>
 

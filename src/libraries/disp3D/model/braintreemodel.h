@@ -30,16 +30,24 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-
-#include <QStandardItemModel>
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_dig_point.h>
+#include <connectivity/network/network.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QStandardItemModel>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <span>
-#include <connectivity/network/network.h>
 
 namespace mne
 {

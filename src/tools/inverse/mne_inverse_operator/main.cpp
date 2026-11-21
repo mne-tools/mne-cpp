@@ -27,10 +27,6 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
-
-#include <vector>
-#include <algorithm>
-#include <iterator>
 #include <base/string_utils.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
@@ -38,11 +34,9 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_proj.h>
-
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -63,6 +57,14 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+#include <algorithm>
+#include <iterator>
 
 //=============================================================================================================
 // USED NAMESPACES

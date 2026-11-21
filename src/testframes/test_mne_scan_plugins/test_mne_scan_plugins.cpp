@@ -34,9 +34,7 @@
 #include <rtfwd/rtfwd.h>
 #include <tmsi/tmsi.h>
 #include <tmsi/tmsielectrodeitem.h>
-
 #include <mainwindow.h>
-
 #include <connectivity/network/network.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimecov.h>
@@ -46,7 +44,6 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scShared/Management/plugininputconnector.h>
 #include <scShared/Management/pluginoutputconnector.h>
-
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
@@ -68,6 +65,10 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

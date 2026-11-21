@@ -104,6 +104,13 @@ aliases; replace the old spelling as below.
   every platform, as Windows does, so such a test fails on macOS and Linux
   too; the connector templates that MNE Scan casts across plugins keep one
   type identity per process (`SCSHARED_TEMPLATE_VISIBLE`).
+- Every include sits under the banner of its kind: INCLUDES (the file's own
+  header, then headers next to the file, then MNE-CPP and other headers),
+  QT INCLUDES, EIGEN INCLUDES and STL INCLUDES, in that order; 980 files had
+  standard headers under INCLUDES, Qt or Eigen headers under the wrong banner,
+  empty banners, duplicate includes or the old STD/C++/MNE INCLUDES banners.
+  `check_format.py` checks it (`scripts/quality/include_sections.py`) and
+  `--fix` regroups the includes.
 - `M_PI` is replaced by `std::numbers::pi` everywhere, so no file defines
   `_USE_MATH_DEFINES` before `<math.h>` any more and the build no longer
   defines it for MSVC: a C++ standard library without the POSIX constants,

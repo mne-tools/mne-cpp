@@ -15,12 +15,12 @@
 //=============================================================================================================
 
 #include "mainwindow.h"
+
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/core/viewstate.h>
 #include <disp3D/scene/multimodalscene.h>
 #include <disp3D/scene/pickresult.h>
-
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
@@ -32,11 +32,18 @@
 #include <mna/mna_session.h>
 #include <mna/mna_recording.h>
 #include <mna/mna_types.h>
-
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
-
 #include <mri/mri_slicer.h>
+#ifdef WASMBUILD
+#include <QBuffer>
+#include <QCborValue>
+#include <QCborMap>
+#endif
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -67,7 +74,6 @@
 #include <QDockWidget>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <QAction>
 #include <QSet>
 #include <QSettings>
 #include <QApplication>
@@ -76,12 +82,15 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QUrl>
-
 #include <QFormLayout>
 #include <QLinearGradient>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QSignalBlocker>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <chrono>
@@ -90,12 +99,6 @@
 #include <filesystem>
 #include <set>
 #include <vector>
-
-#ifdef WASMBUILD
-#include <QBuffer>
-#include <QCborValue>
-#include <QCborMap>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

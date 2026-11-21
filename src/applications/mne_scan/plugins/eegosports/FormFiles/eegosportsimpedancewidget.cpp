@@ -19,15 +19,12 @@
 //=============================================================================================================
 
 #include "eegosportsimpedancewidget.h"
-#include <fstream>
-#include <memory>
-#include "ui_eegosportsimpedancewidget.h"
 
+#include "ui_eegosportsimpedancewidget.h"
+#include "../eegosports.h"
 #include <base/string_utils.h>
 #include <channels/layoutloader.h>
 #include <channels/layoutmaker.h>
-
-#include "../eegosports.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,6 +36,13 @@
 #include <QString>
 #include <QDate>
 #include <QMessageBox>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <fstream>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

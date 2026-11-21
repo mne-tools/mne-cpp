@@ -18,25 +18,16 @@
 //=============================================================================================================
 
 #include "coregistration.h"
-#include <memory>
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/bemdatamodel.h>
-
 #include <disp/viewers/coregsettingsview.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_project_to_surface.h>
 #include <mne/mne_icp.h>
 #include <base/string_utils.h>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +37,19 @@
 #include <QDebug>
 #include <QVector>
 #include <QtConcurrent/QtConcurrent>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

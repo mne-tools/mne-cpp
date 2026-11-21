@@ -16,14 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "evokedsetmodel.h"
-#include <memory>
 
-#include <utility>
-#include <vector>
 #include <base/string_utils.h>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked_set.h>
 
@@ -41,6 +36,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <memory>
+#include <utility>
+#include <vector>
 #include <iostream>
 
 //=============================================================================================================

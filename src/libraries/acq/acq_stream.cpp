@@ -18,15 +18,18 @@
 
 #include "detail/acq_diagnostics.h"
 #include "detail/acq_stream_core.h"
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
+#include <immintrin.h>
+#endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <bit>
 #include <cmath>
 #include <new>
-
-#if defined(__x86_64__) || defined(_M_X64) || defined(__i386__) || defined(_M_IX86)
-#include <immintrin.h>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

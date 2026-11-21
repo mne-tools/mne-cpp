@@ -20,36 +20,26 @@
 //=============================================================================================================
 
 #include "connectivitysettingsmanager.h"
-#include <memory>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/networktreeitem.h>
-
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
-
 #include <fiff/fiff_raw_data.h>
-
 #include <fs/fs_label.h>
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
-
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne.h>
-
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <fiff/fiff_events.h>
-
 #include <disp/viewers/connectivitysettingsview.h>
 #include <disp/viewers/minimumnormsettingsview.h>
 #include <disp/viewers/tfsettingsview.h>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,6 +54,12 @@
 #include <QVariant>
 #include <QDir>
 #include <QMatrix4x4>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

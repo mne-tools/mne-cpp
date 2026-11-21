@@ -16,6 +16,10 @@
 
 #include <base/process.h>
 #include <base/string_utils.h>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,11 +43,6 @@
 #include <string_view>
 #include <thread>
 #include <vector>
-
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

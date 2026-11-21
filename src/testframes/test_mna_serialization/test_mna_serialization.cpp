@@ -32,18 +32,21 @@
 #include <mna/mna_op_registry.h>
 #include <mna/mna_graph.h>
 #include <mna/mna_types.h>
+#include <base/json.h>
+#include <base/cbor.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <base/json.h>
-#include <base/cbor.h>
-#include <base/string_utils.h>
-
 #include <QtTest>
 #include <QObject>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <chrono>
 #include <cstddef>

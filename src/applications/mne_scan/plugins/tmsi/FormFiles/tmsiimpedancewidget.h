@@ -20,12 +20,10 @@
 //=============================================================================================================
 
 #include "../tmsi_global.h"
-
-#include <channels/layoutloader.h>
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
 #include "disp/plots/helpers/colormap.h"
-
+#include <channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================
@@ -37,6 +35,10 @@
 #include <QGraphicsScene>
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

@@ -18,23 +18,6 @@
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
 #include <acq/devices/acq_devices.h>
-
-#include <algorithm>
-#include <array>
-#include <atomic>
-#include <filesystem>
-#include <fstream>
-#include <mutex>
-#include <chrono>
-#include <cmath>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-#include <format>
-#include <string>
-#include <thread>
-#include <vector>
-
 #if !defined(_WIN32)
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -54,6 +37,26 @@
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <filesystem>
+#include <fstream>
+#include <mutex>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <format>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

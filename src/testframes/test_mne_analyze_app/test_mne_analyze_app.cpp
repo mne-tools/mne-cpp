@@ -16,7 +16,6 @@
 
 #include <analyzecore.h>
 #include <mainwindow.h>
-
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/dipolefitmodel.h>
@@ -37,6 +36,10 @@
 #include <QStandardPaths>
 #include <QTextBrowser>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

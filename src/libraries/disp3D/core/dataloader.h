@@ -31,20 +31,28 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
-
-#include <QStringList>
-#include <QList>
-#include <QStandardItem>
-#include <QVector3D>
-#include <QMatrix4x4>
-#include <memory>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_source_spaces.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QStringList>
+#include <QList>
+#include <QStandardItem>
+#include <QVector3D>
+#include <QMatrix4x4>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

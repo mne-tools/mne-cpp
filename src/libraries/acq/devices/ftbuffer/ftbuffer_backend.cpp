@@ -23,7 +23,6 @@
 //=============================================================================================================
 
 #include "ftbuffer_transport.h"
-
 #include "../acq_devices.h"
 #include "../neuromag/neuromag_fiff.h"
 #include "../trigger_word.h"
@@ -31,6 +30,10 @@
 #include "../../acq_device_registry.h"
 #include "../../acq_thread.h"
 #include "../../detail/acq_uri_params.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <atomic>

@@ -15,18 +15,11 @@
 //=============================================================================================================
 
 #include "dataloader.h"
-#include <memory>
+
 #include "core/surfacekeys.h"
 #include "model/items/sensortreeitem.h"
 #include "renderable/brainsurface.h"
-
 #include <fiff/fiff_evoked_set.h>
-#include <QFile>
-#include <QFileInfo>
-#include <QDebug>
-#include <QCoreApplication>
-
-#include <Eigen/Dense>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -34,6 +27,27 @@
 #include <base/log.h>
 #include <base/string_utils.h>
 #include <fs/fs_surface.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+#include <QFileInfo>
+#include <QDebug>
+#include <QCoreApplication>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 using namespace mne;
 

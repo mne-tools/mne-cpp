@@ -15,13 +15,16 @@
 //=============================================================================================================
 
 #include "mne_morph_map.h"
-#include <memory>
-#include <base/log.h>
 
+#include <base/log.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Geometry>
 
@@ -29,6 +32,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <algorithm>
 #include <cmath>
 #include <limits>

@@ -17,11 +17,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <base/log_qt.h>
-
 #include "../../tools/preprocessing/mne_anonymize/fiffanonymizer.h"
 #include "../../tools/preprocessing/mne_anonymize/settingscontrollercl.h"
+#include <base/log.h>
+#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -34,6 +33,10 @@
 #include <QScopedPointer>
 #include <QTemporaryDir>
 #include <QTimeZone>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <utility>
 

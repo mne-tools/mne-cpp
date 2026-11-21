@@ -39,11 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_global.h"
-
-#include <vector>
-
 #include "fiff_info_base.h"
-
 #include "fiff_types.h"
 #include "fiff_id.h"
 #include "fiff_ch_info.h"
@@ -56,6 +52,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <vector>
 #include <chrono>
 #include <memory>
 #include <cstdint>

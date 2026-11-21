@@ -14,17 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "sensorfieldmapper.h"
 
-#include <vector>
-#include <base/string_utils.h>
 #include "renderable/brainsurface.h"
 #include "core/rendertypes.h"
-
+#include <base/string_utils.h>
 #include <fwd/fwd_field_map.h>
-#include <Eigen/LU>
-
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
@@ -32,9 +27,26 @@
 #include <fs/fs_surface.h>
 #include <disp/plots/helpers/colormap.h>
 
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QVector3D>
 #include <QMatrix4x4>
 #include <QDebug>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/LU>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <vector>
 #include <cmath>
 
 using namespace mne;

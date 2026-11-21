@@ -18,8 +18,23 @@
 #include <com/tcp_server.h>
 #include <com/tcp_socket.h>
 #include <com/udp_socket.h>
+#ifndef _WIN32
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <array>
 #include <chrono>
@@ -29,14 +44,6 @@
 #include <string>
 #include <system_error>
 #include <thread>
-
-#ifndef _WIN32
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

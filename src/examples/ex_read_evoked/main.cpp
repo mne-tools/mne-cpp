@@ -16,17 +16,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
-#include <iostream>
 #include <base/string_utils.h>
-#include <vector>
 #include <math.h>
-
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -37,6 +32,14 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <iostream>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

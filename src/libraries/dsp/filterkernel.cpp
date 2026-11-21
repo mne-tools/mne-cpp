@@ -23,18 +23,11 @@
 //=============================================================================================================
 
 #include "filterkernel.h"
-#include <base/log.h>
-
-#include <vector>
-
-#include <math/numerics.h>
 
 #include "parksmcclellan.h"
 #include "cosinefilter.h"
-
-#include <algorithm>
-#include <format>
-#include <utility>
+#include <base/log.h>
+#include <math/numerics.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -45,6 +38,15 @@
 //#define EIGEN_FFTW_DEFAULT
 //#endif
 #include <unsupported/Eigen/FFT>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+#include <algorithm>
+#include <format>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES

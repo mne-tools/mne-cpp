@@ -15,7 +15,6 @@
 //=============================================================================================================
 
 #include <Windows/averagewindow.h>
-#include <memory>
 #include <base/string_utils.h>
 #include <Windows/datawindow.h>
 #include <Windows/eventwindow.h>
@@ -27,11 +26,6 @@
 #include <Models/averagemodel.h>
 #include <Models/virtualchannelmodel.h>
 #include <Windows/virtualchannelwindow.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
@@ -45,7 +39,9 @@
 #include <inv/inv_source_estimate.h>
 #include <mna/mna_project.h>
 
-#include <filesystem>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QAction>
 #include <QBuffer>
@@ -63,14 +59,20 @@
 #include <QLineEdit>
 #include <QTemporaryDir>
 #include <QTimer>
-
-#include <functional>
 #include <QImage>
 #include <QMenuBar>
 #include <QPainter>
 #include <QRhiWidget>
 #include <QStandardPaths>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <filesystem>
+#include <functional>
 
 //=============================================================================================================
 

@@ -20,7 +20,7 @@
 //=============================================================================================================
 
 #include "mne_surface_or_volume.h"
-#include <base/log.h>
+
 #include "mne_surface.h"
 #include "mne_source_space.h"
 #include "mne_patch_info.h"
@@ -33,17 +33,23 @@
 #include "mne_vol_geom.h"
 #include "mne_mgh_tag_group.h"
 #include "mne_mgh_tag.h"
-
+#include <base/log.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dig_point.h>
-
 #include <math/sphere.h>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 

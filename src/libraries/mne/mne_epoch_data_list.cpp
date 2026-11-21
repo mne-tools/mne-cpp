@@ -22,22 +22,21 @@
 //=============================================================================================================
 
 #include "mne_epoch_data_list.h"
+
 #include <fiff/fiff_ch_name.h>
-#include <cstdint>
-#include <memory>
 #include <base/log.h>
-
-#include <vector>
-#include <utility>
-#include <format>
 #include <base/string_utils.h>
-
 #include <fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+#include <utility>
+#include <format>
 #include <cmath>
 
 //=============================================================================================================

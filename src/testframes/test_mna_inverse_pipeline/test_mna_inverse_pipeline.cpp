@@ -37,25 +37,11 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
-
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
-
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/inv_source_estimate.h>
-
 #include <base/string_utils.h>
-
-//=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <algorithm>
-#include <any>
-#include <memory>
-#include <string>
-#include <string_view>
-#include <filesystem>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -73,6 +59,17 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <any>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <filesystem>
 
 //=============================================================================================================
 // USED NAMESPACES

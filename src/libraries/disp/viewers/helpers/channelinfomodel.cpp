@@ -19,12 +19,9 @@
 //=============================================================================================================
 
 #include "channelinfomodel.h"
-#include <memory>
 
-#include <vector>
-#include <base/string_utils.h>
 #include "mneoperator.h"
-
+#include <base/string_utils.h>
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_info.h>
 
@@ -34,6 +31,13 @@
 
 #include <QVector3D>
 #include <QRegularExpression>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

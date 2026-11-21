@@ -16,11 +16,6 @@
 
 #include "serial_port.h"
 
-#include <algorithm>
-#include <array>
-#include <cstring>
-#include <utility>
-
 #ifdef _WIN32
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -34,6 +29,15 @@
 #include <termios.h>
 #include <unistd.h>
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <cstring>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -20,31 +20,33 @@
 //=============================================================================================================
 
 #include "fwd_bem_model.h"
-#include <base/log.h>
+
 #include "fwd_bem_solution.h"
 #include "fwd_eeg_sphere_model.h"
+#include "fwd_comp_data.h"
+#include "fwd_thread_arg.h"
+#include <base/log.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_triangle.h>
 #include <mne/mne_source_space.h>
-
-#include "fwd_comp_data.h"
-
-#include <memory>
-
-#include "fwd_thread_arg.h"
-
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_named_matrix.h>
-
 #include <base/string_utils.h>
-
 #include <base/thread_pool.h>
 
-#include <string_view>
-#include <thread>
-
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <string_view>
+#include <thread>
 #include <cmath>
 #include <numbers>
 

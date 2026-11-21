@@ -17,16 +17,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QMainWindow>
-#include <QElapsedTimer>
-#include <QStringList>
-#include <mna/mna_types.h>
-#include <mna/mna_project.h>
-
-#include <disp3D/scene/multimodalscene.h>
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
 #include "pickreadoutmodel.h"
+#include <mna/mna_types.h>
+#include <mna/mna_project.h>
+#include <disp3D/scene/multimodalscene.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QMainWindow>
+#include <QElapsedTimer>
+#include <QStringList>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

@@ -18,16 +18,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <dsp/rt/rt_averaging.h>
-#include <memory>
 #include <base/string_utils.h>
 #include <dsp/rt/rt_connectivity.h>
 #include <dsp/rt/rt_cov.h>
 #include <dsp/rt/rt_hpi.h>
 #include <dsp/rt/rt_inv_op.h>
 #include <dsp/rt/rt_noise.h>
-
 #include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
@@ -50,6 +47,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <memory>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>

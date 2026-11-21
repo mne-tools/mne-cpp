@@ -15,11 +15,8 @@
 //=============================================================================================================
 
 #include "bridged_electrodes.h"
+
 #include <base/log.h>
-
-#include <vector>
-#include <utility>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -28,6 +25,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <vector>
+#include <utility>
 #include <cmath>
 
 //=============================================================================================================

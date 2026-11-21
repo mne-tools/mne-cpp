@@ -43,20 +43,13 @@
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <inv/dipole_fit/inv_guess_data.h>
-
 #include <fwd/fwd_eeg_sphere_model.h>
-
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <mne/mne_cov_matrix.h>
 #include <mne/mne_meas_data.h>
 #include <mne/mne_meas_data_set.h>
-
-#include <sstream>
-
-#include <memory>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -71,6 +64,14 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <sstream>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

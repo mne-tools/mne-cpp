@@ -19,20 +19,15 @@
 #include "cortical_surface.h"
 
 #include <anShared/Management/communicator.h>
-
 #include <disp3D/scene/multimodalscene.h>
-
 #include <fs/fs_annotation.h>
 #include <fs/fs_label.h>
 #include <fs/fs_label_utils.h>
 #include <fs/fs_surface.h>
-
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
-
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
-
 #include <inv/inv_label_time_course.h>
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_cmne.h>
@@ -40,7 +35,6 @@
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/sparse/inv_gamma_map.h>
 #include <inv/sparse/inv_mxne.h>
-
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -84,6 +78,10 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <cmath>

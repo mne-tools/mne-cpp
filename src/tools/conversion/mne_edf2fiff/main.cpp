@@ -15,15 +15,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
-#include <filesystem>
-
 #include <bids/readers/bids_edf_reader.h>
-
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <base/string_utils.h>
@@ -36,6 +31,13 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <filesystem>
 
 //=============================================================================================================
 // USED NAMESPACES

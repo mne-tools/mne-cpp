@@ -18,37 +18,25 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <disp3D/view/brainview.h>
-#include <memory>
 #include <base/string_utils.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/networktreeitem.h>
-
 #include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
-
-#include <map>
-#include <string>
 #include <connectivity/metrics/abstractmetric.h>
-
 #include <fiff/fiff_raw_data.h>
-
 #include <fs/fs_label.h>
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
-
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne.h>
-
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <fiff/fiff_events.h>
-
 #include <disp/viewers/connectivitysettingsview.h>
 
 //=============================================================================================================
@@ -62,6 +50,15 @@
 #include <QDir>
 #include <QFile>
 #include <QObject>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
+#include <map>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES

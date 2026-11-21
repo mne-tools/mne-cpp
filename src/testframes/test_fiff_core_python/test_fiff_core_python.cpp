@@ -40,7 +40,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <format>
 #include <fiff/fiff_raw_data.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_evoked.h>
@@ -54,12 +53,6 @@
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_events.h>
-
-#include <array>
-#include <clocale>
-#include <cmath>
-#include <initializer_list>
-#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,6 +72,16 @@
 #include <Eigen/Geometry>
 #include <Eigen/SparseCore>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <array>
+#include <clocale>
+#include <cmath>
+#include <initializer_list>
+#include <memory>
 #include <cstring>
 #include <fstream>
 #include <map>

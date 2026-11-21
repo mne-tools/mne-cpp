@@ -17,12 +17,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "lsladapter.h"
-#include <memory>
+
 #include "lsladapterproducer.h"
 #include "FormFiles/lsladaptersetup.h"
-
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
 
@@ -32,6 +30,13 @@
 
 #include <QListWidgetItem>
 #include <QtConcurrent>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

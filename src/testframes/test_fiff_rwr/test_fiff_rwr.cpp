@@ -18,16 +18,10 @@
 
 #include <base/log.h>
 #include <base/log_qt.h>
-
-#include <algorithm>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_forward_solution.h>
 #include <base/byte_stream.h>
-
-#include <iostream>
-#include <stdexcept>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -37,6 +31,14 @@
 #include <QBuffer>
 #include <QDirIterator>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <iostream>
+#include <stdexcept>
 
 //=============================================================================================================
 // USED NAMESPACES

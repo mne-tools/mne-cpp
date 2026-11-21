@@ -16,17 +16,24 @@
 
 #include <applications/mne_analyze/plugins/rawdataviewer/rawdataviewer.h>
 #include <applications/mne_analyze/plugins/rawdataviewer/fiffrawview.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QRhiWidget>
 #include <QtTest>
 #include <QHeaderView>
 #include <QScrollBar>
 #include <QTableView>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <cstring>
 #include <new>

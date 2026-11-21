@@ -40,19 +40,18 @@
 //=============================================================================================================
 
 #include "bids_global.h"
-#include <memory>
 #include "bids_event.h"
 #include "bids_electrode.h"
 #include "bids_coordinate_system.h"
 #include "bids_path.h"
 #include "readers/bids_abstract_format_reader.h"
-
 #include <fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <filesystem>
 #include <map>
 #include <string>

@@ -19,15 +19,12 @@
 //=============================================================================================================
 
 #include "eventview.h"
-#include <memory>
-#include "ui_eventview.h"
 
+#include "ui_eventview.h"
 #include <fiff/fiff.h>
 #include <fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
-
-#include <set>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,6 +40,13 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QtConcurrent/QtConcurrent>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <set>
 
 //=============================================================================================================
 // Eigen INCLUDES

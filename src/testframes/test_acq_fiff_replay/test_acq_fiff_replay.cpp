@@ -22,20 +22,11 @@
 #include <acq/fiff/acq_fiff.h>
 #include <acq/fiff/acq_fiff_replay.h>
 #include <acq/fiff/acq_recorder.h>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
-
-#include <array>
-#include <bit>
-#include <chrono>
-#include <cstring>
-#include <string>
-#include <thread>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -51,6 +42,18 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <array>
+#include <bit>
+#include <chrono>
+#include <cstring>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

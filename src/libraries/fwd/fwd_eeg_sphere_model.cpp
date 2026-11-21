@@ -19,21 +19,28 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "fwd_eeg_sphere_model.h"
+
 #include "math/simplex_algorithm.h"
-#include <memory>
+#include "fwd_eeg_sphere_model_set.h"
 #include <base/log.h>
 
-#include "fwd_eeg_sphere_model.h"
-#include "fwd_eeg_sphere_model_set.h"
-
-#include <cmath>
-#include <numbers>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <cmath>
+#include <numbers>
 #include <algorithm>
 #include <vector>
-#include <Eigen/Dense>
 
 //=============================================================================================================
 // USED NAMESPACES

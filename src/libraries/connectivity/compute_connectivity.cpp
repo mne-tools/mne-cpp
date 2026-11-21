@@ -28,8 +28,6 @@
 
 #include "compute_connectivity.h"
 
-#include <algorithm>
-
 #include "connectivitysettings.h"
 #include "network/network.h"
 #include "metrics/correlation.h"
@@ -45,6 +43,11 @@
 #include "metrics/directed_transfer_function.h"
 #include "metrics/partial_directed_coherence.h"
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
 #include <string_view>
 #include <utility>
 

@@ -20,21 +20,15 @@
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
-
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-
 #include <inv/inv_source_estimate.h>
 #include <inv/rap_music/inv_pwl_rap_music.h>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
-
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -44,6 +38,12 @@
 #include <QCommandLineParser>
 #include <QDir>
 #include <QSet>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES

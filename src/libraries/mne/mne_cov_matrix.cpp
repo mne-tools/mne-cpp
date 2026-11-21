@@ -19,25 +19,32 @@
 //=============================================================================================================
 
 #include "mne_cov_matrix.h"
-#include <memory>
-#include <base/log.h>
 
-#include <vector>
 #include "mne_sss_data.h"
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
-
-#include <Eigen/Core>
-#include <Eigen/Eigenvalues>
+#include <base/log.h>
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/Eigenvalues>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 #include <format>
 #include <string>
-
 
 //=============================================================================================================
 // USED NAMESPACES

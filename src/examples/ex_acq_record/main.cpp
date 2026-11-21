@@ -26,17 +26,9 @@
 #include <acq/acq.h>
 #include <acq/fiff/acq_fiff_replay.h>
 #include <acq/fiff/acq_recorder.h>
-
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 #include <fiff/fiff_raw_data.h>
-
-#include <Eigen/Core>
-
-#include <chrono>
-#include <cstdio>
-#include <string>
-#include <thread>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +38,21 @@
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <cstdio>
+#include <string>
+#include <thread>
 
 //=============================================================================================================
 // USED NAMESPACES

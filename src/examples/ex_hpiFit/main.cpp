@@ -16,23 +16,24 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <memory>
 #include <base/string_utils.h>
-#include <vector>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
-
 #include <inv/hpi/inv_hpi_fit.h>
 #include <inv/hpi/inv_hpi_data_updater.h>
-
 #include <math/matrix_io.h>
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <fwd/fwd_coil_set.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // Qt INCLUDES

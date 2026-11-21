@@ -22,7 +22,6 @@
 #include "events_global.h"
 #include "event.h"
 #include "eventgroup.h"
-
 #ifndef NO_IPC
 #include "eventsharedmemmanager.h"
 #else
@@ -36,8 +35,9 @@ enum SharedMemoryMode
 };
 }
 #endif
+
 //=============================================================================================================
-// STD INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
 #include <string>

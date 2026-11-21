@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "acq_lsl.h"
+
 #include "../acq_backend.h"
 #include "../acq_device.h"
 #include "../acq_clock_model.h"
@@ -22,11 +23,14 @@
 #include "../acq_thread.h"
 #include "../detail/acq_shared_library.h"
 #include "../detail/acq_uri_params.h"
-
 #include <lsl/lsl_stream_discovery.h>
 #include <lsl/lsl_stream_inlet.h>
 #include <lsl/lsl_stream_info.h>
 #include <lsl/lsl_stream_outlet.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <atomic>

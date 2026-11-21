@@ -19,7 +19,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <fiff/fiff_constants.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_coord_trans.h>
@@ -86,6 +85,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <format>

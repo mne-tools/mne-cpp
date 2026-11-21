@@ -17,15 +17,12 @@
 //=============================================================================================================
 
 #include "averaging.h"
-#include <memory>
-#include "FormFiles/averagingsetupwidget.h"
 
+#include "FormFiles/averagingsetupwidget.h"
 #include <disp/viewers/averagingsettingsview.h>
 #include <disp/viewers/artifactsettingsview.h>
-
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
-
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -33,6 +30,11 @@
 
 #include <Eigen/Core>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <optional>
 #include <utility>
 

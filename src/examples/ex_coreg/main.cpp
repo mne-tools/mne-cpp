@@ -16,26 +16,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <memory>
-
+#include "fiff/fiff_dig_point_set.h"
+#include "fiff/fiff_dig_point.h"
+#include "fiff/fiff_coord_trans.h"
+#include "mne/mne_bem.h"
+#include "mne/mne_bem_surface.h"
+#include "mne/mne_project_to_surface.h"
+#include "mne/mne_icp.h"
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/digitizersettreeitem.h>
 #include <disp3D/model/items/bemtreeitem.h>
-
-#include "fiff/fiff_dig_point_set.h"
-#include "fiff/fiff_dig_point.h"
-#include "fiff/fiff_coord_trans.h"
-
-#include "mne/mne_bem.h"
-#include "mne/mne_bem_surface.h"
-#include "mne/mne_project_to_surface.h"
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <base/string_utils.h>
-#include "mne/mne_icp.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +40,13 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <memory>
 
 //=============================================================================================================
 // Eigen

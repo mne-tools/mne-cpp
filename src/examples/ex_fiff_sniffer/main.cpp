@@ -14,31 +14,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-#include <memory>
-
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-
 #include <fiff/fiff_io.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_digitizer_data.h>
-
 ////////////////////////
-
 #include <connectivity/network/network.h>
-
 #include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_digitizer_data.h>
-
 #include <mne/mne_msh_display_surface_set.h>
 #include <mne/mne_surface_or_volume.h>
-//////////////////////
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QCoreApplication>
+//////////////////////
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -46,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <iostream>
 
 //=============================================================================================================

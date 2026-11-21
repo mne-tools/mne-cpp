@@ -24,8 +24,8 @@
 #include <mri/mri_nifti_io.h>
 #include <mri/mri_types.h>
 #include <mri/mri_vol_data.h>
-
 #include <fiff/fiff_file.h>
+#include <zlib.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -38,10 +38,8 @@
 #include <QTemporaryDir>
 
 //=============================================================================================================
-// SYSTEM INCLUDES
+// STL INCLUDES
 //=============================================================================================================
-
-#include <zlib.h>
 
 #include <algorithm>
 #include <cstring>

@@ -15,14 +15,10 @@
 //=============================================================================================================
 
 #include "mne_deriv_set.h"
+
 #include <fiff/fiff_ch_name.h>
-#include <memory>
 #include <base/log.h>
-
-#include <vector>
-#include <utility>
 #include <base/string_utils.h>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
@@ -31,6 +27,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
+#include <vector>
+#include <utility>
 #include <algorithm>
 #include <cctype>
 #include <cmath>

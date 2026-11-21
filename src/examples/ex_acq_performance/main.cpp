@@ -32,6 +32,19 @@
 //=============================================================================================================
 
 #include <acq/acq.h>
+#if defined(_WIN32)
+#define NOMINMAX
+#include <io.h>
+#include <malloc.h>
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <array>
@@ -47,16 +60,6 @@
 #include <string_view>
 #include <thread>
 #include <vector>
-
-#if defined(_WIN32)
-#define NOMINMAX
-#include <io.h>
-#include <malloc.h>
-#include <windows.h>
-#else
-#include <sys/ioctl.h>
-#include <unistd.h>
-#endif
 
 //=============================================================================================================
 // HEAP ALLOCATION COUNTER

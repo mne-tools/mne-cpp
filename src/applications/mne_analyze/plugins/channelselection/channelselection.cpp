@@ -16,17 +16,14 @@
 //=============================================================================================================
 
 #include "channelselection.h"
-#include <memory>
 
 #include <disp/viewers/helpers/selectionsceneitem.h>
 #include <disp/viewers/helpers/channelinfomodel.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/applytoview.h>
-
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/analyzedata.h>
-
 
 //=============================================================================================================
 // QT INCLUDES
@@ -34,6 +31,12 @@
 
 #include <QListWidgetItem>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <utility>
 
 //=============================================================================================================

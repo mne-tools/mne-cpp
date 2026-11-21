@@ -17,18 +17,28 @@
 //=============================================================================================================
 
 #include "datawindow.h"
-#include <memory>
-#include <base/string_utils.h>
+
 #include "../Models/virtualchannelmodel.h"
+#include <base/string_utils.h>
 #include <disp/viewers/helpers/channeldatamodel.h>
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_constants.h>
 
-#include <algorithm>
-#include <cmath>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QHash>
 #include <QSignalBlocker>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <algorithm>
+#include <cmath>
 #include <utility>
 
 //*************************************************************************************************************

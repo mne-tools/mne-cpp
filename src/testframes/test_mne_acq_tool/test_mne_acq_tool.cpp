@@ -16,19 +16,9 @@
 
 #include <acq/acq.h>
 #include <base/string_utils.h>
-
 #include <fiff/fiff_raw_data.h>
-
 #include <lsl/lsl_stream_discovery.h>
 #include <lsl/lsl_stream_inlet.h>
-
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <cstring>
-#include <string>
-#include <thread>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +36,18 @@
 #include <QThread>
 #include <QUdpSocket>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

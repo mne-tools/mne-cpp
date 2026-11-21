@@ -16,15 +16,6 @@
 
 #include "acq_thread.h"
 
-#include <algorithm>
-#include <cerrno>
-#include <charconv>
-#include <cstring>
-#include <fstream>
-#include <future>
-#include <string>
-#include <thread>
-
 #if defined(_WIN32)
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -44,6 +35,19 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cerrno>
+#include <charconv>
+#include <cstring>
+#include <fstream>
+#include <future>
+#include <string>
+#include <thread>
 
 //=============================================================================================================
 // USED NAMESPACES

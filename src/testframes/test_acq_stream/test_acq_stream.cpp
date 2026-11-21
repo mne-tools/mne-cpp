@@ -19,20 +19,6 @@
 
 #include <acq/acq_stream.h>
 #include <acq/detail/acq_diagnostics.h>
-
-#include <array>
-#include <atomic>
-#include <bit>
-#include <chrono>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <new>
-#include <optional>
-#include <string>
-#include <thread>
-#include <vector>
-
 #if defined(_WIN32)
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN
@@ -51,6 +37,23 @@
 //=============================================================================================================
 
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <array>
+#include <atomic>
+#include <bit>
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <new>
+#include <optional>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

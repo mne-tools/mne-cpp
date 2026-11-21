@@ -15,17 +15,18 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/coregistration/coregistration.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/bemdatamodel.h>
-
 #include <disp/viewers/coregsettingsview.h>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_dig_point_set.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
 #include <QCheckBox>
@@ -34,8 +35,11 @@
 #include <QSemaphore>
 #include <QThreadPool>
 
-#include <functional>
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
+#include <functional>
 #include <memory>
 
 using namespace COREGISTRATIONPLUGIN;

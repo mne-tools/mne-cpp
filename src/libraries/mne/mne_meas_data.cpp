@@ -18,24 +18,26 @@
 //=============================================================================================================
 
 #include "mne_meas_data.h"
-#include <base/log.h>
-#include <base/string_utils.h>
+
 #include "mne_meas_data_set.h"
 #include "mne_inverse_operator.h"
-
 #include "mne_types.h"
 #include "mne_named_matrix.h"
-
+#include <base/log.h>
+#include <base/string_utils.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_evoked.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <algorithm>
 #include <cstdlib>
 #include <string_view>
 #include <vector>
-
 #include <sstream>
 
 //=============================================================================================================

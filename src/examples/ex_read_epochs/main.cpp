@@ -16,23 +16,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <memory>
-#include <vector>
 #include <math.h>
-
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-
 #include <mne/mne_epoch_data_list.h>
-
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/imagesc.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -43,6 +32,14 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

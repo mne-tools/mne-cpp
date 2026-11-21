@@ -27,14 +27,10 @@
 
 #include "../inv_global.h"
 #include "inv_rap_music.h"
-
 #include "inv_dipole.h"
-
 #include <mne/mne_forward_solution.h>
 #include <inv/inv_source_estimate.h>
 #include <time.h>
-
-#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,6 +39,12 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/LU>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne

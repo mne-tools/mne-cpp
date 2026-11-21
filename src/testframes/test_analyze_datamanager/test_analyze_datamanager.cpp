@@ -15,7 +15,6 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/datamanager/datamanager.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/event.h>
@@ -23,9 +22,17 @@
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QtTest>
 #include <QDockWidget>
 #include <QTreeView>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <memory>
 

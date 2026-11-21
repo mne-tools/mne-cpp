@@ -59,6 +59,41 @@ python3 scripts/quality/check_format.py --fix    # reformat them in place
 python3 scripts/quality/check_format.py --all    # check the whole tree, as CI does
 ```
 
+The same check keeps the includes at the top of a file under the banner of
+their kind, in this order, and leaves out a banner without includes:
+
+```cpp
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "fiff_info.h"          // the file's own header first
+
+#include "fiff_constants.h"     // headers next to the file
+#include <base/string_utils.h>  // other MNE-CPP and third-party headers
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QString>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+```
+
+`--fix` regroups them; a group under `#if` moves as a whole, and a block that
+defines a macro between includes is left for you to arrange.
+
 Use exactly this version: other clang-format releases lay out some constructs
 differently and the check would fail. Most IDEs can run clang-format on save;
 point them at the pinned binary (`which clang-format` after the `pip install`).

@@ -19,21 +19,26 @@
 //=============================================================================================================
 
 #include "mne_ctf_comp_data_set.h"
-#include <memory>
-#include <base/log.h>
 
-#include <vector>
-
-#include <base/string_utils.h>
 #include "mne_ctf_comp_data.h"
-
 #include "mne_types.h"
-
+#include <base/log.h>
+#include <base/string_utils.h>
 #include <fiff/fiff_coord_trans.h>
-
 #include <fiff/fiff_types.h>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 constexpr int FAIL = -1;
 constexpr int OK = 0;

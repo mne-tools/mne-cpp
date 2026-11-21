@@ -19,10 +19,9 @@
 //=============================================================================================================
 
 #include "rt_filter.h"
-#include <memory>
+
 #include <base/log.h>
 #include <base/thread_pool.h>
-
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_file.h>
 #include <mne/mne_epoch_data.h>
@@ -35,6 +34,11 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <algorithm>
 #include <cmath>
 #include <utility>

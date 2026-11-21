@@ -21,11 +21,14 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
-
 #include <dsp/filterkernel.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
 
 //=============================================================================================================

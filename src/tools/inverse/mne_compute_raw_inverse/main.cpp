@@ -21,22 +21,17 @@
 //=============================================================================================================
 
 #include <fiff/fiff.h>
-#include <memory>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
-
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
 #include <inv/inv_source_estimate.h>
 #include <mne/mne_source_spaces.h>
-
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <fs/fs_label.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 #include <base/string_utils.h>
@@ -61,6 +56,12 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

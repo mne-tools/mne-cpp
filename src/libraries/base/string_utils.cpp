@@ -16,6 +16,16 @@
 
 #include "string_utils.h"
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#include <xlocale.h>
+#elif defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
+
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
@@ -28,16 +38,6 @@
 #include <cstdlib>
 #include <format>
 #include <limits>
-
-#ifdef __APPLE__
-#include <mach-o/dyld.h>
-#include <xlocale.h>
-#elif defined(_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
-#endif
 
 //=============================================================================================================
 // DEFINE STATICS AND LOCAL METHODS

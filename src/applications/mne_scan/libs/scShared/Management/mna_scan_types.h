@@ -19,10 +19,12 @@
 
 #include "../scshared_global.h"
 #include "pluginconnectorconnection.h"
-
 #include <mna/mna_types.h>
-
 #include <base/json.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QVariantMap>
 

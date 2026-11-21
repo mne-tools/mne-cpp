@@ -16,33 +16,35 @@
 //=============================================================================================================
 
 #include "batchprocessor.h"
-#include <memory>
-
-#include <algorithm>
-#include <iterator>
-
-#include <vector>
 
 #include <mne/mne_description_parser.h>
-
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_events.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_file.h>
-
 #include <mne/mne.h>
-
 #include <base/string_utils.h>
 
-#include <QFile>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
+#include <QFile>
+#include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <algorithm>
+#include <iterator>
+#include <vector>
 #include <exception>
 #include <filesystem>
 #include <format>
 #include <fstream>
 #include <optional>
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -21,13 +21,16 @@
 //=============================================================================================================
 
 #include "brainflow_stream.h"
-
 #include "../acq_devices.h"
 #include "../../acq_backend.h"
 #include "../../acq_device_registry.h"
 #include "../../acq_thread.h"
 #include "../../detail/acq_shared_library.h"
 #include "../../detail/acq_uri_params.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <array>

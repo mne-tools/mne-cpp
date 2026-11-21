@@ -18,17 +18,19 @@
 //=============================================================================================================
 
 #include "fwd_coil_set.h"
-#include <memory>
-#include <base/log.h>
 
-#include <vector>
 #include "fwd_coil.h"
 #include "fwd_bem_solution.h"
-
+#include <base/log.h>
 #include <fiff/fiff_ch_info.h>
-
 #include <base/string_utils.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 #include <fstream>
 #include <locale>
 #include <sstream>

@@ -15,20 +15,23 @@
 //=============================================================================================================
 
 #include "acq_fiff_replay.h"
+
 #include "acq_fiff.h"
 #include "../acq_backend.h"
 #include "../acq_clock_model.h"
 #include "../acq_device_registry.h"
 #include "../acq_thread.h"
 #include "../detail/acq_uri_params.h"
-
 #include <base/string_utils.h>
-
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <atomic>
@@ -46,11 +49,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
 
 //=============================================================================================================
 // USED NAMESPACES

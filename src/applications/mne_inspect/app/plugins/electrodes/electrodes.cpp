@@ -20,15 +20,11 @@
 
 #include <ieeg/ieeg_implantation.h>
 #include <mri/mri_vol_data.h>
-
 #include <disp3D/scene/multimodalscene.h>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_stream.h>
-
-#include <Eigen/LU>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -41,6 +37,16 @@
 #include <QHash>
 #include <QStringList>
 #include <QTextStream>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/LU>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <cmath>

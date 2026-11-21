@@ -21,6 +21,15 @@
 #include <com/tcp_server.h>
 #include <com/tcp_socket.h>
 #include <com/udp_socket.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#endif
 
 //=============================================================================================================
 // STL INCLUDES
@@ -33,16 +42,6 @@
 #include <print>
 #include <string>
 #include <string_view>
-
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES

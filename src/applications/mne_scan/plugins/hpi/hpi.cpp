@@ -17,18 +17,14 @@
 // INCLUDES
 //=============================================================================================================
 
-
 #include "hpi.h"
-#include <memory>
-#include <base/string_utils.h>
 
 #include "FormFiles/hpisetupwidget.h"
-
+#include <base/string_utils.h>
 #include <disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <dsp/rt/rt_hpi.h>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_digitizer_data.h>
 
@@ -38,6 +34,12 @@
 
 #include <QDir>
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <cmath>
 #include <filesystem>
 #include <numeric>

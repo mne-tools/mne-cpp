@@ -20,29 +20,30 @@
 //=============================================================================================================
 
 #include "ui_averagewindow.h"
-
-#include <vector>
 #include "../Utils/butterflyscene.h"
 #include "../Utils/types.h"
 #include "../Models/averagemodel.h"
 #include "../Delegates/averagedelegate.h"
-
 #include <channels/layoutloader.h>
 #include <disp/viewers/helpers/averagescene.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
 
-
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+//*************************************************************************************************************
 #include <QDockWidget>
 #include <QAction>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QSvgGenerator>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 #include <memory>
 
 class QDoubleSpinBox;

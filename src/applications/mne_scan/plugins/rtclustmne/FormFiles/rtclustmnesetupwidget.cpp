@@ -17,17 +17,13 @@
 //=============================================================================================================
 
 #include "rtclustmnesetupwidget.h"
-#include <memory>
 
 #include "../rtclustmne.h"
-
 #include <fs/fs_annotationset.h>
 #include <fs/fs_surfaceset.h>
 #include <fiff/fiff_coord_trans.h>
-
 #include <mne/mne_forward_solution.h>
 #include <base/string_utils.h>
-
 #include <scMeas/realtimesourceestimate.h>
 
 //=============================================================================================================
@@ -37,6 +33,12 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QtConcurrent>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

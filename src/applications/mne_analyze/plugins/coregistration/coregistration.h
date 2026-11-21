@@ -20,9 +20,7 @@
 //=============================================================================================================
 
 #include "coregistration_global.h"
-#include <memory>
 #include <anShared/Plugins/abstractplugin.h>
-
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
@@ -35,6 +33,12 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 #include <QPointer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

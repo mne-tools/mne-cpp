@@ -19,7 +19,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include <disp/viewers/abstractview.h>
 #include <base/string_utils.h>
 #include <base/log_qt.h>
@@ -47,7 +46,6 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/applytoview.h>
 #include <disp/viewers/helpers/rtfiffrawviewdelegate.h>
-#include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/viewers/helpers/frequencyspectrummodel.h>
 #include <disp/viewers/helpers/frequencyspectrumdelegate.h>
 #include <disp/viewers/helpers/bidsviewmodel.h>
@@ -57,7 +55,6 @@
 #include <disp/viewers/helpers/averagesceneitem.h>
 #include <disp/viewers/helpers/channeldatamodel.h>
 #include <disp/viewers/helpers/layoutscene.h>
-
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_coord_trans.h>
@@ -67,6 +64,7 @@
 #include <fiff/fiff_proj.h>
 #include <dsp/filterkernel.h>
 #include <dsp/filterio.h>
+#include <rhi/qrhi.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -111,8 +109,6 @@
 #include <QRadioButton>
 #include <QVector3D>
 #include <QTimer>
-
-#include <functional>
 #include <QPointer>
 #include <QTreeView>
 #include <QStyledItemDelegate>
@@ -120,10 +116,18 @@
 #include <QStandardItem>
 #include <QKeyEvent>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 
-#include <rhi/qrhi.h>
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
+#include <algorithm>
+#include <functional>
 #include <memory>
 
 //=============================================================================================================

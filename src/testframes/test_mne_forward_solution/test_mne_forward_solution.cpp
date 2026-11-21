@@ -19,15 +19,10 @@
 
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 #include <mne/mne_forward_solution.h>
-
-#include <algorithm>
-#include <memory>
 #include <mne/mne.h>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_info.h>
@@ -38,6 +33,13 @@
 //=============================================================================================================
 
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -17,9 +17,6 @@
 #include <fwd/compute_fwd/compute_fwd_settings.h>
 #include <fwd/compute_fwd/compute_fwd.h>
 #include <mne/mne_forward_solution.h>
-
-#include <memory>
-
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -30,6 +27,12 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

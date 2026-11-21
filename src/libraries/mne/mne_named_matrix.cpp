@@ -20,8 +20,7 @@
 //=============================================================================================================
 
 #include "mne_named_matrix.h"
-#include <cstdint>
-#include <memory>
+
 #include <base/log.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_stream.h>
@@ -31,6 +30,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
 #include <algorithm>
 #include <iterator>
 #include <numeric>

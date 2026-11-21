@@ -18,30 +18,21 @@
 //=============================================================================================================
 
 #include <fs/fs_label.h>
-#include <memory>
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
-
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
-
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
 #include <inv/inv_source_estimate.h>
-
 #include <time.h>
-
 #include <inv/minimum_norm/inv_minimum_norm.h>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
-
 #include <math/linalg.h>
 #include <base/log.h>
 #include <base/log_qt.h>
-
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,6 +45,13 @@
 #include <QDir>
 #include <QVector3D>
 #include <QRandomGenerator>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES

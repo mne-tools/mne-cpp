@@ -17,12 +17,6 @@
 
 #include "acq_ring_memory.h"
 
-#include <algorithm>
-#include <array>
-#include <cstdint>
-#include <cstdlib>
-#include <cstring>
-
 #if defined(_WIN32)
 #define ACQ_RING_WINDOWS
 #ifndef NOMINMAX
@@ -44,6 +38,16 @@
 #include <cstdio>
 #include <fcntl.h>
 #endif
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -15,17 +15,10 @@
 //=============================================================================================================
 
 #include "acq_view.h"
-#include <memory>
 
 #include <acq/acq_eigen.h>
 #include <acq/fiff/acq_fiff.h>
-
 #include <disp/viewers/channeldataview.h>
-
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -35,6 +28,16 @@
 #include <QElapsedTimer>
 #include <QTextStream>
 #include <QTimer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

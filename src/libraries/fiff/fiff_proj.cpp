@@ -23,26 +23,15 @@
 //=============================================================================================================
 
 #include "fiff_proj.h"
+
 #include "fiff_ch_name.h"
-#include <base/log.h>
-
-#include <format>
-#include <map>
-#include <string>
-
-#include <algorithm>
-#include <iterator>
-
-#include <vector>
-
-#include <set>
-#include <base/string_utils.h>
 #include "fiff_raw_data.h"
 #include "fiff_evoked.h"
 #include "fiff_constants.h"
 #include "fiff_file.h"
+#include <base/log.h>
+#include <base/string_utils.h>
 #include <stdio.h>
-#include <cmath>
 #include <math/linalg.h>
 
 //=============================================================================================================
@@ -51,9 +40,22 @@
 
 #include <Eigen/SVD>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <map>
+#include <string>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <set>
+#include <cmath>
 #include <array>
 #include <stdexcept>
 #include <cstdint>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================

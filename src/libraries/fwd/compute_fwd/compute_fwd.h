@@ -36,16 +36,12 @@
 
 #include "../fwd_global.h"
 #include "compute_fwd_settings.h"
-
-#include <filesystem>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_types.h>
-#include <fiff/fiff_info_base.h>
-
 #include "../fwd_coil_set.h"
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
-
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_info_base.h>
 #include <mne/mne_ctf_comp_data_set.h>
 #include <mne/mne_source_space.h>
 
@@ -53,6 +49,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <vector>
 #include <memory>
 

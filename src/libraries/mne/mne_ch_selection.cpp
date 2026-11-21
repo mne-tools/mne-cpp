@@ -15,13 +15,17 @@
 //=============================================================================================================
 
 #include "mne_ch_selection.h"
+
 #include "mne_deriv.h"
 #include "mne_sparse_named_matrix.h"
 #include "mne_types.h"
-
 #include <base/log.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_ch_info.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <algorithm>
 #include <string_view>

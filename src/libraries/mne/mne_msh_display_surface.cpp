@@ -19,22 +19,29 @@
 //=============================================================================================================
 
 #include "mne_msh_display_surface.h"
-#include <base/log.h>
 
-#include <cassert>
 #include "mne_surface.h"
 #include "mne_morph_map.h"
 #include "mne_msh_picked.h"
 #include "mne_msh_color_scale_def.h"
-
+#include <base/log.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dig_point.h>
-
 #include <math/sphere.h>
 
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cassert>
 #include <cmath>
 #include <numbers>
 

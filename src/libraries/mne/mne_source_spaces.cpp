@@ -21,16 +21,20 @@
 //=============================================================================================================
 
 #include "mne_source_spaces.h"
-#include <cstdint>
-#include <memory>
-#include <base/log.h>
 
-#include <vector>
 #include "mne_nearest.h"
-
+#include <base/log.h>
 #include <math/linalg.h>
 #include <fs/fs_label.h>
 #include <base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

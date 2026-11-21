@@ -25,19 +25,17 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-
-#include <filesystem>
-#include <map>
-#include <string>
-#include <utility>
 #include "mne_deriv.h"
-
 #include <fiff/fiff_ch_info.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
+#include <map>
+#include <string>
+#include <utility>
 #include <memory>
 #include <optional>
 #include <vector>

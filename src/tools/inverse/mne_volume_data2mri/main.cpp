@@ -18,7 +18,6 @@
 #include <inv/inv_source_estimate.h>
 #include <mne/mne.h>
 #include <mne/mne_source_space.h>
-#include <memory>
 #include <base/log.h>
 #include <base/log_qt.h>
 
@@ -40,6 +39,12 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

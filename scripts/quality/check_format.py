@@ -8,7 +8,8 @@
 # @date     October, 2026
 #
 #
-# @brief    Fail when in-scope C/C++ files are not formatted with the pinned clang-format.
+# @brief    Fail when in-scope C/C++ files are not formatted with the pinned clang-format or have includes
+#           outside their section.
 """Check (or fix) the formatting of the C/C++ sources against ``.clang-format``.
 
 The whole tree was reformatted once with the pinned clang-format, so every
@@ -16,6 +17,9 @@ in-scope file must stay formatted as a whole.  CI checks all files
 (``--all``); locally the default is the files changed since the merge base
 with ``origin/staging``, which is faster and gives the same verdict for a
 branch that started from a formatted tree.
+
+It also checks that every include sits under the banner of its kind
+(``include_sections.py``); ``--fix`` regroups them.
 
 The in-scope set is the C/C++ sources under ``src/`` minus ``src/external``.
 Local and CI runs use the same file filter and the same clang-format version.
@@ -42,6 +46,9 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import include_sections  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CLANG_FORMAT_VERSION = "21.1.8"
@@ -114,6 +121,23 @@ def run_clang_format(binary: str, files: list[str], fix: bool) -> tuple[list[str
     return bad, report
 
 
+def check_include_sections(files: list[str], fix: bool) -> list[str]:
+    """Diagnostic lines for includes outside their section; with *fix* the fixable files are rewritten instead."""
+    report: list[str] = []
+    for name in files:
+        path = REPO_ROOT / name
+        text = path.read_text(encoding="utf-8", errors="replace")
+        findings = include_sections.check(text)
+        if not findings:
+            continue
+        fixed = include_sections.fix(text, include_sections.own_header(name)) if fix else None
+        if fixed is not None:
+            path.write_text(fixed, encoding="utf-8")
+            continue
+        report += [f"{name}:{line}: {message}" for line, message in findings]
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     scope = parser.add_mutually_exclusive_group()
@@ -139,12 +163,20 @@ def main(argv: list[str] | None = None) -> int:
         print(f"PASS: no in-scope C/C++ files ({label}).")
         return 0
 
+    sections = check_include_sections(files, args.fix)
     try:
         binary = find_clang_format()
         bad, report = run_clang_format(binary, files, args.fix)
     except (FileNotFoundError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
+    if sections:
+        print("\n".join(sections[:MAX_REPORTED_LINES]))
+        if len(sections) > MAX_REPORTED_LINES:
+            print(f"... {len(sections) - MAX_REPORTED_LINES} more")
+        print("FAIL: includes outside their section (scripts/quality/include_sections.py)"
+              + (": move them by hand, the include block defines a macro" if args.fix else f"; fix with: python3 scripts/quality/check_format.py --fix {scope_flag}"))
+        return 1
     if args.fix:
         print(f"formatted {len(files)} file(s) ({label}).")
         return 0

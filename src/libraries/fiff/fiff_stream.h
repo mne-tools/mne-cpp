@@ -40,10 +40,8 @@
 #include "fiff_file.h"
 #include "fiff_types.h"
 #include "fiff_id.h"
-
 #include "fiff_dir_node.h"
 #include "fiff_dir_entry.h"
-
 #include <base/byte_stream.h>
 #include <base/error.h>
 
@@ -53,6 +51,10 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <expected>
 #include <filesystem>

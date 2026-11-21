@@ -28,34 +28,32 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-
-#include <cstdint>
-#include <string>
-#include <vector>
-
 #include <mne/mne_source_spaces.h>
-
 #include <math/kmeans.h>
-
 #include <fs/fs_annotationset.h>
-
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info_base.h>
 #include <fiff/fiff_cov.h>
-
 #include <base/error.h>
-
 #include <math.h>
-#include <filesystem>
-#include <memory>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <filesystem>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne

@@ -22,27 +22,28 @@
 //=============================================================================================================
 
 #include "mne_source_space.h"
-#include <base/log.h>
 
-#include <cassert>
-
-#include <vector>
-#include <utility>
 #include "mne_nearest.h"
 #include "mne_patch_info.h"
 #include "mne_mgh_tag_group.h"
 #include "mne_surface.h"
 #include "mne_hemisphere.h"
 #include "filter_thread_arg.h"
-
+#include <base/log.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
-
 #include <fiff/fiff_byte_swap.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cassert>
+#include <vector>
+#include <utility>
 #include <charconv>
 #include <cstddef>
 #include <cstdint>
@@ -58,7 +59,6 @@
 #include <thread>
 #include <cmath>
 #include <numbers>
-
 
 using mne::FiffCoordTrans;
 

@@ -18,24 +18,14 @@
 
 #include <base/log.h>
 #include <base/log_qt.h>
-#include <memory>
-
-#include <iostream>
-#include <vector>
 #include <math.h>
-
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_dig_point_set.h>
-
 #include <inv/hpi/inv_hpi_fit.h>
 #include <inv/hpi/inv_hpi_data_updater.h>
-
 #include <math/matrix_io.h>
-
 #include <fwd/fwd_coil_set.h>
-
-#include <Eigen/Dense>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,6 +36,20 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QtTest>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <iostream>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

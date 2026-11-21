@@ -24,14 +24,19 @@
 //=============================================================================================================
 
 #include "fiff_raw_data.h"
-#include <memory>
-#include <base/log.h>
+
 #include "fiff_events.h"
 #include "fiff_tag.h"
 #include "fiff_stream.h"
+#include <base/log.h>
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 #include <cstdlib>
 #include <optional>
 

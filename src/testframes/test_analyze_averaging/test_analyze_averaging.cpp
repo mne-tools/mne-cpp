@@ -16,19 +16,24 @@
 
 #include <applications/mne_analyze/plugins/averaging/averaging.h>
 #include <base/string_utils.h>
-
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-
 #include <disp/viewers/averagingsettingsview.h>
-
 #include <fiff/fiff_evoked_set.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QtTest>
 #include <QDockWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <cmath>
 #include <memory>

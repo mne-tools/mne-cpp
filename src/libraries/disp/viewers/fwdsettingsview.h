@@ -31,14 +31,12 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
-
 #include <fiff/fiff_types.h>
 #include <fs/fs_annotationset.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
-
 
 #include <memory>
 

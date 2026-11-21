@@ -45,22 +45,25 @@
 
 #include "fwd_global.h"
 #include "fwd_coil_set.h"
-
-#include <filesystem>
-#include <string>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_named_matrix.h>
-
-#include <memory>
-#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <string>
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // BEM METHOD CONSTANTS

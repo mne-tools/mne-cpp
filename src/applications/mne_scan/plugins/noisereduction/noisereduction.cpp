@@ -17,27 +17,32 @@
 //=============================================================================================================
 
 #include "noisereduction.h"
-#include <memory>
 
-#include <vector>
+#include "FormFiles/noisereductionsetupwidget.h"
 #include <base/string_utils.h>
-
 #include <disp/viewers/scalingview.h>
 #include <disp/viewers/projectorsview.h>
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/compensatorview.h>
 #include <disp/viewers/spharasettingsview.h>
-
 #include <dsp/rt/rt_filter.h>
 #include <dsp/sphara.h>
-
 #include <math/matrix_io.h>
-
 #include <scMeas/realtimemultisamplearray.h>
 
-#include "FormFiles/noisereductionsetupwidget.h"
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

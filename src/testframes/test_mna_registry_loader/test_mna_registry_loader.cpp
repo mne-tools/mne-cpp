@@ -22,11 +22,7 @@
 #include <mna/mna_op_registry.h>
 #include <mna/mna_op_schema.h>
 #include <mna/mna_types.h>
-
 #include <base/string_utils.h>
-
-#include <filesystem>
-#include <string>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -41,6 +37,13 @@
 #include <QJsonArray>
 #include <QDir>
 #include <QCoreApplication>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES

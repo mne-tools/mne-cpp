@@ -17,24 +17,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <ctime>
-#include <cstdlib>
-#include <Eigen/Dense>
-#include <string>
-
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <math/numerics.h>
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <disp/plots/bar.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/spline.h>
-
 //includes for source localization data
 #include <fs/fs_label.h>
 #include <fs/fs_surface.h>
@@ -53,12 +43,28 @@
 #include <QDebug>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
-
 //includes for source localization data
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 #include <QSet>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+#include <string>
 #include <numbers>
 
 //=============================================================================================================

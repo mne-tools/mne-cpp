@@ -28,12 +28,7 @@
 //=============================================================================================================
 
 #include "fiff_stream.h"
-#include <memory>
-#include <base/log.h>
 
-#include <format>
-
-#include <vector>
 #include "fiff_annotations.h"
 #include "fiff_annotations_json.h"
 #include "fiff_tag.h"
@@ -50,16 +45,11 @@
 #include "fiff_dig_point.h"
 #include "fiff_id.h"
 #include "fiff_digitizer_data.h"
-#include "fiff_dig_point.h"
-
+#include <base/log.h>
 #include <math/linalg.h>
 #include <math/numerics.h>
 #include <base/string_utils.h>
-#include <algorithm>
-#include <cmath>
-#include <functional>
 #include <time.h>
-#include <utility>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -69,9 +59,16 @@
 #include <Eigen/Dense>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
+#include <format>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <utility>
 #include <cstdint>
 
 //=============================================================================================================

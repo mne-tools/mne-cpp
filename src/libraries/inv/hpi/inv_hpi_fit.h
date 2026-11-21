@@ -29,9 +29,9 @@
 //=============================================================================================================
 
 #include "../inv_global.h"
-#include <fiff/fiff_ch_info.h>
 #include "inv_sensor_set.h"
 #include "inv_signal_model.h"
+#include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
@@ -42,6 +42,10 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
 
 #include <filesystem>
 #include <vector>

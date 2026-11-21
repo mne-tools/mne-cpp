@@ -25,12 +25,8 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-
-#include <filesystem>
-#include <string>
-#include <fiff/fiff_types.h>
-
 #include "mne_raw_data.h"
+#include <fiff/fiff_types.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -42,6 +38,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
+#include <string>
 #include <memory>
 #include <vector>
 

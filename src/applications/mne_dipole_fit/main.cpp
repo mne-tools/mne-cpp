@@ -18,31 +18,30 @@
 
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_dipole_fit.h>
-
 #include <base/log.h>
 #include <base/log_qt.h>
-
 #include <mne/mne_bem.h>
-
-#include <QFile>
-#include <QFileInfo>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/dipoletreeitem.h>
-
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotationset.h>
-
-#include <iostream>
-#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFile>
+#include <QFileInfo>
 #include <QApplication>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

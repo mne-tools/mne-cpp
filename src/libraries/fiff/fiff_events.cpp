@@ -19,9 +19,8 @@
 //=============================================================================================================
 
 #include "fiff_events.h"
-#include "fiff_ch_name.h"
-#include <memory>
 
+#include "fiff_ch_name.h"
 #include "fiff_evoked_set.h"
 #include "fiff_raw_data.h"
 #include "fiff_stream.h"
@@ -35,6 +34,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <algorithm>
 #include <charconv>
 #include <cmath>

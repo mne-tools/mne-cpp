@@ -33,14 +33,8 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include <cstdint>
-#include <memory>
-
-#include <string>
-#include <vector>
 #include "mne_source_spaces.h"
 #include "mne_forward_solution.h"
-
 #include <fiff/fiff_types.h>
 #include <base/error.h>
 #include <fiff/fiff_named_matrix.h>
@@ -58,6 +52,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 #include <filesystem>
 
 //=============================================================================================================

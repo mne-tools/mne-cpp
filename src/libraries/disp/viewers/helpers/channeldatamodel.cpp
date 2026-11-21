@@ -15,9 +15,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
 #include "channeldatamodel.h"
-#include <memory>
+
 #include <base/string_utils.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_constants.h>
@@ -29,6 +28,13 @@
 #include <QtMath>
 #include <QWriteLocker>
 #include <QReadLocker>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

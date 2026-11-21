@@ -25,13 +25,12 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include <string>
-#include <mne/mne_types.h>
 #include "mne_vol_geom.h"
 #include "mne_mgh_tag_group.h"
 #include "mne_triangle.h"
 #include "mne_nearest.h"
 #include "mne_patch_info.h"
+#include <mne/mne_types.h>
 #include <fiff/fiff_sparse_matrix.h>
 #include <fiff/fiff_coord_trans.h>
 
@@ -41,10 +40,14 @@
 
 #include <Eigen/Core>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
 #include <memory>
 #include <optional>
 #include <vector>
-
 
 inline constexpr auto FIFF_MNE_SOURCE_SPACE_NNEIGHBORS = 3594; /* Number of neighbors for each source space point (used for volume source spaces) */
 inline constexpr auto FIFF_MNE_SOURCE_SPACE_NEIGHBORS = 3595;  /* Neighbors for each source space point (used for volume source spaces) */

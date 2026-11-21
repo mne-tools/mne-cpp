@@ -18,13 +18,9 @@
 //=============================================================================================================
 
 #include "rtfiffrawview.h"
-#include <memory>
-
-#include <vector>
 
 #include "helpers/rtfiffrawviewdelegate.h"
 #include "helpers/rtfiffrawviewmodel.h"
-
 #include <dsp/filterkernel.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_explain.h>
@@ -42,6 +38,12 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES

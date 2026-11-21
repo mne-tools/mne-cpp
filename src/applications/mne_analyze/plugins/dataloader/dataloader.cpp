@@ -27,12 +27,15 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
-
 #include <disp/viewers/progressview.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
 
 //=============================================================================================================

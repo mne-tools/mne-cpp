@@ -15,10 +15,8 @@
 //=============================================================================================================
 
 #include "simulate.h"
+
 #include <base/log.h>
-
-#include <vector>
-
 #include <inv/inv_source_estimate.h>
 #include <inv/inv_convenience.h>
 #include <fiff/fiff_evoked.h>
@@ -36,6 +34,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <vector>
 #include <cmath>
 #include <random>
 

@@ -43,7 +43,6 @@
 #include <disp/viewers/helpers/overviewbarwidget.h>
 #include <disp/viewers/helpers/channeldatamodel.h>
 #include <disp/viewers/helpers/channelrhiview.h>
-
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_info.h>
 
@@ -57,10 +56,14 @@
 #include <QSignalSpy>
 #include <QToolTip>
 #include <QWidget>
-
-#include <memory>
 #include <QSettings>
 #include <QScopedPointer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -30,20 +30,12 @@
 #include "mri_mgh_io.h"
 
 #include <base/byte_stream.h>
-
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_file.h>
-
-#include <base/byte_stream.h>
 #include <base/log.h>
 #include <base/string_utils.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
 
 //=============================================================================================================
 // EIGEN INCLUDES

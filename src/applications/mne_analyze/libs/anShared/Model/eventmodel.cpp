@@ -20,12 +20,9 @@
 
 #include "eventmodel.h"
 
-#include <fiff/fiff_events.h>
 #include "fiffrawviewmodel.h"
+#include <fiff/fiff_events.h>
 #include <mne/mne.h>
-#include <iomanip>
-#include <iostream>
-
 #include <dsp/rt/rt_detect_trigger.h>
 #include <base/string_utils.h>
 
@@ -40,6 +37,13 @@
 #include <QFileDialog>
 #include <QBuffer>
 #include <QMessageBox>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iomanip>
+#include <iostream>
 
 //=============================================================================================================
 // Eigen INCLUDES

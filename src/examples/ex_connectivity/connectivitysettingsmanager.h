@@ -20,14 +20,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <memory>
-
 #include <connectivity/compute_connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
-#include <map>
-#include <string>
-
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
 #include <disp/plots/imagesc.h>
@@ -41,6 +36,14 @@
 #include <QWidget>
 #include <QDebug>
 #include <QElapsedTimer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <map>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
