@@ -78,6 +78,16 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ANALYZE_STUDIO_CORE_LIBRARY)
 
+# llm-retry: header-only retry/backoff for the LLM planner requests
+include(FetchContent)
+FetchContent_Declare(llm_retry
+    GIT_REPOSITORY https://github.com/Mattbusel/llm-retry.git
+    GIT_TAG v0.3.1
+    GIT_SHALLOW TRUE
+    SOURCE_SUBDIR include)
+FetchContent_MakeAvailable(llm_retry)
+target_include_directories(${PROJECT_NAME} PRIVATE ${llm_retry_SOURCE_DIR}/include)
+
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PUBLIC STATICBUILD)
 endif()

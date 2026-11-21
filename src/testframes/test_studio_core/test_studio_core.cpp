@@ -69,12 +69,15 @@ namespace
 class FakeLlmEndpoint : public QTcpServer
 {
 public:
-    FakeLlmEndpoint(int status, QByteArray body)
+    FakeLlmEndpoint(int status, QByteArray body, int firstStatus = 0)
     : m_status(status)
+    , m_firstStatus(firstStatus)
     , m_body(std::move(body))
     {
         connect(this, &QTcpServer::newConnection, this, [this]() {
             QTcpSocket* socket = nextPendingConnection();
+            m_request.clear();
+            ++m_requests;
             connect(socket, &QTcpSocket::readyRead, socket, [this, socket]() {
                 m_request += socket->readAll();
                 const int headerEnd = m_request.indexOf("\r\n\r\n");
@@ -83,7 +86,7 @@ public:
                 const QByteArray length = header("content-length");
                 if (m_request.size() - headerEnd - 4 < length.toInt())
                     return;
-                socket->write("HTTP/1.1 " + QByteArray::number(m_status) + " X\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(m_body.size()) + "\r\nConnection: close\r\n\r\n" + m_body);
+                socket->write("HTTP/1.1 " + QByteArray::number(m_requests == 1 && m_firstStatus ? m_firstStatus : m_status) + " X\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(m_body.size()) + "\r\nConnection: close\r\n\r\n" + m_body);
                 socket->disconnectFromHost();
             });
         });
@@ -110,8 +113,15 @@ public:
         return QJsonDocument::fromJson(m_request.mid(m_request.indexOf("\r\n\r\n") + 4)).object();
     }
 
+    int requests() const
+    {
+        return m_requests;
+    }
+
 private:
     int m_status;
+    int m_firstStatus;
+    int m_requests = 0;
     QByteArray m_body;
     QByteArray m_request;
 };
@@ -156,6 +166,7 @@ private slots:
     void planner_mockPlansFollowTheRequest();
     void planner_talksToEachProvider_data();
     void planner_talksToEachProvider();
+    void planner_retriesRateLimit();
     void agentChatDockWidget_conversationAndConfirmations();
     void llmSettingsDialog_ruleBasedAndProfileFlow();
     void workflowMiniMapWidget_graphRenderingAndActivation();
@@ -511,6 +522,25 @@ void TestStudioCore::planner_talksToEachProvider()
         QCOMPARE(endpoint.header("authorization"), QByteArray("Bearer secret"));
     }
     QCOMPARE(endpoint.header("x-github-api-version").isEmpty(), mode != "github_models");
+}
+
+//=============================================================================================================
+
+void TestStudioCore::planner_retriesRateLimit()
+{
+    const QString plan = R"({"summary":"One step","steps":[{"tool_name":"view.raw.goto","description":"Go","arguments":{"sample":5}}]})";
+    const QJsonObject body{{"choices", QJsonArray{QJsonObject{{"message", QJsonObject{{"content", plan}}}}}}};
+    FakeLlmEndpoint endpoint(200, QJsonDocument(body).toJson(QJsonDocument::Compact), 429);
+    QVERIFY(endpoint.isListening());
+    LlmToolPlanner planner;
+    planner.setConfiguration(LlmPlannerConfig{"", "", endpoint.url(), "secret", "model-1"});
+
+    // A 429 on the first attempt is retried instead of failing the plan
+    const LlmPlanResult result = planner.plan("go to sample 5", QJsonArray{QJsonObject{{"name", "view.raw.goto"}}}, QJsonObject{});
+    QCOMPARE(endpoint.requests(), 2);
+    QCOMPARE(result.httpStatusCode, 200);
+    QVERIFY2(result.success, qPrintable(result.errorMessage));
+    QCOMPARE(result.plannedCommands, (QStringList{"tools.call view.raw.goto {\"sample\":5}"}));
 }
 
 //=============================================================================================================

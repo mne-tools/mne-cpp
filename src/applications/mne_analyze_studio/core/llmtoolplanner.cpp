@@ -23,6 +23,9 @@
 #include <QNetworkRequest>
 #include <QUrl>
 
+#define LLM_RETRY_IMPLEMENTATION
+#include <llm_retry.hpp>
+
 using namespace MNEANALYZESTUDIO;
 
 namespace
@@ -390,10 +393,25 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         request.setRawHeader("X-GitHub-Api-Version", "2022-11-28");
     }
 
-    QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument(payload).toJson(QJsonDocument::Compact));
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
+    // 408, 429, 5xx and 529 are retried with backoff; any other error falls through on the first reply.
+    QNetworkReply* reply = nullptr;
+    try {
+        llm::with_retry<int>([&]() {
+            if (reply) {
+                reply->deleteLater();
+            }
+            reply = m_networkAccessManager->post(request, QJsonDocument(payload).toJson(QJsonDocument::Compact));
+            QEventLoop loop;
+            connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+            loop.exec();
+            if (reply->error() != QNetworkReply::NoError) {
+                throw llm::LLMError{reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt(), reply->errorString().toStdString(), true};
+            }
+            return 0;
+        });
+    } catch (const llm::LLMError&) {
+        // Not retryable or out of attempts: the last reply is reported below.
+    }
 
     const QByteArray responseBytes = reply->readAll();
     result.rawResponse = QString::fromUtf8(responseBytes);
