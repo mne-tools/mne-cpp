@@ -888,7 +888,8 @@
       "library": "mne",
       "libraries": [
         "mne",
-        "fiff"
+        "fiff",
+        "base"
       ],
       "tasks": [
         "io"
@@ -1888,7 +1889,8 @@
       "url": "/docs/examples/math/ex_warp/",
       "library": "math",
       "libraries": [
-        "math"
+        "math",
+        "base"
       ],
       "tasks": [
         "infrastructure"

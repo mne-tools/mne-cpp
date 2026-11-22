@@ -69,7 +69,7 @@ m_settings->setWidgetResizable(true);
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 188"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 189"
     const AcqDeviceRegistry& registry = AcqDeviceRegistry::instance();
     for (const AcqSchemeInfo& scheme : registry.schemes()) {
         std::printf("%s://  %s\n", scheme.scheme.c_str(), scheme.description.c_str());

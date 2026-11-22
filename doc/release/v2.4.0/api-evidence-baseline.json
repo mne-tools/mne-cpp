@@ -5,35 +5,35 @@
   "summary": {
     "exported_classes": 481,
     "exported_free_functions": 212,
-    "registered_classes": 577,
+    "registered_classes": 579,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 84,
+    "registered_header_only": 86,
     "registered_stale": 0,
-    "registered_with_test": 257,
+    "registered_with_test": 259,
     "registered_test_unresolved": 0,
-    "registered_with_example": 430,
+    "registered_with_example": 432,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 100,
     "registered_without_api_page": 0,
-    "with_snippet": 460,
-    "public_api_units": 579,
-    "example_eligible": 430,
+    "with_snippet": 462,
+    "public_api_units": 581,
+    "example_eligible": 432,
     "example_exempt": 149,
-    "eligible_backed_by_registry_example": 428,
+    "eligible_backed_by_registry_example": 430,
     "eligible_used_by_some_example": 372,
     "examples_on_disk": 80,
     "examples_built": 80
   },
   "by_library": {
     "acq": {
-      "public": 55,
-      "registered": 53,
-      "with_test": 50,
-      "eligible": 37,
-      "eligible_with_registry_example": 35,
+      "public": 57,
+      "registered": 55,
+      "with_test": 52,
+      "eligible": 39,
+      "eligible_with_registry_example": 37,
       "eligible_used_by_example": 10,
-      "with_snippet": 49
+      "with_snippet": 51
     },
     "base": {
       "public": 24,
@@ -1574,6 +1574,52 @@
       "exempt_reason": "registry: Host-time model a device backend publishes with AcqWriter::setClock(); callers read it through AcqStream::clock()."
     },
     {
+      "name": "AcqControlEvent",
+      "header": "acq/acq_control.h",
+      "library": "acq",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_acq_device",
+      "test_resolves": true,
+      "example": "ex_acq_oddball",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_acq_oddball/main.cpp#acq_control_usage",
+        "ex_acq_oddball/main.cpp#acq_control_usage",
+        "ex_acq_oddball/main.cpp#acq_control_usage"
+      ],
+      "api_page": "doc/website/docs/api/acq/acq-control-event.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "AcqControlInfo",
+      "header": "acq/acq_control.h",
+      "library": "acq",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_acq_device",
+      "test_resolves": true,
+      "example": "ex_acq_oddball",
+      "example_state": "built",
+      "including_examples": [],
+      "snippets": [
+        "ex_acq_oddball/main.cpp#acq_control_usage",
+        "ex_acq_oddball/main.cpp#acq_control_usage",
+        "ex_acq_oddball/main.cpp#acq_control_usage"
+      ],
+      "api_page": "doc/website/docs/api/acq/acq-control-info.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "AcqChannelRange",
       "header": "acq/acq_convert.h",
       "library": "acq",
@@ -3051,10 +3097,12 @@
         "ex_compute_forward",
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_performance",
         "ex_coreg",
         "ex_disp",
         "ex_disp_3D",
         "ex_evoked_grad_amp",
+        "ex_fiff_io",
         "ex_filtering",
         "ex_find_evoked",
         "ex_fs_surface",
@@ -3076,7 +3124,8 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_spectral",
         "ex_st_clustered_inverse_pwl_rap_music",
-        "ex_tf_plot"
+        "ex_tf_plot",
+        "ex_warp"
       ],
       "snippets": [
         "ex_base/main.cpp#log_usage",
@@ -3111,10 +3160,12 @@
         "ex_compute_forward",
         "ex_connectivity",
         "ex_connectivity_comparison",
+        "ex_connectivity_performance",
         "ex_coreg",
         "ex_disp",
         "ex_disp_3D",
         "ex_evoked_grad_amp",
+        "ex_fiff_io",
         "ex_filtering",
         "ex_find_evoked",
         "ex_fs_surface",
@@ -3136,7 +3187,8 @@
         "ex_roi_clustered_inverse_pwl_rap_music",
         "ex_spectral",
         "ex_st_clustered_inverse_pwl_rap_music",
-        "ex_tf_plot"
+        "ex_tf_plot",
+        "ex_warp"
       ],
       "snippets": [
         "ex_base/main.cpp#log_usage",

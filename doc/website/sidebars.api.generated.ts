@@ -809,7 +809,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/acq/acq-bids-path',
         'api/acq/polhemus-coregistration',
         'api/acq/acquired-points',
-        'api/acq/digitized-point'
+        'api/acq/digitized-point',
+        'api/acq/acq-control-info',
+        'api/acq/acq-control-event'
       ],
     }
 ];

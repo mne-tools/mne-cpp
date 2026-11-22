@@ -659,6 +659,8 @@
       },
       "registry_classes": [
         "AcqBackend",
+        "AcqControlEvent",
+        "AcqControlInfo",
         "AcqDevice",
         "AcqDeviceDescription",
         "AcqDeviceRegistry",

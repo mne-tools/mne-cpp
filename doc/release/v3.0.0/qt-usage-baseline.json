@@ -6,11 +6,7 @@
     "disp",
     "disp3D"
   ],
-  "kept": {
-    "base": {
-      "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt."
-    }
-  },
+  "kept": {},
   "summary": {
     "libraries": 28,
     "qt_free": [
@@ -19,6 +15,7 @@
       "acq/devices/polhemus",
       "acq/fiff",
       "acq/lsl",
+      "base",
       "bids",
       "channels",
       "com",
@@ -40,7 +37,7 @@
       "report",
       "sts"
     ],
-    "tokens": 8917,
+    "tokens": 8907,
     "gui_outside_design": []
   },
   "libraries": {
@@ -49,7 +46,7 @@
       "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 40,
+      "files": 42,
       "modules": []
     },
     "acq/devices": {
@@ -85,15 +82,11 @@
       "modules": []
     },
     "base": {
-      "tokens": 10,
-      "by_category": {
-        "global": 1,
-        "logging": 6,
-        "strings": 3
-      },
-      "public_header_includes": 3,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
-      "files": 26,
+      "files": 25,
       "modules": []
     },
     "bids": {

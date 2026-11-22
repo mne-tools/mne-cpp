@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 378 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 382 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **Accuracy** `[enum]` in [mne](/docs/api/fiff/)
 - **acq_build_date_time** `[fn]` in [mne](/docs/api/fiff/)
@@ -18,6 +18,9 @@ Index of 378 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **AcqChannelKind** `[enum]` in [mne](/docs/api/fiff/) — Signal kind of a channel.
 - **acqClockDomainId** `[fn]` in [mne](/docs/api/fiff/)
 - **AcqClockSource** `[enum]` in [mne](/docs/api/fiff/) — What the anchor of the clock model is derived from.
+- **AcqControlEventKind** `[enum]` in [mne](/docs/api/fiff/) — What an [`AcqControlEvent`](/docs/api/acq/acq-control-event) reports.
+- **AcqControlKind** `[enum]` in [mne](/docs/api/fiff/) — What a control is.
+- **AcqControlWhen** `[enum]` in [mne](/docs/api/fiff/) — Device states, as a bit mask of the states in which a control may be written or invoked.
 - **acqCurrentCpu** `[fn]` in [mne](/docs/api/fiff/)
 - **AcqDeviceState** `[enum]` in [mne](/docs/api/fiff/) — State of a source.
 - **AcqDirection** `[enum]` in [mne](/docs/api/fiff/) — `Direction` of a stream as seen from the host.
@@ -33,9 +36,12 @@ Index of 378 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **AcqSampleFormat** `[enum]` in [mne](/docs/api/fiff/) — Native sample format of a stream.
 - **AcqScaling** `[enum]` in [mne](/docs/api/fiff/) — Whether converters apply the per-channel scale and offset.
 - **acqSetThisThreadPriority** `[fn]` in [mne](/docs/api/fiff/) — Sets the scheduling class of the calling thread.
+- **AcqSeverity** `[enum]` in [mne](/docs/api/fiff/) — Severity of an alert.
 - **AcqThreadPriority** `[enum]` in [mne](/docs/api/fiff/) — Scheduling class of an acquisition thread.
 - **AcqUnderrunFill** `[enum]` in [mne](/docs/api/fiff/) — What an output device emits when the writer has not committed the sample it has to play.
 - **AcqUnit** `[enum]` in [mne](/docs/api/fiff/) — SI unit of the physical value of a channel (value = raw * scale + offset, times 10^unitExponent).
+- **AcqValue** `[type]` in [mne](/docs/api/fiff/) — A control's value: nothing, a flag, an integer, a number or a text (enum values are texts).
+- **AcqValueType** `[enum]` in [mne](/docs/api/fiff/) — Type of a control's value, or of a command's result and arguments.
 - **AcqWait** `[enum]` in [mne](/docs/api/fiff/) — How a waiting reader or writer is woken.
 - **AcqWritePart** `[type]` in [mne](/docs/api/fiff/) — Writable run.
 - **addReferenceChannels** `[fn]` in [mne](/docs/api/fiff/) — Add reference channel(s) back as zero-filled rows.
@@ -164,7 +170,6 @@ Index of 378 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fixStimArtifact** `[fn]` in [mne](/docs/api/fiff/) — Repair stimulus artifacts by interpolating or zeroing data around events.
 - **FlankDirection** `[enum]` in [mne](/docs/api/fiff/) — Which flanks the gradient detector finds.
 - **format_iso8601** `[fn]` in [mne](/docs/api/fiff/)
-- **forward_log_to_qt** `[fn]` in [mne](/docs/api/fiff/) — Makes Qt's message handler the sink of [`Log`](/docs/api/base/log), so debug, info, warning and critical messages become qDebug(), qInfo(), qWarning() and qCritical().
 - **from_base64** `[fn]` in [mne](/docs/api/fiff/)
 - **from_big_endian** `[fn]` in [mne](/docs/api/fiff/)
 - **fromFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Describes a FIFF measurement as a stream.
@@ -198,7 +203,6 @@ Index of 378 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **iequals** `[fn]` in [mne](/docs/api/fiff/)
 - **ImageFormat** `[enum]` in [mne](/docs/api/fiff/) — Encoding of an embedded figure.
 - **index_of** `[fn]` in [mne](/docs/api/fiff/)
-- **install_qt_message_handler** `[fn]` in [mne](/docs/api/fiff/) — Installs a Qt message handler that writes every Qt message through `mne::Log::write`, so it is printed (or passed to the sink) like a library message, at or above `Log::level()`.
 - **InvEstimateMethod** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the inverse estimation method that produced a source estimate.
 - **InvOrientationType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the orientation constraint used during source estimation.
 - **InvSourceSpaceType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the source space type underlying a source estimate.

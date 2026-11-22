@@ -60,7 +60,7 @@ else
     readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
 if (!readSuccessful) {
-    qWarning("Could not read raw segment.\n");
+    Log::warning("Could not read raw segment.\n");
     return -1;
 }
 ```

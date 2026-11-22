@@ -259,7 +259,7 @@ Reads different surface files and assembles them to a [`FsSurfaceSet`](/docs/api
 
 Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D.
 
-````cpp title="src/examples/ex_fs_surface/main.cpp, line 82"
+````cpp title="src/examples/ex_fs_surface/main.cpp, line 80"
 //
 // pial
 //
@@ -279,7 +279,7 @@ ok &= expect(both.size() == 2 && both[0].rr().rows() == 155407, std::format("FsS
 
 Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
-````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 121"
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 119"
 FsSurfaceSet t_surfSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(surfOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
 FsAnnotationSet t_annotationSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(annotOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
 ````

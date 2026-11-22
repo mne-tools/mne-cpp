@@ -112,6 +112,7 @@ The documented classes this example uses most:
 
 | Class | Library |
 |---|---|
+| [`Log`](../../api/base/log.mdx) | Base |
 | [`InvHpiFit`](../../api/inv/inv-hpi-fit.mdx) | Inverse |
 | [`Error`](../../api/base/error.mdx) | Base |
 | [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
@@ -119,7 +120,6 @@ The documented classes this example uses most:
 | [`FiffCoordTrans`](../../api/fiff/fiff-coord-trans.mdx) | FIFF I/O |
 | [`FiffDigPointSet`](../../api/fiff/fiff-dig-point-set.mdx) | FIFF I/O |
 | [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
-| [`HpiFitResult`](../../api/inv/hpi-fit-result.mdx) | Inverse |
 
 ## Used in the API reference
 
@@ -161,7 +161,6 @@ The documented classes this example uses most:
 #include <inv/hpi/inv_hpi_data_updater.h>
 #include <math/matrix_io.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fwd/fwd_coil_set.h>
 
 //=============================================================================================================
@@ -179,7 +178,6 @@ The documented classes this example uses most:
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QGenericMatrix>
 #include <QElapsedTimer>
 
@@ -209,7 +207,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QElapsedTimer timer;
     QCoreApplication a(argc, argv);
 
@@ -217,7 +214,7 @@ int main(int argc, char* argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
-    qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/resources/data.";
+    Log::info("Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/resources/data.");
 
     QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
     QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in", "400");
@@ -242,13 +239,13 @@ int main(int argc, char* argv[])
     float fWindow = parser.value(inWindow).toFloat() / 1000.0; // convert to seconds
     if (fWindow <= 0.0) {
         // check for proper buffer size
-        qWarning() << "Window <= 0. Window was set to 200 ms.";
+        Log::warning("Window <= 0. Window was set to 200 ms.");
         fWindow = 0.2f;
     }
     float fStep = parser.value(inStep).toFloat() / 1000; // convert to seconds
     if (fStep <= 0.0) {
         // check for proper step size
-        qWarning() << "Step <= 0. Step size was set to 0.1 seconds.";
+        Log::warning("Step <= 0. Step size was set to 0.1 seconds.");
         fStep = 0.1f;
     }
     QStringList lFreqs = parser.value(inFreqs).split(",");
@@ -327,7 +324,7 @@ int main(int argc, char* argv[])
     from = first + vecTime(0);
     to = from + iQuantum;
     if (!raw.read_raw_segment(matData, matTimes, from, to)) {
-        qCritical("error during read_raw_segment");
+        Log::critical("error during read_raw_segment");
         return -1;
     }
 
@@ -357,11 +354,11 @@ int main(int argc, char* argv[])
         to = from + iQuantum;
         if (to > last) {
             to = last;
-            qWarning() << "Block size < iQuantum " << iQuantum;
+            Log::warning("Block size < iQuantum {}", iQuantum);
         }
         // Reading
         if (!raw.read_raw_segment(matData, matTimes, from, to)) {
-            qCritical("error during read_raw_segment");
+            Log::critical("error during read_raw_segment");
             return -1;
         }
 
@@ -381,19 +378,13 @@ int main(int argc, char* argv[])
         // if big head displacement occures, update debHeadTrans
         if (InvHpiFit::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
             transDevHead = hpiFitResult.devHeadTrans;
-            qInfo() << "dev_head_t has been updated.";
+            Log::info("dev_head_t has been updated.");
         }
         if (bVerbose) {
-            qInfo() << "Iteration" << i << "Of" << vecTime.size()
-                    << " Duration " << fTimer << "ms"
-                    << " Error" << hpiFitResult.errorDistances[0] * 1000 << hpiFitResult.errorDistances[1] * 1000 << hpiFitResult.errorDistances[2] * 1000 << hpiFitResult.errorDistances[3] * 1000
-                    << " GoF" << hpiFitResult.GoF[0] << hpiFitResult.GoF[1] << hpiFitResult.GoF[2] << hpiFitResult.GoF[3];
+            Log::info("Iteration {} Of {} Duration {} ms Error {} {} {} {} GoF {} {} {} {}", i, vecTime.size(), fTimer, hpiFitResult.errorDistances[0] * 1000, hpiFitResult.errorDistances[1] * 1000, hpiFitResult.errorDistances[2] * 1000, hpiFitResult.errorDistances[3] * 1000, hpiFitResult.GoF[0], hpiFitResult.GoF[1], hpiFitResult.GoF[2], hpiFitResult.GoF[3]);
         }
     }
-    qInfo() << "Iterations:" << vecTime.size()
-            << "Average GoF:" << matPosition.col(7).mean() * 100 << "%"
-            << "Average Error:" << matPosition.col(8).mean() * 1000 << "mm"
-            << "Average Duration:" << matPosition.col(9).mean() << "ms";
+    Log::info("Iterations: {} Average GoF: {} % Average Error: {} mm Average Duration: {} ms", vecTime.size(), matPosition.col(7).mean() * 100, matPosition.col(8).mean() * 1000, matPosition.col(9).mean());
 
     if (bSave) {
         mne::write_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut).toStdString());

@@ -160,7 +160,7 @@ ok &= expect(pairs.size() == 1 && isPair(pairs[0], 10, 50) && pairs[0].m_vCorrel
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 388"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 386"
 //
 // Compute inverse solution
 //
@@ -171,7 +171,7 @@ InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
 Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution.
 
-````cpp title="src/examples/ex_inverse_pwl_rap_music/main.cpp, line 142"
+````cpp title="src/examples/ex_inverse_pwl_rap_music/main.cpp, line 140"
 InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 ````
 

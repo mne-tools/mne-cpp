@@ -132,7 +132,7 @@ const Vector3d reference = maxfilter.block<1, 3>(0, 4).transpose();
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 183"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 180"
 InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
 InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 ````

@@ -1,0 +1,89 @@
+---
+id: acq-control-event
+title: "mne::AcqControlEvent"
+sidebar_label: AcqControlEvent
+sidebar_position: 57
+---
+
+# AcqControlEvent
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Acquisition Library &nbsp;·&nbsp; **Source:** [`acq/acq_control.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/acq/acq_control.h)
+
+`#include <acq/acq_control.h>`
+
+```cpp
+struct mne::AcqControlEvent
+```
+
+A change or message of a device's control state.
+
+Trivially copyable, so the backend can publish it from the acquisition thread without allocation; texts longer than `text` are cut.
+
+```cpp title="src/examples/ex_acq_oddball/main.cpp"
+// What the device lets a program set, run and watch while it is open, and what it reports
+for (const AcqControlInfo& control : device->controls()) {
+    const char* kind = control.kind == AcqControlKind::Command ? "command" : (control.kind == AcqControlKind::Status ? "status" : "setting");
+    std::printf("  %-7s %-13s %s\n", kind, control.id.c_str(), control.description.c_str());
+}
+std::array<AcqControlEvent, 32> controlEvents;
+const auto reportAlerts = [&] {
+    for (std::size_t i = 0, n = device->pollControlEvents(controlEvents); i < n; ++i) {
+        if (controlEvents[i].kind == AcqControlEventKind::Alert) {
+            const std::string_view text = controlEvents[i].message();
+            std::printf("  device: %.*s\n", static_cast<int>(text.size()), text.data());
+        }
+    }
+};
+```
+
+---
+
+## Public Methods
+
+### message()
+
+**Returns:**
+
+- *std::string_view* — The message.
+
+---
+
+### setMessage(message)
+
+Sets the message, cut to fit.
+
+**Parameters:**
+
+- **message** : *std::string_view*
+  The text.
+
+---
+
+## Example
+
+- Start here: [ex_acq_oddball](../../examples/acq/ex_acq_oddball.mdx) — Recover the P300 from a streaming oddball session by trigger-locked averaging.
+- Full source: [`src/examples/ex_acq_oddball/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_acq_oddball/main.cpp)
+- Build target: `ex_acq_oddball` (runs under CTest)
+
+## Used in examples
+
+### [ex_acq_oddball](../../examples/acq/ex_acq_oddball.mdx)
+
+Recover the P300 from a streaming oddball session by trigger-locked averaging.
+
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 249"
+std::array<AcqControlEvent, 32> controlEvents;
+const auto reportAlerts = [&] {
+    for (std::size_t i = 0, n = device->pollControlEvents(controlEvents); i < n; ++i) {
+        if (controlEvents[i].kind == AcqControlEventKind::Alert) {
+            const std::string_view text = controlEvents[i].message();
+            std::printf("  device: %.*s\n", static_cast<int>(text.size()), text.data());
+        }
+    }
+};
+std::printf("\n");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

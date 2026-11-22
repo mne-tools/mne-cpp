@@ -48,7 +48,7 @@ if (uri == "--list") {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 196"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 197"
     for (const AcqDiscoveredDevice& found : registry.discover(1s)) {
         std::printf("found %s  %s (%s)\n", found.uri.c_str(), found.label.c_str(), found.detail.c_str());
     }

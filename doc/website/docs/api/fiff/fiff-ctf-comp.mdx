@@ -121,11 +121,11 @@ ok &= expect(ctf.info.comps.size() == 5 && compensator.rows() == 36 && std::abs(
 
 Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
 
-````cpp title="src/examples/ex_cancel_noise/main.cpp, line 88"
+````cpp title="src/examples/ex_cancel_noise/main.cpp, line 85"
 //example for compensator generation
 FiffCtfComp comp;
 if (dest_comp > 0) {
-    qDebug() << "This part needs to be debugged";
+    Log::debug("This part needs to be debugged");
     p_FiffEvokedSet.info.make_compensator(comp_now, dest_comp, comp); //ToDo: make_compensator needs to be debugged
     printf("Appropriate forward operator compensator created.\n");
 } else

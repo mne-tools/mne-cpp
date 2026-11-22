@@ -169,7 +169,7 @@ Takes the writer of an output stream (control path).
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 209"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 210"
 const AcqStream stream = device->stream();
 const auto info = stream.info();
 // Electrode check before recording; amplifiers without an impedance mode return NotSupported.

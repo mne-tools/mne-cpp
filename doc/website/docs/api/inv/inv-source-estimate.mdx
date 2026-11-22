@@ -299,7 +299,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
 
 Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 426"
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 424"
 InvSourceEstimate sourceEstimate;
 QList<qint64> qVecElapsedTime;
 for (qint32 i = 0; i < 100; ++i) {
@@ -315,7 +315,7 @@ for (qint32 i = 0; i < 100; ++i) {
 
 Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
-````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 393"
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 391"
 #ifdef BENCHMARK
     InvSourceEstimate sourceEstimate;
     QList<qint64> qVecElapsedTime;

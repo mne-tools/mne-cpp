@@ -304,7 +304,7 @@ ok &= expect(digitizer.size() == 146 && cardinal.size() == 3 && cardinal[0].iden
 
 Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
 
-````cpp title="src/examples/ex_disp_3D/main.cpp, line 256"
+````cpp title="src/examples/ex_disp_3D/main.cpp, line 254"
 // Read and show digitizer points
 FiffDigPointSet t_Dig((QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif").toStdString());
 ````
@@ -313,7 +313,7 @@ FiffDigPointSet t_Dig((QCoreApplication::applicationDirPath() + "/../resources/d
 
 Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
-````cpp title="src/examples/ex_hpiFit/main.cpp, line 156"
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 153"
 std::vector<double> vecError(lFreqs.size());
 VectorXd vecGoF;
 FiffDigPointSet fittedPointSet;

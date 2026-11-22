@@ -199,6 +199,112 @@ Not while Running: amplifiers inject a test current for it.
 
 ---
 
+### controls()
+
+The parameters, commands and status values the device offers (`acq_control.h`).
+
+The list does not change while the device is open; an index into it names a control in `AcqControlEvent::control`.
+
+**Returns:**
+
+- *std::span&lt; const [AcqControlInfo](/docs/api/acq/acq-control-info) &gt;* — The controls, empty for a device without any or a closed handle.
+
+---
+
+### findControl(id)
+
+**Parameters:**
+
+- **id** : *std::string_view*
+  Control id, e.g. "gain".
+
+**Returns:**
+
+- *std::optional&lt; std::size_t &gt;* — Its index in `controls()`, or nothing.
+
+---
+
+### read(id)
+
+Reads a parameter or status value (control path).
+
+**Parameters:**
+
+- **id** : *std::string_view*
+  Control id.
+
+**Returns:**
+
+- *[AcqExpected](/docs/api/acq/acq-expected)&lt; AcqValue &gt;* — The value, or InvalidParameter (no such parameter or status), InvalidState, NotSupported or the backend's error.
+
+---
+
+### write(id, value)
+
+Sets a parameter (control path).
+
+The type, range, options and the states in which it may be set are checked first; an integer is accepted for a number. A parameter that applies to samples takes effect at the next block and reports the first sample in its ValueChanged event.
+
+**Parameters:**
+
+- **id** : *std::string_view*
+  Control id.
+
+- **value** : *const AcqValue &*
+  New value.
+
+**Returns:**
+
+- *[AcqError](/docs/api/acq/acq-error)* — Success, or InvalidParameter, InvalidState or the backend's error.
+
+---
+
+### invoke(id, arguments, timeout)
+
+Runs a command (control path) and waits for its result.
+
+**Parameters:**
+
+- **id** : *std::string_view*
+  Control id.
+
+- **arguments** : *std::span&lt; const AcqValue &gt;*
+  Arguments in the order of `AcqControlInfo::arguments`.
+
+- **timeout** : *std::chrono::milliseconds*
+  Longest time to wait for the device.
+
+**Returns:**
+
+- *[AcqExpected](/docs/api/acq/acq-expected)&lt; AcqValue &gt;* — The result (std::monostate for a command without one), or InvalidParameter, InvalidState, Timeout or the backend's error.
+
+---
+
+### pollControlEvents(out)
+
+Takes the control events published since the last call, oldest first: value changes, status updates, alerts and finished commands.
+
+Poll it regularly, e.g. from a user interface's timer; the queue holds 256 events and drops newer ones while it is full.
+
+**Parameters:**
+
+- **out** : *std::span&lt; [AcqControlEvent](/docs/api/acq/acq-control-event) &gt;*
+  Space for the events.
+
+**Returns:**
+
+- *std::size_t* — The number of events written to `out`.
+
+---
+
+### droppedControlEvents()
+
+**Returns:**
+
+- *std::uint64_t* — Control events dropped because nobody took them in time.
+
+---
+
 ## Static Methods
 
 ### open(uri)
@@ -262,7 +368,7 @@ while (recorder->isRecording()) { // a session of fixed duration ends the stream
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 204"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 205"
 auto device = AcqDevice::open(uri);
 if (!device) {
     std::fprintf(stderr, "Cannot open %s: %s\n", uri.c_str(), device.error().text().c_str());

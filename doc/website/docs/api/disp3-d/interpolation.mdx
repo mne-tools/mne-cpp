@@ -181,7 +181,7 @@ ok &= expect(std::fabs(atVertices(0) - 1.0f) < 1e-6f && std::fabs(atVertices(15)
 
 Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
 
-````cpp title="src/examples/ex_interpolation/main.cpp, line 138"
+````cpp title="src/examples/ex_interpolation/main.cpp, line 136"
 //weight matrix
 qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
 QSharedPointer<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,

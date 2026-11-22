@@ -86,6 +86,78 @@ Called in state Opened or Stopped; the default returns NotSupported.
 
 ---
 
+### controls()
+
+The device's controls.
+
+[`AcqDevice`](/docs/api/acq/acq-device) reads them once, when it takes the backend; indices into this list name the controls in the calls below and in `AcqControlEvent::control`. The default offers none.
+
+**Returns:**
+
+- *std::vector&lt; [AcqControlInfo](/docs/api/acq/acq-control-info) &gt;* — The parameters, commands and status values of the device.
+
+---
+
+### readControl(index)
+
+Reads a parameter or status value.
+
+Control path; [`AcqDevice`](/docs/api/acq/acq-device) serializes the calls. The default returns NotSupported.
+
+**Parameters:**
+
+- **index** : *std::size_t*
+  Index into `controls()`.
+
+**Returns:**
+
+- *[AcqExpected](/docs/api/acq/acq-expected)&lt; AcqValue &gt;* — The value, or the error.
+
+---
+
+### writeControl(index, value)
+
+Sets a parameter.
+
+[`AcqDevice`](/docs/api/acq/acq-device) has checked that it is writable now and that the value has the right type and range. A parameter that applies to samples takes effect at a block boundary and reports the first sample in its ValueChanged event. The default returns NotSupported.
+
+**Parameters:**
+
+- **index** : *std::size_t*
+  Index into `controls()`.
+
+- **value** : *const AcqValue &*
+  The new value.
+
+**Returns:**
+
+- *[AcqError](/docs/api/acq/acq-error)* — Success, or the error.
+
+---
+
+### invokeControl(index, arguments, timeout)
+
+Runs a command.
+
+[`AcqDevice`](/docs/api/acq/acq-device) has checked that it may run now and the argument types. The default returns NotSupported.
+
+**Parameters:**
+
+- **index** : *std::size_t*
+  Index into `controls()`.
+
+- **arguments** : *std::span&lt; const AcqValue &gt;*
+  The arguments, in the order of `AcqControlInfo::arguments`.
+
+- **timeout** : *std::chrono::milliseconds*
+  Longest time to wait for the device.
+
+**Returns:**
+
+- *[AcqExpected](/docs/api/acq/acq-expected)&lt; AcqValue &gt;* — The result, or the error.
+
+---
+
 ### streams()
 
 **Returns:**

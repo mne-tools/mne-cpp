@@ -23,7 +23,7 @@ class mne::FiffInfo
 
 Full FIFF measurement info: per-channel descriptors, sampling and filter setup, projectors, compensators, transforms and dig points.
 
-Materializes the union of the tags found in `FIFFB_MEAS` / `FIFFB_MEAS_INFO:` `sfreq`, `lowpass` / `highpass` / `line_freq`, `meas_date`, `experimenter`, `projs` ([`FiffProj`](/docs/api/fiff/fiff-proj)), `comps` ([`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp)), `dig` ([`FiffDigPoint`](/docs/api/fiff/fiff-dig-point)), `hpi_results` / `hpi_meas`, `dev_head_t` / `ctf_head_t`, plus the [`FiffInfoBase`](/docs/api/fiff/fiff-info-base) channel / bads / sfreq subset. Drop-in counterpart of `mne.Info` in MNE-Python.
+Materializes the union of the tags found in `FIFFB_MEAS` / `FIFFB_MEAS_INFO:` `sfreq`, `lowpass` / `highpass` / `line_freq`, `meas_date`, `experimenter`, `projs` ([`FiffProj`](/docs/api/fiff/fiff-proj)), `comps` ([`FiffCtfComp`](/docs/api/fiff/fiff-ctf-comp)), `dig` ([`FiffDigPoint`](/docs/api/fiff/fiff-dig-point)), `hpi_results` / `hpi_meas`, `dev_head_t` / `ctf_head_t`, plus the [`FiffInfoBase`](/docs/api/fiff/fiff-info-base) channel / bads / sfreq subset. Drop-in counterpart of ``mne.Info`` in MNE-Python.
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
 FiffRawData raw((dir + "/sample_audvis_trunc_raw.fif").toStdString()); // reads the measurement info, raw data is read on demand

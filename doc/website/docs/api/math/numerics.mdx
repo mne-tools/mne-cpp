@@ -206,14 +206,14 @@ ok &= expect(Numerics::gcd(84, 36) == 12 && Numerics::nchoose2(10) == 45, "gcd(8
 
 Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
-````cpp title="src/examples/ex_histogram/main.cpp, line 202"
+````cpp title="src/examples/ex_histogram/main.cpp, line 199"
 dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function
-qDebug() << "sourceEstimateData.rows = " << sourceEstimateData.rows();
-qDebug() << "sourceEstaimateData.cols = " << sourceEstimateData.cols();
+Log::debug("sourceEstimateData.rows = {}", sourceEstimateData.rows());
+Log::debug("sourceEstaimateData.cols = {}", sourceEstimateData.cols());
 Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax); //user input to normalize and sort the data matrix
 std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
 std::cout << "resultFrequency = " << resultFrequency << std::endl;
-qDebug() << "HistCounts timer:" << myTimerHistCounts.elapsed();
+Log::debug("HistCounts timer: {}", myTimerHistCounts.elapsed());
 ````
 
 ## Authors of this file

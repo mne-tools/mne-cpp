@@ -52,7 +52,7 @@ for (std::size_t e = 0; e < view->events().size(); ++e) {
 
 Recover the P300 from a streaming oddball session by trigger-locked averaging.
 
-````cpp title="src/examples/ex_acq_oddball/main.cpp, line 253"
+````cpp title="src/examples/ex_acq_oddball/main.cpp, line 272"
 const std::size_t maxView = capacity - length;
 std::vector<float> history(capacity * frame);
 std::vector<float> block(maxView * frame);

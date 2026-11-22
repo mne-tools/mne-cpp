@@ -3,8 +3,8 @@
   "source": "doc/api_registry.json",
   "modules": {
     "acq": {
-      "classes": 53,
-      "tested": 50,
+      "classes": 55,
+      "tested": 52,
       "untested": [
         "AcquiredPoints",
         "DigitizedPoint",
