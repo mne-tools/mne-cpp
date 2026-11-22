@@ -205,16 +205,17 @@ target_compile_definitions(${PROJECT_NAME}
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+
+    # Qt resource targets (e.g. from qt_add_shaders) must be exported for static builds
+    foreach(_idx RANGE 1 10)
+        if(TARGET ${PROJECT_NAME}_resources_${_idx})
+            install(TARGETS ${PROJECT_NAME}_resources_${_idx} ${MNE_CPP_EXPORT_SET}
+                ARCHIVE DESTINATION lib COMPONENT sdk)
+        endif()
+    endforeach()
 endif()
 
-set(_mne_disp3d_export_args ${MNE_CPP_EXPORT_SET})
-if(WIN32 AND NOT BUILD_SHARED_LIBS)
-    # Static Qt shaders create an internal helper target on MSVC that cannot
-    # participate in the exported install target set.
-    set(_mne_disp3d_export_args)
-endif()
-
-install(TARGETS ${PROJECT_NAME} ${_mne_disp3d_export_args}
+install(TARGETS ${PROJECT_NAME} ${MNE_CPP_EXPORT_SET}
     RUNTIME DESTINATION bin COMPONENT runtime
     LIBRARY DESTINATION lib COMPONENT runtime
     ARCHIVE DESTINATION lib COMPONENT sdk
