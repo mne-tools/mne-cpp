@@ -92,8 +92,9 @@ if(MSVC)
 else()
     set_source_files_properties(acq_convert.cpp PROPERTIES COMPILE_OPTIONS "-ffp-contract=off")
 endif()
+# Only the file that reports the commit sees its hash, so every other compile command stays the same across commits
 if(DEFINED MNE_GIT_HASH_SHORT)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+    set_property(SOURCE acq_global.cpp APPEND PROPERTY COMPILE_DEFINITIONS MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 endif()
 
 if(NOT BUILD_SHARED_LIBS)

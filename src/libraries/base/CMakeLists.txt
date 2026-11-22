@@ -64,7 +64,6 @@ set(SOURCES
 
 set(HEADERS
   base_global.h
-  buildinfo.h
   byte_stream.h
   endian.h
   error.h
@@ -105,7 +104,9 @@ endif()
 # The public headers use std::expected and std::format.
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_BASE_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_BASE_LIBRARY)
+# Only the file that reports the commit sees its hash, so every other compile command stays the same across commits
+set_property(SOURCE base_global.cpp APPEND PROPERTY COMPILE_DEFINITIONS MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

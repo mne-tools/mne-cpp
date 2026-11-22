@@ -24,19 +24,19 @@
 
 const char* WRITETOFILEPLUGIN::buildDateTime()
 {
-    return mne::compile_date_time();
+    return mne::build_date_time();
 }
 
 //=============================================================================================================
 
 const char* WRITETOFILEPLUGIN::buildHash()
 {
-    return mne::git_hash();
+    return mne::build_hash();
 }
 
 //=============================================================================================================
 
 const char* WRITETOFILEPLUGIN::buildHashLong()
 {
-    return mne::git_hash_long();
+    return mne::build_hash_long();
 }

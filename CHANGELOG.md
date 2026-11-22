@@ -39,7 +39,7 @@ The base library's functions are snake_case like the standard library's:
 | `byteSwap`, `byteSwapInPlace`, `toBigEndian`, `fromBigEndian` | `byte_swap`, `byte_swap_in_place`, `to_big_endian`, `from_big_endian` |
 | `ThreadPool::parallelFor`, `parallelMap`, `threadCount` | `parallel_for`, `parallel_map`, `thread_count` |
 | `buildDateTime`, `buildHash`, `buildHashLong` | `build_date_time`, `build_hash`, `build_hash_long` |
-| `timeNowNow`, `dateToday`, `dateTimeNow`, `gitHash`, `gitHashLong` (`base/buildinfo.h`) | `compile_time`, `compile_date`, `compile_date_time`, `git_hash`, `git_hash_long` |
+| `timeNowNow`, `dateToday`, `dateTimeNow`, `gitHash`, `gitHashLong` (`utils/buildinfo.h`, removed) | `build_date_time`, `build_hash`, `build_hash_long` (`base/base_global.h`), the date and commit of the build |
 | `IeegImplantation::indexOf` | `IeegImplantation::index_of` |
 
 The library interfaces use the C++ standard library instead of Qt for strings,
@@ -61,7 +61,7 @@ aliases; replace the old spelling as below.
 | `utils/generics/mne_logger.h`, `utils/generics/log.h` | `base/log.h` |
 | `qWarning() << ...` in library code | `BASELIB::Log::warning("... {}", value)` (std::format syntax) |
 | `QTest::ignoreMessage` for library messages | `BASELIB::LogCapture` |
-| `utils/error.h`, `byte_stream.h`, `endian.h`, `string_utils.h`, `thread_pool.h`, `buildinfo.h` and `UTILSLIB::Expected`, `Error`, `ByteStream`, `StringList`, `ThreadPool`, ... | `base/...` and `BASELIB::...`, in the new `mne_base` library |
+| `utils/error.h`, `byte_stream.h`, `endian.h`, `string_utils.h`, `thread_pool.h` and `UTILSLIB::Expected`, `Error`, `ByteStream`, `StringList`, `ThreadPool`, ... | `base/...` and `BASELIB::...`, in the new `mne_base` library |
 | `utils/layoutloader.h`, `layoutmaker.h`, `selectionio.h`, `montage/standard_montage.h` and `UTILSLIB::LayoutLoader`, `LayoutMaker`, `SelectionIO`, `StandardMontage` | `channels/...` and `CHANNELSLIB::...`, in the new `mne_channels` library |
 | `LayoutLoader::readAsaElcFile(path, names, loc3D, loc2D, unit)` | `LayoutLoader::read_elc(path)` → `std::optional<ElectrodeLayout>` (`names`, `positions_3d`, `positions_2d`, `unit`); `parse_elc(text)` |
 | `LayoutMaker::makeLayout(in, out, names, file, do_fit, prad, w, h, writeFile, mirrorX, mirrorY)` | `LayoutMaker::make_layout(positions, LayoutOptions)` → box corners; `write_lout(path, corners, names, options)` |
@@ -168,6 +168,13 @@ aliases; replace the old spelling as below.
   gone from `doc/api_registry.json`, `validate_api_registry.py` rejects them
   and no longer cross-checks a Skigen registry (`--skigen-registry` is gone).
   Migration: delete an old `src/external/skigen` clone.
+- Compiler caches work across commits. Every library and plugin had the git
+  hash in its compile definitions, and `base/base_global.h` expanded
+  `__DATE__` and `__TIME__` in every file that included it, so each commit
+  and build changed nearly every compile and ccache hit about 2 % of the
+  files in CI. Only `base_global.cpp` and `acq_global.cpp` see them now;
+  `base/buildinfo.h` is gone. `scripts/quality/tests/test_compiler_cache.py`
+  keeps it that way.
 - macOS packages need macOS 26 or later (was 14.4). The libraries parse
   floating-point numbers with `std::from_chars`, which Apple's C++ library
   provides from macOS 26 on. `scripts/quality/tests/test_macos_availability.py`

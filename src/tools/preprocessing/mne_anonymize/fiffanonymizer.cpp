@@ -21,6 +21,8 @@
 
 #include "fiffanonymizer.h"
 
+#include <base/base_global.h>
+
 #include <fiff/fiff_dir_entry.h>
 
 //=============================================================================================================
@@ -209,7 +211,7 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
-    printIfVerbose("Current date and time: " __DATE__ " " __TIME__);
+    printIfVerbose(QString("Build date and time: ") + mne::build_date_time());
     printIfVerbose(" ");
 
     openInOutStreams();

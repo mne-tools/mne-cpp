@@ -24,19 +24,19 @@
 
 const char* RAWDATAVIEWERPLUGIN::buildDateTime()
 {
-    return mne::compile_date_time();
+    return mne::build_date_time();
 }
 
 //=============================================================================================================
 
 const char* RAWDATAVIEWERPLUGIN::buildHash()
 {
-    return mne::git_hash();
+    return mne::build_hash();
 }
 
 //=============================================================================================================
 
 const char* RAWDATAVIEWERPLUGIN::buildHashLong()
 {
-    return mne::git_hash_long();
+    return mne::build_hash_long();
 }

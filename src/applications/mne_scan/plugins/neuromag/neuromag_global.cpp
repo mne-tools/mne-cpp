@@ -24,19 +24,19 @@
 
 const char* NEUROMAGPLUGIN::buildDateTime()
 {
-    return mne::compile_date_time();
+    return mne::build_date_time();
 }
 
 //=============================================================================================================
 
 const char* NEUROMAGPLUGIN::buildHash()
 {
-    return mne::git_hash();
+    return mne::build_hash();
 }
 
 //=============================================================================================================
 
 const char* NEUROMAGPLUGIN::buildHashLong()
 {
-    return mne::git_hash_long();
+    return mne::build_hash_long();
 }

@@ -17,7 +17,7 @@
 //=============================================================================================================
 
 #include "sampleplugin_global.h"
-#include <base/buildinfo.h>
+#include <base/base_global.h>
 
 //=============================================================================================================
 // DEFINE METHODS
@@ -25,19 +25,19 @@
 
 const char* SAMPLEPLUGINPLUGIN::buildDateTime()
 {
-    return mne::compile_date_time();
+    return mne::build_date_time();
 };
 
 //=============================================================================================================
 
 const char* SAMPLEPLUGINPLUGIN::buildHash()
 {
-    return mne::git_hash();
+    return mne::build_hash();
 };
 
 //=============================================================================================================
 
 const char* SAMPLEPLUGINPLUGIN::buildHashLong()
 {
-    return mne::git_hash_long();
+    return mne::build_hash_long();
 };

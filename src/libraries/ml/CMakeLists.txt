@@ -79,7 +79,7 @@ if(TARGET onnxruntime::onnxruntime)
     endif()
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ML_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ML_LIBRARY)
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

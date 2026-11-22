@@ -22,6 +22,7 @@
 
 #include "inv_dipole_fit_settings.h"
 
+#include <base/base_global.h>
 #include <base/log.h>
 #include <base/string_utils.h>
 
@@ -374,7 +375,7 @@ bool InvDipoleFitSettings::check_args(int* argc, char** argv)
             found = 1;
             gui = true;
         } else if (strcmp(argv[k], "--version") == 0) {
-            mne::Log::info("{} compiled at {} {}", argv[0], __DATE__, __TIME__);
+            mne::Log::info("{} compiled at {}", argv[0], mne::build_date_time());
             exit(0);
         } else if (strcmp(argv[k], "--help") == 0) {
             usage(argv[0]);

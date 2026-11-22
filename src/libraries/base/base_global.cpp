@@ -11,12 +11,9 @@
  * @date     August 2021
  * @brief    Out-of-line definitions for the mne_base build-info accessors declared in @ref base_global.h.
  *
- * Kept as a separate translation unit so the @c __DATE__ and
- * @c __TIME__ macros are expanded when this file is compiled
- * rather than when a downstream header is included — the
- * compile-time @c constexpr helpers in @ref buildinfo.h would
- * otherwise pick up the consumer's preprocessor invocation time
- * and report misleading build timestamps to bug reporters.
+ * The only file that expands @c __DATE__ and @c __TIME__ and sees the git hash, which CMake defines for it
+ * alone. Every other unit's preprocessed text and compile command then stay the same from one build and commit
+ * to the next, so the compiler cache can reuse them.
  */
 
 //=============================================================================================================
@@ -31,19 +28,27 @@
 
 const char* mne::build_date_time()
 {
-    return mne::compile_date_time();
+    return __DATE__ " " __TIME__;
 }
 
 //=============================================================================================================
 
 const char* mne::build_hash()
 {
-    return mne::git_hash();
+#ifdef MNE_GIT_HASH_SHORT
+    return MNE_GIT_HASH_SHORT;
+#else
+    return "Git hash not defined.";
+#endif
 }
 
 //=============================================================================================================
 
 const char* mne::build_hash_long()
 {
-    return mne::git_hash_long();
+#ifdef MNE_GIT_HASH_LONG
+    return MNE_GIT_HASH_LONG;
+#else
+    return "Git hash long not defined.";
+#endif
 }

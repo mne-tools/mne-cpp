@@ -22,7 +22,6 @@
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
 #include <base/base_global.h>
-#include <base/buildinfo.h>
 #include "fiff/fiff_global.h"
 
 //=============================================================================================================
@@ -53,8 +52,8 @@ SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(APPLICATION_NAME)
 , m_sAppVer(APPLICATION_VERSION)
-, m_sBuildDate(QString(mne::compile_date_time()))
-, m_sBuildHash(QString(mne::git_hash()))
+, m_sBuildDate(QString(mne::build_date_time()))
+, m_sBuildHash(QString(mne::build_hash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -73,8 +72,8 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(APPLICATION_NAME)
 , m_sAppVer(APPLICATION_VERSION)
-, m_sBuildDate(QString(mne::compile_date_time()))
-, m_sBuildHash(QString(mne::git_hash()))
+, m_sBuildDate(QString(mne::build_date_time()))
+, m_sBuildHash(QString(mne::build_hash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)

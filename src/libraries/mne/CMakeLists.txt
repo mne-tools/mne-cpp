@@ -153,7 +153,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Eigen3::Eigen
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_MNE_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_MNE_LIBRARY)
 
 if(MSVC)
     set_source_files_properties(mne_forward_solution.cpp PROPERTIES COMPILE_FLAGS "/bigobj")

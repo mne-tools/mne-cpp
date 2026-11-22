@@ -15,7 +15,7 @@
 #define EVENTS_GLOBAL_H
 
 #include <QtCore/qglobal.h>
-#include <base/buildinfo.h>
+#include <base/base_global.h>
 
 #if defined(STATICBUILD)
 #define EVENTS_EXPORT

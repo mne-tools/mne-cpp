@@ -78,7 +78,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scShared
     scMeas)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_EEGOSPORTS_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_EEGOSPORTS_PLUGIN)
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)

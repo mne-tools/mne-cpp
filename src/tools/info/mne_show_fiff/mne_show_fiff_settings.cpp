@@ -17,6 +17,8 @@
 //=============================================================================================================
 
 #include "mne_show_fiff_settings.h"
+
+#include <base/base_global.h>
 #include <stdio.h>
 
 
@@ -65,7 +67,7 @@ MNEShowFiffSettings::MNEShowFiffSettings(int* argc, char** argv)
     if (!check_args(argc, argv))
         return;
 
-    qInfo("%s version %s compiled at %s %s", argv[0], PROGRAM_VERSION, __DATE__, __TIME__);
+    qInfo("%s version %s compiled at %s", argv[0], PROGRAM_VERSION, mne::build_date_time());
 
     checkIntegrity();
 }
@@ -133,7 +135,7 @@ bool MNEShowFiffSettings::check_args(int* argc, char** argv)
     for (k = 0; k < *argc; k++) {
         found = 0;
         if (strcmp(argv[k], "--version") == 0) {
-            qInfo("%s version %s compiled at %s %s", argv[0], PROGRAM_VERSION, __DATE__, __TIME__);
+            qInfo("%s version %s compiled at %s", argv[0], PROGRAM_VERSION, mne::build_date_time());
             exit(0);
         } else if (strcmp(argv[k], "--help") == 0) {
             usage(argv[0]);
