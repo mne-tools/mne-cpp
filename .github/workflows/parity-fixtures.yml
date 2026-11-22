@@ -63,6 +63,8 @@ jobs:
       with:
         path: ~/mne_data/MNE-sample-data
         key: mne-sample-data-v3
+        # One 1.6 GB entry for every OS instead of one per OS
+        enableCrossOsArchive: true
 
     - name: Download MNE sample data
       if: steps.cache-mne-data.outputs.cache-hit != 'true'

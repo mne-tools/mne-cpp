@@ -168,6 +168,8 @@ jobs:
       with:
         path: ~/mne_data/MNE-sample-data
         key: mne-sample-data-v3
+        # One 1.6 GB entry for every OS instead of one per OS
+        enableCrossOsArchive: true
 
     - name: Download MNE sample data
       if: steps.cache-mne-data.outputs.cache-hit != 'true'
@@ -177,9 +179,10 @@ jobs:
     # ── Compiler cache ─────────────────────────────────────────────────────
     # One entry per OS/Qt/coverage configuration, capped by CCACHE_MAXSIZE.
     # Only callers that pass save_ccache write it, and then delete the entries
-    # they supersede. The six configurations take about 4.4 GB, which leaves
-    # the sample data (2 x 1.6 GB) inside the 10 GB Actions cache budget. Each
-    # cap holds a full build, so a commit recompiles only what it changes.
+    # they supersede. Each cap holds a full build (MSVC objects are the
+    # largest), so a commit recompiles only what it changes; the six
+    # configurations take about 6 GB and, with the sample data shared across
+    # OSes (1.6 GB), stay inside the 10 GB Actions cache budget.
     - name: Set up ccache
       shell: bash
       run: |
@@ -194,7 +197,7 @@ jobs:
           echo "CCACHE_DIR=$RUNNER_TEMP/ccache"
           echo "CCACHE_BASEDIR=$GITHUB_WORKSPACE"
           echo "CCACHE_COMPILERCHECK=content"
-          echo "CCACHE_MAXSIZE=${{ runner.os == 'Windows' && '900M' || runner.os == 'Linux' && '700M' || '600M' }}"
+          echo "CCACHE_MAXSIZE=${{ runner.os == 'Windows' && '1500M' || runner.os == 'Linux' && '1000M' || '700M' }}"
           echo "CMAKE_C_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache"
           # Coverage only changes the compile on Linux, so macOS shares one key.
