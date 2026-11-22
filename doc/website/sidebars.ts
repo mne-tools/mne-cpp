@@ -278,6 +278,15 @@ const sidebars: SidebarsConfig = {
         },
         {
             type: 'category',
+            label: 'Compliance',
+            link: { type: 'doc', id: 'development/medical-device' },
+            items: [
+                'development/soup',
+                'development/traceability',
+            ],
+        },
+        {
+            type: 'category',
             label: 'Plugin Development',
             items: [
                 {

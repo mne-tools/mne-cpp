@@ -1,0 +1,43 @@
+{
+  "$comment": "Floors for scripts/compliance/traceability.py: per library, the number of public classes in doc/api_registry.json that name their test may only rise. Raise a floor in the commit that adds the tests (traceability.py --print-floors). safety_relevant lists the libraries on the acquisition, processing and file path, which must reach full traceability before a release that claims IEC 62304 class B.",
+  "safety_relevant": [
+    "acq",
+    "base",
+    "channels",
+    "com",
+    "dsp",
+    "fiff",
+    "fwd",
+    "inv",
+    "lsl",
+    "math",
+    "mne",
+    "sts"
+  ],
+  "floors": {
+    "acq": 50,
+    "base": 24,
+    "bids": 5,
+    "channels": 8,
+    "com": 5,
+    "connectivity": 6,
+    "decoding": 4,
+    "disp": 6,
+    "disp3D": 36,
+    "dsp": 33,
+    "fiff": 13,
+    "fs": 4,
+    "fwd": 3,
+    "ieeg": 6,
+    "inv": 19,
+    "lsl": 0,
+    "math": 8,
+    "ml": 4,
+    "mna": 0,
+    "mne": 6,
+    "mri": 0,
+    "pybridge": 4,
+    "report": 1,
+    "sts": 8
+  }
+}

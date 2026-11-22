@@ -50,6 +50,10 @@ import audit_tests  # noqa: E402
 import audit_visual_assets  # noqa: E402
 import render_quality_pages  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "compliance"))
+import generate_soup  # noqa: E402
+import traceability  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RELEASE_DIR = REPO_ROOT / "doc" / "release" / "v2.4.0"
 # The Qt usage report tracks a v3.0.0 gate (G13), so it lives with that release.
@@ -327,6 +331,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {path}")
     if out_dir == RELEASE_DIR:
         render_quality_pages.main([])
+        # The compliance pages derive from the same registry and pins, so they are refreshed together.
+        generate_soup.main([])
+        traceability.main([])
     return 0
 
 

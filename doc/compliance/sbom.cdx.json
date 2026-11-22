@@ -1,0 +1,171 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "mne-cpp",
+      "name": "MNE-CPP",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ]
+    },
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "generate_soup.py"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "qt",
+      "name": "Qt",
+      "version": "6.12.0",
+      "supplier": {
+        "name": "The Qt Company"
+      },
+      "licenses": [
+        {
+          "expression": "LGPL-3.0-only"
+        }
+      ],
+      "description": "Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.",
+      "purl": "pkg:generic/qt@6.12.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://www.qt.io"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "eigen",
+      "name": "Eigen",
+      "version": "5.0.1",
+      "supplier": {
+        "name": "Eigen project"
+      },
+      "licenses": [
+        {
+          "expression": "MPL-2.0"
+        }
+      ],
+      "description": "Dense and sparse linear algebra and decompositions.",
+      "purl": "pkg:generic/eigen@5.0.1",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://eigen.tuxfamily.org"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "zlib",
+      "name": "zlib",
+      "version": "1.4",
+      "supplier": {
+        "name": "Jean-loup Gailly and Mark Adler"
+      },
+      "licenses": [
+        {
+          "expression": "Zlib"
+        }
+      ],
+      "description": "Reading and writing gzip-compressed files.",
+      "purl": "pkg:generic/zlib@1.4",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://zlib.net"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "onnxruntime",
+      "name": "ONNX Runtime",
+      "version": "1.31.0",
+      "supplier": {
+        "name": "Microsoft"
+      },
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "description": "Inference of user-supplied ONNX models.",
+      "purl": "pkg:generic/onnxruntime@1.31.0",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://onnxruntime.ai"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "dlpack",
+      "name": "DLPack",
+      "version": "1.3",
+      "supplier": {
+        "name": "DMLC"
+      },
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "description": "Struct layout for handing sample blocks to Python and ML frameworks without a copy.",
+      "purl": "pkg:github/dmlc/dlpack@v1.3",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://github.com/dmlc/dlpack"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "fonts",
+      "name": "Lato and Roboto fonts",
+      "version": "Lato 1.104, Roboto 2.137",
+      "supplier": {
+        "name": "Łukasz Dziedzic; Google"
+      },
+      "licenses": [
+        {
+          "expression": "OFL-1.1 AND Apache-2.0"
+        }
+      ],
+      "description": "User interface typefaces.",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://fonts.google.com"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "mne-cpp",
+      "dependsOn": [
+        "qt",
+        "eigen",
+        "zlib",
+        "onnxruntime",
+        "dlpack",
+        "fonts"
+      ]
+    }
+  ]
+}

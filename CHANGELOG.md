@@ -175,6 +175,15 @@ aliases; replace the old spelling as below.
   files in CI. Only `base_global.cpp` and `acq_global.cpp` see them now;
   `base/buildinfo.h` is gone. `scripts/quality/tests/test_compiler_cache.py`
   keeps it that way.
+- Medical-device readiness (IEC 62304, ISO 14971): a SOUP inventory of every
+  third-party component with version, license, purpose, failure effect and
+  mitigation (`scripts/compliance/soup_catalog.json`, generated into
+  `doc/compliance/soup.json`, a CycloneDX SBOM and the "Third-Party Software"
+  page); CI refuses a third-party CMake target the catalog does not list and
+  uploads an SBOM with the versions the Linux build used. A class-to-test
+  traceability matrix from `doc/api_registry.json` with per-library floors
+  that may only rise (`scripts/compliance/traceability.py`). The
+  "Medical-Device Readiness" page lists what is in place and the roadmap.
 - Qt Concurrent, Qt Network, Qt Multimedia, Qt XML and Qt Print Support are
   no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets, SVG and
   Shader Tools (plus Qt Test for the tests). Background work runs on

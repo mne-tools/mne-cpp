@@ -1,0 +1,39 @@
+---
+id: medical-device
+title: "Medical-Device Readiness"
+sidebar_label: Medical-Device Readiness
+---
+
+# Medical-device readiness
+
+MNE-CPP is used as a component of systems that acquire and process brain signals, some of which are or will
+become medical devices. A manufacturer that builds on it has to show, under IEC 62304 (software life cycle) and
+ISO 14971 (risk management), that third-party software is known and its failure contained, that requirements
+trace to tests, and that a release can be rebuilt and verified. This page lists what MNE-CPP provides today and
+what is still open. MNE-CPP itself is not a certified medical device.
+
+## In place
+
+| Need | How MNE-CPP meets it | Checked by |
+|---|---|---|
+| SOUP inventory (IEC 62304 5.3.3, 7.1.2, 8.1.2) | [Third-party software](soup.mdx): every component with version, license, purpose, failure effect and mitigation; `doc/compliance/soup.json` | `scripts/compliance/generate_soup.py --check` fails CI when a library links a third-party target that the catalog does not list, or when a file is stale |
+| SBOM | CycloneDX 1.5 `doc/compliance/sbom.cdx.json` from the pinned versions; CI also writes one from the configured Linux build (artifact `sbom`) with the versions that build actually used | same |
+| Traceability, class to test | [Traceability](traceability.mdx): per library, which public classes name their test in `doc/api_registry.json` | `scripts/compliance/traceability.py --check`: named tests exist, per-library counts may only rise |
+| Few, contained dependencies | The acquisition, processing and file libraries build and pass their tests without Qt; Qt is confined to the display layers and each target has an allowlist of Qt modules | Qt-free SDK job on Linux, macOS and Windows; `audit_qt_usage.py`, `audit_qt_modules.py`, `audit_dependencies.py` |
+| Pinned dependency versions | `src/external/external_deps.env` pins Qt, Eigen, ONNX Runtime and Emscripten; zlib is pinned with its SHA-256 | the SOUP check reads the pins |
+| Verification | Unit and integration tests on Linux, macOS and Windows, numerical parity with MNE-Python on shared data, sanitizer builds of the acquisition library, warnings as errors on three compilers | CI on every push |
+| Coverage | Line coverage floor of 60 % that may only rise (`scripts/quality/coverage_policy.json`) | coverage gate in CI |
+
+## Roadmap
+
+| Item | Why | Status |
+|---|---|---|
+| Per-library coverage floors for the safety-relevant libraries | The global floor hides weak libraries on the signal path | open; the coverage report already has per-file data |
+| Full traceability of the safety-relevant libraries | fiff, mne, inv, fwd and dsp name tests for only part of their classes | open; the floors ratchet towards it |
+| Requirement IDs | Trace from a requirement, not only from a class, to its tests and to the risk control it implements | open; extend `doc/api_registry.json` with requirement IDs |
+| Reproducible builds | Rebuild a released binary bit for bit: build stamps from the commit instead of `__DATE__`/`__TIME__`, `-ffile-prefix-map`, fixed archive timestamps | open; the build stamp is already confined to two files |
+| Pinned compilers | The CI images' compilers change with the runner image | open; record the compiler in the SBOM (done for the build artifact) and pin images or containers |
+| System zlib | A build on a system with zlib uses that zlib instead of the pinned one | open; option to force the pinned release for releases |
+| Signed SBOM and release attestation | Prove that a binary came from a commit | open |
+| Risk file | ISO 14971 hazards, causes and controls per safety-relevant library, linked from the SOUP risks | open |
+| Anomaly list | Known defects per release with their risk assessment | open; GitHub issues labelled `bug` are the source |

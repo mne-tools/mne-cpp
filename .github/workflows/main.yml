@@ -200,6 +200,12 @@ jobs:
     - name: Check Qt module allowlists
       run: python3 scripts/quality/audit_qt_modules.py --check
 
+    # IEC 62304: every third-party target is in the SOUP catalog; SOUP, SBOM and traceability pages are current.
+    - name: Check SOUP inventory and traceability
+      run: |
+        python3 scripts/compliance/generate_soup.py --check
+        python3 scripts/compliance/traceability.py --check
+
     - name: Lint GitHub workflows
       run: |
         tarball="$RUNNER_TEMP/actionlint.tar.gz"

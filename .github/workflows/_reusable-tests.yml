@@ -228,6 +228,18 @@ jobs:
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON ${COV_FLAG} ${PCH_FLAG}
         cmake --build build -j "$(nproc)"
 
+    # The SBOM with the versions this build actually used (Qt, Eigen, zlib, compiler), next to the pinned one.
+    - name: SBOM of the build
+      if: matrix.os == 'ubuntu-24.04' && inputs.qt_version == 'max'
+      run: python3 scripts/compliance/generate_soup.py --build-dir build --output-dir sbom
+
+    - name: Upload SBOM
+      if: matrix.os == 'ubuntu-24.04' && inputs.qt_version == 'max'
+      uses: actions/upload-artifact@v7
+      with:
+        name: sbom
+        path: sbom/doc/compliance
+
     # Findings per file and check may only shrink (scripts/quality/tidy_baseline.json).
     # Units are cached by tool version, config, compile command and included file contents.
     - name: Restore clang-tidy cache

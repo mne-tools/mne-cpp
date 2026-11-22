@@ -1,0 +1,212 @@
+{
+  "generated_by": "scripts/compliance/generate_soup.py",
+  "catalog": "scripts/compliance/soup_catalog.json",
+  "components": [
+    {
+      "id": "qt",
+      "name": "Qt",
+      "supplier": "The Qt Company",
+      "license": "LGPL-3.0-only",
+      "url": "https://www.qt.io",
+      "linkage": "dynamic or static",
+      "shipped": true,
+      "used_by": "disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries",
+      "purpose": "Windows, widgets, painting, GPU rendering through QRhi, the applications' event loop.",
+      "risk": "Wrong, stale or frozen display; a crashed application. Acquired data, processing results and files do not pass through Qt.",
+      "mitigation": "The libraries that acquire, process and store data build and pass their tests without Qt (Qt-free SDK job on three platforms). Qt use is ratcheted per library (audit_qt_usage.py) and per module (audit_qt_modules.py). Display tests run offscreen in CI.",
+      "safety_relevant": false,
+      "version": "6.12.0"
+    },
+    {
+      "id": "eigen",
+      "name": "Eigen",
+      "supplier": "Eigen project",
+      "license": "MPL-2.0",
+      "url": "https://eigen.tuxfamily.org",
+      "linkage": "header-only",
+      "shipped": true,
+      "used_by": "the numerical libraries: math, dsp, fwd, inv, mne, sts, connectivity, decoding",
+      "purpose": "Dense and sparse linear algebra and decompositions.",
+      "risk": "Numerically wrong forward models, inverse solutions, filters or statistics without a visible error.",
+      "mitigation": "Results are compared with MNE-Python on shared reference data (scripts/parity, test_crossval_*); one pinned release for every build.",
+      "safety_relevant": true,
+      "version": "5.0.1"
+    },
+    {
+      "id": "zlib",
+      "name": "zlib",
+      "supplier": "Jean-loup Gailly and Mark Adler",
+      "license": "Zlib",
+      "url": "https://zlib.net",
+      "linkage": "system library, or built from the pinned release (SHA-256 checked) when the system has none",
+      "shipped": true,
+      "used_by": "base (gzip streams), fiff and mri (compressed FIFF and NIfTI)",
+      "purpose": "Reading and writing gzip-compressed files.",
+      "risk": "Corrupted data when reading or writing compressed files.",
+      "mitigation": "gzip's CRC-32 and length trailer reject corrupted streams; round trips of gzip streams (test_base_byte_stream) and .nii.gz files (test_mri_nifti_io).",
+      "safety_relevant": true,
+      "version": "1.4"
+    },
+    {
+      "id": "onnxruntime",
+      "name": "ONNX Runtime",
+      "supplier": "Microsoft",
+      "license": "MIT",
+      "url": "https://onnxruntime.ai",
+      "linkage": "dynamic, optional (USE_ONNXRUNTIME)",
+      "shipped": true,
+      "used_by": "ml",
+      "purpose": "Inference of user-supplied ONNX models.",
+      "risk": "Wrong model output; a crash inside the runtime.",
+      "mitigation": "Optional; no built-in processing step depends on it. test_ml_models covers the model wrapper.",
+      "safety_relevant": false,
+      "version": "1.31.0"
+    },
+    {
+      "id": "dlpack",
+      "name": "DLPack",
+      "supplier": "DMLC",
+      "license": "Apache-2.0",
+      "url": "https://github.com/dmlc/dlpack",
+      "linkage": "header-only, vendored in src/external/dlpack",
+      "shipped": true,
+      "used_by": "acq (acq_dlpack.h)",
+      "purpose": "Struct layout for handing sample blocks to Python and ML frameworks without a copy.",
+      "risk": "A layout mismatch with the consumer's DLPack version corrupts shared tensors.",
+      "mitigation": "Plain C structs with version fields; test_acq_dlpack.",
+      "safety_relevant": false,
+      "version": "1.3"
+    },
+    {
+      "id": "brainflow",
+      "name": "BrainFlow",
+      "supplier": "BrainFlow project",
+      "license": "MIT",
+      "url": "https://brainflow.org",
+      "linkage": "runtime-loaded, not shipped",
+      "shipped": false,
+      "used_by": "acq devices (brainflow://)",
+      "purpose": "Drivers of research and consumer EEG boards.",
+      "risk": "Lost, duplicated or mis-scaled samples.",
+      "mitigation": "The major version is checked at load time (UnsupportedVersion otherwise); test_acq_devices runs against BrainFlow's streaming and file boards.",
+      "safety_relevant": true,
+      "version": "5.x, loaded at run time"
+    },
+    {
+      "id": "liblsl",
+      "name": "liblsl",
+      "supplier": "Lab Streaming Layer project",
+      "license": "MIT",
+      "url": "https://github.com/sccn/liblsl",
+      "linkage": "test only: the reference peer that produces LSL outlets in test_acq_lsl; product code uses MNE-CPP's own LSL implementation",
+      "shipped": false,
+      "used_by": "test_acq_lsl",
+      "purpose": "Checks that MNE-CPP's own LSL implementation reads streams of the reference implementation.",
+      "risk": "None in the product; a test that skips when it is not installed.",
+      "mitigation": "Not loaded by any library or application.",
+      "safety_relevant": false,
+      "version": "1.13 or newer, test only"
+    },
+    {
+      "id": "vendor-sdks",
+      "name": "Amplifier vendor SDKs (eego SDK, TMSi SDK, g.USBamp API, BrainAmp driver)",
+      "supplier": "ANT Neuro, TMSi, g.tec, Brain Products",
+      "license": "LicenseRef-proprietary",
+      "url": "",
+      "linkage": "runtime-loaded, not shipped",
+      "shipped": false,
+      "used_by": "acq devices (eego://, tmsi://, gusbamp://, brainamp://)",
+      "purpose": "Access to the vendor's amplifier hardware.",
+      "risk": "Lost or mis-scaled samples, wrong channel mapping.",
+      "mitigation": "Every backend has a simulate=1 mode tested in CI; the vendor library is resolved at run time with explicit errors.",
+      "safety_relevant": true,
+      "version": "installed with the amplifier's driver, loaded at run time"
+    },
+    {
+      "id": "python",
+      "name": "Python and MNE-Python",
+      "supplier": "Python Software Foundation; MNE-Python developers",
+      "license": "PSF-2.0 AND BSD-3-Clause",
+      "url": "https://mne.tools",
+      "linkage": "separate process (pybridge), optional, not shipped",
+      "shipped": false,
+      "used_by": "pybridge; the parity tests",
+      "purpose": "User Python scripts; reference results for the parity tests.",
+      "risk": "A failing or wrong result of an optional Python script.",
+      "mitigation": "Process boundary with timeouts and exit-code checks; the acquisition and processing path does not depend on it.",
+      "safety_relevant": false,
+      "version": "user-installed, separate process"
+    },
+    {
+      "id": "fonts",
+      "name": "Lato and Roboto fonts",
+      "supplier": "Łukasz Dziedzic; Google",
+      "license": "OFL-1.1 AND Apache-2.0",
+      "url": "https://fonts.google.com",
+      "linkage": "resource compiled into the applications",
+      "shipped": true,
+      "used_by": "MNE Scan, MNE Analyze",
+      "purpose": "User interface typefaces.",
+      "risk": "Appearance only.",
+      "mitigation": "None needed.",
+      "safety_relevant": false,
+      "version": "Lato 1.104, Roboto 2.137"
+    },
+    {
+      "id": "platform",
+      "name": "Operating system, C++ standard library and threads",
+      "supplier": "Apple, Microsoft, the Linux distribution, LLVM, GNU",
+      "license": "LicenseRef-platform",
+      "url": "",
+      "linkage": "system",
+      "shipped": false,
+      "used_by": "everything",
+      "purpose": "Files, sockets, threads, real-time scheduling (avrt on Windows), the C++ standard library.",
+      "risk": "Missed real-time deadlines; socket or file errors.",
+      "mitigation": "Ring overruns and device errors are counted and reported per stream; every supported platform is tested in CI.",
+      "safety_relevant": true,
+      "version": "macOS 26+, Windows 10+, Ubuntu 24.04+; libc++, libstdc++ or the MSVC STL"
+    },
+    {
+      "id": "toolchain",
+      "name": "Build toolchain",
+      "supplier": "Kitware, LLVM/Apple, GNU, Microsoft, Emscripten, Doxygen",
+      "license": "LicenseRef-build-tools",
+      "url": "",
+      "linkage": "build tool, not shipped",
+      "shipped": false,
+      "used_by": "the build",
+      "purpose": "Compiling, linking and documenting MNE-CPP.",
+      "risk": "Miscompilation; builds that cannot be reproduced.",
+      "mitigation": "Warnings are errors with Clang, GCC and MSVC; sanitizer and coverage builds; tests on every platform; tool versions pinned in CI.",
+      "safety_relevant": true,
+      "version": "pinned versions in the table below"
+    }
+  ],
+  "toolchain": [
+    {
+      "name": "Emscripten",
+      "version": "6.0.12"
+    },
+    {
+      "name": "Qt (oldest supported)",
+      "version": "6.10.0"
+    },
+    {
+      "name": "Doxygen",
+      "version": "1.16.1"
+    },
+    {
+      "name": "clang-tidy",
+      "version": "22.1.8"
+    },
+    {
+      "name": "C++ standard",
+      "version": "C++23"
+    },
+    {
+      "name": "CMake (minimum)",
+      "version": "3.15"
+    }
+  ]
+}
