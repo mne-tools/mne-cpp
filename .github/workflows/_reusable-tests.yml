@@ -51,6 +51,8 @@ env:
 jobs:
   Tests:
     runs-on: ${{ matrix.os }}
+    env:
+      HAS_CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN != '' }}
 
     strategy:
       fail-fast: false
@@ -476,8 +478,9 @@ jobs:
     # ── Coverage: Codecov upload ──────────────────────────────────────────
     # File fixes would drop brace-only lines that gcov counts, so Codecov's
     # totals would no longer match the report the gate measured.
+    # Forks without the secret skip the upload; Codecov refuses tokenless uploads to a protected branch.
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov
+      if: matrix.os == 'ubuntu-24.04' && inputs.upload_codecov && env.HAS_CODECOV_TOKEN == 'true'
       uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
