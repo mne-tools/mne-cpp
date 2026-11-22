@@ -14,7 +14,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include <mne/acq/acq_device.h>
 #include <mne/acq/acq_device_registry.h>
 #include <mne/acq/detail/acq_control_queue.h>
@@ -152,7 +151,7 @@ Drained drain(AcqReader& reader, std::size_t maxView = 0)
         auto view = reader.acquire(1, 5s, maxView);
         if (!view) {
             if (view.error() != AcqErrorCode::EndOfStream) {
-                Log::warning("acquire failed: {}", view.error().text());
+                qWarning("acquire failed: %s", view.error().text().c_str());
             }
             break;
         }
@@ -181,7 +180,7 @@ std::vector<Drained> recordAll(const std::string& uri)
 {
     auto device = AcqDevice::open(uri);
     if (!device) {
-        Log::warning("open({}): {}", uri, device.error().text());
+        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
         return {};
     }
     AcqReaderOptions gating;
@@ -213,7 +212,7 @@ Drained record(const std::string& uri)
 {
     auto device = AcqDevice::open(uri);
     if (!device) {
-        Log::warning("open({}): {}", uri, device.error().text());
+        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
         return {};
     }
     auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
