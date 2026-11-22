@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "scripts/quality/audit_maintainability.py",
   "policy": "scripts/quality/maintainability_policy.json",
-  "scanned_files": 1603,
-  "scanned_lines": 413268,
+  "scanned_files": 1605,
+  "scanned_lines": 414342,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -38,56 +38,12 @@
       "all_files": {}
     },
     "raw_delete": {
-      "total": 50,
-      "files": 23,
-      "by_scope": {
-        "apps": 38,
-        "libs": 11,
-        "tools": 1
-      },
+      "total": 0,
+      "files": 0,
+      "by_scope": {},
       "suppressed": [],
-      "top": {
-        "src/apps/mne_scan/mne_scan/plugingui.cpp": 11,
-        "src/apps/mne_analyze/mne_analyze/mainwindow.cpp": 5,
-        "src/apps/mne_browse/Windows/noisereductionwindow.cpp": 4,
-        "src/apps/mne_scan/mne_scan/mainwindow.cpp": 4,
-        "src/apps/mne_analyze_studio/workbench/agentchatdockwidget.cpp": 2,
-        "src/apps/mne_analyze_studio/workbench/mainwindow.cpp": 2,
-        "src/apps/mne_browse/Windows/icawindow.cpp": 2,
-        "src/libs/mne/disp/viewers/averageselectionview.cpp": 2,
-        "src/libs/mne/disp/viewers/averagingsettingsview.cpp": 2,
-        "src/libs/mne/disp/viewers/modalityselectionview.cpp": 2,
-        "src/libs/mne/disp3D/scene/sourceestimatemanager.cpp": 2,
-        "src/apps/mne_analyze/libs/anShared/Management/pluginmanager.cpp": 1,
-        "src/apps/mne_analyze_studio/extensions/dummy_3d_extension/dummy3dhostedviewwidget.cpp": 1,
-        "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/rawdatabrowserwidget.cpp": 1,
-        "src/apps/mne_analyze_studio/workbench/extensionhostedviewwidget.cpp": 1
-      },
-      "all_files": {
-        "src/apps/mne_analyze/libs/anShared/Management/pluginmanager.cpp": 1,
-        "src/apps/mne_analyze/mne_analyze/mainwindow.cpp": 5,
-        "src/apps/mne_analyze_studio/extensions/dummy_3d_extension/dummy3dhostedviewwidget.cpp": 1,
-        "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/rawdatabrowserwidget.cpp": 1,
-        "src/apps/mne_analyze_studio/workbench/agentchatdockwidget.cpp": 2,
-        "src/apps/mne_analyze_studio/workbench/extensionhostedviewwidget.cpp": 1,
-        "src/apps/mne_analyze_studio/workbench/mainwindow.cpp": 2,
-        "src/apps/mne_browse/Windows/icawindow.cpp": 2,
-        "src/apps/mne_browse/Windows/noisereductionwindow.cpp": 4,
-        "src/apps/mne_inspect/app/mainwindow.cpp": 1,
-        "src/apps/mne_scan/libs/scShared/Management/displaymanager.cpp": 1,
-        "src/apps/mne_scan/mne_scan/mainwindow.cpp": 4,
-        "src/apps/mne_scan/mne_scan/plugingui.cpp": 11,
-        "src/apps/mne_scan/mne_scan/pluginitem.cpp": 1,
-        "src/apps/mne_scan/mne_scan/pluginscene.cpp": 1,
-        "src/libs/mne/disp/viewers/artifactsettingsview.cpp": 1,
-        "src/libs/mne/disp/viewers/averageselectionview.cpp": 2,
-        "src/libs/mne/disp/viewers/averagingsettingsview.cpp": 2,
-        "src/libs/mne/disp/viewers/modalityselectionview.cpp": 2,
-        "src/libs/mne/disp/viewers/quickcontrolview.cpp": 1,
-        "src/libs/mne/disp/viewers/scalingview.cpp": 1,
-        "src/libs/mne/disp3D/scene/sourceestimatemanager.cpp": 2,
-        "src/tools/server/mne_rt_server/mne_rt_server/connectormanager.cpp": 1
-      }
+      "top": {},
+      "all_files": {}
     },
     "console_io": {
       "total": 0,
@@ -108,11 +64,11 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 893,
-      "files": 99,
+      "total": 883,
+      "files": 98,
       "by_scope": {
-        "apps": 782,
-        "libs": 111
+        "apps": 781,
+        "libs": 102
       },
       "suppressed": [
         "src/apps/mne_analyze_studio/core/backendchannel.cpp"
@@ -189,7 +145,7 @@
         "src/apps/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp": 5,
         "src/apps/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp": 5,
         "src/apps/mne_scan/libs/scDisp/realtimespectrumwidget.cpp": 1,
-        "src/apps/mne_scan/libs/scShared/Management/displaymanager.cpp": 9,
+        "src/apps/mne_scan/libs/scShared/Management/displaymanager.cpp": 8,
         "src/apps/mne_scan/libs/scShared/Management/pluginconnectorconnectionwidget.cpp": 3,
         "src/apps/mne_scan/mne_scan/mainwindow.cpp": 13,
         "src/apps/mne_scan/mne_scan/plugingui.cpp": 10,
@@ -225,13 +181,12 @@
         "src/libs/mne/disp/viewers/projectorsview.cpp": 4,
         "src/libs/mne/disp/viewers/quickcontrolview.cpp": 7,
         "src/libs/mne/disp/viewers/rtfiffrawview.cpp": 1,
-        "src/libs/mne/disp/viewers/scalingview.cpp": 9,
+        "src/libs/mne/disp/viewers/scalingview.cpp": 1,
         "src/libs/mne/disp/viewers/spectrumsettingsview.cpp": 5,
         "src/libs/mne/disp/viewers/spectrumview.cpp": 1,
         "src/libs/mne/disp3D/core/dataloader.cpp": 2,
         "src/libs/mne/disp3D/model/braintreemodel.cpp": 10,
         "src/libs/mne/disp3D/model/items/digitizersettreeitem.cpp": 4,
-        "src/libs/mne/disp3D/scene/sourceestimatemanager.cpp": 1,
         "src/libs/mne/disp3D/workers/rtsensordatacontroller.cpp": 2,
         "src/libs/mne/disp3D/workers/rtsourcedatacontroller.cpp": 2
       }

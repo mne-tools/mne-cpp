@@ -6,7 +6,11 @@
     "disp",
     "disp3D"
   ],
-  "kept": {},
+  "kept": {
+    "disp": {
+      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112)."
+    }
+  },
   "summary": {
     "libraries": 28,
     "qt_free": [
@@ -37,7 +41,7 @@
       "report",
       "sts"
     ],
-    "tokens": 8907,
+    "tokens": 9041,
     "gui_outside_design": []
   },
   "libraries": {
@@ -130,27 +134,26 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6025,
+      "tokens": 6159,
       "by_category": {
         "containers": 474,
-        "files": 106,
-        "global": 1257,
-        "gui": 924,
+        "files": 120,
+        "global": 1281,
+        "gui": 952,
         "logging": 51,
-        "objects_signals": 545,
-        "other": 1504,
+        "objects_signals": 537,
+        "other": 1553,
         "regex": 4,
-        "strings": 1128,
+        "strings": 1155,
         "threads": 21,
         "time": 11
       },
-      "public_header_includes": 110,
+      "public_header_includes": 112,
       "q_object": 60,
-      "files": 134,
+      "files": 136,
       "modules": [
         "Core",
         "GuiPrivate",
-        "Svg",
         "Widgets"
       ]
     },

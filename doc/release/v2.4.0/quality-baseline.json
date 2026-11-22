@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 283,
+      "registered": 284,
       "conditional": 9,
       "unregistered": 3,
       "without_labels": 0,
@@ -57,6 +57,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -95,6 +96,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -133,6 +135,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -171,6 +174,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -209,6 +213,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -247,6 +252,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -283,12 +289,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 581,
+      "public_api_units": 582,
       "exported_not_registered": 2,
-      "example_eligible": 432,
+      "example_eligible": 433,
       "eligible_backed_percent": 99.54,
-      "snippets": 462,
-      "registered_test_percent": 44.73
+      "snippets": 463,
+      "registered_test_percent": 44.83
     },
     "G4_screenshots": {
       "referenced_images": 19,
@@ -303,10 +309,10 @@
       "typedef_struct": 0,
       "c_style_cast": 0,
       "raw_new": 0,
-      "raw_delete": 50,
+      "raw_delete": 0,
       "console_io": 0,
       "numeric_define": 0,
-      "qt_new_unparented": 893
+      "qt_new_unparented": 883
     },
     "G6_parity": {
       "reference": "1.11.0",

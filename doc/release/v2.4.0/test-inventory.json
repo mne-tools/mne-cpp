@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 286,
+    "directories": 287,
     "registration": {
-      "unconditional": 274,
+      "unconditional": 275,
       "conditional": 9,
       "unregistered": 3
     },
@@ -22,7 +22,7 @@
       "sample-data": 21,
       "test-data": 122
     },
-    "gui": 46,
+    "gui": 47,
     "with_qskip": 100,
     "ci_excluded": {},
     "retry_paths": [],
@@ -55,6 +55,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -148,6 +149,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -241,6 +243,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -334,6 +337,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -427,6 +431,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -520,6 +525,7 @@
           "test_base_xml",
           "test_channels_layout_selection",
           "test_channels_standard_montage",
+          "test_disp_svg_writer",
           "test_dsp_rt_averaging",
           "test_dsp_rt_extended",
           "test_math_kmeans",
@@ -2730,6 +2736,41 @@
       },
       "registry_classes": [
         "FigureExporter"
+      ]
+    },
+    {
+      "name": "test_disp_svg_writer",
+      "cmake": "src/tests/test_disp_svg_writer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/tests/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_disp_svg_writer"
+      ],
+      "labels": [
+        "gui",
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": true,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "SvgWriter"
       ]
     },
     {

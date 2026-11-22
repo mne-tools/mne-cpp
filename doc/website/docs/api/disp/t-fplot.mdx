@@ -95,7 +95,7 @@ Plots all frequency bins.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 215"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 218"
 MatrixXd tf = MatrixXd::Zero(50, 100);  // 100 samples at 100 Hz: 50 frequency rows of 1 Hz x 100 times
 tf.middleRows(20, 10).setConstant(1.0); // power in the 20-29 Hz bins
 TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
