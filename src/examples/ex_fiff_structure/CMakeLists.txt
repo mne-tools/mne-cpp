@@ -23,7 +23,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 # A CTF recording with five compensation grades, also used by test_mne_ctf_comp_python
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    MNE_CTF_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_mne_ctf_comp_python/data/ctf_grade0_raw.fif")
+    MNE_CTF_FILE="${CMAKE_CURRENT_SOURCE_DIR}/../../tests/test_mne_ctf_comp_python/data/ctf_grade0_raw.fif")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

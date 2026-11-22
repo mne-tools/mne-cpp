@@ -121,7 +121,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     - name: Download ONNX Runtime (Linux|MacOS)
       if: matrix.os == 'ubuntu-24.04' || matrix.os == 'macos-26'
@@ -131,7 +131,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/onnxruntime"
 
     - name: Download Qt toolchain (Windows)
       if: matrix.os == 'windows-2025-vs2026'
@@ -147,7 +147,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
 
     - name: Download ONNX Runtime (Windows)
       if: matrix.os == 'windows-2025-vs2026'
@@ -155,7 +155,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\onnxruntime"
 
     - name: Install MNE-Python
       run: |
@@ -487,7 +487,7 @@ jobs:
         echo "gcda files: $(find build -name '*.gcda' | wc -l)"
         fastcov --gcov gcov-14 --process-gcno --branch-coverage -d build -o coverage.json
         fastcov -C coverage.json --lcov -o coverage_raw.info \
-             --include src/libs/ src/applications/ src/tools/ \
+             --include src/libs/ src/apps/ src/tools/ \
              --exclude /usr Qt eigen
         python scripts/quality/summarize_coverage.py coverage_raw.info \
              --repo-root . --lcov-out coverage_filtered.info \

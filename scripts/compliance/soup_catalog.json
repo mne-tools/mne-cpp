@@ -115,11 +115,11 @@
       "url": "https://github.com/dmlc/dlpack",
       "purl": "pkg:github/dmlc/dlpack@v{version}",
       "version": {
-        "header": "src/external/dlpack/include/dlpack/dlpack.h",
+        "header": "src/3rdparty/dlpack/include/dlpack/dlpack.h",
         "regex": "#define DLPACK_(?:MAJOR|MINOR)_VERSION (\\d+)",
         "join": "."
       },
-      "linkage": "header-only, vendored in src/external/dlpack",
+      "linkage": "header-only, vendored in src/3rdparty/dlpack",
       "shipped": true,
       "cmake_targets": [],
       "used_by": "acq (acq_dlpack.h)",

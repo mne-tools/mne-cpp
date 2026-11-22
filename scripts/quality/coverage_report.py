@@ -12,7 +12,7 @@
 """Report line coverage using the same scope Codecov does.
 
 Codecov's number comes from the Linux CI job, which runs gcov via fastcov with
-``--process-gcno`` and then filters to ``src/libs/mne``, ``src/applications``
+``--process-gcno`` and then filters to ``src/libs/mne``, ``src/apps``
 and ``src/tools``.  The ``--process-gcno`` part matters: it pulls in objects
 that were compiled but never executed, so a source file no test ever reaches is
 counted at 0 percent instead of being left out of the denominator entirely.
@@ -35,7 +35,7 @@ Usage
 To produce the profile in the first place::
 
     cmake -S . -B build/cov -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON \\
-        -DCMAKE_PREFIX_PATH="$PWD/src/external/qt/dynamic;$PWD/src/external/eigen" \\
+        -DCMAKE_PREFIX_PATH="$PWD/src/3rdparty/qt/dynamic;$PWD/src/3rdparty/eigen" \\
         -DCMAKE_CXX_FLAGS="-fprofile-instr-generate -fcoverage-mapping -O1 -g" \\
         -DCMAKE_EXE_LINKER_FLAGS="-fprofile-instr-generate" \\
         -DCMAKE_SHARED_LINKER_FLAGS="-fprofile-instr-generate"
@@ -62,11 +62,11 @@ from pathlib import Path
 
 # The three trees Codecov keeps, straight from the --include list in
 # .github/workflows/_reusable-tests.yml.
-INCLUDED_ROOTS = ("src/libs/mne/", "src/applications/", "src/tools/")
+INCLUDED_ROOTS = ("src/libs/mne/", "src/apps/", "src/tools/")
 
 # Generated and third-party code is excluded from the report the same way the CI
 # job excludes it, so the denominator reflects code someone actually maintains.
-EXCLUDED_PATTERN = re.compile(r"(/external/|autogen|_autogen|/usr/|Xcode|/testframes/|\.moc$|moc_)")
+EXCLUDED_PATTERN = re.compile(r"(/3rdparty/|autogen|_autogen|/usr/|Xcode|/tests/|\.moc$|moc_)")
 
 
 def find_binaries(build_root: Path) -> list[Path]:

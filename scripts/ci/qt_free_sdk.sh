@@ -11,7 +11,7 @@
 #
 # Usage: scripts/ci/qt_free_sdk.sh [work dir] [extra CMake arguments...]
 #   The work dir (default: build/qt-free) receives build/, sdk/ and consumer/.
-#   Eigen is looked up in src/external/eigen, as for every other build.
+#   Eigen is looked up in src/3rdparty/eigen, as for every other build.
 
 set -euo pipefail
 

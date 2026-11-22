@@ -7,7 +7,7 @@
 #
 # Unlike build-api-docs.sh (which publishes the library-only public API to
 # the website), this generates browsable HTML covering the application and
-# plugin internals under src/applications, including ``@internal`` sections.
+# plugin internals under src/apps, including ``@internal`` sections.
 # The output is for maintainers only and is NEVER published to the website
 # API index.
 #
@@ -18,7 +18,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Doxyfile.internal uses paths relative to the doc/ directory
-# (INPUT=../src/libs ../src/applications), so doxygen must be invoked
+# (INPUT=../src/libs ../src/apps), so doxygen must be invoked
 # with doc/ as the working directory.
 ( cd doc && doxygen Doxyfile.internal )
 

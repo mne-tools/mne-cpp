@@ -24,14 +24,14 @@ COV_WORKING_PATH="${BaseFolder}/cov_scan"
 COVERITY_SCAN_BUILD_PATH="${COV_WORKING_PATH}/build"
 RESULTS_DIR="${COV_WORKING_PATH}/cov-int"
 # Scan everything we ship: libraries, the GUI applications, and the
-# command-line tools. third-party code under src/external is intentionally
+# command-line tools. third-party code under src/3rdparty is intentionally
 # excluded — it is upstream code we do not own and Coverity findings on it
 # would just generate noise. The pre-upload size guard below will catch the
 # day a large new application pushes us past the Coverity Scan 500 MiB
 # upload cap; if that happens we will need to drop a sub-tree again.
 COVERITY_SCAN_WHITELIST=(
     "${BaseFolder}/src/libs/mne"
-    "${BaseFolder}/src/applications"
+    "${BaseFolder}/src/apps"
     "${BaseFolder}/src/tools"
 )
 

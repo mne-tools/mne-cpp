@@ -19,7 +19,7 @@ project(mne_doc_shots LANGUAGES CXX)
 # beside it and not on PATH; the missing-DLL loader dialog then blocks the
 # process forever on headless CI, and test_doc_shots — which spawns the tool —
 # times out. Elsewhere the build-tree RPATH already handles this. Mirrors
-# src/applications/CMakeLists.txt; BINARY_OUTPUT_DIRECTORY is set in
+# src/apps/CMakeLists.txt; BINARY_OUTPUT_DIRECTORY is set in
 # src/CMakeLists.txt but that is a sibling scope, so fall back to its default.
 if(WIN32)
     if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
@@ -87,7 +87,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # Every app core exports its own mainwindow.h; the new kinds include theirs by path from here.
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/applications)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/apps)
 
 # Optional kinds: each app can be switched off, and the manifest then fails with "Unknown shot kind".
 if(TARGET mne_scan_app_core)
@@ -111,7 +111,7 @@ if(TARGET mne_analyze_studio_app_core)
     target_compile_definitions(${PROJECT_NAME} PRIVATE
         MNE_DOC_SHOTS_HAVE_STUDIO
         MNE_DOC_SHOTS_REPO_ROOT="${CMAKE_SOURCE_DIR}"
-        MNE_ANALYZE_STUDIO_WORKFLOWS_DIR="${CMAKE_SOURCE_DIR}/src/applications/mne_analyze_studio/examples/workflows")
+        MNE_ANALYZE_STUDIO_WORKFLOWS_DIR="${CMAKE_SOURCE_DIR}/src/apps/mne_analyze_studio/examples/workflows")
 endif()
 
 # Match the runtime library used by src/ libraries (dynamic CRT on MSVC)

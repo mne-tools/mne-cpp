@@ -53,7 +53,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     - name: Download Eigen package (Windows)
       if: runner.os == 'Windows'
@@ -61,7 +61,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
 
     - name: Build, test, install and consume the Qt-free SDK
       shell: bash

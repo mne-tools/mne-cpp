@@ -49,7 +49,7 @@ class ScopeTests(unittest.TestCase):
     def test_in_scope(self) -> None:
         self.assertTrue(fmt.in_scope("src/libs/mne/fiff/fiff_raw_data.cpp"))
         self.assertTrue(fmt.in_scope("src/libs/mne/fiff/fiff_raw_data.h"))
-        self.assertFalse(fmt.in_scope("src/external/eigen/Eigen/Core.h"))
+        self.assertFalse(fmt.in_scope("src/3rdparty/eigen/Eigen/Core.h"))
         self.assertFalse(fmt.in_scope("scripts/quality/check_format.py"))
         self.assertFalse(fmt.in_scope("src/libs/mne/fiff/CMakeLists.txt"))
         self.assertFalse(fmt.in_scope("doc/snippet.cpp"))

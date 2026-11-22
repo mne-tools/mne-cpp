@@ -9,7 +9,7 @@ This guide explains how to create a new MNE Analyze plugin, including implementi
 
 ## Overview
 
-All MNE Analyze plugins inherit from `AbstractPlugin` (`applications/mne_analyze/libs/anShared/Plugins/abstractplugin.h`). Unlike MNE Scan, MNE Analyze does not differentiate between plugin types.
+All MNE Analyze plugins inherit from `AbstractPlugin` (`src/apps/mne_analyze/libs/anShared/Plugins/abstractplugin.h`). Unlike MNE Scan, MNE Analyze does not differentiate between plugin types.
 
 Plugins are loaded at runtime from `bin/mne_analyze_plugins`. Once loaded, MNE Analyze retrieves each plugin's menus, controls, and views and displays them to the user. Currently each plugin returns at most one of each GUI element.
 
@@ -19,7 +19,7 @@ For implementation details, see:
 
 ## Sample Plugin
 
-A sample plugin with no functionality is included in `applications/mne_analyze/plugins/sampleplugin`. To create a new plugin, duplicate that folder and replace all instances of `SamplePlugin` with your plugin name. See the checklist at the end of this guide for details that are easy to miss.
+A sample plugin with no functionality is included in `src/apps/mne_analyze/plugins/sampleplugin`. To create a new plugin, duplicate that folder and replace all instances of `SamplePlugin` with your plugin name. See the checklist at the end of this guide for details that are easy to miss.
 
 ## Deriving from AbstractPlugin
 
@@ -150,7 +150,7 @@ Data is displayed using views that present the contents of models, following Qt'
 
 ## Static Building
 
-When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro. The CMake configuration handles the rest of the static build setup automatically.
+When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `src/apps/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro. The CMake configuration handles the rest of the static build setup automatically.
 
 ## Checklist
 

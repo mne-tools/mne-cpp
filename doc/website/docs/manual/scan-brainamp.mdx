@@ -10,7 +10,7 @@ The BrainAmp plugin streams Brain Products BrainAmp amplifiers into MNE Scan thr
 ## Building
 
 The plugin is built by default. To talk to a real amplifier on Windows, copy `BrainAmpIoCtl.h` from the BrainAmp SDK
-into `src/applications/mne_scan/plugins/brainamp`, or point CMake at the directory that holds it:
+into `src/apps/mne_scan/plugins/brainamp`, or point CMake at the directory that holds it:
 
 ```bash
 cmake -B build -DMNE_BRAINAMP_SDK_DIR=C:/BrainAmpSDK

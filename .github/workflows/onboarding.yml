@@ -21,9 +21,9 @@ on:
     paths:
       - 'init.sh'
       - 'init.bat'
-      - 'src/external/init.sh'
-      - 'src/external/init.bat'
-      - 'src/external/external_deps.env'
+      - 'src/3rdparty/init.sh'
+      - 'src/3rdparty/init.bat'
+      - 'src/3rdparty/external_deps.env'
       - 'scripts/ci/download_toolchain.*'
       - 'doc/website/docs/development/buildguide-cmake.mdx'
       - 'scripts/onboarding/**'

@@ -61,7 +61,7 @@ class TestMacosAvailability(unittest.TestCase):
         entries = []
         for entry in json.loads((BUILD / "compile_commands.json").read_text(encoding="utf-8")):
             source = Path(entry["file"])
-            if "external" in source.parts or not source.exists():
+            if "3rdparty" in source.parts or not source.exists():
                 continue
             if _GUARDED.search(source.read_text(encoding="utf-8", errors="replace")):
                 arguments = entry.get("arguments") or shlex.split(entry["command"])

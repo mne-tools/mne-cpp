@@ -46,7 +46,7 @@ class FixtureTree:
         _write(root, "src/examples/CMakeLists.txt", "add_subdirectory(ex_read)\n")
         _write(root, "src/examples/ex_read/main.cpp", "#include <mne/fiff/fiff_reader.h>\n")
         _write(root, "src/examples/ex_orphan/main.cpp", "int main() {}\n")
-        _write(root, "src/testframes/test_reader/CMakeLists.txt", "")
+        _write(root, "src/tests/test_reader/CMakeLists.txt", "")
         registry = {
             "modules": {"fiff": {"dir_slug": "fiff"}, "disp": {"dir_slug": "disp"}},
             "classes": [

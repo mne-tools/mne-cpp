@@ -68,7 +68,7 @@ class ParityRecordTests(unittest.TestCase):
     def test_record_takes_the_evidence_of_its_registered_test(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            frames = root / "src" / "testframes"
+            frames = root / "src" / "tests"
             for name, text in {"test_oracle": "// Reference values were produced with mne.read_events",
                                "test_plain": "QVERIFY(true);", "test_orphan": "QVERIFY(true);"}.items():
                 (frames / name).mkdir(parents=True)

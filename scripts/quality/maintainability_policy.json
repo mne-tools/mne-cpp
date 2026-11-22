@@ -2,7 +2,7 @@
   "$comment": "Policy for scripts/quality/audit_maintainability.py. Lexical debt metrics for gate G5. Counts are candidates, not verdicts: every metric names the files it found so the debt can be cut in path-disjoint tranches. Paths are relative to the repository root.",
   "scan_roots": [
     "src/libs/mne",
-    "src/applications",
+    "src/apps",
     "src/tools"
   ],
   "extensions": [
@@ -22,7 +22,7 @@
       "src/libs/mne/base/log.cpp": "The default sink of mne::Log: the one place that writes log records to stdout and stderr."
     },
     "qt_new_unparented": {
-      "src/applications/mne_analyze_studio/core/backendchannel.cpp": "The accept thread creates each connection, which cannot get a parent living in another thread; the queued call on the server's thread parents it (or deletes it if the server is gone)."
+      "src/apps/mne_analyze_studio/core/backendchannel.cpp": "The accept thread creates each connection, which cannot get a parent living in another thread; the queued call on the server's thread parents it (or deletes it if the server is gone)."
     }
   },
   "ceilings": {

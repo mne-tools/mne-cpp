@@ -42,7 +42,7 @@ Checks: >
 #   performance-avoid-endl                      flushing is intended in CLI output
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*/src/(libraries|applications|tools|examples|testframes)/.*'
-ExcludeHeaderFilterRegex: '.*/src/external/.*|.*_autogen/.*|.*/ui_.*\.h'
+ExcludeHeaderFilterRegex: '.*/src/3rdparty/.*|.*_autogen/.*|.*/ui_.*\.h'
 FormatStyle: none
 CheckOptions:
   performance-unnecessary-value-param.AllowedTypes: 'QSharedPointer;QPointer;SPtr;ConstSPtr'

@@ -1,0 +1,906 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2010-2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+#include <QtTest/QtTest>
+#include <memory>
+#include <mne/base/string_utils.h>
+#include <Eigen/Dense>
+#include <format>
+#include <algorithm>
+#include <cmath>
+#include <random>
+
+#include <mne/base/log.h>
+
+#include <mne/dsp/rt/rt_averaging.h>
+#include <mne/dsp/rt/rt_noise.h>
+#include <mne/dsp/rt/rt_connectivity.h>
+#include <mne/dsp/rt/rt_filter.h>
+#include <mne/dsp/rt/rt_detect_trigger.h>
+
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_epoch_data_list.h>
+
+#include "../../apps/mne_browse/Utils/filteroperator.h"
+#include "../../apps/mne_browse/Utils/sessionfilter.h"
+
+using namespace mne;
+using namespace MNEBROWSE;
+using namespace Eigen;
+
+// Helper to create a minimal synthetic FiffInfo
+static std::shared_ptr<FiffInfo> createSyntheticFiffInfo(int nChannels, float sfreq)
+{
+    std::shared_ptr<FiffInfo> info = std::make_shared<FiffInfo>();
+    info->sfreq = sfreq;
+
+    for (int i = 0; i < nChannels; ++i) {
+        FiffChInfo ch;
+        ch.ch_name = (QString("MEG%1").arg(i + 1, 4, 10, QChar('0'))).toStdString();
+        ch.kind = FIFFV_MEG_CH;
+        ch.unit = FIFF_UNIT_T;
+        ch.cal = 1.0;
+        ch.range = 1.0;
+        ch.chpos.coil_type = FIFFV_COIL_VV_MAG_T3;
+        info->chs.push_back(ch);
+        info->ch_names.push_back(ch.ch_name);
+    }
+    // Add one STI channel as trigger
+    FiffChInfo sti;
+    sti.ch_name = "STI 014";
+    sti.kind = FIFFV_STIM_CH;
+    sti.unit = FIFF_UNIT_NONE;
+    sti.cal = 1.0;
+    sti.range = 1.0;
+    info->chs.push_back(sti);
+    info->ch_names.push_back(sti.ch_name);
+
+    info->nchan = static_cast<int>(info->chs.size());
+    return info;
+}
+
+static MatrixXi deriveStimEvents(const FiffRawData& raw)
+{
+    int stimIdx = -1;
+    for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+        if (raw.info.chs[channelIndex].kind == FIFFV_STIM_CH) {
+            stimIdx = channelIndex;
+            if (raw.info.ch_names[channelIndex] == "STI 014") {
+                break;
+            }
+        }
+    }
+
+    if (stimIdx < 0) {
+        return MatrixXi();
+    }
+
+    RowVectorXi picks(1);
+    picks << stimIdx;
+
+    MatrixXd stimData;
+    MatrixXd stimTimes;
+    if (!raw.read_raw_segment(stimData, stimTimes, raw.first_samp, raw.last_samp, picks) || stimData.rows() != 1) {
+        return MatrixXi();
+    }
+
+    QVector<Vector3i> detectedEvents;
+    detectedEvents.reserve(static_cast<int>(stimData.cols() / 32));
+
+    int previousValue = 0;
+    for (int sampleOffset = 0; sampleOffset < stimData.cols(); ++sampleOffset) {
+        const int currentValue = qRound(stimData(0, sampleOffset));
+        if (currentValue != previousValue && currentValue != 0) {
+            detectedEvents.append(Vector3i(raw.first_samp + sampleOffset,
+                                           previousValue,
+                                           currentValue));
+        }
+        previousValue = currentValue;
+    }
+
+    MatrixXi events(detectedEvents.size(), 3);
+    for (int row = 0; row < detectedEvents.size(); ++row) {
+        events(row, 0) = detectedEvents.at(row)(0);
+        events(row, 1) = detectedEvents.at(row)(1);
+        events(row, 2) = detectedEvents.at(row)(2);
+    }
+
+    return events;
+}
+
+static std::vector<int> uniqueEventCodes(const MatrixXi& events, int maxCodes = -1)
+{
+    std::vector<int> codes;
+    for (int row = 0; row < events.rows(); ++row) {
+        const int code = events(row, 2);
+        if (code == 0 || std::ranges::contains(codes, code)) {
+            continue;
+        }
+
+        codes.push_back(code);
+        if (maxCodes > 0 && std::ssize(codes) >= maxCodes) {
+            break;
+        }
+    }
+
+    return codes;
+}
+
+static double responseMagnitudeAt(const VectorXd& response,
+                                  double samplingFrequency,
+                                  double frequencyHz)
+{
+    if (response.size() == 0 || samplingFrequency <= 0.0) {
+        return 0.0;
+    }
+
+    const double nyquist = samplingFrequency / 2.0;
+    const double clampedFrequency = std::clamp(frequencyHz, 0.0, nyquist);
+    const int index = qBound(0,
+                             qRound((clampedFrequency / nyquist) * (response.size() - 1)),
+                             static_cast<int>(response.size() - 1));
+    return response(index);
+}
+
+class TestRtProcessingAveraging : public QObject
+{
+    Q_OBJECT
+
+private:
+    QString m_sDataPath;
+
+    bool hasData() const
+    {
+        return !m_sDataPath.isEmpty();
+    }
+
+private slots:
+    void initTestCase()
+    {
+        QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
+        if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
+            m_sDataPath = base;
+    }
+    //=========================================================================
+    // RtAveraging - construction and lifecycle
+    //=========================================================================
+    void rtAveraging_baselineAndTimes()
+    {
+        // 1 kHz, trigger row 1; pre-stimulus 1.0 on the MEG channel, post-stimulus k for epoch k = 1..4
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 80, .trigger_channel = 1, .averages = 10, .baseline = std::pair(-0.020f, -0.005f)});
+        for (int k = 1; k <= 4; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 200);
+            block.row(0).setConstant(1.0);
+            block.row(0).segment(50, 100).setConstant(k);
+            block(1, 50) = 1.0;
+            QCOMPARE(averaging.update(block), std::vector<int>{1});
+        }
+
+        QCOMPARE(averaging.evoked().evoked.size(), 1);
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
+        QCOMPARE(evoked.nave, 4);
+        QCOMPARE(evoked.comment, "1");
+        // Sample i is at (i - pre) / sfreq, like mne.Epochs times
+        QCOMPARE(evoked.times.size(), 100);
+        for (int i = 0; i < evoked.times.size(); ++i)
+            QVERIFY2(std::fabs(evoked.times(i) - (i - 20) / 1000.0f) < 1e-6f, qPrintable(QString::number(i)));
+        QCOMPARE(evoked.first, -20);
+        QCOMPARE(evoked.last, 79);
+        QCOMPARE(evoked.baseline.first, -0.020f);
+        QCOMPARE(evoked.baseline.second, -0.005f);
+        QVERIFY(std::fabs(evoked.data(0, 10)) < 1e-12);
+        QVERIFY(std::fabs(evoked.data(0, 60) - 1.5) < 1e-12);
+
+        // Without a baseline the same epochs average to the raw values at once
+        RtAveraging::Settings settings = averaging.settings();
+        settings.baseline.reset();
+        averaging.set_settings(settings);
+        QCOMPARE(averaging.evoked().evoked.front().nave, 4);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 10) - 1.0) < 1e-12);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 60) - 2.5) < 1e-12);
+    }
+
+    void rtAveraging_settingsKeepOrDropTheEpochs()
+    {
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 10, .post_stim = 40, .trigger_channel = 1, .averages = 3});
+        for (int k = 1; k <= 3; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 200);
+            block.row(0).segment(50, 100).setConstant(k);
+            block(1, 50) = 1.0;
+            QCOMPARE(averaging.update(block), std::vector<int>{1});
+        }
+        QCOMPARE(averaging.evoked().evoked.front().data.cols(), 50);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 2.0) < 1e-12);
+
+        // Fewer averages keep the newest epochs
+        RtAveraging::Settings settings = averaging.settings();
+        settings.averages = 2;
+        averaging.set_settings(settings);
+        QCOMPARE(averaging.evoked().evoked.front().nave, 2);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 2.5) < 1e-12);
+
+        // Another epoch length drops them
+        settings.post_stim = 30;
+        averaging.set_settings(settings);
+        QVERIFY(averaging.evoked().evoked.empty());
+        MatrixXd block = MatrixXd::Zero(2, 200);
+        block.row(0).segment(50, 100).setConstant(7.0);
+        block(1, 50) = 1.0;
+        QCOMPARE(averaging.update(block), std::vector<int>{1});
+        QCOMPARE(averaging.evoked().evoked.front().nave, 1);
+        QCOMPARE(averaging.evoked().evoked.front().data.cols(), 40);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 20) - 7.0) < 1e-12);
+
+        averaging.reset();
+        QVERIFY(averaging.evoked().evoked.empty());
+    }
+
+    void rtAveraging_countsEveryOnsetOnce()
+    {
+        // The MEG channel carries the onset sample, so each epoch averages to its own trigger time
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 5, .post_stim = 60, .trigger_channel = 1, .averages = 100});
+        MatrixXd stream = MatrixXd::Zero(2, 1000);
+        stream.row(0) = RowVectorXd::LinSpaced(1000, 0.0, 999.0);
+        // Two onsets of one code 30 samples apart, a pulse longer than 100 samples, a code change
+        // without a return to zero, and a pulse that starts on the first sample of a block
+        const std::vector<std::pair<int, int>> pulses{{100, 110}, {130, 140}, {300, 520}, {600, 640}, {800, 820}};
+        for (const auto& [from, to] : pulses)
+            stream.row(1).segment(from, to - from).setConstant(2.0);
+        stream.row(1).segment(620, 20).setConstant(3.0);
+        std::vector<int> changed;
+        for (int start = 0; start < stream.cols(); start += 100) {
+            for (int code : averaging.update(stream.middleCols(start, 100)))
+                changed.push_back(code);
+        }
+        // The epochs at 100 and 130 complete in the same block
+        QCOMPARE(changed, (std::vector<int>{2, 2, 2, 2}));
+
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
+        QCOMPARE(evoked.nave, 5);
+        const double meanOnset = (100.0 + 130.0 + 300.0 + 600.0 + 800.0) / 5.0;
+        QVERIFY(std::fabs(evoked.data(0, 5) - meanOnset) < 1e-9);
+    }
+
+    void rtAveraging_skipsIncompleteAndRejectedEpochs()
+    {
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 20, .post_stim = 30, .trigger_channel = 1, .averages = 10, .reject = {{"mag", 4e-12}}});
+        MatrixXd stream = MatrixXd::Zero(2, 400);
+        // The first onset lacks pre-stimulus data, the second carries a 5 pT jump
+        for (int onset : {10, 100, 200})
+            stream(1, onset) = 1.0;
+        stream(0, 110) = 5e-12;
+        stream.row(0).segment(200, 30).array() += 1e-12;
+        for (int start = 0; start < stream.cols(); start += 40)
+            (void)averaging.update(stream.middleCols(start, std::min<int>(40, static_cast<int>(stream.cols()) - start)));
+
+        QCOMPARE(averaging.evoked().evoked.size(), 1);
+        const FiffEvoked& evoked = averaging.evoked().evoked.front();
+        QCOMPARE(evoked.nave, 1);
+        QVERIFY(std::fabs(evoked.data(0, 20) - 1e-12) < 1e-24);
+    }
+
+    void rtAveraging_movingWindowStaysExact()
+    {
+        // A long run of a short window must equal the mean of the newest epochs
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging averaging(info, {.pre_stim = 0, .post_stim = 10, .trigger_channel = 1, .averages = 3});
+        std::seed_seq seed{7}; // fixed on purpose: the check needs reproducible amplitudes
+        std::mt19937 gen(seed);
+        std::uniform_real_distribution<double> amplitude(-1e6, 1e6);
+        std::vector<double> amplitudes;
+        for (int k = 0; k < 500; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 20);
+            amplitudes.push_back(k % 10 == 0 ? amplitude(gen) : amplitude(gen) * 1e-6);
+            block.row(0).setConstant(amplitudes.back());
+            block(1, 5) = 1.0;
+            (void)averaging.update(block);
+        }
+        const double expected = (amplitudes[497] + amplitudes[498] + amplitudes[499]) / 3.0;
+        QCOMPARE(averaging.evoked().evoked.front().nave, 3);
+        QVERIFY(std::fabs(averaging.evoked().evoked.front().data(0, 0) - expected) < 1e-12 * std::fabs(expected) + 1e-15);
+    }
+
+    //=========================================================================
+    // FiffInfo synthetic - coverage for FiffInfo methods
+    //=========================================================================
+    void fiffInfo_syntheticChannels()
+    {
+        std::shared_ptr<FiffInfo> info = createSyntheticFiffInfo(20, 1000.0f);
+        QCOMPARE(info->nchan, 21); // 20 MEG + 1 STI
+        QVERIFY(qFuzzyCompare(info->sfreq, 1000.0f));
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: RtAveraging streamed in blocks == offline average at the stim onsets
+    //=========================================================================
+    void data_rtAveraging_matchesOfflineAverage()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        std::shared_ptr<FiffInfo> info = std::make_shared<FiffInfo>(raw.info);
+        const int stiIdx = mne::index_of(info->ch_names, "STI 014");
+        QVERIFY(stiIdx >= 0);
+        MatrixXd data, times;
+        QVERIFY(raw.read_raw_segment(data, times));
+
+        const int pre = 50;
+        const int post = 100;
+        const int block = 173;
+        const MatrixXi events = deriveStimEvents(raw);
+        const int code = events(0, 2);
+        MatrixXd expected = MatrixXd::Zero(data.rows(), pre + post);
+        int nave = 0;
+        for (int row = 0; row < events.rows(); ++row) {
+            const int onset = events(row, 0) - raw.first_samp;
+            if (events(row, 2) == code && events(row, 1) == 0 && onset >= pre && onset + post <= data.cols()) {
+                expected += data.middleCols(onset - pre, pre + post);
+                ++nave;
+            }
+        }
+        QVERIFY(nave > 3);
+        expected /= nave;
+
+        RtAveraging averaging(info, {.pre_stim = pre, .post_stim = post, .trigger_channel = stiIdx, .averages = 1000});
+        for (int start = 0; start < data.cols(); start += block)
+            (void)averaging.update(data.middleCols(start, std::min<Index>(block, data.cols() - start)));
+
+        FiffEvoked evoked;
+        for (const FiffEvoked& candidate : averaging.evoked().evoked) {
+            if (candidate.comment == QString::number(code))
+                evoked = candidate;
+        }
+        QCOMPARE(evoked.nave, nave);
+        const MatrixXd diff = evoked.data - expected;
+        for (int ch = 0; ch < data.rows(); ++ch) {
+            const double scale = expected.row(ch).cwiseAbs().maxCoeff();
+            QVERIFY2(diff.row(ch).cwiseAbs().maxCoeff() <= 1e-9 * scale + 1e-30, info->ch_names.at(ch).c_str());
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Filter real raw data
+    //=========================================================================
+    void data_filterRealRawData()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+
+        // Read a small segment
+        MatrixXd data, times;
+        fiff_int_t from = raw.first_samp;
+        fiff_int_t to = qMin(raw.first_samp + 1000, raw.last_samp);
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
+
+        // Apply bandpass filter to a subset of channels
+        int nCh = qMin(10, (int)data.rows());
+        MatrixXd subset = data.topRows(nCh);
+
+        FilterKernel kernel = FilterKernel("data_bp", 2, // BPF=2
+                                           256, 10.0 / raw.info.sfreq, 30.0 / raw.info.sfreq, 1.0 / raw.info.sfreq,
+                                           raw.info.sfreq, 0);
+
+        MatrixXd filtered = subset;
+        // Apply filter row-by-row
+        for (int r = 0; r < filtered.rows(); ++r) {
+            RowVectorXd row = filtered.row(r);
+            kernel.apply_fft_filter(row);
+            filtered.row(r) = row;
+        }
+
+        QVERIFY(filtered.allFinite());
+        QCOMPARE(filtered.rows(), (Index)nCh);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Browser filter operators must handle long QRHI blocks
+    //=========================================================================
+    void data_browserFilterOperator_handlesLongBlocks()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+
+        MatrixXd data, times;
+        const fiff_int_t from = raw.first_samp;
+        const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
+                                   raw.last_samp);
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
+
+        QVERIFY(data.rows() > 0);
+        QVERIFY(data.cols() > 4000);
+
+        const RowVectorXd inputRow = data.row(0);
+        const double nyquist = raw.info.sfreq / 2.0;
+        const int fftLength = 8192;
+
+        const QList<FilterOperator::DesignMethod> methods = {
+            FilterOperator::Cosine,
+            FilterOperator::Tschebyscheff};
+
+        for (FilterOperator::DesignMethod method : methods) {
+            FilterOperator filter(QStringLiteral("browser_filter"),
+                                  FilterOperator::BPF,
+                                  128,
+                                  20.0 / nyquist,
+                                  18.0 / nyquist,
+                                  2.0 / nyquist,
+                                  raw.info.sfreq,
+                                  fftLength,
+                                  method);
+
+            const RowVectorXd filtered = filter.applyFFTFilter(inputRow);
+            QCOMPARE(filtered.cols(), inputRow.cols());
+            QVERIFY(filtered.allFinite());
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter supports FIR/IIR and leaves STI rows untouched
+    //=========================================================================
+    void data_sessionFilter_handlesLongBlocks()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+
+        MatrixXd data, times;
+        const fiff_int_t from = raw.first_samp;
+        const fiff_int_t to = qMin(raw.first_samp + static_cast<fiff_int_t>(raw.info.sfreq * 60.0f),
+                                   raw.last_samp);
+        if (!raw.read_raw_segment(data, times, from, to))
+            QSKIP("Segment read failed");
+
+        QVERIFY(data.rows() > 0);
+        QVERIFY(data.cols() > 4000);
+
+        int stimIndex = -1;
+        int megIndex = -1;
+        for (int channelIndex = 0; channelIndex < raw.info.nchan; ++channelIndex) {
+            if (stimIndex < 0 && raw.info.chs[channelIndex].kind == FIFFV_STIM_CH) {
+                stimIndex = channelIndex;
+            }
+            if (megIndex < 0 && raw.info.chs[channelIndex].kind == FIFFV_MEG_CH) {
+                megIndex = channelIndex;
+            }
+        }
+
+        QVERIFY(megIndex >= 0);
+
+        struct FilterCase
+        {
+            SessionFilter::DesignMethod designMethod;
+            SessionFilter::FilterType filterType;
+            int order;
+            double cutoffLow;
+            double cutoffHigh;
+            double transition;
+        };
+
+        const QList<FilterCase> filterCases = {
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::LowPass, 256, 40.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::HighPass, 256, 10.0, 10.0, 5.0},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 256, 1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandStop, 256, 48.0, 52.0, 2.0},
+            {SessionFilter::DesignMethod::Butterworth, SessionFilter::FilterType::BandPass, 4, 1.0, 40.0, 5.0},
+            {SessionFilter::DesignMethod::Butterworth, SessionFilter::FilterType::BandStop, 4, 48.0, 52.0, 2.0}};
+
+        for (const FilterCase& filterCase : filterCases) {
+            SessionFilter filter(QStringLiteral("session_filter"),
+                                 filterCase.designMethod,
+                                 filterCase.filterType,
+                                 filterCase.order,
+                                 filterCase.cutoffLow,
+                                 filterCase.cutoffHigh,
+                                 filterCase.transition,
+                                 raw.info.sfreq,
+                                 QStringLiteral("All"));
+
+            QVERIFY(filter.isValid());
+            const MatrixXd filtered = filter.applyToMatrix(data, raw.info);
+            QCOMPARE(filtered.rows(), data.rows());
+            QCOMPARE(filtered.cols(), data.cols());
+            QVERIFY(filtered.allFinite());
+            const double maxMegDifference = (filtered.row(megIndex) - data.row(megIndex)).cwiseAbs().maxCoeff();
+            QVERIFY2(maxMegDifference > 1e-18,
+                     qPrintable(QStringLiteral("Expected filtered MEG row to change for %1, max diff was %2")
+                                    .arg(filter.displayName())
+                                    .arg(maxMegDifference, 0, 'g', 6)));
+            if (stimIndex >= 0) {
+                QVERIFY(filtered.row(stimIndex).isApprox(data.row(stimIndex), 1e-12));
+            }
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter response preserves passbands for FIR designs
+    //=========================================================================
+    void sessionFilter_defaultIsInvalid()
+    {
+        const SessionFilter filter;
+
+        QVERIFY(!filter.isValid());
+        QVERIFY(filter.magnitudeResponse(32).isZero(0.0));
+        QVERIFY(filter.phaseResponse(32).isZero(0.0));
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Shared session filter response preserves passbands for FIR designs
+    //=========================================================================
+    void data_sessionFilter_responseSelectivity()
+    {
+        const double samplingFrequency = 1000.0;
+
+        struct ResponseCase
+        {
+            SessionFilter::DesignMethod designMethod;
+            SessionFilter::FilterType filterType;
+            int order;
+            double cutoffLow;
+            double cutoffHigh;
+            double transition;
+            double passbandProbe;
+            double stopbandProbe;
+            double minPassbandMagnitude;
+            double maxStopbandMagnitude;
+        };
+
+        const QList<ResponseCase> responseCases = {
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::LowPass, 80, 40.0, 40.0, 5.0, 5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Cosine, SessionFilter::FilterType::HighPass, 80, 10.0, 10.0, 5.0, 120.0, 2.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::LowPass, 128, 40.0, 40.0, 5.0, 5.0, 200.0, 0.70, 0.20},
+            {SessionFilter::DesignMethod::Tschebyscheff, SessionFilter::FilterType::BandPass, 128, 10.0, 40.0, 5.0, 20.0, 120.0, 0.50, 0.30}};
+
+        for (const ResponseCase& responseCase : responseCases) {
+            SessionFilter filter(QStringLiteral("response_filter"),
+                                 responseCase.designMethod,
+                                 responseCase.filterType,
+                                 responseCase.order,
+                                 responseCase.cutoffLow,
+                                 responseCase.cutoffHigh,
+                                 responseCase.transition,
+                                 samplingFrequency,
+                                 QStringLiteral("All"));
+
+            QVERIFY(filter.isValid());
+
+            const VectorXd response = filter.magnitudeResponse(4096);
+            QVERIFY(response.size() == 4096);
+
+            const double passbandMagnitude = responseMagnitudeAt(response,
+                                                                 samplingFrequency,
+                                                                 responseCase.passbandProbe);
+            const double stopbandMagnitude = responseMagnitudeAt(response,
+                                                                 samplingFrequency,
+                                                                 responseCase.stopbandProbe);
+
+            QVERIFY2(response.maxCoeff() > 0.5,
+                     qPrintable(QStringLiteral("Unexpectedly weak max response for %1")
+                                    .arg(filter.displayName())));
+            QVERIFY2(passbandMagnitude >= responseCase.minPassbandMagnitude,
+                     qPrintable(QStringLiteral("Passband magnitude too small for %1: %2")
+                                    .arg(filter.displayName())
+                                    .arg(passbandMagnitude, 0, 'g', 6)));
+            QVERIFY2(stopbandMagnitude <= responseCase.maxStopbandMagnitude,
+                     qPrintable(QStringLiteral("Stopband magnitude too large for %1: %2")
+                                    .arg(filter.displayName())
+                                    .arg(stopbandMagnitude, 0, 'g', 6)));
+            QVERIFY2(passbandMagnitude > stopbandMagnitude * 2.0,
+                     qPrintable(QStringLiteral("Passband/stopband separation too small for %1: %2 vs %3")
+                                    .arg(filter.displayName())
+                                    .arg(passbandMagnitude, 0, 'g', 6)
+                                    .arg(stopbandMagnitude, 0, 'g', 6)));
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute an evoked response from raw-trigger events
+    //=========================================================================
+    void data_computeAverageFromRawEvents()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const std::vector<int> codes = uniqueEventCodes(events, 1);
+        QVERIFY(!codes.empty());
+
+        const FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
+                                                                   events,
+                                                                   -0.1f,
+                                                                   0.3f,
+                                                                   codes.front(),
+                                                                   true,
+                                                                   -0.1f,
+                                                                   0.0f,
+                                                                   {});
+
+        QVERIFY(evoked.data.size() > 0);
+        QCOMPARE(evoked.data.rows(), static_cast<Index>(raw.info.nchan));
+        QVERIFY(evoked.nave > 0);
+        QVERIFY(qAbs(evoked.baseline.first + 0.1f) < 1e-6f);
+        QVERIFY(qAbs(evoked.baseline.second - 0.0f) < 1e-6f);
+        // Like mne's Evoked.first/last: the samples of tmin and tmax relative to the event
+        const int from = static_cast<int>(std::lround(-0.1 * raw.info.sfreq));
+        const int to = static_cast<int>(std::lround(0.3 * raw.info.sfreq));
+        QCOMPARE(evoked.first, from);
+        QCOMPARE(evoked.last, to);
+        QCOMPARE(evoked.data.cols(), static_cast<Index>(to - from + 1));
+        // Without a matching event there is nothing to average
+        QCOMPARE(MNEEpochDataList::computeAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}).data.size(), Index(0));
+
+        // Filtered epochs are the epochs of the filtered recording, sampled like mne.Epochs
+        const RowVectorXi picks = RowVectorXi::LinSpaced(raw.info.nchan, 0, raw.info.nchan - 1);
+        const FilterKernel kernel("data_bp", 2, 256, 10.0 / raw.info.sfreq, 30.0 / raw.info.sfreq, 1.0 / raw.info.sfreq, raw.info.sfreq, 0);
+        const FiffEvoked filtered = mne::computeFilteredAverage(raw, events, -0.1f, 0.3f, codes.front(), true, -0.1f, 0.0f, {}, kernel);
+        MatrixXd all, allTimes;
+        QVERIFY(raw.read_raw_segment(all, allTimes, raw.first_samp, raw.last_samp, picks));
+        const MatrixXd allFiltered = mne::filterData(all, kernel);
+        const int delay = kernel.filter_order() / 2;
+        MatrixXd sum = MatrixXd::Zero(all.rows(), to - from + 1);
+        int nave = 0;
+        for (int e = 0; e < events.rows(); ++e) {
+            const int start = events(e, 0) + from - raw.first_samp;
+            if (events(e, 1) != 0 || events(e, 2) != codes.front() || start < delay || start + (to - from) + delay > raw.last_samp - raw.first_samp)
+                continue;
+            MatrixXd epoch = allFiltered.middleCols(start, to - from + 1);
+            epoch.colwise() -= epoch.leftCols(1 - from).rowwise().mean();
+            sum += epoch;
+            ++nave;
+        }
+        QVERIFY(nave > 1);
+        QCOMPARE(filtered.nave, nave);
+        QCOMPARE(filtered.first, from);
+        QCOMPARE(filtered.last, to);
+        QCOMPARE(filtered.data.cols(), sum.cols());
+        QVERIFY2((filtered.data - sum / nave).cwiseAbs().maxCoeff() < 1e-6 * sum.cwiseAbs().maxCoeff() / nave,
+                 qPrintable(QString::number((filtered.data - sum / nave).cwiseAbs().maxCoeff())));
+        QVERIFY(qAbs(filtered.baseline.first + 0.1f) < 1e-6f);
+        QCOMPARE(mne::computeFilteredAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}, kernel).data.size(), Index(0));
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Session filtering changes epoch-derived averages and covariance estimates
+    //=========================================================================
+    void data_sessionFilter_changesOfflineResults()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const std::vector<int> codes = uniqueEventCodes(events, 1);
+        QVERIFY(!codes.empty());
+
+        MNEEpochDataList unfilteredEpochs = MNEEpochDataList::readEpochs(raw,
+                                                                         events,
+                                                                         -0.1f,
+                                                                         0.3f,
+                                                                         codes.front(),
+                                                                         {});
+        QVERIFY(!unfilteredEpochs.empty());
+
+        MNEEpochDataList filteredEpochs = MNEEpochDataList::readEpochs(raw,
+                                                                       events,
+                                                                       -0.1f,
+                                                                       0.3f,
+                                                                       codes.front(),
+                                                                       {});
+        QVERIFY(!filteredEpochs.empty());
+
+        SessionFilter filter(QStringLiteral("analysis_filter"),
+                             SessionFilter::DesignMethod::Butterworth,
+                             SessionFilter::FilterType::HighPass,
+                             4,
+                             20.0,
+                             20.0,
+                             5.0,
+                             raw.info.sfreq,
+                             QStringLiteral("MEG"));
+        QVERIFY(filter.isValid());
+
+        for (const auto& epoch : filteredEpochs) {
+            QVERIFY(!!epoch);
+            epoch->epoch = filter.applyToMatrix(epoch->epoch, raw.info);
+        }
+
+        const MatrixXd originalEpoch = unfilteredEpochs.front()->epoch;
+        const MatrixXd filteredEpoch = filteredEpochs.front()->epoch;
+        QVERIFY((filteredEpoch - originalEpoch).cwiseAbs().maxCoeff() > 1e-15);
+
+        const FiffEvoked evokedOriginal = unfilteredEpochs.average(raw.info,
+                                                                   0,
+                                                                   unfilteredEpochs.front()->epoch.cols());
+        const FiffEvoked evokedFiltered = filteredEpochs.average(raw.info,
+                                                                 0,
+                                                                 filteredEpochs.front()->epoch.cols());
+        QVERIFY((evokedFiltered.data - evokedOriginal.data).cwiseAbs().maxCoeff() > 1e-15);
+
+        MatrixXd covOriginal = MatrixXd::Zero(raw.info.nchan, raw.info.nchan);
+        MatrixXd covFiltered = MatrixXd::Zero(raw.info.nchan, raw.info.nchan);
+        int sampleCount = 0;
+        for (int i = 0; i < std::ssize(unfilteredEpochs); ++i) {
+            covOriginal += unfilteredEpochs.at(i)->epoch * unfilteredEpochs.at(i)->epoch.transpose();
+            covFiltered += filteredEpochs.at(i)->epoch * filteredEpochs.at(i)->epoch.transpose();
+            sampleCount += static_cast<int>(unfilteredEpochs.at(i)->epoch.cols());
+        }
+
+        QVERIFY(sampleCount > 1);
+        covOriginal /= static_cast<double>(sampleCount - 1);
+        covFiltered /= static_cast<double>(sampleCount - 1);
+        QVERIFY((covFiltered - covOriginal).cwiseAbs().maxCoeff() > 1e-15);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute a multi-condition evoked set from raw-trigger events
+    //=========================================================================
+    void data_averageCategoriesFromRawEvents()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const std::vector<int> codes = uniqueEventCodes(events, 4);
+        QVERIFY(codes.size() >= 2);
+
+        mne::StringList comments;
+        for (int code : codes) {
+            comments.push_back(std::format("event_{}", code));
+        }
+
+        const FiffEvokedSet evokedSet = MNEEpochDataList::averageCategories(raw,
+                                                                            events,
+                                                                            codes,
+                                                                            comments,
+                                                                            -0.1f,
+                                                                            0.3f,
+                                                                            {},
+                                                                            qMakePair(-0.1f, 0.0f),
+                                                                            false);
+
+        QCOMPARE(evokedSet.evoked.size(), codes.size());
+        for (int index = 0; index < std::ssize(evokedSet.evoked); ++index) {
+            QVERIFY(evokedSet.evoked.at(index).data.size() > 0);
+            QCOMPARE(evokedSet.evoked.at(index).comment, comments.at(index));
+            QVERIFY(evokedSet.evoked.at(index).nave > 0);
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Compute covariance from raw-trigger events
+    //=========================================================================
+    void data_computeCovarianceFromRawEvents()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        const MatrixXi events = deriveStimEvents(raw);
+        QVERIFY(events.rows() > 0);
+
+        const std::vector<int> codes = uniqueEventCodes(events, 4);
+        QVERIFY(!codes.empty());
+
+        const FiffCov cov = FiffCov::compute_from_epochs(raw,
+                                                         events,
+                                                         codes,
+                                                         -0.2f,
+                                                         0.0f,
+                                                         -0.2f,
+                                                         0.0f,
+                                                         true,
+                                                         true);
+
+        QVERIFY(!cov.empty());
+        QCOMPARE(cov.dim, raw.info.nchan);
+        QCOMPARE(cov.data.rows(), static_cast<Index>(raw.info.nchan));
+        QCOMPARE(cov.data.cols(), static_cast<Index>(raw.info.nchan));
+        QVERIFY(cov.nfree > 0);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Detect triggers in real raw data
+    //=========================================================================
+    void data_detectTriggers()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        if (!file.exists())
+            QSKIP("Raw file not found");
+
+        FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
+        MatrixXd data, times;
+        QVERIFY(raw.read_raw_segment(data, times));
+        const int stiIdx = mne::index_of(raw.info.ch_names, "STI 014");
+        QVERIFY(stiIdx >= 0);
+
+        // Rising stim onsets with their codes, as read from the stim channel directly
+        const MatrixXi events = deriveStimEvents(raw);
+        std::vector<TriggerFlank> expected;
+        for (int row = 0; row < events.rows(); ++row) {
+            if (events(row, 1) == 0)
+                expected.push_back({static_cast<int>(events(row, 0) - raw.first_samp), static_cast<double>(events(row, 2))});
+        }
+        QVERIFY(expected.size() > 10);
+
+        QVERIFY(mne::detect_trigger_flanks_max(data, stiIdx, 0, 0.5, false, 20) == expected);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Read evoked and verify structure
+    //=========================================================================
+    void data_evokedSetReadAndPick()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
+        QFile file(path);
+        if (!file.exists())
+            QSKIP("Evoked file not found");
+
+        FiffEvokedSet evokedSet(path.toStdU16String());
+        QVERIFY(evokedSet.evoked.size() > 0);
+
+        // Pick first 50 channels
+        StringList picks;
+        for (int i = 0; i < qMin(50, evokedSet.info.nchan); ++i)
+            picks.push_back(evokedSet.info.ch_names[i]);
+
+        FiffEvokedSet picked = evokedSet.pick_channels(picks);
+        QCOMPARE(picked.info.nchan, picks.size());
+    }
+
+    void cleanupTestCase()
+    {
+    }
+};
+
+QTEST_GUILESS_MAIN(TestRtProcessingAveraging)
+#include "test_dsp_rt_averaging.moc"

@@ -160,7 +160,7 @@ jobs:
       run: python3 scripts/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
     # The tree was reformatted once with the pinned clang-format, so
-    # every C/C++ file under src/ (minus src/external) must stay formatted.
+    # every C/C++ file under src/ (minus src/3rdparty) must stay formatted.
     - name: Check C/C++ formatting
       run: |
         python3 -m pip install --quiet clang-format==21.1.8
@@ -466,7 +466,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     - name: Build WASM
       run: |

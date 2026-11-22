@@ -11,7 +11,7 @@
 """SOUP inventory and SBOM of MNE-CPP.
 
 ``soup_catalog.json`` holds the curated facts of every third-party component (license, purpose, linkage, risk
-and mitigation). This tool adds the versions, read from where they are pinned (``src/external/external_deps.env``,
+and mitigation). This tool adds the versions, read from where they are pinned (``src/3rdparty/external_deps.env``,
 CMake files, vendored headers, CI workflows) or, with ``--build-dir``, from a configured build, and writes:
 
 * ``doc/compliance/soup.json``        the machine-readable inventory
@@ -40,7 +40,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CATALOG = Path(__file__).resolve().parent / "soup_catalog.json"
 DEPENDENCY_POLICY = REPO_ROOT / "scripts" / "quality" / "dependency_policy.json"
-ENV_FILE = REPO_ROOT / "src" / "external" / "external_deps.env"
+ENV_FILE = REPO_ROOT / "src" / "3rdparty" / "external_deps.env"
 OUTPUTS = {
     "json": Path("doc/compliance/soup.json"),
     "sbom": Path("doc/compliance/sbom.cdx.json"),
@@ -127,7 +127,7 @@ def unclaimed_targets(catalog: dict[str, Any], policy_file: Path = DEPENDENCY_PO
 
 
 def inventory(catalog: dict[str, Any], root: Path = REPO_ROOT, build_dir: Path | None = None) -> dict[str, Any]:
-    env = read_env(root / "src" / "external" / "external_deps.env")
+    env = read_env(root / "src" / "3rdparty" / "external_deps.env")
     cache = read_cache(build_dir) if build_dir else {}
     components = []
     for entry in catalog["entries"]:

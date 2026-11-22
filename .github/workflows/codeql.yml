@@ -84,7 +84,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     # Initialize CodeQL tools for scanning.
     - name: Initialize CodeQL

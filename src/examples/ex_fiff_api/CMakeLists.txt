@@ -22,7 +22,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    MNE_TALAIRACH_XFM="${CMAKE_CURRENT_SOURCE_DIR}/../../testframes/test_fiff_core_python/data/sample-talairach.xfm")
+    MNE_TALAIRACH_XFM="${CMAKE_CURRENT_SOURCE_DIR}/../../tests/test_fiff_core_python/data/sample-talairach.xfm")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)

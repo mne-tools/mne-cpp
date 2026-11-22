@@ -42,7 +42,7 @@ def incomplete_members(roots: list[Path], base: Path = REPO_ROOT) -> list[str]:
     found = []
     for root in roots:
         for header in sorted(root.rglob("*.h")):
-            if "external" in header.parts:
+            if "3rdparty" in header.parts:
                 continue
             text = header.read_text(encoding="utf-8", errors="replace")
             forward = set(_FORWARD.findall(text))

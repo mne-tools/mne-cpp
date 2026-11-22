@@ -12,7 +12,7 @@
 """Produce the v2.4.0 test inventory.
 
 ``validate_test_inventory.py`` answers "is anything wrong?".  This tool answers
-"what is there?": one record per ``src/testframes/test_*`` directory with how it
+"what is there?": one record per ``src/tests/test_*`` directory with how it
 is registered, which CMake conditions can remove it, its labels and timeout,
 what it needs at run time, whether CI excludes it on a platform, and whether it
 actually ran in the pinned CI evidence.
@@ -190,7 +190,7 @@ def registry_references(registry_path: Path) -> dict[str, list[str]]:
 
 
 def build_inventory(repo_root: Path = REPO_ROOT, ci_evidence: dict[str, Any] | None = None) -> dict[str, Any]:
-    testframes = repo_root / "src" / "testframes"
+    testframes = repo_root / "src" / "tests"
     policy = vti.load_policy(vti.POLICY_FILE)
     entries, missing_directories = vti.collect_inventory(testframes, testframes / "CMakeLists.txt")
 
@@ -198,7 +198,7 @@ def build_inventory(repo_root: Path = REPO_ROOT, ci_evidence: dict[str, Any] | N
     root_conditions = {
         Path(target).name: conditions
         for target, conditions in conditional_subdirectories(repo_root / "CMakeLists.txt").items()
-        if target.startswith("src/testframes/")
+        if target.startswith("src/tests/")
     }
     excluded = platform_exclusions(repo_root / ".github" / "workflows" / "_reusable-tests.yml")
     references = registry_references(repo_root / "doc" / "api_registry.json")
@@ -207,7 +207,7 @@ def build_inventory(repo_root: Path = REPO_ROOT, ci_evidence: dict[str, Any] | N
     records: list[dict[str, Any]] = []
     for name, entry in sorted(entries.items()):
         if entry.registered:
-            via, conditions = "src/testframes/CMakeLists.txt", leaf_conditions.get(name, [])
+            via, conditions = "src/tests/CMakeLists.txt", leaf_conditions.get(name, [])
         elif name in root_conditions:
             via, conditions = "CMakeLists.txt", root_conditions[name]
         else:

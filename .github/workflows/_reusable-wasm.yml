@@ -69,7 +69,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     - name: Download ONNX Runtime (WASM)
       env:
@@ -79,7 +79,7 @@ jobs:
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
           --platform wasm \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/onnxruntime"
 
     - name: Build WASM
       run: |

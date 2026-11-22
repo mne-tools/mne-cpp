@@ -46,7 +46,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-TESTFRAMES_DIR = REPO_ROOT / "src" / "testframes"
+TESTFRAMES_DIR = REPO_ROOT / "src" / "tests"
 
 # Live: the test launches an interpreter itself.  Static: it states that its expected values came from
 # MNE-Python.  "Inspired by mne-python" or an MNA record whose interpreter field reads "python3" is neither.
@@ -175,7 +175,7 @@ def percent_claims(repo_root: Path) -> list[dict[str, Any]]:
 
 def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
     registry = json.loads((repo_root / "doc" / "api_registry.json").read_text(encoding="utf-8"))
-    testframes = repo_root / "src" / "testframes"
+    testframes = repo_root / "src" / "tests"
     evidence_by_test = test_evidence(testframes)
     registered = registered_tests(testframes)
 

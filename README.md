@@ -23,8 +23,8 @@ No install required — runs entirely in your browser via WebAssembly. **Your da
 
 | | Application | Description | Release | Nightly |
 |---|---|---|---|---|
-| <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse raw MEG/EEG data with filtering, events, averaging, ICA | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_browse.html) |
-| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | 3D visualization of brain surfaces, source estimates, forward models, and sEEG/ECoG electrodes | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_inspect.html) |
+| <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/apps/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse raw MEG/EEG data with filtering, events, averaging, ICA | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_browse.html) |
+| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/apps/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | 3D visualization of brain surfaces, source estimates, forward models, and sEEG/ECoG electrodes | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_inspect.html) |
 
 Applications
 ------------
@@ -74,7 +74,7 @@ git clone --recursive https://github.com/mne-tools/mne-cpp.git && cd mne-cpp
 cmake --build build\developer-dynamic --parallel
 ```
 
-`init` downloads Qt and Eigen into `src/external/`, then configures CMake. Run `./init.sh --help` for all options (linkage, build type, custom Qt path, etc.).
+`init` downloads Qt and Eigen into `src/3rdparty/`, then configures CMake. Run `./init.sh --help` for all options (linkage, build type, custom Qt path, etc.).
 
 ### Requirements
 

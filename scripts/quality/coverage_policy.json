@@ -20,11 +20,11 @@
       "reason": "Built only on Windows; needs the TMSi SDK DLL and an amplifier. tmsi://?simulate=1 covers the rest of the source."
     },
     {
-      "pattern": "src/applications/mne_scan/plugins/dummytoolbox/*",
+      "pattern": "src/apps/mne_scan/plugins/dummytoolbox/*",
       "reason": "Template for plugin authors; no CMakeLists.txt adds its directory, so no target compiles it."
     },
     {
-      "pattern": "src/applications/mne_analyze/plugins/sampleplugin/*",
+      "pattern": "src/apps/mne_analyze/plugins/sampleplugin/*",
       "reason": "Template for plugin authors; its add_subdirectory() is commented out in mne_analyze/plugins/CMakeLists.txt."
     }
   ]

@@ -18,8 +18,8 @@ on:
     branches: [staging]
     paths:
       - 'scripts/parity/reference_lock.json'
-      - 'src/testframes/test_field_map/make_*.py'
-      - 'src/testframes/test_compute_raw_inverse/make_*.py'
+      - 'src/tests/test_field_map/make_*.py'
+      - 'src/tests/test_compute_raw_inverse/make_*.py'
       - '.github/workflows/parity-fixtures.yml'
 
 permissions:
@@ -74,7 +74,7 @@ jobs:
       run: |
         data="$HOME/mne_data/MNE-sample-data"
         out="$RUNNER_TEMP/parity-fixtures/Result/parity"
-        frames=src/testframes
+        frames=src/tests
         sample="$data/MEG/sample"
         common=(--evoked "$sample/sample_audvis-ave.fif" --trans "$sample/sample_audvis_raw-trans.fif"
                 --surf "$data/subjects/sample/bem/sample-head.fif" --mode accurate --max-verts 642)

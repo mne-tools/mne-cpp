@@ -23,7 +23,7 @@ class TestTraceability(unittest.TestCase):
     def test_matrix_counts_and_rules(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "src" / "testframes" / "test_a").mkdir(parents=True)
+            (root / "src" / "tests" / "test_a").mkdir(parents=True)
             registry = {"classes": [{"name": "A", "module": "m", "test": "test_a"},
                                     {"name": "B", "module": "m", "test": "test_gone"},
                                     {"name": "C", "module": "m", "test": None}]}
@@ -31,7 +31,7 @@ class TestTraceability(unittest.TestCase):
             module = report["modules"]["m"]
             self.assertEqual((module["classes"], module["tested"], module["untested"]), (3, 2, ["C"]))
             self.assertEqual(trace.problems(report, {"floors": {"m": 3}, "safety_relevant": []}), [
-                "m: B -> test_gone does not exist in src/testframes",
+                "m: B -> test_gone does not exist in src/tests",
                 "m: 2 classes with a test, below its floor of 3"])
             page = trace.render_mdx(report, {"floors": {}, "safety_relevant": ["m"]})
             self.assertIn("| m | yes | 3 | 2 | 67 % |", page)

@@ -13,7 +13,7 @@ An amplifier plugin is a thin layer over an acquisition source of the `mne_acq` 
 
 | Part | Where | Responsibilities |
 |------|-------|------------------|
-| **Plugin** | `src/applications/mne_scan/plugins/<device>/`, inherits `AbstractSensor` | Setup widget and toolbar actions; builds the source URI from its settings; hands blocks to its output connector |
+| **Plugin** | `src/apps/mne_scan/plugins/<device>/`, inherits `AbstractSensor` | Setup widget and toolbar actions; builds the source URI from its settings; hands blocks to its output connector |
 | **Source** | `src/libs/mne/acq/devices/<device>/`, a scheme of `AcqDeviceRegistry` such as `gusbamp://` | Talks to the vendor SDK in its own thread, writes the device's native samples, events and clock into a lock-free ring; measures impedances |
 | **Transport** | `<device>_transport.h` with `<device>_driver_win32.cpp` and `<device>_simulator.cpp` | The vendor SDK as the source sees it; the simulator digitises a `synthetic://` session in the SDK's format, so the source and plugin are tested on every platform without hardware |
 
@@ -37,10 +37,10 @@ device->start();
 
 | Class | Location | Purpose |
 |-------|----------|---------|
-| `AbstractSensor` | `src/applications/mne_scan/libs/scShared/` | Base class for all acquisition plugins |
+| `AbstractSensor` | `src/apps/mne_scan/libs/scShared/` | Base class for all acquisition plugins |
 | `AcqDevice`, `AcqReader` | `src/libs/mne/acq/` | Opens a source by URI; reads its stream |
 | `AcqBackend` | `src/libs/mne/acq/` | Base class of a source; owns its streams and writers |
-| `PluginOutputData` | `src/applications/mne_scan/libs/scShared/` | Typed output connector that passes data to downstream plugins |
+| `PluginOutputData` | `src/apps/mne_scan/libs/scShared/` | Typed output connector that passes data to downstream plugins |
 
 ## Device Control
 
@@ -56,7 +56,7 @@ named is also a new stream description version (`AcqWriter::updateInfo()`), vali
 
 ## Implementing a New Amplifier
 
-1. **Write the tests** in `src/testframes/test_acq_devices/` against `<device>://?simulate=1`: stream layout, agreement with `synthetic://`, invalid parameters, a gating reader, and the error without hardware.
+1. **Write the tests** in `src/tests/test_acq_devices/` against `<device>://?simulate=1`: stream layout, agreement with `synthetic://`, invalid parameters, a gating reader, and the error without hardware.
 2. **Declare the transport** in `src/libs/mne/acq/devices/<device>/<device>_transport.h`, write the simulator and the backend, and register the scheme in `acq_devices.h`.
 3. **Implement the Windows driver**: load the vendor DLL at run time from an absolute path with `detail::AcqSharedLibrary`, so the source builds without the SDK.
 4. **Write the plugin**: copy `gusbamp` or `tmsi`, build the URI from the settings, and add a test to `test_mne_scan_plugins`.

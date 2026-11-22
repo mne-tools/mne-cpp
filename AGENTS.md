@@ -5,7 +5,7 @@ Guidance for coding agents working in this repository. The coding conventions ar
 
 ## Formatting
 
-- C/C++ under `src/` (excluding `src/external`) is formatted with the repository [.clang-format](.clang-format),
+- C/C++ under `src/` (excluding `src/3rdparty`) is formatted with the repository [.clang-format](.clang-format),
   using the pinned clang-format version (`pip install clang-format==21.1.8`).
 - Check or fix changed files before committing:
   ```bash

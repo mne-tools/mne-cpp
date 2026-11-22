@@ -5,721 +5,721 @@
     "src/libs/mne/decoding/"
   ],
   "findings": {
-    "src/applications/mne_analyze/libs/anShared/Management/analyzedata.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Management/analyzedata.cpp": {
       "performance-for-range-copy": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/analyzedata.h": {
+    "src/apps/mne_analyze/libs/anShared/Management/analyzedata.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/communicator.h": {
+    "src/apps/mne_analyze/libs/anShared/Management/communicator.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/event.h": {
+    "src/apps/mne_analyze/libs/anShared/Management/event.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/eventmanager.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Management/eventmanager.cpp": {
       "performance-unnecessary-value-param": 2
     },
-    "src/applications/mne_analyze/libs/anShared/Management/pluginmanager.h": {
+    "src/apps/mne_analyze/libs/anShared/Management/pluginmanager.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/statusbar.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Management/statusbar.cpp": {
       "performance-move-const-arg": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Management/statusbar.h": {
+    "src/apps/mne_analyze/libs/anShared/Management/statusbar.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/abstractmodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/abstractmodel.h": {
       "modernize-use-override": 7
     },
-    "src/applications/mne_analyze/libs/anShared/Model/averagingdatamodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/averagingdatamodel.cpp": {
       "bugprone-parent-virtual-call": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/averagingdatamodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/averagingdatamodel.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/bemdatamodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/bemdatamodel.cpp": {
       "bugprone-parent-virtual-call": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/bemdatamodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/bemdatamodel.h": {
       "modernize-use-override": 6
     },
-    "src/applications/mne_analyze/libs/anShared/Model/covariancemodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/covariancemodel.cpp": {
       "bugprone-parent-virtual-call": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/covariancemodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/covariancemodel.h": {
       "modernize-use-override": 3
     },
-    "src/applications/mne_analyze/libs/anShared/Model/dipolefitmodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/dipolefitmodel.cpp": {
       "bugprone-parent-virtual-call": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/dipolefitmodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/dipolefitmodel.h": {
       "modernize-use-override": 3
     },
-    "src/applications/mne_analyze/libs/anShared/Model/eventmodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/eventmodel.cpp": {
       "bugprone-switch-missing-default-case": 6,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/eventmodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/eventmodel.h": {
       "modernize-use-override": 5
     },
-    "src/applications/mne_analyze/libs/anShared/Model/fiffrawviewmodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/fiffrawviewmodel.cpp": {
       "bugprone-integer-division": 1,
       "bugprone-parent-virtual-call": 1,
       "bugprone-switch-missing-default-case": 2
     },
-    "src/applications/mne_analyze/libs/anShared/Model/fiffrawviewmodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/fiffrawviewmodel.h": {
       "modernize-use-override": 2,
       "performance-unnecessary-value-param": 2
     },
-    "src/applications/mne_analyze/libs/anShared/Model/mricoordmodel.cpp": {
+    "src/apps/mne_analyze/libs/anShared/Model/mricoordmodel.cpp": {
       "bugprone-parent-virtual-call": 1
     },
-    "src/applications/mne_analyze/libs/anShared/Model/mricoordmodel.h": {
+    "src/apps/mne_analyze/libs/anShared/Model/mricoordmodel.h": {
       "modernize-use-override": 3
     },
-    "src/applications/mne_analyze/libs/anShared/Plugins/abstractplugin.h": {
+    "src/apps/mne_analyze/libs/anShared/Plugins/abstractplugin.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/libs/events/event.cpp": {
+    "src/apps/mne_analyze/libs/events/event.cpp": {
       "misc-unconventional-assign-operator": 1,
       "performance-noexcept-move-constructor": 1
     },
-    "src/applications/mne_analyze/libs/events/event.h": {
+    "src/apps/mne_analyze/libs/events/event.h": {
       "misc-unconventional-assign-operator": 1,
       "performance-noexcept-move-constructor": 1
     },
-    "src/applications/mne_analyze/libs/events/eventmanager.cpp": {
+    "src/apps/mne_analyze/libs/events/eventmanager.cpp": {
       "bugprone-throwing-static-initialization": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/libs/events/eventsharedmemmanager.cpp": {
+    "src/apps/mne_analyze/libs/events/eventsharedmemmanager.cpp": {
       "bugprone-throwing-static-initialization": 2
     },
-    "src/applications/mne_analyze/libs/events/eventsharedmemmanager.h": {
+    "src/apps/mne_analyze/libs/events/eventsharedmemmanager.h": {
       "bugprone-throwing-static-initialization": 1
     },
-    "src/applications/mne_analyze/mne_analyze/analyzecore.h": {
+    "src/apps/mne_analyze/mne_analyze/analyzecore.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/mne_analyze/info.h": {
+    "src/apps/mne_analyze/mne_analyze/info.h": {
       "bugprone-reserved-identifier": 6
     },
-    "src/applications/mne_analyze/mne_analyze/mainwindow.h": {
+    "src/apps/mne_analyze/mne_analyze/mainwindow.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze/plugins/averaging/averaging.cpp": {
+    "src/apps/mne_analyze/plugins/averaging/averaging.cpp": {
       "performance-unnecessary-value-param": 7
     },
-    "src/applications/mne_analyze/plugins/averaging/averaging.h": {
+    "src/apps/mne_analyze/plugins/averaging/averaging.h": {
       "modernize-use-override": 10
     },
-    "src/applications/mne_analyze/plugins/channelselection/channelselection.h": {
+    "src/apps/mne_analyze/plugins/channelselection/channelselection.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/controlmanager/controlmanager.h": {
+    "src/apps/mne_analyze/plugins/controlmanager/controlmanager.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/coregistration/coregistration.cpp": {
+    "src/apps/mne_analyze/plugins/coregistration/coregistration.cpp": {
       "bugprone-switch-missing-default-case": 4,
       "performance-unnecessary-value-param": 3
     },
-    "src/applications/mne_analyze/plugins/coregistration/coregistration.h": {
+    "src/apps/mne_analyze/plugins/coregistration/coregistration.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/dataloader/dataloader.cpp": {
+    "src/apps/mne_analyze/plugins/dataloader/dataloader.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/plugins/dataloader/dataloader.h": {
+    "src/apps/mne_analyze/plugins/dataloader/dataloader.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/datamanager/datamanager.h": {
+    "src/apps/mne_analyze/plugins/datamanager/datamanager.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/dipolefit/dipolefit.cpp": {
+    "src/apps/mne_analyze/plugins/dipolefit/dipolefit.cpp": {
       "performance-for-range-copy": 6,
       "performance-unnecessary-value-param": 3
     },
-    "src/applications/mne_analyze/plugins/dipolefit/dipolefit.h": {
+    "src/apps/mne_analyze/plugins/dipolefit/dipolefit.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/events/eventdelegate.cpp": {
+    "src/apps/mne_analyze/plugins/events/eventdelegate.cpp": {
       "bugprone-switch-missing-default-case": 3
     },
-    "src/applications/mne_analyze/plugins/events/eventdelegate.h": {
+    "src/apps/mne_analyze/plugins/events/eventdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_analyze/plugins/events/events.h": {
+    "src/apps/mne_analyze/plugins/events/events.h": {
       "modernize-use-override": 10
     },
-    "src/applications/mne_analyze/plugins/events/eventview.cpp": {
+    "src/apps/mne_analyze/plugins/events/eventview.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/plugins/events/eventview.h": {
+    "src/apps/mne_analyze/plugins/events/eventview.h": {
       "modernize-use-override": 2
     },
-    "src/applications/mne_analyze/plugins/filtering/filtering.h": {
+    "src/apps/mne_analyze/plugins/filtering/filtering.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/fiffrawview.cpp": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/fiffrawview.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/fiffrawview.h": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/fiffrawview.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-override": 7
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/fiffrawviewdelegate.cpp": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/fiffrawviewdelegate.cpp": {
       "bugprone-switch-missing-default-case": 2
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/fiffrawviewdelegate.h": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/fiffrawviewdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/rawdataviewer.cpp": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/rawdataviewer.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/plugins/rawdataviewer/rawdataviewer.h": {
+    "src/apps/mne_analyze/plugins/rawdataviewer/rawdataviewer.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_analyze/plugins/sourcelocalization/sourcelocalization.h": {
+    "src/apps/mne_analyze/plugins/sourcelocalization/sourcelocalization.h": {
       "modernize-use-override": 10
     },
-    "src/applications/mne_analyze/plugins/view3d/view3d.cpp": {
+    "src/apps/mne_analyze/plugins/view3d/view3d.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze/plugins/view3d/view3d.h": {
+    "src/apps/mne_analyze/plugins/view3d/view3d.h": {
       "modernize-use-override": 10
     },
-    "src/applications/mne_analyze_studio/core/capabilitycatalog.cpp": {
+    "src/apps/mne_analyze_studio/core/capabilitycatalog.cpp": {
       "performance-implicit-conversion-in-loop": 5
     },
-    "src/applications/mne_analyze_studio/core/capabilityutils.cpp": {
+    "src/apps/mne_analyze_studio/core/capabilityutils.cpp": {
       "performance-implicit-conversion-in-loop": 2
     },
-    "src/applications/mne_analyze_studio/core/llmtoolplanner.cpp": {
+    "src/apps/mne_analyze_studio/core/llmtoolplanner.cpp": {
       "performance-implicit-conversion-in-loop": 12,
       "performance-no-automatic-move": 5
     },
-    "src/applications/mne_analyze_studio/core/manifestparser.cpp": {
+    "src/apps/mne_analyze_studio/core/manifestparser.cpp": {
       "performance-implicit-conversion-in-loop": 9
     },
-    "src/applications/mne_analyze_studio/core/scenecontextregistry.cpp": {
+    "src/apps/mne_analyze_studio/core/scenecontextregistry.cpp": {
       "performance-implicit-conversion-in-loop": 2,
       "performance-no-automatic-move": 2
     },
-    "src/applications/mne_analyze_studio/core/viewmanager.cpp": {
+    "src/apps/mne_analyze_studio/core/viewmanager.cpp": {
       "bugprone-throwing-static-initialization": 2,
       "performance-no-automatic-move": 1
     },
-    "src/applications/mne_analyze_studio/core/viewproviderregistry.cpp": {
+    "src/apps/mne_analyze_studio/core/viewproviderregistry.cpp": {
       "performance-implicit-conversion-in-loop": 1
     },
-    "src/applications/mne_analyze_studio/core/workflowmanager.cpp": {
+    "src/apps/mne_analyze_studio/core/workflowmanager.cpp": {
       "performance-implicit-conversion-in-loop": 1
     },
-    "src/applications/mne_analyze_studio/extensions/analysis_results_extension/analysisresultswidget.cpp": {
+    "src/apps/mne_analyze_studio/extensions/analysis_results_extension/analysisresultswidget.cpp": {
       "bugprone-throwing-static-initialization": 1
     },
-    "src/applications/mne_analyze_studio/extensions/dummy_3d_extension/dummy3dhostedviewwidget.cpp": {
+    "src/apps/mne_analyze_studio/extensions/dummy_3d_extension/dummy3dhostedviewwidget.cpp": {
       "bugprone-throwing-static-initialization": 1,
       "performance-implicit-conversion-in-loop": 1,
       "performance-no-automatic-move": 4
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/eventmodel.cpp": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/eventmodel.cpp": {
       "bugprone-switch-missing-default-case": 5,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/eventmodel.h": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/eventmodel.h": {
       "modernize-use-override": 9
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/rawmodel.cpp": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/rawmodel.cpp": {
       "bugprone-switch-missing-default-case": 5,
       "clang-analyzer-deadcode.DeadStores": 2,
       "performance-unnecessary-value-param": 2
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/rawmodel.h": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/rawmodel.h": {
       "modernize-use-override": 4
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/filteroperator.cpp": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/filteroperator.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/filteroperator.h": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/filteroperator.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/info.h": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/info.h": {
       "bugprone-reserved-identifier": 6
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/rawdatabrowserwidget.cpp": {
+    "src/apps/mne_analyze_studio/extensions/fiff_browser_extension/rawdatabrowserwidget.cpp": {
       "bugprone-float-loop-counter": 1,
       "bugprone-throwing-static-initialization": 1
     },
-    "src/applications/mne_analyze_studio/extensions/psd_analysis_extension/psdresultwidget.cpp": {
+    "src/apps/mne_analyze_studio/extensions/psd_analysis_extension/psdresultwidget.cpp": {
       "bugprone-throwing-static-initialization": 1
     },
-    "src/applications/mne_analyze_studio/neuro_kernel/neurokernelservice.cpp": {
+    "src/apps/mne_analyze_studio/neuro_kernel/neurokernelservice.cpp": {
       "performance-implicit-conversion-in-loop": 2
     },
-    "src/applications/mne_analyze_studio/skill_host/skillhostservice.cpp": {
+    "src/apps/mne_analyze_studio/skill_host/skillhostservice.cpp": {
       "performance-implicit-conversion-in-loop": 7,
       "performance-unnecessary-copy-initialization": 3
     },
-    "src/applications/mne_analyze_studio/workbench/agentchatdockwidget.cpp": {
+    "src/apps/mne_analyze_studio/workbench/agentchatdockwidget.cpp": {
       "performance-implicit-conversion-in-loop": 4
     },
-    "src/applications/mne_analyze_studio/workbench/extensionhostedviewwidget.cpp": {
+    "src/apps/mne_analyze_studio/workbench/extensionhostedviewwidget.cpp": {
       "performance-implicit-conversion-in-loop": 1
     },
-    "src/applications/mne_analyze_studio/workbench/extensionsettingswidget.cpp": {
+    "src/apps/mne_analyze_studio/workbench/extensionsettingswidget.cpp": {
       "performance-implicit-conversion-in-loop": 5
     },
-    "src/applications/mne_analyze_studio/workbench/llmsettingsdialog.cpp": {
+    "src/apps/mne_analyze_studio/workbench/llmsettingsdialog.cpp": {
       "performance-implicit-conversion-in-loop": 2,
       "performance-no-automatic-move": 1
     },
-    "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": {
+    "src/apps/mne_analyze_studio/workbench/mainwindow.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 1,
       "clang-analyzer-deadcode.DeadStores": 1,
       "performance-implicit-conversion-in-loop": 54,
       "performance-no-automatic-move": 1,
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/applications/mne_analyze_studio/workbench/workflowminimapwidget.cpp": {
+    "src/apps/mne_analyze_studio/workbench/workflowminimapwidget.cpp": {
       "performance-implicit-conversion-in-loop": 3,
       "performance-unnecessary-copy-initialization": 2
     },
-    "src/applications/mne_browse/Delegates/averagedelegate.h": {
+    "src/apps/mne_browse/Delegates/averagedelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Delegates/eventdelegate.cpp": {
+    "src/apps/mne_browse/Delegates/eventdelegate.cpp": {
       "bugprone-switch-missing-default-case": 3
     },
-    "src/applications/mne_browse/Delegates/eventdelegate.h": {
+    "src/apps/mne_browse/Delegates/eventdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_browse/Delegates/rawdelegate.cpp": {
+    "src/apps/mne_browse/Delegates/rawdelegate.cpp": {
       "bugprone-switch-missing-default-case": 3
     },
-    "src/applications/mne_browse/Delegates/rawdelegate.h": {
+    "src/apps/mne_browse/Delegates/rawdelegate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/applications/mne_browse/Models/annotationmodel.cpp": {
+    "src/apps/mne_browse/Models/annotationmodel.cpp": {
       "bugprone-integer-division": 1,
       "clang-analyzer-deadcode.DeadStores": 2,
       "performance-implicit-conversion-in-loop": 3
     },
-    "src/applications/mne_browse/Models/averagemodel.cpp": {
+    "src/apps/mne_browse/Models/averagemodel.cpp": {
       "bugprone-switch-missing-default-case": 1
     },
-    "src/applications/mne_browse/Models/averagemodel.h": {
+    "src/apps/mne_browse/Models/averagemodel.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 8
     },
-    "src/applications/mne_browse/Models/eventmodel.cpp": {
+    "src/apps/mne_browse/Models/eventmodel.cpp": {
       "bugprone-switch-missing-default-case": 5,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Models/eventmodel.h": {
+    "src/apps/mne_browse/Models/eventmodel.h": {
       "modernize-use-override": 9
     },
-    "src/applications/mne_browse/Models/rawmodel.cpp": {
+    "src/apps/mne_browse/Models/rawmodel.cpp": {
       "bugprone-switch-missing-default-case": 5,
       "clang-analyzer-deadcode.DeadStores": 2,
       "performance-unnecessary-value-param": 2
     },
-    "src/applications/mne_browse/Models/rawmodel.h": {
+    "src/apps/mne_browse/Models/rawmodel.h": {
       "modernize-use-override": 4
     },
-    "src/applications/mne_browse/Models/virtualchannelmodel.cpp": {
+    "src/apps/mne_browse/Models/virtualchannelmodel.cpp": {
       "performance-implicit-conversion-in-loop": 5
     },
-    "src/applications/mne_browse/Utils/butterflyscene.h": {
+    "src/apps/mne_browse/Utils/butterflyscene.h": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_browse/Utils/butterflysceneitem.cpp": {
+    "src/apps/mne_browse/Utils/butterflysceneitem.cpp": {
       "bugprone-float-loop-counter": 2,
       "bugprone-switch-missing-default-case": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Utils/butterflysceneitem.h": {
+    "src/apps/mne_browse/Utils/butterflysceneitem.h": {
       "modernize-use-override": 2
     },
-    "src/applications/mne_browse/Utils/datamarker.cpp": {
+    "src/apps/mne_browse/Utils/datamarker.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Utils/datamarker.h": {
+    "src/apps/mne_browse/Utils/datamarker.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 5
     },
-    "src/applications/mne_browse/Utils/filteroperator.cpp": {
+    "src/apps/mne_browse/Utils/filteroperator.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Utils/filteroperator.h": {
+    "src/apps/mne_browse/Utils/filteroperator.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Utils/filterplotscene.cpp": {
+    "src/apps/mne_browse/Utils/filterplotscene.cpp": {
       "bugprone-integer-division": 3
     },
-    "src/applications/mne_browse/Utils/filterplotscene.h": {
+    "src/apps/mne_browse/Utils/filterplotscene.h": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_browse/Utils/info.h": {
+    "src/apps/mne_browse/Utils/info.h": {
       "bugprone-reserved-identifier": 6
     },
-    "src/applications/mne_browse/Utils/rawsettings.h": {
+    "src/apps/mne_browse/Utils/rawsettings.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/aboutwindow.h": {
+    "src/apps/mne_browse/Windows/aboutwindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/averagewindow.cpp": {
+    "src/apps/mne_browse/Windows/averagewindow.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Windows/averagewindow.h": {
+    "src/apps/mne_browse/Windows/averagewindow.h": {
       "bugprone-forward-declaration-namespace": 1,
       "modernize-use-override": 2
     },
-    "src/applications/mne_browse/Windows/chinfowindow.h": {
+    "src/apps/mne_browse/Windows/chinfowindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/datawindow.cpp": {
+    "src/apps/mne_browse/Windows/datawindow.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Windows/datawindow.h": {
+    "src/apps/mne_browse/Windows/datawindow.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_browse/Windows/eventwindow.cpp": {
+    "src/apps/mne_browse/Windows/eventwindow.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_browse/Windows/eventwindow.h": {
+    "src/apps/mne_browse/Windows/eventwindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 2
     },
-    "src/applications/mne_browse/Windows/filterwindow.cpp": {
+    "src/apps/mne_browse/Windows/filterwindow.cpp": {
       "bugprone-switch-missing-default-case": 1,
       "clang-analyzer-deadcode.DeadStores": 2
     },
-    "src/applications/mne_browse/Windows/filterwindow.h": {
+    "src/apps/mne_browse/Windows/filterwindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_browse/Windows/informationwindow.h": {
+    "src/apps/mne_browse/Windows/informationwindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/mainwindow.cpp": {
+    "src/apps/mne_browse/Windows/mainwindow.cpp": {
       "bugprone-incorrect-roundings": 1,
       "bugprone-integer-division": 4,
       "performance-no-automatic-move": 1
     },
-    "src/applications/mne_browse/Windows/mainwindow.h": {
+    "src/apps/mne_browse/Windows/mainwindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/noisereductionwindow.cpp": {
+    "src/apps/mne_browse/Windows/noisereductionwindow.cpp": {
       "modernize-use-nullptr": 4
     },
-    "src/applications/mne_browse/Windows/noisereductionwindow.h": {
+    "src/apps/mne_browse/Windows/noisereductionwindow.h": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_browse/Windows/scalewindow.cpp": {
+    "src/apps/mne_browse/Windows/scalewindow.cpp": {
       "bugprone-switch-missing-default-case": 1
     },
-    "src/applications/mne_browse/Windows/scalewindow.h": {
+    "src/apps/mne_browse/Windows/scalewindow.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_browse/Windows/virtualchannelwindow.cpp": {
+    "src/apps/mne_browse/Windows/virtualchannelwindow.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/applications/mne_browse/main.cpp": {
+    "src/apps/mne_browse/main.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/applications/mne_inspect/app/mainwindow.cpp": {
+    "src/apps/mne_inspect/app/mainwindow.cpp": {
       "performance-unnecessary-copy-initialization": 2
     },
-    "src/applications/mne_inspect/app/plugins/mri_slices/mri_slices.cpp": {
+    "src/apps/mne_inspect/app/plugins/mri_slices/mri_slices.cpp": {
       "bugprone-incorrect-roundings": 1
     },
-    "src/applications/mne_scan/libs/scDisp/measurementwidget.h": {
+    "src/apps/mne_scan/libs/scDisp/measurementwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scDisp/realtime3dwidget.h": {
+    "src/apps/mne_scan/libs/scDisp/realtime3dwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 3
     },
-    "src/applications/mne_scan/libs/scDisp/realtimecovwidget.h": {
+    "src/apps/mne_scan/libs/scDisp/realtimecovwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 3
     },
-    "src/applications/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp": {
+    "src/apps/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_scan/libs/scDisp/realtimeevokedsetwidget.h": {
+    "src/apps/mne_scan/libs/scDisp/realtimeevokedsetwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp": {
+    "src/apps/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_scan/libs/scDisp/realtimemultisamplearraywidget.h": {
+    "src/apps/mne_scan/libs/scDisp/realtimemultisamplearraywidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 3
     },
-    "src/applications/mne_scan/libs/scDisp/realtimespectrumwidget.h": {
+    "src/apps/mne_scan/libs/scDisp/realtimespectrumwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 4
     },
-    "src/applications/mne_scan/libs/scMeas/measurement.h": {
+    "src/apps/mne_scan/libs/scMeas/measurement.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/measurementtypes.h": {
+    "src/apps/mne_scan/libs/scMeas/measurementtypes.h": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_scan/libs/scMeas/numeric.h": {
+    "src/apps/mne_scan/libs/scMeas/numeric.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimeconnectivityestimate.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimeconnectivityestimate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimecov.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimecov.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimeevokedset.cpp": {
+    "src/apps/mne_scan/libs/scMeas/realtimeevokedset.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimeevokedset.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimeevokedset.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimefwdsolution.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimefwdsolution.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimehpiresult.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimehpiresult.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimemultisamplearray.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimemultisamplearray.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimesamplearraychinfo.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimesamplearraychinfo.h": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimesourceestimate.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimesourceestimate.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scMeas/realtimespectrum.h": {
+    "src/apps/mne_scan/libs/scMeas/realtimespectrum.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/displaymanager.h": {
+    "src/apps/mne_scan/libs/scShared/Management/displaymanager.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginconnector.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginconnector.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginconnectorconnection.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginconnectorconnection.h": {
       "bugprone-reserved-identifier": 8,
       "modernize-use-nullptr": 2,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginconnectorconnectionwidget.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginconnectorconnectionwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/plugininputconnector.h": {
+    "src/apps/mne_scan/libs/scShared/Management/plugininputconnector.h": {
       "modernize-use-override": 3
     },
-    "src/applications/mne_scan/libs/scShared/Management/plugininputdata.cpp": {
+    "src/apps/mne_scan/libs/scShared/Management/plugininputdata.cpp": {
       "modernize-use-nullptr": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/plugininputdata.h": {
+    "src/apps/mne_scan/libs/scShared/Management/plugininputdata.h": {
       "bugprone-suspicious-include": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginmanager.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginmanager.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginoutputconnector.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginoutputconnector.h": {
       "modernize-use-override": 3
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginoutputdata.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginoutputdata.h": {
       "bugprone-suspicious-include": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Management/pluginscenemanager.h": {
+    "src/apps/mne_scan/libs/scShared/Management/pluginscenemanager.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/libs/scShared/Plugins/abstractalgorithm.h": {
+    "src/apps/mne_scan/libs/scShared/Plugins/abstractalgorithm.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/libs/scShared/Plugins/abstractplugin.h": {
+    "src/apps/mne_scan/libs/scShared/Plugins/abstractplugin.h": {
       "bugprone-reserved-identifier": 3,
       "modernize-use-override": 2
     },
-    "src/applications/mne_scan/libs/scShared/Plugins/abstractsensor.h": {
+    "src/apps/mne_scan/libs/scShared/Plugins/abstractsensor.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/mne_scan/arrow.h": {
+    "src/apps/mne_scan/mne_scan/arrow.h": {
       "modernize-use-nullptr": 2,
       "modernize-use-override": 4
     },
-    "src/applications/mne_scan/mne_scan/info.h": {
+    "src/apps/mne_scan/mne_scan/info.h": {
       "bugprone-reserved-identifier": 6
     },
-    "src/applications/mne_scan/mne_scan/mainsplashscreen.h": {
+    "src/apps/mne_scan/mne_scan/mainsplashscreen.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/mne_scan/mainsplashscreencloser.h": {
+    "src/apps/mne_scan/mne_scan/mainsplashscreencloser.h": {
       "modernize-use-override": 2
     },
-    "src/applications/mne_scan/mne_scan/mainwindow.cpp": {
+    "src/apps/mne_scan/mne_scan/mainwindow.cpp": {
       "bugprone-throwing-static-initialization": 1,
       "modernize-use-nullptr": 3,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_scan/mne_scan/mainwindow.h": {
+    "src/apps/mne_scan/mne_scan/mainwindow.h": {
       "modernize-use-override": 2
     },
-    "src/applications/mne_scan/mne_scan/plugingui.cpp": {
+    "src/apps/mne_scan/mne_scan/plugingui.cpp": {
       "modernize-use-nullptr": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_scan/mne_scan/plugingui.h": {
+    "src/apps/mne_scan/mne_scan/plugingui.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/mne_scan/pluginitem.cpp": {
+    "src/apps/mne_scan/mne_scan/pluginitem.cpp": {
       "bugprone-integer-division": 20
     },
-    "src/applications/mne_scan/mne_scan/pluginitem.h": {
+    "src/apps/mne_scan/mne_scan/pluginitem.h": {
       "bugprone-derived-method-shadowing-base-method": 1,
       "modernize-use-nullptr": 2,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/mne_scan/pluginscene.cpp": {
+    "src/apps/mne_scan/mne_scan/pluginscene.cpp": {
       "bugprone-float-loop-counter": 2,
       "modernize-use-nullptr": 4
     },
-    "src/applications/mne_scan/mne_scan/pluginscene.h": {
+    "src/apps/mne_scan/mne_scan/pluginscene.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/mne_scan/startupwidget.h": {
+    "src/apps/mne_scan/mne_scan/startupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/averaging/FormFiles/averagingsetupwidget.h": {
+    "src/apps/mne_scan/plugins/averaging/FormFiles/averagingsetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/averaging/averaging.h": {
+    "src/apps/mne_scan/plugins/averaging/averaging.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/covariance/FormFiles/covariancesetupwidget.h": {
+    "src/apps/mne_scan/plugins/covariance/FormFiles/covariancesetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/covariance/covariance.cpp": {
+    "src/apps/mne_scan/plugins/covariance/covariance.cpp": {
       "clang-analyzer-deadcode.DeadStores": 1
     },
-    "src/applications/mne_scan/plugins/covariance/covariance.h": {
+    "src/apps/mne_scan/plugins/covariance/covariance.h": {
       "modernize-use-override": 13
     },
-    "src/applications/mne_scan/plugins/ftbuffer/FormFiles/ftbuffersetupwidget.h": {
+    "src/apps/mne_scan/plugins/ftbuffer/FormFiles/ftbuffersetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/ftbuffer/ftbuffer.h": {
+    "src/apps/mne_scan/plugins/ftbuffer/ftbuffer.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/ftbuffer/ftbuffproducer.cpp": {
+    "src/apps/mne_scan/plugins/ftbuffer/ftbuffproducer.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_scan/plugins/ftbuffer/ftbuffproducer.h": {
+    "src/apps/mne_scan/plugins/ftbuffer/ftbuffproducer.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/ftbuffer/ftconnector.h": {
+    "src/apps/mne_scan/plugins/ftbuffer/ftconnector.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/hpi/FormFiles/hpisetupwidget.h": {
+    "src/apps/mne_scan/plugins/hpi/FormFiles/hpisetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/hpi/hpi.h": {
+    "src/apps/mne_scan/plugins/hpi/hpi.h": {
       "modernize-use-override": 13
     },
-    "src/applications/mne_scan/plugins/lsladapter/FormFiles/lsladaptersetup.cpp": {
+    "src/apps/mne_scan/plugins/lsladapter/FormFiles/lsladaptersetup.cpp": {
       "performance-for-range-copy": 1
     },
-    "src/applications/mne_scan/plugins/lsladapter/FormFiles/lsladaptersetup.h": {
+    "src/apps/mne_scan/plugins/lsladapter/FormFiles/lsladaptersetup.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/lsladapter/lsladapter.h": {
+    "src/apps/mne_scan/plugins/lsladapter/lsladapter.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/lsladapter/lsladapterproducer.h": {
+    "src/apps/mne_scan/plugins/lsladapter/lsladapterproducer.h": {
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/neuronalconnectivity/FormFiles/neuronalconnectivitysetupwidget.h": {
+    "src/apps/mne_scan/plugins/neuronalconnectivity/FormFiles/neuronalconnectivitysetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/neuronalconnectivity/neuronalconnectivity.h": {
+    "src/apps/mne_scan/plugins/neuronalconnectivity/neuronalconnectivity.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/noisereduction/FormFiles/noisereductionsetupwidget.h": {
+    "src/apps/mne_scan/plugins/noisereduction/FormFiles/noisereductionsetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/noisereduction/noisereduction.cpp": {
+    "src/apps/mne_scan/plugins/noisereduction/noisereduction.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/applications/mne_scan/plugins/noisereduction/noisereduction.h": {
+    "src/apps/mne_scan/plugins/noisereduction/noisereduction.h": {
       "modernize-use-override": 11
     },
-    "src/applications/mne_scan/plugins/rtclustmne/FormFiles/rtclustmnesetupwidget.h": {
+    "src/apps/mne_scan/plugins/rtclustmne/FormFiles/rtclustmnesetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/rtclustmne/rtclustmne.h": {
+    "src/apps/mne_scan/plugins/rtclustmne/rtclustmne.h": {
       "modernize-use-override": 13
     },
-    "src/applications/mne_scan/plugins/rtfwd/FormFiles/rtfwdsetupwidget.h": {
+    "src/apps/mne_scan/plugins/rtfwd/FormFiles/rtfwdsetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/rtfwd/rtfwd.h": {
+    "src/apps/mne_scan/plugins/rtfwd/rtfwd.h": {
       "modernize-use-override": 13
     },
-    "src/applications/mne_scan/plugins/writetofile/FormFiles/writetofilesetupwidget.h": {
+    "src/apps/mne_scan/plugins/writetofile/FormFiles/writetofilesetupwidget.h": {
       "modernize-use-nullptr": 1,
       "modernize-use-override": 1
     },
-    "src/applications/mne_scan/plugins/writetofile/writetofile.h": {
+    "src/apps/mne_scan/plugins/writetofile/writetofile.h": {
       "modernize-use-override": 13
     },
     "src/examples/ex_clustered_inverse_mne_raw/main.cpp": {
@@ -1448,189 +1448,189 @@
       "performance-unnecessary-copy-initialization": 2,
       "performance-unnecessary-value-param": 4
     },
-    "src/testframes/test_api_registry/test_api_registry.cpp": {
+    "src/tests/test_api_registry/test_api_registry.cpp": {
       "performance-implicit-conversion-in-loop": 3
     },
-    "src/testframes/test_bids/test_bids.cpp": {
+    "src/tests/test_bids/test_bids.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_cortical_surface_picking/test_cortical_surface_picking.cpp": {
+    "src/tests/test_cortical_surface_picking/test_cortical_surface_picking.cpp": {
       "clang-analyzer-core.CallAndMessage": 1
     },
-    "src/testframes/test_decoding_csp/test_decoding_csp.cpp": {
+    "src/tests/test_decoding_csp/test_decoding_csp.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_decoding_spoc/test_decoding_spoc.cpp": {
+    "src/tests/test_decoding_spoc/test_decoding_spoc.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_decoding_ssd/test_decoding_ssd.cpp": {
+    "src/tests/test_decoding_ssd/test_decoding_ssd.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_disp3d_viewstate/test_disp3d_viewstate.cpp": {
+    "src/tests/test_disp3d_viewstate/test_disp3d_viewstate.cpp": {
       "bugprone-float-loop-counter": 1
     },
-    "src/testframes/test_disp_plots/test_disp_plots.cpp": {
+    "src/tests/test_disp_plots/test_disp_plots.cpp": {
       "bugprone-float-loop-counter": 4,
       "clang-analyzer-cplusplus.NewDeleteLeaks": 2
     },
-    "src/testframes/test_disp_viewers2/test_disp_viewers2.cpp": {
+    "src/tests/test_disp_viewers2/test_disp_viewers2.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_disp_viewers3/test_disp_viewers3.cpp": {
+    "src/tests/test_disp_viewers3/test_disp_viewers3.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 10
     },
-    "src/testframes/test_dsp_bad_channel_detect/test_dsp_bad_channel_detect.cpp": {
+    "src/tests/test_dsp_bad_channel_detect/test_dsp_bad_channel_detect.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_dsp_bad_channels_lof/test_dsp_bad_channels_lof.cpp": {
+    "src/tests/test_dsp_bad_channels_lof/test_dsp_bad_channels_lof.cpp": {
       "bugprone-random-generator-seed": 5
     },
-    "src/testframes/test_dsp_bad_channels_maxwell/test_dsp_bad_channels_maxwell.cpp": {
+    "src/tests/test_dsp_bad_channels_maxwell/test_dsp_bad_channels_maxwell.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_dsp_bridged_electrodes/test_dsp_bridged_electrodes.cpp": {
+    "src/tests/test_dsp_bridged_electrodes/test_dsp_bridged_electrodes.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_dsp_eog_regression/test_dsp_eog_regression.cpp": {
+    "src/tests/test_dsp_eog_regression/test_dsp_eog_regression.cpp": {
       "bugprone-integer-division": 4
     },
-    "src/testframes/test_dsp_infomax/test_dsp_infomax.cpp": {
+    "src/tests/test_dsp_infomax/test_dsp_infomax.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_dsp_xdawn/test_dsp_xdawn.cpp": {
+    "src/tests/test_dsp_xdawn/test_dsp_xdawn.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_fiff_cov_python/test_fiff_cov_python.cpp": {
+    "src/tests/test_fiff_cov_python/test_fiff_cov_python.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/testframes/test_fiff_extended/test_fiff_extended.cpp": {
+    "src/tests/test_fiff_extended/test_fiff_extended.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_fiff_fs_library/test_fiff_fs_library.cpp": {
+    "src/tests/test_fiff_fs_library/test_fiff_fs_library.cpp": {
       "cppcoreguidelines-slicing": 1,
       "performance-unnecessary-copy-initialization": 2
     },
-    "src/testframes/test_fiff_info/test_fiff_info.cpp": {
+    "src/tests/test_fiff_info/test_fiff_info.cpp": {
       "cppcoreguidelines-slicing": 1,
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_fiff_mne_types_io/fiff_types_ref.h": {
+    "src/tests/test_fiff_mne_types_io/fiff_types_ref.h": {
       "bugprone-reserved-identifier": 1
     },
-    "src/testframes/test_fwd_library/test_fwd_library.cpp": {
+    "src/tests/test_fwd_library/test_fwd_library.cpp": {
       "clang-analyzer-core.CallAndMessage": 1,
       "clang-analyzer-core.NullDereference": 1
     },
-    "src/testframes/test_fwd_sphere_settings/test_fwd_sphere_settings.cpp": {
+    "src/tests/test_fwd_sphere_settings/test_fwd_sphere_settings.cpp": {
       "clang-analyzer-core.CallAndMessage": 1,
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_hpiModelParameter/test_hpiModelParameter.cpp": {
+    "src/tests/test_hpiModelParameter/test_hpiModelParameter.cpp": {
       "performance-unnecessary-copy-initialization": 3
     },
-    "src/testframes/test_ica_label/test_ica_label.cpp": {
+    "src/tests/test_ica_label/test_ica_label.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_inv_cmne/test_inv_cmne.cpp": {
+    "src/tests/test_inv_cmne/test_inv_cmne.cpp": {
       "bugprone-random-generator-seed": 6
     },
-    "src/testframes/test_inv_convenience/test_inv_convenience.cpp": {
+    "src/tests/test_inv_convenience/test_inv_convenience.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_inv_rt_library/test_inv_rt_library.cpp": {
+    "src/tests/test_inv_rt_library/test_inv_rt_library.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_inv_sparse/test_inv_sparse.cpp": {
+    "src/tests/test_inv_sparse/test_inv_sparse.cpp": {
       "performance-unnecessary-value-param": 1
     },
-    "src/testframes/test_lsl/test_lsl.cpp": {
+    "src/tests/test_lsl/test_lsl.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_mne_analyze_studio_core_capabilities/test_mne_analyze_studio_core_capabilities.cpp": {
+    "src/tests/test_mne_analyze_studio_core_capabilities/test_mne_analyze_studio_core_capabilities.cpp": {
       "performance-implicit-conversion-in-loop": 1
     },
-    "src/testframes/test_mne_analyze_studio_workflow_integration/test_mne_analyze_studio_workflow_integration.cpp": {
+    "src/tests/test_mne_analyze_studio_workflow_integration/test_mne_analyze_studio_workflow_integration.cpp": {
       "performance-implicit-conversion-in-loop": 1
     },
-    "src/testframes/test_mne_anonymize/test_mne_anonymize.cpp": {
+    "src/tests/test_mne_anonymize/test_mne_anonymize.cpp": {
       "performance-no-automatic-move": 1,
       "performance-unnecessary-value-param": 1
     },
-    "src/testframes/test_mne_browse_data/test_mne_browse_data.cpp": {
+    "src/tests/test_mne_browse_data/test_mne_browse_data.cpp": {
       "clang-analyzer-core.NullDereference": 1
     },
-    "src/testframes/test_mne_data_types/test_mne_data_types.cpp": {
+    "src/tests/test_mne_data_types/test_mne_data_types.cpp": {
       "performance-unnecessary-copy-initialization": 5
     },
-    "src/testframes/test_mne_extended/test_mne_extended.cpp": {
+    "src/tests/test_mne_extended/test_mne_extended.cpp": {
       "performance-unnecessary-copy-initialization": 2
     },
-    "src/testframes/test_mne_hemisphere_epoch/test_mne_hemisphere_epoch.cpp": {
+    "src/tests/test_mne_hemisphere_epoch/test_mne_hemisphere_epoch.cpp": {
       "performance-unnecessary-copy-initialization": 3
     },
-    "src/testframes/test_mne_inspect_multimodal/test_mne_inspect_multimodal.cpp": {
+    "src/tests/test_mne_inspect_multimodal/test_mne_inspect_multimodal.cpp": {
       "clang-analyzer-core.NullDereference": 1,
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_mne_io_coverage/test_mne_io_coverage.cpp": {
+    "src/tests/test_mne_io_coverage/test_mne_io_coverage.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_mne_library/test_mne_library.cpp": {
+    "src/tests/test_mne_library/test_mne_library.cpp": {
       "clang-analyzer-core.NullDereference": 1,
       "performance-unnecessary-copy-initialization": 2
     },
-    "src/testframes/test_mne_projections/test_mne_projections.cpp": {
+    "src/tests/test_mne_projections/test_mne_projections.cpp": {
       "performance-unnecessary-copy-initialization": 14
     },
-    "src/testframes/test_mri_nifti_io/test_mri_nifti_io.cpp": {
+    "src/tests/test_mri_nifti_io/test_mri_nifti_io.cpp": {
       "bugprone-integer-division": 2
     },
-    "src/testframes/test_picard_ica/test_picard_ica.cpp": {
+    "src/tests/test_picard_ica/test_picard_ica.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_rt_source_streaming/test_rt_source_streaming.cpp": {
+    "src/tests/test_rt_source_streaming/test_rt_source_streaming.cpp": {
       "performance-unnecessary-copy-initialization": 1
     },
-    "src/testframes/test_scdisp_widgets/test_scdisp_widgets.cpp": {
+    "src/tests/test_scdisp_widgets/test_scdisp_widgets.cpp": {
       "clang-analyzer-cplusplus.NewDeleteLeaks": 3
     },
-    "src/testframes/test_sts_cov_estimators/test_sts_cov_estimators.cpp": {
+    "src/tests/test_sts_cov_estimators/test_sts_cov_estimators.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_studio_core/test_studio_core.cpp": {
+    "src/tests/test_studio_core/test_studio_core.cpp": {
       "clang-analyzer-core.CallAndMessage": 1
     },
-    "src/testframes/test_tool_conversion_extended/test_tool_conversion_extended.cpp": {
+    "src/tests/test_tool_conversion_extended/test_tool_conversion_extended.cpp": {
       "bugprone-suspicious-include": 8
     },
-    "src/testframes/test_tool_conversion_functions/test_tool_conversion_functions.cpp": {
+    "src/tests/test_tool_conversion_functions/test_tool_conversion_functions.cpp": {
       "bugprone-suspicious-include": 3
     },
-    "src/testframes/test_tool_forward_generation/test_tool_forward_generation.cpp": {
+    "src/tests/test_tool_forward_generation/test_tool_forward_generation.cpp": {
       "bugprone-suspicious-include": 2
     },
-    "src/testframes/test_tool_info_helpers/test_tool_info_helpers.cpp": {
+    "src/tests/test_tool_info_helpers/test_tool_info_helpers.cpp": {
       "bugprone-suspicious-include": 3
     },
-    "src/testframes/test_tool_inverse_computation/test_tool_inverse_computation.cpp": {
+    "src/tests/test_tool_inverse_computation/test_tool_inverse_computation.cpp": {
       "bugprone-suspicious-include": 3
     },
-    "src/testframes/test_tool_preproc_helpers/test_tool_preproc_helpers.cpp": {
+    "src/tests/test_tool_preproc_helpers/test_tool_preproc_helpers.cpp": {
       "bugprone-suspicious-include": 4
     },
-    "src/testframes/test_tool_surface_math/test_tool_surface_math.cpp": {
+    "src/tests/test_tool_surface_math/test_tool_surface_math.cpp": {
       "bugprone-suspicious-include": 5
     },
-    "src/testframes/test_trap_music/test_trap_music.cpp": {
+    "src/tests/test_trap_music/test_trap_music.cpp": {
       "bugprone-random-generator-seed": 3
     },
-    "src/testframes/test_math_kmeans/test_math_kmeans.cpp": {
+    "src/tests/test_math_kmeans/test_math_kmeans.cpp": {
       "bugprone-random-generator-seed": 1
     },
-    "src/testframes/test_channels_layout_selection/test_channels_layout_selection.cpp": {
+    "src/tests/test_channels_layout_selection/test_channels_layout_selection.cpp": {
       "performance-faster-string-find": 1
     },
-    "src/testframes/test_math_sphere/test_math_sphere.cpp": {
+    "src/tests/test_math_sphere/test_math_sphere.cpp": {
       "bugprone-random-generator-seed": 1
     },
     "src/tools/conversion/mne_edf2fiff/edf_ch_info.cpp": {

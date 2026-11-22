@@ -14,7 +14,7 @@
 A validator nobody has tried to fool is a validator nobody should trust, so each
 check here is fed a synthetic tree that violates exactly one invariant and is
 asserted to produce exactly that finding code.  The trees are built in a
-temporary directory; the real ``src/testframes`` is never touched.
+temporary directory; the real ``src/tests`` is never touched.
 
 Run with::
 
@@ -65,11 +65,11 @@ ADD_TEST = "add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})"
 
 
 class InventoryFixture:
-    """A throwaway ``src/testframes`` built to break one rule at a time."""
+    """A throwaway ``src/tests`` built to break one rule at a time."""
 
     def __init__(self, root: Path) -> None:
         self.root = root
-        self.testframes = root / "src" / "testframes"
+        self.testframes = root / "src" / "tests"
         self.testframes.mkdir(parents=True)
         self._registered: list[str] = []
 
@@ -241,7 +241,7 @@ class TestApplicationTargets(ValidatorTestCase):
 
     def test_source_path_through_an_application_directory_passes(self) -> None:
         self.assertEqual([], self.check(
-            "target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/applications/mne_studio_core/a.cpp)\n"
+            "target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/apps/mne_studio_core/a.cpp)\n"
             "mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)"))
 
     def test_test_added_inside_an_if_in_the_root_passes(self) -> None:
@@ -256,8 +256,8 @@ class TestApplicationTargets(ValidatorTestCase):
 
     def test_application_and_tool_targets_are_collected(self) -> None:
         src = self.root / "src"
-        (src / "applications" / "app").mkdir(parents=True)
-        (src / "applications" / "app" / "CMakeLists.txt").write_text(
+        (src / "apps" / "app").mkdir(parents=True)
+        (src / "apps" / "app" / "CMakeLists.txt").write_text(
             "project(mne_app)\nqt_add_executable(${PROJECT_NAME} main.cpp)\nadd_library(app_core STATIC a.cpp)\n",
             encoding="utf-8")
         (src / "tools" / "t").mkdir(parents=True)

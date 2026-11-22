@@ -9,7 +9,7 @@ MNE Scan's functionality is extended through plugins. Each plugin is a shared li
 
 ## Plugin Categories
 
-MNE Scan distinguishes between three plugin categories, each with a corresponding abstract base class in `src/applications/mne_scan/libs/scShared/`:
+MNE Scan distinguishes between three plugin categories, each with a corresponding abstract base class in `src/apps/mne_scan/libs/scShared/`:
 
 | Category | Base Class | Purpose | Examples |
 |----------|-----------|---------|----------|
@@ -23,13 +23,13 @@ Your new plugin must inherit from one of these base classes depending on its rol
 
 The easiest way to create a new plugin is to start from the **DummyToolbox** template:
 
-1. Copy the `dummytoolbox` folder under `src/applications/mne_scan/plugins/dummytoolbox`.
+1. Copy the `dummytoolbox` folder under `src/apps/mne_scan/plugins/dummytoolbox`.
 2. Rename the folder and all files to match your new plugin name.
 3. In all source files, replace `DummyToolbox` / `dummytoolbox` with your plugin name.
 4. Update the `CMakeLists.txt` inside your new plugin folder with the correct target name and source files.
-5. Register your plugin in the parent `src/applications/mne_scan/plugins/CMakeLists.txt` by adding an `add_subdirectory()` call for your plugin folder.
+5. Register your plugin in the parent `src/apps/mne_scan/plugins/CMakeLists.txt` by adding an `add_subdirectory()` call for your plugin folder.
 
-The DummyToolbox source can also be viewed on [GitHub](https://github.com/mne-tools/mne-cpp/tree/main/src/applications/mne_scan/plugins/dummytoolbox).
+The DummyToolbox source can also be viewed on [GitHub](https://github.com/mne-tools/mne-cpp/tree/main/src/apps/mne_scan/plugins/dummytoolbox).
 
 ## Plugin Structure
 
@@ -145,7 +145,7 @@ install(TARGETS ${TARGET_NAME}
 
 ## Static Building
 
-When building statically, MNE Scan needs to be told about plugins at compile time. Add a `Q_IMPORT_PLUGIN` macro in `src/applications/mne_scan/mne_scan/main.cpp` under the `#ifdef STATICBUILD` guard:
+When building statically, MNE Scan needs to be told about plugins at compile time. Add a `Q_IMPORT_PLUGIN` macro in `src/apps/mne_scan/mne_scan/main.cpp` under the `#ifdef STATICBUILD` guard:
 
 ```cpp
 #ifdef STATICBUILD
@@ -170,7 +170,7 @@ The compiled plugin library will be placed in the output directory where MNE Sca
 
 Before submitting your plugin as a pull request, verify:
 
-- [ ] Plugin folder added under `src/applications/mne_scan/plugins/`
+- [ ] Plugin folder added under `src/apps/mne_scan/plugins/`
 - [ ] `add_subdirectory()` added to the parent `CMakeLists.txt`
 - [ ] Plugin has a `*_global.h` file with export macros
 - [ ] All virtual functions from the base class are implemented

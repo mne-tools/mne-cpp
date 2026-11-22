@@ -12,7 +12,7 @@
 """Maintainability baseline for gate G5.
 
 Counts lexical debt candidates in maintained C++ under ``src/libs/mne``,
-``src/applications`` and ``src/tools``:
+``src/apps`` and ``src/tools``:
 
 * ``null_macro``        uses of ``NULL`` or ``Q_NULLPTR`` instead of ``nullptr``
 * ``typedef_struct``    C-style ``typedef struct`` / ``typedef enum`` / ``typedef union``
@@ -228,7 +228,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "Counts are lexical candidates with comments and string literals removed; they rank work, they do not prove defects.",
         "",
         f"Scanned {report['scanned_files']:,} files / {report['scanned_lines']:,} lines in "
-        "`src/libs/mne`, `src/applications`, `src/tools`. Compiler warnings: 0 (the build is `-Werror`).",
+        "`src/libs/mne`, `src/apps`, `src/tools`. Compiler warnings: 0 (the build is `-Werror`).",
         "",
         "| Metric | Total | Files | libraries | applications | tools |",
         "|---|---:|---:|---:|---:|---:|",
@@ -236,8 +236,8 @@ def render_markdown(report: dict[str, Any]) -> str:
     for name, metric in report["metrics"].items():
         scope = metric["by_scope"]
         lines.append(
-            f"| `{name}` | {metric['total']:,} | {metric['files']:,} | {scope.get('libraries', 0):,} "
-            f"| {scope.get('applications', 0):,} | {scope.get('tools', 0):,} |"
+            f"| `{name}` | {metric['total']:,} | {metric['files']:,} | {scope.get('libs', 0):,} "
+            f"| {scope.get('apps', 0):,} | {scope.get('tools', 0):,} |"
         )
     for name, metric in report["metrics"].items():
         if not metric["top"]:

@@ -35,7 +35,7 @@ EventsFile="${SampleDir}/sample_audvis_raw-eve.fif"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 OUT_DIR="$SCRIPT_DIR/../../../../out"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/../../../external/external_deps.env"
+source "$SCRIPT_DIR/../../../3rdparty/external_deps.env"
 
 BuildRoot=""
 BuildPath=""
@@ -86,7 +86,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         export QT_PLUGIN_PATH="$QT_BASE/plugins"
     fi
 
-    ORT_LIB="$SCRIPT_DIR/../../../../src/external/onnxruntime/lib"
+    ORT_LIB="$SCRIPT_DIR/../../../../src/3rdparty/onnxruntime/lib"
     EXTRA_LIB=""
     [ -d "$ORT_LIB" ] && EXTRA_LIB=":$ORT_LIB"
 
@@ -102,7 +102,7 @@ else
         export QT_PLUGIN_PATH="$QT_BASE/plugins"
     fi
 
-    ORT_LIB="$SCRIPT_DIR/../../../../src/external/onnxruntime/lib"
+    ORT_LIB="$SCRIPT_DIR/../../../../src/3rdparty/onnxruntime/lib"
     EXTRA_LIB=""
     [ -d "$ORT_LIB" ] && EXTRA_LIB=":$ORT_LIB"
 

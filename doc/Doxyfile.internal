@@ -12,7 +12,7 @@
 #     scripts/doxy2mdx/doxy2mdx.py to publish the website API reference.
 #
 #   * This file additionally covers the application & plugin code under
-#     ../src/applications, turns on INTERNAL_DOCS so ``@internal`` sections
+#     ../src/apps, turns on INTERNAL_DOCS so ``@internal`` sections
 #     are kept, and emits browsable HTML into a separate directory. Its
 #     output is NEVER fed to doxy2mdx and therefore NEVER reaches the
 #     published API index — it exists purely so maintainers can navigate
@@ -32,12 +32,12 @@ PROJECT_BRIEF          = "Application & plugin internals (not the public API)"
 # ---------------------------------------------------------------------------
 # Input — libraries AND applications/plugins (the maintainer surface)
 # ---------------------------------------------------------------------------
-INPUT                  = ../src/libs ../src/applications
+INPUT                  = ../src/libs ../src/apps
 RECURSIVE              = YES
 FILE_PATTERNS          = *.h *.hpp *.cpp
 EXCLUDE_PATTERNS       = */moc_* */ui_* */qrc_* */*_autogen/*
 STRIP_FROM_PATH        = ../src/
-EXAMPLE_PATH           = ../src/applications ../doc/website/docs/snippets
+EXAMPLE_PATH           = ../src/apps ../doc/website/docs/snippets
 EXAMPLE_RECURSIVE      = YES
 
 # ---------------------------------------------------------------------------

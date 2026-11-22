@@ -47,7 +47,7 @@ FileLoader(int iOpenMode,
 
 ## Formatting
 
-All C/C++ sources under `src/` (except `src/external/`) are formatted with
+All C/C++ sources under `src/` (except `src/3rdparty/`) are formatted with
 **clang-format 21.1.8** using the repository's
 [`.clang-format`](https://github.com/mne-tools/mne-cpp/blob/main/.clang-format).
 CI fails if any file deviates, so format before you push:
@@ -116,7 +116,7 @@ the **application/plugin code** that consumes it:
   full Doxygen comments and published to the website [API reference](/docs/api/).
   The public [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile)
   extracts XML from these headers only.
-- **Applications & plugins (`src/applications/`)** are *not* part of the public
+- **Applications & plugins (`src/apps/`)** are *not* part of the public
   API and are intentionally excluded from the published reference. They still
   deserve maintainer-level documentation: add a brief `@brief` file/class header
   describing the component's responsibility, plus inline comments for non-obvious
@@ -144,7 +144,7 @@ maintainer doc set (HTML, never published):
 ```
 
 This uses [`doc/Doxyfile.internal`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile.internal),
-which adds `src/applications` to the input and enables `INTERNAL_DOCS`, keeping
+which adds `src/apps` to the input and enables `INTERNAL_DOCS`, keeping
 the published API surface limited to the libraries.
 
 ## MNE-CPP Class Templates

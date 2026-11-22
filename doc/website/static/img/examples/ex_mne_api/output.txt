@@ -242,11 +242,11 @@ Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_au
 	302 MEG and 0 EEG-like channels remain in the whitened data
 
   ok   MNECovMatrix: projected noise covariance whitens like mne's pseudo-inverse
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-Read 5 compensation data sets from src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Read 5 compensation data sets from src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
 
 Compensation in file : third order gradiometer
 
@@ -270,15 +270,15 @@ No compensation was requested.
 
 A new compensation value (uncompensated) was assigned to 7 MEG channels.
 
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-No SSS data in src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+No SSS data in src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
 
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
-0 bad channels read from src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+0 bad channels read from src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
 
 Initial dc offsets determined
 
-Raw data file src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif:
+Raw data file src/examples/ex_mne_api/../../tests/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif:
 
 	nchan  = 36
 
@@ -353,7 +353,7 @@ EEG053
 	Left Auditory : using baseline  -199.8 ...     0.0 ms
 
   ok   MNEMeasData/MNEMeasDataSet: evoked set, baseline and interpolated values match mne
-Creating tag directory for src/examples/ex_mne_api/../../testframes/test_fiff_raw_formats_python/data/raw_sss_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../tests/test_fiff_raw_formats_python/data/raw_sss_raw.fif...
   ok   MNESssData: Maxwell filter parameters like info['proc_history'] of the fixture
 Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-Tejtev/audvis-eve.fif...
 Binary event file /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-Tejtev/audvis-eve.fif read
@@ -396,24 +396,24 @@ MNEDerivSet::match - 1 of 2 derivations were matched.
   ok   MNELayout/MNELayoutPort: Vectorview layout like mne.channels.read_layout, zoom and channel matching
 Reading surface...
 
-	src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg is a triangle file (nvert = 162 ntri = 320)
+	src/examples/ex_mne_api/../../tests/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg is a triangle file (nvert = 162 ntri = 320)
 
 	
 
 	computing normals
 
-	Read a surface with 162 vertices from src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg
+	Read a surface with 162 vertices from src/examples/ex_mne_api/../../tests/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg
 [done]
 
 Reading surface...
 
-	src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg is a triangle file (nvert = 642 ntri = 1280)
+	src/examples/ex_mne_api/../../tests/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg is a triangle file (nvert = 642 ntri = 1280)
 
 	
 
 	computing normals
 
-	Read a surface with 642 vertices from src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg
+	Read a surface with 642 vertices from src/examples/ex_mne_api/../../tests/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg
 [done]
 
 Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-Tejtev/small-large-morph.fif...

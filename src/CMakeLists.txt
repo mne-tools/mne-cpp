@@ -111,14 +111,14 @@ if(MNE_LOG_MODE STREQUAL "FORMATTED")
 endif()
 message(STATUS "[MNE-CPP] Log mode: ${MNE_LOG_MODE}")
 
-set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw")
-set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw")
+set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/3rdparty/fftw")
+set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/3rdparty/fftw")
 if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
 # NOTE: WITH_CODE_COV coverage flags are applied in src/libs/,
-# src/applications/, and src/tools/ CMakeLists.txt so that gcov data
+# src/apps/, and src/tools/ CMakeLists.txt so that gcov data
 # is generated for libraries, applications, and CLI tools.
 
 if(MSVC)
@@ -299,7 +299,7 @@ if(NOT MNE_BUILD_QT)
                  "(no disp, disp3D, applications, CLI tools, plugins or QtTest tests)")
 endif()
 
-# CMAKE_INSTALL_RPATH_USE_LINK_PATH skips directories inside the project, such as the Qt init.sh downloads into src/external
+# CMAKE_INSTALL_RPATH_USE_LINK_PATH skips directories inside the project, such as the Qt init.sh downloads into src/3rdparty
 set(MNE_QT_RPATH "")
 if(MNE_BUILD_QT AND NOT WIN32 AND NOT WASM)
   get_filename_component(_mne_qt_lib_dir "${QT_DIR}/../.." ABSOLUTE)
@@ -343,13 +343,13 @@ endif()
 ## Eigen dependency
 
 set(MNE_CPP_EIGEN_VERSION "5.0.1" CACHE STRING "Preferred Eigen package version for MNE-CPP.")
-set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/eigen"
+set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/3rdparty/eigen"
     CACHE PATH "Location of a prebuilt Eigen package prepared by the init scripts or CI helpers.")
 
 find_package(Eigen3 ${MNE_CPP_EIGEN_VERSION} QUIET NO_MODULE
     HINTS
         "${MNE_CPP_PREBUILT_EIGEN_DIR}"
-        "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}-install")
+        "${PROJECT_SOURCE_DIR}/3rdparty/eigen-${MNE_CPP_EIGEN_VERSION}-install")
 
 if(TARGET Eigen3::Eigen)
     if(DEFINED Eigen3_DIR AND NOT Eigen3_DIR STREQUAL "")
@@ -371,7 +371,7 @@ endif()
 
 if(USE_ONNXRUNTIME)
     set(MNE_CPP_ONNXRUNTIME_VERSION "1.31.0" CACHE STRING "Preferred ONNX Runtime version for MNE-CPP.")
-    set(MNE_CPP_PREBUILT_ONNXRUNTIME_DIR "${PROJECT_SOURCE_DIR}/external/onnxruntime"
+    set(MNE_CPP_PREBUILT_ONNXRUNTIME_DIR "${PROJECT_SOURCE_DIR}/3rdparty/onnxruntime"
         CACHE PATH "Location of the extracted ONNX Runtime package.")
 
     # Propagate as CMake variable so FindOnnxRuntime.cmake can pick it up
@@ -416,7 +416,7 @@ if(USE_ONNXRUNTIME)
     else()
         message(WARNING
             "[MNE-CPP] USE_ONNXRUNTIME=ON but ONNX Runtime was not found.\n"
-            "Run ./src/external/init.sh --onnxruntime-version ${MNE_CPP_ONNXRUNTIME_VERSION}\n"
+            "Run ./src/3rdparty/init.sh --onnxruntime-version ${MNE_CPP_ONNXRUNTIME_VERSION}\n"
             "or download the ONNX Runtime release into ${MNE_CPP_PREBUILT_ONNXRUNTIME_DIR}.\n"
             "The ml library will be built without ONNX Runtime support."
         )
@@ -430,7 +430,7 @@ add_subdirectory(libs)
 
 # The applications (with their plugins) and the CLI tools are Qt programs.
 if(MNE_BUILD_QT AND BUILD_APPLICATIONS)
-  add_subdirectory(applications)
+  add_subdirectory(apps)
 endif()
 
 if(MNE_BUILD_QT AND BUILD_APPLICATIONS AND BUILD_TOOLS)
@@ -443,7 +443,7 @@ endif()
 
 
 if(BUILD_TESTS)
-  add_subdirectory(testframes)
+  add_subdirectory(tests)
 endif()
 
 if(WIN32)

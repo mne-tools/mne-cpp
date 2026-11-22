@@ -26,7 +26,7 @@ audit = importlib.util.module_from_spec(_spec)
 sys.modules["audit_qt_modules"] = audit
 _spec.loader.exec_module(audit)
 
-SCOPES = {"disp": "src/libs/mne/disp", "applications": "src/applications"}
+SCOPES = {"disp": "src/libs/mne/disp", "applications": "src/apps"}
 
 
 def make_repo(root: Path, files: dict[str, str]) -> None:
@@ -113,30 +113,30 @@ class ScanTests(unittest.TestCase):
 
     def test_cmake_requested_vs_used_per_target(self) -> None:
         report = self.scan({
-            "src/applications/viewer/CMakeLists.txt":
+            "src/apps/viewer/CMakeLists.txt":
                 "set(QT_REQUIRED_COMPONENTS Core Widgets Svg)  # Svg was for export\n"
                 "if(NOT WASM)\n  list(APPEND QT_REQUIRED_COMPONENTS PrintSupport)\nendif()\n"
                 "find_package(Qt6 REQUIRED COMPONENTS ShaderTools)\n"
                 "qt_add_executable(viewer main.cpp)\nqt_add_shaders(viewer \"s\" FILES a.frag)\n"
                 "target_link_libraries(viewer PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)\n",
-            "src/applications/viewer/main.cpp":
+            "src/apps/viewer/main.cpp":
                 "#include <QApplication>\nint main() { QApplication a; QPainter p; QtConcurrent::run([]{}); }\n",
-            "src/applications/viewer/plugins/net/CMakeLists.txt":
+            "src/apps/viewer/plugins/net/CMakeLists.txt":
                 "find_package(Qt6 REQUIRED COMPONENTS Core Network)\nadd_library(net net.cpp)\n",
-            "src/applications/viewer/plugins/net/net.cpp": "#include <QTcpSocket>\nQTcpSocket s;\n",
+            "src/apps/viewer/plugins/net/net.cpp": "#include <QTcpSocket>\nQTcpSocket s;\n",
         })
-        viewer = report["units"]["src/applications/viewer"]
+        viewer = report["units"]["src/apps/viewer"]
         self.assertEqual(viewer["requested"], ["Core", "PrintSupport", "ShaderTools", "Svg", "Widgets"])
         self.assertEqual(viewer["requested_unused"], ["Core", "PrintSupport", "Svg"])
         self.assertEqual(viewer["build_time_only"], ["ShaderTools"])
         self.assertEqual(viewer["implied"], ["Gui"])
         self.assertEqual(viewer["transitive"], ["Concurrent"])
-        net = report["units"]["src/applications/viewer/plugins/net"]
+        net = report["units"]["src/apps/viewer/plugins/net"]
         self.assertEqual(net["used"], ["Network"])
         self.assertEqual(net["requested_unused"], ["Core"])
         modules = report["scopes"]["applications"]["modules"]
         self.assertEqual(modules["Network"]["verdict"], "own")
-        self.assertEqual(list(modules["Network"]["files"]), ["src/applications/viewer/plugins/net/net.cpp"])
+        self.assertEqual(list(modules["Network"]["files"]), ["src/apps/viewer/plugins/net/net.cpp"])
         self.assertIn("## Requested but unused", audit.render_markdown(report))
 
     def test_gui_private_findings(self) -> None:
@@ -151,26 +151,26 @@ class ScanTests(unittest.TestCase):
 
 class PolicyTests(unittest.TestCase):
     REPORT = {"units": {
-        "src/applications/viewer": {"requested": ["Core", "Widgets"], "used": ["Core", "Gui", "Svg", "Widgets"],
+        "src/apps/viewer": {"requested": ["Core", "Widgets"], "used": ["Core", "Gui", "Svg", "Widgets"],
                                     "requested_unused": []},
-        "src/applications/tool": {"requested": ["Core", "PrintSupport"], "used": ["Core"],
+        "src/apps/tool": {"requested": ["Core", "PrintSupport"], "used": ["Core"],
                                   "requested_unused": ["PrintSupport"]},
     }}
 
     def test_modules_outside_the_allowlist_and_unused_requests_fail(self) -> None:
         policy = {"default": ["Core", "Gui", "Widgets"],
-                  "targets": {"src/applications/tool": ["Core", "PrintSupport"], "src/applications/gone": ["Core"]}}
+                  "targets": {"src/apps/tool": ["Core", "PrintSupport"], "src/apps/gone": ["Core"]}}
         self.assertEqual(audit.check_policy(self.REPORT, policy), [
-            "src/applications/tool: requests Qt PrintSupport but does not use it",
-            "src/applications/viewer: Qt Svg is not in its allowlist (Core Gui Widgets)",
-            "src/applications/gone: listed in the allowlist but no such target",
+            "src/apps/tool: requests Qt PrintSupport but does not use it",
+            "src/apps/viewer: Qt Svg is not in its allowlist (Core Gui Widgets)",
+            "src/apps/gone: listed in the allowlist but no such target",
         ])
 
     def test_allowed_modules_pass(self) -> None:
-        policy = {"default": ["Core"], "targets": {"src/applications/viewer": ["Core", "Gui", "Svg", "Widgets"],
-                                                   "src/applications/tool": ["Core", "PrintSupport"]}}
+        policy = {"default": ["Core"], "targets": {"src/apps/viewer": ["Core", "Gui", "Svg", "Widgets"],
+                                                   "src/apps/tool": ["Core", "PrintSupport"]}}
         report = {"units": dict(self.REPORT["units"])}
-        report["units"]["src/applications/tool"] = dict(report["units"]["src/applications/tool"], requested_unused=[])
+        report["units"]["src/apps/tool"] = dict(report["units"]["src/apps/tool"], requested_unused=[])
         self.assertEqual(audit.check_policy(report, policy), [])
 
     def test_modules_found_for_the_whole_tree_must_be_requested(self) -> None:
@@ -179,7 +179,7 @@ class PolicyTests(unittest.TestCase):
             make_repo(root, {
                 "src/CMakeLists.txt": "set(_MNE_QT_COMPONENTS Core Gui Xml)\nif(NOT WASM)\n"
                                       "  list(APPEND _MNE_QT_COMPONENTS PrintSupport)\nendif()\n",
-                "src/applications/a/CMakeLists.txt": "set(QT_REQUIRED_COMPONENTS Core Gui)\n",
+                "src/apps/a/CMakeLists.txt": "set(QT_REQUIRED_COMPONENTS Core Gui)\n",
             })
             self.assertEqual(audit.unrequested_prefetched(root), ["PrintSupport", "Xml"])
 

@@ -216,7 +216,7 @@ download_release_asset "${ASSET_NAME}" "${DOWNLOAD_DIR}"
 for guard_root in "${OUTPUT_DIR}" "${OUTPUT_DIR}/.." "${OUTPUT_DIR}/../.."; do
     if compgen -G "${guard_root}/MaintenanceTool*" > /dev/null 2>&1; then
         echo "Refusing to overwrite '${OUTPUT_DIR}': it lives inside a user-managed Qt install (MaintenanceTool found near '${guard_root}')." >&2
-        echo "Pass an --output-dir under the repository (e.g. src/external/qt/<linkage>)." >&2
+        echo "Pass an --output-dir under the repository (e.g. src/3rdparty/qt/<linkage>)." >&2
         exit 1
     fi
 done

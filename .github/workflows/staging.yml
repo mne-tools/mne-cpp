@@ -105,7 +105,7 @@ jobs:
                base=$(gh api "repos/$GH_REPO/git/tags/$base" --jq .object.sha 2>/dev/null || echo "$base") &&
                files=$(gh api "repos/$GH_REPO/compare/$base...${{ github.sha }}" \
                          --jq 'if (.files | length) < 300 then .files[].filename else "too-many" end'); then
-              if ! printf '%s\n' "$files" | grep -vE '^(src/testframes|doc)/' |
+              if ! printf '%s\n' "$files" | grep -vE '^(src/tests|doc)/' |
                    grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy|wasm)/|^\.github/workflows/(staging\.yml|release-[^/]*|_reusable-release[^/]*)$|^too-many$'; then
                 echo "No build or packaging change since the last dev build ($base)"
                 handoff=false
@@ -353,7 +353,7 @@ jobs:
       run: python3 scripts/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
     # The tree was reformatted once with the pinned clang-format, so
-    # every C/C++ file under src/ (minus src/external) must stay formatted.
+    # every C/C++ file under src/ (minus src/3rdparty) must stay formatted.
     - name: Check C/C++ formatting
       run: |
         python3 -m pip install --quiet clang-format==21.1.8

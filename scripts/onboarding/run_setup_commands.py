@@ -28,7 +28,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COMMANDS_JSON = Path(__file__).with_name("setup_commands.json")
-DEPENDENCY_PINS = REPO_ROOT / "src" / "external" / "external_deps.env"
+DEPENDENCY_PINS = REPO_ROOT / "src" / "3rdparty" / "external_deps.env"
 # Documented blocks a contributor on each OS follows, in order
 SECTIONS = {"linux": ["linux", "unix"], "macos": ["unix"], "windows": ["windows"]}
 _MARK = "__ONBOARDING_STEP__"

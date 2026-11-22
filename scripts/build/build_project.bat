@@ -98,7 +98,7 @@ SET BuildFolder=%BaseFolder%\build\%BuildName%
 SET OutFolder=%BaseFolder%\out\%BuildName%
 
 IF [%QtCustomPath%]==[] (
-  SET "QtDefaultPath=%BaseFolder%\src\external\qt\%QtLinkage%"
+  SET "QtDefaultPath=%BaseFolder%\src\3rdparty\qt\%QtLinkage%"
   IF EXIST "!QtDefaultPath!\bin" (
     SET "QtCustomPath=!QtDefaultPath!"
   )
@@ -216,8 +216,8 @@ exit /B 0
   ECHO [qt=\path\]- Use specified qt installation to build the project. This \path
   ECHO              must point to the directory containing the bin and lib folders
   ECHO              for the desired Qt version. ex. \some\path\to\Qt\5.15.2\msvc2019_64\
-  ECHO              If omitted, the script auto-detects src\external\qt\dynamic or
-  ECHO              src\external\qt\static prepared by init.bat.
+  ECHO              If omitted, the script auto-detects src\3rdparty\qt\dynamic or
+  ECHO              src\3rdparty\qt\static prepared by init.bat.
   ECHO [--]       - Mark beginning of extra-arguments section. Any argument
   ECHO              following the double dash will be passed on to cmake 
   ECHO              directly without it being parsed.      

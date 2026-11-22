@@ -17,5 +17,5 @@ add_subdirectory(src)
 add_subdirectory(doc)
 
 if(BUILD_TESTS AND TARGET mne_doc_shots)
-	add_subdirectory(src/testframes/test_doc_shots)
+	add_subdirectory(src/tests/test_doc_shots)
 endif()

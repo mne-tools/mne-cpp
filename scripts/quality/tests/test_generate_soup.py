@@ -32,15 +32,15 @@ class TestGenerateSoup(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
-        (self.root / "src" / "external").mkdir(parents=True)
-        (self.root / "src" / "external" / "external_deps.env").write_text("# pins\nLIB_VERSION=2.5.0\n", encoding="utf-8")
+        (self.root / "src" / "3rdparty").mkdir(parents=True)
+        (self.root / "src" / "3rdparty" / "external_deps.env").write_text("# pins\nLIB_VERSION=2.5.0\n", encoding="utf-8")
         (self.root / "lib.h").write_text("#define LIB_MAJOR 3\n#define LIB_MINOR 7\n", encoding="utf-8")
 
     def tearDown(self):
         self.directory.cleanup()
 
     def test_versions_come_from_their_pins(self):
-        env = soup.read_env(self.root / "src" / "external" / "external_deps.env")
+        env = soup.read_env(self.root / "src" / "3rdparty" / "external_deps.env")
         self.assertEqual(soup.pinned_version({"env": "LIB_VERSION"}, self.root, env), "2.5.0")
         self.assertEqual(soup.pinned_version({"header": "lib.h", "regex": r"#define LIB_(?:MAJOR|MINOR) (\d+)", "join": "."},
                                              self.root, env), "3.7")

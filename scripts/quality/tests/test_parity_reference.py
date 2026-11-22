@@ -41,7 +41,7 @@ check_fixtures = _load("check_fixtures")
 
 # Generators that do not produce MNE-Python reference fixtures, with the reason
 NOT_MNE_PYTHON = {
-    "src/testframes/test_inv_cmne/data/make_cmne_reference.py": "reference output of the cmne package, not MNE-Python",
+    "src/tests/test_inv_cmne/data/make_cmne_reference.py": "reference output of the cmne package, not MNE-Python",
 }
 
 
@@ -73,7 +73,7 @@ class ReferenceLockTests(unittest.TestCase):
         self.assertIn(f"python-version: '{lock['python']}'", workflow)
 
     def test_every_mne_python_fixture_generator_checks_the_reference(self) -> None:
-        files = subprocess.run(["git", "ls-files", "src/testframes"], cwd=_REPO_ROOT, check=True,
+        files = subprocess.run(["git", "ls-files", "src/tests"], cwd=_REPO_ROOT, check=True,
                                capture_output=True, text=True).stdout.split()
         generators = [f for f in files if Path(f).name.startswith("make_") and f.endswith(".py")]
         self.assertTrue(generators)
@@ -86,11 +86,11 @@ class FixtureManifestTests(unittest.TestCase):
     def setUp(self) -> None:
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root)
-        data = self.root / "src" / "testframes" / "test_demo" / "data"
+        data = self.root / "src" / "tests" / "test_demo" / "data"
         data.mkdir(parents=True)
         (data / "a.fif").write_bytes(b"\x00\x01")
         (data.parent / "make_a.py").write_text("require_reference()\n", encoding="utf-8")
-        self.files = ["src/testframes/test_demo/data/a.fif", "src/testframes/test_demo/make_a.py"]
+        self.files = ["src/tests/test_demo/data/a.fif", "src/tests/test_demo/make_a.py"]
         self.manifest = check_fixtures.build_manifest(self.root, self.files)
 
     def problems(self, files: list[str] | None = None) -> list[str]:
@@ -99,17 +99,17 @@ class FixtureManifestTests(unittest.TestCase):
     def test_manifest_records_generator_and_checksum(self) -> None:
         """The manifest records each fixture's generator and checksum."""
         entry = self.manifest["tests"]["test_demo"]
-        self.assertEqual(entry["generators"], ["src/testframes/test_demo/make_a.py"])
-        self.assertEqual(len(entry["fixtures"]["src/testframes/test_demo/data/a.fif"]), 64)
+        self.assertEqual(entry["generators"], ["src/tests/test_demo/make_a.py"])
+        self.assertEqual(len(entry["fixtures"]["src/tests/test_demo/data/a.fif"]), 64)
         self.assertEqual(self.problems(), [])
 
     def test_corrupted_orphaned_and_missing_fixtures_fail(self) -> None:
         """A corrupted or stale fixture fails and names its generator."""
         (self.root / self.files[0]).write_bytes(b"\x00\x02")
-        self.assertIn("regenerate with src/testframes/test_demo/make_a.py", self.problems()[0])
+        self.assertIn("regenerate with src/tests/test_demo/make_a.py", self.problems()[0])
         (self.root / self.files[0]).write_bytes(b"\x00\x01")
-        (self.root / "src/testframes/test_demo/data/b.fif").write_bytes(b"x")
-        self.assertIn("not in the manifest", self.problems(self.files + ["src/testframes/test_demo/data/b.fif"])[0])
+        (self.root / "src/tests/test_demo/data/b.fif").write_bytes(b"x")
+        self.assertIn("not in the manifest", self.problems(self.files + ["src/tests/test_demo/data/b.fif"])[0])
         self.assertIn("not committed", self.problems([self.files[1]])[0])
 
     def test_committed_manifest_is_current(self) -> None:

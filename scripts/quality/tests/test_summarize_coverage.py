@@ -70,12 +70,12 @@ class TestLcovParsing(CoverageTestCase):
 
     def test_paths_are_repository_relative(self) -> None:
         files = self.parse(
-            _record("C:\\work\\src\\applications\\mne_scan\\main.cpp", {1: 0})
+            _record("C:\\work\\src\\apps\\mne_scan\\main.cpp", {1: 0})
             + _record("/home/runner/work/mne-cpp/mne-cpp/build/src/tools/info/x_autogen/moc_a.cpp", {1: 1})
         )
-        self.assertEqual(["src/applications/mne_scan/main.cpp", "src/tools/info/x_autogen/moc_a.cpp"],
+        self.assertEqual(["src/apps/mne_scan/main.cpp", "src/tools/info/x_autogen/moc_a.cpp"],
                          [item.path for item in files])
-        self.assertEqual("src/applications/mne_scan", files[0].component)
+        self.assertEqual("src/apps/mne_scan", files[0].component)
 
     def test_duplicate_records_are_summed(self) -> None:
         files = self.parse(
@@ -92,7 +92,7 @@ class TestLcovParsing(CoverageTestCase):
 
     def test_out_of_scope_record_fails(self) -> None:
         with self.assertRaisesRegex(ValueError, "outside the measured production scope"):
-            self.parse(_record("/checkout/src/testframes/test_fiff/test.cpp", {1: 1}))
+            self.parse(_record("/checkout/src/tests/test_fiff/test.cpp", {1: 1}))
 
     def test_written_report_round_trips(self) -> None:
         files = self.parse(_record("/x/src/libs/mne/mne/a.cpp", {3: 1, 1: 0}, ("3,0,1,0", "3,0,0,2", "4,1,0,-")))
@@ -233,7 +233,7 @@ class TestRepositoryConfiguration(unittest.TestCase):
         # An uninstrumented copy of a measured source makes its tests count as 0 % covered.
         measured = [_REPO_ROOT / "src" / scope for scope in coverage.SCOPES]
         uninstrumented = []
-        for cmake in sorted((_REPO_ROOT / "src" / "testframes").glob("*/CMakeLists.txt")):
+        for cmake in sorted((_REPO_ROOT / "src" / "tests").glob("*/CMakeLists.txt")):
             text = cmake.read_text(encoding="utf-8")
             variables = {"CMAKE_SOURCE_DIR": str(_REPO_ROOT)}
             variables.update(re.findall(r"set\((\w+)\s+([^\s)]+)\)", text))

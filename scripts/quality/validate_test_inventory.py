@@ -9,7 +9,7 @@
 #
 #
 # @brief    Validate the invariants that keep the test suite honest.
-"""Validate the test inventory under ``src/testframes``.
+"""Validate the test inventory under ``src/tests``.
 
 A test that builds but never runs is worse than a missing test: it looks like
 coverage in the repository and produces none in CI.  That is not hypothetical.
@@ -71,7 +71,7 @@ from typing import Any
 # --------------------------------------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-TESTFRAMES_DIR = REPO_ROOT / "src" / "testframes"
+TESTFRAMES_DIR = REPO_ROOT / "src" / "tests"
 ROOT_TEST_CMAKE = TESTFRAMES_DIR / "CMakeLists.txt"
 API_REGISTRY = REPO_ROOT / "doc" / "api_registry.json"
 POLICY_FILE = Path(__file__).resolve().parent / "test_inventory_policy.json"
@@ -178,7 +178,7 @@ class TestEntry:
 
     @property
     def cmake_path(self) -> str:
-        return f"src/testframes/{self.directory}/CMakeLists.txt"
+        return f"src/tests/{self.directory}/CMakeLists.txt"
 
 
 def _call_arguments(text: str, open_paren: int) -> str:
@@ -251,9 +251,9 @@ def parse_guarded_directories(root_cmake: Path) -> set[str]:
 
 
 def application_targets(src_dir: Path) -> set[str]:
-    """Targets defined under src/applications and src/tools, which a build without them lacks."""
+    """Targets defined under src/apps and src/tools, which a build without them lacks."""
     targets: set[str] = set()
-    for top in ("applications", "tools"):
+    for top in ("apps", "tools"):
         for cmake in sorted((src_dir / top).rglob("CMakeLists.txt")):
             text = strip_cmake_comments(cmake.read_text(encoding="utf-8"))
             project = _PROJECT_RE.search(text)
@@ -413,7 +413,7 @@ def check_registration(
         findings.append(
             error(
                 "TI001",
-                "src/testframes/CMakeLists.txt",
+                "src/tests/CMakeLists.txt",
                 f"add_subdirectory({directory}) names a directory with no CMakeLists.txt.",
             )
         )
@@ -438,7 +438,7 @@ def check_registration(
             error(
                 "TI003",
                 entry.cmake_path,
-                f"'{name}' is not added via add_subdirectory() in src/testframes/CMakeLists.txt. "
+                f"'{name}' is not added via add_subdirectory() in src/tests/CMakeLists.txt. "
                 "Register it, or record a reason under 'unregistered' in the policy file.",
             )
         )
@@ -449,7 +449,7 @@ def check_registration(
                 error(
                     "TI004",
                     display_path(POLICY_FILE),
-                    f"'unregistered' names '{name}', which no longer exists under src/testframes.",
+                    f"'unregistered' names '{name}', which no longer exists under src/tests.",
                 )
             )
 
@@ -535,7 +535,7 @@ def check_application_targets(entries: dict[str, TestEntry], app_targets: set[st
                 error(
                     "TI015",
                     entry.cmake_path,
-                    f"'{name}' uses {', '.join(used)} from src/applications or src/tools, which a build "
+                    f"'{name}' uses {', '.join(used)} from src/apps or src/tools, which a build "
                     "without applications does not have. Name them in mne_add_test(... REQUIRES_TARGETS) "
                     "and return() if(MNE_TEST_SKIPPED) before building, or drop the dependency.",
                 )
@@ -554,7 +554,7 @@ def check_example_application_targets(examples_dir: Path, app_targets: set[str])
                 error(
                     "TI016",
                     display_path(cmake),
-                    f"example '{cmake.parent.name}' uses {', '.join(used)} from src/applications or src/tools, "
+                    f"example '{cmake.parent.name}' uses {', '.join(used)} from src/apps or src/tools, "
                     "which a build without applications does not have; examples may use the libraries only.",
                 )
             )
@@ -571,7 +571,7 @@ def check_output_directory_overrides(entries: dict[str, TestEntry]) -> list[Find
                     "TI011",
                     entry.cmake_path,
                     f"'{name}' sets RUNTIME_OUTPUT_DIRECTORY. Leaf tests must inherit the location "
-                    "set in src/testframes/CMakeLists.txt; overriding it has previously hidden tests "
+                    "set in src/tests/CMakeLists.txt; overriding it has previously hidden tests "
                     "from CI and from the coverage numbers.",
                 )
             )
@@ -614,7 +614,7 @@ def check_names(entries: dict[str, TestEntry]) -> list[Finding]:
                 error(
                     "TI021",
                     entry.cmake_path,
-                    f"test name '{entry.name}' is already used by src/testframes/{previous}.",
+                    f"test name '{entry.name}' is already used by src/tests/{previous}.",
                 )
             )
         else:
@@ -748,9 +748,9 @@ def check_registry_references(entries: dict[str, TestEntry], registry_path: Path
             continue
         entry = entries.get(name)
         if entry is None:
-            detail = "no such directory under src/testframes."
+            detail = "no such directory under src/tests."
         elif not entry.registered:
-            detail = "the directory exists but is not registered in src/testframes/CMakeLists.txt."
+            detail = "the directory exists but is not registered in src/tests/CMakeLists.txt."
         else:
             detail = "the directory is registered but never calls add_test()."
         findings.append(
@@ -802,7 +802,7 @@ def check_quarantine(entries: dict[str, TestEntry], policy: dict[str, Any], toda
 
         if name not in entries:
             findings.append(
-                error("TI073", location, f"{label} names a test that does not exist under src/testframes.")
+                error("TI073", location, f"{label} names a test that does not exist under src/tests.")
             )
 
         try:
@@ -850,7 +850,7 @@ def check_ctest_json(entries: dict[str, TestEntry], ctest_json: Path) -> list[Fi
         findings.append(
             error(
                 "TI081",
-                f"src/testframes/{name}/CMakeLists.txt",
+                f"src/tests/{name}/CMakeLists.txt",
                 f"'{name}' registers a test but does not appear in the configured CTest inventory. "
                 "It is most likely disabled by a condition that no longer holds.",
             )
@@ -862,7 +862,7 @@ def check_ctest_json(entries: dict[str, TestEntry], ctest_json: Path) -> list[Fi
                 "TI082",
                 location,
                 f"CTest knows test '{name}', which the static inventory did not find under "
-                "src/testframes.",
+                "src/tests.",
             )
         )
 
@@ -1008,7 +1008,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--testframes",
         default=str(TESTFRAMES_DIR),
-        help="path to src/testframes (default: %(default)s)",
+        help="path to src/tests (default: %(default)s)",
     )
     parser.add_argument(
         "--policy",

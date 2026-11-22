@@ -11,10 +11,10 @@
 """Qt modules used by the display stack and the applications.
 
 Plans shrinking the Qt dependency to Qt Core + Gui. For each scope (``src/libs/mne/disp``,
-``src/libs/mne/disp3D``, ``src/applications``) and each CMake target inside it, it reports:
+``src/libs/mne/disp3D``, ``src/apps``) and each CMake target inside it, it reports:
 
 * which Qt module every ``#include`` and every Q-identifier in code belongs to (comments and string literals are
-  removed); the class -> module map is built from the Qt headers in ``src/external/qt/dynamic`` (forwarding headers
+  removed); the class -> module map is built from the Qt headers in ``src/3rdparty/qt/dynamic`` (forwarding headers
   such as ``QWidget``, ``Headers/<version>/Qt<X>/private`` for ``<X>Private`` and ``rhi/`` for the semi-public QRhi
   API), with a small built-in map when Qt is missing
 * a verdict and a replacement for every module outside Core/Gui, from the data-driven ``RULES`` table
@@ -44,8 +44,8 @@ from audit_maintainability import strip_comments_and_strings  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY_FILE = Path(__file__).resolve().parent / "qt_usage_policy.json"
-QT_ROOT = REPO_ROOT / "src" / "external" / "qt" / "dynamic"
-SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "applications": "src/applications"}
+QT_ROOT = REPO_ROOT / "src" / "3rdparty" / "qt" / "dynamic"
+SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "applications": "src/apps"}
 EXTENSIONS = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".mm"}
 BASE_MODULES = {"Core", "Gui"}
 
@@ -688,7 +688,7 @@ def unrequested_prefetched(repo_root: Path = REPO_ROOT) -> list[str]:
         prefetched.update(w for w in match.group(1).split() if re.fullmatch(r"[A-Z]\w*", w))
     requested: set[str] = set()
     for cmake in (repo_root / "src").rglob("CMakeLists.txt"):
-        if cmake.parent == repo_root / "src" or "external" in cmake.parts:
+        if cmake.parent == repo_root / "src" or "3rdparty" in cmake.parts:
             continue
         requested.update(cmake_components(cmake.read_text(encoding="utf-8", errors="replace"))["requested"])
     return sorted(prefetched - requested)

@@ -18,7 +18,7 @@ SignPath Foundation requires for each file it signs.
 
   Adds ``mne_version_info.rc.in`` to every executable, shared library and
   module target defined in ``<directory>`` or below. Static libraries carry
-  no resources; targets under ``src/external`` are third-party and skipped.
+  no resources; targets under ``src/3rdparty`` are third-party and skipped.
   No-op outside Windows.
 #]=======================================================================]
 
@@ -47,7 +47,7 @@ function(mne_add_windows_version_info directory version)
     foreach(target IN LISTS targets)
         get_target_property(type ${target} TYPE)
         get_target_property(source_dir ${target} SOURCE_DIR)
-        if(source_dir MATCHES "/src/external(/|$)")
+        if(source_dir MATCHES "/src/3rdparty(/|$)")
             continue()
         endif()
         if(type STREQUAL "EXECUTABLE")

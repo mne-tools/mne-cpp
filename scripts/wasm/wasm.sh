@@ -18,7 +18,7 @@ function cleanAbsPath()
 }
 
 ECHO_FLAG=""
-EMSCRIPTEN_VERSION="$(sed -n 's/^EMSCRIPTEN_VERSION=//p' "$(dirname "$0")/../../src/external/external_deps.env")"
+EMSCRIPTEN_VERSION="$(sed -n 's/^EMSCRIPTEN_VERSION=//p' "$(dirname "$0")/../../src/3rdparty/external_deps.env")"
 SAVE_LOG="true"
 SHOW_HELP="false"
 WARNINGS_AS_ERRORS="OFF"
@@ -71,7 +71,7 @@ if [ ${SHOW_HELP} == "true" ]; then
 	echo ""
 	echo "Options:"
 	echo "    --emsdk, -e  Set what version of emscripten to use."
-	echo "                 Default: EMSCRIPTEN_VERSION from src/external/external_deps.env"
+	echo "                 Default: EMSCRIPTEN_VERSION from src/3rdparty/external_deps.env"
 	echo "                 (${EMSCRIPTEN_VERSION}), matching the default Qt version."
 	echo ""
 	echo "    --qt, -q     Set path to qt installation manually."
@@ -132,14 +132,14 @@ else
 fi
 
 # Locate Eigen package for cross-compilation
-EIGEN_DIR="${PROJECT_BASE_PATH}/src/external/eigen"
+EIGEN_DIR="${PROJECT_BASE_PATH}/src/3rdparty/eigen"
 EIGEN_CMAKE_ARGS=""
 if [ -f "${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake" ]; then
     EIGEN_CMAKE_ARGS="-DEigen3_DIR=${EIGEN_DIR}/share/eigen3/cmake"
 fi
 
 # Locate ONNX Runtime for cross-compilation
-ONNXRUNTIME_DIR="${PROJECT_BASE_PATH}/src/external/onnxruntime"
+ONNXRUNTIME_DIR="${PROJECT_BASE_PATH}/src/3rdparty/onnxruntime"
 ONNXRUNTIME_CMAKE_ARGS=""
 if [ -d "${ONNXRUNTIME_DIR}" ]; then
     ONNXRUNTIME_CMAKE_ARGS="-DUSE_ONNXRUNTIME=ON -DONNXRUNTIME_ROOT_DIR=${ONNXRUNTIME_DIR}"

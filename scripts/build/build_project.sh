@@ -130,8 +130,8 @@ doPrintHelp() {
   echo "[qt=<path>]- Use specified qt installation to build the project. This path"
   echo "             must point to the directory containing the bin and lib folders"
   echo "             for the desired Qt version. ex. /some/path/to/Qt/5.15.2/gcc_64/"
-  echo "             If omitted, the script auto-detects src/external/qt/dynamic or"
-  echo "             src/external/qt/static prepared by ./init.sh."
+  echo "             If omitted, the script auto-detects src/3rdparty/qt/dynamic or"
+  echo "             src/3rdparty/qt/static prepared by ./init.sh."
   echo "[--]       - mark beginning of extra-arguments section. any argument"
   echo "             following the double dash will be passed on to cmake"
   echo "             directly without it being parsed."
@@ -189,7 +189,7 @@ BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
 
 if [ -z "${QtCustomPath}" ]; then
-  QtDefaultPath="${BaseFolder}/src/external/qt/${QtLinkage}"
+  QtDefaultPath="${BaseFolder}/src/3rdparty/qt/${QtLinkage}"
   if [ -d "${QtDefaultPath}/bin" ]; then
     QtCustomPath="${QtDefaultPath}"
   fi

@@ -230,7 +230,7 @@ if [ "$WITH_COVERAGE" = "true" ]; then
     echo "  Using fastcov …"
     fastcov --process-gcno --branch-coverage -d "$BUILD_DIR" -o "${BUILD_DIR}/coverage.json"
     fastcov -C "${BUILD_DIR}/coverage.json" --lcov -o "${BUILD_DIR}/coverage_raw.info" \
-      --include src/libs/ src/applications/ src/tools/ \
+      --include src/libs/ src/apps/ src/tools/ \
       --exclude /usr Qt eigen
   elif command -v lcov &>/dev/null; then
     COVERAGE_TOOL="lcov"
@@ -243,7 +243,7 @@ if [ "$WITH_COVERAGE" = "true" ]; then
       --add-tracefile "${BUILD_DIR}/coverage_run.info" --rc lcov_branch_coverage=1 \
       --output-file "${BUILD_DIR}/coverage.info" --quiet
     lcov --extract "${BUILD_DIR}/coverage.info" \
-      '*/src/libs/mne/*' '*/src/applications/*' '*/src/tools/*' --rc lcov_branch_coverage=1 \
+      '*/src/libs/mne/*' '*/src/apps/*' '*/src/tools/*' --rc lcov_branch_coverage=1 \
       --output-file "${BUILD_DIR}/coverage_raw.info" --quiet
   fi
 

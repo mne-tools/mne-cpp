@@ -22,7 +22,7 @@
  * the socket in a non-blocking pass and @ref mne::stream_inlet::pull_chunk "pull_chunk" returns
  * every fully-received multichannel sample in one call, which is the
  * pattern that real-time acquisition pipelines in mne-cpp (sensor
- * plug-ins under @c applications/mne_scan_plugins) consume most
+ * plug-ins under @c src/apps/mne_scan/plugins) consume most
  * efficiently. The templated @ref mne::stream_inlet::pull_chunk "pull_chunk" mirrors liblsl's; samples
  * are decoded as double, which holds every float32, double64, int32, int16 and int8 value exactly, so
  * @ref mne::stream_inlet::pull_chunk_double "pull_chunk_double" delivers the native values without loss

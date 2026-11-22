@@ -26,12 +26,12 @@ All data models inherit from `AbstractModel`, which itself extends `QAbstractIte
 
 ## Subclassing AbstractModel
 
-`AbstractModel` is located at `applications/mne_analyze/libs/anShared/Model/abstractmodel.h`. Since it extends `QAbstractItemModel`, you must implement all pure virtual functions from both classes.
+`AbstractModel` is located at `src/apps/mne_analyze/libs/anShared/Model/abstractmodel.h`. Since it extends `QAbstractItemModel`, you must implement all pure virtual functions from both classes.
 
 ### Pure Virtual Functions
 
 #### `getType()`
-Returns the type identifier for your model. Add a new entry to the `MODEL_TYPE` enum in `applications/mne_analyze/libs/anShared/Utils/types.h`:
+Returns the type identifier for your model. Add a new entry to the `MODEL_TYPE` enum in `src/apps/mne_analyze/libs/anShared/Utils/types.h`:
 
 ```cpp
 enum MODEL_TYPE {

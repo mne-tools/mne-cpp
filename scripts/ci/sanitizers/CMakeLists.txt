@@ -4,8 +4,8 @@
 
 # Builds mne_acq, its FIFF bridge mne_acq_fiff (with the FIFF and BIDS libraries it needs), the device sources
 # mne_acq_devices (with mne_com) and every
-# src/testframes/test_acq_* test with one sanitizer set, without the rest of MNE-CPP. Eigen is taken from
-# src/external/eigen. Usage: cmake -S scripts/ci/sanitizers -B build-tsan -DMNE_SANITIZE=thread
+# src/tests/test_acq_* test with one sanitizer set, without the rest of MNE-CPP. Eigen is taken from
+# src/3rdparty/eigen. Usage: cmake -S scripts/ci/sanitizers -B build-tsan -DMNE_SANITIZE=thread
 cmake_minimum_required(VERSION 3.21)
 project(mne_acq_sanitizers LANGUAGES CXX)
 
@@ -22,14 +22,14 @@ add_link_options(-fsanitize=${MNE_SANITIZE})
 find_package(Qt6 REQUIRED COMPONENTS Core Test)
 
 get_filename_component(MNE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../.." ABSOLUTE)
-find_package(Eigen3 REQUIRED NO_MODULE PATHS "${MNE_ROOT}/src/external/eigen")
+find_package(Eigen3 REQUIRED NO_MODULE PATHS "${MNE_ROOT}/src/3rdparty/eigen")
 add_subdirectory("${MNE_ROOT}/src/libs/mne/acq" acq)
 foreach(_lib base math fiff bids acq/fiff lsl acq/lsl com acq/devices)
     add_subdirectory("${MNE_ROOT}/src/libs/mne/${_lib}" "lib_${_lib}")
 endforeach()
 
 enable_testing()
-file(GLOB _acq_tests LIST_DIRECTORIES true "${MNE_ROOT}/src/testframes/test_acq_*")
+file(GLOB _acq_tests LIST_DIRECTORIES true "${MNE_ROOT}/src/tests/test_acq_*")
 foreach(_dir ${_acq_tests})
     get_filename_component(_name "${_dir}" NAME)
     add_executable(${_name} "${_dir}/${_name}.cpp")
@@ -58,7 +58,7 @@ foreach(_dir ${_acq_tests})
     if(_name STREQUAL "test_acq_dlpack")
         # An instrumented probe cannot be loaded into an uninstrumented Python, so the NumPy round trip is skipped.
         target_sources(${_name} PRIVATE "${_dir}/acq_dlpack_probe.cpp")
-        target_include_directories(${_name} PRIVATE "${MNE_ROOT}/src/external/dlpack/include")
+        target_include_directories(${_name} PRIVATE "${MNE_ROOT}/src/3rdparty/dlpack/include")
         target_compile_definitions(${_name} PRIVATE ACQ_DLPACK_PROBE_PATH="" ACQ_LIBRARY_DIR="")
     endif()
     add_test(NAME ${_name} COMMAND ${_name})

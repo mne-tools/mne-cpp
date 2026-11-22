@@ -70,6 +70,16 @@ THRESHOLDS = {
 }
 
 
+# Coverage summaries before 3.0 name the scopes after src/libraries and src/applications
+_SCOPE_NAMES = {"libraries": ("libs", "libraries"), "libs": ("libs", "libraries"),
+                "applications": ("apps", "applications"), "apps": ("apps", "applications"), "tools": ("tools",)}
+
+
+def _scope(scopes: dict, name: str) -> dict:
+    """The totals of scope *name* under its current or pre-3.0 key."""
+    return next(scopes[key] for key in _SCOPE_NAMES[name] if key in scopes)
+
+
 def _json(data: dict[str, Any]) -> str:
     return json.dumps(data, indent=2) + "\n"
 
@@ -124,17 +134,17 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
             "commit": coverage["source"]["commit"],
             "source": coverage["source"]["coverage_url"],
             "line_combined": coverage["totals"]["line_percent"],
-            "line_libraries": scopes["libraries"]["line_percent"],
-            "line_applications": scopes["applications"]["line_percent"],
+            "line_libraries": _scope(scopes, "libs")["line_percent"],
+            "line_applications": _scope(scopes, "apps")["line_percent"],
             "line_tools": scopes["tools"]["line_percent"],
             "branch_reported": coverage["totals"]["branches_found"] > 0,
-            "branch_libraries": scopes["libraries"]["branch_percent"],
+            "branch_libraries": _scope(scopes, "libs")["branch_percent"],
             "lines_to_combined_target": max(
                 0, round(THRESHOLDS["coverage_line_combined"] / 100 * coverage["totals"]["lines_found"]
                          - coverage["totals"]["lines_hit"])),
             "lines_to_scope_targets": {
-                scope: max(0, round(THRESHOLDS[f"coverage_line_{scope}"] / 100 * scopes[scope]["lines_found"]
-                                    - scopes[scope]["lines_hit"]))
+                scope: max(0, round(THRESHOLDS[f"coverage_line_{scope}"] / 100 * _scope(scopes, scope)["lines_found"]
+                                    - _scope(scopes, scope)["lines_hit"]))
                 for scope in ("libraries", "applications", "tools")
             },
         },

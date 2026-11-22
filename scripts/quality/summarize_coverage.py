@@ -55,7 +55,7 @@ from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Callable
 
-SCOPES = ("libs", "applications", "tools")
+SCOPES = ("libs", "apps", "tools")
 POLICY_FILE = Path(__file__).resolve().parent / "coverage_policy.json"
 TRANSLATION_UNIT_SUFFIXES = (".c", ".cc", ".cpp", ".cxx")
 _SCOPE_MARKER = re.compile(r"(?:^|/)(src/(?:" + "|".join(SCOPES) + r")/.*)$")
@@ -80,7 +80,7 @@ class FileCoverage:
 
     @property
     def component(self) -> str:
-        # src/libs/mne/<library>/..., src/applications/<application>/...
+        # src/libs/mne/<library>/..., src/apps/<application>/...
         parts = PurePosixPath(self.path).parts
         return "/".join(parts[:4] if self.scope == "libs" else parts[:3])
 

@@ -9,7 +9,7 @@ Validator for doc/api_registry.json.
 Enforces the following invariants:
 1. JSON is well-formed.
 2. Every 'header' path exists under 'src/libs/mne/' (relative).
-3. Every 'test' (when not null) corresponds to a directory under 'src/testframes/'.
+3. Every 'test' (when not null) corresponds to a directory under 'src/tests/'.
 4. No entry carries the retired Skigen port fields (skigen_candidate, skigen_target).
 5. Example evidence: example targets, snippets, modes, data,
    screenshots and exemptions; eligible entries without an example are errors
@@ -81,7 +81,7 @@ def validate_tests(repo_root: Path, registry: Dict[str, Any]) -> Tuple[bool, Lis
         test_name = cls.get("test")
         if not test_name:
             continue
-        test_dir = repo_root / "src" / "testframes" / test_name
+        test_dir = repo_root / "src" / "tests" / test_name
         if not test_dir.is_dir():
             missing.append(f"{test_name} (class: {cls.get('name', 'UNNAMED')})")
     return (len(missing) == 0, missing)
@@ -173,7 +173,7 @@ def validate_parity_block(registry: Dict[str, Any], repo_root: Path) -> Tuple[bo
     * ``implemented``/``partial`` records must name a non-empty ``mne_cpp``
       equivalent; ``missing``/``not-applicable`` must leave ``mne_cpp`` empty.
     * An optional ``test`` (the evidence for an implemented/partial claim)
-      must name a ``src/testframes`` directory.
+      must name a ``src/tests`` directory.
     """
     issues: List[str] = []
     parity = registry.get("parity")
@@ -219,8 +219,8 @@ def validate_parity_block(registry: Dict[str, Any], repo_root: Path) -> Tuple[bo
             )
         test = rec.get("test")
         if test is not None and (status not in ("implemented", "partial") or not isinstance(test, str)
-                                 or not (repo_root / "src" / "testframes" / test).is_dir()):
-            issues.append(f"'{py}': 'test' must name an existing src/testframes directory "
+                                 or not (repo_root / "src" / "tests" / test).is_dir()):
+            issues.append(f"'{py}': 'test' must name an existing src/tests directory "
                           f"on an implemented/partial record (found '{test}')")
         if rec.get("equivalence") and status != "implemented":
             issues.append(f"'{py}': 'equivalence' requires status 'implemented' (found '{status}')")
@@ -238,7 +238,7 @@ def validate_equivalence(registry: Dict[str, Any], repo_root: Path) -> List[str]
 
     API documentation and examples are enforced for every eligible API by step 7 (G3).
     """
-    testframes = repo_root / "src" / "testframes"
+    testframes = repo_root / "src" / "tests"
     registered = audit_parity_baseline.registered_tests(testframes) if (testframes / "CMakeLists.txt").is_file() else set()
     texts: Dict[str, str] = {}
     issues: List[str] = []
@@ -465,7 +465,7 @@ def main() -> int:
     else:
         print(f"  OK ({total} entries)")
 
-    print("[3/7] Test directories under src/testframes/...")
+    print("[3/7] Test directories under src/tests/...")
     ok, missing = validate_tests(repo_root, registry)
     if not ok:
         all_passed = False

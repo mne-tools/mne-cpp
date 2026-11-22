@@ -15,7 +15,7 @@
   },
   "unregistered": {
     "test_mna_coverage": "Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored.",
-    "test_doc_shots": "Registered from the repository root after doc/ creates the mne_doc_shots target, rather than from src/testframes/CMakeLists.txt.",
+    "test_doc_shots": "Registered from the repository root after doc/ creates the mne_doc_shots target, rather than from src/tests/CMakeLists.txt.",
     "test_wasm_multi_draw": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case.",
     "test_wasm_multi_pass": "Standalone WebAssembly rendering demo, built only by scripts/wasm; not a CTest case."
   },

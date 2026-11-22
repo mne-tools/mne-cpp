@@ -17,7 +17,7 @@ concurrency:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  # Canonical Eigen version lives in src/external/external_deps.env (EIGEN_VERSION).
+  # Canonical Eigen version lives in src/3rdparty/external_deps.env (EIGEN_VERSION).
   # This producer runs only on manual dispatch / the generateeigen branch; keep
   # EIGEN_VERSION below in sync with external_deps.env when bumping Eigen.
   EIGEN_VERSION: '5.0.1'

@@ -61,7 +61,7 @@ class RatchetTests(unittest.TestCase):
 
     def test_findings_are_parsed_per_check(self) -> None:
         output = (f"{_REPO_ROOT}/src/libs/mne/fiff/a.cpp:12:5: warning: text [bugprone-x,cert-y]\n"
-                  f"{_REPO_ROOT}/src/external/eigen/x.h:1:1: warning: text [bugprone-x]\n")
+                  f"{_REPO_ROOT}/src/3rdparty/eigen/x.h:1:1: warning: text [bugprone-x]\n")
         matches = [(tidy.relative(m.group("file")), m.group("checks")) for m in tidy.FINDING_RE.finditer(output)]
         self.assertEqual(matches[0], ("src/libs/mne/fiff/a.cpp", "bugprone-x,cert-y"))
         self.assertFalse(tidy.in_scope(matches[1][0]))

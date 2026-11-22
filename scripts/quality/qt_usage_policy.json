@@ -173,257 +173,257 @@
       "Widgets"
     ],
     "targets": {
-      "src/applications/mne_align": [
+      "src/apps/mne_align": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/libs/anShared": [
+      "src/apps/mne_analyze/libs/anShared": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/libs/events": [
+      "src/apps/mne_analyze/libs/events": [
         "Core"
       ],
-      "src/applications/mne_analyze/mne_analyze": [
+      "src/apps/mne_analyze/mne_analyze": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/averaging": [
+      "src/apps/mne_analyze/plugins/averaging": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/channelselection": [
+      "src/apps/mne_analyze/plugins/channelselection": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/controlmanager": [
-        "Core",
-        "Gui",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze/plugins/coregistration": [
+      "src/apps/mne_analyze/plugins/controlmanager": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/cortical_surface": [
+      "src/apps/mne_analyze/plugins/coregistration": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/dataloader": [
+      "src/apps/mne_analyze/plugins/cortical_surface": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/datamanager": [
-        "Core",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze/plugins/dipolefit": [
-        "Core",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze/plugins/events": [
+      "src/apps/mne_analyze/plugins/dataloader": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/filtering": [
+      "src/apps/mne_analyze/plugins/datamanager": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/rawdataviewer": [
+      "src/apps/mne_analyze/plugins/dipolefit": [
+        "Core",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze/plugins/events": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze/plugins/filtering": [
+        "Core",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze/plugins/rawdataviewer": [
         "Core",
         "Gui",
         "Svg",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/sampleplugin": [
+      "src/apps/mne_analyze/plugins/sampleplugin": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/sourcelocalization": [
+      "src/apps/mne_analyze/plugins/sourcelocalization": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_analyze/plugins/view3d": [
-        "Core",
-        "Gui",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze_studio/core": [
-        "Core"
-      ],
-      "src/applications/mne_analyze_studio/extensions/analysis_results_extension": [
-        "Core",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze_studio/extensions/dummy_3d_extension": [
-        "Core",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze_studio/extensions/fiff_browser_extension": [
+      "src/apps/mne_analyze/plugins/view3d": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze_studio/extensions/mna_skills": [
+      "src/apps/mne_analyze_studio/core": [
         "Core"
       ],
-      "src/applications/mne_analyze_studio/extensions/psd_analysis_extension": [
+      "src/apps/mne_analyze_studio/extensions/analysis_results_extension": [
+        "Core",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze_studio/extensions/dummy_3d_extension": [
+        "Core",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze_studio/extensions/fiff_browser_extension": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_analyze_studio/extensions/source_estimation_skill": [
+      "src/apps/mne_analyze_studio/extensions/mna_skills": [
         "Core"
       ],
-      "src/applications/mne_analyze_studio/extensions/temporal_filter_skill": [
-        "Core"
-      ],
-      "src/applications/mne_analyze_studio/neuro_kernel": [
-        "Core"
-      ],
-      "src/applications/mne_analyze_studio/sdk": [
-        "Core",
-        "Widgets"
-      ],
-      "src/applications/mne_analyze_studio/skill_host": [
-        "Core"
-      ],
-      "src/applications/mne_analyze_studio/workbench": [
+      "src/apps/mne_analyze_studio/extensions/psd_analysis_extension": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_browse": [
+      "src/apps/mne_analyze_studio/extensions/source_estimation_skill": [
+        "Core"
+      ],
+      "src/apps/mne_analyze_studio/extensions/temporal_filter_skill": [
+        "Core"
+      ],
+      "src/apps/mne_analyze_studio/neuro_kernel": [
+        "Core"
+      ],
+      "src/apps/mne_analyze_studio/sdk": [
+        "Core",
+        "Widgets"
+      ],
+      "src/apps/mne_analyze_studio/skill_host": [
+        "Core"
+      ],
+      "src/apps/mne_analyze_studio/workbench": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/apps/mne_browse": [
         "Core",
         "Gui",
         "Svg",
         "Widgets"
       ],
-      "src/applications/mne_dipole_fit": [
+      "src/apps/mne_dipole_fit": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_inspect": [
+      "src/apps/mne_inspect": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_inspect/app/plugins/electrodes": [
+      "src/apps/mne_inspect/app/plugins/electrodes": [
         "Core",
         "Gui"
       ],
-      "src/applications/mne_inspect/app/plugins/mri_slices": [
+      "src/apps/mne_inspect/app/plugins/mri_slices": [
         "Core",
         "Gui"
       ],
-      "src/applications/mne_scan/libs/scDisp": [
+      "src/apps/mne_scan/libs/scDisp": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_scan/libs/scMeas": [
+      "src/apps/mne_scan/libs/scMeas": [
         "Core",
         "Gui"
       ],
-      "src/applications/mne_scan/libs/scShared": [
+      "src/apps/mne_scan/libs/scShared": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_scan/mne_scan": [
+      "src/apps/mne_scan/mne_scan": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/averaging": [
+      "src/apps/mne_scan/plugins/averaging": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/babymeg": [
+      "src/apps/mne_scan/plugins/babymeg": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/brainamp": [
+      "src/apps/mne_scan/plugins/brainamp": [
         "Core",
         "Gui",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/brainflowboard": [
+      "src/apps/mne_scan/plugins/brainflowboard": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/covariance": [
+      "src/apps/mne_scan/plugins/covariance": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/dummytoolbox": [
+      "src/apps/mne_scan/plugins/dummytoolbox": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/eegosports": [
+      "src/apps/mne_scan/plugins/eegosports": [
         "Core",
         "Gui",
         "Svg",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/fiffsimulator": [
+      "src/apps/mne_scan/plugins/fiffsimulator": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/ftbuffer": [
+      "src/apps/mne_scan/plugins/ftbuffer": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/gusbamp": [
+      "src/apps/mne_scan/plugins/gusbamp": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/hpi": [
+      "src/apps/mne_scan/plugins/hpi": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/lsladapter": [
+      "src/apps/mne_scan/plugins/lsladapter": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/natus": [
+      "src/apps/mne_scan/plugins/natus": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/neuromag": [
+      "src/apps/mne_scan/plugins/neuromag": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/neuronalconnectivity": [
+      "src/apps/mne_scan/plugins/neuronalconnectivity": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/noisereduction": [
+      "src/apps/mne_scan/plugins/noisereduction": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/rtclustmne": [
+      "src/apps/mne_scan/plugins/rtclustmne": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/rtfwd": [
+      "src/apps/mne_scan/plugins/rtfwd": [
         "Core",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/tmsi": [
+      "src/apps/mne_scan/plugins/tmsi": [
         "Core",
         "Gui",
         "Svg",
         "Widgets"
       ],
-      "src/applications/mne_scan/plugins/writetofile": [
+      "src/apps/mne_scan/plugins/writetofile": [
         "Core",
         "Gui",
         "Widgets"

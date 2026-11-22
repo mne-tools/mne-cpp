@@ -45,10 +45,10 @@ component_management:
         - type: project
           target: auto
           threshold: 0.1%
-    - component_id: applications
+    - component_id: apps
       name: Applications
       paths:
-        - src/applications/**
+        - src/apps/**
       statuses:
         - type: project
           target: auto
@@ -157,34 +157,34 @@ component_management:
       name: libs/mne/report
       paths:
         - src/libs/mne/report/**
-    - component_id: applications_mne_align
-      name: applications/mne_align
+    - component_id: apps_mne_align
+      name: apps/mne_align
       paths:
-        - src/applications/mne_align/**
-    - component_id: applications_mne_analyze
-      name: applications/mne_analyze
+        - src/apps/mne_align/**
+    - component_id: apps_mne_analyze
+      name: apps/mne_analyze
       paths:
-        - src/applications/mne_analyze/**
-    - component_id: applications_mne_analyze_studio
-      name: applications/mne_analyze_studio
+        - src/apps/mne_analyze/**
+    - component_id: apps_mne_analyze_studio
+      name: apps/mne_analyze_studio
       paths:
-        - src/applications/mne_analyze_studio/**
-    - component_id: applications_mne_browse
-      name: applications/mne_browse
+        - src/apps/mne_analyze_studio/**
+    - component_id: apps_mne_browse
+      name: apps/mne_browse
       paths:
-        - src/applications/mne_browse/**
-    - component_id: applications_mne_dipole_fit
-      name: applications/mne_dipole_fit
+        - src/apps/mne_browse/**
+    - component_id: apps_mne_dipole_fit
+      name: apps/mne_dipole_fit
       paths:
-        - src/applications/mne_dipole_fit/**
-    - component_id: applications_mne_inspect
-      name: applications/mne_inspect
+        - src/apps/mne_dipole_fit/**
+    - component_id: apps_mne_inspect
+      name: apps/mne_inspect
       paths:
-        - src/applications/mne_inspect/**
-    - component_id: applications_mne_scan
-      name: applications/mne_scan
+        - src/apps/mne_inspect/**
+    - component_id: apps_mne_scan
+      name: apps/mne_scan
       paths:
-        - src/applications/mne_scan/**
+        - src/apps/mne_scan/**
     - component_id: tools_acquisition
       name: tools/acquisition
       paths:

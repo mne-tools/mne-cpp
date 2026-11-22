@@ -23,7 +23,7 @@
 /lib/
 
 # External device SDKs (if installed)
-/src/applications/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
+/src/apps/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
 
 # Installer framework
 !linux/
@@ -65,12 +65,12 @@ mne-cpp.pro.user*
 compile_commands.json
 
 # FFTW
-/src/external/fftw
-/src/external/qt/
-/src/external/eigen/
-/src/external/eigen-*/
-/src/external/eigen-*-install/
-/src/external/onnxruntime/
+/src/3rdparty/fftw
+/src/3rdparty/qt/
+/src/3rdparty/eigen/
+/src/3rdparty/eigen-*/
+/src/3rdparty/eigen-*-install/
+/src/3rdparty/onnxruntime/
 
 # Generated docu Docker files
 /_site

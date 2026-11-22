@@ -1,0 +1,100 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+cmake_minimum_required(VERSION 3.14)
+project(test_mne_browse_data LANGUAGES CXX)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+
+# Code-coverage instrumentation for Pattern 2 test
+if(WITH_CODE_COV)
+  add_compile_options("--coverage" "-O1" "-g")
+  add_link_options("--coverage")
+endif()
+set(CMAKE_AUTORCC ON)
+
+set(QT_REQUIRED_COMPONENTS Core Gui Widgets Test)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+
+set(SOURCES
+    test_mne_browse_data.cpp
+
+    # Models (non-GUI)
+    ../../apps/mne_browse/Models/rawmodel.cpp
+    ../../apps/mne_browse/Models/annotationmodel.cpp
+    ../../apps/mne_browse/Models/eventmodel.cpp
+    ../../apps/mne_browse/Models/averagemodel.cpp
+    ../../apps/mne_browse/Models/epochmodel.cpp
+    ../../apps/mne_browse/Models/fiffblockreader.cpp
+
+    # Utils (non-GUI only)
+    ../../apps/mne_browse/Utils/datapackage.cpp
+    ../../apps/mne_browse/Utils/filteroperator.cpp
+    ../../apps/mne_browse/Utils/rawsettings.cpp
+    ../../apps/mne_browse/Utils/sessionfilter.cpp
+
+    # Headers for MOC
+    ../../apps/mne_browse/Models/rawmodel.h
+    ../../apps/mne_browse/Models/annotationmodel.h
+    ../../apps/mne_browse/Models/eventmodel.h
+    ../../apps/mne_browse/Models/averagemodel.h
+    ../../apps/mne_browse/Models/epochmodel.h
+    ../../apps/mne_browse/Models/fiffblockreader.h
+    ../../apps/mne_browse/Utils/rawsettings.h
+    ../../apps/mne_browse/Utils/sessionfilter.h
+)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES})
+endif()
+
+# Add mne_browse source directory to include path so relative includes work
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../apps/mne_browse
+)
+
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
+set(MNE_LIBS_REQUIRED
+    mne_dsp
+    mne_connectivity
+    mne_inv
+    mne_fwd
+    mne_mne
+    mne_fiff
+    mne_fs
+    mne_base
+    mne_math
+    mne_disp
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${QT_REQUIRED_COMPONENT_LIBS}
+    ${MNE_LIBS_REQUIRED}
+    Eigen3::Eigen
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE FALSE
+    MACOSX_BUNDLE FALSE
+)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS integration gui
+    TIMEOUT 60
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample)
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()

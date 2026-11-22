@@ -3,7 +3,7 @@
 # Copyright (c) 2010-2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 #
-# Load external dependency versions from src/external/external_deps.env and
+# Load external dependency versions from src/3rdparty/external_deps.env and
 # export them to the GitHub Actions environment ($GITHUB_ENV) so downstream
 # steps can reference the shared dependency versions. When run outside Actions
 # it just prints the values. Pass "min" to select QT_MIN_VERSION for builds;
@@ -14,7 +14,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
-source "${SCRIPT_DIR}/../../src/external/external_deps.env"
+source "${SCRIPT_DIR}/../../src/3rdparty/external_deps.env"
 
 emit()
 {

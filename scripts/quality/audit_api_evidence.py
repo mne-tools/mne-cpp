@@ -128,7 +128,7 @@ def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
     example_dirs = {p.name for p in examples_dir.iterdir() if p.is_dir()} if examples_dir.is_dir() else set()
     includes = example_includes(examples_dir)
     snippets = snippet_references(libraries_dir)
-    test_dirs = {p.name for p in (repo_root / "src" / "testframes").iterdir() if p.is_dir()}
+    test_dirs = {p.name for p in (repo_root / "src" / "tests").iterdir() if p.is_dir()}
 
     by_key = {(c["name"], c["header"]): c for c in registry.get("classes", [])}
     exported_keys = {(c["name"], c["header"]) for c in exported}

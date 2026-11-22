@@ -7,7 +7,7 @@ show_help() {
 Usage: ./init.sh [options] [-- <extra cmake args>]
 
 Bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen
-artifacts into src/external and configuring a build directory from the repo root.
+artifacts into src/3rdparty and configuring a build directory from the repo root.
 
 Options:
     --qt-version <version>      Qt version to use (default: external_deps.env)
@@ -25,7 +25,7 @@ Options:
   --repository <owner/repo>     Repository hosting the prerelease assets (default: mne-tools/mne-cpp)
   --qt-release-tag <tag>        Override the Qt prerelease tag
   --eigen-release-tag <tag>     Override the Eigen prerelease tag
-  --deps-only                   Only prepare src/external, do not run CMake configure
+  --deps-only                   Only prepare src/3rdparty, do not run CMake configure
   --force                       Re-download dependency bundles even if present
   --help                        Show this help text
 EOF
@@ -34,7 +34,7 @@ EOF
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # shellcheck disable=SC1091
-source "${REPO_ROOT}/src/external/external_deps.env"
+source "${REPO_ROOT}/src/3rdparty/external_deps.env"
 
 LINKAGE="dynamic"
 BUILD_TYPE="Release"
@@ -138,7 +138,7 @@ if [[ "${QT_MODE}" != "auto" && "${QT_MODE}" != "system" && "${QT_MODE}" != "art
 fi
 
 if [[ -z "${EIGEN_DIR}" ]]; then
-    EIGEN_DIR="${REPO_ROOT}/src/external/eigen"
+    EIGEN_DIR="${REPO_ROOT}/src/3rdparty/eigen"
 fi
 
 if [[ -z "${BUILD_DIR}" ]]; then
@@ -159,7 +159,7 @@ done
 declare -a QT_CANDIDATES=()
 PROBED_QT_ROOT_DIR=""
 QT_SOURCE=""
-QT_ARTIFACT_DIR="${REPO_ROOT}/src/external/qt/${LINKAGE}"
+QT_ARTIFACT_DIR="${REPO_ROOT}/src/3rdparty/qt/${LINKAGE}"
 
 EIGEN_CONFIG_PATH="${EIGEN_DIR}/share/eigen3/cmake/Eigen3Config.cmake"
 
@@ -361,11 +361,11 @@ if [[ ${FORCE} -eq 1 ]]; then
     external_args+=(--force)
 fi
 
-"${REPO_ROOT}/src/external/init.sh" "${external_args[@]}"
+"${REPO_ROOT}/src/3rdparty/init.sh" "${external_args[@]}"
 
 if [[ ${DEPS_ONLY} -eq 1 ]]; then
     echo ""
-    echo "Dependencies are ready in src/external."
+    echo "Dependencies are ready in src/3rdparty."
     exit 0
 fi
 

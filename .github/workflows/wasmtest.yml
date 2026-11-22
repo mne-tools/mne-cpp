@@ -81,7 +81,7 @@ jobs:
         bash scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh

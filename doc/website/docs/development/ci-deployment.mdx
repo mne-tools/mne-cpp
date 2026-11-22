@@ -12,7 +12,7 @@ This page explains how MNE-CPP handles deployment on Windows, Linux, and macOS. 
 All MNE-CPP libraries are built to the `mne-cpp/lib` folder. All applications, test, and examples are built to the `mne-cpp/out/Release` folder.
 
 ## Dependency Solving
-MNE-CPP depends on [Qt](https://www.qt.io/), [Eigen](https://eigen.tuxfamily.org/), and optionally [ONNX Runtime](https://onnxruntime.ai/). Qt and Eigen are downloaded automatically by the repository init scripts (`./init.sh` / `.\init.bat`) into `src/external/`; neither is bundled in the repository. For Qt runtime deployment we use Qt-specific deployment tools (`windeployqt`, `linuxdeployqt`, `macdeployqt`).
+MNE-CPP depends on [Qt](https://www.qt.io/), [Eigen](https://eigen.tuxfamily.org/), and optionally [ONNX Runtime](https://onnxruntime.ai/). Qt and Eigen are downloaded automatically by the repository init scripts (`./init.sh` / `.\init.bat`) into `src/3rdparty/`; neither is bundled in the repository. For Qt runtime deployment we use Qt-specific deployment tools (`windeployqt`, `linuxdeployqt`, `macdeployqt`).
 
 ### Windows
 

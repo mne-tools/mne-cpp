@@ -13,6 +13,10 @@ instead of `#include <fiff/fiff_raw_data.h>`, which marks them as MNE-CPP header
 the way `Q` marks Qt's. The library sources moved from `src/libraries/<lib>` to
 `src/libs/mne/<lib>`; `src/libs` is the include root, and installed headers land in
 `include/mne/<lib>`. The library named `mne` keeps its name (`<mne/mne/...>`).
+The other source directories follow suit: `src/applications` is `src/apps`,
+`src/testframes` is `src/tests` and `src/external` is `src/3rdparty`, the one
+place for third-party code (SOUP); `src/3rdparty/init.sh` downloads Qt, Eigen
+and ONNX Runtime there.
 
 All libraries share one namespace, `mne`. The per-library namespaces are gone;
 type names already carry their library prefix (`FiffInfo`, `BidsChannel`,

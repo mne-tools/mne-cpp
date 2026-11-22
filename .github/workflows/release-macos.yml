@@ -67,7 +67,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
     - name: Download ONNX Runtime
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -75,7 +75,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/onnxruntime"
     - name: Configure and compile MNE-CPP
       run: |
         ./scripts/build/build_project.sh -- -DUSE_ONNXRUNTIME=ON
@@ -221,7 +221,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
     - name: Download ONNX Runtime
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
@@ -229,7 +229,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind onnxruntime \
           --version "$ONNXRUNTIME_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/onnxruntime"
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

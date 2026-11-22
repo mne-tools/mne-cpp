@@ -118,7 +118,7 @@ keychain access) and previews a workflow graph without executing it:
 
 | Key           | Type / values                | Effect |
 |---------------|------------------------------|--------|
-| `workflow`    | file name                    | Workflow from `src/applications/mne_analyze_studio/examples/workflows/`. |
+| `workflow`    | file name                    | Workflow from `src/apps/mne_analyze_studio/examples/workflows/`. |
 | `open_editor` | bool                         | Also opens the file in an editor tab. |
 | `center`      | `"graph"` \| `"editor"`       | Which center tab is in front (default `graph`). |
 

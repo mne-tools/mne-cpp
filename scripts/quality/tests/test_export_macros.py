@@ -16,7 +16,7 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SCANNED = [REPO_ROOT / "src" / "applications", REPO_ROOT / "src" / "tools"]
+SCANNED = [REPO_ROOT / "src" / "apps", REPO_ROOT / "src" / "tools"]
 
 _EXPORT_BRANCH = re.compile(r"^#\s*(?:el)?if\s+defined\((\w+)\)\s*\n#\s*define\s+\w+\s+Q_DECL_EXPORT", re.MULTILINE)
 

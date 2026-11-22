@@ -63,7 +63,7 @@ jobs:
         ./scripts/ci/download_toolchain.sh \
           --kind eigen \
           --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+          --output-dir "$GITHUB_WORKSPACE/src/3rdparty/eigen"
 
     # The recorder test reads its recordings back with mne-python, mne-bids and the BIDS validator.
     - name: Install MNE-Python, MNE-BIDS and the BIDS validator

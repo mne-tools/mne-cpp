@@ -61,13 +61,13 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
     - name: Download ONNX Runtime
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\onnxruntime"
     - name: Configure and compile MNE-CPP
       run: |
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -170,13 +170,13 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\eigen"
+        call scripts\ci\download_toolchain.bat --kind eigen --version "%EIGEN_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\eigen"
     - name: Download ONNX Runtime
       shell: cmd
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\external\onnxruntime"
+        call scripts\ci\download_toolchain.bat --kind onnxruntime --version "%ONNXRUNTIME_VERSION%" --output-dir "%GITHUB_WORKSPACE%\src\3rdparty\onnxruntime"
     - name: Cache static Qt binaries
       id: cache-qt-static
       uses: actions/cache@v5

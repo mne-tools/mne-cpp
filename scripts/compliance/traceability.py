@@ -14,7 +14,7 @@
 turns that into a traceability matrix per library (``doc/compliance/traceability.json``) and a documentation page
 (``doc/website/docs/development/traceability.mdx``), and enforces two rules with ``--check``:
 
-* every named test exists in ``src/testframes``;
+* every named test exists in ``src/tests``;
 * per library, the number of classes with a named test never falls below its floor in ``traceability_policy.json``
   (a ratchet: raise the floor in the commit that adds tests). Libraries marked safety-relevant there are listed
   first and must reach full traceability before a release that claims IEC 62304 class B.
@@ -49,7 +49,7 @@ def matrix(registry: dict[str, Any], root: Path = REPO_ROOT) -> dict[str, Any]:
         module["classes"] += 1
         if item.get("test"):
             module["tested"] += 1
-            if not (root / "src" / "testframes" / item["test"]).is_dir():
+            if not (root / "src" / "tests" / item["test"]).is_dir():
                 module["missing_tests"].append(f"{item['name']} -> {item['test']}")
         else:
             module["untested"].append(item["name"])
@@ -60,7 +60,7 @@ def matrix(registry: dict[str, Any], root: Path = REPO_ROOT) -> dict[str, Any]:
 def problems(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
     found = []
     for name, module in report["modules"].items():
-        found += [f"{name}: {entry} does not exist in src/testframes" for entry in module["missing_tests"]]
+        found += [f"{name}: {entry} does not exist in src/tests" for entry in module["missing_tests"]]
         floor = policy["floors"].get(name, 0)
         if module["tested"] < floor:
             found.append(f"{name}: {module['tested']} classes with a test, below its floor of {floor}")

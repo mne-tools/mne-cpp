@@ -70,7 +70,7 @@ set(HEADERS
 )
 
 # Brain Products' BrainAmpIoCtl.h is not redistributable
-set(MNE_BRAINAMP_SDK_DIR "${CMAKE_SOURCE_DIR}/src/applications/mne_scan/plugins/brainamp" CACHE PATH
+set(MNE_BRAINAMP_SDK_DIR "${CMAKE_SOURCE_DIR}/src/apps/mne_scan/plugins/brainamp" CACHE PATH
     "Directory with BrainAmpIoCtl.h; the BrainAmp driver interface is built on Windows when it is there")
 set(_brainamp_hardware OFF)
 if(WIN32 AND EXISTS "${MNE_BRAINAMP_SDK_DIR}/BrainAmpIoCtl.h")

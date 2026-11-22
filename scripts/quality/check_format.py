@@ -21,7 +21,7 @@ branch that started from a formatted tree.
 It also checks that every include sits under the banner of its kind
 (``include_sections.py``); ``--fix`` regroups them.
 
-The in-scope set is the C/C++ sources under ``src/`` minus ``src/external``.
+The in-scope set is the C/C++ sources under ``src/`` minus ``src/3rdparty``.
 Local and CI runs use the same file filter and the same clang-format version.
 
 Usage
@@ -54,7 +54,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CLANG_FORMAT_VERSION = "21.1.8"
 EXTENSIONS = ("c", "cc", "cpp", "cxx", "h", "hh", "hpp", "hxx")
 INCLUDE_PREFIX = "src/"
-EXCLUDE_PREFIXES = ("src/external/",)
+EXCLUDE_PREFIXES = ("src/3rdparty/",)
 BATCH = 200
 MAX_REPORTED_LINES = 40
 

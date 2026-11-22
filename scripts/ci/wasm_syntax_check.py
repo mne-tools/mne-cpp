@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCOPES = ("src/applications", "src/tools", "src/libs")
+SCOPES = ("src/apps", "src/tools", "src/libs")
 
 
 def wasm_units() -> set[Path]:

@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 set "REPO_ROOT=%~dp0"
 if "%REPO_ROOT:~-1%"=="\" set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
-set "EXTERNAL_DEPS_ENV=%REPO_ROOT%\src\external\external_deps.env"
+set "EXTERNAL_DEPS_ENV=%REPO_ROOT%\src\3rdparty\external_deps.env"
 for /f "usebackq tokens=1,2 delims==" %%A in ("%EXTERNAL_DEPS_ENV%") do (
     set "deps_key=%%A"
     set "deps_key=!deps_key: =!"
@@ -143,9 +143,9 @@ if /I not "%QT_MODE%"=="auto" if /I not "%QT_MODE%"=="system" if /I not "%QT_MOD
     exit /b 1
 )
 
-if not defined EIGEN_DIR set "EIGEN_DIR=%REPO_ROOT%\src\external\eigen"
+if not defined EIGEN_DIR set "EIGEN_DIR=%REPO_ROOT%\src\3rdparty\eigen"
 if not defined BUILD_DIR set "BUILD_DIR=%REPO_ROOT%\build\developer-%LINKAGE%"
-set "QT_ARTIFACT_DIR=%REPO_ROOT%\src\external\qt\%LINKAGE%"
+set "QT_ARTIFACT_DIR=%REPO_ROOT%\src\3rdparty\qt\%LINKAGE%"
 
 echo %EXTRA_CMAKE_ARGS% | findstr /I /C:"-DNO_OPENGL=OFF" /C:"-DNO_OPENGL:BOOL=OFF" >nul && set "NO_OPENGL_VALUE=OFF"
 echo %EXTRA_CMAKE_ARGS% | findstr /I /C:"-DNO_OPENGL=ON" /C:"-DNO_OPENGL:BOOL=ON" >nul && set "NO_OPENGL_VALUE=ON"
@@ -157,9 +157,9 @@ set "FORCE_ARG="
 if "%FORCE%"=="1" set "FORCE_ARG=--force"
 
 if /I "%QT_SOURCE%"=="artifact" (
-    call "%REPO_ROOT%\src\external\init.bat" --qt-version "%QT_VERSION%" --eigen-version "%EIGEN_VERSION%" --linkage "%LINKAGE%" --qt-dir "%QT_DIR%" --eigen-dir "%EIGEN_DIR%" --repository "%REPOSITORY%" --qt-release-tag "%QT_RELEASE_TAG%" --eigen-release-tag "%EIGEN_RELEASE_TAG%" %FORCE_ARG%
+    call "%REPO_ROOT%\src\3rdparty\init.bat" --qt-version "%QT_VERSION%" --eigen-version "%EIGEN_VERSION%" --linkage "%LINKAGE%" --qt-dir "%QT_DIR%" --eigen-dir "%EIGEN_DIR%" --repository "%REPOSITORY%" --qt-release-tag "%QT_RELEASE_TAG%" --eigen-release-tag "%EIGEN_RELEASE_TAG%" %FORCE_ARG%
 ) else (
-    call "%REPO_ROOT%\src\external\init.bat" --qt-version "%QT_VERSION%" --eigen-version "%EIGEN_VERSION%" --linkage "%LINKAGE%" --qt-dir "%QT_DIR%" --skip-qt --eigen-dir "%EIGEN_DIR%" --repository "%REPOSITORY%" --qt-release-tag "%QT_RELEASE_TAG%" --eigen-release-tag "%EIGEN_RELEASE_TAG%" %FORCE_ARG%
+    call "%REPO_ROOT%\src\3rdparty\init.bat" --qt-version "%QT_VERSION%" --eigen-version "%EIGEN_VERSION%" --linkage "%LINKAGE%" --qt-dir "%QT_DIR%" --skip-qt --eigen-dir "%EIGEN_DIR%" --repository "%REPOSITORY%" --qt-release-tag "%QT_RELEASE_TAG%" --eigen-release-tag "%EIGEN_RELEASE_TAG%" %FORCE_ARG%
 )
 if errorlevel 1 exit /b 1
 
@@ -171,7 +171,7 @@ if exist "%EIGEN_DIR%\share\eigen3\cmake\Eigen3Config.cmake" (
 
 if "%DEPS_ONLY%"=="1" (
     echo.
-    echo Dependencies are ready in src\external.
+    echo Dependencies are ready in src\3rdparty.
     exit /b 0
 )
 
@@ -206,7 +206,7 @@ exit /b 1
 echo Usage: init.bat [options] [-- ^<extra cmake args^>]
 echo.
 echo Bootstraps a developer build by downloading the MNE-CPP-maintained Qt and Eigen
-echo artifacts into src\external and configuring a build directory from the repo root.
+echo artifacts into src\3rdparty and configuring a build directory from the repo root.
 echo.
 echo Options:
 echo   --qt-version ^<version^>        Qt version to use ^(default: %QT_VERSION%^)
@@ -224,7 +224,7 @@ echo   --with-opengl                   Configure with QOpenGLWidget support inst
 echo   --repository ^<owner/repo^>     Repository hosting the prerelease assets ^(default: mne-tools/mne-cpp^)
 echo   --qt-release-tag ^<tag^>        Override the Qt prerelease tag
 echo   --eigen-release-tag ^<tag^>     Override the Eigen prerelease tag
-echo   --deps-only                     Only prepare src\external, do not run CMake configure
+echo   --deps-only                     Only prepare src\3rdparty, do not run CMake configure
 echo   --force                         Re-download dependency bundles even if present
 echo   --help                          Show this help text
 exit /b 0

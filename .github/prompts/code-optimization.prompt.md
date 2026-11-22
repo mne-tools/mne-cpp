@@ -109,7 +109,7 @@ That document tracks:
    cd build/developer-dynamic && cmake --build . 2>&1 | tail -50
    ```
    Build must complete with **0 errors and 0 new warnings**. Run any
-   relevant tests in `src/testframes/`.
+   relevant tests in `src/tests/`.
 
 6. **Measure delta (perf changes only).** Re-time the same path with the
    same dataset:
@@ -158,7 +158,7 @@ That document tracks:
 - **Don't** introduce new third-party dependencies as part of an optimization
   pass; raise that separately.
 - **Do** add a focused unit test when fixing a bug uncovered during cleanup
-  (§ 10), and a benchmark in `src/testframes/` whenever a hot path is
+  (§ 10), and a benchmark in `src/tests/` whenever a hot path is
   optimized (§ 5.12).
 
 ## Reference docs

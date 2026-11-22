@@ -128,7 +128,7 @@ def locate_qt_lib_dir(build_dir: Path) -> Path | None:
                 # <qt>/lib/cmake/Qt6 -> <qt>/lib
                 qt6_dir = Path(line.split('=', 1)[1].strip())
                 return qt6_dir.parent.parent
-    fallback = REPO_ROOT / 'src/external/qt/dynamic/lib'
+    fallback = REPO_ROOT / 'src/3rdparty/qt/dynamic/lib'
     return fallback if fallback.is_dir() else None
 
 

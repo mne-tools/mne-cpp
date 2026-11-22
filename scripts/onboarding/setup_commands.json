@@ -12,7 +12,7 @@
   "windows": [
     ".\\init.bat",
     "cmake --build build\\developer-dynamic --config Release --parallel 4",
-    "set PATH=%CD%\\src\\external\\qt\\dynamic\\bin;%PATH%",
+    "set PATH=%CD%\\src\\3rdparty\\qt\\dynamic\\bin;%PATH%",
     "out\\Release\\bin\\ex_math.exe"
   ]
 }

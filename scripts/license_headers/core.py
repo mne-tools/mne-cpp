@@ -954,7 +954,7 @@ INCLUDE_GLOBS: tuple[str, ...] = (
 )
 
 EXCLUDE_PATTERNS: tuple[str, ...] = (
-    "src/external/*",
+    "src/3rdparty/*",
     "*/build/*",
     "*/build-*/*",
     "build/*",
@@ -989,7 +989,7 @@ _PRUNE_DIRS = {
     ".docusaurus",
     ".git",
     ".github_cache",
-    "external",  # under src/external/
+    "3rdparty",  # under src/3rdparty/
     "Testing",
     "doxygen-awesome",
     "katex",
@@ -1036,7 +1036,7 @@ def iter_in_scope(repo_root: Path) -> list[Path]:
     """Enumerate all in-scope files under *repo_root*, deduped and sorted.
 
     Uses :func:`os.walk` with directory pruning so vendored / generated
-    subtrees (``build/``, ``node_modules/``, ``src/external/`` …) never get
+    subtrees (``build/``, ``node_modules/``, ``src/3rdparty/`` …) never get
     descended into.
     """
     import os
@@ -1053,8 +1053,8 @@ def iter_in_scope(repo_root: Path) -> list[Path]:
             if d in _PRUNE_DIRS or d.startswith("build-") or d.startswith("build_"):
                 prune.append(d)
                 continue
-            # Prune the third-party trees under src/external.
-            if rel_parts == ("src",) and d == "external":
+            # Prune the third-party trees under src/3rdparty.
+            if rel_parts == ("src",) and d == "3rdparty":
                 prune.append(d)
                 continue
             # Inside doc/website prune everything except src/.

@@ -64,7 +64,7 @@ CONFIG = REPO_ROOT / ".clang-tidy"
 SOURCE_EXTENSIONS = (".cpp", ".cc", ".cxx", ".c")
 HEADER_EXTENSIONS = (".h", ".hh", ".hpp", ".hxx")
 INCLUDE_PREFIX = "src/"
-EXCLUDE_PREFIXES = ("src/external/",)
+EXCLUDE_PREFIXES = ("src/3rdparty/",)
 DEFAULT_TIMEOUT = 300
 CACHE_DIR = Path(os.environ.get("MNE_TIDY_CACHE", REPO_ROOT / ".cache" / "clang-tidy"))
 

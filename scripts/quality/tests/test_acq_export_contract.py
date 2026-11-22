@@ -76,7 +76,7 @@ class TestAcqExportContract(unittest.TestCase):
         self.assertEqual(windows_macro_names("auto small = 1;\n"), [])
 
     def test_no_windows_macro_names_in_acq_code(self):
-        files = sorted(ACQ.rglob("*.[ch]*")) + sorted((ROOT / "src" / "testframes").glob("test_acq_*/*.cpp"))
+        files = sorted(ACQ.rglob("*.[ch]*")) + sorted((ROOT / "src" / "tests").glob("test_acq_*/*.cpp"))
         files += sorted((ROOT / "src" / "examples").glob("ex_acq_*/*.cpp"))
         for path in files:
             with self.subTest(file=path.name):
@@ -89,7 +89,7 @@ class TestAcqExportContract(unittest.TestCase):
         self.assertFalse(aligned_free_in_plain_delete(good))
 
     def test_replaced_allocators_free_plain_blocks_with_free(self):
-        files = sorted((ROOT / "src" / "testframes").glob("test_acq_*/*.cpp"))
+        files = sorted((ROOT / "src" / "tests").glob("test_acq_*/*.cpp"))
         files += sorted((ROOT / "src" / "examples").glob("ex_acq_*/*.cpp"))
         for path in files:
             with self.subTest(file=path.name):

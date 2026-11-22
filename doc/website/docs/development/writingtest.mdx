@@ -13,11 +13,11 @@ Every new function should be tested. Consider the use case, determine how to val
 
 ## Creating a new Test
 
-A good starting point is to look at existing tests under `src/testframes/`. You can duplicate an existing test directory (e.g., `test_fiff_rwr`) and adapt it for your new test. Make sure to:
+A good starting point is to look at existing tests under `src/tests/`. You can duplicate an existing test directory (e.g., `test_fiff_rwr`) and adapt it for your new test. Make sure to:
 
 1. Rename the directory and source files to match your test name.
 2. Update the `CMakeLists.txt` inside the new test directory.
-3. Register the new test in the parent `src/testframes/CMakeLists.txt` via `add_subdirectory()`.
+3. Register the new test in the parent `src/tests/CMakeLists.txt` via `add_subdirectory()`.
 4. Register it with CTest through `mne_add_test()` from `cmake/MneTesting.cmake` instead of a bare `add_test()`.
 
 `mne_add_test()` requires `LABELS` and `TIMEOUT`; leaving either out, or using a label or timeout outside `scripts/quality/test_inventory_policy.json`, stops the configure step.

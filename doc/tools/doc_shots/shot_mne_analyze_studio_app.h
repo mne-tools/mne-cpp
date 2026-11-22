@@ -24,7 +24,7 @@ struct ShotSpec;
 //=============================================================================================================
 /**
  * Build the real MNE Analyze Studio workbench in offline mode (no backend processes), open a workflow file
- * from `src/applications/mne_analyze_studio/examples/workflows/` and capture it.
+ * from `src/apps/mne_analyze_studio/examples/workflows/` and capture it.
  *
  * Setup keys: `workflow` (file name in the examples directory), `open_editor` (bool; also open the file in
  * an editor tab), `center` ("graph" | "editor"; which center tab is in front).
