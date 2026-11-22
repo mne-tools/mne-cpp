@@ -100,21 +100,17 @@ MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
 
 MainWindow::~MainWindow()
 {
-    deleteMenus();
+    removeMenus();
 }
 
 //=============================================================================================================
 
-void MainWindow::deleteMenus()
+void MainWindow::removeMenus()
 {
+    // The menus created in initMenuBar are children of the menu bar and are destroyed with it
     for (auto& action : menuBar()->actions()) {
         menuBar()->removeAction(action);
     }
-    delete m_pMenuFile;
-    delete m_pMenuView;
-    delete m_pMenuControl;
-    delete m_pMenuAppearance;
-    delete m_pMenuHelp;
 }
 
 //=============================================================================================================

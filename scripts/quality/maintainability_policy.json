@@ -31,9 +31,9 @@
     "typedef_struct": 0,
     "c_style_cast": 0,
     "raw_new": 0,
-    "raw_delete": 50,
+    "raw_delete": 0,
     "console_io": 0,
     "numeric_define": 0,
-    "qt_new_unparented": 893
+    "qt_new_unparented": 883
   }
 }

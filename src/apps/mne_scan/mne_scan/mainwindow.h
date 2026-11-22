@@ -40,6 +40,12 @@
 #include <QPointer>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -410,9 +416,9 @@ private:
     QPointer<QDockWidget> m_pPluginGuiDockWidget; /**< Dock widget which holds the plugin gui. */
     QPointer<QDockWidget> m_pDockWidget_Log;      /**< Holds the dock widget containing the log.*/
 
-    QPointer<QToolBar> m_pToolBar;              /**< Holds the tool bar.*/
-    QPointer<QToolBar> m_pDynamicPluginToolBar; /**< Holds the plugin tool bar.*/
-    QPointer<QWidget> m_pPluginStatusContainer; /**< Right-hand toolbar container for per-plugin status widgets.*/
+    std::unique_ptr<QToolBar> m_pToolBar;              /**< Holds the tool bar.*/
+    std::unique_ptr<QToolBar> m_pDynamicPluginToolBar; /**< Holds the plugin tool bar.*/
+    QPointer<QWidget> m_pPluginStatusContainer;        /**< Right-hand toolbar container for per-plugin status widgets.*/
 
     QPointer<QLabel> m_pLabelTime; /**< Holds the display label for the running time.*/
 

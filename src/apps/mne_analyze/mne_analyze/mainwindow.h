@@ -265,9 +265,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Delete the menus created in initMenuBar.
+     * Remove all menus from the menu bar. The menus created in initMenuBar are owned by the menu bar.
      */
-    void deleteMenus();
+    void removeMenus();
 
     QPointer<mne::disp::MultiView> m_pMultiView;    /**< The central View.*/
     QPointer<AnalyzeCore> m_pAnalyzeCoreController; /**< Pointer to the application controller Obj.*/

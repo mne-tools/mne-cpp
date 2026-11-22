@@ -56,9 +56,7 @@ PluginManager::PluginManager(QObject* parent)
 
 PluginManager::~PluginManager()
 {
-    for (AbstractPlugin*& plugin : m_qVecPlugins) {
-        delete plugin;
-    }
+    // The plugin instances are children of this manager and are destroyed with it
 }
 
 //=============================================================================================================
@@ -72,6 +70,8 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     for (QObject* plugin : staticInstances) {
         // AbstractPlugin
         if (AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(plugin)) {
+            // The loader does not delete its root instances; the manager takes them over
+            pPlugin->setParent(this);
             m_qVecPlugins.push_back(qobject_cast<AbstractPlugin*>(pPlugin));
         }
     }
@@ -109,6 +109,8 @@ void PluginManager::loadPlugin(const QString& file)
 
 void PluginManager::insertPlugin(AbstractPlugin* pPlugin)
 {
+    // The loader does not delete its root instances; the manager takes them over
+    pPlugin->setParent(this);
     m_qVecPlugins.push_back(pPlugin);
     std::sort(m_qVecPlugins.begin(), m_qVecPlugins.end(),
               [](AbstractPlugin* a, AbstractPlugin* b) { return a->getOrder() > b->getOrder(); });

@@ -31,6 +31,12 @@
 #include <QPainterPath>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -197,7 +203,8 @@ void PluginItem::removeArrows()
         arrow->startItem()->removeArrow(arrow);
         arrow->endItem()->removeArrow(arrow);
         scene()->removeItem(arrow);
-        delete arrow;
+        // removeItem() hands the ownership of the arrow back to the caller
+        std::unique_ptr<Arrow> pRemoved(arrow);
     }
 }
 

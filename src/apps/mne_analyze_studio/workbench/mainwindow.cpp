@@ -95,6 +95,7 @@
 #include <QStringList>
 
 #include <chrono>
+#include <memory>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -2354,7 +2355,8 @@ void MainWindow::refreshWorkspaceArtifacts()
     for (int i = m_workspaceExplorer->topLevelItemCount() - 1; i >= 0; --i) {
         QTreeWidgetItem* item = m_workspaceExplorer->topLevelItem(i);
         if (item && item->data(0, Qt::UserRole).toString() == QLatin1String(kWorkspaceArtifactRoot)) {
-            delete m_workspaceExplorer->takeTopLevelItem(i);
+            // takeTopLevelItem() hands the ownership of the item back to the caller
+            std::unique_ptr<QTreeWidgetItem> pRemoved(m_workspaceExplorer->takeTopLevelItem(i));
         }
     }
 
@@ -3190,7 +3192,7 @@ void MainWindow::closeCenterTab(int index)
         m_extensionViewWidgetsBySessionId.remove(hostedView->sessionId());
     }
     m_centerTabs->removeTab(index);
-    delete widget;
+    widget->deleteLater();
     refreshWorkflowGraphDockingUi();
 }
 

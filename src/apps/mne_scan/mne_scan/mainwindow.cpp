@@ -55,6 +55,12 @@
 #include <QStandardPaths>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -132,14 +138,9 @@ MainWindow::~MainWindow()
         this->stopMeasurement();
     }
 
-    if (m_pToolBar) {
-        if (m_pLabelTime) {
-            delete m_pLabelTime;
-        }
-        delete m_pToolBar;
-    }
-
-    delete m_pDynamicPluginToolBar;
+    // The tool bars hold the plugins' status widgets and actions, so they go before the plugin managers
+    m_pToolBar.reset();
+    m_pDynamicPluginToolBar.reset();
 
     // PluginGui saves the scene on destruction through the plugin managers, which are members and die before
     // QWidget deletes the child widgets.
@@ -688,7 +689,8 @@ void MainWindow::createToolBars()
 {
     //Control
     if (!m_pToolBar) {
-        m_pToolBar = addToolBar(tr("Control"));
+        m_pToolBar = std::make_unique<QToolBar>(tr("Control"), this);
+        addToolBar(m_pToolBar.get());
         m_pToolBar->addAction(m_pActionRun);
         m_pToolBar->addAction(m_pActionStop);
         m_pActionStop->setEnabled(false);
@@ -713,7 +715,8 @@ void MainWindow::createToolBars()
 
     //Plugin
     if (!m_pDynamicPluginToolBar) {
-        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
+        m_pDynamicPluginToolBar = std::make_unique<QToolBar>(tr("Plugin Control"), this);
+        addToolBar(m_pDynamicPluginToolBar.get());
     }
 
     m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);
@@ -748,11 +751,10 @@ void MainWindow::refreshPluginStatusWidgets()
 
     // Clear previously installed plugin status widgets.
     if (auto* pLayout = m_pPluginStatusContainer->layout()) {
-        while (QLayoutItem* item = pLayout->takeAt(0)) {
-            if (QWidget* w = item->widget()) {
+        while (std::unique_ptr<QLayoutItem> pItem{pLayout->takeAt(0)}) {
+            if (QWidget* w = pItem->widget()) {
                 w->deleteLater();
             }
-            delete item;
         }
     }
 

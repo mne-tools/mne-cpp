@@ -35,6 +35,8 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 using namespace mne::disp;
 
@@ -78,16 +80,15 @@ public:
 
     QWidget* createView(const QJsonObject& sessionDescriptor, QWidget* parent) const override
     {
-        Dummy3DHostedViewWidget* widget = new Dummy3DHostedViewWidget(parent);
+        auto widget = std::make_unique<Dummy3DHostedViewWidget>(parent);
         widget->setSessionDescriptor(sessionDescriptor);
 
         const QString requestedFile = sessionDescriptor.value("file").toString().trimmed();
         if (!requestedFile.isEmpty() && !widget->hasLoadedFile(requestedFile)) {
-            delete widget;
             return nullptr;
         }
 
-        return widget;
+        return widget.release();
     }
 };
 

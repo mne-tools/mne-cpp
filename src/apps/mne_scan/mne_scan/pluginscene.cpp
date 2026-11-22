@@ -32,6 +32,13 @@
 #include <QtMath>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <utility>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -173,8 +180,9 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* mouseEvent)
         if (endItems.count() && endItems.first() == line)
             endItems.removeFirst();
 
+        // removeItem() hands the ownership of the rubber band line back to the caller
         removeItem(line);
-        delete line;
+        std::unique_ptr<QGraphicsLineItem> pRubberBand(std::exchange(line, nullptr));
 
         //Insert Connection
         if (startItems.count() > 0 && endItems.count() > 0 &&

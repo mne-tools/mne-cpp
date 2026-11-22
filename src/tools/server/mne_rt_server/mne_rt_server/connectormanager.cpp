@@ -63,9 +63,7 @@ ConnectorManager::ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObjec
 
 ConnectorManager::~ConnectorManager()
 {
-    QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
-    for (; it != s_vecConnectors.end(); ++it)
-        delete (*it);
+    // The connector instances are children of this manager and are destroyed with it
 }
 
 //=============================================================================================================
@@ -322,6 +320,8 @@ void ConnectorManager::loadConnectors(const QString& dir)
                 t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
                 t_pIConnector->connectCommandManager();
 
+                // The loader does not delete its root instances; the manager takes them over
+                t_pIConnector->setParent(this);
                 s_vecConnectors.push_back(t_pIConnector);
                 mne::Log::info("[ConnectorManager::loadConnectors] Loading {} done", t_pIConnector->getName());
             } else {
@@ -355,6 +355,8 @@ void ConnectorManager::loadConnectors(const QString& dir)
             t_pIConnector->getCommandManager().insert(t_jsonDocumentOrigin);
             t_pIConnector->connectCommandManager();
 
+            // The loader does not delete its root instances; the manager takes them over
+            t_pIConnector->setParent(this);
             s_vecConnectors.push_back(t_pIConnector);
 
             mne::Log::info("[ConnectorManager::loadConnectors] Loading {} done", fileName.toStdString());

@@ -67,8 +67,7 @@ void SourceEstimateManager::cancelLoading()
     }
     // The worker is deleted here, once its thread has stopped, never by the thread itself:
     // onStcLoadingFinished still reads it after the thread may have finished
-    delete m_stcWorker;
-    m_stcWorker = nullptr;
+    m_stcWorker.reset();
     m_isLoading = false;
 }
 
@@ -119,21 +118,20 @@ bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
 
     // Clean up any previous loading thread and worker
     cancelLoading();
-    delete m_loadingThread;
-    m_loadingThread = nullptr;
+    m_loadingThread.reset();
 
     // Create overlay for results
     m_overlay = std::make_unique<SourceEstimateOverlay>();
 
     // Create worker and thread
-    m_loadingThread = new QThread(this);
-    m_stcWorker = new StcLoadingWorker(lhPath, rhPath, lhSurface, rhSurface);
-    m_stcWorker->moveToThread(m_loadingThread);
+    m_loadingThread = std::make_unique<QThread>();
+    m_stcWorker = std::make_unique<StcLoadingWorker>(lhPath, rhPath, lhSurface, rhSurface);
+    m_stcWorker->moveToThread(m_loadingThread.get());
 
-    connect(m_loadingThread, &QThread::started, m_stcWorker, &StcLoadingWorker::process);
-    connect(m_stcWorker, &StcLoadingWorker::progress, this, &SourceEstimateManager::loadingProgress);
-    connect(m_stcWorker, &StcLoadingWorker::finished, this, &SourceEstimateManager::onStcLoadingFinished);
-    connect(m_stcWorker, &StcLoadingWorker::finished, m_loadingThread, &QThread::quit);
+    connect(m_loadingThread.get(), &QThread::started, m_stcWorker.get(), &StcLoadingWorker::process);
+    connect(m_stcWorker.get(), &StcLoadingWorker::progress, this, &SourceEstimateManager::loadingProgress);
+    connect(m_stcWorker.get(), &StcLoadingWorker::finished, this, &SourceEstimateManager::onStcLoadingFinished);
+    connect(m_stcWorker.get(), &StcLoadingWorker::finished, m_loadingThread.get(), &QThread::quit);
 
     m_isLoading = true;
     m_loadingThread->start();

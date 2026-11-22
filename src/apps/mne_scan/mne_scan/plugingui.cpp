@@ -48,6 +48,12 @@
 #include <QFileInfo>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -155,18 +161,7 @@ PluginGui::~PluginGui()
 
     m_pCurrentPlugin.reset();
 
-    //Plugin Toolbar (delete is a no-op on nullptr, so no guards needed)
-    delete m_pSensorToolButton;
-    delete m_pAlgorithmToolButton;
-    delete m_pToolBarPlugins;
-    //Pointers Toolbar
-    delete m_pPointerButton;
-    delete m_pLinePointerButton;
-    delete m_pToolBarPointer;
-    //Item
-    delete m_pToolBarItem;
-
-    delete m_pGraphicsView;
+    // The tool bars, their buttons and the graphics view are children of this window and are destroyed with it.
 }
 
 //=============================================================================================================
@@ -178,7 +173,8 @@ void PluginGui::clearScene()
             if (removePlugin(qgraphicsitem_cast<PluginItem*>(item)->plugin())) {
                 qgraphicsitem_cast<PluginItem*>(item)->removeArrows();
                 m_pPluginScene->removeItem(item);
-                delete item;
+                // removeItem() hands the ownership of the item back to the caller
+                std::unique_ptr<QGraphicsItem> pRemoved(item);
             }
         }
     }
@@ -481,10 +477,10 @@ void PluginGui::deleteItem()
     foreach (QGraphicsItem* item, m_pPluginScene->selectedItems()) {
         if (item->type() == Arrow::Type) {
             m_pPluginScene->removeItem(item);
+            std::unique_ptr<QGraphicsItem> pRemoved(item);
             Arrow* arrow = qgraphicsitem_cast<Arrow*>(item);
             arrow->startItem()->removeArrow(arrow);
             arrow->endItem()->removeArrow(arrow);
-            delete item;
         }
     }
 
@@ -495,7 +491,7 @@ void PluginGui::deleteItem()
                 qgraphicsitem_cast<PluginItem*>(item)->removeArrows();
 
                 m_pPluginScene->removeItem(item);
-                delete item;
+                std::unique_ptr<QGraphicsItem> pRemoved(item);
             }
         }
     }

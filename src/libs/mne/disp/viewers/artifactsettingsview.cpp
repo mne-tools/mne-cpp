@@ -215,12 +215,11 @@ void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void ArtifactSettingsView::redrawGUI()
 {
-    if (QLayout* layout = this->layout()) {
-        // Deleting a layout leaves its widgets on the view
-        while (std::unique_ptr<QLayoutItem> pItem{layout->takeAt(0)}) {
+    // The view accepts the new layout only once the old one is gone, and deleting a layout leaves its widgets on the view
+    if (std::unique_ptr<QLayout> pLayout{this->layout()}) {
+        while (std::unique_ptr<QLayoutItem> pItem{pLayout->takeAt(0)}) {
             std::unique_ptr<QWidget> pWidget{pItem->widget()};
         }
-        delete layout;
     }
     m_mapChThresholdsDoubleSpinBoxes.clear();
     m_mapChThresholdsSpinBoxes.clear();

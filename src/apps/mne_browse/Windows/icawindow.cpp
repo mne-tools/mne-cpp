@@ -166,10 +166,9 @@ void IcaWindow::clearIca()
     m_componentCheckboxes.clear();
 
     // Remove all items from the component list layout
-    while (QLayoutItem* item = m_pComponentListLayout->takeAt(0)) {
-        if (item->widget())
-            item->widget()->deleteLater();
-        delete item;
+    while (std::unique_ptr<QLayoutItem> pItem{m_pComponentListLayout->takeAt(0)}) {
+        if (pItem->widget())
+            pItem->widget()->deleteLater();
     }
 }
 
@@ -263,10 +262,9 @@ void IcaWindow::rebuildComponentList()
     for (auto* cb : m_componentCheckboxes)
         cb->deleteLater();
     m_componentCheckboxes.clear();
-    while (QLayoutItem* item = m_pComponentListLayout->takeAt(0)) {
-        if (item->widget())
-            item->widget()->deleteLater();
-        delete item;
+    while (std::unique_ptr<QLayoutItem> pItem{m_pComponentListLayout->takeAt(0)}) {
+        if (pItem->widget())
+            pItem->widget()->deleteLater();
     }
 
     const int nComp = static_cast<int>(m_icaResult.matSources.rows());

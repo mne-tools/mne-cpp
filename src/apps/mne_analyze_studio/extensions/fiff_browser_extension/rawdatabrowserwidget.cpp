@@ -41,6 +41,8 @@
 #include <QTableView>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 namespace
@@ -56,13 +58,12 @@ public:
 
     QWidget* createView(const QJsonObject& sessionDescriptor, QWidget* parent) const override
     {
-        RawDataBrowserWidget* rawBrowser = new RawDataBrowserWidget(parent);
+        auto rawBrowser = std::make_unique<RawDataBrowserWidget>(parent);
         if (!rawBrowser->loadFile(sessionDescriptor.value("file").toString())) {
-            delete rawBrowser;
             return nullptr;
         }
 
-        return rawBrowser;
+        return rawBrowser.release();
     }
 };
 

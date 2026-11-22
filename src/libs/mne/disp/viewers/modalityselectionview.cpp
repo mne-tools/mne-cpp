@@ -33,6 +33,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <vector>
 
 //=============================================================================================================
@@ -200,10 +201,9 @@ void ModalitySelectionView::redrawGUI()
         topLayout = new QGridLayout();
     }
 
-    QLayoutItem* child;
-    while ((child = topLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
+    // The widgets go right away: the view is redrawn synchronously and looked up by name
+    while (std::unique_ptr<QLayoutItem> pItem{topLayout->takeAt(0)}) {
+        std::unique_ptr<QWidget> pWidget{pItem->widget()};
     }
 
     QMapIterator<QString, bool> i(m_modalityMap);

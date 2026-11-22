@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -329,8 +330,9 @@ private:
      */
     void keyPressEvent(QKeyEvent* event) override;
 
-    QMap<qint32, float> m_qMapChScaling;                      /**< Channel scaling values. */
-    QMap<qint32, QPointer<ScaleControl>> m_qMapScaleControls; /**< Map of channel scaling controls. */
+    QMap<qint32, float> m_qMapChScaling;                           /**< Channel scaling values. */
+    QMap<qint32, QPointer<ScaleControl>> m_qMapScaleControls;      /**< Map of channel scaling controls. */
+    std::vector<std::unique_ptr<ScaleControl>> m_vecScaleControls; /**< Owns every scale control created; the map refers to the current ones. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 

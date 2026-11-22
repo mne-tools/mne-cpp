@@ -97,6 +97,7 @@
 #include <cmath>
 #include <cstdint>
 #include <filesystem>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -2984,7 +2985,10 @@ void MainWindow::createLoadedFilesDock()
                     break;
                 }
             }
-            delete item;
+            // Taking the item out of the tree hands its ownership to the caller
+            QTreeWidgetItem* pParent = item->parent();
+            std::unique_ptr<QTreeWidgetItem> pRemoved(pParent ? pParent->takeChild(pParent->indexOfChild(item))
+                                                              : m_loadedFilesTree->takeTopLevelItem(m_loadedFilesTree->indexOfTopLevelItem(item)));
             if (m_statusLabel)
                 m_statusLabel->setText("Ready");
 #ifndef WASMBUILD

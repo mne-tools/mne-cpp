@@ -256,8 +256,8 @@ private slots:
 private:
     std::unique_ptr<SourceEstimateOverlay> m_overlay;       /**< Source estimate data / interpolation. */
     std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time streaming controller. */
-    QThread* m_loadingThread = nullptr;                     /**< Background thread for STC file loading. */
-    StcLoadingWorker* m_stcWorker = nullptr;                /**< Worker performing the async STC load. */
+    std::unique_ptr<QThread> m_loadingThread;               /**< Background thread for STC file loading. */
+    std::unique_ptr<StcLoadingWorker> m_stcWorker;          /**< Worker performing the async STC load. */
     int m_currentTimePoint = 0;                             /**< Current time-point index. */
     bool m_isLoading = false;                               /**< True while async load is in progress. */
     bool m_isStreaming = false;                             /**< True while real-time streaming is active. */

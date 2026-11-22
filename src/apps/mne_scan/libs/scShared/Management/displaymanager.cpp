@@ -41,6 +41,12 @@
 #include <QVBoxLayout>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -68,12 +74,12 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
                               QSharedPointer<QTime>& pT,
                               QList<QAction*>& qListActions)
 {
-    QWidget* newDisp = new QWidget;
+    auto newDisp = std::make_unique<QWidget>();
     QVBoxLayout* vboxLayout = new QVBoxLayout;
 
     foreach (QSharedPointer<PluginOutputConnector> pPluginOutputConnector, outputConnectorList) {
         if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeMultiSampleArray>>()) {
-            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp);
+            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(pT, newDisp.get());
 
             qListActions.append(rtmsaWidget->getDisplayActions());
 
@@ -86,7 +92,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
             rtmsaWidget->init();
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeSourceEstimate>>()) {
             if (!m_pRealTime3DWidget) {
-                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp.get());
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
             }
@@ -99,7 +105,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeConnectivityEstimate>>()) {
             if (!m_pRealTime3DWidget) {
-                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp.get());
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
             }
@@ -112,7 +118,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeHpiResult>>()) {
             if (!m_pRealTime3DWidget) {
-                m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
+                m_pRealTime3DWidget = new RealTime3DWidget(newDisp.get());
                 vboxLayout->addWidget(m_pRealTime3DWidget);
                 m_pRealTime3DWidget->init();
             }
@@ -124,7 +130,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeEvokedSet>>()) {
-            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
+            RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp.get());
 
             qListActions.append(rtesWidget->getDisplayActions());
 
@@ -136,7 +142,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
             vboxLayout->addWidget(rtesWidget);
             rtesWidget->init();
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeCov>>()) {
-            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(pT, newDisp);
+            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(pT, newDisp.get());
 
             qListActions.append(rtcWidget->getDisplayActions());
 
@@ -150,7 +156,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
         } else if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeSpectrum>>()) {
             QSharedPointer<RealTimeSpectrum> pRealTimeSpectrum = pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeSpectrum>>()->measurementData();
 
-            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(pRealTimeSpectrum, pT, newDisp);
+            RealTimeSpectrumWidget* fsWidget = new RealTimeSpectrumWidget(pRealTimeSpectrum, pT, newDisp.get());
 
             qListActions.append(fsWidget->getDisplayActions());
 
@@ -166,11 +172,10 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
 
     // If no display was attached return NULL pointer
     if (vboxLayout->count() == 0) {
-        delete newDisp;
-        newDisp = nullptr;
+        return nullptr;
     }
 
-    return newDisp;
+    return newDisp.release();
 }
 
 //=============================================================================================================

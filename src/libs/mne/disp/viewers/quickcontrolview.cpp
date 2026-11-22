@@ -35,6 +35,12 @@
 #include <QDebug>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -89,9 +95,9 @@ QuickControlView::~QuickControlView()
 void QuickControlView::clear()
 {
     while (m_pUi->m_pTabWidget->count() != 0) {
-        QWidget* pTabWidget = m_pUi->m_pTabWidget->widget(m_pUi->m_pTabWidget->count() - 1);
+        // removeTab() leaves the page to the caller
+        std::unique_ptr<QWidget> pTabWidget{m_pUi->m_pTabWidget->widget(m_pUi->m_pTabWidget->count() - 1)};
         m_pUi->m_pTabWidget->removeTab(m_pUi->m_pTabWidget->count() - 1);
-        delete pTabWidget;
     }
 }
 

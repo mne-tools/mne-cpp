@@ -24,6 +24,8 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 ExtensionHostedViewWidget::ExtensionHostedViewWidget(QWidget* parent)
@@ -172,11 +174,10 @@ void ExtensionHostedViewWidget::rebuildUi()
 
 void ExtensionHostedViewWidget::rebuildActionButtons(const QJsonArray& actions)
 {
-    while (QLayoutItem* item = m_actionsLayout->takeAt(0)) {
-        if (QWidget* widget = item->widget()) {
+    while (std::unique_ptr<QLayoutItem> pItem{m_actionsLayout->takeAt(0)}) {
+        if (QWidget* widget = pItem->widget()) {
             widget->deleteLater();
         }
-        delete item;
     }
 
     if (actions.isEmpty()) {

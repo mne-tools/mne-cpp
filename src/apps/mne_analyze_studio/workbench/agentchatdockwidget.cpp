@@ -29,6 +29,8 @@
 #include <QVBoxLayout>
 #include <QJsonObject>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 namespace
@@ -603,11 +605,10 @@ void AgentChatDockWidget::restoreConversationState(const QJsonArray& currentEntr
 void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmations)
 {
     m_pendingConfirmations = confirmations;
-    while (QLayoutItem* item = m_confirmationLayout->takeAt(0)) {
-        if (QWidget* w = item->widget()) {
+    while (std::unique_ptr<QLayoutItem> pItem{m_confirmationLayout->takeAt(0)}) {
+        if (QWidget* w = pItem->widget()) {
             w->deleteLater();
         }
-        delete item;
     }
 
     m_confirmationLabel->setVisible(!confirmations.isEmpty());
@@ -760,11 +761,10 @@ void AgentChatDockWidget::refreshCurrentTranscriptView()
 
 void AgentChatDockWidget::refreshArchivedSessions()
 {
-    while (QLayoutItem* item = m_archivedSessionsLayout->takeAt(0)) {
-        if (QWidget* w = item->widget()) {
+    while (std::unique_ptr<QLayoutItem> pItem{m_archivedSessionsLayout->takeAt(0)}) {
+        if (QWidget* w = pItem->widget()) {
             w->deleteLater();
         }
-        delete item;
     }
 
     if (m_archivedConversationSessions.isEmpty()) {

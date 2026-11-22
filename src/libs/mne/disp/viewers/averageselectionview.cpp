@@ -40,6 +40,12 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -195,10 +201,9 @@ void AverageSelectionView::redrawGUI()
         topLayout = new QGridLayout();
     }
 
-    QLayoutItem* child;
-    while ((child = topLayout->takeAt(0)) != 0) {
-        delete child->widget();
-        delete child;
+    // The widgets go right away: the view is redrawn synchronously and looked up by name
+    while (std::unique_ptr<QLayoutItem> pItem{topLayout->takeAt(0)}) {
+        std::unique_ptr<QWidget> pWidget{pItem->widget()};
     }
 
     // Create new GUI elements

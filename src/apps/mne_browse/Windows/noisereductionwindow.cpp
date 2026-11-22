@@ -151,7 +151,9 @@ void NoiseReductionWindow::createProjectorGroup()
                     this, &NoiseReductionWindow::enableDisableAllProj);
         }
 
-        delete ui->m_groupBox_projections->layout();
+        // The group box accepts the new layout only once the old one is gone
+        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_projections->layout());
+        pOldLayout.reset();
         ui->m_groupBox_projections->setLayout(topLayout);
     }
 }
@@ -196,7 +198,9 @@ void NoiseReductionWindow::createCompensatorGroup()
                     this, &NoiseReductionWindow::checkCompStatusChanged);
         }
 
-        delete ui->m_groupBox_compensators->layout();
+        // The group box accepts the new layout only once the old one is gone
+        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_compensators->layout());
+        pOldLayout.reset();
         ui->m_groupBox_compensators->setLayout(topLayout);
     }
 }
@@ -265,15 +269,11 @@ void NoiseReductionWindow::checkCompStatusChanged(const QString& compName)
 
 void NoiseReductionWindow::remove(QLayout* layout)
 {
-    QLayoutItem* child;
-    while (layout->count() != 0) {
-        child = layout->takeAt(0);
-        if (child->layout() != 0) {
-            remove(child->layout());
-        } else if (child->widget() != 0) {
-            delete child->widget();
+    while (std::unique_ptr<QLayoutItem> pChild{layout->takeAt(0)}) {
+        if (QLayout* pChildLayout = pChild->layout()) {
+            remove(pChildLayout);
+        } else if (QWidget* pWidget = pChild->widget()) {
+            pWidget->deleteLater();
         }
-
-        delete child;
     }
 }
