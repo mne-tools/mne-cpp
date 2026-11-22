@@ -249,7 +249,7 @@ static QString wasmSaveToTemp(const QString& fileName, const QByteArray& fileCon
     QString tempPath = QStringLiteral("/tmp/") + QFileInfo(fileName).fileName();
     QFile f(tempPath);
     if (!f.open(QIODevice::WriteOnly)) {
-        Log::warning("WASM: failed to write temp file {}", tempPath);
+        Log::warning("WASM: failed to write temp file {}", tempPath.toStdString());
         return QString();
     }
     f.write(fileContent);
@@ -1013,7 +1013,7 @@ void MainWindow::setupConnections()
             ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
             ref.format = QFileInfo(entry.first).suffix().toStdString();
             if (const Expected<void> embedded = ref.embed(fsPath(entry.first)); !embedded) {
-                Log::warning("Cannot embed {} {}", entry.first, embedded.error().what());
+                Log::warning("Cannot embed {} {}", entry.first.toStdString(), embedded.error().what());
                 continue;
             }
             rec.files.push_back(std::move(ref));

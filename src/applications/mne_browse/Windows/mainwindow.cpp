@@ -2717,9 +2717,9 @@ void MainWindow::openFile()
             s_wasmByteArray = fileContent;
             const bool ok = m_pDataWindow->loadFiffBuffer(fileContent, fileName);
             if (ok)
-                mne::Log::info("Fiff data file {} loaded (ChannelDataView).", fileName);
+                mne::Log::info("Fiff data file {} loaded (ChannelDataView).", fileName.toStdString());
             else
-                mne::Log::warning("ERROR loading fiff data file {}", fileName);
+                mne::Log::warning("ERROR loading fiff data file {}", fileName.toStdString());
 
             if (ok) {
                 syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
