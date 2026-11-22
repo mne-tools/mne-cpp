@@ -75,6 +75,11 @@ class TestSnippetReferences(unittest.TestCase):
         self.assertRegex(text, r"(?m)^EXAMPLE_RECURSIVE\s*=\s*YES\s*$")
         self.assertRegex(text, r"(?m)^CASE_SENSE_NAMES\s*=\s*NO\s*$")
 
+    def test_ci_doxyfile_searches_the_examples_tree(self) -> None:
+        """The Doxygen CI jobs run doc/doxygen/mne-cpp_doxyfile, which resolves snippets the same way."""
+        text = (REPO_ROOT / "doc" / "doxygen" / "mne-cpp_doxyfile").read_text(encoding="utf-8")
+        self.assertRegex(text, r"(?m)^EXAMPLE_PATH\s*=\s*\.\./\.\./src/examples\s*$")
+
     def test_references_are_qualified_and_resolve(self) -> None:
         """Every example is main.cpp, so a reference must name its directory."""
         refs = snippet_references()
