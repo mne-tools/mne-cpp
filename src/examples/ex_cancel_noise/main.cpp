@@ -18,7 +18,6 @@
 
 #include <math.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
@@ -28,7 +27,6 @@
 
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QFile>
 
 //=============================================================================================================
@@ -59,7 +57,6 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
@@ -88,7 +85,7 @@ int main(int argc, char* argv[])
     //example for compensator generation
     FiffCtfComp comp;
     if (dest_comp > 0) {
-        qDebug() << "This part needs to be debugged";
+        Log::debug("This part needs to be debugged");
         p_FiffEvokedSet.info.make_compensator(comp_now, dest_comp, comp); //ToDo: make_compensator needs to be debugged
         printf("Appropriate forward operator compensator created.\n");
     } else

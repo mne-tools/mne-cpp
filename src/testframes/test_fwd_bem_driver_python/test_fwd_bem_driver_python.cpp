@@ -21,7 +21,8 @@
 //=============================================================================================================
 
 #include <fwd/fwd_bem_model.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <fwd/fwd_coil_set.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -126,7 +127,6 @@ private slots:
 
 void TestFwdBemDriverPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString dir = QStringLiteral(MNE_FWD_BEM_DRIVER_DATA_DIR);
     m_gain = readMatrix(dir + "/gain.txt");
     const MatrixXd geo = readMatrix(dir + "/geometry.txt");
@@ -310,15 +310,17 @@ void TestFwdBemDriverPython::saveModel()
     QCOMPARE(reread->bem_method, static_cast<int>(FWD_BEM_CONSTANT_COLL));
     QCOMPARE(reread->sol_name, constant);
     QCOMPARE(reread->solution, constantSolution);
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Approximation method in file"));
+    ScopedLogCapture capture;
     QCOMPARE(reread->fwd_bem_load_recompute_solution(constant.toStdU16String(), FWD_BEM_LINEAR_COLL, 0), 0);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Approximation method in file"), capture.dump().c_str());
     QVERIFY(reread->sol_name.empty());
     // The recomputed linear solution matches mne.make_bem_solution's
     const float relDiff = (reread->solution - m_model->solution).norm() / m_model->solution.norm();
     QVERIFY2(relDiff < 1e-5f, qPrintable(QString::number(relDiff)));
 
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No model to save"));
+    capture.clear();
     QCOMPARE(FwdBemModel().fwd_bem_save_model(dir.filePath(QStringLiteral("empty.fif")).toStdU16String()), -1);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "No model to save"), capture.dump().c_str());
 }
 
 //=============================================================================================================

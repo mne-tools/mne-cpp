@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "electrodes.h"
 
 #include <ieeg/ieeg_implantation.h>
@@ -31,7 +32,6 @@
 //=============================================================================================================
 
 #include <QByteArray>
-#include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -165,13 +165,13 @@ bool ElectrodesPlugin::loadFiff(const QString& path)
 {
     const auto dig = FiffDigPointSet::read(path.toStdU16String());
     if (!dig) {
-        qWarning() << "ElectrodesPlugin::loadFiff:" << dig.error().what();
+        Log::warning("ElectrodesPlugin::loadFiff: {}", dig.error().what());
         return false;
     }
     const FiffDigPointSet picked = dig->pick_types({FIFFV_POINT_EEG, FIFFV_POINT_EXTRA});
 
     if (picked.empty()) {
-        qWarning() << "ElectrodesPlugin::loadFiff: no EEG/EXTRA points in" << path;
+        Log::warning("ElectrodesPlugin::loadFiff: no EEG/EXTRA points in {}", path.toStdString());
         return false;
     }
 
@@ -200,7 +200,7 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "ElectrodesPlugin::loadCsv: cannot open" << path;
+        Log::warning("ElectrodesPlugin::loadCsv: cannot open {}", path.toStdString());
         return false;
     }
 
@@ -257,7 +257,7 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
     }
 
     if (contacts.empty()) {
-        qWarning() << "ElectrodesPlugin::loadCsv: no contact rows parsed from" << path;
+        Log::warning("ElectrodesPlugin::loadCsv: no contact rows parsed from {}", path.toStdString());
         return false;
     }
 
@@ -278,7 +278,7 @@ bool ElectrodesPlugin::loadBids(const QString& path, const QString& t1Path)
     mne::IeegImplantation implantation = mne::IeegImplantation::readBids(path.toStdString(), &error);
     m_lastError = QString::fromStdString(error);
     if (implantation.empty()) {
-        qWarning() << "ElectrodesPlugin::loadBids:" << m_lastError;
+        Log::warning("ElectrodesPlugin::loadBids: {}", m_lastError.toStdString());
         return false;
     }
 
@@ -288,7 +288,7 @@ bool ElectrodesPlugin::loadBids(const QString& path, const QString& t1Path)
         if (t1Path.isEmpty() || !t1.read(t1Path.toStdString())) {
             m_lastError = QStringLiteral("%1 positions are scanner RAS of the subject's T1; T1.mgz is needed to place them on the surfaces")
                               .arg(QString::fromStdString(implantation.coordinateSystem()));
-            qWarning() << "ElectrodesPlugin::loadBids:" << m_lastError;
+            Log::warning("ElectrodesPlugin::loadBids: {}", m_lastError.toStdString());
             return false;
         }
         implantation = implantation.transformed(t1.computeVox2RasTkr() * t1.computeVox2Ras().inverse(), "surface RAS");

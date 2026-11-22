@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffsimulator.h"
 
 #include <acq/acq_device_registry.h>
@@ -201,13 +202,13 @@ void FiffSimulator::comSimfile(Command p_command)
 
             m_commandManager[Commands::SIMFILE].reply("New simulation file set succefully.\r\n");
         } else {
-            qDebug() << "Didn't set new file";
+            Log::debug("Didn't set new file");
             m_sResourceDataPath = t_sResourceDataPathOld;
 
             m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
         }
     } else {
-        qDebug() << "File does not exist on server!";
+        Log::debug("File does not exist on server!");
         m_sResourceDataPath = t_sResourceDataPathOld;
         m_commandManager[Commands::SIMFILE].reply("Simulation file not set.\r\n");
     }
@@ -262,10 +263,10 @@ void FiffSimulator::init()
 
                 if (t_qFileMeas.open(QIODevice::ReadOnly)) {
                     m_sResourceDataPath = sFileName;
-                    qInfo() << "[FiffSimulator::init] Load simulation file " << sFileName;
+                    Log::info("[FiffSimulator::init] Load simulation file {}", sFileName.toStdString());
                     t_qFileMeas.close();
                 } else {
-                    qInfo() << "[FiffSimulator::init] Trying to open simulation file " << sFileName << "read from FiffSimulation.cfg failed. Opening sample_audvis_raw.fif instead.";
+                    Log::info("[FiffSimulator::init] Trying to open simulation file {} read from FiffSimulation.cfg failed. Opening sample_audvis_raw.fif instead.", sFileName.toStdString());
                 }
             }
         }
@@ -290,12 +291,12 @@ bool FiffSimulator::start()
                       {"events", "0"}}};
     auto device = AcqDevice::open(uri.toString());
     if (!device) {
-        qWarning("[FiffSimulator::start] %s", device.error().text().c_str());
+        Log::warning("[FiffSimulator::start] {}", device.error().text());
         return false;
     }
     auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
     if (!reader || !device->start().ok()) {
-        qWarning("[FiffSimulator::start] Cannot start the replay of %s", m_RawInfo.info.filename.c_str());
+        Log::warning("[FiffSimulator::start] Cannot start the replay of {}", m_RawInfo.info.filename);
         return false;
     }
     m_device = std::move(*device);
@@ -336,7 +337,7 @@ bool FiffSimulator::readRawInfo()
 
         auto raw = FiffRawData::read(m_sResourceDataPath.toStdU16String());
         if (!raw) {
-            qInfo("Error: Not able to read raw info: %s", raw.error().what());
+            Log::info("Error: Not able to read raw info: {}", raw.error().what());
             return false;
         }
         m_RawInfo = std::move(*raw);
@@ -358,7 +359,7 @@ void FiffSimulator::run()
         const auto block = mne::read(*m_reader, m_uiBufferSampleSize, data, std::chrono::milliseconds(100));
         if (!block) {
             if (block.error().code() != AcqErrorCode::Timeout) {
-                qWarning("[FiffSimulator::run] %s", block.error().text().c_str());
+                Log::warning("[FiffSimulator::run] {}", block.error().text());
                 return;
             }
             continue;

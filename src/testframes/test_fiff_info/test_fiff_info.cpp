@@ -11,7 +11,6 @@
 #include <new>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff_ch_name.h>
 #include <fiff/fiff_info_base.h>
@@ -69,7 +68,6 @@ private:
 private slots:
     void initTestCase()
     {
-        mne::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
             m_sDataPath = base;
@@ -442,10 +440,9 @@ private slots:
         if (projs.empty())
             QSKIP("No projectors in file");
 
-        qDebug() << "Found" << projs.size() << "projectors:";
+        Log::debug("Found {} projectors:", projs.size());
         for (const FiffProj& p : projs) {
-            qDebug() << "  " << p.desc << " active=" << p.active
-                     << " kind=" << p.kind;
+            Log::debug("  {} active= {} kind= {}", p.desc, p.active, p.kind);
         }
 
         // Activate all
@@ -528,7 +525,7 @@ private slots:
         if (digSet.size() == 0)
             QSKIP("No dig points");
 
-        qDebug() << "Found" << digSet.size() << "digitization points";
+        Log::debug("Found {} digitization points", digSet.size());
 
         // Check that dig points have valid coordinates
         for (int i = 0; i < std::ssize(digSet); ++i) {
@@ -548,7 +545,7 @@ private slots:
 
         // Get current compensation
         fiff_int_t comp = raw.info.get_current_comp();
-        qDebug() << "Current compensation grade:" << comp;
+        Log::debug("Current compensation grade: {}", comp);
 
         // Set compensation (exercise the code path)
         raw.info.set_current_comp(0);

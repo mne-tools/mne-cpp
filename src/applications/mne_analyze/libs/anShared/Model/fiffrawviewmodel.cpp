@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffrawviewmodel.h"
 
 #include "eventmodel.h"
@@ -65,7 +66,7 @@ using namespace mne;
 FiffRawViewModel::FiffRawViewModel(QObject* pParent)
 : AbstractModel(pParent)
 {
-    qInfo() << "[FiffRawViewModel::FiffRawViewModel] Default constructor called !";
+    Log::info("[FiffRawViewModel::FiffRawViewModel] Default constructor called !");
 }
 
 //=============================================================================================================
@@ -124,7 +125,7 @@ bool FiffRawViewModel::initFiffData(QSharedPointer<mne::FiffIO> io)
     m_pFiffIO = std::move(io);
 
     if (m_pFiffIO->raw.empty()) {
-        qWarning() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
+        Log::warning("[FiffRawViewModel::loadFiffData] File does not contain any Fiff data");
         return false;
     }
 
@@ -146,9 +147,9 @@ bool FiffRawViewModel::initFiffData(QSharedPointer<mne::FiffIO> io)
     m_iSamplesPerBlock = m_pFiffInfo->sfreq;
     reloadAllData();
 
-    qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size" << data.rows() << "x" << m_iSamplesPerBlock;
+    Log::info("[FiffRawViewModel::initFiffData] Loaded {} blocks with size {} x {}", m_lData.size(), data.rows(), m_iSamplesPerBlock);
 
-    qDebug() << "FIRST SAMPLE OFFSET IN ANALYZE:" << m_pFiffIO->raw[0]->first_samp;
+    Log::debug("FIRST SAMPLE OFFSET IN ANALYZE: {}", m_pFiffIO->raw[0]->first_samp);
 
     m_bIsInit = true;
 
@@ -203,12 +204,12 @@ QVariant FiffRawViewModel::data(const QModelIndex& index,
         else if (index.column() == 2) {
             return QVariant(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[index.row()]));
         } else {
-            qWarning() << "[FiffRawViewModel::data] Column " << index.column() << " not implemented !";
+            Log::warning("[FiffRawViewModel::data] Column {} not implemented !", index.column());
             return QVariant();
         }
     }
 
-    qWarning() << "[FiffRawViewModel::data] Warning, non of the presumed cases took effect";
+    Log::warning("[FiffRawViewModel::data] Warning, non of the presumed cases took effect");
     return QVariant();
 }
 
@@ -534,7 +535,7 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
 {
     // check if we are currently loading something in the background. This is a rudimentary solution.
     if (m_bCurrentlyLoading) {
-        qInfo() << "[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...";
+        Log::info("[FiffRawViewModel::updateScrollPosition] Background operation still pending, try again later...");
         return;
     }
 
@@ -594,7 +595,7 @@ bool FiffRawViewModel::filterDataBlock(MatrixXd& matData,
     }
 
     if (m_lFilterChannelList.cols() == 0) {
-        qWarning() << "[FiffRawViewModel::filterDataBlock] No channels to filter specified.";
+        Log::warning("[FiffRawViewModel::filterDataBlock] No channels to filter specified.");
         return false;
     }
 
@@ -630,10 +631,10 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     int leftSamples = (m_iFiffCursorBegin - numBlocks * m_iSamplesPerBlock) - absoluteFirstSample();
 
     if (leftSamples <= 0) {
-        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Reached start of file !";
+        Log::info("[FiffRawViewModel::loadEarlierBlocks] Reached start of file !");
         // see how many blocks we still can load
         int maxNumBlocks = (m_iFiffCursorBegin - absoluteFirstSample()) / m_iSamplesPerBlock;
-        qInfo() << "[FiffRawViewModel::loadEarlierBlocks] Loading " << maxNumBlocks << " earlier blocks instead of requested " << numBlocks;
+        Log::info("[FiffRawViewModel::loadEarlierBlocks] Loading {} earlier blocks instead of requested {}", maxNumBlocks, numBlocks);
         if (maxNumBlocks != 0) {
             numBlocks = maxNumBlocks;
         } else {
@@ -646,7 +647,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     // we expect m_lNewData and m_lFilteredNewData to be empty:
     if (m_lNewData.empty() == false ||
         m_lFilteredNewData.empty() == false) {
-        qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Warning! Temporary data storage non empty !";
+        Log::warning("[FiffRawViewModel::loadEarlierBlocks] Warning! Temporary data storage non empty !");
         return -1;
     }
 
@@ -687,7 +688,7 @@ int FiffRawViewModel::loadEarlierBlocks(qint32 numBlocks)
     if (m_pFiffIO->raw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
-        qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Could not read block ";
+        Log::warning("[FiffRawViewModel::loadEarlierBlocks] Could not read block ");
         return -1;
     }
 
@@ -730,7 +731,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // check if end of file is reached:
     int leftSamples = absoluteLastSample() - (m_iFiffCursorBegin + (m_iTotalBlockCount + numBlocks) * m_iSamplesPerBlock);
     if (leftSamples < 0) {
-        qInfo() << "[FiffRawViewModel::loadLaterBlocks] Reached end of file !";
+        Log::info("[FiffRawViewModel::loadLaterBlocks] Reached end of file !");
         // see how many blocks we still can load
         int maxNumBlocks = (absoluteLastSample() - (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock)) / m_iSamplesPerBlock;
         //qInfo() << "[FiffRawViewModel::loadLaterBlocks] Loading " << maxNumBlocks << " later blocks instead of requested " << numBlocks;
@@ -746,7 +747,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     // we expect m_lNewData and m_lFilteredNewData to be empty:
     if (m_lNewData.empty() == false ||
         m_lFilteredNewData.empty() == false) {
-        qWarning() << "[FiffRawViewModel::loadEarlierBlocks] Warning! Temporary data storage non empty !";
+        Log::warning("[FiffRawViewModel::loadEarlierBlocks] Warning! Temporary data storage non empty !");
         return -1;
     }
 
@@ -784,7 +785,7 @@ int FiffRawViewModel::loadLaterBlocks(qint32 numBlocks)
     if (m_pFiffIO->raw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawViewModel::loadFiffData] Successfully read a block ";
     } else {
-        qWarning() << "[FiffRawViewModel::loadLaterBlocks] Could not read block ";
+        Log::warning("[FiffRawViewModel::loadLaterBlocks] Could not read block ");
         return -1;
     }
 
@@ -818,7 +819,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 {
     switch (result) {
         case -1:
-            qWarning() << "[FiffRawViewModel::postBlockLoad] block load returned an error: " << result;
+            Log::warning("[FiffRawViewModel::postBlockLoad] block load returned an error: {}", result);
             break;
         case 0: {
             // insertion of earlier blocks
@@ -869,7 +870,7 @@ void FiffRawViewModel::postBlockLoad(int result)
             break;
         }
         default:
-            qWarning() << "[FiffRawViewModel::postBlockLoad] FATAL Non-intended return value: " << result;
+            Log::warning("[FiffRawViewModel::postBlockLoad] FATAL Non-intended return value: {}", result);
     }
 
     updateEndStartFlags();
@@ -919,7 +920,7 @@ void FiffRawViewModel::reloadAllData()
     if (m_pFiffIO->raw[0]->read_raw_segment(matData, matTimes, start, end)) {
         // qDebug() << "[FiffRawmodel::loadFiffData] Successfully read a block ";
     } else {
-        qWarning() << "[FiffRawViewModel::loadFiffData] Could not read samples " << start << " to " << end;
+        Log::warning("[FiffRawViewModel::loadFiffData] Could not read samples {} to {}", start, end);
         return;
     }
 

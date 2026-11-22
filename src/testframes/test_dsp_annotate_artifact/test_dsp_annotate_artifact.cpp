@@ -15,7 +15,8 @@
 //=============================================================================================================
 
 #include <dsp/annotate_artifact.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <dsp/firfilter.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
@@ -141,11 +142,6 @@ class TestDspAnnotateArtifact : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase()
-    {
-        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
-    }
-
     void testMusclZscoreMatchesPython_data();
     void testMusclZscoreMatchesPython();
     void testMusclZscoreCleanData();
@@ -209,8 +205,9 @@ void TestDspAnnotateArtifact::testMusclZscoreCleanData()
     QCOMPARE(annot.size(), 1);
     QVERIFY(std::fabs(annot[0].onset) < 1e-12 && std::fabs(annot[0].duration - 0.109) < 1e-9);
     // Channels that are neither MEG nor EEG give no annotation.
-    QTest::ignoreMessage(QtWarningMsg, "annotateMusclZscore: no MEG or EEG channels found");
+    ScopedLogCapture capture;
     QCOMPARE(annotateMusclZscore(data, FiffInfo(), sfreq).size(), 0);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "annotateMusclZscore: no MEG or EEG channels found"), capture.dump().c_str());
 }
 
 //=============================================================================================================

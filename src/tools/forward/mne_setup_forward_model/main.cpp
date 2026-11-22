@@ -34,7 +34,6 @@
 #include "setupforwardmodel.h"
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,7 +68,6 @@ using namespace MNESETUPFORWARDMODEL;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_setup_forward_model");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "averagingdatamodel.h"
 
 #include <fiff/fiff_evoked_set.h>
@@ -165,7 +166,7 @@ bool AveragingDataModel::saveToFile(const QString& sPath)
 #else
     const auto saved = m_pFiffEvokedSet->save(sPath.toStdU16String());
     if (!saved) {
-        qWarning() << "[AveragingDataModel]" << saved.error().what();
+        mne::Log::warning("[AveragingDataModel] {}", saved.error().what());
     }
     return saved.has_value();
 #endif

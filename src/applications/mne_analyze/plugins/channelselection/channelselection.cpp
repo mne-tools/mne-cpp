@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "channelselection.h"
 
 #include <disp/viewers/helpers/selectionsceneitem.h>
@@ -30,7 +31,6 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -146,7 +146,7 @@ void ChannelSelection::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases";
+            mne::Log::warning("[ChannelSelection::handleEvent] received an Event that is not handled by switch-cases");
             break;
     }
 }

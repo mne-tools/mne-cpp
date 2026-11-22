@@ -20,7 +20,6 @@
 #include <mne/mne_bem_surface.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,7 +54,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -114,28 +111,28 @@ int main(int argc, char* argv[])
     }
 
     if (bemName.isEmpty() || outName.isEmpty()) {
-        qCritical("Both --bem and --out are required.");
+        Log::critical("Both --bem and --out are required.");
         parser.showHelp(1);
     }
 
-    qInfo("input  file : %s", qPrintable(bemName));
-    qInfo("output file : %s", qPrintable(outName));
-    qInfo("surface id  : %d", surfId);
+    Log::info("input  file : {}", bemName.toStdString());
+    Log::info("output file : {}", outName.toStdString());
+    Log::info("surface id  : {}", surfId);
     if (lengthMult == 1.0f)
-        qInfo("output in meters.");
+        Log::info("output in meters.");
     else
-        qInfo("output in millimeters.");
+        Log::info("output in millimeters.");
     if (thomOutput)
-        qInfo("output in Oostendorp (xfit) format.");
+        Log::info("output in Oostendorp (xfit) format.");
     else if (oldOutput)
-        qInfo("output in old stream format.");
+        Log::info("output in old stream format.");
     else
-        qInfo("output the vertex coordinates only.");
+        Log::info("output the vertex coordinates only.");
 
     // Read BEM surfaces
     auto read = MNEBem::read(bemName.toStdU16String());
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     const MNEBem& bem = *read;
@@ -149,7 +146,7 @@ int main(int argc, char* argv[])
         }
     }
     if (surfIdx < 0) {
-        qCritical("Surface id %d not found in %s", surfId, qPrintable(bemName));
+        Log::critical("Surface id {} not found in {}", surfId, bemName.toStdString());
         return 1;
     }
 
@@ -158,7 +155,7 @@ int main(int argc, char* argv[])
     // Write output
     QFile outFile(outName);
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outName));
+        Log::critical("Cannot open output file: {}", outName.toStdString());
         return 1;
     }
 
@@ -210,7 +207,7 @@ int main(int argc, char* argv[])
 
     out.flush();
     outFile.close();
-    qInfo("done.");
+    Log::info("done.");
 
     return 0;
 }

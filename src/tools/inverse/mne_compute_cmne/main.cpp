@@ -35,7 +35,6 @@
 #include <ml/ml_trainer.h>
 #include <pybridge/python_runner.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -451,7 +450,6 @@ static int doTrain(const QCommandLineParser& parser, bool finetune)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("mne_compute_cmne"));
     QCoreApplication::setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));

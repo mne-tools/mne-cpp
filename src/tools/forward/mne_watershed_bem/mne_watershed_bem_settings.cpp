@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mne_watershed_bem_settings.h"
 
 //=============================================================================================================
@@ -22,7 +23,6 @@
 
 #include <QCoreApplication>
 #include <QProcessEnvironment>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -139,7 +139,7 @@ MNEWatershedBemSettings::MNEWatershedBemSettings(int* argc, char** argv)
         bool ok;
         m_iPreflood = parser.value(prefloodOpt).toInt(&ok);
         if (!ok) {
-            qWarning() << "Invalid preflood value:" << parser.value(prefloodOpt);
+            mne::Log::warning("Invalid preflood value: {}", parser.value(prefloodOpt).toStdString());
             m_iPreflood = -1;
         }
     }

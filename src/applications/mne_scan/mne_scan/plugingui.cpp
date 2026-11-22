@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "plugingui.h"
 
 #include "arrow.h"
@@ -187,7 +188,7 @@ void PluginGui::clearScene()
 
 void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "load" << sPath + "/" + sFileName;
+    mne::Log::debug("load {}", (sPath + "/" + sFileName).toStdString());
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
@@ -200,7 +201,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
 {
     mne::Expected<mne::MnaProject> read = mne::MnaIO::read(mne::path_from_utf8(fullPath.toStdString()));
     if (!read || read->pipeline.empty()) {
-        qWarning() << "Empty or invalid MNA pipeline in" << fullPath << (read ? "" : read.error().what());
+        mne::Log::warning("Empty or invalid MNA pipeline in {} {}", fullPath.toStdString(), (read ? "" : read.error().what()));
         return;
     }
     mne::MnaProject& project = *read;
@@ -223,8 +224,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
             // Skipping it silently leaves the user with a pipeline that is
             // quietly missing a stage, so say which one was dropped.
             //
-            qWarning() << "[PluginGui::loadConfigMna] Configuration refers to unknown plugin"
-                       << QString::fromStdString(node.op_type) << "- skipping it.";
+            mne::Log::warning("[PluginGui::loadConfigMna] Configuration refers to unknown plugin {} - skipping it.", QString::fromStdString(node.op_type).toStdString());
             continue;
         }
 
@@ -296,7 +296,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
 
 void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "Save Config" << sPath + "/" + sFileName;
+    mne::Log::debug("Save Config {}", (sPath + "/" + sFileName).toStdString());
 
     QString fullPath = sPath + QStringLiteral("/") + sFileName;
 
@@ -366,7 +366,7 @@ void PluginGui::saveConfigMna(const QString& fullPath)
             return;
 
     if (const mne::Expected<void> written = project.write(mne::path_from_utf8(fullPath.toStdString())); !written) {
-        qWarning() << "[PluginGui::saveConfigMna]" << written.error().what();
+        mne::Log::warning("[PluginGui::saveConfigMna] {}", written.error().what());
     }
     m_loadedMnaProject = std::move(project);
 }

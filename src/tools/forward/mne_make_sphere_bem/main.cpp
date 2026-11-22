@@ -18,7 +18,6 @@
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -112,7 +110,6 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_sphere_bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -144,7 +141,7 @@ int main(int argc, char* argv[])
     // Parse origin
     QStringList originParts = parser.value(originOpt).split(',');
     if (originParts.size() != 3) {
-        qCritical("--origin: need x,y,z");
+        Log::critical("--origin: need x,y,z");
         return 1;
     }
     Vector3f origin(originParts[0].toFloat() / 1000.0f,
@@ -166,12 +163,11 @@ int main(int argc, char* argv[])
     int icoLevel = parser.value(icoOpt).toInt();
 
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
     if (radii.size() != sigmas.size()) {
-        qCritical("Number of radii (%lld) must match number of conductivities (%lld)",
-                  static_cast<long long>(radii.size()), static_cast<long long>(sigmas.size()));
+        Log::critical("Number of radii ({}) must match number of conductivities ({})", static_cast<long long>(radii.size()), static_cast<long long>(sigmas.size()));
         return 1;
     }
 
@@ -179,8 +175,7 @@ int main(int argc, char* argv[])
     MatrixX3f unitVerts;
     MatrixX3i tris;
     makeIcosphere(icoLevel, unitVerts, tris);
-    qInfo("Icosphere subdivision %d: %d vertices, %d triangles",
-          icoLevel, static_cast<int>(unitVerts.rows()), static_cast<int>(tris.rows()));
+    Log::info("Icosphere subdivision {}: {} vertices, {} triangles", icoLevel, static_cast<int>(unitVerts.rows()), static_cast<int>(tris.rows()));
 
     // Create BEM model
     MNEBem bem;
@@ -216,19 +211,17 @@ int main(int argc, char* argv[])
         surf.itris = tris;
         surf.nn = unitVerts; // normals point outward on unit sphere
 
-        qInfo("Surface %d (%s): radius=%6.1f mm, sigma=%g S/m, %d vertices",
-              i + 1, MNEBemSurface::id_name(surfId).c_str(),
-              1000.0f * radius, sigma, surf.np);
+        Log::info("Surface {} ({}): radius={:6.1f} mm, sigma={:g} S/m, {} vertices", i + 1, MNEBemSurface::id_name(surfId), 1000.0f * radius, sigma, surf.np);
 
         bem.push_back(surf);
     }
 
     // Write BEM
     if (auto written = bem.write(outFile.toStdU16String()); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return 1;
     }
-    qInfo("Written spherical BEM model to: %s", qPrintable(outFile));
+    Log::info("Written spherical BEM model to: {}", outFile.toStdString());
 
     return 0;
 }

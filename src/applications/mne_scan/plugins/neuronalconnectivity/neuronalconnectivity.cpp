@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "neuronalconnectivity.h"
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
@@ -335,7 +336,7 @@ void NeuronalConnectivity::updateRTEV(mne::scan::Measurement::SPtr pMeasurement)
 void NeuronalConnectivity::generateNodeVertices()
 {
     if (!m_pFiffInfo) {
-        qDebug() << "NeuronalConnectivity::generateNodeVertices - FiffInfo is Null. Returning.";
+        Log::debug("NeuronalConnectivity::generateNodeVertices - FiffInfo is Null. Returning.");
         return;
     }
 

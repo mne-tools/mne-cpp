@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "averaging.h"
 
 #include "FormFiles/averagingsetupwidget.h"
@@ -250,7 +251,7 @@ void Averaging::initPluginControlWidgets()
         int iCurrentStimChIdx = m_mapStimChsIndexNames.value(pAveragingSettingsView->getCurrentStimCh());
 
         if (!m_mapStimChsIndexNames.contains(pAveragingSettingsView->getCurrentStimCh())) {
-            qDebug() << "Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.";
+            Log::debug("Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.");
             iCurrentStimChIdx = m_mapStimChsIndexNames.first();
         }
 

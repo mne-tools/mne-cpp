@@ -18,7 +18,6 @@
 
 #include "fiff_types_ref.h"
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff.h>
 
 //=============================================================================================================
@@ -78,10 +77,9 @@ TestFiffMneTypesIO::TestFiffMneTypesIO()
 
 void TestFiffMneTypesIO::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qDebug() << "Epsilon" << dEpsilon;
-    qDebug() << "Raw File Name" << sRawName;
-    qDebug() << "Evoked File Name" << sEvokedName;
+    Log::debug("Epsilon {}", dEpsilon);
+    Log::debug("Raw File Name {}", sRawName.toStdString());
+    Log::debug("Evoked File Name {}", sEvokedName.toStdString());
 }
 
 //=============================================================================================================

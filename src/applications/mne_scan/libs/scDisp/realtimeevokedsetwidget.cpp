@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "realtimeevokedsetwidget.h"
 
 #include <disp/viewers/channelselectionview.h>
@@ -432,8 +433,7 @@ void RealTimeEvokedSetWidget::onMakeScreenshot(const QString& imageType)
     } else if (imageType.contains("PNG")) {
         sSuffix = "png";
     } else {
-        qWarning() << "[RealTimeEvokedSetWidget::onMakeScreenshot] Unsupported image type"
-                   << imageType << "- no screenshot was taken.";
+        Log::warning("[RealTimeEvokedSetWidget::onMakeScreenshot] Unsupported image type {} - no screenshot was taken.", imageType.toStdString());
         return;
     }
 

@@ -23,7 +23,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -129,23 +128,21 @@ bool TestMneFlashBem::hasFreeSurfer()
 
 void TestMneFlashBem::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     QVERIFY(m_tempDir.isValid());
 
     m_sAppPath = findApplication();
     m_bAppAvailable = !m_sAppPath.isEmpty();
     if (m_bAppAvailable) {
-        qDebug() << "Application found at" << m_sAppPath;
+        mne::Log::debug("Application found at {}", m_sAppPath.toStdString());
     } else {
-        qDebug() << "mne_flash_bem executable not found — skipping app tests";
+        mne::Log::debug("mne_flash_bem executable not found — skipping app tests");
     }
 
     m_bFreeSurferAvailable = hasFreeSurfer();
     if (m_bFreeSurferAvailable) {
-        qDebug() << "FreeSurfer found at" << m_sFreeSurferHome;
+        mne::Log::debug("FreeSurfer found at {}", m_sFreeSurferHome.toStdString());
     } else {
-        qDebug() << "FreeSurfer not found — skipping full-run test";
+        mne::Log::debug("FreeSurfer not found — skipping full-run test");
     }
 }
 

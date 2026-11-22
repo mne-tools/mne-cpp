@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "realtimemultisamplearraywidget.h"
 
 #include <disp/viewers/filterdesignview.h>
@@ -45,7 +46,6 @@
 #include <QDir>
 #include <QSettings>
 #include <QToolBar>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -333,14 +333,12 @@ void RealTimeMultiSampleArrayWidget::onMakeScreenshot(const QString& imageType)
     } else if (imageType.contains("PNG")) {
         sSuffix = "png";
     } else {
-        qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] Unsupported image type"
-                   << imageType << "- no screenshot was taken.";
+        mne::Log::warning("[RealTimeMultiSampleArrayWidget::onMakeScreenshot] Unsupported image type {} - no screenshot was taken.", imageType.toStdString());
         return;
     }
 
     if (m_pChannelDataView.isNull()) {
-        qWarning() << "[RealTimeMultiSampleArrayWidget::onMakeScreenshot] No data view"
-                   << "- no screenshot was taken.";
+        mne::Log::warning("[RealTimeMultiSampleArrayWidget::onMakeScreenshot] No data view - no screenshot was taken.");
         return;
     }
 

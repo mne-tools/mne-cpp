@@ -18,7 +18,6 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_entry.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -52,7 +50,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_to_meas_info");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -74,17 +71,17 @@ int main(int argc, char* argv[])
     QString destName = parser.value(destOpt);
 
     if (addName.isEmpty() || destName.isEmpty()) {
-        qCritical("Both --add and --dest are required.");
+        Log::critical("Both --add and --dest are required.");
         parser.showHelp(1);
     }
 
-    qInfo("Source file      : %s", qPrintable(addName));
-    qInfo("Destination file : %s", qPrintable(destName));
+    Log::info("Source file      : {}", addName.toStdString());
+    Log::info("Destination file : {}", destName.toStdString());
 
     // Read all tags from the source file
     FiffStream addStream(addName.toStdU16String());
     if (!addStream.open()) {
-        qCritical("Cannot open source file: %s", qPrintable(addName));
+        Log::critical("Cannot open source file: {}", addName.toStdString());
         return 1;
     }
 
@@ -103,17 +100,17 @@ int main(int argc, char* argv[])
     }
     addStream.close();
 
-    qInfo("%d tags to add", static_cast<int>(tagsToAdd.size()));
+    Log::info("{} tags to add", static_cast<int>(tagsToAdd.size()));
 
     if (tagsToAdd.empty()) {
-        qInfo("No tags to add.");
+        Log::info("No tags to add.");
         return 0;
     }
 
     // Open destination file for update and append tags
     auto destStream = FiffStream::open_update(destName.toStdU16String());
     if (!destStream) {
-        qCritical("Cannot open destination file for update: %s", qPrintable(destName));
+        Log::critical("Cannot open destination file for update: {}", destName.toStdString());
         return 1;
     }
 
@@ -126,8 +123,8 @@ int main(int argc, char* argv[])
 
     destStream->close();
 
-    qInfo("%d tags added to %s", nAdded, qPrintable(destName));
-    qInfo("done.");
+    Log::info("{} tags added to {}", nAdded, destName.toStdString());
+    Log::info("done.");
 
     return 0;
 }

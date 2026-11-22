@@ -21,7 +21,7 @@
 
 #include <disp/viewers/abstractview.h>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
 #include <disp/viewers/hpisettingsview.h>
 #include <disp/viewers/coregsettingsview.h>
 #include <disp/viewers/artifactsettingsview.h>
@@ -708,7 +708,6 @@ private slots:
 
 void TestDispViewers2::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QApplication::processEvents();
 }
 
@@ -2993,15 +2992,22 @@ void TestDispViewers2::channelRhiView_gpuFrame()
         }
         const QList<int> gpuRows = traceRows(gpu, size.width() / 8);
         const QList<int> cpuRows = traceRows(view.renderToImage(size), size.width() / 8);
+        const auto listed = [](const QList<int>& rows) {
+            StringList text;
+            for (const int row : rows) {
+                text.push_back(std::to_string(row));
+            }
+            return join(text, " ");
+        };
         for (int y : cpuRows) {
             if (!near(gpuRows, y)) {
-                qWarning() << mode << "CPU row" << y << "missing on the GPU" << gpuRows;
+                Log::warning("{} CPU row {} missing on the GPU {}", mode, y, listed(gpuRows));
                 return false;
             }
         }
         for (int y : gpuRows) {
             if (!near(cpuRows, y)) {
-                qWarning() << mode << "GPU row" << y << "missing in the image" << cpuRows;
+                Log::warning("{} GPU row {} missing in the image {}", mode, y, listed(cpuRows));
                 return false;
             }
         }

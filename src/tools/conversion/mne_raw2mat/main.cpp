@@ -17,7 +17,6 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -28,7 +27,6 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
-#include <QDebug>
 #include <QDataStream>
 #include <QByteArray>
 
@@ -157,7 +155,6 @@ static void writeMatrixVariable(QDataStream& ds, const QString& name, const Matr
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_raw2mat");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -187,18 +184,18 @@ int main(int argc, char* argv[])
     int toSamp = parser.value(toOpt).toInt();
 
     if (rawFile.isEmpty()) {
-        qCritical("--raw is required.");
+        Log::critical("--raw is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
 
     // Load raw data
     FiffRawData raw(rawFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read raw: %s", qPrintable(rawFile));
+        Log::critical("Cannot read raw: {}", rawFile.toStdString());
         return 1;
     }
 
@@ -207,19 +204,19 @@ int main(int argc, char* argv[])
     int first = (fromSamp >= 0) ? fromSamp : raw.first_samp;
     int last = (toSamp >= 0) ? toSamp : raw.last_samp;
 
-    qInfo("Raw: %d channels, %.1f Hz, samples %d..%d", nChan, sfreq, first, last);
+    Log::info("Raw: {} channels, {:.1f} Hz, samples {}..{}", nChan, sfreq, first, last);
 
     // Read data
     MatrixXd data;
     MatrixXd times;
     if (!raw.read_raw_segment(data, times, first, last)) {
-        qCritical("Cannot read data segment.");
+        Log::critical("Cannot read data segment.");
         return 1;
     }
 
     const auto rowCount = static_cast<long long>(data.rows());
     const auto sampleCount = static_cast<long long>(data.cols());
-    qInfo("Read %lld channels x %lld samples", rowCount, sampleCount);
+    Log::info("Read {} channels x {} samples", rowCount, sampleCount);
 
     // Build channel names
     StringList chNames;
@@ -229,7 +226,7 @@ int main(int argc, char* argv[])
     // Write MAT file (Level 5 format)
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly)) {
-        qCritical("Cannot open output: %s", qPrintable(outFile));
+        Log::critical("Cannot open output: {}", outFile.toStdString());
         return 1;
     }
 
@@ -263,11 +260,8 @@ int main(int argc, char* argv[])
     writeMatrixVariable(ds, "times", times);
 
     outF.close();
-    qInfo("Written MAT file: %s", qPrintable(outFile));
-    qInfo("Variables: data (%d x %lld), sfreq (1x1), times (1 x %lld)",
-          nChan,
-          sampleCount,
-          static_cast<long long>(times.cols()));
+    Log::info("Written MAT file: {}", outFile.toStdString());
+    Log::info("Variables: data ({} x {}), sfreq (1x1), times (1 x {})", nChan, sampleCount, static_cast<long long>(times.cols()));
 
     return 0;
 }

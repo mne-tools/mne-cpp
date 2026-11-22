@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "noisereductionwindow.h"
 
 //=============================================================================================================
@@ -28,8 +29,6 @@
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -234,9 +233,7 @@ void NoiseReductionWindow::checkProjStatusChanged(bool status)
             bAllActivated = false;
 
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
-        qWarning() << "[NoiseReduction] proj" << i
-                   << "checked=" << m_qListProjCheckBox[i]->isChecked()
-                   << "FiffInfo ptr=" << reinterpret_cast<void*>(m_pFiffInfo.get());
+        mne::Log::warning("[NoiseReduction] proj {} checked= {} FiffInfo ptr= {}", i, m_qListProjCheckBox[i]->isChecked(), reinterpret_cast<void*>(m_pFiffInfo.get()));
     }
 
     m_enableDisableProjectors->setChecked(bAllActivated);

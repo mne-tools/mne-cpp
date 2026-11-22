@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "commandthread.h"
 
 //=============================================================================================================
@@ -23,7 +24,6 @@
 //=============================================================================================================
 
 #include <QDataStream>
-#include <QDebug>
 #include <QIODevice>
 #include <QtEndian>
 
@@ -67,7 +67,7 @@ CommandThread::~CommandThread()
 
 void CommandThread::attachCommandReply(QString p_blockReply, qint32 p_iID)
 {
-    qDebug() << "CommandThread::attachCommandReply";
+    mne::Log::debug("CommandThread::attachCommandReply");
     if (p_iID == m_iThreadID) {
         m_qMutex.lock();
         m_qSendData = p_blockReply;
@@ -81,7 +81,7 @@ void CommandThread::run()
 {
     m_bIsRunning = true;
 
-    qInfo("CommandClient connection accepted (ID %d)\n", m_iThreadID);
+    mne::Log::info("CommandClient connection accepted (ID {})\n", m_iThreadID);
 
     // Frames are a big-endian quint16 size followed by a QDataStream (Qt 6.0) serialized QString
     QByteArray t_received;

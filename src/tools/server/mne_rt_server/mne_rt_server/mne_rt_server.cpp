@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mne_rt_server.h"
 
 #include <rtserver_connector/iconnector.h>
@@ -28,7 +29,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -102,26 +102,26 @@ MNERTServer::MNERTServer()
     //
     QString t_sError;
     if (!m_commandServer.listen(4217, t_sError)) {
-        qInfo("Unable to start the command server: %s", t_sError.toUtf8().constData());
+        mne::Log::info("Unable to start the command server: {}", t_sError.toStdString());
         return;
     }
     //
     // Run data server
     //
     if (!m_fiffStreamServer.listen(4218, t_sError)) {
-        qInfo("Unable to start the fiff stream server: %s", t_sError.toUtf8().constData());
+        mne::Log::info("Unable to start the fiff stream server: {}", t_sError.toStdString());
         return;
     }
 
     // Both servers listen on all interfaces
-    qInfo("mne_rt_server is running on\n\tHost:\t\t%s (all interfaces)\n\tcommand port:\t%d\n\tfiff data port:\t%d\n", mne::host_name().c_str(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
+    mne::Log::info("mne_rt_server is running on\n\tHost:\t\t{} (all interfaces)\n\tcommand port:\t{}\n\tfiff data port:\t{}\n", mne::host_name(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
 }
 
 //=============================================================================================================
 
 MNERTServer::~MNERTServer()
 {
-    qDebug() << "MNERTServer destructed";
+    mne::Log::debug("MNERTServer destructed");
 }
 
 //=============================================================================================================
@@ -150,7 +150,7 @@ void MNERTServer::comHelp(Command p_command)
         for (itCommands = t_pCommandManager->commandMap().begin(); itCommands != t_pCommandManager->commandMap().end(); ++itCommands) {
             if (t_qMapCommands.keys().contains(itCommands.key())) {
                 //ToDo merge
-                qDebug() << "Merge has to be performed.";
+                mne::Log::debug("Merge has to be performed.");
             } else
                 t_qMapCommands.insert(itCommands.key(), itCommands.value());
         }

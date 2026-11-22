@@ -17,14 +17,12 @@
 #include <QCommandLineParser>
 #include <QImage>
 #include <QDir>
-#include <QDebug>
 
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <cmath>
 
@@ -58,7 +56,6 @@ static double imageRmse(const QImage& a, const QImage& b)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     app.setApplicationName("mne_screenshot_regression");
 
@@ -84,7 +81,7 @@ int main(int argc, char* argv[])
     const int height = parser.value("height").toInt();
 
     if (subjectsDir.isEmpty()) {
-        qCritical().noquote().nospace() << "Error: --subjects-dir is required.";
+        Log::critical("Error: --subjects-dir is required.");
         return 1;
     }
 
@@ -113,48 +110,44 @@ int main(int argc, char* argv[])
     }
 
     if (!anyLoaded) {
-        qCritical().noquote().nospace() << "Error: No surfaces found in "
-                                        << subjectsDir << "/" << subject
-                                        << "/surf/";
+        Log::critical("Error: No surfaces found in {}/{}/surf/", subjectsDir.toStdString(), subject.toStdString());
         return 1;
     }
 
     // ── Render offscreen ────────────────────────────────────────────────
 
-    qInfo().noquote().nospace() << "Surfaces loaded, rendering offscreen (" << width << "x" << height << ")...";
+    Log::info("Surfaces loaded, rendering offscreen ({}x{})...", width, height);
 
     if (!view.savePng(outPath, width, height, QStringLiteral("white"))) {
-        qCritical().noquote().nospace() << "Error: offscreen render failed.";
+        Log::critical("Error: offscreen render failed.");
         return 1;
     }
 
-    qInfo().noquote().nospace() << "Saved screenshot: " << outPath;
+    Log::info("Saved screenshot: {}", outPath.toStdString());
 
     // ── Optional golden comparison ──────────────────────────────────────
     if (!refPath.isEmpty()) {
         QImage ref(refPath);
         if (ref.isNull()) {
-            qCritical().noquote().nospace() << "Error: cannot load reference image: "
-                                            << refPath;
+            Log::critical("Error: cannot load reference image: {}", refPath.toStdString());
             return 1;
         }
 
         QImage out(outPath);
         if (out.isNull()) {
-            qCritical().noquote().nospace() << "Error: cannot load rendered image.";
+            Log::critical("Error: cannot load rendered image.");
             return 1;
         }
 
         const double rmse = imageRmse(ref, out);
-        qInfo().noquote().nospace() << "RMSE: " << rmse << " (tolerance: " << tolerance << ")";
+        Log::info("RMSE: {} (tolerance: {})", rmse, tolerance);
 
         if (rmse > tolerance) {
-            qCritical().noquote().nospace() << "FAIL: RMSE " << rmse << " exceeds tolerance "
-                                            << tolerance;
+            Log::critical("FAIL: RMSE {} exceeds tolerance {}", rmse, tolerance);
             return 1;
         }
 
-        qInfo().noquote().nospace() << "PASS: screenshot matches reference within tolerance.";
+        Log::info("PASS: screenshot matches reference within tolerance.");
     }
 
     return 0;

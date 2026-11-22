@@ -20,7 +20,6 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -33,7 +32,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,7 +58,7 @@ static StringList readBadChannelList(const QString& filename)
     StringList bads;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open bad channel file: %s", qPrintable(filename));
+        Log::critical("Cannot open bad channel file: {}", filename.toStdString());
         return bads;
     }
     QTextStream in(&file);
@@ -76,7 +74,6 @@ static StringList readBadChannelList(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_mark_bad_channels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -98,27 +95,27 @@ int main(int argc, char* argv[])
     QString fifName = parser.value(fifOpt);
 
     if (fifName.isEmpty() || badName.isEmpty()) {
-        qCritical("Both --fif and --bad are required.");
+        Log::critical("Both --fif and --bad are required.");
         return 1;
     }
     if (!QFileInfo(badName).isReadable()) {
-        qCritical("Cannot open bad channel file: %s", qPrintable(badName));
+        Log::critical("Cannot open bad channel file: {}", badName.toStdString());
         return 1;
     }
     if (!QFileInfo(fifName).isReadable()) {
-        qCritical("Cannot read FIFF file: %s", qPrintable(fifName));
+        Log::critical("Cannot read FIFF file: {}", fifName.toStdString());
         return 1;
     }
 
     // Read the bad channel list
     StringList bads = readBadChannelList(badName);
     if (bads.empty()) {
-        qWarning("Bad channel list is empty.");
+        Log::warning("Bad channel list is empty.");
     }
 
-    qInfo("Bad channels to mark (%lld):", static_cast<long long>(bads.size()));
+    Log::info("Bad channels to mark ({}):", static_cast<long long>(bads.size()));
     for (const std::string& ch : bads) {
-        qInfo("  %s", ch.c_str());
+        Log::info("  {}", ch);
     }
 
     // Open the FIFF file and read raw data
@@ -126,24 +123,24 @@ int main(int argc, char* argv[])
     try {
         raw = FiffRawData(fifName.toStdU16String());
     } catch (const std::exception& error) {
-        qCritical("Cannot read FIFF file %s: %s", qPrintable(fifName), error.what());
+        Log::critical("Cannot read FIFF file {}: {}", fifName.toStdString(), error.what());
         return 1;
     }
     if (raw.info.empty()) {
-        qCritical("Cannot read FIFF file: %s", qPrintable(fifName));
+        Log::critical("Cannot read FIFF file: {}", fifName.toStdString());
         return 1;
     }
 
     // Update bad channels
-    qInfo("Previous bad channels: %lld", static_cast<long long>(raw.info.bads.size()));
+    Log::info("Previous bad channels: {}", static_cast<long long>(raw.info.bads.size()));
     raw.info.bads = bads;
-    qInfo("New bad channels: %lld", static_cast<long long>(raw.info.bads.size()));
+    Log::info("New bad channels: {}", static_cast<long long>(raw.info.bads.size()));
 
     // Read all data
     Eigen::MatrixXd data;
     Eigen::MatrixXd times;
     if (!raw.read_raw_segment(data, times)) {
-        qCritical("Cannot read raw data segment.");
+        Log::critical("Cannot read raw data segment.");
         return 1;
     }
 
@@ -152,7 +149,7 @@ int main(int argc, char* argv[])
     Eigen::RowVectorXd cals;
     auto outStream = FiffStream::start_writing_raw(tmpName.toStdU16String(), raw.info, cals);
     if (!outStream) {
-        qCritical("Cannot open temp file for writing.");
+        Log::critical("Cannot open temp file for writing.");
         return 1;
     }
 
@@ -172,7 +169,7 @@ int main(int argc, char* argv[])
     QFile::remove(fifName);
     QFile::rename(tmpName, fifName);
 
-    qInfo("Successfully updated bad channels in %s", qPrintable(fifName));
+    Log::info("Successfully updated bad channels in {}", fifName.toStdString());
 
     return 0;
 }

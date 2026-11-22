@@ -13,7 +13,8 @@
  */
 
 #include <writetofile/writetofile.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <memory>
 #include <writetofile/FormFiles/writetofilestatuswidget.h>
 
@@ -39,11 +40,6 @@ class TestWriteToFileStatus : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase()
-    {
-        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
-    }
-
     void formatHelpers_produceExpectedStrings();
     void emitRecordingStatus_isRepeatableAndMonotonic();
     void statusWidget_reflectsLatestSummary();
@@ -200,8 +196,9 @@ void TestWriteToFileStatus::recording_refusesUnwritableFile()
     plugin.m_pOutfid = mne::FiffStream::start_writing_raw(tmpDir.filePath(QStringLiteral("rec_raw.fif")).toStdString(), *plugin.m_pFiffInfo, plugin.m_mCals);
     QVERIFY(plugin.m_pOutfid);
     plugin.m_bWriteToFile = true;
-    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot write"));
+    ScopedLogCapture capture;
     plugin.splitRecordingFile();
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Cannot write"), capture.dump().c_str());
     QVERIFY(!plugin.m_pOutfid);
     QVERIFY(!plugin.m_bWriteToFile);
     mne::FiffStream finished(QString(tmpDir.filePath(QStringLiteral("rec_raw.fif"))).toStdU16String()); // the first file was finished and links to the next one

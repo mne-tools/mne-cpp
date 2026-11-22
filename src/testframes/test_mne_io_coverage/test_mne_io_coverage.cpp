@@ -10,6 +10,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
+#include <base/log.h>
 #include <memory>
 #include <QCoreApplication>
 #include <QDir>
@@ -132,7 +133,7 @@ private slots:
             QVERIFY(info->sfreq > 0);
             QVERIFY(!info->chInfo.empty());
         } else {
-            qWarning() << "MNERawInfo::load failed — code path exercised";
+            Log::warning("MNERawInfo::load failed — code path exercised");
         }
     }
 

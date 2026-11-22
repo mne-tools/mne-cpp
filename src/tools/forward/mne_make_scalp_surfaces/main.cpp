@@ -19,7 +19,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,7 +59,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_scalp_surfaces");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -90,11 +87,11 @@ int main(int argc, char* argv[])
     QString gradesStr = parser.value(gradesOpt);
 
     if (bemFile.isEmpty()) {
-        qCritical("--bem is required.");
+        Log::critical("--bem is required.");
         return 1;
     }
     if (outDir.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -107,48 +104,48 @@ int main(int argc, char* argv[])
             grades.append(val);
     }
     if (grades.isEmpty()) {
-        qCritical("No valid vertex counts specified.");
+        Log::critical("No valid vertex counts specified.");
         return 1;
     }
 
     const QFileInfo bemFileInfo(bemFile);
     if (!bemFileInfo.isFile() || !bemFileInfo.isReadable()) {
-        qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
+        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
         return 1;
     }
 
     // Read BEM
     MNEBem bem(bemFile.toStdU16String());
     if (bem.size() == 0) {
-        qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
+        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
         return 1;
     }
 
-    qInfo("Read BEM with %zu surface(s) from %s", bem.size(), qPrintable(bemFile));
+    Log::info("Read BEM with {} surface(s) from {}", bem.size(), bemFile.toStdString());
 
     // Find outer skin surface (typically the last/outermost surface, or id == FIFFV_BEM_SURF_ID_HEAD)
     auto head = std::ranges::find(bem, FIFFV_BEM_SURF_ID_HEAD, &MNEBemSurface::id);
     if (head == bem.end()) {
         head = std::prev(bem.end());
-        qInfo("No explicit outer skin surface found, using the outermost surface.");
+        Log::info("No explicit outer skin surface found, using the outermost surface.");
     }
     const MNEBemSurface& skin = *head;
-    qInfo("Using surface %td: %d vertices, %d triangles", head - bem.begin(), skin.np, skin.ntri);
+    Log::info("Using surface {}: {} vertices, {} triangles", head - bem.begin(), skin.np, skin.ntri);
 
     // Create output directory
     QDir dir;
     if (!dir.mkpath(outDir)) {
-        qCritical("Cannot create output directory: %s", qPrintable(outDir));
+        Log::critical("Cannot create output directory: {}", outDir.toStdString());
         return 1;
     }
 
     // Generate decimated surfaces
     for (int targetVerts : grades) {
-        qInfo("Decimating to %d vertices...", targetVerts);
+        Log::info("Decimating to {} vertices...", targetVerts);
         const std::vector<MNEBemSurface> surfaces =
             MNEBemSurface::makeScalpSurfaces(skin, {targetVerts});
         if (surfaces.empty()) {
-            qCritical("Could not decimate scalp surface to %d vertices.", targetVerts);
+            Log::critical("Could not decimate scalp surface to {} vertices.", targetVerts);
             return 1;
         }
         const MNEBemSurface& decimated = surfaces.front();
@@ -161,14 +158,13 @@ int main(int argc, char* argv[])
         outBem.push_back(decimated);
 
         if (auto written = outBem.write(outPath.toStdU16String()); !written) {
-            qCritical("%s", written.error().what());
+            Log::critical("{}", written.error().what());
             return 1;
         }
 
-        qInfo("  Written %d vertices, %d triangles to %s",
-              decimated.np, decimated.ntri, qPrintable(outPath));
+        Log::info("  Written {} vertices, {} triangles to {}", decimated.np, decimated.ntri, outPath.toStdString());
     }
 
-    qInfo("Done.");
+    Log::info("Done.");
     return 0;
 }

@@ -18,18 +18,12 @@
 #include "brainflowboard.h"
 
 #include "FormFiles/brainflowsetupwidget.h"
-
+#include <base/log.h>
 #include <acq/acq_device_registry.h>
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
 #include <fiff/fiff_info.h>
 #include <scMeas/realtimemultisamplearray.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -112,14 +106,14 @@ bool BrainFlowBoard::start()
     mne::register_brainflow_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString(device.error().text());
+        mne::Log::warning("[BrainFlowBoard::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        mne::Log::warning("[BrainFlowBoard::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -130,7 +124,7 @@ bool BrainFlowBoard::start()
     m_pOutput->measurementData()->setVisibility(true);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[BrainFlowBoard::start]" << QString::fromStdString(e.text());
+        mne::Log::warning("[BrainFlowBoard::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -187,7 +181,7 @@ void BrainFlowBoard::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[BrainFlowBoard::run]" << QString::fromStdString(read.error().text());
+            mne::Log::warning("[BrainFlowBoard::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pOutput->measurementData()->setValue(block);

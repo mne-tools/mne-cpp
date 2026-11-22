@@ -20,7 +20,6 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -32,7 +31,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
-#include <QDebug>
 #include <QStringList>
 
 //=============================================================================================================
@@ -76,7 +74,7 @@ static QList<DigPoint> readCtfDig(const QString& filename, bool numFids)
     QList<DigPoint> points;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open CTF digitization file: %s", qPrintable(filename));
+        Log::critical("Cannot open CTF digitization file: {}", filename.toStdString());
         return points;
     }
 
@@ -175,7 +173,6 @@ static bool computeHeadTransform(const DigPoint& nasion, const DigPoint& lpa, co
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf_dig2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -205,22 +202,22 @@ int main(int argc, char* argv[])
     bool numFids = parser.isSet(numfidsOpt);
 
     if (ctfName.isEmpty()) {
-        qCritical("--ctf is required.");
+        Log::critical("--ctf is required.");
         parser.showHelp(1);
     }
     if (fifName.isEmpty() && hptsName.isEmpty()) {
-        qCritical("At least one of --fif or --hpts must be specified.");
+        Log::critical("At least one of --fif or --hpts must be specified.");
         parser.showHelp(1);
     }
 
     QList<DigPoint> points = readCtfDig(ctfName, numFids);
     const auto pointCount = static_cast<long long>(points.size());
     if (points.size() < 3) {
-        qCritical("Need at least 3 fiducial points, got %lld", pointCount);
+        Log::critical("Need at least 3 fiducial points, got {}", pointCount);
         return 1;
     }
 
-    qInfo("Read %lld digitization points from %s", pointCount, qPrintable(ctfName));
+    Log::info("Read {} digitization points from {}", pointCount, ctfName.toStdString());
 
     // Compute head coordinate transform from fiducials
     Matrix4f headTrans;
@@ -239,7 +236,7 @@ int main(int argc, char* argv[])
     if (!fifName.isEmpty()) {
         auto outStream = FiffStream::start_file(fifName.toStdU16String());
         if (!outStream) {
-            qCritical("Cannot open output file: %s", qPrintable(fifName));
+            Log::critical("Cannot open output file: {}", fifName.toStdString());
             return 1;
         }
 
@@ -256,14 +253,14 @@ int main(int argc, char* argv[])
         }
         outStream->end_block(FIFFB_ISOTRAK);
         outStream->end_file();
-        qInfo("Wrote %lld points to %s", pointCount, qPrintable(fifName));
+        Log::info("Wrote {} points to {}", pointCount, fifName.toStdString());
     }
 
     // Write hpts output
     if (!hptsName.isEmpty()) {
         QFile hptsFile(hptsName);
         if (!hptsFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open hpts file: %s", qPrintable(hptsName));
+            Log::critical("Cannot open hpts file: {}", hptsName.toStdString());
             return 1;
         }
         QTextStream out(&hptsFile);
@@ -284,7 +281,7 @@ int main(int argc, char* argv[])
                 << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
         }
         hptsFile.close();
-        qInfo("Wrote %lld points to %s", pointCount, qPrintable(hptsName));
+        Log::info("Wrote {} points to {}", pointCount, hptsName.toStdString());
     }
 
     return 0;

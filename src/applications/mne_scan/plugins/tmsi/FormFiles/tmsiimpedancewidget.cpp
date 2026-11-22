@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "tmsiimpedancewidget.h"
 
 #include "ui_tmsiimpedancewidget.h"
@@ -136,7 +137,7 @@ void TMSIImpedanceWidget::initGraphicScene()
 
     const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8((layoutDirectory() + "standard_waveguard128.elc").toStdString()));
     if (!layout) {
-        qDebug() << "Error: Reading elc file.";
+        mne::Log::debug("Error: Reading elc file.");
         return;
     }
     addElectrodeItems(*layout);
@@ -241,7 +242,7 @@ void TMSIImpedanceWidget::loadLayout()
 
     const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(sElcFilePath.toStdString()));
     if (!layout) {
-        qDebug() << "Error: Reading elc file.";
+        mne::Log::debug("Error: Reading elc file.");
         return;
     }
     m_qGScene->clear();

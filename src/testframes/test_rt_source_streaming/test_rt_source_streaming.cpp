@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <disp3D/workers/rtsourcedataworker.h>
 #include <disp3D/workers/rtsourcedatacontroller.h>
 
@@ -89,9 +90,7 @@ TestRtSourceStreaming::TestRtSourceStreaming()
 
 void TestRtSourceStreaming::initTestCase()
 {
-    qDebug() << "TestRtSourceStreaming: starting tests with"
-             << m_iNumSourcesLh << "LH sources," << m_iNumSourcesRh << "RH sources,"
-             << m_iNumVertsLh << "LH verts," << m_iNumVertsRh << "RH verts.";
+    mne::Log::debug("TestRtSourceStreaming: starting tests with {} LH sources, {} RH sources, {} LH verts, {} RH verts.", m_iNumSourcesLh, m_iNumSourcesRh, m_iNumVertsLh, m_iNumVertsRh);
 }
 
 //=============================================================================================================
@@ -371,7 +370,7 @@ void TestRtSourceStreaming::testControllerStreaming()
 
     controller.setStreamingState(false);
 
-    qDebug() << "Controller streaming frames received:" << spy.count();
+    mne::Log::debug("Controller streaming frames received: {}", spy.count());
 
     // Verify first frame has correct structure
     QList<QVariant> firstArgs = spy.first();
@@ -423,7 +422,7 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
     controller.setStreamingState(false);
     int count100 = spy100.count();
 
-    qDebug() << "Frames at 500ms interval:" << count500 << ", at 100ms interval:" << count100;
+    mne::Log::debug("Frames at 500ms interval: {} , at 100ms interval: {}", count500, count100);
     // 100ms interval should produce more frames than 500ms
     QVERIFY2(count100 > count500,
              qPrintable(QString("Expected more frames at 100ms (%1) than 500ms (%2)").arg(count100).arg(count500)));
@@ -433,7 +432,7 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
 
 void TestRtSourceStreaming::cleanupTestCase()
 {
-    qDebug() << "TestRtSourceStreaming: all tests completed.";
+    mne::Log::debug("TestRtSourceStreaming: all tests completed.");
 }
 
 //=============================================================================================================

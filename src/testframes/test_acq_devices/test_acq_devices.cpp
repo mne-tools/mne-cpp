@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_convert.h>
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
@@ -112,7 +113,7 @@ Recording record_device(AcqDevice& device)
         auto view = reader->acquire(1, 10s);
         if (!view) {
             if (view.error() != AcqErrorCode::EndOfStream) {
-                qWarning("acquire: %s", view.error().text().c_str());
+                Log::warning("acquire: {}", view.error().text());
             }
             break;
         }
@@ -152,7 +153,7 @@ Recording record(const std::string& uri)
 {
     auto device = AcqDevice::open(uri);
     if (!device) {
-        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
+        Log::warning("open({}): {}", uri, device.error().text());
         return {};
     }
     return record_device(*device);

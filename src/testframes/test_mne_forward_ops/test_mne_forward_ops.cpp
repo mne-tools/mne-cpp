@@ -13,7 +13,8 @@
 
 #include <QtTest/QtTest>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -59,7 +60,6 @@ private slots:
 
     void initTestCase()
     {
-        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
         m_sDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         m_sFwdFile = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
         m_sRawFile = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
@@ -258,8 +258,9 @@ private slots:
         // A vertex the forward does not have is refused, as with mne's on_missing="raise"
         InvSourceEstimate missing(data.topRows(1), (VectorXi(1) << 842).finished(), 0.1f, 0.002f);
         missing.nVerticesLh = 1;
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("apply_forward.*842"));
+        ScopedLogCapture capture;
         QCOMPARE(mne::apply_forward(m_fwd, missing, ave.info).data.size(), Eigen::Index(0));
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, std::regex("apply_forward.*842")), capture.dump().c_str());
     }
 
     // ── compute_orient_prior ────────────────────────────────────────────────
@@ -426,7 +427,7 @@ private slots:
             QCOMPARE(reloaded.nchan, m_fwd.nchan);
             QFile::remove(tmpFile);
         } else {
-            qWarning("Forward solution write failed — code path exercised");
+            Log::warning("Forward solution write failed — code path exercised");
         }
     }
 

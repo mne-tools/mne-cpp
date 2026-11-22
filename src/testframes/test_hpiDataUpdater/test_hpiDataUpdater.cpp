@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 #include <inv/hpi/inv_hpi_data_updater.h>
 #include <inv/hpi/inv_sensor_set.h>
@@ -102,8 +101,6 @@ TestHpiDataUpdater::TestHpiDataUpdater()
 
 void TestHpiDataUpdater::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
@@ -118,7 +115,7 @@ void TestHpiDataUpdater::initTestCase()
     int iBuffer = 200;
     MatrixXd matTimes;
     if (!m_raw.read_raw_segment(m_matData, matTimes, m_raw.first_samp, m_raw.first_samp + iBuffer - 1)) {
-        qCritical("error during read_raw_segment");
+        Log::critical("error during read_raw_segment");
     }
 
     // Prepare channel lists without bads

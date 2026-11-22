@@ -15,7 +15,8 @@
 //=============================================================================================================
 
 #include <base/base_global.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <bids/bids_path.h>
 #include <base/byte_stream.h>
 #include <base/json.h>
@@ -169,7 +170,6 @@ std::filesystem::path TestBids::bidsRoot() const
 
 void TestBids::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     // Verify fixture data exists
     QVERIFY2(std::filesystem::is_directory(bidsRoot()),
              qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + mne::utf8_from_path(bidsRoot()))));
@@ -859,8 +859,9 @@ void TestBids::testBrainVisionReaderMatchesPython()
     ascii.write(header.replace(QStringLiteral("DataFormat=BINARY"), QStringLiteral("DataFormat=ASCII")).toUtf8());
     ascii.close();
     BrainVisionReader asciiReader;
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Only BINARY data is supported"));
+    ScopedLogCapture capture;
     QVERIFY(!asciiReader.open(stdpath(ascii.fileName())));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Only BINARY data is supported"), capture.dump().c_str());
 }
 
 //=============================================================================================================

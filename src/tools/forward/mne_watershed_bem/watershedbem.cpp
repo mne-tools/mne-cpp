@@ -26,6 +26,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "watershedbem.h"
 #include "mne_watershed_bem_settings.h"
 
@@ -48,7 +49,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -75,20 +75,20 @@ int WatershedBem::run()
     // Validate environment — ported from mne_watershed_bem shell script
     //
     if (m_settings.freeSurferHome().isEmpty()) {
-        qCritical() << "The FreeSurfer environment needs to be set up for this tool.";
-        qCritical() << "Please set FREESURFER_HOME.";
+        Log::critical("The FreeSurfer environment needs to be set up for this tool.");
+        Log::critical("Please set FREESURFER_HOME.");
         return 1;
     }
 
     if (m_settings.subjectsDir().isEmpty()) {
-        qCritical() << "The subjects directory (SUBJECTS_DIR) is not set.";
-        qCritical() << "Use --subjects-dir or set the SUBJECTS_DIR environment variable.";
+        Log::critical("The subjects directory (SUBJECTS_DIR) is not set.");
+        Log::critical("Use --subjects-dir or set the SUBJECTS_DIR environment variable.");
         return 1;
     }
 
     if (m_settings.subject().isEmpty()) {
-        qCritical() << "The subject name is not set.";
-        qCritical() << "Use --subject or set the SUBJECT environment variable.";
+        Log::critical("The subject name is not set.");
+        Log::critical("Use --subject or set the SUBJECT environment variable.");
         return 1;
     }
 
@@ -106,14 +106,14 @@ int WatershedBem::run()
     // Validate directory structure
     //
     if (!QDir(subjectDir).exists()) {
-        qCritical() << "Could not find the MRI data directory" << subjectDir;
+        Log::critical("Could not find the MRI data directory {}", subjectDir.toStdString());
         return 1;
     }
 
     // Create bem directory if needed
     if (!QDir(bemDir).exists()) {
         if (!QDir().mkpath(bemDir)) {
-            qCritical() << "Could not create the model directory" << bemDir;
+            Log::critical("Could not create the model directory {}", bemDir.toStdString());
             return 1;
         }
     }
@@ -121,21 +121,21 @@ int WatershedBem::run()
     // Check that MRI data exists (directory or .mgz file)
     bool useMgz = QFileInfo::exists(T1Mgz);
     if (!QDir(T1Dir).exists() && !useMgz) {
-        qCritical() << "Could not find the MRI data.";
-        qCritical() << "  Looked for directory:" << T1Dir;
-        qCritical() << "  Looked for file:" << T1Mgz;
+        Log::critical("Could not find the MRI data.");
+        Log::critical("  Looked for directory: {}", T1Dir.toStdString());
+        Log::critical("  Looked for file: {}", T1Mgz.toStdString());
         return 1;
     }
 
     // Check for existing watershed directory
     if (QDir(wsDir).exists()) {
         if (!m_settings.overwrite()) {
-            qCritical() << wsDir << "already exists. Use the --overwrite option to recreate it.";
+            Log::critical("{} already exists. Use the --overwrite option to recreate it.", wsDir.toStdString());
             return 1;
         } else {
             QDir wsDirObj(wsDir);
             if (!wsDirObj.removeRecursively()) {
-                qCritical() << "Could not remove" << wsDir;
+                Log::critical("Could not remove {}", wsDir.toStdString());
                 return 1;
             }
         }
@@ -144,18 +144,18 @@ int WatershedBem::run()
     //
     // Report parameters
     //
-    qInfo("%s", "");
-    qInfo("Running mri_watershed for BEM segmentation with the following parameters");
-    qInfo("%s", "");
-    qInfo("SUBJECTS_DIR = %s", qPrintable(m_settings.subjectsDir()));
-    qInfo("Subject      = %s", qPrintable(m_settings.subject()));
-    qInfo("Result dir   = %s", qPrintable(wsDir));
-    qInfo("%s", "");
+    Log::info("{}", "");
+    Log::info("Running mri_watershed for BEM segmentation with the following parameters");
+    Log::info("{}", "");
+    Log::info("SUBJECTS_DIR = {}", m_settings.subjectsDir().toStdString());
+    Log::info("Subject      = {}", m_settings.subject().toStdString());
+    Log::info("Result dir   = {}", wsDir.toStdString());
+    Log::info("{}", "");
 
     // Create output directory structure
     QString wsSubDir = wsDir + "/ws";
     if (!QDir().mkpath(wsSubDir)) {
-        qCritical() << "Could not create the destination directories.";
+        Log::critical("Could not create the destination directories.");
         return 1;
     }
 
@@ -195,8 +195,8 @@ int WatershedBem::run()
         return 1;
     }
 
-    qInfo("Created %s", qPrintable(headFif));
-    qInfo("\nComplete.\n");
+    Log::info("Created {}", headFif.toStdString());
+    Log::info("\nComplete.\n");
     return 0;
 }
 
@@ -210,7 +210,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     //
     QString watershedBin = m_settings.freeSurferHome() + "/bin/mri_watershed";
     if (!QFileInfo::exists(watershedBin)) {
-        qCritical() << "Could not find mri_watershed at" << watershedBin;
+        Log::critical("Could not find mri_watershed at {}", watershedBin.toStdString());
         return false;
     }
 
@@ -242,7 +242,7 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     args << mriInput;
     args << (wsDir + "/ws");
 
-    qInfo("Running: %s %s\n", qPrintable(watershedBin), qPrintable(args.join(' ')));
+    Log::info("Running: {} {}\n", watershedBin.toStdString(), args.join(' ').toStdString());
 
     //
     // Execute mri_watershed
@@ -259,18 +259,18 @@ bool WatershedBem::runMriWatershed(const QString& mriInput, const QString& wsDir
     process.start(watershedBin, args);
 
     if (!process.waitForStarted()) {
-        qCritical() << "Failed to start mri_watershed:" << process.errorString();
+        Log::critical("Failed to start mri_watershed: {}", process.errorString().toStdString());
         return false;
     }
 
     // Wait indefinitely for mri_watershed to finish (it can take minutes)
     if (!process.waitForFinished(-1)) {
-        qCritical() << "mri_watershed did not finish:" << process.errorString();
+        Log::critical("mri_watershed did not finish: {}", process.errorString().toStdString());
         return false;
     }
 
     if (process.exitCode() != 0) {
-        qCritical() << "mri_watershed failed with exit code" << process.exitCode();
+        Log::critical("mri_watershed failed with exit code {}", process.exitCode());
         return false;
     }
 
@@ -302,7 +302,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
     QString subjectMriDir = m_settings.subjectsDir() + "/" + m_settings.subject() + "/mri";
 
     if (!MriMghIO::read(mgzFile.toStdString(), volData, additionalTrans, subjectMriDir.toStdString(), m_settings.verbose())) {
-        qCritical() << "Failed to read MGH/MGZ file" << mgzFile;
+        Log::critical("Failed to read MGH/MGZ file {}", mgzFile.toStdString());
         return false;
     }
 
@@ -317,21 +317,21 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         QString surfPath = wsDir + "/" + surfName;
         QFileInfo fi(surfPath);
         if (!fi.exists()) {
-            qWarning() << "Watershed surface not found:" << surfPath;
+            Log::warning("Watershed surface not found: {}", surfPath.toStdString());
             continue;
         }
 
         if (m_settings.verbose()) {
-            qInfo("Verifying surface: %s", qPrintable(surfPath));
+            Log::info("Verifying surface: {}", surfPath.toStdString());
         }
 
         // Read surface to verify it is valid
         FsSurface surf;
         FsSurface::read(surfPath.toStdU16String(), surf, false);
         if (surf.rr().rows() == 0) {
-            qWarning() << "FsSurface" << surfPath << "has no vertices.";
+            Log::warning("FsSurface {} has no vertices.", surfPath.toStdString());
         } else if (m_settings.verbose()) {
-            qInfo("  %d vertices, %d triangles", static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
+            Log::info("  {} vertices, {} triangles", static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
         }
     }
 
@@ -357,12 +357,11 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     FsSurface::read(surfFile.toStdU16String(), fsSurface, false);
 
     if (fsSurface.rr().rows() == 0 || fsSurface.tris().rows() == 0) {
-        qCritical() << "Failed to read surface from" << surfFile;
+        Log::critical("Failed to read surface from {}", surfFile.toStdString());
         return false;
     }
 
-    qInfo("Read surface: %d vertices, %d triangles",
-          static_cast<int>(fsSurface.rr().rows()), static_cast<int>(fsSurface.tris().rows()));
+    Log::info("Read surface: {} vertices, {} triangles", static_cast<int>(fsSurface.rr().rows()), static_cast<int>(fsSurface.tris().rows()));
 
     //
     // Create BEM surface
@@ -390,7 +389,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     bem.push_back(bemSurface);
 
     if (auto written = bem.write(fifFile.toStdU16String()); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return false;
     }
 

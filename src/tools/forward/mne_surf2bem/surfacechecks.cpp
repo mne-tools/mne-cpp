@@ -24,13 +24,8 @@
 
 #include "surfacechecks.h"
 
+#include <base/log.h>
 #include <fiff/fiff_constants.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -123,19 +118,14 @@ bool SurfaceChecks::isCompleteSurface(const MNEBemSurface& surf)
     }
     cm /= static_cast<float>(surf.np);
 
-    qInfo("%s CM is %6.2f %6.2f %6.2f mm",
-          qPrintable(getNameOf(surf.id)),
-          1000.0f * cm(0),
-          1000.0f * cm(1),
-          1000.0f * cm(2));
+    Log::info("{} CM is {:6.2f} {:6.2f} {:6.2f} mm", getNameOf(surf.id).toStdString(), 1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
     //
     // Sum of solid angles from the center should be 4*pi for a complete surface
     //
     double totAngle = sumSolids(cm, surf) / (4.0 * std::numbers::pi);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        qCritical() << "FsSurface" << getNameOf(surf.id) << "is not complete"
-                    << "(sum of solid angles =" << totAngle << "* 4*PI instead).";
+        Log::critical("FsSurface {} is not complete (sum of solid angles = {} * 4*PI instead).", getNameOf(surf.id).toStdString(), totAngle);
         return false;
     }
     return true;
@@ -149,9 +139,7 @@ bool SurfaceChecks::isInside(const MNEBemSurface& from, const MNEBemSurface& to)
         Vector3f pt = from.rr.row(k);
         double totAngle = sumSolids(pt, to) / (4.0 * std::numbers::pi);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            qCritical() << "FsSurface" << getNameOf(from.id)
-                        << "is not completely inside surface" << getNameOf(to.id)
-                        << "(sum of solid angles =" << totAngle << "* 4*PI).";
+            Log::critical("FsSurface {} is not completely inside surface {} (sum of solid angles = {} * 4*PI).", getNameOf(from.id).toStdString(), getNameOf(to.id).toStdString(), totAngle);
             return false;
         }
     }
@@ -179,10 +167,10 @@ bool SurfaceChecks::checkSurfaces(const QVector<MNEBemSurface>& surfs)
                                   .arg(getNameOf(surfs[j + 1].id), getNameOf(surfs[j].id));
 
         if (!isInside(surfs[j + 1], surfs[j])) {
-            qCritical("%s [failed]", qPrintable(check));
+            Log::critical("{} [failed]", check.toStdString());
             return false;
         }
-        qInfo("%s [ok]", qPrintable(check));
+        Log::info("{} [ok]", check.toStdString());
     }
     return true;
 }
@@ -208,14 +196,9 @@ float SurfaceChecks::minSurfaceDistance(const MNEBemSurface& s1, const MNEBemSur
 bool SurfaceChecks::checkThicknesses(const QVector<MNEBemSurface>& surfs)
 {
     for (int k = 0; k < surfs.size() - 1; ++k) {
-        qInfo("Checking distance between %s and %s surfaces...",
-              qPrintable(getNameOf(surfs[k].id)),
-              qPrintable(getNameOf(surfs[k + 1].id)));
+        Log::info("Checking distance between {} and {} surfaces...", getNameOf(surfs[k].id).toStdString(), getNameOf(surfs[k + 1].id).toStdString());
         float dist = minSurfaceDistance(surfs[k], surfs[k + 1]);
-        qInfo("Minimum distance between the %s and %s surfaces is approximately %6.1f mm",
-              qPrintable(getNameOf(surfs[k].id)),
-              qPrintable(getNameOf(surfs[k + 1].id)),
-              1000.0f * dist);
+        Log::info("Minimum distance between the {} and {} surfaces is approximately {:6.1f} mm", getNameOf(surfs[k].id).toStdString(), getNameOf(surfs[k + 1].id).toStdString(), 1000.0f * dist);
     }
     return true;
 }
@@ -240,9 +223,7 @@ bool SurfaceChecks::checkSurfaceSize(const MNEBemSurface& surf)
 
     for (int c = 0; c < 3; ++c) {
         if (maxDim(c) - minDim(c) < MINSIZE) {
-            qCritical() << "Dimensions of the surface" << getNameOf(surf.id)
-                        << "seem too small (" << 1000.0f * (maxDim(c) - minDim(c)) << "mm)."
-                        << "Maybe the unit of measure is meters instead of mm.";
+            Log::critical("Dimensions of the surface {} seem too small ( {} mm). Maybe the unit of measure is meters instead of mm.", getNameOf(surf.id).toStdString(), 1000.0f * (maxDim(c) - minDim(c)));
             return false;
         }
     }
@@ -254,15 +235,12 @@ bool SurfaceChecks::checkSurfaceSize(const MNEBemSurface& surf)
 void SurfaceChecks::reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
 {
     if (surf.tri_area.size() == 0) {
-        qInfo("No triangle area data available for %s", qPrintable(name));
+        Log::info("No triangle area data available for {}", name.toStdString());
         return;
     }
 
     double minArea = surf.tri_area.minCoeff();
     double maxArea = surf.tri_area.maxCoeff();
 
-    qInfo("Triangle areas on %s surface: %8.3f ... %8.3f mm^2",
-          qPrintable(name),
-          1e6 * minArea,
-          1e6 * maxArea);
+    Log::info("Triangle areas on {} surface: {:8.3f} ... {:8.3f} mm^2", name.toStdString(), 1e6 * minArea, 1e6 * maxArea);
 }

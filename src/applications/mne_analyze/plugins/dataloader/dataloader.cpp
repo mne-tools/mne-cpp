@@ -18,6 +18,7 @@
 
 #include "dataloader.h"
 
+#include <base/log.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
@@ -31,12 +32,6 @@
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
 #include <disp/viewers/progressview.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -217,7 +212,7 @@ void DataLoader::handleEvent(QSharedPointer<Event> e)
             onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[DataLoader::handleEvent] Received an Event that is not handled by switch cases.";
+            mne::Log::warning("[DataLoader::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 
@@ -283,8 +278,7 @@ void DataLoader::loadFilePath(const QString& sFilePath)
             //
             m_pAnalyzeData->loadModel<mne::analyze::BemDataModel>(sFilePath);
         } else {
-            qWarning() << "[DataLoader::loadFilePath] Cannot determine the type of"
-                       << sFilePath << "- no model was loaded.";
+            mne::Log::warning("[DataLoader::loadFilePath] Cannot determine the type of {} - no model was loaded.", sFilePath.toStdString());
         }
     }
 
@@ -367,7 +361,7 @@ void DataLoader::loadSettings()
 void DataLoader::onSaveFilePressed(FileType type)
 {
     if (type == AVERAGE_FILE ? !m_pSelectedAverage : !m_pSelectedModel) {
-        qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
+        mne::Log::warning("[DataLoader::onSaveFilePressed] No model selected.");
         return;
     }
 
@@ -387,7 +381,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         default: {
-            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
+            mne::Log::warning("[DataLoader::onSaveFilePressed] Saving operation not supported.");
         }
     }
 #else
@@ -414,7 +408,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         default: {
-            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
+            mne::Log::warning("[DataLoader::onSaveFilePressed] Saving operation not supported.");
         }
     }
 
@@ -445,7 +439,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         default: {
-            qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
+            mne::Log::warning("[DataLoader::onSaveFilePressed] Saving operation not supported.");
         }
     }
 
@@ -463,7 +457,7 @@ void DataLoader::onLoadSubjectPressed()
                                                     QDir::currentPath() + "/../resources/data/MNE-sample-data");
 
     if (dir.isEmpty()) {
-        qDebug() << "Empty input";
+        mne::Log::debug("Empty input");
         return;
     }
 
@@ -524,7 +518,7 @@ void DataLoader::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNew
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if (m_pSelectedModel) {
             if (m_pSelectedModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                mne::Log::info("[Averaging::onModelChanged] New model is the same as old model");
                 return;
             }
         }

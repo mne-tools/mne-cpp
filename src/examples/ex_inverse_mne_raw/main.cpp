@@ -33,7 +33,6 @@
 #include <disp3D/model/braintreemodel.h>
 #include <math/linalg.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -80,7 +79,6 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -346,10 +344,10 @@ int main(int argc, char* argv[])
 
         //DEBUG
         std::cout << data[0]->epoch.block(0, 0, 10, 10) << std::endl;
-        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
+        Log::debug("{} x {}", data[0]->epoch.rows(), data[0]->epoch.cols());
 
         std::cout << times.block(0, 0, 1, 10) << std::endl;
-        qDebug() << times.rows() << " x " << times.cols();
+        Log::debug("{} x {}", times.rows(), times.cols());
     }
 
     // Calculate the average
@@ -394,7 +392,7 @@ int main(int argc, char* argv[])
     QString t_sFileNameStc(parser.value(stcFileOutOption));
 
     float lambda2 = 1.0f / pow(snr, 2);
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+    Log::debug("Start calculation with: SNR {} ; Lambda {} ; Method {} ; stc: {}", snr, lambda2, method.toStdString(), t_sFileNameStc.toStdString());
 
     //
     // Load data
@@ -421,7 +419,7 @@ int main(int argc, char* argv[])
     //
     if (!t_sFileNameInv.isEmpty()) {
         if (auto written = inverse_operator.write(t_sFileNameInv.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 
@@ -447,8 +445,8 @@ int main(int argc, char* argv[])
     std::cout << "time step\n"
               << sourceEstimate.tstep << std::endl;
 
-    qDebug() << "Sampling frequency" << raw.info.sfreq;
-    qDebug() << "Number of Steps" << sourceEstimate.data.cols();
+    Log::debug("Sampling frequency {}", raw.info.sfreq);
+    Log::debug("Number of Steps {}", sourceEstimate.data.cols());
 
     VectorXd s;
 
@@ -479,10 +477,10 @@ int main(int argc, char* argv[])
     QString lhStcPath = tmpDir + "/mnecpp_ex_inverse_mne_raw-lh.stc";
     QString rhStcPath = tmpDir + "/mnecpp_ex_inverse_mne_raw-rh.stc";
     if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
     if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
 
     BrainView* pBrainView = new BrainView();
@@ -509,7 +507,7 @@ int main(int argc, char* argv[])
 
     if (!t_sFileNameStc.isEmpty()) {
         if (auto written = sourceEstimate.write(t_sFileNameStc.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 

@@ -17,7 +17,8 @@
 //=============================================================================================================
 
 #include <mna/mna_graph.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mna/mna_graph_executor.h>
 #include <mna/mna_op_registry.h>
 #include <mna/mna_node.h>
@@ -197,7 +198,6 @@ private:
 
 void TestMnaGraphExecution::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     registerTestOps();
 }
 
@@ -520,16 +520,18 @@ void TestMnaGraphExecution::testStreamStartStop()
     const auto partial = [&](std::string_view opType) -> std::shared_ptr<void> {
         return opType == "test_double" ? nullptr : factory(opType);
     };
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("factory returned nullptr"));
+    ScopedLogCapture capture;
     ctx = MnaGraphExecutor::start_stream(graph, partial);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "factory returned nullptr"), capture.dump().c_str());
     QVERIFY(!ctx.running && ctx.live_plugins.empty());
     QCOMPARE(destroyed, StringList{"test_source"});
 
     // An invalid graph (unconnected input) does not start
     MnaGraph invalid;
     invalid.add_node(makeNode("dbl", "test_double"));
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("graph validation failed"));
+    capture.clear();
     QVERIFY(!MnaGraphExecutor::start_stream(invalid, factory).running);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "graph validation failed"), capture.dump().c_str());
 }
 
 //=============================================================================================================

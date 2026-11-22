@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "brainampsetupprojectwidget.h"
 
 #include "../brainamp.h"
@@ -172,7 +173,7 @@ void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
     const auto layout = LayoutLoader::read_elc(mne::path_from_utf8(sPath.toStdString()));
     if (!layout) {
-        qDebug() << "Error: Reading elc file.";
+        Log::debug("Error: Reading elc file.");
         return;
     }
     QStringList elcChannelNames;

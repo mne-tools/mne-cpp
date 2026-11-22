@@ -21,17 +21,11 @@
 
 #include "FormFiles/brainampsetupwidget.h"
 #include "FormFiles/brainampsetupprojectwidget.h"
-
+#include <base/log.h>
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -130,13 +124,13 @@ bool BrainAMP::start()
     mne::registerBrainAmpScheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[BrainAMP::start]" << QString::fromStdString(device.error().text());
+        Log::warning("[BrainAMP::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     auto fiffInfo = mne::toFiffInfo(*device->stream().info());
     auto reader = device->stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[BrainAMP::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        Log::warning("[BrainAMP::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         return false;
     }
 
@@ -145,7 +139,7 @@ bool BrainAMP::start()
     m_pRMTSA_BrainAMP->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = device->start(); !e.ok()) {
-        qWarning() << "[BrainAMP::start]" << QString::fromStdString(e.text());
+        Log::warning("[BrainAMP::start] {}", QString::fromStdString(e.text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
@@ -238,7 +232,7 @@ void BrainAMP::run()
         if (read) {
             m_pRMTSA_BrainAMP->measurementData()->setValue(block);
         } else if (read.error() != mne::AcqErrorCode::Timeout && read.error() != mne::AcqErrorCode::Overrun) {
-            qWarning() << "[BrainAMP::run]" << QString::fromStdString(read.error().text());
+            Log::warning("[BrainAMP::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
     }

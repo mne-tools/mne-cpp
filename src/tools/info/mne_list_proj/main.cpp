@@ -22,7 +22,6 @@
 #include <fiff/fiff_constants.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -33,7 +32,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -73,7 +71,6 @@ static QString projKindName(int kind)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_proj");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -91,7 +88,7 @@ int main(int argc, char* argv[])
     QString measName = parser.value(measOpt);
 
     if (measName.isEmpty()) {
-        qCritical("The --meas option is required.");
+        Log::critical("The --meas option is required.");
         parser.showHelp(1);
     }
 
@@ -99,38 +96,31 @@ int main(int argc, char* argv[])
     FiffRawData raw(measName.toStdU16String());
 
     if (raw.info.chs.empty()) {
-        qCritical("No channel information found in %s", qPrintable(measName));
+        Log::critical("No channel information found in {}", measName.toStdString());
         return 1;
     }
 
-    qInfo("Opened %s : %d channels", qPrintable(measName), raw.info.nchan);
+    Log::info("Opened {} : {} channels", measName.toStdString(), raw.info.nchan);
 
     const std::vector<FiffProj>& projs = raw.info.projs;
 
     if (projs.empty()) {
-        qInfo("No SSP projectors found.");
+        Log::info("No SSP projectors found.");
         return 0;
     }
 
-    qInfo("Found %d SSP projector(s):\n", static_cast<int>(projs.size()));
+    Log::info("Found {} SSP projector(s):\n", static_cast<int>(projs.size()));
 
     // Print header
-    qInfo("%-6s %-20s %-8s %-8s %s",
-          "Index", "Kind", "NVec", "Active", "Description");
-    qInfo("%-6s %-20s %-8s %-8s %s",
-          "------", "--------------------", "--------", "--------", "--------------------");
+    Log::info("{:<6} {:<20} {:<8} {:<8} {}", "Index", "Kind", "NVec", "Active", "Description");
+    Log::info("{:<6} {:<20} {:<8} {:<8} {}", "------", "--------------------", "--------", "--------", "--------------------");
 
     for (int k = 0; k < std::ssize(projs); ++k) {
         const FiffProj& proj = projs[k];
 
         const int nVec = proj.data.empty() ? 0 : proj.data.nrow;
 
-        qInfo("%-6d %-20s %-8d %-8s %s",
-              k + 1,
-              qPrintable(projKindName(proj.kind)),
-              nVec,
-              proj.active ? "Yes" : "No",
-              proj.desc.c_str());
+        Log::info("{:<6} {:<20} {:<8} {:<8} {}", k + 1, projKindName(proj.kind).toStdString(), nVec, proj.active ? "Yes" : "No", proj.desc);
     }
 
     return 0;

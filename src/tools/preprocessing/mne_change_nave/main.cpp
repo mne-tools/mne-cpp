@@ -18,7 +18,6 @@
 #include <fiff/fiff_evoked.h>
 #include <base/string_utils.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -52,7 +50,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_change_nave");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -80,15 +77,15 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (measFile.isEmpty()) {
-        qCritical("--meas is required.");
+        Log::critical("--meas is required.");
         return 1;
     }
     if (!parser.isSet(naveOpt)) {
-        qCritical("--nave is required.");
+        Log::critical("--nave is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -98,29 +95,26 @@ int main(int argc, char* argv[])
     // Read evoked data
     auto read = FiffEvokedSet::read(measFile.toStdU16String(), {}, {}, false);
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     FiffEvokedSet& evokedSet = *read;
 
     if (setIdx < 0 || setIdx >= std::ssize(evokedSet.evoked)) {
-        qCritical("Set index %d out of range (0..%lld).", setIdx,
-                  static_cast<long long>(evokedSet.evoked.size() - 1));
+        Log::critical("Set index {} out of range (0..{}).", setIdx, static_cast<long long>(evokedSet.evoked.size() - 1));
         return 1;
     }
 
-    qInfo("Changing nave for set %d (%s): %d -> %d",
-          setIdx, evokedSet.evoked[setIdx].comment.c_str(),
-          evokedSet.evoked[setIdx].nave, newNave);
+    Log::info("Changing nave for set {} ({}): {} -> {}", setIdx, evokedSet.evoked[setIdx].comment, evokedSet.evoked[setIdx].nave, newNave);
 
     evokedSet.evoked[setIdx].nave = newNave;
 
     // Save
     if (!evokedSet.save(outFile.toStdU16String())) {
-        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        Log::critical("Cannot write output file: {}", outFile.toStdString());
         return 1;
     }
 
-    qInfo("Written updated evoked data to: %s", qPrintable(outFile));
+    Log::info("Written updated evoked data to: {}", outFile.toStdString());
     return 0;
 }

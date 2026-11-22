@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "writetofile.h"
 
 #include "FormFiles/writetofilesetupwidget.h"
@@ -468,7 +469,7 @@ void WriteToFile::splitRecordingFile()
                                               sel,
                                               false);
     if (!m_pOutfid) {
-        qCritical() << "[WriteToFile::splitRecordingFile] Cannot write" << nextFileName << "- recording stopped.";
+        Log::critical("[WriteToFile::splitRecordingFile] Cannot write {} - recording stopped.", nextFileName.toStdString());
         m_bWriteToFile = false;
         emit recordingActiveChanged(false);
         return;
@@ -506,10 +507,10 @@ void WriteToFile::clipRecording(bool bChecked)
     }
     m_pOutfid->close();
     if (const auto shared = m_FileSharer.copy_realtime_file(m_qFileOut.fileName().toStdU16String()); !shared) {
-        qWarning() << "Could not share realtime file:" << QString::fromStdString(shared.error().what());
+        Log::warning("Could not share realtime file: {}", QString::fromStdString(shared.error().what()).toStdString());
     }
     if (!m_pOutfid->reopen()) {
-        qWarning() << "Could not reopen realtime file:" << m_qFileOut.fileName();
+        Log::warning("Could not reopen realtime file: {}", m_qFileOut.fileName().toStdString());
         return;
     }
     mne::ByteStream& bytes = m_pOutfid->byte_stream();

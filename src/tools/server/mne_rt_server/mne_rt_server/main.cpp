@@ -18,7 +18,6 @@
 
 #include "mne_rt_server.h"
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QCommandLineParser>
 #include <QFile>
 #include <QFileInfo>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -63,7 +61,6 @@ Q_IMPORT_PLUGIN(FiffSimulator)
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
@@ -90,19 +87,19 @@ int main(int argc, char* argv[])
                 ;
                 file.close();
 
-                qInfo() << QString("[MNERtServer::main] Streaming file %1").arg(parser.value(inFileOpt));
+                mne::Log::info("{}", QString("[MNERtServer::main] Streaming file %1").arg(parser.value(inFileOpt)).toStdString());
             } else {
-                qWarning() << QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+                mne::Log::warning("{}", QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").toStdString());
             }
         } else {
-            qWarning("[MNERtServer::main] Provided file does not exist. Falling back to default one.");
+            mne::Log::warning("[MNERtServer::main] Provided file does not exist. Falling back to default one.");
 
             if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
                 QTextStream stream(&file);
                 stream << QString("simFile = <pathTo>/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
                 file.close();
             } else {
-                qWarning() << QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+                mne::Log::warning("{}", QString("[MNERtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").toStdString());
             }
         }
     }

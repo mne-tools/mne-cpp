@@ -22,6 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
@@ -839,7 +840,7 @@ inline QString FiffAnonymizer::subjectSexToString(int sexCode) const
     if (sexCode > -1 && sexCode < subjectSexRefList.size()) {
         return subjectSexRefList.at(sexCode);
     } else {
-        qCritical() << "Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: " << QString::number(sexCode);
+        mne::Log::critical("Invalid subject sex code. [0 = unknown, 1 = male, 2 = female]. The code of the subject is: {}", sexCode);
         return QString("invalid-code");
     }
 }
@@ -858,7 +859,7 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
     if ((handCode > -1) && (handCode < subjectHandRefList.size())) {
         return subjectHandRefList.at(handCode);
     } else {
-        qCritical() << "Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: " << QString::number(handCode);
+        mne::Log::critical("Invalid subject handedness code. [0 = unknown, 1 = right, 2 = left, 3 = ambidextrous]. The code of the subject is: {}", handCode);
         return QString("invalid-code");
     }
 }
@@ -868,7 +869,7 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if (m_bVerboseMode) {
-        qInfo("%s", qPrintable(str));
+        mne::Log::info("{}", str.toStdString());
     }
 }
 

@@ -19,7 +19,7 @@
 //=============================================================================================================
 
 #include <connectivity/connectivity.h>
-#include <base/log_qt.h>
+#include <base/log.h>
 #include <base/process.h>
 
 #include <fiff/fiff_raw_data.h>
@@ -34,7 +34,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QFile>
 #include <QDateTime>
 #include <QDir>
@@ -58,17 +57,17 @@ int m_iNumberTrials;
 int m_iNumberChannels;
 int m_iNumberSamples;
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+/** The @ref mne::Log sink of this example: appends every warning to the log file of the current run. */
+void writeWarningsToFile(Log::Level type, std::string_view message)
 {
-    Q_UNUSED(context);
-
+    const QString msg = QString::fromUtf8(message.data(), static_cast<qsizetype>(message.size()));
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt; // = QString("[%1] ").arg(dt);
 
     bool writeToLog = false;
 
     switch (type) {
-        case QtWarningMsg:
+        case Log::Level::Warning:
             //txt += QString("{Warning} \t %1").arg(msg);
             txt += QString("%1").arg(msg);
             writeToLog = true;
@@ -92,7 +91,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
 #endif
         textStream << txt << endl;
     } else {
-        qDebug() << "Unable to read data from file";
+        Log::debug("Unable to read data from file");
     }
 }
 
@@ -115,8 +114,7 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    qInstallMessageHandler(customMessageHandler);
-    mne::forward_log_to_qt();
+    Log::set_sink(writeWarningsToFile);
     QCoreApplication a(argc, argv);
 
     m_sCurrentDir = QCoreApplication::applicationDirPath();
@@ -148,7 +146,7 @@ int main(int argc, char* argv[])
     readSuccessful = raw.read_raw_segment(matDataOrig, times, raw.first_samp, raw.first_samp + 100001);
 
     if (!readSuccessful) {
-        qDebug() << "Could not read raw segment.";
+        Log::debug("Could not read raw segment.");
     }
 
     //Perform connectivity performance tests
@@ -171,15 +169,15 @@ int main(int argc, char* argv[])
     }
 
     iTime = timer.elapsed();
-    qDebug() << "Prepare data " << iTime;
+    Log::debug("Prepare data {}", iTime);
     timer.restart();
 
-    qWarning() << "matInputData[256][40000].first().rows()" << matInputData[256][40000].rows();
-    qWarning() << "matInputData[256][40000].first().cols()" << matInputData[256][40000].cols();
-    qWarning() << "matInputData[32][500].rows()" << matInputData[32][500].rows();
-    qWarning() << "matInputData[32][500].cols()" << matInputData[32][500].cols();
-    qWarning() << "matInputData[64][100000].rows()" << matInputData[64][100000].rows();
-    qWarning() << "matInputData[64][100000].cols()" << matInputData[64][100000].cols();
+    Log::warning("matInputData[256][40000].first().rows() {}", matInputData[256][40000].rows());
+    Log::warning("matInputData[256][40000].first().cols() {}", matInputData[256][40000].cols());
+    Log::warning("matInputData[32][500].rows() {}", matInputData[32][500].rows());
+    Log::warning("matInputData[32][500].cols() {}", matInputData[32][500].cols());
+    Log::warning("matInputData[64][100000].rows() {}", matInputData[64][100000].rows());
+    Log::warning("matInputData[64][100000].cols() {}", matInputData[64][100000].cols());
 
     for (int j = 0; j < lNumberSamples.size(); ++j) {
         for (int k = 0; k < lNumberChannels.size(); ++k) {
@@ -207,16 +205,16 @@ int main(int argc, char* argv[])
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file
-                    qWarning() << "sConnectivityMethod" << sConnectivityMethodList.at(i);
-                    qWarning() << "sRaw" << sRaw;
-                    qWarning() << "storageModeActive" << iStorageModeActive;
-                    qWarning() << "iNumberSamples" << lNumberSamples.at(j);
-                    qWarning() << "iNumberChannels" << lNumberChannels.at(k);
-                    qWarning() << "iNumberTrials" << lNumberTrials.at(l);
-                    qWarning() << "iNumberCSDFreqBins" << connectivitySettings.frequency_bins().second;
-                    qWarning() << "rows" << matData.rows();
-                    qWarning() << "cols" << matData.cols();
-                    qWarning() << "numberNodes" << connectivitySettings.getNodePositions().rows();
+                    Log::warning("sConnectivityMethod {}", sConnectivityMethodList.at(i).toStdString());
+                    Log::warning("sRaw {}", sRaw.toStdString());
+                    Log::warning("storageModeActive {}", iStorageModeActive);
+                    Log::warning("iNumberSamples {}", lNumberSamples.at(j));
+                    Log::warning("iNumberChannels {}", lNumberChannels.at(k));
+                    Log::warning("iNumberTrials {}", lNumberTrials.at(l));
+                    Log::warning("iNumberCSDFreqBins {}", connectivitySettings.frequency_bins().second);
+                    Log::warning("rows {}", matData.rows());
+                    Log::warning("cols {}", matData.cols());
+                    Log::warning("numberNodes {}", connectivitySettings.getNodePositions().rows());
 
                     // Check that iNfft >= signal length
                     int iSignalLength = lNumberSamples.at(j);
@@ -225,10 +223,10 @@ int main(int argc, char* argv[])
                         iNfft = iSignalLength;
                     }
 
-                    qWarning() << "iNfft" << iNfft;
+                    Log::warning("iNfft {}", iNfft);
 
                     int iNFreqs = int(floor(iNfft / 2.0)) + 1;
-                    qWarning() << "iNFreqs" << iNFreqs;
+                    Log::warning("iNFreqs {}", iNFreqs);
 
                     connectivitySettings.setConnectivityMethods({sConnectivityMethodList.at(i).toStdString()});
 
@@ -236,7 +234,7 @@ int main(int argc, char* argv[])
                     for (int u = 0; u < iNumberRepeats; ++u) {
                         connectivitySettings.clearIntermediateData();
 
-                        qWarning() << "iteration" << m_iCurrentIteration;
+                        Log::warning("iteration {}", m_iCurrentIteration);
 
                         //Do connectivity estimation
                         compute_connectivity(connectivitySettings);

@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eventmodel.h"
 
 #include "fiffrawviewmodel.h"
@@ -31,7 +32,6 @@
 //=============================================================================================================
 
 #include <QBrush>
-#include <QDebug>
 #include <QFile>
 #include <QFileInfo>
 #include <QFileDialog>
@@ -74,7 +74,7 @@ EventModel::EventModel(QObject* parent)
 , m_iSelectedCheckState(0)
 , m_fFreq(600)
 {
-    qInfo() << "[EventModel::EventModel] CONSTRUCTOR";
+    mne::Log::info("[EventModel::EventModel] CONSTRUCTOR");
     initModel();
 }
 
@@ -477,7 +477,7 @@ bool EventModel::saveToFile(const QString& sPath)
 #else
     QFile device(sPath);
     if (!device.open(QIODevice::WriteOnly)) {
-        qWarning() << "[EventModel::saveToFile] Unable to access file.";
+        mne::Log::warning("[EventModel::saveToFile] Unable to access file.");
         return false;
     }
 #endif
@@ -808,13 +808,13 @@ void EventModel::getEventsFromNewData()
         if (!raw->read_raw_segment(mSampleData,
                                    mSampleTimes,
                                    previousLastSample)) {
-            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
+            mne::Log::warning("[EventModel::getEventsFromNewData] Could not read block ");
             return;
         }
     } else {
         if (!raw->read_raw_segment(mSampleData,
                                    mSampleTimes)) {
-            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
+            mne::Log::warning("[EventModel::getEventsFromNewData] Could not read block ");
             return;
         }
     }

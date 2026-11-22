@@ -14,6 +14,7 @@
  */
 
 #include <algorithm>
+#include <base/log.h>
 #include <QtTest/QtTest>
 #include <QTemporaryDir>
 #include <base/string_utils.h>
@@ -318,7 +319,7 @@ private slots:
         if (prepared.dim >= 0) {
             QVERIFY(prepared.dim == static_cast<int>(chNames.size()));
         } else {
-            qWarning("%s", qPrintable(QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised").arg(prepared.dim).arg(chNames.size())));
+            Log::warning("{}", QString("prepare_noise_cov returned dim=%1 for %2 channels — code path exercised").arg(prepared.dim).arg(chNames.size()).toStdString());
         }
     }
 

@@ -38,7 +38,8 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_coord_trans.h>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mne/mne_forward_solution.h>
 #include <fs/fs_label.h>
 
@@ -137,7 +138,6 @@ QString TestFwdPython::data(const QString& file)
 
 void TestFwdPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString refPath = data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(refPath)) {
         QSKIP("Reference forward solution not found");
@@ -752,10 +752,10 @@ void TestFwdPython::ctfCompensatedForward()
     // Like MNE-C, the surfaces are read from the -sol name; a file without a solution has it recomputed.
     QTemporaryDir bemDir;
     s->bemname = bemDir.filePath("one-layer-bem.fif").toStdString();
-    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot open .*one-layer-bem-sol.fif"));
-    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot open .*one-layer-bem-sol.fif"));
-    QTest::ignoreMessage(QtCriticalMsg, "ComputeFwd::calculateFwd - the forward computation could not be set up.");
+    ScopedLogCapture capture;
     QVERIFY(std::make_shared<ComputeFwd>(s)->calculateFwd() == nullptr);
+    QVERIFY2(capture.count(mne::Log::Level::Critical, std::regex("Cannot open .*one-layer-bem-sol.fif")) == 2, capture.dump().c_str());
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "ComputeFwd::calculateFwd - the forward computation could not be set up."), capture.dump().c_str());
     QVERIFY(QFile::copy(QStringLiteral(MNE_FWD_DATA_DIR "/one-layer-bem.fif"), bemDir.filePath("one-layer-bem-sol.fif")));
     auto bemFwd = std::make_shared<ComputeFwd>(s)->calculateFwd();
     QVERIFY(bemFwd != nullptr);

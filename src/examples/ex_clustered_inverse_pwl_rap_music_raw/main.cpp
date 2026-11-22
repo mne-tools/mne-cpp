@@ -30,7 +30,6 @@
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,7 +78,6 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -418,7 +416,7 @@ int main(int argc, char* argv[])
     varTime /= (double)c - 1.0f;
     varTime = sqrt(varTime);
 
-    qDebug() << "RAP-MUSIC calculation took" << meanTime << "+-" << varTime << "ms in average";
+    Log::debug("RAP-MUSIC calculation took {} +- {} ms in average", meanTime, varTime);
 
 #else
     int iWinSize = 200;
@@ -489,10 +487,10 @@ int main(int argc, char* argv[])
     QString lhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_pwl_rap_music_raw-lh.stc";
     QString rhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_pwl_rap_music_raw-rh.stc";
     if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
     if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
 
     BrainView* pBrainView = new BrainView();
@@ -525,7 +523,7 @@ int main(int argc, char* argv[])
 
     if (!t_sFileNameStc.isEmpty()) {
         if (auto written = sourceEstimate.write(t_sFileNameStc.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 

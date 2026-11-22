@@ -25,6 +25,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <mna/mna_graph.h>
 #include <mna/mna_graph_executor.h>
 #include <mna/mna_op_registry.h>
@@ -253,7 +254,7 @@ void TestMnaInversePipeline::registerRealOps()
 
 void TestMnaInversePipeline::testLoadMnaFile()
 {
-    qInfo() << "Loading .mna file:" << m_mnaFilePath;
+    Log::info("Loading .mna file: {}", m_mnaFilePath.toStdString());
     m_project = MnaIO::read(path_from_utf8(m_mnaFilePath.toStdString())).value();
 
     QCOMPARE(m_project.name, std::string("dSPM Inverse Pipeline"));
@@ -310,22 +311,22 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
     if (m_graph.nodes().empty())
         QSKIP("Graph not built — testLoadMnaFile must run first");
 
-    qInfo() << "Executing real dSPM inverse pipeline with sample_audvis data...";
+    Log::info("Executing real dSPM inverse pipeline with sample_audvis data...");
     const MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(m_graph);
 
     // ── Stage 1: Verify FiffInfo from load_raw ──────────────────────────────
-    qInfo() << "  [1/6] Verifying load_raw::info (FiffInfo)...";
+    Log::info("  [1/6] Verifying load_raw::info (FiffInfo)...");
     {
         const auto info = result<FiffInfo>(ctx.results, "load_raw::info");
         QVERIFY2(info != nullptr, "FiffInfo is null");
         QVERIFY2(info->nchan > 0,
                  qPrintable(QString("nchan = %1, expected > 0").arg(info->nchan)));
         QVERIFY(info->sfreq > 0.0);
-        qInfo() << "        nchan =" << info->nchan << ", sfreq =" << info->sfreq << "Hz";
+        Log::info("        nchan = {} , sfreq = {} Hz", info->nchan, info->sfreq);
     }
 
     // ── Stage 2: Verify FiffEvoked from load_evoked ─────────────────────────
-    qInfo() << "  [2/6] Verifying load_evoked::evoked (FiffEvoked)...";
+    Log::info("  [2/6] Verifying load_evoked::evoked (FiffEvoked)...");
     {
         const auto evoked = result<FiffEvoked>(ctx.results, "load_evoked::evoked");
         QVERIFY2(evoked != nullptr, "FiffEvoked is null");
@@ -335,12 +336,11 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
                  qPrintable(QString("evoked cols = %1").arg(evoked->data.cols())));
         QVERIFY(evoked->times.size() > 0);
         QVERIFY(evoked->nave > 0);
-        qInfo() << "        " << evoked->data.rows() << "channels x"
-                << evoked->data.cols() << "time points, nave =" << evoked->nave;
+        Log::info("        {} channels x {} time points, nave = {}", evoked->data.rows(), evoked->data.cols(), evoked->nave);
     }
 
     // ── Stage 3: Verify FiffCov from load_cov ───────────────────────────────
-    qInfo() << "  [3/6] Verifying load_cov::noise_cov (FiffCov)...";
+    Log::info("  [3/6] Verifying load_cov::noise_cov (FiffCov)...");
     {
         const auto cov = result<FiffCov>(ctx.results, "load_cov::noise_cov");
         QVERIFY2(cov != nullptr, "FiffCov is null");
@@ -349,12 +349,11 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
         QCOMPARE(cov->data.rows(), cov->data.cols()); // must be square
         QVERIFY(cov->names.size() > 0);
         QCOMPARE(cov->names.size(), (int)cov->data.rows());
-        qInfo() << "        " << cov->data.rows() << "x" << cov->data.cols()
-                << ", nfree =" << cov->nfree;
+        Log::info("        {} x {} , nfree = {}", cov->data.rows(), cov->data.cols(), cov->nfree);
     }
 
     // ── Stage 4: Verify MNEForwardSolution from load_fwd ────────────────────
-    qInfo() << "  [4/6] Verifying load_fwd::forward (MNEForwardSolution)...";
+    Log::info("  [4/6] Verifying load_fwd::forward (MNEForwardSolution)...");
     {
         const auto fwd = result<MNEForwardSolution>(ctx.results, "load_fwd::forward");
         QVERIFY2(fwd != nullptr, "MNEForwardSolution is null");
@@ -364,12 +363,11 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
         QVERIFY(fwd->sol.data.rows() > 0);
         QVERIFY(fwd->sol.data.cols() > 0);
         QVERIFY(fwd->src.size() > 0);
-        qInfo() << "        " << fwd->sol.data.rows() << "channels,"
-                << fwd->nsource << "sources," << fwd->src.size() << "hemispheres";
+        Log::info("        {} channels, {} sources, {} hemispheres", fwd->sol.data.rows(), fwd->nsource, fwd->src.size());
     }
 
     // ── Stage 5: Verify MNEInverseOperator from make_inv ────────────────────
-    qInfo() << "  [5/6] Verifying make_inv::inverse_operator (MNEInverseOperator)...";
+    Log::info("  [5/6] Verifying make_inv::inverse_operator (MNEInverseOperator)...");
     int expectedNsource = 0;
     {
         const auto invOp = result<MNEInverseOperator>(ctx.results, "make_inv::inverse_operator");
@@ -381,12 +379,11 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
         QVERIFY(invOp->sing.size() > 0);
         QVERIFY(invOp->src.size() > 0);
         expectedNsource = invOp->nsource;
-        qInfo() << "        nchan =" << invOp->nchan << ", nsource =" << invOp->nsource
-                << ", singular values =" << invOp->sing.size();
+        Log::info("        nchan = {} , nsource = {} , singular values = {}", invOp->nchan, invOp->nsource, invOp->sing.size());
     }
 
     // ── Stage 6: Verify InvSourceEstimate (dSPM STC) from apply_dspm ────────
-    qInfo() << "  [6/6] Verifying apply_dspm::source_estimate (InvSourceEstimate)...";
+    Log::info("  [6/6] Verifying apply_dspm::source_estimate (InvSourceEstimate)...");
     {
         const auto stc = result<InvSourceEstimate>(ctx.results, "apply_dspm::source_estimate");
         QVERIFY2(stc != nullptr, "InvSourceEstimate is null");
@@ -405,14 +402,12 @@ void TestMnaInversePipeline::testExecuteRealPipeline()
         // Temporal parameters
         QVERIFY(stc->tstep > 0.0f);
 
-        qInfo() << "        " << stc->data.rows() << "sources x"
-                << stc->data.cols() << "time points";
-        qInfo() << "        tmin =" << stc->tmin << ", tstep =" << stc->tstep;
-        qInfo() << "        dSPM range: [" << stc->data.minCoeff()
-                << "," << stc->data.maxCoeff() << "]";
+        Log::info("        {} sources x {} time points", stc->data.rows(), stc->data.cols());
+        Log::info("        tmin = {} , tstep = {}", stc->tmin, stc->tstep);
+        Log::info("        dSPM range: [ {} , {} ]", stc->data.minCoeff(), stc->data.maxCoeff());
     }
 
-    qInfo() << "All 6 pipeline stages verified successfully with real data.";
+    Log::info("All 6 pipeline stages verified successfully with real data.");
 }
 
 //=============================================================================================================

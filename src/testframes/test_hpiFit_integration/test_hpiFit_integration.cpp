@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <math.h>
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -34,7 +33,6 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QtTest>
 
 //=============================================================================================================
@@ -111,9 +109,8 @@ TestHpiFitIntegration::TestHpiFitIntegration()
 
 void TestHpiFitIntegration::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qInfo() << "Error Translation" << dErrorTrans;
-    qInfo() << "Error Quaternion" << dErrorQuat;
+    Log::info("Error Translation {}", dErrorTrans);
+    Log::info("Error Quaternion {}", dErrorQuat);
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
@@ -170,10 +167,10 @@ void TestHpiFitIntegration::initTestCase()
     from = first + mRefPos(0, 0) * pFiffInfo->sfreq;
     to = from + quantum;
     if (!raw.read_raw_segment(mData, mTimes, from, to)) {
-        qCritical("error during read_raw_segment");
+        Log::critical("error during read_raw_segment");
     }
 
-    qInfo() << "Order Frequecies: ...";
+    Log::info("Order Frequecies: ...");
     hpiDataUpdater.prepareDataAndProjectors(mData, mProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
@@ -187,7 +184,7 @@ void TestHpiFitIntegration::initTestCase()
                                                true);
     vFreqs = hpiFitResult.hpiFreqs;
 
-    qInfo() << "[done]";
+    Log::info("[done]");
 
     for (int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i, 0) * pFiffInfo->sfreq;
@@ -197,7 +194,7 @@ void TestHpiFitIntegration::initTestCase()
         }
 
         if (!raw.read_raw_segment(mData, mTimes, from, to)) {
-            qWarning("error during read_raw_segment\n");
+            Log::warning("error during read_raw_segment\n");
         }
 
         hpiDataUpdater.prepareDataAndProjectors(mData, mProjectors);
@@ -237,9 +234,9 @@ void TestHpiFitIntegration::compareTranslation()
     vDiffTrans(0) = (mRefPos.col(4) - mHpiPos.col(4)).mean();
     vDiffTrans(1) = (mRefPos.col(5) - mHpiPos.col(5)).mean();
     vDiffTrans(2) = (mRefPos.col(6) - mHpiPos.col(6)).mean();
-    qDebug() << "ErrorTrans x: " << std::abs(vDiffTrans(0));
-    qDebug() << "ErrorTrans y: " << std::abs(vDiffTrans(1));
-    qDebug() << "ErrorTrans z: " << std::abs(vDiffTrans(2));
+    Log::debug("ErrorTrans x: {}", std::abs(vDiffTrans(0)));
+    Log::debug("ErrorTrans y: {}", std::abs(vDiffTrans(1)));
+    Log::debug("ErrorTrans z: {}", std::abs(vDiffTrans(2)));
     QVERIFY(std::abs(vDiffTrans(0)) < dErrorTrans);
     QVERIFY(std::abs(vDiffTrans(1)) < dErrorTrans);
     QVERIFY(std::abs(vDiffTrans(2)) < dErrorTrans);
@@ -253,9 +250,9 @@ void TestHpiFitIntegration::compareRotation()
     vDiffQuat(0) = (mRefPos.col(1) - mHpiPos.col(1)).mean();
     vDiffQuat(1) = (mRefPos.col(2) - mHpiPos.col(2)).mean();
     vDiffQuat(2) = (mRefPos.col(3) - mHpiPos.col(3)).mean();
-    qDebug() << "ErrorQuat q1: " << std::abs(vDiffQuat(0));
-    qDebug() << "ErrorQuat q2: " << std::abs(vDiffQuat(1));
-    qDebug() << "ErrorQuat q3: " << std::abs(vDiffQuat(2));
+    Log::debug("ErrorQuat q1: {}", std::abs(vDiffQuat(0)));
+    Log::debug("ErrorQuat q2: {}", std::abs(vDiffQuat(1)));
+    Log::debug("ErrorQuat q3: {}", std::abs(vDiffQuat(2)));
     QVERIFY(std::abs(vDiffQuat(0)) < dErrorQuat);
     QVERIFY(std::abs(vDiffQuat(1)) < dErrorQuat);
     QVERIFY(std::abs(vDiffQuat(2)) < dErrorQuat);
@@ -268,7 +265,7 @@ void TestHpiFitIntegration::compareMove()
     float fDiffMove = (mRefResult.col(0) - mHpiResult.col(0)).mean();
     fDiffMove = std::abs(fDiffMove);
 
-    qDebug() << "DiffMove: [m]" << fDiffMove;
+    Log::debug("DiffMove: [m] {}", fDiffMove);
     QVERIFY(std::abs(fDiffMove) < dErrorTrans);
 }
 
@@ -279,7 +276,7 @@ void TestHpiFitIntegration::compareAngle()
     float fDiffAngle = (mRefResult.col(1) - mHpiResult.col(1)).mean();
     fDiffAngle = std::abs(fDiffAngle);
 
-    qDebug() << "DiffAngle: [degree]" << fDiffAngle;
+    Log::debug("DiffAngle: [degree] {}", fDiffAngle);
     QVERIFY(std::abs(fDiffAngle) < dErrorAngle);
 }
 
@@ -290,7 +287,7 @@ void TestHpiFitIntegration::compareDetect()
     float fDiffCompare = (mRefResult.col(2) - mHpiResult.col(2)).mean();
     fDiffCompare = std::abs(fDiffCompare);
 
-    qDebug() << "DiffCompare: " << fDiffCompare;
+    Log::debug("DiffCompare: {}", fDiffCompare);
     QVERIFY(std::abs(fDiffCompare) == dErrorDetect);
 }
 
@@ -302,7 +299,7 @@ void TestHpiFitIntegration::compareTime()
     mDiff.col(0) = mRefPos.col(0) - mHpiPos.col(0);
     float fDiffTime = mDiff.col(0).mean();
 
-    qDebug() << "ErrorTime: " << fDiffTime;
+    Log::debug("ErrorTime: {}", fDiffTime);
     QVERIFY(std::abs(fDiffTime) < dErrorTime);
 }
 

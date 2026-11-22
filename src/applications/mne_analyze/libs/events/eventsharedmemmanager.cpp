@@ -13,6 +13,12 @@
  */
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <base/log.h>
+
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -458,10 +464,7 @@ void detail::EventSharedMemManager::createGroupIfNeeded()
 void detail::EventSharedMemManager::printLocalBuffer()
 {
     for (int i = 0; i < bufferLength; ++i) {
-        qDebug() << "[" << i << "] -" << m_LocalBuffer[i].eventTypeToText().c_str()
-                 << "-" << m_LocalBuffer[i].getSample()
-                 << "-" << m_LocalBuffer[i].getCreatorId()
-                 << "-" << m_LocalBuffer[i].getCreationTime() << "\n";
+        mne::Log::debug("[ {} ] - {} - {} - {} - {}\n", i, m_LocalBuffer[i].eventTypeToText(), m_LocalBuffer[i].getSample(), m_LocalBuffer[i].getCreatorId(), m_LocalBuffer[i].getCreationTime());
     }
 }
 

@@ -10,10 +10,7 @@
     "disp3D"
   ],
   "kept": {
-    "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
-    "base": {
-      "Core": "base/log_qt.h is an optional header-only bridge between Log and Qt's message handler for Qt programs; mne_base itself does not link Qt."
-    }
+    "$comment": "Library -> { use: reason } for Qt kept by decision D16."
   },
   "ceilings": {
     "acq": {
@@ -42,8 +39,8 @@
       "modules": []
     },
     "base": {
-      "tokens": 10,
-      "public_header_includes": 3,
+      "tokens": 0,
+      "public_header_includes": 0,
       "modules": []
     },
     "bids": {

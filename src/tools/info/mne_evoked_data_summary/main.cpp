@@ -21,7 +21,6 @@
 #include <base/string_utils.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
+#include <QMap>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -97,7 +96,6 @@ static QString coilTypeName(fiff_int_t kind, fiff_int_t coilType)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_evoked_data_summary");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -117,33 +115,33 @@ int main(int argc, char* argv[])
 
     QString measFile = parser.value(measOpt);
     if (measFile.isEmpty()) {
-        qCritical("--meas is required.");
+        Log::critical("--meas is required.");
         parser.showHelp(1);
     }
 
     // Read evoked data
     auto read = FiffEvokedSet::read(measFile.toStdU16String(), {}, {}, false);
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     FiffEvokedSet& evokedSet = *read;
 
-    qInfo("File: %s", qPrintable(measFile));
-    qInfo("Number of evoked data sets: %lld\n", static_cast<long long>(evokedSet.evoked.size()));
+    Log::info("File: {}", measFile.toStdString());
+    Log::info("Number of evoked data sets: {}\n", static_cast<long long>(evokedSet.evoked.size()));
 
     for (int i = 0; i < std::ssize(evokedSet.evoked); ++i) {
         const FiffEvoked& evoked = evokedSet.evoked[i];
 
-        qInfo("--- Set %d ---", i + 1);
-        qInfo("  Comment    : %s", evoked.comment.c_str());
-        qInfo("  Type       : %s", evoked.aspectKindToString().c_str());
-        qInfo("  Nave       : %d", evoked.nave);
+        Log::info("--- Set {} ---", i + 1);
+        Log::info("  Comment    : {}", evoked.comment);
+        Log::info("  Type       : {}", evoked.aspectKindToString());
+        Log::info("  Nave       : {}", evoked.nave);
 
         float tmin = evoked.times.size() > 0 ? evoked.times(0) : 0.0f;
         float tmax = evoked.times.size() > 0 ? evoked.times(evoked.times.size() - 1) : 0.0f;
-        qInfo("  Time range : %.3f to %.3f s", tmin, tmax);
-        qInfo("  Channels   : %d", evoked.info.nchan);
+        Log::info("  Time range : {:.3f} to {:.3f} s", tmin, tmax);
+        Log::info("  Channels   : {}", evoked.info.nchan);
 
         // Count channel types
         QMap<QString, int> typeCounts;
@@ -153,11 +151,11 @@ int main(int argc, char* argv[])
             typeCounts[typeName]++;
         }
 
-        qInfo("  Channel types:");
+        Log::info("  Channel types:");
         for (auto it = typeCounts.constBegin(); it != typeCounts.constEnd(); ++it) {
-            qInfo("    %-12s : %d", qPrintable(it.key()), it.value());
+            Log::info("    {:<12} : {}", it.key().toStdString(), it.value());
         }
-        qInfo("%s", "");
+        Log::info("{}", "");
     }
 
     return 0;

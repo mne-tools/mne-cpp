@@ -18,7 +18,6 @@
 
 #include <mne/mne.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,7 +55,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
@@ -79,25 +77,25 @@ int main(int argc, char* argv[])
     MNEBem t_Bem(parser.value(bemFileInOption).toStdU16String());
 
     if (t_Bem.size() > 0) {
-        qDebug() << "Loaded BEM";
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(0, 0) << t_Bem[0].tri_nn(0, 1) << t_Bem[0].tri_nn(0, 2);
-        qDebug() << "t_Bem[0].tri_nn:" << t_Bem[0].tri_nn(2, 0) << t_Bem[0].tri_nn(2, 1) << t_Bem[0].tri_nn(2, 2);
-        qDebug() << "t_Bem[0].rr:" << t_Bem[0].rr(2, 0) << t_Bem[0].rr(2, 1) << t_Bem[0].rr(2, 2);
+        Log::debug("Loaded BEM");
+        Log::debug("t_Bem[0].tri_nn: {} {} {}", t_Bem[0].tri_nn(0, 0), t_Bem[0].tri_nn(0, 1), t_Bem[0].tri_nn(0, 2));
+        Log::debug("t_Bem[0].tri_nn: {} {} {}", t_Bem[0].tri_nn(2, 0), t_Bem[0].tri_nn(2, 1), t_Bem[0].tri_nn(2, 2));
+        Log::debug("t_Bem[0].rr: {} {} {}", t_Bem[0].rr(2, 0), t_Bem[0].rr(2, 1), t_Bem[0].rr(2, 2));
     }
 
     // Write the BEM
     if (auto written = t_Bem.write(parser.value(bemFileOutOption).toStdU16String()); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return 1;
     }
 
     MNEBem t_BemTest(parser.value(bemFileOutOption).toStdU16String());
 
     if (t_BemTest.size() > 0) {
-        qDebug() << "Loaded written BEM";
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(0, 0) << t_BemTest[0].tri_nn(0, 1) << t_BemTest[0].tri_nn(0, 2);
-        qDebug() << "t_BemTest[0].tri_nn:" << t_BemTest[0].tri_nn(2, 0) << t_BemTest[0].tri_nn(2, 1) << t_BemTest[0].tri_nn(2, 2);
-        qDebug() << "t_BemTest[0].rr:" << t_BemTest[0].rr(2, 0) << t_BemTest[0].rr(2, 1) << t_BemTest[0].rr(2, 2);
+        Log::debug("Loaded written BEM");
+        Log::debug("t_BemTest[0].tri_nn: {} {} {}", t_BemTest[0].tri_nn(0, 0), t_BemTest[0].tri_nn(0, 1), t_BemTest[0].tri_nn(0, 2));
+        Log::debug("t_BemTest[0].tri_nn: {} {} {}", t_BemTest[0].tri_nn(2, 0), t_BemTest[0].tri_nn(2, 1), t_BemTest[0].tri_nn(2, 2));
+        Log::debug("t_BemTest[0].rr: {} {} {}", t_BemTest[0].rr(2, 0), t_BemTest[0].rr(2, 1), t_BemTest[0].rr(2, 2));
     }
 
     return t_BemTest.size() == t_Bem.size() && t_Bem.size() > 0 ? 0 : 1;

@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "hpi.h"
 
 #include "FormFiles/hpisetupwidget.h"
@@ -33,7 +34,6 @@
 //=============================================================================================================
 
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -243,8 +243,11 @@ void Hpi::initFiffInfo(std::shared_ptr<mne::FiffInfo> info)
             m_vCoilFreqs.push_back(static_cast<int>(std::lround(fFreq)));
         }
 
-        qInfo() << "[Hpi::initFiffInfo] Read" << m_vCoilFreqs.size()
-                << "HPI coil frequencies from the file:" << m_vCoilFreqs;
+        StringList frequencies;
+        for (const int frequency : m_vCoilFreqs) {
+            frequencies.push_back(std::to_string(frequency));
+        }
+        Log::info("[Hpi::initFiffInfo] Read {} HPI coil frequencies from the file: {}", m_vCoilFreqs.size(), join(frequencies, ", "));
     }
     m_mutex.unlock();
     updateProjections();
@@ -562,7 +565,7 @@ void Hpi::run()
         m_mutex.lock();
         if (fittingWindowSize != m_iFittingWindowSize) {
             fittingWindowSize = m_iFittingWindowSize;
-            qInfo().noquote().nospace() << "Fitting window size: " << fittingWindowSize;
+            Log::info("Fitting window size: {}", fittingWindowSize);
             rtHpi.set_window(fittingWindowSize, fittingWindowSize / 2);
         }
         // A single fit or a frequency ordering keeps the data coming until its fit is done

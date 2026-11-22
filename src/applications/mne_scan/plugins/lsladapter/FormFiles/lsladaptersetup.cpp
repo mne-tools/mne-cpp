@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "lsladaptersetup.h"
 
 #include "../lsladapter.h"
@@ -24,7 +25,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QListWidgetItem>
 
 //=============================================================================================================
@@ -108,7 +108,7 @@ void LSLAdapterSetup::on_listLSLStreams_itemDoubleClicked(QListWidgetItem* pItem
         emit streamSelectionChanged(m_mItemToStreamInfo.value(m_pCurrentSelectedStream));
     } else {
         // this should not happen
-        qDebug() << "[LSLAdapterSetup] CRITICAL: Major inconsistency in UI!";
+        mne::Log::debug("[LSLAdapterSetup] CRITICAL: Major inconsistency in UI!");
     }
 }
 
@@ -132,7 +132,7 @@ void LSLAdapterSetup::on_blockSizeEdit_editingFinished()
     QString sInput = ui.blockSizeEdit->text();
     int iBlockSize = sInput.toInt();
     if (iBlockSize <= 1) {
-        qDebug() << "[LSLAdapterSetup: blockSizeEdit: Not a valid block size: " << sInput;
+        mne::Log::debug("[LSLAdapterSetup: blockSizeEdit: Not a valid block size: {}", sInput.toStdString());
     } else {
         emit blockSizeChanged(iBlockSize);
     }

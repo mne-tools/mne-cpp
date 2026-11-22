@@ -45,7 +45,8 @@
 
 #include <inv/inv_convenience.h>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
@@ -131,7 +132,6 @@ QString TestInvEloretaPython::data(const QString& file)
 
 void TestInvEloretaPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString fwdPath = data("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(fwdPath)) {
         QSKIP("Reference forward solution not found");
@@ -307,11 +307,14 @@ void TestInvEloretaPython::estimateSnr_matchesPython()
         evoked.data.setZero();
         for (int i = 0; i < g.size(); ++i)
             evoked.data.row(mne::channel_index(evoked.info.ch_names, m_freeFwd.sol.row_names[i])) = g(i) * ramp;
-    } else {
-        QTest::ignoreMessage(QtWarningMsg, "[estimate_snr] SNR estimation did not converge.");
     }
 
+    ScopedLogCapture capture;
     const auto [snr, est] = estimate_snr(evoked, m_loose);
+    // Without a signal the estimation does not converge
+    if (amplitude <= 0.0) {
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, "[estimate_snr] SNR estimation did not converge."), capture.dump().c_str());
+    }
     QCOMPARE(static_cast<int>(snr.size()), 421);
     QCOMPARE(static_cast<int>(est.size()), 421);
     QVERIFY2(std::fabs(snr.sum() - snrSum) <= 1e-6 * snrSum, qPrintable(QString("snr sum %1").arg(snr.sum(), 0, 'g', 17)));
@@ -509,8 +512,9 @@ void TestInvEloretaPython::kernel_matchesPython()
         // Two iterations are not enough: mne-python warns as well and keeps the unconverged weights.
         InvMinimumNorm early(fixed ? m_fixed : m_loose, 1.0f / 9.0f, method.toStdString());
         early.setELoretaOptions(2, 1e-6, forceEqual);
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("eLORETA weight fitting did not converge after 2 iterations"));
+        ScopedLogCapture capture;
         early.doInverseSetup(m_nave, false);
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, "eLORETA weight fitting did not converge after 2 iterations"), capture.dump().c_str());
         QCOMPARE(static_cast<int>(early.getKernel().rows()), rows);
         QVERIFY(std::fabs(early.getKernel().cwiseAbs().sum() - kernelAbsSum) > 1e-4 * kernelAbsSum);
     }

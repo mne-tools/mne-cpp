@@ -19,19 +19,13 @@
 #include "ftbuffer.h"
 
 #include "FormFiles/ftbuffersetupwidget.h"
-
+#include <base/log.h>
 #include <acq/acq_device_registry.h>
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_info.h>
 #include <scMeas/realtimemultisamplearray.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -103,14 +97,14 @@ bool FtBuffer::start()
     mne::register_ftbuffer_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[FtBuffer::start]" << QString::fromStdString(device.error().text());
+        mne::Log::warning("[FtBuffer::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[FtBuffer::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        mne::Log::warning("[FtBuffer::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -130,7 +124,7 @@ bool FtBuffer::start()
     m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[FtBuffer::start]" << QString::fromStdString(e.text());
+        mne::Log::warning("[FtBuffer::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -187,7 +181,7 @@ void FtBuffer::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[FtBuffer::run]" << QString::fromStdString(read.error().text());
+            mne::Log::warning("[FtBuffer::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pRTMSA_BufferOutput->measurementData()->setValue(block);

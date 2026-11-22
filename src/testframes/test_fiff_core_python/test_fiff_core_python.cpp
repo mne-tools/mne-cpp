@@ -40,6 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <fiff/fiff_raw_data.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_evoked.h>
@@ -1088,7 +1089,7 @@ void TestFiffCorePython::events_matchPython()
     QFile eveFile(dir.filePath("run.eve"));
     QVERIFY(eveFile.open(QIODevice::ReadOnly | QIODevice::Text));
     QCOMPARE(QString::fromUtf8(eveFile.readAll()), expected);
-    qInfo("decimal comma locale %s", comma ? "tested" : "not installed");
+    Log::info("decimal comma locale {}", comma ? "tested" : "not installed");
     QCOMPARE(found.write_ascii(path("no/dir/run.eve"), sfreq).error().code, mne::ErrorCode::Io);
     const FiffEvents ascii(path("run.eve"));
     QVERIFY(ascii.events == onsets);

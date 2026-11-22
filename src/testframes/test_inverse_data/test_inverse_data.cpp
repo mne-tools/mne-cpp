@@ -20,7 +20,6 @@
 #include <Eigen/Dense>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -222,7 +221,6 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        mne::install_qt_message_handler();
         m_bDataLoaded = false;
 
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
@@ -230,7 +228,7 @@ private slots:
             m_sDataPath = base;
         }
         if (m_sDataPath.isEmpty()) {
-            qWarning() << "Test data not found";
+            Log::warning("Test data not found");
             return;
         }
 
@@ -296,7 +294,7 @@ private slots:
         // to keep source-space I/O feasible within CI time limits.
         MNEInverseOperator smallInv = makeSmallInverseOp(m_info, m_fwd, m_noiseCov, 15);
         QVERIFY2(smallInv.nchan > 0, "Failed to build small inverse operator");
-        qDebug() << "Small inverse for roundtrip: nsource=" << smallInv.nsource;
+        Log::debug("Small inverse for roundtrip: nsource= {}", smallInv.nsource);
 
         // Strip full-mesh geometry from source spaces so the file is
         // small enough for fast I/O (keeps only in-use vertex positions).
@@ -313,8 +311,7 @@ private slots:
         QFileInfo fi(invPath);
         QVERIFY2(fi.exists(), "Inverse operator file was not created");
         QVERIFY2(fi.size() > 0, "Inverse operator file is empty");
-        qDebug() << "Written inverse file size:" << fi.size() << "bytes"
-                 << "(" << (fi.size() / 1024.0 / 1024.0) << "MB)";
+        Log::debug("Written inverse file size: {} bytes ( {} MB)", fi.size(), (fi.size() / 1024.0 / 1024.0));
 
         // Read it back
         const MNEInverseOperator invRead(invPath.toStdU16String());
@@ -348,9 +345,7 @@ private slots:
         // Verify noise covariance dimensions
         QCOMPARE(invRead.noise_cov.data.rows(), smallInv.noise_cov.data.rows());
 
-        qDebug() << "Inverse operator roundtrip: nchan=" << invRead.nchan
-                 << "nsource=" << invRead.nsource
-                 << "file_size=" << fi.size() << "bytes";
+        Log::debug("Inverse operator roundtrip: nchan= {} nsource= {} file_size= {} bytes", invRead.nchan, invRead.nsource, fi.size());
     }
 
     //=========================================================================
@@ -720,17 +715,14 @@ private slots:
         FiffEvokedSet evokedSet(path.toStdU16String());
         QVERIFY(evokedSet.evoked.size() > 0);
 
-        qDebug() << "Number of evoked conditions:" << evokedSet.evoked.size();
+        Log::debug("Number of evoked conditions: {}", evokedSet.evoked.size());
 
         for (int i = 0; i < std::ssize(evokedSet.evoked); ++i) {
             FiffEvoked& evk = evokedSet.evoked[i];
             QVERIFY(evk.data.rows() > 0);
             QVERIFY(evk.data.cols() > 0);
             QVERIFY(evk.times.size() > 0);
-            qDebug() << "  condition" << i << ":"
-                     << evk.comment << "nave=" << evk.nave
-                     << "nchan=" << evk.data.rows()
-                     << "ntimes=" << evk.data.cols();
+            Log::debug("  condition {} : {} nave= {} nchan= {} ntimes= {}", i, evk.comment, evk.nave, evk.data.rows(), evk.data.cols());
         }
     }
 
@@ -756,7 +748,7 @@ private slots:
         QVERIFY(cov.kind >= 0);
         QVERIFY(cov.nfree > 0);
 
-        qDebug() << "Covariance:" << cov.names.size() << "channels, kind=" << cov.kind;
+        Log::debug("Covariance: {} channels, kind= {}", cov.names.size(), cov.kind);
     }
 
     //=========================================================================

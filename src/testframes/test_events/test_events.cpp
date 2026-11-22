@@ -16,7 +16,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <events/eventmanager.h>
 
 //=============================================================================================================
@@ -25,7 +24,6 @@
 
 #include <QCoreApplication>
 #include <QObject>
-#include <QDebug>
 #include <QtTest>
 
 //=============================================================================================================
@@ -115,8 +113,7 @@ TestEvents::TestEvents()
 
 void TestEvents::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qInfo() << "TestEvents: Starting EventManager unit tests";
+    mne::Log::info("TestEvents: Starting EventManager unit tests");
 }
 
 //=============================================================================================================
@@ -739,7 +736,7 @@ void TestEvents::testRgbColor()
 
 void TestEvents::cleanupTestCase()
 {
-    qInfo() << "TestEvents: All tests completed";
+    mne::Log::info("TestEvents: All tests completed");
 }
 
 //=============================================================================================================

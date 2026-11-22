@@ -16,7 +16,8 @@
 #include <QTemporaryDir>
 
 #include <mne/mne.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_hemisphere.h>
@@ -41,12 +42,6 @@ private:
     }
 
 private slots:
-    void initTestCase()
-    {
-        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
-    }
-
-
     //=========================================================================
     // MNENamedMatrix
     //=========================================================================
@@ -338,8 +333,9 @@ private slots:
         QCOMPARE(hasArtifact, true);
 
         // A limit for gradiometers only leaves the magnetometer unchecked, like mne.Epochs(reject=dict(grad=...))
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No channels found"));
+        ScopedLogCapture capture;
         QCOMPARE(MNEEpochDataList::checkForArtifact(dataBad, info, {{"grad", 5e-12}}), false);
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, "No channels found"), capture.dump().c_str());
     }
 
     void epochDataList_average()

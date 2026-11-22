@@ -20,17 +20,11 @@
 #include "gusbamp.h"
 
 #include "FormFiles/gusbampsetupwidget.h"
-
+#include <base/log.h>
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
 #include <fiff/fiff_info.h>
 #include <scMeas/realtimemultisamplearray.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -99,14 +93,14 @@ bool GUSBAmp::start()
     mne::register_gusbamp_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[GUSBAmp::start]" << QString::fromStdString(device.error().text());
+        mne::Log::warning("[GUSBAmp::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[GUSBAmp::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        mne::Log::warning("[GUSBAmp::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -116,7 +110,7 @@ bool GUSBAmp::start()
     m_pRTMSA_GUSBAmp->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[GUSBAmp::start]" << QString::fromStdString(e.text());
+        mne::Log::warning("[GUSBAmp::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -173,7 +167,7 @@ void GUSBAmp::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[GUSBAmp::run]" << QString::fromStdString(read.error().text());
+            mne::Log::warning("[GUSBAmp::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pRTMSA_GUSBAmp->measurementData()->setValue(block);

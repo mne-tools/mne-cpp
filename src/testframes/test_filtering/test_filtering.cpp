@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <math.h>
 #include <fiff/fiff.h>
 #include <dsp/filterkernel.h>
@@ -96,8 +95,7 @@ TestFiltering::TestFiltering()
 
 void TestFiltering::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qDebug() << "Epsilon" << dEpsilon;
+    Log::debug("Epsilon {}", dEpsilon);
 
     QFile t_fileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
 

@@ -22,7 +22,6 @@
 #include <disp/plots/lineplot.h>
 #include <math/spectral.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <mne/mne.h>
 
 //=============================================================================================================
@@ -62,7 +61,6 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Generate input data
@@ -123,11 +121,11 @@ int main(int argc, char* argv[])
     VectorXd psdTest2 = vecCsdSeed.real();
 
     //Check that sums of different psds of the same signal are equal
-    qDebug() << psd.sum();
-    qDebug() << psdTest.sum();
-    qDebug() << psdTest2.sum();
+    Log::debug("{}", psd.sum());
+    Log::debug("{}", psdTest.sum());
+    Log::debug("{}", psdTest2.sum());
     RowVectorXd data_hann = inputData.row(0).cwiseProduct(matTaps.row(0));
-    qDebug() << data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq;
+    Log::debug("{}", data_hann.row(0).cwiseAbs2().sum() * double(iNSamples) / dSampFreq);
 
     //Compute Spectrum of second row of input data
     MatrixXcd matTapSpectrumTarget = Spectral::computeTaperedSpectraRow(inputData.row(1), matTaps, iNfft);

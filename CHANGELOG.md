@@ -56,7 +56,7 @@ aliases; replace the old spelling as below.
 | `T::UPtr` | `std::unique_ptr<T>` |
 | `ptr.data()`, `ptr.isNull()`, `ptr.clear()` | `ptr.get()`, `!ptr`, `ptr.reset()` |
 | `QJsonDocument`, `QJsonObject`, `QJsonArray`, `QJsonValue`, `QJsonParseError` | `BASELIB::JsonDocument`, `JsonObject`, `JsonArray`, `JsonValue`, `JsonParseError` in `base/json.h`, with snake_case methods (`from_json()`, `to_json()`, `to_int()`, `is_undefined()`, ...); incremental NDJSON / SAX parsing with `BASELIB::JsonStreamParser` in `base/json_stream_parser.h` |
-| `qInstallMessageHandler(MNELogger::customLogWriter)` | `BASELIB::Log::install_qt_message_handler()` |
+| `qInstallMessageHandler(MNELogger::customLogWriter)` | nothing: programs log through `mne::Log` (`qDebug()` / `qWarning()` → `mne::Log::debug()` / `warning()`); a log window installs `mne::Log::set_sink()` |
 | `MNELogger::setLogFile(QString)`, `logFile()` | `BASELIB::Log::set_file(path)`, `Log::file()` |
 | `utils/generics/mne_logger.h`, `utils/generics/log.h` | `base/log.h` |
 | `qWarning() << ...` in library code | `BASELIB::Log::warning("... {}", value)` (std::format syntax) |
@@ -1016,16 +1016,16 @@ aliases; replace the old spelling as below.
   themselves load without it. Without a sink, `mne::Log` prints every
   message itself (results to stdout, diagnostics to stderr, the log file
   and colours as before) instead of handing it to Qt's message handler; the
-  new `Log::print()` prints a message that way. The Qt bridge is the
-  header-only `base/log_qt.h` for Qt programs: `install_qt_message_handler()`
-  sends Qt's own messages through `Log`, `forward_log_to_qt()` makes Qt's
-  message handler the sink of `Log`. MNE Analyze and MNE Browse forward
-  library messages to their log windows. Migration:
-  `Log::install_qt_message_handler()` → `mne::install_qt_message_handler()`
-  from `base/log_qt.h`; code that read library messages through Qt
+  new `Log::print()` prints a message that way. There is no bridge to Qt's
+  message handler: the applications, tools, examples and tests log through
+  `mne::Log` instead of `qDebug()` / `qInfo()` / `qWarning()` /
+  `qCritical()`, and MNE Analyze and MNE Browse install a `Log` sink that
+  writes to their log windows. Migration: `Log::install_qt_message_handler()`
+  is gone, log with `mne::Log`; code that read library messages through Qt
   (`QTest::ignoreMessage`, `QTest::failOnWarning`, a custom
-  `qInstallMessageHandler`) calls `mne::forward_log_to_qt()` first, or uses
-  `mne::LogCapture`.
+  `qInstallMessageHandler`) installs a sink with `mne::Log::set_sink()` or
+  records them with `mne::LogCapture` (the test frames use
+  `ScopedLogCapture` from `src/testframes/common/scoped_log_capture.h`).
 - The LSL library (`mne_lsl`) and the `lsl://` source (`mne_acq_lsl`) no
   longer use or link Qt. Outlets, inlets, discovery and time correction run
   on the sockets of `mne_com`, stream infos are parsed with

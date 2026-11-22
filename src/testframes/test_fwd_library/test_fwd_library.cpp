@@ -16,7 +16,6 @@
 
 #include <base/base_global.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
@@ -126,7 +125,6 @@ private slots:
 
 void TestFwdLibrary::initTestCase()
 {
-    mne::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -391,7 +389,7 @@ void TestFwdLibrary::bemModel_findSurface()
     MNESurface* surf = model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->np > 0);
-    qDebug() << "Found brain surface:" << surf->np << "vertices";
+    Log::debug("Found brain surface: {} vertices", surf->np);
 }
 
 void TestFwdLibrary::bemModel_solidAngles()
@@ -717,7 +715,7 @@ void TestFwdLibrary::settings_checkIntegrity()
     settings.accurate = false;
     settings.mindist = 5.0f;
     settings.checkIntegrity();
-    qDebug() << "ComputeFwdSettings integrity check passed";
+    Log::debug("ComputeFwdSettings integrity check passed");
 }
 
 //=============================================================================================================

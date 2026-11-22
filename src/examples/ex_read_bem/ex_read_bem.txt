@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <base/log.h>
 #include <memory>
 #include <mne/mne_surface.h> 
 
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
  
  MNESurface::read(t_readBemFile, bemSurfaces);
  
- qDebug() << "Put your stuff your interest in here";
+ Log::debug("Put your stuff your interest in here");
  
     return a.exec(); 
 }

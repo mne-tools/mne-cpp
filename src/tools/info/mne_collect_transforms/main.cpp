@@ -23,7 +23,6 @@
 #include <mri/mri_vol_data.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -34,7 +33,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QFileInfo>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -58,22 +56,17 @@ using namespace mne;
 
 static void printTransform(const FiffCoordTrans& t)
 {
-    qInfo("%s -> %s transform:",
-          std::string(FiffCoordTrans::frame_name(t.from)).c_str(),
-          std::string(FiffCoordTrans::frame_name(t.to)).c_str());
+    Log::info("{} -> {} transform:", std::string(FiffCoordTrans::frame_name(t.from)), std::string(FiffCoordTrans::frame_name(t.to)));
     for (int i = 0; i < 3; i++) {
-        qInfo("  %10.6f %10.6f %10.6f  %10.4f mm",
-              t.trans(i, 0), t.trans(i, 1), t.trans(i, 2),
-              1000.0f * t.trans(i, 3));
+        Log::info("  {:10.6f} {:10.6f} {:10.6f}  {:10.4f} mm", t.trans(i, 0), t.trans(i, 1), t.trans(i, 2), 1000.0f * t.trans(i, 3));
     }
-    qInfo("%s", "");
+    Log::info("{}", "");
 }
 
 //=============================================================================================================
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_collect_transforms");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -98,7 +91,7 @@ int main(int argc, char* argv[])
     const QString mghName = parser.value(mghOpt);
     const QString outName = parser.value(outOpt);
     if (measName.isEmpty() && mriName.isEmpty() && mghName.isEmpty()) {
-        qCritical("At least one of --meas, --mri or --mgh must be specified.");
+        Log::critical("At least one of --meas, --mri or --mgh must be specified.");
         parser.showHelp(1);
     }
 
@@ -106,7 +99,7 @@ int main(int argc, char* argv[])
     if (!measName.isEmpty()) {
         const auto read = FiffCoordTrans::read(measName.toStdU16String(), FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD);
         if (!read) {
-            qCritical("%s", read.error().what());
+            Log::critical("{}", read.error().what());
             return 1;
         }
         devHeadT = *read;
@@ -118,7 +111,7 @@ int main(int argc, char* argv[])
         std::vector<FiffCoordTrans> volumeTrans;
         const QString mriDir = QFileInfo(mghName).absolutePath();
         if (!MriMghIO::read(mghName.toStdString(), volume, volumeTrans, mriDir.toStdString())) {
-            qCritical("Cannot read %s", qPrintable(mghName));
+            Log::critical("Cannot read {}", mghName.toStdString());
             return 1;
         }
         for (const FiffCoordTrans& t : volumeTrans) {
@@ -128,13 +121,13 @@ int main(int argc, char* argv[])
         }
         // FreeSurfer keeps the Talairach transform next to the volume (MNE-C mne_mri_get_mgh_xform_file_name).
         if (!chain.addTalairach((mriDir + "/transforms/talairach.xfm").toStdU16String())) {
-            qWarning("No Talairach transform found for %s", qPrintable(mghName));
+            Log::warning("No Talairach transform found for {}", mghName.toStdString());
         }
     }
     if (!mriName.isEmpty()) {
         FiffCoordTransSet fromFile;
         if (fromFile.read(mriName.toStdU16String()) < 0 || fromFile.head_surf_RAS_t.empty()) {
-            qCritical("No MRI->head transform in %s", qPrintable(mriName));
+            Log::critical("No MRI->head transform in {}", mriName.toStdString());
             return 1;
         }
         chain.head_surf_RAS_t = fromFile.head_surf_RAS_t;
@@ -155,7 +148,7 @@ int main(int argc, char* argv[])
     if (!outName.isEmpty()) {
         auto outStream = FiffStream::start_file(outName.toStdU16String());
         if (!outStream) {
-            qCritical("Cannot open output file: %s", qPrintable(outName));
+            Log::critical("Cannot open output file: {}", outName.toStdString());
             return 1;
         }
         if (!devHeadT.empty()) {
@@ -163,7 +156,7 @@ int main(int argc, char* argv[])
         }
         chain.write(*outStream);
         outStream->end_file();
-        qInfo("Written %s", qPrintable(outName));
+        Log::info("Written {}", outName.toStdString());
     }
     return 0;
 }

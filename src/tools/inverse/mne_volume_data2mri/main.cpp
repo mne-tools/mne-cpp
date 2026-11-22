@@ -19,7 +19,6 @@
 #include <mne/mne.h>
 #include <mne/mne_source_space.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,7 +63,7 @@ static bool readWFile(const QString& filename, VectorXd& data, VectorXi& vertice
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "Cannot open w file:" << filename;
+        Log::critical("Cannot open w file: {}", filename.toStdString());
         return false;
     }
     QDataStream in(&file);
@@ -103,7 +101,7 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 {
     auto read = InvSourceEstimate::read(filename.toStdU16String());
     if (!read) {
-        qCritical() << read.error().what();
+        Log::critical("{}", read.error().what());
         return false;
     }
     const InvSourceEstimate& stc = *read;
@@ -119,7 +117,6 @@ static bool readStcFile(const QString& filename, MatrixXd& data, VectorXi& verti
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_volume_data2mri");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -149,15 +146,15 @@ int main(int argc, char* argv[])
     int tpoint = parser.value(tpointOpt).toInt();
 
     if (srcFile.isEmpty()) {
-        qCritical("Source space file (--src) is required.");
+        Log::critical("Source space file (--src) is required.");
         return 1;
     }
     if (stcFile.isEmpty() && wFile.isEmpty()) {
-        qInfo("Either --stc or --w must be specified.");
+        Log::info("Either --stc or --w must be specified.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("Output file (--out) is required.");
+        Log::critical("Output file (--out) is required.");
         return 1;
     }
 
@@ -166,11 +163,11 @@ int main(int argc, char* argv[])
     //
     std::vector<std::unique_ptr<MNESourceSpace>> spaces;
     if (MNESourceSpace::read_source_spaces(srcFile.toStdU16String(), spaces) != FIFF_OK || spaces.empty()) {
-        qCritical("Failed to read source space from: %s", srcFile.toUtf8().constData());
+        Log::critical("Failed to read source space from: {}", srcFile.toStdString());
         return 1;
     }
 
-    qInfo("Read %lld source spaces", static_cast<long long>(spaces.size()));
+    Log::info("Read {} source spaces", static_cast<long long>(spaces.size()));
 
     //
     // Read source estimate data
@@ -183,23 +180,21 @@ int main(int argc, char* argv[])
         float tmin;
         float tstep;
         if (!readStcFile(stcFile, stcData, vertices, tmin, tstep)) {
-            qCritical("Failed to read stc file.");
+            Log::critical("Failed to read stc file.");
             return 1;
         }
         if (tpoint < 0 || tpoint >= static_cast<int>(stcData.cols())) {
-            qInfo("Time point %d out of range (0-%ld)",
-                  tpoint, static_cast<long>(stcData.cols() - 1));
+            Log::info("Time point {} out of range (0-{})", tpoint, static_cast<long>(stcData.cols() - 1));
             return 1;
         }
         values = stcData.col(tpoint);
-        qInfo("Read STC: %ld vertices, %ld time points, using tpoint %d",
-              static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
+        Log::info("Read STC: {} vertices, {} time points, using tpoint {}", static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
-            qCritical("Failed to read w file.");
+            Log::critical("Failed to read w file.");
             return 1;
         }
-        qInfo("Read W: %ld vertices", static_cast<long>(values.size()));
+        Log::info("Read W: {} vertices", static_cast<long>(values.size()));
     }
 
     //
@@ -230,7 +225,7 @@ int main(int argc, char* argv[])
         // Write vertex values as text (vertex index and value)
         QFile outF(outFile);
         if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot write output file: %s", outFile.toUtf8().constData());
+            Log::critical("Cannot write output file: {}", outFile.toStdString());
             return 1;
         }
         QTextStream out(&outF);
@@ -245,13 +240,12 @@ int main(int argc, char* argv[])
                     << vertValues(i) << "\n";
             }
         }
-        qInfo("Wrote %d non-zero vertex values to %s",
-              nonZero, outFile.toUtf8().constData());
+        Log::info("Wrote {} non-zero vertex values to {}", nonZero, outFile.toStdString());
         break;
     }
 
     if (!found) {
-        qInfo("No matching source data found in any source space.");
+        Log::info("No matching source data found in any source space.");
         return 1;
     }
 

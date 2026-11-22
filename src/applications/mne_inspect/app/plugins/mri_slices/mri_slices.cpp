@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mri_slices.h"
 
 #include <disp3D/scene/multimodalscene.h>
@@ -25,7 +26,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QFileInfo>
 #include <QImage>
 
@@ -103,14 +103,13 @@ bool MriSlicesPlugin::loadVolume(const QString& path)
         lower.endsWith(QStringLiteral(".nii")) ||
         lower.endsWith(QStringLiteral(".nii.gz"));
     if (!supported) {
-        qWarning() << "MriSlicesPlugin::loadVolume: unsupported format" << path
-                   << "\u2014 supported: .mgh, .mgz, .nii, .nii.gz";
+        Log::warning("MriSlicesPlugin::loadVolume: unsupported format {} \u2014 supported: .mgh, .mgz, .nii, .nii.gz", path.toStdString());
         return false;
     }
 
     auto vol = std::make_unique<MriVolData>();
     if (!vol->read(path.toStdString()) || !vol->isValid()) {
-        qWarning() << "MriSlicesPlugin::loadVolume: failed to read" << path;
+        Log::warning("MriSlicesPlugin::loadVolume: failed to read {}", path.toStdString());
         return false;
     }
 
@@ -128,7 +127,7 @@ bool MriSlicesPlugin::loadVolume(const QString& path)
 bool MriSlicesPlugin::setVolume(std::unique_ptr<MriVolData> volume)
 {
     if (!volume || !volume->isValid()) {
-        qWarning() << "MriSlicesPlugin::setVolume: rejecting null / invalid volume";
+        Log::warning("MriSlicesPlugin::setVolume: rejecting null / invalid volume");
         return false;
     }
 
@@ -275,7 +274,7 @@ void MriSlicesPlugin::rebuildSlices()
 
     // extractOrthogonal documents the result order as {axial, coronal, sagittal}.
     if (ortho.size() != 3) {
-        qWarning() << "MriSlicesPlugin: unexpected ortho slice count" << ortho.size();
+        Log::warning("MriSlicesPlugin: unexpected ortho slice count {}", ortho.size());
         publishToScene();
         return;
     }

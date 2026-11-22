@@ -20,14 +20,13 @@
 #include <fs/fs_annotationset.h>
 #include <math/matrix_io.h>
 #include <base/log.h>
-#include <base/log_qt.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
-#include <QDebug>
 #include <QCommandLineParser>
 #include <QDir>
 
@@ -58,7 +57,6 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
 
     // Command Line Parser
@@ -86,7 +84,7 @@ int main(int argc, char* argv[])
     QFile t_fileForwardSolution(parser.value(fwdFileOption));
     MNEForwardSolution t_Fwd(parser.value(fwdFileOption).toStdU16String());
     if (t_Fwd.empty()) {
-        qWarning() << "Could not read the forward solution" << t_fileForwardSolution.fileName();
+        Log::warning("Could not read the forward solution {}", t_fileForwardSolution.fileName().toStdString());
         return 1;
     }
 
@@ -107,16 +105,16 @@ int main(int argc, char* argv[])
     //
     MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20); //40);
 
-    qDebug() << "==== Results ====";
-    qDebug() << "nrow: " << t_clusteredFwd.sol.nrow;
-    qDebug() << "ncol: " << t_clusteredFwd.sol.ncol;
-    qDebug() << "row_names:";
-    qDebug() << t_clusteredFwd.sol.row_names;
-    qDebug() << "col_names:";
-    qDebug() << t_clusteredFwd.sol.col_names;
-    qDebug() << "write fwd data to ./test_fwd.txt ...";
+    Log::debug("==== Results ====");
+    Log::debug("nrow: {}", t_clusteredFwd.sol.nrow);
+    Log::debug("ncol: {}", t_clusteredFwd.sol.ncol);
+    Log::debug("row_names:");
+    Log::debug("{}", join(t_clusteredFwd.sol.row_names, " "));
+    Log::debug("col_names:");
+    Log::debug("{}", join(t_clusteredFwd.sol.col_names, " "));
+    Log::debug("write fwd data to ./test_fwd.txt ...");
     mne::write_matrix(t_clusteredFwd.sol.data, QDir::temp().filePath("ex_read_fwd-clustered.txt").toStdString());
-    qDebug() << "[done]";
+    Log::debug("[done]");
 
     return t_clusteredFwd.sol.ncol > 0 && t_clusteredFwd.sol.ncol < t_Fwd.sol.ncol ? 0 : 1;
 }

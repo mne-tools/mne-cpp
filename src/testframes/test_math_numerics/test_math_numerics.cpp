@@ -17,7 +17,6 @@
 #include <math/linalg.h>
 #include <math/numerics.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -25,7 +24,6 @@
 
 #include <QCoreApplication>
 #include <QObject>
-#include <QDebug>
 #include <QtTest>
 
 //=============================================================================================================
@@ -131,8 +129,7 @@ TestMNEMath::TestMNEMath()
 
 void TestMNEMath::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qInfo() << "TestMNEMath: Starting MNEMath unit tests";
+    Log::info("TestMNEMath: Starting MNEMath unit tests");
 }
 
 //=============================================================================================================
@@ -685,7 +682,7 @@ void TestMNEMath::testPinvRankDeficient()
 
 void TestMNEMath::cleanupTestCase()
 {
-    qInfo() << "TestMNEMath: All tests completed";
+    Log::info("TestMNEMath: All tests completed");
 }
 
 //=============================================================================================================

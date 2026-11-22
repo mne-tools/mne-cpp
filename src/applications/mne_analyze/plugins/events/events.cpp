@@ -19,15 +19,10 @@
 
 #include "events.h"
 
+#include <base/log.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -159,7 +154,7 @@ void Events::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
+            mne::Log::warning("[Events::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 

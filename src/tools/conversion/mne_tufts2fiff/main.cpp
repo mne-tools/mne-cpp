@@ -17,7 +17,6 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDataStream>
-#include <QDebug>
 #include <QFileInfo>
 #include <QStringList>
 #include <QRegularExpression>
@@ -100,8 +98,7 @@ static bool readTuftsHeader(QFile& file, TuftsHeader& header)
 
     header.dataOffset = 512; // typical header size
 
-    qInfo("Tufts header: %d channels, %d samples, %.1f Hz",
-          header.nChannels, header.nSamples, header.sFreq);
+    Log::info("Tufts header: {} channels, {} samples, {:.1f} Hz", header.nChannels, header.nSamples, header.sFreq);
     return true;
 }
 
@@ -111,7 +108,7 @@ static bool readElpFile(const QString& filename, MatrixX3f& positions, QStringLi
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open elp file:" << filename;
+        Log::critical("Cannot open elp file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -135,8 +132,7 @@ static bool readElpFile(const QString& filename, MatrixX3f& positions, QStringLi
     for (int i = 0; i < posVec.size(); i++) {
         positions.row(i) = posVec[i].transpose();
     }
-    qInfo("Read %d electrode positions from %s",
-          static_cast<int>(posVec.size()), filename.toUtf8().constData());
+    Log::info("Read {} electrode positions from {}", static_cast<int>(posVec.size()), filename.toStdString());
     return true;
 }
 
@@ -146,7 +142,7 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open calibration file:" << filename;
+        Log::critical("Cannot open calibration file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -163,7 +159,7 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
     cals.resize(calVec.size());
     for (int i = 0; i < calVec.size(); i++)
         cals(i) = calVec[i];
-    qInfo("Read %d calibration values", static_cast<int>(calVec.size()));
+    Log::info("Read {} calibration values", static_cast<int>(calVec.size()));
     return true;
 }
 
@@ -171,7 +167,6 @@ static bool readCalibration(const QString& filename, VectorXf& cals)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_tufts2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -201,11 +196,11 @@ int main(int argc, char* argv[])
     float sfreqOverride = parser.isSet(sfreqOpt) ? parser.value(sfreqOpt).toFloat() : 0.0f;
 
     if (rawFile.isEmpty()) {
-        qCritical("Raw data file (--raw) is required.");
+        Log::critical("Raw data file (--raw) is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("Output file (--out) is required.");
+        Log::critical("Output file (--out) is required.");
         return 1;
     }
 
@@ -214,13 +209,13 @@ int main(int argc, char* argv[])
     //
     QFile raw(rawFile);
     if (!raw.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open raw file: %s", rawFile.toUtf8().constData());
+        Log::critical("Cannot open raw file: {}", rawFile.toStdString());
         return 1;
     }
 
     TuftsHeader header;
     if (!readTuftsHeader(raw, header)) {
-        qCritical("Failed to read Tufts header.");
+        Log::critical("Failed to read Tufts header.");
         return 1;
     }
 
@@ -303,7 +298,7 @@ int main(int argc, char* argv[])
     //
     auto stream = FiffStream::start_file(outFile.toStdU16String());
     if (!stream) {
-        qCritical("Cannot create output FIFF file.");
+        Log::critical("Cannot create output FIFF file.");
         return 1;
     }
 
@@ -356,8 +351,7 @@ int main(int argc, char* argv[])
     stream->end_block(FIFFB_MEAS);
     stream->end_file();
 
-    qInfo("Wrote FIFF: %d channels, %d samples at %.1f Hz to %s",
-          nch, nSamples, header.sFreq, outFile.toUtf8().constData());
+    Log::info("Wrote FIFF: {} channels, {} samples at {:.1f} Hz to {}", nch, nSamples, header.sFreq, outFile.toStdString());
 
     return 0;
 }

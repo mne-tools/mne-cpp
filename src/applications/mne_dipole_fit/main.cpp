@@ -19,7 +19,6 @@
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_dipole_fit.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <mne/mne_bem.h>
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
@@ -82,7 +81,6 @@ int main(int argc, char* argv[])
             break;
         }
     }
-    mne::install_qt_message_handler();
     std::unique_ptr<QCoreApplication> app;
     if (guiRequested) {
         app = std::make_unique<QApplication>(argc, argv);
@@ -97,18 +95,18 @@ int main(int argc, char* argv[])
         return 1;
     }
     if (settings.dipname.empty() && settings.bdipname.empty()) {
-        qCritical("Output file name missing. Please use the --dip or --bdip options to do this.");
+        Log::critical("Output file name missing. Please use the --dip or --bdip options to do this.");
         return 1;
     }
     if (!QFileInfo(QString::fromStdString(settings.measname)).isReadable()) {
-        qCritical("Measurement data file is not readable: %s", settings.measname.c_str());
+        Log::critical("Measurement data file is not readable: {}", settings.measname);
         return 1;
     }
 
     InvDipoleFit dipFit(&settings);
     InvEcdSet set = dipFit.calculateFit();
     if (set.size() == 0) {
-        qCritical("Dipole fitting failed: no dipoles were fitted.");
+        Log::critical("Dipole fitting failed: no dipoles were fitted.");
         return 1;
     }
 
@@ -135,11 +133,11 @@ int main(int argc, char* argv[])
      * Saving...
      */
     if (!settings.dipname.empty() && !set.save_dipoles_dip(mne::path_from_utf8(settings.dipname))) {
-        qCritical("Dipoles could not be saved to %s.", settings.dipname.c_str());
+        Log::critical("Dipoles could not be saved to {}.", settings.dipname);
         return 1;
     }
     if (!settings.bdipname.empty() && !set.save_dipoles_bdip(mne::path_from_utf8(settings.bdipname))) {
-        qCritical("Dipoles could not be saved to %s.", settings.bdipname.c_str());
+        Log::critical("Dipoles could not be saved to {}.", settings.bdipname);
         return 1;
     }
 

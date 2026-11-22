@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "rtfwd.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
@@ -36,7 +37,6 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
-#include <QDebug>
 #include <QFile>
 
 //=============================================================================================================
@@ -398,7 +398,7 @@ void RtFwd::run()
             pFwdSolution.reset(pFwdComputer->calculateFwd().release());
 
             if (auto written = pFwdSolution->write(mne::path_from_utf8(m_pFwdSettings->solname)); !written) {
-                qWarning() << written.error().what();
+                Log::warning("{}", written.error().what());
             }
 
             // emit results to control widget

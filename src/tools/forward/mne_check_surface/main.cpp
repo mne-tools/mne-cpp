@@ -19,7 +19,6 @@
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -120,17 +118,14 @@ static bool isCompleteSurface(const MNEBemSurface& surf)
         cm += surf.rr.row(k).transpose();
     cm /= static_cast<float>(surf.np);
 
-    qInfo("%s CM is %6.2f %6.2f %6.2f mm",
-          qPrintable(nameOf(surf.id)),
-          1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
+    Log::info("{} CM is {:6.2f} {:6.2f} {:6.2f} mm", nameOf(surf.id).toStdString(), 1000.0f * cm(0), 1000.0f * cm(1), 1000.0f * cm(2));
 
     double totAngle = sumSolids(cm, surf) / (4.0 * std::numbers::pi);
     if (fabs(totAngle - 1.0) > 1e-5) {
-        qInfo("Surface %s is NOT complete (solid angle = %g * 4*PI instead of 1.0)",
-              qPrintable(nameOf(surf.id)), totAngle);
+        Log::info("Surface {} is NOT complete (solid angle = {:g} * 4*PI instead of 1.0)", nameOf(surf.id).toStdString(), totAngle);
         return false;
     }
-    qInfo("Surface %s is complete.", qPrintable(nameOf(surf.id)));
+    Log::info("Surface {} is complete.", nameOf(surf.id).toStdString());
     return true;
 }
 
@@ -146,12 +141,10 @@ static bool checkNesting(const QVector<MNEBemSurface>& surfs)
         Vector3f pt = surfs[j + 1].rr.row(0);
         double totAngle = sumSolids(pt, surfs[j]) / (4.0 * std::numbers::pi);
         if (fabs(totAngle - 1.0) > 1e-5) {
-            qInfo("Checking that %s is inside %s... [FAILED]",
-                  qPrintable(inner), qPrintable(outer));
+            Log::info("Checking that {} is inside {}... [FAILED]", inner.toStdString(), outer.toStdString());
             return false;
         }
-        qInfo("Checking that %s is inside %s... [OK]",
-              qPrintable(inner), qPrintable(outer));
+        Log::info("Checking that {} is inside {}... [OK]", inner.toStdString(), outer.toStdString());
     }
     return true;
 }
@@ -172,9 +165,7 @@ static void reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
             maxArea = area;
         totalArea += area;
     }
-    qInfo("%s: %d triangles, area %7.1f ... %7.1f mm^2 (total %10.1f mm^2)",
-          qPrintable(name), surf.ntri,
-          1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
+    Log::info("{}: {} triangles, area {:7.1f} ... {:7.1f} mm^2 (total {:10.1f} mm^2)", name.toStdString(), surf.ntri, 1e6 * minArea, 1e6 * maxArea, 1e6 * totalArea);
 }
 
 //=============================================================================================================
@@ -198,7 +189,6 @@ static float minSurfaceDist(const MNEBemSurface& s1, const MNEBemSurface& s2)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_check_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -228,7 +218,7 @@ int main(int argc, char* argv[])
     bool doThickness = parser.isSet(thicknessOpt);
 
     if (bemFile.isEmpty() && surfFile.isEmpty()) {
-        qCritical("Either --bem or --surf is required.");
+        Log::critical("Either --bem or --surf is required.");
         return 1;
     }
 
@@ -238,17 +228,17 @@ int main(int argc, char* argv[])
         // Read BEM from FIFF
         MNEBem bem(bemFile.toStdU16String());
         if (bem.size() == 0) {
-            qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
+            Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
             return 1;
         }
-        qInfo("Read %zu surfaces from %s\n", bem.size(), qPrintable(bemFile));
+        Log::info("Read {} surfaces from {}\n", bem.size(), bemFile.toStdString());
         for (int i = 0; i < std::ssize(bem); ++i)
             surfs.append(bem[i]);
     } else {
         // Read single FreeSurfer surface
         FsSurface surface;
         if (!FsSurface::read(surfFile.toStdU16String(), surface)) {
-            qCritical("Cannot read surface: %s", qPrintable(surfFile));
+            Log::critical("Cannot read surface: {}", surfFile.toStdString());
             return 1;
         }
         MNEBemSurface bemSurf;
@@ -260,8 +250,7 @@ int main(int argc, char* argv[])
         bemSurf.nn = surface.nn();
         bemSurf.coord_frame = FIFFV_COORD_MRI;
         surfs.append(bemSurf);
-        qInfo("Read surface: %s (%d vertices, %d triangles)\n",
-              qPrintable(surfFile), bemSurf.np, bemSurf.ntri);
+        Log::info("Read surface: {} ({} vertices, {} triangles)\n", surfFile.toStdString(), bemSurf.np, bemSurf.ntri);
     }
 
     // Check completeness
@@ -271,7 +260,7 @@ int main(int argc, char* argv[])
             allOk = false;
         reportTriangleAreas(surfs[k], nameOf(surfs[k].id));
     }
-    qInfo("%s", "");
+    Log::info("{}", "");
 
     // Check nesting if multiple surfaces
     if (surfs.size() > 1) {
@@ -281,20 +270,17 @@ int main(int argc, char* argv[])
 
     // Check inter-surface distances
     if (doThickness && surfs.size() > 1) {
-        qInfo("%s", "");
+        Log::info("{}", "");
         for (int k = 0; k < surfs.size() - 1; ++k) {
             float dist = minSurfaceDist(surfs[k], surfs[k + 1]);
-            qInfo("Minimum distance between %s and %s: %6.1f mm",
-                  qPrintable(nameOf(surfs[k].id)),
-                  qPrintable(nameOf(surfs[k + 1].id)),
-                  1000.0f * dist);
+            Log::info("Minimum distance between {} and {}: {:6.1f} mm", nameOf(surfs[k].id).toStdString(), nameOf(surfs[k + 1].id).toStdString(), 1000.0f * dist);
         }
     }
 
     if (allOk)
-        qInfo("\nAll surface checks passed.");
+        Log::info("\nAll surface checks passed.");
     else
-        qInfo("\nSome surface checks FAILED.");
+        Log::info("\nSome surface checks FAILED.");
 
     return allOk ? 0 : 1;
 }

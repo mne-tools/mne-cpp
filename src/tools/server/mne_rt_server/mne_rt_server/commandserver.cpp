@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "commandserver.h"
 
 #include "commandthread.h"
@@ -123,8 +124,7 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
     if (!m_commandParser.parse(p_sCommand, t_qListParsedCommands)) {
         QByteArray t_blockReply;
         t_blockReply.append("command unknown\r\n");
-        qWarning("[CommandServer::incommingCommand] command unknown: %s",
-                 p_sCommand.toUtf8().constData());
+        mne::Log::warning("[CommandServer::incommingCommand] command unknown: {}", p_sCommand.toStdString());
 
         //send reply
         emit replyCommand(t_blockReply, p_iThreadID);

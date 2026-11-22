@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "averaging.h"
 
 #include <anShared/Management/communicator.h>
@@ -261,7 +262,7 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
+            Log::warning("[Averaging::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 
@@ -289,7 +290,7 @@ void Averaging::onModelChanged(QSharedPointer<mne::analyze::AbstractModel> pNewM
     if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         if (m_pFiffRawModel) {
             if (m_pFiffRawModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                Log::info("[Averaging::onModelChanged] New model is the same as old model");
                 return;
             }
         }
@@ -460,7 +461,7 @@ void Averaging::createNewAverage()
             updateEvokedSetModel();
         }
     } else {
-        qInfo() << "[Averaging::createNewAverage] Unable to compute average.";
+        Log::info("[Averaging::createNewAverage] Unable to compute average.");
     }
 
     m_bSavingAverage = false;

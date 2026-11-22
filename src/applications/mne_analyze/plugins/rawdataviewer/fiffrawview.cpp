@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <math.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
@@ -101,7 +102,7 @@ void FiffRawView::reset()
 void FiffRawView::setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate)
 {
     if (!pDelegate) {
-        qWarning() << "[FiffRawView::setDelegate] Passed delegate is NULL.";
+        Log::warning("[FiffRawView::setDelegate] Passed delegate is NULL.");
         return;
     }
     m_pDelegate = pDelegate;
@@ -128,7 +129,7 @@ QSharedPointer<FiffRawViewModel> FiffRawView::getModel()
 void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
 {
     if (!pModel) {
-        qWarning() << "[FiffRawView::setModel] Passed model is NULL.";
+        Log::warning("[FiffRawView::setModel] Passed model is NULL.");
         return;
     }
     disconnectModel();
@@ -339,13 +340,13 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
         svgGen.setViewBox(m_pTableView->rect());
 
         m_pTableView->render(&svgGen);
-        qInfo() << "[FiffRawView::onMakeScreenshot] Saving SVG Screenshot";
+        Log::info("[FiffRawView::onMakeScreenshot] Saving SVG Screenshot");
     } else if (imageType.contains("PNG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);
 
         QPixmap pixMap = m_pTableView->grab();
         pixMap.save(fileName);
-        qInfo() << "[FiffRawView::onMakeScreenshot] Saving PNG Screenshot";
+        Log::info("[FiffRawView::onMakeScreenshot] Saving PNG Screenshot");
     }
 }
 
@@ -433,7 +434,7 @@ bool FiffRawView::eventFilter(QObject* object, QEvent* event)
         } else
 
             if (event->type() == QEvent::KeyPress) {
-            qDebug() << "Key Press";
+            Log::debug("Key Press");
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
             switch (keyEvent->key()) {
                 case Qt::Key_E: {

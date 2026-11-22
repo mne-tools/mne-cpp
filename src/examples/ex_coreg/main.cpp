@@ -28,7 +28,6 @@
 #include <disp3D/model/items/digitizersettreeitem.h>
 #include <disp3D/model/items/bemtreeitem.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -38,7 +37,6 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QFile>
 
 //=============================================================================================================
@@ -81,7 +79,6 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -163,7 +160,7 @@ int main(int argc, char* argv[])
 
     // align fiducials
     if (!mne::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
-        qWarning() << "Point cloud registration not succesfull.";
+        Log::warning("Point cloud registration not succesfull.");
     }
 
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
@@ -192,7 +189,7 @@ int main(int argc, char* argv[])
 
     // discard outliers
     if (!mne::discard3DPointOutliers(mneSurfacePoints, matHsp, transHeadMri, vecTake, matHspClean, fMaxDist)) {
-        qWarning() << "Discard outliers was not succesfull.";
+        Log::warning("Discard outliers was not succesfull.");
     }
     VectorXf vecWeightsICPClean(vecTake.size());
 
@@ -202,11 +199,11 @@ int main(int argc, char* argv[])
 
     // icp
     if (!mne::performIcp(mneSurfacePoints, matHspClean, transHeadMri, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
-        qWarning() << "ICP was not succesfull.";
+        Log::warning("ICP was not succesfull.");
     }
-    qInfo() << "transHeadMri:";
+    Log::info("transHeadMri:");
     transHeadMri.print();
-    qInfo() << "transHeadMriRef:";
+    Log::info("transHeadMriRef:");
     transHeadMriRef.print();
 
     BrainView* pBrainView = new BrainView();

@@ -66,7 +66,7 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
             onModelChanged(e->getData().value<QSharedPointer<mne::analyze::AbstractModel> >());
             break;
         default:
-            qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
+            mne::Log::warning("[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 ```

@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "lsladapter.h"
 
 #include "lsladapterproducer.h"
@@ -146,7 +147,7 @@ bool LSLAdapter::start()
 
         return true;
     } else {
-        qDebug() << "[LSLAdapter::start] No valid stream !";
+        Log::debug("[LSLAdapter::start] No valid stream !");
         return false;
     }
 }
@@ -228,7 +229,7 @@ void LSLAdapter::onLSLStreamScanReady()
         // check whether we had a valid stream, and if its still amongst the available ones
         if (m_bHasValidStream) {
             if (!std::ranges::contains(m_vAvailableStreams, m_currentStream.uid(), &mne::stream_info::uid)) {
-                qDebug() << "[LSLAdapter] Old stream no longer available, switching to first available stream";
+                Log::debug("[LSLAdapter] Old stream no longer available, switching to first available stream");
                 m_currentStream = m_vAvailableStreams[0];
                 m_bHasValidStream = true;
             }
@@ -260,7 +261,7 @@ QVector<mne::stream_info> LSLAdapter::scanAvailableLSLStreams()
         if (isValid(vAvailableStreams[i]) == false) {
             vAvailableStreams.remove(i);
             i--;
-            qDebug() << "[LSLAdapter::scanAvailableLSLStreams] Found and removed an invalid stream !";
+            Log::debug("[LSLAdapter::scanAvailableLSLStreams] Found and removed an invalid stream !");
         }
     }
     return vAvailableStreams;
@@ -367,7 +368,7 @@ void LSLAdapter::prepareFiffInfo(const mne::stream_info& stream)
         m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
         m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
     } else {
-        qDebug() << "[LSLAdapterProducer::setStreamInfo] Type " << type << " not implemented !";
+        Log::debug("[LSLAdapterProducer::setStreamInfo] Type {} not implemented !", type.toStdString());
         return;
     }
 }

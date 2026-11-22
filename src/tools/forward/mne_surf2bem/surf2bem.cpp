@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "surf2bem.h"
 #include "mne_surf2bem_settings.h"
 #include "surfacechecks.h"
@@ -66,26 +67,26 @@ int Surf2Bem::run()
     const QVector<SurfaceInput>& inputs = m_settings.surfaces();
 
     if (inputs.isEmpty()) {
-        qInfo("Usage: mne_surf2bem [options]");
-        qInfo("Use --help for available options.");
+        Log::info("Usage: mne_surf2bem [options]");
+        Log::info("Use --help for available options.");
         return 1;
     }
 
     //
     // Report input summary
     //
-    qInfo("%s", "");
+    Log::info("{}", "");
     for (int k = 0; k < inputs.size(); ++k) {
         QString line = QString::asprintf("input  file # %3d : %s", k + 1, qPrintable(inputs[k].fileName));
         line += inputs[k].id > 0 ? QString(" / id = %1").arg(inputs[k].id) : QString(" / id N/A");
         line += inputs[k].sigma > 0.0f ? QString::asprintf(" / sigma = %g S/m", inputs[k].sigma) : QString(" / sigma N/A");
         if (inputs[k].shift != 0.0f)
             line += QString::asprintf(" / shift %6.1f mm", 1000.0f * inputs[k].shift);
-        qInfo("%s", qPrintable(line));
+        Log::info("{}", line.toStdString());
     }
     if (!m_settings.outputFile().isEmpty())
-        qInfo("output file       : %s", qPrintable(m_settings.outputFile()));
-    qInfo("%s", "");
+        Log::info("output file       : {}", m_settings.outputFile().toStdString());
+    Log::info("{}", "");
 
     //
     // Step 1: Read all surfaces
@@ -105,13 +106,13 @@ int Surf2Bem::run()
         }
 
         if (!ok) {
-            qCritical("Failed to read surface %s", qPrintable(inputs[k].fileName));
+            Log::critical("Failed to read surface {}", inputs[k].fileName.toStdString());
             fflush(stderr);
             return 1;
         }
 
         surfs[k].id = inputs[k].id;
-        qInfo("%s read. id = %d\n", qPrintable(inputs[k].fileName), inputs[k].id);
+        Log::info("{} read. id = {}\n", inputs[k].fileName.toStdString(), inputs[k].id);
         fflush(stderr);
     }
 
@@ -143,7 +144,7 @@ int Surf2Bem::run()
                 return 1;
             }
         }
-        qInfo("Surfaces passed the basic topology checks.");
+        Log::info("Surfaces passed the basic topology checks.");
 
         if (m_settings.checkMore()) {
             if (!SurfaceChecks::checkThicknesses(surfs)) {
@@ -151,7 +152,7 @@ int Surf2Bem::run()
             }
         }
     } else {
-        qInfo("Topology checks skipped.");
+        Log::info("Topology checks skipped.");
     }
 
     //
@@ -169,15 +170,15 @@ int Surf2Bem::run()
 
 
         if (auto written = bem.write(m_settings.outputFile().toStdU16String()); !written) {
-            qCritical() << written.error().what();
+            Log::critical("{}", written.error().what());
 
 
             return 1;
         }
 
-        qInfo("%s written.", qPrintable(m_settings.outputFile()));
+        Log::info("{} written.", m_settings.outputFile().toStdString());
     } else {
-        qInfo("No output requested.");
+        Log::info("No output requested.");
     }
 
     return 0;
@@ -192,11 +193,11 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     // BEM surface names such as inner_skull.surf name no hemisphere, which FsSurface::read() requires
     auto geometry = FsSurface::read_geometry(input.fileName.toStdU16String());
     if (!geometry) {
-        qCritical("%s", geometry.error().what());
+        Log::critical("{}", geometry.error().what());
         fflush(stderr);
         return false;
     }
-    qInfo("%s: %d vertices and %d triangles", qPrintable(input.fileName), static_cast<int>(geometry->rr.rows()), static_cast<int>(geometry->tris.rows()));
+    Log::info("{}: {} vertices and {} triangles", input.fileName.toStdString(), static_cast<int>(geometry->rr.rows()), static_cast<int>(geometry->tris.rows()));
 
     bemSurf.np = static_cast<int>(geometry->rr.rows());
     bemSurf.ntri = static_cast<int>(geometry->tris.rows());
@@ -207,8 +208,7 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     // Compute vertex normals
     bemSurf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
-    qInfo("Read FreeSurfer surface: %d vertices, %d triangles",
-          bemSurf.np, bemSurf.ntri);
+    Log::info("Read FreeSurfer surface: {} vertices, {} triangles", bemSurf.np, bemSurf.ntri);
     fflush(stderr);
 
     return true;
@@ -232,7 +232,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     //
     QFile file(input.fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Could not open ASCII triangle file:" << input.fileName;
+        Log::critical("Could not open ASCII triangle file: {}", input.fileName.toStdString());
         return false;
     }
 
@@ -242,7 +242,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
-        qCritical() << "Invalid vertex count in" << input.fileName;
+        Log::critical("Invalid vertex count in {}", input.fileName.toStdString());
         return false;
     }
 
@@ -252,7 +252,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
         float x, y, z;
         in >> x >> y >> z;
         if (in.status() != QTextStream::Ok) {
-            qCritical() << "Error reading vertex" << k << "from" << input.fileName;
+            Log::critical("Error reading vertex {} from {}", k, input.fileName.toStdString());
             return false;
         }
         rr(k, 0) = x;
@@ -264,7 +264,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     int ntri = 0;
     in >> ntri;
     if (ntri <= 0) {
-        qCritical() << "Invalid triangle count in" << input.fileName;
+        Log::critical("Invalid triangle count in {}", input.fileName.toStdString());
         return false;
     }
 
@@ -274,7 +274,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
         int v1, v2, v3;
         in >> v1 >> v2 >> v3;
         if (in.status() != QTextStream::Ok) {
-            qCritical() << "Error reading triangle" << k << "from" << input.fileName;
+            Log::critical("Error reading triangle {} from {}", k, input.fileName.toStdString());
             return false;
         }
         if (input.swap) {
@@ -307,8 +307,7 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     // Compute vertex normals
     bemSurf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
-    qInfo("Read ASCII triangle surface: %d vertices, %d triangles",
-          bemSurf.np, bemSurf.ntri);
+    Log::info("Read ASCII triangle surface: {} vertices, {} triangles", bemSurf.np, bemSurf.ntri);
 
     return true;
 }
@@ -332,9 +331,7 @@ bool Surf2Bem::shiftVertices(MNEBemSurface& surf, float shift)
     // Recompute normals after shifting
     surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    qInfo("%s vertex locations shifted by %6.1f mm.",
-          qPrintable(SurfaceChecks::getNameOf(surf.id)),
-          1000.0f * shift);
+    Log::info("{} vertex locations shifted by {:6.1f} mm.", SurfaceChecks::getNameOf(surf.id).toStdString(), 1000.0f * shift);
 
     return true;
 }

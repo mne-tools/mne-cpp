@@ -18,13 +18,8 @@
 
 #include "sourcelocalization.h"
 
+#include <base/log.h>
 #include <anShared/Management/communicator.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -105,8 +100,7 @@ void SourceLocalization::handleEvent(QSharedPointer<Event> e)
 {
     // See DataManager::handleEvent: a switch with only a default label is
     // MSVC C4065, and this plugin subscribes to no events anyway.
-    qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled:"
-               << e->getType();
+    mne::Log::warning("[SourceLocalization::handleEvent] Received an Event that is not handled: {}", static_cast<int>(e->getType()));
 }
 
 //=============================================================================================================

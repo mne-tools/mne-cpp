@@ -23,7 +23,6 @@
 #include <inv/inv_source_estimate.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -65,7 +64,6 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
 
     // Command Line Parser
@@ -93,7 +91,7 @@ int main(int argc, char* argv[])
     QString t_sFileNameStc(parser.value(stcFileOption));
 
     double lambda2 = 1.0 / pow(snr, 2);
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+    Log::debug("Start calculation with: SNR {} ; Lambda {} ; Method {} ; stc: {}", snr, lambda2, method.toStdString(), t_sFileNameStc.toStdString());
 
     //
     //   Read the data first
@@ -144,7 +142,7 @@ int main(int argc, char* argv[])
     if (!t_sFileNameStc.isEmpty()) {
         const std::filesystem::path stcPath = t_sFileNameStc.toStdU16String();
         if (auto written = sourceEstimate.write(stcPath); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
             return 1;
         }
 

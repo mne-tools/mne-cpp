@@ -16,7 +16,7 @@
 //=============================================================================================================
 
 #include <stdio.h>
-#include <base/log_qt.h>
+#include <base/log.h>
 #include "Windows/mainwindow.h"
 #include "Utils/info.h"
 
@@ -55,43 +55,36 @@ MainWindow* mainWindow = nullptr;
 
 //*************************************************************************************************************
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+/** The @ref mne::Log sink of MNE Browse: writes every message to the log window of the main window. */
+void writeToLogWindow(mne::Log::Level type, std::string_view message)
 {
-    Q_UNUSED(context);
-
     if (!mainWindow)
         return;
+
+    const QString msg = QString::fromUtf8(message.data(), static_cast<qsizetype>(message.size()));
 
     QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString txt = QString("[%1] ").arg(dt);
 
     LogKind kind = _LogKndMessage;
     LogLevel level = _LogLvMax;
-    bool doAbort = false;
-
     switch (type) {
-        case QtDebugMsg:
+        case mne::Log::Level::Debug:
             txt += QString("{Debug} \t\t %1").arg(msg);
             kind = _LogKndMessage;
             level = _LogLvMax;
             break;
-        case QtWarningMsg:
+        case mne::Log::Level::Warning:
             txt += QString("{Warning} \t %1").arg(msg);
             kind = _LogKndWarning;
             level = _LogLvNormal;
             break;
-        case QtCriticalMsg:
+        case mne::Log::Level::Critical:
             txt += QString("{Critical} \t %1").arg(msg);
             kind = _LogKndError;
             level = _LogLvMin;
             break;
-        case QtFatalMsg:
-            txt += QString("{Fatal} \t\t %1").arg(msg);
-            kind = _LogKndError;
-            level = _LogLvMin;
-            doAbort = true;
-            break;
-        default:
+        case mne::Log::Level::Info:
             return;
     }
 
@@ -105,9 +98,6 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
         LogLevel capturedLevel = level;
         QMetaObject::invokeMethod(mainWindow, [capturedTxt, capturedKind, capturedLevel]() { mainWindow->writeToLog(capturedTxt, capturedKind, capturedLevel); }, Qt::QueuedConnection);
     }
-
-    if (doAbort)
-        abort();
 }
 
 
@@ -115,8 +105,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context, con
 // MAIN
 int main(int argc, char* argv[])
 {
-    qInstallMessageHandler(customMessageHandler);
-    mne::forward_log_to_qt(); // library messages reach the log window too
+    mne::Log::set_sink(writeToLogWindow);
     QApplication a(argc, argv);
 
     //set application settings
@@ -170,8 +159,7 @@ int main(int argc, char* argv[])
     if (parser.isSet(cdOption)) {
         const QString dir = parser.value(cdOption);
         if (!QDir::setCurrent(dir)) {
-            qWarning("[mne_browse] --cd: could not change to directory: %s",
-                     dir.toUtf8().data());
+            mne::Log::warning("[mne_browse] --cd: could not change to directory: {}", dir.toStdString());
         }
     }
 
@@ -183,13 +171,11 @@ int main(int argc, char* argv[])
     double highpass = parser.isSet(highpassOption) ? parser.value(highpassOption).toDouble(&hpOk) : -1.0;
     double lowpass = parser.isSet(lowpassOption) ? parser.value(lowpassOption).toDouble(&lpOk) : -1.0;
     if (parser.isSet(highpassOption) && !hpOk) {
-        qWarning("[mne_browse] --highpass: invalid value '%s', ignoring.",
-                 parser.value(highpassOption).toUtf8().data());
+        mne::Log::warning("[mne_browse] --highpass: invalid value '{}', ignoring.", parser.value(highpassOption).toStdString());
         highpass = -1.0;
     }
     if (parser.isSet(lowpassOption) && !lpOk) {
-        qWarning("[mne_browse] --lowpass: invalid value '%s', ignoring.",
-                 parser.value(lowpassOption).toUtf8().data());
+        mne::Log::warning("[mne_browse] --lowpass: invalid value '{}', ignoring.", parser.value(lowpassOption).toStdString());
         lowpass = -1.0;
     }
 

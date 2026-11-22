@@ -17,7 +17,6 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -80,7 +78,6 @@ static VectorXi buildNearestMap(const MatrixX3f& srcSphere, const MatrixX3f& dst
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_morph_labels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -119,23 +116,23 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
-        qCritical("--from and --to are required.");
+        Log::critical("--from and --to are required.");
         parser.showHelp(1);
     }
     if (hemi.isEmpty()) {
-        qCritical("--hemi is required.");
+        Log::critical("--hemi is required.");
         parser.showHelp(1);
     }
     if (labelFile.isEmpty()) {
-        qCritical("--label is required.");
+        Log::critical("--label is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
     if (subjectsDir.isEmpty()) {
-        qCritical("$SUBJECTS_DIR not set.");
+        Log::critical("$SUBJECTS_DIR not set.");
         return 1;
     }
 
@@ -146,32 +143,32 @@ int main(int argc, char* argv[])
 
     FsSurface srcSphere, dstSphere, dstWhite;
     if (!FsSurface::read(srcSpherePath.toStdU16String(), srcSphere)) {
-        qCritical("Cannot read source sphere: %s", qPrintable(srcSpherePath));
+        Log::critical("Cannot read source sphere: {}", srcSpherePath.toStdString());
         return 1;
     }
     if (!FsSurface::read(dstSpherePath.toStdU16String(), dstSphere)) {
-        qCritical("Cannot read dest sphere: %s", qPrintable(dstSpherePath));
+        Log::critical("Cannot read dest sphere: {}", dstSpherePath.toStdString());
         return 1;
     }
     if (!FsSurface::read(dstWhitePath.toStdU16String(), dstWhite)) {
-        qCritical("Cannot read dest white surface: %s", qPrintable(dstWhitePath));
+        Log::critical("Cannot read dest white surface: {}", dstWhitePath.toStdString());
         return 1;
     }
 
-    qInfo("Source sphere: %d vertices", static_cast<int>(srcSphere.rr().rows()));
-    qInfo("Dest sphere:   %d vertices", static_cast<int>(dstSphere.rr().rows()));
+    Log::info("Source sphere: {} vertices", static_cast<int>(srcSphere.rr().rows()));
+    Log::info("Dest sphere:   {} vertices", static_cast<int>(dstSphere.rr().rows()));
 
     // Build nearest-neighbor mapping on sphere
-    qInfo("Building nearest-neighbor mapping on sphere...");
+    Log::info("Building nearest-neighbor mapping on sphere...");
     VectorXi mapping = buildNearestMap(srcSphere.rr(), dstSphere.rr());
 
     // Read input label
     FsLabel label;
     if (!FsLabel::read(labelFile.toStdU16String(), label)) {
-        qCritical("Cannot read label: %s", qPrintable(labelFile));
+        Log::critical("Cannot read label: {}", labelFile.toStdString());
         return 1;
     }
-    qInfo("Input label: %d vertices", static_cast<int>(label.vertices.size()));
+    Log::info("Input label: {} vertices", static_cast<int>(label.vertices.size()));
 
     // Morph label vertices
     std::set<int> morphedSet;
@@ -185,7 +182,7 @@ int main(int argc, char* argv[])
     // Write morphed label
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot write: %s", qPrintable(outFile));
+        Log::critical("Cannot write: {}", outFile.toStdString());
         return 1;
     }
     QTextStream out(&outF);
@@ -201,6 +198,6 @@ int main(int argc, char* argv[])
     }
     outF.close();
 
-    qInfo("Morphed label: %d vertices -> %s", static_cast<int>(morphedSet.size()), qPrintable(outFile));
+    Log::info("Morphed label: {} vertices -> {}", static_cast<int>(morphedSet.size()), outFile.toStdString());
     return 0;
 }

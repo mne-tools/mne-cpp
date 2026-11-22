@@ -18,7 +18,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -99,7 +98,7 @@ static bool writeEventFile(const QString& fileName, const QList<EventEntry>& eve
 {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(fileName));
+        Log::critical("Cannot open output file: {}", fileName.toStdString());
         return false;
     }
     QTextStream out(&file);
@@ -120,7 +119,6 @@ static bool writeEventFile(const QString& fileName, const QList<EventEntry>& eve
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_dacq_annotator");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -170,11 +168,11 @@ int main(int argc, char* argv[])
     if (!measFile.isEmpty()) {
         FiffRawData rawData(measFile.toStdU16String());
         if (rawData.info.empty()) {
-            qCritical("Cannot read measurement info from: %s", qPrintable(measFile));
+            Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
             return 1;
         }
         sfreq = rawData.info.sfreq;
-        qInfo("Measurement: %d channels, sfreq = %.1f Hz", rawData.info.nchan, sfreq);
+        Log::info("Measurement: {} channels, sfreq = {:.1f} Hz", rawData.info.nchan, sfreq);
 
         // Default events file
         if (eventsFile.isEmpty()) {
@@ -188,7 +186,7 @@ int main(int argc, char* argv[])
     //=========================================================================
     if (parser.isSet(stim_chOpt)) {
         if (measFile.isEmpty()) {
-            qCritical("--meas is required with --stim-ch.");
+            Log::critical("--meas is required with --stim-ch.");
             return 1;
         }
 
@@ -206,7 +204,7 @@ int main(int argc, char* argv[])
             }
         }
         if (stimIdx < 0) {
-            qCritical("Stimulus channel '%s' not found.", qPrintable(stimName));
+            Log::critical("Stimulus channel '{}' not found.", stimName.toStdString());
             return 1;
         }
 
@@ -217,7 +215,7 @@ int main(int argc, char* argv[])
         sel(0) = stimIdx;
 
         if (!raw.read_raw_segment(data, times, raw.first_samp, raw.last_samp, sel)) {
-            qCritical("Cannot read stimulus channel data.");
+            Log::critical("Cannot read stimulus channel data.");
             return 1;
         }
 
@@ -236,19 +234,18 @@ int main(int argc, char* argv[])
             }
         }
 
-        qInfo("Found %lld events from stimulus channel '%s'",
-              static_cast<long long>(events.size()), qPrintable(stimName));
+        Log::info("Found {} events from stimulus channel '{}'", static_cast<long long>(events.size()), stimName.toStdString());
 
         if (outFile.isEmpty())
             outFile = eventsFile;
         if (outFile.isEmpty()) {
-            qCritical("Specify --out for output event file.");
+            Log::critical("Specify --out for output event file.");
             return 1;
         }
 
         if (!writeEventFile(outFile, events))
             return 1;
-        qInfo("Written events to: %s", qPrintable(outFile));
+        Log::info("Written events to: {}", outFile.toStdString());
         return 0;
     }
 
@@ -258,7 +255,7 @@ int main(int argc, char* argv[])
     QList<EventEntry> events;
     if (!eventsFile.isEmpty() && QFile::exists(eventsFile)) {
         events = readEventFile(eventsFile);
-        qInfo("Loaded %lld existing events from: %s", static_cast<long long>(events.size()), qPrintable(eventsFile));
+        Log::info("Loaded {} existing events from: {}", static_cast<long long>(events.size()), eventsFile.toStdString());
     }
 
     //=========================================================================
@@ -268,7 +265,7 @@ int main(int argc, char* argv[])
         QString spec = parser.value(addOpt);
         QStringList parts = spec.split(':');
         if (parts.size() < 3) {
-            qCritical("Invalid event spec '%s'. Use sample:before:after[:comment].", qPrintable(spec));
+            Log::critical("Invalid event spec '{}'. Use sample:before:after[:comment].", spec.toStdString());
             return 1;
         }
 
@@ -279,9 +276,7 @@ int main(int argc, char* argv[])
         ev.comment = (parts.size() > 3) ? parts.mid(3).join(":") : QString();
 
         events.append(ev);
-        qInfo("Added event: sample=%d, before=%d, after=%d%s",
-              ev.sample, ev.before, ev.after,
-              ev.comment.isEmpty() ? "" : qPrintable(QString(", comment=%1").arg(ev.comment)));
+        Log::info("Added event: sample={}, before={}, after={}{}", ev.sample, ev.before, ev.after, ev.comment.isEmpty() ? "" : qPrintable(QString(", comment=%1").arg(ev.comment)));
 
         // Sort by sample
         std::sort(events.begin(), events.end(),
@@ -300,15 +295,15 @@ int main(int argc, char* argv[])
                 removed++;
             }
         }
-        qInfo("Removed %d event(s) at sample %d", removed, removeSample);
+        Log::info("Removed {} event(s) at sample {}", removed, removeSample);
     }
 
     //=========================================================================
     // List events
     //=========================================================================
     if (doList) {
-        qInfo("\n%-10s  %-8s  %-8s  %s", "Sample", "Before", "After", "Comment");
-        qInfo("%-10s  %-8s  %-8s  %s", "------", "------", "-----", "-------");
+        Log::info("\n{:<10}  {:<8}  {:<8}  {}", "Sample", "Before", "After", "Comment");
+        Log::info("{:<10}  {:<8}  {:<8}  {}", "------", "------", "-----", "-------");
         for (const EventEntry& ev : events) {
             QString line = QString::asprintf("%-10d  %-8d  %-8d",
                                              ev.sample, ev.before, ev.after);
@@ -319,9 +314,9 @@ int main(int argc, char* argv[])
             if (!ev.comment.isEmpty()) {
                 line += "  " + ev.comment;
             }
-            qInfo("%s", qPrintable(line));
+            Log::info("{}", line.toStdString());
         }
-        qInfo("\nTotal: %lld event(s)", static_cast<long long>(events.size()));
+        Log::info("\nTotal: {} event(s)", static_cast<long long>(events.size()));
     }
 
     //=========================================================================
@@ -331,13 +326,13 @@ int main(int argc, char* argv[])
         if (outFile.isEmpty())
             outFile = eventsFile;
         if (outFile.isEmpty()) {
-            qCritical("Specify --out for output event file.");
+            Log::critical("Specify --out for output event file.");
             return 1;
         }
 
         if (!writeEventFile(outFile, events))
             return 1;
-        qInfo("Written %lld events to: %s", static_cast<long long>(events.size()), qPrintable(outFile));
+        Log::info("Written {} events to: {}", static_cast<long long>(events.size()), outFile.toStdString());
     }
 
     return 0;

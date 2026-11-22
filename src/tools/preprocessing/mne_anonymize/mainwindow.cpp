@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingscontrollergui.h"
@@ -609,7 +610,7 @@ void MainWindow::openInFileDialog()
         if (!filePath.isNull()) {
             QFile fileIn(m_sDefaultWasmInFile);
             if (!fileIn.open(QIODevice::WriteOnly) || fileIn.write(fileContent) != fileContent.size()) {
-                qWarning() << "Could not store" << filePath << "in the browser's file system";
+                mne::Log::warning("Could not store {} in the browser's file system", filePath);
                 return;
             }
             fileIn.close();
@@ -690,7 +691,7 @@ void MainWindow::outputFileReady()
     //    qDebug() << "fileout size: " << QString::number(fileOut.size());
 
     if (!fileOut.open(QIODevice::ReadOnly)) {
-        qWarning() << "Could not read the anonymized file" << fileOut.fileName();
+        mne::Log::warning("Could not read the anonymized file {}", fileOut.fileName());
         return;
     }
     const QByteArray outFileContent = fileOut.readAll();

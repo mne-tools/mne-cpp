@@ -16,7 +16,6 @@
 
 #include <mne/mne_deriv_set.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -42,7 +41,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_derivations");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -66,24 +64,24 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (inFile.isEmpty()) {
-        qCritical("--in is required.");
+        Log::critical("--in is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
     const std::optional<MNEDerivSet> derivations = MNEDerivSet::readText(inFile.toStdU16String());
     if (!derivations) {
-        qCritical("No derivations read from: %s", qPrintable(inFile));
+        Log::critical("No derivations read from: {}", inFile.toStdString());
         return 1;
     }
-    qInfo("Read %d derivation(s) from %s", derivations->count(), qPrintable(inFile));
+    Log::info("Read {} derivation(s) from {}", derivations->count(), inFile.toStdString());
     if (!derivations->write(outFile.toStdU16String())) {
-        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        Log::critical("Cannot write output file: {}", outFile.toStdString());
         return 1;
     }
-    qInfo("Written derivations to: %s", qPrintable(outFile));
+    Log::info("Written derivations to: {}", outFile.toStdString());
     return 0;
 }

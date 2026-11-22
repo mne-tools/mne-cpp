@@ -21,7 +21,6 @@
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +62,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_label_ssp");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -92,15 +90,15 @@ int main(int argc, char* argv[])
     // Validate required arguments
     //
     if (!parser.isSet(fwdOpt)) {
-        qCritical("Error: --fwd is required.");
+        Log::critical("Error: --fwd is required.");
         return 1;
     }
     if (!parser.isSet(labelOpt)) {
-        qCritical("Error: at least one --label is required.");
+        Log::critical("Error: at least one --label is required.");
         return 1;
     }
     if (!parser.isSet(outOpt)) {
-        qCritical("Error: --out is required.");
+        Log::critical("Error: --out is required.");
         return 1;
     }
 
@@ -110,22 +108,22 @@ int main(int argc, char* argv[])
     const QString outFile = parser.value(outOpt);
 
     if (ncomp < 1) {
-        qCritical("Error: --ncomp must be >= 1.");
+        Log::critical("Error: --ncomp must be >= 1.");
         return 1;
     }
 
     //
     // Load forward solution
     //
-    qInfo("Reading forward solution from %s...", fwdFile.toUtf8().constData());
+    Log::info("Reading forward solution from {}...", fwdFile.toStdString());
     auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
     if (!fwdRead) {
-        qCritical("%s", fwdRead.error().what());
+        Log::critical("{}", fwdRead.error().what());
         return 1;
     }
     MNEForwardSolution& fwd = *fwdRead;
 
-    qInfo("Forward solution: %d channels x %d sources", fwd.nchan, fwd.nsource);
+    Log::info("Forward solution: {} channels x {} sources", fwd.nchan, fwd.nsource);
 
     //
     // Get the gain matrix and channel names
@@ -144,24 +142,24 @@ int main(int argc, char* argv[])
     std::vector<FiffProj> projectors;
 
     for (const QString& labelFile : labelFiles) {
-        qInfo("Processing label: %s", labelFile.toUtf8().constData());
+        Log::info("Processing label: {}", labelFile.toStdString());
 
         //
         // Read label vertices
         //
         const std::optional<VectorXi> read = MNESourceSpace::read_label(labelFile.toStdU16String());
         if (!read) {
-            qCritical("Failed to read label file %s.", labelFile.toUtf8().constData());
+            Log::critical("Failed to read label file {}.", labelFile.toStdString());
             return 1;
         }
         const VectorXi& labelVerts = *read;
 
         if (labelVerts.size() == 0) {
-            qCritical("Label %s contains no vertices.", labelFile.toUtf8().constData());
+            Log::critical("Label {} contains no vertices.", labelFile.toStdString());
             return 1;
         }
 
-        qInfo("  Label has %td vertices", static_cast<ptrdiff_t>(labelVerts.size()));
+        Log::info("  Label has {} vertices", static_cast<ptrdiff_t>(labelVerts.size()));
 
         //
         // Build set of source indices present in the forward solution
@@ -186,11 +184,11 @@ int main(int argc, char* argv[])
         }
 
         if (colIndices.isEmpty()) {
-            qInfo("  Warning: no forward solution vertices matched label — skipping.");
+            Log::info("  Warning: no forward solution vertices matched label — skipping.");
             continue;
         }
 
-        qInfo("  Matched %lld gain-matrix columns", static_cast<long long>(colIndices.size()));
+        Log::info("  Matched {} gain-matrix columns", static_cast<long long>(colIndices.size()));
 
         //
         // Extract restricted gain matrix columns
@@ -228,29 +226,29 @@ int main(int argc, char* argv[])
             projectors.push_back(proj);
         }
 
-        qInfo("  Created %d projector(s) from %s", nUse, labelFile.toUtf8().constData());
+        Log::info("  Created {} projector(s) from {}", nUse, labelFile.toStdString());
     }
 
     if (projectors.empty()) {
-        qCritical("No projectors were created.");
+        Log::critical("No projectors were created.");
         return 1;
     }
 
     //
     // Write projectors to output file
     //
-    qInfo("Writing %lld projector(s) to %s...", static_cast<long long>(projectors.size()), outFile.toUtf8().constData());
+    Log::info("Writing {} projector(s) to {}...", static_cast<long long>(projectors.size()), outFile.toStdString());
 
     auto stream = FiffStream::start_file(outFile.toStdU16String());
 
     if (!stream) {
-        qCritical("Could not open %s for writing.", outFile.toUtf8().constData());
+        Log::critical("Could not open {} for writing.", outFile.toStdString());
         return 1;
     }
 
     stream->write_proj(projectors);
     stream->end_file();
 
-    qInfo("Finished.");
+    Log::info("Finished.");
     return 0;
 }

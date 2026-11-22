@@ -15,30 +15,23 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "view3d.h"
 
+#include <base/log.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
-
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/model/items/digitizersettreeitem.h>
 #include <disp3D/model/items/digitizertreeitem.h>
 #include <disp3D/model/items/bemtreeitem.h>
 #include <disp3D/model/items/dipoletreeitem.h>
-
 #include <disp/viewers/control3dview.h>
-
 #include <fiff/fiff_dig_point_set.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -166,7 +159,7 @@ void View3D::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[View3D::handleEvent] Received an Event that is not handled by switch cases.";
+            Log::warning("[View3D::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 
@@ -192,10 +185,10 @@ QVector<EVENT_TYPE> View3D::getEventSubscriptions(void) const
 void View3D::updateCoregBem(QSharedPointer<mne::analyze::BemDataModel> pNewModel)
 {
     if (!pNewModel) {
-        qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
+        Log::warning("[View3D::updateCoregBem] Null Bem Model pointer.");
         return;
     } else if (!m_p3DModel) {
-        qWarning().noquote().nospace() << "[View3D::updateCoregBem] Null BrainTreeModel";
+        Log::warning("[View3D::updateCoregBem] Null BrainTreeModel");
         return;
     } else if (pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         if (!pNewModel->getBem().get()->empty()) {
@@ -296,7 +289,7 @@ void View3D::settingsChanged(mne::analyze::View3DParameters viewParameters)
             emit takeScreenshotChanged();
             break;
         default:
-            qInfo() << "[View3D::settingsChanged] Unknown setting";
+            Log::info("[View3D::settingsChanged] Unknown setting");
     }
 }
 

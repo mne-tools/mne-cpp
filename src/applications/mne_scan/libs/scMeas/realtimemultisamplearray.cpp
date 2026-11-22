@@ -18,14 +18,9 @@
 
 #include "realtimemultisamplearray.h"
 
+#include <base/log.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_digitizer_data.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -131,7 +126,7 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     m_qMutex.lock();
     //check vector size
     if (mat.rows() != m_qListChInfo.size())
-        qCritical() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not match the number of channels! ";
+        Log::critical("Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not match the number of channels! ");
 
     //Store
     m_matSamples.push_back(mat);

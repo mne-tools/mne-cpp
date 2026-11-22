@@ -13,6 +13,7 @@
  */
 
 #include "fiffbuffer.h"
+#include <base/log.h>
 #include <base/string_utils.h>
 
 #include <QJsonArray>
@@ -63,7 +64,7 @@ bool FiffBuffer::open()
         // FiffRawData reports a bad file by throwing. A buffer that cannot be
         // read is an ordinary outcome for a caller handed an arbitrary path,
         // so it is turned back into a false rather than unwinding into the UI.
-        qWarning() << "[FiffBuffer::open] could not read" << m_filePath << ":" << e.what();
+        mne::Log::warning("[FiffBuffer::open] could not read {} : {}", m_filePath.toStdString(), e.what());
         if (m_file.isOpen()) {
             m_file.close();
         }

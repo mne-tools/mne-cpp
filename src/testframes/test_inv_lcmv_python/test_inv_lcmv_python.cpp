@@ -41,7 +41,8 @@
 
 #include <inv/beamformer/inv_lcmv.h>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <inv/beamformer/inv_dics.h>
 #include <inv/beamformer/inv_beamformer.h>
 #include <inv/inv_source_estimate.h>
@@ -115,7 +116,6 @@ private:
 
 void TestInvLcmvPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QFile fwdFile(base + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile covFile(base + "/MEG/sample/sample_audvis-cov.fif");
@@ -306,10 +306,12 @@ void TestInvLcmvPython::timeCoursesMatch()
     std::reverse(reordered.info.ch_names.begin(), reordered.info.ch_names.end());
     QVERIFY(InvLCMV::applyLCMV(reordered, filters).data.isApprox(stcs[0].data));
 
-    QTest::ignoreMessage(QtWarningMsg, "InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!");
+    ScopedLogCapture capture;
     QVERIFY(InvLCMV::applyLCMVEpochs({m_evoked.data}, 0.0f, tstep, dics).empty());
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICS - freqIdx 1 out of range (0..0)!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(InvDICS::applyDICS(m_evoked.data, 0.0f, tstep, dics, 1).empty());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::applyDICS - freqIdx 1 out of range (0..0)!"), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -381,34 +383,44 @@ void TestInvLcmvPython::resolutionMatrixMatches()
 
 void TestInvLcmvPython::rejectsInvalidInput()
 {
-    QTest::ignoreMessage(QtWarningMsg, "InvLCMV::makeLCMV - Forward solution has no gain matrix!");
+    ScopedLogCapture capture;
     QVERIFY(!InvLCMV::makeLCMV(m_info, MNEForwardSolution(), m_dataCov, 0.05, m_noiseCov).isValid());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvLCMV::makeLCMV - Forward solution has no gain matrix!"), capture.dump().c_str());
     FiffCov smallCov = m_dataCov;
     smallCov.data = smallCov.data.topLeftCorner(10, 10).eval(); // resizing frees the block being read
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Data covariance dimension \\(10 x 10\\)"));
+    capture.clear();
     QVERIFY(!InvLCMV::makeLCMV(m_info, m_fwd, smallCov, 0.05, m_noiseCov).isValid());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, std::regex("Data covariance dimension \\(10 x 10\\)")), capture.dump().c_str());
 
     const VectorXd f10 = VectorXd::Constant(1, 10.0);
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::makeDICS - No CSD matrices provided!");
+    capture.clear();
     QVERIFY(!InvDICS::makeDICS(m_info, m_fwd, {}, f10).isValid());
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::makeDICS - Frequency vector size mismatch with CSD count!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::makeDICS - No CSD matrices provided!"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(!InvDICS::makeDICS(m_info, m_fwd, {m_dataCov.data, m_dataCov.data}, f10).isValid());
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::makeDICS - Forward solution has no gain matrix!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::makeDICS - Frequency vector size mismatch with CSD count!"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(!InvDICS::makeDICS(m_info, MNEForwardSolution(), {m_dataCov.data}, f10).isValid());
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::makeDICS - CSD[0] dimension mismatch!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::makeDICS - Forward solution has no gain matrix!"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(!InvDICS::makeDICS(m_info, m_fwd, {smallCov.data}, f10).isValid());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::makeDICS - CSD[0] dimension mismatch!"), capture.dump().c_str());
 
     // A DICS filter for one frequency rejects two CSDs, a bad frequency index and LCMV filters.
     const InvBeamformer& dics = makeDicsFilter(BeamformerPickOri::MaxPower);
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICSCsd - CSD count (2) does not match filter count (1)!");
+    capture.clear();
     QCOMPARE(InvDICS::applyDICSCsd({m_dataCov.data, m_dataCov.data}, VectorXd::Constant(2, 10.0), dics).data.size(), Index(0));
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICS - freqIdx 1 out of range (0..0)!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::applyDICSCsd - CSD count (2) does not match filter count (1)!"), capture.dump().c_str());
+    capture.clear();
     QCOMPARE(InvDICS::applyDICS(m_evoked.data, 0.0f, 0.01f, dics, 1).data.size(), Index(0));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::applyDICS - freqIdx 1 out of range (0..0)!"), capture.dump().c_str());
     const InvBeamformer& lcmv = makeFilter(BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICS - Invalid or non-DICS filters!");
+    capture.clear();
     QCOMPARE(InvDICS::applyDICS(m_evoked.data, 0.0f, 0.01f, lcmv, 0).data.size(), Index(0));
-    QTest::ignoreMessage(QtWarningMsg, "InvDICS::applyDICSCsd - Invalid or non-DICS filters!");
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::applyDICS - Invalid or non-DICS filters!"), capture.dump().c_str());
+    capture.clear();
     QCOMPARE(InvDICS::applyDICSCsd({m_dataCov.data}, f10, lcmv).data.size(), Index(0));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvDICS::applyDICSCsd - Invalid or non-DICS filters!"), capture.dump().c_str());
 }
 
 //=============================================================================================================

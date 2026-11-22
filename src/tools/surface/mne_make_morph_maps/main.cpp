@@ -21,7 +21,6 @@
 #include <fs/fs_surface.h>
 #include <mne/mne_morph_map.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,7 +53,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_morph_maps");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -81,11 +79,11 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (fromSubject.isEmpty() || toSubject.isEmpty()) {
-        qCritical("--from and --to are required.");
+        Log::critical("--from and --to are required.");
         return 1;
     }
     if (subjectsDir.isEmpty()) {
-        qCritical("$SUBJECTS_DIR not set.");
+        Log::critical("$SUBJECTS_DIR not set.");
         return 1;
     }
     if (outFile.isEmpty()) {
@@ -100,7 +98,7 @@ int main(int argc, char* argv[])
         FsSurface toSphere;
         if (!FsSurface::read(QString("%1/%2/surf/%3").arg(subjectsDir, fromSubject, name).toStdU16String(), fromSphere, false) ||
             !FsSurface::read(QString("%1/%2/surf/%3").arg(subjectsDir, toSubject, name).toStdU16String(), toSphere, false)) {
-            qCritical("Cannot read the %s surfaces.", qPrintable(name));
+            Log::critical("Cannot read the {} surfaces.", name.toStdString());
             return 1;
         }
         MNEMorphMap fromTo = MNEMorphMap::compute(fromSphere.rr(), fromSphere.tris(), toSphere.rr());
@@ -111,14 +109,14 @@ int main(int argc, char* argv[])
         toFrom.hemi = hemi;
         toFrom.from_subj = toSubject.toStdString();
         toFrom.to_subj = fromSubject.toStdString();
-        qInfo("%s: %d -> %d and %d -> %d vertices", qPrintable(name), fromTo.map->cols(), fromTo.map->rows(), toFrom.map->cols(), toFrom.map->rows());
+        Log::info("{}: {} -> {} and {} -> {} vertices", name.toStdString(), fromTo.map->cols(), fromTo.map->rows(), toFrom.map->cols(), toFrom.map->rows());
         maps.push_back(std::move(fromTo));
         maps.push_back(std::move(toFrom));
     }
     if (!MNEMorphMap::write(outFile.toStdU16String(), {&maps[0], &maps[2], &maps[1], &maps[3]})) {
-        qCritical("Cannot write %s", qPrintable(outFile));
+        Log::critical("Cannot write {}", outFile.toStdString());
         return 1;
     }
-    qInfo("Written morph maps to: %s", qPrintable(outFile));
+    Log::info("Written morph maps to: {}", outFile.toStdString());
     return 0;
 }

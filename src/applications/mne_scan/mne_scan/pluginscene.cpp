@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "pluginscene.h"
 
 #include "plugingui.h"
@@ -29,7 +30,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QAction>
 #include <QtMath>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -120,7 +120,7 @@ bool PluginScene::insertPlugin(QAction* pActionPluginItem, mne::scan::AbstractPl
         QString name = pActionPluginItem->text();
         qint32 idx = m_pPluginGui->m_pPluginManager->findByName(name);
         if (idx < 0) {
-            qDebug() << "Unable to find index";
+            mne::Log::debug("Unable to find index");
             return false;
         }
         mne::scan::AbstractPlugin* pPlugin = m_pPluginGui->m_pPluginManager->getPlugins()[idx];

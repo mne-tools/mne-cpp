@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_convert.h>
 #include <acq/acq_reader.h>
 #include <acq/acq_stream.h>
@@ -394,7 +395,7 @@ TestAcqRecorder::Recorded TestAcqRecorder::record(const AcqStreamInfo& info, con
     r.format = info.format;
     auto writer = AcqWriter::create(info);
     if (!writer) {
-        qWarning() << QString::fromStdString(writer.error().text());
+        Log::warning("{}", QString::fromStdString(writer.error().text()).toStdString());
         return r;
     }
     // Samples before the recording starts: the file then starts at FIFF first_samp = skipFirst.
@@ -406,7 +407,7 @@ TestAcqRecorder::Recorded TestAcqRecorder::record(const AcqStreamInfo& info, con
     auto reference = writer->stream().reader(AcqReader::ReadMode::Lossless);
     auto recorder = AcqRecorder::start(writer->stream(), path, options);
     if (!recorder) {
-        qWarning() << QString::fromStdString(recorder.error().text());
+        Log::warning("{}", QString::fromStdString(recorder.error().text()).toStdString());
         return r;
     }
     for (std::uint64_t s = skipFirst; s < skipFirst + samples; s += 97) {
@@ -427,7 +428,7 @@ TestAcqRecorder::Recorded TestAcqRecorder::record(const AcqStreamInfo& info, con
     const std::vector<double> raw = drainRaw(*reference);
     const AcqError stopped = recorder->stop();
     if (!stopped.ok()) {
-        qWarning() << QString::fromStdString(stopped.text());
+        Log::warning("{}", QString::fromStdString(stopped.text()).toStdString());
         return r;
     }
     r.stats = recorder->stats();
@@ -717,7 +718,7 @@ void TestAcqRecorder::recordsNativeFormats()
     const QString result = checkWithMne(m_dir, spec(r, path, out));
     QVERIFY2(result == QStringLiteral("OK") || result.startsWith(QStringLiteral("SKIP")), qPrintable(result));
     if (result != QStringLiteral("OK")) {
-        qWarning() << result;
+        Log::warning("{}", result.toStdString());
     }
 }
 
@@ -798,7 +799,7 @@ void TestAcqRecorder::recordsLostSamplesAsSkips()
     const QString result = checkWithMne(m_dir, check);
     QVERIFY2(result == QStringLiteral("OK") || result.startsWith(QStringLiteral("SKIP")), qPrintable(result));
     if (result != QStringLiteral("OK")) {
-        qWarning() << result;
+        Log::warning("{}", result.toStdString());
     }
 }
 
@@ -832,7 +833,7 @@ void TestAcqRecorder::splitsFiles()
     const QString result = checkWithMne(m_dir, spec(r, path, 17));
     QVERIFY2(result == QStringLiteral("OK") || result.startsWith(QStringLiteral("SKIP")), qPrintable(result));
     if (result != QStringLiteral("OK")) {
-        qWarning() << result;
+        Log::warning("{}", result.toStdString());
     }
 }
 
@@ -889,7 +890,7 @@ void TestAcqRecorder::recordsBids()
     const QString result = checkWithMne(m_dir, check);
     QVERIFY2(result == QStringLiteral("OK") || result.startsWith(QStringLiteral("SKIP")), qPrintable(result));
     if (result != QStringLiteral("OK")) {
-        qWarning() << result;
+        Log::warning("{}", result.toStdString());
     }
 
     // A split BIDS recording names every part split-NN, the first renamed once the second exists.
@@ -981,7 +982,7 @@ void TestAcqRecorder::survivesSigkill()
     const QString result = checkWithMne(m_dir, check);
     QVERIFY2(result == QStringLiteral("OK") || result.startsWith(QStringLiteral("SKIP")), qPrintable(result));
     if (result != QStringLiteral("OK")) {
-        qWarning() << result;
+        Log::warning("{}", result.toStdString());
     }
 }
 

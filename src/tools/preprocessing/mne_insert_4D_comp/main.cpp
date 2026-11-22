@@ -17,7 +17,6 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -30,7 +29,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,7 +63,7 @@ static bool readSensorPositions(const QString& filename, MatrixX3f& pos, QString
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open sensor position file:" << filename;
+        Log::critical("Cannot open sensor position file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -137,7 +135,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open reference data file:" << filename;
+        Log::critical("Cannot open reference data file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -161,7 +159,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
     }
 
     if (rows.isEmpty()) {
-        qCritical() << "No data in reference file";
+        Log::critical("No data in reference file");
         return false;
     }
 
@@ -175,7 +173,7 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
         }
     }
 
-    qInfo("Read reference data: %d channels x %d samples", nChannels, nSamples);
+    Log::info("Read reference data: {} channels x {} samples", nChannels, nSamples);
     return true;
 }
 
@@ -183,7 +181,6 @@ static bool readRefData(const QString& filename, MatrixXf& refData, int& nChanne
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_insert_4D_comp");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -213,7 +210,7 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (inFile.isEmpty() || refFile.isEmpty() || outFile.isEmpty()) {
-        qInfo("Required: --in, --ref, --out");
+        Log::info("Required: --in, --ref, --out");
         return 1;
     }
 
@@ -222,10 +219,9 @@ int main(int argc, char* argv[])
     //
     FiffRawData raw(inFile.toStdU16String());
     if (!raw.info.empty()) {
-        qInfo("Read input: %d channels at %.1f Hz",
-              raw.info.nchan, raw.info.sfreq);
+        Log::info("Read input: {} channels at {:.1f} Hz", raw.info.nchan, raw.info.sfreq);
     } else {
-        qCritical("Failed to read input FIFF: %s", inFile.toUtf8().constData());
+        Log::critical("Failed to read input FIFF: {}", inFile.toStdString());
         return 1;
     }
 
@@ -252,7 +248,7 @@ int main(int argc, char* argv[])
                           static_cast<int>(megPos.rows()));
         if (nMatch >= 3) {
             alignTransform = procrustes(refPos.topRows(nMatch), megPos.topRows(nMatch));
-            qInfo("Computed Procrustes alignment from %d matching points", nMatch);
+            Log::info("Computed Procrustes alignment from {} matching points", nMatch);
         }
     }
 
@@ -279,7 +275,7 @@ int main(int argc, char* argv[])
     //
     auto outStream = FiffStream::start_file(outFile.toStdU16String());
     if (!outStream) {
-        qCritical("Cannot create output file.");
+        Log::critical("Cannot create output file.");
         return 1;
     }
 
@@ -365,8 +361,7 @@ int main(int argc, char* argv[])
     outStream->end_block(FIFFB_MEAS);
     outStream->end_file();
 
-    qInfo("Wrote merged FIFF: %d channels (%d original + %d reference) to %s",
-          totalCh, raw.info.nchan, nRefCh, outFile.toUtf8().constData());
+    Log::info("Wrote merged FIFF: {} channels ({} original + {} reference) to {}", totalCh, raw.info.nchan, nRefCh, outFile.toStdString());
 
     return 0;
 }

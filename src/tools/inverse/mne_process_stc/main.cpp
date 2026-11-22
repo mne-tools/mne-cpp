@@ -16,7 +16,6 @@
 
 #include <inv/inv_source_estimate.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -27,7 +26,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -52,7 +50,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_process_stc");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -80,19 +77,19 @@ int main(int argc, char* argv[])
     parser.process(app);
 
     if (!parser.isSet(inOpt)) {
-        qCritical() << "--in is required.";
+        Log::critical("--in is required.");
         parser.showHelp(1);
     }
 
     if (!parser.isSet(outOpt) && !parser.isSet(outAscOpt)) {
-        qCritical() << "At least one of --out or --outasc is required.";
+        Log::critical("At least one of --out or --outasc is required.");
         parser.showHelp(1);
     }
 
     //--- Read input STC ---
     auto read = InvSourceEstimate::read(parser.value(inOpt).toStdU16String());
     if (!read) {
-        qCritical() << read.error().what();
+        Log::critical("{}", read.error().what());
         return 1;
     }
     InvSourceEstimate& stc = *read;
@@ -101,43 +98,43 @@ int main(int argc, char* argv[])
         bool ok;
         double factor = parser.value(scaleByOpt).toDouble(&ok);
         if (!ok) {
-            qCritical() << "Invalid --scaleby value:" << parser.value(scaleByOpt);
+            Log::critical("Invalid --scaleby value: {}", parser.value(scaleByOpt).toStdString());
             return 1;
         }
         stc.data *= factor;
-        qInfo() << "Scaled data by factor" << factor;
+        Log::info("Scaled data by factor {}", factor);
     }
 
     if (parser.isSet(scaleToOpt)) {
         bool ok;
         double target = parser.value(scaleToOpt).toDouble(&ok);
         if (!ok) {
-            qCritical() << "Invalid --scaleto value:" << parser.value(scaleToOpt);
+            Log::critical("Invalid --scaleto value: {}", parser.value(scaleToOpt).toStdString());
             return 1;
         }
         double maxVal = stc.data.array().abs().maxCoeff();
         if (qFuzzyIsNull(maxVal)) {
-            qWarning() << "Data maximum is zero — cannot scale to target.";
+            Log::warning("Data maximum is zero — cannot scale to target.");
         } else {
             stc.data *= (target / maxVal);
-            qInfo() << "Scaled data so max =" << target;
+            Log::info("Scaled data so max = {}", target);
         }
     }
 
     //--- Write binary STC ---
     if (parser.isSet(outOpt)) {
         if (!stc.write(parser.value(outOpt).toStdU16String())) {
-            qCritical() << "Failed to write output STC.";
+            Log::critical("Failed to write output STC.");
             return 1;
         }
-        qInfo() << "Wrote binary STC:" << parser.value(outOpt);
+        Log::info("Wrote binary STC: {}", parser.value(outOpt).toStdString());
     }
 
     //--- Write ASCII ---
     if (parser.isSet(outAscOpt)) {
         QFile ascFile(parser.value(outAscOpt));
         if (!ascFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical() << "Cannot open ASCII output file:" << parser.value(outAscOpt);
+            Log::critical("Cannot open ASCII output file: {}", parser.value(outAscOpt).toStdString());
             return 1;
         }
         QTextStream out(&ascFile);
@@ -147,7 +144,7 @@ int main(int argc, char* argv[])
             }
         }
         ascFile.close();
-        qInfo() << "Wrote ASCII file:" << parser.value(outAscOpt);
+        Log::info("Wrote ASCII file: {}", parser.value(outAscOpt).toStdString());
     }
 
     return 0;

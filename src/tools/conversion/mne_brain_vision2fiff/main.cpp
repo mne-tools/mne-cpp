@@ -18,7 +18,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -30,7 +29,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <QFileInfo>
 #include <QDir>
 #include <QRegularExpression>
@@ -101,7 +99,7 @@ static bool parseBVHeader(const QString& vhdrPath, BVHeader& hdr)
 {
     QFile file(vhdrPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open header file: %s", qPrintable(vhdrPath));
+        Log::critical("Cannot open header file: {}", vhdrPath.toStdString());
         return false;
     }
 
@@ -192,7 +190,7 @@ static bool parseBVMarkers(const QString& vmrkPath, BVHeader& hdr)
 {
     QFile file(vmrkPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qInfo("Warning: Cannot open marker file: %s", qPrintable(vmrkPath));
+        Log::info("Warning: Cannot open marker file: {}", vmrkPath.toStdString());
         return false;
     }
 
@@ -240,7 +238,7 @@ static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& d
 {
     QFile file(dataPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open data file: %s", qPrintable(dataPath));
+        Log::critical("Cannot open data file: {}", dataPath.toStdString());
         return false;
     }
 
@@ -262,7 +260,7 @@ static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& d
         nSamples = fileSize / (nChan * bytesPerSample);
     }
 
-    qInfo("Data: %d channels x %lld samples (%s)", nChan, nSamples, qPrintable(hdr.binaryFormat));
+    Log::info("Data: {} channels x {} samples ({})", nChan, nSamples, hdr.binaryFormat.toStdString());
 
     data.resize(nChan, nSamples);
     QDataStream ds(&file);
@@ -321,7 +319,6 @@ static bool readBVData(const QString& dataPath, const BVHeader& hdr, MatrixXd& d
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_brain_vision2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -343,11 +340,11 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (vhdrFile.isEmpty()) {
-        qCritical("--vhdr is required.");
+        Log::critical("--vhdr is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -359,16 +356,13 @@ int main(int argc, char* argv[])
     QFileInfo vhdrInfo(vhdrFile);
     QDir baseDir = vhdrInfo.absoluteDir();
 
-    qInfo("BrainVision header: %d channels, sfreq=%.1f Hz, format=%s",
-          hdr.numberOfChannels,
-          1e6 / hdr.samplingInterval,
-          qPrintable(hdr.binaryFormat));
+    Log::info("BrainVision header: {} channels, sfreq={:.1f} Hz, format={}", hdr.numberOfChannels, 1e6 / hdr.samplingInterval, hdr.binaryFormat.toStdString());
 
     // Parse markers if available
     if (!hdr.markerFile.isEmpty()) {
         QString vmrkPath = baseDir.filePath(hdr.markerFile);
         parseBVMarkers(vmrkPath, hdr);
-        qInfo("Markers: %lld events", static_cast<long long>(hdr.markers.size()));
+        Log::info("Markers: {} events", static_cast<long long>(hdr.markers.size()));
     }
 
     // Read binary data
@@ -378,7 +372,7 @@ int main(int argc, char* argv[])
         if (!readBVData(dataPath, hdr, data))
             return 1;
     } else {
-        qCritical("ASCII data format not supported.");
+        Log::critical("ASCII data format not supported.");
         return 1;
     }
 
@@ -436,7 +430,7 @@ int main(int argc, char* argv[])
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), info, cals);
     if (!stream) {
-        qCritical("Cannot open output: %s", qPrintable(outFile));
+        Log::critical("Cannot open output: {}", outFile.toStdString());
         return 1;
     }
 
@@ -450,8 +444,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)",
-          qPrintable(outFile), nChan, nSamples, sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, sfreq);
 
     return 0;
 }

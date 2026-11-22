@@ -29,7 +29,6 @@
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -40,7 +39,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -71,7 +69,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_map_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -112,65 +109,64 @@ int main(int argc, char* argv[])
     float snr = parser.value(snrOpt).toFloat();
 
     if (fromFile.isEmpty() || toFile.isEmpty() || fwdFile.isEmpty() || outFile.isEmpty()) {
-        qCritical("--from, --to, --fwd, and --out are required.");
+        Log::critical("--from, --to, --fwd, and --out are required.");
         parser.showHelp(1);
     }
 
     float lambda2 = 1.0f / (snr * snr);
 
     // 1. Load source evoked data
-    qInfo("Loading source evoked: %s", qPrintable(fromFile));
+    Log::info("Loading source evoked: {}", fromFile.toStdString());
     auto read = FiffEvokedSet::read(fromFile.toStdU16String());
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     FiffEvokedSet& srcEvokedSet = *read;
     if (srcEvokedSet.evoked.empty()) {
-        qCritical("No evoked data sets found in: %s", qPrintable(fromFile));
+        Log::critical("No evoked data sets found in: {}", fromFile.toStdString());
         return 1;
     }
-    qInfo("  %lld evoked set(s), %d channels",
-          static_cast<long long>(srcEvokedSet.evoked.size()), srcEvokedSet.info.nchan);
+    Log::info("  {} evoked set(s), {} channels", static_cast<long long>(srcEvokedSet.evoked.size()), srcEvokedSet.info.nchan);
 
     // 2. Load target measurement info
-    qInfo("Loading target info: %s", qPrintable(toFile));
+    Log::info("Loading target info: {}", toFile.toStdString());
     FiffStream toStream(toFile.toStdU16String());
     if (!toStream.open()) {
-        qCritical("Cannot open target file: %s", qPrintable(toFile));
+        Log::critical("Cannot open target file: {}", toFile.toStdString());
         return 1;
     }
     FiffInfo targetInfo;
     std::shared_ptr<FiffDirNode> targetNode;
     if (!toStream.read_meas_info(toStream.dirtree(), targetInfo, targetNode)) {
-        qCritical("Cannot read target measurement info: %s", qPrintable(toFile));
+        Log::critical("Cannot read target measurement info: {}", toFile.toStdString());
         return 1;
     }
     toStream.close();
-    qInfo("  %d channels in target", targetInfo.nchan);
+    Log::info("  {} channels in target", targetInfo.nchan);
 
     // 3. Load forward solution
-    qInfo("Loading forward solution: %s", qPrintable(fwdFile));
+    Log::info("Loading forward solution: {}", fwdFile.toStdString());
     auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
     if (!fwdRead) {
-        qCritical("%s", fwdRead.error().what());
+        Log::critical("{}", fwdRead.error().what());
         return 1;
     }
     MNEForwardSolution& fwd = *fwdRead;
-    qInfo("  %d sources, %d channels", fwd.nsource, fwd.nchan);
+    Log::info("  {} sources, {} channels", fwd.nsource, fwd.nchan);
 
     // 4. Load or compute inverse operator
     MNEInverseOperator invOp;
     if (!invFile.isEmpty()) {
-        qInfo("Loading inverse operator: %s", qPrintable(invFile));
+        Log::info("Loading inverse operator: {}", invFile.toStdString());
         auto invRead = MNEInverseOperator::read(invFile.toStdU16String());
         if (!invRead) {
-            qCritical("%s", invRead.error().what());
+            Log::critical("{}", invRead.error().what());
             return 1;
         }
         invOp = std::move(*invRead);
     } else {
-        qInfo("Computing inverse operator from forward solution...");
+        Log::info("Computing inverse operator from forward solution...");
 
         // We need a noise covariance; use identity as fallback
         FiffCov noiseCov;
@@ -233,20 +229,16 @@ int main(int argc, char* argv[])
 
         outEvokedSet.evoked.push_back(outEvoked);
 
-        qInfo("  Mapped set %d/%lld (%s): %d sources, %lld time points",
-              i + 1, static_cast<long long>(srcEvokedSet.evoked.size()),
-              srcEvoked.comment.c_str(),
-              static_cast<int>(sourceEst.rows()),
-              static_cast<long long>(sourceEst.cols()));
+        Log::info("  Mapped set {}/{} ({}): {} sources, {} time points", i + 1, static_cast<long long>(srcEvokedSet.evoked.size()), srcEvoked.comment, static_cast<int>(sourceEst.rows()), static_cast<long long>(sourceEst.cols()));
     }
 
     // 7. Write output
-    qInfo("Writing output: %s", qPrintable(outFile));
+    Log::info("Writing output: {}", outFile.toStdString());
     if (!outEvokedSet.save(outFile.toStdU16String())) {
-        qCritical("Cannot write output evoked: %s", qPrintable(outFile));
+        Log::critical("Cannot write output evoked: {}", outFile.toStdString());
         return 1;
     }
 
-    qInfo("Done. Mapped %lld evoked set(s).", static_cast<long long>(outEvokedSet.evoked.size()));
+    Log::info("Done. Mapped {} evoked set(s).", static_cast<long long>(outEvokedSet.evoked.size()));
     return 0;
 }

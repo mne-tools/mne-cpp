@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fwd/compute_fwd/compute_fwd_settings.h>
@@ -67,7 +66,6 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     QElapsedTimer timer0, timer1, timer2, timer3, timer4;
@@ -122,7 +120,7 @@ int main(int argc, char* argv[])
     // store calculated forward solution
     timer2.start();
     if (auto written = pFwdSolution->write(mne::path_from_utf8(pSettings->solname)); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return 1;
     }
     fTime2 = timer2.elapsed();
@@ -138,9 +136,9 @@ int main(int argc, char* argv[])
     fTime4 = timer4.elapsed();
 
     // Print timer results
-    qInfo() << "The initialization took: " << fTime0 << " ms.";
-    qInfo() << "The computation took: " << fTime1 << " ms.";
-    qInfo() << "Storing the fwd solution took: " << fTime2 << " ms.";
-    qInfo() << "Reading the fwd solution took: " << fTime3 << " ms.";
-    qInfo() << "The recomputation took: " << fTime4 << " ms.";
+    Log::info("The initialization took: {} ms.", fTime0);
+    Log::info("The computation took: {} ms.", fTime1);
+    Log::info("Storing the fwd solution took: {} ms.", fTime2);
+    Log::info("Reading the fwd solution took: {} ms.", fTime3);
+    Log::info("The recomputation took: {} ms.", fTime4);
 }

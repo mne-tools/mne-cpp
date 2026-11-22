@@ -16,13 +16,13 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "lsladapterproducer.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QThread>
 
 //=============================================================================================================
@@ -59,7 +59,7 @@ void LSLAdapterProducer::readStream()
 {
     // check if we have a stream info
     if (m_bHasStreamInfo == false) {
-        qDebug() << "[LSLAdapterProducer::readStream] No stream info was supplied !";
+        mne::Log::debug("[LSLAdapterProducer::readStream] No stream info was supplied !");
         return;
     }
 
@@ -68,7 +68,7 @@ void LSLAdapterProducer::readStream()
         m_StreamInlet = std::make_unique<mne::stream_inlet>(m_StreamInfo);
         m_StreamInlet->open_stream();
     } catch (std::exception& e) {
-        qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to open LSL stream inlet: " << e.what();
+        mne::Log::debug("[LSLAdapterProducer::readStream] Something went wrong when trying to open LSL stream inlet: {}", e.what());
     }
 
     m_bIsRunning = true;
@@ -104,7 +104,7 @@ void LSLAdapterProducer::readStream()
                 m_pRTMSA->measurementData()->setValue(matOutput);
             }
         } catch (std::exception& e) {
-            qDebug() << "[LSLAdapterProducer::readStream] Something went wrong while streaming data: " << e.what();
+            mne::Log::debug("[LSLAdapterProducer::readStream] Something went wrong while streaming data: {}", e.what());
             m_bIsRunning = false;
         }
     }
@@ -113,7 +113,7 @@ void LSLAdapterProducer::readStream()
     try {
         m_StreamInlet->close_stream();
     } catch (std::exception& e) {
-        qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to close LSL stream: " << e.what();
+        mne::Log::debug("[LSLAdapterProducer::readStream] Something went wrong when trying to close LSL stream: {}", e.what());
     }
 
     emit finished();

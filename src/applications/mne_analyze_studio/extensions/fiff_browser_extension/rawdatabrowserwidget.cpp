@@ -13,6 +13,7 @@
  */
 
 #include <algorithm>
+#include <base/log.h>
 #include "rawdatabrowserwidget.h"
 #include <base/string_utils.h>
 
@@ -25,7 +26,6 @@
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QJsonObject>
-#include <QDebug>
 #include <QLabel>
 #include <QFile>
 #include <QFrame>
@@ -290,7 +290,7 @@ bool RawDataBrowserWidget::loadFile(const QString& filePath)
     m_file->setFileName(filePath);
 
     if (!m_rawModel->loadFiffData(m_file)) {
-        qWarning() << "[RawDataBrowserWidget] Failed to load raw model for" << filePath;
+        mne::Log::warning("[RawDataBrowserWidget] Failed to load raw model for {}", filePath.toStdString());
         emit outputMessage(QString("Raw browser failed to load %1").arg(filePath));
         return false;
     }
@@ -311,8 +311,7 @@ bool RawDataBrowserWidget::loadFile(const QString& filePath)
         if (m_eventModel->loadEventData(eveFile)) {
             m_eventModel->setFiffInfo(m_rawModel->fiffInfo());
             m_eventModel->setFirstLastSample(m_rawModel->firstSample(), m_rawModel->lastSample());
-            qInfo() << "[RawDataBrowserWidget] Loaded event file:" << eveCandidate
-                    << "(" << m_eventModel->rowCount() << "events)";
+            mne::Log::info("[RawDataBrowserWidget] Loaded event file: {} ( {} events)", eveCandidate.toStdString(), m_eventModel->rowCount());
             emit outputMessage(QString("Events loaded: %1 (%2 events)")
                                    .arg(eveCandidate)
                                    .arg(m_eventModel->rowCount()));
@@ -322,8 +321,7 @@ bool RawDataBrowserWidget::loadFile(const QString& filePath)
     publishBrowserState(true);
 
     const auto info = m_rawModel->fiffInfo();
-    qInfo() << "[RawDataBrowserWidget] Loaded raw browser for" << filePath
-            << "with" << (info ? info->nchan : 0) << "channels";
+    mne::Log::info("[RawDataBrowserWidget] Loaded raw browser for {} with {} channels", filePath.toStdString(), (info ? info->nchan : 0));
 
     return true;
 }

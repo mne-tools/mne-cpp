@@ -19,7 +19,6 @@
 #include <fiff/fiff_raw_data.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -31,7 +30,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -78,7 +76,6 @@ static void azimuthalProjection(const Vector3f& pos, const Vector3f& center,
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_eeg_layout");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -108,14 +105,14 @@ int main(int argc, char* argv[])
     float height = parser.value(heightOpt).toDouble();
 
     if (fifName.isEmpty() || outName.isEmpty()) {
-        qCritical("Both --fif and --out are required.");
+        Log::critical("Both --fif and --out are required.");
         parser.showHelp(1);
     }
 
     // Read the FIFF file to get channel info
     FiffRawData raw(fifName.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read FIFF file: %s", qPrintable(fifName));
+        Log::critical("Cannot read FIFF file: {}", fifName.toStdString());
         return 1;
     }
 
@@ -139,12 +136,12 @@ int main(int argc, char* argv[])
     }
 
     if (eegChannels.isEmpty()) {
-        qCritical("No EEG channels found in %s", qPrintable(fifName));
+        Log::critical("No EEG channels found in {}", fifName.toStdString());
         return 1;
     }
     const auto eegChannelCount = static_cast<long long>(eegChannels.size());
 
-    qInfo("%lld EEG channels found.", eegChannelCount);
+    Log::info("{} EEG channels found.", eegChannelCount);
 
     // Compute center of mass for a simple sphere fit
     Vector3f center = Vector3f::Zero();
@@ -160,8 +157,7 @@ int main(int argc, char* argv[])
     }
     radius /= eegChannels.size();
 
-    qInfo("Sphere center: %.3f %.3f %.3f m, radius: %.3f m",
-          center(0), center(1), center(2), radius);
+    Log::info("Sphere center: {:.3f} {:.3f} {:.3f} m, radius: {:.3f} m", center(0), center(1), center(2), radius);
 
     // Project to 2D
     QList<float> xs, ys;
@@ -188,7 +184,7 @@ int main(int argc, char* argv[])
     // Write layout file
     QFile outFile(outName);
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outName));
+        Log::critical("Cannot open output file: {}", outName.toStdString());
         return 1;
     }
 
@@ -209,7 +205,7 @@ int main(int argc, char* argv[])
     }
 
     outFile.close();
-    qInfo("Layout written to %s (%lld channels)", qPrintable(outName), eegChannelCount);
+    Log::info("Layout written to {} ({} channels)", outName.toStdString(), eegChannelCount);
 
     return 0;
 }

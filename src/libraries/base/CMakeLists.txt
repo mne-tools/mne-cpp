@@ -73,7 +73,6 @@ set(HEADERS
   json_stream_parser.h
   xml.h
   log.h
-  log_qt.h
   process.h
   sha256.h
   string_utils.h

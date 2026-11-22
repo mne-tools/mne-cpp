@@ -19,7 +19,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
+#include <QMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -141,7 +140,6 @@ static void multiSourceDijkstra(
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_patch_info");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -163,32 +161,31 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (srcFile.isEmpty()) {
-        qCritical("--src is required.");
+        Log::critical("--src is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
     // Read source space
     auto read = MNESourceSpaces::read(srcFile.toStdU16String());
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     MNESourceSpaces& src = *read;
 
-    qInfo("Read source space: %d hemispheres", static_cast<int>(src.size()));
+    Log::info("Read source space: {} hemispheres", static_cast<int>(src.size()));
 
     // Process each hemisphere
     for (int h = 0; h < src.size(); ++h) {
         MNESourceSpace& sp = src[h];
-        qInfo("\nHemisphere %d: %d vertices, %d active, %d triangles",
-              h + 1, sp.np, sp.nuse, sp.ntri);
+        Log::info("\nHemisphere {}: {} vertices, {} active, {} triangles", h + 1, sp.np, sp.nuse, sp.ntri);
 
         if (sp.ntri == 0 || sp.np == 0) {
-            qInfo("  Skipping (no triangulation)");
+            Log::info("  Skipping (no triangulation)");
             continue;
         }
 
@@ -206,7 +203,7 @@ int main(int argc, char* argv[])
         for (int i = 0; i < activeList.size(); ++i)
             sourceVerts(i) = activeList[i];
 
-        qInfo("  Running multi-source Dijkstra with %d source vertices...", static_cast<int>(sourceVerts.size()));
+        Log::info("  Running multi-source Dijkstra with {} source vertices...", static_cast<int>(sourceVerts.size()));
 
         VectorXi nearest;
         VectorXf dist;
@@ -235,21 +232,20 @@ int main(int argc, char* argv[])
         if (!patchSizes.isEmpty())
             avgPatch /= patchSizes.size();
 
-        qInfo("  Patch info: %d patches, size range %d..%d (avg %.1f)",
-              static_cast<int>(patchSizes.size()), minPatch, maxPatch, avgPatch);
+        Log::info("  Patch info: {} patches, size range {}..{} (avg {:.1f})", static_cast<int>(patchSizes.size()), minPatch, maxPatch, avgPatch);
     }
 
     // Write output
-    qInfo("\nWriting source space with patch info to: %s", qPrintable(outFile));
+    Log::info("\nWriting source space with patch info to: {}", outFile.toStdString());
 
     auto outStream = FiffStream::start_file(outFile.toStdU16String());
     if (!outStream) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
     src.write_to_stream(*outStream);
     outStream->end_file();
 
-    qInfo("Done.");
+    Log::info("Done.");
     return 0;
 }

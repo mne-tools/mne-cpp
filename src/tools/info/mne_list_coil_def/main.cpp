@@ -17,7 +17,6 @@
 #include <fwd/fwd_coil_set.h>
 #include <fwd/fwd_coil.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -27,7 +26,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -87,7 +85,6 @@ static QString accuracyName(int acc)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_coil_def");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -120,37 +117,29 @@ int main(int argc, char* argv[])
         }
 
         if (coildefName.isEmpty()) {
-            qCritical("No coil definition file found. Use --coildef to specify one.");
+            Log::critical("No coil definition file found. Use --coildef to specify one.");
             return 1;
         }
     }
 
-    qInfo("Reading coil definitions from: %s", qPrintable(coildefName));
+    Log::info("Reading coil definitions from: {}", coildefName.toStdString());
 
     std::unique_ptr<FwdCoilSet> coilSet = FwdCoilSet::read_coil_defs(coildefName.toStdU16String());
     if (!coilSet) {
-        qCritical("Cannot read coil definitions from: %s", qPrintable(coildefName));
+        Log::critical("Cannot read coil definitions from: {}", coildefName.toStdString());
         return 1;
     }
 
     int ncoils = coilSet->ncoil();
-    qInfo("Read %d coil definitions.\n", ncoils);
+    Log::info("Read {} coil definitions.\n", ncoils);
 
     // Print header
-    qInfo("%-8s %-14s %-10s %-6s %-10s %s",
-          "Type", "Class", "Accuracy", "NP", "Size(m)", "Description");
-    qInfo("%-8s %-14s %-10s %-6s %-10s %s",
-          "--------", "--------------", "----------", "------", "----------", "--------------------");
+    Log::info("{:<8} {:<14} {:<10} {:<6} {:<10} {}", "Type", "Class", "Accuracy", "NP", "Size(m)", "Description");
+    Log::info("{:<8} {:<14} {:<10} {:<6} {:<10} {}", "--------", "--------------", "----------", "------", "----------", "--------------------");
 
     for (int k = 0; k < ncoils; ++k) {
         const FwdCoil& coil = *(coilSet->coils[k]);
-        qInfo("%-8d %-14s %-10s %-6d %-10.4f %s",
-              coil.type,
-              qPrintable(coilClassName(coil.coil_class)),
-              qPrintable(accuracyName(coil.accuracy)),
-              coil.np,
-              coil.size,
-              coil.desc.c_str());
+        Log::info("{:<8} {:<14} {:<10} {:<6} {:<10.4f} {}", coil.type, coilClassName(coil.coil_class).toStdString(), accuracyName(coil.accuracy).toStdString(), coil.np, coil.size, coil.desc);
     }
 
     return 0;

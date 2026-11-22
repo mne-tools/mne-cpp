@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "connectormanager.h"
 #include "mne_rt_server.h"
 #include "commandserver.h"
@@ -41,7 +42,6 @@
 #include <QStringList>
 #include <QTextStream>
 #include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -106,7 +106,7 @@ void ConnectorManager::comSelcon(Command p_command)
         //        qobject_cast<MNERTServer*> (this->parent())->getCommandManager()["selcon"].reply(this->setActiveConnector(t_id));
         QString t_sActivated = this->setActiveConnector(t_id);
 
-        qDebug() << t_sActivated;
+        mne::Log::debug("{}", t_sActivated.toStdString());
 
         bool t_bCommandIsJson = p_command.isJson();
 
@@ -176,7 +176,7 @@ void ConnectorManager::connectActiveConnector()
         QObject::connect(t_activeConnector, &IConnector::remitRawBuffer,
                          this->m_pFiffStreamServer, &FiffStreamServer::forwardRawBuffer);
     } else {
-        qInfo("Error: Can't connect, no connector active!");
+        mne::Log::info("Error: Can't connect, no connector active!");
     }
 }
 
@@ -222,7 +222,7 @@ void ConnectorManager::disconnectActiveConnector()
         //
         //        t_pMNERTServer->m_pCommandServer->disconnect(t_activeConnector);
     } else {
-        qInfo("Error: Can't connect, no connector active!");
+        mne::Log::info("Error: Can't connect, no connector active!");
     }
 }
 
@@ -323,16 +323,16 @@ void ConnectorManager::loadConnectors(const QString& dir)
                 t_pIConnector->connectCommandManager();
 
                 s_vecConnectors.push_back(t_pIConnector);
-                qInfo() << "[ConnectorManager::loadConnectors] Loading " << t_pIConnector->getName() << "done";
+                mne::Log::info("[ConnectorManager::loadConnectors] Loading {} done", t_pIConnector->getName());
             } else {
-                qWarning() << "[ConnectorManager::loadConnectors] Loading plugin failed";
+                mne::Log::warning("[ConnectorManager::loadConnectors] Loading plugin failed");
             }
         }
     }
 #else
     QDir ConnectorsDir(dir);
 
-    qInfo("Loading connectors in directory... %s", ConnectorsDir.path().toUtf8().constData());
+    mne::Log::info("Loading connectors in directory... {}", ConnectorsDir.path().toStdString());
 
     foreach (QString fileName, ConnectorsDir.entryList(QDir::Files)) {
         if (fileName.compare("README") == 0 || fileName.compare("plugin.cfg") == 0)
@@ -341,7 +341,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
         this->setFileName(ConnectorsDir.absoluteFilePath(fileName));
         QObject* pConnector = this->instance();
 
-        qInfo("\tLoading %s...", fileName.toUtf8().constData());
+        mne::Log::info("\tLoading {}...", fileName.toStdString());
 
         // IModule
         if (pConnector) {
@@ -357,9 +357,9 @@ void ConnectorManager::loadConnectors(const QString& dir)
 
             s_vecConnectors.push_back(t_pIConnector);
 
-            qInfo() << "[ConnectorManager::loadConnectors] Loading " << fileName << "done";
+            mne::Log::info("[ConnectorManager::loadConnectors] Loading {} done", fileName.toStdString());
         } else {
-            qWarning() << "[ConnectorManager::loadConnectors] Loading plugin failed" << fileName << "failed";
+            mne::Log::warning("[ConnectorManager::loadConnectors] Loading plugin failed {} failed", fileName.toStdString());
         }
     }
 #endif
@@ -371,9 +371,9 @@ void ConnectorManager::loadConnectors(const QString& dir)
     QString configFileName("plugin.cfg");
     QFile configFile(QString("%1/../resources/mne_rt_server/plugins/" + configFileName).arg(QCoreApplication::applicationDirPath()));
     if (!configFile.open(QIODevice::ReadOnly)) {
-        qInfo("Not able to read config file... %s", configFile.fileName().toUtf8().constData());
+        mne::Log::info("Not able to read config file... {}", configFile.fileName().toStdString());
     } else {
-        qInfo("\tReading %s...", configFileName.toUtf8().constData());
+        mne::Log::info("\tReading {}...", configFileName.toStdString());
 
         QTextStream in(&configFile);
         QString line = in.readLine();
@@ -395,7 +395,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
             for (qint32 i = 0; i < s_vecConnectors.size(); ++i) {
                 if (s_vecConnectors[i]->getConnectorID() == configConnector) {
                     s_vecConnectors[i]->setStatus(true);
-                    qInfo("activate %s... [done]", s_vecConnectors[i]->getName());
+                    mne::Log::info("activate {}... [done]", s_vecConnectors[i]->getName());
                     activated = true;
                     break;
                 }
@@ -408,8 +408,8 @@ void ConnectorManager::loadConnectors(const QString& dir)
     }
 
     //print
-    qInfo("Connector list");
-    qInfo("%s", getConnectorList().data());
+    mne::Log::info("Connector list");
+    mne::Log::info("{}", getConnectorList().data());
 }
 
 //=============================================================================================================

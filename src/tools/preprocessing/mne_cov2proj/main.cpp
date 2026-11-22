@@ -21,7 +21,6 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_raw_data.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -32,7 +31,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,7 +62,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_cov2proj");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -94,11 +91,11 @@ int main(int argc, char* argv[])
     int nProj = parser.value(nprojOpt).toInt();
 
     if (covFile.isEmpty()) {
-        qCritical("--cov is required.");
+        Log::critical("--cov is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -107,15 +104,14 @@ int main(int argc, char* argv[])
     try {
         cov = FiffCov(covFile.toStdU16String());
     } catch (const std::exception& error) {
-        qCritical("Cannot read covariance from %s: %s",
-                  qPrintable(covFile), error.what());
+        Log::critical("Cannot read covariance from {}: {}", covFile.toStdString(), error.what());
         return 1;
     }
     if (cov.empty()) {
-        qCritical("Cannot read covariance from: %s", qPrintable(covFile));
+        Log::critical("Cannot read covariance from: {}", covFile.toStdString());
         return 1;
     }
-    qInfo("Read covariance: %d x %d channels", cov.dim, cov.dim);
+    Log::info("Read covariance: {} x {} channels", cov.dim, cov.dim);
 
     // Get channel names
     StringList chNames = cov.names;
@@ -128,15 +124,14 @@ int main(int argc, char* argv[])
     MatrixXd covMat = cov.data;
     SelfAdjointEigenSolver<MatrixXd> eig(covMat);
     if (eig.info() != Success) {
-        qCritical("Eigendecomposition failed.");
+        Log::critical("Eigendecomposition failed.");
         return 1;
     }
 
     VectorXd eigenvalues = eig.eigenvalues();
     MatrixXd eigenvectors = eig.eigenvectors();
 
-    qInfo("Eigenvalue range: %g .. %g",
-          eigenvalues(0), eigenvalues(eigenvalues.size() - 1));
+    Log::info("Eigenvalue range: {:g} .. {:g}", eigenvalues(0), eigenvalues(eigenvalues.size() - 1));
 
     // Select the top nProj eigenvectors (largest eigenvalues = most noise)
     int nEig = eigenvalues.size();
@@ -160,18 +155,18 @@ int main(int argc, char* argv[])
 
         projs.push_back(proj);
 
-        qInfo("  Projector %d: eigenvalue = %g", p + 1, eigenvalues(idx));
+        Log::info("  Projector {}: eigenvalue = {:g}", p + 1, eigenvalues(idx));
     }
 
     // Write projectors to file
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly)) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
     auto stream = FiffStream::start_file(outFile.toStdU16String());
     if (!stream) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
 
@@ -180,6 +175,6 @@ int main(int argc, char* argv[])
     stream->end_block(FIFFB_MNE);
     stream->end_file();
 
-    qInfo("Written %d projectors to: %s", nProj, qPrintable(outFile));
+    Log::info("Written {} projectors to: {}", nProj, outFile.toStdString());
     return 0;
 }

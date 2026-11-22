@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eventview.h"
 
 #include "ui_eventview.h"
@@ -31,7 +32,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QMap>
 #include <QToolBar>
 #include <QColorDialog>
@@ -467,7 +467,7 @@ void EventView::onDetectTriggers(const QString& sChannelName,
                                  double dThreshold)
 {
     if (!m_pFiffRawModel) {
-        qWarning() << "[EventView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
+        mne::Log::warning("[EventView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.");
         return;
     }
 
@@ -602,7 +602,7 @@ void EventView::redrawGroups()
         }
     }
 
-    qDebug() << "EventView::redrawGroups";
+    mne::Log::debug("EventView::redrawGroups");
     emit triggerRedraw();
 }
 

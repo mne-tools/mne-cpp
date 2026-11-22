@@ -32,7 +32,6 @@
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QFile>
 #include <QTest>
 
@@ -147,7 +146,7 @@ void TestCoregistration::initTestCase()
 
     // align fiducials
     if (!mne::fitMatchedPoints(matSrc, matDst, matTrans, fScale, bScale, vecWeights)) {
-        qWarning() << "Point cloud registration not succesfull.";
+        Log::warning("Point cloud registration not succesfull.");
     }
 
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
@@ -177,7 +176,7 @@ void TestCoregistration::initTestCase()
 
     // discard outliers
     if (!mne::discard3DPointOutliers(mneSurfacePoints, matHsp, transPerformICP, vecTake, matHspClean, fMaxDist)) {
-        qWarning() << "Discard outliers was not succesfull.";
+        Log::warning("Discard outliers was not succesfull.");
     }
     VectorXf vecWeightsICPClean(vecTake.size());
     for (int i = 0; i < vecTake.size(); ++i) {
@@ -187,7 +186,7 @@ void TestCoregistration::initTestCase()
     // icp
     float fRMSE = 0.0;
     if (!mne::performIcp(mneSurfacePoints, matHspClean, transPerformICP, fRMSE, bScale, iMaxIter, fTol, vecWeightsICPClean)) {
-        qWarning() << "ICP was not succesfull.";
+        Log::warning("ICP was not succesfull.");
     }
     transPerformICPRef = FiffCoordTrans(t_fileTransRefIcp.fileName().toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 }

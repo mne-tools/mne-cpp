@@ -19,7 +19,6 @@
 #include <channels/layoutmaker.h>
 #include <channels/selectionio.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -122,7 +121,6 @@ private:
 
 void TestChannelsLayoutSelection::initTestCase()
 {
-    mne::install_qt_message_handler();
     QVERIFY(m_tempDir.isValid());
 }
 

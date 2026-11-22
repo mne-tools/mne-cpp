@@ -21,7 +21,6 @@
 #include <fiff/fiff_dir_entry.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -32,7 +31,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <QRegularExpression>
 
 //=============================================================================================================
@@ -70,7 +68,7 @@ static QList<DigPt> readFifDig(const QString& filename)
     QFile file(filename);
     FiffStream stream(filename.toStdU16String());
     if (!stream.open()) {
-        qCritical("Cannot open FIFF file: %s", qPrintable(filename));
+        Log::critical("Cannot open FIFF file: {}", filename.toStdString());
         return points;
     }
 
@@ -99,7 +97,7 @@ static QList<DigPt> readHpts(const QString& filename)
     QList<DigPt> points;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open hpts file: %s", qPrintable(filename));
+        Log::critical("Cannot open hpts file: {}", filename.toStdString());
         return points;
     }
 
@@ -141,7 +139,7 @@ static bool writeFifDig(const QString& filename, const QList<DigPt>& points)
 {
     auto outStream = FiffStream::start_file(filename.toStdU16String());
     if (!outStream) {
-        qCritical("Cannot open output FIFF file: %s", qPrintable(filename));
+        Log::critical("Cannot open output FIFF file: {}", filename.toStdString());
         return false;
     }
 
@@ -168,7 +166,7 @@ static bool writeHpts(const QString& filename, const QList<DigPt>& points)
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open hpts output file: %s", qPrintable(filename));
+        Log::critical("Cannot open hpts output file: {}", filename.toStdString());
         return false;
     }
 
@@ -198,7 +196,6 @@ static bool writeHpts(const QString& filename, const QList<DigPt>& points)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_dig_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -228,11 +225,11 @@ int main(int argc, char* argv[])
     QString hptsOut = parser.value(hptsoutOpt);
 
     if (fifIn.isEmpty() && hptsIn.isEmpty()) {
-        qCritical("Specify input with --fif or --hpts.");
+        Log::critical("Specify input with --fif or --hpts.");
         parser.showHelp(1);
     }
     if (fifOut.isEmpty() && hptsOut.isEmpty()) {
-        qCritical("Specify output with --fifout or --hptsout.");
+        Log::critical("Specify output with --fifout or --hptsout.");
         parser.showHelp(1);
     }
 
@@ -240,18 +237,14 @@ int main(int argc, char* argv[])
     QList<DigPt> points;
     if (!fifIn.isEmpty()) {
         points = readFifDig(fifIn);
-        qInfo("Read %lld points from %s",
-              static_cast<long long>(points.size()),
-              qPrintable(fifIn));
+        Log::info("Read {} points from {}", static_cast<long long>(points.size()), fifIn.toStdString());
     } else {
         points = readHpts(hptsIn);
-        qInfo("Read %lld points from %s",
-              static_cast<long long>(points.size()),
-              qPrintable(hptsIn));
+        Log::info("Read {} points from {}", static_cast<long long>(points.size()), hptsIn.toStdString());
     }
 
     if (points.isEmpty()) {
-        qCritical("No digitization points read.");
+        Log::critical("No digitization points read.");
         return 1;
     }
     const auto pointCount = static_cast<long long>(points.size());
@@ -260,14 +253,14 @@ int main(int argc, char* argv[])
     if (!fifOut.isEmpty()) {
         if (!writeFifDig(fifOut, points))
             return 1;
-        qInfo("Wrote %lld points to %s", pointCount, qPrintable(fifOut));
+        Log::info("Wrote {} points to {}", pointCount, fifOut.toStdString());
     }
     if (!hptsOut.isEmpty()) {
         if (!writeHpts(hptsOut, points))
             return 1;
-        qInfo("Wrote %lld points to %s", pointCount, qPrintable(hptsOut));
+        Log::info("Wrote {} points to {}", pointCount, hptsOut.toStdString());
     }
 
-    qInfo("done.");
+    Log::info("done.");
     return 0;
 }

@@ -22,7 +22,6 @@
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -69,7 +68,6 @@ int main(int argc, char* argv[])
 
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -164,11 +162,7 @@ int main(int argc, char* argv[])
                                                          {},
                                                          picks);
 
-    qInfo().noquote() << QString("Averaged %1 epochs of event %2 over %3 channels and %4 samples.")
-                             .arg(evoked.nave)
-                             .arg(event)
-                             .arg(evoked.data.rows())
-                             .arg(evoked.data.cols());
+    Log::info("{}", (QString("Averaged %1 epochs of event %2 over %3 channels and %4 samples.").arg(evoked.nave).arg(event).arg(evoked.data.rows()).arg(evoked.data.cols())).toStdString());
 
     // Butterfly plot of the gradiometers in fT/cm against time in ms
     QVector<double> times(evoked.times.size());

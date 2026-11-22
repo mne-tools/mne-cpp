@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "rtclustmne.h"
 
 #include "FormFiles/rtclustmnesetupwidget.h"
@@ -199,7 +200,7 @@ bool RtClustMne::calcFiffInfo()
     QMutexLocker locker(&m_qMutex);
 
     if (m_qListCovChNames.size() > 0 && m_pFiffInfoInput && m_pFiffInfoForward) {
-        qDebug() << "[RtClustMne::calcFiffInfoFiff] Infos available";
+        Log::debug("[RtClustMne::calcFiffInfoFiff] Infos available");
 
         //        qDebug() << "RtClustMne::calcFiffInfo - m_qListCovChNames" << m_qListCovChNames;
         //        qDebug() << "RtClustMne::calcFiffInfo - m_pFiffInfoForward->ch_names" << m_pFiffInfoForward->ch_names;
@@ -337,8 +338,7 @@ void RtClustMne::updateRTFS(mne::scan::Measurement::SPtr pMeasurement)
         // more sources and therefore a higher computational load.
         //
         if (!pRTFS->isClustered()) {
-            qInfo() << "[RtClustMne::updateRTFS] Using a full (unclustered) source space."
-                    << "Source localization will be slower than with a clustered one.";
+            Log::info("[RtClustMne::updateRTFS] Using a full (unclustered) source space. Source localization will be slower than with a clustered one.");
         }
 
         m_pRTSEOutput->measurementData()->setFwdSolution(pRTFS->getValue());
@@ -389,7 +389,7 @@ void RtClustMne::updateRTMSA(mne::scan::Measurement::SPtr pMeasurement)
                             //Do nothing until the circular buffer is ready to accept new data again
                         }
                     } else {
-                        qDebug() << "RtClustMne::updateRTMSA - Reject data block";
+                        Log::debug("RtClustMne::updateRTMSA - Reject data block");
                     }
                 }
             }
@@ -601,7 +601,7 @@ void RtClustMne::run()
             nVerticesLh = static_cast<int>(fwd->src[0].vertno.size());
         }
         if (pNoiseCov && !rtInvOp->update(*pNoiseCov)) {
-            qWarning() << "[RtClustMne::run] The noise covariance gives no inverse operator.";
+            Log::warning("[RtClustMne::run] The noise covariance gives no inverse operator.");
         }
 
         //Process data from raw data input
@@ -637,7 +637,7 @@ InvSourceEstimate RtClustMne::computeCmneInverse(const FiffEvoked& evoked,
     InvSourceEstimate stcEmpty;
 
     if (sModelCheckpoint.isEmpty()) {
-        qWarning() << "[RtClustMne::computeCmneInverse] CMNE selected but no model checkpoint set.";
+        Log::warning("[RtClustMne::computeCmneInverse] CMNE selected but no model checkpoint set.");
         return stcEmpty;
     }
 
@@ -648,7 +648,7 @@ InvSourceEstimate RtClustMne::computeCmneInverse(const FiffEvoked& evoked,
         rows.push_back(mne::channel_index(evoked.info.ch_names, name));
     }
     if (std::ranges::contains(rows, -1)) {
-        qWarning() << "[RtClustMne::computeCmneInverse] The evoked lacks channels of the inverse operator.";
+        Log::warning("[RtClustMne::computeCmneInverse] The evoked lacks channels of the inverse operator.");
         return stcEmpty;
     }
 

@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eventmanager.h"
 
 #include "communicator.h"
@@ -26,7 +27,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QMutexLocker>
 
 //=============================================================================================================
@@ -142,8 +142,8 @@ void EventManager::removeCommunicatorInt(Communicator* commu)
         int removed = m_routingTable.remove(etype, commu);
         // consistency check:
         if (removed != 1) {
-            qDebug() << "[EventManager::removeCommunicator] WARNING ! Found " << removed << " entries instead of 1 for event type ";
-            qDebug() << etype << " and communicator ID " << commu->getID();
+            mne::Log::debug("[EventManager::removeCommunicator] WARNING ! Found {} entries instead of 1 for event type ", removed);
+            mne::Log::debug("{} and communicator ID {}", static_cast<int>(etype), commu->getID());
         }
     }
 }
@@ -160,7 +160,7 @@ bool EventManager::startEventHandling(float frequency)
 bool EventManager::startEventHandlingInt(float frequency)
 {
     if (m_running) {
-        qDebug() << "[EventManager::startEventHandling] WARNING ! somebody tried to call startEventHandling when already running...";
+        mne::Log::debug("[EventManager::startEventHandling] WARNING ! somebody tried to call startEventHandling when already running...");
         return false;
     } else {
         m_sleepTime = static_cast<long>(1000.0f / frequency);
@@ -189,7 +189,7 @@ bool EventManager::stopEventHandlingInt()
         wait();
         return true;
     } else {
-        qDebug() << "[EventManager] WARNING ! Somebody tried to call stopEventHandling when already stopped...";
+        mne::Log::debug("[EventManager] WARNING ! Somebody tried to call stopEventHandling when already stopped...");
         return false;
     }
 }
@@ -251,7 +251,7 @@ void EventManager::run()
             QThread::currentThread()->msleep(m_sleepTime - elapsed);
         } else {
             // issue warning
-            qDebug() << "[EventManager::run] WARNING ! Running behind on event handling...";
+            mne::Log::debug("[EventManager::run] WARNING ! Running behind on event handling...");
         }
         // check for shutdown requests
         if (isInterruptionRequested()) {

@@ -22,6 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
@@ -683,7 +684,7 @@ inline qint32 FiffRawViewModel::absoluteFirstSample() const
     if (m_pFiffIO && m_pFiffIO->raw.empty() == false)
         return m_pFiffIO->raw[0]->first_samp;
     else {
-        qWarning() << "[FiffRawViewModel::firstSample] Raw list is empty, returning -1";
+        Log::warning("[FiffRawViewModel::firstSample] Raw list is empty, returning -1");
         return -1;
     }
 }
@@ -703,7 +704,7 @@ inline qint32 FiffRawViewModel::absoluteLastSample() const
     if (m_pFiffIO && m_pFiffIO->raw.empty() == false)
         return m_pFiffIO->raw[0]->last_samp;
     else {
-        qWarning() << "[FiffRawViewModel::lastSample] Raw list is empty, returning -1";
+        Log::warning("[FiffRawViewModel::lastSample] Raw list is empty, returning -1");
         return -1;
     }
 }
@@ -899,7 +900,7 @@ public:
     , m_iRowNumber(0)
     , m_iNumSamples(0)
     {
-        qWarning() << "[FiffRawViewModel::ChannelData::ChannelData] WARNING: default constructor called, this is probably wrong ...";
+        Log::warning("[FiffRawViewModel::ChannelData::ChannelData] WARNING: default constructor called, this is probably wrong ...");
     }
 
     // we need a public destructor in order to register this as QMetaType

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "bemdatamodel.h"
 
 #include <fiff/fiff_stream.h>
@@ -44,7 +45,7 @@ using namespace mne;
 BemDataModel::BemDataModel(QObject* pParent)
 : AbstractModel(pParent)
 {
-    qInfo() << "[BemDataModel::BemDataModel] Default constructor called !";
+    Log::info("[BemDataModel::BemDataModel] Default constructor called !");
 }
 
 //=============================================================================================================
@@ -75,7 +76,7 @@ void BemDataModel::initBemData(std::unique_ptr<mne::FiffStream> stream)
 {
     auto bem = MNEBem::read(*stream);
     if (!bem) {
-        qWarning() << "[BemDataModel::initBemData]" << bem.error().what();
+        Log::warning("[BemDataModel::initBemData] {}", bem.error().what());
         return;
     }
 

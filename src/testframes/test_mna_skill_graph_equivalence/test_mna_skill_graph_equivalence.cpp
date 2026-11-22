@@ -28,6 +28,7 @@
  */
 
 #include <pipelineparser.h>
+#include <base/log.h>
 #include <workflowgraph.h>
 #include <workflowmanager.h>
 #include <iskilloperator.h>
@@ -233,9 +234,9 @@ void TestMnaSkillGraphEquivalence::initTestCase()
     }
 
     m_assetsReady = true;
-    qInfo().noquote() << "Showcase  :" << m_showcasePath;
-    qInfo().noquote() << "Raw input :" << m_rawPath;
-    qInfo().noquote() << "Inv op    :" << m_invPath;
+    Log::info("Showcase  : {}", m_showcasePath.toStdString());
+    Log::info("Raw input : {}", m_rawPath.toStdString());
+    Log::info("Inv op    : {}", m_invPath.toStdString());
 }
 
 void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
@@ -424,11 +425,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     QVERIFY(!bytesB.isEmpty());
 
     if (bytesA == bytesB) {
-        qInfo().noquote()
-            << "ACCEPTANCE CRITERION SATISFIED: byte-identical STC outputs.\n"
-            << "  Size:" << bytesA.size() << "bytes\n"
-            << "  Path A:" << stcPathA << "\n"
-            << "  Path B:" << stcPathB;
+        Log::info("ACCEPTANCE CRITERION SATISFIED: byte-identical STC outputs.\n  Size: {} bytes\n  Path A: {}\n  Path B: {}", bytesA.size(), stcPathA.toStdString(), stcPathB.toStdString());
     } else {
         // STC files have no timestamp header — they are pure numeric payloads
         // (tmin float, tstep float, vertex count int, vertex indices int[],
@@ -446,13 +443,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
                 break;
             }
         }
-        qWarning().noquote()
-            << "ACCEPTANCE CRITERION PARTIALLY SATISFIED: value-equal but byte-different STC outputs.\n"
-            << "  Size A:" << bytesA.size() << "  Size B:" << bytesB.size() << "\n"
-            << "  First differing byte offset:" << firstDiff << "\n"
-            << "  Path A:" << stcPathA << "\n"
-            << "  Path B:" << stcPathB << "\n"
-            << "  Note: ignored fields = entire file header; value-equality verified via InvSourceEstimate::read.";
+        Log::warning("ACCEPTANCE CRITERION PARTIALLY SATISFIED: value-equal but byte-different STC outputs.\n  Size A: {}  Size B: {}\n  First differing byte offset: {}\n  Path A: {}\n  Path B: {}\n  Note: ignored fields = entire file header; value-equality verified via InvSourceEstimate::read.", bytesA.size(), bytesB.size(), firstDiff, stcPathA.toStdString(), stcPathB.toStdString());
     }
 }
 

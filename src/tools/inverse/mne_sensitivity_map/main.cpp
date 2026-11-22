@@ -17,7 +17,6 @@
 #include <mne/mne_forward_solution.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,7 +52,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_sensitivity_map");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -80,18 +77,18 @@ int main(int argc, char* argv[])
     QString method = parser.value(methodOpt).toLower();
 
     if (fwdFile.isEmpty()) {
-        qCritical("--fwd is required.");
+        Log::critical("--fwd is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
 
     // Load forward solution
     auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
     if (!fwdRead) {
-        qCritical("%s", fwdRead.error().what());
+        Log::critical("{}", fwdRead.error().what());
         return 1;
     }
     MNEForwardSolution& fwd = *fwdRead;
@@ -101,8 +98,7 @@ int main(int argc, char* argv[])
     int nSrc = G.cols();
     bool isFixed = fwd.isFixedOrient();
 
-    qInfo("Forward: %d channels x %d sources (%s orientation)",
-          nChan, nSrc, isFixed ? "fixed" : "free");
+    Log::info("Forward: {} channels x {} sources ({} orientation)", nChan, nSrc, isFixed ? "fixed" : "free");
 
     // Compute sensitivity per source
     int nSourcePoints = isFixed ? nSrc : nSrc / 3;
@@ -132,7 +128,7 @@ int main(int argc, char* argv[])
             sensitivity(s) = svd.singularValues()(0);
         }
     } else {
-        qCritical("Unknown method: %s (use 'norm' or 'svd')", qPrintable(method));
+        Log::critical("Unknown method: {} (use 'norm' or 'svd')", method.toStdString());
         return 1;
     }
 
@@ -141,13 +137,12 @@ int main(int argc, char* argv[])
     if (maxSens > 0)
         sensitivity /= maxSens;
 
-    qInfo("Sensitivity range: %g .. %g (normalized)",
-          sensitivity.minCoeff(), sensitivity.maxCoeff());
+    Log::info("Sensitivity range: {:g} .. {:g} (normalized)", sensitivity.minCoeff(), sensitivity.maxCoeff());
 
     // Write output
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot write: %s", qPrintable(outFile));
+        Log::critical("Cannot write: {}", outFile.toStdString());
         return 1;
     }
     QTextStream out(&outF);
@@ -157,6 +152,6 @@ int main(int argc, char* argv[])
         out << s << " " << QString::number(sensitivity(s), 'g', 10) << "\n";
     outF.close();
 
-    qInfo("Written sensitivity map to: %s", qPrintable(outFile));
+    Log::info("Written sensitivity map to: {}", outFile.toStdString());
     return 0;
 }

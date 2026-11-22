@@ -16,7 +16,6 @@
 
 #include <math/sphere.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,7 +101,6 @@ TestSphere::TestSphere()
 
 void TestSphere::initTestCase()
 {
-    mne::install_qt_message_handler();
 }
 
 //=============================================================================================================
@@ -284,7 +282,7 @@ void TestSphere::testFitSphereToPointsRawPtr()
 
 void TestSphere::cleanupTestCase()
 {
-    qInfo() << "TestSphere: All tests completed";
+    Log::info("TestSphere: All tests completed");
 }
 
 //=============================================================================================================

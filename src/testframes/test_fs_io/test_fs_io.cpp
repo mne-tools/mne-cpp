@@ -16,7 +16,8 @@
 #include <QDataStream>
 
 #include <fs/fs_surface.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
 #include <fs/fs_annotationset.h>
@@ -117,12 +118,6 @@ private:
     }
 
 private slots:
-    void initTestCase()
-    {
-        mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
-    }
-
-
     //=========================================================================
     // FsSurface - default & clear
     //=========================================================================
@@ -330,9 +325,10 @@ private slots:
             QVERIFY(file.open(QIODevice::WriteOnly));
             file.write(data);
             file.close();
-            QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("Invalid or truncated surface file")));
+            ScopedLogCapture capture;
             FsSurface notASurface;
             QVERIFY(!FsSurface::read(file.fileName().toStdU16String(), notASurface, false));
+            QVERIFY2(capture.contains(mne::Log::Level::Warning, "Invalid or truncated surface file"), capture.dump().c_str());
         }
 
         // The MNE-C reader refuses counts that are negative or exceed the file instead of allocating them

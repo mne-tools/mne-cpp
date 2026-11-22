@@ -22,6 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <math/warp.h>
 
 //=============================================================================================================
@@ -29,7 +30,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -119,24 +119,20 @@ int main(int argc, char* argv[])
     MatrixXf warpedLm = warp.calculate(sourceLm, destLm, sourceLm);
     const float fMaxLmError = (warpedLm - destLm).cwiseAbs().maxCoeff();
 
-    qInfo() << "Thin-plate-spline warp example";
-    qInfo() << "  source landmarks :" << sourceLm.rows();
-    qInfo() << "  warped vertices  :" << warpedVert.rows();
-    qInfo() << "  max landmark interpolation error :" << fMaxLmError;
+    Log::info("Thin-plate-spline warp example");
+    Log::info("  source landmarks : {}", sourceLm.rows());
+    Log::info("  warped vertices  : {}", warpedVert.rows());
+    Log::info("  max landmark interpolation error : {}", fMaxLmError);
 
     if (fMaxLmError < 1e-3f) {
-        qInfo() << "  -> landmarks reproduced exactly (TPS interpolation property holds).";
+        Log::info("  -> landmarks reproduced exactly (TPS interpolation property holds).");
     } else {
-        qWarning() << "  -> unexpected landmark error; the warp did not interpolate the landmarks.";
+        Log::warning("  -> unexpected landmark error; the warp did not interpolate the landmarks.");
         return 1;
     }
 
-    qInfo() << "First warped vertex :"
-            << warpedVert(0, 0) << warpedVert(0, 1) << warpedVert(0, 2);
-    qInfo() << "Last warped vertex  :"
-            << warpedVert(warpedVert.rows() - 1, 0)
-            << warpedVert(warpedVert.rows() - 1, 1)
-            << warpedVert(warpedVert.rows() - 1, 2);
+    Log::info("First warped vertex : {} {} {}", warpedVert(0, 0), warpedVert(0, 1), warpedVert(0, 2));
+    Log::info("Last warped vertex  : {} {} {}", warpedVert(warpedVert.rows() - 1, 0), warpedVert(warpedVert.rows() - 1, 1), warpedVert(warpedVert.rows() - 1, 2));
 
     return 0;
 }

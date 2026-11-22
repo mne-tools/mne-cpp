@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_evoked.h>
@@ -158,8 +157,6 @@ QString TestComputeRawInverse::findDataPath()
 
 void TestComputeRawInverse::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Raw Inverse Test Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     m_sDataPath = findDataPath();

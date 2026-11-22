@@ -20,7 +20,6 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_file.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -33,7 +32,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -69,7 +67,7 @@ static QList<TriggerEvent> readTriggerFile(const QString& filename)
     QList<TriggerEvent> triggers;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open trigger file: %s", qPrintable(filename));
+        Log::critical("Cannot open trigger file: {}", filename.toStdString());
         return triggers;
     }
     QTextStream in(&file);
@@ -92,7 +90,6 @@ static QList<TriggerEvent> readTriggerFile(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_add_triggers");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -118,31 +115,30 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (rawFile.isEmpty()) {
-        qCritical("--raw is required.");
+        Log::critical("--raw is required.");
         return 1;
     }
     if (trgFile.isEmpty()) {
-        qCritical("--trg is required.");
+        Log::critical("--trg is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
     // Read trigger file
     QList<TriggerEvent> triggers = readTriggerFile(trgFile);
     if (triggers.isEmpty()) {
-        qCritical("No triggers read from: %s", qPrintable(trgFile));
+        Log::critical("No triggers read from: {}", trgFile.toStdString());
         return 1;
     }
-    qInfo("Read %lld trigger events from %s",
-          static_cast<long long>(triggers.size()), qPrintable(trgFile));
+    Log::info("Read {} trigger events from {}", static_cast<long long>(triggers.size()), trgFile.toStdString());
 
     // Open raw data
     FiffRawData raw(rawFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read raw data from: %s", qPrintable(rawFile));
+        Log::critical("Cannot read raw data from: {}", rawFile.toStdString());
         return 1;
     }
 
@@ -158,17 +154,16 @@ int main(int argc, char* argv[])
     }
 
     if (stiIdx < 0) {
-        qCritical("No STI/stimulus channel found in data.");
+        Log::critical("No STI/stimulus channel found in data.");
         return 1;
     }
-    qInfo("Using stimulus channel: %s (index %d)",
-          raw.info.chs[stiIdx].ch_name.c_str(), stiIdx);
+    Log::info("Using stimulus channel: {} (index {})", raw.info.chs[stiIdx].ch_name, stiIdx);
 
     // Read all data
     MatrixXd data;
     MatrixXd times;
     if (!raw.read_raw_segment(data, times)) {
-        qCritical("Cannot read raw data segment.");
+        Log::critical("Cannot read raw data segment.");
         return 1;
     }
 
@@ -180,17 +175,16 @@ int main(int argc, char* argv[])
             data(stiIdx, col) = static_cast<double>(evt.value);
             ++nAdded;
         } else {
-            qWarning("Trigger sample %d out of range [%d, %d], skipping.",
-                     evt.sample, raw.first_samp, raw.last_samp);
+            Log::warning("Trigger sample {} out of range [{}, {}], skipping.", evt.sample, raw.first_samp, raw.last_samp);
         }
     }
-    qInfo("Added %d trigger events.", nAdded);
+    Log::info("Added {} trigger events.", nAdded);
 
     // Write output
     RowVectorXd cals;
     auto outStream = FiffStream::start_writing_raw(outFile.toStdU16String(), raw.info, cals);
     if (!outStream) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
 
@@ -205,6 +199,6 @@ int main(int argc, char* argv[])
     }
     outStream->finish_writing_raw();
 
-    qInfo("Written modified raw data to: %s", qPrintable(outFile));
+    Log::info("Written modified raw data to: {}", outFile.toStdString());
     return 0;
 }

@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eegosports.h"
 
 #include <acq/devices/acq_devices.h>
@@ -32,7 +33,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <QSettings>
 
 //=============================================================================================================
@@ -167,7 +167,7 @@ void EEGoSports::applyElectrodeLayout(FiffInfo& info) const
 {
     const auto layout = readLayout(m_sElcFilePath);
     if (!layout) {
-        qWarning() << "[EEGoSports] Cannot read the electrode positions in" << m_sElcFilePath;
+        Log::warning("[EEGoSports] Cannot read the electrode positions in {}", m_sElcFilePath.toStdString());
         return;
     }
     Vector3d center = Vector3d::Zero();
@@ -196,7 +196,7 @@ void EEGoSports::applyElectrodeLayout(FiffInfo& info) const
         if (r) {
             dig.push_back(digPoint(FIFFV_POINT_CARDINAL, ident, *r));
         } else if (tracked || m_bUseElectrodeShiftMode) {
-            qWarning() << "[EEGoSports]" << (tracked ? trackedName : electrode) << "not found. Check the loaded layout.";
+            Log::warning("[EEGoSports] {} not found. Check the loaded layout.", ((tracked ? trackedName : electrode)).toStdString());
         }
     }
 
@@ -232,7 +232,7 @@ bool EEGoSports::start()
     mne::register_eego_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[EEGoSports::start]" << QString::fromStdString(device.error().text());
+        Log::warning("[EEGoSports::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
@@ -244,7 +244,7 @@ bool EEGoSports::start()
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[EEGoSports::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        Log::warning("[EEGoSports::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -255,7 +255,7 @@ bool EEGoSports::start()
     m_pRMTSA_EEGoSports->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[EEGoSports::start]" << QString::fromStdString(e.text());
+        Log::warning("[EEGoSports::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -378,7 +378,7 @@ void EEGoSports::run()
         while (!isInterruptionRequested()) {
             const auto impedances = m_device.measureImpedances(std::chrono::seconds(5));
             if (!impedances) {
-                qWarning() << "[EEGoSports::run]" << QString::fromStdString(impedances.error().text());
+                Log::warning("[EEGoSports::run] {}", QString::fromStdString(impedances.error().text()).toStdString());
                 return;
             }
             // Electrode i of the cap is referential input i, and those lead the stream
@@ -406,7 +406,7 @@ void EEGoSports::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[EEGoSports::run]" << QString::fromStdString(read.error().text());
+            Log::warning("[EEGoSports::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pRMTSA_EEGoSports->measurementData()->setValue(block);

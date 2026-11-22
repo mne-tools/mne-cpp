@@ -24,7 +24,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <mri/mri_types.h>
 #include <mri/mri_vol_data.h>
@@ -251,15 +250,13 @@ QString TestMriIO::findSubjectsDir()
 
 void TestMriIO::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     QVERIFY(m_tempDir.isValid());
 
     m_sSubjectsDir = findSubjectsDir();
     if (!m_sSubjectsDir.isEmpty()) {
         m_sMriDir = m_sSubjectsDir + "/sample/mri";
         m_bDataAvailable = true;
-        qDebug() << "Sample data found at" << m_sMriDir;
+        Log::debug("Sample data found at {}", m_sMriDir.toStdString());
 
         // Pre-load T1 volume for multiple tests
         QString t1Path = m_sMriDir + "/T1.mgz";
@@ -268,7 +265,7 @@ void TestMriIO::initTestCase()
             QVERIFY2(ok, "Failed to pre-load T1.mgz in initTestCase");
         }
     } else {
-        qDebug() << "MNE sample data not found — skipping data-dependent tests";
+        Log::debug("MNE sample data not found — skipping data-dependent tests");
     }
 }
 

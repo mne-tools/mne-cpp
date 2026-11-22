@@ -18,18 +18,13 @@
 
 #include "filtering.h"
 
+#include <base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/filtersettingsview.h>
 #include <disp/viewers/filterdesignview.h>
 #include <dsp/filterkernel.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -150,7 +145,7 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
             break;
 
         default:
-            qWarning() << "[Filtering::handleEvent] received an Event that is not handled by switch-cases";
+            Log::warning("[Filtering::handleEvent] received an Event that is not handled by switch-cases");
     }
 }
 

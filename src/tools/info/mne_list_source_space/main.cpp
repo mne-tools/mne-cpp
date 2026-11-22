@@ -20,7 +20,6 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +29,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
+#include <QTextStream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -89,7 +88,6 @@ static const char* spaceTypeName(int type)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_list_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -131,32 +129,32 @@ int main(int argc, char* argv[])
     else if (coordStr == "mri")
         coordFrame = FIFFV_COORD_MRI;
     else {
-        qCritical("Unknown coordinate frame: %s (use head or mri)", qPrintable(coordStr));
+        Log::critical("Unknown coordinate frame: {} (use head or mri)", coordStr.toStdString());
         return 1;
     }
 
     if (srcName.isEmpty()) {
-        qCritical("--src is required.");
+        Log::critical("--src is required.");
         return 1;
     }
 
     // Read source spaces
     auto read = MNESourceSpaces::read(srcName.toStdU16String());
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     const MNESourceSpaces& sourceSpaces = *read;
 
     if (sourceSpaces.size() == 0) {
-        qCritical("No source spaces found in file.");
+        Log::critical("No source spaces found in file.");
         return 1;
     }
 
     // Print summary
-    qInfo("Source space file : %s", qPrintable(srcName));
-    qInfo("Number of spaces  : %d", sourceSpaces.size());
-    qInfo("%s", "");
+    Log::info("Source space file : {}", srcName.toStdString());
+    Log::info("Number of spaces  : {}", sourceSpaces.size());
+    Log::info("{}", "");
 
     int totalActive = 0;
     int totalVerts = 0;
@@ -170,17 +168,17 @@ int main(int argc, char* argv[])
         totalActive += nuse;
         totalVerts += nvert;
 
-        qInfo("--- Space %d ---", s + 1);
-        qInfo("  Type            : %s", spaceTypeName(space.type));
-        qInfo("  Vertices        : %d", nvert);
-        qInfo("  Active vertices : %d", nuse);
-        qInfo("  Triangles       : %d", ntri);
-        qInfo("  Coord frame     : %s", coordFrameName(space.coord_frame));
+        Log::info("--- Space {} ---", s + 1);
+        Log::info("  Type            : {}", spaceTypeName(space.type));
+        Log::info("  Vertices        : {}", nvert);
+        Log::info("  Active vertices : {}", nuse);
+        Log::info("  Triangles       : {}", ntri);
+        Log::info("  Coord frame     : {}", coordFrameName(space.coord_frame));
 
         if (space.id == FIFFV_MNE_SURF_LEFT_HEMI)
-            qInfo("  Hemisphere      : Left");
+            Log::info("  Hemisphere      : Left");
         else if (space.id == FIFFV_MNE_SURF_RIGHT_HEMI)
-            qInfo("  Hemisphere      : Right");
+            Log::info("  Hemisphere      : Right");
 
         if (nuse > 0 && space.rr.rows() > 0) {
             // Compute bounding box of active vertices
@@ -207,19 +205,18 @@ int main(int argc, char* argv[])
                 if (z > zmax)
                     zmax = z;
             }
-            qInfo("  Extent (mm)     : x [%.1f, %.1f] y [%.1f, %.1f] z [%.1f, %.1f]",
-                  xmin, xmax, ymin, ymax, zmin, zmax);
+            Log::info("  Extent (mm)     : x [{:.1f}, {:.1f}] y [{:.1f}, {:.1f}] z [{:.1f}, {:.1f}]", xmin, xmax, ymin, ymax, zmin, zmax);
         }
-        qInfo("%s", "");
+        Log::info("{}", "");
     }
 
-    qInfo("Total active vertices : %d / %d", totalActive, totalVerts);
+    Log::info("Total active vertices : {} / {}", totalActive, totalVerts);
 
     // Write point file (MRIlab format)
     if (!pntName.isEmpty()) {
         QFile pntFile(pntName);
         if (!pntFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open output file: %s", qPrintable(pntName));
+            Log::critical("Cannot open output file: {}", pntName.toStdString());
             return 1;
         }
         QTextStream pnt(&pntFile);
@@ -235,14 +232,14 @@ int main(int argc, char* argv[])
                                          space.rr(v, 2) * 1000.0f);
             }
         }
-        qInfo("Wrote point file: %s", qPrintable(pntName));
+        Log::info("Wrote point file: {}", pntName.toStdString());
     }
 
     // Write dipole file (MRIlab format: position + orientation)
     if (!dipName.isEmpty()) {
         QFile dipFile(dipName);
         if (!dipFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open output file: %s", qPrintable(dipName));
+            Log::critical("Cannot open output file: {}", dipName.toStdString());
             return 1;
         }
         QTextStream dip(&dipFile);
@@ -259,14 +256,14 @@ int main(int argc, char* argv[])
                                          space.nn(v, 0), space.nn(v, 1), space.nn(v, 2));
             }
         }
-        qInfo("Wrote dipole file: %s", qPrintable(dipName));
+        Log::info("Wrote dipole file: {}", dipName.toStdString());
     }
 
     // Write vertex file (text: vertex_number x y z)
     if (!vertName.isEmpty()) {
         QFile vertFile(vertName);
         if (!vertFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open output file: %s", qPrintable(vertName));
+            Log::critical("Cannot open output file: {}", vertName.toStdString());
             return 1;
         }
         QTextStream vert(&vertFile);
@@ -281,7 +278,7 @@ int main(int argc, char* argv[])
                                           space.rr(v, 0) * 1000.0f, space.rr(v, 1) * 1000.0f, space.rr(v, 2) * 1000.0f);
             }
         }
-        qInfo("Wrote vertex file: %s", qPrintable(vertName));
+        Log::info("Wrote vertex file: {}", vertName.toStdString());
     }
 
     return 0;

@@ -23,7 +23,6 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -38,7 +37,6 @@
 #include <QGuiApplication>
 #include <QImage>
 #include <QPainter>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -216,7 +214,6 @@ static QImage renderFrame(const FsSurface& surf,
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QGuiApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_movie");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -328,28 +325,25 @@ int main(int argc, char* argv[])
         if (QFile::exists(lhFile)) {
             auto read = InvSourceEstimate::read(lhFile.toStdU16String());
             if (!read) {
-                qCritical("%s", read.error().what());
+                Log::critical("{}", read.error().what());
                 return 1;
             }
             stcLH = std::move(*read);
-            qInfo("Read LH STC: %d sources x %d time points (tmin=%.3f, tstep=%.6f)",
-                  static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()),
-                  stcLH.tmin, stcLH.tstep);
+            Log::info("Read LH STC: {} sources x {} time points (tmin={:.3f}, tstep={:.6f})", static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()), stcLH.tmin, stcLH.tstep);
         }
 
         if (QFile::exists(rhFile)) {
             auto read = InvSourceEstimate::read(rhFile.toStdU16String());
             if (!read) {
-                qCritical("%s", read.error().what());
+                Log::critical("{}", read.error().what());
                 return 1;
             }
             stcRH = std::move(*read);
-            qInfo("Read RH STC: %d sources x %d time points",
-                  static_cast<int>(stcRH.data.rows()), static_cast<int>(stcRH.data.cols()));
+            Log::info("Read RH STC: {} sources x {} time points", static_cast<int>(stcRH.data.rows()), static_cast<int>(stcRH.data.cols()));
         }
 
         if (stcLH.empty() && stcRH.empty()) {
-            qCritical("No STC data loaded from prefix: %s", qPrintable(stcPrefix));
+            Log::critical("No STC data loaded from prefix: {}", stcPrefix.toStdString());
             return 1;
         }
     } else if (parser.isSet(invOpt) && parser.isSet(measOpt)) {
@@ -363,31 +357,29 @@ int main(int argc, char* argv[])
 
         auto invOpRead = MNEInverseOperator::read(invFile.toStdU16String());
         if (!invOpRead) {
-            qCritical("%s", invOpRead.error().what());
+            Log::critical("{}", invOpRead.error().what());
             return 1;
         }
         MNEInverseOperator& invOp = *invOpRead;
 
         auto read = FiffEvokedSet::read(measFile.toStdU16String());
         if (!read) {
-            qCritical("%s", read.error().what());
+            Log::critical("{}", read.error().what());
             return 1;
         }
         FiffEvokedSet& evokedSet = *read;
         if (setNo >= std::ssize(evokedSet.evoked)) {
-            qCritical("Set number %d out of range (have %lld sets).",
-                      setNo, static_cast<long long>(evokedSet.evoked.size()));
+            Log::critical("Set number {} out of range (have {} sets).", setNo, static_cast<long long>(evokedSet.evoked.size()));
             return 1;
         }
 
         FiffEvoked evoked = evokedSet.evoked[setNo];
-        qInfo("Computing inverse: %s, SNR=%.1f, lambda2=%.4f",
-              qPrintable(method), snr, lambda2);
+        Log::info("Computing inverse: {}, SNR={:.1f}, lambda2={:.4f}", method.toStdString(), snr, lambda2);
 
         InvMinimumNorm minimumNorm(invOp, lambda2, method.toStdString());
         stcLH = minimumNorm.calculateInverse(evoked);
         if (stcLH.empty()) {
-            qCritical("Inverse computation failed.");
+            Log::critical("Inverse computation failed.");
             return 1;
         }
 
@@ -396,10 +388,9 @@ int main(int argc, char* argv[])
             subject = "sample";
         }
 
-        qInfo("Computed STC: %d sources x %d time points",
-              static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()));
+        Log::info("Computed STC: {} sources x {} time points", static_cast<int>(stcLH.data.rows()), static_cast<int>(stcLH.data.cols()));
     } else {
-        qCritical("Provide either --stcin or both --inv and --meas.");
+        Log::critical("Provide either --stcin or both --inv and --meas.");
         return 1;
     }
 
@@ -436,16 +427,15 @@ int main(int argc, char* argv[])
 
         FsLabel label;
         if (!FsLabel::read(labelFile.toStdU16String(), label)) {
-            qCritical("Cannot read label: %s", qPrintable(labelFile));
+            Log::critical("Cannot read label: {}", labelFile.toStdString());
             return 1;
         }
 
-        qInfo("Extracting label time course for %lld vertices",
-              static_cast<long long>(label.vertices.size()));
+        Log::info("Extracting label time course for {} vertices", static_cast<long long>(label.vertices.size()));
 
         QFile outFile(labelOutFile);
         if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open output file: %s", qPrintable(labelOutFile));
+            Log::critical("Cannot open output file: {}", labelOutFile.toStdString());
             return 1;
         }
         QTextStream out(&outFile);
@@ -467,7 +457,7 @@ int main(int argc, char* argv[])
         }
 
         outFile.close();
-        qInfo("Written label time course to: %s", qPrintable(labelOutFile));
+        Log::info("Written label time course to: {}", labelOutFile.toStdString());
     }
 
     //=========================================================================
@@ -476,13 +466,13 @@ int main(int argc, char* argv[])
     QString pngPrefix = parser.value(pngOpt);
 
     if (pngPrefix.isEmpty()) {
-        qInfo("No --png specified; skipping frame rendering.");
-        qInfo("Use --png <prefix> to export image frames.");
+        Log::info("No --png specified; skipping frame rendering.");
+        Log::info("Use --png <prefix> to export image frames.");
         return 0;
     }
 
     if (subject.isEmpty() || subjectsDir.isEmpty()) {
-        qCritical("--subject and --subjects-dir (or $SUBJECTS_DIR) are required for rendering.");
+        Log::critical("--subject and --subjects-dir (or $SUBJECTS_DIR) are required for rendering.");
         return 1;
     }
 
@@ -495,17 +485,15 @@ int main(int argc, char* argv[])
         QString surfPath = subjectsDir + "/" + subject + "/surf/" + hemi + "." + surfName;
         FsSurface surf;
         if (!FsSurface::read(surfPath.toStdU16String(), surf)) {
-            qCritical("Cannot read surface: %s", qPrintable(surfPath));
+            Log::critical("Cannot read surface: {}", surfPath.toStdString());
             return;
         }
-        qInfo("Loaded surface %s: %d vertices, %d triangles",
-              qPrintable(surfPath), static_cast<int>(surf.rr().rows()),
-              static_cast<int>(surf.tris().rows()));
+        Log::info("Loaded surface {}: {} vertices, {} triangles", surfPath.toStdString(), static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
 
         // Select the appropriate STC for this hemisphere
         const InvSourceEstimate& hemiStc = (hemi == "lh") ? stcLH : stcRH;
         if (hemiStc.empty()) {
-            qInfo("No STC data for %s hemisphere, skipping.", qPrintable(hemi));
+            Log::info("No STC data for {} hemisphere, skipping.", hemi.toStdString());
             return;
         }
 
@@ -534,7 +522,7 @@ int main(int argc, char* argv[])
 
             QString framePath = QString("%1-%2-%3.png").arg(pngPrefix).arg(hemi).arg(frameCount, 5, 10, QChar('0'));
             if (!frame.save(framePath)) {
-                qCritical("Cannot save frame: %s", qPrintable(framePath));
+                Log::critical("Cannot save frame: {}", framePath.toStdString());
                 return;
             }
             frameCount++;
@@ -546,10 +534,9 @@ int main(int argc, char* argv[])
     if (doRH)
         renderHemi("rh");
 
-    qInfo("Exported %d frame(s) to %s-*.png", frameCount, qPrintable(pngPrefix));
-    qInfo("\nTo create a movie, use:");
-    qInfo("  ffmpeg -framerate 24 -i %s-lh-%%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4",
-          qPrintable(pngPrefix));
+    Log::info("Exported {} frame(s) to {}-*.png", frameCount, pngPrefix.toStdString());
+    Log::info("\nTo create a movie, use:");
+    Log::info("  ffmpeg -framerate 24 -i {}-lh-%05d.png -c:v libx264 -pix_fmt yuv420p movie.mp4", pngPrefix.toStdString());
 
     return 0;
 }

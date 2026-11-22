@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <fiff/fiff_byte_swap.h>
 
 //=============================================================================================================
@@ -270,7 +271,7 @@ void TestFiffByteSwap::testSwapDoublepKnown()
 
 void TestFiffByteSwap::cleanupTestCase()
 {
-    qInfo() << "TestFiffByteSwap: All tests completed";
+    Log::info("TestFiffByteSwap: All tests completed");
 }
 
 //=============================================================================================================

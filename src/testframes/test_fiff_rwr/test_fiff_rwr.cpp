@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_forward_solution.h>
@@ -162,8 +161,7 @@ TestFiffRWR::TestFiffRWR()
 
 void TestFiffRWR::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qDebug() << "dEpsilon" << dEpsilon;
+    Log::debug("dEpsilon {}", dEpsilon);
 
     QVERIFY(m_tempDir.isValid());
 

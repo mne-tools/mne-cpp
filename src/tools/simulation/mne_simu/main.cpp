@@ -19,7 +19,6 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -30,7 +29,6 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,7 +62,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_simu");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -110,45 +107,45 @@ int main(int argc, char* argv[])
     double signalFreq = parser.value(freqOpt).toDouble();
 
     if (fwdFile.isEmpty()) {
-        qCritical("--fwd is required.");
+        Log::critical("--fwd is required.");
         parser.showHelp(1);
     }
     if (rawFile.isEmpty()) {
-        qCritical("--raw is required.");
+        Log::critical("--raw is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
 
     // Load forward solution
     auto fwdRead = MNEForwardSolution::read(fwdFile.toStdU16String());
     if (!fwdRead) {
-        qCritical("%s", fwdRead.error().what());
+        Log::critical("{}", fwdRead.error().what());
         return 1;
     }
     MNEForwardSolution& fwd = *fwdRead;
 
     int nChan = fwd.sol.data.rows();
     int nSrc = fwd.sol.data.cols();
-    qInfo("Forward: %d channels x %d sources", nChan, nSrc);
+    Log::info("Forward: {} channels x {} sources", nChan, nSrc);
 
     if (sourceIdx < 0 || sourceIdx >= nSrc) {
-        qCritical("Source index %d out of range [0, %d)", sourceIdx, nSrc);
+        Log::critical("Source index {} out of range [0, {})", sourceIdx, nSrc);
         return 1;
     }
 
     // Load raw file for channel info
     FiffRawData raw(rawFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read raw: %s", qPrintable(rawFile));
+        Log::critical("Cannot read raw: {}", rawFile.toStdString());
         return 1;
     }
 
     double sfreq = raw.info.sfreq;
     int nSamples = static_cast<int>(duration * sfreq);
-    qInfo("Sampling rate: %.1f Hz, duration: %.1f s, samples: %d", sfreq, duration, nSamples);
+    Log::info("Sampling rate: {:.1f} Hz, duration: {:.1f} s, samples: {}", sfreq, duration, nSamples);
 
     // Get gain vector for selected source
     VectorXd gainCol = fwd.sol.data.col(sourceIdx);
@@ -162,7 +159,7 @@ int main(int argc, char* argv[])
 
     // Compute simulated sensor data: data = gain * signal
     MatrixXd data = gainCol * sourceSignal.transpose();
-    qInfo("Signal: source=%d, freq=%.1f Hz, amplitude=1 nAm", sourceIdx, signalFreq);
+    Log::info("Signal: source={}, freq={:.1f} Hz, amplitude=1 nAm", sourceIdx, signalFreq);
 
     // Add noise if covariance provided
     if (!covFile.isEmpty()) {
@@ -188,9 +185,9 @@ int main(int argc, char* argv[])
 
             noise = noiseScale * L * noise;
             data += noise;
-            qInfo("Added noise: SNR=%.1f dB, noise scale=%g", snrDb, noiseScale);
+            Log::info("Added noise: SNR={:.1f} dB, noise scale={:g}", snrDb, noiseScale);
         } else {
-            qInfo("Warning: Covariance dimensions mismatch, skipping noise.");
+            Log::info("Warning: Covariance dimensions mismatch, skipping noise.");
         }
     } else {
         // Add simple white noise based on SNR
@@ -204,14 +201,14 @@ int main(int argc, char* argv[])
         for (int i = 0; i < nChan; ++i)
             for (int t = 0; t < nSamples; ++t)
                 data(i, t) += dist(rng);
-        qInfo("Added white noise: SNR=%.1f dB", snrDb);
+        Log::info("Added white noise: SNR={:.1f} dB", snrDb);
     }
 
     // Write output
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), raw.info, cals);
     if (!stream) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
 
@@ -224,6 +221,6 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written simulated data to: %s", qPrintable(outFile));
+    Log::info("Written simulated data to: {}", outFile.toStdString());
     return 0;
 }

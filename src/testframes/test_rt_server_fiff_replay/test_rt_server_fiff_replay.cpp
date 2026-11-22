@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_device.h>
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
@@ -421,7 +422,7 @@ void TestRtServerFiffReplay::streamsTheFile()
 void TestRtServerFiffReplay::cleanupTestCase()
 {
     if (m_server.state() == QProcess::NotRunning) {
-        qWarning("mne_rt_server exited early (%d): %s", m_server.exitCode(), m_server.readAll().constData());
+        Log::warning("mne_rt_server exited early ({}): {}", m_server.exitCode(), m_server.readAll().constData());
     } else {
         m_server.kill();
         m_server.waitForFinished(10000);

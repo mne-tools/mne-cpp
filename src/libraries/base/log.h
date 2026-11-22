@@ -18,7 +18,7 @@
  * Libraries report through @ref mne::Log, whose interface is standard C++ only. By default every
  * message is printed, results to stdout and diagnostics to stderr, optionally mirrored to a log file;
  * a sink set with @ref mne::Log::set_sink receives them instead. @ref mne::LogCapture records messages for
- * the lifetime of a scope. Qt programs connect Log and Qt's message handler with base/log_qt.h.
+ * the lifetime of a scope. Programs, Qt-based ones included, log through Log as well.
  */
 
 #ifndef BASE_LOG_H

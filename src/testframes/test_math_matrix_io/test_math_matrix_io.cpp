@@ -16,7 +16,6 @@
 
 #include <math/matrix_io.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -90,7 +89,6 @@ void TestMatrixIo::writeText(const std::string& name, const std::string& text) c
 
 void TestMatrixIo::initTestCase()
 {
-    mne::install_qt_message_handler();
     QVERIFY(m_tempDir.isValid());
 }
 

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mne_show_fiff_settings.h"
 
 #include <base/base_global.h>
@@ -67,7 +68,7 @@ MNEShowFiffSettings::MNEShowFiffSettings(int* argc, char** argv)
     if (!check_args(argc, argv))
         return;
 
-    qInfo("%s version %s compiled at %s", argv[0], PROGRAM_VERSION, mne::build_date_time());
+    mne::Log::info("{} version {} compiled at {}", argv[0], PROGRAM_VERSION, mne::build_date_time());
 
     checkIntegrity();
 }
@@ -94,17 +95,17 @@ void MNEShowFiffSettings::checkIntegrity()
 
 void MNEShowFiffSettings::usage(char* name)
 {
-    qInfo("usage: %s [options]", name);
-    qInfo("List contents of a fif file to stdout");
-    qInfo("\t--in name         The input file.");
-    qInfo("\t--fif name        Synonym for the above.");
-    qInfo("\t--blocks          Only list the blocks (the tree structure)");
-    qInfo("\t--verbose         Verbose output.");
-    qInfo("\t--indent no       Number of spaces to use in indentation (default %d in terse and 0 in verbose output)", indent);
-    qInfo("\t--tag no          Provide information about these tags (can have multiple of these).");
-    qInfo("\t--long            Print long strings in full?");
-    qInfo("\t--help            print this info.");
-    qInfo("\t--version         print version info.\n");
+    mne::Log::info("usage: {} [options]", name);
+    mne::Log::info("List contents of a fif file to stdout");
+    mne::Log::info("\t--in name         The input file.");
+    mne::Log::info("\t--fif name        Synonym for the above.");
+    mne::Log::info("\t--blocks          Only list the blocks (the tree structure)");
+    mne::Log::info("\t--verbose         Verbose output.");
+    mne::Log::info("\t--indent no       Number of spaces to use in indentation (default {} in terse and 0 in verbose output)", indent);
+    mne::Log::info("\t--tag no          Provide information about these tags (can have multiple of these).");
+    mne::Log::info("\t--long            Print long strings in full?");
+    mne::Log::info("\t--help            print this info.");
+    mne::Log::info("\t--version         print version info.\n");
 }
 
 
@@ -116,8 +117,8 @@ bool MNEShowFiffSettings::check_unrecognized_args(int argc, char** argv)
         QStringList unrecognized;
         for (int k = 1; k < argc; k++)
             unrecognized << QString::fromLocal8Bit(argv[k]);
-        qCritical("Unrecognized arguments : %s", qPrintable(unrecognized.join(' ')));
-        qCritical("Check the command line.");
+        mne::Log::critical("Unrecognized arguments : {}", unrecognized.join(' ').toStdString());
+        mne::Log::critical("Check the command line.");
         return false;
     }
     return true;
@@ -135,7 +136,7 @@ bool MNEShowFiffSettings::check_args(int* argc, char** argv)
     for (k = 0; k < *argc; k++) {
         found = 0;
         if (strcmp(argv[k], "--version") == 0) {
-            qInfo("%s version %s compiled at %s", argv[0], PROGRAM_VERSION, mne::build_date_time());
+            mne::Log::info("{} version {} compiled at {}", argv[0], PROGRAM_VERSION, mne::build_date_time());
             exit(0);
         } else if (strcmp(argv[k], "--help") == 0) {
             usage(argv[0]);
@@ -143,40 +144,40 @@ bool MNEShowFiffSettings::check_args(int* argc, char** argv)
         } else if (strcmp(argv[k], "--in") == 0) {
             found = 2;
             if (k == *argc - 1) {
-                qCritical("--in: argument required.");
+                mne::Log::critical("--in: argument required.");
                 return false;
             }
             inname = QString(argv[k + 1]);
         } else if (strcmp(argv[k], "--fif") == 0) {
             found = 2;
             if (k == *argc - 1) {
-                qCritical("--fif: argument required.");
+                mne::Log::critical("--fif: argument required.");
                 return false;
             }
             inname = QString(argv[k + 1]);
         } else if (strcmp(argv[k], "--tag") == 0) {
             found = 2;
             if (k == *argc - 1) {
-                qCritical("--tag: argument required.");
+                mne::Log::critical("--tag: argument required.");
                 return false;
             }
             bool bOk = false;
             val = QString::fromUtf8(argv[k + 1]).toInt(&bOk);
             if (!bOk) {
-                qCritical("Incomprehensible tag number : %s", argv[k + 1]);
+                mne::Log::critical("Incomprehensible tag number : {}", argv[k + 1]);
                 return false;
             }
             tags.append(val);
         } else if (strcmp(argv[k], "--indent") == 0) {
             found = 2;
             if (k == *argc - 1) {
-                qCritical("--indent: argument required.");
+                mne::Log::critical("--indent: argument required.");
                 return false;
             }
             bool bOk = false;
             val = QString::fromUtf8(argv[k + 1]).toInt(&bOk);
             if (!bOk) {
-                qCritical("Incomprehensible number : %s", argv[k + 1]);
+                mne::Log::critical("Incomprehensible number : {}", argv[k + 1]);
                 return false;
             }
             if (val >= 0)

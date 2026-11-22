@@ -22,13 +22,19 @@
 #include "pluginoutputdata.h"
 
 #include <scMeas/measurement.h>
+#include <base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QSharedPointer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdlib>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::scan
@@ -55,9 +61,10 @@ PluginOutputData<T>::PluginOutputData(AbstractPlugin* parent,
 
     QSharedPointer<mne::scan::Measurement> t_measurement = qSharedPointerDynamicCast<mne::scan::Measurement>(m_pMeasurement);
 
-    if (t_measurement.isNull())
-        qFatal("Template type is not a measurement and therefor not supported!");
-    else
+    if (t_measurement.isNull()) {
+        mne::Log::critical("Template type is not a measurement and therefor not supported!");
+        std::abort();
+    } else
         connect(t_measurement.data(), &mne::scan::Measurement::notify,
                 this, &PluginOutputData<T>::update, Qt::DirectConnection);
 }

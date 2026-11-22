@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
 #include <acq/acq_reader.h>
@@ -209,7 +210,7 @@ Replayed replay(const std::string& uri, std::uint64_t limit = 0)
     Replayed out;
     auto device = AcqDevice::open(uri);
     if (!device) {
-        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
+        Log::warning("open({}): {}", uri, device.error().text());
         return out;
     }
     out.description = device->description();
@@ -258,12 +259,12 @@ std::vector<double> reference(const QString& path)
 bool bitEqual(const std::vector<double>& a, const std::vector<double>& b)
 {
     if (a.size() != b.size()) {
-        qWarning("sizes differ: %zu vs %zu", a.size(), b.size());
+        Log::warning("sizes differ: {} vs {}", a.size(), b.size());
         return false;
     }
     for (std::size_t i = 0; i < a.size(); ++i) {
         if (std::bit_cast<std::uint64_t>(a[i]) != std::bit_cast<std::uint64_t>(b[i])) {
-            qWarning("first difference at %zu: %.17g vs %.17g", i, a[i], b[i]);
+            Log::warning("first difference at {}: {:.17g} vs {:.17g}", i, a[i], b[i]);
             return false;
         }
     }

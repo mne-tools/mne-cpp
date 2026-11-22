@@ -19,7 +19,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +29,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QFileInfo>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -54,7 +52,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_prepare_bem_model");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -80,7 +77,7 @@ int main(int argc, char* argv[])
     QString methodStr = parser.value(methodOpt).toLower();
 
     if (bemFile.isEmpty()) {
-        qCritical("--bem is required.");
+        Log::critical("--bem is required.");
         parser.showHelp(1);
     }
 
@@ -90,7 +87,7 @@ int main(int argc, char* argv[])
     else if (methodStr == "constant")
         bemMethod = FWD_BEM_CONSTANT_COLL;
     else {
-        qCritical("Unknown method: %s (use 'linear' or 'constant')", qPrintable(methodStr));
+        Log::critical("Unknown method: {} (use 'linear' or 'constant')", methodStr.toStdString());
         return 1;
     }
 
@@ -98,50 +95,45 @@ int main(int argc, char* argv[])
     if (solFile.isEmpty())
         solFile = QString::fromStdU16String(FwdBemModel::fwd_bem_make_bem_sol_name(bemFile.toStdU16String()).u16string());
 
-    qInfo("BEM model file:    %s", qPrintable(bemFile));
-    qInfo("BEM solution file: %s", qPrintable(solFile));
-    qInfo("BEM method:        %s",
-          FwdBemModel::fwd_bem_explain_method(bemMethod).c_str());
+    Log::info("BEM model file:    {}", bemFile.toStdString());
+    Log::info("BEM solution file: {}", solFile.toStdString());
+    Log::info("BEM method:        {}", FwdBemModel::fwd_bem_explain_method(bemMethod));
 
     // Determine how many layers we have
     // Try three-layer first, fall back to single-layer
     std::unique_ptr<FwdBemModel> bemModel;
     bemModel = FwdBemModel::fwd_bem_load_three_layer_surfaces(bemFile.toStdU16String());
     if (!bemModel) {
-        qInfo("Not a three-layer model, trying single-layer (homogeneous)...");
+        Log::info("Not a three-layer model, trying single-layer (homogeneous)...");
         bemModel = FwdBemModel::fwd_bem_load_homog_surface(bemFile.toStdU16String());
     }
 
     if (!bemModel) {
-        qCritical("Cannot load BEM surfaces from: %s", qPrintable(bemFile));
+        Log::critical("Cannot load BEM surfaces from: {}", bemFile.toStdString());
         return 1;
     }
 
-    qInfo("Loaded %d BEM surface(s)", bemModel->nsurf);
+    Log::info("Loaded {} BEM surface(s)", bemModel->nsurf);
     for (int k = 0; k < bemModel->nsurf; ++k) {
-        qInfo("  Surface %d: %s  (%d vertices, %d triangles)",
-              k + 1,
-              FwdBemModel::fwd_bem_explain_surface(bemModel->surfs[k]->id).c_str(),
-              bemModel->surfs[k]->np,
-              bemModel->surfs[k]->ntri);
+        Log::info("  Surface {}: {}  ({} vertices, {} triangles)", k + 1, FwdBemModel::fwd_bem_explain_surface(bemModel->surfs[k]->id), bemModel->surfs[k]->np, bemModel->surfs[k]->ntri);
     }
 
     // Compute the BEM solution
-    qInfo("\nComputing BEM solution...");
+    Log::info("\nComputing BEM solution...");
     if (bemModel->fwd_bem_compute_solution(bemMethod) != 0) {
-        qCritical("BEM solution computation failed.");
+        Log::critical("BEM solution computation failed.");
         return 1;
     }
-    qInfo("BEM solution computed successfully.");
+    Log::info("BEM solution computed successfully.");
 
     // Save the solution
-    qInfo("Writing solution to: %s", qPrintable(solFile));
+    Log::info("Writing solution to: {}", solFile.toStdString());
 
     if (bemModel->fwd_bem_save_model(solFile.toStdU16String()) != 0) {
-        qCritical("Cannot write output file: %s", qPrintable(solFile));
+        Log::critical("Cannot write output file: {}", solFile.toStdString());
         return 1;
     }
 
-    qInfo("BEM solution saved.");
+    Log::info("BEM solution saved.");
     return 0;
 }

@@ -21,7 +21,6 @@
 #include <fiff/fiff_constants.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -32,7 +31,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,7 +55,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_check_eeg_locations");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -75,7 +72,7 @@ int main(int argc, char* argv[])
     QString measName = parser.value(measOpt);
 
     if (measName.isEmpty()) {
-        qCritical("The --meas option is required.");
+        Log::critical("The --meas option is required.");
         parser.showHelp(1);
     }
 
@@ -83,11 +80,11 @@ int main(int argc, char* argv[])
     FiffRawData raw(measName.toStdU16String());
 
     if (raw.info.chs.empty()) {
-        qCritical("No channel information found in %s", qPrintable(measName));
+        Log::critical("No channel information found in {}", measName.toStdString());
         return 1;
     }
 
-    qInfo("Opened %s : %d channels", qPrintable(measName), raw.info.nchan);
+    Log::info("Opened {} : {} channels", measName.toStdString(), raw.info.nchan);
 
     // Collect EEG channels
     struct EegEntry
@@ -110,19 +107,18 @@ int main(int argc, char* argv[])
     }
 
     if (eegChannels.isEmpty()) {
-        qInfo("No EEG channels found.");
+        Log::info("No EEG channels found.");
         return 0;
     }
 
-    qInfo("Found %d EEG channels.", static_cast<int>(eegChannels.size()));
+    Log::info("Found {} EEG channels.", static_cast<int>(eegChannels.size()));
 
     int nProblems = 0;
 
     // Check 1: Undefined locations (all zeros)
     for (const auto& e : eegChannels) {
         if (e.pos.norm() < 1e-10f) {
-            qWarning("WARNING: %s (ch %d): location is undefined (all zeros).",
-                     qPrintable(e.name), e.index + 1);
+            Log::warning("WARNING: {} (ch {}): location is undefined (all zeros).", e.name.toStdString(), e.index + 1);
             ++nProblems;
         }
     }
@@ -137,10 +133,7 @@ int main(int argc, char* argv[])
                 continue;
             float dist = (eegChannels[i].pos - eegChannels[j].pos).norm();
             if (dist < dupTol) {
-                qWarning("WARNING: %s and %s have duplicate positions (distance = %.4f mm).",
-                         qPrintable(eegChannels[i].name),
-                         qPrintable(eegChannels[j].name),
-                         dist * 1000.0f);
+                Log::warning("WARNING: {} and {} have duplicate positions (distance = {:.4f} mm).", eegChannels[i].name.toStdString(), eegChannels[j].name.toStdString(), dist * 1000.0f);
                 ++nProblems;
             }
         }
@@ -154,19 +147,17 @@ int main(int argc, char* argv[])
             continue; // skip undefined
         float r = e.pos.norm();
         if (r < minRadius || r > maxRadius) {
-            qWarning("WARNING: %s (ch %d): distance from origin = %.1f mm (expected %.0f-%.0f mm).",
-                     qPrintable(e.name), e.index + 1,
-                     r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
+            Log::warning("WARNING: {} (ch {}): distance from origin = {:.1f} mm (expected {:.0f}-{:.0f} mm).", e.name.toStdString(), e.index + 1, r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
             ++nProblems;
         }
     }
 
     // Summary
     if (nProblems == 0) {
-        qInfo("All %d EEG channels have valid locations.", static_cast<int>(eegChannels.size()));
+        Log::info("All {} EEG channels have valid locations.", static_cast<int>(eegChannels.size()));
         return 0;
     } else {
-        qInfo("\n%d problem(s) found in %d EEG channels.", nProblems, static_cast<int>(eegChannels.size()));
+        Log::info("\n{} problem(s) found in {} EEG channels.", nProblems, static_cast<int>(eegChannels.size()));
         return 1;
     }
 }

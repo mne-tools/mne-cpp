@@ -24,7 +24,6 @@
 
 #include <inv/inv_source_estimate.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -286,8 +285,6 @@ bool TestMneComputeRawInverse::readStc(const QString& path, InvSourceEstimate& s
 
 void TestMneComputeRawInverse::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> mne_compute_raw_inverse Integration Test Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     m_sDataPath = findDataPath();

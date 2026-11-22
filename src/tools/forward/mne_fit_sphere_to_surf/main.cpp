@@ -22,7 +22,6 @@
 #include <math/sphere.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -34,7 +33,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,7 +57,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_fit_sphere_to_surf");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -81,7 +78,7 @@ int main(int argc, char* argv[])
     QString outName = parser.value(outOpt);
 
     if (surfName.isEmpty() || outName.isEmpty()) {
-        qCritical("Both --surf and --out are required.");
+        Log::critical("Both --surf and --out are required.");
         parser.showHelp(1);
     }
 
@@ -93,7 +90,7 @@ int main(int argc, char* argv[])
     // Attempt FIFF BEM
     if (auto bem = MNEBem::read(surfName.toStdU16String())) {
         vertices = (*bem)[0].rr;
-        qInfo("Read FIFF BEM surface: %d vertices", static_cast<int>(vertices.rows()));
+        Log::info("Read FIFF BEM surface: {} vertices", static_cast<int>(vertices.rows()));
         loaded = true;
     }
 
@@ -102,35 +99,35 @@ int main(int argc, char* argv[])
         FsSurface surf;
         if (FsSurface::read(surfName.toStdU16String(), surf, false)) {
             vertices = surf.rr();
-            qInfo("Read FreeSurfer surface: %d vertices", static_cast<int>(vertices.rows()));
+            Log::info("Read FreeSurfer surface: {} vertices", static_cast<int>(vertices.rows()));
             loaded = true;
         }
     }
 
     if (!loaded) {
-        qCritical("Cannot read surface from: %s", qPrintable(surfName));
+        Log::critical("Cannot read surface from: {}", surfName.toStdString());
         return 1;
     }
 
     if (vertices.rows() < 4) {
-        qCritical("Need at least 4 vertices to fit a sphere, got %d.", static_cast<int>(vertices.rows()));
+        Log::critical("Need at least 4 vertices to fit a sphere, got {}.", static_cast<int>(vertices.rows()));
         return 1;
     }
 
     // Fit sphere using simplex method
-    qInfo("Fitting sphere to %d points...", static_cast<int>(vertices.rows()));
+    Log::info("Fitting sphere to {} points...", static_cast<int>(vertices.rows()));
     Sphere sphere = Sphere::fit_sphere_simplex(vertices);
 
     Vector3f center = sphere.center();
     float radius = sphere.radius();
 
-    qInfo("Sphere center : %10.6f %10.6f %10.6f m", center(0), center(1), center(2));
-    qInfo("Sphere radius : %10.6f m", radius);
+    Log::info("Sphere center : {:10.6f} {:10.6f} {:10.6f} m", center(0), center(1), center(2));
+    Log::info("Sphere radius : {:10.6f} m", radius);
 
     // Write output
     QFile outFile(outName);
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outName));
+        Log::critical("Cannot open output file: {}", outName.toStdString());
         return 1;
     }
 
@@ -140,7 +137,7 @@ int main(int argc, char* argv[])
     out << center(0) << " " << center(1) << " " << center(2) << " " << radius << "\n";
     outFile.close();
 
-    qInfo("Wrote sphere parameters to %s", qPrintable(outName));
+    Log::info("Wrote sphere parameters to {}", outName.toStdString());
 
     return 0;
 }

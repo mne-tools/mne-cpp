@@ -31,6 +31,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "../common/python_guard.h"
 #include <sts/sts_cov_estimators.h>
 #include <fiff/fiff.h>
@@ -145,10 +146,7 @@ void TestCrossvalCovariance::initTestCase()
     bool hasSklearn = hasPython && m_pyHelper.has_package("sklearn");
     m_bPythonAvailable = hasMne && hasSklearn;
 
-    qDebug() << "Python detection: python3=" << hasPython
-             << " mne=" << hasMne
-             << " sklearn=" << hasSklearn
-             << " MNE_REQUIRE_PYTHON=" << PythonTestHelper::is_python_required();
+    Log::debug("Python detection: python3= {} mne= {} sklearn= {} MNE_REQUIRE_PYTHON= {}", hasPython, hasMne, hasSklearn, PythonTestHelper::is_python_required());
 
     // --- C++ covariance (always computed) ---
     computeCppCovariance();
@@ -196,9 +194,7 @@ void TestCrossvalCovariance::computeCppCovariance()
     QCOMPARE(m_cppCov.cols(), m_nChannels);
     QVERIFY(m_cppAlpha >= 0.0 && m_cppAlpha <= 1.0);
 
-    qDebug() << "C++ Ledoit-Wolf: channels =" << m_nChannels
-             << ", samples =" << data.cols()
-             << ", shrinkage =" << m_cppAlpha;
+    Log::debug("C++ Ledoit-Wolf: channels = {} , samples = {} , shrinkage = {}", m_nChannels, data.cols(), m_cppAlpha);
 }
 
 //=============================================================================================================
@@ -260,7 +256,7 @@ void TestCrossvalCovariance::computePythonCovariance()
     QCOMPARE(m_pyCov.rows(), m_nChannels);
     QCOMPARE(m_pyCov.cols(), m_nChannels);
 
-    qDebug() << "Python Ledoit-Wolf: shrinkage =" << m_pyAlpha;
+    Log::debug("Python Ledoit-Wolf: shrinkage = {}", m_pyAlpha);
 }
 
 //=============================================================================================================
@@ -284,9 +280,7 @@ void TestCrossvalCovariance::testLedoitWolfCovarianceVsPython()
     double frobDiff = (m_cppCov - m_pyCov).norm();
     double relDiff = frobDiff / frobCpp;
 
-    qDebug() << "Covariance Frobenius norm (C++):" << frobCpp
-             << "  diff:" << frobDiff
-             << "  relative:" << relDiff;
+    Log::debug("Covariance Frobenius norm (C++): {}  diff: {}  relative: {}", frobCpp, frobDiff, relDiff);
 
     // Relative tolerance: 2% — generous enough for minor implementation
     // differences (e.g. normalization 1/n vs 1/(n-1)) but tight enough to
@@ -311,9 +305,7 @@ void TestCrossvalCovariance::testLedoitWolfShrinkageVsPython()
     //
     double absDiff = qAbs(m_cppAlpha - m_pyAlpha);
 
-    qDebug() << "Shrinkage C++:" << m_cppAlpha
-             << " Python:" << m_pyAlpha
-             << " |diff|:" << absDiff;
+    Log::debug("Shrinkage C++: {} Python: {} |diff|: {}", m_cppAlpha, m_pyAlpha, absDiff);
 
     // Absolute tolerance: 0.02 — both should agree on the shrinkage
     // coefficient within 2 percentage points.

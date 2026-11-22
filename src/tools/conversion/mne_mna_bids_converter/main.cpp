@@ -30,7 +30,6 @@
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,7 +42,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -169,7 +167,7 @@ static std::optional<MnaProject> readProject(const QString& path)
 {
     Expected<MnaProject> project = MnaIO::read(fsPath(path));
     if (!project) {
-        qCritical().noquote().nospace() << "failed to read project: " << project.error().what();
+        Log::critical("failed to read project: {}", project.error().what());
         return std::nullopt;
     }
     return std::move(*project);
@@ -179,10 +177,10 @@ static std::optional<MnaProject> readProject(const QString& path)
 static int writeProject(const MnaProject& project, const QString& path, const QString& done)
 {
     if (const Expected<void> written = MnaIO::write(project, fsPath(path)); !written) {
-        qCritical().noquote().nospace() << "failed to write " << written.error().what();
+        Log::critical("failed to write {}", written.error().what());
         return 1;
     }
-    qInfo().noquote().nospace() << done;
+    Log::info("{}", done.toStdString());
     return 0;
 }
 
@@ -195,7 +193,7 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
 {
     std::optional<MnaProject> read = readProject(inputPath);
     if (!read || read->subjects.empty()) {
-        qCritical().noquote().nospace() << "empty project: " << inputPath;
+        Log::critical("empty project: {}", inputPath.toStdString());
         return 1;
     }
     const MnaProject& proj = *read;
@@ -219,10 +217,10 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                     if (ref.embedded && !ref.data.empty()) {
                         QDir().mkpath(QFileInfo(fullPath).absolutePath());
                         if (write_file_bytes(fsPath(fullPath), ref.data)) {
-                            qInfo().noquote().nospace() << "  extracted: " << relPath;
+                            Log::info("  extracted: {}", relPath.toStdString());
                             ++extracted;
                         } else {
-                            qCritical().noquote().nospace() << "Failed: " << relPath;
+                            Log::critical("Failed: {}", relPath.toStdString());
                         }
                     } else if (!ref.embedded) {
                         // Copy from source location relative to the project file
@@ -232,17 +230,17 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                         if (QFile::exists(srcPath)) {
                             QDir().mkpath(QFileInfo(fullPath).absolutePath());
                             if (QFile::copy(srcPath, fullPath)) {
-                                qInfo().noquote().nospace() << "  copied:    " << relPath;
+                                Log::info("  copied:    {}", relPath.toStdString());
                                 ++extracted;
                             } else {
-                                qCritical().noquote().nospace() << "Failed: " << relPath << " (copy error)";
+                                Log::critical("Failed: {} (copy error)", relPath.toStdString());
                             }
                         } else {
-                            qWarning().noquote().nospace() << "Skipped: " << refPath << " (source not found)";
+                            Log::warning("Skipped: {} (source not found)", refPath.toStdString());
                             ++skipped;
                         }
                     } else {
-                        qWarning().noquote().nospace() << "Skipped: " << refPath << " (empty embedded data)";
+                        Log::warning("Skipped: {} (empty embedded data)", refPath.toStdString());
                         ++skipped;
                     }
                 }
@@ -268,7 +266,7 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
         return 1;
     }
 
-    qInfo().noquote().nospace() << "  Done. Extracted: " << extracted << "  Skipped: " << skipped;
+    Log::info("  Done. Extracted: {}  Skipped: {}", extracted, skipped);
     return 0;
 }
 
@@ -288,7 +286,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
             return 1;
         }
         proj = std::move(*sidecar);
-        qInfo().noquote().nospace() << "  Using existing sidecar: " << sidecarPath;
+        Log::info("  Using existing sidecar: {}", sidecarPath.toStdString());
 
         if (embed) {
             // Read file data into each ref
@@ -298,7 +296,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                         for (MnaFileRef& ref : rec.files) {
                             const QString filePath = QDir(inputDir).filePath(QString::fromStdString(ref.path));
                             if (!ref.embed(fsPath(filePath))) {
-                                qWarning().noquote().nospace() << "cannot read " << filePath;
+                                Log::warning("cannot read {}", filePath.toStdString());
                             }
                         }
                     }
@@ -307,7 +305,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
         }
     } else {
         // Scan the directory for BIDS structure: sub-*/ses-*/<modality>/*
-        qInfo().noquote().nospace() << "  Scanning BIDS directory: " << inputDir;
+        Log::info("  Scanning BIDS directory: {}", inputDir.toStdString());
 
         proj.name = "BIDS Import";
         proj.description = "Imported from BIDS directory";
@@ -363,14 +361,14 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
 
                         if (embed) {
                             if (!ref.embed(fsPath(absPath))) {
-                                qWarning().noquote().nospace() << "cannot read " << absPath;
+                                Log::warning("cannot read {}", absPath.toStdString());
                             }
                         } else {
                             ref.embedded = false;
                             ref.size_bytes = QFileInfo(absPath).size();
                         }
 
-                        qInfo().noquote().nospace() << "  + " << QString::fromUtf8(to_string(ref.role)) << "  " << QString::fromStdString(ref.path);
+                        Log::info("  + {}  {}", QString::fromUtf8(to_string(ref.role)).toStdString(), QString::fromStdString(ref.path).toStdString());
                         rec.files.push_back(std::move(ref));
                     }
                 }
@@ -416,9 +414,9 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
                             const QString filePath = QDir::cleanPath(QDir(projDir).filePath(QString::fromStdString(ref.path)));
                             if (ref.embed(fsPath(filePath))) {
                                 ref.path = QFileInfo(filePath).fileName().toStdString();
-                                qInfo().noquote().nospace() << "  embedded: " << filePath;
+                                Log::info("  embedded: {}", filePath.toStdString());
                             } else {
-                                qWarning().noquote().nospace() << "cannot read " << filePath << ", keeping as reference";
+                                Log::warning("cannot read {}, keeping as reference", filePath.toStdString());
                             }
                         }
                     }
@@ -429,7 +427,7 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
 
     // When converting .mnx → .mna, strip embedded data (files must be extracted first)
     if (outSuffix == QLatin1String("mna") && inSuffix == QLatin1String("mnx")) {
-        qInfo().noquote().nospace() << "  Note: embedded data will be dropped. Use 'extract' first to write files to disk.";
+        Log::info("  Note: embedded data will be dropped. Use 'extract' first to write files to disk.");
         for (MnaSubject& subj : proj.subjects) {
             for (MnaSession& sess : subj.sessions) {
                 for (MnaRecording& rec : sess.recordings) {
@@ -466,7 +464,6 @@ static void printUsage(QTextStream& out)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_mna_bids_converter"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
@@ -495,7 +492,7 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("extract")) {
         if (args.size() < 2) {
-            qCritical().noquote().nospace() << "extract requires <input> <output_dir>";
+            Log::critical("extract requires <input> <output_dir>");
             return 1;
         }
         return cmdExtract(args[0], args[1]);
@@ -503,7 +500,7 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("pack")) {
         if (args.size() < 2) {
-            qCritical().noquote().nospace() << "pack requires <bids_dir> <output.mnx|mna>";
+            Log::critical("pack requires <bids_dir> <output.mnx|mna>");
             return 1;
         }
         bool embed;
@@ -518,13 +515,13 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("convert")) {
         if (args.size() < 2) {
-            qCritical().noquote().nospace() << "convert requires <input> <output>";
+            Log::critical("convert requires <input> <output>");
             return 1;
         }
         return cmdConvert(args[0], args[1]);
     }
 
-    qCritical().noquote().nospace() << "unknown command '" << cmd << "'";
+    Log::critical("unknown command '{}'", cmd.toStdString());
     printUsage(err);
     return 1;
 }

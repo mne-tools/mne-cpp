@@ -15,7 +15,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <connectivity/network/network.h>
 
 //=============================================================================================================
@@ -154,21 +153,19 @@ TestNetworkVisualization::TestNetworkVisualization()
 
 void TestNetworkVisualization::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     m_fullNet4 = buildTestNetwork(4);
     m_fullNet10 = buildTestNetwork(10);
     m_linearNet = buildLinearNetwork(0.8, 0.3);
 
-    qDebug() << "TestNetworkVisualization::initTestCase - Networks built";
-    qDebug() << "  4-node:  " << m_fullNet4.nodes().size() << "nodes";
-    qDebug() << "  10-node: " << m_fullNet10.nodes().size() << "nodes";
-    qDebug() << "  linear:  " << m_linearNet.nodes().size() << "nodes";
+    Log::debug("TestNetworkVisualization::initTestCase - Networks built");
+    Log::debug("  4-node:  {} nodes", m_fullNet4.nodes().size());
+    Log::debug("  10-node: {} nodes", m_fullNet10.nodes().size());
+    Log::debug("  linear:  {} nodes", m_linearNet.nodes().size());
 }
 
 void TestNetworkVisualization::cleanupTestCase()
 {
-    qDebug() << "TestNetworkVisualization::cleanupTestCase";
+    Log::debug("TestNetworkVisualization::cleanupTestCase");
 }
 
 //=============================================================================================================
@@ -295,7 +292,7 @@ void TestNetworkVisualization::testThresholdMax()
 
     // First, find the max weight
     std::pair<double, double> minMax = net.weight_range();
-    qDebug() << "  Weight range:" << minMax.first << "–" << minMax.second;
+    Log::debug("  Weight range: {} – {}", minMax.first, minMax.second);
 
     // Set threshold above max weight -> no edges should survive
     net.set_threshold(minMax.second + 1.0);
@@ -305,7 +302,7 @@ void TestNetworkVisualization::testThresholdMax()
     double midThresh = (minMax.first + minMax.second) / 2.0;
     net.set_threshold(midThresh);
     const auto activeMid = net.edge_count(EdgeSet::thresholded);
-    qDebug() << "  Mid threshold" << midThresh << "-> active:" << activeMid;
+    Log::debug("  Mid threshold {} -> active: {}", midThresh, activeMid);
     QVERIFY2(activeMid > 0 && activeMid < 10,
              qPrintable(QString("Expected partial filtering, got %1 of 10").arg(activeMid)));
 }
@@ -326,7 +323,7 @@ void TestNetworkVisualization::testThresholdProgressive()
         net.set_threshold(t);
         const std::size_t activeCount = net.edge_count(EdgeSet::thresholded);
 
-        qDebug() << "  Threshold" << t << "-> active:" << activeCount;
+        Log::debug("  Threshold {} -> active: {}", t, activeCount);
 
         // Active count should be monotonically non-increasing as threshold rises
         QVERIFY2(activeCount <= prevActive,
@@ -365,7 +362,7 @@ void TestNetworkVisualization::testThresholdDegreeUpdate()
 
     bool anyDecreased = false;
     for (int i = 0; i < 4; ++i) {
-        qDebug() << "  Node" << i << "degree:" << net.degree(i, EdgeSet::thresholded);
+        Log::debug("  Node {} degree: {}", i, net.degree(i, EdgeSet::thresholded));
         if (net.degree(i, EdgeSet::thresholded) < 3) {
             anyDecreased = true;
         }
@@ -490,8 +487,8 @@ void TestNetworkVisualization::testMinMaxWeights()
     std::pair<double, double> minMaxFull = net.weight_range();
     std::pair<double, double> minMaxThresh = net.weight_range(EdgeSet::thresholded);
 
-    qDebug() << "  Full weights: min =" << minMaxFull.first << " max =" << minMaxFull.second;
-    qDebug() << "  Thresholded weights: min =" << minMaxThresh.first << " max =" << minMaxThresh.second;
+    Log::debug("  Full weights: min = {} max = {}", minMaxFull.first, minMaxFull.second);
+    Log::debug("  Thresholded weights: min = {} max = {}", minMaxThresh.first, minMaxThresh.second);
 
     // Min should be less than max
     QVERIFY(minMaxFull.first <= minMaxFull.second);

@@ -30,7 +30,6 @@
 #include "batchprocessor.h"
 #include <mne/mne_process_description.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -188,7 +187,6 @@ static void printHelp()
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_process_raw");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -358,7 +356,7 @@ int main(int argc, char* argv[])
     // Report unknown options
     if (!parser.unknownOptionNames().isEmpty()) {
         for (const QString& opt : parser.unknownOptionNames())
-            qCritical() << "Unknown option:" << opt;
+            Log::critical("Unknown option: {}", opt.toStdString());
         printHelp();
         return 1;
     }
@@ -368,7 +366,7 @@ int main(int argc, char* argv[])
     //=========================================================================
     if (parser.isSet(cdOpt)) {
         QDir::setCurrent(parser.value(cdOpt));
-        qInfo() << "Working directory changed to:" << QDir::currentPath();
+        Log::info("Working directory changed to: {}", QDir::currentPath().toStdString());
     }
 
     //=========================================================================
@@ -452,7 +450,7 @@ int main(int argc, char* argv[])
     // Validate required options
     //=========================================================================
     if (settings.rawFiles.empty()) {
-        qCritical() << "Error: At least one --raw file must be specified.";
+        Log::critical("Error: At least one --raw file must be specified.");
         printHelp();
         return 1;
     }

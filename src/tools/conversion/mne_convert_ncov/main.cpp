@@ -19,7 +19,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -33,7 +32,6 @@
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QFileInfo>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -58,7 +56,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_ncov");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -95,11 +92,11 @@ int main(int argc, char* argv[])
     bool includeEeg = parser.isSet(eegOpt);
 
     if (ncovFile.isEmpty()) {
-        qCritical("--ncov is required.");
+        Log::critical("--ncov is required.");
         return 1;
     }
     if (measFile.isEmpty()) {
-        qCritical("--meas is required.");
+        Log::critical("--meas is required.");
         return 1;
     }
 
@@ -120,7 +117,7 @@ int main(int argc, char* argv[])
     //=========================================================================
     FiffRawData raw(measFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read measurement info from: %s", qPrintable(measFile));
+        Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
         return 1;
     }
     const FiffInfo& info = raw.info;
@@ -136,15 +133,14 @@ int main(int argc, char* argv[])
         }
     }
 
-    qInfo("Measurement: %lld MEG channels, %lld EEG channels, %d total",
-          static_cast<long long>(megIdx.size()), static_cast<long long>(eegIdx.size()), info.nchan);
+    Log::info("Measurement: {} MEG channels, {} EEG channels, {} total", static_cast<long long>(megIdx.size()), static_cast<long long>(eegIdx.size()), info.nchan);
 
     //=========================================================================
     // Read ncov ASCII file
     //=========================================================================
     QFile ncFile(ncovFile);
     if (!ncFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open ncov file: %s", qPrintable(ncovFile));
+        Log::critical("Cannot open ncov file: {}", ncovFile.toStdString());
         return 1;
     }
     QTextStream in(&ncFile);
@@ -152,7 +148,7 @@ int main(int argc, char* argv[])
     // Check header
     QString header = in.readLine().trimmed();
     if (header != "#!ascii") {
-        qCritical("Invalid ncov header: expected '#!ascii', got '%s'.", qPrintable(header));
+        Log::critical("Invalid ncov header: expected '#!ascii', got '{}'.", header.toStdString());
         return 1;
     }
 
@@ -160,7 +156,7 @@ int main(int argc, char* argv[])
     QString dimLine = in.readLine().trimmed();
     QStringList dims = dimLine.split(QRegularExpression("\\s+"));
     if (dims.size() < 3) {
-        qCritical("Invalid dimension line: '%s'.", qPrintable(dimLine));
+        Log::critical("Invalid dimension line: '{}'.", dimLine.toStdString());
         return 1;
     }
 
@@ -169,18 +165,15 @@ int main(int argc, char* argv[])
     int nFree = dims[2].toInt();
     int nTotal = nMegFile + nEegFile;
 
-    qInfo("Ncov file: %d MEG + %d EEG = %d channels, nfree = %d",
-          nMegFile, nEegFile, nTotal, nFree);
+    Log::info("Ncov file: {} MEG + {} EEG = {} channels, nfree = {}", nMegFile, nEegFile, nTotal, nFree);
 
     // Validate dimensions
     if (nMegFile != megIdx.size()) {
-        qCritical("MEG channel count mismatch: file says %d, measurement has %lld.",
-                  nMegFile, static_cast<long long>(megIdx.size()));
+        Log::critical("MEG channel count mismatch: file says {}, measurement has {}.", nMegFile, static_cast<long long>(megIdx.size()));
         return 1;
     }
     if (nEegFile != eegIdx.size()) {
-        qCritical("EEG channel count mismatch: file says %d, measurement has %lld.",
-                  nEegFile, static_cast<long long>(eegIdx.size()));
+        Log::critical("EEG channel count mismatch: file says {}, measurement has {}.", nEegFile, static_cast<long long>(eegIdx.size()));
         return 1;
     }
 
@@ -189,7 +182,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i < nTotal; ++i) {
         for (int j = 0; j < nTotal; ++j) {
             if (in.atEnd()) {
-                qCritical("Unexpected end of file at element (%d, %d).", i, j);
+                Log::critical("Unexpected end of file at element ({}, {}).", i, j);
                 return 1;
             }
             in >> fullCov(i, j);
@@ -197,7 +190,7 @@ int main(int argc, char* argv[])
     }
     ncFile.close();
 
-    qInfo("Read %dx%d covariance matrix", nTotal, nTotal);
+    Log::info("Read {}x{} covariance matrix", nTotal, nTotal);
 
     //=========================================================================
     // Extract requested submatrix
@@ -229,9 +222,7 @@ int main(int argc, char* argv[])
     // Symmetrize
     selCov = (selCov + selCov.transpose()) / 2.0;
 
-    qInfo("Selected %d channels (%s%s)", nSel,
-          includeMeg ? "MEG" : "",
-          (includeMeg && includeEeg) ? "+EEG" : (includeEeg ? "EEG" : ""));
+    Log::info("Selected {} channels ({}{})", nSel, includeMeg ? "MEG" : "", (includeMeg && includeEeg) ? "+EEG" : (includeEeg ? "EEG" : ""));
 
     //=========================================================================
     // Build and write FIFF covariance
@@ -250,10 +241,10 @@ int main(int argc, char* argv[])
     cov.nfree = nFree;
 
     if (!cov.save(covFile.toStdU16String())) {
-        qCritical("Cannot write output file: %s", qPrintable(covFile));
+        Log::critical("Cannot write output file: {}", covFile.toStdString());
         return 1;
     }
 
-    qInfo("Written FIFF covariance (%d channels) to: %s", nSel, qPrintable(covFile));
+    Log::info("Written FIFF covariance ({} channels) to: {}", nSel, covFile.toStdString());
     return 0;
 }

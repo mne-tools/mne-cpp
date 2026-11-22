@@ -18,7 +18,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fs/fs_surface.h>
 #include <fs/fs_surfaceset.h>
 #include <fs/fs_annotation.h>
@@ -125,8 +124,7 @@ TestFS::TestFS()
 
 void TestFS::initTestCase()
 {
-    mne::install_qt_message_handler();
-    qInfo() << "TestFS: Starting FreeSurfer library unit tests";
+    Log::info("TestFS: Starting FreeSurfer library unit tests");
 }
 
 //=============================================================================================================
@@ -177,7 +175,7 @@ QString TestFS::createTempLabelFile(const QTemporaryDir& dir, const QString& pre
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning("Failed to create temp label file");
+        Log::warning("Failed to create temp label file");
         return QString();
     }
 
@@ -640,7 +638,7 @@ void TestFS::testAnnotationSetInsert()
 
 void TestFS::cleanupTestCase()
 {
-    qInfo() << "TestFS: All tests completed";
+    Log::info("TestFS: All tests completed");
 }
 
 //=============================================================================================================

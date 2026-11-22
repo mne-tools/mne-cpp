@@ -18,15 +18,9 @@
 
 #include "rtfwdsetupwidget.h"
 
+#include <base/log.h>
 #include <fiff/fiff_stream.h>
-
 #include <fwd/compute_fwd/compute_fwd_settings.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -138,7 +132,7 @@ void RtFwdSetupWidget::onSolNameChanged()
     if (t_sFileName.contains("-fwd.fif")) {
         m_pRtFwd->m_pFwdSettings->solname = t_sFileName.toStdString();
     } else {
-        qWarning() << "rtFwdSetup: make sure to name solution file correctly: -fwd.fif";
+        Log::warning("rtFwdSetup: make sure to name solution file correctly: -fwd.fif");
     }
 }
 
@@ -158,7 +152,7 @@ void RtFwdSetupWidget::showMeasFileDialog()
         m_pRtFwd->m_pFwdSettings->measname = t_sFileName.toStdString();
         m_ui.m_qLineEdit_MeasName->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Measurement file cannot be opened";
+        Log::warning("rtFwdSetup: Measurement file cannot be opened");
     }
     t_fSource.close();
 }
@@ -177,7 +171,7 @@ void RtFwdSetupWidget::showSourceFileDialog()
         m_pRtFwd->m_pFwdSettings->srcname = t_sFileName.toStdString();
         m_ui.m_qLineEdit_SourceName->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Source file cannot be opened";
+        Log::warning("rtFwdSetup: Source file cannot be opened");
     }
     t_fSource.close();
 }
@@ -196,7 +190,7 @@ void RtFwdSetupWidget::showBemFileDialog()
         m_pRtFwd->m_pFwdSettings->bemname = t_sFileName.toStdString();
         m_ui.m_qLineEdit_BemName->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Bem file cannot be opened";
+        Log::warning("rtFwdSetup: Bem file cannot be opened");
     }
     t_fBem.close();
 }
@@ -215,7 +209,7 @@ void RtFwdSetupWidget::showMriFileDialog()
         m_pRtFwd->m_pFwdSettings->mriname = t_sFileName.toStdString();
         m_ui.m_qLineEdit_MriName->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Mri-Head transformation cannot be opened";
+        Log::warning("rtFwdSetup: Mri-Head transformation cannot be opened");
     }
     t_fMri.close();
 }
@@ -234,7 +228,7 @@ void RtFwdSetupWidget::showEEGModelFileDialog()
         m_pRtFwd->m_pFwdSettings->eeg_model_file = t_sFileName.toStdString();
         m_ui.m_qLineEdit_EEGModelFile->setText(t_sFileName);
     } else {
-        qWarning() << "rtFwdSetup: Eeg model file cannot be opened";
+        Log::warning("rtFwdSetup: Eeg model file cannot be opened");
     }
     t_fEegModel.close();
 }

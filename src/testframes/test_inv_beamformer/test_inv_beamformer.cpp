@@ -18,7 +18,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
@@ -195,11 +194,10 @@ private slots:
 
 void TestInvBeamformer::initTestCase()
 {
-    mne::install_qt_message_handler();
     m_bDataLoaded = false;
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (!QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
-        qWarning() << "Test data not found at" << base;
+        Log::warning("Test data not found at {}", base.toStdString());
         return;
     }
     m_sDataPath = base;
@@ -398,15 +396,12 @@ void TestInvBeamformer::lcmv_makeAndApply()
     QVERIFY(filters.nChannels() > 0);
     QVERIFY(filters.weights.size() == 1);
     QVERIFY(filters.weights[0].allFinite());
-    qDebug() << "LCMV filter: sources=" << filters.nSources()
-             << "channels=" << filters.nChannels()
-             << "orient=" << filters.nOrient();
+    Log::debug("LCMV filter: sources= {} channels= {} orient= {}", filters.nSources(), filters.nChannels(), filters.nOrient());
     InvSourceEstimate stc = InvLCMV::applyLCMV(evoked, filters);
     QVERIFY(!stc.empty());
     QVERIFY(stc.data.rows() > 0);
     QVERIFY(stc.data.allFinite());
-    qDebug() << "LCMV STC: sources=" << stc.data.rows()
-             << "times=" << stc.data.cols();
+    Log::debug("LCMV STC: sources= {} times= {}", stc.data.rows(), stc.data.cols());
 }
 
 //=============================================================================================================
@@ -442,9 +437,7 @@ void TestInvBeamformer::lcmv_applyLCMVCov()
     QVERIFY(stcPower.data.allFinite());
     for (int i = 0; i < stcPower.data.rows(); ++i)
         QVERIFY(stcPower.data(i, 0) >= 0.0);
-    qDebug() << "LCMV power: n_sources=" << stcPower.data.rows()
-             << "min=" << stcPower.data.minCoeff()
-             << "max=" << stcPower.data.maxCoeff();
+    Log::debug("LCMV power: n_sources= {} min= {} max= {}", stcPower.data.rows(), stcPower.data.minCoeff(), stcPower.data.maxCoeff());
 }
 
 //=============================================================================================================
@@ -466,16 +459,12 @@ void TestInvBeamformer::dics_makeAndApplyCsd()
     QVERIFY(filters.nFreqs() == 1);
     QVERIFY(filters.weights.size() == 1);
     QVERIFY(filters.weights[0].allFinite());
-    qDebug() << "DICS filter: sources=" << filters.nSources()
-             << "channels=" << filters.nChannels()
-             << "n_freqs=" << filters.nFreqs();
+    Log::debug("DICS filter: sources= {} channels= {} n_freqs= {}", filters.nSources(), filters.nChannels(), filters.nFreqs());
     InvSourceEstimate stcPower = InvDICS::applyDICSCsd(csdMatrices, frequencies, filters);
     QVERIFY(!stcPower.empty());
     QVERIFY(stcPower.data.rows() > 0);
     QVERIFY(stcPower.data.allFinite());
-    qDebug() << "DICS power map: sources=" << stcPower.data.rows()
-             << "min=" << stcPower.data.minCoeff()
-             << "max=" << stcPower.data.maxCoeff();
+    Log::debug("DICS power map: sources= {} min= {} max= {}", stcPower.data.rows(), stcPower.data.minCoeff(), stcPower.data.maxCoeff());
 }
 
 //=============================================================================================================

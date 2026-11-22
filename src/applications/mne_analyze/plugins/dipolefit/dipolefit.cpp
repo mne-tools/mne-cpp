@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "dipolefit.h"
 
 #include <anShared/Management/analyzedata.h>
@@ -183,7 +184,7 @@ void InvDipoleFit::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[InvDipoleFit::handleEvent] received an Event that is not handled by switch-cases";
+            mne::Log::warning("[InvDipoleFit::handleEvent] received an Event that is not handled by switch-cases");
             break;
     }
 }
@@ -437,18 +438,18 @@ mne::InvEcdSet InvDipoleFit::dipoleFitCalculation()
 {
     QMutexLocker lock(&m_FitMutex);
 
-    qInfo() << "Checking integrity...";
+    mne::Log::info("Checking integrity...");
     if (!m_DipoleSettings.checkIntegrity()) {
         return mne::InvEcdSet();
     }
 
-    qInfo() << "Initializing settings...";
+    mne::Log::info("Initializing settings...");
     mne::InvDipoleFit dipFit(&m_DipoleSettings);
 
-    qInfo() << "Calculating fit...";
+    mne::Log::info("Calculating fit...");
     mne::InvEcdSet ecdSet = dipFit.calculateFit();
 
-    qInfo() << "Done!";
+    mne::Log::info("Done!");
     return ecdSet;
 }
 

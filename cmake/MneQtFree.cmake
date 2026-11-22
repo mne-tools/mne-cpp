@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+include_guard(GLOBAL)
+
+# Fails the configuration when a target defined in one of the given directories (or below) links Qt or runs one
+# of Qt's code generators. Only the display libraries may use Qt; every other library must build without it, also
+# when Qt is found for the rest of the tree.
+function(mne_require_qt_free)
+  set(_directories ${ARGN})
+  set(_offenders)
+  while(_directories)
+    list(POP_FRONT _directories _directory)
+    get_property(_subdirectories DIRECTORY "${_directory}" PROPERTY SUBDIRECTORIES)
+    list(APPEND _directories ${_subdirectories})
+    get_property(_targets DIRECTORY "${_directory}" PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(_target IN LISTS _targets)
+      get_target_property(_type ${_target} TYPE)
+      if(_type STREQUAL "UTILITY")
+        continue()
+      endif()
+      set(_links)
+      foreach(_property LINK_LIBRARIES INTERFACE_LINK_LIBRARIES)
+        get_target_property(_value ${_target} ${_property})
+        if(_value)
+          list(APPEND _links ${_value})
+        endif()
+      endforeach()
+      foreach(_link IN LISTS _links)
+        if(_link MATCHES "(^|[^A-Za-z])Qt[0-9]*::")
+          list(APPEND _offenders "${_target} links ${_link}")
+        endif()
+      endforeach()
+      foreach(_generator AUTOMOC AUTOUIC AUTORCC)
+        get_target_property(_value ${_target} ${_generator})
+        if(_value)
+          list(APPEND _offenders "${_target} has ${_generator} on")
+        endif()
+      endforeach()
+    endforeach()
+  endwhile()
+  if(_offenders)
+    list(JOIN _offenders "\n  " _text)
+    message(FATAL_ERROR "Only the display libraries may use Qt:\n  ${_text}")
+  endif()
+endfunction()

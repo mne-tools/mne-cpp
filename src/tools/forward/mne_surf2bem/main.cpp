@@ -29,7 +29,6 @@
 #include "surf2bem.h"
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,7 +63,6 @@ using namespace MNESURF2BEM;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_surf2bem");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

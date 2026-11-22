@@ -21,6 +21,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 
@@ -32,7 +33,6 @@
 #include <QPointer>
 #include <QAbstractItemModel>
 #include <QStandardItemModel>
-#include <QDebug>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -210,7 +210,7 @@ QString AbstractModel::getModelName() const
 
 bool AbstractModel::saveToFile(const QString& sPath)
 {
-    qDebug() << "[AbstractModel::saveToFile] Saving data to" << sPath << "is not implemented for MODELTYPE = " << getType();
+    Log::debug("[AbstractModel::saveToFile] Saving data to {} is not implemented for MODELTYPE = {}", sPath.toStdString(), static_cast<int>(getType()));
     return false;
 }
 

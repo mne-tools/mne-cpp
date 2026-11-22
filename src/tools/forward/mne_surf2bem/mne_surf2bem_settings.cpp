@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mne_surf2bem_settings.h"
 
 #include <fiff/fiff_constants.h>
@@ -28,7 +29,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,43 +61,43 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
         const QString& arg = args[i];
 
         if (arg == "--help" || arg == "-h") {
-            qInfo("Usage: %s [options]", qPrintable(args[0]));
-            qInfo("Convert FreeSurfer surfaces into BEM FIFF files.\n");
-            qInfo("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen");
-            qInfo("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n");
-            qInfo("Options:");
-            qInfo("  --surf name       Input FreeSurfer binary surface file.");
-            qInfo("  --tri name        Input ASCII triangle file.");
-            qInfo("  --fif name        Output FIFF BEM surface file.");
-            qInfo("  --id id           BEM surface id to assign:");
-            qInfo("                      %d = head (outer skin)", FIFFV_BEM_SURF_ID_HEAD);
-            qInfo("                      %d = outer skull", FIFFV_BEM_SURF_ID_SKULL);
-            qInfo("                      %d = inner skull (brain)", FIFFV_BEM_SURF_ID_BRAIN);
-            qInfo("  --swap            Swap vertex winding order (ASCII tri files).");
-            qInfo("  --meters          Coordinates in meters (ASCII files only, default: mm).");
-            qInfo("  --coordf no       Coordinate frame for ASCII file vertices.");
-            qInfo("  --shift val       Shift vertices by val [mm] along normals.");
-            qInfo("  --ico number      Downsample to icosahedron subdivision (0-6).");
-            qInfo("  --sigma val       Compartment conductivity [S/m].");
-            qInfo("  --force           Load surface despite topological defects.");
-            qInfo("  --check           Perform topology and solid angle checks.");
-            qInfo("  --checkmore       Also check skull/skin thicknesses.");
-            qInfo("  --help            Print this help.");
-            qInfo("  --version         Print version info.\n");
-            qInfo("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the");
-            qInfo("most recently specified --surf or --tri.\n");
+            mne::Log::info("Usage: {} [options]", args[0].toStdString());
+            mne::Log::info("Convert FreeSurfer surfaces into BEM FIFF files.\n");
+            mne::Log::info("Ported from the original MNE C tool mne_surf2bem by Matti Hamalainen");
+            mne::Log::info("(SVN $Id: mne_surf2bem.c 3351 2012-03-05 12:03:50Z msh $).\n");
+            mne::Log::info("Options:");
+            mne::Log::info("  --surf name       Input FreeSurfer binary surface file.");
+            mne::Log::info("  --tri name        Input ASCII triangle file.");
+            mne::Log::info("  --fif name        Output FIFF BEM surface file.");
+            mne::Log::info("  --id id           BEM surface id to assign:");
+            mne::Log::info("                      {} = head (outer skin)", FIFFV_BEM_SURF_ID_HEAD);
+            mne::Log::info("                      {} = outer skull", FIFFV_BEM_SURF_ID_SKULL);
+            mne::Log::info("                      {} = inner skull (brain)", FIFFV_BEM_SURF_ID_BRAIN);
+            mne::Log::info("  --swap            Swap vertex winding order (ASCII tri files).");
+            mne::Log::info("  --meters          Coordinates in meters (ASCII files only, default: mm).");
+            mne::Log::info("  --coordf no       Coordinate frame for ASCII file vertices.");
+            mne::Log::info("  --shift val       Shift vertices by val [mm] along normals.");
+            mne::Log::info("  --ico number      Downsample to icosahedron subdivision (0-6).");
+            mne::Log::info("  --sigma val       Compartment conductivity [S/m].");
+            mne::Log::info("  --force           Load surface despite topological defects.");
+            mne::Log::info("  --check           Perform topology and solid angle checks.");
+            mne::Log::info("  --checkmore       Also check skull/skin thicknesses.");
+            mne::Log::info("  --help            Print this help.");
+            mne::Log::info("  --version         Print version info.\n");
+            mne::Log::info("Note: --id, --swap, --meters, --shift, --ico, --sigma apply to the");
+            mne::Log::info("most recently specified --surf or --tri.\n");
             m_bShouldExit = true;
             m_iExitCode = 0;
             return;
         } else if (arg == "--version") {
-            qInfo("mne_surf2bem version 2.0 (mne-cpp port)");
-            qInfo("Based on MNE C version 1.8 by Matti Hamalainen");
+            mne::Log::info("mne_surf2bem version 2.0 (mne-cpp port)");
+            mne::Log::info("Based on MNE C version 1.8 by Matti Hamalainen");
             m_bShouldExit = true;
             m_iExitCode = 0;
             return;
         } else if (arg == "--surf" || arg == "--tri") {
             if (i + 1 >= args.size()) {
-                qCritical() << arg << ": argument required.";
+                mne::Log::critical("{} : argument required.", arg.toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -108,7 +108,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.append(si);
         } else if (arg == "--fif") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--fif: argument required.";
+                mne::Log::critical("--fif: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -116,7 +116,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_sOutputFile = args[++i];
         } else if (arg == "--id") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--id: argument required.";
+                mne::Log::critical("--id: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -124,13 +124,13 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
-                qCritical() << "Illegal number:" << args[i];
+                mne::Log::critical("Illegal number: {}", args[i].toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify surface before its id.";
+                mne::Log::critical("Specify surface before its id.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -138,7 +138,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.last().id = val;
         } else if (arg == "--swap") {
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify surface before --swap.";
+                mne::Log::critical("Specify surface before --swap.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -146,7 +146,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.last().swap = true;
         } else if (arg == "--meters") {
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify surface before --meters.";
+                mne::Log::critical("Specify surface before --meters.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -154,7 +154,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.last().mm = false;
         } else if (arg == "--coordf") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--coordf: argument required.";
+                mne::Log::critical("--coordf: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -162,7 +162,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
-                qCritical() << "Illegal number:" << args[i];
+                mne::Log::critical("Illegal number: {}", args[i].toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -170,7 +170,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_iCoordFrame = val;
         } else if (arg == "--ico") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--ico: argument required.";
+                mne::Log::critical("--ico: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -178,19 +178,19 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             bool ok;
             int val = args[++i].toInt(&ok);
             if (!ok) {
-                qCritical() << "Illegal number:" << args[i];
+                mne::Log::critical("Illegal number: {}", args[i].toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify surface before --ico.";
+                mne::Log::critical("Specify surface before --ico.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             if (val < 0 || val > 6) {
-                qCritical() << "--ico value should be between 0 and 6.";
+                mne::Log::critical("--ico value should be between 0 and 6.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -198,7 +198,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.last().ico = val;
         } else if (arg == "--sigma") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--sigma: argument required.";
+                mne::Log::critical("--sigma: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -206,13 +206,13 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
-                qCritical() << "Illegal number:" << args[i];
+                mne::Log::critical("Illegal number: {}", args[i].toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify surface before its conductivity.";
+                mne::Log::critical("Specify surface before its conductivity.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -220,7 +220,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_surfaces.last().sigma = val;
         } else if (arg == "--shift") {
             if (i + 1 >= args.size()) {
-                qCritical() << "--shift: argument required.";
+                mne::Log::critical("--shift: argument required.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -228,13 +228,13 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             bool ok;
             float val = args[++i].toFloat(&ok);
             if (!ok) {
-                qCritical() << "Incomprehensible value:" << args[i];
+                mne::Log::critical("Incomprehensible value: {}", args[i].toStdString());
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
             }
             if (m_surfaces.isEmpty()) {
-                qCritical() << "Specify the surface before the vertex shift.";
+                mne::Log::critical("Specify the surface before the vertex shift.");
                 m_bShouldExit = true;
                 m_iExitCode = 1;
                 return;
@@ -249,7 +249,7 @@ MNESurf2BemSettings::MNESurf2BemSettings(int* argc, char** argv)
             m_bCheck = true;
             m_bCheckMore = true;
         } else {
-            qCritical() << "Unrecognized argument:" << arg;
+            mne::Log::critical("Unrecognized argument: {}", arg.toStdString());
             m_bShouldExit = true;
             m_iExitCode = 1;
             return;

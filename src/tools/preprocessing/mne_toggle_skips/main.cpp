@@ -19,7 +19,6 @@
 #include <fiff/fiff_dir_entry.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,7 +45,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_toggle_skips");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -66,7 +63,7 @@ int main(int argc, char* argv[])
 
     QString rawFile = parser.value(rawOpt);
     if (rawFile.isEmpty()) {
-        qCritical("--raw is required.");
+        Log::critical("--raw is required.");
         return 1;
     }
 
@@ -74,7 +71,7 @@ int main(int argc, char* argv[])
     QFile file(rawFile);
     auto stream = FiffStream::open_update(rawFile.toStdU16String());
     if (!stream) {
-        qCritical("Cannot open FIFF file for update: %s", qPrintable(rawFile));
+        Log::critical("Cannot open FIFF file for update: {}", rawFile.toStdString());
         return 1;
     }
 
@@ -87,7 +84,7 @@ int main(int argc, char* argv[])
         }
         std::optional<FiffTag> tag = stream->read_tag(entry.pos);
         if (!tag) {
-            qCritical("Cannot read the tag at position %lld.", static_cast<long long>(entry.pos));
+            Log::critical("Cannot read the tag at position {}.", static_cast<long long>(entry.pos));
             return 1;
         }
         const bool on = tag->kind == FIFF_DATA_SKIP;
@@ -97,6 +94,6 @@ int main(int argc, char* argv[])
     }
     stream->close();
 
-    qInfo("%d skips turned off, %d skips turned on in %s", turnedOff, turnedOn, qPrintable(rawFile));
+    Log::info("{} skips turned off, {} skips turned on in {}", turnedOff, turnedOn, rawFile.toStdString());
     return 0;
 }

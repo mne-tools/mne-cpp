@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <pybridge/python_runner.h>
 #include <pybridge/python_test_helper.h>
 
@@ -96,8 +97,7 @@ PythonRunner TestPythonRunner::runner()
 void TestPythonRunner::initTestCase()
 {
     m_bPythonAvailable = PythonRunner().is_python_available();
-    qDebug() << "Python detection: available=" << m_bPythonAvailable
-             << " MNE_REQUIRE_PYTHON=" << PythonTestHelper::is_python_required();
+    Log::debug("Python detection: available= {} MNE_REQUIRE_PYTHON= {}", m_bPythonAvailable, PythonTestHelper::is_python_required());
 }
 
 //=============================================================================================================

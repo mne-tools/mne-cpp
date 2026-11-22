@@ -19,7 +19,6 @@
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -96,7 +94,6 @@ static QString tagName(int kind)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_compare_fif_files");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -122,7 +119,7 @@ int main(int argc, char* argv[])
     bool verbose = parser.isSet(verboseOpt);
 
     if (file1.isEmpty() || file2.isEmpty()) {
-        qCritical("Both --file1 and --file2 are required.");
+        Log::critical("Both --file1 and --file2 are required.");
         return 1;
     }
 
@@ -131,21 +128,21 @@ int main(int argc, char* argv[])
     FiffStream stream2(file2.toStdU16String());
 
     if (!stream1.open()) {
-        qCritical("Cannot parse FIFF: %s", qPrintable(file1));
+        Log::critical("Cannot parse FIFF: {}", file1.toStdString());
         return 1;
     }
 
     if (!stream2.open()) {
-        qCritical("Cannot parse FIFF: %s", qPrintable(file2));
+        Log::critical("Cannot parse FIFF: {}", file2.toStdString());
         return 1;
     }
 
     const std::vector<FiffDirEntry>& dir1 = stream1.dir();
     const std::vector<FiffDirEntry>& dir2 = stream2.dir();
 
-    qInfo("File 1: %s (%d directory entries)", qPrintable(file1), static_cast<int>(dir1.size()));
-    qInfo("File 2: %s (%d directory entries)", qPrintable(file2), static_cast<int>(dir2.size()));
-    qInfo("%s", "");
+    Log::info("File 1: {} ({} directory entries)", file1.toStdString(), static_cast<int>(dir1.size()));
+    Log::info("File 2: {} ({} directory entries)", file2.toStdString(), static_cast<int>(dir2.size()));
+    Log::info("{}", "");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
     int minEntries = static_cast<int>(std::min(dir1.size(), dir2.size()));
@@ -172,8 +169,7 @@ int main(int argc, char* argv[])
         if (isMatch) {
             nMatch++;
             if (verbose)
-                qInfo("  [%4d] %s : MATCH (size=%d)",
-                      i, qPrintable(tagName(dir1[i].kind)), dir1[i].size);
+                Log::info("  [{:4}] {} : MATCH (size={})", i, tagName(dir1[i].kind).toStdString(), dir1[i].size);
         } else {
             nDiff++;
             QString line = QString::asprintf("  [%4d] DIFF:", i);
@@ -187,21 +183,19 @@ int main(int argc, char* argv[])
                 line += QString::asprintf(" size=%d vs %d", dir1[i].size, dir2[i].size);
             if (sizeMatch && !dataMatch)
                 line += " DATA_DIFFERS";
-            qInfo("%s", qPrintable(line));
+            Log::info("{}", line.toStdString());
         }
     }
 
     if (dir1.size() != dir2.size()) {
         nMissing = static_cast<int>(std::abs(std::ssize(dir1) - std::ssize(dir2)));
-        qInfo("\n  File %s has %d extra directory entries.",
-              dir1.size() > dir2.size() ? "1" : "2", nMissing);
+        Log::info("\n  File {} has {} extra directory entries.", dir1.size() > dir2.size() ? "1" : "2", nMissing);
     }
 
-    qInfo("\nSummary: %d matching, %d different, %d extra entries",
-          nMatch, nDiff, nMissing);
+    Log::info("\nSummary: {} matching, {} different, {} extra entries", nMatch, nDiff, nMissing);
 
     bool identical = (nDiff == 0 && nMissing == 0);
-    qInfo("Files are %s.", identical ? "IDENTICAL" : "DIFFERENT");
+    Log::info("Files are {}.", identical ? "IDENTICAL" : "DIFFERENT");
 
     stream1.close();
     stream2.close();

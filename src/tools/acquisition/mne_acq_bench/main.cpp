@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq.h>
 #if defined(MNE_ACQ_BENCH_RECORDING) // the standalone A/B build has no FIFF bridge
 #include <acq/fiff/acq_recorder.h>
@@ -765,13 +766,13 @@ int main(int argc, char* argv[])
     bool ok = false;
     settings.repeats = parser.value(repeatsOpt).toInt(&ok);
     if (!ok || settings.repeats < 1) {
-        qCritical("--repeats needs a positive integer, got '%s'", qPrintable(parser.value(repeatsOpt)));
+        Log::critical("--repeats needs a positive integer, got '{}'", parser.value(repeatsOpt).toStdString());
         return 1;
     }
     if (parser.isSet(pacedOpt)) {
         settings.pacedSeconds = parser.value(pacedOpt).toDouble(&ok);
         if (!ok || settings.pacedSeconds <= 0.0) {
-            qCritical("--paced-seconds needs a positive number, got '%s'", qPrintable(parser.value(pacedOpt)));
+            Log::critical("--paced-seconds needs a positive number, got '{}'", parser.value(pacedOpt).toStdString());
             return 1;
         }
     }
@@ -794,11 +795,11 @@ int main(int argc, char* argv[])
     }
     out.flush();
     if (parser.isSet(jsonOpt) && !writeJson(parser.value(jsonOpt), metrics, settings)) {
-        qCritical("Cannot write %s", qPrintable(parser.value(jsonOpt)));
+        Log::critical("Cannot write {}", parser.value(jsonOpt).toStdString());
         return 1;
     }
     if (lost) {
-        qCritical("A stream run lost, corrupted or did not deliver samples");
+        Log::critical("A stream run lost, corrupted or did not deliver samples");
         return 1;
     }
     return 0;

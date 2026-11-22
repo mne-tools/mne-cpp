@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
 #include <acq/acq_reader.h>
@@ -252,7 +253,7 @@ void TestAcqLsl::initTestCase()
 {
     QVERIFY(registerLslScheme().ok());
     m_lsl = Outlets::load();
-    qInfo("liblsl reference peer: %s", m_lsl ? m_lsl->library.path().c_str() : "not found, its cases skip");
+    Log::info("liblsl reference peer: {}", m_lsl ? m_lsl->library.path().c_str() : "not found, its cases skip");
 }
 
 //=============================================================================================================

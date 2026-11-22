@@ -17,7 +17,6 @@
 #include <mne/mne_forward_solution.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QFileInfo>
-#include <QDebug>
 #include <QTextStream>
 
 //=============================================================================================================
@@ -54,7 +52,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_average_forward_solutions");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -87,7 +84,7 @@ int main(int argc, char* argv[])
     if (!listFile.isEmpty()) {
         QFile lf(listFile);
         if (!lf.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qCritical("Cannot open list file: %s", qPrintable(listFile));
+            Log::critical("Cannot open list file: {}", listFile.toStdString());
             return 1;
         }
         QTextStream in(&lf);
@@ -99,11 +96,11 @@ int main(int argc, char* argv[])
     }
 
     if (fwdFiles.size() < 2) {
-        qCritical("At least 2 forward solutions are required.");
+        Log::critical("At least 2 forward solutions are required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -114,9 +111,7 @@ int main(int argc, char* argv[])
         for (const QString& p : parts)
             weights.append(p.toDouble());
         if (weights.size() != fwdFiles.size()) {
-            qCritical("Number of weights (%lld) doesn't match number of files (%lld)",
-                      static_cast<long long>(weights.size()),
-                      static_cast<long long>(fwdFiles.size()));
+            Log::critical("Number of weights ({}) doesn't match number of files ({})", static_cast<long long>(weights.size()), static_cast<long long>(fwdFiles.size()));
             return 1;
         }
     } else {
@@ -133,16 +128,15 @@ int main(int argc, char* argv[])
         weights[i] /= wSum;
 
     // Load first forward solution as template
-    qInfo("Loading %lld forward solutions...", static_cast<long long>(fwdFiles.size()));
+    Log::info("Loading {} forward solutions...", static_cast<long long>(fwdFiles.size()));
 
     auto fwd0Read = MNEForwardSolution::read(fwdFiles[0].toStdU16String());
     if (!fwd0Read) {
-        qCritical("%s", fwd0Read.error().what());
+        Log::critical("{}", fwd0Read.error().what());
         return 1;
     }
     MNEForwardSolution& fwd0 = *fwd0Read;
-    qInfo("  [1] %s: %d channels x %d sources (weight=%.4f)",
-          qPrintable(fwdFiles[0]), static_cast<int>(fwd0.sol.data.rows()), static_cast<int>(fwd0.sol.data.cols()), weights[0]);
+    Log::info("  [1] {}: {} channels x {} sources (weight={:.4f})", fwdFiles[0].toStdString(), static_cast<int>(fwd0.sol.data.rows()), static_cast<int>(fwd0.sol.data.cols()), weights[0]);
 
     int nChan = fwd0.sol.data.rows();
     int nSrc = fwd0.sol.data.cols();
@@ -153,35 +147,31 @@ int main(int argc, char* argv[])
     for (int i = 1; i < fwdFiles.size(); ++i) {
         auto fwdiRead = MNEForwardSolution::read(fwdFiles[i].toStdU16String());
         if (!fwdiRead) {
-            qCritical("%s", fwdiRead.error().what());
+            Log::critical("{}", fwdiRead.error().what());
             return 1;
         }
         MNEForwardSolution& fwdi = *fwdiRead;
 
         if (fwdi.sol.data.rows() != nChan || fwdi.sol.data.cols() != nSrc) {
-            qCritical("Forward solution dimension mismatch in %s: %dx%d vs %dx%d",
-                      qPrintable(fwdFiles[i]),
-                      static_cast<int>(fwdi.sol.data.rows()), static_cast<int>(fwdi.sol.data.cols()),
-                      nChan, nSrc);
+            Log::critical("Forward solution dimension mismatch in {}: {}x{} vs {}x{}", fwdFiles[i].toStdString(), static_cast<int>(fwdi.sol.data.rows()), static_cast<int>(fwdi.sol.data.cols()), nChan, nSrc);
             return 1;
         }
 
-        qInfo("  [%d] %s: %d channels x %d sources (weight=%.4f)",
-              i + 1, qPrintable(fwdFiles[i]), nChan, nSrc, weights[i]);
+        Log::info("  [{}] {}: {} channels x {} sources (weight={:.4f})", i + 1, fwdFiles[i].toStdString(), nChan, nSrc, weights[i]);
 
         avgSol += weights[i] * fwdi.sol.data;
     }
 
-    qInfo("Averaged forward solution: %d channels x %d sources", nChan, nSrc);
+    Log::info("Averaged forward solution: {} channels x {} sources", nChan, nSrc);
 
     // Write averaged forward solution
     fwd0.sol.data = avgSol;
 
     if (auto written = fwd0.write(outFile.toStdU16String()); !written) {
-        qCritical("%s", written.error().what());
+        Log::critical("{}", written.error().what());
         return 1;
     }
 
-    qInfo("Written averaged forward solution to: %s", qPrintable(outFile));
+    Log::info("Written averaged forward solution to: {}", outFile.toStdString());
     return 0;
 }

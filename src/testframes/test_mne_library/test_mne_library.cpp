@@ -25,7 +25,6 @@
 #include <Eigen/Sparse>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -256,7 +255,6 @@ private slots:
 
 void TestMneLibrary::initTestCase()
 {
-    mne::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -1704,7 +1702,7 @@ void TestMneLibrary::bemSurface_readSingleLayer()
     QVERIFY(surf->ntri > 0);
     QVERIFY(surf->rr.rows() == surf->np);
     QVERIFY(surf->itris.rows() == surf->ntri);
-    qDebug() << "Single-layer BEM:" << surf->np << "verts," << surf->ntri << "tris, sigma=" << sigma;
+    Log::debug("Single-layer BEM: {} verts, {} tris, sigma= {}", surf->np, surf->ntri, sigma);
 }
 
 void TestMneLibrary::bemSurface_readThreeLayer()
@@ -1719,7 +1717,7 @@ void TestMneLibrary::bemSurface_readThreeLayer()
     auto surf = MNESurface::read_bem_surface(bem3File.toStdU16String(), 1, true, sigma);
     QVERIFY(surf != nullptr);
     QVERIFY(surf->np > 0);
-    qDebug() << "Three-layer BEM brain:" << surf->np << "verts";
+    Log::debug("Three-layer BEM brain: {} verts", surf->np);
 }
 
 void TestMneLibrary::bemSurface_sumSolids()
@@ -1730,7 +1728,7 @@ void TestMneLibrary::bemSurface_sumSolids()
     QVERIFY(surf != nullptr);
     Vector3f inside(surf->cm[0], surf->cm[1], surf->cm[2]);
     double total = surf->sum_solids(inside);
-    qDebug() << "Sum of solid angles from CM:" << total;
+    Log::debug("Sum of solid angles from CM: {}", total);
     QVERIFY(std::abs(std::abs(total) - 4.0 * std::numbers::pi) < 1.0);
 }
 
@@ -1828,7 +1826,7 @@ void TestMneLibrary::forwardSolution_readVerify()
     int totalVerts = 0;
     for (int i = 0; i < fwd.src.size(); ++i)
         totalVerts += fwd.src[i].nuse;
-    qDebug() << "Fwd:" << fwd.sol.nrow << "chs," << fwd.nsource << "src," << totalVerts << "verts";
+    Log::debug("Fwd: {} chs, {} src, {} verts", fwd.sol.nrow, fwd.nsource, totalVerts);
 }
 
 //=============================================================================================================

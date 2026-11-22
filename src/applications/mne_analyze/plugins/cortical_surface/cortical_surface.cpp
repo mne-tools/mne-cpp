@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "cortical_surface.h"
 
 #include <anShared/Management/communicator.h>
@@ -45,7 +46,6 @@
 #include <QCheckBox>
 #include <QColorDialog>
 #include <QComboBox>
-#include <QDebug>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -520,13 +520,13 @@ bool CorticalSurface::loadSurfaces(const QString& subjectsDir,
         const QString path = surfaceFilePath(subjectsDir, subjectId, hemiCode, type);
         if (!QFileInfo::exists(path)) {
             slot.reset();
-            qWarning() << "[CorticalSurface] Surface file not found:" << path;
+            Log::warning("[CorticalSurface] Surface file not found: {}", path.toStdString());
             return;
         }
         auto pSurf = std::make_shared<FsSurface>();
         if (!FsSurface::read(path.toStdU16String(), *pSurf, /*loadCurvature*/ true)) {
             slot.reset();
-            qWarning() << "[CorticalSurface] FsSurface::read failed for" << path;
+            Log::warning("[CorticalSurface] FsSurface::read failed for {}", path.toStdString());
             return;
         }
         slot = pSurf;
@@ -640,11 +640,11 @@ bool CorticalSurface::loadSourceEstimate(const QString& path)
 {
     auto stc = InvSourceEstimate::read(path.toStdU16String());
     if (!stc) {
-        qWarning() << "[CorticalSurface]" << stc.error().what();
+        Log::warning("[CorticalSurface] {}", stc.error().what());
         return false;
     }
     if (stc->empty() || stc->data.rows() == 0) {
-        qWarning() << "[CorticalSurface] STC produced an empty estimate:" << path;
+        Log::warning("[CorticalSurface] STC produced an empty estimate: {}", path.toStdString());
         return false;
     }
     setSourceEstimate(*stc);
@@ -1407,29 +1407,29 @@ bool CorticalSurface::runComputeSourceEstimate(const QString& fwdPath,
 {
     auto fwdRead = MNEForwardSolution::read(fwdPath.toStdU16String());
     if (!fwdRead) {
-        qWarning() << "[CorticalSurface]" << fwdRead.error().what();
+        Log::warning("[CorticalSurface] {}", fwdRead.error().what());
         return false;
     }
     const MNEForwardSolution& fwd = *fwdRead;
 
     if (!QFileInfo::exists(covPath)) {
-        qWarning() << "[CorticalSurface] Cannot open cov file" << covPath;
+        Log::warning("[CorticalSurface] Cannot open cov file {}", covPath.toStdString());
         return false;
     }
     FiffCov noiseCov;
     try {
         noiseCov = FiffCov(covPath.toStdU16String());
     } catch (const std::exception& e) {
-        qWarning() << "[CorticalSurface] read cov failed:" << e.what();
+        Log::warning("[CorticalSurface] read cov failed: {}", e.what());
         return false;
     }
     if (!QFileInfo::exists(evokedPath)) {
-        qWarning() << "[CorticalSurface] Cannot open evoked file" << evokedPath;
+        Log::warning("[CorticalSurface] Cannot open evoked file {}", evokedPath.toStdString());
         return false;
     }
     auto read = FiffEvoked::read(evokedPath.toStdU16String());
     if (!read) {
-        qWarning() << "[CorticalSurface]" << read.error().what();
+        Log::warning("[CorticalSurface] {}", read.error().what());
         return false;
     }
     const FiffEvoked& evoked = *read;
@@ -1472,7 +1472,7 @@ bool CorticalSurface::runComputeSourceEstimate(const QString& fwdPath,
         stc = res.stcCmne;
         ok = !stc.empty();
     } else {
-        qWarning() << "[CorticalSurface] Unknown inverse method" << m;
+        Log::warning("[CorticalSurface] Unknown inverse method {}", m.toStdString());
     }
 
     QGuiApplication::restoreOverrideCursor();
@@ -1701,7 +1701,7 @@ int CorticalSurface::loadAnnot(const QString& path)
     int hemi = path.contains(QStringLiteral("/rh.")) ? 1 : 0;
     std::shared_ptr<FsSurface> surf = (hemi == 0) ? m_pSurfaceLh : m_pSurfaceRh;
     if (!surf) {
-        qWarning() << "[CorticalSurface] loadAnnot: matching hemisphere surface not loaded";
+        Log::warning("[CorticalSurface] loadAnnot: matching hemisphere surface not loaded");
         return 0;
     }
     std::vector<FsLabel> labelList;

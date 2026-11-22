@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "datawindow.h"
 
 #include "../Models/virtualchannelmodel.h"
@@ -30,7 +31,6 @@
 
 #include <QHash>
 #include <QSignalBlocker>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -190,13 +190,13 @@ void DataWindow::scaleData(const QMap<QString, double>& scaleMap)
 
 void DataWindow::updateProjections()
 {
-    qWarning() << "[DataWindow] updateProjections called.";
+    mne::Log::warning("[DataWindow] updateProjections called.");
     if (m_pFiffReader)
         m_pFiffReader->updateProjections();
 
     // Reload all visible data with the updated projection
     restartChannelView(m_iCurrentScrollSample, false);
-    qWarning() << "[DataWindow] updateProjections: restartChannelView done.";
+    mne::Log::warning("[DataWindow] updateProjections: restartChannelView done.");
 }
 
 
@@ -269,9 +269,9 @@ void DataWindow::computeAutoScale()
     // Apply to the GPU model (and cache in the view for restartChannelView)
     if (m_pChannelDataView && !autoScaleMap.isEmpty()) {
         m_pChannelDataView->setScalingMap(autoScaleMap);
-        qWarning() << "[DataWindow] Auto-scale applied:" << autoScaleMap.size() << "channel types.";
+        mne::Log::warning("[DataWindow] Auto-scale applied: {} channel types.", autoScaleMap.size());
         for (auto it = autoScaleMap.constBegin(); it != autoScaleMap.constEnd(); ++it)
-            qWarning() << "  typeKey=" << it.key() << "scale=" << it.value();
+            mne::Log::warning("  typeKey= {} scale= {}", it.key(), it.value());
     }
 }
 
@@ -1127,10 +1127,7 @@ void DataWindow::rebuildVirtualChannels()
             primaryChannel < 0 || referenceChannels.isEmpty() || (definition.kind == VirtualChannelKind::Bipolar && referenceChannels.size() != 1);
 
         if (invalidDefinition) {
-            qWarning() << "DataWindow: could not resolve virtual channel"
-                       << definition.name
-                       << definition.primaryChannel
-                       << definition.referenceChannels;
+            mne::Log::warning("DataWindow: could not resolve virtual channel {} {} {}", definition.name.toStdString(), definition.primaryChannel.toStdString(), definition.referenceChannels.join(", ").toStdString());
             continue;
         }
 

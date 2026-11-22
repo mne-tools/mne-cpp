@@ -16,7 +16,6 @@
 
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -25,7 +24,6 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -43,7 +41,6 @@ using namespace mne;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_copy_processing_history");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -65,20 +62,19 @@ int main(int argc, char* argv[])
     QString toFile = parser.value(toOpt);
 
     if (fromFile.isEmpty()) {
-        qCritical("--from is required.");
+        Log::critical("--from is required.");
         return 1;
     }
     if (toFile.isEmpty()) {
-        qCritical("--to is required.");
+        Log::critical("--to is required.");
         return 1;
     }
 
     if (!FiffStream::copy_processing_history(fromFile.toStdU16String(), toFile.toStdU16String())) {
-        qCritical("Failed to copy processing history from %s to %s", qPrintable(fromFile), qPrintable(toFile));
+        Log::critical("Failed to copy processing history from {} to {}", fromFile.toStdString(), toFile.toStdString());
         return 1;
     }
 
-    qInfo("Successfully copied processing history from %s to %s",
-          qPrintable(fromFile), qPrintable(toFile));
+    Log::info("Successfully copied processing history from {} to {}", fromFile.toStdString(), toFile.toStdString());
     return 0;
 }

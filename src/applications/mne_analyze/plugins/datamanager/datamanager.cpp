@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "datamanager.h"
 #include <disp/viewers/bidsview.h>
 
@@ -29,7 +30,6 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -127,8 +127,7 @@ void DataManager::handleEvent(QSharedPointer<Event> e)
     // This plugin subscribes to no events, so anything arriving here is
     // unexpected. A switch with only a default label is what MSVC reports as
     // C4065, so warn directly instead.
-    qWarning() << "[DataManager::handleEvent] received an Event that is not handled:"
-               << e->getType();
+    mne::Log::warning("[DataManager::handleEvent] received an Event that is not handled: {}", static_cast<int>(e->getType()));
 }
 
 //=============================================================================================================

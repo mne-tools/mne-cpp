@@ -24,7 +24,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 
@@ -188,24 +187,22 @@ void TestMneSurf2Bem::setupProcess(QProcess& proc)
 
 void TestMneSurf2Bem::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     QVERIFY(m_tempDir.isValid());
 
     m_sAppPath = findApplication();
     m_bAppAvailable = !m_sAppPath.isEmpty();
     if (m_bAppAvailable) {
-        qDebug() << "Application found at" << m_sAppPath;
+        Log::debug("Application found at {}", m_sAppPath.toStdString());
     } else {
-        qDebug() << "mne_surf2bem executable not found — skipping app tests";
+        Log::debug("mne_surf2bem executable not found — skipping app tests");
     }
 
     m_sSubjectsDir = findSubjectsDir();
     m_bDataAvailable = !m_sSubjectsDir.isEmpty();
     if (m_bDataAvailable) {
-        qDebug() << "Sample data found at" << m_sSubjectsDir;
+        Log::debug("Sample data found at {}", m_sSubjectsDir.toStdString());
     } else {
-        qDebug() << "MNE sample data not found — skipping data-dependent tests";
+        Log::debug("MNE sample data not found — skipping data-dependent tests");
     }
 }
 
@@ -336,9 +333,9 @@ void TestMneSurf2Bem::testSingleSurfConversion()
     if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
-        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
-        qDebug() << "stdout:" << stdOut;
-        qDebug() << "stderr:" << stdErr;
+        Log::debug("exitCode: {} exitStatus: {}", proc.exitCode(), static_cast<int>(proc.exitStatus()));
+        Log::debug("stdout: {}", stdOut.toStdString());
+        Log::debug("stderr: {}", stdErr.toStdString());
     }
     QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);
@@ -362,9 +359,9 @@ void TestMneSurf2Bem::testSingleSurfConversion()
                  "FsSurface should have vertices");
         QVERIFY2(surf.ntri > 0,
                  "FsSurface should have triangles");
-        qDebug() << "Read back:" << surf.np << "vertices," << surf.ntri << "triangles";
+        Log::debug("Read back: {} vertices, {} triangles", surf.np, surf.ntri);
     } else {
-        qDebug() << "Could not read back FIFF file — skipping content validation";
+        Log::debug("Could not read back FIFF file — skipping content validation");
     }
 }
 
@@ -406,9 +403,9 @@ void TestMneSurf2Bem::testMultiSurfConversion()
     if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
-        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
-        qDebug() << "stdout:" << stdOut;
-        qDebug() << "stderr:" << stdErr;
+        Log::debug("exitCode: {} exitStatus: {}", proc.exitCode(), static_cast<int>(proc.exitStatus()));
+        Log::debug("stdout: {}", stdOut.toStdString());
+        Log::debug("stderr: {}", stdErr.toStdString());
     }
     QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);
@@ -432,9 +429,9 @@ void TestMneSurf2Bem::testMultiSurfConversion()
             QVERIFY2(bem[k].ntri > 0,
                      qPrintable(QString("FsSurface %1 should have triangles").arg(k)));
         }
-        qDebug() << "Read back 3 surfaces successfully";
+        Log::debug("Read back 3 surfaces successfully");
     } else {
-        qDebug() << "Could not read back FIFF file — skipping content validation";
+        Log::debug("Could not read back FIFF file — skipping content validation");
     }
 }
 
@@ -478,9 +475,9 @@ void TestMneSurf2Bem::testSurfConversionWithCheck()
     if (proc.exitCode() != 0 || proc.exitStatus() != QProcess::NormalExit) {
         QString stdErr = proc.readAllStandardError();
         QString stdOut = proc.readAllStandardOutput();
-        qDebug() << "exitCode:" << proc.exitCode() << "exitStatus:" << proc.exitStatus();
-        qDebug() << "stdout:" << stdOut;
-        qDebug() << "stderr:" << stdErr;
+        Log::debug("exitCode: {} exitStatus: {}", proc.exitCode(), static_cast<int>(proc.exitStatus()));
+        Log::debug("stdout: {}", stdOut.toStdString());
+        Log::debug("stderr: {}", stdErr.toStdString());
     }
     QCOMPARE(proc.exitStatus(), QProcess::NormalExit);
     QCOMPARE(proc.exitCode(), 0);

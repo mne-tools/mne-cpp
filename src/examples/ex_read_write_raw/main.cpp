@@ -19,7 +19,6 @@
 #include <math.h>
 #include <fiff/fiff.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,7 +57,6 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
 
     // Command Line Parser

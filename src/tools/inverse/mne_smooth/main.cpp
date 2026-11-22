@@ -20,7 +20,6 @@
 #include <fiff/fiff_constants.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <QRegularExpression>
 
 //=============================================================================================================
@@ -102,7 +100,6 @@ static SparseMatrix<double> buildSmoothingOperator(const MatrixX3i& tris, int nV
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_smooth");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -136,15 +133,15 @@ int main(int argc, char* argv[])
     int nSmooth = parser.value(smoothOpt).toInt();
 
     if (srcFile.isEmpty() && surfFile.isEmpty()) {
-        qCritical("Either --src or --surf is required.");
+        Log::critical("Either --src or --surf is required.");
         parser.showHelp(1);
     }
     if (stcFile.isEmpty()) {
-        qCritical("--stc is required.");
+        Log::critical("--stc is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
 
@@ -155,34 +152,34 @@ int main(int argc, char* argv[])
     if (!surfFile.isEmpty()) {
         FsSurface surface;
         if (!FsSurface::read(surfFile.toStdU16String(), surface)) {
-            qCritical("Cannot read surface: %s", qPrintable(surfFile));
+            Log::critical("Cannot read surface: {}", surfFile.toStdString());
             return 1;
         }
         tris = surface.tris();
         nVert = surface.rr().rows();
-        qInfo("Read surface: %d vertices, %d triangles", nVert, static_cast<int>(tris.rows()));
+        Log::info("Read surface: {} vertices, {} triangles", nVert, static_cast<int>(tris.rows()));
     } else {
         // Read source space
         auto read = MNESourceSpaces::read(srcFile.toStdU16String());
         if (!read) {
-            qCritical("%s", read.error().what());
+            Log::critical("{}", read.error().what());
             return 1;
         }
         const MNESourceSpaces& srcSpaces = *read;
         // Use first hemisphere's triangulation
         tris = srcSpaces[0].itris;
         nVert = srcSpaces[0].np;
-        qInfo("Read source space: %d vertices, %d triangles", nVert, static_cast<int>(tris.rows()));
+        Log::info("Read source space: {} vertices, {} triangles", nVert, static_cast<int>(tris.rows()));
     }
 
     // Build smoothing operator
     SparseMatrix<double> S = buildSmoothingOperator(tris, nVert);
-    qInfo("Built smoothing operator: %d x %d", static_cast<int>(S.rows()), static_cast<int>(S.cols()));
+    Log::info("Built smoothing operator: {} x {}", static_cast<int>(S.rows()), static_cast<int>(S.cols()));
 
     // Read STC data (text format: one value per line, or vertex value pairs)
     QFile stcIn(stcFile);
     if (!stcIn.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open STC file: %s", qPrintable(stcFile));
+        Log::critical("Cannot open STC file: {}", stcFile.toStdString());
         return 1;
     }
 
@@ -207,19 +204,19 @@ int main(int argc, char* argv[])
         if (pair.first >= 0 && pair.first < nVert)
             data(pair.first) = pair.second;
     }
-    qInfo("Read %d data values", static_cast<int>(dataList.size()));
+    Log::info("Read {} data values", static_cast<int>(dataList.size()));
 
     // Apply iterative smoothing
     VectorXd smoothed = data;
     for (int iter = 0; iter < nSmooth; ++iter) {
         smoothed = S * smoothed;
     }
-    qInfo("Applied %d iterations of Laplacian smoothing", nSmooth);
+    Log::info("Applied {} iterations of Laplacian smoothing", nSmooth);
 
     // Write output
     QFile stcOut(outFile);
     if (!stcOut.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        Log::critical("Cannot write output file: {}", outFile.toStdString());
         return 1;
     }
     QTextStream out(&stcOut);
@@ -229,7 +226,7 @@ int main(int argc, char* argv[])
             out << i << " " << QString::number(smoothed(i), 'g', 10) << "\n";
     }
     stcOut.close();
-    qInfo("Written smoothed data to: %s", qPrintable(outFile));
+    Log::info("Written smoothed data to: {}", outFile.toStdString());
 
     return 0;
 }

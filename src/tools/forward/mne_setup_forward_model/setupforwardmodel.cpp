@@ -29,6 +29,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "setupforwardmodel.h"
 #include "mne_setup_forward_model_settings.h"
 
@@ -57,7 +58,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -84,13 +84,13 @@ int SetupForwardModel::run()
     // Validate settings
     //
     if (m_settings.subjectsDir().isEmpty()) {
-        qCritical() << "The environment variable SUBJECTS_DIR should be set.";
-        qCritical() << "Use --subjects-dir or set the SUBJECTS_DIR environment variable.";
+        Log::critical("The environment variable SUBJECTS_DIR should be set.");
+        Log::critical("Use --subjects-dir or set the SUBJECTS_DIR environment variable.");
         return 1;
     }
     if (m_settings.subject().isEmpty()) {
-        qCritical() << "Subject not specified.";
-        qCritical() << "Use --subject or set the SUBJECT environment variable.";
+        Log::critical("Subject not specified.");
+        Log::critical("Use --subject or set the SUBJECT environment variable.");
         return 1;
     }
 
@@ -102,11 +102,11 @@ int SetupForwardModel::run()
     QString ext = m_settings.useSurfFormat() ? "surf" : "tri";
 
     if (!QDir(subjectDir).exists()) {
-        qCritical() << "Could not find the MRI data directory" << subjectDir;
+        Log::critical("Could not find the MRI data directory {}", subjectDir.toStdString());
         return 1;
     }
     if (!QDir(bemDir).exists()) {
-        qCritical() << "Could not find the BEM directory" << bemDir;
+        Log::critical("Could not find the BEM directory {}", bemDir.toStdString());
         return 1;
     }
 
@@ -115,18 +115,18 @@ int SetupForwardModel::run()
     //
     QString innerSkullFile;
     if (!locateSurface(bemDir, "inner_skull", ext, innerSkullFile)) {
-        qCritical() << "Could not find the inner skull triangulation";
+        Log::critical("Could not find the inner skull triangulation");
         return 1;
     }
 
     QString outerSkullFile, outerSkinFile;
     if (!m_settings.homogeneous()) {
         if (!locateSurface(bemDir, "outer_skull", ext, outerSkullFile)) {
-            qCritical() << "Could not find the outer skull triangulation" << outerSkullFile;
+            Log::critical("Could not find the outer skull triangulation {}", outerSkullFile.toStdString());
             return 1;
         }
         if (!locateSurface(bemDir, "outer_skin", ext, outerSkinFile)) {
-            qCritical() << "Could not find the scalp triangulation" << outerSkinFile;
+            Log::critical("Could not find the scalp triangulation {}", outerSkinFile.toStdString());
             return 1;
         }
     }
@@ -134,11 +134,11 @@ int SetupForwardModel::run()
     //
     // Step 1: Read surfaces and create BEM geometry
     //
-    qInfo("%s", "");
-    qInfo("Setting up the BEM with the following parameters:");
-    qInfo("%s", "");
-    qInfo("SUBJECTS_DIR       = %s", qPrintable(m_settings.subjectsDir()));
-    qInfo("Subject            = %s", qPrintable(m_settings.subject()));
+    Log::info("{}", "");
+    Log::info("Setting up the BEM with the following parameters:");
+    Log::info("{}", "");
+    Log::info("SUBJECTS_DIR       = {}", m_settings.subjectsDir().toStdString());
+    Log::info("Subject            = {}", m_settings.subject().toStdString());
 
     // Read inner skull
     MNEBemSurface innerSkull;
@@ -155,8 +155,7 @@ int SetupForwardModel::run()
             return 1;
         }
     }
-    qInfo("Inner skull        = %s (%d triangles)",
-          qPrintable(innerSkullFile), innerSkull.ntri);
+    Log::info("Inner skull        = {} ({} triangles)", innerSkullFile.toStdString(), innerSkull.ntri);
 
     MNEBemSurface outerSkull, outerSkin;
     if (!m_settings.homogeneous()) {
@@ -174,8 +173,7 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        qInfo("Outer skull        = %s (%d triangles)",
-              qPrintable(outerSkullFile), outerSkull.ntri);
+        Log::info("Outer skull        = {} ({} triangles)", outerSkullFile.toStdString(), outerSkull.ntri);
 
         // Read outer skin (scalp)
         if (m_settings.useSurfFormat()) {
@@ -191,14 +189,13 @@ int SetupForwardModel::run()
                 return 1;
             }
         }
-        qInfo("Scalp              = %s (%d triangles)",
-              qPrintable(outerSkinFile), outerSkin.ntri);
+        Log::info("Scalp              = {} ({} triangles)", outerSkinFile.toStdString(), outerSkin.ntri);
     }
 
-    qInfo("brain conductivity = %g S/m", m_settings.brainConductivity());
+    Log::info("brain conductivity = {:g} S/m", m_settings.brainConductivity());
     if (!m_settings.homogeneous()) {
-        qInfo("skull conductivity = %g S/m", m_settings.skullConductivity());
-        qInfo("scalp conductivity = %g S/m", m_settings.scalpConductivity());
+        Log::info("skull conductivity = {:g} S/m", m_settings.skullConductivity());
+        Log::info("scalp conductivity = {:g} S/m", m_settings.scalpConductivity());
     }
 
     //
@@ -223,21 +220,21 @@ int SetupForwardModel::run()
         modelFile = bemDir + "/" + m_settings.modelName() + "-bem.fif";
     }
 
-    qInfo("Resulting BEM      = %s\n", qPrintable(modelFile));
+    Log::info("Resulting BEM      = {}\n", modelFile.toStdString());
 
     //
     // Check if file already exists
     //
     if (QFileInfo::exists(modelFile) && !m_settings.overwrite()) {
-        qCritical() << "Output file" << modelFile << "already exists.";
-        qCritical() << "Use --overwrite to overwrite.";
+        Log::critical("Output file {} already exists.", modelFile.toStdString());
+        Log::critical("Use --overwrite to overwrite.");
         return 1;
     }
 
     //
     // >> 1. Creating the BEM geometry file
     //
-    qInfo(">> 1. Creating the BEM geometry file...");
+    Log::info(">> 1. Creating the BEM geometry file...");
 
     MNEBem bem;
     if (m_settings.homogeneous()) {
@@ -250,15 +247,15 @@ int SetupForwardModel::run()
     }
 
     if (auto written = bem.write(modelFile.toStdU16String()); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return 1;
     }
-    qInfo("BEM geometry file written to %s\n", qPrintable(modelFile));
+    Log::info("BEM geometry file written to {}\n", modelFile.toStdString());
 
     //
     // >> 2. Creating ascii pnt files and surf files
     //
-    qInfo(">> 2. Creating ascii pnt files and surf files...");
+    Log::info(">> 2. Creating ascii pnt files and surf files...");
 
     if (m_settings.homogeneous()) {
         QString pntFile = QString("%1/%2-inner_skull-%3.pnt")
@@ -326,26 +323,26 @@ int SetupForwardModel::run()
                 return 1;
         }
     }
-    qInfo("%s", "");
+    Log::info("{}", "");
 
     //
     // >> 3. Calculating BEM geometry data (solution)
     //
     if (!m_settings.noSolution()) {
-        qInfo(">> 3. Calculating BEM geometry data (this takes several minutes)...\n");
+        Log::info(">> 3. Calculating BEM geometry data (this takes several minutes)...\n");
 
         QString solFile = modelFile;
         solFile.replace(".fif", "-sol.fif");
 
         if (!prepareBemSolution(modelFile, solFile)) {
-            qCritical() << "Model preparation failed.";
+            Log::critical("Model preparation failed.");
             return 1;
         } else {
-            qInfo("\nThe model %s is now ready for use", qPrintable(solFile));
+            Log::info("\nThe model {} is now ready for use", solFile.toStdString());
         }
     }
 
-    qInfo("\nComplete.");
+    Log::info("\nComplete.");
     return 0;
 }
 
@@ -390,7 +387,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     //
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Could not open ASCII triangle file:" << fileName;
+        Log::critical("Could not open ASCII triangle file: {}", fileName.toStdString());
         return false;
     }
 
@@ -400,7 +397,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
-        qCritical() << "Invalid vertex count in" << fileName;
+        Log::critical("Invalid vertex count in {}", fileName.toStdString());
         return false;
     }
 
@@ -410,7 +407,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
         float x, y, z;
         in >> x >> y >> z;
         if (in.status() != QTextStream::Ok) {
-            qCritical() << "Error reading vertex" << k << "from" << fileName;
+            Log::critical("Error reading vertex {} from {}", k, fileName.toStdString());
             return false;
         }
         rr(k, 0) = x;
@@ -422,7 +419,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     int ntri = 0;
     in >> ntri;
     if (ntri <= 0) {
-        qCritical() << "Invalid triangle count in" << fileName;
+        Log::critical("Invalid triangle count in {}", fileName.toStdString());
         return false;
     }
 
@@ -432,7 +429,7 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
         int v1, v2, v3;
         in >> v1 >> v2 >> v3;
         if (in.status() != QTextStream::Ok) {
-            qCritical() << "Error reading triangle" << k << "from" << fileName;
+            Log::critical("Error reading triangle {} from {}", k, fileName.toStdString());
             return false;
         }
         if (m_settings.swap()) {
@@ -483,7 +480,7 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
 {
     auto geometry = FsSurface::read_geometry(fileName.toStdU16String());
     if (!geometry) {
-        qCritical() << geometry.error().what();
+        Log::critical("{}", geometry.error().what());
         return false;
     }
 
@@ -522,7 +519,7 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
     // Recompute normals after shifting
     surf.nn = FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
-    qInfo("FsSurface vertices shifted by %6.1f mm.", 1000.0f * shift);
+    Log::info("FsSurface vertices shifted by {:6.1f} mm.", 1000.0f * shift);
 }
 
 //=============================================================================================================
@@ -537,7 +534,7 @@ bool SetupForwardModel::exportPntFile(const MNEBemSurface& surf,
     //
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical() << "Could not open" << fileName << "for writing";
+        Log::critical("Could not open {} for writing", fileName.toStdString());
         return false;
     }
 
@@ -551,7 +548,7 @@ bool SetupForwardModel::exportPntFile(const MNEBemSurface& surf,
                    .arg(static_cast<double>(surf.rr(k, 2)) * 1000.0, 0, 'f', 4);
     }
     file.close();
-    qInfo("Written %s", qPrintable(fileName));
+    Log::info("Written {}", fileName.toStdString());
     return true;
 }
 
@@ -565,7 +562,7 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
     //
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
-        qCritical() << "Could not open" << fileName << "for writing";
+        Log::critical("Could not open {} for writing", fileName.toStdString());
         return false;
     }
 
@@ -599,7 +596,7 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
     }
 
     file.close();
-    qInfo("Written %s", qPrintable(fileName));
+    Log::info("Written {}", fileName.toStdString());
     return true;
 }
 
@@ -626,26 +623,26 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
     }
 
     if (!bemModel) {
-        qCritical() << "Could not load BEM surfaces from" << bemFile;
+        Log::critical("Could not load BEM surfaces from {}", bemFile.toStdString());
         return false;
     }
 
-    qInfo("Computing the linear collocation solution...");
+    Log::info("Computing the linear collocation solution...");
 
     int result = bemModel->fwd_bem_compute_solution(FWD_BEM_LINEAR_COLL);
     if (result != 0) {
-        qCritical() << "BEM solution computation failed.";
+        Log::critical("BEM solution computation failed.");
         return false;
     }
 
-    qInfo("Solution computed.");
+    Log::info("Solution computed.");
 
-    qInfo("Saving...");
+    Log::info("Saving...");
     if (bemModel->fwd_bem_save_model(solFile.toStdU16String()) != 0) {
-        qCritical() << "Could not write" << solFile;
+        Log::critical("Could not write {}", solFile.toStdString());
         return false;
     }
-    qInfo("Saved the result to %s", qPrintable(solFile));
+    Log::info("Saved the result to {}", solFile.toStdString());
 
 
     return true;

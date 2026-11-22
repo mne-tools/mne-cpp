@@ -28,7 +28,6 @@
 #include <disp3D/model/braintreemodel.h>
 #include <math/linalg.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,7 +71,6 @@ int main(int argc, char* argv[])
 #ifdef STATICBUILD
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
 
     // Command Line Parser
@@ -121,7 +119,7 @@ int main(int argc, char* argv[])
     FsSurfaceSet t_surfSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(surfOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
     FsAnnotationSet t_annotationSet(parser.value(subjectOption).toStdString(), parser.value(hemiOption).toInt(), parser.value(annotOption).toStdString(), parser.value(subjectPathOption).toStdU16String());
 
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+    Log::debug("Start calculation with: SNR {} ; Lambda {} ; Method {} ; stc: {}", snr, lambda2, method.toStdString(), t_sFileNameStc.toStdString());
 
     // Load data
     FiffEvoked evoked(parser.value(sampleEvokedFileOption).toStdU16String(), 0);
@@ -157,7 +155,7 @@ int main(int argc, char* argv[])
     //
     if (!t_sFileNameClusteredInv.isEmpty()) {
         if (auto written = inverse_operator.write(t_sFileNameClusteredInv.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 
@@ -277,10 +275,10 @@ int main(int argc, char* argv[])
     QString lhStcPath = tmpDir + "/mnecpp_clustered_inv_mne-lh.stc";
     QString rhStcPath = tmpDir + "/mnecpp_clustered_inv_mne-rh.stc";
     if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
     if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
 
     BrainView* pBrainView = new BrainView();
@@ -309,7 +307,7 @@ int main(int argc, char* argv[])
 
     if (!t_sFileNameStc.isEmpty()) {
         if (auto written = sourceEstimate.write(t_sFileNameStc.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 

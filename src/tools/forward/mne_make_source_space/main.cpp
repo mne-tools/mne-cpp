@@ -31,7 +31,6 @@
 #include <fs/fs_surfaceset.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -43,7 +42,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -145,7 +143,7 @@ static bool makeIcosahedron(int grade, MatrixX3f& verts)
         verts.row(i) = icoVerts[i].transpose();
     }
 
-    qInfo("  Icosahedron grade %d: %d vertices", std::abs(grade), static_cast<int>(verts.rows()));
+    Log::info("  Icosahedron grade {}: {} vertices", std::abs(grade), static_cast<int>(verts.rows()));
     return true;
 }
 
@@ -329,7 +327,6 @@ static MNEHemisphere buildHemisphere(const FsSurface& surf,
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -407,10 +404,10 @@ int main(int argc, char* argv[])
         // Fall back to $SUBJECT environment variable (matching SVN MNE-C)
         QString envSubject = qEnvironmentVariable("SUBJECT");
         if (envSubject.isEmpty()) {
-            qCritical() << "Error: --subject option is required (or set $SUBJECT).";
+            Log::critical("Error: --subject option is required (or set $SUBJECT).");
             parser.showHelp(1);
         }
-        qInfo("Using subject from $SUBJECT: %s", envSubject.toUtf8().constData());
+        Log::info("Using subject from $SUBJECT: {}", envSubject.toStdString());
     }
 
     QString subject = parser.isSet(subjectOpt) ? parser.value(subjectOpt)
@@ -421,14 +418,14 @@ int main(int argc, char* argv[])
     } else {
         subjectsDir = qEnvironmentVariable("SUBJECTS_DIR");
         if (subjectsDir.isEmpty()) {
-            qCritical() << "Error: SUBJECTS_DIR not set. Use --subjects_dir.";
+            Log::critical("Error: SUBJECTS_DIR not set. Use --subjects_dir.");
             return 1;
         }
     }
 
     // --surf is required (matching SVN MNE-C)
     if (!parser.isSet(surfOpt)) {
-        qCritical() << "Error: --surf option is required.";
+        Log::critical("Error: --surf option is required.");
         parser.showHelp(1);
     }
     QString surfName = parser.value(surfOpt);
@@ -449,7 +446,7 @@ int main(int argc, char* argv[])
         decimMethod = SPACING;
         spacing = parser.value(spacingOpt).toFloat();
         if (spacing <= 0.0f) {
-            qCritical() << "Error: --spacing must be a positive number.";
+            Log::critical("Error: --spacing must be a positive number.");
             return 1;
         }
     } else if (parser.isSet(icoOpt) || parser.isSet(octOpt)) {
@@ -460,11 +457,11 @@ int main(int argc, char* argv[])
             icoGrade = parser.value(octOpt).toInt();
         }
         if (icoGrade < 1 || icoGrade > 7) {
-            qCritical() << "Error: --ico/--oct grade should be between 1 and 7.";
+            Log::critical("Error: --ico/--oct grade should be between 1 and 7.");
             return 1;
         }
     } else {
-        qCritical() << "Error: A decimation method is required (--ico, --oct, --spacing, or --all).";
+        Log::critical("Error: A decimation method is required (--ico, --oct, --spacing, or --all).");
         parser.showHelp(1);
     }
 
@@ -490,9 +487,9 @@ int main(int argc, char* argv[])
 
     MatrixX3f icoVerts;
     if (decimMethod == ICO) {
-        qInfo("\nBuilding icosahedron with grade %d for decimation...", icoGrade);
+        Log::info("\nBuilding icosahedron with grade {} for decimation...", icoGrade);
         if (!makeIcosahedron(icoGrade, icoVerts)) {
-            qCritical() << "Error: Failed to build icosahedron.";
+            Log::critical("Error: Failed to build icosahedron.");
             return 1;
         }
     }
@@ -507,23 +504,22 @@ int main(int argc, char* argv[])
     QVector<MNEHemisphere> hemispheres;
 
     for (int h = 0; h < 2; ++h) {
-        qInfo("\n========================================");
-        qInfo("Processing %s hemisphere...", hemiNames[h].toUtf8().constData());
+        Log::info("\n========================================");
+        Log::info("Processing {} hemisphere...", hemiNames[h].toStdString());
 
         // Read FreeSurfer surface
         QString surfPath = subjectsDir + "/" + subject + "/surf/" +
             hemiNames[h] + "." + surfName;
 
-        qInfo("Reading surface from %s...", surfPath.toUtf8().constData());
+        Log::info("Reading surface from {}...", surfPath.toStdString());
 
         FsSurface surf;
         if (!FsSurface::read(surfPath.toStdU16String(), surf)) {
-            qCritical() << "Error: Could not read surface" << surfPath;
+            Log::critical("Error: Could not read surface {}", surfPath.toStdString());
             return 1;
         }
 
-        qInfo("  FsSurface: %d vertices, %d triangles",
-              static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
+        Log::info("  FsSurface: {} vertices, {} triangles", static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
 
         // Select source vertices
         VectorXi inuse;
@@ -531,7 +527,7 @@ int main(int argc, char* argv[])
         int nuse;
 
         if (decimMethod == ALL) {
-            qInfo("  Using all vertices.");
+            Log::info("  Using all vertices.");
             int np = surf.rr().rows();
             inuse = VectorXi::Ones(np);
             vertno.resize(np);
@@ -539,17 +535,17 @@ int main(int argc, char* argv[])
                 vertno(i) = i;
             nuse = np;
         } else if (decimMethod == ICO) {
-            qInfo("  Decimating with icosahedron grade %d...", icoGrade);
+            Log::info("  Decimating with icosahedron grade {}...", icoGrade);
             nuse = selectVerticesIco(surf.rr(), icoVerts, inuse, vertno);
         } else {
-            qInfo("  Decimating with spacing %.1f mm...", spacing);
+            Log::info("  Decimating with spacing {:.1f} mm...", spacing);
             nuse = selectVerticesSpacing(surf.rr(), spacing, inuse, vertno);
         }
 
-        qInfo("  Selected %d source locations.", nuse);
+        Log::info("  Selected {} source locations.", nuse);
 
         if (nuse == 0) {
-            qCritical() << "Error: No vertices selected for" << hemiNames[h];
+            Log::critical("Error: No vertices selected for {}", hemiNames[h].toStdString());
             return 1;
         }
 
@@ -562,8 +558,8 @@ int main(int argc, char* argv[])
     // Write source space
     //=========================================================================================================
 
-    qInfo("\n========================================");
-    qInfo("Writing source space to %s...", srcName.toUtf8().constData());
+    Log::info("\n========================================");
+    Log::info("Writing source space to {}...", srcName.toStdString());
 
     // Ensure output directory exists
     QFileInfo fi(srcName);
@@ -571,7 +567,7 @@ int main(int argc, char* argv[])
 
     QFile srcFile(srcName);
     if (!srcFile.open(QIODevice::WriteOnly)) {
-        qCritical() << "Error: Could not open output file" << srcName;
+        Log::critical("Error: Could not open output file {}", srcName.toStdString());
         return 1;
     }
 
@@ -585,21 +581,17 @@ int main(int argc, char* argv[])
     srcFile.close();
 
     // Summary
-    qInfo("\nSource space created successfully:");
+    Log::info("\nSource space created successfully:");
     for (int h = 0; h < hemispheres.size(); ++h) {
         if (hemispheres[h].nuse_tri > 0) {
-            qInfo("  %s hemisphere: %d of %d vertices selected, %d use triangles",
-                  h == 0 ? "Left" : "Right",
-                  hemispheres[h].nuse, hemispheres[h].np, hemispheres[h].nuse_tri);
+            Log::info("  {} hemisphere: {} of {} vertices selected, {} use triangles", h == 0 ? "Left" : "Right", hemispheres[h].nuse, hemispheres[h].np, hemispheres[h].nuse_tri);
         } else {
-            qInfo("  %s hemisphere: %d of %d vertices selected",
-                  h == 0 ? "Left" : "Right",
-                  hemispheres[h].nuse, hemispheres[h].np);
+            Log::info("  {} hemisphere: {} of {} vertices selected", h == 0 ? "Left" : "Right", hemispheres[h].nuse, hemispheres[h].np);
         }
     }
-    qInfo("\nOutput: %s", srcName.toUtf8().constData());
-    qInfo("\nYou can now use mne_forward_solution to compute forward solutions");
-    qInfo("using this source space.\n");
+    Log::info("\nOutput: {}", srcName.toStdString());
+    Log::info("\nYou can now use mne_forward_solution to compute forward solutions");
+    Log::info("using this source space.\n");
 
     return 0;
 }

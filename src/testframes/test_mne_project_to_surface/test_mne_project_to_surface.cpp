@@ -109,7 +109,7 @@ void TestMNEProjectToSurface::compareValue()
 {
     // check if MNEProjectToSurface was able to get original points on surface
     MatrixXf matDiff = matRef.cast<float>() - matResult;
-    qDebug() << "Summed Difference: " << std::abs(matDiff.sum());
+    Log::debug("Summed Difference: {}", std::abs(matDiff.sum()));
     QVERIFY(std::abs(matDiff.sum()) < dEpsilon);
 }
 

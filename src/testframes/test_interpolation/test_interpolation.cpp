@@ -24,7 +24,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp3D/helpers/geometryinfo.h>
 #include <disp3D/helpers/interpolation.h>
 #include <mne/mne_bem.h>
@@ -91,7 +90,6 @@ TestInterpolation::TestInterpolation()
 
 void TestInterpolation::initTestCase()
 {
-    mne::install_qt_message_handler();
     //acquire real data
     MNEBem t_sensorSurfaceVV((QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif").toStdU16String());
     realSurface = t_sensorSurfaceVV[0];

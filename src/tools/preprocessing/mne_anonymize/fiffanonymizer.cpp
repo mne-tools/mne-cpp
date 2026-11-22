@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffanonymizer.h"
 
 #include <base/base_global.h>
@@ -201,12 +202,12 @@ FiffAnonymizer::FiffAnonymizer(FiffAnonymizer&& obj)
 int FiffAnonymizer::anonymizeFile()
 {
     if (!m_bFileInSet) {
-        qCritical() << "Input file has not been specified.";
+        mne::Log::critical("Input file has not been specified.");
         return 1;
     }
 
     if (!m_bFileOutSet) {
-        qCritical() << "Output file has not been specified.";
+        mne::Log::critical("Output file has not been specified.");
         return 1;
     }
 
@@ -530,7 +531,7 @@ void FiffAnonymizer::processHeaderTags()
     if (checkValidFiffFormatVersion()) {
         printIfVerbose("Input file compatible with this version.");
     } else {
-        qCritical() << "This file may not be compatible with this application. First tag is not a valid ID tag.";
+        mne::Log::critical("This file may not be compatible with this application. First tag is not a valid ID tag.");
     }
 
     censorTag();
@@ -540,7 +541,7 @@ void FiffAnonymizer::processHeaderTags()
     readTag();
 
     if (m_pTag->kind != FIFF_DIR_POINTER) {
-        qCritical() << "This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.";
+        mne::Log::critical("This file may not be compatible with this application. Second tag is not a valid Tag directory pointer tag.");
     }
     qint32 newTagDirLoc(-1);
     memcpy(m_pTag->data(), &newTagDirLoc, sizeof(qint32));
@@ -552,7 +553,7 @@ void FiffAnonymizer::processHeaderTags()
     readTag();
 
     if ((m_pTag->kind == FIFF_FREE_LIST) && (*m_pTag->to_int() > 0)) {
-        qWarning() << "This file contains a Free List of tags. It will not be copied to the output file.";
+        mne::Log::warning("This file contains a Free List of tags. It will not be copied to the output file.");
     } else {
         // output this tag, whatever kind it is, to the oupput file.
         censorTag();
@@ -618,7 +619,7 @@ int FiffAnonymizer::setOutFile(const QString& sFileOut)
     QFileInfo fiIn(m_fFileIn);
     QFileInfo fiOut(sFileOut);
     if (fiOut.absoluteFilePath() == fiIn.absoluteFilePath()) {
-        qWarning() << "Both input and output file names are the same.";
+        mne::Log::warning("Both input and output file names are the same.");
         return 1;
     } else {
         m_fFileOut.setFileName(fiOut.absoluteFilePath());
@@ -767,7 +768,7 @@ int FiffAnonymizer::openInOutStreams()
 {
     auto in = mne::FileByteStream::open(m_fFileIn.fileName().toStdU16String(), mne::FileByteStream::Mode::Read);
     if (!in) {
-        qCritical() << "Problem opening the input file: " << m_fFileIn.fileName();
+        mne::Log::critical("Problem opening the input file: {}", m_fFileIn.fileName().toStdString());
         return 1;
     }
     printIfVerbose("Input file opened correctly: " + m_fFileIn.fileName());
@@ -775,7 +776,7 @@ int FiffAnonymizer::openInOutStreams()
 
     auto out = mne::FileByteStream::open(m_fFileOut.fileName().toStdU16String(), mne::FileByteStream::Mode::Write);
     if (!out) {
-        qCritical() << "Problem opening the output file: " << m_fFileOut.fileName();
+        mne::Log::critical("Problem opening the output file: {}", m_fFileOut.fileName().toStdString());
         return 1;
     }
     printIfVerbose("Output file opened correctly: " + m_fFileOut.fileName());
@@ -790,14 +791,14 @@ int FiffAnonymizer::closeInOutStreams()
     if (m_pInStream->close()) {
         printIfVerbose("Input file closed.");
     } else {
-        qCritical() << "Problem closing the input file: " << m_fFileIn.fileName();
+        mne::Log::critical("Problem closing the input file: {}", m_fFileIn.fileName().toStdString());
         return 1;
     }
 
     if (m_pOutStream->close()) {
         printIfVerbose("Output file closed.");
     } else {
-        qCritical() << "Problem closing the output file: " << m_fFileOut.fileName();
+        mne::Log::critical("Problem closing the output file: {}", m_fFileOut.fileName().toStdString());
         return 1;
     }
 

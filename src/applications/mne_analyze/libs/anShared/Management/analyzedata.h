@@ -21,6 +21,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
@@ -178,7 +179,7 @@ public:
     {
         // check if model was already loaded
         if (QSharedPointer<AbstractModel> pModel = getModelByPath(sPath)) {
-            qInfo() << "[AnalyzeData::loadModel] Data has been loaded already.";
+            Log::info("[AnalyzeData::loadModel] Data has been loaded already.");
             return qSharedPointerDynamicCast<T>(pModel);
         }
 
@@ -283,7 +284,7 @@ public:
                 break;
             }
             default: {
-                qWarning() << "[AnalyzeData::addModel] Model type not supported";
+                Log::warning("[AnalyzeData::addModel] Model type not supported");
                 break;
             }
         }

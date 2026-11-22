@@ -18,7 +18,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <math/matrix_io.h>
 #include <connectivity/metrics/coherency.h>
@@ -98,7 +97,6 @@ TestSpectralConnectivity::TestSpectralConnectivity()
 
 void TestSpectralConnectivity::initTestCase()
 {
-    mne::install_qt_message_handler();
     //*********************************************************************************************************
     // Load and Setup Testing Data
     //*********************************************************************************************************

@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "controlmanager.h"
 
 #include <anShared/Management/analyzedata.h>
@@ -34,7 +35,6 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -200,7 +200,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
             break;
 #endif
         default:
-            qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
+            mne::Log::warning("[ControlManager::handleEvent] received an Event that is not handled by switch-cases");
             break;
     }
 }

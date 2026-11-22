@@ -17,7 +17,6 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_file.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +29,6 @@
 #include <QDir>
 #include <QTextStream>
 #include <QDataStream>
-#include <QDebug>
 #include <QFileInfo>
 
 //=============================================================================================================
@@ -68,17 +66,17 @@ static bool readCorDirectory(const QString& dirPath, std::vector<std::vector<uns
         QString fname = dir.filePath(QString("COR-%1").arg(k + 1, 3, 10, QChar('0')));
         QFile file(fname);
         if (!file.open(QIODevice::ReadOnly)) {
-            qCritical() << "Cannot open COR file:" << fname;
+            Log::critical("Cannot open COR file: {}", fname.toStdString());
             return false;
         }
         QByteArray data = file.readAll();
         if (data.size() != COR_SLICE_SIZE) {
-            qCritical() << "Unexpected COR slice size:" << data.size() << "expected" << COR_SLICE_SIZE;
+            Log::critical("Unexpected COR slice size: {} expected {}", data.size(), COR_SLICE_SIZE);
             return false;
         }
         slices[k].assign(data.constData(), data.constData() + data.size());
     }
-    qInfo("Read %d COR slices from %s", COR_NSLICE, dirPath.toUtf8().constData());
+    Log::info("Read {} COR slices from {}", COR_NSLICE, dirPath.toStdString());
     return true;
 }
 
@@ -91,7 +89,7 @@ static bool writeMriDescription(const QString& filename,
     QFile file(filename);
     auto stream = FiffStream::start_file(filename.toStdU16String());
     if (!stream) {
-        qCritical() << "Cannot create output FIFF file:" << filename;
+        Log::critical("Cannot create output FIFF file: {}", filename.toStdString());
         return false;
     }
 
@@ -152,8 +150,7 @@ static bool writeMriDescription(const QString& filename,
     stream->end_block(FIFFB_MRI);
     stream->end_file();
 
-    qInfo("Wrote MRI description to %s (%dx%dx%d)",
-          filename.toUtf8().constData(), width, height, nslice);
+    Log::info("Wrote MRI description to {} ({}x{}x{})", filename.toStdString(), width, height, nslice);
     return true;
 }
 
@@ -161,7 +158,6 @@ static bool writeMriDescription(const QString& filename,
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_cor_set");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -185,11 +181,11 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (corDir.isEmpty() && mghFile.isEmpty()) {
-        qInfo("Either --dir or --mgh must be specified.");
+        Log::info("Either --dir or --mgh must be specified.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("Output file (--out) is required.");
+        Log::critical("Output file (--out) is required.");
         return 1;
     }
 
@@ -205,7 +201,7 @@ int main(int argc, char* argv[])
         bool isGz = mghFile.endsWith(".mgz") || mghFile.endsWith(".mgh.gz");
 
         if (!file.open(QIODevice::ReadOnly)) {
-            qCritical("Cannot open mgh file: %s", mghFile.toUtf8().constData());
+            Log::critical("Cannot open mgh file: {}", mghFile.toStdString());
             return 1;
         }
 
@@ -216,7 +212,7 @@ int main(int argc, char* argv[])
         if (isGz) {
             data = qUncompress(rawData);
             if (data.isEmpty()) {
-                qCritical("Failed to decompress mgz file. Try using an uncompressed .mgh file.");
+                Log::critical("Failed to decompress mgz file. Try using an uncompressed .mgh file.");
                 return 1;
             }
         } else {
@@ -231,7 +227,7 @@ int main(int argc, char* argv[])
         in >> version >> w >> h >> d >> nframes >> type;
 
         if (version != 1) {
-            qInfo("Unsupported MGH version: %d", version);
+            Log::info("Unsupported MGH version: {}", version);
             return 1;
         }
 
@@ -242,7 +238,7 @@ int main(int argc, char* argv[])
         // Skip rest of header (284 bytes total - 24 already read)
         in.skipRawData(284 - 24);
 
-        qInfo("Read MGH: %dx%dx%d, type=%d", width, height, nslice, type);
+        Log::info("Read MGH: {}x{}x{}, type={}", width, height, nslice, type);
 
         slices.resize(nslice);
         int sliceSize = width * height;
@@ -270,7 +266,7 @@ int main(int argc, char* argv[])
                     slices[k][j] = static_cast<unsigned char>(qBound(0, static_cast<int>(val), 255));
                 }
             } else {
-                qInfo("Unsupported MGH data type: %d", type);
+                Log::info("Unsupported MGH data type: {}", type);
                 return 1;
             }
         }

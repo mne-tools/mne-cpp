@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eegosportsimpedancewidget.h"
 
 #include "ui_eegosportsimpedancewidget.h"
@@ -159,7 +160,7 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
     // Load standard layout file
     const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8((layoutDirectory() + "standard_waveguard66.elc").toStdString()));
     if (!layout) {
-        qDebug() << "Error: Reading elc file.";
+        mne::Log::debug("Error: Reading elc file.");
         return;
     }
     addElectrodeItems(*layout);
@@ -268,7 +269,7 @@ void EEGoSportsImpedanceWidget::loadLayout()
     // Load standard layout file
     const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(sElcFilePath.toStdString()));
     if (!layout) {
-        qDebug() << "Error: Reading elc file.";
+        mne::Log::debug("Error: Reading elc file.");
         return;
     }
     m_qGScene->clear();

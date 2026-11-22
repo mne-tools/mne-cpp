@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "rawdataviewer.h"
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
@@ -39,7 +40,6 @@
 //=============================================================================================================
 
 #include <QSpacerItem>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -182,7 +182,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.";
+            Log::warning("[RawDataViewer::handleEvent] Received an Event that is not handled by switch cases.");
     }
 }
 
@@ -282,7 +282,7 @@ void RawDataViewer::updateViewParameters(mne::analyze::ViewParameters viewParame
             m_pFiffRawView->onMakeScreenshot(viewParameters.m_sImageType);
             break;
         default:
-            qDebug() << "Unknown setting";
+            Log::debug("Unknown setting");
     }
 }
 

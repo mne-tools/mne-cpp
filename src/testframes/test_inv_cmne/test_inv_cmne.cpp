@@ -18,7 +18,8 @@
 //=============================================================================================================
 
 #include <inv/minimum_norm/inv_cmne.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <inv/minimum_norm/inv_cmne_settings.h>
 
 //=============================================================================================================
@@ -95,7 +96,6 @@ private:
 
 void TestInvCmne::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
 }
 
 //=============================================================================================================
@@ -400,9 +400,10 @@ void TestInvCmne::testDspmKernelMatchesDefinition()
 
     // A model that cannot be loaded leaves only the dSPM estimate.
     settings.onnxModelPath = "/nonexistent/model.onnx";
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot load CMNE model"));
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("returning the dSPM estimate only"));
+    ScopedLogCapture capture;
     const InvCMNEResult failed = InvCMNE::compute(evoked, gain, noiseCov, srcCov, settings);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Cannot load CMNE model"), capture.dump().c_str());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "returning the dSPM estimate only"), capture.dump().c_str());
     QVERIFY(failed.stcCmne.empty());
     QVERIFY((failed.stcDspm.data - dspm).norm() < 1e-9 * dspm.norm());
 }
@@ -445,6 +446,7 @@ void TestInvCmne::testCmneMatchesReference()
     QVERIFY(close(InvCMNE::zScoreRectify(source), load(QStringLiteral("sensing")), 1e-6));
     QVERIFY(close(InvCMNE::controlEstimate(source, 6), load(QStringLiteral("control")), 1e-6));
 
+    ScopedLogCapture capture;
 #ifdef MNE_USE_ONNXRUNTIME
     MatrixXd sensing, prediction, cmne;
     QVERIFY(InvCMNE::applyCmne(source, MNE_CMNE_REF_DIR "/cmne_ref.onnx", sensing, prediction, cmne));
@@ -453,14 +455,17 @@ void TestInvCmne::testCmneMatchesReference()
     QVERIFY2(close(cmne, load(QStringLiteral("cmne")), 1e-5), qPrintable(QString::number((cmne - load(QStringLiteral("cmne"))).cwiseAbs().maxCoeff())));
 
     // The model is for 12 sources and needs more than 6 samples.
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("has no cmne_config for 11 sources"));
+    capture.clear();
     QVERIFY(!InvCMNE::applyCmne(source.topRows(11), MNE_CMNE_REF_DIR "/cmne_ref.onnx", sensing, prediction, cmne));
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Need more than look_back"));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "has no cmne_config for 11 sources"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(!InvCMNE::applyCmne(source.leftCols(6), MNE_CMNE_REF_DIR "/cmne_ref.onnx", sensing, prediction, cmne));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Need more than look_back"), capture.dump().c_str());
 #endif
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot load CMNE model"));
+    capture.clear();
     MatrixXd s, p, c;
     QVERIFY(!InvCMNE::applyCmne(source, "/nonexistent.onnx", s, p, c));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Cannot load CMNE model"), capture.dump().c_str());
 }
 
 //=============================================================================================================

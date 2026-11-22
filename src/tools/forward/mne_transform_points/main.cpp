@@ -18,7 +18,6 @@
 #include <fiff/fiff_constants.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -31,7 +30,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,7 +72,6 @@ static int frameFromName(const QString& name)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_transform_points");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -108,7 +105,7 @@ int main(int argc, char* argv[])
     QString toName = parser.value(toOpt);
 
     if (transName.isEmpty() || inName.isEmpty() || outName.isEmpty() || fromName.isEmpty() || toName.isEmpty()) {
-        qCritical("All options --trans, --in, --out, --from, and --to are required.");
+        Log::critical("All options --trans, --in, --out, --from, and --to are required.");
         parser.showHelp(1);
     }
 
@@ -116,30 +113,28 @@ int main(int argc, char* argv[])
     int toFrame = frameFromName(toName);
 
     if (fromFrame < 0) {
-        qCritical("Unknown source frame: %s", qPrintable(fromName));
+        Log::critical("Unknown source frame: {}", fromName.toStdString());
         return 1;
     }
     if (toFrame < 0) {
-        qCritical("Unknown target frame: %s", qPrintable(toName));
+        Log::critical("Unknown target frame: {}", toName.toStdString());
         return 1;
     }
 
     // Read the transform between the requested frames (inverted if stored the other way round)
     const auto read = FiffCoordTrans::read(transName.toStdU16String(), fromFrame, toFrame);
     if (!read) {
-        qCritical("%s", read.error().what());
+        Log::critical("{}", read.error().what());
         return 1;
     }
     const FiffCoordTrans& trans = *read;
 
-    qInfo("Read transform: %s -> %s",
-          std::string(FiffCoordTrans::frame_name(trans.from)).c_str(),
-          std::string(FiffCoordTrans::frame_name(trans.to)).c_str());
+    Log::info("Read transform: {} -> {}", std::string(FiffCoordTrans::frame_name(trans.from)), std::string(FiffCoordTrans::frame_name(trans.to)));
 
     // Read input points
     QFile inFile(inName);
     if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open input file: %s", qPrintable(inName));
+        Log::critical("Cannot open input file: {}", inName.toStdString());
         return 1;
     }
 
@@ -151,7 +146,7 @@ int main(int argc, char* argv[])
             continue;
         QStringList parts = line.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
         if (parts.size() < 3) {
-            qCritical("Invalid line in input file: %s", qPrintable(line));
+            Log::critical("Invalid line in input file: {}", line.toStdString());
             return 1;
         }
         bool ok1, ok2, ok3;
@@ -159,14 +154,14 @@ int main(int argc, char* argv[])
         float y = parts[1].toFloat(&ok2);
         float z = parts[2].toFloat(&ok3);
         if (!ok1 || !ok2 || !ok3) {
-            qCritical("Cannot parse coordinates: %s", qPrintable(line));
+            Log::critical("Cannot parse coordinates: {}", line.toStdString());
             return 1;
         }
         points.append(Vector3f(x, y, z));
     }
     inFile.close();
 
-    qInfo("Read %lld points from %s", static_cast<long long>(points.size()), qPrintable(inName));
+    Log::info("Read {} points from {}", static_cast<long long>(points.size()), inName.toStdString());
 
     // Build matrix from points
     MatrixX3f rr(points.size(), 3);
@@ -178,7 +173,7 @@ int main(int argc, char* argv[])
     // Write output
     QFile outFile(outName);
     if (!outFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outName));
+        Log::critical("Cannot open output file: {}", outName.toStdString());
         return 1;
     }
 
@@ -192,7 +187,7 @@ int main(int argc, char* argv[])
     }
     outFile.close();
 
-    qInfo("Wrote %d transformed points to %s", static_cast<int>(transformed.rows()), qPrintable(outName));
+    Log::info("Wrote {} transformed points to {}", static_cast<int>(transformed.rows()), outName.toStdString());
 
     return 0;
 }

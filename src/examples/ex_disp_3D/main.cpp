@@ -38,7 +38,6 @@
 #include <inv/minimum_norm/inv_minimum_norm.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -83,7 +82,6 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
     QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP"));
     QCoreApplication::setOrganizationDomain(QStringLiteral("mne-cpp.org"));
@@ -197,7 +195,7 @@ int main(int argc, char* argv[])
 
         if (!t_sFileClusteredInverse.isEmpty()) {
             if (auto written = inverse_operator.write(t_sFileClusteredInverse.toStdU16String()); !written) {
-                qWarning() << written.error().what();
+                Log::warning("{}", written.error().what());
             }
         }
 
@@ -280,10 +278,10 @@ int main(int argc, char* argv[])
         QString lhStcPath = tmpDir + "/mnecpp_disp3d-lh.stc";
         QString rhStcPath = tmpDir + "/mnecpp_disp3d-rh.stc";
         if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
         if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
 
         // Load source estimate and configure visualization

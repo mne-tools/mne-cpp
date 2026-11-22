@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <analyzecore.h>
 #include <mainwindow.h>
 #include <anShared/Management/communicator.h>
@@ -243,7 +244,7 @@ void TestMneAnalyzeApp::closesAndShutsDown()
     QVERIFY(trigger(m_window, "Exit"));
     QTRY_VERIFY(window.isNull());
     // Logging after the main window is gone must not reach it
-    qInfo() << "after close";
+    mne::Log::info("after close");
     m_core.reset();
 }
 

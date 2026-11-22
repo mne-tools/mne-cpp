@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_digitizer_data.h>
 
@@ -81,7 +80,6 @@ TestFiffDigitizer::TestFiffDigitizer()
 
 void TestFiffDigitizer::initTestCase()
 {
-    mne::install_qt_message_handler();
     //Read the results produced with MNE-CPP
     const QString dataDir = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/";
     digDataLoaded = FiffDigitizerData((dataDir + "sample_audvis_trunc_raw.fif").toStdString());

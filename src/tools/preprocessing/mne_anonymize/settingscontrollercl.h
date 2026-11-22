@@ -22,6 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mne_anonymize.h"
 #include "fiffanonymizer.h"
 
@@ -251,7 +252,7 @@ private:
 inline void SettingsControllerCl::printIfVerbose(const QString& str) const
 {
     if (m_bVerboseMode) {
-        qInfo("%s", qPrintable(str));
+        mne::Log::info("{}", str.toStdString());
     }
 }
 

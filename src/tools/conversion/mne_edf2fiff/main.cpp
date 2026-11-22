@@ -20,7 +20,6 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -29,7 +28,6 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QFile>
 
 //=============================================================================================================
@@ -58,7 +56,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication a(argc, argv);
     QCoreApplication::setApplicationName("mne_edf2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -84,11 +81,11 @@ int main(int argc, char* argv[])
     const std::filesystem::path inputPath = mne::path_from_utf8(sInputFile.toStdString());
     EDFReader reader;
     if (!reader.supports_extension(mne::utf8_from_path(inputPath.extension()))) {
-        qCritical() << "Not an EDF or BDF file:" << sInputFile;
+        Log::critical("Not an EDF or BDF file: {}", sInputFile.toStdString());
         return 1;
     }
     if (!reader.open(inputPath) || reader.sample_count() <= 0) {
-        qCritical() << "Could not read" << sInputFile;
+        Log::critical("Could not read {}", sInputFile.toStdString());
         return 1;
     }
     if (sOutputFile.isEmpty()) {
@@ -99,7 +96,7 @@ int main(int argc, char* argv[])
     RowVectorXd cals;
     auto outfid = FiffStream::start_writing_raw(sOutputFile.toStdU16String(), fiffRaw.info, cals);
     if (!outfid) {
-        qCritical() << "Could not write" << sOutputFile;
+        Log::critical("Could not write {}", sOutputFile.toStdString());
         return 1;
     }
     fiff_int_t first = 0;
@@ -114,6 +111,6 @@ int main(int argc, char* argv[])
     }
     outfid->finish_writing_raw();
 
-    qInfo() << "Wrote" << sOutputFile;
+    Log::info("Wrote {}", sOutputFile.toStdString());
     return 0;
 }

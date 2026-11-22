@@ -21,7 +21,6 @@
 #include <Eigen/Dense>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -61,13 +60,12 @@ private slots:
     //=========================================================================
     void initTestCase()
     {
-        mne::install_qt_message_handler();
         QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
         if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
             m_sDataPath = base;
         }
         if (m_sDataPath.isEmpty()) {
-            qWarning() << "Test data not found";
+            Log::warning("Test data not found");
         }
     }
 

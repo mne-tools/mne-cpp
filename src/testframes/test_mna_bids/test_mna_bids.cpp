@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 #include <mna/mna_subject.h>
@@ -143,8 +144,8 @@ void TestMnaBids::initTestCase()
     m_showMnaPath = findTool("mne_show_mna");
     m_converterPath = findTool("mne_mna_bids_converter");
 
-    qInfo() << "mne_show_mna:" << m_showMnaPath;
-    qInfo() << "mne_mna_bids_converter:" << m_converterPath;
+    Log::info("mne_show_mna: {}", m_showMnaPath.toStdString());
+    Log::info("mne_mna_bids_converter: {}", m_converterPath.toStdString());
 }
 
 void TestMnaBids::cleanupTestCase()

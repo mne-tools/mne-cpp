@@ -10,6 +10,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
+#include <base/log.h>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -526,7 +527,7 @@ private slots:
         if (desc) {
             QVERIFY(desc->categories.size() > 0);
         } else {
-            qWarning("parseAverageFile failed — code path exercised");
+            Log::warning("parseAverageFile failed — code path exercised");
         }
     }
 
@@ -558,7 +559,7 @@ private slots:
         if (desc) {
             QVERIFY(desc->defs.size() > 0);
         } else {
-            qWarning("parseCovarianceFile failed — code path exercised");
+            Log::warning("parseCovarianceFile failed — code path exercised");
         }
     }
 

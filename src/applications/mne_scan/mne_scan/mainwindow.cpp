@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
@@ -46,7 +47,6 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QDebug>
 #include <QTimer>
 #include <QTime>
 #include <QFile>
@@ -93,9 +93,7 @@ MainWindow::MainWindow(QWidget* parent)
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
 {
-    qInfo("%s - Version %s",
-          CInfo::AppNameShort().toUtf8().constData(),
-          CInfo::AppVersion().toUtf8().constData());
+    mne::Log::info("{} - Version {}", CInfo::AppNameShort().toStdString(), CInfo::AppVersion().toStdString());
 
     initSharedResources();
 
@@ -116,7 +114,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
-    qInfo() << "Loading icon...";
+    mne::Log::info("Loading icon...");
     QMainWindow::setWindowIcon(QIcon(":/images/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
 
@@ -214,15 +212,15 @@ void MainWindow::loadSettings()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
-    qInfo() << "MainWindow::onStyleChanged";
-    qInfo() << "MainWindow::onStyleChanged sStyle" << sStyle;
+    mne::Log::info("MainWindow::onStyleChanged");
+    mne::Log::info("MainWindow::onStyleChanged sStyle {}", sStyle.toStdString());
     if (QApplication* pApp = qobject_cast<QApplication*>(QApplication::instance())) {
         if (sStyle == "default") {
-            qInfo() << "MainWindow::onStyleChanged 1";
+            mne::Log::info("MainWindow::onStyleChanged 1");
             m_sCurrentStyle = "default";
             pApp->setStyleSheet("");
         } else if (sStyle == "dark") {
-            qInfo() << "MainWindow::onStyleChanged 2";
+            mne::Log::info("MainWindow::onStyleChanged 2");
             m_sCurrentStyle = "dark";
             QFile file(":/dark.qss");
             if (file.open(QFile::ReadOnly)) {

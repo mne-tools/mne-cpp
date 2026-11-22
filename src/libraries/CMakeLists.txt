@@ -44,7 +44,6 @@ if(APPLE)
 else()
   set(CMAKE_INSTALL_RPATH "\${ORIGIN}/")
 endif()
-list(APPEND CMAKE_INSTALL_RPATH ${MNE_QT_RPATH})
 
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -61,7 +60,7 @@ endif()
 add_subdirectory(base)
 add_subdirectory(math)
 add_subdirectory(channels)
-if(NOT WASM) # QProcess is not available in Qt for WebAssembly
+if(NOT WASM) # WebAssembly cannot start processes
   add_subdirectory(pybridge)
 endif()
 add_subdirectory(report)
@@ -83,7 +82,7 @@ add_subdirectory(acq)
 add_subdirectory(acq/fiff)
 add_subdirectory(acq/lsl)
 add_subdirectory(acq/devices)
-if(NOT WASM) # Qt SerialPort is not available in WebAssembly
+if(NOT WASM) # WebAssembly has no serial ports
   add_subdirectory(acq/devices/polhemus)
 endif()
 
@@ -92,8 +91,12 @@ add_subdirectory(ml)
 add_subdirectory(decoding)
 add_subdirectory(sts)
 
-# The display libraries are Qt by design.
+include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/MneQtFree.cmake)
+mne_require_qt_free(${CMAKE_CURRENT_SOURCE_DIR})
+
+# The display libraries are Qt by design and the only libraries that may use it.
 if(MNE_BUILD_QT)
+  list(APPEND CMAKE_INSTALL_RPATH ${MNE_QT_RPATH})
   add_subdirectory(disp)
   add_subdirectory(disp3D)
 endif()

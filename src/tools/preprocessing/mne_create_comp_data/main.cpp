@@ -17,7 +17,6 @@
 #include <fiff/fiff.h>
 #include <fiff/fiff_ctf_comp.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,7 +57,7 @@ static bool readAsciiMatrix(const QString& filename,
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open matrix file:" << filename;
+        Log::critical("Cannot open matrix file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -73,7 +71,7 @@ static bool readAsciiMatrix(const QString& filename,
         ncol = dimParts[1].toInt();
     }
     if (nrow <= 0 || ncol <= 0) {
-        qCritical() << "Invalid dimensions in matrix file:" << nrow << "x" << ncol;
+        Log::critical("Invalid dimensions in matrix file: {} x {}", nrow, ncol);
         return false;
     }
 
@@ -91,7 +89,7 @@ static bool readAsciiMatrix(const QString& filename,
     rowNames.clear();
     for (int r = 0; r < nrow; r++) {
         if (in.atEnd()) {
-            qCritical() << "Unexpected end of matrix file at row" << r;
+            Log::critical("Unexpected end of matrix file at row {}", r);
             return false;
         }
         QString line = in.readLine().trimmed();
@@ -110,7 +108,7 @@ static bool readAsciiMatrix(const QString& filename,
         }
     }
 
-    qInfo("Read matrix: %d x %d", nrow, ncol);
+    Log::info("Read matrix: {} x {}", nrow, ncol);
     return true;
 }
 
@@ -118,7 +116,6 @@ static bool readAsciiMatrix(const QString& filename,
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_create_comp_data");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -145,15 +142,15 @@ int main(int argc, char* argv[])
     bool calibrated = parser.isSet(calibratedOpt);
 
     if (inFile.isEmpty()) {
-        qCritical("Input matrix file (--in) is required.");
+        Log::critical("Input matrix file (--in) is required.");
         return 1;
     }
     if (!parser.isSet(kindOpt)) {
-        qCritical("Compensation kind (--kind) is required.");
+        Log::critical("Compensation kind (--kind) is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("Output file (--out) is required.");
+        Log::critical("Output file (--out) is required.");
         return 1;
     }
 
@@ -173,7 +170,7 @@ int main(int argc, char* argv[])
     //
     auto stream = FiffStream::start_file(outFile.toStdU16String());
     if (!stream) {
-        qCritical("Cannot create output FIFF file.");
+        Log::critical("Cannot create output FIFF file.");
         return 1;
     }
 
@@ -203,10 +200,7 @@ int main(int argc, char* argv[])
     stream->end_block(FIFFB_MNE_CTF_COMP);
     stream->end_file();
 
-    qInfo("Wrote CTF compensation data (kind=%d, %dx%d, %s) to %s",
-          ctfKind, nrow, ncol,
-          calibrated ? "calibrated" : "uncalibrated",
-          outFile.toUtf8().constData());
+    Log::info("Wrote CTF compensation data (kind={}, {}x{}, {}) to {}", ctfKind, nrow, ncol, calibrated ? "calibrated" : "uncalibrated", outFile.toStdString());
 
     return 0;
 }

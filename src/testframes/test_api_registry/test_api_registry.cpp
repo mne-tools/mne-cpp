@@ -19,6 +19,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
+#include <base/log.h>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -48,7 +49,7 @@ private:
         const QString regPath = m_repoRoot + "/doc/api_registry.json";
         QFile file(regPath);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            qWarning() << "Failed to open registry:" << regPath;
+            mne::Log::warning("Failed to open registry: {}", regPath.toStdString());
             return false;
         }
         const QByteArray data = file.readAll();
@@ -57,7 +58,7 @@ private:
         QJsonParseError err{};
         m_registry = QJsonDocument::fromJson(data, &err);
         if (err.error != QJsonParseError::NoError) {
-            qWarning() << "JSON parse error:" << err.errorString() << "at offset" << err.offset;
+            mne::Log::warning("JSON parse error: {} at offset {}", err.errorString().toStdString(), err.offset);
             return false;
         }
         return true;
@@ -67,7 +68,7 @@ private slots:
     void initTestCase()
     {
         QVERIFY2(discoverRepoRoot(), "Could not locate mne-cpp repo root");
-        qDebug() << "Repo root:" << m_repoRoot;
+        mne::Log::debug("Repo root: {}", m_repoRoot.toStdString());
         QVERIFY2(loadRegistry(), "Failed to load doc/api_registry.json");
     }
 
@@ -92,8 +93,7 @@ private slots:
             const QString headerRel = cls.value("header").toString();
             const QString headerFull = m_repoRoot + "/src/libraries/" + headerRel;
             if (!QFile::exists(headerFull)) {
-                qWarning() << "Missing header:" << headerRel
-                           << "(class:" << cls.value("name").toString() << ")";
+                mne::Log::warning("Missing header: {} (class: {} )", headerRel.toStdString(), cls.value("name").toString().toStdString());
                 ++missing;
             }
         }
@@ -114,8 +114,7 @@ private slots:
             const QString testName = tv.toString();
             const QString testDir = m_repoRoot + "/src/testframes/" + testName;
             if (!QDir(testDir).exists()) {
-                qWarning() << "Missing test directory:" << testName
-                           << "(class:" << cls.value("name").toString() << ")";
+                mne::Log::warning("Missing test directory: {} (class: {} )", testName.toStdString(), cls.value("name").toString().toStdString());
                 ++missing;
             }
         }
@@ -130,7 +129,7 @@ private slots:
             const QJsonObject cls = val.toObject();
             for (const char* field : {"skigen_candidate", "skigen_target"}) {
                 if (cls.contains(QLatin1String(field))) {
-                    qWarning() << cls.value("name").toString() << "carries the retired field" << field;
+                    mne::Log::warning("{} carries the retired field {}", cls.value("name").toString().toStdString(), field);
                     ++retired;
                 }
             }

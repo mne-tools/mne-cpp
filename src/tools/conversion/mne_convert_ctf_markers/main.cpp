@@ -15,7 +15,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -26,7 +25,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <QRegularExpression>
 
 //=============================================================================================================
@@ -78,7 +76,7 @@ static QList<CtfMarker> parseCtfMarkers(const QString& filename)
     QList<CtfMarker> markers;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open CTF marker file: %s", qPrintable(filename));
+        mne::Log::critical("Cannot open CTF marker file: {}", filename.toStdString());
         return markers;
     }
 
@@ -161,7 +159,6 @@ static QList<CtfMarker> parseCtfMarkers(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_ctf_markers");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -184,25 +181,25 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (markersFile.isEmpty()) {
-        qCritical("--markers is required.");
+        mne::Log::critical("--markers is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        mne::Log::critical("--out is required.");
         return 1;
     }
 
     // Parse CTF markers
     QList<CtfMarker> markers = parseCtfMarkers(markersFile);
     if (markers.isEmpty()) {
-        qCritical("No markers parsed from: %s", qPrintable(markersFile));
+        mne::Log::critical("No markers parsed from: {}", markersFile.toStdString());
         return 1;
     }
 
     // Write MNE event format
     QFile fOut(outFile);
     if (!fOut.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        mne::Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
 
@@ -210,10 +207,7 @@ int main(int argc, char* argv[])
     int totalEvents = 0;
 
     for (const CtfMarker& marker : markers) {
-        qInfo("Marker '%s' (id=%d): %lld events",
-              qPrintable(marker.name),
-              marker.eventId,
-              static_cast<long long>(marker.samples.size()));
+        mne::Log::info("Marker '{}' (id={}): {} events", marker.name.toStdString(), marker.eventId, static_cast<long long>(marker.samples.size()));
 
         for (int sample : marker.samples) {
             out << sample << " 0 " << marker.eventId << "\n";
@@ -222,6 +216,6 @@ int main(int argc, char* argv[])
     }
 
     fOut.close();
-    qInfo("Written %d events to: %s", totalEvents, qPrintable(outFile));
+    mne::Log::info("Written {} events to: {}", totalEvents, outFile.toStdString());
     return 0;
 }

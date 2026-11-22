@@ -15,7 +15,8 @@
 //=============================================================================================================
 
 #include <averaging/averaging.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <babymeg/babymeg.h>
 #include <brainamp/brainamp.h>
 #include <brainflowboard/brainflowboard.h>
@@ -124,7 +125,6 @@ private:
 
 void TestMneScanPlugins::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QStandardPaths::setTestModeEnabled(true);
     QSettings("MNECPP").clear();
     m_rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
@@ -405,7 +405,7 @@ void TestMneScanPlugins::connectivityFollowsTheStream()
         QSKIP("Sample test data not found");
 
     // The default correlation has no frequency bins, so no frequency band applies to it
-    QTest::failOnWarning(QRegularExpression("frequency bins has not been set"));
+    ScopedLogCapture capture(true);
     std::unique_ptr<AbstractPlugin> plugin = makePlugin("NeuronalConnectivity");
     QList<QSharedPointer<Network>> networks;
     QMutex mutex;
@@ -429,6 +429,7 @@ void TestMneScanPlugins::connectivityFollowsTheStream()
     plugin->stop();
     QVERIFY(plugin->wait(5000));
     QVERIFY(received);
+    QVERIFY2(!capture.contains(mne::Log::Level::Warning, "frequency bins has not been set"), capture.dump().c_str());
 
     // One node per gradiometer pair (the first of each, unless bad); normalized weights reach 1 at most
     const Eigen::MatrixXd matrix = networks.last()->connectivity_matrix();

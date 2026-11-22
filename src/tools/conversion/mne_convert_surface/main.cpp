@@ -18,7 +18,6 @@
 #include <mne/mne.h>
 #include <fs/fs_surface.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QTextStream>
 #include <QRegularExpression>
 #include <QDataStream>
-#include <QDebug>
 #include <QFileInfo>
 
 //=============================================================================================================
@@ -98,14 +96,14 @@ static bool readTriFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open tri file:" << filename;
+        Log::critical("Cannot open tri file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
     int nvert = 0;
     in >> nvert;
     if (nvert <= 0) {
-        qCritical() << "Invalid vertex count in tri file";
+        Log::critical("Invalid vertex count in tri file");
         return false;
     }
     rr.resize(nvert, 3);
@@ -120,7 +118,7 @@ static bool readTriFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
     int ntri = 0;
     in >> ntri;
     if (ntri <= 0) {
-        qCritical() << "Invalid triangle count in tri file";
+        Log::critical("Invalid triangle count in tri file");
         return false;
     }
     tris.resize(ntri, 3);
@@ -140,7 +138,7 @@ static bool writeTriFile(const QString& filename, const MatrixX3f& rr, const Mat
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical() << "Cannot write tri file:" << filename;
+        Log::critical("Cannot write tri file: {}", filename.toStdString());
         return false;
     }
     QTextStream out(&file);
@@ -163,7 +161,7 @@ static bool readSmfFile(const QString& filename, MatrixX3f& rr, MatrixX3i& tris)
 {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open smf file:" << filename;
+        Log::critical("Cannot open smf file: {}", filename.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -197,7 +195,7 @@ static bool writeSmfFile(const QString& filename, const MatrixX3f& rr, const Mat
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical() << "Cannot write smf file:" << filename;
+        Log::critical("Cannot write smf file: {}", filename.toStdString());
         return false;
     }
     QTextStream out(&file);
@@ -217,7 +215,7 @@ static bool readFifSurface(const QString& filename, MatrixX3f& rr, MatrixX3i& tr
 {
     auto read = MNEBem::read(filename.toStdU16String());
     if (!read) {
-        qCritical() << read.error().what();
+        Log::critical("{}", read.error().what());
         return false;
     }
     const MNEBem& bem = *read;
@@ -234,7 +232,7 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
     QFile file(filename);
     auto stream = FiffStream::start_file(filename.toStdU16String());
     if (!stream) {
-        qCritical() << "Cannot create FIF file:" << filename;
+        Log::critical("Cannot create FIF file: {}", filename.toStdString());
         return false;
     }
     stream->start_block(FIFFB_BEM);
@@ -279,7 +277,6 @@ static bool writeFifSurface(const QString& filename, const MatrixX3f& rr, const 
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_surface");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -365,15 +362,15 @@ int main(int argc, char* argv[])
     }
 
     if (inputFile.isEmpty()) {
-        qInfo("No input file specified.");
+        Log::info("No input file specified.");
         return 1;
     }
     if (outputFile.isEmpty()) {
-        qInfo("No output file specified.");
+        Log::info("No output file specified.");
         return 1;
     }
     if (outputFormat == FORMAT_UNKNOWN) {
-        qInfo("Cannot determine output format. Use --outtri, --outfif, --outsurf, or --outsmf.");
+        Log::info("Cannot determine output format. Use --outtri, --outfif, --outsurf, or --outsmf.");
         return 1;
     }
 
@@ -412,17 +409,16 @@ int main(int argc, char* argv[])
                 scaleFactor = 0.001f; // smf files are typically in mm
             break;
         default:
-            qInfo("Cannot determine input format. Use --surf, --fif, --tri, or --smf.");
+            Log::info("Cannot determine input format. Use --surf, --fif, --tri, or --smf.");
             return 1;
     }
 
     if (!ok) {
-        qCritical("Failed to read input surface.");
+        Log::critical("Failed to read input surface.");
         return 1;
     }
 
-    qInfo("Read surface: %ld vertices, %ld triangles",
-          static_cast<long>(rr.rows()), static_cast<long>(tris.rows()));
+    Log::info("Read surface: {} vertices, {} triangles", static_cast<long>(rr.rows()), static_cast<long>(tris.rows()));
 
     // Apply scale factor to convert to meters (internal representation)
     if (scaleFactor != 1.0f) {
@@ -441,22 +437,22 @@ int main(int argc, char* argv[])
             ok = writeTriFile(outputFile, rr * 1000.0f, tris);
             break;
         case FORMAT_FREESURFER:
-            qInfo("FreeSurfer surface writing not yet supported. Use --outtri or --outfif.");
+            Log::info("FreeSurfer surface writing not yet supported. Use --outtri or --outfif.");
             return 1;
         case FORMAT_SMF:
             // smf format uses mm
             ok = writeSmfFile(outputFile, rr * 1000.0f, tris);
             break;
         default:
-            qCritical("Unknown output format.");
+            Log::critical("Unknown output format.");
             return 1;
     }
 
     if (!ok) {
-        qCritical("Failed to write output surface.");
+        Log::critical("Failed to write output surface.");
         return 1;
     }
 
-    qInfo("Wrote surface to %s", outputFile.toUtf8().constData());
+    Log::info("Wrote surface to {}", outputFile.toStdString());
     return 0;
 }

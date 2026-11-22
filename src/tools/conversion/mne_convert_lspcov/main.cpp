@@ -19,7 +19,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -31,7 +30,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -195,8 +193,7 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
     mat.resize(n, n);
     for (int i = 0; i < n; ++i) {
         if (rows[i].size() != n) {
-            qCritical("Row %d has %lld values, expected %d (matrix must be square).",
-                      i, static_cast<long long>(rows[i].size()), n);
+            Log::critical("Row {} has {} values, expected {} (matrix must be square).", i, static_cast<long long>(rows[i].size()), n);
             return false;
         }
         for (int j = 0; j < n; ++j) {
@@ -211,7 +208,6 @@ static bool parseLspMatrix(QTextStream& stream, MatrixXd& mat)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_convert_lspcov");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -245,15 +241,15 @@ int main(int argc, char* argv[])
     QString outascFile = parser.value(outascOpt);
 
     if (lspcovFile.isEmpty()) {
-        qCritical("--lspcov is required.");
+        Log::critical("--lspcov is required.");
         return 1;
     }
     if (measFile.isEmpty()) {
-        qCritical("--meas is required.");
+        Log::critical("--meas is required.");
         return 1;
     }
     if (outFile.isEmpty() && outascFile.isEmpty()) {
-        qCritical("At least one of --out or --outasc is required.");
+        Log::critical("At least one of --out or --outasc is required.");
         return 1;
     }
 
@@ -262,37 +258,35 @@ int main(int argc, char* argv[])
     //=========================================================================
     FiffRawData raw(measFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read measurement info from: %s", qPrintable(measFile));
+        Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
         return 1;
     }
     const FiffInfo& info = raw.info;
 
     int nChan = info.nchan;
-    qInfo("Measurement file: %d channels", nChan);
+    Log::info("Measurement file: {} channels", nChan);
 
     //=========================================================================
     // Parse LISP covariance matrix
     //=========================================================================
     QFile lspFile(lspcovFile);
     if (!lspFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open LISP covariance file: %s", qPrintable(lspcovFile));
+        Log::critical("Cannot open LISP covariance file: {}", lspcovFile.toStdString());
         return 1;
     }
     QTextStream lspStream(&lspFile);
 
     MatrixXd covMat;
     if (!parseLspMatrix(lspStream, covMat)) {
-        qCritical("Failed to parse LISP covariance matrix from: %s", qPrintable(lspcovFile));
+        Log::critical("Failed to parse LISP covariance matrix from: {}", lspcovFile.toStdString());
         return 1;
     }
     lspFile.close();
 
-    qInfo("Parsed %dx%d matrix from LISP file",
-          static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
+    Log::info("Parsed {}x{} matrix from LISP file", static_cast<int>(covMat.rows()), static_cast<int>(covMat.cols()));
 
     if (covMat.rows() != nChan) {
-        qCritical("Matrix dimension (%d) does not match channel count (%d).",
-                  static_cast<int>(covMat.rows()), nChan);
+        Log::critical("Matrix dimension ({}) does not match channel count ({}).", static_cast<int>(covMat.rows()), nChan);
         return 1;
     }
 
@@ -305,7 +299,7 @@ int main(int argc, char* argv[])
     if (!outascFile.isEmpty()) {
         QFile ascFile(outascFile);
         if (!ascFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            qCritical("Cannot open output file: %s", qPrintable(outascFile));
+            Log::critical("Cannot open output file: {}", outascFile.toStdString());
             return 1;
         }
         QTextStream out(&ascFile);
@@ -320,7 +314,7 @@ int main(int argc, char* argv[])
             out << "\n";
         }
         ascFile.close();
-        qInfo("Written ASCII covariance to: %s", qPrintable(outascFile));
+        Log::info("Written ASCII covariance to: {}", outascFile.toStdString());
     }
 
     //=========================================================================
@@ -352,11 +346,11 @@ int main(int argc, char* argv[])
         cov.nfree = 1;
 
         if (!cov.save(outFile.toStdU16String())) {
-            qCritical("Cannot write output file: %s", qPrintable(outFile));
+            Log::critical("Cannot write output file: {}", outFile.toStdString());
             return 1;
         }
 
-        qInfo("Written FIFF covariance to: %s", qPrintable(outFile));
+        Log::info("Written FIFF covariance to: {}", outFile.toStdString());
     }
 
     return 0;

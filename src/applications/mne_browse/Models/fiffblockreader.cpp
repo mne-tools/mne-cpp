@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffblockreader.h"
 
 #include <base/byte_stream.h>
@@ -25,7 +26,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QPointer>
 
 //=============================================================================================================
@@ -71,18 +71,18 @@ bool FiffBlockReader::open(const QString& path)
     // be pre-opened here. Just set the file name and pass it to FiffRawData.
     m_file->setFileName(path);
     if (!QFile::exists(path)) {
-        qWarning() << "[FiffBlockReader] File not found:" << path;
+        Log::warning("[FiffBlockReader] File not found: {}", path.toStdString());
         return false;
     }
 
     try {
         m_raw = std::make_shared<FiffRawData>(path.toStdU16String());
     } catch (const std::exception& e) {
-        qWarning() << "[FiffBlockReader] Exception constructing FiffRawData:" << e.what();
+        Log::warning("[FiffBlockReader] Exception constructing FiffRawData: {}", e.what());
         return false;
     }
     if (m_raw->empty()) {
-        qWarning() << "[FiffBlockReader] Not a valid FIFF raw file:" << path;
+        Log::warning("[FiffBlockReader] Not a valid FIFF raw file: {}", path.toStdString());
         m_raw.reset();
         return false;
     }
@@ -91,10 +91,7 @@ bool FiffBlockReader::open(const QString& path)
     m_firstSample = m_raw->first_samp;
     m_lastSample = m_raw->last_samp;
 
-    qInfo() << "[FiffBlockReader] Opened" << path
-            << "| channels:" << m_fiffInfo->nchan
-            << "| samples:" << (m_lastSample - m_firstSample + 1)
-            << "| sfreq:" << m_fiffInfo->sfreq;
+    Log::info("[FiffBlockReader] Opened {} | channels: {} | samples: {} | sfreq: {}", path.toStdString(), m_fiffInfo->nchan, (m_lastSample - m_firstSample + 1), m_fiffInfo->sfreq);
 
     return true;
 }
@@ -112,12 +109,12 @@ bool FiffBlockReader::openBuffer(const QByteArray& data, const QString& displayN
     try {
         m_raw = std::make_shared<FiffRawData>(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + data.size())));
     } catch (const std::exception& e) {
-        qWarning() << "[FiffBlockReader] Exception constructing FiffRawData from buffer:" << e.what();
+        Log::warning("[FiffBlockReader] Exception constructing FiffRawData from buffer: {}", e.what());
         return false;
     }
 
     if (m_raw->empty()) {
-        qWarning() << "[FiffBlockReader] Not a valid FIFF raw buffer";
+        Log::warning("[FiffBlockReader] Not a valid FIFF raw buffer");
         m_raw.reset();
         return false;
     }
@@ -126,10 +123,7 @@ bool FiffBlockReader::openBuffer(const QByteArray& data, const QString& displayN
     m_firstSample = m_raw->first_samp;
     m_lastSample = m_raw->last_samp;
 
-    qInfo() << "[FiffBlockReader] Opened in-memory raw buffer"
-            << "| channels:" << m_fiffInfo->nchan
-            << "| samples:" << (m_lastSample - m_firstSample + 1)
-            << "| sfreq:" << m_fiffInfo->sfreq;
+    Log::info("[FiffBlockReader] Opened in-memory raw buffer | channels: {} | samples: {} | sfreq: {}", m_fiffInfo->nchan, (m_lastSample - m_firstSample + 1), m_fiffInfo->sfreq);
 
     return true;
 }
@@ -232,14 +226,13 @@ MatrixXd FiffBlockReader::doRead(int from, int to)
 {
     // FiffRawData closes its stream after the header; keeping it open spares a reopen per block.
     if (!m_raw->file->reopen()) {
-        qWarning() << "[FiffBlockReader] Cannot reopen file:" << m_file->fileName();
+        Log::warning("[FiffBlockReader] Cannot reopen file: {}", m_file->fileName().toStdString());
         return {};
     }
 
     MatrixXd data, times;
     if (!m_raw->read_raw_segment(data, times, from, to)) {
-        qWarning() << "[FiffBlockReader] read_raw_segment failed for"
-                   << from << "-" << to;
+        Log::warning("[FiffBlockReader] read_raw_segment failed for {} - {}", from, to);
         return {};
     }
     return data;
@@ -252,15 +245,12 @@ void FiffBlockReader::updateProjections()
     if (!m_raw || !m_fiffInfo)
         return;
 
-    qWarning() << "[FiffBlockReader] updateProjections called. FiffInfo ptr="
-               << reinterpret_cast<void*>(m_fiffInfo.get());
+    Log::warning("[FiffBlockReader] updateProjections called. FiffInfo ptr= {}", reinterpret_cast<void*>(m_fiffInfo.get()));
 
     // Count active projectors for diagnostics
     int nActive = 0;
     for (int i = 0; i < std::ssize(m_fiffInfo->projs); ++i) {
-        qWarning() << "[FiffBlockReader] proj" << i
-                   << "desc=" << m_fiffInfo->projs[i].desc
-                   << "active=" << m_fiffInfo->projs[i].active;
+        Log::warning("[FiffBlockReader] proj {} desc= {} active= {}", i, m_fiffInfo->projs[i].desc, m_fiffInfo->projs[i].active);
         if (m_fiffInfo->projs[i].active)
             ++nActive;
     }
@@ -276,12 +266,9 @@ void FiffBlockReader::updateProjections()
             Eigen::MatrixXd diff = matProj - Eigen::MatrixXd::Identity(matProj.rows(), matProj.cols());
             offDiagNorm = diff.norm();
         }
-        qWarning() << "[FiffBlockReader] Projections updated:" << nActive
-                   << "active projectors," << nproj << "applied. Matrix:"
-                   << matProj.rows() << "x" << matProj.cols()
-                   << "off-identity norm:" << offDiagNorm;
+        Log::warning("[FiffBlockReader] Projections updated: {} active projectors, {} applied. Matrix: {} x {} off-identity norm: {}", nActive, nproj, matProj.rows(), matProj.cols(), offDiagNorm);
     } else {
         m_raw->proj.resize(0, 0); // Clear — no active projectors
-        qWarning() << "[FiffBlockReader] Projections cleared (0 active).";
+        Log::warning("[FiffBlockReader] Projections cleared (0 active).");
     }
 }

@@ -35,7 +35,6 @@
 #include <mne/mne.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <fiff/fiff_events.h>
 #include <disp/viewers/connectivitysettingsview.h>
 #include <disp/viewers/minimumnormsettingsview.h>
@@ -48,7 +47,6 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QFile>
 #include <QObject>
 #include <QVariant>
@@ -87,7 +85,6 @@ int main(int argc, char* argv[])
 #ifdef STATICBUILD
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
     QApplication::addLibraryPath(QApplication::applicationDirPath() + "/../lib");
 
@@ -411,10 +408,10 @@ int main(int argc, char* argv[])
         QString lhStcPath = tmpDir + "/mnecpp_connectivity-lh.stc";
         QString rhStcPath = tmpDir + "/mnecpp_connectivity-rh.stc";
         if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
         if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
 
         // Add hemisphere surfaces

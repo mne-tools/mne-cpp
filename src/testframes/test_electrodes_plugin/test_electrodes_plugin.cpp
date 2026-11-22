@@ -22,7 +22,8 @@
 #include <disp3D/scene/multimodalscene.h>
 #include <disp3D/scene/pickresult.h>
 #include <ieeg/ieeg_implantation.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mri/mri_types.h>
 
 //=============================================================================================================
@@ -94,7 +95,6 @@ private slots:
 
 void TestElectrodesPlugin::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     // No-op; constructor used per test.
 }
 
@@ -223,8 +223,9 @@ void TestElectrodesPlugin::bidsLoadGroupsLeadsByName()
 
     // Units are unknown without a coordsystem sidecar, so the file is refused
     ElectrodesPlugin plugin;
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("no \\*_coordsystem.json")));
+    ScopedLogCapture capture;
     QVERIFY(!plugin.loadBids(tsv));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, std::regex("no \\*_coordsystem.json")), capture.dump().c_str());
 
     {
         QFile json(dir.filePath(QStringLiteral("sub-01_ses-01_coordsystem.json")));
@@ -268,8 +269,9 @@ void TestElectrodesPlugin::bidsLoadConvertsScannerRas()
 
     // Scanner RAS needs the T1 to reach the surfaces
     ElectrodesPlugin plugin;
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("T1.mgz is needed")));
+    ScopedLogCapture capture;
     QVERIFY(!plugin.loadBids(tsv));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, std::regex("T1.mgz is needed")), capture.dump().c_str());
     QVERIFY(plugin.lastError().contains(QStringLiteral("ACPC")));
 
     // Surface RAS drops the T1's centre (c_ras)

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "pluginmanager.h"
 
 #include "../Plugins/abstractplugin.h"
@@ -27,7 +28,6 @@
 //=============================================================================================================
 
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,21 +72,21 @@ void PluginManager::loadPlugins(const QString& dir)
                 if (pluginType == AbstractPlugin::_ISensor) {
                     if (AbstractSensor* pSensor = qobject_cast<AbstractSensor*>(pPlugin)) {
                         m_qVecSensorPlugins.push_back(pSensor);
-                        qDebug() << "Sensor" << pSensor->getName() << "loaded.";
+                        mne::Log::debug("Sensor {} loaded.", pSensor->getName());
                     }
                 }
                 // AbstractAlgorithm
                 else if (pluginType == AbstractPlugin::_IAlgorithm) {
                     if (AbstractAlgorithm* pAlgorithm = qobject_cast<AbstractAlgorithm*>(pPlugin)) {
                         m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                        qDebug() << "RTAlgorithm" << pAlgorithm->getName() << "loaded.";
+                        mne::Log::debug("RTAlgorithm {} loaded.", pAlgorithm->getName());
                     }
                 }
 
                 emit pluginLoaded(msg);
             }
         } else {
-            qDebug() << "Plugin could not be instantiated!";
+            mne::Log::debug("Plugin could not be instantiated!");
         }
     }
 #else
@@ -96,10 +96,10 @@ void PluginManager::loadPlugins(const QString& dir)
         // Exclude .exp and .lib files (only relevant for windows builds)
         if (!file.contains(".exp") && !file.contains(".lib")) {
             this->setFileName(PluginsDir.absoluteFilePath(file));
-            qDebug() << PluginsDir.absoluteFilePath(file);
+            mne::Log::debug("{}", PluginsDir.absoluteFilePath(file).toStdString());
             QObject* pPlugin = this->instance();
             if (!pPlugin) {
-                qWarning() << "[PluginManager::loadPlugins] Cannot load" << file << "-" << errorString();
+                mne::Log::warning("[PluginManager::loadPlugins] Cannot load {} - {}", file.toStdString(), errorString().toStdString());
             }
 
             // AbstractPlugin
@@ -116,11 +116,11 @@ void PluginManager::loadPlugins(const QString& dir)
 
                     if (pSensor) {
                         m_qVecSensorPlugins.push_back(pSensor);
-                        qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin" << pSensor->getName() << "succeeded.";
-                        qInfo() << "[PluginManager::loadPlugins] Build Info:" << pSensor->getBuildInfo();
+                        mne::Log::info("[PluginManager::loadPlugins] Loading sensor plugin {} succeeded.", pSensor->getName().toStdString());
+                        mne::Log::info("[PluginManager::loadPlugins] Build Info: {}", pSensor->getBuildInfo().toStdString());
 
                     } else {
-                        qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin failed.";
+                        mne::Log::info("[PluginManager::loadPlugins] Loading sensor plugin failed.");
                     }
                 } else if (pluginType == AbstractPlugin::_IAlgorithm) {
                     // AbstractAlgorithm
@@ -128,10 +128,10 @@ void PluginManager::loadPlugins(const QString& dir)
 
                     if (pAlgorithm) {
                         m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                        qInfo() << "[PluginManager::loadPlugins] Loading algorithm plugin" << pAlgorithm->getName() << "succeeded.";
-                        qInfo() << "[PluginManager::loadPlugins] Build Timestamp:" << pAlgorithm->getBuildInfo();
+                        mne::Log::info("[PluginManager::loadPlugins] Loading algorithm plugin {} succeeded.", pAlgorithm->getName().toStdString());
+                        mne::Log::info("[PluginManager::loadPlugins] Build Timestamp: {}", pAlgorithm->getBuildInfo().toStdString());
                     } else {
-                        qInfo() << "[PluginManager::loadPlugins] Loading algorithm plugin failed.";
+                        mne::Log::info("[PluginManager::loadPlugins] Loading algorithm plugin failed.");
                     }
                 }
 

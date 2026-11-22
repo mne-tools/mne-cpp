@@ -23,7 +23,6 @@
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/imagesc.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,7 +63,6 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -163,7 +161,7 @@ int main(int argc, char* argv[])
             kept.append(epoch);
         }
     }
-    qInfo().noquote() << QString("Read %1 epochs of event %2, %3 rejected.").arg(data.size()).arg(event).arg(data.size() - kept.size());
+    Log::info("{}", QString("Read %1 epochs of event %2, %3 rejected.").arg(data.size()).arg(event).arg(data.size() - kept.size()).toStdString());
     if (kept.isEmpty()) {
         return 0;
     }

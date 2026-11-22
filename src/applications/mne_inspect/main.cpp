@@ -16,7 +16,6 @@
 
 #include "app/mainwindow.h"
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -37,7 +36,6 @@
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("MNE Inspect");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);

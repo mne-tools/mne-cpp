@@ -17,6 +17,7 @@
  */
 
 #include <pipelineparser.h>
+#include <base/log.h>
 #include <workflowgraph.h>
 #include <workflowmanager.h>
 #include <iskilloperator.h>
@@ -143,8 +144,8 @@ void TestWorkflowIntegration::initTestCase()
     }
     m_hasFifData = !m_sampleFifPath.isEmpty();
     if (!m_hasFifData) {
-        qWarning("sample_audvis_trunc_raw.fif not found — execution tests will be skipped.");
-        qWarning("Set MNE_CPP_TEST_DATA_PATH to the mne-cpp-test-data root to enable them.");
+        mne::Log::warning("sample_audvis_trunc_raw.fif not found — execution tests will be skipped.");
+        mne::Log::warning("Set MNE_CPP_TEST_DATA_PATH to the mne-cpp-test-data root to enable them.");
     }
 }
 

@@ -23,7 +23,6 @@
 #include <fiff/fiff_raw_data.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,7 +64,6 @@ private:
 
 void TestEDF2FIFFRWR::initTestCase()
 {
-    mne::install_qt_message_handler();
     const QString appDir = QCoreApplication::applicationDirPath();
     m_sEdf = appDir + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf";
     QVERIFY(QFileInfo::exists(m_sEdf));

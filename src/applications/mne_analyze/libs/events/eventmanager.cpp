@@ -18,11 +18,7 @@
 
 #include "eventmanager.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
+#include <base/log.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -251,7 +247,7 @@ Event EventManager::addEvent(int sample, idNum groupId)
 
 #ifndef NO_IPC
     if (m_pSharedMemManager->isInit()) {
-        qDebug() << "Sending event to SM: Sample: " << sample;
+        mne::Log::debug("Sending event to SM: Sample: {}", sample);
         m_pSharedMemManager->addEvent(newEvent.getSample());
     }
 #endif

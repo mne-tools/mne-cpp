@@ -22,7 +22,6 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -35,7 +34,6 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
-#include <QDebug>
 #include <QDataStream>
 
 //=============================================================================================================
@@ -134,7 +132,7 @@ static bool parseRes4(CtfDatasetInfo& info)
 {
     QFile file(info.res4Path);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open res4: %s", qPrintable(info.res4Path));
+        Log::critical("Cannot open res4: {}", info.res4Path.toStdString());
         return false;
     }
 
@@ -145,7 +143,7 @@ static bool parseRes4(CtfDatasetInfo& info)
     // Skip header identifier (8 bytes: "MEG41RS" or "MEG42RS")
     char headerTag[9] = {0};
     ds.readRawData(headerTag, 8);
-    qInfo("Res4 tag: %s", headerTag);
+    Log::info("Res4 tag: {}", headerTag);
 
     // Skip appName (256 bytes), DataOrigin (256 bytes), DataDescription (256 bytes)
     ds.skipRawData(256 + 256 + 256);
@@ -188,8 +186,7 @@ static bool parseRes4(CtfDatasetInfo& info)
             info.nSamples = static_cast<int>(epochTime * info.sfreq);
     }
 
-    qInfo("Res4: %d channels, %d samples/trial, %d trials, %.1f Hz",
-          info.nChannels, info.nSamples, info.nTrials, info.sfreq);
+    Log::info("Res4: {} channels, {} samples/trial, {} trials, {:.1f} Hz", info.nChannels, info.nSamples, info.nTrials, info.sfreq);
 
     // Seek to sensor records (at fixed offset after general header)
     file.seek(CTF_RES4_HEADER_SIZE);
@@ -258,7 +255,7 @@ static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
 {
     QFile file(info.meg4Path);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open meg4: %s", qPrintable(info.meg4Path));
+        Log::critical("Cannot open meg4: {}", info.meg4Path.toStdString());
         return false;
     }
 
@@ -297,7 +294,7 @@ static bool readMeg4Data(const CtfDatasetInfo& info, MatrixXd& data)
     }
 
     file.close();
-    qInfo("Read %d channels x %d samples", nChan, totalSamples);
+    Log::info("Read {} channels x {} samples", nChan, totalSamples);
     return true;
 }
 
@@ -371,7 +368,6 @@ static void mapCtfToFiff(const CtfSensorInfo& sen, FiffChInfo& ch)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_ctf2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -393,18 +389,18 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (dsPath.isEmpty()) {
-        qCritical("--ds is required.");
+        Log::critical("--ds is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
     // Locate res4 and meg4 files in .ds directory
     QDir dsDir(dsPath);
     if (!dsDir.exists()) {
-        qCritical("Dataset directory does not exist: %s", qPrintable(dsPath));
+        Log::critical("Dataset directory does not exist: {}", dsPath.toStdString());
         return 1;
     }
 
@@ -414,7 +410,7 @@ int main(int argc, char* argv[])
     // Find res4 file
     QStringList res4Files = dsDir.entryList(QStringList() << "*.res4", QDir::Files);
     if (res4Files.isEmpty()) {
-        qCritical("No .res4 file found in %s", qPrintable(dsPath));
+        Log::critical("No .res4 file found in {}", dsPath.toStdString());
         return 1;
     }
     info.res4Path = dsDir.filePath(res4Files.first());
@@ -422,14 +418,14 @@ int main(int argc, char* argv[])
     // Find meg4 file
     QStringList meg4Files = dsDir.entryList(QStringList() << "*.meg4", QDir::Files);
     if (meg4Files.isEmpty()) {
-        qCritical("No .meg4 file found in %s", qPrintable(dsPath));
+        Log::critical("No .meg4 file found in {}", dsPath.toStdString());
         return 1;
     }
     info.meg4Path = dsDir.filePath(meg4Files.first());
 
-    qInfo("CTF dataset: %s", qPrintable(dsPath));
-    qInfo("  res4: %s", qPrintable(info.res4Path));
-    qInfo("  meg4: %s", qPrintable(info.meg4Path));
+    Log::info("CTF dataset: {}", dsPath.toStdString());
+    Log::info("  res4: {}", info.res4Path.toStdString());
+    Log::info("  meg4: {}", info.meg4Path.toStdString());
 
     // Parse res4 header
     if (!parseRes4(info))
@@ -469,7 +465,7 @@ int main(int argc, char* argv[])
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), fiffInfo, cals);
     if (!stream) {
-        qCritical("Cannot open output: %s", qPrintable(outFile));
+        Log::critical("Cannot open output: {}", outFile.toStdString());
         return 1;
     }
 
@@ -482,8 +478,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)",
-          qPrintable(outFile), nChan, nSamples, info.sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, info.sfreq);
 
     return 0;
 }

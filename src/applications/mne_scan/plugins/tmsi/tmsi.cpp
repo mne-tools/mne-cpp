@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "tmsi.h"
 
 #include <acq/devices/acq_devices.h>
@@ -35,7 +36,6 @@
 //=============================================================================================================
 
 #include <QApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -150,7 +150,7 @@ void TMSI::applyElectrodeLayout(FiffInfo& info) const
     // Only works for ANT Neuro Waveguard Duke caps
     const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(m_sElcFilePath.toStdString()));
     if (!layout) {
-        qWarning() << "[TMSI] Cannot read the electrode positions in" << m_sElcFilePath;
+        Log::warning("[TMSI] Cannot read the electrode positions in {}", m_sElcFilePath.toStdString());
         return;
     }
 
@@ -174,7 +174,7 @@ void TMSI::applyElectrodeLayout(FiffInfo& info) const
     for (const auto& [name, ident, drop] : cardinals) {
         const auto it = std::find(layout->names.begin(), layout->names.end(), name);
         if (it == layout->names.end()) {
-            qWarning() << "[TMSI]" << name << "not found. Check the loaded layout.";
+            Log::warning("[TMSI] {} not found. Check the loaded layout.", name);
             continue;
         }
         FiffDigPoint point;
@@ -226,7 +226,7 @@ bool TMSI::start()
     mne::registerTmsiScheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[TMSI::start]" << QString::fromStdString(device.error().text());
+        Log::warning("[TMSI::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
@@ -238,7 +238,7 @@ bool TMSI::start()
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[TMSI::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        Log::warning("[TMSI::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -255,7 +255,7 @@ bool TMSI::start()
     m_pRMTSA_TMSI->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[TMSI::start]" << QString::fromStdString(e.text());
+        Log::warning("[TMSI::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -337,7 +337,7 @@ void TMSI::run()
         while (!isInterruptionRequested()) {
             const auto impedances = m_device.measureImpedances(std::chrono::seconds(5));
             if (!impedances) {
-                qWarning() << "[TMSI::run]" << QString::fromStdString(impedances.error().text());
+                Log::warning("[TMSI::run] {}", QString::fromStdString(impedances.error().text()).toStdString());
                 return;
             }
             // Electrode i of the cap is ExG input i, and the ExG inputs lead the stream
@@ -364,7 +364,7 @@ void TMSI::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[TMSI::run]" << QString::fromStdString(read.error().text());
+            Log::warning("[TMSI::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         if (m_iStimRow >= 0) {

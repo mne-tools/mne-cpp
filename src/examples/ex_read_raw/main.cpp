@@ -19,7 +19,6 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -64,7 +63,6 @@ using namespace Eigen;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
 
     // Command Line Parser
@@ -143,12 +141,12 @@ int main(int argc, char* argv[])
         readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
     if (!readSuccessful) {
-        qWarning("Could not read raw segment.\n");
+        Log::warning("Could not read raw segment.\n");
         return -1;
     }
     //! [fiff_raw_data_read_segment]
 
-    qInfo("Read %d samples.\n", (qint32)data.cols());
+    Log::info("Read {} samples.\n", (qint32)data.cols());
 
     std::cout << data.block(0, 0, 10, 10) << std::endl;
 

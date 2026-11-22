@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "displaymanager.h"
 
 #include <scDisp/realtimemultisamplearraywidget.h>
@@ -38,7 +39,6 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -177,5 +177,5 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
 
 void DisplayManager::clean()
 {
-    qDebug() << "DisplayManager::clean()";
+    mne::Log::debug("DisplayManager::clean()");
 }

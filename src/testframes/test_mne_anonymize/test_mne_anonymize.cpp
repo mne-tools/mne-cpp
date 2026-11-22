@@ -20,7 +20,6 @@
 #include "../../tools/preprocessing/mne_anonymize/fiffanonymizer.h"
 #include "../../tools/preprocessing/mne_anonymize/settingscontrollercl.h"
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -149,7 +148,6 @@ TestMneAnonymize::TestMneAnonymize()
 
 void TestMneAnonymize::initTestCase()
 {
-    mne::install_qt_message_handler();
 }
 
 //=============================================================================================================
@@ -355,15 +353,15 @@ void TestMneAnonymize::testDefaultOutput()
     QVERIFY(!sFileIn.isEmpty());
     QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
-    qInfo() << "\n\n-------------------------testDefaultOutput-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
+    Log::info("\n\n-------------------------testDefaultOutput-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
 
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
     arguments << "--no-gui";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     if (QFile::exists(sFileOut)) {
         QFile::remove(sFileOut);
@@ -387,8 +385,8 @@ void TestMneAnonymize::testDeleteInputFile()
     QString sFileInTest(tempDir.filePath("testing0.fif"));
     QString sFileOutTest(tempDir.filePath("testing0_anonymized.fif"));
 
-    qInfo() << "\n\n-------------------------testDeleteInputFile-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
+    Log::info("\n\n-------------------------testDeleteInputFile-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
 
     QFile::copy(sFileIn, sFileInTest);
     QVERIFY(QFile::exists(sFileInTest));
@@ -401,7 +399,7 @@ void TestMneAnonymize::testDeleteInputFile()
     arguments << "--delete_input_file_after";
     arguments << "--avoid_delete_confirmation";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
     controller.run();
@@ -423,8 +421,8 @@ void TestMneAnonymize::testInPlace()
     QString sFileInTest(tempDir.filePath("testing1.fif"));
     QString sFileOutTest(tempDir.filePath("testing1.fif"));
 
-    qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
+    Log::info("\n\n-------------------------testInPlace-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
 
     QFile::copy(sFileIn, sFileInTest);
     QVERIFY(QFile::exists(sFileInTest));
@@ -436,7 +434,7 @@ void TestMneAnonymize::testInPlace()
     arguments << "--no-gui";
     arguments << "--avoid_delete_confirmation";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
     controller.run();
@@ -454,22 +452,22 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     QVERIFY(!sFileIn.isEmpty());
     QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
-    qInfo() << "\n\n-------------------------testDefaultAnonymizationOfTags-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
+    Log::info("\n\n-------------------------testDefaultAnonymizationOfTags-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
 
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
     arguments << "--no-gui";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
     controller.run();
 
     auto outStream = std::make_unique<FiffStream>(sFileOut.toStdU16String());
     if (outStream->open()) {
-        qInfo() << "output file opened correctly " << sFileIn;
+        Log::info("output file opened correctly {}", sFileIn.toStdString());
     } else {
         QFAIL("Output file could not be loaded.");
     }
@@ -489,9 +487,9 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     QVERIFY(!sFileIn.isEmpty());
     QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
-    qInfo() << "\n\n-------------------------compareBirthdayOffsetOption-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
-    qInfo() << "sFileOut" << sFileOut;
+    Log::info("\n\n-------------------------compareBirthdayOffsetOption-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
+    Log::info("sFileOut {}", sFileOut.toStdString());
 
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
@@ -500,14 +498,14 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     arguments << "--verbose";
     arguments << "--no-gui";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
     controller.run();
 
     FiffStream outStream(sFileOut.toStdU16String());
     if (outStream.open()) {
-        qInfo() << "output file opened correctly " << sFileIn;
+        Log::info("output file opened correctly {}", sFileIn.toStdString());
     } else {
         QFAIL("Output file could not be loaded.");
     }
@@ -527,9 +525,9 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     QVERIFY(!sFileIn.isEmpty());
     QString sFileOut(tempDir.filePath("sample_audvis_trunc_raw_anonymized.fif"));
 
-    qInfo() << "\n\n-------------------------compareMeasureDateOffsetOption-------------------------------------";
-    qInfo() << "sFileIn" << sFileIn;
-    qInfo() << "sFileOut" << sFileOut;
+    Log::info("\n\n-------------------------compareMeasureDateOffsetOption-------------------------------------");
+    Log::info("sFileIn {}", sFileIn.toStdString());
+    Log::info("sFileOut {}", sFileOut.toStdString());
 
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
@@ -538,7 +536,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     arguments << "--verbose";
     arguments << "--no-gui";
 
-    qInfo() << "arguments" << arguments;
+    Log::info("arguments {}", arguments.join(", ").toStdString());
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
     controller.run();
@@ -546,7 +544,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
 
     FiffStream outStream(sFileOut.toStdU16String());
     if (outStream.open()) {
-        qInfo() << "output file opened correctly " << sFileIn;
+        Log::info("output file opened correctly {}", sFileIn.toStdString());
     } else {
         QFAIL("Output file could not be loaded.");
     }
@@ -599,10 +597,10 @@ void TestMneAnonymize::verifyTags(mne::FiffStream& stream,
                 QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag.to_int(), QTimeZone::LocalTime));
                 QDateTime originalDateInFile(QDate(2002, 12, 3), QTime(14, 1, 10));
 
-                qInfo() << "InMeasDate: " << inMeasDate;
-                qInfo() << "originalDateInFile: " << originalDateInFile;
-                qInfo() << "days in between: " << inMeasDate.daysTo(originalDateInFile);
-                qInfo() << "days used as offset: " << mDaysToOffsetDates;
+                Log::info("InMeasDate: {}", inMeasDate.toString().toStdString());
+                Log::info("originalDateInFile: {}", originalDateInFile.toString().toStdString());
+                Log::info("days in between: {}", inMeasDate.daysTo(originalDateInFile));
+                Log::info("days used as offset: {}", mDaysToOffsetDates);
 
                 if (testArg == "MeasDateOffset") {
                     QVERIFY(inMeasDate.daysTo(originalDateInFile) == mDaysToOffsetDates);

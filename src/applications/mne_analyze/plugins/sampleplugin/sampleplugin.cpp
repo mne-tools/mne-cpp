@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "sampleplugin.h"
 
 #include <anShared/Management/analyzedata.h>
@@ -25,7 +26,6 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -126,7 +126,7 @@ void SamplePlugin::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         default:
-            qWarning() << "[SamplePlugin::handleEvent] received an Event that is not handled by switch-cases";
+            mne::Log::warning("[SamplePlugin::handleEvent] received an Event that is not handled by switch-cases");
             break;
     }
 }

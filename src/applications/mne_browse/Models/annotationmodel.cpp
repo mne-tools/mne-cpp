@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "annotationmodel.h"
 
 //=============================================================================================================
@@ -23,7 +24,6 @@
 
 #include <QBrush>
 #include <QDateTime>
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -760,7 +760,7 @@ bool AnnotationModel::saveAnnotationData(QFile& qFile) const
 {
     const QFileInfo fileInfo(qFile);
     if (fileInfo.dir().exists() == false) {
-        qWarning() << "AnnotationModel: annotation directory does not exist" << fileInfo.absolutePath();
+        Log::warning("AnnotationModel: annotation directory does not exist {}", fileInfo.absolutePath().toStdString());
         return false;
     }
 
@@ -785,7 +785,7 @@ bool AnnotationModel::saveAnnotationData(QFile& qFile) const
 bool AnnotationModel::loadAnnotationJson(QFile& qFile)
 {
     if (!qFile.open(QIODevice::ReadOnly)) {
-        qWarning() << "AnnotationModel: could not open annotation file" << qFile.fileName();
+        Log::warning("AnnotationModel: could not open annotation file {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -794,7 +794,7 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
     qFile.close();
 
     if (parseError.error != QJsonParseError::NoError || (!document.isObject() && !document.isArray())) {
-        qWarning() << "AnnotationModel: invalid annotation json" << qFile.fileName() << parseError.errorString();
+        Log::warning("AnnotationModel: invalid annotation json {} {}", qFile.fileName().toStdString(), parseError.errorString().toStdString());
         return false;
     }
 
@@ -855,7 +855,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 {
     mne::FiffStream stream(qFile.fileName().toStdU16String());
     if (!stream.open()) {
-        qWarning() << "AnnotationModel: could not open annotation fif" << qFile.fileName();
+        Log::warning("AnnotationModel: could not open annotation fif {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -864,7 +864,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 
     if (annotationBlocks.empty()) {
         qFile.close();
-        qWarning() << "AnnotationModel: could not find annotation block in" << qFile.fileName();
+        Log::warning("AnnotationModel: could not find annotation block in {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -929,7 +929,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 
     const int count = onsetSeconds.size();
     if (count == 0 || endSeconds.size() != count || descriptions.size() != count) {
-        qWarning() << "AnnotationModel: incomplete annotation fif content in" << qFile.fileName();
+        Log::warning("AnnotationModel: incomplete annotation fif content in {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -973,14 +973,14 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
 bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 {
     if (!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "AnnotationModel: could not open annotation csv" << qFile.fileName();
+        Log::warning("AnnotationModel: could not open annotation csv {}", qFile.fileName().toStdString());
         return false;
     }
 
     QTextStream stream(&qFile);
     if (stream.atEnd()) {
         qFile.close();
-        qWarning() << "AnnotationModel: empty annotation csv" << qFile.fileName();
+        Log::warning("AnnotationModel: empty annotation csv {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -992,7 +992,7 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 
     if (!columnMap.contains(QStringLiteral("onset")) || !columnMap.contains(QStringLiteral("duration")) || !columnMap.contains(QStringLiteral("description"))) {
         qFile.close();
-        qWarning() << "AnnotationModel: invalid annotation csv header" << qFile.fileName();
+        Log::warning("AnnotationModel: invalid annotation csv header {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -1092,7 +1092,7 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
 bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
 {
     if (!qFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "AnnotationModel: could not open annotation txt" << qFile.fileName();
+        Log::warning("AnnotationModel: could not open annotation txt {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -1193,7 +1193,7 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
 bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
 {
     if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        qWarning() << "AnnotationModel: could not write annotation file" << qFile.fileName();
+        Log::warning("AnnotationModel: could not write annotation file {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -1254,7 +1254,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 {
     auto stream = mne::FiffStream::start_file(std::filesystem::path(qFile.fileName().toStdU16String()));
     if (!stream) {
-        qWarning() << "AnnotationModel: could not write annotation fif" << qFile.fileName();
+        Log::warning("AnnotationModel: could not write annotation fif {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -1344,7 +1344,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
 {
     if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-        qWarning() << "AnnotationModel: could not write annotation csv" << qFile.fileName();
+        Log::warning("AnnotationModel: could not write annotation csv {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -1426,7 +1426,7 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
 bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
 {
     if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-        qWarning() << "AnnotationModel: could not write annotation txt" << qFile.fileName();
+        Log::warning("AnnotationModel: could not write annotation txt {}", qFile.fileName().toStdString());
         return false;
     }
 

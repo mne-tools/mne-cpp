@@ -21,7 +21,6 @@
 #include <mne/mne.h>
 #include <math/numerics.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp/plots/bar.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/spline.h>
@@ -40,7 +39,6 @@
 #include <QVector>
 #include <QTime>
 #include <QElapsedTimer>
-#include <QDebug>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 //includes for source localization data
@@ -101,7 +99,6 @@ Eigen::VectorXd sineWaveGenerator(double amplitude, double xStep, int xNow, int 
 int main(int argc, char* argv[])
 {
     //code to generate source localization data
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -135,7 +132,7 @@ int main(int argc, char* argv[])
     QString t_sFileNameStc(parser.value(stcFileOption));
 
     double lambda2 = 1.0 / pow(snr, 2);
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
+    Log::debug("Start calculation with: SNR {} ; Lambda {} ; Method {} ; stc: {}", snr, lambda2, method.toStdString(), t_sFileNameStc.toStdString());
 
     // Load data
     // Without a baseline the DC offset of the average dominates the estimate
@@ -174,7 +171,7 @@ int main(int argc, char* argv[])
     //
     if (!t_sFileNameClusteredInv.isEmpty()) {
         if (auto written = inverse_operator.write(t_sFileNameClusteredInv.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 
@@ -200,12 +197,12 @@ int main(int argc, char* argv[])
     myTimerHistCounts.start();
     Eigen::VectorXd dataSine;
     dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function
-    qDebug() << "sourceEstimateData.rows = " << sourceEstimateData.rows();
-    qDebug() << "sourceEstaimateData.cols = " << sourceEstimateData.cols();
+    Log::debug("sourceEstimateData.rows = {}", sourceEstimateData.rows());
+    Log::debug("sourceEstaimateData.cols = {}", sourceEstimateData.cols());
     Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax); //user input to normalize and sort the data matrix
     std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
     std::cout << "resultFrequency = " << resultFrequency << std::endl;
-    qDebug() << "HistCounts timer:" << myTimerHistCounts.elapsed();
+    Log::debug("HistCounts timer: {}", myTimerHistCounts.elapsed());
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
     Spline* displayObj = new Spline(0, QString("%1 of %2 clustered sources at 100 ms").arg(method).arg(sourceEstimateData.size()));
@@ -224,7 +221,7 @@ int main(int argc, char* argv[])
     };
     displayObj->setThreshold(QVector3D(percentile(0.5), percentile(0.9), percentile(0.99)));
 
-    qDebug() << "Histogram timer:" << myTimerHistogram.elapsed();
+    Log::debug("Histogram timer: {}", myTimerHistogram.elapsed());
 
     FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 values of the %2 clustered sources at 100 ms in %3 classes, with markers at the 50th, 90th and 99th percentile.").arg(method).arg(sourceEstimateData.size()).arg(classAmount));
     if (!FigureExporter::directory().isEmpty()) {

@@ -19,7 +19,7 @@
   "suppressions": {
     "$comment": "Map metric -> { 'path': 'reason' }. A suppression hides one file from one metric and must say why.",
     "console_io": {
-      "src/libraries/base/log.cpp": "The Qt message handler itself: the one place that writes log records to stdout/stderr."
+      "src/libraries/base/log.cpp": "The default sink of mne::Log: the one place that writes log records to stdout and stderr."
     },
     "qt_new_unparented": {
       "src/applications/mne_analyze_studio/core/backendchannel.cpp": "The accept thread creates each connection, which cannot get a parent living in another thread; the queued call on the server's thread parents it (or deletes it if the server is gone)."

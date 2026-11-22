@@ -24,6 +24,7 @@
 
 #include <disp/viewers/abstractview.h>
 #include "analyzecore.h"
+#include <base/log.h>
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -107,14 +108,12 @@ public:
 
     //=============================================================================================================
     /**
-     * Custom Qt message handler.
+     * Appends a message to the log window; the @ref mne::Log sink of MNE Analyze.
      *
-     * @param[in] type      enum to identify the various message types.
-     * @param[in] context   additional information about a log message.
+     * @param[in] level     Severity of the message.
      * @param[in] msg       the message to log.
      */
-    void writeToLog(QtMsgType type,
-                    const QMessageLogContext& context,
+    void writeToLog(mne::Log::Level level,
                     const QString& msg);
 
     //=========================================================================================================

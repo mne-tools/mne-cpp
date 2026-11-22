@@ -20,7 +20,6 @@
 #include <fiff/fiff_ch_info.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +29,6 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,7 +49,7 @@ static int processFile(const QString& name, bool doMagnes, QString& summary)
     QFile file(name);
     auto stream = FiffStream::open_update(name.toStdU16String());
     if (!stream) {
-        qCritical("Cannot open file for update: %s", qPrintable(name));
+        Log::critical("Cannot open file for update: {}", name.toStdString());
         return -1;
     }
 
@@ -118,7 +116,6 @@ static int processFile(const QString& name, bool doMagnes, QString& summary)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_fix_mag_coil_types");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -143,7 +140,7 @@ int main(int argc, char* argv[])
     QStringList files = parser.positionalArguments();
 
     if (files.isEmpty()) {
-        qCritical("No input files specified.");
+        Log::critical("No input files specified.");
         parser.showHelp(1);
     }
 
@@ -151,10 +148,10 @@ int main(int argc, char* argv[])
     for (const QString& fname : files) {
         QString summary;
         if (processFile(fname, doMagnes, summary) != 0) {
-            qCritical("%s ... [failed]", qPrintable(fname));
+            Log::critical("{} ... [failed]", fname.toStdString());
             ++failed;
         } else {
-            qInfo("%s ... %s [ok]", qPrintable(fname), qPrintable(summary));
+            Log::info("{} ... {} [ok]", fname.toStdString(), summary.toStdString());
         }
     }
 
@@ -162,8 +159,7 @@ int main(int argc, char* argv[])
     // passing. Reporting success here made the tool unusable from a script: a
     // batch in which every single file failed still exited zero.
     if (failed) {
-        qCritical("%d of %lld file(s) could not be updated.",
-                  failed, static_cast<long long>(files.size()));
+        Log::critical("{} of {} file(s) could not be updated.", failed, static_cast<long long>(files.size()));
         return 1;
     }
 

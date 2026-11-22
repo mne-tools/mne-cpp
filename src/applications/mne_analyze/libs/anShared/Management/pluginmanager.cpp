@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "pluginmanager.h"
 
 #include "../Plugins/abstractplugin.h"
@@ -29,7 +30,6 @@
 //=============================================================================================================
 
 #include <QDir>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -93,14 +93,14 @@ void PluginManager::loadPlugin(const QString& file)
         AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
         if (pPlugin) {
             if (findByName(pPlugin->getName()) == -1) {
-                qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
-                qInfo() << "[PluginManager::loadPlugin] Build Info:" << pPlugin->getBuildInfo();
+                mne::Log::info("[PluginManager::loadPlugin] Loading Plugin {} succeeded.", file.toStdString());
+                mne::Log::info("[PluginManager::loadPlugin] Build Info: {}", pPlugin->getBuildInfo().toStdString());
                 insertPlugin(pPlugin);
             } else {
-                qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
+                mne::Log::info("[PluginManager::loadPlugin] Loading Plugin {} . Plugin already loaded.", file.toStdString());
             }
         } else {
-            qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
+            mne::Log::info("[PluginManager::loadPlugin] Loading Plugin {} failed.", file.toStdString());
         }
     }
 }

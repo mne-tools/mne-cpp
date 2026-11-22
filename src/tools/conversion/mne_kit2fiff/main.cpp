@@ -23,7 +23,6 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_types.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -35,7 +34,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 #include <QRegularExpression>
 #include <QFileInfo>
 
@@ -104,7 +102,7 @@ static bool parseSqdHeader(const QString& sqdPath, KitDatasetInfo& info)
 {
     QFile file(sqdPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open SQD file: %s", qPrintable(sqdPath));
+        Log::critical("Cannot open SQD file: {}", sqdPath.toStdString());
         return false;
     }
 
@@ -144,8 +142,7 @@ static bool parseSqdHeader(const QString& sqdPath, KitDatasetInfo& info)
     if (info.dataOffset <= 0)
         info.dataOffset = KIT_HEADER_SIZE;
 
-    qInfo("KIT dataset: system=%d, %d channels, %d samples, %.1f Hz",
-          info.systemId, info.nChannels, info.nSamples, info.sfreq);
+    Log::info("KIT dataset: system={}, {} channels, {} samples, {:.1f} Hz", info.systemId, info.nChannels, info.nSamples, info.sfreq);
 
     // Initialize sensors with default info
     for (int c = 0; c < info.nChannels; ++c) {
@@ -170,7 +167,7 @@ static bool readSensorLayout(const QString& snsPath, KitDatasetInfo& info)
 {
     QFile file(snsPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open sensor file: %s", qPrintable(snsPath));
+        Log::critical("Cannot open sensor file: {}", snsPath.toStdString());
         return false;
     }
 
@@ -202,7 +199,7 @@ static bool readSensorLayout(const QString& snsPath, KitDatasetInfo& info)
     }
 
     file.close();
-    qInfo("Read %d sensor positions from %s", count, qPrintable(snsPath));
+    Log::info("Read {} sensor positions from {}", count, snsPath.toStdString());
     return true;
 }
 
@@ -217,7 +214,7 @@ static bool computeDevHeadTransform(const QString& hpiPath, FiffCoordTrans& tran
     // Or alternating lines: device_x device_y device_z head_x head_y head_z
     QFile file(hpiPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qInfo("Warning: Cannot open HPI file: %s", qPrintable(hpiPath));
+        Log::info("Warning: Cannot open HPI file: {}", hpiPath.toStdString());
         return false;
     }
 
@@ -258,7 +255,7 @@ static bool computeDevHeadTransform(const QString& hpiPath, FiffCoordTrans& tran
 
     int nPts = std::min(devicePts.size(), headPts.size());
     if (nPts < 3) {
-        qInfo("Warning: Need at least 3 HPI points, got %d", nPts);
+        Log::info("Warning: Need at least 3 HPI points, got {}", nPts);
         return false;
     }
 
@@ -324,7 +321,7 @@ static bool computeDevHeadTransform(const QString& hpiPath, FiffCoordTrans& tran
         rms += (fitted - headPts[i]).squaredNorm();
     }
     rms = sqrt(rms / nPts);
-    qInfo("HPI alignment: %d points, RMS error: %.2f mm", nPts, rms * 1000.0);
+    Log::info("HPI alignment: {} points, RMS error: {:.2f} mm", nPts, rms * 1000.0);
 
     return true;
 }
@@ -337,7 +334,7 @@ static bool readSqdData(const QString& sqdPath, const KitDatasetInfo& info, Matr
 {
     QFile file(sqdPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open SQD: %s", qPrintable(sqdPath));
+        Log::critical("Cannot open SQD: {}", sqdPath.toStdString());
         return false;
     }
 
@@ -360,7 +357,7 @@ static bool readSqdData(const QString& sqdPath, const KitDatasetInfo& info, Matr
     }
 
     file.close();
-    qInfo("Read %d channels x %d samples", nChan, nSamp);
+    Log::info("Read {} channels x {} samples", nChan, nSamp);
     return true;
 }
 
@@ -368,7 +365,6 @@ static bool readSqdData(const QString& sqdPath, const KitDatasetInfo& info, Matr
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_kit2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -407,11 +403,11 @@ int main(int argc, char* argv[])
     }
 
     if (sqdFile.isEmpty()) {
-        qCritical("--sqd is required.");
+        Log::critical("--sqd is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         return 1;
     }
 
@@ -503,7 +499,7 @@ int main(int argc, char* argv[])
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), fiffInfo, cals);
     if (!stream) {
-        qCritical("Cannot open output: %s", qPrintable(outFile));
+        Log::critical("Cannot open output: {}", outFile.toStdString());
         return 1;
     }
 
@@ -516,8 +512,7 @@ int main(int argc, char* argv[])
     }
 
     stream->finish_writing_raw();
-    qInfo("Written FIFF: %s (%d channels, %d samples, %.1f Hz)",
-          qPrintable(outFile), nChan, nSamples, info.sfreq);
+    Log::info("Written FIFF: {} ({} channels, {} samples, {:.1f} Hz)", outFile.toStdString(), nChan, nSamples, info.sfreq);
 
     return 0;
 }

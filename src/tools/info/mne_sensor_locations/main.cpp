@@ -21,7 +21,6 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dir_node.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -63,7 +62,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_sensor_locations");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -91,25 +89,25 @@ int main(int argc, char* argv[])
     QString frame = parser.value(frameOpt).toLower();
 
     if (measFile.isEmpty() || outFile.isEmpty()) {
-        qCritical("Both --meas and --out are required.");
+        Log::critical("Both --meas and --out are required.");
         parser.showHelp(1);
     }
     if (frame != "head" && frame != "device") {
-        qCritical("--frame must be \"head\" or \"device\".");
+        Log::critical("--frame must be \"head\" or \"device\".");
         return 1;
     }
 
     // Read measurement info
     FiffStream stream(measFile.toStdU16String());
     if (!stream.open()) {
-        qCritical("Cannot open FIFF file: %s", qPrintable(measFile));
+        Log::critical("Cannot open FIFF file: {}", measFile.toStdString());
         return 1;
     }
 
     FiffInfo info;
     std::shared_ptr<FiffDirNode> infoNode;
     if (!stream.read_meas_info(stream.dirtree(), info, infoNode)) {
-        qCritical("Cannot read measurement info from: %s", qPrintable(measFile));
+        Log::critical("Cannot read measurement info from: {}", measFile.toStdString());
         return 1;
     }
     stream.close();
@@ -127,7 +125,7 @@ int main(int argc, char* argv[])
     // Open output file
     QFile outputFile(outFile);
     if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot open output file: %s", qPrintable(outFile));
+        Log::critical("Cannot open output file: {}", outFile.toStdString());
         return 1;
     }
     QTextStream out(&outputFile);
@@ -186,8 +184,7 @@ int main(int argc, char* argv[])
 
     out.flush();
     outputFile.close();
-    qInfo("Wrote %d sensor locations to %s (frame: %s)",
-          nWritten, qPrintable(outFile), qPrintable(frame));
+    Log::info("Wrote {} sensor locations to {} (frame: {})", nWritten, outFile.toStdString(), frame.toStdString());
 
     return 0;
 }

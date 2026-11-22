@@ -30,7 +30,6 @@
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,7 +75,6 @@ int main(int argc, char* argv[])
 // Q_INIT_RESOURCE(mne_disp3d);
 #endif
 
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser
@@ -338,10 +336,10 @@ int main(int argc, char* argv[])
 
         //DEBUG
         std::cout << data[0]->epoch.block(0, 0, 10, 10) << std::endl;
-        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
+        Log::debug("{} x {}", data[0]->epoch.rows(), data[0]->epoch.cols());
 
         std::cout << times.block(0, 0, 1, 10) << std::endl;
-        qDebug() << times.rows() << " x " << times.cols();
+        Log::debug("{} x {}", times.rows(), times.cols());
     }
 
     // Calculate the average
@@ -448,10 +446,10 @@ int main(int argc, char* argv[])
     QString lhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_rap_music_raw-lh.stc";
     QString rhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_rap_music_raw-rh.stc";
     if (auto written = stcLh.write(lhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
     if (auto written = stcRh.write(rhStcPath.toStdU16String()); !written) {
-        qWarning() << written.error().what();
+        Log::warning("{}", written.error().what());
     }
 
     BrainView* pBrainView = new BrainView();
@@ -478,7 +476,7 @@ int main(int argc, char* argv[])
 
     if (!t_sFileNameStc.isEmpty()) {
         if (auto written = sourceEstimate.write(t_sFileNameStc.toStdU16String()); !written) {
-            qWarning() << written.error().what();
+            Log::warning("{}", written.error().what());
         }
     }
 

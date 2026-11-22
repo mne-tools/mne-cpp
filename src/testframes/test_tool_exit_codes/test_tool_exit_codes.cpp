@@ -26,7 +26,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,8 +101,6 @@ TestToolExitCodes::TestToolExitCodes()
 
 void TestToolExitCodes::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     // Scoped to a directory that is created and removed per run. Some tools open
     // their input read-write and so leave an empty file behind on failure, which
     // would make a fixed path in the system temp directory exist on the second

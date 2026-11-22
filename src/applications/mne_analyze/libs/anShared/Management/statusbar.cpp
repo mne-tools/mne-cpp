@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "statusbar.h"
 #include "communicator.h"
 #include "event.h"
@@ -30,7 +31,6 @@
 //=============================================================================================================
 
 #include <QLabel>
-#include <QDebug>
 #include <QProgressBar>
 #include <QMenu>
 #include <QHoverEvent>
@@ -83,7 +83,7 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
                 showMessage(pEvent->getData().toString(), m_iMsgTimeout);
                 break;
             }
-            qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that cannot be parsed";
+            mne::Log::warning("[StatusBar::onNewMessageReceived] Received a message/event that cannot be parsed");
             break;
         }
         case EVENT_TYPE::LOADING_START: {
@@ -120,7 +120,7 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
             break;
         }
         default:
-            qWarning() << "[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases";
+            mne::Log::warning("[StatusBar::onNewMessageReceived] Received a message/event that is not handled by switch-cases");
             break;
     }
 }

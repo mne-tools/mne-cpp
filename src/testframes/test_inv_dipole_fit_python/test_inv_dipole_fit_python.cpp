@@ -38,7 +38,8 @@
 //=============================================================================================================
 
 #include <inv/dipole_fit/inv_dipole_fit.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <inv/dipole_fit/inv_dipole_fit_data.h>
 #include <inv/dipole_fit/inv_dipole_fit_settings.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
@@ -207,7 +208,6 @@ private:
 
 void TestInvDipoleFitPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     m_sampleAve = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
     QVERIFY2(QFile::exists(m_sampleAve), "test data missing");
     QVERIFY(m_dir.isValid());
@@ -373,11 +373,12 @@ void TestInvDipoleFitPython::bemForwardMatches()
     }
 
     // EEG needs a layered model; a homogeneous BEM is refused.
-    QTest::ignoreMessage(QtCriticalMsg, "Cannot use a homogeneous model in EEG calculations.");
+    ScopedLogCapture capture;
     QVERIFY(!InvDipoleFitData::setup_dipole_fit_data(
         (data + "MEG/sample/all-trans.fif").toStdString(), m_sampleAve.toStdString(), (data + "subjects/sample/bem/sample-5120-bem.fif").toStdString(),
         nullptr, FwdEegSphereModel::setup_eeg_sphere_model({}, {}, 0.09f).release(), false, {}, {},
         5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, false, true));
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Cannot use a homogeneous model in EEG calculations."), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -587,8 +588,9 @@ void TestInvDipoleFitPython::surfaceGuessesFitMatches()
     // A guess surface that cannot be read must stop the fit, not run it without guesses.
     settings.guess_surfname = (data + "subjects/sample/bem/sample-inner_skull-5120.surf").toStdString();
     InvDipoleFit badFit(&settings);
-    QTest::ignoreMessage(QtCriticalMsg, "Could not create the initial guesses.");
+    ScopedLogCapture capture;
     QCOMPARE(badFit.calculateFit().size(), 0);
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Could not create the initial guesses."), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -672,8 +674,9 @@ void TestInvDipoleFitPython::fitsOneTimePoint()
     // A flat field fits no guess better than another, as in MNE-C's find_best_guess.
     VectorXf flat = VectorXf::Zero(m_fitData->nmeg);
     InvEcd none;
-    QTest::ignoreMessage(QtWarningMsg, "No reasonable initial guess found.");
+    ScopedLogCapture capture;
     QVERIFY(!InvDipoleFitData::fit_one(m_fitData.get(), &guess, 0.0f, flat, false, none));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "No reasonable initial guess found."), capture.dump().c_str());
     QVERIFY(!none.valid);
 }
 
@@ -699,15 +702,17 @@ void TestInvDipoleFitPython::printsFields()
     }
     QVERIFY2(worst < 1e-2 * 1e15 * m_fields.col(0).cwiseAbs().maxCoeff(), qPrintable(QString::number(worst)));
 
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot pick time"));
+    ScopedLogCapture capture;
     QVERIFY(!InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 10.0f, 0.0f, *m_fitData, *data, out));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Cannot pick time"), capture.dump().c_str());
 
     // Data read for a different channel set cannot be compared channel by channel
     std::unique_ptr<MNEMeasData> fewer(MNEMeasData::mne_read_meas_data(m_synthAve.toStdU16String(), 1, nullptr, nullptr, m_fitData->ch_names, 10));
     QVERIFY(fewer);
     const std::string before = out.str();
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("do not hold the 305 fit channels"));
+    capture.clear();
     QVERIFY(!InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 0.0f, 0.0f, *m_fitData, *fewer, out));
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "do not hold the 305 fit channels"), capture.dump().c_str());
     QCOMPARE(out.str(), before);
 }
 
@@ -740,16 +745,19 @@ void TestInvDipoleFitPython::guessesFromFile()
     QVERIFY(guess.guess_fwd[5]->sing.size() == 3 && guess.guess_fwd[5]->sing[0] > 0.0f);
 
     // A file that is not a source space gives no guesses.
-    QTest::ignoreMessage(QtCriticalMsg, "No source spaces available here");
+    ScopedLogCapture capture;
     InvGuessData none(m_sampleAve.toStdU16String(), {}, 0.0f, 0.0f, 0.01f, fitData.get());
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "No source spaces available here"), capture.dump().c_str());
     QCOMPARE(none.nguess, 0);
 
     // Fields need the noise covariance that whitens them.
     fitData->noise.reset();
-    QTest::ignoreMessage(QtCriticalMsg, "Noise covariance missing in compute_guess_fields");
+    capture.clear();
     QVERIFY(!guess.compute_guess_fields(fitData.get()));
-    QTest::ignoreMessage(QtCriticalMsg, "Data missing in compute_guess_fields");
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Noise covariance missing in compute_guess_fields"), capture.dump().c_str());
+    capture.clear();
     QVERIFY(!guess.compute_guess_fields(nullptr));
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Data missing in compute_guess_fields"), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -797,8 +805,9 @@ void TestInvDipoleFitPython::commandLine()
     for (QByteArray& a : bad)
         badArgv.push_back(a.data());
     int badArgc = static_cast<int>(badArgv.size());
-    QTest::ignoreMessage(QtCriticalMsg, "Grid spacing should be positive");
+    ScopedLogCapture capture;
     InvDipoleFitSettings rejected(&badArgc, badArgv.data());
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, "Grid spacing should be positive"), capture.dump().c_str());
     QCOMPARE(rejected.guess_grid, 0.010f);
 
     // The remaining options, in MNE-C's units (mm, fT/cm, fT, uV, ms).
@@ -891,9 +900,10 @@ void TestInvDipoleFitPython::commandLineRejects()
     for (QByteArray& a : args)
         argv.push_back(a.data());
     int argc = static_cast<int>(argv.size());
-    QTest::ignoreMessage(QtCriticalMsg, message.toUtf8().constData());
+    ScopedLogCapture capture;
     // Parsing stops at the error, before checkIntegrity would also complain about the missing --meas.
     InvDipoleFitSettings s(&argc, argv.data());
+    QVERIFY2(capture.contains(mne::Log::Level::Critical, message.toStdString()), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -953,11 +963,12 @@ void TestInvDipoleFitPython::selectsNoiseCov()
     std::vector<int> sels(kN, 1);
     for (int k = 0; k < nUnselected; ++k)
         sels[kN - 1 - k] = 0;
-    if (!ok)
-        QTest::ignoreMessage(QtCriticalMsg, "Too few MEG channels remaining");
+    ScopedLogCapture capture;
     QCOMPARE(InvDipoleFitData::select_dipole_fit_noise_cov(&fit, &meas, -1, sels.data()) == 0, ok);
-    if (!ok)
+    if (!ok) {
+        QVERIFY2(capture.contains(mne::Log::Level::Critical, "Too few MEG channels remaining"), capture.dump().c_str());
         return;
+    }
     QCOMPARE(fit.nave, nave);
 
     VectorXd w = VectorXd::Ones(kN);

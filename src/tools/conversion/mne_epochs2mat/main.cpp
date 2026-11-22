@@ -22,7 +22,6 @@
 #include <fiff/fiff_stream.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -39,7 +38,6 @@
 #include <QDataStream>
 #include <QByteArray>
 #include <QRegularExpression>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -180,7 +178,7 @@ static QList<EventEntry> readEvents(const QString& filename)
     QList<EventEntry> events;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open event file: %s", qPrintable(filename));
+        Log::critical("Cannot open event file: {}", filename.toStdString());
         return events;
     }
 
@@ -207,7 +205,6 @@ static QList<EventEntry> readEvents(const QString& filename)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_epochs2mat");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -247,18 +244,18 @@ int main(int argc, char* argv[])
     int eventId = parser.value(eventIdOpt).toInt();
 
     if (rawFile.isEmpty() || eventFile.isEmpty() || outDir.isEmpty() || !parser.isSet(tminOpt) || !parser.isSet(tmaxOpt) || !parser.isSet(eventIdOpt)) {
-        qCritical("--raw, --event, --tmin, --tmax, --event-id, and --out are required.");
+        Log::critical("--raw, --event, --tmin, --tmax, --event-id, and --out are required.");
         parser.showHelp(1);
     }
 
     if (tmin >= tmax) {
-        qCritical("--tmin must be less than --tmax.");
+        Log::critical("--tmin must be less than --tmax.");
         return 1;
     }
 
     const QFileInfo rawFileInfo(rawFile);
     if (!rawFileInfo.isFile() || !rawFileInfo.isReadable()) {
-        qCritical("Cannot read raw data: %s", qPrintable(rawFile));
+        Log::critical("Cannot read raw data: {}", rawFile.toStdString());
         return 1;
     }
 
@@ -266,38 +263,37 @@ int main(int argc, char* argv[])
     QDir dir(outDir);
     if (!dir.exists()) {
         if (!dir.mkpath(".")) {
-            qCritical("Cannot create output directory: %s", qPrintable(outDir));
+            Log::critical("Cannot create output directory: {}", outDir.toStdString());
             return 1;
         }
     }
 
     // Load raw data
-    qInfo("Loading raw: %s", qPrintable(rawFile));
+    Log::info("Loading raw: {}", rawFile.toStdString());
     FiffRawData raw(rawFile.toStdU16String());
     if (raw.info.empty()) {
-        qCritical("Cannot read raw data: %s", qPrintable(rawFile));
+        Log::critical("Cannot read raw data: {}", rawFile.toStdString());
         return 1;
     }
 
     double sfreq = raw.info.sfreq;
     int nChan = raw.info.nchan;
-    qInfo("  %d channels, %.1f Hz", nChan, sfreq);
+    Log::info("  {} channels, {:.1f} Hz", nChan, sfreq);
 
     // Read events
     QList<EventEntry> events = readEvents(eventFile);
     if (events.isEmpty()) {
-        qCritical("No events read from: %s", qPrintable(eventFile));
+        Log::critical("No events read from: {}", eventFile.toStdString());
         return 1;
     }
-    qInfo("Read %lld events", static_cast<long long>(events.size()));
+    Log::info("Read {} events", static_cast<long long>(events.size()));
 
     // Compute sample offsets for epoch
     int sminOffset = static_cast<int>(qRound(tmin * sfreq));
     int smaxOffset = static_cast<int>(qRound(tmax * sfreq));
     int epochLen = smaxOffset - sminOffset + 1;
 
-    qInfo("Epoch: %.3f to %.3f s (%d samples), event ID = %d",
-          tmin, tmax, epochLen, eventId);
+    Log::info("Epoch: {:.3f} to {:.3f} s ({} samples), event ID = {}", tmin, tmax, epochLen, eventId);
 
     // Build time vector
     MatrixXd timesMat(1, epochLen);
@@ -316,14 +312,14 @@ int main(int argc, char* argv[])
 
         // Check bounds
         if (fromSamp < raw.first_samp || toSamp > raw.last_samp) {
-            qInfo("  Skipping event at sample %d (out of bounds)", eventSample);
+            Log::info("  Skipping event at sample {} (out of bounds)", eventSample);
             continue;
         }
 
         MatrixXd data;
         MatrixXd times;
         if (!raw.read_raw_segment(data, times, fromSamp, toSamp)) {
-            qInfo("  Warning: cannot read epoch at sample %d", eventSample);
+            Log::info("  Warning: cannot read epoch at sample {}", eventSample);
             continue;
         }
 
@@ -333,7 +329,7 @@ int main(int argc, char* argv[])
         QString matFile = dir.filePath(QString("epoch_%1.mat").arg(epochCount, 3, 10, QChar('0')));
         QFile outF(matFile);
         if (!outF.open(QIODevice::WriteOnly)) {
-            qCritical("Cannot open output file: %s", qPrintable(matFile));
+            Log::critical("Cannot open output file: {}", matFile.toStdString());
             return 1;
         }
 
@@ -352,10 +348,9 @@ int main(int argc, char* argv[])
 
         outF.close();
 
-        qInfo("  Wrote epoch %d -> %s (%d x %d)",
-              epochCount, qPrintable(matFile), nChan, epochLen);
+        Log::info("  Wrote epoch {} -> {} ({} x {})", epochCount, matFile.toStdString(), nChan, epochLen);
     }
 
-    qInfo("Done. Extracted %d epochs for event ID %d.", epochCount, eventId);
+    Log::info("Done. Extracted {} epochs for event ID {}.", epochCount, eventId);
     return 0;
 }

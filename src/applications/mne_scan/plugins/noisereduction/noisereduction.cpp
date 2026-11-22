@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "noisereduction.h"
 
 #include "FormFiles/noisereductionsetupwidget.h"
@@ -79,7 +80,7 @@ NoiseReduction::NoiseReduction()
     } else {
         m_iNBaseFctsFirst = 0;
         m_iNBaseFctsSecond = 0;
-        qDebug() << "[NoiseReduction::NoiseReduction] Current system type not recognized.";
+        Log::debug("[NoiseReduction::NoiseReduction] Current system type not recognized.");
     }
 }
 
@@ -616,7 +617,7 @@ void NoiseReduction::initSphara()
 
 void NoiseReduction::createSpharaOperator()
 {
-    qDebug() << "NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for" << m_sCurrentSystem;
+    Log::debug("NoiseReduction::createSpharaOperator - Creating SPHARA oerpator for {}", m_sCurrentSystem.toStdString());
 
     m_mutex.lock();
 

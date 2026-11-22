@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <fs/fs_atlas_lookup.h>
 
 //=============================================================================================================
@@ -135,8 +136,7 @@ void TestFsAtlasLookup::testBatchLookupEmpty()
 void TestFsAtlasLookup::testLoadAndLookup()
 {
     if (!m_hasTestData) {
-        qWarning("No aparc+aseg.mgz found — skipping data-driven atlas lookup test. "
-                 "Set MNE_DATA or provide mne-cpp-test-data.");
+        Log::warning("No aparc+aseg.mgz found — skipping data-driven atlas lookup test. Set MNE_DATA or provide mne-cpp-test-data.");
         return;
     }
 
@@ -156,7 +156,7 @@ void TestFsAtlasLookup::testLoadAndLookup()
 void TestFsAtlasLookup::testOutsideBrainReturnsUnknown()
 {
     if (!m_hasTestData) {
-        qWarning("No aparc+aseg.mgz found — skipping data-driven test.");
+        Log::warning("No aparc+aseg.mgz found — skipping data-driven test.");
         return;
     }
 
@@ -173,7 +173,7 @@ void TestFsAtlasLookup::testOutsideBrainReturnsUnknown()
 void TestFsAtlasLookup::testBatchLookup()
 {
     if (!m_hasTestData) {
-        qWarning("No aparc+aseg.mgz found — skipping batch lookup test.");
+        Log::warning("No aparc+aseg.mgz found — skipping batch lookup test.");
         return;
     }
 

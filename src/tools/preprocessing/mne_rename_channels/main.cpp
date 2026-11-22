@@ -20,7 +20,6 @@
 #include <fiff/fiff_ch_info.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,7 +30,6 @@
 #include <QCommandLineOption>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -89,7 +87,7 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
     QList<ChannelAlias> aliases;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open alias file: %s", qPrintable(filename));
+        Log::critical("Cannot open alias file: {}", filename.toStdString());
         return aliases;
     }
     QTextStream in(&file);
@@ -100,7 +98,7 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
 
         QStringList parts = line.split(':');
         if (parts.size() < 2) {
-            qCritical("Alias line should contain a colon: %s", qPrintable(line));
+            Log::critical("Alias line should contain a colon: {}", line.toStdString());
             return QList<ChannelAlias>();
         }
 
@@ -118,20 +116,20 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
             bool ok;
             a.toKind = parts[2].trimmed().toInt(&ok);
             if (!ok) {
-                qCritical("Cannot interpret new kind: %s", qPrintable(parts[2]));
+                Log::critical("Cannot interpret new kind: {}", parts[2].toStdString());
                 return QList<ChannelAlias>();
             }
         }
 
         if (a.to.isEmpty()) {
-            qCritical("Destination name missing (from = %s)", qPrintable(a.from));
+            Log::critical("Destination name missing (from = {})", a.from.toStdString());
             return QList<ChannelAlias>();
         }
 
         // Truncate to 15 chars (FIFF channel name limit)
         if (a.to.length() > 15) {
             a.to.truncate(15);
-            qWarning("Warning: name truncated to <%s>", qPrintable(a.to));
+            Log::warning("Warning: name truncated to <{}>", a.to.toStdString());
         }
 
         aliases.append(a);
@@ -143,7 +141,6 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_rename_channels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -169,29 +166,27 @@ int main(int argc, char* argv[])
     bool reverse = parser.isSet(revertOpt);
 
     if (fifName.isEmpty() || aliasName.isEmpty()) {
-        qCritical("Both --fif and --alias are required.");
+        Log::critical("Both --fif and --alias are required.");
         parser.showHelp(1);
     }
 
-    qInfo("fif file   : %s", qPrintable(fifName));
-    qInfo("alias file : %s", qPrintable(aliasName));
+    Log::info("fif file   : {}", fifName.toStdString());
+    Log::info("alias file : {}", aliasName.toStdString());
     if (reverse)
-        qInfo("Exchange the roles of old and new channel names in the alias file");
+        Log::info("Exchange the roles of old and new channel names in the alias file");
 
     QList<ChannelAlias> aliases = readAliases(aliasName, reverse);
     if (aliases.isEmpty()) {
-        qCritical("No aliases read.");
+        Log::critical("No aliases read.");
         return 1;
     }
-    qInfo("%lld aliases read from %s",
-          static_cast<long long>(aliases.size()),
-          qPrintable(aliasName));
+    Log::info("{} aliases read from {}", static_cast<long long>(aliases.size()), aliasName.toStdString());
 
     // Open FIFF file for in-place update
     QFile file(fifName);
     auto stream = FiffStream::open_update(fifName.toStdU16String());
     if (!stream) {
-        qCritical("Cannot open file for update: %s", qPrintable(fifName));
+        Log::critical("Cannot open file for update: {}", fifName.toStdString());
         return 1;
     }
 
@@ -211,7 +206,7 @@ int main(int argc, char* argv[])
                         line += QString(" (%1 -> %2)").arg(explainKind(ch.kind), explainKind(a.toKind));
                         ch.kind = a.toKind;
                     }
-                    qInfo("%s", qPrintable(line));
+                    Log::info("{}", line.toStdString());
                     stream->byte_stream().seek(stream->dir()[k].pos);
                     stream->write_ch_info(ch);
                     break;
@@ -221,8 +216,8 @@ int main(int argc, char* argv[])
     }
 
     stream->close();
-    qInfo("%d changes done", nMod);
-    qInfo("%s processed.", qPrintable(fifName));
+    Log::info("{} changes done", nMod);
+    Log::info("{} processed.", fifName.toStdString());
 
     return 0;
 }

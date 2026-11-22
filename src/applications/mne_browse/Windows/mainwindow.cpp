@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mainwindow.h"
 
 #include <fiff/fiff_ch_name.h>
@@ -238,7 +239,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
 {
     mne::FiffRawData raw(rawFilePath.toStdU16String());
     if (raw.empty()) {
-        qWarning() << "[MainWindow] Could not reopen raw data for filtered write" << rawFilePath;
+        mne::Log::warning("[MainWindow] Could not reopen raw data for filtered write {}", rawFilePath.toStdString());
         return false;
     }
 
@@ -246,7 +247,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
 
     auto outfid = mne::FiffStream::start_writing_raw(outputPath.toStdU16String(), raw.info, cals);
     if (!outfid) {
-        qWarning() << "[MainWindow] Could not open output stream for filtered write.";
+        mne::Log::warning("[MainWindow] Could not open output stream for filtered write.");
         return false;
     }
 
@@ -264,7 +265,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
         if (!raw.read_raw_segment(data, times, paddedFirst, paddedLast)) {
-            qWarning() << "[MainWindow] Error during filtered read_raw_segment.";
+            mne::Log::warning("[MainWindow] Error during filtered read_raw_segment.");
             return false;
         }
 
@@ -2716,9 +2717,9 @@ void MainWindow::openFile()
             s_wasmByteArray = fileContent;
             const bool ok = m_pDataWindow->loadFiffBuffer(fileContent, fileName);
             if (ok)
-                qInfo() << "Fiff data file" << fileName << "loaded (ChannelDataView).";
+                mne::Log::info("Fiff data file {} loaded (ChannelDataView).", fileName);
             else
-                qWarning() << "ERROR loading fiff data file" << fileName;
+                mne::Log::warning("ERROR loading fiff data file {}", fileName);
 
             if (ok) {
                 syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
@@ -3110,9 +3111,9 @@ void MainWindow::writeFile()
     progressDialog.exec();
 
     if (!writeFileFuture.get())
-        qWarning() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName();
+        mne::Log::warning("MainWindow: ERROR writing fiff data file {}", qFileOutput.fileName().toStdString());
     else
-        qInfo() << "MainWindow: Successfully written to" << qFileOutput.fileName();
+        mne::Log::info("MainWindow: Successfully written to {}", qFileOutput.fileName().toStdString());
 }
 
 
@@ -3148,9 +3149,9 @@ void MainWindow::saveEvents()
     m_qEventFile.setFileName(filename);
 
     if (m_pEventWindow->getEventModel()->saveEventData(m_qEventFile))
-        qInfo() << "Fiff event data file" << filename << "saved.";
+        mne::Log::info("Fiff event data file {} saved.", filename.toStdString());
     else
-        qWarning() << "ERROR saving fiff event data file" << filename;
+        mne::Log::warning("ERROR saving fiff event data file {}", filename.toStdString());
 }
 
 //*************************************************************************************************************
@@ -3207,9 +3208,9 @@ void MainWindow::saveAnnotations()
     m_qAnnotationFile.setFileName(filename);
 
     if (m_pAnnotationWindow->getAnnotationModel()->saveAnnotationData(m_qAnnotationFile)) {
-        qInfo() << "Annotation file" << filename << "saved.";
+        mne::Log::info("Annotation file {} saved.", filename.toStdString());
     } else {
-        qWarning() << "ERROR saving annotation file" << filename;
+        mne::Log::warning("ERROR saving annotation file {}", filename.toStdString());
     }
 
     setWindowStatus();
@@ -3269,10 +3270,10 @@ void MainWindow::saveVirtualChannels()
     m_qVirtualChannelFile.setFileName(filename);
 
     if (m_pVirtualChannelWindow->getVirtualChannelModel()->saveVirtualChannels(m_qVirtualChannelFile)) {
-        qInfo() << "Virtual-channel file" << filename << "saved.";
+        mne::Log::info("Virtual-channel file {} saved.", filename.toStdString());
         setWindowStatus();
     } else {
-        qWarning() << "ERROR saving virtual-channel file" << filename;
+        mne::Log::warning("ERROR saving virtual-channel file {}", filename.toStdString());
     }
 }
 
@@ -3323,9 +3324,9 @@ bool MainWindow::loadRawFile(const QString& filename)
     // ── ChannelDataView path: demand-paged, opens header only (fast) ──
     const bool ok = m_pDataWindow->loadFiffFile(filename);
     if (ok)
-        qInfo() << "Fiff data file" << filename << "loaded (ChannelDataView).";
+        mne::Log::info("Fiff data file {} loaded (ChannelDataView).", filename.toStdString());
     else
-        qWarning() << "ERROR loading fiff data file" << filename;
+        mne::Log::warning("ERROR loading fiff data file {}", filename.toStdString());
 
     if (ok)
         syncAuxWindowsToFiffInfo(m_pDataWindow->fiffInfo(),
@@ -3376,9 +3377,9 @@ bool MainWindow::loadEventsFile(const QString& filename)
 
     const bool ok = m_pEventWindow->getEventModel()->loadEventData(m_qEventFile);
     if (ok)
-        qInfo() << "Fiff event data file" << filename << "loaded.";
+        mne::Log::info("Fiff event data file {} loaded.", filename.toStdString());
     else
-        qWarning() << "ERROR loading fiff event data file" << filename;
+        mne::Log::warning("ERROR loading fiff event data file {}", filename.toStdString());
 
     setWindowStatus();
 
@@ -3400,9 +3401,9 @@ bool MainWindow::loadAnnotationsFile(const QString& filename, bool showWindow)
 
     const bool ok = m_pAnnotationWindow->getAnnotationModel()->loadAnnotationData(m_qAnnotationFile);
     if (ok) {
-        qInfo() << "Annotation file" << filename << "loaded.";
+        mne::Log::info("Annotation file {} loaded.", filename.toStdString());
     } else {
-        qWarning() << "ERROR loading annotation file" << filename;
+        mne::Log::warning("ERROR loading annotation file {}", filename.toStdString());
     }
 
     setWindowStatus();
@@ -3426,9 +3427,9 @@ bool MainWindow::loadVirtualChannelsFile(const QString& filename, bool showWindo
 
     const bool ok = m_pVirtualChannelWindow->getVirtualChannelModel()->loadVirtualChannels(m_qVirtualChannelFile);
     if (ok) {
-        qInfo() << "Virtual-channel file" << filename << "loaded.";
+        mne::Log::info("Virtual-channel file {} loaded.", filename.toStdString());
     } else {
-        qWarning() << "ERROR loading virtual-channel file" << filename;
+        mne::Log::warning("ERROR loading virtual-channel file {}", filename.toStdString());
     }
 
     setWindowStatus();
@@ -3879,10 +3880,10 @@ void MainWindow::saveEvoked()
     m_qEvokedFile.setFileName(filename);
 
     if (m_pAverageWindow->getAverageModel()->saveEvokedData(m_qEvokedFile)) {
-        qInfo() << "Fiff evoked data file" << filename << "saved.";
+        mne::Log::info("Fiff evoked data file {} saved.", filename.toStdString());
         setWindowStatus();
     } else {
-        qWarning() << "ERROR saving evoked data file" << filename;
+        mne::Log::warning("ERROR saving evoked data file {}", filename.toStdString());
         QMessageBox::warning(this,
                              "Save Evoked",
                              QString("Could not save evoked data to %1.").arg(filename));
@@ -4334,10 +4335,10 @@ void MainWindow::saveCovariance()
     m_qCovFile.setFileName(filename);
 
     if (m_covariance.save(filename.toStdU16String())) {
-        qInfo() << "Fiff covariance data file" << filename << "saved.";
+        mne::Log::info("Fiff covariance data file {} saved.", filename.toStdString());
         setWindowStatus();
     } else {
-        qWarning() << "ERROR saving covariance data file" << filename;
+        mne::Log::warning("ERROR saving covariance data file {}", filename.toStdString());
         QMessageBox::warning(this,
                              "Save Covariance",
                              QString("Could not save covariance data to %1.").arg(filename));
@@ -4354,7 +4355,7 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
 {
     if (!rawFile.isEmpty()) {
         if (!QFile::exists(rawFile)) {
-            qWarning() << "[mne_browse] --raw: file not found:" << rawFile;
+            mne::Log::warning("[mne_browse] --raw: file not found: {}", rawFile.toStdString());
         } else {
             m_mnxProject = mne::MnaProject();
             loadRawFile(rawFile);
@@ -4363,7 +4364,7 @@ void MainWindow::applyCommandLineOptions(const QString& rawFile,
 
     if (!eventsFile.isEmpty()) {
         if (!QFile::exists(eventsFile)) {
-            qWarning() << "[mne_browse] --events: file not found:" << eventsFile;
+            mne::Log::warning("[mne_browse] --events: file not found: {}", eventsFile.toStdString());
         } else {
             loadEventsFile(eventsFile);
         }
@@ -4395,9 +4396,9 @@ void MainWindow::loadEvoked()
     m_qEvokedFile.setFileName(filename);
 
     if (m_pAverageWindow->getAverageModel()->loadEvokedData(m_qEvokedFile))
-        qInfo() << "Fiff evoked data file" << filename << "loaded.";
+        mne::Log::info("Fiff evoked data file {} loaded.", filename.toStdString());
     else
-        qWarning() << "ERROR loading evoked data file" << filename;
+        mne::Log::warning("ERROR loading evoked data file {}", filename.toStdString());
 
     //Update status bar
     setWindowStatus();

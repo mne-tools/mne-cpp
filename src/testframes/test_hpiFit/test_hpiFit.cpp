@@ -17,7 +17,8 @@
 //=============================================================================================================
 
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <math.h>
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
@@ -34,7 +35,6 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QCommandLineParser>
-#include <QDebug>
 #include <QtTest>
 
 //=============================================================================================================
@@ -117,7 +117,6 @@ TestHpiFit::TestHpiFit()
 
 void TestHpiFit::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
@@ -132,7 +131,7 @@ void TestHpiFit::initTestCase()
     int iBuffer = 200;
     MatrixXd matTimes;
     if (!m_raw.read_raw_segment(m_matData, matTimes, m_raw.first_samp, m_raw.first_samp + iBuffer - 1)) {
-        qCritical("error during read_raw_segment");
+        Log::critical("error during read_raw_segment");
     }
 
     // Use SSP + SGM + calibration
@@ -178,12 +177,13 @@ void TestHpiFit::testFit_dimensions_dataAndProjectors()
 
     HpiFitResult hpiFitResult;
 
-    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Projector and data dimensions do not match. Returning.");
+    ScopedLogCapture capture;
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
             matCoilsHead,
             hpiFitResult);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvHpiFit::fit - Projector and data dimensions do not match. Returning."), capture.dump().c_str());
 
     QVERIFY(hpiFitResult.errorDistances.empty());
 }
@@ -203,12 +203,13 @@ void TestHpiFit::testFit_dimensions_nCoils()
 
     HpiFitResult hpiFitResult;
 
-    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning.");
+    ScopedLogCapture capture;
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
             matCoilsHead,
             hpiFitResult);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning."), capture.dump().c_str());
 
     QVERIFY(hpiFitResult.errorDistances.empty());
 }
@@ -231,12 +232,13 @@ void TestHpiFit::testFit_dimensions_emptyData()
 
     HpiFitResult hpiFitResult;
 
-    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - No data or Projectors passed. Returning.");
+    ScopedLogCapture capture;
     HPI.fit(MatrixXd(),
             MatrixXd(),
             hpiModelParameters,
             matCoilsHead,
             hpiFitResult);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvHpiFit::fit - No data or Projectors passed. Returning."), capture.dump().c_str());
 
     QVERIFY(hpiFitResult.errorDistances.empty());
 }
@@ -268,12 +270,13 @@ void TestHpiFit::testFit_dimensions_dataAndSensors()
 
     HpiFitResult hpiFitResult;
 
-    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Number of channels in sensors and data do not match. Returning.");
+    ScopedLogCapture capture;
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
             matCoilsHead,
             hpiFitResult);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "InvHpiFit::fit - Number of channels in sensors and data do not match. Returning."), capture.dump().c_str());
 
     QVERIFY(hpiFitResult.errorDistances.empty());
 }

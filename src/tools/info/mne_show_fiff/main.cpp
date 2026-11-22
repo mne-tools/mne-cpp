@@ -21,7 +21,6 @@
 #include "mne_fiff_contents.h"
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,7 +62,6 @@ using namespace SHOWFIFF;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_show_fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
     MNEShowFiffSettings settings(&argc, argv);
     QTextStream out(stdout);
     if (!MNEFiffContents::show_fiff_contents(out, settings)) {
-        qCritical("Cannot read %s", qPrintable(settings.inname));
+        mne::Log::critical("Cannot read {}", settings.inname.toStdString());
         return 1;
     }
 

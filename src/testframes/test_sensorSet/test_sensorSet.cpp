@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 #include <inv/hpi/inv_sensor_set.h>
 #include <fiff/fiff_raw_data.h>
@@ -93,8 +92,6 @@ TestSensorSet::TestSensorSet()
 
 void TestSensorSet::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = std::shared_ptr<FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath.toStdU16String()).release());
 

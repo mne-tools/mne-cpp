@@ -26,7 +26,6 @@
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Plugins/abstractplugin.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -110,7 +109,6 @@ int main(int argc, char* argv[])
     Q_INIT_RESOURCE(tmsi);
 #endif
 
-    mne::install_qt_message_handler();
 
     // Enable crisp fractional scaling on high-DPI monitors. Must be set before
     // the QApplication is constructed. (Qt6 enables high-DPI pixmaps by default.)
@@ -140,9 +138,9 @@ int main(int argc, char* argv[])
     if (!sLogDir.isEmpty() && QDir().mkpath(sLogDir)) {
         const QString sLogFile = sLogDir + "/mne_scan.log";
         if (mne::Log::set_file(sLogFile.toStdU16String())) {
-            qInfo() << "Logging to" << sLogFile;
+            mne::Log::info("Logging to {}", sLogFile.toStdString());
         } else {
-            qWarning() << "Could not open log file" << sLogFile << "- logging to console only.";
+            mne::Log::warning("Could not open log file {} - logging to console only.", sLogFile.toStdString());
         }
     }
 

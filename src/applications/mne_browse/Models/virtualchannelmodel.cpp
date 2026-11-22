@@ -15,6 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "virtualchannelmodel.h"
 
 //=============================================================================================================
@@ -22,7 +23,6 @@
 //=============================================================================================================
 
 #include <QBrush>
-#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -381,7 +381,7 @@ VirtualReferenceSetDefinition VirtualChannelModel::referenceSet(const QString& n
 bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
 {
     if (!qFile.open(QIODevice::ReadOnly)) {
-        qWarning() << "VirtualChannelModel: could not open virtual-channel file" << qFile.fileName();
+        mne::Log::warning("VirtualChannelModel: could not open virtual-channel file {}", qFile.fileName().toStdString());
         return false;
     }
 
@@ -390,8 +390,7 @@ bool VirtualChannelModel::loadVirtualChannels(QFile& qFile)
     qFile.close();
 
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
-        qWarning() << "VirtualChannelModel: invalid virtual-channel json"
-                   << qFile.fileName() << parseError.errorString();
+        mne::Log::warning("VirtualChannelModel: invalid virtual-channel json {} {}", qFile.fileName().toStdString(), parseError.errorString().toStdString());
         return false;
     }
 
@@ -490,13 +489,12 @@ bool VirtualChannelModel::saveVirtualChannels(QFile& qFile) const
 {
     QFileInfo fileInfo(qFile);
     if (!fileInfo.dir().exists()) {
-        qWarning() << "VirtualChannelModel: virtual-channel directory does not exist"
-                   << fileInfo.absolutePath();
+        mne::Log::warning("VirtualChannelModel: virtual-channel directory does not exist {}", fileInfo.absolutePath().toStdString());
         return false;
     }
 
     if (!qFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        qWarning() << "VirtualChannelModel: could not write virtual-channel file" << qFile.fileName();
+        mne::Log::warning("VirtualChannelModel: could not write virtual-channel file {}", qFile.fileName().toStdString());
         return false;
     }
 

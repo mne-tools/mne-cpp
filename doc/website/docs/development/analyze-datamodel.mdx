@@ -137,7 +137,7 @@ bool MyDataModel::saveToFile(const QString& sPath)
 {
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "[MyDataModel::saveToFile] Could not open" << sPath;
+        mne::Log::warning("[MyDataModel::saveToFile] Could not open {}", sPath.toStdString());
         return false;
     }
     // Write your data format

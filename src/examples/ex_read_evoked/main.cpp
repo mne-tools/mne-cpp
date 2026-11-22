@@ -21,7 +21,6 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 
@@ -96,7 +95,6 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication a(argc, argv);
 
     // Command Line Parser

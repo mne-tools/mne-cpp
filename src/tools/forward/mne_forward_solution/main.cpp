@@ -18,7 +18,6 @@
 #include <fwd/compute_fwd/compute_fwd.h>
 #include <mne/mne_forward_solution.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,7 +60,6 @@ using namespace mne;
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_forward_solution");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -158,7 +156,7 @@ int main(int argc, char* argv[])
     if (parser.isSet(originOpt)) {
         QStringList parts = parser.value(originOpt).split(':');
         if (parts.size() != 3) {
-            qCritical("Could not interpret the origin.");
+            Log::critical("Could not interpret the origin.");
             return 1;
         }
         bool ok1, ok2, ok3;
@@ -166,7 +164,7 @@ int main(int argc, char* argv[])
         settings->r0[1] = parts[1].toFloat(&ok2) / 1000.0f;
         settings->r0[2] = parts[2].toFloat(&ok3) / 1000.0f;
         if (!ok1 || !ok2 || !ok3) {
-            qCritical("Could not interpret the origin.");
+            Log::critical("Could not interpret the origin.");
             return 1;
         }
     }
@@ -182,7 +180,7 @@ int main(int argc, char* argv[])
         bool ok;
         float rad = parser.value(eegradOpt).toFloat(&ok);
         if (!ok || rad <= 0) {
-            qCritical("Radius must be a positive number.");
+            Log::critical("Radius must be a positive number.");
             return 1;
         }
         settings->eeg_sphere_rad = rad / 1000.0f;
@@ -214,7 +212,7 @@ int main(int argc, char* argv[])
         bool ok;
         float dist = parser.value(mindistOpt).toFloat(&ok);
         if (!ok) {
-            qCritical("Could not interpret the distance.");
+            Log::critical("Could not interpret the distance.");
             return 1;
         }
         settings->mindist = (dist <= 0.0f) ? 0.0f : dist / 1000.0f;
@@ -235,12 +233,12 @@ int main(int argc, char* argv[])
     ComputeFwd computer(settings);
     auto fwdSolution = computer.calculateFwd();
     if (!fwdSolution) {
-        qCritical("The forward solution could not be computed.");
+        Log::critical("The forward solution could not be computed.");
         return 1;
     }
 
     if (!fwdSolution->write(mne::path_from_utf8(settings->solname))) {
-        qCritical("The forward solution could not be written to %s.", settings->solname.c_str());
+        Log::critical("The forward solution could not be written to {}.", settings->solname);
         return 1;
     }
 

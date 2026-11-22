@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffstreamthread.h"
 
 #include "fiffstreamserver.h"
@@ -48,7 +49,6 @@
 //=============================================================================================================
 
 #include <QtEndian>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -111,7 +111,7 @@ FiffStreamThread::~FiffStreamThread()
 void FiffStreamThread::startMeas(qint32 ID)
 {
     if (ID == m_iDataClientId) {
-        qDebug() << "Activate raw buffer sending.";
+        Log::debug("Activate raw buffer sending.");
 
         m_qMutex.lock();
         appendTags(m_qSendBlock, [](FiffStream& out) { out.start_block(FIFFB_RAW_DATA); });
@@ -124,9 +124,9 @@ void FiffStreamThread::startMeas(qint32 ID)
 
 void FiffStreamThread::stopMeas(qint32 ID)
 {
-    qDebug() << "void FiffStreamThread::stopMeas(qint32 ID)";
+    Log::debug("void FiffStreamThread::stopMeas(qint32 ID)");
     if (ID == m_iDataClientId || ID == -1) {
-        qDebug() << "stop raw buffer sending.";
+        Log::debug("stop raw buffer sending.");
 
         m_qMutex.lock();
         appendTags(m_qSendBlock, [](FiffStream& out) { out.end_block(FIFFB_RAW_DATA); });
@@ -149,18 +149,18 @@ void FiffStreamThread::parseCommand(const FiffTag& p_pTag)
             // Set Client Alias
             //
             m_sDataClientAlias = QString::fromUtf8(reinterpret_cast<const char*>(p_pTag.data()) + 4, static_cast<qsizetype>(p_pTag.size() - 4));
-            qInfo("FiffStreamClient (ID %d): new alias = '%s'\r\n", m_iDataClientId, m_sDataClientAlias.toUtf8().constData());
+            Log::info("FiffStreamClient (ID {}): new alias = '{}'\r\n", m_iDataClientId, m_sDataClientAlias.toStdString());
         } else if (t_iCmd == MNE_RT_GET_CLIENT_ID) {
             //
             // Send Client ID
             //
-            qInfo("FiffStreamClient (ID %d): send client ID %d\r\n", m_iDataClientId, m_iDataClientId);
+            Log::info("FiffStreamClient (ID {}): send client ID {}\r\n", m_iDataClientId, m_iDataClientId);
             writeClientId();
         } else {
-            qInfo("FiffStreamClient (ID %d): unknown command\r\n", m_iDataClientId);
+            Log::info("FiffStreamClient (ID {}): unknown command\r\n", m_iDataClientId);
         }
     } else {
-        qInfo("FiffStreamClient (ID %d): unknown command\r\n", m_iDataClientId);
+        Log::info("FiffStreamClient (ID {}): unknown command\r\n", m_iDataClientId);
     }
 }
 
@@ -211,7 +211,7 @@ void FiffStreamThread::run()
     connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
             this, &FiffStreamThread::stopMeas);
 
-    qInfo("FiffStreamClient (assigned ID %d) accepted\n", m_iDataClientId);
+    Log::info("FiffStreamClient (assigned ID {}) accepted\n", m_iDataClientId);
 
     constexpr qsizetype kHeaderBytes = 4 * sizeof(qint32);
     QByteArray t_received;
@@ -228,7 +228,7 @@ void FiffStreamThread::run()
         // The producers only append to m_qSendBlock, so writing here in this thread never stalls them.
         if (!t_qBlock.isEmpty()) {
             if (const std::error_code t_error = m_socket.write(std::as_bytes(std::span(t_qBlock.constData(), static_cast<std::size_t>(t_qBlock.size()))), kWriteTimeout)) {
-                qInfo("FiffStreamClient (ID %d) dropped: %s\n", m_iDataClientId, t_error.message().c_str());
+                Log::info("FiffStreamClient (ID {}) dropped: {}\n", m_iDataClientId, t_error.message());
                 break;
             }
         }

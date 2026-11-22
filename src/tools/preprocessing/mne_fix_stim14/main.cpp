@@ -24,7 +24,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -125,7 +124,7 @@ std::string fixFile(const QString& path, bool fix32)
             const float range = 1.0f;
             std::memcpy(tag->data() + kRangeOffset, &range, sizeof(range));
             stream->write_tag(*tag, entry.pos);
-            qInfo("  STI 014 range set to 1");
+            Log::info("  STI 014 range set to 1");
         }
     }
 
@@ -153,7 +152,7 @@ std::string fixFile(const QString& path, bool fix32)
             changed += inTag;
         }
     }
-    qInfo("  %d samples fixed", changed);
+    Log::info("  {} samples fixed", changed);
     stream->close();
     return {};
 }
@@ -164,7 +163,6 @@ std::string fixFile(const QString& path, bool fix32)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_fix_stim14");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -186,9 +184,9 @@ int main(int argc, char* argv[])
     }
     int failed = 0;
     for (const QString& path : files) {
-        qInfo("%s", qPrintable(path));
+        Log::info("{}", path.toStdString());
         if (const std::string error = fixFile(path, parser.isSet(fix32Opt)); !error.empty()) {
-            qCritical("  %s: %s", qPrintable(path), error.c_str());
+            Log::critical("  {}: {}", path.toStdString(), error);
             ++failed;
         }
     }

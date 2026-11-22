@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "pluginconnectorconnection.h"
 #include "pluginconnectorconnectionwidget.h"
 
@@ -161,7 +162,7 @@ bool PluginConnectorConnection::createConnection()
     //DEBUG
     QHash<QPair<QString, QString>, QMetaObject::Connection>::iterator it;
     for (it = m_qHashConnections.begin(); it != m_qHashConnections.end(); ++it)
-        qDebug() << "Connected: " << it.key().first << it.key().second;
+        mne::Log::debug("Connected: {} {}", it.key().first.toStdString(), it.key().second.toStdString());
     //DEBUG
 
     return bConnected;

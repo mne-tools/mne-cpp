@@ -26,7 +26,7 @@
 #include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/pluginmanager.h"
 #include "../libs/anShared/Management/eventmanager.h"
-#include <base/log_qt.h>
+#include <base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <functional>
+#include <string_view>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -63,23 +64,20 @@ const char* pluginsDir = "/mne_analyze_plugins"; /**< Holds path to the plugins.
 //=============================================================================================================
 
 QPointer<MainWindow> appMainWindowHandler(nullptr); /**< The main window. */
-QtMessageHandler previousMessageHandler = nullptr;  /**< Handler to use once the main window is gone. */
 
 //=============================================================================================================
 /**
- * Custom Qt message handler.
+ * The @ref mne::Log sink of MNE Analyze: messages go to the log window, or are printed once it is gone.
  *
- * @param[in] type      enum to identify the various message types.
- * @param[in] context   additional information about a log message.
- * @param[in] msg       the message to log.
+ * @param[in] level     Severity of the message.
+ * @param[in] message   the message to log.
  */
-void customMessageHandler(QtMsgType type, const QMessageLogContext& context,
-                          const QString& msg)
+void writeToLogWindow(mne::Log::Level level, std::string_view message)
 {
     if (appMainWindowHandler) {
-        appMainWindowHandler->writeToLog(type, context, msg);
-    } else if (previousMessageHandler) {
-        previousMessageHandler(type, context, msg);
+        appMainWindowHandler->writeToLog(level, QString::fromUtf8(message.data(), static_cast<qsizetype>(message.size())));
+    } else {
+        mne::Log::print(level, message);
     }
 }
 
@@ -122,8 +120,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
     // Setup log window
     appMainWindowHandler = m_pMainWindow;
-    previousMessageHandler = qInstallMessageHandler(customMessageHandler);
-    mne::forward_log_to_qt(); // library messages appear in the log window too
+    mne::Log::set_sink(writeToLogWindow);
 
     // Initialize cmd line inputs if provided by the user
     parseCmdLineInputs();
@@ -134,7 +131,6 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 AnalyzeCore::~AnalyzeCore()
 {
     mne::Log::set_sink({});
-    qInstallMessageHandler(previousMessageHandler);
 }
 
 //=============================================================================================================

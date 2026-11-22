@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "info.h"
 #include "mainwindow.h"
 
@@ -34,7 +35,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
 #include <QtWidgets>
 #include <QMenu>
 #include <QMenuBar>
@@ -89,7 +89,7 @@ MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
 
 //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
-    qInfo() << "Loading icon...";
+    mne::Log::info("Loading icon...");
     QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
 
@@ -147,31 +147,23 @@ void MainWindow::initWindow()
 
 //=============================================================================================================
 
-void MainWindow::writeToLog(QtMsgType type,
-                            const QMessageLogContext& context,
+void MainWindow::writeToLog(mne::Log::Level level,
                             const QString& msg)
 {
-    Q_UNUSED(context);
     QMutexLocker locker(&m_Mutex);
 
-    switch (type) {
-        case QtDebugMsg:
+    switch (level) {
+        case mne::Log::Level::Debug:
             m_pTextBrowser_Log->insertHtml("<font color=green><b>[DEBUG]</b> " + msg + "</font>");
             break;
-        case QtInfoMsg:
+        case mne::Log::Level::Info:
             m_pTextBrowser_Log->insertHtml("<font color=green><b>[INFO]</b> " + msg + "</font>");
             break;
-        case QtWarningMsg:
+        case mne::Log::Level::Warning:
             m_pTextBrowser_Log->insertHtml("<font color=purple><b>[WARNING]</b> " + msg + "</font>");
             break;
-        case QtCriticalMsg:
+        case mne::Log::Level::Critical:
             m_pTextBrowser_Log->insertHtml("<font color=red><b>[CRITICAL]</b> " + msg + "</font>");
-            break;
-        case QtFatalMsg:
-            m_pTextBrowser_Log->insertHtml("<font color=purple><b>[FATAL]</b> " + msg + "</font>");
-            abort();
-        default:
-            m_pTextBrowser_Log->insertHtml("<font color=black><b>[UNKOWN]</b> " + msg + "</font>");
             break;
     }
 
@@ -250,7 +242,7 @@ void MainWindow::initMenusAndPluginControls()
         initPluginViews();
         createPluginViews();
     } else {
-        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+        mne::Log::warning("[MainWindow::MainWindow] Plugin manager is nullptr!");
     }
 }
 
@@ -386,7 +378,7 @@ void MainWindow::changeStyle()
                 QTextStream stream(&file);
                 pApp->setStyleSheet(stream.readAll());
             } else {
-                qWarning() << "Could not open dark theme stylesheet.";
+                mne::Log::warning("Could not open dark theme stylesheet.");
                 pApp->setStyleSheet("");
             }
             emit guiStyleChanged(mne::disp::AbstractView::StyleMode::Dark);
@@ -485,11 +477,11 @@ void MainWindow::createPluginControls()
             QDockWidget* pControl = pPlugin->getControl();
             if (pControl) {
                 addDockWidget(Qt::LeftDockWidgetArea, pControl);
-                qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
+                mne::Log::info("[MainWindow::createPluginControls] Found and added dock widget for {}", pPlugin->getName().toStdString());
                 QAction* pAction = pControl->toggleViewAction();
                 pAction->setText(pPlugin->getName());
                 m_pMenuControl->addAction(pAction);
-                qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
+                mne::Log::info("[MainWindow::createPluginControls] Added {} controls to View menu", pPlugin->getName().toStdString());
 
                 // Connect plugin controls to GUI mode toggling
                 connect(this, &MainWindow::guiModeChanged,
@@ -539,7 +531,7 @@ void MainWindow::createPluginViews()
                     m_pMenuView->addAction(pAction);
                 }
 
-                qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
+                mne::Log::info("[MainWindow::createPluginViews] Found and added subwindow for {}", pPlugin->getName().toStdString());
             }
         }
     }
@@ -587,7 +579,7 @@ void MainWindow::tabifyDockWindows()
                 area = Qt::BottomDockWidgetArea;
                 break;
             default:
-                qDebug() << "[MainWindow::tabifyDockWindows] Unhandled dock widget area";
+                mne::Log::debug("[MainWindow::tabifyDockWindows] Unhandled dock widget area");
                 break;
         }
         removeDockWidget(pDockWidget);

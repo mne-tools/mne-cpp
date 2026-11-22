@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "averagemodel.h"
 
 #include <fiff/fiff_io.h>
@@ -296,7 +297,7 @@ bool AverageModel::loadEvokedData(QFile& qFile)
 {
     auto read = FiffEvokedSet::read(qFile.fileName().toStdU16String());
     if (!read) {
-        qWarning("AverageModel: %s", read.error().what());
+        Log::warning("AverageModel: {}", read.error().what());
         return false;
     }
     return setEvokedData(*read);
@@ -317,7 +318,7 @@ bool AverageModel::setEvokedData(const FiffEvokedSet& evokedSet)
     endResetModel();
 
     if (!m_bFileloaded) {
-        qWarning("AverageModel: ERROR! Data set does not contain any evoked data!");
+        Log::warning("AverageModel: ERROR! Data set does not contain any evoked data!");
         emit fileLoaded(false);
         return false;
     }
@@ -334,13 +335,13 @@ bool AverageModel::setEvokedData(const FiffEvokedSet& evokedSet)
 bool AverageModel::saveEvokedData(QFile& qFile)
 {
     if (!m_bFileloaded || !m_pEvokedDataSet || m_pEvokedDataSet->evoked.empty()) {
-        qWarning("AverageModel: ERROR! No evoked data available for saving.");
+        Log::warning("AverageModel: ERROR! No evoked data available for saving.");
         return false;
     }
 
     const auto saved = m_pEvokedDataSet->save(qFile.fileName().toStdU16String());
     if (!saved) {
-        qWarning("AverageModel: %s", saved.error().what());
+        Log::warning("AverageModel: {}", saved.error().what());
     }
     return saved.has_value();
 }
@@ -378,5 +379,5 @@ void AverageModel::clearModel()
 
     endResetModel();
 
-    qInfo("AverageModel cleared.");
+    Log::info("AverageModel cleared.");
 }

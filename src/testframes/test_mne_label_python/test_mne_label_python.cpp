@@ -34,7 +34,8 @@
 
 #include <mne/mne_forward_solution.h>
 #include <base/string_utils.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_source_space.h>
@@ -143,7 +144,6 @@ FsLabel TestMneLabelPython::label(const QString& name) const
 
 void TestMneLabelPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString fwdPath = dataPath("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     if (!QFile::exists(fwdPath)) {
         QSKIP("Forward solution not found");
@@ -380,8 +380,9 @@ void TestMneLabelPython::clusterForward_invariants()
     MNEForwardSolution fixed = small;
     fixed.source_ori = FIFFV_MNE_FIXED_ORI;
     MatrixXd Df;
-    QTest::ignoreMessage(QtWarningMsg, "Error: Fixed orientation not implemented yet!");
+    ScopedLogCapture capture;
     QVERIFY(!fixed.cluster_forward_solution(m_annot, 40, Df, FiffCov(), FiffInfo()).isClustered());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Error: Fixed orientation not implemented yet!"), capture.dump().c_str());
 }
 
 //=============================================================================================================
@@ -467,13 +468,16 @@ void TestMneLabelPython::assembleKernel_label()
         QVERIFY2(std::abs(R.trace() - 43.488585536748346) <= 1e-5 * 43.488585536748346, qPrintable(QString::number(R.trace(), 'g', 17)));
         QVERIFY2(std::abs(R.norm() - 7.8792209245077) <= 1e-5 * 7.8792209245077, qPrintable(QString::number(R.norm(), 'g', 17)));
 
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Inverse kernel is empty"));
+        ScopedLogCapture capture;
         QVERIFY(MNECorticalMap::makeCorticalMap(fwd, inv, evoked.info).size() == 0);
-        QTest::ignoreMessage(QtWarningMsg, "MNECorticalMap::makeCorticalMap - Forward solution is empty.");
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, "Inverse kernel is empty"), capture.dump().c_str());
+        capture.clear();
         QVERIFY(MNECorticalMap::makeCorticalMap(MNEForwardSolution(), prepared, evoked.info).size() == 0);
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, "MNECorticalMap::makeCorticalMap - Forward solution is empty."), capture.dump().c_str());
         const MNEForwardSolution noMeg = fwd.pick_channels({}, StringList(fwd.sol.row_names.begin() + 0, fwd.sol.row_names.begin() + 0 + 306));
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Channel MEG \\d+ is not in the forward solution"));
+        capture.clear();
         QVERIFY(MNECorticalMap::makeCorticalMap(noMeg, prepared, evoked.info).size() == 0);
+        QVERIFY2(capture.contains(mne::Log::Level::Warning, std::regex("Channel MEG \\d+ is not in the forward solution")), capture.dump().c_str());
     } else {
         QCOMPARE(static_cast<int>(nnLabel.rows()), static_cast<int>(sel.size()));
         QCOMPARE(static_cast<int>(nnLabel.cols()), static_cast<int>(sel.size()));

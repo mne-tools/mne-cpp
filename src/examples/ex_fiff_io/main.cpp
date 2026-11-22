@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <math.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
@@ -26,7 +27,6 @@
 //=============================================================================================================
 
 #include <QtCore/QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
         //Write some raw data
         p_fiffIO.write((sample + "sample_write/sample_out.fif").toStdU16String(), FIFFB_RAW_DATA);
     } else {
-        qDebug() << "Could not read raw segment.";
+        Log::debug("Could not read raw segment.");
     }
 
     return 0;

@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "coregistration.h"
 
 #include <anShared/Management/analyzedata.h>
@@ -35,7 +36,6 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QDebug>
 #include <QVector>
 
 //=============================================================================================================
@@ -201,7 +201,7 @@ void CoRegistration::handleEvent(QSharedPointer<Event> e)
             onModelRemoved(e->getData().value<QSharedPointer<mne::analyze::AbstractModel>>());
             break;
         default:
-            qWarning() << "[CoRegistration::handleEvent] received an Event that is not handled by switch-cases";
+            Log::warning("[CoRegistration::handleEvent] received an Event that is not handled by switch-cases");
             break;
     }
 }
@@ -317,7 +317,7 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     auto digSet = FiffDigPointSet::read(sFilePath.toStdU16String());
     if (!digSet) {
-        qWarning() << "[CoRegistration::onDigitizersChanged]" << digSet.error().what();
+        Log::warning("[CoRegistration::onDigitizersChanged] {}", digSet.error().what());
         return;
     }
     m_digSetHead = std::move(*digSet);
@@ -341,7 +341,7 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 {
     auto fiducials = FiffDigPointSet::read(sFilePath.toStdU16String());
     if (!fiducials) {
-        qWarning() << "[CoRegistration::onFiducialsChanged]" << fiducials.error().what();
+        Log::warning("[CoRegistration::onFiducialsChanged] {}", fiducials.error().what());
         return;
     }
     m_digFidMri = std::move(*fiducials);
@@ -356,7 +356,7 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 void CoRegistration::onStoreFiducials(const QString& sFilePath)
 {
     if (auto written = m_digFidMri.write(sFilePath.toStdU16String()); !written) {
-        qWarning() << "[CoRegistration::onStoreFiducials]" << written.error().what();
+        Log::warning("[CoRegistration::onStoreFiducials] {}", written.error().what());
     }
 }
 
@@ -366,7 +366,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
 {
     const auto read = FiffCoordTrans::read(sFilePath.toStdU16String());
     if (!read) {
-        qWarning("[CoRegistration::onLoadTrans] %s", read.error().what());
+        Log::warning("[CoRegistration::onLoadTrans] {}", read.error().what());
         return;
     }
     FiffCoordTrans transTemp = *read;
@@ -401,7 +401,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
         QVariant data = QVariant::fromValue(m_transHeadMri);
         m_pCommu->publishEvent(EVENT_TYPE::NEW_TRANS_AVAILABE, data);
     } else {
-        qDebug() << "[CoRegistration::onLoadTrans] Loaded Transformation from:" << FiffCoordTrans::frame_name(transTemp.from) << "to:" << FiffCoordTrans::frame_name(transTemp.to) << "is not suitable for co-registration.";
+        Log::debug("[CoRegistration::onLoadTrans] Loaded Transformation from: {} to: {} is not suitable for co-registration.", FiffCoordTrans::frame_name(transTemp.from), FiffCoordTrans::frame_name(transTemp.to));
     }
     return;
 }
@@ -412,7 +412,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 {
     if (!m_transHeadMri.empty()) {
         if (const auto written = m_transHeadMri.write(sFilePath.toStdU16String()); !written) {
-            qWarning("[CoRegistration::onStoreTrans] %s", written.error().what());
+            Log::warning("[CoRegistration::onStoreTrans] {}", written.error().what());
         }
     }
     return;
@@ -423,7 +423,7 @@ void CoRegistration::onStoreTrans(const QString& sFilePath)
 void CoRegistration::onFitFiducials()
 {
     if (m_digSetHead.empty() || m_digFidMri.empty() || m_pBem->empty()) {
-        qWarning() << "[CoRegistration::onFitFiducials] Make sure to load all the necessary data.";
+        Log::warning("[CoRegistration::onFitFiducials] Make sure to load all the necessary data.");
         return;
     }
 
@@ -454,7 +454,7 @@ void CoRegistration::onFitFiducials()
                 pMri = &m_digFidMri[k];
         }
         if (!pHead || !pMri) {
-            qWarning() << "[CoRegistration::onFitFiducials] LPA, nasion and RPA are needed in both the digitizer and the MRI fiducials.";
+            Log::warning("[CoRegistration::onFitFiducials] LPA, nasion and RPA are needed in both the digitizer and the MRI fiducials.");
             return;
         }
         matHead.row(i) << pHead->r[0], pHead->r[1], pHead->r[2];
@@ -464,7 +464,7 @@ void CoRegistration::onFitFiducials()
 
     // align fiducials
     if (!mne::fitMatchedPoints(matHead, matMri, matTrans, fScale, bScale, vecWeights)) {
-        qWarning() << "Point cloud registration not succesfull.";
+        Log::warning("Point cloud registration not succesfull.");
     }
 
     // make transform
@@ -505,12 +505,12 @@ void CoRegistration::triggerLoadingEnd(QString sMessage)
 void CoRegistration::onFitICP()
 {
     if (m_digSetHead.empty() || m_digFidMri.empty() || m_pBem->empty()) {
-        qWarning() << "[CoRegistration::onFitICP] Make sure to load all the necessary data.";
+        Log::warning("[CoRegistration::onFitICP] Make sure to load all the necessary data.");
         return;
     }
 
     if (m_Future.valid()) {
-        qWarning() << "ICP computation already taking place.";
+        Log::warning("ICP computation already taking place.");
         return;
     }
 
@@ -625,7 +625,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
                                      vecTake,
                                      matHspClean,
                                      fMaxDist)) {
-        qWarning() << "Discard outliers was not succesfull.";
+        Log::warning("Discard outliers was not succesfull.");
     }
     const int iNDiscarded = static_cast<int>(vecWeightsICP.size() - vecTake.size());
 

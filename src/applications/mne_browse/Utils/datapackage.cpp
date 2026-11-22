@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "datapackage.h"
 
 #include <math/numerics.h>
@@ -92,7 +93,7 @@ void DataPackage::setOrigRawData(const MatrixXdR& originalRawData, int cutFront,
 void DataPackage::setOrigRawData(const RowVectorXd& originalRawData, int row, int cutFront, int cutBack)
 {
     if (originalRawData.cols() != m_dataRawOriginal.cols() || row >= m_dataRawOriginal.rows()) {
-        qWarning() << "DataPackage::setOrigRawData - cannot set row data to m_dataRawOriginal";
+        Log::warning("DataPackage::setOrigRawData - cannot set row data to m_dataRawOriginal");
         return;
     }
 
@@ -157,7 +158,7 @@ void DataPackage::setMappedProcData(const MatrixXdR& originalProcData, int cutFr
 void DataPackage::setOrigProcData(const RowVectorXd& originalProcData, int row, int cutFront, int cutBack)
 {
     if (originalProcData.cols() != m_dataProcOriginal.cols() || row >= m_dataProcOriginal.rows()) {
-        qWarning() << "DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal";
+        Log::warning("DataPackage::setOrigProcData - cannot set row data to m_dataProcOriginal");
         return;
     }
 
@@ -183,7 +184,7 @@ void DataPackage::setOrigProcData(const RowVectorXd& originalProcData, int row, 
 void DataPackage::setMappedProcData(const RowVectorXd& originalProcData, int row, int cutFront, int cutBack)
 {
     if (originalProcData.cols() - cutFront - cutBack != m_dataProcMapped.cols() || row >= m_dataProcMapped.rows()) {
-        qWarning() << "DataPackage::setMappedProcData - cannot set row data to m_dataProcOriginal";
+        Log::warning("DataPackage::setMappedProcData - cannot set row data to m_dataProcOriginal");
         return;
     }
 
@@ -259,7 +260,7 @@ double DataPackage::dataRawMean(int row)
 void DataPackage::applyFFTFilter(int channelNumber, const std::shared_ptr<FilterOperator>& filter, bool useRawData)
 {
     if (channelNumber >= m_dataRawOriginal.rows()) {
-        qWarning() << "DataPackage::applyFFTFilter - channel number out of range.";
+        Log::warning("DataPackage::applyFFTFilter - channel number out of range.");
         return;
     }
 
@@ -281,7 +282,7 @@ void DataPackage::applyFFTFilter(int channelNumber, const std::shared_ptr<Filter
 MatrixXdR DataPackage::cutData(const MatrixXdR& originalData, int cutFront, int cutBack)
 {
     if (originalData.cols() - cutFront - cutBack < 0 || cutFront > originalData.cols()) {
-        qWarning() << "DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.";
+        Log::warning("DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.");
         MatrixXdR returnMat = originalData;
         return returnMat;
     }
@@ -296,7 +297,7 @@ MatrixXdR DataPackage::cutData(const MatrixXdR& originalData, int cutFront, int 
 RowVectorXd DataPackage::cutData(const RowVectorXd& originalData, int cutFront, int cutBack)
 {
     if (originalData.cols() - cutFront - cutBack < 0 || cutFront > originalData.cols()) {
-        qWarning() << "DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.";
+        Log::warning("DataPackage::cutData - cutFront or cutBack do not fit. Aborting mapping and returning original data.");
         RowVectorXd returnVec = originalData;
         return returnVec;
     }

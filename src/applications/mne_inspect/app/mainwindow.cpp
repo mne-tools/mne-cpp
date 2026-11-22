@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "mainwindow.h"
 
 #include <disp3D/view/brainview.h>
@@ -68,7 +69,6 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QDockWidget>
@@ -249,7 +249,7 @@ static QString wasmSaveToTemp(const QString& fileName, const QByteArray& fileCon
     QString tempPath = QStringLiteral("/tmp/") + QFileInfo(fileName).fileName();
     QFile f(tempPath);
     if (!f.open(QIODevice::WriteOnly)) {
-        qWarning() << "WASM: failed to write temp file" << tempPath;
+        Log::warning("WASM: failed to write temp file {}", tempPath);
         return QString();
     }
     f.write(fileContent);
@@ -1013,7 +1013,7 @@ void MainWindow::setupConnections()
             ref.path = bidsBuildRelPath(subj.id, session.id, ref.role, entry.first);
             ref.format = QFileInfo(entry.first).suffix().toStdString();
             if (const Expected<void> embedded = ref.embed(fsPath(entry.first)); !embedded) {
-                qWarning() << "Cannot embed" << entry.first << embedded.error().what();
+                Log::warning("Cannot embed {} {}", entry.first, embedded.error().what());
                 continue;
             }
             rec.files.push_back(std::move(ref));
@@ -1193,8 +1193,7 @@ void MainWindow::setupConnections()
                 m_model->addSurface("User", hemi, type, surf);
                 m_surfGroup->setEnabled(true);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
-                qInfo() << "Loaded surface:" << hemi << type
-                        << "(load the opposite hemisphere separately in browser mode)";
+                Log::info("Loaded surface: {} {} (load the opposite hemisphere separately in browser mode)", hemi.toStdString(), type.toStdString());
             }
         });
 #else
@@ -1218,7 +1217,7 @@ void MainWindow::setupConnections()
             m_model->addSurface("User", hemi, type, surf);
             m_surfGroup->setEnabled(true);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Surface));
-            qInfo() << "Loaded surface:" << hemi << type;
+            Log::info("Loaded surface: {} {}", hemi.toStdString(), type.toStdString());
         }
 
         // Auto-load opposite hemisphere if available
@@ -1229,7 +1228,7 @@ void MainWindow::setupConnections()
             if (!otherSurf.empty()) {
                 m_model->addSurface("User", otherHemi, type, otherSurf);
                 trackLoadedFile(otherPath, static_cast<int>(MnaFileRole::Surface));
-                qInfo() << "Auto-loaded opposite hemisphere:" << otherHemi << type;
+                Log::info("Auto-loaded opposite hemisphere: {} {}", otherHemi.toStdString(), type.toStdString());
             }
         }
 #endif
@@ -1266,7 +1265,7 @@ void MainWindow::setupConnections()
         if (!annot.empty()) {
             m_model->addAnnotation("User", hemi, annot);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Annotation));
-            qInfo() << "Loaded annotation:" << hemi;
+            Log::info("Loaded annotation: {}", hemi.toStdString());
         }
 
         // Auto-load opposite hemisphere annotation if available
@@ -1277,7 +1276,7 @@ void MainWindow::setupConnections()
             if (!otherAnnot.empty()) {
                 m_model->addAnnotation("User", otherHemi, otherAnnot);
                 trackLoadedFile(otherPath, static_cast<int>(MnaFileRole::Annotation));
-                qInfo() << "Auto-loaded opposite hemisphere annotation:" << otherHemi;
+                Log::info("Auto-loaded opposite hemisphere annotation: {}", otherHemi.toStdString());
             }
         }
 #endif
@@ -2076,20 +2075,20 @@ void MainWindow::loadInitialData(const QString& subjectPath,
     QString subjectDir = subjectPath + "/" + subjectName + "/surf";
     QDir surfDir(subjectDir);
     if (!surfDir.exists()) {
-        qWarning() << "No surface data found. Subject directory does not exist:" << subjectDir;
-        qWarning() << "Use --subjectPath and --subject options to specify data location,";
-        qWarning() << "or load data interactively through the UI.";
+        Log::warning("No surface data found. Subject directory does not exist: {}", subjectDir.toStdString());
+        Log::warning("Use --subjectPath and --subject options to specify data location,");
+        Log::warning("or load data interactively through the UI.");
     } else {
-        qInfo() << "Loading surfaces...";
+        Log::info("Loading surfaces...");
         m_subjectDir = subjectPath + "/" + subjectName;
         loadHemisphere(subjectPath, subjectName, "lh");
         loadHemisphere(subjectPath, subjectName, "rh");
-        qInfo() << "Surfaces loaded.";
+        Log::info("Surfaces loaded.");
     }
 
     // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)
     if (!atlasPath.isEmpty() && QFile::exists(atlasPath)) {
-        qInfo() << "Auto-loading atlas from:" << atlasPath;
+        Log::info("Auto-loading atlas from: {}", atlasPath.toStdString());
         QString fileName = QFileInfo(atlasPath).fileName();
         QString lhAnnotPath, rhAnnotPath;
 
@@ -2107,14 +2106,14 @@ void MainWindow::loadInitialData(const QString& subjectPath,
             FsAnnotation annot(lhAnnotPath.toStdU16String());
             if (!annot.empty()) {
                 m_model->addAnnotation(subjectName, "lh", annot);
-                qInfo() << "Added atlas annotation for lh";
+                Log::info("Added atlas annotation for lh");
             }
         }
         if (!rhAnnotPath.isEmpty() && QFile::exists(rhAnnotPath)) {
             FsAnnotation annot(rhAnnotPath.toStdU16String());
             if (!annot.empty()) {
                 m_model->addAnnotation(subjectName, "rh", annot);
-                qInfo() << "Added atlas annotation for rh";
+                Log::info("Added atlas annotation for rh");
             }
         }
     }
@@ -2125,7 +2124,7 @@ void MainWindow::loadInitialData(const QString& subjectPath,
 
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
-        qInfo() << "Auto-loading digitizer from:" << digitizerPath;
+        Log::info("Auto-loading digitizer from: {}", digitizerPath.toStdString());
         trackLoadedFile(digitizerPath, static_cast<int>(MnaFileRole::Digitizer));
         if (m_brainView->loadSensors(digitizerPath)) {
             m_sensorGroup->setEnabled(true);
@@ -2158,14 +2157,14 @@ void MainWindow::loadInitialData(const QString& subjectPath,
 
     // Auto-load transformation
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
-        qInfo() << "Auto-loading transformation from:" << transPath;
+        Log::info("Auto-loading transformation from: {}", transPath.toStdString());
         trackLoadedFile(transPath, static_cast<int>(MnaFileRole::Transform));
         m_brainView->loadTransformation(transPath);
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
-        qInfo() << "Auto-loading source space from:" << srcSpacePath;
+        Log::info("Auto-loading source space from: {}", srcSpacePath.toStdString());
         trackLoadedFile(srcSpacePath, static_cast<int>(MnaFileRole::SourceSpace));
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
             m_srcSpaceGroup->setEnabled(true);
@@ -2179,7 +2178,7 @@ void MainWindow::loadInitialData(const QString& subjectPath,
     for (int i = 0; i < stcPaths.size(); ++i) {
         const QString& stcPath = stcPaths[i];
         if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
-            qInfo() << "Auto-loading source estimate from:" << stcPath;
+            Log::info("Auto-loading source estimate from: {}", stcPath.toStdString());
             trackLoadedFile(stcPath, static_cast<int>(MnaFileRole::SourceEstimate));
             addStcEntry(stcPath, /*activate=*/(i == 0));
         }
@@ -2187,20 +2186,20 @@ void MainWindow::loadInitialData(const QString& subjectPath,
 
     // Auto-load MRI volume
     if (!mriPath.isEmpty() && QFile::exists(mriPath)) {
-        qInfo() << "Auto-loading MRI volume from:" << mriPath;
+        Log::info("Auto-loading MRI volume from: {}", mriPath.toStdString());
         if (m_mriSlicesPlugin.loadVolume(mriPath)) {
             populateMriVolumeCombo(mriPath);
             if (m_layerMriCheck) {
                 m_layerMriCheck->setChecked(true);
             }
         } else {
-            qWarning() << "Failed to load MRI volume:" << mriPath;
+            Log::warning("Failed to load MRI volume: {}", mriPath.toStdString());
         }
     }
 
     // Auto-load evoked
     if (!evokedPath.isEmpty() && QFile::exists(evokedPath)) {
-        qInfo() << "Auto-loading evoked from:" << evokedPath;
+        Log::info("Auto-loading evoked from: {}", evokedPath.toStdString());
         trackLoadedFile(evokedPath, static_cast<int>(MnaFileRole::Evoked));
 
         QStringList sets = BrainView::probeEvokedSets(evokedPath);
@@ -2292,7 +2291,7 @@ void MainWindow::loadHemisphere(const QString& subjectPath, const QString& subje
             m_model->addSurface(subjectName, hemi, type, surf);
             m_surfGroup->setEnabled(true);
             trackLoadedFile(surfPath, static_cast<int>(MnaFileRole::Surface));
-            qInfo() << "Added" << hemi << type;
+            Log::info("Added {} {}", hemi.toStdString(), type.toStdString());
         }
     }
 
@@ -2303,7 +2302,7 @@ void MainWindow::loadHemisphere(const QString& subjectPath, const QString& subje
         if (!annot.empty()) {
             m_model->addAnnotation(subjectName, hemi, annot);
             trackLoadedFile(annotPath, static_cast<int>(MnaFileRole::Annotation));
-            qInfo() << "Added annotation for" << hemi;
+            Log::info("Added annotation for {}", hemi.toStdString());
         }
     }
 }
@@ -2315,7 +2314,7 @@ void MainWindow::loadBem(const QString& subjectName, const QString& bemPath)
     if (QFile::exists(bemPath)) {
         auto read = MNEBem::read(bemPath.toStdU16String());
         if (!read) {
-            qWarning() << read.error().what();
+            Log::warning("{}", read.error().what());
             return;
         }
         const MNEBem& bem = *read;
@@ -2337,11 +2336,11 @@ void MainWindow::loadBem(const QString& subjectName, const QString& bemPath)
                     break;
             }
             m_model->addBemSurface(subjectName, name, bem[i]);
-            qInfo() << "Added BEM:" << name;
+            Log::info("Added BEM: {}", name.toStdString());
         }
         m_bemGroup->setEnabled(true);
     } else {
-        qWarning() << "BEM path provided but file not found:" << bemPath;
+        Log::warning("BEM path provided but file not found: {}", bemPath.toStdString());
     }
 }
 
@@ -2558,13 +2557,13 @@ void MainWindow::importMnaProject(const QString& path)
 {
     Expected<MnaProject> read = MnaIO::read(fsPath(path));
     if (!read) {
-        qWarning() << "Failed to read MNA project:" << read.error().what();
+        Log::warning("Failed to read MNA project: {}", read.error().what());
         return;
     }
     MnaProject& proj = *read;
     const QString projectName = QString::fromStdString(proj.name);
 
-    qInfo() << "Importing MNA project:" << projectName;
+    Log::info("Importing MNA project: {}", projectName.toStdString());
     const QString projectDir = QFileInfo(path).absolutePath();
 
     // Create a unique extraction root under /tmp using the project name
@@ -2584,7 +2583,7 @@ void MainWindow::importMnaProject(const QString& path)
                         filePath = extractRoot + QStringLiteral("/") + refPath;
                         QDir().mkpath(QFileInfo(filePath).absolutePath());
                         if (!write_file_bytes(fsPath(filePath), ref.data)) {
-                            qWarning() << "Failed to extract embedded file:" << refPath;
+                            Log::warning("Failed to extract embedded file: {}", refPath.toStdString());
                             continue;
                         }
                     } else {
@@ -2592,7 +2591,7 @@ void MainWindow::importMnaProject(const QString& path)
                         // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
                         filePath = QDir::cleanPath(QDir(projectDir).filePath(refPath));
                         if (!QFile::exists(filePath)) {
-                            qWarning() << "Referenced file not found:" << filePath;
+                            Log::warning("Referenced file not found: {}", filePath.toStdString());
                             continue;
                         }
                     }
@@ -2615,7 +2614,7 @@ void MainWindow::importMnaProject(const QString& path)
                             if (!surf.empty()) {
                                 m_model->addSurface(QString::fromStdString(subj.id), hemi, type, surf);
                                 m_surfGroup->setEnabled(true);
-                                qInfo() << "Imported surface:" << fn;
+                                Log::info("Imported surface: {}", fn.toStdString());
                             }
                             break;
                         }
@@ -2625,13 +2624,13 @@ void MainWindow::importMnaProject(const QString& path)
                             FsAnnotation annot(filePath.toStdU16String());
                             if (!annot.empty()) {
                                 m_model->addAnnotation(QString::fromStdString(subj.id), hemi, annot);
-                                qInfo() << "Imported annotation:" << fn;
+                                Log::info("Imported annotation: {}", fn.toStdString());
                             }
                             break;
                         }
                         case MnaFileRole::Bem:
                             loadBem(QString::fromStdString(subj.id), filePath);
-                            qInfo() << "Imported BEM:" << refPath;
+                            Log::info("Imported BEM: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::Digitizer:
                             if (m_brainView->loadSensors(filePath)) {
@@ -2641,12 +2640,12 @@ void MainWindow::importMnaProject(const QString& path)
                                 m_showDigCheck->setEnabled(true);
                                 m_showHelmetCheck->setEnabled(true);
                                 m_helmetShapeCombo->setEnabled(true);
-                                qInfo() << "Imported digitizer:" << refPath;
+                                Log::info("Imported digitizer: {}", refPath.toStdString());
                             }
                             break;
                         case MnaFileRole::Transform:
                             m_brainView->loadTransformation(filePath);
-                            qInfo() << "Imported transformation:" << refPath;
+                            Log::info("Imported transformation: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::SourceSpace:
                             if (m_brainView->loadSourceSpace(filePath)) {
@@ -2654,12 +2653,12 @@ void MainWindow::importMnaProject(const QString& path)
                                 m_showSrcSpaceCheck->setEnabled(true);
                                 m_showSrcSpaceCheck->setChecked(false);
                                 m_brainView->setSourceSpaceVisible(false);
-                                qInfo() << "Imported source space:" << refPath;
+                                Log::info("Imported source space: {}", refPath.toStdString());
                             }
                             break;
                         case MnaFileRole::SourceEstimate:
                             addStcEntry(filePath, m_stcCombo->count() == 0);
-                            qInfo() << "Imported STC:" << refPath;
+                            Log::info("Imported STC: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::Evoked: {
                             QStringList sets = BrainView::probeEvokedSets(filePath);
@@ -2673,11 +2672,11 @@ void MainWindow::importMnaProject(const QString& path)
                             m_evokedSetCombo->blockSignals(false);
                             m_evokedSetCombo->setProperty("evokedPath", filePath);
                             m_brainView->loadSensorField(filePath, 0);
-                            qInfo() << "Imported evoked:" << refPath;
+                            Log::info("Imported evoked: {}", refPath.toStdString());
                             break;
                         }
                         default:
-                            qInfo() << "Preserving foreign file with role:" << QString::fromUtf8(to_string(ref.role)) << refPath;
+                            Log::info("Preserving foreign file with role: {} {}", QString::fromUtf8(to_string(ref.role)).toStdString(), refPath.toStdString());
                             break;
                     }
                 }
@@ -2696,7 +2695,7 @@ void MainWindow::importMnaProject(const QString& path)
 
     m_loadedMnaProject = std::move(proj);
 
-    qInfo() << "MNA project import complete.";
+    Log::info("MNA project import complete.");
     addRecentFile(path);
 }
 
@@ -2777,7 +2776,7 @@ void MainWindow::exportMnaProject(const QString& path, bool embedData)
                                         proj.subjects[0].sessions[0].id,
                                         ref.role, entry.first);
             if (const Expected<void> embedded = ref.embed(fsPath(entry.first)); !embedded) {
-                qWarning() << "Cannot embed" << entry.first << embedded.error().what();
+                Log::warning("Cannot embed {} {}", entry.first.toStdString(), embedded.error().what());
                 continue;
             }
         } else {
@@ -2791,9 +2790,9 @@ void MainWindow::exportMnaProject(const QString& path, bool embedData)
 
     if (const Expected<void> written = MnaIO::write(proj, fsPath(path)); written) {
         m_loadedMnaProject = std::move(proj);
-        qInfo() << "Exported MNA project to:" << path;
+        Log::info("Exported MNA project to: {}", path.toStdString());
     } else {
-        qWarning() << "Failed to export MNA project:" << written.error().what();
+        Log::warning("Failed to export MNA project: {}", written.error().what());
     }
 }
 

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "pluginscenemanager.h"
 
 #include <mna/mna_graph.h>
@@ -125,7 +126,7 @@ bool PluginSceneManager::startSensorPlugins()
     for (; it != m_pluginList.end(); ++it) {
         if ((*it)->getType() == AbstractPlugin::_ISensor) {
             if (!(*it)->start())
-                qWarning() << "Could not start AbstractSensor: " << (*it)->getName();
+                mne::Log::warning("Could not start AbstractSensor: {}", ((*it)->getName()).toStdString());
             else
                 bFlag = true; //At least one sensor has to be started
         }
@@ -145,7 +146,7 @@ bool PluginSceneManager::startAlgorithmPlugins()
         if ((*it)->getType() == AbstractPlugin::_IAlgorithm) {
             if (!(*it)->start()) {
                 bFlag = false;
-                qWarning() << "Could not start AbstractAlgorithm: " << (*it)->getName();
+                mne::Log::warning("Could not start AbstractAlgorithm: {}", ((*it)->getName()).toStdString());
             }
         }
     }
@@ -175,7 +176,7 @@ void PluginSceneManager::stopSensorPlugins()
     for (auto& plugin : m_pluginList) {
         if (plugin->getType() == AbstractPlugin::_ISensor) {
             if (!plugin->stop()) {
-                qWarning() << "Could not stop AbstractPlugin: " << plugin->getName();
+                mne::Log::warning("Could not stop AbstractPlugin: {}", plugin->getName().toStdString());
             }
         }
     }
@@ -188,7 +189,7 @@ void PluginSceneManager::stopNonSensorPlugins()
     for (auto& plugin : m_pluginList) {
         if (plugin->getType() != AbstractPlugin::_ISensor) {
             if (!plugin->stop()) {
-                qWarning() << "Could not stop AbstractPlugin: " << plugin->getName();
+                mne::Log::warning("Could not stop AbstractPlugin: {}", plugin->getName().toStdString());
             }
         }
     }

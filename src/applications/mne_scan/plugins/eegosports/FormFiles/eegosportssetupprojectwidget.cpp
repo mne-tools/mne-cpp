@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eegosportssetupprojectwidget.h"
 #include "ui_eegosportssetupprojectwidget.h"
 #include "../eegosports.h"
@@ -179,7 +180,7 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
 {
     const auto layout = LayoutLoader::read_elc(mne::path_from_utf8(sPath.toStdString()));
     if (!layout) {
-        qCritical() << "Unable to read elc file.";
+        Log::critical("Unable to read elc file.");
         return;
     }
     QStringList elcChannelNames;

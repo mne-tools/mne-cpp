@@ -31,7 +31,8 @@
 //=============================================================================================================
 
 #include <mne/mne_source_space.h>
-#include <base/log_qt.h>
+#include <base/log.h>
+#include "../common/scoped_log_capture.h"
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_surface.h>
 #include <mne/mne_patch_info.h>
@@ -115,7 +116,6 @@ private:
 
 void TestMneSourceSpaceOpsPython::initTestCase()
 {
-    mne::forward_log_to_qt(); // QTest::ignoreMessage() and failOnWarning() see library messages
     const QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem";
     m_srcPath = base + "/sample-oct-6-src.fif";
     m_bemPath = base + "/sample-5120-bem.fif";
@@ -371,20 +371,12 @@ void TestMneSourceSpaceOpsPython::icoDownsample_matchesPythonIco()
     QVERIFY(down.vertno == expected);
     QCOMPARE(MNESourceSpace::icoDownsample(hemi, 0).nuse, 12);
 
-    QTest::ignoreMessage(QtWarningMsg, "MNESourceSpace::icoDownsample - Hemisphere has no vertices.");
+    ScopedLogCapture capture;
     QCOMPARE(MNESourceSpace::icoDownsample(MNEHemisphere(), 2).nuse, MNEHemisphere().nuse);
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "MNESourceSpace::icoDownsample - Hemisphere has no vertices."), capture.dump().c_str());
 }
 
 //=============================================================================================================
-
-namespace
-{
-int s_criticals = 0;
-void countCriticals(QtMsgType type, const QMessageLogContext&, const QString&)
-{
-    s_criticals += type == QtCriticalMsg ? 1 : 0;
-}
-} // namespace
 
 void TestMneSourceSpaceOpsPython::gradeToVertices_matchesPython()
 {
@@ -393,18 +385,17 @@ void TestMneSourceSpaceOpsPython::gradeToVertices_matchesPython()
     const std::vector<int> lh = {1, 9, 18, 22, 24, 25, 30, 32, 61, 62, 63, 64, 79, 84, 85, 86, 87, 88, 89, 90, 108, 115, 116, 117, 118, 119, 137, 140, 162, 165, 168, 171, 174, 177, 182, 184, 185, 190, 196, 199, 202, 205, 209, 210, 212, 216, 219, 221, 224, 228, 244, 246, 249, 251, 254, 257, 261, 262, 267, 272, 275, 276, 277, 281, 282, 289, 294, 297, 305, 309, 310, 312, 316, 346, 350, 352, 355, 356, 363, 366, 368, 371, 373, 376, 379, 383, 384, 386, 390, 394, 398, 400, 403, 404, 411, 419, 421, 425, 427, 431, 432, 434, 438, 466, 471, 474, 477, 478, 485, 487, 488, 489, 492, 493, 495, 498, 503, 505, 506, 509, 512, 516, 518, 521, 522, 529, 533, 538, 541, 547, 550, 555, 560, 562, 563, 565, 568, 573, 575, 576, 579, 582, 586, 589, 591, 592, 599, 603, 605, 607, 609, 612, 617, 619, 620, 623, 624, 625, 628, 629, 637, 640};
     const std::vector<int> rh = {1, 2, 9, 10, 16, 17, 18, 19, 20, 22, 24, 25, 28, 30, 32, 36, 37, 39, 44, 48, 52, 58, 61, 63, 64, 66, 74, 85, 86, 87, 88, 89, 90, 93, 95, 115, 116, 117, 118, 120, 124, 137, 142, 147, 151, 153, 154, 161, 167, 169, 176, 177, 182, 186, 187, 190, 192, 194, 201, 202, 205, 209, 211, 215, 226, 233, 236, 244, 257, 263, 267, 271, 273, 277, 280, 282, 286, 290, 296, 302, 305, 309, 310, 312, 316, 318, 347, 352, 355, 356, 366, 368, 371, 373, 379, 383, 384, 385, 389, 394, 398, 400, 403, 404, 411, 414, 419, 422, 425, 428, 431, 432, 434, 438, 461, 471, 474, 478, 483, 484, 487, 490, 492, 493, 498, 502, 503, 505, 506, 509, 512, 516, 518, 521, 522, 529, 533, 540, 543, 549, 552, 557, 560, 563, 572, 579, 580, 581, 590, 592, 596, 597, 607, 610, 615, 617, 621, 626, 628, 629, 633, 636};
     // A surface without trailing tags ends cleanly; reaching EOF must not be reported as an error.
-    s_criticals = 0;
-    const QtMessageHandler previous = qInstallMessageHandler(countCriticals);
+    ScopedLogCapture capture;
     const std::vector<VectorXi> v = MNESourceSpace::gradeToVertices(subjectsDir.toStdU16String(), "large", 2);
-    qInstallMessageHandler(previous);
-    QCOMPARE(s_criticals, 0);
+    QVERIFY2(!capture.contains(mne::Log::Level::Critical), capture.dump().c_str());
     QCOMPARE(v.size(), 2);
     QVERIFY(v[0] == Map<const VectorXi>(lh.data(), static_cast<Index>(lh.size())));
     QVERIFY(v[1] == Map<const VectorXi>(rh.data(), static_cast<Index>(rh.size())));
 
     // mne raises for grades that map two ico vertices onto one surface vertex (162 vertices, grade 2).
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot use icosahedral grade 2"));
+    capture.clear();
     QVERIFY(MNESourceSpace::gradeToVertices(subjectsDir.toStdU16String(), "small", 2).empty());
+    QVERIFY2(capture.contains(mne::Log::Level::Warning, "Cannot use icosahedral grade 2"), capture.dump().c_str());
 }
 
 //=============================================================================================================

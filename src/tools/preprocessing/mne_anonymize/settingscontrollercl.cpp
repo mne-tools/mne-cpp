@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
 #include <base/base_global.h>
@@ -32,7 +33,6 @@
 #include <QRandomGenerator>
 #include <QDir>
 #include <QFileInfo>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -89,7 +89,7 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 
     initParser();
     if (parseInputs(arguments)) {
-        qCritical() << "Something went wrong during the parsing of input options.";
+        mne::Log::critical("Something went wrong during the parsing of input options.");
         return;
     }
 
@@ -249,8 +249,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if (m_parser.isSet("measurement_date")) {
         if (m_parser.isSet("measurement_date_offset")) {
-            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
-                           "the same time.";
+            mne::Log::critical("You cannot specify the measurement date and the measurement date offset at the same time.");
             m_parser.showHelp();
         }
         QString strMeasDate(m_parser.value("measurement_date"));
@@ -259,8 +258,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if (m_parser.isSet("measurement_date_offset")) {
         if (m_parser.isSet("measurement_date")) {
-            qCritical() << "You cannot specify the measurement date and the measurement date offset at "
-                           "the same time.";
+            mne::Log::critical("You cannot specify the measurement date and the measurement date offset at the same time.");
             m_parser.showHelp();
         }
 
@@ -271,8 +269,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if (m_parser.isSet("subject_birthday")) {
         if (m_parser.isSet("subject_birthday_offset")) {
-            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
-                           "the same time.";
+            mne::Log::critical("You cannot specify the subject's birthday and subject's birthday offsetthe same time.");
             m_parser.showHelp();
         }
 
@@ -282,8 +279,7 @@ int SettingsControllerCl::parseInputs(const QStringList& arguments)
 
     if (m_parser.isSet("subject_birthday_offset")) {
         if (m_parser.isSet("subject_birthday")) {
-            qCritical() << "You cannot specify the subject's birthday and subject's birthday offset"
-                           "the same time.";
+            mne::Log::critical("You cannot specify the subject's birthday and subject's birthday offsetthe same time.");
             m_parser.showHelp();
         }
         int strBirthdayOffset(m_parser.value("subject_birthday_offset").toInt());
@@ -312,16 +308,16 @@ int SettingsControllerCl::parseInOutFiles()
         m_fiInFile.setFile(m_parser.value("in"));
         if (m_fiInFile.isFile()) {
             if (m_pAnonymizer->setInFile(m_fiInFile.absoluteFilePath())) {
-                qCritical() << "Error while setting the input file.";
+                mne::Log::critical("Error while setting the input file.");
                 return 1;
             }
         } else {
-            qCritical() << "Input file is not a file.";
+            mne::Log::critical("Input file is not a file.");
             return 1;
         }
     } else {
         if (!m_bGuiMode) {
-            qCritical() << "No valid input file specified.";
+            mne::Log::critical("No valid input file specified.");
             m_parser.showHelp();
         }
     }
@@ -329,7 +325,7 @@ int SettingsControllerCl::parseInOutFiles()
     if (m_parser.isSet("out")) {
         m_fiOutFile.setFile(m_parser.value("out"));
         if (m_fiOutFile.isDir()) {
-            qCritical() << "Error. Output file is infact a folder.";
+            mne::Log::critical("Error. Output file is infact a folder.");
             return 1;
         } else {
             if ((m_fiInFile.absoluteFilePath() == m_fiOutFile.absoluteFilePath())) {
@@ -337,12 +333,12 @@ int SettingsControllerCl::parseInOutFiles()
                 QString fileOut(QDir(m_fiInFile.absolutePath()).filePath(generateRandomFileName()));
                 m_fiOutFile.setFile(fileOut);
                 if (m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath())) {
-                    qCritical() << "Error while setting the output file.";
+                    mne::Log::critical("Error while setting the output file.");
                     return 1;
                 }
             }
             if (m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath())) {
-                qCritical() << "Error while setting the output file.";
+                mne::Log::critical("Error while setting the output file.");
                 return 1;
             }
         }
@@ -350,7 +346,7 @@ int SettingsControllerCl::parseInOutFiles()
         if (!m_bGuiMode) {
             generateDefaultOutputFileName();
             if (m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath())) {
-                qCritical() << "Error while setting the output file.";
+                mne::Log::critical("Error while setting the output file.");
                 return 1;
             }
         }
@@ -363,7 +359,7 @@ int SettingsControllerCl::parseInOutFiles()
 int SettingsControllerCl::run()
 {
     if (m_pAnonymizer->anonymizeFile()) {
-        qCritical() << "Error. Program ends now.";
+        mne::Log::critical("Error. Program ends now.");
         return 1;
     }
 
@@ -376,7 +372,7 @@ int SettingsControllerCl::run()
     }
 
     if (!m_bSilentMode) {
-        qInfo("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFile.fileName() + " -> " + m_fiOutFile.fileName()).toUtf8().data());
+        mne::Log::info("\n{}", QString("MNE Anonymize finished correctly: " + m_fiInFile.fileName() + " -> " + m_fiOutFile.fileName()).toStdString());
     }
 
     printFooterIfVerbose();
@@ -393,14 +389,14 @@ bool SettingsControllerCl::checkDeleteInputFile()
     if (m_bDeleteInputFileAfter) //false by default
     {
         if (!m_bSilentMode) {
-            qInfo("You have requested to delete the input file: %s", qPrintable(m_fiInFile.fileName()));
+            mne::Log::info("You have requested to delete the input file: {}", m_fiInFile.fileName().toStdString());
         }
 
         if (m_bDeleteInputFileConfirmation) //true by default
         {
             QTextStream consoleIn(stdin);
             QString confirmation;
-            qInfo("You can avoid this confirmation by using the delete_confirmation [-f] option.");
+            mne::Log::info("You can avoid this confirmation by using the delete_confirmation [-f] option.");
             // A prompt is not a log message: it must show regardless of the log level.
             QTextStream consoleOut(stdout);
             consoleOut << "Are you sure you want to delete the input file? [Y/n] " << Qt::flush;
@@ -424,7 +420,7 @@ void SettingsControllerCl::deleteInputFile()
     if ((m_bInputFileDeleted = inFile.remove())) {
         printIfVerbose("Input file deleted.");
     } else {
-        qCritical() << "Unable to delete the input file: " << inFile.fileName();
+        mne::Log::critical("Unable to delete the input file: {}", inFile.fileName().toStdString());
     }
 }
 
@@ -451,8 +447,8 @@ bool SettingsControllerCl::checkRenameOutputFile()
                 return true;
             } else {
                 if (!m_bSilentMode) {
-                    qWarning("You have requested to save the output file with the same name as the input file.");
-                    qWarning("This cannot be done without deleting or modifying the input file.");
+                    mne::Log::warning("You have requested to save the output file with the same name as the input file.");
+                    mne::Log::warning("This cannot be done without deleting or modifying the input file.");
                 }
             }
         }
@@ -468,11 +464,11 @@ void SettingsControllerCl::renameOutputFileAsInputFile()
     QFile auxFile(m_fiOutFile.absoluteFilePath());
     if ((m_bOutFileRenamed = auxFile.rename(m_fiInFile.absoluteFilePath()))) {
         if (m_bVerboseMode) {
-            qInfo("Output file named: %s --> renamed as: %s", qPrintable(m_fiOutFile.fileName()), qPrintable(m_fiInFile.fileName()));
+            mne::Log::info("Output file named: {} --> renamed as: {}", m_fiOutFile.fileName().toStdString(), m_fiInFile.fileName().toStdString());
         }
         m_fiOutFile.setFile(m_fiInFile.absoluteFilePath());
     } else {
-        qCritical() << "Error while renaming the output file: " << auxFile.fileName() << " as " << m_fiInFile.fileName();
+        mne::Log::critical("Error while renaming the output file: {} as {}", auxFile.fileName().toStdString(), m_fiInFile.fileName().toStdString());
     }
 }
 

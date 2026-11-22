@@ -28,6 +28,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   ${QT_REQUIRED_COMPONENT_LIBS}
+  mne_base
 )
 
 # The registry and the trees it names live in the source tree, wherever the binaries are written.

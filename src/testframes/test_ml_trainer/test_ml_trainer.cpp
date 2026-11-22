@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #ifndef WASMBUILD
 #include <ml/ml_trainer.h>
 #include <pybridge/python_runner.h>
@@ -82,8 +83,7 @@ void TestMlTrainer::initTestCase()
 #ifndef WASMBUILD
     MLTrainer trainer;
     m_pythonAvailable = trainer.runner().is_python_available();
-    qDebug() << "Python detection: available=" << m_pythonAvailable
-             << " MNE_REQUIRE_PYTHON=" << PythonTestHelper::is_python_required();
+    Log::debug("Python detection: available= {} MNE_REQUIRE_PYTHON= {}", m_pythonAvailable, PythonTestHelper::is_python_required());
 #endif
     QVERIFY(m_tempDir.isValid());
 }

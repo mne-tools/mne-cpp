@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "babymeg.h"
 
 #include "FormFiles/babymegsetupwidget.h"
@@ -34,7 +35,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -136,14 +136,14 @@ bool BabyMEG::start()
     mne::register_babymeg_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[BabyMEG::start]" << QString::fromStdString(device.error().text());
+        Log::warning("[BabyMEG::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[BabyMEG::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        Log::warning("[BabyMEG::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -155,7 +155,7 @@ bool BabyMEG::start()
     m_pRTMSABabyMEG->measurementData()->setMultiArraySize(1);
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[BabyMEG::start]" << QString::fromStdString(e.text());
+        Log::warning("[BabyMEG::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -212,7 +212,7 @@ void BabyMEG::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[BabyMEG::run]" << QString::fromStdString(read.error().text());
+            Log::warning("[BabyMEG::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pRTMSABabyMEG->measurementData()->setValue(block);

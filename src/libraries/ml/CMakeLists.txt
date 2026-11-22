@@ -32,7 +32,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen)
 
-# MLTrainer exposes PythonRunner; QProcess is not available in Qt for WebAssembly
+# MLTrainer exposes PythonRunner; WebAssembly cannot start processes
 if(NOT WASM)
     target_link_libraries(${PROJECT_NAME} PUBLIC mne_pybridge)
 endif()

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "fiffsimulator.h"
 
 #include "FormFiles/fiffsimulatorsetupwidget.h"
@@ -32,7 +33,6 @@
 //=============================================================================================================
 
 #include <QCoreApplication>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -108,14 +108,14 @@ bool FiffSimulator::start()
     mne::register_rtserver_scheme();
     auto device = mne::AcqDevice::open(uri());
     if (!device) {
-        qWarning() << "[FiffSimulator::start]" << QString::fromStdString(device.error().text());
+        mne::Log::warning("[FiffSimulator::start] {}", QString::fromStdString(device.error().text()).toStdString());
         return false;
     }
     m_device = std::move(*device);
     auto fiffInfo = mne::toFiffInfo(*m_device.stream().info());
     auto reader = m_device.stream().reader(mne::AcqReader::ReadMode::Lossless);
     if (!fiffInfo || !reader) {
-        qWarning() << "[FiffSimulator::start]" << QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text());
+        mne::Log::warning("[FiffSimulator::start] {}", QString::fromStdString((fiffInfo ? reader.error() : fiffInfo.error()).text()).toStdString());
         m_device.close();
         return false;
     }
@@ -138,7 +138,7 @@ bool FiffSimulator::start()
                                                                 "/../resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
 
     if (mne::AcqError e = m_device.start(); !e.ok()) {
-        qWarning() << "[FiffSimulator::start]" << QString::fromStdString(e.text());
+        mne::Log::warning("[FiffSimulator::start] {}", QString::fromStdString(e.text()).toStdString());
         m_device.close();
         return false;
     }
@@ -195,7 +195,7 @@ void FiffSimulator::run()
             if (read.error() == mne::AcqErrorCode::Timeout || read.error() == mne::AcqErrorCode::Overrun) {
                 continue;
             }
-            qWarning() << "[FiffSimulator::run]" << QString::fromStdString(read.error().text());
+            mne::Log::warning("[FiffSimulator::run] {}", QString::fromStdString(read.error().text()).toStdString());
             return;
         }
         m_pRTMSA_FiffSimulator->measurementData()->setValue(block);

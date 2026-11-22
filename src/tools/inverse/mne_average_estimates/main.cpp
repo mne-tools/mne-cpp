@@ -16,7 +16,6 @@
 
 #include <inv/inv_source_estimate.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QFile>
 #include <QRegularExpression>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -53,7 +51,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_average_estimates");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -73,14 +70,14 @@ int main(int argc, char* argv[])
     parser.process(app);
 
     if (!parser.isSet(descOpt) || !parser.isSet(outOpt)) {
-        qCritical() << "Both --desc and --out are required.";
+        Log::critical("Both --desc and --out are required.");
         parser.showHelp(1);
     }
 
     //--- Parse description file ---
     QFile descFile(parser.value(descOpt));
     if (!descFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open description file:" << parser.value(descOpt);
+        Log::critical("Cannot open description file: {}", parser.value(descOpt).toStdString());
         return 1;
     }
 
@@ -95,14 +92,14 @@ int main(int argc, char* argv[])
 
         QStringList parts = line.split(QRegularExpression("\\s+"));
         if (parts.size() < 2) {
-            qCritical() << "Invalid line" << lineNum << "in description file (expected: <weight> <path>).";
+            Log::critical("Invalid line {} in description file (expected: <weight> <path>).", lineNum);
             return 1;
         }
 
         bool ok;
         double weight = parts[0].toDouble(&ok);
         if (!ok) {
-            qCritical() << "Invalid weight on line" << lineNum << ":" << parts[0];
+            Log::critical("Invalid weight on line {} : {}", lineNum, parts[0].toStdString());
             return 1;
         }
         entries.append(qMakePair(weight, parts[1]));
@@ -110,7 +107,7 @@ int main(int argc, char* argv[])
     descFile.close();
 
     if (entries.isEmpty()) {
-        qCritical() << "Description file contains no entries.";
+        Log::critical("Description file contains no entries.");
         return 1;
     }
 
@@ -124,7 +121,7 @@ int main(int argc, char* argv[])
 
         auto read = InvSourceEstimate::read(path.toStdU16String());
         if (!read) {
-            qCritical() << read.error().what();
+            Log::critical("{}", read.error().what());
             return 1;
         }
         const InvSourceEstimate& stc = *read;
@@ -134,7 +131,7 @@ int main(int argc, char* argv[])
             result.data = w * stc.data;
         } else {
             if (stc.data.rows() != result.data.rows() || stc.data.cols() != result.data.cols()) {
-                qCritical() << "STC dimension mismatch in file:" << path;
+                Log::critical("STC dimension mismatch in file: {}", path.toStdString());
                 return 1;
             }
             result.data += w * stc.data;
@@ -143,7 +140,7 @@ int main(int argc, char* argv[])
     }
 
     if (qFuzzyIsNull(weightSum)) {
-        qCritical() << "Total weight is zero — cannot normalize.";
+        Log::critical("Total weight is zero — cannot normalize.");
         return 1;
     }
 
@@ -151,10 +148,10 @@ int main(int argc, char* argv[])
 
     //--- Write output ---
     if (!result.write(parser.value(outOpt).toStdU16String())) {
-        qCritical() << "Failed to write output STC.";
+        Log::critical("Failed to write output STC.");
         return 1;
     }
 
-    qInfo() << "Averaged" << entries.size() << "STC files -> " << parser.value(outOpt);
+    Log::info("Averaged {} STC files -> {}", entries.size(), parser.value(outOpt).toStdString());
     return 0;
 }

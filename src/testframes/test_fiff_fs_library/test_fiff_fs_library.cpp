@@ -19,7 +19,6 @@
 
 #include <base/base_global.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 // FIFF
 #include <fiff/fiff.h>
@@ -55,6 +54,7 @@
 #include <fs/fs_label.h>
 #include <fs/fs_colortable.h>
 #include <fs/fs_global.h>
+#include <cstdlib>
 
 using namespace mne;
 using namespace Eigen;
@@ -260,7 +260,6 @@ private slots:
 
 void TestFiffFsLibrary::initTestCase()
 {
-    mne::install_qt_message_handler();
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
         m_sDataPath = base;
@@ -1058,7 +1057,7 @@ void TestFiffFsLibrary::fiffEvokedSet_findEvoked()
     FiffEvokedSet evokedSet(avePath().toStdU16String());
     QVERIFY(evokedSet.evoked.size() > 0);
     bool found = evokedSet.find_evoked(evokedSet);
-    qDebug() << "find_evoked result:" << found;
+    Log::debug("find_evoked result: {}", found);
 }
 
 //=============================================================================================================
@@ -1554,7 +1553,8 @@ static void writeSyntheticSurface(const QString& path, int nvert, int ntri,
 {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {
-        qFatal("Cannot open synthetic surface file: %s", qPrintable(path));
+        mne::Log::critical("Cannot open synthetic surface file: {}", path.toStdString());
+        std::abort();
     }
     QDataStream ds(&f);
     ds.setByteOrder(QDataStream::BigEndian);
@@ -1576,7 +1576,8 @@ static void writeSyntheticAnnotation(const QString& path, int nvert,
 {
     QFile f(path);
     if (!f.open(QIODevice::WriteOnly)) {
-        qFatal("Cannot open synthetic annotation file: %s", qPrintable(path));
+        mne::Log::critical("Cannot open synthetic annotation file: {}", path.toStdString());
+        std::abort();
     }
     QDataStream ds(&f);
     ds.setByteOrder(QDataStream::BigEndian);

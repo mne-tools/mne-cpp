@@ -21,7 +21,6 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -111,7 +110,7 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
 {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical("Cannot open digitizer file %s", qPrintable(path));
+        Log::critical("Cannot open digitizer file {}", path.toStdString());
         return false;
     }
     QTextStream in(&file);
@@ -135,14 +134,14 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
         for (int k = 0; k < 3; ++k)
             p.r[k] = f[k].toFloat(&ok[k]) * 1e-3f;
         if (!ok[0] || !ok[1] || !ok[2]) {
-            qCritical("Malformed digitizer line in %s: %s", qPrintable(path), qPrintable(line));
+            Log::critical("Malformed digitizer line in {}: {}", path.toStdString(), line.toStdString());
             return false;
         }
         p.coord_frame = FIFFV_COORD_UNKNOWN;
         points.push_back(p);
     }
     if (!points.transform_to_head()) {
-        qCritical("%s lacks the Left, Nasion and Right fiducials needed for head coordinates", qPrintable(path));
+        Log::critical("{} lacks the Left, Nasion and Right fiducials needed for head coordinates", path.toStdString());
         return false;
     }
     return true;
@@ -156,7 +155,6 @@ bool readDigitizer(const QString& path, FiffDigPointSet& points)
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_eximia2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -178,28 +176,28 @@ int main(int argc, char* argv[])
     const QString nxeFile = parser.value(nxeOpt);
     const QString outFile = parser.value(outOpt);
     if (nxeFile.isEmpty()) {
-        qCritical("eXimia .nxe file (--nxe) is required.");
+        Log::critical("eXimia .nxe file (--nxe) is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        qCritical("Output file (--out) is required.");
+        Log::critical("Output file (--out) is required.");
         return 1;
     }
 
     QFile nxe(nxeFile);
     if (!nxe.open(QIODevice::ReadOnly)) {
-        qCritical("Cannot open %s", qPrintable(nxeFile));
+        Log::critical("Cannot open {}", nxeFile.toStdString());
         return 1;
     }
     const QByteArray bytes = nxe.readAll();
     const qint64 frame = kChannels * qint64(sizeof(qint16));
     const qint64 nSamples = bytes.size() / frame;
     if (nSamples == 0) {
-        qCritical("%s holds no complete sample of %d channels", qPrintable(nxeFile), kChannels);
+        Log::critical("{} holds no complete sample of {} channels", nxeFile.toStdString(), kChannels);
         return 1;
     }
     if (bytes.size() % frame != 0)
-        qWarning("%s ends with a partial sample; the file is likely truncated", qPrintable(nxeFile));
+        Log::warning("{} ends with a partial sample; the file is likely truncated", nxeFile.toStdString());
 
     FiffInfo info = eximiaInfo();
     if (parser.isSet(digOpt) && !readDigitizer(parser.value(digOpt), info.dig))
@@ -214,20 +212,19 @@ int main(int argc, char* argv[])
     Eigen::RowVectorXd cals;
     auto stream = FiffStream::start_writing_raw(outFile.toStdU16String(), info, cals);
     if (!stream) {
-        qCritical("Cannot open output: %s", qPrintable(outFile));
+        Log::critical("Cannot open output: {}", outFile.toStdString());
         return 1;
     }
     constexpr qint64 kBuffer = 10000;
     for (qint64 start = 0; start < nSamples; start += kBuffer) {
         const qint64 n = std::min(kBuffer, nSamples - start);
         if (!stream->write_raw_buffer(data.middleCols(start, n), cals)) {
-            qCritical("Writing %s failed", qPrintable(outFile));
+            Log::critical("Writing {} failed", outFile.toStdString());
             return 1;
         }
     }
     stream->finish_writing_raw();
 
-    qInfo("Converted %s: %d channels, %lld samples at %.0f Hz -> %s", qPrintable(QFileInfo(nxeFile).fileName()),
-          kChannels, static_cast<long long>(nSamples), kSfreq, qPrintable(outFile));
+    Log::info("Converted {}: {} channels, {} samples at {:.0f} Hz -> {}", QFileInfo(nxeFile).fileName().toStdString(), kChannels, static_cast<long long>(nSamples), kSfreq, outFile.toStdString());
     return 0;
 }

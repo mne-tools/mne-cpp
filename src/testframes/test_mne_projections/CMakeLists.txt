@@ -17,6 +17,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Test
     Eigen3::Eigen
+    mne_base
     mne_fiff
     mne_mne
 )

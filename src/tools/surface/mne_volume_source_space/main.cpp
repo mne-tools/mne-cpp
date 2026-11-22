@@ -19,7 +19,6 @@
 #include <mne/mne_bem_surface.h>
 #include <fiff/fiff_constants.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,7 +28,6 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,7 +52,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_volume_source_space");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -88,11 +85,11 @@ int main(int argc, char* argv[])
     float mindistMm = parser.value(mindistOpt).toFloat();
 
     if (bemFile.isEmpty()) {
-        qCritical("--bem is required.");
+        Log::critical("--bem is required.");
         parser.showHelp(1);
     }
     if (outFile.isEmpty()) {
-        qCritical("--out is required.");
+        Log::critical("--out is required.");
         parser.showHelp(1);
     }
 
@@ -104,7 +101,7 @@ int main(int argc, char* argv[])
     // Read BEM file - find innermost surface
     MNEBem bem(bemFile.toStdU16String());
     if (bem.size() == 0) {
-        qCritical("Cannot read BEM from: %s", qPrintable(bemFile));
+        Log::critical("Cannot read BEM from: {}", bemFile.toStdString());
         return 1;
     }
 
@@ -118,9 +115,7 @@ int main(int argc, char* argv[])
     }
 
     const MNEBemSurface& innerSurf = bem[innerIdx];
-    qInfo("Using surface: %s (%d vertices, %d triangles)",
-          MNEBemSurface::id_name(innerSurf.id).c_str(),
-          innerSurf.np, innerSurf.ntri);
+    Log::info("Using surface: {} ({} vertices, {} triangles)", MNEBemSurface::id_name(innerSurf.id), innerSurf.np, innerSurf.ntri);
 
     // Create MNESurface from BEM surface for the library function
     MNESurface surf;
@@ -132,27 +127,26 @@ int main(int argc, char* argv[])
     surf.id = innerSurf.id;
     surf.coord_frame = innerSurf.coord_frame;
 
-    qInfo("Creating volume source space (grid=%.1f mm, mindist=%.1f mm, exclude=%.1f mm)...",
-          gridMm, mindistMm, excludeMm);
+    Log::info("Creating volume source space (grid={:.1f} mm, mindist={:.1f} mm, exclude={:.1f} mm)...", gridMm, mindistMm, excludeMm);
 
     // Use the existing library function
     const auto sp = MNESourceSpace::make_volume_source_space(surf, grid, exclude, mindist);
     if (!sp) {
-        qCritical("Volume source space creation failed.");
+        Log::critical("Volume source space creation failed.");
         return 1;
     }
 
-    qInfo("Volume source space: %d total points, %d active", sp->np, sp->nuse);
+    Log::info("Volume source space: {} total points, {} active", sp->np, sp->nuse);
 
     // Write output
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly)) {
-        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        Log::critical("Cannot write output file: {}", outFile.toStdString());
         return 1;
     }
     auto outStream = FiffStream::start_file(outFile.toStdU16String());
     if (!outStream) {
-        qCritical("Cannot write output file: %s", qPrintable(outFile));
+        Log::critical("Cannot write output file: {}", outFile.toStdString());
         return 1;
     }
     outStream->start_block(FIFFB_MNE);
@@ -162,6 +156,6 @@ int main(int argc, char* argv[])
     outStream->end_block(FIFFB_MNE);
     outStream->end_file();
     outF.close();
-    qInfo("Written volume source space to: %s", qPrintable(outFile));
+    Log::info("Written volume source space to: {}", outFile.toStdString());
     return 0;
 }

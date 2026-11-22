@@ -38,7 +38,6 @@
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forward_solution.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,7 +49,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -109,16 +107,14 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
     //   1. Projectors embedded in the noise covariance file
     //   2. Projectors from explicit --proj files (only if noise cov had none)
     if (!noiseCov.projs.empty()) {
-        qInfo("  Using %lld SSP projectors from noise covariance file.",
-              static_cast<long long>(noiseCov.projs.size()));
+        Log::info("  Using {} SSP projectors from noise covariance file.", static_cast<long long>(noiseCov.projs.size()));
         info.projs = noiseCov.projs;
         FiffProj::activate_projs(info.projs);
         if (!extraProjs.empty()) {
-            qInfo("  NOTE: Noise covariance already contains projectors; ignoring --proj files.");
+            Log::info("  NOTE: Noise covariance already contains projectors; ignoring --proj files.");
         }
     } else if (!extraProjs.empty()) {
-        qInfo("  Using %lld SSP projectors from --proj files.",
-              static_cast<long long>(extraProjs.size()));
+        Log::info("  Using {} SSP projectors from --proj files.", static_cast<long long>(extraProjs.size()));
         info.projs = extraProjs;
         FiffProj::activate_projs(info.projs);
     }
@@ -136,7 +132,7 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
             hasEegAvRef = true;
     }
     if (hasEeg && !hasEegAvRef) {
-        qInfo("  Adding average EEG reference projector.");
+        Log::info("  Adding average EEG reference projector.");
         // Build EEG average reference projector
         StringList eegNames;
         for (int i = 0; i < info.nchan; ++i) {
@@ -171,7 +167,7 @@ static std::vector<FiffProj> readProjFile(const QString& fileName)
     QFile file(fileName);
     FiffStream stream(fileName.toStdU16String());
     if (!stream.open()) {
-        qWarning() << "  WARNING: Could not open projection file" << fileName;
+        Log::warning("  WARNING: Could not open projection file {}", fileName.toStdString());
         return projs;
     }
     projs = stream.read_proj(stream.dirtree());
@@ -187,7 +183,7 @@ static QStringList readBadFile(const QString& fileName)
     QStringList bads;
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "  WARNING: Could not open bad channel file" << fileName;
+        Log::warning("  WARNING: Could not open bad channel file {}", fileName.toStdString());
         return bads;
     }
     QTextStream in(&file);
@@ -221,7 +217,6 @@ static QStringList readBadFile(const QString& fileName)
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_inverse_operator");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -350,11 +345,11 @@ int main(int argc, char* argv[])
     //=========================================================================================================
 
     if (!parser.isSet(fwdOpt)) {
-        qCritical() << "Error: --fwd option is required.";
+        Log::critical("Error: --fwd option is required.");
         parser.showHelp(1);
     }
     if (!parser.isSet(noisecovOpt)) {
-        qCritical() << "Error: --noisecov option is required.";
+        Log::critical("Error: --noisecov option is required.");
         parser.showHelp(1);
     }
 
@@ -362,7 +357,7 @@ int main(int argc, char* argv[])
     bool useMeg = parser.isSet(megOpt);
     bool useEeg = parser.isSet(eegOpt);
     if (!useMeg && !useEeg) {
-        qInfo("Neither --meg nor --eeg specified; using all available channels.");
+        Log::info("Neither --meg nor --eeg specified; using all available channels.");
         useMeg = true;
         useEeg = true;
     }
@@ -404,55 +399,48 @@ int main(int argc, char* argv[])
     // Read forward solution
     //=========================================================================================================
 
-    qInfo("%s", "");
-    qInfo("========================================");
-    qInfo("Reading forward solution from %s...", fwdName.toUtf8().constData());
+    Log::info("{}", "");
+    Log::info("========================================");
+    Log::info("Reading forward solution from {}...", fwdName.toStdString());
 
     auto forwardRead = MNEForwardSolution::read(fwdName.toStdU16String(), {.surf_ori = true});
     if (!forwardRead) {
-        qCritical("%s", forwardRead.error().what());
+        Log::critical("{}", forwardRead.error().what());
         return 1;
     }
     MNEForwardSolution& forward = *forwardRead;
 
-    qInfo("  Forward solution: %d sources, %d channels",
-          forward.nsource, forward.nchan);
-    qInfo("  Source orientation: %s",
-          forward.isFixedOrient() ? "fixed" : "free");
-    qInfo("  Source space type: %d hemispheres", forward.src.size());
+    Log::info("  Forward solution: {} sources, {} channels", forward.nsource, forward.nchan);
+    Log::info("  Source orientation: {}", forward.isFixedOrient() ? "fixed" : "free");
+    Log::info("  Source space type: {} hemispheres", forward.src.size());
 
     // Pick channel types according to --meg/--eeg options
     if (!(useMeg && useEeg)) {
-        qInfo("Restricting forward solution to %s channels...",
-              useMeg ? "MEG" : "EEG");
+        Log::info("Restricting forward solution to {} channels...", useMeg ? "MEG" : "EEG");
         forward = forward.pick_types(useMeg, useEeg);
         if (forward.empty()) {
-            qCritical() << "Error: No channels remaining after channel type restriction.";
+            Log::critical("Error: No channels remaining after channel type restriction.");
             return 1;
         }
-        qInfo("  After restriction: %d channels", forward.nchan);
+        Log::info("  After restriction: {} channels", forward.nchan);
     }
 
     //=========================================================================================================
     // Read noise covariance
     //=========================================================================================================
 
-    qInfo("\nReading noise covariance from %s...",
-          parser.value(noisecovOpt).toUtf8().constData());
+    Log::info("\nReading noise covariance from {}...", parser.value(noisecovOpt).toStdString());
 
     FiffCov noiseCov(parser.value(noisecovOpt).toStdU16String());
 
     if (noiseCov.data.rows() == 0) {
-        qCritical() << "Error: Could not read noise covariance from"
-                    << parser.value(noisecovOpt);
+        Log::critical("Error: Could not read noise covariance from {}", parser.value(noisecovOpt).toStdString());
         return 1;
     }
 
-    qInfo("  Noise covariance: %d x %d",
-          static_cast<int>(noiseCov.data.rows()), static_cast<int>(noiseCov.data.cols()));
+    Log::info("  Noise covariance: {} x {}", static_cast<int>(noiseCov.data.rows()), static_cast<int>(noiseCov.data.cols()));
     if (!noiseCov.projs.empty()) {
-        qInfo("  Noise covariance contains %lld SSP projectors.",
-              static_cast<long long>(noiseCov.projs.size()));
+        Log::info("  Noise covariance contains {} SSP projectors.", static_cast<long long>(noiseCov.projs.size()));
     }
 
     //=========================================================================================================
@@ -462,10 +450,9 @@ int main(int argc, char* argv[])
     std::vector<FiffProj> extraProjs;
     QStringList projFiles = parser.values(projOpt);
     for (const QString& projFileName : projFiles) {
-        qInfo("Reading SSP projectors from %s...",
-              projFileName.toUtf8().constData());
+        Log::info("Reading SSP projectors from {}...", projFileName.toStdString());
         std::vector<FiffProj> fileProjs = readProjFile(projFileName);
-        qInfo("  Found %lld projectors.", static_cast<long long>(fileProjs.size()));
+        Log::info("  Found {} projectors.", static_cast<long long>(fileProjs.size()));
         std::ranges::move(fileProjs, std::back_inserter(extraProjs));
     }
 
@@ -474,10 +461,9 @@ int main(int argc, char* argv[])
     // (same approach as the original MNE-C tool — no measurement file needed)
     //=========================================================================================================
 
-    qInfo("\nBuilding measurement info from forward solution...");
+    Log::info("\nBuilding measurement info from forward solution...");
     FiffInfo info = buildInfoFromForward(forward, noiseCov, extraProjs);
-    qInfo("  Info: %d channels, %lld projectors",
-          info.nchan, static_cast<long long>(info.projs.size()));
+    Log::info("  Info: {} channels, {} projectors", info.nchan, static_cast<long long>(info.projs.size()));
 
     //=========================================================================================================
     // Merge bad channels from --bad files
@@ -485,8 +471,7 @@ int main(int argc, char* argv[])
 
     QStringList badFiles = parser.values(badOpt);
     for (const QString& badFileName : badFiles) {
-        qInfo("Reading bad channels from %s...",
-              badFileName.toUtf8().constData());
+        Log::info("Reading bad channels from {}...", badFileName.toStdString());
         QStringList fileBads = readBadFile(badFileName);
         for (const QString& bad : fileBads) {
             if (!std::ranges::contains(info.bads, bad.toStdString()))
@@ -499,22 +484,19 @@ int main(int argc, char* argv[])
             info.bads.push_back(bad);
     }
     if (!info.bads.empty()) {
-        qInfo("  Bad channels (%lld): %s",
-              static_cast<long long>(info.bads.size()),
-              QString::fromStdString(mne::join(info.bads, " ")).toUtf8().constData());
+        Log::info("  Bad channels ({}): {}", static_cast<long long>(info.bads.size()), QString::fromStdString(mne::join(info.bads, " ")).toStdString());
     }
 
     //=========================================================================================================
     // Regularize noise covariance
     //=========================================================================================================
 
-    qInfo("\nRegularizing noise covariance (mag=%.3f, grad=%.3f, eeg=%.3f)...",
-          magReg, gradReg, eegReg);
+    Log::info("\nRegularizing noise covariance (mag={:.3f}, grad={:.3f}, eeg={:.3f})...", magReg, gradReg, eegReg);
     noiseCov = noiseCov.regularize(info, magReg, gradReg, eegReg, true);
 
     // If --diagnoise, zero out off-diagonal elements
     if (diagNoise) {
-        qInfo("Using only diagonal noise covariance.");
+        Log::info("Using only diagonal noise covariance.");
         MatrixXd diagCov = MatrixXd::Zero(noiseCov.data.rows(), noiseCov.data.cols());
         diagCov.diagonal() = noiseCov.data.diagonal();
         noiseCov.data = diagCov;
@@ -524,42 +506,41 @@ int main(int argc, char* argv[])
     // Assemble the inverse operator
     //=========================================================================================================
 
-    qInfo("\nAssembling inverse operator...");
-    qInfo("  Fixed orientation: %s", useFixed ? "yes" : "no");
+    Log::info("\nAssembling inverse operator...");
+    Log::info("  Fixed orientation: {}", useFixed ? "yes" : "no");
     if (!useFixed) {
-        qInfo("  Loose constraint: %.2f", loose);
+        Log::info("  Loose constraint: {:.2f}", loose);
     }
     if (depth > 0.0f) {
-        qInfo("  Depth weighting:  yes (%.2f)", depth);
+        Log::info("  Depth weighting:  yes ({:.2f})", depth);
     } else {
-        qInfo("  Depth weighting:  no");
+        Log::info("  Depth weighting:  no");
     }
 
     MNEInverseOperator invOp(info, forward, noiseCov, loose, depth, useFixed, true);
 
     if (invOp.nsource <= 0) {
-        qCritical() << "Error: Failed to assemble inverse operator.";
+        Log::critical("Error: Failed to assemble inverse operator.");
         return 1;
     }
 
-    qInfo("  Inverse operator: %d sources, %d channels",
-          invOp.nsource, invOp.nchan);
+    Log::info("  Inverse operator: {} sources, {} channels", invOp.nsource, invOp.nchan);
 
     //=========================================================================================================
     // Write the inverse operator
     //=========================================================================================================
 
-    qInfo("\nWriting inverse operator to %s...", invName.toUtf8().constData());
+    Log::info("\nWriting inverse operator to {}...", invName.toStdString());
 
     if (auto written = invOp.write(invName.toStdU16String()); !written) {
-        qCritical() << written.error().what();
+        Log::critical("{}", written.error().what());
         return 1;
     }
 
-    qInfo("Done.\n");
-    qInfo("The inverse operator is ready.");
-    qInfo("You can now use mne_compute_mne or mne_compute_raw_inverse");
-    qInfo("to compute source estimates.\n");
+    Log::info("Done.\n");
+    Log::info("The inverse operator is ready.");
+    Log::info("You can now use mne_compute_mne or mne_compute_raw_inverse");
+    Log::info("to compute source estimates.\n");
 
     return 0;
 }

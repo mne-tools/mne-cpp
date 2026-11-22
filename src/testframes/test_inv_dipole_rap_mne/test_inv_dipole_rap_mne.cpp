@@ -23,7 +23,6 @@
 
 #include <base/base_global.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_stream.h>
@@ -178,8 +177,6 @@ private slots:
 
 void TestInvDipoleRapMne::initTestCase()
 {
-    mne::install_qt_message_handler();
-
     m_sTestDataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     QVERIFY2(QFile::exists(rawPath()),
              qPrintable(QString("Test data not found: %1").arg(rawPath())));
@@ -191,8 +188,7 @@ void TestInvDipoleRapMne::initTestCase()
         m_invOp = MNEInverseOperator(invPath.toStdU16String());
         QVERIFY2(m_invOp.nsource > 0, "Failed to load inverse operator");
     } else {
-        qDebug() << "MNE sample data not found at" << m_sMneSamplePath
-                 << "— inverse operator tests will be skipped";
+        Log::debug("MNE sample data not found at {} — inverse operator tests will be skipped", m_sMneSamplePath.toStdString());
     }
 
     // Load forward solution from submodule test data

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include "eventmodel.h"
 
 #include <fiff/fiff_events.h>
@@ -364,11 +365,11 @@ bool EventModel::loadEventData(QFile& qFile)
     }
 
     if (!readSuccess) {
-        qWarning() << "Error while reading events.";
+        Log::warning("Error while reading events.");
         return false;
     }
 
-    qInfo() << QString("Events read from %1").arg(qFile.fileName());
+    Log::info("{}", QString("Events read from %1").arg(qFile.fileName()).toStdString());
     replaceEventData(events, true);
     return true;
 }
@@ -542,7 +543,7 @@ void EventModel::clearModel()
     endResetModel();
     emit updateEventTypes("All");
 
-    qInfo("EventModel cleared.");
+    Log::info("EventModel cleared.");
 }
 
 

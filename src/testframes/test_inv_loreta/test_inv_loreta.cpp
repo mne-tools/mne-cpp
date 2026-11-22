@@ -17,7 +17,6 @@
 //=============================================================================================================
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_raw_data.h>
@@ -133,12 +132,11 @@ private slots:
 
 void TestInvLoreta::initTestCase()
 {
-    mne::install_qt_message_handler();
     m_bDataLoaded = false;
 
     QString base = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data";
     if (!QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif")) {
-        qWarning() << "Test data not found at" << base;
+        Log::warning("Test data not found at {}", base.toStdString());
         return;
     }
     m_sDataPath = base;
@@ -232,10 +230,7 @@ void TestInvLoreta::eloreta_fromEvoked()
     QCOMPARE((int)stc.data.rows(), m_invOp.nsource);
     QVERIFY(stc.data.allFinite());
 
-    qDebug() << "eLORETA STC: sources=" << stc.data.rows()
-             << "times=" << stc.data.cols()
-             << "min=" << stc.data.minCoeff()
-             << "max=" << stc.data.maxCoeff();
+    Log::debug("eLORETA STC: sources= {} times= {} min= {} max= {}", stc.data.rows(), stc.data.cols(), stc.data.minCoeff(), stc.data.maxCoeff());
 }
 
 //=============================================================================================================
@@ -312,7 +307,7 @@ void TestInvLoreta::eloreta_vs_dSPM()
     double diff = (stcDspm.data - stcEloreta.data).norm();
     QVERIFY2(diff > 1e-10, "eLORETA and dSPM should produce different results");
 
-    qDebug() << "dSPM vs eLORETA norm difference:" << diff;
+    Log::debug("dSPM vs eLORETA norm difference: {}", diff);
 }
 
 QTEST_GUILESS_MAIN(TestInvLoreta)

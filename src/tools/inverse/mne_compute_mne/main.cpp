@@ -41,7 +41,6 @@
 #include <fs/fs_label.h>
 
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,7 +54,6 @@
 #include <QDir>
 #include <QRegularExpression>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -153,11 +151,11 @@ static void collapseData(MatrixXd& data, int mode)
 static void scaleData(MatrixXd& data, double scaleTo, double scaleBy, bool siCurrents)
 {
     if (siCurrents) {
-        qInfo("  Output: SI-unit currents (no scaling).");
+        Log::info("  Output: SI-unit currents (no scaling).");
         return;
     }
     if (scaleBy != 0.0) {
-        qInfo("  Scaling data by %.6e", scaleBy);
+        Log::info("  Scaling data by {:.6e}", scaleBy);
         data *= scaleBy;
         return;
     }
@@ -165,7 +163,7 @@ static void scaleData(MatrixXd& data, double scaleTo, double scaleBy, bool siCur
         double maxAbs = data.cwiseAbs().maxCoeff();
         if (maxAbs > 0.0) {
             double factor = scaleTo / maxAbs;
-            qInfo("  Scaling data so max = %.1f (factor = %.6e)", scaleTo, factor);
+            Log::info("  Scaling data so max = {:.1f} (factor = {:.6e})", scaleTo, factor);
             data *= factor;
         }
     }
@@ -188,7 +186,7 @@ static bool readBaselines(const QString& fileName,
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "  WARNING: Could not open baselines file" << fileName;
+        Log::warning("  WARNING: Could not open baselines file {}", fileName.toStdString());
         return false;
     }
 
@@ -209,7 +207,7 @@ static bool readBaselines(const QString& fileName,
         }
     }
     file.close();
-    qInfo("  Read %d baseline values from %s", nFound, fileName.toUtf8().constData());
+    Log::info("  Read {} baseline values from {}", nFound, fileName.toStdString());
     return true;
 }
 
@@ -253,14 +251,13 @@ static bool writeLabelOutput(const FsLabel& label,
     }
 
     if (srcIdx.isEmpty()) {
-        qInfo("  WARNING: No vertices found in label %s for this hemisphere.",
-              label.name.c_str());
+        Log::info("  WARNING: No vertices found in label {} for this hemisphere.", label.name);
         return false;
     }
 
     QFile file(outputFile);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "  WARNING: Could not open label output file" << outputFile;
+        Log::warning("  WARNING: Could not open label output file {}", outputFile.toStdString());
         return false;
     }
 
@@ -321,8 +318,7 @@ static bool writeLabelOutput(const FsLabel& label,
     }
 
     file.close();
-    qInfo("  FsLabel output: %d vertices, %d times -> %s",
-          static_cast<int>(srcIdx.size()), nTimes, outputFile.toUtf8().constData());
+    Log::info("  FsLabel output: {} vertices, {} times -> {}", static_cast<int>(srcIdx.size()), nTimes, outputFile.toStdString());
     return true;
 }
 
@@ -349,7 +345,7 @@ static bool writeDipFile(const QString& fileName,
 {
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "  WARNING: Could not open dipole output file" << fileName;
+        Log::warning("  WARNING: Could not open dipole output file {}", fileName.toStdString());
         return false;
     }
 
@@ -389,8 +385,7 @@ static bool writeDipFile(const QString& fileName,
     }
 
     file.close();
-    qInfo("  Dipole snapshot: %d sources at %.1f ms -> %s",
-          row, time_ms, fileName.toUtf8().constData());
+    Log::info("  Dipole snapshot: {} sources at {:.1f} ms -> {}", row, time_ms, fileName.toStdString());
     return true;
 }
 
@@ -412,19 +407,18 @@ static bool writePredictedData(const QString& fileName,
                                const VectorXd& timesVec)
 {
     if (forward.sol.data.rows() == 0) {
-        qWarning() << "  WARNING: Forward solution has no gain matrix.";
+        Log::warning("  WARNING: Forward solution has no gain matrix.");
         return false;
     }
 
     // Predicted data = G * J  (nChannels x nSources) * (nSources x nTimes)
     MatrixXd predicted = forward.sol.data * stcData;
 
-    qInfo("  Predicted data: %d channels, %d time points",
-          static_cast<int>(predicted.rows()), static_cast<int>(predicted.cols()));
+    Log::info("  Predicted data: {} channels, {} time points", static_cast<int>(predicted.rows()), static_cast<int>(predicted.cols()));
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qWarning() << "  WARNING: Could not open predicted data output file" << fileName;
+        Log::warning("  WARNING: Could not open predicted data output file {}", fileName.toStdString());
         return false;
     }
 
@@ -447,7 +441,7 @@ static bool writePredictedData(const QString& fileName,
     }
     file.close();
 
-    qInfo("  Predicted data written to %s", fileName.toUtf8().constData());
+    Log::info("  Predicted data written to {}", fileName.toStdString());
     return true;
 }
 
@@ -502,7 +496,6 @@ static bool writePredictedData(const QString& fileName,
  */
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_compute_mne");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -735,12 +728,12 @@ int main(int argc, char* argv[])
     //=========================================================================================================
 
     if (!parser.isSet(invOpt)) {
-        qCritical() << "Error: --inv option is required.";
+        Log::critical("Error: --inv option is required.");
         parser.showHelp(1);
     }
     bool useFwdAsData = parser.isSet(fwdOpt);
     if (!parser.isSet(measOpt) && !useFwdAsData) {
-        qCritical() << "Error: --meas option is required (unless --fwd is used).";
+        Log::critical("Error: --meas option is required (unless --fwd is used).");
         parser.showHelp(1);
     }
 
@@ -760,8 +753,7 @@ int main(int argc, char* argv[])
 
     // Validate method
     if (method != "MNE" && method != "dSPM" && method != "sLORETA") {
-        qCritical() << "Error: Unknown method" << method
-                    << "(must be MNE, dSPM, or sLORETA).";
+        Log::critical("Error: Unknown method {} (must be MNE, dSPM, or sLORETA).", method.toStdString());
         return 1;
     }
 
@@ -798,21 +790,19 @@ int main(int argc, char* argv[])
     // Read inverse operator
     //=========================================================================================================
 
-    qInfo("%s", "");
-    qInfo("========================================");
-    qInfo("Reading inverse operator from %s...", invName.toUtf8().constData());
+    Log::info("{}", "");
+    Log::info("========================================");
+    Log::info("Reading inverse operator from {}...", invName.toStdString());
 
     auto invOpRead = MNEInverseOperator::read(invName.toStdU16String());
     if (!invOpRead) {
-        qCritical("%s", invOpRead.error().what());
+        Log::critical("{}", invOpRead.error().what());
         return 1;
     }
     MNEInverseOperator& invOp = *invOpRead;
 
-    qInfo("  Inverse operator: %d sources, %d channels",
-          invOp.nsource, invOp.nchan);
-    qInfo("  Source orientation: %s",
-          invOp.isFixedOrient() ? "fixed" : "free");
+    Log::info("  Inverse operator: {} sources, {} channels", invOp.nsource, invOp.nchan);
+    Log::info("  Source orientation: {}", invOp.isFixedOrient() ? "fixed" : "free");
 
     //=========================================================================================================
     // Read evoked data (or use forward solution as synthetic data)
@@ -832,13 +822,12 @@ int main(int argc, char* argv[])
         QString fwdName = parser.value(fwdOpt);
         double fwdAmp = parser.value(fwdampOpt).toDouble() * 1e-9; // nAm -> Am
 
-        qInfo("\nUsing forward solution as synthetic data from %s...",
-              fwdName.toUtf8().constData());
-        qInfo("  Source amplitude: %.1f nAm", fwdAmp * 1e9);
+        Log::info("\nUsing forward solution as synthetic data from {}...", fwdName.toStdString());
+        Log::info("  Source amplitude: {:.1f} nAm", fwdAmp * 1e9);
 
         auto fwdRead = MNEForwardSolution::read(fwdName.toStdU16String());
         if (!fwdRead) {
-            qCritical("%s", fwdRead.error().what());
+            Log::critical("{}", fwdRead.error().what());
             return 1;
         }
         MNEForwardSolution& fwd = *fwdRead;
@@ -847,8 +836,7 @@ int main(int argc, char* argv[])
         for (int channel = 0; channel < static_cast<int>(invOp.noise_cov.names.size()); ++channel) {
             const int fwdChannel = mne::channel_index(fwd.sol.row_names, invOp.noise_cov.names[channel]);
             if (fwdChannel < 0) {
-                qCritical("Error: Forward solution is missing inverse-operator channel %s.",
-                          invOp.noise_cov.names[channel].c_str());
+                Log::critical("Error: Forward solution is missing inverse-operator channel {}.", invOp.noise_cov.names[channel]);
                 return 1;
             }
             pickedData.row(channel) = fwd.sol.data.row(fwdChannel) * fwdAmp;
@@ -868,8 +856,7 @@ int main(int argc, char* argv[])
         tmin = firstSource * tstep;
         nave = 1;
 
-        qInfo("  Forward synthetic data: %d channels, %d selected sources (time points)",
-              static_cast<int>(data.rows()), nTimes);
+        Log::info("  Forward synthetic data: {} channels, {} selected sources (time points)", static_cast<int>(data.rows()), nTimes);
 
         // Time vector for label output
         timesVec.resize(nTimes);
@@ -880,30 +867,26 @@ int main(int argc, char* argv[])
         //---------------------------------------------------------------------
         // Normal evoked data mode
         //---------------------------------------------------------------------
-        qInfo("\nReading evoked data from %s (set %d)...",
-              measName.toUtf8().constData(), setNo + 1);
+        Log::info("\nReading evoked data from {} (set {})...", measName.toStdString(), setNo + 1);
 
         FiffEvoked::Baseline baseline;
         if (parser.isSet(bminOpt) || parser.isSet(bmaxOpt)) {
             float bmin = parser.isSet(bminOpt) ? parser.value(bminOpt).toFloat() / 1000.0f : -1.0f;
             float bmax = parser.isSet(bmaxOpt) ? parser.value(bmaxOpt).toFloat() / 1000.0f : -1.0f;
             baseline = std::pair(bmin, bmax);
-            qInfo("  Baseline: %.1f - %.1f ms",
-                  bmin * 1000.0f, bmax * 1000.0f);
+            Log::info("  Baseline: {:.1f} - {:.1f} ms", bmin * 1000.0f, bmax * 1000.0f);
         }
         auto read = FiffEvoked::read(measName.toStdU16String(), setNo, baseline);
         if (!read) {
-            qCritical("Error: %s", read.error().what());
+            Log::critical("Error: {}", read.error().what());
             return 1;
         }
         FiffEvoked& evoked = *read;
 
-        qInfo("  Evoked data: %d channels, %d time points",
-              static_cast<int>(evoked.data.rows()), static_cast<int>(evoked.data.cols()));
-        qInfo("  Comment: %s", evoked.comment.c_str());
-        qInfo("  Nave: %d", evoked.nave);
-        qInfo("  Time range: %.1f - %.1f ms",
-              evoked.times(0) * 1000.0f, evoked.times(evoked.times.size() - 1) * 1000.0f);
+        Log::info("  Evoked data: {} channels, {} time points", static_cast<int>(evoked.data.rows()), static_cast<int>(evoked.data.cols()));
+        Log::info("  Comment: {}", evoked.comment);
+        Log::info("  Nave: {}", evoked.nave);
+        Log::info("  Time range: {:.1f} - {:.1f} ms", evoked.times(0) * 1000.0f, evoked.times(evoked.times.size() - 1) * 1000.0f);
 
         // Measurement ID matching check (SVN MNE-C --nomatch feature)
         // Compare measurement IDs between inverse operator info and evoked data
@@ -912,12 +895,12 @@ int main(int argc, char* argv[])
                 if (invOp.info.meas_id.version != evoked.info.meas_id.version ||
                     invOp.info.meas_id.machid[0] != evoked.info.meas_id.machid[0] ||
                     invOp.info.meas_id.machid[1] != evoked.info.meas_id.machid[1]) {
-                    qInfo("  WARNING: Measurement IDs differ between inverse operator and data.");
-                    qInfo("           Use --nomatch to suppress this check.");
+                    Log::info("  WARNING: Measurement IDs differ between inverse operator and data.");
+                    Log::info("           Use --nomatch to suppress this check.");
                 }
             }
         } else {
-            qInfo("  Measurement ID matching skipped (--nomatch).");
+            Log::info("  Measurement ID matching skipped (--nomatch).");
         }
 
         // Apply per-channel baselines from file if specified
@@ -931,7 +914,7 @@ int main(int argc, char* argv[])
                 for (int c = 0; c < evoked.data.rows(); ++c) {
                     evoked.data.row(c).array() -= baselines(c);
                 }
-                qInfo("  Applied per-channel baselines from file.");
+                Log::info("  Applied per-channel baselines from file.");
             }
         }
 
@@ -939,7 +922,7 @@ int main(int argc, char* argv[])
         nave = evoked.nave;
         if (parser.isSet(naveOpt)) {
             nave = parser.value(naveOpt).toInt();
-            qInfo("  Overriding nave to %d", nave);
+            Log::info("  Overriding nave to {}", nave);
         }
 
         // Apply time window if specified
@@ -953,8 +936,7 @@ int main(int argc, char* argv[])
                     break;
                 }
             }
-            qInfo("  Start time restricted to %.1f ms (sample %d)",
-                  evoked.times(tminIdx) * 1000.0f, tminIdx);
+            Log::info("  Start time restricted to {:.1f} ms (sample {})", evoked.times(tminIdx) * 1000.0f, tminIdx);
         }
         if (parser.isSet(tmaxOpt)) {
             float tmax_s = parser.value(tmaxOpt).toFloat() / 1000.0f;
@@ -964,17 +946,15 @@ int main(int argc, char* argv[])
                     break;
                 }
             }
-            qInfo("  End time restricted to %.1f ms (sample %d)",
-                  evoked.times(tmaxIdx) * 1000.0f, tmaxIdx);
+            Log::info("  End time restricted to {:.1f} ms (sample {})", evoked.times(tmaxIdx) * 1000.0f, tmaxIdx);
         }
 
         FiffEvoked pickedEvoked = evoked.pick_channels(invOp.noise_cov.names);
         if (pickedEvoked.info.nchan != invOp.nchan) {
-            qCritical("Error: Found %d of %d inverse-operator channels in the evoked data.",
-                      pickedEvoked.info.nchan, invOp.nchan);
+            Log::critical("Error: Found {} of {} inverse-operator channels in the evoked data.", pickedEvoked.info.nchan, invOp.nchan);
             return 1;
         }
-        qInfo("  Picked %d inverse-operator channels", pickedEvoked.info.nchan);
+        Log::info("  Picked {} inverse-operator channels", pickedEvoked.info.nchan);
 
         // Extract the time window
         nTimes = tmaxIdx - tminIdx + 1;
@@ -992,8 +972,7 @@ int main(int argc, char* argv[])
     // Compute inverse solution
     //=========================================================================================================
 
-    qInfo("\nComputing %s inverse solution (SNR=%.1f, lambda2=%.4e, nave=%d)...",
-          method.toUtf8().constData(), snr, lambda2, nave);
+    Log::info("\nComputing {} inverse solution (SNR={:.1f}, lambda2={:.4e}, nave={})...", method.toStdString(), snr, lambda2, nave);
 
     InvMinimumNorm minimumNorm(invOp, lambda2, method.toStdString());
     minimumNorm.doInverseSetup(nave, pickNormal);
@@ -1001,15 +980,12 @@ int main(int argc, char* argv[])
     InvSourceEstimate stc = minimumNorm.calculateInverse(data, tmin, tstep, pickNormal);
 
     if (stc.empty()) {
-        qCritical() << "Error: Inverse computation returned empty result.";
+        Log::critical("Error: Inverse computation returned empty result.");
         return 1;
     }
 
-    qInfo("  Source estimate: %d sources, %d time points",
-          static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
-    qInfo("  Time range: %.1f - %.1f ms",
-          stc.tmin * 1000.0f,
-          (stc.tmin + (stc.data.cols() - 1) * stc.tstep) * 1000.0f);
+    Log::info("  Source estimate: {} sources, {} time points", static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
+    Log::info("  Time range: {:.1f} - {:.1f} ms", stc.tmin * 1000.0f, (stc.tmin + (stc.data.cols() - 1) * stc.tstep) * 1000.0f);
 
     //=========================================================================================================
     // Post-processing: abs/signed, collapse, scaling
@@ -1017,17 +993,17 @@ int main(int argc, char* argv[])
 
     // Apply abs/signed transformations
     if (doAbs) {
-        qInfo("  Applying absolute value transform.");
+        Log::info("  Applying absolute value transform.");
         stc.data = stc.data.cwiseAbs();
     } else if (doSigned) {
-        qInfo("  Preserving signed current direction.");
+        Log::info("  Preserving signed current direction.");
         // Signed: keep data as-is (already signed from fixed orientation)
     }
 
     // Collapse time axis to single frame
     if (collapseMode > 0) {
         const char* modeNames[] = {"", "max-abs", "L1 (mean-abs)", "L2 (RMS)"};
-        qInfo("  Collapsing time axis using %s mode.", modeNames[collapseMode]);
+        Log::info("  Collapsing time axis using {} mode.", modeNames[collapseMode]);
         collapseData(stc.data, collapseMode);
     }
 
@@ -1085,30 +1061,30 @@ int main(int argc, char* argv[])
         // Left hemisphere
         if (nLh > 0) {
             QString lhFile = stcBase + "-lh.stc";
-            qInfo("\nWriting left hemisphere STC to %s...", lhFile.toUtf8().constData());
+            Log::info("\nWriting left hemisphere STC to {}...", lhFile.toStdString());
 
             MatrixXd lhData = stc.data.topRows(nLh);
             InvSourceEstimate lhStc(lhData, vertno[0], stc.tmin, stc.tstep);
 
             if (!lhStc.write(lhFile.toStdU16String())) {
-                qWarning() << "Warning: Failed to write" << lhFile;
+                Log::warning("Warning: Failed to write {}", lhFile.toStdString());
             } else {
-                qInfo("  %d vertices, %d time points", nLh, static_cast<int>(lhData.cols()));
+                Log::info("  {} vertices, {} time points", nLh, static_cast<int>(lhData.cols()));
             }
         }
 
         // Right hemisphere
         if (nRh > 0) {
             QString rhFile = stcBase + "-rh.stc";
-            qInfo("Writing right hemisphere STC to %s...", rhFile.toUtf8().constData());
+            Log::info("Writing right hemisphere STC to {}...", rhFile.toStdString());
 
             MatrixXd rhData = stc.data.bottomRows(nRh);
             InvSourceEstimate rhStc(rhData, vertno[1], stc.tmin, stc.tstep);
 
             if (!rhStc.write(rhFile.toStdU16String())) {
-                qWarning() << "Warning: Failed to write" << rhFile;
+                Log::warning("Warning: Failed to write {}", rhFile.toStdString());
             } else {
-                qInfo("  %d vertices, %d time points", nRh, static_cast<int>(rhData.cols()));
+                Log::info("  {} vertices, {} time points", nRh, static_cast<int>(rhData.cols()));
             }
         }
 
@@ -1118,17 +1094,15 @@ int main(int argc, char* argv[])
 
         QStringList labelFiles = parser.values(labelOpt);
         if (doLabelTag && !labelFiles.isEmpty()) {
-            qInfo("\nWriting label-based ASCII output...");
+            Log::info("\nWriting label-based ASCII output...");
 
             for (const QString& labelFile : labelFiles) {
                 FsLabel label;
                 if (!FsLabel::read(labelFile.toStdU16String(), label)) {
-                    qWarning() << "  WARNING: Could not read label" << labelFile;
+                    Log::warning("  WARNING: Could not read label {}", labelFile.toStdString());
                     continue;
                 }
-                qInfo("  FsLabel: %s (%d vertices, hemi=%d)",
-                      label.name.c_str(),
-                      static_cast<int>(label.vertices.size()), label.hemi);
+                Log::info("  FsLabel: {} ({} vertices, hemi={})", label.name, static_cast<int>(label.vertices.size()), label.hemi);
 
                 // Determine hemisphere and write
                 // hemi: 0 = lh, 1 = rh (FsLabel convention)
@@ -1165,14 +1139,13 @@ int main(int argc, char* argv[])
     } else {
         // Single source space (e.g., volume) — write as single STC
         QString outFile = stcBase + ".stc";
-        qInfo("\nWriting STC to %s...", outFile.toUtf8().constData());
+        Log::info("\nWriting STC to {}...", outFile.toStdString());
 
         if (auto written = stc.write(outFile.toStdU16String()); !written) {
-            qCritical() << written.error().what();
+            Log::critical("{}", written.error().what());
             return 1;
         }
-        qInfo("  %d vertices, %d time points",
-              static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
+        Log::info("  {} vertices, {} time points", static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
     }
 
     //=========================================================================================================
@@ -1194,8 +1167,7 @@ int main(int argc, char* argv[])
                 dipIdx = t;
             }
         }
-        qInfo("\nWriting dipole snapshot at %.1f ms (nearest: %.1f ms, idx %d)...",
-              dipTime_ms, timesVec(dipIdx) * 1000.0, dipIdx);
+        Log::info("\nWriting dipole snapshot at {:.1f} ms (nearest: {:.1f} ms, idx {})...", dipTime_ms, timesVec(dipIdx) * 1000.0, dipIdx);
 
         writeDipFile(dipFile, stc.data, invOp.src, vertno, dipIdx, timesVec(dipIdx) * 1000.0);
     }
@@ -1206,7 +1178,7 @@ int main(int argc, char* argv[])
 
     QStringList pickValues = parser.values(pickOpt);
     if (!pickValues.isEmpty()) {
-        qInfo("\nExtracting source estimates at %d time point(s)...", static_cast<int>(pickValues.size()));
+        Log::info("\nExtracting source estimates at {} time point(s)...", static_cast<int>(pickValues.size()));
 
         for (const QString& pickStr : pickValues) {
             double pickTime_ms = pickStr.toDouble();
@@ -1223,8 +1195,7 @@ int main(int argc, char* argv[])
                 }
             }
 
-            qInfo("  Pick at %.1f ms (nearest: %.1f ms, idx %d)",
-                  pickTime_ms, timesVec(pickIdx) * 1000.0, pickIdx);
+            Log::info("  Pick at {:.1f} ms (nearest: {:.1f} ms, idx {})", pickTime_ms, timesVec(pickIdx) * 1000.0, pickIdx);
 
             // Write per-hemisphere w-like text files
             if (vertno.size() >= 2) {
@@ -1238,7 +1209,7 @@ int main(int argc, char* argv[])
                     QString pickFile = stcBase + QString("-pick%1-%2.w").arg(QString::number(pickTime_ms, 'f', 0)).arg(hemiName);
                     QFile pf(pickFile);
                     if (!pf.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                        qWarning() << "  WARNING: Could not write" << pickFile;
+                        Log::warning("  WARNING: Could not write {}", pickFile.toStdString());
                         continue;
                     }
                     QTextStream out(&pf);
@@ -1250,8 +1221,7 @@ int main(int argc, char* argv[])
                         out << vertno[h](v) << "\t" << stc.data(offset + v, pickIdx) << "\n";
                     }
                     pf.close();
-                    qInfo("    %s: %d vertices -> %s", hemiName.toUtf8().constData(),
-                          nVert, pickFile.toUtf8().constData());
+                    Log::info("    {}: {} vertices -> {}", hemiName.toStdString(), nVert, pickFile.toStdString());
                 }
             }
         }
@@ -1263,7 +1233,7 @@ int main(int argc, char* argv[])
 
     if (parser.isSet(predOpt)) {
         QString predFile = parser.value(predOpt);
-        qInfo("\nComputing predicted sensor data...");
+        Log::info("\nComputing predicted sensor data...");
 
         // Read forward solution for prediction
         MNEForwardSolution predFwd;
@@ -1272,21 +1242,21 @@ int main(int argc, char* argv[])
         } else if (useFwdAsData) {
             predFwd = MNEForwardSolution(parser.value(fwdOpt).toStdU16String(), {.surf_ori = true});
         } else {
-            qInfo("  NOTE: --pred requires a forward solution.");
-            qInfo("         Use --predfwd to specify one, or use --fwd mode.");
-            qInfo("         Skipping predicted data output.");
+            Log::info("  NOTE: --pred requires a forward solution.");
+            Log::info("         Use --predfwd to specify one, or use --fwd mode.");
+            Log::info("         Skipping predicted data output.");
             goto done;
         }
 
         if (predFwd.sol.data.rows() > 0) {
             writePredictedData(predFile, predFwd, stc.data, timesVec);
         } else {
-            qInfo("  WARNING: Forward solution has no gain matrix.");
+            Log::info("  WARNING: Forward solution has no gain matrix.");
         }
     }
 
 done:
-    qInfo("\nDone.");
+    Log::info("\nDone.");
 
     return 0;
 }

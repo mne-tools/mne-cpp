@@ -18,7 +18,6 @@
 #include <fs/fs_surface.h>
 #include <fs/fs_label.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +29,6 @@
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,7 +57,7 @@ static bool writeLabel(const QString& filename, const QString& comment,
 {
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qCritical("Cannot write label file: %s", qPrintable(filename));
+        Log::critical("Cannot write label file: {}", filename.toStdString());
         return false;
     }
     QTextStream out(&file);
@@ -84,30 +82,26 @@ static bool processHemisphere(const QString& subjectsDir, const QString& subject
     QString surfPath = QString("%1/%2/surf/%3.%4").arg(subjectsDir, subject, hemi, surfName);
     FsSurface surface;
     if (!FsSurface::read(surfPath.toStdU16String(), surface)) {
-        qCritical("Cannot read surface: %s", qPrintable(surfPath));
+        Log::critical("Cannot read surface: {}", surfPath.toStdString());
         return false;
     }
-    qInfo("Read surface: %s (%lld vertices)",
-          qPrintable(surfPath),
-          static_cast<long long>(surface.rr().rows()));
+    Log::info("Read surface: {} ({} vertices)", surfPath.toStdString(), static_cast<long long>(surface.rr().rows()));
 
     // Read annotation
     QString annotPath = QString("%1/%2/label/%3.%4.annot").arg(subjectsDir, subject, hemi, annotName);
     FsAnnotation annot;
     if (!FsAnnotation::read(annotPath.toStdU16String(), annot)) {
-        qCritical("Cannot read annotation: %s", qPrintable(annotPath));
+        Log::critical("Cannot read annotation: {}", annotPath.toStdString());
         return false;
     }
-    qInfo("Read annotation: %s", qPrintable(annotPath));
+    Log::info("Read annotation: {}", annotPath.toStdString());
 
     // Convert to labels using the library method
     std::vector<FsLabel> labels;
     std::vector<Eigen::RowVector4i> labelRgbas;
     annot.toLabels(surface, labels, labelRgbas);
 
-    qInfo("Found %lld labels in %s hemisphere",
-          static_cast<long long>(labels.size()),
-          qPrintable(hemi));
+    Log::info("Found {} labels in {} hemisphere", static_cast<long long>(labels.size()), hemi.toStdString());
 
     // Write each label to a file
     int written = 0;
@@ -138,7 +132,7 @@ static bool processHemisphere(const QString& subjectsDir, const QString& subject
         }
     }
 
-    qInfo("Wrote %d label files for %s hemisphere", written, qPrintable(hemi));
+    Log::info("Wrote {} label files for {} hemisphere", written, hemi.toStdString());
     return true;
 }
 
@@ -146,7 +140,6 @@ static bool processHemisphere(const QString& subjectsDir, const QString& subject
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_annot2labels");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -184,11 +177,11 @@ int main(int argc, char* argv[])
     QString surfName = parser.value(surfOpt);
 
     if (subject.isEmpty()) {
-        qCritical("--subject is required.");
+        Log::critical("--subject is required.");
         return 1;
     }
     if (subjectsDir.isEmpty()) {
-        qCritical("--subjects_dir or $SUBJECTS_DIR is required.");
+        Log::critical("--subjects_dir or $SUBJECTS_DIR is required.");
         return 1;
     }
 

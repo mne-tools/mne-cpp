@@ -18,7 +18,6 @@
 #include <mne/mne_source_spaces.h>
 #include <fiff/fiff_stream.h>
 #include <base/log.h>
-#include <base/log_qt.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -28,7 +27,6 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -53,7 +51,6 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-    mne::install_qt_message_handler();
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("mne_make_uniform_stc");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
@@ -75,21 +72,21 @@ int main(int argc, char* argv[])
     parser.process(app);
 
     if (!parser.isSet(srcOpt) || !parser.isSet(outOpt)) {
-        qCritical() << "Both --src and --out are required.";
+        Log::critical("Both --src and --out are required.");
         parser.showHelp(1);
     }
 
     bool ok;
     double uniformVal = parser.value(valOpt).toDouble(&ok);
     if (!ok) {
-        qCritical() << "Invalid --val value:" << parser.value(valOpt);
+        Log::critical("Invalid --val value: {}", parser.value(valOpt).toStdString());
         return 1;
     }
 
     //--- Read source space ---
     auto read = MNESourceSpaces::read(parser.value(srcOpt).toStdU16String());
     if (!read) {
-        qCritical() << read.error().what();
+        Log::critical("{}", read.error().what());
         return 1;
     }
     const MNESourceSpaces& srcSpaces = *read;
@@ -101,7 +98,7 @@ int main(int argc, char* argv[])
         totalVerts += v.size();
 
     if (totalVerts == 0) {
-        qCritical() << "No in-use vertices found in source space.";
+        Log::critical("No in-use vertices found in source space.");
         return 1;
     }
 
@@ -122,11 +119,10 @@ int main(int argc, char* argv[])
 
     //--- Write output ---
     if (!stc.write(parser.value(outOpt).toStdU16String())) {
-        qCritical() << "Failed to write output STC.";
+        Log::critical("Failed to write output STC.");
         return 1;
     }
 
-    qInfo() << "Created uniform STC with" << totalVerts << "vertices, value ="
-            << uniformVal << "->" << parser.value(outOpt);
+    Log::info("Created uniform STC with {} vertices, value = {} -> {}", totalVerts, uniformVal, parser.value(outOpt).toStdString());
     return 0;
 }

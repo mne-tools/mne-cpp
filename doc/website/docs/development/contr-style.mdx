@@ -161,20 +161,20 @@ If you use QtCreator as your IDE, you can install these templates as wizards:
 
 ## Command Line Outputs
 
-Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations that do not lead to a termination of the application. `qCritical()` should only be used if an error was caught that will lead to the application being terminated. For example:
+Libraries, applications, tools, examples and tests all log through `mne::Log` (`base/log.h`), which formats its arguments like `std::format`; Qt's `qDebug()` / `qInfo()` / `qWarning()` / `qCritical()` are not used outside the display libraries. Every output should start with `[<ClassName::FunctionName>]`. Please make use of `Log::debug()` during development and `Log::info()` for general user information. `Log::warning()` should be used to alert about unusual situations that do not lead to a termination of the application. `Log::critical()` should only be used if an error was caught that will lead to the application being terminated. Pass a `QString` as `toStdString()`. For example:
 
 ```cpp
 void FileLoader::loadTxtFile(const QString& sPath)
 {
-    qInfo() << "[FileLoader::loadTxtFile] Working on file" << sPath;
+    mne::Log::info("[FileLoader::loadTxtFile] Working on file {}", sPath.toStdString());
 
     if (!sPath.contains(".txt")) {
-        qWarning() << "[FileLoader::loadTxtFile] The file does not end with .txt.";
+        mne::Log::warning("[FileLoader::loadTxtFile] The file does not end with .txt.");
     }
 
     QFile file(sPath);
     if (!file.open(QIODevice::ReadOnly)) {
-        qCritical() << "[FileLoader::loadTxtFile] Unable to open file.";
+        mne::Log::critical("[FileLoader::loadTxtFile] Unable to open file.");
         return;
     }
     // ...
