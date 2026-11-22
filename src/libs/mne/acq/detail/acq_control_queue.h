@@ -31,6 +31,11 @@
 // DEFINE NAMESPACE mne::detail
 //=============================================================================================================
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4324) // padding from cache-line alignment is intended
+#endif
+
 namespace mne::detail
 {
 
@@ -135,5 +140,9 @@ private:
 };
 
 } // namespace mne::detail
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif // ACQ_CONTROL_QUEUE_H
