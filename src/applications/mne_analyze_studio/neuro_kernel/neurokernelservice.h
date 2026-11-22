@@ -13,19 +13,17 @@
 #ifndef MNE_ANALYZE_STUDIO_NEUROKERNELSERVICE_H
 #define MNE_ANALYZE_STUDIO_NEUROKERNELSERVICE_H
 
+#include <backendchannel.h>
 #include <mcprouter.h>
 
 #include <QJsonArray>
-#include <QLocalServer>
 #include <QObject>
-
-class QLocalSocket;
 
 namespace MNEANALYZESTUDIO
 {
 
 /**
- * @brief Local socket service that exposes Neuro-Kernel analysis tools over JSON-RPC.
+ * @brief Loopback service that exposes Neuro-Kernel analysis tools over JSON-RPC.
  */
 class NeuroKernelService : public QObject
 {
@@ -41,7 +39,7 @@ private:
     QJsonObject handleToolsList() const;
     QJsonArray toolDefinitions() const;
 
-    QLocalServer m_server;
+    BackendServer m_server;
     McpRouter m_router;
 };
 

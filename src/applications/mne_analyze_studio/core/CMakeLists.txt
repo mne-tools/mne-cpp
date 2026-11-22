@@ -11,14 +11,16 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Network)
+set(QT_REQUIRED_COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
+    backendchannel.cpp
     capabilitycatalog.cpp
     capabilityutils.cpp
     fiffbuffer.cpp
+    httprequest.cpp
     interfaces.cpp
     jsonrpcmessage.cpp
     llmtoolplanner.cpp
@@ -33,9 +35,11 @@ set(SOURCES
 )
 
 set(HEADERS
+    backendchannel.h
     capabilitycatalog.h
     capabilityutils.h
     fiffbuffer.h
+    httprequest.h
     ibuffer.h
     iskilloperator.h
     jsonrpcmessage.h
@@ -72,6 +76,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     mne_fiff
     mne_base
     mne_bids
+    mne_com
     mne_fs
     Eigen3::Eigen
 )

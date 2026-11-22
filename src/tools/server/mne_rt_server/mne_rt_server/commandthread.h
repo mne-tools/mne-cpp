@@ -16,12 +16,23 @@
 #define COMMANDTHREAD_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <com/tcp_socket.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QThread>
 #include <QMutex>
-#include <QTcpSocket>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <atomic>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -35,7 +46,7 @@ class CommandThread : public QThread
     Q_OBJECT
 
 public:
-    CommandThread(int socketDescriptor, qint32 p_iId, QObject* parent);
+    CommandThread(mne::TcpSocket socket, qint32 p_iId, QObject* parent);
 
     ~CommandThread();
 
@@ -44,14 +55,12 @@ public:
     void run();
 
 signals:
-    void error(QTcpSocket::SocketError socketError);
-
     void newCommand(QString p_sCommand, qint32 p_iThreadID);
 
 private:
-    int socketDescriptor;
+    mne::TcpSocket m_socket;
 
-    bool m_bIsRunning;
+    std::atomic<bool> m_bIsRunning;
     qint32 m_iThreadID;
 
     QMutex m_qMutex;

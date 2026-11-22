@@ -19,7 +19,6 @@
 
 class QLabel;
 class QLineEdit;
-class QNetworkAccessManager;
 class QPushButton;
 class QTextEdit;
 class QTextBrowser;
@@ -87,7 +86,6 @@ private:
     QString m_testPrompt;
     QJsonArray m_testToolDefinitions;
     QJsonObject m_testContext;
-    QNetworkAccessManager* m_networkAccessManager;
 };
 
 } // namespace MNEANALYZESTUDIO

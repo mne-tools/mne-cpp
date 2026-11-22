@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Test Widgets Network)
+set(QT_REQUIRED_COMPONENTS Core Gui Test Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -59,6 +59,7 @@ set(MNE_LIBS_REQUIRED
     mne_analyze_studio_core
     mne_fiff
     mne_base
+    mne_com
     mne_math
 )
 

@@ -215,7 +215,7 @@ int main()
     options.timeout = std::chrono::seconds(5); // killed if it takes longer
     const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
     Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
-    Log::info("{} network interface(s) with a hardware address", hardware_addresses().size()); // QNetworkInterface
+    Log::info("{} network interface(s) with a hardware address", hardware_addresses().size());
     //! [process_usage]
     ok &= expect(!host_name().empty() && !os_pretty_name().empty() && (python.started || !python.error.empty()),
                  "run_process ran a program and the host was described");

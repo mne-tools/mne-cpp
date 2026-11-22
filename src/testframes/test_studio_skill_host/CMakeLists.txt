@@ -11,8 +11,8 @@ if(WITH_CODE_COV)
     add_compile_options("--coverage" "-O1" "-g")
 endif()
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network Test)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Test)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Test)
 
 mne_add_test(${PROJECT_NAME}
     LABELS integration
@@ -44,7 +44,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Test
     mne_analyze_studio_core
     mne_analyze_studio_temporal_filter_skill

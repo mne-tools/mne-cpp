@@ -31,12 +31,16 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
 #include <iostream>
+#include <memory>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -49,9 +53,10 @@ using namespace RTSERVER;
 //=============================================================================================================
 
 CommandServer::CommandServer(QObject* parent)
-: QTcpServer(parent)
+: QObject(parent)
 , m_iThreadCount(0)
 , m_iCurrentCommandThreadID(0)
+, m_iPort(0)
 {
     QObject::connect(&m_commandParser, &CommandParser::response, this, &CommandServer::prepareReply);
 }
@@ -60,7 +65,51 @@ CommandServer::CommandServer(QObject* parent)
 
 CommandServer::~CommandServer()
 {
+    m_listener.request_stop();
+    if (m_listener.joinable()) {
+        m_listener.join();
+    }
     emit closeCommandThreads();
+}
+
+//=============================================================================================================
+
+bool CommandServer::listen(std::uint16_t port, QString& error)
+{
+    auto server = mne::TcpServer::listen("0.0.0.0", port);
+    if (!server) {
+        error = QString::fromStdString(server.error().message());
+        return false;
+    }
+    m_iPort = server->port();
+    m_listener = std::jthread([server = std::move(*server), receiver = QPointer<CommandServer>(this)](const std::stop_token& stop) mutable {
+        while (!stop.stop_requested()) {
+            auto client = server.accept(std::chrono::milliseconds(100));
+            if (!client) {
+                if (client.error() != std::errc::timed_out) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+                continue;
+            }
+            auto socket = std::make_shared<mne::TcpSocket>(std::move(*client));
+            QMetaObject::invokeMethod(
+                receiver,
+                [receiver, socket]() {
+                    if (receiver) {
+                        receiver->incomingConnection(std::move(*socket));
+                    }
+                },
+                Qt::QueuedConnection);
+        }
+    });
+    return true;
+}
+
+//=============================================================================================================
+
+std::uint16_t CommandServer::serverPort() const
+{
+    return m_iPort;
 }
 
 //=============================================================================================================
@@ -84,9 +133,9 @@ void CommandServer::incommingCommand(QString p_sCommand, qint32 p_iThreadID)
 
 //=============================================================================================================
 
-void CommandServer::incomingConnection(qintptr socketDescriptor)
+void CommandServer::incomingConnection(mne::TcpSocket socket)
 {
-    CommandThread* t_pCommandThread = new CommandThread(socketDescriptor, m_iThreadCount, this);
+    CommandThread* t_pCommandThread = new CommandThread(std::move(socket), m_iThreadCount, this);
     ++m_iThreadCount;
 
     //when thread has finished it gets deleted

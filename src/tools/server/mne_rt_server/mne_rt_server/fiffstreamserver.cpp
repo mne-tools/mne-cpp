@@ -25,6 +25,20 @@
 #include <stdlib.h>
 
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QPointer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <memory>
+#include <utility>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -36,8 +50,9 @@ using namespace mne;
 //=============================================================================================================
 
 FiffStreamServer::FiffStreamServer(QObject* parent)
-: QTcpServer(parent)
+: QObject(parent)
 , m_iNextClientId(0)
+, m_iPort(0)
 {
 }
 
@@ -45,7 +60,51 @@ FiffStreamServer::FiffStreamServer(QObject* parent)
 
 FiffStreamServer::~FiffStreamServer()
 {
+    m_listener.request_stop();
+    if (m_listener.joinable()) {
+        m_listener.join();
+    }
     emit closeFiffStreamServer();
+}
+
+//=============================================================================================================
+
+bool FiffStreamServer::listen(std::uint16_t port, QString& error)
+{
+    auto server = mne::TcpServer::listen("0.0.0.0", port);
+    if (!server) {
+        error = QString::fromStdString(server.error().message());
+        return false;
+    }
+    m_iPort = server->port();
+    m_listener = std::jthread([server = std::move(*server), receiver = QPointer<FiffStreamServer>(this)](const std::stop_token& stop) mutable {
+        while (!stop.stop_requested()) {
+            auto client = server.accept(std::chrono::milliseconds(100));
+            if (!client) {
+                if (client.error() != std::errc::timed_out) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+                continue;
+            }
+            auto socket = std::make_shared<mne::TcpSocket>(std::move(*client));
+            QMetaObject::invokeMethod(
+                receiver,
+                [receiver, socket]() {
+                    if (receiver) {
+                        receiver->incomingConnection(std::move(*socket));
+                    }
+                },
+                Qt::QueuedConnection);
+        }
+    });
+    return true;
+}
+
+//=============================================================================================================
+
+std::uint16_t FiffStreamServer::serverPort() const
+{
+    return m_iPort;
 }
 
 //=============================================================================================================
@@ -323,9 +382,9 @@ void FiffStreamServer::forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRa
 
 //=============================================================================================================
 
-void FiffStreamServer::incomingConnection(qintptr socketDescriptor)
+void FiffStreamServer::incomingConnection(mne::TcpSocket socket)
 {
-    FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, socketDescriptor, this);
+    FiffStreamThread* t_pStreamThread = new FiffStreamThread(m_iNextClientId, std::move(socket), this);
 
     m_qClientList.insert(m_iNextClientId, t_pStreamThread);
     ++m_iNextClientId;

@@ -24,6 +24,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <com/tcp_server.h>
 #include <core/llmtoolplanner.h>
 #include <core/jsonrpcmessage.h>
 #include <core/fiffbuffer.h>
@@ -56,8 +57,6 @@
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QToolButton>
-#include <QTcpServer>
-#include <QTcpSocket>
 #include <QTreeWidget>
 
 //=============================================================================================================
@@ -65,43 +64,77 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <mutex>
+#include <span>
+#include <thread>
 
 namespace
 {
 
-/** Answers one HTTP request with a fixed status and body, and keeps the request it received. */
-class FakeLlmEndpoint : public QTcpServer
+/** Answers HTTP requests with a fixed status and body, and keeps the last request it received. */
+class FakeLlmEndpoint
 {
 public:
-    FakeLlmEndpoint(int status, QByteArray body)
-    : m_status(status)
-    , m_body(std::move(body))
+    FakeLlmEndpoint(int status, const QByteArray& body)
     {
-        connect(this, &QTcpServer::newConnection, this, [this]() {
-            QTcpSocket* socket = nextPendingConnection();
-            connect(socket, &QTcpSocket::readyRead, socket, [this, socket]() {
-                m_request += socket->readAll();
-                const int headerEnd = m_request.indexOf("\r\n\r\n");
-                if (headerEnd < 0)
-                    return;
-                const QByteArray length = header("content-length");
-                if (m_request.size() - headerEnd - 4 < length.toInt())
-                    return;
-                socket->write("HTTP/1.1 " + QByteArray::number(m_status) + " X\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(m_body.size()) + "\r\nConnection: close\r\n\r\n" + m_body);
-                socket->disconnectFromHost();
-            });
+        auto server = mne::TcpServer::listen("127.0.0.1", 0);
+        if (!server)
+            return;
+        m_port = server->port();
+        const QByteArray response = "HTTP/1.1 " + QByteArray::number(status) + " X\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+        m_thread = std::jthread([this, server = std::move(*server), response](const std::stop_token& stop) mutable {
+            while (!stop.stop_requested()) {
+                auto socket = server.accept(std::chrono::milliseconds(100));
+                if (!socket)
+                    continue;
+                QByteArray request;
+                std::array<std::byte, 4096> chunk{};
+                while (!stop.stop_requested() && !isComplete(request)) {
+                    const auto read = socket->read_some(chunk, std::chrono::milliseconds(100));
+                    if (read)
+                        request.append(reinterpret_cast<const char*>(chunk.data()), static_cast<qsizetype>(*read));
+                    else if (read.error() != std::errc::timed_out)
+                        break;
+                }
+                {
+                    const std::lock_guard lock(m_mutex);
+                    m_request = request;
+                }
+                // The client sees a short answer as a failed request; the test checks what it received.
+                [[maybe_unused]] const std::error_code written = socket->write(std::as_bytes(std::span(response.constData(), static_cast<std::size_t>(response.size()))));
+            }
         });
-        listen(QHostAddress::LocalHost);
+    }
+
+    bool isListening() const
+    {
+        return m_port != 0;
     }
 
     QString url() const
     {
-        return QString("http://127.0.0.1:%1/v1").arg(serverPort());
+        return QString("http://127.0.0.1:%1/v1").arg(m_port);
     }
 
     QByteArray header(const QByteArray& name) const
     {
-        for (const QByteArray& line : m_request.left(m_request.indexOf("\r\n\r\n")).split('\n')) {
+        return headerOf(request(), name);
+    }
+
+    QJsonObject payload() const
+    {
+        const QByteArray received = request();
+        return QJsonDocument::fromJson(received.mid(received.indexOf("\r\n\r\n") + 4)).object();
+    }
+
+private:
+    static QByteArray headerOf(const QByteArray& request, const QByteArray& name)
+    {
+        for (const QByteArray& line : request.left(request.indexOf("\r\n\r\n")).split('\n')) {
             const int colon = line.indexOf(':');
             if (colon > 0 && line.left(colon).trimmed().toLower() == name)
                 return line.mid(colon + 1).trimmed();
@@ -109,15 +142,22 @@ public:
         return {};
     }
 
-    QJsonObject payload() const
+    static bool isComplete(const QByteArray& request)
     {
-        return QJsonDocument::fromJson(m_request.mid(m_request.indexOf("\r\n\r\n") + 4)).object();
+        const qsizetype headerEnd = request.indexOf("\r\n\r\n");
+        return headerEnd >= 0 && request.size() - headerEnd - 4 >= headerOf(request, "content-length").toInt();
     }
 
-private:
-    int m_status;
-    QByteArray m_body;
+    QByteArray request() const
+    {
+        const std::lock_guard lock(m_mutex);
+        return m_request;
+    }
+
+    std::uint16_t m_port = 0;
+    mutable std::mutex m_mutex;
     QByteArray m_request;
+    std::jthread m_thread; // declared last so it stops before the members it uses go
 };
 
 } // namespace

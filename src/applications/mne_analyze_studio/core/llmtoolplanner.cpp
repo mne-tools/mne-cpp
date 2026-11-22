@@ -13,15 +13,11 @@
  */
 
 #include "llmtoolplanner.h"
+#include "httprequest.h"
 
 #include <QCoreApplication>
-#include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonParseError>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QUrl>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -180,7 +176,6 @@ QString formatToolContracts(const QJsonArray& toolDefinitions)
 
 LlmToolPlanner::LlmToolPlanner(QObject* parent)
 : QObject(parent)
-, m_networkAccessManager(new QNetworkAccessManager(this))
 {
 }
 
@@ -377,28 +372,24 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
             {"messages", QJsonArray{QJsonObject{{"role", "system"}, {"content", systemPrompt}}, QJsonObject{{"role", "user"}, {"content", QString::fromUtf8(QJsonDocument(userPayload).toJson(QJsonDocument::Compact))}}}}};
     }
 
-    QNetworkRequest request{QUrl(endpoint())};
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QList<QPair<QByteArray, QByteArray>> headers{{"Content-Type", "application/json"}};
     if (isAnthropicMessagesMode()) {
-        request.setRawHeader("x-api-key", apiKey().toUtf8());
-        request.setRawHeader("anthropic-version", "2023-06-01");
+        headers.emplaceBack("x-api-key", apiKey().toUtf8());
+        headers.emplaceBack("anthropic-version", "2023-06-01");
     } else if (!apiKey().isEmpty()) {
-        request.setRawHeader("Authorization", QString("Bearer %1").arg(apiKey()).toUtf8());
+        headers.emplaceBack("Authorization", QString("Bearer %1").arg(apiKey()).toUtf8());
     }
     if (isGitHubModelsMode()) {
-        request.setRawHeader("Accept", "application/vnd.github+json");
-        request.setRawHeader("X-GitHub-Api-Version", "2022-11-28");
+        headers.emplaceBack("Accept", "application/vnd.github+json");
+        headers.emplaceBack("X-GitHub-Api-Version", "2022-11-28");
     }
 
-    QNetworkReply* reply = m_networkAccessManager->post(request, QJsonDocument(payload).toJson(QJsonDocument::Compact));
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
+    const HttpResponse reply = sendHttpRequest(endpoint(), headers, QJsonDocument(payload).toJson(QJsonDocument::Compact));
 
-    const QByteArray responseBytes = reply->readAll();
+    const QByteArray& responseBytes = reply.body;
     result.rawResponse = QString::fromUtf8(responseBytes);
     result.usedModel = true;
-    result.httpStatusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    result.httpStatusCode = reply.statusCode;
 
     QJsonParseError responseError;
     const QJsonDocument responseDocument = QJsonDocument::fromJson(responseBytes, &responseError);
@@ -406,16 +397,13 @@ LlmPlanResult LlmToolPlanner::plan(const QString& userCommand,
         ? responseDocument.object()
         : QJsonObject();
 
-    if (reply->error() != QNetworkReply::NoError) {
+    if (!reply.errorString.isEmpty()) {
         result.errorMessage = extractApiErrorMessage(responseObject, &result.providerErrorType);
         if (result.errorMessage.isEmpty()) {
-            result.errorMessage = reply->errorString();
+            result.errorMessage = reply.errorString;
         }
-        reply->deleteLater();
         return result;
     }
-
-    reply->deleteLater();
 
     if (responseError.error != QJsonParseError::NoError || !responseDocument.isObject()) {
         result.errorMessage = responseError.errorString();

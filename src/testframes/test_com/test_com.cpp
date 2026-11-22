@@ -44,6 +44,7 @@
 #include <string>
 #include <system_error>
 #include <thread>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -124,6 +125,7 @@ private slots:
     void tcpReportsAHalfAnswerAndAClosedPeer();
     void tcpConnectFails();
     void tcpServerAcceptsAndReadsWhatArrived();
+    void tcpWriteTimesOutWhenThePeerDoesNotRead();
     void udpReceivesDatagrams();
     void udpSharesAMulticastGroup();
     void udpBindFails();
@@ -256,6 +258,34 @@ void TestCom::tcpServerAcceptsAndReadsWhatArrived()
     client->close();
     QVERIFY(!client->is_open());
     QVERIFY(peer->read_some(buffer, 1s).error() == std::errc::connection_reset);
+}
+
+//=============================================================================================================
+
+void TestCom::tcpWriteTimesOutWhenThePeerDoesNotRead()
+{
+    auto server = TcpServer::listen("127.0.0.1", 0);
+    QVERIFY(server);
+    auto client = TcpSocket::connect("127.0.0.1", server->port(), 1s);
+    QVERIFY(client);
+    auto peer = server->accept(1s);
+    QVERIFY(peer);
+
+    // More than the socket buffers of both ends hold; the peer never reads
+    const std::vector<std::byte> data(std::size_t{64} << 20);
+    const auto start = std::chrono::steady_clock::now();
+    QVERIFY(client->write(data, 200ms) == std::errc::timed_out);
+    const auto took = std::chrono::steady_clock::now() - start;
+    QVERIFY2(took >= 150ms && took < 5s, qPrintable(QString::number(std::chrono::duration_cast<std::chrono::milliseconds>(took).count())));
+
+    // What fits is still sent at once
+    std::array<std::byte, 4> small{};
+    auto reader = TcpSocket::connect("127.0.0.1", server->port(), 1s);
+    QVERIFY(reader);
+    auto other = server->accept(1s);
+    QVERIFY(other);
+    QVERIFY(!reader->write(small, 0ms));
+    QVERIFY(!other->read(small, 1s));
 }
 
 //=============================================================================================================

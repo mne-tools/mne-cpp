@@ -22,12 +22,21 @@
 #include <rtserver_connector/command_parser.h>
 #include <rtserver_connector/command_manager.h>
 
+#include <com/tcp_server.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QStringList>
-#include <QTcpServer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <thread>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -42,11 +51,12 @@ namespace RTSERVER
 
 //=============================================================================================================
 /**
- * Command Server which manages command connections in seperate threads
+ * Command Server which manages command connections in seperate threads. A listener thread accepts the clients
+ * and hands every connection to the thread of the server, which starts a CommandThread for it.
  *
  * @brief CommandServer manages threaded command connections
  */
-class CommandServer : public QTcpServer
+class CommandServer : public QObject
 {
     Q_OBJECT
 
@@ -72,6 +82,25 @@ public:
      * @return the command parser.
      */
     inline RTSERVER::CommandParser& getCommandParser();
+
+    //=========================================================================================================
+    /**
+     * Starts listening for command clients on all interfaces.
+     *
+     * @param[in] port       Port to listen on.
+     * @param[out] error     Why the server does not listen, if it does not.
+     *
+     * @return Whether the server listens.
+     */
+    bool listen(std::uint16_t port, QString& error);
+
+    //=========================================================================================================
+    /**
+     * Returns the port the server listens on.
+     *
+     * @return the port, 0 if the server does not listen.
+     */
+    std::uint16_t serverPort() const;
 
     //=========================================================================================================
     /**
@@ -115,20 +144,24 @@ signals:
      */
     void closeCommandThreads();
 
-protected:
+private:
     //=========================================================================================================
     /**
-     * Slot which handels incomming connections.
+     * Starts a CommandThread for a new connection.
+     *
+     * @param[in] socket     The accepted connection.
      */
-    void incomingConnection(qintptr socketDescriptor);
+    void incomingConnection(mne::TcpSocket socket);
 
-private:
     qint32 m_iThreadCount; /**< Is incresed each time a new command client connects to mne_rt_server. */
 
     RTSERVER::CommandParser m_commandParser; /**< Command parser. */
 
     //    QMultiMap<QString, qint32> m_qMultiMapCommandThreadID;//This is need when commands are processed by different threads; currently its only one command per time processed by one thread --> m_iCurrentCommandThreadID
     qint32 m_iCurrentCommandThreadID; /**< Command Thread ID of the current command. */
+
+    std::uint16_t m_iPort;   /**< The port the server listens on, 0 if it does not. */
+    std::jthread m_listener; /**< Accepts the clients; declared last so it stops first. */
 };
 
 //=============================================================================================================

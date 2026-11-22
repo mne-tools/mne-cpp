@@ -73,6 +73,17 @@ public:
     std::error_code write(std::span<const std::byte> data);
 
     /**
+     * As write(), within a time limit, e.g. so a peer that stops reading cannot hold the caller.
+     *
+     * @param[in] data      Bytes to send, all of them.
+     * @param[in] timeout   Maximum wait for the peer to take all of them.
+     *
+     * @return timed_out if the peer did not take them in time (part of them may have been sent), or the system's
+     *         error if the connection fails.
+     */
+    std::error_code write(std::span<const std::byte> data, std::chrono::milliseconds timeout);
+
+    /**
      * Reads exactly @p buffer.size() bytes.
      *
      * @param[out] buffer    Destination.

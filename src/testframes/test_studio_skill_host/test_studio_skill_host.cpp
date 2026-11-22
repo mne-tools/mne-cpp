@@ -12,13 +12,15 @@
 
 #include <skillhostservice.h>
 
+#include <backendchannel.h>
 #include <jsonrpcmessage.h>
 
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QLocalSocket>
 #include <QUuid>
 #include <QtTest>
+
+#include <chrono>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -38,7 +40,8 @@ private:
     void sendRequest(const QString& method, const QJsonObject& params, QJsonObject& result);
 
     SkillHostService m_service;
-    QLocalSocket m_socket;
+    BackendConnection m_socket;
+    QList<QByteArray> m_lines;
     QString m_dummySessionId;
 };
 
@@ -46,8 +49,8 @@ void TestStudioSkillHost::initTestCase()
 {
     const QString socketName = QStringLiteral("mne-sh-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
     QVERIFY(m_service.start(socketName, QStringLiteral(MNE_STUDIO_EXTENSIONS_DIR)));
-    m_socket.connectToServer(socketName);
-    QVERIFY(m_socket.waitForConnected(5000));
+    connect(&m_socket, &BackendConnection::lineReceived, this, [this](const QByteArray& line) { m_lines.append(line); });
+    QVERIFY(m_socket.connectToService(socketName, std::chrono::milliseconds(5000)));
 }
 
 void TestStudioSkillHost::sendRequest(const QString& method,
@@ -55,26 +58,24 @@ void TestStudioSkillHost::sendRequest(const QString& method,
                                       QJsonObject& result)
 {
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("request"), method, params);
-    QVERIFY(m_socket.write(JsonRpcMessage::serialize(request)) > 0);
-    m_socket.flush();
-    QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
+    QVERIFY(m_socket.send(JsonRpcMessage::serialize(request)));
+    QTRY_VERIFY_WITH_TIMEOUT(!m_lines.isEmpty(), 5000);
 
     QJsonObject response;
     QString errorString;
-    QVERIFY2(JsonRpcMessage::deserialize(m_socket.readLine(), response, errorString),
+    QVERIFY2(JsonRpcMessage::deserialize(m_lines.takeFirst(), response, errorString),
              qPrintable(errorString));
     result = response.value(QStringLiteral("result")).toObject();
 }
 
 void TestStudioSkillHost::malformedRequest()
 {
-    QVERIFY(m_socket.write("{bad json\n") > 0);
-    m_socket.flush();
-    QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
+    QVERIFY(m_socket.send("{bad json\n"));
+    QTRY_VERIFY_WITH_TIMEOUT(!m_lines.isEmpty(), 5000);
 
     QJsonObject response;
     QString errorString;
-    QVERIFY(JsonRpcMessage::deserialize(m_socket.readLine(), response, errorString));
+    QVERIFY(JsonRpcMessage::deserialize(m_lines.takeFirst(), response, errorString));
     QCOMPARE(response.value(QStringLiteral("error")).toObject().value(QStringLiteral("code")).toInt(),
              -32700);
 }

@@ -13,8 +13,8 @@ if(WITH_CODE_COV)
   add_link_options("--coverage")
 endif()
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Test Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Test Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Test)
 
 set(SOURCES
     test_setup_forward_model.cpp
@@ -36,7 +36,6 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Test
-    Qt${QT_VERSION_MAJOR}::Network
     mne_mne
     mne_fiff
     mne_fs

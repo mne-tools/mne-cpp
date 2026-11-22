@@ -21,7 +21,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QFileInfo>
-#include <QLocalSocket>
 #include <QSet>
 #include <QStringList>
 #include <QUuid>
@@ -98,31 +97,24 @@ bool SkillHostService::start(const QString& socketName, const QString& extension
     m_extensionsDirectory = extensionsDirectory;
     reloadExtensions(extensionsDirectory, QStringList());
 
-    QLocalServer::removeServer(socketName);
     if (!m_server.listen(socketName)) {
         return false;
     }
 
-    connect(&m_server, &QLocalServer::newConnection, this, [this]() {
-        while (QLocalSocket* socket = m_server.nextPendingConnection()) {
-            connect(socket, &QLocalSocket::readyRead, socket, [this, socket]() {
-                while (socket->canReadLine()) {
-                    const QByteArray payload = socket->readLine();
-                    QJsonObject request;
-                    QString errorString;
-                    QJsonObject response;
+    connect(&m_server, &BackendServer::newConnection, this, [this](BackendConnection* connection) {
+        connect(connection, &BackendConnection::lineReceived, connection, [this, connection](const QByteArray& payload) {
+            QJsonObject request;
+            QString errorString;
+            QJsonObject response;
 
-                    if (JsonRpcMessage::deserialize(payload, request, errorString)) {
-                        response = m_router.route(request);
-                    } else {
-                        response = JsonRpcMessage::createError(QJsonValue(), -32700, errorString);
-                    }
+            if (JsonRpcMessage::deserialize(payload, request, errorString)) {
+                response = m_router.route(request);
+            } else {
+                response = JsonRpcMessage::createError(QJsonValue(), -32700, errorString);
+            }
 
-                    socket->write(JsonRpcMessage::serialize(response));
-                    socket->flush();
-                }
-            });
-        }
+            connection->send(JsonRpcMessage::serialize(response));
+        });
     });
 
     return true;

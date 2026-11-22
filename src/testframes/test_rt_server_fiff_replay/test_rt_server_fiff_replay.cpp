@@ -23,6 +23,8 @@
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
 #include <rtserver_connector/iconnector.h>
+#include <com/tcp_server.h>
+#include <com/tcp_socket.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -35,8 +37,7 @@
 #include <QLibrary>
 #include <QPluginLoader>
 #include <QProcess>
-#include <QTcpServer>
-#include <QTcpSocket>
+#include <QtEndian>
 #include <QtTest>
 
 //=============================================================================================================
@@ -49,8 +50,12 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <array>
 #include <chrono>
+#include <cstddef>
 #include <format>
+#include <optional>
+#include <span>
 #include <thread>
 
 //=============================================================================================================
@@ -73,8 +78,14 @@ QByteArray tagBytes(Write&& write)
     return QByteArray(reinterpret_cast<const char*>(written.data().data()), static_cast<qsizetype>(written.size()));
 }
 
-/** @return The reply of the server's command port to @p line, framed as mne_rt_server frames its commands. */
-QString send(QTcpSocket& socket, const QString& line)
+/** Writes all of @p block to @p socket. */
+bool writeAll(mne::TcpSocket& socket, const QByteArray& block)
+{
+    return !socket.write(std::as_bytes(std::span(block.constData(), static_cast<std::size_t>(block.size()))));
+}
+
+/** @return The bytes of @p line framed as mne_rt_server frames commands and replies: a quint16 size and the string. */
+QByteArray frame(const QString& line)
 {
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
@@ -82,19 +93,34 @@ QString send(QTcpSocket& socket, const QString& line)
     out << quint16(0) << line;
     out.device()->seek(0);
     out << quint16(block.size() - sizeof(quint16));
-    socket.write(block);
-    QString reply;
-    QDataStream in(&socket);
-    in.setVersion(QDataStream::Qt_6_0);
-    while (socket.waitForReadyRead(10000)) {
-        in.startTransaction();
-        quint16 size = 0;
-        in >> size >> reply;
-        if (in.commitTransaction()) {
-            break;
-        }
+    return block;
+}
+
+/** @return The string of the next frame on @p socket, or nothing if none arrives within @p timeout. */
+std::optional<QString> readFrame(mne::TcpSocket& socket, std::chrono::milliseconds timeout)
+{
+    std::array<std::byte, 2> size{};
+    if (socket.read(size, timeout)) {
+        return std::nullopt;
     }
-    return reply;
+    QByteArray block(qFromBigEndian<quint16>(size.data()), Qt::Uninitialized);
+    if (socket.read(std::as_writable_bytes(std::span(block.data(), static_cast<std::size_t>(block.size()))), timeout)) {
+        return std::nullopt;
+    }
+    QDataStream in(block);
+    in.setVersion(QDataStream::Qt_6_0);
+    QString line;
+    in >> line;
+    return line;
+}
+
+/** @return The reply of the server's command port to @p line, framed as mne_rt_server frames its commands. */
+QString send(mne::TcpSocket& socket, const QString& line)
+{
+    if (!writeAll(socket, frame(line))) {
+        return QString();
+    }
+    return readFrame(socket, std::chrono::milliseconds(10000)).value_or(QString());
 }
 
 /**
@@ -108,10 +134,15 @@ public:
     {
         m_info = tagBytes([&info](FiffStream& out) { info.writeToStream(out); });
         for (quint16 port = 40217; port < 40417 && m_port == 0; port += 2) {
-            if (m_commands.listen(QHostAddress::LocalHost, port) && m_data.listen(QHostAddress::LocalHost, port + 1)) {
+            auto commands = mne::TcpServer::listen("127.0.0.1", port);
+            if (!commands) {
+                continue;
+            }
+            auto data = mne::TcpServer::listen("127.0.0.1", static_cast<std::uint16_t>(port + 1));
+            if (data) {
+                m_commands = std::move(*commands);
+                m_data = std::move(*data);
                 m_port = port;
-            } else {
-                m_commands.close();
             }
         }
     }
@@ -124,54 +155,36 @@ public:
     /** Answers the client in this thread until it has the measurement info. */
     void serve()
     {
-        QVERIFY(m_commands.waitForNewConnection(5000) && m_data.waitForNewConnection(5000));
+        auto command_socket = m_commands.accept(std::chrono::milliseconds(5000));
+        QVERIFY(command_socket);
+        auto data_socket = m_data.accept(std::chrono::milliseconds(5000));
+        QVERIFY(data_socket);
         // Closing a socket with unread data (the alias) resets the connection, so both stay open until the end
-        m_command_socket.reset(m_commands.nextPendingConnection());
-        m_data_socket.reset(m_data.nextPendingConnection());
-        QTcpSocket* commands = m_command_socket.get();
-        QTcpSocket* data = m_data_socket.get();
+        m_command_socket = std::move(*command_socket);
+        m_data_socket = std::move(*data_socket);
         // The id request: a command tag of 20 bytes; then the alias tag
-        while (data->bytesAvailable() < 20 && data->waitForReadyRead(5000)) {
-        }
-        data->read(20);
-        data->write(tagBytes([](FiffStream& out) {
-            const fiff_int_t id = 1;
-            out.write_int(FIFF_MNE_RT_CLIENT_ID, &id);
-        }));
-        data->waitForBytesWritten(5000);
-        QDataStream in(commands);
-        in.setVersion(QDataStream::Qt_6_0);
-        while (commands->waitForReadyRead(5000)) {
-            in.startTransaction();
-            quint16 size = 0;
-            QString line;
-            in >> size >> line;
-            if (!in.commitTransaction()) {
-                continue;
+        std::array<std::byte, 20> request{};
+        QVERIFY(!m_data_socket.read(request, std::chrono::milliseconds(5000)));
+        QVERIFY(writeAll(m_data_socket, tagBytes([](FiffStream& out) {
+                             const fiff_int_t id = 1;
+                             out.write_int(FIFF_MNE_RT_CLIENT_ID, &id);
+                         })));
+        while (const std::optional<QString> line = readFrame(m_command_socket, std::chrono::milliseconds(5000))) {
+            if (*line == QStringLiteral("measinfo 1")) {
+                QVERIFY(writeAll(m_data_socket, m_info));
             }
-            if (line == QStringLiteral("measinfo 1")) {
-                data->write(m_info);
-                data->waitForBytesWritten(5000);
-            }
-            QByteArray block;
-            QDataStream reply(&block, QIODevice::WriteOnly);
-            reply.setVersion(QDataStream::Qt_6_0);
-            reply << quint16(0) << QStringLiteral("ok");
-            reply.device()->seek(0);
-            reply << quint16(block.size() - sizeof(quint16));
-            commands->write(block);
-            commands->waitForBytesWritten(5000);
-            if (line.startsWith(QStringLiteral("measinfo"))) {
+            QVERIFY(writeAll(m_command_socket, frame(QStringLiteral("ok"))));
+            if (line->startsWith(QStringLiteral("measinfo"))) {
                 break;
             }
         }
     }
 
 private:
-    QTcpServer m_commands;
-    QTcpServer m_data;
-    std::unique_ptr<QTcpSocket> m_command_socket;
-    std::unique_ptr<QTcpSocket> m_data_socket;
+    mne::TcpServer m_commands;
+    mne::TcpServer m_data;
+    mne::TcpSocket m_command_socket;
+    mne::TcpSocket m_data_socket;
     QByteArray m_info;
     quint16 m_port = 0;
 };
@@ -337,9 +350,9 @@ void TestRtServerFiffReplay::streamsTheFile()
     QVERIFY2(output.contains("fiff data port"), output.constData());
     QVERIFY2(output.contains("Fiff File Simulator"), output.constData());
 
-    QTcpSocket command;
-    command.connectToHost(QStringLiteral("127.0.0.1"), 4217);
-    QVERIFY(command.waitForConnected(5000));
+    auto connected = mne::TcpSocket::connect("127.0.0.1", 4217, std::chrono::milliseconds(5000));
+    QVERIFY(connected);
+    mne::TcpSocket& command = *connected;
     const QString help = send(command, QStringLiteral("help"));
     QVERIFY2(help.contains(QStringLiteral("simfile")),
              qPrintable(QStringLiteral("help reply: ") + help.left(400) + "\nserver: " + QString::fromUtf8(output + m_server.readAll())));
@@ -400,7 +413,7 @@ void TestRtServerFiffReplay::streamsTheFile()
     QVERIFY(!send(command, QStringLiteral("stop-all")).isEmpty());
     QVERIFY2(reply.elapsed() < 2000, qPrintable(QStringLiteral("stop-all took %1 ms").arg(reply.elapsed())));
     device->close();
-    command.disconnectFromHost();
+    command.close();
 }
 
 //=============================================================================================================

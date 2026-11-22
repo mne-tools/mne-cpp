@@ -22,8 +22,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtNetwork>
+#include <QDataStream>
 #include <QDebug>
+#include <QIODevice>
+#include <QtEndian>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <span>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -35,9 +47,9 @@ using namespace RTSERVER;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-CommandThread::CommandThread(int socketDescriptor, qint32 p_iId, QObject* parent)
+CommandThread::CommandThread(mne::TcpSocket socket, qint32 p_iId, QObject* parent)
 : QThread(parent)
-, socketDescriptor(socketDescriptor)
+, m_socket(std::move(socket))
 , m_bIsRunning(false)
 , m_iThreadID(p_iId)
 {
@@ -69,74 +81,70 @@ void CommandThread::run()
 {
     m_bIsRunning = true;
 
-    QTcpSocket t_qTcpSocket;
+    qInfo("CommandClient connection accepted (ID %d)\n", m_iThreadID);
 
-    if (!t_qTcpSocket.setSocketDescriptor(socketDescriptor)) {
-        emit error(t_qTcpSocket.error());
-        return;
-    } else {
-        qInfo("CommandClient connection accepted from\n\tIP:\t%s\n\tPort:\t%d\n",
-              QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
-              t_qTcpSocket.peerPort());
-    }
+    // Frames are a big-endian quint16 size followed by a QDataStream (Qt 6.0) serialized QString
+    QByteArray t_received;
+    std::array<std::byte, 4096> t_chunk{};
 
-    QDataStream t_FiffStreamIn(&t_qTcpSocket);
-    t_FiffStreamIn.setVersion(QDataStream::Qt_6_0);
-
-    while (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning) {
+    while (m_socket.is_open() && m_bIsRunning) {
         //
         // Write available data
         //
-        if (m_qSendData.size() > 0) {
+        QString t_sReply;
+        m_qMutex.lock();
+        t_sReply.swap(m_qSendData);
+        m_qMutex.unlock();
+        if (t_sReply.size() > 0) {
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
             out.setVersion(QDataStream::Qt_6_0);
             out << static_cast<quint16>(0);
-            m_qMutex.lock();
-            out << m_qSendData;
-            m_qSendData.clear();
-            m_qMutex.unlock();
+            out << t_sReply;
             out.device()->seek(0);
             out << static_cast<quint16>(block.size() - sizeof(quint16));
 
-            t_qTcpSocket.write(block);
-            t_qTcpSocket.waitForBytesWritten();
+            if (m_socket.write(std::as_bytes(std::span(block.constData(), static_cast<std::size_t>(block.size()))))) {
+                break;
+            }
         }
 
         //
-        // Read: Wait 100ms for incomming tag header, read and continue
+        // Read: Wait 100ms for incomming data, parse complete frames and continue
         //
+        const auto t_read = m_socket.read_some(t_chunk, std::chrono::milliseconds(100));
+        if (t_read) {
+            t_received.append(reinterpret_cast<const char*>(t_chunk.data()), static_cast<qsizetype>(*t_read));
+        } else if (t_read.error() != std::errc::timed_out) {
+            break;
+        }
 
-        t_qTcpSocket.waitForReadyRead(100);
-
-        if (t_qTcpSocket.bytesAvailable() >= static_cast<int>(sizeof(quint16))) {
-            quint16 blockSize = 0;
-
-            bool respComplete = false;
-            t_FiffStreamIn >> blockSize;
-
-            while (!respComplete && blockSize < 65000) //Sanity Check -> allowed maximal blocksize is 65.000
-            {
-                if (t_qTcpSocket.bytesAvailable() >= blockSize) {
-                    QString t_sCommand;
-
-                    t_FiffStreamIn >> t_sCommand;
-
-                    t_sCommand = t_sCommand.simplified();
-
-                    //
-                    // Parse command
-                    //
-                    if (!t_sCommand.isEmpty())
-                        emit newCommand(t_sCommand, m_iThreadID);
-
-                    respComplete = true;
-                }
+        while (t_received.size() >= static_cast<qsizetype>(sizeof(quint16))) {
+            const quint16 blockSize = qFromBigEndian<quint16>(t_received.constData());
+            if (blockSize >= 65000) { //Sanity Check -> allowed maximal blocksize is 65.000
+                t_received.clear();
+                break;
             }
+            if (t_received.size() < static_cast<qsizetype>(sizeof(quint16)) + blockSize) {
+                break;
+            }
+            QByteArray t_block = t_received.mid(sizeof(quint16), blockSize);
+            t_received.remove(0, static_cast<qsizetype>(sizeof(quint16)) + blockSize);
+
+            QDataStream t_in(t_block);
+            t_in.setVersion(QDataStream::Qt_6_0);
+            QString t_sCommand;
+            t_in >> t_sCommand;
+
+            t_sCommand = t_sCommand.simplified();
+
+            //
+            // Parse command
+            //
+            if (!t_sCommand.isEmpty())
+                emit newCommand(t_sCommand, m_iThreadID);
         }
     }
 
-    t_qTcpSocket.disconnectFromHost();
-    if (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
-        t_qTcpSocket.waitForDisconnected();
+    m_socket.close();
 }

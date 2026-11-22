@@ -22,6 +22,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
+#include <span>
 #include <string>
 #include <utility>
 
@@ -31,6 +33,23 @@
 
 using namespace mne;
 using namespace mne::detail;
+
+namespace
+{
+
+/** @return The number of bytes of @p data the system took, or a negative number with the reason in last_error(). */
+auto send_some(Native s, std::span<const std::byte> data) noexcept
+{
+#ifdef _WIN32
+    return ::send(s, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
+#elif defined(MSG_NOSIGNAL)
+    return ::send(s, data.data(), data.size(), MSG_NOSIGNAL);
+#else
+    return ::send(s, data.data(), data.size(), 0); // SO_NOSIGPIPE is set
+#endif
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -128,19 +147,44 @@ std::error_code TcpSocket::write(std::span<const std::byte> data)
 {
     const auto s = static_cast<Native>(m_socket);
     while (!data.empty()) {
-#ifdef _WIN32
-        const int sent = ::send(s, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
-#elif defined(MSG_NOSIGNAL)
-        const auto sent = ::send(s, data.data(), data.size(), MSG_NOSIGNAL);
-#else
-        const auto sent = ::send(s, data.data(), data.size(), 0); // SO_NOSIGPIPE is set
-#endif
+        const auto sent = send_some(s, data);
         if (sent < 0) {
             const std::error_code error = last_error();
             if (would_block(error) && wait_for(s, POLLOUT, std::chrono::milliseconds(1000)) > 0) {
                 continue;
             }
             return error;
+        }
+        data = data.subspan(static_cast<std::size_t>(sent));
+    }
+    return {};
+}
+
+//=============================================================================================================
+
+std::error_code TcpSocket::write(std::span<const std::byte> data, std::chrono::milliseconds timeout)
+{
+    const auto s = static_cast<Native>(m_socket);
+    const auto deadline = std::chrono::steady_clock::now() + timeout;
+    while (!data.empty()) {
+        const auto sent = send_some(s, data);
+        if (sent < 0) {
+            const std::error_code error = last_error();
+            if (!would_block(error)) {
+                return error;
+            }
+            const auto left = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now());
+            if (left <= std::chrono::milliseconds::zero()) {
+                return std::make_error_code(std::errc::timed_out);
+            }
+            const int ready = wait_for(s, POLLOUT, left);
+            if (ready == 0) {
+                return std::make_error_code(std::errc::timed_out);
+            }
+            if (ready < 0) {
+                return last_error();
+            }
+            continue;
         }
         data = data.subspan(static_cast<std::size_t>(sent));
     }

@@ -59,7 +59,6 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
-#include <QLocalSocket>
 #include <QInputDialog>
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -94,6 +93,8 @@
 #include <QRegularExpression>
 #include <QSignalBlocker>
 #include <QStringList>
+
+#include <chrono>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -1344,8 +1345,8 @@ MainWindow::MainWindow(QWidget* parent)
 , m_terminalInput(new QLineEdit)
 , m_terminalRunButton(new QPushButton("Run"))
 , m_activeStateItem(new QListWidgetItem("Active view state: idle"))
-, m_kernelSocket(new QLocalSocket(this))
-, m_extensionSocket(new QLocalSocket(this))
+, m_kernelSocket(new BackendConnection(this))
+, m_extensionSocket(new BackendConnection(this))
 , m_kernelProcess(new QProcess(this))
 , m_extensionHostProcess(new QProcess(this))
 , m_activePipelineTotalSteps(0)
@@ -1375,8 +1376,8 @@ MainWindow::MainWindow(QWidget* parent)
     applyWorkbenchStyle();
     refreshAgentPlannerStatus();
 
-    connect(m_kernelSocket, &QLocalSocket::connected, this, &MainWindow::requestKernelToolDefinitions);
-    connect(m_extensionSocket, &QLocalSocket::connected, this, &MainWindow::requestExtensionHostState);
+    connect(m_kernelSocket, &BackendConnection::connected, this, &MainWindow::requestKernelToolDefinitions);
+    connect(m_extensionSocket, &BackendConnection::connected, this, &MainWindow::requestExtensionHostState);
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::shutdownManagedBackends);
 
     const auto configureBackendProcess = [this](QProcess* process, const QString& displayName) {
@@ -2013,263 +2014,257 @@ void MainWindow::createConnections()
         m_terminalRunButton->click();
     });
 
-    connect(m_kernelSocket, &QLocalSocket::readyRead, this, [this]() {
-        while (m_kernelSocket->canReadLine()) {
-            const QByteArray payload = m_kernelSocket->readLine();
-            QJsonObject response;
-            QString errorString;
-            if (JsonRpcMessage::deserialize(payload, response, errorString)) {
-                if (response.contains("error")) {
-                    const QString message = response.value("error").toObject().value("message").toString();
-                    rememberToolResult("kernel.error",
-                                       normalizedToolErrorEnvelope("kernel.error",
-                                                                   message,
-                                                                   "kernel",
-                                                                   "rpc_error",
-                                                                   "retry"));
-                    if (!m_activePipelineId.isEmpty()) {
-                        failActivePipeline(QString("Kernel error: %1").arg(message));
-                    }
-                    m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
-                    appendProblemMessage(QString("Kernel error: %1").arg(message));
-                    appendTerminalMessage(QString("> %1").arg(message));
-                } else {
-                    const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
-                                                                            response.value("result").toObject(),
-                                                                            "kernel");
-                    const QString toolName = result.value("tool_name").toString();
-                    if (toolName == "tools/list" && result.value("tools").isArray()) {
-                        m_cachedKernelToolDefinitions = result.value("tools").toArray();
-                        rebuildSkillsExplorer();
-                        statusBar()->showMessage(QString("Discovered %1 Neuro-Kernel tools.")
-                                                     .arg(result.value("tools").toArray().size()),
-                                                 4000);
-                        continue;
-                    }
-                    rememberToolResult(toolName, result);
-                    QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
-                    if (result.contains("tools") && result.value("tools").isArray()) {
-                        message = QString("%1 | %2").arg(message, formatToolDefinitions(result.value("tools").toArray()));
-                    }
-                    m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
-                    appendOutputMessage(QString("Kernel: %1").arg(message));
-                    appendTerminalMessage(QString("> %1").arg(message));
-                    const QString kernelNarration = narrateToolResult(toolName, result);
-                    if (!kernelNarration.isEmpty()) {
-                        m_agentChatDock->appendTranscript(QString("Studio> %1").arg(kernelNarration));
-                    }
+    connect(m_kernelSocket, &BackendConnection::lineReceived, this, [this](const QByteArray& payload) {
+        QJsonObject response;
+        QString errorString;
+        if (JsonRpcMessage::deserialize(payload, response, errorString)) {
+            if (response.contains("error")) {
+                const QString message = response.value("error").toObject().value("message").toString();
+                rememberToolResult("kernel.error",
+                                   normalizedToolErrorEnvelope("kernel.error",
+                                                               message,
+                                                               "kernel",
+                                                               "rpc_error",
+                                                               "retry"));
+                if (!m_activePipelineId.isEmpty()) {
+                    failActivePipeline(QString("Kernel error: %1").arg(message));
                 }
+                m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
+                appendProblemMessage(QString("Kernel error: %1").arg(message));
+                appendTerminalMessage(QString("> %1").arg(message));
             } else {
-                const QString message = QString::fromUtf8(payload).trimmed();
+                const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
+                                                                        response.value("result").toObject(),
+                                                                        "kernel");
+                const QString toolName = result.value("tool_name").toString();
+                if (toolName == "tools/list" && result.value("tools").isArray()) {
+                    m_cachedKernelToolDefinitions = result.value("tools").toArray();
+                    rebuildSkillsExplorer();
+                    statusBar()->showMessage(QString("Discovered %1 Neuro-Kernel tools.")
+                                                 .arg(result.value("tools").toArray().size()),
+                                             4000);
+                    return;
+                }
+                rememberToolResult(toolName, result);
+                QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
+                if (result.contains("tools") && result.value("tools").isArray()) {
+                    message = QString("%1 | %2").arg(message, formatToolDefinitions(result.value("tools").toArray()));
+                }
                 m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
                 appendOutputMessage(QString("Kernel: %1").arg(message));
                 appendTerminalMessage(QString("> %1").arg(message));
+                const QString kernelNarration = narrateToolResult(toolName, result);
+                if (!kernelNarration.isEmpty()) {
+                    m_agentChatDock->appendTranscript(QString("Studio> %1").arg(kernelNarration));
+                }
             }
+        } else {
+            const QString message = QString::fromUtf8(payload).trimmed();
+            m_agentChatDock->appendTranscript(QString("Kernel> %1").arg(message));
+            appendOutputMessage(QString("Kernel: %1").arg(message));
+            appendTerminalMessage(QString("> %1").arg(message));
         }
     });
-    connect(m_extensionSocket, &QLocalSocket::readyRead, this, [this]() {
-        while (m_extensionSocket->canReadLine()) {
-            const QByteArray payload = m_extensionSocket->readLine();
-            QJsonObject response;
-            QString errorString;
-            if (JsonRpcMessage::deserialize(payload, response, errorString)) {
-                if (response.contains("error")) {
-                    const QString requestId = response.value("id").toString();
-                    const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
-                    const QString message = response.value("error").toObject().value("message").toString();
-                    rememberToolResult("extension_host.error",
-                                       normalizedToolErrorEnvelope("extension_host.error",
-                                                                   message,
-                                                                   "extension_host",
-                                                                   "rpc_error",
-                                                                   "retry"));
-                    if (!m_activePipelineId.isEmpty()) {
-                        failActivePipeline(QString("Extension host error: %1").arg(message));
+    connect(m_extensionSocket, &BackendConnection::lineReceived, this, [this](const QByteArray& payload) {
+        QJsonObject response;
+        QString errorString;
+        if (JsonRpcMessage::deserialize(payload, response, errorString)) {
+            if (response.contains("error")) {
+                const QString requestId = response.value("id").toString();
+                const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
+                const QString message = response.value("error").toObject().value("message").toString();
+                rememberToolResult("extension_host.error",
+                                   normalizedToolErrorEnvelope("extension_host.error",
+                                                               message,
+                                                               "extension_host",
+                                                               "rpc_error",
+                                                               "retry"));
+                if (!m_activePipelineId.isEmpty()) {
+                    failActivePipeline(QString("Extension host error: %1").arg(message));
+                }
+                m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
+                appendProblemMessage(QString("Extension host error: %1").arg(message));
+                appendTerminalMessage(QString("> %1").arg(message));
+                if (!workflowFilePath.isEmpty()) {
+                    const QString workflowLabel = QFileInfo(workflowFilePath).fileName().isEmpty()
+                        ? workflowFilePath
+                        : QFileInfo(workflowFilePath).fileName();
+                    setWorkflowStatusBanner(QString("Failed to activate %1: %2").arg(workflowLabel, message),
+                                            QStringLiteral("error"));
+                    if (m_activeWorkflowGraph.isEmpty()) {
+                        rebuildWorkflowNavigatorUi();
                     }
-                    m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
-                    appendProblemMessage(QString("Extension host error: %1").arg(message));
-                    appendTerminalMessage(QString("> %1").arg(message));
-                    if (!workflowFilePath.isEmpty()) {
-                        const QString workflowLabel = QFileInfo(workflowFilePath).fileName().isEmpty()
-                            ? workflowFilePath
-                            : QFileInfo(workflowFilePath).fileName();
-                        setWorkflowStatusBanner(QString("Failed to activate %1: %2").arg(workflowLabel, message),
-                                                QStringLiteral("error"));
+                }
+            } else {
+                const QString requestId = response.value("id").toString();
+                const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
+                                                                        response.value("result").toObject(),
+                                                                        "extension_host");
+                const QString toolName = result.value("tool_name").toString();
+                const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
+                if (toolName == "views/open" && m_pendingExtensionViewOpens.contains(requestId)) {
+                    const QJsonObject dispatch = m_pendingExtensionViewOpens.take(requestId);
+                    const QString filePath = m_pendingExtensionViewFiles.take(requestId);
+                    QJsonObject descriptor = result;
+                    for (auto it = dispatch.constBegin(); it != dispatch.constEnd(); ++it) {
+                        if (!descriptor.contains(it.key())) {
+                            descriptor.insert(it.key(), it.value());
+                        }
+                    }
+                    finalizeExtensionViewOpen(filePath, descriptor);
+                    requestExtensionHostState();
+                    return;
+                }
+                if (toolName == "tools/list" && result.value("tools").isArray()) {
+                    QJsonArray filteredTools;
+                    for (const QJsonValue& value : result.value("tools").toArray()) {
+                        const QJsonObject tool = value.toObject();
+                        const QString extensionId = tool.value("extension_id").toString().trimmed();
+                        if (!m_viewProviderRegistry || extensionId.isEmpty() || m_viewProviderRegistry->isExtensionEnabled(extensionId)) {
+                            filteredTools.append(tool);
+                        }
+                    }
+                    m_cachedExtensionToolDefinitions = filteredTools;
+                    rebuildSkillsExplorer();
+                    statusBar()->showMessage(QString("Discovered %1 extension-host tools.")
+                                                 .arg(m_cachedExtensionToolDefinitions.size()),
+                                             4000);
+                    refreshExtensionManagerUi();
+                    rebuildWorkflowNavigatorUi();
+                    return;
+                }
+                if (toolName == "resources/list" && result.value("resources").isArray()) {
+                    QJsonArray filteredResources;
+                    for (const QJsonValue& value : result.value("resources").toArray()) {
+                        const QJsonObject resource = value.toObject();
+                        const QString extensionId = resource.value("extension_id").toString().trimmed();
+                        const QString resourceId = resource.value("id").toString().trimmed();
+                        const QString resourceUri = resource.value("uri").toString().trimmed();
+                        const bool isWorkflowGraphResource = resourceUri == QLatin1String(kActiveWorkflowGraphUri) || resource.value("kind").toString().trimmed() == QLatin1String("workflow_graph");
+                        const QString visibilityId = extensionId.isEmpty() ? resourceId : extensionId;
+                        if (isWorkflowGraphResource || !m_viewProviderRegistry || visibilityId.isEmpty() || m_viewProviderRegistry->isExtensionEnabled(visibilityId)) {
+                            filteredResources.append(resource);
+                        }
+                    }
+                    m_cachedExtensionResources = filteredResources;
+                    rebuildSkillsExplorer();
+                    statusBar()->showMessage(QString("Discovered %1 live extension/workflow resources.")
+                                                 .arg(m_cachedExtensionResources.size()),
+                                             4000);
+                    refreshExtensionManagerUi();
+                    return;
+                }
+                if (toolName == "resources/read" && result.value("uri").toString().trimmed() == QLatin1String(kActiveWorkflowGraphUri)) {
+                    adoptWorkflowGraph(result);
+                }
+                if (toolName == "extensions/reload") {
+                    m_lastExtensionReloadResult = result;
+                    appendOutputMessage(QString("Extension Host: %1").arg(result.value("message").toString()));
+                    appendTerminalMessage(QString("> %1").arg(result.value("message").toString()));
+                    statusBar()->showMessage(result.value("message").toString(), 5000);
+                    refreshExtensionManagerUi();
+                    requestExtensionHostState();
+                    return;
+                }
+                if (toolName == "views/list" && result.value("sessions").isArray()) {
+                    QJsonArray filteredSessions;
+                    for (const QJsonValue& value : result.value("sessions").toArray()) {
+                        const QJsonObject session = value.toObject();
+                        if (m_viewProviderRegistry->isExtensionEnabled(session.value("extension_id").toString())) {
+                            filteredSessions.append(session);
+                        }
+                    }
+                    m_cachedExtensionViewSessions = filteredSessions;
+                    rebuildSkillsExplorer();
+                    statusBar()->showMessage(QString("Extension host sessions: %1")
+                                                 .arg(m_cachedExtensionViewSessions.size()),
+                                             4000);
+                    refreshExtensionManagerUi();
+                    return;
+                }
+                const QString resultStatus = result.value("status").toString().trimmed().toLower();
+                const QJsonObject workflowOperatorDefinition = workflowOperatorToolDefinition(toolName);
+                if (toolName == "studio.workflow.load") {
+                    const QString effectiveWorkflowFilePath = !workflowFilePath.isEmpty()
+                        ? workflowFilePath
+                        : result.value("source_file").toString().trimmed();
+                    const QString workflowLabel = QFileInfo(effectiveWorkflowFilePath).fileName().isEmpty()
+                        ? effectiveWorkflowFilePath
+                        : QFileInfo(effectiveWorkflowFilePath).fileName();
+                    const QString resultMessage = result.value("message").toString().trimmed();
+
+                    if (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed")) {
+                        const QString bannerMessage = workflowLabel.isEmpty()
+                            ? (resultMessage.isEmpty()
+                                   ? QStringLiteral("Failed to activate workflow graph.")
+                                   : resultMessage)
+                            : QString("Failed to activate %1: %2")
+                                  .arg(workflowLabel,
+                                       resultMessage.isEmpty()
+                                           ? QStringLiteral("Unknown workflow load error.")
+                                           : resultMessage);
+                        setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
                         if (m_activeWorkflowGraph.isEmpty()) {
                             rebuildWorkflowNavigatorUi();
                         }
                     }
-                } else {
-                    const QString requestId = response.value("id").toString();
-                    const QJsonObject result = normalizedToolResultEnvelope(response.value("result").toObject().value("tool_name").toString(),
-                                                                            response.value("result").toObject(),
-                                                                            "extension_host");
-                    const QString toolName = result.value("tool_name").toString();
-                    const QString workflowFilePath = m_pendingWorkflowLoads.take(requestId);
-                    if (toolName == "views/open" && m_pendingExtensionViewOpens.contains(requestId)) {
-                        const QJsonObject dispatch = m_pendingExtensionViewOpens.take(requestId);
-                        const QString filePath = m_pendingExtensionViewFiles.take(requestId);
-                        QJsonObject descriptor = result;
-                        for (auto it = dispatch.constBegin(); it != dispatch.constEnd(); ++it) {
-                            if (!descriptor.contains(it.key())) {
-                                descriptor.insert(it.key(), it.value());
-                            }
-                        }
-                        finalizeExtensionViewOpen(filePath, descriptor);
-                        requestExtensionHostState();
-                        continue;
-                    }
-                    if (toolName == "tools/list" && result.value("tools").isArray()) {
-                        QJsonArray filteredTools;
-                        for (const QJsonValue& value : result.value("tools").toArray()) {
-                            const QJsonObject tool = value.toObject();
-                            const QString extensionId = tool.value("extension_id").toString().trimmed();
-                            if (!m_viewProviderRegistry || extensionId.isEmpty() || m_viewProviderRegistry->isExtensionEnabled(extensionId)) {
-                                filteredTools.append(tool);
-                            }
-                        }
-                        m_cachedExtensionToolDefinitions = filteredTools;
-                        rebuildSkillsExplorer();
-                        statusBar()->showMessage(QString("Discovered %1 extension-host tools.")
-                                                     .arg(m_cachedExtensionToolDefinitions.size()),
-                                                 4000);
-                        refreshExtensionManagerUi();
-                        rebuildWorkflowNavigatorUi();
-                        continue;
-                    }
-                    if (toolName == "resources/list" && result.value("resources").isArray()) {
-                        QJsonArray filteredResources;
-                        for (const QJsonValue& value : result.value("resources").toArray()) {
-                            const QJsonObject resource = value.toObject();
-                            const QString extensionId = resource.value("extension_id").toString().trimmed();
-                            const QString resourceId = resource.value("id").toString().trimmed();
-                            const QString resourceUri = resource.value("uri").toString().trimmed();
-                            const bool isWorkflowGraphResource = resourceUri == QLatin1String(kActiveWorkflowGraphUri) || resource.value("kind").toString().trimmed() == QLatin1String("workflow_graph");
-                            const QString visibilityId = extensionId.isEmpty() ? resourceId : extensionId;
-                            if (isWorkflowGraphResource || !m_viewProviderRegistry || visibilityId.isEmpty() || m_viewProviderRegistry->isExtensionEnabled(visibilityId)) {
-                                filteredResources.append(resource);
-                            }
-                        }
-                        m_cachedExtensionResources = filteredResources;
-                        rebuildSkillsExplorer();
-                        statusBar()->showMessage(QString("Discovered %1 live extension/workflow resources.")
-                                                     .arg(m_cachedExtensionResources.size()),
-                                                 4000);
-                        refreshExtensionManagerUi();
-                        continue;
-                    }
-                    if (toolName == "resources/read" && result.value("uri").toString().trimmed() == QLatin1String(kActiveWorkflowGraphUri)) {
-                        adoptWorkflowGraph(result);
-                    }
-                    if (toolName == "extensions/reload") {
-                        m_lastExtensionReloadResult = result;
-                        appendOutputMessage(QString("Extension Host: %1").arg(result.value("message").toString()));
-                        appendTerminalMessage(QString("> %1").arg(result.value("message").toString()));
-                        statusBar()->showMessage(result.value("message").toString(), 5000);
-                        refreshExtensionManagerUi();
-                        requestExtensionHostState();
-                        continue;
-                    }
-                    if (toolName == "views/list" && result.value("sessions").isArray()) {
-                        QJsonArray filteredSessions;
-                        for (const QJsonValue& value : result.value("sessions").toArray()) {
-                            const QJsonObject session = value.toObject();
-                            if (m_viewProviderRegistry->isExtensionEnabled(session.value("extension_id").toString())) {
-                                filteredSessions.append(session);
-                            }
-                        }
-                        m_cachedExtensionViewSessions = filteredSessions;
-                        rebuildSkillsExplorer();
-                        statusBar()->showMessage(QString("Extension host sessions: %1")
-                                                     .arg(m_cachedExtensionViewSessions.size()),
-                                                 4000);
-                        refreshExtensionManagerUi();
-                        continue;
-                    }
-                    const QString resultStatus = result.value("status").toString().trimmed().toLower();
-                    const QJsonObject workflowOperatorDefinition = workflowOperatorToolDefinition(toolName);
-                    if (toolName == "studio.workflow.load") {
-                        const QString effectiveWorkflowFilePath = !workflowFilePath.isEmpty()
-                            ? workflowFilePath
-                            : result.value("source_file").toString().trimmed();
-                        const QString workflowLabel = QFileInfo(effectiveWorkflowFilePath).fileName().isEmpty()
-                            ? effectiveWorkflowFilePath
-                            : QFileInfo(effectiveWorkflowFilePath).fileName();
-                        const QString resultMessage = result.value("message").toString().trimmed();
-
-                        if (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed")) {
-                            const QString bannerMessage = workflowLabel.isEmpty()
-                                ? (resultMessage.isEmpty()
-                                       ? QStringLiteral("Failed to activate workflow graph.")
-                                       : resultMessage)
-                                : QString("Failed to activate %1: %2")
-                                      .arg(workflowLabel,
-                                           resultMessage.isEmpty()
-                                               ? QStringLiteral("Unknown workflow load error.")
-                                               : resultMessage);
-                            setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
-                            if (m_activeWorkflowGraph.isEmpty()) {
-                                rebuildWorkflowNavigatorUi();
-                            }
-                        }
-                    }
-                    if (toolName == "studio.workflow.save" && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
-                        const QString targetPath = result.value("source_file").toString().trimmed();
-                        const QString targetLabel = QFileInfo(targetPath).fileName().isEmpty()
-                            ? targetPath
-                            : QFileInfo(targetPath).fileName();
-                        const QString bannerMessage = targetLabel.isEmpty()
-                            ? result.value("message").toString(QStringLiteral("Failed to save the active workflow graph."))
-                            : QString("Failed to save %1: %2")
-                                  .arg(targetLabel,
-                                       result.value("message").toString(QStringLiteral("Unknown workflow save error.")));
-                        setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
-                    }
-                    if (!workflowOperatorDefinition.isEmpty() && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
-                        const QString operatorLabel = workflowOperatorDefinition.value("display_name")
-                                                          .toString(workflowOperatorDefinition.value("name").toString(toolName));
-                        setWorkflowStatusBanner(QString("Failed to append workflow step via %1: %2")
-                                                    .arg(operatorLabel,
-                                                         result.value("message").toString(QStringLiteral("Unknown operator error."))),
-                                                QStringLiteral("error"));
-                    }
-                    if (toolName == "views/command") {
-                        const QString sessionId = result.value("session_id").toString();
-                        if (QWidget* widget = m_extensionViewWidgetsBySessionId.value(sessionId, nullptr)) {
-                            widget->setProperty("mne_session_descriptor", result);
-                            QMetaObject::invokeMethod(widget,
-                                                      "applySessionUpdate",
-                                                      Qt::DirectConnection,
-                                                      Q_ARG(QJsonObject, result));
-                        }
-                        const QString commandName = result.value("command").toString().trimmed();
-                        if (!commandName.isEmpty()) {
-                            rememberToolResult(QString("view.hosted.%1").arg(commandName), result);
-                        }
-                        requestExtensionHostState();
-                    }
-                    const bool isHousekeepingMethod = toolName == QLatin1String("tools/list") || toolName == QLatin1String("resources/list") || toolName == QLatin1String("resources/read") || toolName == QLatin1String("views/list");
-                    if (toolName != QLatin1String("views/command") && !isHousekeepingMethod) {
-                        rememberToolResult(toolName, result);
-                    }
-                    if (!workflowFilePath.isEmpty() || result.value("graph").isObject()) {
-                        adoptWorkflowGraph(result, workflowFilePath);
-                    }
-                    const QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
-                    m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
-                    appendOutputMessage(QString("Extension Host: %1").arg(message));
-                    appendTerminalMessage(QString("> %1").arg(message));
-                    const QString extNarration = narrateToolResult(toolName, result);
-                    if (!extNarration.isEmpty()) {
-                        m_agentChatDock->appendTranscript(QString("Studio> %1").arg(extNarration));
-                    }
                 }
-            } else {
-                const QString message = QString::fromUtf8(payload).trimmed();
+                if (toolName == "studio.workflow.save" && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
+                    const QString targetPath = result.value("source_file").toString().trimmed();
+                    const QString targetLabel = QFileInfo(targetPath).fileName().isEmpty()
+                        ? targetPath
+                        : QFileInfo(targetPath).fileName();
+                    const QString bannerMessage = targetLabel.isEmpty()
+                        ? result.value("message").toString(QStringLiteral("Failed to save the active workflow graph."))
+                        : QString("Failed to save %1: %2")
+                              .arg(targetLabel,
+                                   result.value("message").toString(QStringLiteral("Unknown workflow save error.")));
+                    setWorkflowStatusBanner(bannerMessage, QStringLiteral("error"));
+                }
+                if (!workflowOperatorDefinition.isEmpty() && (resultStatus == QLatin1String("error") || resultStatus == QLatin1String("failed"))) {
+                    const QString operatorLabel = workflowOperatorDefinition.value("display_name")
+                                                      .toString(workflowOperatorDefinition.value("name").toString(toolName));
+                    setWorkflowStatusBanner(QString("Failed to append workflow step via %1: %2")
+                                                .arg(operatorLabel,
+                                                     result.value("message").toString(QStringLiteral("Unknown operator error."))),
+                                            QStringLiteral("error"));
+                }
+                if (toolName == "views/command") {
+                    const QString sessionId = result.value("session_id").toString();
+                    if (QWidget* widget = m_extensionViewWidgetsBySessionId.value(sessionId, nullptr)) {
+                        widget->setProperty("mne_session_descriptor", result);
+                        QMetaObject::invokeMethod(widget,
+                                                  "applySessionUpdate",
+                                                  Qt::DirectConnection,
+                                                  Q_ARG(QJsonObject, result));
+                    }
+                    const QString commandName = result.value("command").toString().trimmed();
+                    if (!commandName.isEmpty()) {
+                        rememberToolResult(QString("view.hosted.%1").arg(commandName), result);
+                    }
+                    requestExtensionHostState();
+                }
+                const bool isHousekeepingMethod = toolName == QLatin1String("tools/list") || toolName == QLatin1String("resources/list") || toolName == QLatin1String("resources/read") || toolName == QLatin1String("views/list");
+                if (toolName != QLatin1String("views/command") && !isHousekeepingMethod) {
+                    rememberToolResult(toolName, result);
+                }
+                if (!workflowFilePath.isEmpty() || result.value("graph").isObject()) {
+                    adoptWorkflowGraph(result, workflowFilePath);
+                }
+                const QString message = result.value("message").toString(QJsonDocument(result).toJson(QJsonDocument::Compact));
                 m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
                 appendOutputMessage(QString("Extension Host: %1").arg(message));
                 appendTerminalMessage(QString("> %1").arg(message));
+                const QString extNarration = narrateToolResult(toolName, result);
+                if (!extNarration.isEmpty()) {
+                    m_agentChatDock->appendTranscript(QString("Studio> %1").arg(extNarration));
+                }
             }
+        } else {
+            const QString message = QString::fromUtf8(payload).trimmed();
+            m_agentChatDock->appendTranscript(QString("Extension Host> %1").arg(message));
+            appendOutputMessage(QString("Extension Host: %1").arg(message));
+            appendTerminalMessage(QString("> %1").arg(message));
         }
     });
 }
@@ -5376,30 +5371,28 @@ QJsonArray MainWindow::kernelToolDefinitions() const
 
 void MainWindow::requestKernelToolDefinitions()
 {
-    if (!m_kernelSocket || m_kernelSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_kernelSocket || !m_kernelSocket->isConnected()) {
         appendProblemMessage("Kernel tool discovery requested before the Neuro-Kernel socket was connected.");
         return;
     }
 
     const QJsonObject message = JsonRpcMessage::createRequest("workbench-tools-list", "tools/list");
-    m_kernelSocket->write(JsonRpcMessage::serialize(message));
-    m_kernelSocket->flush();
+    m_kernelSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::requestExtensionHostState()
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         appendProblemMessage("Extension host discovery requested before the extension socket was connected.");
         return;
     }
 
     const QJsonObject toolsMessage = JsonRpcMessage::createRequest("workbench-extension-tools-list", "tools/list");
-    m_extensionSocket->write(JsonRpcMessage::serialize(toolsMessage));
+    m_extensionSocket->send(JsonRpcMessage::serialize(toolsMessage));
     const QJsonObject resourcesMessage = JsonRpcMessage::createRequest("workbench-extension-resources-list", "resources/list");
-    m_extensionSocket->write(JsonRpcMessage::serialize(resourcesMessage));
+    m_extensionSocket->send(JsonRpcMessage::serialize(resourcesMessage));
     const QJsonObject viewsMessage = JsonRpcMessage::createRequest("workbench-extension-views-list", "views/list");
-    m_extensionSocket->write(JsonRpcMessage::serialize(viewsMessage));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(viewsMessage));
     requestActiveWorkflowGraph();
     if (m_activeWorkflowGraph.isEmpty() && !m_activeWorkflowFilePath.trimmed().isEmpty() && QFileInfo::exists(m_activeWorkflowFilePath)) {
         requestWorkflowLoad(m_activeWorkflowFilePath);
@@ -5408,7 +5401,7 @@ void MainWindow::requestExtensionHostState()
 
 void MainWindow::requestExtensionHostReload()
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         appendProblemMessage("Extension host reload requested before the extension socket was connected.");
         return;
     }
@@ -5424,8 +5417,7 @@ void MainWindow::requestExtensionHostReload()
         {"extensions_directory", ViewProviderRegistry::locateExtensionsDirectory()},
         {"disabled_extension_ids", disabledArray}};
     const QJsonObject message = JsonRpcMessage::createRequest("workbench-extension-reload", "extensions.reload", params);
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 QJsonArray MainWindow::availableToolDefinitions() const
@@ -7501,7 +7493,7 @@ QJsonObject MainWindow::buildRawWindowArguments(int windowSamples) const
 
 void MainWindow::requestExtensionViewOpen(const QString& filePath, const QJsonObject& dispatch)
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         finalizeExtensionViewOpen(filePath, dispatch);
         return;
     }
@@ -7518,8 +7510,7 @@ void MainWindow::requestExtensionViewOpen(const QString& filePath, const QJsonOb
         {"slot", dispatch.value("slot").toString("center")}};
 
     const QJsonObject message = JsonRpcMessage::createRequest(requestId, "views/open", params);
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::finalizeExtensionViewOpen(const QString& filePath, const QJsonObject& sessionDescriptor)
@@ -7744,7 +7735,7 @@ void MainWindow::refreshWorkflowCenterView()
         m_workflowCenterMiniMap->setWorkflowGraph(m_activeWorkflowGraph);
     }
 
-    const bool extensionConnected = m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState;
+    const bool extensionConnected = m_extensionSocket && m_extensionSocket->isConnected();
     if (m_workflowCenterOpenSourceButton) {
         m_workflowCenterOpenSourceButton->setEnabled(QFileInfo(m_activeWorkflowFilePath).isFile());
     }
@@ -7910,7 +7901,7 @@ QString MainWindow::resolveStudioCompanionExecutable(const QString& executableNa
     return QString();
 }
 
-void MainWindow::ensureBackendConnection(QLocalSocket* socket,
+void MainWindow::ensureBackendConnection(BackendConnection* socket,
                                          const QString& socketName,
                                          const QString& executableName,
                                          QProcess* process,
@@ -7920,9 +7911,7 @@ void MainWindow::ensureBackendConnection(QLocalSocket* socket,
         return;
     }
 
-    socket->abort();
-    socket->connectToServer(socketName);
-    if (socket->waitForConnected(150)) {
+    if (socket->connectToService(socketName, std::chrono::milliseconds(150))) {
         appendOutputMessage(QString("%1 connected.").arg(displayName));
         return;
     }
@@ -7951,11 +7940,9 @@ void MainWindow::ensureBackendConnection(QLocalSocket* socket,
         appendOutputMessage(QString("Started %1 at %2").arg(displayName, executablePath));
     }
 
-    socket->abort();
-    socket->connectToServer(socketName);
-    if (!socket->waitForConnected(1500)) {
-        appendProblemMessage(QString("%1 did not connect on socket %2 after launch.")
-                                 .arg(displayName, socketName));
+    if (!socket->connectToService(socketName, std::chrono::milliseconds(1500))) {
+        appendProblemMessage(QString("%1 did not connect on socket %2 after launch: %3")
+                                 .arg(displayName, socketName, socket->errorString()));
         statusBar()->showMessage(QString("%1 did not connect after launch.").arg(displayName), 6000);
     }
 }
@@ -7971,20 +7958,12 @@ void MainWindow::shutdownManagedBackends()
     shutdownManagedBackend(m_kernelSocket, m_kernelProcess, QStringLiteral("Neuro-Kernel"));
 }
 
-void MainWindow::shutdownManagedBackend(QLocalSocket* socket,
+void MainWindow::shutdownManagedBackend(BackendConnection* socket,
                                         QProcess* process,
                                         const QString& displayName)
 {
     if (socket) {
-        if (socket->state() == QLocalSocket::ConnectedState) {
-            socket->flush();
-            socket->disconnectFromServer();
-            if (socket->state() != QLocalSocket::UnconnectedState) {
-                socket->waitForDisconnected(500);
-            }
-        } else {
-            socket->abort();
-        }
+        socket->close();
     }
 
     if (!process || process->state() == QProcess::NotRunning) {
@@ -8092,7 +8071,7 @@ void MainWindow::requestWorkflowLoad(const QString& filePath)
         return;
     }
 
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         setWorkflowStatusBanner(QString("Extension Host is not connected, so %1 could not be activated as a workflow graph.")
                                     .arg(workflowLabel),
                                 QStringLiteral("error"));
@@ -8107,13 +8086,12 @@ void MainWindow::requestWorkflowLoad(const QString& filePath)
         {"name", "studio.workflow.load"},
         {"arguments", QJsonObject{{"file", normalizedRequestedPath}}}};
     const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::requestActiveWorkflowGraph()
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         if (m_activeWorkflowGraph.isEmpty()) {
             setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected. Live workflow graph is unavailable."),
                                     QStringLiteral("warning"));
@@ -8126,8 +8104,7 @@ void MainWindow::requestActiveWorkflowGraph()
     const QJsonObject message = JsonRpcMessage::createRequest(requestId,
                                                               "resources/read",
                                                               QJsonObject{{"uri", kActiveWorkflowGraphUri}});
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::adoptWorkflowGraph(const QJsonObject& result, const QString& fallbackFilePath)
@@ -8201,8 +8178,8 @@ void MainWindow::rebuildWorkflowNavigatorUi()
         m_workflowExplorer->clear();
 
         const bool hasLocalWorkflowFile = QFileInfo(m_activeWorkflowFilePath).isFile();
-        const bool extensionConnected = m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState;
-        m_workflowRefreshButton->setEnabled((m_extensionSocket && m_extensionSocket->state() == QLocalSocket::ConnectedState) || hasLocalWorkflowFile);
+        const bool extensionConnected = m_extensionSocket && m_extensionSocket->isConnected();
+        m_workflowRefreshButton->setEnabled((m_extensionSocket && m_extensionSocket->isConnected()) || hasLocalWorkflowFile);
         m_workflowAddStepButton->setEnabled(extensionConnected && !m_activeWorkflowGraph.isEmpty() && !workflowOperatorToolDefinitions().isEmpty());
         m_workflowSaveButton->setEnabled(extensionConnected && !m_activeWorkflowGraph.isEmpty());
 
@@ -8499,7 +8476,7 @@ void MainWindow::rebuildWorkflowNavigatorUi()
 
 void MainWindow::appendWorkflowStep()
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected, so workflow steps cannot be appended right now."),
                                 QStringLiteral("error"));
         appendProblemMessage(QStringLiteral("Workflow authoring requires a connected Extension Host."));
@@ -8588,7 +8565,7 @@ void MainWindow::saveActiveWorkflowGraph()
         return;
     }
 
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         setWorkflowStatusBanner(QStringLiteral("Extension Host is not connected, so the workflow graph cannot be saved right now."),
                                 QStringLiteral("error"));
         appendProblemMessage(QStringLiteral("Workflow saving requires a connected Extension Host."));
@@ -8817,7 +8794,7 @@ bool MainWindow::isExtensionHostTool(const QString& toolName) const
 
 void MainWindow::sendKernelToolCall(const QString& toolName, const QJsonObject& arguments)
 {
-    if (!m_kernelSocket || m_kernelSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_kernelSocket || !m_kernelSocket->isConnected()) {
         appendProblemMessage(QString("Neuro-Kernel is not connected for tool %1.").arg(toolName));
         return;
     }
@@ -8829,8 +8806,7 @@ void MainWindow::sendKernelToolCall(const QString& toolName, const QJsonObject& 
     const QString requestId = QString("workbench-kernel-tool-%1")
                                   .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
     const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
-    m_kernelSocket->write(JsonRpcMessage::serialize(message));
-    m_kernelSocket->flush();
+    m_kernelSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::handleHostedExtensionViewOutput(const QString& message)
@@ -8854,7 +8830,7 @@ void MainWindow::handleHostedExtensionViewCommand(const QString& sessionId,
 
 void MainWindow::sendExtensionToolCall(const QString& toolName, const QJsonObject& arguments)
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         appendProblemMessage(QString("Extension host is not connected for tool %1.").arg(toolName));
         return;
     }
@@ -8866,15 +8842,14 @@ void MainWindow::sendExtensionToolCall(const QString& toolName, const QJsonObjec
     const QString requestId = QString("workbench-extension-tool-%1")
                                   .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
     const QJsonObject message = JsonRpcMessage::createRequest(requestId, "tools/call", params);
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::sendExtensionViewCommand(const QString& sessionId,
                                           const QString& commandName,
                                           const QJsonObject& arguments)
 {
-    if (!m_extensionSocket || m_extensionSocket->state() != QLocalSocket::ConnectedState) {
+    if (!m_extensionSocket || !m_extensionSocket->isConnected()) {
         appendProblemMessage(QString("Extension host is not connected for view session %1.").arg(sessionId));
         return;
     }
@@ -8887,8 +8862,7 @@ void MainWindow::sendExtensionViewCommand(const QString& sessionId,
     const QString requestId = QString("workbench-extension-view-command-%1")
                                   .arg(QUuid::createUuid().toString(QUuid::WithoutBraces));
     const QJsonObject message = JsonRpcMessage::createRequest(requestId, "views/command", params);
-    m_extensionSocket->write(JsonRpcMessage::serialize(message));
-    m_extensionSocket->flush();
+    m_extensionSocket->send(JsonRpcMessage::serialize(message));
 }
 
 void MainWindow::appendOutputMessage(const QString& message)

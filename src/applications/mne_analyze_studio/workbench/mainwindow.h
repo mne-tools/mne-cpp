@@ -13,6 +13,7 @@
 #ifndef MNE_ANALYZE_STUDIO_MAINWINDOW_H
 #define MNE_ANALYZE_STUDIO_MAINWINDOW_H
 
+#include <backendchannel.h>
 #include <scenecontextregistry.h>
 #include <viewmanager.h>
 #include <llmtoolplanner.h>
@@ -22,7 +23,6 @@
 #include <QJsonObject>
 #include <QHash>
 #include <QList>
-#include <QLocalSocket>
 #include <QStringList>
 
 class QCloseEvent;
@@ -212,13 +212,13 @@ private:
     QJsonObject defaultArgumentsForWorkflowTool(const QString& toolName) const;
     QString selectedWorkflowArtifactUid() const;
     QString resolveStudioCompanionExecutable(const QString& executableName) const;
-    void ensureBackendConnection(QLocalSocket* socket,
+    void ensureBackendConnection(BackendConnection* socket,
                                  const QString& socketName,
                                  const QString& executableName,
                                  QProcess* process,
                                  const QString& displayName);
     void shutdownManagedBackends();
-    void shutdownManagedBackend(QLocalSocket* socket,
+    void shutdownManagedBackend(BackendConnection* socket,
                                 QProcess* process,
                                 const QString& displayName);
     void setWorkflowStatusBanner(const QString& message, const QString& severity = QStringLiteral("info"));
@@ -327,8 +327,8 @@ private:
     QLineEdit* m_terminalInput;
     QPushButton* m_terminalRunButton;
     QListWidgetItem* m_activeStateItem;
-    QLocalSocket* m_kernelSocket;
-    QLocalSocket* m_extensionSocket;
+    BackendConnection* m_kernelSocket;
+    BackendConnection* m_extensionSocket;
     QProcess* m_kernelProcess;
     QProcess* m_extensionHostProcess;
     QString m_lastToolName;

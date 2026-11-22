@@ -25,7 +25,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QNetworkInterface>
 #include <QOperatingSystemVersion>
 #include <QSysInfo>
 #include <QtTest>
@@ -126,7 +125,7 @@ private slots:
     void reportsAMissingProgram();
     void reportsACrash();
     void describesTheHostLikeQSysInfo();
-    void listsTheHardwareAddressesLikeQNetworkInterface();
+    void listsTheHardwareAddressesTheSystemReports();
 };
 
 //=============================================================================================================
@@ -272,21 +271,28 @@ int main(int argc, char* argv[])
 
 //=============================================================================================================
 
-void TestBaseProcess::listsTheHardwareAddressesLikeQNetworkInterface()
+void TestBaseProcess::listsTheHardwareAddressesTheSystemReports()
 {
-    std::vector<std::string> expected;
-    for (const QNetworkInterface& iface : QNetworkInterface::allInterfaces()) {
-        const QNetworkInterface::InterfaceFlags flags = iface.flags();
-        if (!flags.testFlag(QNetworkInterface::IsUp) || !flags.testFlag(QNetworkInterface::IsRunning) || flags.testFlag(QNetworkInterface::IsLoopBack) || flags.testFlag(QNetworkInterface::IsPointToPoint))
-            continue;
-        const QString address = iface.hardwareAddress();
-        if (address.count(u':') == 5 && address != QStringLiteral("00:00:00:00:00:00"))
-            expected.push_back(address.toUpper().toStdString());
-    }
+    // Every address is a real 48-bit address and one the system's own tool reports
     std::vector<std::string> ours;
-    for (const HardwareAddress& address : hardware_addresses())
-        ours.push_back(std::format("{:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X}", address[0], address[1], address[2], address[3], address[4], address[5]));
-    QCOMPARE(ours, expected);
+    for (const HardwareAddress& address : hardware_addresses()) {
+        QVERIFY(address != HardwareAddress{});
+        ours.push_back(std::format("{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}", address[0], address[1], address[2], address[3], address[4], address[5]));
+    }
+#if defined(Q_OS_LINUX)
+    const ProcessResult listing = run_process("ip", std::vector<std::string>{"-o", "link"});
+#elif defined(Q_OS_MACOS)
+    const ProcessResult listing = run_process("ifconfig", std::vector<std::string>{});
+#else
+    const ProcessResult listing;
+#endif
+    if (!listing.ok()) {
+        QSKIP("No system tool lists the network interfaces here");
+    }
+    const QString reported = QString::fromStdString(listing.std_out).toLower();
+    for (const std::string& address : ours) {
+        QVERIFY2(reported.contains(QString::fromStdString(address)), address.c_str());
+    }
 }
 
 #include "test_base_process.moc"

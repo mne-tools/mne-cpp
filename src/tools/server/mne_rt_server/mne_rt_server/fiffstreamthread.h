@@ -23,14 +23,21 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 
+#include <com/tcp_socket.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QThread>
-#include <QTcpSocket>
 #include <QMutex>
 #include <QSharedPointer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <atomic>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -48,7 +55,7 @@ class FiffStreamThread : public QThread
     Q_OBJECT
 
 public:
-    FiffStreamThread(qint32 id, int socketDescriptor, QObject* parent);
+    FiffStreamThread(qint32 id, mne::TcpSocket socket, QObject* parent);
 
     ~FiffStreamThread();
 
@@ -64,23 +71,19 @@ public:
 
     void writeClientId();
 
-    //    void sendData(QTcpSocket& p_qTcpSocket);
-
-signals:
-    void error(QTcpSocket::SocketError socketError);
 
 private:
     qint32 m_iDataClientId;
     QString m_sDataClientAlias;
 
-    int m_iSocketDescriptor;
+    mne::TcpSocket m_socket;
 
     QMutex m_qMutex;
     QByteArray m_qSendBlock;
 
     bool m_bIsSendingRawBuffer;
 
-    bool m_bIsRunning;
+    std::atomic<bool> m_bIsRunning;
 
     void startMeas(qint32 ID);
 
@@ -90,7 +93,6 @@ private:
 
     void sendRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
     //void readToBuffer1();
-    //    void readProc(QTcpSocket& p_qTcpSocket);
 };
 
 inline qint32 FiffStreamThread::getID()

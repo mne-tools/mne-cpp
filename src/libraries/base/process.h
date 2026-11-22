@@ -8,7 +8,7 @@
  * @since    3.0.0
  * @date     November 2026
  * @brief    Runs external programs and describes the host, the standard C++ counterpart of QProcess, QSysInfo and
- *           the hardware addresses of QNetworkInterface.
+ *           the hardware addresses of Qt's network interface list.
  *
  * run_process() starts a program without a shell, so arguments reach it verbatim, reads its standard output and
  * error while it runs and waits for it to finish or time out. Standard input is empty.
@@ -126,7 +126,7 @@ using HardwareAddress = std::array<std::uint8_t, 6>;
 //=============================================================================================================
 /**
  * Lists the hardware addresses of the network interfaces that are up and running and are neither loopback nor
- * point-to-point, in interface order, like QNetworkInterface::allInterfaces() filtered by those flags.
+ * point-to-point, in interface order, as the operating system lists them.
  * Interfaces without a 48-bit address are left out.
  *
  * @return The addresses; empty where the platform has no network interfaces (WebAssembly).

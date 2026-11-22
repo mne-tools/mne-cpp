@@ -15,9 +15,10 @@
 #include "llmsettingsdialog.h"
 #include "pillselectorwidget.h"
 
+#include <httprequest.h>
+
 #include <QDesktopServices>
 #include <QDialogButtonBox>
-#include <QEventLoop>
 #include <QFrame>
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -28,9 +29,6 @@
 #include <QJsonParseError>
 #include <QLabel>
 #include <QLineEdit>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QProcess>
 #include <QPushButton>
 #include <QSettings>
@@ -266,7 +264,6 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
 , m_toolInventoryView(new QTextEdit(this))
 , m_testStatusLabel(new QLabel("No planner test run yet.", this))
 , m_testButton(new QPushButton("Validate Connection", this))
-, m_networkAccessManager(new QNetworkAccessManager(this))
 {
     setWindowTitle("Connect Model");
     resize(520, 380);
@@ -776,20 +773,16 @@ QStringList LlmSettingsDialog::fetchAvailableModels(QString* errorMessage) const
         return QStringList();
     }
 
-    QNetworkRequest request{QUrl(endpoint)};
+    QList<QPair<QByteArray, QByteArray>> headers;
     if (!apiKey.isEmpty()) {
-        request.setRawHeader("Authorization", QString("Bearer %1").arg(apiKey).toUtf8());
+        headers.emplaceBack("Authorization", QString("Bearer %1").arg(apiKey).toUtf8());
     }
 
-    QNetworkReply* reply = m_networkAccessManager->get(request);
-    QEventLoop loop;
-    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
+    const HttpResponse reply = sendHttpRequest(endpoint, headers);
 
-    const QByteArray responseBytes = reply->readAll();
-    const int httpStatus = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    const QString networkError = reply->error() != QNetworkReply::NoError ? reply->errorString() : QString();
-    reply->deleteLater();
+    const QByteArray& responseBytes = reply.body;
+    const int httpStatus = reply.statusCode;
+    const QString& networkError = reply.errorString;
 
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(responseBytes, &parseError);

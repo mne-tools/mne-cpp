@@ -11,7 +11,7 @@ if(WITH_CODE_COV)
     add_compile_options("--coverage" "-O1" "-g")
 endif()
 
-set(QT_REQUIRED_COMPONENTS Core Network Test)
+set(QT_REQUIRED_COMPONENTS Core Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -43,7 +43,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Test
     mne_analyze_studio_core
     mne_dsp

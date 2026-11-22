@@ -12,16 +12,56 @@
 
 #include <neurokernelservice.h>
 
+#include <backendchannel.h>
 #include <jsonrpcmessage.h>
 
+#include <com/tcp_server.h>
+#include <com/tcp_socket.h>
+
 #include <QJsonArray>
+#include <QElapsedTimer>
+#include <QFile>
 #include <QJsonObject>
-#include <QLocalSocket>
 #include <QTemporaryFile>
 #include <QUuid>
 #include <QtTest>
 
+#include <array>
+#include <chrono>
+#include <cstddef>
+#include <optional>
+#include <span>
+
 using namespace MNEANALYZESTUDIO;
+
+namespace
+{
+
+/** @return Whether the backend closes @p socket within 5 s without having sent anything, while events run. */
+bool closedWithoutAnswer(mne::TcpSocket& socket)
+{
+    std::array<std::byte, 256> buffer{};
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < 5000) {
+        QCoreApplication::processEvents();
+        const auto read = socket.read_some(buffer, std::chrono::milliseconds(10));
+        if (read) {
+            return false;
+        }
+        if (read.error() != std::errc::timed_out) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::span<const std::byte> bytesOf(const QByteArray& data)
+{
+    return std::as_bytes(std::span(data.constData(), static_cast<std::size_t>(data.size())));
+}
+
+} // namespace
 
 class TestStudioNeuroKernel : public QObject
 {
@@ -42,42 +82,45 @@ private slots:
     void analyzeRawData();
     void unmatchedChannels_data();
     void unmatchedChannels();
+    void rejectsClientsWithoutTheToken();
+    void failsFastOnAStalePortFile();
 
 private:
     void sendRequest(const QJsonObject& request, QJsonObject& response);
 
     NeuroKernelService m_service;
-    QLocalSocket m_socket;
+    QString m_socketName;
+    BackendConnection m_socket;
+    QList<QByteArray> m_lines;
 };
 
 void TestStudioNeuroKernel::initTestCase()
 {
-    const QString socketName = QStringLiteral("mne-nk-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
+    m_socketName = QStringLiteral("mne-nk-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
+    const QString& socketName = m_socketName;
     QVERIFY(m_service.start(socketName));
-    m_socket.connectToServer(socketName);
-    QVERIFY(m_socket.waitForConnected(5000));
+    connect(&m_socket, &BackendConnection::lineReceived, this, [this](const QByteArray& line) { m_lines.append(line); });
+    QVERIFY(m_socket.connectToService(socketName, std::chrono::milliseconds(5000)));
 }
 
 void TestStudioNeuroKernel::sendRequest(const QJsonObject& request, QJsonObject& response)
 {
-    QVERIFY(m_socket.write(JsonRpcMessage::serialize(request)) > 0);
-    m_socket.flush();
-    QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
+    QVERIFY(m_socket.send(JsonRpcMessage::serialize(request)));
+    QTRY_VERIFY_WITH_TIMEOUT(!m_lines.isEmpty(), 5000);
 
     QString errorString;
-    QVERIFY2(JsonRpcMessage::deserialize(m_socket.readLine(), response, errorString),
+    QVERIFY2(JsonRpcMessage::deserialize(m_lines.takeFirst(), response, errorString),
              qPrintable(errorString));
 }
 
 void TestStudioNeuroKernel::malformedRequest()
 {
-    QVERIFY(m_socket.write("{bad json\n") > 0);
-    m_socket.flush();
-    QTRY_VERIFY_WITH_TIMEOUT(m_socket.canReadLine(), 5000);
+    QVERIFY(m_socket.send("{bad json\n"));
+    QTRY_VERIFY_WITH_TIMEOUT(!m_lines.isEmpty(), 5000);
 
     QJsonObject response;
     QString errorString;
-    QVERIFY(JsonRpcMessage::deserialize(m_socket.readLine(), response, errorString));
+    QVERIFY(JsonRpcMessage::deserialize(m_lines.takeFirst(), response, errorString));
     QCOMPARE(response.value(QStringLiteral("error")).toObject().value(QStringLiteral("code")).toInt(),
              -32700);
 }
@@ -297,6 +340,57 @@ void TestStudioNeuroKernel::unmatchedChannels()
     const QJsonObject result = response.value(QStringLiteral("result")).toObject();
     QCOMPARE(result.value(QStringLiteral("status")).toString(), QStringLiteral("error"));
     QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("could not find")));
+}
+
+void TestStudioNeuroKernel::rejectsClientsWithoutTheToken()
+{
+    const std::optional<BackendEndpoint> endpoint = publishedBackend(m_socketName);
+    QVERIFY(endpoint);
+    QCOMPARE(endpoint->token.size(), 32);
+    const QByteArray request = JsonRpcMessage::serialize(JsonRpcMessage::createRequest(QStringLiteral("list"), QStringLiteral("tools/list")));
+
+    // A wrong token, or none (a request first), closes the connection without an answer
+    for (const QByteArray& firstLine : {QByteArray(32, 'a') + '\n', request}) {
+        auto socket = mne::TcpSocket::connect("127.0.0.1", endpoint->port, std::chrono::milliseconds(1000));
+        QVERIFY(socket);
+        QVERIFY(!socket->write(bytesOf(firstLine + request)));
+        QVERIFY2(closedWithoutAnswer(*socket), firstLine.constData());
+    }
+
+    // The token is answered with the name of the service
+    auto socket = mne::TcpSocket::connect("127.0.0.1", endpoint->port, std::chrono::milliseconds(1000));
+    QVERIFY(socket);
+    QVERIFY(!socket->write(bytesOf(endpoint->token + '\n')));
+    const QByteArray hello = "hello " + m_socketName.toUtf8() + '\n';
+    QByteArray answer(hello.size(), Qt::Uninitialized);
+    QVERIFY(!socket->read(std::as_writable_bytes(std::span(answer.data(), static_cast<std::size_t>(answer.size()))), std::chrono::milliseconds(2000)));
+    QCOMPARE(answer, hello);
+}
+
+void TestStudioNeuroKernel::failsFastOnAStalePortFile()
+{
+    // The file names a port another program now listens on, which does not answer the handshake
+    const QString serviceName = QStringLiteral("mne-stale-") + QUuid::createUuid().toString(QUuid::Id128).left(12);
+    auto other = mne::TcpServer::listen("127.0.0.1", 0);
+    QVERIFY(other);
+    QFile file(backendPortFile(serviceName));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.write(QByteArray::number(other->port()) + "\n0123456789abcdef0123456789abcdef\n");
+    file.close();
+
+    BackendConnection client;
+    QElapsedTimer timer;
+    timer.start();
+    QVERIFY(!client.connectToService(serviceName, std::chrono::milliseconds(10000)));
+    QVERIFY2(timer.elapsed() < 3000, qPrintable(QString::number(timer.elapsed())));
+    QVERIFY2(client.errorString().contains(QStringLiteral("stale")), qPrintable(client.errorString()));
+    QVERIFY(!client.isConnected());
+
+    // Nothing listens on the port any more
+    *other = mne::TcpServer();
+    QVERIFY(!client.connectToService(serviceName, std::chrono::milliseconds(300)));
+    QVERIFY2(client.errorString().contains(QStringLiteral("Nothing answers")), qPrintable(client.errorString()));
+    QVERIFY(QFile::remove(file.fileName()));
 }
 
 QTEST_GUILESS_MAIN(TestStudioNeuroKernel)

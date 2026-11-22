@@ -16,6 +16,7 @@
 
 #include <acq/acq.h>
 #include <base/string_utils.h>
+#include <com/udp_socket.h>
 #include <fiff/fiff_raw_data.h>
 #include <lsl/lsl_stream_discovery.h>
 #include <lsl/lsl_stream_inlet.h>
@@ -28,13 +29,11 @@
 #include <QDateTime>
 #include <QFile>
 #include <QImage>
-#include <QNetworkInterface>
 #include <QRegularExpression>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QThread>
-#include <QUdpSocket>
 #include <QtTest>
 
 //=============================================================================================================
@@ -42,8 +41,11 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <string>
 #include <thread>
@@ -126,33 +128,20 @@ Source readSource(const std::string& uri)
 }
 
 /** Whether this host delivers a multicast datagram it sends on the interface BrainFlow joins groups on. */
-bool multicastLoopsBack(const QHostAddress& group, quint16 port)
+bool multicastLoopsBack(const std::string& group, std::uint16_t port)
 {
-    // STREAMING_BOARD joins on the interface that routes to 8.8.8.8, as mne_acq sends on it.
-    QNetworkInterface iface;
-    QUdpSocket probe;
-    probe.connectToHost(QHostAddress(QStringLiteral("8.8.8.8")), 53);
-    if (probe.waitForConnected(1000)) {
-        for (const QNetworkInterface& candidate : QNetworkInterface::allInterfaces()) {
-            for (const QNetworkAddressEntry& entry : candidate.addressEntries()) {
-                if (entry.ip() == probe.localAddress()) {
-                    iface = candidate;
-                }
-            }
-        }
-    }
-    QUdpSocket receiver;
-    if (!receiver.bind(QHostAddress(QHostAddress::AnyIPv4), port, QAbstractSocket::ShareAddress | QAbstractSocket::ReuseAddressHint) || !(iface.isValid() ? receiver.joinMulticastGroup(group, iface) : receiver.joinMulticastGroup(group))) {
+    // STREAMING_BOARD joins on the interface of the default route, as mne_acq sends on it; so does mne::UdpSocket.
+    auto receiver = mne::UdpSocket::bind(group, port);
+    auto sender = mne::UdpSocket::bind("0.0.0.0", 0);
+    if (!receiver || !sender) {
         return false;
     }
-    QUdpSocket sender;
-    sender.bind(QHostAddress(QHostAddress::AnyIPv4), 0);
-    sender.setSocketOption(QAbstractSocket::MulticastLoopbackOption, 1);
-    if (iface.isValid()) {
-        sender.setMulticastInterface(iface);
+    const std::array<std::byte, 5> probe{std::byte{'p'}, std::byte{'r'}, std::byte{'o'}, std::byte{'b'}, std::byte{'e'}};
+    if (sender->send_to(probe, group, port)) {
+        return false;
     }
-    sender.writeDatagram("probe", group, port);
-    return receiver.waitForReadyRead(1000) && receiver.hasPendingDatagrams();
+    std::array<std::byte, 16> buffer{};
+    return receiver->receive(buffer, std::chrono::milliseconds(1000)).has_value();
 }
 
 QString python()
@@ -381,7 +370,7 @@ void TestMneAcqTool::streamPublishesBrainFlow()
     const QString received = dir.filePath(QStringLiteral("brainflow.bin"));
     // A port of its own per run, so parallel runs on one host do not mix.
     const QString port = QString::number(20000 + QCoreApplication::applicationPid() % 20000);
-    if (!multicastLoopsBack(QHostAddress(QStringLiteral("225.1.1.1")), port.toUShort())) {
+    if (!multicastLoopsBack("225.1.1.1", port.toUShort())) {
         QSKIP("This host does not loop multicast back (BrainFlow's STREAMING_BOARD receives multicast only)");
     }
     QProcess consumer;

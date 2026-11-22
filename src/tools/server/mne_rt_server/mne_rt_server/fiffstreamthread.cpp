@@ -27,7 +27,13 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <array>
+#include <chrono>
+#include <cstddef>
 #include <cstring>
+#include <span>
+#include <system_error>
+#include <utility>
 
 //=============================================================================================================
 // Fiff INCLUDES
@@ -42,7 +48,6 @@
 //=============================================================================================================
 
 #include <QtEndian>
-#include <QtNetwork>
 #include <QDebug>
 
 //=============================================================================================================
@@ -54,6 +59,12 @@ using namespace mne;
 
 namespace
 {
+
+/**
+ * Longest wait for a client to take a block. One that does not (it stopped reading) is dropped, so neither the
+ * memory of the pending blocks nor the shutdown of the server depends on it.
+ */
+constexpr std::chrono::milliseconds kWriteTimeout(2000);
 
 /** Appends the tags @p write puts on a FIFF stream to @p block. */
 template<typename Write>
@@ -72,11 +83,11 @@ void appendTags(QByteArray& block, Write&& write)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject* parent)
+FiffStreamThread::FiffStreamThread(qint32 id, mne::TcpSocket socket, QObject* parent)
 : QThread(parent)
 , m_iDataClientId(id)
 , m_sDataClientAlias(QString(""))
-, m_iSocketDescriptor(socketDescriptor)
+, m_socket(std::move(socket))
 , m_bIsSendingRawBuffer(false)
 , m_bIsRunning(false)
 {
@@ -200,18 +211,13 @@ void FiffStreamThread::run()
     connect(t_pParentServer, &FiffStreamServer::stopMeasFiffStreamClient,
             this, &FiffStreamThread::stopMeas);
 
-    QTcpSocket t_qTcpSocket;
-    if (!t_qTcpSocket.setSocketDescriptor(m_iSocketDescriptor)) {
-        emit error(t_qTcpSocket.error());
-        return;
-    } else {
-        qInfo("FiffStreamClient (assigned ID %d) accepted from\n\tIP:\t%s\n\tPort:\t%d\n",
-              m_iDataClientId,
-              QHostAddress(t_qTcpSocket.peerAddress()).toString().toUtf8().constData(),
-              t_qTcpSocket.peerPort());
-    }
+    qInfo("FiffStreamClient (assigned ID %d) accepted\n", m_iDataClientId);
 
-    while (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning) {
+    constexpr qsizetype kHeaderBytes = 4 * sizeof(qint32);
+    QByteArray t_received;
+    std::array<std::byte, 4096> t_chunk{};
+
+    while (m_socket.is_open() && m_bIsRunning) {
         //
         // Write available data
         //
@@ -219,31 +225,38 @@ void FiffStreamThread::run()
         m_qMutex.lock();
         t_qBlock.swap(m_qSendBlock);
         m_qMutex.unlock();
-        // The socket buffers the block and flushes it in waitForReadyRead; blocking here would stall the producers.
+        // The producers only append to m_qSendBlock, so writing here in this thread never stalls them.
         if (!t_qBlock.isEmpty()) {
-            t_qTcpSocket.write(t_qBlock);
+            if (const std::error_code t_error = m_socket.write(std::as_bytes(std::span(t_qBlock.constData(), static_cast<std::size_t>(t_qBlock.size()))), kWriteTimeout)) {
+                qInfo("FiffStreamClient (ID %d) dropped: %s\n", m_iDataClientId, t_error.message().c_str());
+                break;
+            }
         }
 
-        // Read: wait 10 ms for a tag header (kind, type, size, next), then for its data
-        t_qTcpSocket.waitForReadyRead(10);
-        constexpr qint64 kHeaderBytes = 4 * sizeof(qint32);
-        if (t_qTcpSocket.bytesAvailable() < kHeaderBytes) {
-            continue;
+        // Read: wait 10 ms for data; parse every complete tag (kind, type, size, next, data)
+        const auto t_read = m_socket.read_some(t_chunk, std::chrono::milliseconds(10));
+        if (t_read) {
+            t_received.append(reinterpret_cast<const char*>(t_chunk.data()), static_cast<qsizetype>(*t_read));
+        } else if (t_read.error() != std::errc::timed_out) {
+            break;
         }
-        QByteArray tagBytes = t_qTcpSocket.read(kHeaderBytes);
-        const qint32 size = qFromBigEndian<qint32>(tagBytes.constData() + 2 * sizeof(qint32));
-        while (t_qTcpSocket.bytesAvailable() < size && t_qTcpSocket.state() == QAbstractSocket::ConnectedState) {
-            t_qTcpSocket.waitForReadyRead(10);
-        }
-        tagBytes += t_qTcpSocket.read(size);
-        const auto* begin = reinterpret_cast<const std::byte*>(tagBytes.constData());
-        FiffStream in(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + tagBytes.size())));
-        if (const std::optional<FiffTag> tag = in.read_tag(); tag && tag->kind == FIFF_MNE_RT_COMMAND) {
-            parseCommand(*tag);
+        while (t_received.size() >= kHeaderBytes) {
+            const qint32 size = qFromBigEndian<qint32>(t_received.constData() + 2 * sizeof(qint32));
+            if (size < 0) {
+                t_received.clear();
+                break;
+            }
+            if (t_received.size() < kHeaderBytes + size) {
+                break;
+            }
+            const auto* begin = reinterpret_cast<const std::byte*>(t_received.constData());
+            FiffStream in(std::make_unique<mne::MemoryByteStream>(std::vector<std::byte>(begin, begin + kHeaderBytes + size)));
+            t_received.remove(0, kHeaderBytes + size);
+            if (const std::optional<FiffTag> tag = in.read_tag(); tag && tag->kind == FIFF_MNE_RT_COMMAND) {
+                parseCommand(*tag);
+            }
         }
     }
 
-    t_qTcpSocket.disconnectFromHost();
-    if (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState)
-        t_qTcpSocket.waitForDisconnected();
+    m_socket.close();
 }

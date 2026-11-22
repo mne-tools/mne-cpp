@@ -19,7 +19,7 @@
 #include "mne_rt_server.h"
 
 #include <rtserver_connector/iconnector.h>
-
+#include <base/process.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -27,8 +27,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtNetwork>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -91,33 +100,21 @@ MNERTServer::MNERTServer()
     //
     // Run instruction server
     //
-    if (!m_commandServer.listen(QHostAddress::Any, 4217)) {
-        qInfo("Unable to start the command server: %s", m_commandServer.errorString().toUtf8().constData());
+    QString t_sError;
+    if (!m_commandServer.listen(4217, t_sError)) {
+        qInfo("Unable to start the command server: %s", t_sError.toUtf8().constData());
         return;
     }
     //
     // Run data server
     //
-    if (!m_fiffStreamServer.listen(QHostAddress::Any, 4218)) {
-        qInfo("Unable to start the fiff stream server: %s", m_fiffStreamServer.errorString().toUtf8().constData());
+    if (!m_fiffStreamServer.listen(4218, t_sError)) {
+        qInfo("Unable to start the fiff stream server: %s", t_sError.toUtf8().constData());
         return;
     }
 
-    QString ipAddress;
-    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-    // use the first non-localhost IPv4 address
-    for (int i = 0; i < ipAddressesList.size(); ++i) {
-        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
-            ipAddressesList.at(i).toIPv4Address()) {
-            ipAddress = ipAddressesList.at(i).toString();
-            break;
-        }
-    }
-    // if we did not find one, use IPv4 localhost
-    if (ipAddress.isEmpty())
-        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
-
-    qInfo("mne_rt_server is running on\n\tIP:\t\t%s\n\tcommand port:\t%d\n\tfiff data port:\t%d\n", ipAddress.toUtf8().constData(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
+    // Both servers listen on all interfaces
+    qInfo("mne_rt_server is running on\n\tHost:\t\t%s (all interfaces)\n\tcommand port:\t%d\n\tfiff data port:\t%d\n", mne::host_name().c_str(), m_commandServer.serverPort(), m_fiffStreamServer.serverPort());
 }
 
 //=============================================================================================================

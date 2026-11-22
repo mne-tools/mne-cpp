@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <backendchannel.h>
 #include <mainwindow.h>
 #include <irawdataview.h>
 #include <neurokernelservice.h>
@@ -26,7 +27,6 @@
 
 #include <QLineEdit>
 #include <QListWidget>
-#include <QLocalSocket>
 #include <QPushButton>
 #include <QRhiWidget>
 #include <QSettings>
@@ -37,6 +37,12 @@
 #include <QTextEdit>
 #include <QToolButton>
 #include <QtTest>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
 
 //=============================================================================================================
 
@@ -59,7 +65,7 @@ private:
     MainWindow* makeWindow();
     static QTextEdit* terminal(MainWindow* window);
     static QString runCommand(MainWindow* window, const QString& command);
-    static QLocalSocket* backendSocket(MainWindow* window, int index);
+    static BackendConnection* backendSocket(MainWindow* window, int index);
     static QTabWidget* tabsWithFile(MainWindow* window, const QString& filePath);
 
     QString m_rawPath;
@@ -121,10 +127,10 @@ QString TestMneAnalyzeStudioWorkbench::runCommand(MainWindow* window, const QStr
 
 //=============================================================================================================
 
-QLocalSocket* TestMneAnalyzeStudioWorkbench::backendSocket(MainWindow* window, int index)
+BackendConnection* TestMneAnalyzeStudioWorkbench::backendSocket(MainWindow* window, int index)
 {
     // Created in member order: Neuro-Kernel first, then Extension Host.
-    const QList<QLocalSocket*> sockets = window->findChildren<QLocalSocket*>(Qt::FindDirectChildrenOnly);
+    const QList<BackendConnection*> sockets = window->findChildren<BackendConnection*>(Qt::FindDirectChildrenOnly);
     return sockets.size() == 2 ? sockets.at(index) : nullptr;
 }
 
@@ -282,10 +288,9 @@ void TestMneAnalyzeStudioWorkbench::analysesRawThroughNeuroKernel()
 
     MainWindow* window = makeWindow();
     window->openInitialFiles({m_rawPath});
-    QLocalSocket* socket = backendSocket(window, 0);
+    BackendConnection* socket = backendSocket(window, 0);
     QVERIFY(socket);
-    socket->connectToServer(socketName);
-    QVERIFY(socket->waitForConnected(2000));
+    QVERIFY(socket->connectToService(socketName, std::chrono::milliseconds(2000)));
     QTRY_VERIFY(window->statusBar()->currentMessage().contains("Neuro-Kernel tools"));
 
     runCommand(window, "raw.goto_sample 15000");
@@ -305,7 +310,7 @@ void TestMneAnalyzeStudioWorkbench::analysesRawThroughNeuroKernel()
     runCommand(window, "status");
     QTRY_VERIFY(terminal(window)->toPlainText().contains("Neuro-Kernel is running."));
 
-    socket->abort();
+    socket->close();
 }
 
 //=============================================================================================================
@@ -338,10 +343,9 @@ void TestMneAnalyzeStudioWorkbench::loadsAndSavesWorkflowThroughSkillHost()
     QVERIFY(host.start(socketName, QStringLiteral(MNE_STUDIO_EXTENSIONS_DIR)));
 
     MainWindow* window = makeWindow();
-    QLocalSocket* socket = backendSocket(window, 1);
+    BackendConnection* socket = backendSocket(window, 1);
     QVERIFY(socket);
-    socket->connectToServer(socketName);
-    QVERIFY(socket->waitForConnected(2000));
+    QVERIFY(socket->connectToService(socketName, std::chrono::milliseconds(2000)));
     QTRY_VERIFY(window->statusBar()->currentMessage().startsWith("Extension host sessions"));
 
     runCommand(window, QString("tools.call studio.workflow.load {\"file\":\"%1\"}").arg(workflowPath));
@@ -364,7 +368,7 @@ void TestMneAnalyzeStudioWorkbench::loadsAndSavesWorkflowThroughSkillHost()
     QVERIFY(saved.hasNode("op_filter"));
     QCOMPARE(saved.nodes().size(), 1);
 
-    socket->abort();
+    socket->close();
 }
 
 //=============================================================================================================

@@ -22,12 +22,21 @@
 #include <fiff/fiff_info.h>
 #include <rtserver_connector/command_manager.h>
 
+#include <com/tcp_server.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QStringList>
-#include <QTcpServer>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstdint>
+#include <thread>
 
 //=============================================================================================================
 // DEFINE NAMESPACE RTSERVER
@@ -48,7 +57,7 @@ class FiffStreamThread;
  *
  * @brief The FiffStreamServer class provides
  */
-class FiffStreamServer : public QTcpServer //, public ICommandParser //OLD remove this
+class FiffStreamServer : public QObject //, public ICommandParser //OLD remove this
 {
     Q_OBJECT
 
@@ -75,6 +84,22 @@ public:
      */
     void connectCommands();
 
+    /**
+     * Starts listening for fiff stream clients on all interfaces; a listener thread accepts them and hands every
+     * connection to the thread of the server, which starts a FiffStreamThread for it.
+     *
+     * @param[in] port       Port to listen on.
+     * @param[out] error     Why the server does not listen, if it does not.
+     *
+     * @return Whether the server listens.
+     */
+    bool listen(std::uint16_t port, QString& error);
+
+    /**
+     * Returns the port the server listens on, 0 if it does not.
+     */
+    std::uint16_t serverPort() const;
+
     //public slots: --> in Qt 5 not anymore declared as slot
     void forwardMeasInfo(qint32 ID, const mne::FiffInfo& p_fiffInfo);
     void forwardRawBuffer(QSharedPointer<Eigen::MatrixXf> m_pMatRawData);
@@ -90,10 +115,9 @@ signals:
 
     void closeFiffStreamServer();
 
-protected:
-    void incomingConnection(qintptr socketDescriptor);
-
 private:
+    void incomingConnection(mne::TcpSocket socket);
+
     //SLOTS
     //=========================================================================================================
     /**
@@ -139,6 +163,9 @@ private:
 
     QMap<qint32, FiffStreamThread*> m_qClientList;
     qint32 m_iNextClientId;
+
+    std::uint16_t m_iPort;   /**< The port the server listens on, 0 if it does not. */
+    std::jthread m_listener; /**< Accepts the clients; declared last so it stops first. */
 };
 
 //=============================================================================================================

@@ -20,8 +20,6 @@
 #include <QObject>
 #include <QStringList>
 
-class QNetworkAccessManager;
-
 namespace MNEANALYZESTUDIO
 {
 
@@ -83,7 +81,6 @@ private:
     QString extractJsonPayload(const QString& text) const;
 
     LlmPlannerConfig m_config;
-    mutable QNetworkAccessManager* m_networkAccessManager;
 };
 
 } // namespace MNEANALYZESTUDIO

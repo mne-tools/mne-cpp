@@ -13,6 +13,7 @@
 #ifndef MNE_ANALYZE_STUDIO_SKILLHOSTSERVICE_H
 #define MNE_ANALYZE_STUDIO_SKILLHOSTSERVICE_H
 
+#include <backendchannel.h>
 #include <mcprouter.h>
 #include <viewproviderregistry.h>
 #include <workflowmanager.h>
@@ -20,7 +21,6 @@
 #include <QJsonObject>
 #include <QObject>
 #include <QHash>
-#include <QLocalServer>
 
 namespace MNEANALYZESTUDIO
 {
@@ -53,7 +53,7 @@ private:
     QJsonObject handleViewsCommand(const QJsonObject& params);
 
     McpRouter m_router;
-    QLocalServer m_server;
+    BackendServer m_server;
     ViewProviderRegistry m_registry;
     WorkflowManager m_workflowManager;
     QString m_extensionsDirectory;
