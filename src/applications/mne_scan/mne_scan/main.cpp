@@ -99,8 +99,6 @@ int main(int argc, char* argv[])
 
 // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
 #ifdef STATICBUILD
-    Q_INIT_RESOURCE(babymeg);
-    Q_INIT_RESOURCE(fiffsimulator);
     Q_INIT_RESOURCE(covariance);
     Q_INIT_RESOURCE(noisereduction);
     Q_INIT_RESOURCE(rtclustmne);
