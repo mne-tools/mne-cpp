@@ -114,6 +114,8 @@ jobs:
         doxygen mne-cpp_doxyfile
 
     - name: Deploy Doxygen to GitHub Pages (production)
+      # Forks have no token for the mne-cpp organisation's repositories
+      if: github.repository == 'mne-tools/mne-cpp'
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
@@ -489,6 +491,8 @@ jobs:
         gh release upload "${{ github.ref_name }}" "mne-cpp-${VERSION}-wasm.tar.gz" --clobber
 
     - name: Deploy WASM to mne-cpp/wasm repository
+      # Forks have no token for the mne-cpp organisation's repositories
+      if: github.repository == 'mne-tools/mne-cpp'
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |

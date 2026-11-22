@@ -317,6 +317,8 @@ jobs:
         gh release upload dev_build mne-cpp-dev-doc-qtcreator.qch --clobber
 
     - name: Deploy Doxygen to GitHub Pages (dev subdirectory)
+      # Forks have no token for the mne-cpp organisation's repositories
+      if: github.repository == 'mne-tools/mne-cpp'
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
@@ -503,6 +505,8 @@ jobs:
         gh release upload dev_build mne-cpp-dev-wasm.tar.gz --clobber
 
     - name: Deploy dev WASM to mne-cpp/wasm repository
+      # Forks have no token for the mne-cpp organisation's repositories
+      if: github.repository == 'mne-tools/mne-cpp'
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
