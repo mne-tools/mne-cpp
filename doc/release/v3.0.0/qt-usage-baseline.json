@@ -40,7 +40,7 @@
       "report",
       "sts"
     ],
-    "tokens": 8932,
+    "tokens": 8917,
     "gui_outside_design": []
   },
   "libraries": {
@@ -137,7 +137,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6027,
+      "tokens": 6025,
       "by_category": {
         "containers": 474,
         "files": 106,
@@ -148,14 +148,13 @@
         "other": 1504,
         "regex": 4,
         "strings": 1128,
-        "threads": 23,
+        "threads": 21,
         "time": 11
       },
       "public_header_includes": 110,
       "q_object": 60,
       "files": 134,
       "modules": [
-        "Concurrent",
         "Core",
         "GuiPrivate",
         "Svg",
@@ -163,11 +162,11 @@
       ]
     },
     "disp3D": {
-      "tokens": 2895,
+      "tokens": 2882,
       "by_category": {
-        "containers": 261,
+        "containers": 258,
         "files": 45,
-        "global": 302,
+        "global": 303,
         "gui": 962,
         "logging": 105,
         "objects_signals": 142,
@@ -175,14 +174,13 @@
         "random": 3,
         "smart_pointers": 69,
         "strings": 687,
-        "threads": 74,
+        "threads": 63,
         "time": 17
       },
       "public_header_includes": 142,
       "q_object": 12,
       "files": 81,
       "modules": [
-        "Concurrent",
         "Core",
         "Gui",
         "GuiPrivate",

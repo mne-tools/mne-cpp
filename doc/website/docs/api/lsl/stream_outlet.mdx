@@ -69,6 +69,39 @@ Push a chunk of multichannel samples into the outlet.
 
 ---
 
+### push_chunk_double(chunk)
+
+Push a chunk of double samples; double64 and int32 streams carry them without loss through float.
+
+**Parameters:**
+
+- **chunk** : *const std::vector&lt; std::vector&lt; double &gt; &gt; &*
+  A vector of samples, where each sample is a vector of channel values.
+
+---
+
+### push_sample(sample)
+
+Push a single sample of any numeric type, as liblsl's push_sample&lt;T&gt;; float takes the overload above.
+
+**Parameters:**
+
+- **sample** : *const std::vector&lt; T &gt; &*
+  A vector of channel values (must match the stream's channel_count).
+
+---
+
+### push_chunk(chunk)
+
+Push a chunk of samples of any numeric type, as liblsl's push_chunk&lt;T&gt;; float takes the overload above.
+
+**Parameters:**
+
+- **chunk** : *const std::vector&lt; std::vector&lt; T &gt; &gt; &*
+  A vector of samples, where each sample is a vector of channel values.
+
+---
+
 ### info()
 
 Get the [`stream_info`](/docs/api/lsl/stream_info) associated with this outlet (including the assigned data port).
@@ -104,8 +137,6 @@ LSL library: publish a stream, discover it and receive its samples over loopback
 ````cpp title="src/examples/ex_lsl/main.cpp, line 75"
 stream_info info("ex_lsl_eeg", "EEG", 3, 250.0, ChannelFormat::Float32, "ex_lsl"); // name, type, channels, Hz
 stream_outlet outlet(info);                                                        // starts serving immediately
-ok &= expect(outlet.info().name() == "ex_lsl_eeg" && outlet.info().channel_count() == 3 && outlet.info().nominal_srate() == 250.0 && outlet.info().data_port() > 0 && !outlet.info().uid().empty(),
-             std::format("stream_info: 3 channels at 250 Hz, served on port {}", outlet.info().data_port()));
 ````
 
 ## Authors of this file

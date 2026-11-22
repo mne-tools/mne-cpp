@@ -15,7 +15,7 @@ sidebar_position: 2
 class mne::stream_inlet
 ```
 
-Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float chunks.
+Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float or double chunks.
 
 ```cpp title="src/examples/ex_lsl/main.cpp"
 stream_info source = outlet.info(); // normally an entry of resolve_stream("name", "ex_lsl_eeg")
@@ -96,7 +96,7 @@ Also performs a non-blocking read from the TCP socket to collect any pending dat
 
 Pull a chunk of multichannel data from the inlet.
 
-Returns all complete samples currently in the buffer. Template is provided for API compatibility with liblsl; only float is supported in this implementation.
+Returns all complete samples currently in the buffer, converted to `T` as liblsl's pull_chunk&lt;T&gt; does (integers rounded to the nearest value).
 
 **Returns:**
 
@@ -129,6 +129,48 @@ Pull a chunk of float data with the timestamp of every sample.
 
 ---
 
+### pull_chunk_double()
+
+Pull a chunk of double data: the native values of float32, double64, int32, int16 and int8 streams.
+
+**Returns:**
+
+- *std::vector&lt; std::vector&lt; double &gt; &gt;* — A vector of samples, where each sample is a vector of double channel values.
+
+---
+
+### pull_chunk_double(timestamps)
+
+Pull a chunk of double data with the timestamp of every sample.
+
+**Parameters:**
+
+- **timestamps** : *std::vector&lt; double &gt; &*
+  One timestamp per returned sample, in the outlet host's `local_clock()` seconds.
+
+**Returns:**
+
+- *std::vector&lt; std::vector&lt; double &gt; &gt;* — A vector of samples, where each sample is a vector of double channel values.
+
+---
+
+### info(timeout)
+
+The full info of the stream, as liblsl's `stream_inlet::info()`: fetched from the outlet once (fullinfo request), then cached.
+
+Unlike the info from discovery it carries the channel description.
+
+**Parameters:**
+
+- **timeout** : *double*
+  Maximum wait in seconds.
+
+**Returns:**
+
+- *[stream_info](/docs/api/lsl/stream_info)* — The stream info with its channel description.
+
+---
+
 ### time_correction(timeout)
 
 Estimates the offset between the outlet host's clock and `local_clock()` from round trips to the outlet's service port, keeping the one with the shortest round-trip time.
@@ -156,18 +198,15 @@ Estimates the offset between the outlet host's clock and `local_clock()` from ro
 
 LSL library: publish a stream, discover it and receive its samples over loopback.
 
-````cpp title="src/examples/ex_lsl/main.cpp, line 82"
-stream_info source = outlet.info(); // normally an entry of resolve_stream("name", "ex_lsl_eeg")
-source.set_data_host("127.0.0.1");
-stream_inlet inlet(source);
-inlet.open_stream();
-QElapsedTimer clock;
-clock.start();
-while (!outlet.have_consumers() && clock.elapsed() < 5000) { // samples pushed before the outlet accepts the inlet are not delivered
-    QThread::msleep(5);
-}
-outlet.push_sample({1.0f, 2.0f, 3.0f});
-outlet.push_chunk({{4.0f, 5.0f, 6.0f}, {7.0f, 8.0f, 9.0f}});
+````cpp title="src/examples/ex_lsl/main.cpp, line 84"
+stream_info labelledSource = labelled.info();
+labelledSource.set_data_host("127.0.0.1");
+stream_inlet labelledInlet(labelledSource);
+const stream_info full = labelledInlet.info(); // the full info, fetched from the outlet once
+ok &= expect(full.channels().size() == 2 && full.channels()[0].label == "Fz" && full.channels()[1].unit == "microvolts",
+             "channel_description: labels and units travel with the stream's full info");
+ok &= expect(outlet.info().name() == "ex_lsl_eeg" && outlet.info().channel_count() == 3 && outlet.info().nominal_srate() == 250.0 && outlet.info().data_port() > 0 && !outlet.info().uid().empty(),
+             std::format("stream_info: 3 channels at 250 Hz, served on port {}", outlet.info().data_port()));
 ````
 
 ## Authors of this file

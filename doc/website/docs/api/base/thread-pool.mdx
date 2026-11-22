@@ -62,6 +62,14 @@ Runs the tasks still queued, then joins the workers.
 
 ---
 
+### active_count()
+
+**Returns:**
+
+- *std::size_t* — The number of tasks that are queued or running; 0 once the pool is idle.
+
+---
+
 ### submit(task)
 
 Queues `task`.

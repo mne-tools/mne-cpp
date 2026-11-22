@@ -65,6 +65,26 @@ if (!server) {
 
 ---
 
+### write(data, timeout)
+
+As `write()`, within a time limit, e.g.
+
+so a peer that stops reading cannot hold the caller.
+
+**Parameters:**
+
+- **data** : *std::span&lt; const std::byte &gt;*
+  Bytes to send, all of them.
+
+- **timeout** : *std::chrono::milliseconds*
+  Maximum wait for the peer to take all of them.
+
+**Returns:**
+
+- *std::error_code* — timed_out if the peer did not take them in time (part of them may have been sent), or the system's error if the connection fails.
+
+---
+
 ### read(buffer, timeout)
 
 Reads exactly `buffer.size()` bytes.

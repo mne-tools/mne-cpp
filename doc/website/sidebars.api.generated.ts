@@ -563,7 +563,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
       items: [
         'api/lsl/stream_info',
         'api/lsl/stream_inlet',
-        'api/lsl/stream_outlet'
+        'api/lsl/stream_outlet',
+        'api/lsl/channel_description'
       ],
     },
     {

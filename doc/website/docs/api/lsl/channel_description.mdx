@@ -1,0 +1,51 @@
+---
+id: channel_description
+title: "mne::channel_description"
+sidebar_label: channel_description
+sidebar_position: 4
+---
+
+# channel_description
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** LSL Library &nbsp;·&nbsp; **Source:** [`lsl/lsl_stream_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/lsl/lsl_stream_info.h)
+
+`#include <lsl/lsl_stream_info.h>`
+
+```cpp
+struct mne::channel_description
+```
+
+Description of one channel, as liblsl's stream description carries it in desc/channels/channel.
+
+```cpp title="src/examples/ex_lsl/main.cpp"
+stream_info described("ex_lsl_labelled", "EEG", 2, 250.0, ChannelFormat::Float32, "ex_lsl_labelled");
+described.set_channels({{"Fz", "EEG", "microvolts"}, {"Cz", "EEG", "microvolts"}}); // sent with the full info
+stream_outlet labelled(described);
+```
+
+---
+
+## Example
+
+- Start here: [ex_lsl](../../examples/lsl/ex_lsl.mdx) — LSL library: publish a stream, discover it and receive its samples over loopback.
+- Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
+- Build target: `ex_lsl` (runs under CTest)
+
+## Used in examples
+
+### [ex_lsl](../../examples/lsl/ex_lsl.mdx)
+
+LSL library: publish a stream, discover it and receive its samples over loopback.
+
+````cpp title="src/examples/ex_lsl/main.cpp, line 86"
+stream_inlet labelledInlet(labelledSource);
+const stream_info full = labelledInlet.info(); // the full info, fetched from the outlet once
+ok &= expect(full.channels().size() == 2 && full.channels()[0].label == "Fz" && full.channels()[1].unit == "microvolts",
+             "channel_description: labels and units travel with the stream's full info");
+ok &= expect(outlet.info().name() == "ex_lsl_eeg" && outlet.info().channel_count() == 3 && outlet.info().nominal_srate() == 250.0 && outlet.info().data_port() > 0 && !outlet.info().uid().empty(),
+             std::format("stream_info: 3 channels at 250 Hz, served on port {}", outlet.info().data_port()));
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
