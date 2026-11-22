@@ -256,8 +256,9 @@ jobs:
         $vsInstallPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
         if (-not $vsInstallPath) { throw 'Could not locate a Visual Studio installation with VC tools.' }
         $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
-        cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        # Kept for the test steps: with Ninja, the self-test of MneTesting configures projects that need cl, rc and link
+        cmd.exe /c "call `"$vcvarsPath`" && set > %RUNNER_TEMP%\vcvars.txt"
+        Get-Content "$env:RUNNER_TEMP\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         # Ninja compiles the files of a target in parallel, msbuild only the targets. ccache cannot cache an MSVC
         # compile that uses a precompiled header or writes a .pdb, so neither is used here.
         cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON `
@@ -395,6 +396,7 @@ jobs:
         MNE_REQUIRE_PYTHON: 'true'
       shell: pwsh
       run: |
+        Get-Content "$env:RUNNER_TEMP\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         ctest --test-dir build -C Release `
               --output-on-failure `
               --no-tests=error `
