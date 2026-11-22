@@ -68,7 +68,7 @@
       "supplier": "DMLC",
       "license": "Apache-2.0",
       "url": "https://github.com/dmlc/dlpack",
-      "linkage": "header-only, vendored in src/external/dlpack",
+      "linkage": "header-only, vendored in src/3rdparty/dlpack",
       "shipped": true,
       "used_by": "acq (acq_dlpack.h)",
       "purpose": "Struct layout for handing sample blocks to Python and ML frameworks without a copy.",

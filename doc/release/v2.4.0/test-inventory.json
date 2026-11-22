@@ -590,10 +590,10 @@
   "tests": [
     {
       "name": "test_acq_convert",
-      "cmake": "src/testframes/test_acq_convert/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_convert/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -629,10 +629,10 @@
     },
     {
       "name": "test_acq_device",
-      "cmake": "src/testframes/test_acq_device/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_device/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -674,10 +674,10 @@
     },
     {
       "name": "test_acq_devices",
-      "cmake": "src/testframes/test_acq_devices/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_devices/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -708,10 +708,10 @@
     },
     {
       "name": "test_acq_dlpack",
-      "cmake": "src/testframes/test_acq_dlpack/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_dlpack/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -742,10 +742,10 @@
     },
     {
       "name": "test_acq_error",
-      "cmake": "src/testframes/test_acq_error/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_error/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -779,10 +779,10 @@
     },
     {
       "name": "test_acq_fiff_replay",
-      "cmake": "src/testframes/test_acq_fiff_replay/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_fiff_replay/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -813,10 +813,10 @@
     },
     {
       "name": "test_acq_lsl",
-      "cmake": "src/testframes/test_acq_lsl/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_lsl/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -847,10 +847,10 @@
     },
     {
       "name": "test_acq_recorder",
-      "cmake": "src/testframes/test_acq_recorder/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_recorder/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -886,10 +886,10 @@
     },
     {
       "name": "test_acq_stream",
-      "cmake": "src/testframes/test_acq_stream/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_stream/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -940,10 +940,10 @@
     },
     {
       "name": "test_acq_thread",
-      "cmake": "src/testframes/test_acq_thread/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_thread/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -974,10 +974,10 @@
     },
     {
       "name": "test_acq_timebase",
-      "cmake": "src/testframes/test_acq_timebase/CMakeLists.txt",
+      "cmake": "src/tests/test_acq_timebase/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1011,10 +1011,10 @@
     },
     {
       "name": "test_analyze_averaging",
-      "cmake": "src/testframes/test_analyze_averaging/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_averaging/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1048,10 +1048,10 @@
     },
     {
       "name": "test_analyze_channelselection",
-      "cmake": "src/testframes/test_analyze_channelselection/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_channelselection/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1084,10 +1084,10 @@
     },
     {
       "name": "test_analyze_controlmanager",
-      "cmake": "src/testframes/test_analyze_controlmanager/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_controlmanager/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1120,10 +1120,10 @@
     },
     {
       "name": "test_analyze_coregistration",
-      "cmake": "src/testframes/test_analyze_coregistration/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_coregistration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1156,10 +1156,10 @@
     },
     {
       "name": "test_analyze_dataloader",
-      "cmake": "src/testframes/test_analyze_dataloader/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_dataloader/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1192,10 +1192,10 @@
     },
     {
       "name": "test_analyze_datamanager",
-      "cmake": "src/testframes/test_analyze_datamanager/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_datamanager/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1228,10 +1228,10 @@
     },
     {
       "name": "test_analyze_dipolefit",
-      "cmake": "src/testframes/test_analyze_dipolefit/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_dipolefit/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1265,10 +1265,10 @@
     },
     {
       "name": "test_analyze_events",
-      "cmake": "src/testframes/test_analyze_events/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_events/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1301,10 +1301,10 @@
     },
     {
       "name": "test_analyze_rawdataviewer",
-      "cmake": "src/testframes/test_analyze_rawdataviewer/CMakeLists.txt",
+      "cmake": "src/tests/test_analyze_rawdataviewer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1337,10 +1337,10 @@
     },
     {
       "name": "test_anshared_models",
-      "cmake": "src/testframes/test_anshared_models/CMakeLists.txt",
+      "cmake": "src/tests/test_anshared_models/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1373,10 +1373,10 @@
     },
     {
       "name": "test_api_registry",
-      "cmake": "src/testframes/test_api_registry/CMakeLists.txt",
+      "cmake": "src/tests/test_api_registry/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1405,10 +1405,10 @@
     },
     {
       "name": "test_base_byte_stream",
-      "cmake": "src/testframes/test_base_byte_stream/CMakeLists.txt",
+      "cmake": "src/tests/test_base_byte_stream/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1441,10 +1441,10 @@
     },
     {
       "name": "test_base_cbor",
-      "cmake": "src/testframes/test_base_cbor/CMakeLists.txt",
+      "cmake": "src/tests/test_base_cbor/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1478,10 +1478,10 @@
     },
     {
       "name": "test_base_circular_buffer",
-      "cmake": "src/testframes/test_base_circular_buffer/CMakeLists.txt",
+      "cmake": "src/tests/test_base_circular_buffer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1512,10 +1512,10 @@
     },
     {
       "name": "test_base_json",
-      "cmake": "src/testframes/test_base_json/CMakeLists.txt",
+      "cmake": "src/tests/test_base_json/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1552,10 +1552,10 @@
     },
     {
       "name": "test_base_logger",
-      "cmake": "src/testframes/test_base_logger/CMakeLists.txt",
+      "cmake": "src/tests/test_base_logger/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1587,10 +1587,10 @@
     },
     {
       "name": "test_base_process",
-      "cmake": "src/testframes/test_base_process/CMakeLists.txt",
+      "cmake": "src/tests/test_base_process/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1622,10 +1622,10 @@
     },
     {
       "name": "test_base_sha256",
-      "cmake": "src/testframes/test_base_sha256/CMakeLists.txt",
+      "cmake": "src/tests/test_base_sha256/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1656,10 +1656,10 @@
     },
     {
       "name": "test_base_string_utils",
-      "cmake": "src/testframes/test_base_string_utils/CMakeLists.txt",
+      "cmake": "src/tests/test_base_string_utils/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1688,10 +1688,10 @@
     },
     {
       "name": "test_base_thread_pool",
-      "cmake": "src/testframes/test_base_thread_pool/CMakeLists.txt",
+      "cmake": "src/tests/test_base_thread_pool/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1722,10 +1722,10 @@
     },
     {
       "name": "test_base_xml",
-      "cmake": "src/testframes/test_base_xml/CMakeLists.txt",
+      "cmake": "src/tests/test_base_xml/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1756,10 +1756,10 @@
     },
     {
       "name": "test_batch_processor",
-      "cmake": "src/testframes/test_batch_processor/CMakeLists.txt",
+      "cmake": "src/tests/test_batch_processor/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1791,10 +1791,10 @@
     },
     {
       "name": "test_bids",
-      "cmake": "src/testframes/test_bids/CMakeLists.txt",
+      "cmake": "src/tests/test_bids/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1833,10 +1833,10 @@
     },
     {
       "name": "test_bids_coordinate_system",
-      "cmake": "src/testframes/test_bids_coordinate_system/CMakeLists.txt",
+      "cmake": "src/tests/test_bids_coordinate_system/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1865,10 +1865,10 @@
     },
     {
       "name": "test_browse_virtual_channels",
-      "cmake": "src/testframes/test_browse_virtual_channels/CMakeLists.txt",
+      "cmake": "src/tests/test_browse_virtual_channels/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1897,10 +1897,10 @@
     },
     {
       "name": "test_channels_layout_selection",
-      "cmake": "src/testframes/test_channels_layout_selection/CMakeLists.txt",
+      "cmake": "src/tests/test_channels_layout_selection/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1936,10 +1936,10 @@
     },
     {
       "name": "test_channels_standard_montage",
-      "cmake": "src/testframes/test_channels_standard_montage/CMakeLists.txt",
+      "cmake": "src/tests/test_channels_standard_montage/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -1972,10 +1972,10 @@
     },
     {
       "name": "test_com",
-      "cmake": "src/testframes/test_com/CMakeLists.txt",
+      "cmake": "src/tests/test_com/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2010,10 +2010,10 @@
     },
     {
       "name": "test_compute_raw_inverse",
-      "cmake": "src/testframes/test_compute_raw_inverse/CMakeLists.txt",
+      "cmake": "src/tests/test_compute_raw_inverse/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2049,10 +2049,10 @@
     },
     {
       "name": "test_conn_network",
-      "cmake": "src/testframes/test_conn_network/CMakeLists.txt",
+      "cmake": "src/tests/test_conn_network/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2081,10 +2081,10 @@
     },
     {
       "name": "test_connectivity_aec",
-      "cmake": "src/testframes/test_connectivity_aec/CMakeLists.txt",
+      "cmake": "src/tests/test_connectivity_aec/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2115,10 +2115,10 @@
     },
     {
       "name": "test_connectivity_metrics",
-      "cmake": "src/testframes/test_connectivity_metrics/CMakeLists.txt",
+      "cmake": "src/tests/test_connectivity_metrics/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2151,10 +2151,10 @@
     },
     {
       "name": "test_coregistration",
-      "cmake": "src/testframes/test_coregistration/CMakeLists.txt",
+      "cmake": "src/tests/test_coregistration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2188,10 +2188,10 @@
     },
     {
       "name": "test_cortical_surface_inverse",
-      "cmake": "src/testframes/test_cortical_surface_inverse/CMakeLists.txt",
+      "cmake": "src/tests/test_cortical_surface_inverse/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2224,10 +2224,10 @@
     },
     {
       "name": "test_cortical_surface_labels",
-      "cmake": "src/testframes/test_cortical_surface_labels/CMakeLists.txt",
+      "cmake": "src/tests/test_cortical_surface_labels/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2257,10 +2257,10 @@
     },
     {
       "name": "test_cortical_surface_picking",
-      "cmake": "src/testframes/test_cortical_surface_picking/CMakeLists.txt",
+      "cmake": "src/tests/test_cortical_surface_picking/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2292,10 +2292,10 @@
     },
     {
       "name": "test_cortical_surface_stc",
-      "cmake": "src/testframes/test_cortical_surface_stc/CMakeLists.txt",
+      "cmake": "src/tests/test_cortical_surface_stc/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2325,10 +2325,10 @@
     },
     {
       "name": "test_crossval_covariance",
-      "cmake": "src/testframes/test_crossval_covariance/CMakeLists.txt",
+      "cmake": "src/tests/test_crossval_covariance/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2360,10 +2360,10 @@
     },
     {
       "name": "test_decoding_csp",
-      "cmake": "src/testframes/test_decoding_csp/CMakeLists.txt",
+      "cmake": "src/tests/test_decoding_csp/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2394,10 +2394,10 @@
     },
     {
       "name": "test_decoding_spoc",
-      "cmake": "src/testframes/test_decoding_spoc/CMakeLists.txt",
+      "cmake": "src/tests/test_decoding_spoc/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2428,10 +2428,10 @@
     },
     {
       "name": "test_decoding_ssd",
-      "cmake": "src/testframes/test_decoding_ssd/CMakeLists.txt",
+      "cmake": "src/tests/test_decoding_ssd/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2462,10 +2462,10 @@
     },
     {
       "name": "test_dipole_fit",
-      "cmake": "src/testframes/test_dipole_fit/CMakeLists.txt",
+      "cmake": "src/tests/test_dipole_fit/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2497,10 +2497,10 @@
     },
     {
       "name": "test_disp3d_brainsurface",
-      "cmake": "src/testframes/test_disp3d_brainsurface/CMakeLists.txt",
+      "cmake": "src/tests/test_disp3d_brainsurface/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2532,10 +2532,10 @@
     },
     {
       "name": "test_disp3d_brainview",
-      "cmake": "src/testframes/test_disp3d_brainview/CMakeLists.txt",
+      "cmake": "src/tests/test_disp3d_brainview/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2594,10 +2594,10 @@
     },
     {
       "name": "test_disp3d_headless",
-      "cmake": "src/testframes/test_disp3d_headless/CMakeLists.txt",
+      "cmake": "src/tests/test_disp3d_headless/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2632,10 +2632,10 @@
     },
     {
       "name": "test_disp3d_viewstate",
-      "cmake": "src/testframes/test_disp3d_viewstate/CMakeLists.txt",
+      "cmake": "src/tests/test_disp3d_viewstate/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2667,10 +2667,10 @@
     },
     {
       "name": "test_disp_colormap",
-      "cmake": "src/testframes/test_disp_colormap/CMakeLists.txt",
+      "cmake": "src/tests/test_disp_colormap/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2699,10 +2699,10 @@
     },
     {
       "name": "test_disp_plots",
-      "cmake": "src/testframes/test_disp_plots/CMakeLists.txt",
+      "cmake": "src/tests/test_disp_plots/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2734,10 +2734,10 @@
     },
     {
       "name": "test_disp_viewers",
-      "cmake": "src/testframes/test_disp_viewers/CMakeLists.txt",
+      "cmake": "src/tests/test_disp_viewers/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2767,10 +2767,10 @@
     },
     {
       "name": "test_disp_viewers2",
-      "cmake": "src/testframes/test_disp_viewers2/CMakeLists.txt",
+      "cmake": "src/tests/test_disp_viewers2/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2808,10 +2808,10 @@
     },
     {
       "name": "test_disp_viewers3",
-      "cmake": "src/testframes/test_disp_viewers3/CMakeLists.txt",
+      "cmake": "src/tests/test_disp_viewers3/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2841,7 +2841,7 @@
     },
     {
       "name": "test_doc_shots",
-      "cmake": "src/testframes/test_doc_shots/CMakeLists.txt",
+      "cmake": "src/tests/test_doc_shots/CMakeLists.txt",
       "registration": {
         "state": "conditional",
         "via": "CMakeLists.txt",
@@ -2876,10 +2876,10 @@
     },
     {
       "name": "test_dsp_annotate_artifact",
-      "cmake": "src/testframes/test_dsp_annotate_artifact/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_annotate_artifact/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2911,10 +2911,10 @@
     },
     {
       "name": "test_dsp_artifact_detect",
-      "cmake": "src/testframes/test_dsp_artifact_detect/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_artifact_detect/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2949,10 +2949,10 @@
     },
     {
       "name": "test_dsp_bad_channel_detect",
-      "cmake": "src/testframes/test_dsp_bad_channel_detect/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_bad_channel_detect/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -2981,10 +2981,10 @@
     },
     {
       "name": "test_dsp_bad_channels_lof",
-      "cmake": "src/testframes/test_dsp_bad_channels_lof/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_bad_channels_lof/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3015,10 +3015,10 @@
     },
     {
       "name": "test_dsp_bad_channels_maxwell",
-      "cmake": "src/testframes/test_dsp_bad_channels_maxwell/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_bad_channels_maxwell/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3049,10 +3049,10 @@
     },
     {
       "name": "test_dsp_bridged_electrodes",
-      "cmake": "src/testframes/test_dsp_bridged_electrodes/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_bridged_electrodes/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3083,10 +3083,10 @@
     },
     {
       "name": "test_dsp_channel_derivation",
-      "cmake": "src/testframes/test_dsp_channel_derivation/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_channel_derivation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3115,10 +3115,10 @@
     },
     {
       "name": "test_dsp_csd",
-      "cmake": "src/testframes/test_dsp_csd/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_csd/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3148,10 +3148,10 @@
     },
     {
       "name": "test_dsp_eeg_reference",
-      "cmake": "src/testframes/test_dsp_eeg_reference/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_eeg_reference/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3183,10 +3183,10 @@
     },
     {
       "name": "test_dsp_eog_regression",
-      "cmake": "src/testframes/test_dsp_eog_regression/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_eog_regression/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3218,10 +3218,10 @@
     },
     {
       "name": "test_dsp_epoch_extractor",
-      "cmake": "src/testframes/test_dsp_epoch_extractor/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_epoch_extractor/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3250,10 +3250,10 @@
     },
     {
       "name": "test_dsp_filter_chpi",
-      "cmake": "src/testframes/test_dsp_filter_chpi/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_filter_chpi/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3284,10 +3284,10 @@
     },
     {
       "name": "test_dsp_filterio",
-      "cmake": "src/testframes/test_dsp_filterio/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_filterio/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3316,10 +3316,10 @@
     },
     {
       "name": "test_dsp_firfilter",
-      "cmake": "src/testframes/test_dsp_firfilter/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_firfilter/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3351,10 +3351,10 @@
     },
     {
       "name": "test_dsp_ica",
-      "cmake": "src/testframes/test_dsp_ica/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_ica/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3385,10 +3385,10 @@
     },
     {
       "name": "test_dsp_iirfilter",
-      "cmake": "src/testframes/test_dsp_iirfilter/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_iirfilter/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3420,10 +3420,10 @@
     },
     {
       "name": "test_dsp_infomax",
-      "cmake": "src/testframes/test_dsp_infomax/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_infomax/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3454,10 +3454,10 @@
     },
     {
       "name": "test_dsp_morlet_tfr",
-      "cmake": "src/testframes/test_dsp_morlet_tfr/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_morlet_tfr/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3489,10 +3489,10 @@
     },
     {
       "name": "test_dsp_multitaper",
-      "cmake": "src/testframes/test_dsp_multitaper/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_multitaper/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3525,10 +3525,10 @@
     },
     {
       "name": "test_dsp_peak_finder",
-      "cmake": "src/testframes/test_dsp_peak_finder/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_peak_finder/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3559,10 +3559,10 @@
     },
     {
       "name": "test_dsp_resample",
-      "cmake": "src/testframes/test_dsp_resample/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_resample/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3593,10 +3593,10 @@
     },
     {
       "name": "test_dsp_rt_averaging",
-      "cmake": "src/testframes/test_dsp_rt_averaging/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_rt_averaging/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3628,10 +3628,10 @@
     },
     {
       "name": "test_dsp_rt_cov",
-      "cmake": "src/testframes/test_dsp_rt_cov/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_rt_cov/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3660,10 +3660,10 @@
     },
     {
       "name": "test_dsp_rt_extended",
-      "cmake": "src/testframes/test_dsp_rt_extended/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_rt_extended/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3692,10 +3692,10 @@
     },
     {
       "name": "test_dsp_simulate",
-      "cmake": "src/testframes/test_dsp_simulate/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_simulate/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3727,10 +3727,10 @@
     },
     {
       "name": "test_dsp_spectrogram",
-      "cmake": "src/testframes/test_dsp_spectrogram/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_spectrogram/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3759,10 +3759,10 @@
     },
     {
       "name": "test_dsp_sphara",
-      "cmake": "src/testframes/test_dsp_sphara/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_sphara/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3793,10 +3793,10 @@
     },
     {
       "name": "test_dsp_sss",
-      "cmake": "src/testframes/test_dsp_sss/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_sss/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3827,10 +3827,10 @@
     },
     {
       "name": "test_dsp_stim_artifact",
-      "cmake": "src/testframes/test_dsp_stim_artifact/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_stim_artifact/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3861,10 +3861,10 @@
     },
     {
       "name": "test_dsp_welch_psd",
-      "cmake": "src/testframes/test_dsp_welch_psd/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_welch_psd/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3896,10 +3896,10 @@
     },
     {
       "name": "test_dsp_xdawn",
-      "cmake": "src/testframes/test_dsp_xdawn/CMakeLists.txt",
+      "cmake": "src/tests/test_dsp_xdawn/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3930,10 +3930,10 @@
     },
     {
       "name": "test_edf2fiff_rwr",
-      "cmake": "src/testframes/test_edf2fiff_rwr/CMakeLists.txt",
+      "cmake": "src/tests/test_edf2fiff_rwr/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3966,10 +3966,10 @@
     },
     {
       "name": "test_electrode_object",
-      "cmake": "src/testframes/test_electrode_object/CMakeLists.txt",
+      "cmake": "src/tests/test_electrode_object/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -3998,10 +3998,10 @@
     },
     {
       "name": "test_electrodes_plugin",
-      "cmake": "src/testframes/test_electrodes_plugin/CMakeLists.txt",
+      "cmake": "src/tests/test_electrodes_plugin/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4030,10 +4030,10 @@
     },
     {
       "name": "test_epochs",
-      "cmake": "src/testframes/test_epochs/CMakeLists.txt",
+      "cmake": "src/tests/test_epochs/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4065,10 +4065,10 @@
     },
     {
       "name": "test_events",
-      "cmake": "src/testframes/test_events/CMakeLists.txt",
+      "cmake": "src/tests/test_events/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4097,10 +4097,10 @@
     },
     {
       "name": "test_field_map",
-      "cmake": "src/testframes/test_field_map/CMakeLists.txt",
+      "cmake": "src/tests/test_field_map/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4134,10 +4134,10 @@
     },
     {
       "name": "test_fiff_annotation_event_utils",
-      "cmake": "src/testframes/test_fiff_annotation_event_utils/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_annotation_event_utils/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4168,10 +4168,10 @@
     },
     {
       "name": "test_fiff_annotations",
-      "cmake": "src/testframes/test_fiff_annotations/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_annotations/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4202,10 +4202,10 @@
     },
     {
       "name": "test_fiff_byte_swap",
-      "cmake": "src/testframes/test_fiff_byte_swap/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_byte_swap/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4234,10 +4234,10 @@
     },
     {
       "name": "test_fiff_coord_trans",
-      "cmake": "src/testframes/test_fiff_coord_trans/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_coord_trans/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4274,10 +4274,10 @@
     },
     {
       "name": "test_fiff_coord_transform",
-      "cmake": "src/testframes/test_fiff_coord_transform/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_coord_transform/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4306,10 +4306,10 @@
     },
     {
       "name": "test_fiff_core_python",
-      "cmake": "src/testframes/test_fiff_core_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_core_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4342,10 +4342,10 @@
     },
     {
       "name": "test_fiff_cov",
-      "cmake": "src/testframes/test_fiff_cov/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_cov/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4377,10 +4377,10 @@
     },
     {
       "name": "test_fiff_cov_python",
-      "cmake": "src/testframes/test_fiff_cov_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_cov_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4415,10 +4415,10 @@
     },
     {
       "name": "test_fiff_coverage",
-      "cmake": "src/testframes/test_fiff_coverage/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_coverage/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4450,10 +4450,10 @@
     },
     {
       "name": "test_fiff_data_types",
-      "cmake": "src/testframes/test_fiff_data_types/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_data_types/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4485,10 +4485,10 @@
     },
     {
       "name": "test_fiff_dig_point_python",
-      "cmake": "src/testframes/test_fiff_dig_point_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_dig_point_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4523,10 +4523,10 @@
     },
     {
       "name": "test_fiff_digitizer",
-      "cmake": "src/testframes/test_fiff_digitizer/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_digitizer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4558,10 +4558,10 @@
     },
     {
       "name": "test_fiff_evoked_python",
-      "cmake": "src/testframes/test_fiff_evoked_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_evoked_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4594,10 +4594,10 @@
     },
     {
       "name": "test_fiff_extended",
-      "cmake": "src/testframes/test_fiff_extended/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_extended/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4629,10 +4629,10 @@
     },
     {
       "name": "test_fiff_fs_library",
-      "cmake": "src/testframes/test_fiff_fs_library/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_fs_library/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4665,10 +4665,10 @@
     },
     {
       "name": "test_fiff_info",
-      "cmake": "src/testframes/test_fiff_info/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_info/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4703,10 +4703,10 @@
     },
     {
       "name": "test_fiff_io_evoked_info",
-      "cmake": "src/testframes/test_fiff_io_evoked_info/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_io_evoked_info/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4741,10 +4741,10 @@
     },
     {
       "name": "test_fiff_mne_types_io",
-      "cmake": "src/testframes/test_fiff_mne_types_io/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_mne_types_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4776,10 +4776,10 @@
     },
     {
       "name": "test_fiff_proj_python",
-      "cmake": "src/testframes/test_fiff_proj_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_proj_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4815,10 +4815,10 @@
     },
     {
       "name": "test_fiff_raw_formats_python",
-      "cmake": "src/testframes/test_fiff_raw_formats_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_raw_formats_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4850,10 +4850,10 @@
     },
     {
       "name": "test_fiff_raw_io",
-      "cmake": "src/testframes/test_fiff_raw_io/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_raw_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4888,10 +4888,10 @@
     },
     {
       "name": "test_fiff_raw_save_python",
-      "cmake": "src/testframes/test_fiff_raw_save_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_raw_save_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4924,10 +4924,10 @@
     },
     {
       "name": "test_fiff_rwr",
-      "cmake": "src/testframes/test_fiff_rwr/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_rwr/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4959,10 +4959,10 @@
     },
     {
       "name": "test_fiff_stream_python",
-      "cmake": "src/testframes/test_fiff_stream_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fiff_stream_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -4995,10 +4995,10 @@
     },
     {
       "name": "test_fiffsimulator_ssp",
-      "cmake": "src/testframes/test_fiffsimulator_ssp/CMakeLists.txt",
+      "cmake": "src/tests/test_fiffsimulator_ssp/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5029,10 +5029,10 @@
     },
     {
       "name": "test_filter_data",
-      "cmake": "src/testframes/test_filter_data/CMakeLists.txt",
+      "cmake": "src/tests/test_filter_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5064,10 +5064,10 @@
     },
     {
       "name": "test_filter_kernel",
-      "cmake": "src/testframes/test_filter_kernel/CMakeLists.txt",
+      "cmake": "src/tests/test_filter_kernel/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5098,10 +5098,10 @@
     },
     {
       "name": "test_filtering",
-      "cmake": "src/testframes/test_filtering/CMakeLists.txt",
+      "cmake": "src/tests/test_filtering/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5134,10 +5134,10 @@
     },
     {
       "name": "test_fine_calibration",
-      "cmake": "src/testframes/test_fine_calibration/CMakeLists.txt",
+      "cmake": "src/tests/test_fine_calibration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5170,10 +5170,10 @@
     },
     {
       "name": "test_fs",
-      "cmake": "src/testframes/test_fs/CMakeLists.txt",
+      "cmake": "src/tests/test_fs/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5204,10 +5204,10 @@
     },
     {
       "name": "test_fs_annotation_labels",
-      "cmake": "src/testframes/test_fs_annotation_labels/CMakeLists.txt",
+      "cmake": "src/tests/test_fs_annotation_labels/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5243,10 +5243,10 @@
     },
     {
       "name": "test_fs_atlas_lookup",
-      "cmake": "src/testframes/test_fs_atlas_lookup/CMakeLists.txt",
+      "cmake": "src/tests/test_fs_atlas_lookup/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5278,10 +5278,10 @@
     },
     {
       "name": "test_fs_io",
-      "cmake": "src/testframes/test_fs_io/CMakeLists.txt",
+      "cmake": "src/tests/test_fs_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5311,10 +5311,10 @@
     },
     {
       "name": "test_fs_surface_annotation",
-      "cmake": "src/testframes/test_fs_surface_annotation/CMakeLists.txt",
+      "cmake": "src/tests/test_fs_surface_annotation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5343,10 +5343,10 @@
     },
     {
       "name": "test_fwd_bem_data",
-      "cmake": "src/testframes/test_fwd_bem_data/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_bem_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5381,10 +5381,10 @@
     },
     {
       "name": "test_fwd_bem_driver_python",
-      "cmake": "src/testframes/test_fwd_bem_driver_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_bem_driver_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5414,10 +5414,10 @@
     },
     {
       "name": "test_fwd_bem_field_computation",
-      "cmake": "src/testframes/test_fwd_bem_field_computation/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_bem_field_computation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5450,10 +5450,10 @@
     },
     {
       "name": "test_fwd_bem_field_integrals",
-      "cmake": "src/testframes/test_fwd_bem_field_integrals/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_bem_field_integrals/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5482,10 +5482,10 @@
     },
     {
       "name": "test_fwd_extended",
-      "cmake": "src/testframes/test_fwd_extended/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_extended/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5516,10 +5516,10 @@
     },
     {
       "name": "test_fwd_library",
-      "cmake": "src/testframes/test_fwd_library/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_library/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5551,10 +5551,10 @@
     },
     {
       "name": "test_fwd_models",
-      "cmake": "src/testframes/test_fwd_models/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_models/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5586,10 +5586,10 @@
     },
     {
       "name": "test_fwd_python",
-      "cmake": "src/testframes/test_fwd_python/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5625,10 +5625,10 @@
     },
     {
       "name": "test_fwd_sphere_settings",
-      "cmake": "src/testframes/test_fwd_sphere_settings/CMakeLists.txt",
+      "cmake": "src/tests/test_fwd_sphere_settings/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5657,10 +5657,10 @@
     },
     {
       "name": "test_geometryinfo",
-      "cmake": "src/testframes/test_geometryinfo/CMakeLists.txt",
+      "cmake": "src/tests/test_geometryinfo/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5692,10 +5692,10 @@
     },
     {
       "name": "test_hpiDataUpdater",
-      "cmake": "src/testframes/test_hpiDataUpdater/CMakeLists.txt",
+      "cmake": "src/tests/test_hpiDataUpdater/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5727,10 +5727,10 @@
     },
     {
       "name": "test_hpiFit",
-      "cmake": "src/testframes/test_hpiFit/CMakeLists.txt",
+      "cmake": "src/tests/test_hpiFit/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5765,10 +5765,10 @@
     },
     {
       "name": "test_hpiFit_integration",
-      "cmake": "src/testframes/test_hpiFit_integration/CMakeLists.txt",
+      "cmake": "src/tests/test_hpiFit_integration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5801,10 +5801,10 @@
     },
     {
       "name": "test_hpiModelParameter",
-      "cmake": "src/testframes/test_hpiModelParameter/CMakeLists.txt",
+      "cmake": "src/tests/test_hpiModelParameter/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5833,10 +5833,10 @@
     },
     {
       "name": "test_ica_label",
-      "cmake": "src/testframes/test_ica_label/CMakeLists.txt",
+      "cmake": "src/tests/test_ica_label/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5867,10 +5867,10 @@
     },
     {
       "name": "test_ieeg",
-      "cmake": "src/testframes/test_ieeg/CMakeLists.txt",
+      "cmake": "src/tests/test_ieeg/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5906,10 +5906,10 @@
     },
     {
       "name": "test_interpolation",
-      "cmake": "src/testframes/test_interpolation/CMakeLists.txt",
+      "cmake": "src/tests/test_interpolation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5941,10 +5941,10 @@
     },
     {
       "name": "test_inv_beamformer",
-      "cmake": "src/testframes/test_inv_beamformer/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_beamformer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -5976,10 +5976,10 @@
     },
     {
       "name": "test_inv_beamformer_python",
-      "cmake": "src/testframes/test_inv_beamformer_python/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_beamformer_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6009,10 +6009,10 @@
     },
     {
       "name": "test_inv_cmne",
-      "cmake": "src/testframes/test_inv_cmne/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_cmne/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6043,10 +6043,10 @@
     },
     {
       "name": "test_inv_convenience",
-      "cmake": "src/testframes/test_inv_convenience/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_convenience/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6077,10 +6077,10 @@
     },
     {
       "name": "test_inv_dipole_fit_python",
-      "cmake": "src/testframes/test_inv_dipole_fit_python/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_dipole_fit_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6115,10 +6115,10 @@
     },
     {
       "name": "test_inv_dipole_rap_mne",
-      "cmake": "src/testframes/test_inv_dipole_rap_mne/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_dipole_rap_mne/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6153,10 +6153,10 @@
     },
     {
       "name": "test_inv_eloreta_python",
-      "cmake": "src/testframes/test_inv_eloreta_python/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_eloreta_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6191,10 +6191,10 @@
     },
     {
       "name": "test_inv_lcmv_python",
-      "cmake": "src/testframes/test_inv_lcmv_python/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_lcmv_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6231,10 +6231,10 @@
     },
     {
       "name": "test_inv_loreta",
-      "cmake": "src/testframes/test_inv_loreta/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_loreta/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6267,10 +6267,10 @@
     },
     {
       "name": "test_inv_rap_music_truth",
-      "cmake": "src/testframes/test_inv_rap_music_truth/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_rap_music_truth/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6299,10 +6299,10 @@
     },
     {
       "name": "test_inv_rt_library",
-      "cmake": "src/testframes/test_inv_rt_library/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_rt_library/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6338,10 +6338,10 @@
     },
     {
       "name": "test_inv_source_estimate_token",
-      "cmake": "src/testframes/test_inv_source_estimate_token/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_source_estimate_token/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6370,10 +6370,10 @@
     },
     {
       "name": "test_inv_sparse",
-      "cmake": "src/testframes/test_inv_sparse/CMakeLists.txt",
+      "cmake": "src/tests/test_inv_sparse/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6406,10 +6406,10 @@
     },
     {
       "name": "test_inverse_data",
-      "cmake": "src/testframes/test_inverse_data/CMakeLists.txt",
+      "cmake": "src/tests/test_inverse_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6441,10 +6441,10 @@
     },
     {
       "name": "test_inverse_rap_dipole",
-      "cmake": "src/testframes/test_inverse_rap_dipole/CMakeLists.txt",
+      "cmake": "src/tests/test_inverse_rap_dipole/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6477,10 +6477,10 @@
     },
     {
       "name": "test_label_time_course",
-      "cmake": "src/testframes/test_label_time_course/CMakeLists.txt",
+      "cmake": "src/tests/test_label_time_course/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6511,10 +6511,10 @@
     },
     {
       "name": "test_label_utils",
-      "cmake": "src/testframes/test_label_utils/CMakeLists.txt",
+      "cmake": "src/tests/test_label_utils/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6545,10 +6545,10 @@
     },
     {
       "name": "test_lsl",
-      "cmake": "src/testframes/test_lsl/CMakeLists.txt",
+      "cmake": "src/tests/test_lsl/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6582,10 +6582,10 @@
     },
     {
       "name": "test_math_kmeans",
-      "cmake": "src/testframes/test_math_kmeans/CMakeLists.txt",
+      "cmake": "src/tests/test_math_kmeans/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6616,10 +6616,10 @@
     },
     {
       "name": "test_math_matrix_io",
-      "cmake": "src/testframes/test_math_matrix_io/CMakeLists.txt",
+      "cmake": "src/tests/test_math_matrix_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6650,10 +6650,10 @@
     },
     {
       "name": "test_math_numerics",
-      "cmake": "src/testframes/test_math_numerics/CMakeLists.txt",
+      "cmake": "src/tests/test_math_numerics/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6685,10 +6685,10 @@
     },
     {
       "name": "test_math_spectral",
-      "cmake": "src/testframes/test_math_spectral/CMakeLists.txt",
+      "cmake": "src/tests/test_math_spectral/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6720,10 +6720,10 @@
     },
     {
       "name": "test_math_sphere",
-      "cmake": "src/testframes/test_math_sphere/CMakeLists.txt",
+      "cmake": "src/tests/test_math_sphere/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6754,10 +6754,10 @@
     },
     {
       "name": "test_math_warp",
-      "cmake": "src/testframes/test_math_warp/CMakeLists.txt",
+      "cmake": "src/tests/test_math_warp/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6788,10 +6788,10 @@
     },
     {
       "name": "test_maxwell_movement_comp",
-      "cmake": "src/testframes/test_maxwell_movement_comp/CMakeLists.txt",
+      "cmake": "src/tests/test_maxwell_movement_comp/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6822,10 +6822,10 @@
     },
     {
       "name": "test_ml_models",
-      "cmake": "src/testframes/test_ml_models/CMakeLists.txt",
+      "cmake": "src/tests/test_ml_models/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6858,10 +6858,10 @@
     },
     {
       "name": "test_ml_trainer",
-      "cmake": "src/testframes/test_ml_trainer/CMakeLists.txt",
+      "cmake": "src/tests/test_ml_trainer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6894,10 +6894,10 @@
     },
     {
       "name": "test_mna_bids",
-      "cmake": "src/testframes/test_mna_bids/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_bids/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6926,7 +6926,7 @@
     },
     {
       "name": "test_mna_coverage",
-      "cmake": "src/testframes/test_mna_coverage/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_coverage/CMakeLists.txt",
       "registration": {
         "state": "unregistered",
         "via": null,
@@ -6956,10 +6956,10 @@
     },
     {
       "name": "test_mna_graph_execution",
-      "cmake": "src/testframes/test_mna_graph_execution/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_graph_execution/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -6990,10 +6990,10 @@
     },
     {
       "name": "test_mna_inverse_pipeline",
-      "cmake": "src/testframes/test_mna_inverse_pipeline/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_inverse_pipeline/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7025,10 +7025,10 @@
     },
     {
       "name": "test_mna_io",
-      "cmake": "src/testframes/test_mna_io/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7057,10 +7057,10 @@
     },
     {
       "name": "test_mna_registry_loader",
-      "cmake": "src/testframes/test_mna_registry_loader/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_registry_loader/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7089,10 +7089,10 @@
     },
     {
       "name": "test_mna_serialization",
-      "cmake": "src/testframes/test_mna_serialization/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_serialization/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7123,10 +7123,10 @@
     },
     {
       "name": "test_mna_skill_graph_equivalence",
-      "cmake": "src/testframes/test_mna_skill_graph_equivalence/CMakeLists.txt",
+      "cmake": "src/tests/test_mna_skill_graph_equivalence/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7159,10 +7159,10 @@
     },
     {
       "name": "test_mne_acq_tool",
-      "cmake": "src/testframes/test_mne_acq_tool/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_acq_tool/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7193,10 +7193,10 @@
     },
     {
       "name": "test_mne_analyze_app",
-      "cmake": "src/testframes/test_mne_analyze_app/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_analyze_app/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "BUILD_MNE_ANALYZE"
         ],
@@ -7231,10 +7231,10 @@
     },
     {
       "name": "test_mne_analyze_studio_core_capabilities",
-      "cmake": "src/testframes/test_mne_analyze_studio_core_capabilities/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_analyze_studio_core_capabilities/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7263,10 +7263,10 @@
     },
     {
       "name": "test_mne_analyze_studio_scene_jsonrpc",
-      "cmake": "src/testframes/test_mne_analyze_studio_scene_jsonrpc/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_analyze_studio_scene_jsonrpc/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7299,10 +7299,10 @@
     },
     {
       "name": "test_mne_analyze_studio_workbench",
-      "cmake": "src/testframes/test_mne_analyze_studio_workbench/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_analyze_studio_workbench/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "BUILD_MNE_ANALYZE_STUDIO"
         ],
@@ -7337,10 +7337,10 @@
     },
     {
       "name": "test_mne_analyze_studio_workflow_integration",
-      "cmake": "src/testframes/test_mne_analyze_studio_workflow_integration/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_analyze_studio_workflow_integration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7372,10 +7372,10 @@
     },
     {
       "name": "test_mne_anonymize",
-      "cmake": "src/testframes/test_mne_anonymize/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_anonymize/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7407,10 +7407,10 @@
     },
     {
       "name": "test_mne_browse_app",
-      "cmake": "src/testframes/test_mne_browse_app/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_browse_app/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "BUILD_MNE_BROWSE"
         ],
@@ -7446,10 +7446,10 @@
     },
     {
       "name": "test_mne_browse_data",
-      "cmake": "src/testframes/test_mne_browse_data/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_browse_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7482,10 +7482,10 @@
     },
     {
       "name": "test_mne_channel_selection",
-      "cmake": "src/testframes/test_mne_channel_selection/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_channel_selection/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7514,10 +7514,10 @@
     },
     {
       "name": "test_mne_compute_raw_inverse",
-      "cmake": "src/testframes/test_mne_compute_raw_inverse/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_compute_raw_inverse/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7551,10 +7551,10 @@
     },
     {
       "name": "test_mne_cov_matrix",
-      "cmake": "src/testframes/test_mne_cov_matrix/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_cov_matrix/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7586,10 +7586,10 @@
     },
     {
       "name": "test_mne_cov_python",
-      "cmake": "src/testframes/test_mne_cov_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_cov_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7622,10 +7622,10 @@
     },
     {
       "name": "test_mne_ctf_comp_python",
-      "cmake": "src/testframes/test_mne_ctf_comp_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_ctf_comp_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7655,10 +7655,10 @@
     },
     {
       "name": "test_mne_data_types",
-      "cmake": "src/testframes/test_mne_data_types/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_data_types/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7691,10 +7691,10 @@
     },
     {
       "name": "test_mne_description_parser",
-      "cmake": "src/testframes/test_mne_description_parser/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_description_parser/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7725,10 +7725,10 @@
     },
     {
       "name": "test_mne_extended",
-      "cmake": "src/testframes/test_mne_extended/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_extended/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7760,10 +7760,10 @@
     },
     {
       "name": "test_mne_flash_bem",
-      "cmake": "src/testframes/test_mne_flash_bem/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_flash_bem/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "BUILD_MNE_FLASH_BEM"
         ],
@@ -7796,10 +7796,10 @@
     },
     {
       "name": "test_mne_forward_ops",
-      "cmake": "src/testframes/test_mne_forward_ops/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_forward_ops/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7834,10 +7834,10 @@
     },
     {
       "name": "test_mne_forward_solution",
-      "cmake": "src/testframes/test_mne_forward_solution/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_forward_solution/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7870,10 +7870,10 @@
     },
     {
       "name": "test_mne_hemisphere_epoch",
-      "cmake": "src/testframes/test_mne_hemisphere_epoch/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_hemisphere_epoch/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7905,10 +7905,10 @@
     },
     {
       "name": "test_mne_inspect_app",
-      "cmake": "src/testframes/test_mne_inspect_app/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_inspect_app/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7941,10 +7941,10 @@
     },
     {
       "name": "test_mne_inspect_multimodal",
-      "cmake": "src/testframes/test_mne_inspect_multimodal/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_inspect_multimodal/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -7973,10 +7973,10 @@
     },
     {
       "name": "test_mne_inv_coverage",
-      "cmake": "src/testframes/test_mne_inv_coverage/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_inv_coverage/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8008,10 +8008,10 @@
     },
     {
       "name": "test_mne_io_coverage",
-      "cmake": "src/testframes/test_mne_io_coverage/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_io_coverage/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8043,10 +8043,10 @@
     },
     {
       "name": "test_mne_label_python",
-      "cmake": "src/testframes/test_mne_label_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_label_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8079,10 +8079,10 @@
     },
     {
       "name": "test_mne_library",
-      "cmake": "src/testframes/test_mne_library/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_library/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8115,10 +8115,10 @@
     },
     {
       "name": "test_mne_msh_display_surface_set",
-      "cmake": "src/testframes/test_mne_msh_display_surface_set/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_msh_display_surface_set/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8150,10 +8150,10 @@
     },
     {
       "name": "test_mne_project_to_surface",
-      "cmake": "src/testframes/test_mne_project_to_surface/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_project_to_surface/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8185,10 +8185,10 @@
     },
     {
       "name": "test_mne_projections",
-      "cmake": "src/testframes/test_mne_projections/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_projections/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8220,10 +8220,10 @@
     },
     {
       "name": "test_mne_raw_data_python",
-      "cmake": "src/testframes/test_mne_raw_data_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_raw_data_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8256,10 +8256,10 @@
     },
     {
       "name": "test_mne_raw_proj_comp",
-      "cmake": "src/testframes/test_mne_raw_proj_comp/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_raw_proj_comp/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8291,10 +8291,10 @@
     },
     {
       "name": "test_mne_scan_plugins",
-      "cmake": "src/testframes/test_mne_scan_plugins/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_scan_plugins/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8328,10 +8328,10 @@
     },
     {
       "name": "test_mne_setup_mri",
-      "cmake": "src/testframes/test_mne_setup_mri/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_setup_mri/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8362,10 +8362,10 @@
     },
     {
       "name": "test_mne_source_analysis",
-      "cmake": "src/testframes/test_mne_source_analysis/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_source_analysis/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8398,10 +8398,10 @@
     },
     {
       "name": "test_mne_source_data",
-      "cmake": "src/testframes/test_mne_source_data/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_source_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8435,10 +8435,10 @@
     },
     {
       "name": "test_mne_source_space_ops_python",
-      "cmake": "src/testframes/test_mne_source_space_ops_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_source_space_ops_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8471,10 +8471,10 @@
     },
     {
       "name": "test_mne_source_space_python",
-      "cmake": "src/testframes/test_mne_source_space_python/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_source_space_python/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8508,10 +8508,10 @@
     },
     {
       "name": "test_mne_surf2bem",
-      "cmake": "src/testframes/test_mne_surf2bem/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_surf2bem/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8542,10 +8542,10 @@
     },
     {
       "name": "test_mne_testing_helper",
-      "cmake": "src/testframes/test_mne_testing_helper/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_testing_helper/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8574,10 +8574,10 @@
     },
     {
       "name": "test_mne_watershed_bem",
-      "cmake": "src/testframes/test_mne_watershed_bem/CMakeLists.txt",
+      "cmake": "src/tests/test_mne_watershed_bem/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "BUILD_MNE_WATERSHED_BEM"
         ],
@@ -8611,10 +8611,10 @@
     },
     {
       "name": "test_mri_io",
-      "cmake": "src/testframes/test_mri_io/CMakeLists.txt",
+      "cmake": "src/tests/test_mri_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8645,10 +8645,10 @@
     },
     {
       "name": "test_mri_nifti_io",
-      "cmake": "src/testframes/test_mri_nifti_io/CMakeLists.txt",
+      "cmake": "src/tests/test_mri_nifti_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8677,10 +8677,10 @@
     },
     {
       "name": "test_mri_slicer",
-      "cmake": "src/testframes/test_mri_slicer/CMakeLists.txt",
+      "cmake": "src/tests/test_mri_slicer/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8711,10 +8711,10 @@
     },
     {
       "name": "test_mri_slices_plugin",
-      "cmake": "src/testframes/test_mri_slices_plugin/CMakeLists.txt",
+      "cmake": "src/tests/test_mri_slices_plugin/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8743,10 +8743,10 @@
     },
     {
       "name": "test_mri_vol_data",
-      "cmake": "src/testframes/test_mri_vol_data/CMakeLists.txt",
+      "cmake": "src/tests/test_mri_vol_data/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8775,10 +8775,10 @@
     },
     {
       "name": "test_multimodal_scene",
-      "cmake": "src/testframes/test_multimodal_scene/CMakeLists.txt",
+      "cmake": "src/tests/test_multimodal_scene/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8807,10 +8807,10 @@
     },
     {
       "name": "test_network_visualization",
-      "cmake": "src/testframes/test_network_visualization/CMakeLists.txt",
+      "cmake": "src/tests/test_network_visualization/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8839,10 +8839,10 @@
     },
     {
       "name": "test_picard_ica",
-      "cmake": "src/testframes/test_picard_ica/CMakeLists.txt",
+      "cmake": "src/tests/test_picard_ica/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8873,10 +8873,10 @@
     },
     {
       "name": "test_polhemus_coregistration",
-      "cmake": "src/testframes/test_polhemus_coregistration/CMakeLists.txt",
+      "cmake": "src/tests/test_polhemus_coregistration/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8905,10 +8905,10 @@
     },
     {
       "name": "test_project_resume_layout",
-      "cmake": "src/testframes/test_project_resume_layout/CMakeLists.txt",
+      "cmake": "src/tests/test_project_resume_layout/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8938,10 +8938,10 @@
     },
     {
       "name": "test_pybridge_python_runner",
-      "cmake": "src/testframes/test_pybridge_python_runner/CMakeLists.txt",
+      "cmake": "src/tests/test_pybridge_python_runner/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -8978,10 +8978,10 @@
     },
     {
       "name": "test_report",
-      "cmake": "src/testframes/test_report/CMakeLists.txt",
+      "cmake": "src/tests/test_report/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9012,10 +9012,10 @@
     },
     {
       "name": "test_resolution_matrix",
-      "cmake": "src/testframes/test_resolution_matrix/CMakeLists.txt",
+      "cmake": "src/tests/test_resolution_matrix/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9047,10 +9047,10 @@
     },
     {
       "name": "test_rt_server_fiff_replay",
-      "cmake": "src/testframes/test_rt_server_fiff_replay/CMakeLists.txt",
+      "cmake": "src/tests/test_rt_server_fiff_replay/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "TARGET mne_rt_server"
         ],
@@ -9083,10 +9083,10 @@
     },
     {
       "name": "test_rt_source_streaming",
-      "cmake": "src/testframes/test_rt_source_streaming/CMakeLists.txt",
+      "cmake": "src/tests/test_rt_source_streaming/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9117,10 +9117,10 @@
     },
     {
       "name": "test_rtserver_commands",
-      "cmake": "src/testframes/test_rtserver_commands/CMakeLists.txt",
+      "cmake": "src/tests/test_rtserver_commands/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "TARGET mne_rt_server"
         ],
@@ -9151,10 +9151,10 @@
     },
     {
       "name": "test_rtserver_observer_pattern",
-      "cmake": "src/testframes/test_rtserver_observer_pattern/CMakeLists.txt",
+      "cmake": "src/tests/test_rtserver_observer_pattern/CMakeLists.txt",
       "registration": {
         "state": "conditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [
           "TARGET mne_rt_server"
         ],
@@ -9185,10 +9185,10 @@
     },
     {
       "name": "test_scdisp_widgets",
-      "cmake": "src/testframes/test_scdisp_widgets/CMakeLists.txt",
+      "cmake": "src/tests/test_scdisp_widgets/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9218,10 +9218,10 @@
     },
     {
       "name": "test_scmeas_measurements",
-      "cmake": "src/testframes/test_scmeas_measurements/CMakeLists.txt",
+      "cmake": "src/tests/test_scmeas_measurements/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9251,10 +9251,10 @@
     },
     {
       "name": "test_scshared_management",
-      "cmake": "src/testframes/test_scshared_management/CMakeLists.txt",
+      "cmake": "src/tests/test_scshared_management/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9284,10 +9284,10 @@
     },
     {
       "name": "test_sensorSet",
-      "cmake": "src/testframes/test_sensorSet/CMakeLists.txt",
+      "cmake": "src/tests/test_sensorSet/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9319,10 +9319,10 @@
     },
     {
       "name": "test_sensor_field_mapper",
-      "cmake": "src/testframes/test_sensor_field_mapper/CMakeLists.txt",
+      "cmake": "src/tests/test_sensor_field_mapper/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9356,10 +9356,10 @@
     },
     {
       "name": "test_sensor_streaming",
-      "cmake": "src/testframes/test_sensor_streaming/CMakeLists.txt",
+      "cmake": "src/tests/test_sensor_streaming/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9391,10 +9391,10 @@
     },
     {
       "name": "test_setup_forward_model",
-      "cmake": "src/testframes/test_setup_forward_model/CMakeLists.txt",
+      "cmake": "src/tests/test_setup_forward_model/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9423,10 +9423,10 @@
     },
     {
       "name": "test_signalModel",
-      "cmake": "src/testframes/test_signalModel/CMakeLists.txt",
+      "cmake": "src/tests/test_signalModel/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9455,10 +9455,10 @@
     },
     {
       "name": "test_source_estimate_io",
-      "cmake": "src/testframes/test_source_estimate_io/CMakeLists.txt",
+      "cmake": "src/tests/test_source_estimate_io/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9490,10 +9490,10 @@
     },
     {
       "name": "test_source_estimate_types",
-      "cmake": "src/testframes/test_source_estimate_types/CMakeLists.txt",
+      "cmake": "src/tests/test_source_estimate_types/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9527,10 +9527,10 @@
     },
     {
       "name": "test_source_morph",
-      "cmake": "src/testframes/test_source_morph/CMakeLists.txt",
+      "cmake": "src/tests/test_source_morph/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9561,10 +9561,10 @@
     },
     {
       "name": "test_spectral_connectivity",
-      "cmake": "src/testframes/test_spectral_connectivity/CMakeLists.txt",
+      "cmake": "src/tests/test_spectral_connectivity/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9601,10 +9601,10 @@
     },
     {
       "name": "test_sts_cluster",
-      "cmake": "src/testframes/test_sts_cluster/CMakeLists.txt",
+      "cmake": "src/tests/test_sts_cluster/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9640,10 +9640,10 @@
     },
     {
       "name": "test_sts_cov_estimators",
-      "cmake": "src/testframes/test_sts_cov_estimators/CMakeLists.txt",
+      "cmake": "src/tests/test_sts_cov_estimators/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9676,10 +9676,10 @@
     },
     {
       "name": "test_studio_core",
-      "cmake": "src/testframes/test_studio_core/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_core/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9712,10 +9712,10 @@
     },
     {
       "name": "test_studio_dummy3d_view",
-      "cmake": "src/testframes/test_studio_dummy3d_view/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_dummy3d_view/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9747,10 +9747,10 @@
     },
     {
       "name": "test_studio_extension_widgets",
-      "cmake": "src/testframes/test_studio_extension_widgets/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_extension_widgets/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9780,10 +9780,10 @@
     },
     {
       "name": "test_studio_mna_skills",
-      "cmake": "src/testframes/test_studio_mna_skills/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_mna_skills/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9812,10 +9812,10 @@
     },
     {
       "name": "test_studio_neuro_kernel",
-      "cmake": "src/testframes/test_studio_neuro_kernel/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_neuro_kernel/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9847,10 +9847,10 @@
     },
     {
       "name": "test_studio_raw_model",
-      "cmake": "src/testframes/test_studio_raw_model/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_raw_model/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9882,10 +9882,10 @@
     },
     {
       "name": "test_studio_skill_host",
-      "cmake": "src/testframes/test_studio_skill_host/CMakeLists.txt",
+      "cmake": "src/tests/test_studio_skill_host/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9914,10 +9914,10 @@
     },
     {
       "name": "test_surface_checks",
-      "cmake": "src/testframes/test_surface_checks/CMakeLists.txt",
+      "cmake": "src/tests/test_surface_checks/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9949,10 +9949,10 @@
     },
     {
       "name": "test_surface_laplacian",
-      "cmake": "src/testframes/test_surface_laplacian/CMakeLists.txt",
+      "cmake": "src/tests/test_surface_laplacian/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -9984,10 +9984,10 @@
     },
     {
       "name": "test_tf_mxne",
-      "cmake": "src/testframes/test_tf_mxne/CMakeLists.txt",
+      "cmake": "src/tests/test_tf_mxne/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10018,10 +10018,10 @@
     },
     {
       "name": "test_tool_compute_pipeline",
-      "cmake": "src/testframes/test_tool_compute_pipeline/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_compute_pipeline/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10054,10 +10054,10 @@
     },
     {
       "name": "test_tool_conversion_extended",
-      "cmake": "src/testframes/test_tool_conversion_extended/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_conversion_extended/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10088,10 +10088,10 @@
     },
     {
       "name": "test_tool_conversion_functions",
-      "cmake": "src/testframes/test_tool_conversion_functions/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_conversion_functions/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10123,10 +10123,10 @@
     },
     {
       "name": "test_tool_data_pipeline",
-      "cmake": "src/testframes/test_tool_data_pipeline/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_data_pipeline/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10161,10 +10161,10 @@
     },
     {
       "name": "test_tool_exit_codes",
-      "cmake": "src/testframes/test_tool_exit_codes/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_exit_codes/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10196,10 +10196,10 @@
     },
     {
       "name": "test_tool_forward_generation",
-      "cmake": "src/testframes/test_tool_forward_generation/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_forward_generation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10230,10 +10230,10 @@
     },
     {
       "name": "test_tool_info_helpers",
-      "cmake": "src/testframes/test_tool_info_helpers/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_info_helpers/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10264,10 +10264,10 @@
     },
     {
       "name": "test_tool_inverse_computation",
-      "cmake": "src/testframes/test_tool_inverse_computation/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_inverse_computation/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10299,10 +10299,10 @@
     },
     {
       "name": "test_tool_inverse_operator",
-      "cmake": "src/testframes/test_tool_inverse_operator/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_inverse_operator/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10336,10 +10336,10 @@
     },
     {
       "name": "test_tool_list_source_space",
-      "cmake": "src/testframes/test_tool_list_source_space/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_list_source_space/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10372,10 +10372,10 @@
     },
     {
       "name": "test_tool_preproc_helpers",
-      "cmake": "src/testframes/test_tool_preproc_helpers/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_preproc_helpers/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10406,10 +10406,10 @@
     },
     {
       "name": "test_tool_preprocessing",
-      "cmake": "src/testframes/test_tool_preprocessing/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_preprocessing/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10441,10 +10441,10 @@
     },
     {
       "name": "test_tool_show_fiff",
-      "cmake": "src/testframes/test_tool_show_fiff/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_show_fiff/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10476,10 +10476,10 @@
     },
     {
       "name": "test_tool_surface_math",
-      "cmake": "src/testframes/test_tool_surface_math/CMakeLists.txt",
+      "cmake": "src/tests/test_tool_surface_math/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10510,10 +10510,10 @@
     },
     {
       "name": "test_trap_music",
-      "cmake": "src/testframes/test_trap_music/CMakeLists.txt",
+      "cmake": "src/tests/test_trap_music/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
@@ -10544,7 +10544,7 @@
     },
     {
       "name": "test_wasm_multi_draw",
-      "cmake": "src/testframes/test_wasm_multi_draw/CMakeLists.txt",
+      "cmake": "src/tests/test_wasm_multi_draw/CMakeLists.txt",
       "registration": {
         "state": "unregistered",
         "via": null,
@@ -10574,7 +10574,7 @@
     },
     {
       "name": "test_wasm_multi_pass",
-      "cmake": "src/testframes/test_wasm_multi_pass/CMakeLists.txt",
+      "cmake": "src/tests/test_wasm_multi_pass/CMakeLists.txt",
       "registration": {
         "state": "unregistered",
         "via": null,
@@ -10604,10 +10604,10 @@
     },
     {
       "name": "test_writetofile_status",
-      "cmake": "src/testframes/test_writetofile_status/CMakeLists.txt",
+      "cmake": "src/tests/test_writetofile_status/CMakeLists.txt",
       "registration": {
         "state": "unconditional",
-        "via": "src/testframes/CMakeLists.txt",
+        "via": "src/tests/CMakeLists.txt",
         "conditions": [],
         "early_return_guard": null,
         "unregistered_reason": null
