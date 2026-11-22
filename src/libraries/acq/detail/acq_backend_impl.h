@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "../acq_backend.h"
+#include "acq_control_queue.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -39,7 +40,8 @@ struct AcqBackend::Impl
     std::vector<AcqStream> streams;
     std::vector<std::unique_ptr<AcqWriter>> writers;
     std::vector<std::unique_ptr<AcqReader>> deviceReaders;
-    bool sealed = false; // set when an AcqDevice takes the backend; no streams are added afterwards
+    detail::AcqControlQueue<AcqControlEvent, 256> controlEvents; // backend threads push, the device's users pop
+    bool sealed = false;                                         // set when an AcqDevice takes the backend; no streams are added afterwards
 
     // First reported error wins: 0 = none, 1 = being written, 2 = readable.
     std::atomic<int> errorState{0};

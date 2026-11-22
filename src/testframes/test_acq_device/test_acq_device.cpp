@@ -14,8 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/log.h>
 #include <acq/acq_device.h>
 #include <acq/acq_device_registry.h>
+#include <acq/detail/acq_control_queue.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -150,7 +152,7 @@ Drained drain(AcqReader& reader, std::size_t maxView = 0)
         auto view = reader.acquire(1, 5s, maxView);
         if (!view) {
             if (view.error() != AcqErrorCode::EndOfStream) {
-                qWarning("acquire failed: %s", view.error().text().c_str());
+                Log::warning("acquire failed: {}", view.error().text());
             }
             break;
         }
@@ -179,7 +181,7 @@ std::vector<Drained> recordAll(const std::string& uri)
 {
     auto device = AcqDevice::open(uri);
     if (!device) {
-        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
+        Log::warning("open({}): {}", uri, device.error().text());
         return {};
     }
     AcqReaderOptions gating;
@@ -211,7 +213,7 @@ Drained record(const std::string& uri)
 {
     auto device = AcqDevice::open(uri);
     if (!device) {
-        qWarning("open(%s): %s", uri.c_str(), device.error().text().c_str());
+        Log::warning("open({}): {}", uri, device.error().text());
         return {};
     }
     auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
@@ -285,6 +287,9 @@ private slots:
     void testRealtimeRecordingIsComplete();
     void testBackpressureReplayIsLossless();
     void testImpedances();
+    void testControlQueueUnderContention();
+    void testControlsAreChecked();
+    void testSyntheticControls();
 };
 
 //=============================================================================================================
@@ -1255,6 +1260,162 @@ void TestAcqDevice::testImpedances()
     device->close();
     QVERIFY(device->measureImpedances().error() == AcqErrorCode::InvalidState);
     QVERIFY(AcqDevice().measureImpedances().error() == AcqErrorCode::InvalidState);
+}
+
+//=============================================================================================================
+
+//=============================================================================================================
+
+void TestAcqDevice::testControlQueueUnderContention()
+{
+    // Four producers race a consumer through a small queue: nothing is lost unaccounted, nothing duplicated, and
+    // every producer's records arrive in the order it pushed them.
+    struct Record
+    {
+        std::uint32_t producer = 0;
+        std::uint32_t index = 0;
+    };
+    detail::AcqControlQueue<Record, 16> queue;
+    constexpr std::uint32_t kProducers = 4;
+    constexpr std::uint32_t kEach = 20000;
+    std::atomic<std::uint32_t> pushed{0};
+    std::vector<std::thread> producers;
+    producers.reserve(kProducers);
+    for (std::uint32_t p = 0; p < kProducers; ++p) {
+        producers.emplace_back([&queue, &pushed, p] {
+            for (std::uint32_t i = 0; i < kEach; ++i) {
+                if (queue.push({p, i})) {
+                    pushed.fetch_add(1, std::memory_order_relaxed);
+                }
+            }
+        });
+    }
+    std::array<std::int64_t, kProducers> last{-1, -1, -1, -1};
+    std::uint64_t popped = 0;
+    bool ordered = true;
+    const auto drainQueue = [&] {
+        Record r;
+        while (queue.pop(r)) {
+            ordered = ordered && static_cast<std::int64_t>(r.index) > last[r.producer];
+            last[r.producer] = r.index;
+            ++popped;
+        }
+    };
+    while (popped + queue.dropped() < std::uint64_t(kProducers) * kEach) {
+        drainQueue();
+        if (std::all_of(producers.begin(), producers.end(), [](const std::thread& t) { return !t.joinable(); })) {
+            break;
+        }
+        if (pushed.load() + queue.dropped() == std::uint64_t(kProducers) * kEach) {
+            break;
+        }
+    }
+    for (std::thread& t : producers) {
+        t.join();
+    }
+    drainQueue();
+    QVERIFY(ordered);
+    QCOMPARE(popped, std::uint64_t(pushed.load()));
+    QCOMPARE(popped + queue.dropped(), std::uint64_t(kProducers) * kEach);
+}
+
+//=============================================================================================================
+
+void TestAcqDevice::testControlsAreChecked()
+{
+    auto device = AcqDevice::open("synthetic://?realtime=1&seed=1");
+    QVERIFY(device);
+    QCOMPARE(device->read("nothing").error().code(), AcqErrorCode::InvalidParameter);
+    QCOMPARE(device->write("gain", AcqValue(std::string("2"))).code(), AcqErrorCode::InvalidParameter);
+    QCOMPARE(device->write("gain", AcqValue(-1.0)).code(), AcqErrorCode::InvalidParameter);
+    QCOMPARE(device->write("gain", AcqValue(std::nan(""))).code(), AcqErrorCode::InvalidParameter);
+    QCOMPARE(device->write("samples", AcqValue(std::int64_t(1))).code(), AcqErrorCode::InvalidParameter); // status
+    QCOMPARE(device->read("inject_event").error().code(), AcqErrorCode::InvalidParameter);                // command
+    const std::array<AcqValue, 1> code{AcqValue(std::int64_t(7))};
+    QCOMPARE(device->invoke("inject_event", code).error().code(), AcqErrorCode::InvalidState); // only while running
+    QCOMPARE(device->invoke("inject_event").error().code(), AcqErrorCode::InvalidParameter);   // one argument
+    const std::array<AcqValue, 1> zero{AcqValue(std::int64_t(0))};
+    QCOMPARE(device->invoke("inject_event", zero).error().code(), AcqErrorCode::InvalidParameter); // codes start at 1
+    QVERIFY(device->write("gain", AcqValue(std::int64_t(3))).ok());                                // an integer is a valid number
+    QCOMPARE(std::get<double>(*device->read("gain")), 3.0);
+    device->close();
+    QVERIFY(device->controls().size() == 4); // the description outlives the backend
+    QCOMPARE(device->write("gain", AcqValue(1.0)).code(), AcqErrorCode::InvalidState);
+}
+
+//=============================================================================================================
+
+void TestAcqDevice::testSyntheticControls()
+{
+    // The reference: the same seeded session without any control.
+    const std::string session = "synthetic://?duration=2&seed=9&interval=0&eeg=4";
+    const Drained reference = record(session + "&realtime=0");
+    QCOMPARE(reference.samples.size(), std::size_t(2000 * 5));
+
+    auto device = AcqDevice::open(session + "&realtime=1&speed=4");
+    QVERIFY(device);
+    std::vector<std::string> ids;
+    for (const AcqControlInfo& info : device->controls()) {
+        ids.push_back(info.id);
+    }
+    QCOMPARE(ids, (std::vector<std::string>{"gain", "inject_event", "refresh_info", "samples"}));
+    const auto versionBefore = device->stream().info()->version;
+
+    auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
+    QVERIFY(reader);
+    QVERIFY(device->start().ok());
+    std::this_thread::sleep_for(100ms); // a few blocks into the session
+    QVERIFY(device->write("gain", AcqValue(2.0)).ok());
+    const std::array<AcqValue, 1> code{AcqValue(std::int64_t(7))};
+    const auto injected = device->invoke("inject_event", code, 5s);
+    QVERIFY2(injected, injected ? "" : injected.error().text().c_str());
+    const auto version = device->invoke("refresh_info", {}, 5s);
+    QVERIFY(version);
+    const Drained d = drain(*reader);
+    QCOMPARE(d.samples.size(), reference.samples.size());
+
+    std::vector<AcqControlEvent> events(64);
+    events.resize(device->pollControlEvents(events));
+    QCOMPARE(device->droppedControlEvents(), std::uint64_t(0));
+    std::uint64_t gainFrom = AcqControlEvent::kNoSample;
+    bool injectDone = false;
+    bool refreshed = false;
+    std::int64_t lastStatus = -1;
+    for (const AcqControlEvent& e : events) {
+        if (e.kind == AcqControlEventKind::ValueChanged && e.control == 0) {
+            QCOMPARE(std::get<double>(e.value), 2.0);
+            gainFrom = e.sample;
+        } else if (e.kind == AcqControlEventKind::CommandDone && e.control == 1) {
+            QCOMPARE(std::get<std::int64_t>(e.value), std::get<std::int64_t>(*injected));
+            injectDone = true;
+        } else if (e.kind == AcqControlEventKind::Alert && e.control == 2) {
+            QVERIFY(e.message().starts_with("stream description refreshed"));
+            refreshed = true;
+        } else if (e.kind == AcqControlEventKind::Status && e.control == 3) {
+            QVERIFY(std::get<std::int64_t>(e.value) > lastStatus);
+            lastStatus = std::get<std::int64_t>(e.value);
+        }
+        QVERIFY(e.hostNs > 0);
+    }
+    QVERIFY(gainFrom > 0 && gainFrom < 2000);
+    QVERIFY(injectDone && refreshed);
+    QCOMPARE(lastStatus, std::int64_t(2000));
+
+    // Before the change the data are the reference's, from its first sample on twice as large; the trigger is not scaled.
+    const std::size_t channels = 5;
+    for (std::size_t s = 0; s < 2000; ++s) {
+        for (std::size_t c = 0; c < channels; ++c) {
+            const float expected = reference.samples[s * channels + c] * (s >= gainFrom && c < 4 ? 2.0f : 1.0f);
+            if (d.samples[s * channels + c] != expected) {
+                QFAIL(qPrintable(QString("sample %1, channel %2").arg(s).arg(c)));
+            }
+        }
+    }
+    const auto at = static_cast<std::uint64_t>(std::get<std::int64_t>(*injected));
+    QVERIFY(std::any_of(d.events.begin(), d.events.end(), [at](const AcqEvent& e) { return e.sample == at && e.code == 7; }));
+    QCOMPARE(static_cast<std::int64_t>(device->stream().info()->version), std::get<std::int64_t>(*version));
+    QVERIFY(device->stream().info()->version > versionBefore);
+    QCOMPARE(std::get<std::int64_t>(*device->read("samples")), std::int64_t(2000));
 }
 
 //=============================================================================================================

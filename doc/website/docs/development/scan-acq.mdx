@@ -42,6 +42,18 @@ device->start();
 | `AcqBackend` | `src/libraries/acq/` | Base class of a source; owns its streams and writers |
 | `PluginOutputData` | `src/applications/mne_scan/libs/scShared/` | Typed output connector that passes data to downstream plugins |
 
+## Device Control
+
+While a source is open, a program can change its settings and run its commands without knowing the device:
+`AcqDevice::controls()` lists them as `AcqControlInfo` (parameters, commands and status values, each with type,
+unit, range and the states in which it may be used), `read()`, `write()` and `invoke()` take a control by id, and
+`pollControlEvents()` returns what changed: new values with the first sample they apply to, status updates,
+alerts and finished commands. A backend offers controls by overriding `controls()`, `readControl()`,
+`writeControl()` and `invokeControl()`, applies changes that affect samples at a block boundary, and reports
+with `publishControlEvent()`, which is safe on its acquisition thread. A change to how samples are scaled or
+named is also a new stream description version (`AcqWriter::updateInfo()`), valid from that sample on.
+`synthetic://` shows all of it (`gain`, `inject_event`, `refresh_info`, `samples`).
+
 ## Implementing a New Amplifier
 
 1. **Write the tests** in `src/testframes/test_acq_devices/` against `<device>://?simulate=1`: stream layout, agreement with `synthetic://`, invalid parameters, a gating reader, and the error without hardware.

@@ -342,6 +342,16 @@ aliases; replace the old spelling as below.
   instead of reading them as zero. `SelectionIO::write_mon` refuses group names
   that would leave the target directory.
 - `ex_make_layout` honours `--mirrorY`; it used to mirror x twice.
+- Device control in `mne_acq` (`acq/acq_control.h`): a device publishes the
+  parameters, commands and status values it offers while open
+  (`AcqDevice::controls()`), which programs `read()`, `write()` and
+  `invoke()` by id, with type, range and device state checked first.
+  Changes, status updates, alerts and finished commands arrive as
+  `AcqControlEvent` records through `pollControlEvents()`, published by the
+  backend from any thread without locks or allocation, and a change that
+  applies to samples names the first sample it applies to. `synthetic://`
+  offers `gain`, `inject_event`, `refresh_info` (a new stream description
+  version) and the `samples` status.
 - New `mne_acq_devices` library with the `brainamp://` source for Brain
   Products BrainAmp amplifiers. `brainamp://?simulate=1` emits the amplifier's
   int16 wire format from `synthetic://` signals, so it runs without hardware

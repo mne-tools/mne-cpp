@@ -51,6 +51,7 @@
 
 #include <algorithm>
 #include <array>
+#include <string_view>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -239,6 +240,24 @@ int main(int argc, char* argv[])
     std::printf("%s\n  %s: %zu channels (%zu EEG) at %.0f Hz\n\n", device->description().device.c_str(),
                 info->name.c_str(), info->channelCount(), eeg.size(), info->sfreq);
 
+    //! [acq_control_usage]
+    // What the device lets a program set, run and watch while it is open, and what it reports
+    for (const AcqControlInfo& control : device->controls()) {
+        const char* kind = control.kind == AcqControlKind::Command ? "command" : (control.kind == AcqControlKind::Status ? "status" : "setting");
+        std::printf("  %-7s %-13s %s\n", kind, control.id.c_str(), control.description.c_str());
+    }
+    std::array<AcqControlEvent, 32> controlEvents;
+    const auto reportAlerts = [&] {
+        for (std::size_t i = 0, n = device->pollControlEvents(controlEvents); i < n; ++i) {
+            if (controlEvents[i].kind == AcqControlEventKind::Alert) {
+                const std::string_view text = controlEvents[i].message();
+                std::printf("  device: %.*s\n", static_cast<int>(text.size()), text.data());
+            }
+        }
+    };
+    //! [acq_control_usage]
+    std::printf("\n");
+
     const auto pre = static_cast<std::uint64_t>(std::llround(kPreSeconds * info->sfreq));
     const auto post = static_cast<std::uint64_t>(std::llround(kPostSeconds * info->sfreq));
     const std::size_t length = pre + post;
@@ -334,6 +353,7 @@ int main(int argc, char* argv[])
         pending.erase(std::remove_if(pending.begin(), pending.end(), complete), pending.end());
     }
     //! [acq_epoch_stream]
+    reportAlerts();
     device->close();
 
     const Average& standards = average[kStandard];

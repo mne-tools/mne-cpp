@@ -23,6 +23,7 @@
 //=============================================================================================================
 
 #include "acq_global.h"
+#include "acq_control.h"
 #include "acq_error.h"
 #include "acq_reader.h"
 #include "acq_stream.h"
@@ -115,6 +116,50 @@ public:
      */
     [[nodiscard]] virtual AcqExpected<std::vector<AcqImpedance>> measureImpedances(std::chrono::milliseconds timeout);
 
+    //=========================================================================================================
+    /**
+     * The device's controls. AcqDevice reads them once, when it takes the backend; indices into this list name
+     * the controls in the calls below and in AcqControlEvent::control. The default offers none.
+     *
+     * @return The parameters, commands and status values of the device.
+     */
+    [[nodiscard]] virtual std::vector<AcqControlInfo> controls() const;
+
+    /**
+     * Reads a parameter or status value. Control path; AcqDevice serializes the calls. The default returns
+     * NotSupported.
+     *
+     * @param[in] index   Index into controls().
+     *
+     * @return The value, or the error.
+     */
+    [[nodiscard]] virtual AcqExpected<AcqValue> readControl(std::size_t index);
+
+    /**
+     * Sets a parameter. AcqDevice has checked that it is writable now and that the value has the right type
+     * and range. A parameter that applies to samples takes effect at a block boundary and reports the first
+     * sample in its ValueChanged event. The default returns NotSupported.
+     *
+     * @param[in] index   Index into controls().
+     * @param[in] value   The new value.
+     *
+     * @return Success, or the error.
+     */
+    virtual AcqError writeControl(std::size_t index, const AcqValue& value);
+
+    /**
+     * Runs a command. AcqDevice has checked that it may run now and the argument types. The default returns
+     * NotSupported.
+     *
+     * @param[in] index       Index into controls().
+     * @param[in] arguments   The arguments, in the order of AcqControlInfo::arguments.
+     * @param[in] timeout     Longest time to wait for the device.
+     *
+     * @return The result, or the error.
+     */
+    [[nodiscard]] virtual AcqExpected<AcqValue> invokeControl(std::size_t index, std::span<const AcqValue> arguments,
+                                                              std::chrono::milliseconds timeout);
+
     /** @return The streams created while opening, in creation order. */
     [[nodiscard]] std::span<const AcqStream> streams() const noexcept;
 
@@ -151,6 +196,14 @@ protected:
      * @param[in] error   The error.
      */
     void reportError(AcqError error) noexcept;
+
+    /**
+     * Publishes a control event from any thread, the acquisition thread included: lock-free and allocation-free.
+     * The event is dropped (and counted) if the device's users have not taken the previous ones.
+     *
+     * @param[in] event   The event; hostNs is set to now if it is 0.
+     */
+    void publishControlEvent(const AcqControlEvent& event) noexcept;
 
 private:
     friend struct detail::BackendAccess;

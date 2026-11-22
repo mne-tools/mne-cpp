@@ -47,6 +47,47 @@ AcqExpected<std::vector<AcqImpedance>> AcqBackend::measureImpedances(std::chrono
 
 //=============================================================================================================
 
+std::vector<AcqControlInfo> AcqBackend::controls() const
+{
+    return {};
+}
+
+//=============================================================================================================
+
+AcqExpected<AcqValue> AcqBackend::readControl(std::size_t /*index*/)
+{
+    return AcqErrorCode::NotSupported;
+}
+
+//=============================================================================================================
+
+AcqError AcqBackend::writeControl(std::size_t /*index*/, const AcqValue& /*value*/)
+{
+    return AcqErrorCode::NotSupported;
+}
+
+//=============================================================================================================
+
+AcqExpected<AcqValue> AcqBackend::invokeControl(std::size_t /*index*/, std::span<const AcqValue> /*arguments*/,
+                                                std::chrono::milliseconds /*timeout*/)
+{
+    return AcqErrorCode::NotSupported;
+}
+
+//=============================================================================================================
+
+void AcqBackend::publishControlEvent(const AcqControlEvent& event) noexcept
+{
+    AcqControlEvent stamped = event;
+    if (stamped.hostNs == 0) {
+        stamped.hostNs =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+    }
+    static_cast<void>(m_pImpl->controlEvents.push(stamped));
+}
+
+//=============================================================================================================
+
 std::span<const AcqStream> AcqBackend::streams() const noexcept
 {
     return m_pImpl->streams;

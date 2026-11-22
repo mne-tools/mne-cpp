@@ -784,8 +784,10 @@ public:
             clock.anchorSample = stream.next;
             stream.writer->setClock(clock);
         }
+        m_running.store(true, std::memory_order_release);
         auto thread = start_thread(m_config.thread, [this] { run(); });
         if (!thread) {
+            m_running.store(false, std::memory_order_release);
             return thread.error();
         }
         m_thread = std::move(*thread);
@@ -814,6 +816,93 @@ public:
         return out;
     }
 
+    /**
+     * gain multiplies the EEG/MEG samples from the next block on; inject_event writes a trigger at the next block;
+     * refresh_info publishes a new description of the stream (as a device does after re-reading its gains);
+     * samples counts what was produced and is reported every second.
+     */
+    std::vector<AcqControlInfo> controls() const override
+    {
+        AcqControlInfo gain;
+        gain.id = "gain";
+        gain.label = "Gain";
+        gain.group = "Amplifier";
+        gain.description = "Multiplies every EEG/MEG sample from the next block on.";
+        gain.type = AcqValueType::Double;
+        gain.writable = true;
+        gain.minimum = 0.0;
+        gain.maximum = 1000.0;
+
+        AcqControlInfo inject;
+        inject.id = "inject_event";
+        inject.label = "Inject event";
+        inject.group = "Triggers";
+        inject.description = "Writes an event with the given code at the next block; returns its sample.";
+        inject.kind = AcqControlKind::Command;
+        inject.type = AcqValueType::Int;
+        inject.when = AcqWhenRunning;
+        inject.minimum = 1.0;
+        inject.maximum = 65535.0;
+        inject.arguments = {AcqValueType::Int};
+
+        AcqControlInfo refresh;
+        refresh.id = "refresh_info";
+        refresh.label = "Refresh description";
+        refresh.group = "Amplifier";
+        refresh.description = "Publishes the stream description again, from the next block on; returns its version.";
+        refresh.kind = AcqControlKind::Command;
+        refresh.type = AcqValueType::Int;
+        refresh.changesStreamInfo = true;
+
+        AcqControlInfo samples;
+        samples.id = "samples";
+        samples.label = "Samples";
+        samples.group = "Status";
+        samples.description = "Samples of the first stream produced so far, updated every second.";
+        samples.kind = AcqControlKind::Status;
+        samples.type = AcqValueType::Int;
+        return {gain, inject, refresh, samples};
+    }
+
+    AcqExpected<AcqValue> readControl(std::size_t index) override
+    {
+        switch (index) {
+            case kGain:
+                return AcqValue(m_requestedGain.load(std::memory_order_relaxed));
+            case kSamples:
+                return AcqValue(static_cast<std::int64_t>(m_produced.load(std::memory_order_relaxed)));
+            default:
+                return AcqErrorCode::NotSupported;
+        }
+    }
+
+    AcqError writeControl(std::size_t index, const AcqValue& value) override
+    {
+        if (index != kGain) {
+            return AcqErrorCode::NotSupported;
+        }
+        m_requestedGain.store(std::get<double>(value), std::memory_order_relaxed);
+        if (!m_running.load(std::memory_order_acquire)) {
+            applyGain(m_next); // AcqDevice serializes this with start(): it takes effect with the next sample
+        }
+        return {};
+    }
+
+    AcqExpected<AcqValue> invokeControl(std::size_t index, std::span<const AcqValue> arguments,
+                                        std::chrono::milliseconds timeout) override
+    {
+        if (index == kInject) {
+            return request(m_injectCode, std::get<std::int64_t>(arguments[0]), timeout);
+        }
+        if (index == kRefresh) {
+            if (!m_running.load(std::memory_order_acquire)) {
+                return refreshInfo(m_next);
+            }
+            return request(m_refreshRequest, 1, timeout);
+        }
+        return AcqErrorCode::NotSupported;
+    }
+
     void stop() override
     {
         {
@@ -824,13 +913,142 @@ public:
         if (m_thread.joinable()) {
             m_thread.join();
         }
+        m_running.store(false, std::memory_order_release);
+        finishRequests(AcqError(AcqErrorCode::DeviceStopped, "the device stopped before the command ran"));
     }
 
 private:
+    static constexpr std::size_t kGain = 0;
+    static constexpr std::size_t kInject = 1;
+    static constexpr std::size_t kRefresh = 2;
+    static constexpr std::size_t kSamples = 3;
+
+    /** A command for the producer thread: posted by invokeControl(), done at the next block. */
+    struct Request
+    {
+        std::int64_t argument = 0;
+        bool pending = false;
+        bool done = false;
+        AcqExpected<AcqValue> result = AcqValue();
+    };
+
+    /** Posts @p argument to @p slot and waits until the producer has run it or @p timeout passes. */
+    AcqExpected<AcqValue> request(Request& slot, std::int64_t argument, std::chrono::milliseconds timeout)
+    {
+        std::unique_lock<std::mutex> lock(m_requestMutex);
+        slot = Request{argument, true, false, AcqValue()};
+        m_requestsPending.store(true, std::memory_order_release);
+        if (!m_requestDone.wait_for(lock, timeout, [&slot] { return slot.done; })) {
+            slot.pending = false;
+            return AcqError(AcqErrorCode::Timeout, "the command did not run within the timeout");
+        }
+        return slot.result;
+    }
+
+    /** Fails the commands still waiting, e.g. after stop(). */
+    void finishRequests(const AcqError& error)
+    {
+        std::lock_guard<std::mutex> lock(m_requestMutex);
+        for (Request* slot : {&m_injectCode, &m_refreshRequest}) {
+            if (slot->pending) {
+                slot->pending = false;
+                slot->done = true;
+                slot->result = error;
+            }
+        }
+        m_requestDone.notify_all();
+    }
+
+    /** Applies a changed gain from @p sample on and reports it. */
+    void applyGain(std::uint64_t sample)
+    {
+        const double gain = m_requestedGain.load(std::memory_order_relaxed);
+        if (gain == m_gain) {
+            return;
+        }
+        m_gain = gain;
+        AcqControlEvent event;
+        event.kind = AcqControlEventKind::ValueChanged;
+        event.control = kGain;
+        event.value = gain;
+        event.sample = sample;
+        publishControlEvent(event);
+    }
+
+    /** Publishes the stream description again from @p sample on; returns its version. */
+    AcqExpected<AcqValue> refreshInfo(std::uint64_t sample)
+    {
+        AcqStreamInfo info = *m_writer->stream().info();
+        const AcqError updated = m_writer->updateInfo(std::move(info), sample);
+        if (!updated.ok()) {
+            return updated;
+        }
+        const auto version = static_cast<std::int64_t>(m_writer->stream().info()->version);
+        AcqControlEvent event;
+        event.kind = AcqControlEventKind::Alert;
+        event.control = kRefresh;
+        event.value = version;
+        event.sample = sample;
+        event.setMessage("stream description refreshed, version " + std::to_string(version));
+        publishControlEvent(event);
+        return AcqValue(version);
+    }
+
+    /** Runs the posted commands at the start of the block at @p sample; returns the event code to inject, if any. */
+    std::int64_t serveRequests(std::uint64_t sample)
+    {
+        if (!m_requestsPending.load(std::memory_order_acquire)) {
+            return 0;
+        }
+        std::int64_t inject = 0;
+        {
+            std::lock_guard<std::mutex> lock(m_requestMutex);
+            m_requestsPending.store(false, std::memory_order_relaxed);
+            if (m_injectCode.pending) {
+                inject = m_injectCode.argument;
+                m_injectCode.pending = false;
+                m_injectCode.done = true;
+                m_injectCode.result = AcqValue(static_cast<std::int64_t>(sample));
+            }
+            if (m_refreshRequest.pending) {
+                m_refreshRequest.pending = false;
+                m_refreshRequest.done = true;
+                m_refreshRequest.result = refreshInfo(sample);
+            }
+        }
+        m_requestDone.notify_all();
+        if (inject != 0) {
+            AcqControlEvent event;
+            event.kind = AcqControlEventKind::CommandDone;
+            event.control = kInject;
+            event.value = static_cast<std::int64_t>(sample);
+            event.sample = sample;
+            publishControlEvent(event);
+        }
+        return inject;
+    }
+
+    /** Reports the sample count about once a second of stream time. */
+    void reportProgress(std::uint64_t produced)
+    {
+        m_produced.store(produced, std::memory_order_relaxed);
+        const auto second = static_cast<std::uint64_t>(m_config.sfreq);
+        if (second > 0 && produced / second != m_reportedSecond) {
+            m_reportedSecond = produced / second;
+            AcqControlEvent event;
+            event.kind = AcqControlEventKind::Status;
+            event.control = kSamples;
+            event.value = static_cast<std::int64_t>(produced);
+            event.sample = produced;
+            publishControlEvent(event);
+        }
+    }
+
     SyntheticBackend(const Config& config, std::string uri)
     : m_config(config)
     , m_model(config)
     , m_uri(std::move(uri))
+    , m_scaledChannels(config.eeg + config.meg)
     {
     }
 
@@ -961,17 +1179,25 @@ private:
             if (!waitForSpace(n)) {
                 return; // stopped; nothing reserved
             }
+            applyGain(m_next);
+            const std::int64_t inject = serveRequests(m_next);
             auto view = m_writer->beginWrite(n);
             if (!view) {
                 reportError(view.error());
                 return;
             }
             m_model.trials(m_next, m_next + n - 1, trials);
+            const auto gain = static_cast<float>(m_gain);
             std::uint64_t s = m_next;
             for (std::size_t p = 0; p < view->partCount(); ++p) {
                 const AcqWritePart& part = view->part(p);
                 for (std::size_t i = 0; i < part.samples; ++i, ++s) {
                     m_model.frame(s, trials, frame.data());
+                    if (gain != 1.0f) {
+                        for (std::size_t c = 0; c < m_scaledChannels; ++c) {
+                            frame[c] *= gain;
+                        }
+                    }
                     std::memcpy(part.at(0, i), frame.data(), channels * sizeof(float));
                 }
             }
@@ -1001,8 +1227,17 @@ private:
                     }
                 }
             }
+            if (inject != 0) {
+                const AcqError pushed = m_writer->pushEvent({m_next, static_cast<std::uint32_t>(m_config.pulse),
+                                                             static_cast<std::int32_t>(inject)});
+                if (!pushed.ok()) {
+                    reportError(pushed);
+                    return;
+                }
+            }
             m_writer->commit(n);
             m_next += n;
+            reportProgress(m_next);
             for (ModalityStream& stream : m_streams) {
                 if (!commit(stream)) {
                     return;
@@ -1021,6 +1256,18 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_wake;
     std::atomic<bool> m_stop{false};
+    // Controls
+    std::size_t m_scaledChannels = 0;         // EEG and MEG come first; the trigger channel is not scaled
+    std::atomic<double> m_requestedGain{1.0}; // set by writeControl()
+    double m_gain = 1.0;                      // in effect; owned by the producer while it runs
+    std::atomic<bool> m_running{false};
+    std::atomic<std::uint64_t> m_produced{0};
+    std::uint64_t m_reportedSecond = 0;
+    std::mutex m_requestMutex;
+    std::condition_variable m_requestDone;
+    std::atomic<bool> m_requestsPending{false};
+    Request m_injectCode;
+    Request m_refreshRequest;
 };
 
 //=============================================================================================================

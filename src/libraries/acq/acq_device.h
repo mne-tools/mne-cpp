@@ -24,6 +24,7 @@
 
 #include "acq_global.h"
 #include "acq_backend.h"
+#include "acq_control.h"
 #include "acq_error.h"
 #include "acq_stream.h"
 
@@ -35,6 +36,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <span>
 #include <string_view>
 #include <vector>
@@ -157,6 +159,71 @@ public:
 
     /** @return The last error reported by the backend or a failed transition; success if none. */
     [[nodiscard]] AcqError lastError() const;
+
+    //=========================================================================================================
+    /**
+     * The parameters, commands and status values the device offers (acq_control.h). The list does not change
+     * while the device is open; an index into it names a control in AcqControlEvent::control.
+     *
+     * @return The controls, empty for a device without any or a closed handle.
+     */
+    [[nodiscard]] std::span<const AcqControlInfo> controls() const noexcept;
+
+    /**
+     * @param[in] id   Control id, e.g. "gain".
+     *
+     * @return Its index in controls(), or nothing.
+     */
+    [[nodiscard]] std::optional<std::size_t> findControl(std::string_view id) const noexcept;
+
+    /**
+     * Reads a parameter or status value (control path).
+     *
+     * @param[in] id   Control id.
+     *
+     * @return The value, or InvalidParameter (no such parameter or status), InvalidState, NotSupported or the
+     *         backend's error.
+     */
+    [[nodiscard]] AcqExpected<AcqValue> read(std::string_view id);
+
+    /**
+     * Sets a parameter (control path). The type, range, options and the states in which it may be set are
+     * checked first; an integer is accepted for a number. A parameter that applies to samples takes effect at
+     * the next block and reports the first sample in its ValueChanged event.
+     *
+     * @param[in] id      Control id.
+     * @param[in] value   New value.
+     *
+     * @return Success, or InvalidParameter, InvalidState or the backend's error.
+     */
+    AcqError write(std::string_view id, const AcqValue& value);
+
+    /**
+     * Runs a command (control path) and waits for its result.
+     *
+     * @param[in] id          Control id.
+     * @param[in] arguments   Arguments in the order of AcqControlInfo::arguments.
+     * @param[in] timeout     Longest time to wait for the device.
+     *
+     * @return The result (std::monostate for a command without one), or InvalidParameter, InvalidState, Timeout
+     *         or the backend's error.
+     */
+    [[nodiscard]] AcqExpected<AcqValue> invoke(std::string_view id, std::span<const AcqValue> arguments = {},
+                                               std::chrono::milliseconds timeout = std::chrono::seconds(10));
+
+    /**
+     * Takes the control events published since the last call, oldest first: value changes, status updates,
+     * alerts and finished commands. Poll it regularly, e.g. from a user interface's timer; the queue holds 256
+     * events and drops newer ones while it is full.
+     *
+     * @param[out] out   Space for the events.
+     *
+     * @return The number of events written to @p out.
+     */
+    std::size_t pollControlEvents(std::span<AcqControlEvent> out);
+
+    /** @return Control events dropped because nobody took them in time. */
+    [[nodiscard]] std::uint64_t droppedControlEvents() const;
 
 private:
     struct Impl;

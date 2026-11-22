@@ -49,6 +49,7 @@
 
 #include "acq_global.h"
 #include "acq_backend.h"
+#include "acq_control.h"
 #include "acq_block_view.h"
 #include "acq_clock_model.h"
 #include "acq_convert.h"

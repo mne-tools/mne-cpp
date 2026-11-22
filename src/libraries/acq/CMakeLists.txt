@@ -37,6 +37,7 @@ set(PRIVATE_HEADERS
   detail/acq_stream_core.h
   detail/acq_ring_memory.h
   detail/acq_backend_impl.h
+  detail/acq_control_queue.h
   detail/acq_uri_params.h
   detail/acq_synthetic_backend.h
   detail/acq_shared_library.h
@@ -58,6 +59,7 @@ set(HEADERS
   acq_reader.h
   acq_stream.h
   acq_backend.h
+  acq_control.h
   acq_device.h
   acq_device_registry.h
   acq_eigen.h
