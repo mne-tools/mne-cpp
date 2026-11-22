@@ -16,13 +16,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "pluginscenemanager.h"
 
-#include <mna/mna_graph.h>
-#include <mna/mna_node.h>
-#include <mna/mna_port.h>
-#include <mna/mna_types.h>
+#include <mne/mna/mna_graph.h>
+#include <mne/mna/mna_node.h>
+#include <mne/mna/mna_port.h>
+#include <mne/mna/mna_types.h>
 #include "mna_scan_types.h"
 
 //=============================================================================================================

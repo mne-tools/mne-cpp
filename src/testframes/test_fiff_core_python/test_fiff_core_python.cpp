@@ -40,20 +40,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fiff/fiff_raw_data.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ctf_comp.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_coord_trans_set.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_sparse_matrix.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_events.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_coord_trans_set.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_sparse_matrix.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_events.h>
 
 //=============================================================================================================
 // QT INCLUDES

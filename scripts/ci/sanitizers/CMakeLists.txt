@@ -23,9 +23,9 @@ find_package(Qt6 REQUIRED COMPONENTS Core Test)
 
 get_filename_component(MNE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../.." ABSOLUTE)
 find_package(Eigen3 REQUIRED NO_MODULE PATHS "${MNE_ROOT}/src/external/eigen")
-add_subdirectory("${MNE_ROOT}/src/libraries/acq" acq)
+add_subdirectory("${MNE_ROOT}/src/libs/mne/acq" acq)
 foreach(_lib base math fiff bids acq/fiff lsl acq/lsl com acq/devices)
-    add_subdirectory("${MNE_ROOT}/src/libraries/${_lib}" "lib_${_lib}")
+    add_subdirectory("${MNE_ROOT}/src/libs/mne/${_lib}" "lib_${_lib}")
 endforeach()
 
 enable_testing()

@@ -14,22 +14,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/base_global.h>
-#include <base/log.h>
+#include <mne/base/base_global.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <bids/bids_path.h>
-#include <base/byte_stream.h>
-#include <base/json.h>
-#include <base/string_utils.h>
-#include <bids/bids_channel.h>
-#include <bids/bids_electrode.h>
-#include <bids/bids_event.h>
-#include <bids/bids_coordinate_system.h>
-#include <bids/bids_dataset_description.h>
-#include <bids/bids_raw_data.h>
-#include <bids/bids_global.h>
-#include <bids/readers/bids_brain_vision_reader.h>
-#include <bids/readers/bids_edf_reader.h>
+#include <mne/bids/bids_path.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/json.h>
+#include <mne/base/string_utils.h>
+#include <mne/bids/bids_channel.h>
+#include <mne/bids/bids_electrode.h>
+#include <mne/bids/bids_event.h>
+#include <mne/bids/bids_coordinate_system.h>
+#include <mne/bids/bids_dataset_description.h>
+#include <mne/bids/bids_raw_data.h>
+#include <mne/bids/bids_global.h>
+#include <mne/bids/readers/bids_brain_vision_reader.h>
+#include <mne/bids/readers/bids_edf_reader.h>
 
 //=============================================================================================================
 // QT INCLUDES

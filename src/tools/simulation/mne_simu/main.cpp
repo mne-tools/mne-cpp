@@ -14,12 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forward_solution.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

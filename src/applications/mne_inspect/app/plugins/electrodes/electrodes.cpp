@@ -16,16 +16,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "electrodes.h"
 
-#include <ieeg/ieeg_implantation.h>
-#include <mri/mri_vol_data.h>
-#include <disp3D/scene/multimodalscene.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_stream.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/mri/mri_vol_data.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES

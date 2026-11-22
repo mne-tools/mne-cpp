@@ -22,7 +22,7 @@
 #include <rtserver_connector/command_parser.h>
 #include <rtserver_connector/command_manager.h>
 
-#include <com/tcp_server.h>
+#include <mne/com/tcp_server.h>
 
 //=============================================================================================================
 // QT INCLUDES

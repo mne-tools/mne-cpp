@@ -17,8 +17,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq_stream.h>
-#include <acq/detail/acq_diagnostics.h>
+#include <mne/acq/acq_stream.h>
+#include <mne/acq/detail/acq_diagnostics.h>
 #if defined(_WIN32)
 #define NOMINMAX
 #define WIN32_LEAN_AND_MEAN

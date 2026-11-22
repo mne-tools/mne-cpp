@@ -27,9 +27,9 @@
 #include "Utils/filteroperator.h"
 #include "Utils/sessionfilter.h"
 #include "Utils/rawsettings.h"
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

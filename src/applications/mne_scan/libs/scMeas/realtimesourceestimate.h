@@ -21,14 +21,14 @@
 
 #include "scmeas_global.h"
 #include "measurement.h"
-#include <fs/fs_label.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_coord_trans.h>
-#include <mne/mne_source_spaces.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

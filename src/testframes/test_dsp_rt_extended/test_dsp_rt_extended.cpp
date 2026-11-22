@@ -5,10 +5,10 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 #include <cmath>
-#include <dsp/rt/rt_detect_trigger.h>
-#include <dsp/parksmcclellan.h>
-#include <dsp/filterkernel.h>
-#include <dsp/rt/rt_filter.h>
+#include <mne/dsp/rt/rt_detect_trigger.h>
+#include <mne/dsp/parksmcclellan.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_filter.h>
 #include <numbers>
 
 using namespace mne;

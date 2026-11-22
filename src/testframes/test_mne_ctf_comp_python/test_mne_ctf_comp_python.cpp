@@ -31,14 +31,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_constants.h>
-#include <mne/mne.h>
-#include <mne/mne_raw_data.h>
-#include <mne/mne_raw_info.h>
-#include <mne/mne_ctf_comp_data_set.h>
-#include <mne/mne_filter_def.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_raw_data.h>
+#include <mne/mne/mne_raw_info.h>
+#include <mne/mne/mne_ctf_comp_data_set.h>
+#include <mne/mne/mne_filter_def.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

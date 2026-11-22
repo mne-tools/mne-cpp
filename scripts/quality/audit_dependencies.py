@@ -9,7 +9,7 @@
 #
 #
 # @brief    Generate and police the library dependency graph.
-"""Audit the dependency architecture of ``src/libraries``.
+"""Audit the dependency architecture of ``src/libs/mne``.
 
 Layering is the kind of property that is obvious while it holds and expensive
 once it does not.  A single edge from a low-level library back up into a
@@ -69,7 +69,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LIBRARIES_DIR = REPO_ROOT / "src" / "libraries"
+LIBRARIES_DIR = REPO_ROOT / "src" / "libs" / "mne"
 POLICY_FILE = Path(__file__).resolve().parent / "dependency_policy.json"
 
 INTERNAL_PREFIX = "mne_"
@@ -199,7 +199,7 @@ class Library:
 
     @property
     def cmake_path(self) -> str:
-        return f"src/libraries/{self.directory}/CMakeLists.txt"
+        return f"src/libs/mne/{self.directory}/CMakeLists.txt"
 
 
 def read_library(directory: Path, prefixes: dict[str, str] | None = None, root: Path | None = None) -> Library | None:
@@ -346,7 +346,7 @@ def check_layer_assignment(
                 error(
                     "DEP002",
                     policy_location(),
-                    f"the layering names '{library}', which is not a library under src/libraries.",
+                    f"the layering names '{library}', which is not a library under src/libs/mne.",
                 )
             )
     return findings
@@ -408,7 +408,7 @@ def check_edges(
                     error(
                         "DEP004",
                         library.cmake_path,
-                        f"'{name}' links '{dependency}', which is not a library under src/libraries.",
+                        f"'{name}' links '{dependency}', which is not a library under src/libs/mne.",
                     )
                 )
                 continue
@@ -707,7 +707,7 @@ def run(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Audit the MNE-CPP library dependency architecture.")
-    parser.add_argument("--libraries", default=str(LIBRARIES_DIR), help="path to src/libraries")
+    parser.add_argument("--libraries", default=str(LIBRARIES_DIR), help="path to src/libs/mne")
     parser.add_argument("--policy", default=str(POLICY_FILE), help="path to the architecture policy")
     parser.add_argument(
         "--format", choices=("text", "json", "dot"), default="text", help="output format (default: %(default)s)"

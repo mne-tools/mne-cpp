@@ -16,17 +16,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
 #include <math.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <inv/hpi/inv_hpi_fit.h>
-#include <inv/hpi/inv_hpi_data_updater.h>
-#include <inv/hpi/inv_sensor_set.h>
-#include <fwd/fwd_coil_set.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/inv/hpi/inv_hpi_fit.h>
+#include <mne/inv/hpi/inv_hpi_data_updater.h>
+#include <mne/inv/hpi/inv_sensor_set.h>
+#include <mne/fwd/fwd_coil_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

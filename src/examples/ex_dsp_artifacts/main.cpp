@@ -20,20 +20,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/annotate_artifact.h>
-#include <base/string_utils.h>
-#include <dsp/artifact_detect.h>
-#include <dsp/bad_channel_detect.h>
-#include <dsp/bad_channels_lof.h>
-#include <dsp/bridged_electrodes.h>
-#include <dsp/eeg_reference.h>
-#include <dsp/eog_regression.h>
-#include <dsp/stim_artifact.h>
+#include <mne/dsp/annotate_artifact.h>
+#include <mne/base/string_utils.h>
+#include <mne/dsp/artifact_detect.h>
+#include <mne/dsp/bad_channel_detect.h>
+#include <mne/dsp/bad_channels_lof.h>
+#include <mne/dsp/bridged_electrodes.h>
+#include <mne/dsp/eeg_reference.h>
+#include <mne/dsp/eog_regression.h>
+#include <mne/dsp/stim_artifact.h>
 
-#include <fiff/fiff_annotations.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff_annotations.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

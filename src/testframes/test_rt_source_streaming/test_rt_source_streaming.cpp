@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <disp3D/workers/rtsourcedataworker.h>
-#include <disp3D/workers/rtsourcedatacontroller.h>
+#include <mne/base/log.h>
+#include <mne/disp3D/workers/rtsourcedataworker.h>
+#include <mne/disp3D/workers/rtsourcedatacontroller.h>
 
 //=============================================================================================================
 // QT INCLUDES

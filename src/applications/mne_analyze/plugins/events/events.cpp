@@ -19,7 +19,7 @@
 
 #include "events.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>

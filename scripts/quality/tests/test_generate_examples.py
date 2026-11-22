@@ -46,7 +46,7 @@ class GenerateExamplesTest(unittest.TestCase):
             ex = root / gen.EXAMPLES / "ex_demo"
             ex.mkdir(parents=True)
             (ex / "main.cpp").write_text(
-                '/** @brief Fit {dipoles} to <data>. */\n#include <fiff/fiff.h>\n#include <inv/inv.h>\n'
+                '/** @brief Fit {dipoles} to <data>. */\n#include <mne/fiff/fiff.h>\n#include <mne/inv/inv.h>\n'
                 'QCommandLineOption in({"file", "f"}, "The input <in> | {x}.", "in");\n')
             api = root / gen.API / "inv"
             api.mkdir(parents=True)
@@ -69,7 +69,7 @@ class GenerateExamplesTest(unittest.TestCase):
             for name, title in (("ex_demo", "Fit <dipoles>"), ("ex_other", "Other demo")):
                 ex = root / gen.EXAMPLES / name
                 ex.mkdir(parents=True)
-                (ex / "main.cpp").write_text(f"/** @brief {name} brief */\n#include <inv/inv.h>\n")
+                (ex / "main.cpp").write_text(f"/** @brief {name} brief */\n#include <mne/inv/inv.h>\n")
             facets = {"tasks": {"io": "IO"}, "modalities": {"meg": "MEG"}, "levels": {"start": "Start"}}
             entry = {"tasks": ["io"], "modalities": ["meg"], "level": "start"}
             (root / gen.kn.REGISTRY).parent.mkdir(parents=True)
@@ -112,7 +112,7 @@ class GenerateExamplesTest(unittest.TestCase):
                 ex = root / gen.EXAMPLES / name
                 ex.mkdir(parents=True)
                 lib = "fiff" if name == "ex_other_lib" else "inv"
-                (ex / "main.cpp").write_text(f"/** @brief {name} */\n#include <{lib}/x.h>\n{body}")
+                (ex / "main.cpp").write_text(f"/** @brief {name} */\n#include <mne/{lib}/x.h>\n{body}")
             found = gen.usages("InvDipole", "inv", root)
         self.assertEqual([(u["name"], u["uses"]) for u in found], [("ex_two", 2), ("ex_one", 1)])
         self.assertEqual(found[1]["code"], ["InvDipole d;", "d.fit();"])
@@ -195,7 +195,7 @@ class GenerateExamplesTest(unittest.TestCase):
             root = Path(tmp)
             ex = root / gen.EXAMPLES / "ex_acq_demo"
             ex.mkdir(parents=True)
-            (ex / "main.cpp").write_text('/** @brief Stream data. */\n#include <acq/acq.h>\n#include <fiff/fiff.h>\n')
+            (ex / "main.cpp").write_text('/** @brief Stream data. */\n#include <mne/acq/acq.h>\n#include <mne/fiff/fiff.h>\n')
             (root / gen.API / "fiff").mkdir(parents=True)
             out = root / "out"
             gen.generate(root, out)
@@ -209,7 +209,7 @@ class GenerateExamplesTest(unittest.TestCase):
             root = Path(tmp)
             good = root / gen.EXAMPLES / "ex_good"
             good.mkdir(parents=True)
-            (good / "main.cpp").write_text("/** @brief Good. */\n#include <fiff/fiff.h>\n")
+            (good / "main.cpp").write_text("/** @brief Good. */\n#include <mne/fiff/fiff.h>\n")
             stray = root / gen.EXAMPLES / "ex_stray"
             stray.mkdir(parents=True)
             (stray / "main.cpp").write_text("/** @brief Stray. */\n#include <vector>\n")

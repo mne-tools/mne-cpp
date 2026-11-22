@@ -22,20 +22,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_cov.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_cov.h>
 
-#include <mne/mne_forward_solution.h>
+#include <mne/mne/mne_forward_solution.h>
 
-#include <inv/inv_source_estimate.h>
-#include <inv/minimum_norm/inv_cmne.h>
-#include <inv/minimum_norm/inv_cmne_settings.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_cmne.h>
+#include <mne/inv/minimum_norm/inv_cmne_settings.h>
 
-#include <ml/ml_trainer.h>
-#include <pybridge/python_runner.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/ml/ml_trainer.h>
+#include <mne/pybridge/python_runner.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

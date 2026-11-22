@@ -32,20 +32,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forward_solution.h>
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_source_space.h>
-#include <mne/mne_cortical_map.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_evoked.h>
-#include <fs/fs_label.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_surfaceset.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/mne/mne_cortical_map.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_surfaceset.h>
 
 //=============================================================================================================
 // QT INCLUDES

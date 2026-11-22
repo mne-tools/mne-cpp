@@ -16,8 +16,8 @@
 
 #include "sessionfilter.h"
 
-#include <base/string_utils.h>
-#include <dsp/firfilter.h>
+#include <mne/base/string_utils.h>
+#include <mne/dsp/firfilter.h>
 
 //=============================================================================================================
 // QT INCLUDES

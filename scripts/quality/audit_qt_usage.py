@@ -10,7 +10,7 @@
 # @brief    Count Qt usage per library so it can only fall (gate G13).
 """Qt usage per library for gate G13.
 
-For every library under ``src/libraries`` (a directory whose CMakeLists.txt calls ``add_library``; nested
+For every library under ``src/libs/mne`` (a directory whose CMakeLists.txt calls ``add_library``; nested
 libraries such as ``acq/fiff`` count separately) it reports:
 
 * ``tokens``                  Qt identifiers in code, by category (comments, strings and ``#include`` lines removed)

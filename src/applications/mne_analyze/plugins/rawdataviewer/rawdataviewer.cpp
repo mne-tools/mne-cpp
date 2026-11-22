@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "rawdataviewer.h"
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
@@ -29,11 +29,11 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <disp/viewers/fiffrawviewsettings.h>
-#include <disp/viewers/scalingview.h>
-#include <disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
 
-#include <dsp/filterkernel.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

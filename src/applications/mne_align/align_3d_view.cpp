@@ -14,16 +14,16 @@
 
 #include "qt_conversions.h"
 
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/scene/multimodalscene.h>
-#include <disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/disp3D/view/brainview.h>
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_file.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_icp.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_icp.h>
 
 #include <QVBoxLayout>
 

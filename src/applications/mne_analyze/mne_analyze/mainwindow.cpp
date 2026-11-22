@@ -18,18 +18,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "info.h"
 #include "mainwindow.h"
 
 #include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Management/statusbar.h>
 
-#include <disp/viewers/multiview.h>
-#include <disp/viewers/multiviewwindow.h>
-#include <disp/viewers/abstractview.h>
+#include <mne/disp/viewers/multiview.h>
+#include <mne/disp/viewers/multiviewwindow.h>
+#include <mne/disp/viewers/abstractview.h>
 
-#include <base/base_global.h>
+#include <mne/base/base_global.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -19,7 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingscontrollergui.h"

@@ -14,16 +14,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_digitizer_data.h>
 ////////////////////////
-#include <connectivity/network/network.h>
-#include <fiff/fiff_ch_info.h>
-#include <mne/mne_msh_display_surface_set.h>
-#include <mne/mne_surface_or_volume.h>
+#include <mne/connectivity/network/network.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/mne/mne_msh_display_surface_set.h>
+#include <mne/mne/mne_surface_or_volume.h>
 
 //=============================================================================================================
 // QT INCLUDES

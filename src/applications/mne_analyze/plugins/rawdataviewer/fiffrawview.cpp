@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <math.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
@@ -26,7 +26,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <dsp/filterkernel.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // Qt INCLUDES

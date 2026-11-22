@@ -15,7 +15,7 @@
 //=============================================================================================================
 
 #include <averaging/averaging.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
 #include <babymeg/babymeg.h>
 #include <brainamp/brainamp.h>
@@ -36,7 +36,7 @@
 #include <tmsi/tmsi.h>
 #include <tmsi/tmsielectrodeitem.h>
 #include <mainwindow.h>
-#include <connectivity/network/network.h>
+#include <mne/connectivity/network/network.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
@@ -45,11 +45,11 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scShared/Management/plugininputconnector.h>
 #include <scShared/Management/pluginoutputconnector.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

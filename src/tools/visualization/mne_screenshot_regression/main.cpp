@@ -18,11 +18,11 @@
 #include <QImage>
 #include <QDir>
 
-#include <fs/fs_surface.h>
-#include <fs/fs_annotation.h>
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <base/log.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/base/log.h>
 
 #include <cmath>
 

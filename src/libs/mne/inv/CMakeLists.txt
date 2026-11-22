@@ -1,0 +1,154 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+cmake_minimum_required(VERSION 3.14)
+project(mne_inv LANGUAGES CXX)
+
+set(SOURCES
+    minimum_norm/inv_minimum_norm.cpp
+    rap_music/inv_rap_music.cpp
+    rap_music/inv_pwl_rap_music.cpp
+    rap_music/inv_dipole.cpp
+    rap_music/inv_trap_music.cpp
+    inv_source_coupling.cpp
+    inv_source_estimate.cpp
+    inv_source_estimate_token.cpp
+    dipole_fit/inv_dipole_fit.cpp
+    dipole_fit/inv_dipole_fit_data.cpp
+    dipole_fit/inv_dipole_fit_settings.cpp
+    dipole_fit/inv_dipole_forward.cpp
+    dipole_fit/inv_ecd.cpp
+    dipole_fit/inv_ecd_set.cpp
+    dipole_fit/inv_guess_data.cpp
+    hpi/inv_hpi_data_updater.cpp
+    hpi/inv_hpi_fit.cpp
+    hpi/inv_hpi_fit_data.cpp
+    hpi/inv_hpi_model_parameters.cpp
+    hpi/inv_sensor_set.cpp
+    hpi/inv_signal_model.cpp
+    beamformer/inv_beamformer.cpp
+    beamformer/inv_beamformer_compute.cpp
+    beamformer/inv_lcmv.cpp
+    beamformer/inv_dics.cpp
+    sparse/inv_mxne.cpp
+    sparse/inv_tf_mxne.cpp
+    sparse/inv_gamma_map.cpp
+    inv_source_estimate_io.cpp
+    minimum_norm/inv_cmne.cpp
+    minimum_norm/inv_cmne_settings.cpp
+    inv_convenience.cpp
+    morph/source_morph.cpp
+    inv_resolution_matrix.cpp
+    inv_label_time_course.cpp
+    inv_vector_source_estimate.cpp
+    inv_volume_source_estimate.cpp
+)
+
+set(HEADERS
+    inv_global.h
+    minimum_norm/inv_minimum_norm.h
+    rap_music/inv_rap_music.h
+    rap_music/inv_pwl_rap_music.h
+    rap_music/inv_dipole.h
+    rap_music/inv_trap_music.h
+    inv_source_estimate.h
+    inv_source_estimate_token.h
+    inv_types.h
+    inv_token.h
+    inv_focal_dipole.h
+    inv_source_coupling.h
+    inv_connectivity.h
+    dipole_fit/inv_dipole_fit.h
+    dipole_fit/inv_dipole_fit_data.h
+    dipole_fit/inv_dipole_fit_settings.h
+    dipole_fit/inv_dipole_forward.h
+    dipole_fit/inv_ecd.h
+    dipole_fit/inv_ecd_set.h
+    dipole_fit/inv_guess_data.h
+    hpi/inv_hpi_data_updater.h
+    hpi/inv_hpi_fit.h
+    hpi/inv_hpi_fit_data.h
+    hpi/inv_hpi_model_parameters.h
+    hpi/inv_sensor_set.h
+    hpi/inv_signal_model.h
+    beamformer/inv_beamformer.h
+    beamformer/inv_beamformer_compute.h
+    beamformer/inv_beamformer_settings.h
+    beamformer/inv_lcmv.h
+    beamformer/inv_dics.h
+    sparse/inv_mxne.h
+    sparse/inv_tf_mxne.h
+    sparse/inv_gamma_map.h
+    inv_source_estimate_io.h
+    minimum_norm/inv_cmne.h
+    minimum_norm/inv_cmne_settings.h
+    inv_convenience.h
+    morph/source_morph.h
+    inv_resolution_matrix.h
+    inv_label_time_course.h
+    inv_vector_source_estimate.h
+    inv_volume_source_estimate.h
+)
+
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+set(FFTW_LIBS "")
+
+if(USE_FFTW)
+  if (WIN32)
+    set(FFTW_LIBS
+      ${FFTW_DIR_LIBS}/libfftw3-3.dll
+      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
+      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
+    )
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
+  elseif(UNIX AND NOT APPLE)
+    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
+  endif()
+endif()
+
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
+
+set(MNE_LIBS_REQUIRED 
+    mne_base
+    mne_math
+    mne_fiff
+    mne_fs
+    mne_mne
+    mne_fwd
+    mne_ml
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${MNE_LIBS_REQUIRED}
+    Eigen3::Eigen
+    ${FFTW_LIBS})
+
+# InvCMNE::train_lstm runs the training script through mne_pybridge, which WebAssembly lacks
+if(NOT WASM)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mne_pybridge)
+endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_INV_LIBRARY)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
+
+install(TARGETS ${PROJECT_NAME} ${MNE_CPP_EXPORT_SET}
+    RUNTIME DESTINATION bin COMPONENT runtime
+    LIBRARY DESTINATION lib COMPONENT runtime
+    ARCHIVE DESTINATION lib COMPONENT sdk
+)
+
+# Install public headers for SDK
+foreach(_header ${HEADERS})
+    get_filename_component(_dir "${_header}" DIRECTORY)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${_header}"
+        DESTINATION include/mne/inv/${_dir}
+        COMPONENT sdk
+    )
+endforeach()
+

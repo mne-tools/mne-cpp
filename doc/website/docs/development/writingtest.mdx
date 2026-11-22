@@ -63,8 +63,8 @@ private:
 Here you execute and declare everything that is necessary for setting up your test. You generate and load all values in a variable that can be compared to later. If you want to load external calculated data in e.g. `.txt` files you can use:
 
 ```cpp
-#include <math/matrix_io.h>
-#include <pybridge/python_test_helper.h>
+#include <mne/math/matrix_io.h>
+#include <mne/pybridge/python_test_helper.h>
 
 Eigen::MatrixXd mDataFromFile;
 QVERIFY(mne::read_matrix(mDataFromFile, mne::PythonTestHelper::test_data_path() / "Result" / "<yourFile>.txt"));

@@ -23,9 +23,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
 //=============================================================================================================
 // QT INCLUDES

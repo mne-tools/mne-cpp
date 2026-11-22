@@ -19,15 +19,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/bad_channels_maxwell.h>
-#include <base/string_utils.h>
-#include <dsp/filter_chpi.h>
-#include <dsp/fine_calibration.h>
-#include <dsp/maxwell_movement_comp.h>
-#include <dsp/sss.h>
+#include <mne/dsp/bad_channels_maxwell.h>
+#include <mne/base/string_utils.h>
+#include <mne/dsp/filter_chpi.h>
+#include <mne/dsp/fine_calibration.h>
+#include <mne/dsp/maxwell_movement_comp.h>
+#include <mne/dsp/sss.h>
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

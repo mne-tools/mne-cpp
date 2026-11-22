@@ -16,20 +16,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "neuronalconnectivity.h"
 
 #include "FormFiles/neuronalconnectivitysetupwidget.h"
-#include <base/string_utils.h>
-#include <connectivity/connectivity.h>
-#include <dsp/rt/rt_connectivity.h>
-#include <disp/viewers/connectivitysettingsview.h>
+#include <mne/base/string_utils.h>
+#include <mne/connectivity/connectivity.h>
+#include <mne/dsp/rt/rt_connectivity.h>
+#include <mne/disp/viewers/connectivitysettingsview.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimeevokedset.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_bem.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/mne/mne_bem.h>
 
 //=============================================================================================================
 // QT INCLUDES

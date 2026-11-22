@@ -15,15 +15,15 @@
 //=============================================================================================================
 
 #include <applications/mne_analyze/plugins/channelselection/channelselection.h>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/event.h>
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
 
 //=============================================================================================================
 // QT INCLUDES

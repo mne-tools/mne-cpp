@@ -4,7 +4,7 @@
 
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <math/spectral.h>
+#include <mne/math/spectral.h>
 #include <cmath>
 #include <numbers>
 

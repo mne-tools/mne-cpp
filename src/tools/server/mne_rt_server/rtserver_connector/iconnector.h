@@ -24,7 +24,7 @@
 
 #include "rtserver_connector_global.h"
 
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff_info.h>
 #include <rtserver_connector/command_manager.h>
 
 //=============================================================================================================

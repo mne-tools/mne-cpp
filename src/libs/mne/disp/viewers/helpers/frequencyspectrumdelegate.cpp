@@ -1,0 +1,412 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2014-2026 MNE-CPP Authors
+ *
+ * @file     frequencyspectrumdelegate.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Limin Sun <limin.sun@childrens.harvard.edu>
+ * @since    0.1.0
+ * @date     May 2014
+ * @brief    Implementation of the FrequencySpectrumDelegate spectrum-row painter.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "frequencyspectrumdelegate.h"
+
+#include "frequencyspectrummodel.h"
+#include <mne/fiff/fiff_info.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QPainter>
+#include <QTableView>
+#include <QPainterPath>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <limits>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne::disp;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView, QObject* parent)
+: QAbstractItemDelegate(parent)
+, m_tableview_row(0)
+, m_mousex(0)
+, m_mousey(0)
+, m_x_rate(0.0)
+, m_fMaxValue(0.0)
+, m_fScaleY(0.0)
+, m_iScaleType(0)
+{
+    m_tableview = m_pTableView;
+    m_tableview->setMouseTracking(true);
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::setScaleType(qint8 ScaleType)
+{
+    m_iScaleType = ScaleType;
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    float t_fPlotHeight = option.rect.height();
+    switch (index.column()) {
+        case 0: { //chnames
+            painter->save();
+
+            painter->rotate(-90);
+            painter->drawText(QRectF(-option.rect.y() - t_fPlotHeight, 0, t_fPlotHeight, 20), Qt::AlignCenter, index.model()->data(index, Qt::DisplayRole).toString());
+
+            painter->restore();
+            break;
+        }
+        case 1: { //data plot
+            painter->save();
+
+            //draw special background when channel is marked as bad
+            //            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+            //            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+            //                QPointF oldBO = painter->brushOrigin();
+            //                painter->setBrushOrigin(option.rect.topLeft());
+            //                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+            //                painter->setBrushOrigin(oldBO);
+            //            }
+
+            //            //Highlight selected channels
+            //            if(option.state & QStyle::State_Selected) {
+            //                QPointF oldBO = painter->brushOrigin();
+            //                painter->setBrushOrigin(option.rect.topLeft());
+            //                painter->fillRect(option.rect, option.palette.highlight());
+            //                painter->setBrushOrigin(oldBO);
+            //            }
+
+            //Get data
+            QVariant variant = index.model()->data(index, Qt::DisplayRole);
+            RowVectorXd data = variant.value<RowVectorXd>();
+
+            const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+            if (data.size() > 0) {
+                QPainterPath path(QPointF(option.rect.x(), option.rect.y())); //QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
+
+                //Plot grid
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                createGridPath(index, option, path, data);
+                createGridTick(index, option, painter);
+
+                //capture the mouse
+                capturePoint(index, option, path, data, painter);
+
+                painter->save();
+                QPen pen;
+                pen.setStyle(Qt::DotLine);
+                pen.setWidthF(0.5);
+                painter->setPen(pen);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot data path
+                path = QPainterPath(QPointF(option.rect.x(), option.rect.y())); //QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+
+                createPlotPath(index, option, path, data);
+
+                painter->save();
+                painter->translate(0, t_fPlotHeight / 2);
+                painter->setRenderHint(QPainter::Antialiasing, true);
+
+                if (option.state & QStyle::State_Selected)
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkRed : Qt::red, 1, Qt::SolidLine));
+                else
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
+
+                painter->drawPath(path);
+                painter->restore();
+            }
+            painter->restore();
+            break;
+        }
+    }
+}
+
+//=============================================================================================================
+
+QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QSize size;
+
+    switch (index.column()) {
+        case 0:
+            size = QSize(20, option.rect.height());
+            break;
+        case 1:
+            RowVectorXd data = index.model()->data(index).value<RowVectorXd>();
+            //        qint32 nsamples = (static_cast<const FrequencySpectrumModel*>(index.model()))->lastSample()-(static_cast<const FrequencySpectrumModel*>(index.model()))->firstSample();
+
+            //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
+            Q_UNUSED(option);
+            break;
+    }
+
+    return size;
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
+{
+    if (mousex != m_mousex) {
+        m_tableview_row = tableview_row;
+        m_mousex = mousex;
+        m_mousey = mousey;
+        m_visRect = visRect;
+
+        m_x_rate = static_cast<float>(m_mousex) / static_cast<float>(m_visRect.width());
+
+        m_tableview->viewport()->repaint();
+    }
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::capturePoint(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorXd& data, QPainter* painter) const
+{
+    Q_UNUSED(option);
+    Q_UNUSED(path);
+
+    if (m_tableview_row == index.row()) {
+        const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+        qint32 i;
+
+        RowVectorXd org_vecFreqScale = t_pModel->getFreqScale();
+        RowVectorXd vecFreqScale = t_pModel->getFreqScaleBound();
+
+        qint32 lowerIdx = t_pModel->getLowerFrqBound();
+        qint32 upperIdx = t_pModel->getUpperFrqBound();
+
+        //qint32 numbins = vecFreqScale.size();//  data.size();
+
+        //qDebug() << "numbins" << numbins;
+        //qDebug() << "lowerIdx" << lowerIdx << "upperIdx" << upperIdx;
+
+        // find the bin nearest to the current mouse cursor location
+        i = lowerIdx;
+        double dBestDistance = std::numeric_limits<double>::max();
+        for (qint32 j = lowerIdx; j <= upperIdx; ++j) {
+            const double dRate = (vecFreqScale[j] - vecFreqScale[lowerIdx]) / (vecFreqScale[upperIdx] - vecFreqScale[lowerIdx]);
+            if (std::abs(dRate - m_x_rate) < dBestDistance) {
+                dBestDistance = std::abs(dRate - m_x_rate);
+                i = j;
+            }
+        }
+
+        /***************************************************
+     * Mouse moving showing the frequency and value
+     *
+     * *************************************************/
+
+        unsigned short usPosY = m_visRect.bottom();
+        unsigned short usPosX = m_visRect.left();
+        unsigned short usHeight = m_visRect.height();
+        unsigned short usWidth = m_visRect.width();
+
+        int iPosX = m_mousex;
+        int iPosY = m_mousey;
+
+        if (iPosX > usPosX && iPosX < usPosX + usWidth && iPosY > (usPosY - usHeight) && iPosY < usPosY) {
+            //qDebug()<<" index row" << index.row()<< "i"<< i << "iPosX,iposY" << iPosX << iPosY << "usPosY"<<usPosY<<"usHeight"<<usHeight;
+            //Horizontal line
+            painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
+
+            QPoint start(iPosX - 25, iPosY); //iStartY-5);//paint measure line vertical direction
+            QPoint end(iPosX + 25, iPosY);   //iStartY+5);
+
+            //    painter->drawLine(start, end);
+
+            //vertical line
+            start.setX(iPosX);
+            start.setY(usPosY - usHeight); // iPosY - 25);//iStartY - 5);
+            end.setX(iPosX);
+            end.setY(usPosY); //iPosY + 25);//iStartY + 5);
+            painter->drawLine(start, end);
+            // Draw text
+            painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+
+            // cal the frequency according to the iPosX
+            double fs = t_pModel->getInfo()->sfreq / 2;
+
+            //RowVectorXd vecFreqScale = t_pModel->getFreqScale();
+            //RowVectorXd vecFreqScale = t_pModel->getFreqScaleBound();
+            double freq;
+            if (m_iScaleType) // log
+            {
+                double max = log10(fs + 1);
+                org_vecFreqScale *= max;
+
+                freq = pow(10, org_vecFreqScale[i]) - 1;
+            } else //normal
+            {
+                org_vecFreqScale *= fs;
+
+                freq = org_vecFreqScale[i];
+            }
+
+            QString tx = QString("%1 [DB], %2 [Hz]").arg(data[i]).arg(freq);
+
+            if (iPosX > usPosX + usWidth - tx.size() * 8)
+                painter->drawText(iPosX - tx.size() * 8, iPosY - 8, tx); // ToDo Precision should be part of preferences
+            else
+                painter->drawText(iPosX + 8, iPosY - 8, tx); // ToDo Precision should be part of preferences
+        }
+    } //correct row to plot
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::createPlotPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorXd& data) const
+{
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    qint32 lowerIdx = t_pModel->getLowerFrqBound();
+    qint32 upperIdx = t_pModel->getUpperFrqBound();
+
+    if (data.size() == 0 || upperIdx < lowerIdx) {
+        return;
+    }
+
+    // Map the visible range into the cell (1 px margin), larger values upwards. The path starts at the cell top and
+    // is drawn translated down by half the cell height, so the cell bottom is at top + height / 2 here.
+    const double dMin = data.segment(lowerIdx, upperIdx - lowerIdx + 1).minCoeff();
+    const double dMax = data.segment(lowerIdx, upperIdx - lowerIdx + 1).maxCoeff();
+    const double dRange = (dMax > dMin) ? dMax - dMin : 1.0;
+    const double dScaleY = (option.rect.height() - 2.0) / dRange;
+    const double dYBottom = path.currentPosition().y() + option.rect.height() / 2.0 - 1.0;
+
+    for (qint32 i = lowerIdx; i <= upperIdx; ++i) {
+        const QPointF qSamplePosition(option.rect.x() + option.rect.width() * t_pModel->getFreqScaleBound()[i],
+                                      dYBottom - (data[i] - dMin) * dScaleY);
+        if (i == lowerIdx) {
+            path.moveTo(qSamplePosition);
+        } else {
+            path.lineTo(qSamplePosition);
+        }
+    }
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::createGridPath(const QModelIndex& index, const QStyleOptionViewItem& option, QPainterPath& path, RowVectorXd& data) const
+{
+    Q_UNUSED(data)
+
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    if (t_pModel->getInfo()) {
+        double nf = t_pModel->getInfo()->sfreq / 2;
+
+        qint32 numLines = (m_iScaleType) ? static_cast<qint32>(ceil(log10(nf))) : 5;
+
+        QList<qint32> qListLineSamples;
+
+        qListLineSamples << 0;
+
+        if (m_iScaleType) { // log
+            for (qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx) {
+                double val = pow(10, lineIdx);
+                qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
+                qListLineSamples.append(idx);
+            }
+        } else { // normal
+            for (qint32 lineIdx = 1; lineIdx < numLines; ++lineIdx) {
+                double val = lineIdx * (nf / numLines);
+                qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
+                qListLineSamples.append(idx);
+            }
+        }
+        //vertical lines
+        float yStart = option.rect.topLeft().y();
+
+        float yEnd = option.rect.bottomRight().y();
+
+        for (qint32 i = 0; i < qListLineSamples.size(); ++i) {
+            if (qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound()) {
+                float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]]) * option.rect.width();
+                path.moveTo(x, yStart);
+                path.lineTo(x, yEnd);
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void FrequencySpectrumDelegate::createGridTick(const QModelIndex& index, const QStyleOptionViewItem& option, QPainter* painter) const
+{
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    if (t_pModel->getInfo()) {
+        double nf = t_pModel->getInfo()->sfreq / 2;
+
+        qint32 numLines = (m_iScaleType) ? static_cast<qint32>(ceil(log10(nf))) : 5;
+
+        QList<qint32> qListLineSamples;
+
+        qListLineSamples << 0;
+        if (m_iScaleType) { // log
+            for (qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx) {
+                double val = pow(10, lineIdx);
+                qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
+                qListLineSamples.append(idx);
+            }
+        } else { // normal
+            for (qint32 lineIdx = 1; lineIdx < numLines; ++lineIdx) {
+                double val = lineIdx * (nf / numLines);
+                qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
+                qListLineSamples.append(idx);
+            }
+        }
+
+        // XTick
+        float yStart = 1.0 * option.rect.topLeft().y();
+
+        if (qListLineSamples[0] > t_pModel->getLowerFrqBound() && qListLineSamples[0] < t_pModel->getUpperFrqBound()) {
+            double val = 0.0;
+            float x = (t_pModel->getFreqScaleBound()[qListLineSamples[0]]) * option.rect.width();
+            painter->drawText(x, yStart, QString("%1Hz").arg(val));
+        }
+
+        for (qint32 i = 1; i < qListLineSamples.size(); ++i) {
+            if (qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound()) {
+                double val = (m_iScaleType) ? pow(10, i - 1) : t_pModel->getFreqScaleBound()[qListLineSamples[i]] * nf;
+                float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]]) * option.rect.width();
+                painter->drawText(x, yStart, QString("%1Hz").arg(val));
+            }
+        }
+
+        // YTick
+    }
+}

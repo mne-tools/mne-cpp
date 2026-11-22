@@ -13,9 +13,9 @@
  */
 
 #include <algorithm>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "rawdatabrowserwidget.h"
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
 #include "mnebrowserrawdelegate.h"
 

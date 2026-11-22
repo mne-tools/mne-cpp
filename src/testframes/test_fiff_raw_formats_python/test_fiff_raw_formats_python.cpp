@@ -20,17 +20,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_annotations.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <mne/mne.h>
-#include <mne/mne_filter_def.h>
-#include <mne/mne_meas_data.h>
-#include <mne/mne_meas_data_set.h>
-#include <mne/mne_raw_data.h>
-#include <mne/mne_proj_op.h>
-#include <mne/mne_raw_info.h>
-#include <mne/mne_sss_data.h>
+#include <mne/fiff/fiff_annotations.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_filter_def.h>
+#include <mne/mne/mne_meas_data.h>
+#include <mne/mne/mne_meas_data_set.h>
+#include <mne/mne/mne_raw_data.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/mne/mne_raw_info.h>
+#include <mne/mne/mne_sss_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

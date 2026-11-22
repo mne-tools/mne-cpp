@@ -4,24 +4,24 @@
 
 #include <algorithm>
 #include <QtTest/QtTest>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <QBuffer>
 #include <QFile>
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_info_base.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_info_base.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 using namespace mne;
 using namespace Eigen;

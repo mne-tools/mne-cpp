@@ -14,14 +14,14 @@ An amplifier plugin is a thin layer over an acquisition source of the `mne_acq` 
 | Part | Where | Responsibilities |
 |------|-------|------------------|
 | **Plugin** | `src/applications/mne_scan/plugins/<device>/`, inherits `AbstractSensor` | Setup widget and toolbar actions; builds the source URI from its settings; hands blocks to its output connector |
-| **Source** | `src/libraries/acq/devices/<device>/`, a scheme of `AcqDeviceRegistry` such as `gusbamp://` | Talks to the vendor SDK in its own thread, writes the device's native samples, events and clock into a lock-free ring; measures impedances |
+| **Source** | `src/libs/mne/acq/devices/<device>/`, a scheme of `AcqDeviceRegistry` such as `gusbamp://` | Talks to the vendor SDK in its own thread, writes the device's native samples, events and clock into a lock-free ring; measures impedances |
 | **Transport** | `<device>_transport.h` with `<device>_driver_win32.cpp` and `<device>_simulator.cpp` | The vendor SDK as the source sees it; the simulator digitises a `synthetic://` session in the SDK's format, so the source and plugin are tested on every platform without hardware |
 
 The source has no Qt dependency and works the same from any program, e.g. `mne_acq` or a test:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::register_gusbamp_scheme();
 auto device = mne::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512");
@@ -38,8 +38,8 @@ device->start();
 | Class | Location | Purpose |
 |-------|----------|---------|
 | `AbstractSensor` | `src/applications/mne_scan/libs/scShared/` | Base class for all acquisition plugins |
-| `AcqDevice`, `AcqReader` | `src/libraries/acq/` | Opens a source by URI; reads its stream |
-| `AcqBackend` | `src/libraries/acq/` | Base class of a source; owns its streams and writers |
+| `AcqDevice`, `AcqReader` | `src/libs/mne/acq/` | Opens a source by URI; reads its stream |
+| `AcqBackend` | `src/libs/mne/acq/` | Base class of a source; owns its streams and writers |
 | `PluginOutputData` | `src/applications/mne_scan/libs/scShared/` | Typed output connector that passes data to downstream plugins |
 
 ## Device Control
@@ -57,7 +57,7 @@ named is also a new stream description version (`AcqWriter::updateInfo()`), vali
 ## Implementing a New Amplifier
 
 1. **Write the tests** in `src/testframes/test_acq_devices/` against `<device>://?simulate=1`: stream layout, agreement with `synthetic://`, invalid parameters, a gating reader, and the error without hardware.
-2. **Declare the transport** in `src/libraries/acq/devices/<device>/<device>_transport.h`, write the simulator and the backend, and register the scheme in `acq_devices.h`.
+2. **Declare the transport** in `src/libs/mne/acq/devices/<device>/<device>_transport.h`, write the simulator and the backend, and register the scheme in `acq_devices.h`.
 3. **Implement the Windows driver**: load the vendor DLL at run time from an absolute path with `detail::AcqSharedLibrary`, so the source builds without the SDK.
 4. **Write the plugin**: copy `gusbamp` or `tmsi`, build the URI from the settings, and add a test to `test_mne_scan_plugins`.
 5. **Register** the plugin in the parent `CMakeLists.txt` and, for static builds, in `main.cpp` via `Q_IMPORT_PLUGIN`.

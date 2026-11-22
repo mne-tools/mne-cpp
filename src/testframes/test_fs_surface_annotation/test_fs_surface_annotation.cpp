@@ -5,12 +5,12 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 
-#include <fs/fs_surface.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotation.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_label.h>
-#include <fs/fs_colortable.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_colortable.h>
 
 using namespace mne;
 using namespace Eigen;

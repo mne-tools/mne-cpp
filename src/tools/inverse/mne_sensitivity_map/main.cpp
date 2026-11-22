@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forward_solution.h>
-#include <fiff/fiff_stream.h>
-#include <base/log.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

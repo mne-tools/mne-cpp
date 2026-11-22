@@ -18,10 +18,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq.h>
 #if defined(MNE_ACQ_BENCH_RECORDING) // the standalone A/B build has no FIFF bridge
-#include <acq/fiff/acq_recorder.h>
+#include <mne/acq/fiff/acq_recorder.h>
 
 #include <QTemporaryDir>
 #endif

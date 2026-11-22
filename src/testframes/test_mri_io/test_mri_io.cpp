@@ -23,19 +23,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <mri/mri_types.h>
-#include <mri/mri_vol_data.h>
-#include <mri/mri_mgh_io.h>
-#include <mri/mri_cor_io.h>
-#include <mri/mri_cor_fif_io.h>
+#include <mne/mri/mri_types.h>
+#include <mne/mri/mri_vol_data.h>
+#include <mne/mri/mri_mgh_io.h>
+#include <mne/mri/mri_cor_io.h>
+#include <mne/mri/mri_cor_fif_io.h>
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

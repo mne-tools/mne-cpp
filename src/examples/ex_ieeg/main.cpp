@@ -16,9 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <ieeg/ieeg_implantation.h>
-#include <ieeg/ieeg_reference.h>
-#include <ieeg/ieeg_surface_map.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/ieeg/ieeg_reference.h>
+#include <mne/ieeg/ieeg_surface_map.h>
 
 //=============================================================================================================
 // QT INCLUDES

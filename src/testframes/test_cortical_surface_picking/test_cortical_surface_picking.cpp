@@ -21,8 +21,8 @@
 #include <Eigen/Core>
 
 #include <applications/mne_analyze/plugins/cortical_surface/cortical_surface.h>
-#include <fs/fs_surface.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/inv/inv_source_estimate.h>
 
 using namespace CORTICALSURFACEPLUGIN;
 using namespace mne;

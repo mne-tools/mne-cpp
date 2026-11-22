@@ -11,7 +11,7 @@
 # @brief    Count maintainability debt per file so it can be ratcheted and assigned.
 """Maintainability baseline for gate G5.
 
-Counts lexical debt candidates in maintained C++ under ``src/libraries``,
+Counts lexical debt candidates in maintained C++ under ``src/libs/mne``,
 ``src/applications`` and ``src/tools``:
 
 * ``null_macro``        uses of ``NULL`` or ``Q_NULLPTR`` instead of ``nullptr``
@@ -228,7 +228,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         "Counts are lexical candidates with comments and string literals removed; they rank work, they do not prove defects.",
         "",
         f"Scanned {report['scanned_files']:,} files / {report['scanned_lines']:,} lines in "
-        "`src/libraries`, `src/applications`, `src/tools`. Compiler warnings: 0 (the build is `-Werror`).",
+        "`src/libs/mne`, `src/applications`, `src/tools`. Compiler warnings: 0 (the build is `-Werror`).",
         "",
         "| Metric | Total | Files | libraries | applications | tools |",
         "|---|---:|---:|---:|---:|---:|",

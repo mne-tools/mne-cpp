@@ -1,0 +1,113 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2012-2026 MNE-CPP Authors
+ *
+ * @file     mne_epoch_data.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ * @since    0.1.0
+ * @date     October 2012
+ * @brief    Implementation of @ref mne::MNEEpochData.
+ *
+ * Provides constructors, deep-copy semantics for the sensor matrix and
+ * the application of SSP / baseline correction to one epoch in place.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_epoch_data.h"
+
+#include <mne/base/log.h>
+#include <mne/math/numerics.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
+#include <cmath>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MNEEpochData::MNEEpochData()
+: event(-1)
+, eventSample(-1)
+, tmin(-1)
+, tmax(-1)
+, bReject(false)
+, bUserReject(false)
+{
+}
+
+//=============================================================================================================
+
+MNEEpochData::MNEEpochData(const MNEEpochData& p_MNEEpochData)
+: epoch(p_MNEEpochData.epoch)
+, event(p_MNEEpochData.event)
+, eventSample(p_MNEEpochData.eventSample)
+, tmin(p_MNEEpochData.tmin)
+, tmax(p_MNEEpochData.tmax)
+, bReject(p_MNEEpochData.bReject)
+, bUserReject(p_MNEEpochData.bUserReject)
+{
+}
+
+//=============================================================================================================
+
+MNEEpochData::~MNEEpochData()
+{
+}
+
+//=============================================================================================================
+
+void MNEEpochData::applyBaselineCorrection(const std::pair<float, float>& baseline)
+{
+    // Times on whole sample offsets: an interpolated float grid puts the stimulus sample just after 0
+    const Eigen::Index n = this->epoch.cols();
+    const double step = n > 1 ? (static_cast<double>(this->tmax) - this->tmin) / static_cast<double>(n - 1) : 1.0;
+    const double first = std::round(this->tmin / step);
+    RowVectorXf times(n);
+    for (Eigen::Index i = 0; i < n; ++i)
+        times(i) = static_cast<float>((first + static_cast<double>(i)) * step);
+    this->epoch = Numerics::rescale(this->epoch, times, baseline, "mean");
+}
+
+//=============================================================================================================
+
+void MNEEpochData::pick_channels(const RowVectorXi& sel)
+{
+    if (sel.cols() == 0) {
+        Log::warning("MNEEpochData::pick_channels - Warning : No channels were provided.\n");
+        return;
+    }
+
+    // Reduce data set
+    MatrixXd selBlock(1, 1);
+
+    if (selBlock.rows() != sel.cols() || selBlock.cols() != epoch.cols()) {
+        selBlock.resize(sel.cols(), epoch.cols());
+    }
+
+    for (Eigen::Index l = 0; l < sel.cols(); ++l) {
+        if (sel(l) <= epoch.rows()) {
+            selBlock.row(l) = epoch.row(sel(0, l));
+        } else {
+            Log::warning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
+        }
+    }
+
+    epoch = selBlock;
+}

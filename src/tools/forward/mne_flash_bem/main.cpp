@@ -28,7 +28,7 @@
 #include "mne_flash_bem_settings.h"
 #include "flashbem.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -49,7 +49,7 @@ if $BUILD_SITE; then
   require npm "Node.js 22"
 fi
 
-# Doxyfile paths are relative to doc/ (INPUT=../src/libraries).
+# Doxyfile paths are relative to doc/ (INPUT=../src/libs/mne).
 rm -rf doc/xml_out
 ( cd doc && doxygen Doxyfile )
 python3 scripts/quality/check_doxygen_warnings.py doc/xml_out/doxygen-warnings.log

@@ -16,11 +16,11 @@
  *           QSKIPped when sample data is not available.
  */
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_named_matrix.h>
 
 #include <Eigen/Core>
 

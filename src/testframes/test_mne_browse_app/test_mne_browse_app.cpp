@@ -15,7 +15,7 @@
 //=============================================================================================================
 
 #include <Windows/averagewindow.h>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <Windows/datawindow.h>
 #include <Windows/eventwindow.h>
 #include <Models/eventmodel.h>
@@ -26,18 +26,18 @@
 #include <Models/averagemodel.h>
 #include <Models/virtualchannelmodel.h>
 #include <Windows/virtualchannelwindow.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_tag.h>
-#include <mna/mna_io.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/inv_source_estimate.h>
-#include <mna/mna_project.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mna/mna_project.h>
 
 //=============================================================================================================
 // QT INCLUDES

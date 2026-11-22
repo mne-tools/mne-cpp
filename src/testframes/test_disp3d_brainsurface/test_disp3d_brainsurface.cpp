@@ -16,10 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/renderable/brainsurface.h>
-#include <disp3D/geometry/meshfactory.h>
-#include <disp3D/core/rendertypes.h>
-#include <fs/fs_annotation.h>
+#include <mne/disp3D/renderable/brainsurface.h>
+#include <mne/disp3D/geometry/meshfactory.h>
+#include <mne/disp3D/core/rendertypes.h>
+#include <mne/fs/fs_annotation.h>
 
 //=============================================================================================================
 // QT INCLUDES

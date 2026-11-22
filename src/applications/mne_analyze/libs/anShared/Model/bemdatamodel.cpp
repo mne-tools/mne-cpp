@@ -16,10 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "bemdatamodel.h"
 
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
 // STL INCLUDES

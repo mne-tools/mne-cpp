@@ -1,0 +1,132 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2013-2026 MNE-CPP Authors
+ *
+ * @file     inv_pwl_rap_music.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     July 2013
+ * @brief    Powell-accelerated RAP-MUSIC variant — replaces the exhaustive pair scan with a Powell line-search refinement.
+ *
+ * @ref mne::InvPwlRapMusic derives from @ref mne::InvRapMusic and
+ * overrides the pair-scanning step with a Powell direction-set
+ * optimiser, drastically reducing the number of leadfield evaluations
+ * per iteration on dense grids. All other behaviour — signal-subspace
+ * estimation, recursive projection, stopping criterion, output
+ * assembly — is inherited from the base class so results stay
+ * comparable to the exhaustive scanner.
+ */
+
+#ifndef INV_PWL_RAP_MUSIC_H
+#define INV_PWL_RAP_MUSIC_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../inv_global.h"
+#include "inv_rap_music.h"
+#include "inv_dipole.h"
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <time.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SVD>
+#include <Eigen/LU>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+/**
+ * @brief Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting
+ *
+ * ToDo Detailed description
+ *
+ * @snippet ex_inv_beamformer/main.cpp inv_rap_music_usage
+ */
+class INVSHARED_EXPORT InvPwlRapMusic : public InvRapMusic
+{
+public:
+    //=========================================================================================================
+    /**
+     * Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
+     */
+    InvPwlRapMusic();
+
+    //=========================================================================================================
+    /**
+     * Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
+     *
+     * @param[in] p_pFwd          The model which contains the gain matrix and its corresponding grid matrix.
+     * @param[in] p_bSparsed     True when sparse matrices should be used.
+     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with.
+     *                           the strongest.
+     * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
+     */
+    InvPwlRapMusic(mne::MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+
+    virtual ~InvPwlRapMusic();
+
+    //=========================================================================================================
+    /**
+     *
+     * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
+     *       implementation is called.
+     *
+     * @param[in] p_fiffEvoked Evoked data to localize.
+     * @param[in] pick_normal Keep only the component normal to the cortex.
+     *
+     * @return
+     */
+    virtual InvSourceEstimate calculateInverse(const mne::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
+
+    //=========================================================================================================
+    /**
+     *
+     * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
+     *       implementation is called.
+     *
+     * @param[in] data Measurement data (channels x samples).
+     * @param[in] tmin Time of the first sample in seconds.
+     * @param[in] tstep Time between samples in seconds.
+     * @param[in] pick_normal Keep only the component normal to the cortex.
+     *
+     * @return
+     */
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
+
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& p_matMeasurement, std::vector<InvDipolePair<double>>& p_RapDipoles) const;
+
+    static int PowellOffset(int p_iRow, int p_iNumPoints);
+
+    static void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
+
+    virtual const char* getName() const;
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} //NAMESPACE
+
+#endif // INV_PWL_RAP_MUSIC_H

@@ -22,7 +22,7 @@
 #include "scmeas_global.h"
 #include "measurement.h"
 #include "realtimesamplearraychinfo.h"
-#include <fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

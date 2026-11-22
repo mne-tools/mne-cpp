@@ -1,0 +1,386 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *
+ * @file     inv_hpi_fit.h
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     March 2017
+ * @brief    HPI (Head Position Indicator) fitting — estimates the MEG dewar-to-head transform from coil-current signals.
+ *
+ * @ref mne::InvHpiFit fits a magnetic dipole to each HPI coil from
+ * the projected MEG data, matches the fitted coils to the digitised coil
+ * locations and returns the resulting dewar↔head coordinate transform.
+ * The class drives the same pipeline used by Elekta/MEGIN MaxFilter and
+ * mne-python's @c mne.chpi: per-coil dipole localisation, frequency
+ * ordering, large-movement detection and quaternion-formatted position
+ * storage. Inputs are the projected sensor data, the SSP projector and
+ * an @ref mne::InvHpiModelParameters spec; output is an @ref mne::HpiFitResult
+ * that downstream stages can feed to head-movement-corrected averaging
+ * or continuous co-registration.
+ */
+
+#ifndef INV_HPI_FIT_H
+#define INV_HPI_FIT_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../inv_global.h"
+#include "inv_sensor_set.h"
+#include "inv_signal_model.h"
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_coord_trans.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace mne
+{
+class FwdCoil;
+class FwdCoilSet;
+}
+
+namespace mne
+{
+class FiffInfo;
+class FiffCoordTrans;
+class FiffDigPointSet;
+}
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+class InvSensorSet;
+class InvSignalModel;
+class InvHpiModelParameters;
+//=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+
+/**
+ * The strucut specifing the coil parameters.
+ *
+ * @brief Estimated dipole parameters (position, moment, goodness-of-fit) for a single HPI coil
+ */
+struct CoilParam
+{
+    Eigen::MatrixXd pos;
+    Eigen::MatrixXd mom;
+    Eigen::VectorXd dpfiterror;
+    Eigen::VectorXd dpfitnumitr;
+
+    CoilParam(int iNumCoils)
+    : pos(Eigen::MatrixXd(iNumCoils, 3))
+    , mom(Eigen::MatrixXd::Zero(iNumCoils, 3))
+    , dpfiterror(Eigen::VectorXd::Zero(iNumCoils))
+    , dpfitnumitr(Eigen::VectorXd::Zero(iNumCoils))
+    {
+    }
+};
+
+/**
+ * The struct specifing all data needed to perform coil-wise fitting.
+ *
+ * @brief Complete HPI fit output: per-coil dipole parameters, head-to-device transform, fit error, and head movement distance
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
+ */
+struct HpiFitResult
+{
+    std::vector<int> hpiFreqs;
+    mne::FiffDigPointSet fittedCoils;
+    mne::FiffCoordTrans devHeadTrans;
+    std::vector<double> errorDistances;
+    Eigen::VectorXd GoF;
+    std::filesystem::path digitizerFile;
+    bool bIsLargeHeadMovement = false;
+    float fHeadMovementDistance = 0.0f;
+    float fHeadMovementAngle = 0.0f;
+};
+
+//=============================================================================================================
+// mne FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * Drives one HPI fit: per-coil magnetic-dipole localisation, frequency
+ * matching against the digitised coil layout and Procrustes solve for the
+ * dewar-to-head transform. The class is reusable across consecutive
+ * measurement blocks and caches the sensor geometry to avoid
+ * recomputing it on every call.
+ *
+ * @brief Drives one HPI fit (per-coil dipole localisation, coil ordering, dewar-to-head transform).
+ *
+ * @snippet ex_inv_hpi/main.cpp inv_hpi_usage
+ */
+class INVSHARED_EXPORT InvHpiFit
+{
+public:
+    //=========================================================================================================
+    /**
+     * Default constructor.
+     *
+     */
+    explicit InvHpiFit();
+
+    //=========================================================================================================
+    /**
+     * Constructs the HPI from a InvSensorSet.
+     *
+     * @param[in] sensorSet     The MEG sensorSet used for the hpi fitting.
+     */
+    explicit InvHpiFit(const InvSensorSet& sensorSet);
+
+    //=========================================================================================================
+    /**
+     * Checks if InvSensorSet has changed and updates member InvSensorSet.
+     *
+     * @param[in] sensorSet     The MEG sensorSet used for the hpi fitting.
+     */
+    void checkForUpdate(const InvSensorSet& sensorSet);
+
+    //=========================================================================================================
+    /**
+     * Perform one single HPI fit.
+     *
+     * @param[in]   matProjectedData            Data to estimate the HPI positions from. Projectars should be already applied.
+     * @param[in]   matProjectors               The projectors to apply.
+     * @param[in]   hpiModelParameters          The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
+     * @param[in]   matCoilsHead                The hpi coil locations in head space.
+     * @param[out]  hpiFitResult                The fitting results.
+     */
+    void fit(const Eigen::MatrixXd& matProjectedData,
+             const Eigen::MatrixXd& matProjectors,
+             const InvHpiModelParameters& hpiModelParameters,
+             const Eigen::MatrixXd& matCoilsHead,
+             HpiFitResult& hpiFitResult);
+
+    void fit(const Eigen::MatrixXd& matProjectedData,
+             const Eigen::MatrixXd& matProjectors,
+             const InvHpiModelParameters& hpiModelParameters,
+             const Eigen::MatrixXd& matCoilsHead,
+             const bool bOrderFrequencies,
+             HpiFitResult& hpiFitResult);
+
+    //=========================================================================================================
+    /**
+     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
+     * get from Neuromag's MaxFilter.
+     *
+     *
+     * @param[in]   fTime               The corresponding time in the measurement for the fit.
+     * @param[in]   matTransDevHead     The device->head transformation matrix.
+     * @param[out]  matPosition         The matrix to store the results.
+     * @param[in]   vecGoF              The goodness of fit per coil.
+     * @param[in]   vecError            The Hpi estimation Error per coil.
+     */
+    static void storeHeadPosition(float fTime,
+                                  const Eigen::MatrixXf& matTransDevHead,
+                                  Eigen::MatrixXd& matPosition,
+                                  const Eigen::VectorXd& vecGoF,
+                                  const std::vector<double>& vecError);
+
+    //=========================================================================================================
+    /**
+     * Compares two 4x4 transformation matrices by evaluating their rotation
+     * and translation differences against given thresholds.
+     *
+     * @param[in]   mDevHeadT      The first transformation matrix.
+     * @param[in]   mDevHeadDest   The second (destination) transformation matrix.
+     * @param[in]   fThreshRot     The rotation threshold in degrees.
+     * @param[in]   fThreshTrans   The translation threshold in meters.
+     *
+     * @return True if the movement exceeds either threshold.
+     */
+    static bool compareTransformation(const Eigen::MatrixX4f& mDevHeadT,
+                                      const Eigen::MatrixX4f& mDevHeadDest,
+                                      const float& fThreshRot,
+                                      const float& fThreshTrans);
+
+private:
+    //=========================================================================================================
+    /**
+     * Fit linear model to data to get amplitudes for the dipole fit.
+     *
+     * @param[in]   matProjectedData    Projected data to estimate the HPI positions from.
+     * @param[in]   hpiModelParameters     The model parameters to use for the hpi signal model.
+     * @return  matAmplitudes       The computed amplitudes amplitudes (n_channels x n_coils).
+     *
+     */
+    Eigen::MatrixXd computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
+                                      const InvHpiModelParameters& hpiModelParameters);
+
+    //=========================================================================================================
+    /**
+     * Compute initial coil positions for the dipole fit.
+     *
+     * @param[in]   matAmplitudes       The amplitudes fitted using computeAmplitudes.
+     * @param[in]   transDevHead        The dev head transformation matrix for an initial guess.
+     * @param[in]   vecError            The Error Distances from the last fit.
+     * @param[in]   matCoilsHead        The hpi coil locations in head space.
+     * @return Returns the seed points.
+     */
+    Eigen::MatrixXd computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
+                                      const mne::FiffCoordTrans& transDevHead,
+                                      const std::vector<double>& vecError,
+                                      const Eigen::MatrixXd& matCoilsHead);
+
+    //=========================================================================================================
+    /**
+     * Fits dipoles for the given coils and a given data set.
+     *
+     * @param[in] matCoilsSeed              The coil parameters.
+     * @param[in]   sensors           The sensor information.
+     * @param[in]   matData           The data which used to fit the coils.
+     * @param[in]   iNumCoils         The number of coils.
+     * @param[in]   t_matProjectors   The projectors to apply.
+     * @param[in]   iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]   fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     *
+     * @return Returns the coil parameters.
+     */
+    CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
+                     const InvSensorSet& sensors,
+                     const Eigen::MatrixXd& matData,
+                     const int iNumCoils,
+                     const Eigen::MatrixXd& t_matProjectors,
+                     const int iMaxIterations,
+                     const float fAbortError);
+
+    //=========================================================================================================
+    /**
+     * Compute the goodness of fit from the dipole fit error.
+     *
+     * @param[in]   vecDipFitError      The dipole fit error.
+     * @return Returns the goodness of fit.
+     */
+    Eigen::VectorXd computeGoF(const Eigen::VectorXd& vecDipFitError);
+
+    //=========================================================================================================
+    /**
+     * Compute the device to head transformation matrix.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @param[in]   matCoilsHead        The hpi coil locations in head space.
+     * @return  Returns the dev head transformation matrix.
+     *
+     */
+    mne::FiffCoordTrans computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+                                                        const Eigen::MatrixXd& matCoilsHead);
+
+    //=========================================================================================================
+    /**
+     * Compute the distance between fitted and digitized coils.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @param[in]   matCoilsHead        The hpi coil locations in head space.
+     * @param[out]  transDevHead        The dev->head transformation matrix.
+     * @return Returns the coil estimation error.
+     */
+    std::vector<double> computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
+                                               const Eigen::MatrixXd& matCoilsHead,
+                                               const mne::FiffCoordTrans& transDevHead);
+
+    //=========================================================================================================
+    /**
+     * Converts the fitted coils from a MAtrix into a fitted point set.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @return The final fitted positions in form of a digitizer set.
+     *
+     */
+    mne::FiffDigPointSet getFittedPointSet(const Eigen::MatrixXd& matCoilsDev);
+
+    //=========================================================================================================
+    /**
+     * Computes the transformation matrix between two sets of 3D points.
+     *
+     * @param[in] matNH         The estimated coil positions in device space.
+     * @param[in] matBT        The hpi coil locations in head space.
+     *
+     * @return Returns the transformation matrix.
+     */
+    Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
+                                          Eigen::MatrixXd matBT);
+
+    //=========================================================================================================
+    /**
+     * Find the coil ordering.
+     *
+     * @param[in] matCoilsDev    The first set of input 3D points (row-wise order) - To.
+     * @param[in] matCoilsHead    The second set of input 3D points (row-wise order) - From.
+     *
+     * @return Returns the order of the coils in head space.
+     */
+    std::vector<int> findCoilOrder(const Eigen::MatrixXd& matCoilsDev,
+                                   const Eigen::MatrixXd& matCoilsHead);
+
+    //=========================================================================================================
+    /**
+     * Order a vector or matrix.
+     *
+     * @param[in] vecOrder      The order.
+     * @param[in] matToOrder       The vector/matrix to order.
+     *
+     * @return Returns the ordered vector/matrix.
+     */
+    Eigen::MatrixXd order(const std::vector<int>& vecOrder,
+                          const Eigen::MatrixXd& matToOrder);
+
+    std::vector<int> order(const std::vector<int>& vecOrder,
+                           const std::vector<int>& vecToOrder);
+
+    //=========================================================================================================
+    /**
+     * The objective function to measure the goodness of the calculated transform.
+     *
+     * @param[in] matCoilsDev       The fitted coil positions (device space).
+     * @param[in] matHeadCoil      The digitized coil positions (head space).
+     * @param[in] matTrans          The dev head transformation matrix.
+     *
+     * @return Returns the registration error.
+     */
+    double objectTrans(const Eigen::MatrixXd& matHeadCoil,
+                       const Eigen::MatrixXd& matCoilsDev,
+                       const Eigen::MatrixXd& matTrans);
+
+    InvSensorSet m_sensors;       /**< The sensor struct that contains information about all sensors. */
+    InvSignalModel m_signalModel; /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+} //NAMESPACE
+
+#endif // INV_HPI_FIT_H

@@ -15,22 +15,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/fwd_bem_model.h>
-#include <fwd/fwd_comp_data.h>
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_coil.h>
-#include <fwd/fwd_thread_arg.h>
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/compute_fwd/compute_fwd.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_coord_trans.h>
-#include <base/string_utils.h>
-#include <mne/mne_source_space.h>
-#include <mne/mne_surface.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_comp_data.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_coil.h>
+#include <mne/fwd/fwd_thread_arg.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/compute_fwd/compute_fwd.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/base/string_utils.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/mne/mne_surface.h>
+#include <mne/mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

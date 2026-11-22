@@ -18,17 +18,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_ctf_comp.h>
-#include <fiff/fiff_data_ref.h>
-#include <fiff/fiff_dir_entry.h>
-#include <fiff/fiff_epochs.h>
-#include <fiff/fiff_file_sharer.h>
-#include <fiff/fiff_id.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_raw_dir.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_time.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/fiff/fiff_data_ref.h>
+#include <mne/fiff/fiff_dir_entry.h>
+#include <mne/fiff/fiff_epochs.h>
+#include <mne/fiff/fiff_file_sharer.h>
+#include <mne/fiff/fiff_id.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_raw_dir.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_time.h>
 
 //=============================================================================================================
 // QT INCLUDES

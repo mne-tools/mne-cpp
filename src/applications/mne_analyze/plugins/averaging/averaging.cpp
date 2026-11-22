@@ -16,7 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "averaging.h"
 
 #include <anShared/Management/communicator.h>
@@ -24,25 +24,25 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
-#include <disp/viewers/helpers/channelinfomodel.h>
-#include <disp/viewers/helpers/evokedsetmodel.h>
-#include <disp/viewers/averagingsettingsview.h>
-#include <disp/viewers/modalityselectionview.h>
-#include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/averageselectionview.h>
-#include <disp/viewers/fiffrawviewsettings.h>
-#include <disp/viewers/averagelayoutview.h>
-#include <disp/viewers/butterflyview.h>
-#include <disp/viewers/scalingview.h>
-#include <disp/viewers/helpers/selectionsceneitem.h>
-#include <dsp/filterkernel.h>
-#include <dsp/rt/rt_filter.h>
-#include <mne/mne_epoch_data_list.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_info.h>
+#include <mne/disp/viewers/helpers/channelinfomodel.h>
+#include <mne/disp/viewers/helpers/evokedsetmodel.h>
+#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp/viewers/modalityselectionview.h>
+#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp/viewers/averageselectionview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/averagelayoutview.h>
+#include <mne/disp/viewers/butterflyview.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_filter.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_info.h>
 #include <events/eventmanager.h>
-#include <base/thread_pool.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

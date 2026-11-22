@@ -13,10 +13,10 @@
  * builds FIFF measurement info for it (mne_fiff). Exits non-zero when any step fails.
  */
 
-#include <acq/acq.h>
-#include <acq/acq_eigen.h>
-#include <dsp/iirfilter.h>
-#include <fiff/fiff_info.h>
+#include <mne/acq/acq.h>
+#include <mne/acq/acq_eigen.h>
+#include <mne/dsp/iirfilter.h>
+#include <mne/fiff/fiff_info.h>
 
 #include <chrono>
 #include <cmath>

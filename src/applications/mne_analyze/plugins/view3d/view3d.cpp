@@ -18,20 +18,20 @@
 
 #include "view3d.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/model/items/digitizersettreeitem.h>
-#include <disp3D/model/items/digitizertreeitem.h>
-#include <disp3D/model/items/bemtreeitem.h>
-#include <disp3D/model/items/dipoletreeitem.h>
-#include <disp/viewers/control3dview.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/model/items/digitizersettreeitem.h>
+#include <mne/disp3D/model/items/digitizertreeitem.h>
+#include <mne/disp3D/model/items/bemtreeitem.h>
+#include <mne/disp3D/model/items/dipoletreeitem.h>
+#include <mne/disp/viewers/control3dview.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
 // USED NAMESPACES

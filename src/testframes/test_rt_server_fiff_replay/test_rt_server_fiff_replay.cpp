@@ -17,15 +17,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
-#include <acq/fiff/acq_fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
 #include <rtserver_connector/iconnector.h>
-#include <com/tcp_server.h>
-#include <com/tcp_socket.h>
+#include <mne/com/tcp_server.h>
+#include <mne/com/tcp_socket.h>
 
 //=============================================================================================================
 // QT INCLUDES

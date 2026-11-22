@@ -17,19 +17,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/fs_label.h>
-#include <fs/fs_surface.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <mne/mne_epoch_data_list.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/rap_music/inv_rap_music.h>
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <base/log.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

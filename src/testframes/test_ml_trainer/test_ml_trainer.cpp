@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #ifndef WASMBUILD
-#include <ml/ml_trainer.h>
-#include <pybridge/python_runner.h>
-#include <pybridge/python_test_helper.h>
+#include <mne/ml/ml_trainer.h>
+#include <mne/pybridge/python_runner.h>
+#include <mne/pybridge/python_test_helper.h>
 
 #include "../common/python_guard.h"
 #endif

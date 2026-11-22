@@ -22,7 +22,7 @@
 #include "pluginoutputdata.h"
 
 #include <scMeas/measurement.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

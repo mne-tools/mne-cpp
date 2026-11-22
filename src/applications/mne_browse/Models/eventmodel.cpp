@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "eventmodel.h"
 
-#include <fiff/fiff_events.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

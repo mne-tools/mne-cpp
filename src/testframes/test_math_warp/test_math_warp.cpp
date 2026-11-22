@@ -5,7 +5,7 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 #include <QTemporaryFile>
-#include <math/warp.h>
+#include <mne/math/warp.h>
 
 using namespace mne;
 using namespace Eigen;

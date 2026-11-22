@@ -22,17 +22,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "setupmri.h"
 #include "mne_setup_mri_settings.h"
 
-#include <mri/mri_mgh_io.h>
-#include <mri/mri_cor_io.h>
-#include <mri/mri_cor_fif_io.h>
-#include <mri/mri_vol_data.h>
-#include <mri/mri_types.h>
+#include <mne/mri/mri_mgh_io.h>
+#include <mne/mri/mri_cor_io.h>
+#include <mne/mri/mri_cor_fif_io.h>
+#include <mne/mri/mri_vol_data.h>
+#include <mne/mri/mri_types.h>
 
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

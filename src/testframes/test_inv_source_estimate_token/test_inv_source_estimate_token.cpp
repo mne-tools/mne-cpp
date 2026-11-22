@@ -19,8 +19,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_source_estimate.h>
-#include <inv/inv_source_estimate_token.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate_token.h>
 
 //=============================================================================================================
 // QT INCLUDES

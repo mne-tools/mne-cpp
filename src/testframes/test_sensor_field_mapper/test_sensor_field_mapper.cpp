@@ -10,14 +10,14 @@
  * @brief    Data-free tests for SensorFieldMapper utilities and state.
  */
 
-#include <disp3D/scene/sensorfieldmapper.h>
+#include <mne/disp3D/scene/sensorfieldmapper.h>
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <disp3D/renderable/brainsurface.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/disp3D/renderable/brainsurface.h>
 
 #include <Eigen/Core>
 

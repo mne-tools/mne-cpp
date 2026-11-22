@@ -17,15 +17,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "brainampsetupprojectwidget.h"
 
 #include "../brainamp.h"
 
 #include "ui_brainampsetupprojectwidget.h"
 
-#include <channels/layoutloader.h>
-#include <channels/layoutmaker.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/channels/layoutmaker.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/fs_label_utils.h>
-#include <fs/fs_label.h>
-#include <fs/fs_surface.h>
+#include <mne/fs/fs_label_utils.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_surface.h>
 
 //=============================================================================================================
 // QT INCLUDES

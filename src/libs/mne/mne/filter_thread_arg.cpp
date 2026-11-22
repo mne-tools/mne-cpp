@@ -1,0 +1,54 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *
+ * @file     filter_thread_arg.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     January 2017
+ * @brief    Implementation of @ref mne::FilterThreadArg.
+ *
+ * Provides constructors and the deep-copy semantics needed when the
+ * argument is queued across a thread boundary.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "filter_thread_arg.h"
+
+#include <mne/fiff/fiff_coord_trans.h>
+
+constexpr int FAIL = -1;
+// Return code (kept for documentation).
+[[maybe_unused]] constexpr int OK = 0;
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace mne;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FilterThreadArg::FilterThreadArg()
+: s(nullptr)
+, limit(-1)
+, filtered(nullptr)
+, stat(FAIL)
+{
+}
+
+//=============================================================================================================
+
+FilterThreadArg::~FilterThreadArg()
+{
+}

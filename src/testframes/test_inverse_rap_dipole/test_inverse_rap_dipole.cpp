@@ -6,31 +6,31 @@
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <inv/dipole_fit/inv_ecd.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_dipole_forward.h>
-#include <inv/dipole_fit/inv_guess_data.h>
-#include <inv/rap_music/inv_rap_music.h>
-#include <inv/rap_music/inv_pwl_rap_music.h>
-#include <inv/rap_music/inv_dipole.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/hpi/inv_hpi_model_parameters.h>
-#include <inv/hpi/inv_sensor_set.h>
-#include <mne/mne_meas_data.h>
-#include <mne/mne_meas_data_set.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_forward_solution.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
+#include <mne/inv/dipole_fit/inv_ecd.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_dipole_forward.h>
+#include <mne/inv/dipole_fit/inv_guess_data.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/inv/rap_music/inv_pwl_rap_music.h>
+#include <mne/inv/rap_music/inv_dipole.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/hpi/inv_hpi_model_parameters.h>
+#include <mne/inv/hpi/inv_sensor_set.h>
+#include <mne/mne/mne_meas_data.h>
+#include <mne/mne/mne_meas_data_set.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
 
 using namespace mne;
 using namespace Eigen;

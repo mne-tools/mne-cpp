@@ -15,10 +15,10 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <dsp/sss.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/sss.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 #include <numbers>
 
 using namespace mne;

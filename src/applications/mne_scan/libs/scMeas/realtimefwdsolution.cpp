@@ -18,7 +18,7 @@
 
 #include "realtimefwdsolution.h"
 
-#include <mne/mne_forward_solution.h>
+#include <mne/mne/mne_forward_solution.h>
 #include <time.h>
 
 //=============================================================================================================

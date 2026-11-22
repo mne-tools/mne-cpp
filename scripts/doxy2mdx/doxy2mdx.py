@@ -937,8 +937,8 @@ def generate_class_mdx(compounddef,
     _check_registered_snippets(compound_name, reg_entry)
 
     # Resolve source path for SPDX scraping.  Doxygen is configured
-    # with ``INPUT = src/libraries`` (relative to ``doc/``), so the
-    # ``<location file=...>`` values are relative to ``src/libraries``,
+    # with ``INPUT = src/libs/mne`` (relative to ``doc/``), so the
+    # ``<location file=...>`` values are relative to ``src/libs/mne``,
     # e.g. ``fiff/fiff_id.h``.
     loc_el = compounddef.find("location")
     loc_file = loc_el.get("file", "") if loc_el is not None else ""
@@ -948,7 +948,7 @@ def generate_class_mdx(compounddef,
         if candidate.is_absolute():
             src_path = candidate
         else:
-            src_path = repo_root / "src" / "libraries" / loc_file
+            src_path = repo_root / "src" / "libs" / "mne" / loc_file
     authors = read_spdx_authors(src_path) if src_path else []
     if not authors:
         for a in extract_doxygen_authors(detail_el):
@@ -995,7 +995,7 @@ def generate_class_mdx(compounddef,
     mod_label = mod.get("sidebar_label", module_key)
     banner = f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
     if loc_file and not Path(loc_file).is_absolute():
-        banner += f" &nbsp;·&nbsp; **Source:** [`{loc_file}`]({GITHUB_BLOB}/src/libraries/{loc_file})"
+        banner += f" &nbsp;·&nbsp; **Source:** [`{loc_file}`]({GITHUB_BLOB}/src/libs/mne/{loc_file})"
     lines.append(banner)
     lines.append("")
 
@@ -1015,8 +1015,8 @@ def generate_class_mdx(compounddef,
             lines.append(":::")
         lines.append("")
 
-    lines.append(f"`#include <{include_dir}/{Path(loc_file).name}>`"
-                 if loc_file else f"`#include <{include_dir}>`")
+    lines.append(f"`#include <mne/{include_dir}/{Path(loc_file).name}>`"
+                 if loc_file else f"`#include <mne/{include_dir}>`")
     lines.append("")
 
     topics = [t["id"] for t in _REGISTRY.get("topics", {}).get("entries", []) if short_name in t["classes"]]
@@ -1246,7 +1246,7 @@ def generate_module_mdx(xml_dir: Path,
     body_text = extract_body_text(detail_el) if detail_el is not None else ""
     _check_registered_snippets(short_name, reg_entry)
 
-    src_path = repo_root / "src" / "libraries" / header_rel
+    src_path = repo_root / "src" / "libs" / "mne" / header_rel
     authors = read_spdx_authors(src_path)
     if not authors:
         for a in extract_doxygen_authors(detail_el):
@@ -1307,7 +1307,7 @@ def generate_module_mdx(xml_dir: Path,
         lines.append(":::")
         lines.append("")
 
-    lines.append(f"`#include <{include_dir}/{Path(header_rel).name}>`")
+    lines.append(f"`#include <mne/{include_dir}/{Path(header_rel).name}>`")
     lines.append("")
 
     if brief:
@@ -1413,7 +1413,7 @@ def generate_library_overview(module_key: str,
         f"# {label}",
         "",
         f"**Namespace:** `{namespace}` &nbsp;·&nbsp; **Source:** "
-        f"`src/libraries/{mod.get('include', module_key)}`",
+        f"`src/libs/mne/{mod.get('include', module_key)}`",
         "",
     ]
 
@@ -1619,7 +1619,7 @@ def generate_file_list(xml_dir: Path, out_dir: Path) -> Path:
     # Group by top-level directory (library)
     grouped: Dict[str, List[Tuple[str, str]]] = defaultdict(list)
     for fname, loc in sorted(files, key=lambda x: x[1] or x[0]):
-        # loc is relative to src/libraries/, e.g. "fiff/fiff_info.h"
+        # loc is relative to src/libs/mne/, e.g. "fiff/fiff_info.h"
         parts = (loc or fname).split("/")
         lib_dir = parts[0] if len(parts) > 1 else "other"
         grouped[lib_dir].append((fname, loc))
@@ -1652,7 +1652,7 @@ def generate_file_list(xml_dir: Path, out_dir: Path) -> Path:
         lines.append("|------|------|")
         for fname, loc in entries:
             gh_link = (f"[`{fname}`](https://github.com/mne-tools/mne-cpp/blob/"
-                       f"staging/src/libraries/{loc})")
+                       f"staging/src/libs/mne/{loc})")
             lines.append(f"| {gh_link} | `{loc}` |")
         lines.append("")
 

@@ -16,9 +16,9 @@
 
 #include "digitizer.h"
 
-#include <acq/acq_convert.h>
-#include <acq/acq_device_registry.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_convert.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/devices/acq_devices.h>
 
 //=============================================================================================================
 // STL INCLUDES

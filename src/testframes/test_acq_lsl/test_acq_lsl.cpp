@@ -19,15 +19,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_device.h>
-#include <acq/acq_device_registry.h>
-#include <acq/acq_reader.h>
-#include <acq/acq_stream.h>
-#include <acq/detail/acq_shared_library.h>
-#include <acq/lsl/acq_lsl.h>
-#include <lsl/lsl_stream_info.h>
-#include <lsl/lsl_stream_outlet.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/acq_reader.h>
+#include <mne/acq/acq_stream.h>
+#include <mne/acq/detail/acq_shared_library.h>
+#include <mne/acq/lsl/acq_lsl.h>
+#include <mne/lsl/lsl_stream_info.h>
+#include <mne/lsl/lsl_stream_outlet.h>
 
 //=============================================================================================================
 // QT INCLUDES

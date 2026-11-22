@@ -59,14 +59,14 @@ class CoverageTestCase(unittest.TestCase):
 class TestLcovParsing(CoverageTestCase):
     def test_line_and_branch_totals_reconcile(self) -> None:
         files = self.parse(
-            _record("/checkout/src/libraries/fiff/stream.cpp", {1: 3, 2: 0, 3: 1}, ("2,0,0,1", "2,0,1,0", "3,0,0,-"))
+            _record("/checkout/src/libs/mne/fiff/stream.cpp", {1: 3, 2: 0, 3: 1}, ("2,0,0,1", "2,0,1,0", "3,0,0,-"))
             + _record("/checkout/src/tools/info/mne_show/main.cpp", {1: 0, 2: 5})
         )
         summary = coverage.build_summary(files, commit="abc", source_url=None, top=25)
         totals = summary["totals"]
         self.assertEqual((5, 3, 60.0), (totals["lines_found"], totals["lines_hit"], totals["line_percent"]))
         self.assertEqual((3, 1, 33.33), (totals["branches_found"], totals["branches_hit"], totals["branch_percent"]))
-        self.assertEqual({"libraries", "tools"}, {name for name, values in summary["scopes"].items() if values["files"]})
+        self.assertEqual({"libs", "tools"}, {name for name, values in summary["scopes"].items() if values["files"]})
 
     def test_paths_are_repository_relative(self) -> None:
         files = self.parse(
@@ -79,8 +79,8 @@ class TestLcovParsing(CoverageTestCase):
 
     def test_duplicate_records_are_summed(self) -> None:
         files = self.parse(
-            _record("/a/src/libraries/mne/example.cpp", {1: 0, 2: 1}, ("1,0,0,-",))
-            + _record("/b/src/libraries/mne/example.cpp", {1: 2, 2: 0}, ("1,0,0,4",))
+            _record("/a/src/libs/mne/mne/example.cpp", {1: 0, 2: 1}, ("1,0,0,-",))
+            + _record("/b/src/libs/mne/mne/example.cpp", {1: 2, 2: 0}, ("1,0,0,4",))
         )
         self.assertEqual(1, len(files))
         self.assertEqual({1: 2, 2: 1}, files[0].lines)
@@ -88,18 +88,18 @@ class TestLcovParsing(CoverageTestCase):
 
     def test_unterminated_record_fails(self) -> None:
         with self.assertRaisesRegex(ValueError, "unterminated LCOV record"):
-            self.parse("SF:/checkout/src/libraries/fiff/stream.cpp\nDA:1,1\n")
+            self.parse("SF:/checkout/src/libs/mne/fiff/stream.cpp\nDA:1,1\n")
 
     def test_out_of_scope_record_fails(self) -> None:
         with self.assertRaisesRegex(ValueError, "outside the measured production scope"):
             self.parse(_record("/checkout/src/testframes/test_fiff/test.cpp", {1: 1}))
 
     def test_written_report_round_trips(self) -> None:
-        files = self.parse(_record("/x/src/libraries/mne/a.cpp", {3: 1, 1: 0}, ("3,0,1,0", "3,0,0,2", "4,1,0,-")))
+        files = self.parse(_record("/x/src/libs/mne/mne/a.cpp", {3: 1, 1: 0}, ("3,0,1,0", "3,0,0,2", "4,1,0,-")))
         out = self.root / "out.info"
         coverage.write_lcov(files, out)
         text = out.read_text(encoding="utf-8")
-        self.assertIn("SF:src/libraries/mne/a.cpp\n", text)
+        self.assertIn("SF:src/libs/mne/mne/a.cpp\n", text)
         self.assertIn("BRDA:4,1,0,-\n", text)
         self.assertNotIn("FN:", text)
         again = coverage.parse_lcov(out)
@@ -116,7 +116,7 @@ class TestExclusions(CoverageTestCase):
                     coverage.load_exclusions(self.policy([entry]))
 
     def test_main_rejects_policy_without_reason(self) -> None:
-        lcov = self.write("c.info", _record("/x/src/libraries/mne/a.cpp", {1: 1}))
+        lcov = self.write("c.info", _record("/x/src/libs/mne/mne/a.cpp", {1: 1}))
         err = io.StringIO()
         with redirect_stdout(io.StringIO()), redirect_stderr(err):
             code = coverage.main([str(lcov), "--policy", str(self.policy([{"pattern": "*"}]))])
@@ -144,10 +144,10 @@ class TestExclusions(CoverageTestCase):
 
 class TestCompleteness(unittest.TestCase):
     SOURCES = {
-        "src/libraries/a/reported.cpp": "int f() { return 1; }\n",
-        "src/libraries/a/unbuilt.cpp": "int g() { return 2; }\n",
-        "src/libraries/a/empty.cpp": "/* header */\n#include \"empty.h\"\n\nusing namespace A;\n// done\n",
-        "src/libraries/a/header.h": "int f();\n",
+        "src/libs/mne/a/reported.cpp": "int f() { return 1; }\n",
+        "src/libs/mne/a/unbuilt.cpp": "int g() { return 2; }\n",
+        "src/libs/mne/a/empty.cpp": "/* header */\n#include \"empty.h\"\n\nusing namespace A;\n// done\n",
+        "src/libs/mne/a/header.h": "int f();\n",
         "src/tools/t/template/plugin.cpp": "void h() {}\n",
     }
 
@@ -156,42 +156,42 @@ class TestCompleteness(unittest.TestCase):
 
     def test_every_translation_unit_is_accounted_for(self) -> None:
         """A compiled-nowhere unit with code is reported as missing."""
-        result = self.check({"src/libraries/a/reported.cpp"},
+        result = self.check({"src/libs/mne/a/reported.cpp"},
                             [{"pattern": "src/tools/t/template/*", "reason": "template"}])
-        self.assertEqual(["src/libraries/a/unbuilt.cpp"], result["missing"])
-        self.assertEqual(["src/libraries/a/empty.cpp"], result["no_executable_code"])
+        self.assertEqual(["src/libs/mne/a/unbuilt.cpp"], result["missing"])
+        self.assertEqual(["src/libs/mne/a/empty.cpp"], result["no_executable_code"])
         self.assertEqual((4, 1, 1), (result["translation_units"], result["reported"], result["excluded"]))
 
     def test_untracked_report_entries_are_flagged(self) -> None:
-        result = self.check({"src/libraries/a/reported.cpp", "src/libraries/a/generated.cpp"})
-        self.assertEqual(["src/libraries/a/generated.cpp"], result["untracked"])
+        result = self.check({"src/libs/mne/a/reported.cpp", "src/libs/mne/a/generated.cpp"})
+        self.assertEqual(["src/libs/mne/a/generated.cpp"], result["untracked"])
 
 
 class TestCodecovModel(CoverageTestCase):
     def test_branch_counters_decide_the_line_and_partials_are_hits(self) -> None:
-        files = self.parse(_record("/x/src/libraries/a/b.cpp", {1: 1, 2: 1, 3: 0, 4: 5},
+        files = self.parse(_record("/x/src/libs/mne/a/b.cpp", {1: 1, 2: 1, 3: 0, 4: 5},
                                    ("2,0,0,1", "2,0,1,0", "4,0,0,0", "4,0,1,-")))
         self.assertEqual((4, 2), coverage.codecov_counts(files[0]))
 
     def test_reconcile_names_every_difference(self) -> None:
-        files = self.parse(_record("/x/src/libraries/a/b.cpp", {1: 1, 2: 0})
-                           + _record("/x/src/libraries/a/c.cpp", {1: 1}))
-        codecov = {"files": [{"name": "src/libraries/a/b.cpp", "totals": {"lines": 2, "hits": 1}},
-                             {"name": "src/libraries/a/d.cpp", "totals": {"lines": 1, "hits": 0}}]}
-        self.assertEqual(["src/libraries/a/c.cpp: missing from Codecov",
-                          "src/libraries/a/d.cpp: in Codecov but not in the report"],
+        files = self.parse(_record("/x/src/libs/mne/a/b.cpp", {1: 1, 2: 0})
+                           + _record("/x/src/libs/mne/a/c.cpp", {1: 1}))
+        codecov = {"files": [{"name": "src/libs/mne/a/b.cpp", "totals": {"lines": 2, "hits": 1}},
+                             {"name": "src/libs/mne/a/d.cpp", "totals": {"lines": 1, "hits": 0}}]}
+        self.assertEqual(["src/libs/mne/a/c.cpp: missing from Codecov",
+                          "src/libs/mne/a/d.cpp: in Codecov but not in the report"],
                          coverage.reconcile(files, codecov))
         codecov["files"][0]["totals"]["hits"] = 2
-        self.assertIn("src/libraries/a/b.cpp: Codecov 2/2, expected 1/2", coverage.reconcile(files, codecov))
+        self.assertIn("src/libs/mne/a/b.cpp: Codecov 2/2, expected 1/2", coverage.reconcile(files, codecov))
 
 
 class TestSummary(CoverageTestCase):
     def test_priority_order_is_deterministic(self) -> None:
-        files = self.parse(_record("/c/src/libraries/mne/z.cpp", {1: 1, 2: 0})
-                           + _record("/c/src/libraries/mne/a.cpp", {1: 1, 2: 0})
-                           + _record("/c/src/libraries/mne/b.cpp", {1: 0, 2: 0, 3: 0}))
+        files = self.parse(_record("/c/src/libs/mne/mne/z.cpp", {1: 1, 2: 0})
+                           + _record("/c/src/libs/mne/mne/a.cpp", {1: 1, 2: 0})
+                           + _record("/c/src/libs/mne/mne/b.cpp", {1: 0, 2: 0, 3: 0}))
         summary = coverage.build_summary(files, commit=None, source_url=None, top=2)
-        self.assertEqual(["src/libraries/mne/b.cpp", "src/libraries/mne/a.cpp"],
+        self.assertEqual(["src/libs/mne/mne/b.cpp", "src/libs/mne/mne/a.cpp"],
                          [item["path"] for item in summary["priority_files"]])
 
 
@@ -211,8 +211,9 @@ class TestRepositoryConfiguration(unittest.TestCase):
         declared = dict(re.findall(r"component_id: (\S+)\s+name: \S+\s+paths:\s+- (\S+)", text))
         expected = {scope: f"src/{scope}/**" for scope in coverage.SCOPES}
         for scope in coverage.SCOPES:
-            for module in sorted(p for p in (_REPO_ROOT / "src" / scope).iterdir() if p.is_dir()):
-                expected[f"{scope}_{module.name}"] = f"src/{scope}/{module.name}/**"
+            parent = "libs/mne" if scope == "libs" else scope  # the libraries live under src/libs/mne/
+            for module in sorted(p for p in (_REPO_ROOT / "src" / parent).iterdir() if p.is_dir()):
+                expected[f"{scope}_{module.name}"] = f"src/{parent}/{module.name}/**"
         self.assertEqual(expected, declared)
 
     def test_codecov_counts_lines_like_the_gate(self) -> None:

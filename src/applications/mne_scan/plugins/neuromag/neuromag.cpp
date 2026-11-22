@@ -19,11 +19,11 @@
 #include "neuromag.h"
 
 #include "FormFiles/neuromagsetupwidget.h"
-#include <base/log.h>
-#include <acq/acq_device_registry.h>
-#include <acq/devices/acq_devices.h>
-#include <acq/fiff/acq_fiff.h>
-#include <fiff/fiff_info.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/fiff/fiff_info.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

@@ -37,9 +37,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

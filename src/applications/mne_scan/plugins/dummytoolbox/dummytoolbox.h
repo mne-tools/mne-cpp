@@ -24,9 +24,9 @@
 #include "FormFiles/dummysetupwidget.h"
 #include "FormFiles/dummyyourwidget.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
+#include <mne/base/circular_buffer.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <fiff/fiff.h>
+#include <mne/fiff/fiff.h>
 
 //=============================================================================================================
 // QT INCLUDES

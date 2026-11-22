@@ -18,10 +18,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <channels/layoutloader.h>
-#include <channels/layoutmaker.h>
-#include <channels/standard_montage.h>
-#include <channels/selectionio.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/channels/layoutmaker.h>
+#include <mne/channels/standard_montage.h>
+#include <mne/channels/selectionio.h>
 
 //=============================================================================================================
 // STL INCLUDES

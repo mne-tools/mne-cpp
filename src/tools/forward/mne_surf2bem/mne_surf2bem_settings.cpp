@@ -18,11 +18,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mne_surf2bem_settings.h"
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/bad_channels_maxwell.h>
-#include <dsp/sss.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
+#include <mne/dsp/bad_channels_maxwell.h>
+#include <mne/dsp/sss.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/firfilter.h>
-#include <dsp/filterkernel.h>
-#include <dsp/parksmcclellan.h>
+#include <mne/dsp/firfilter.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/parksmcclellan.h>
 
 //=============================================================================================================
 // QT INCLUDES

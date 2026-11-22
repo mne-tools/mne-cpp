@@ -29,7 +29,7 @@ audit = importlib.util.module_from_spec(_spec)
 sys.modules["audit_qt_usage"] = audit
 _spec.loader.exec_module(audit)
 
-POLICY = {"scan_root": "src/libraries", "qt_by_design": [], "kept": {}, "ceilings": {}}
+POLICY = {"scan_root": "src/libs/mne", "qt_by_design": [], "kept": {}, "ceilings": {}}
 
 
 def make_repo(root: Path, files: dict[str, str]) -> None:
@@ -54,12 +54,12 @@ class CountTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             make_repo(root, {
-                "src/libraries/acq/CMakeLists.txt": "add_library(mne_acq a.cpp)\n",
-                "src/libraries/acq/a.h": "int a();\n",
-                "src/libraries/acq/fiff/CMakeLists.txt":
+                "src/libs/mne/acq/CMakeLists.txt": "add_library(mne_acq a.cpp)\n",
+                "src/libs/mne/acq/a.h": "int a();\n",
+                "src/libs/mne/acq/fiff/CMakeLists.txt":
                     "set(QT_REQUIRED_COMPONENTS Core)\nadd_library(mne_acq_fiff b.cpp)\n",
-                "src/libraries/acq/fiff/b.h": "#include <QString>\nQString b();\n",
-                "src/libraries/acq/fiff/detail/c.h": "#include <QList>\nQList<int> c();\n",
+                "src/libs/mne/acq/fiff/b.h": "#include <QString>\nQString b();\n",
+                "src/libs/mne/acq/fiff/detail/c.h": "#include <QList>\nQList<int> c();\n",
             })
             report = audit.build_report(root, POLICY)
         self.assertEqual(report["summary"]["qt_free"], ["acq"])
@@ -71,13 +71,13 @@ class CeilingTests(unittest.TestCase):
     def test_qt_free_library_fails_on_a_single_qstring(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            make_repo(root, {"src/libraries/acq/CMakeLists.txt": "add_library(mne_acq a.cpp)\n",
-                             "src/libraries/acq/a.cpp": "int a() { return 0; }\n"})
+            make_repo(root, {"src/libs/mne/acq/CMakeLists.txt": "add_library(mne_acq a.cpp)\n",
+                             "src/libs/mne/acq/a.cpp": "int a() { return 0; }\n"})
             policy = copy.deepcopy(POLICY)
             policy["ceilings"] = audit.current_ceilings(audit.build_report(root, policy))
             self.assertEqual(audit.check_ceilings(audit.build_report(root, policy), policy), [])
 
-            (root / "src/libraries/acq/a.cpp").write_text("QString a() { return {}; }\n", encoding="utf-8")
+            (root / "src/libs/mne/acq/a.cpp").write_text("QString a() { return {}; }\n", encoding="utf-8")
             self.assertEqual(audit.check_ceilings(audit.build_report(root, policy), policy),
                              ["acq: tokens 1 > ceiling 0"])
 

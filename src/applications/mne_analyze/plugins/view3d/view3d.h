@@ -23,7 +23,7 @@
 
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <dsp/filterkernel.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

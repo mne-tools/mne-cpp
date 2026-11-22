@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <base/log.h>
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/lineplot.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/base/log.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

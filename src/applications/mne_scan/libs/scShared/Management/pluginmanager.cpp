@@ -16,7 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "pluginmanager.h"
 
 #include "../Plugins/abstractplugin.h"

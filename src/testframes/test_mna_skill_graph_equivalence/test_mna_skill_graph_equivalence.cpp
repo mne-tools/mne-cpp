@@ -28,7 +28,7 @@
  */
 
 #include <pipelineparser.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <workflowgraph.h>
 #include <workflowmanager.h>
 #include <iskilloperator.h>
@@ -36,7 +36,7 @@
 #include <temporalfilterskill.h>
 #include <sourceestimationskill.h>
 
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate.h>
 
 #include <Eigen/Core>
 

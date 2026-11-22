@@ -14,12 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_convert.h>
-#include <acq/acq_device.h>
-#include <acq/acq_device_registry.h>
-#include <acq/devices/acq_devices.h>
-#include <com/udp_socket.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_convert.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/com/udp_socket.h>
 #if !defined(_WIN32)
 #include <arpa/inet.h>
 #include <fcntl.h>

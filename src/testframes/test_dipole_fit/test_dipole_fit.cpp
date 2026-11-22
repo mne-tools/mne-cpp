@@ -15,8 +15,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES

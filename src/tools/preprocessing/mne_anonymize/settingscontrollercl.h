@@ -22,7 +22,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mne_anonymize.h"
 #include "fiffanonymizer.h"
 

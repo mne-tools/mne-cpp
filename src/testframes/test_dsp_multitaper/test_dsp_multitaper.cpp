@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/dpss.h>
-#include <dsp/multitaper_psd.h>
-#include <dsp/multitaper_tfr.h>
+#include <mne/dsp/dpss.h>
+#include <mne/dsp/multitaper_psd.h>
+#include <mne/dsp/multitaper_tfr.h>
 
 //=============================================================================================================
 // QT INCLUDES

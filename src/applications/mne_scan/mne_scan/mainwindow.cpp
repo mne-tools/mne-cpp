@@ -17,7 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
@@ -29,12 +29,12 @@
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
 
-#include <disp/viewers/multiview.h>
-#include <disp/viewers/multiviewwindow.h>
+#include <mne/disp/viewers/multiview.h>
+#include <mne/disp/viewers/multiviewwindow.h>
 
-#include <disp/viewers/quickcontrolview.h>
+#include <mne/disp/viewers/quickcontrolview.h>
 
-#include <base/base_global.h>
+#include <mne/base/base_global.h>
 
 #include "mainwindow.h"
 #include "startupwidget.h"

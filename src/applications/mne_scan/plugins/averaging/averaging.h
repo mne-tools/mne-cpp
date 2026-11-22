@@ -21,9 +21,9 @@
 
 #include "averaging_global.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
-#include <dsp/rt/rt_averaging.h>
-#include <fiff/fiff_evoked_set.h>
+#include <mne/base/circular_buffer.h>
+#include <mne/dsp/rt/rt_averaging.h>
+#include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -23,11 +23,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <disp3D/helpers/geometryinfo.h>
-#include <disp3D/helpers/interpolation.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/base/log.h>
+#include <mne/disp3D/helpers/geometryinfo.h>
+#include <mne/disp3D/helpers/interpolation.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
 //=============================================================================================================
 // QT INCLUDES

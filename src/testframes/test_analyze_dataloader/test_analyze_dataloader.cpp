@@ -19,9 +19,9 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_events.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

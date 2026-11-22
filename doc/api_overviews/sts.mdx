@@ -42,7 +42,7 @@ Dependencies: `mne_base`, `mne_math`, `mne_fiff`, Qt6::Core, Eigen3.
 Parametric t-tests: one-sample, paired, and independent two-sample.
 
 ```cpp
-#include <sts/sts_ttest.h>
+#include <mne/sts/sts_ttest.h>
 
 // One-sample t-test (each column tested against mu=0)
 Eigen::MatrixXd data(30, 100);  // 30 subjects × 100 time points
@@ -79,7 +79,7 @@ auto paired = mne::StatsTtest::paired(condA, condB);
 One-way ANOVA F-test for comparing multiple groups:
 
 ```cpp
-#include <sts/sts_ftest.h>
+#include <mne/sts/sts_ftest.h>
 
 QVector<Eigen::MatrixXd> groups;
 groups.append(group1);  // n_obs × n_variables
@@ -115,8 +115,8 @@ auto result = mne::StatsFtest::oneWay(groups);
 Cluster-based permutation test for comparing two conditions while controlling for multiple comparisons through spatial-temporal clustering:
 
 ```cpp
-#include <sts/sts_cluster.h>
-#include <sts/sts_adjacency.h>
+#include <mne/sts/sts_cluster.h>
+#include <mne/sts/sts_adjacency.h>
 
 // Build adjacency matrix from channel positions
 auto adjacency = mne::StatsAdjacency::fromChannelPositions(fiffInfo);
@@ -180,7 +180,7 @@ for (int c = 0; c < result.vecClusterPvals.size(); ++c) {
 Build spatial adjacency matrices for cluster permutation testing:
 
 ```cpp
-#include <sts/sts_adjacency.h>
+#include <mne/sts/sts_adjacency.h>
 
 // From channel positions (distance threshold = 3× median nearest-neighbor distance)
 auto chAdj = mne::StatsAdjacency::fromChannelPositions(info);
@@ -206,7 +206,7 @@ auto srcAdj = mne::StatsAdjacency::fromSourceSpace(tris, nVertices);
 Covariance matrix estimators with shrinkage methods:
 
 ```cpp
-#include <sts/sts_cov_estimators.h>
+#include <mne/sts/sts_cov_estimators.h>
 
 // Zero-mean data: n_channels × n_samples
 Eigen::MatrixXd data(306, 10000);
@@ -232,7 +232,7 @@ The Ledoit-Wolf estimator computes the optimal linear shrinkage coefficient anal
 Multiple comparison correction methods:
 
 ```cpp
-#include <sts/sts_correction.h>
+#include <mne/sts/sts_correction.h>
 
 Eigen::MatrixXd pvals = result.matPval;
 
@@ -261,7 +261,7 @@ auto fdr = mne::StatsMcCorrection::fdr(pvals, 0.05);
 Source-space evaluation metrics for inverse solutions, as used in CMNE evaluation (Dinh et al., 2021):
 
 ```cpp
-#include <sts/sts_source_metrics.h>
+#include <mne/sts/sts_source_metrics.h>
 
 // Peak localization error
 Eigen::Vector3d truePos(0.03, -0.02, 0.06);
@@ -290,11 +290,11 @@ qDebug() << "SD:" << sd << "m";
 ## Complete Example: Cluster Permutation Test
 
 ```cpp
-#include <fiff/fiff_info.h>
-#include <sts/sts_ttest.h>
-#include <sts/sts_cluster.h>
-#include <sts/sts_adjacency.h>
-#include <sts/sts_correction.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/sts/sts_ttest.h>
+#include <mne/sts/sts_cluster.h>
+#include <mne/sts/sts_adjacency.h>
+#include <mne/sts/sts_correction.h>
 
 // Load measurement info for channel positions
 mne::FiffInfo info = ...;

@@ -21,9 +21,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mri/mri_vol_data.h>
+#include <mne/mri/mri_vol_data.h>
 
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

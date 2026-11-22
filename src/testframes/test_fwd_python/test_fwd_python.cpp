@@ -28,20 +28,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/fwd_bem_model.h>
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/compute_fwd/compute_fwd.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_coord_trans.h>
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_eeg_sphere_model_set.h>
+#include <mne/fwd/compute_fwd/compute_fwd.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mne/mne_forward_solution.h>
-#include <fs/fs_label.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fs/fs_label.h>
 
 //=============================================================================================================
 // QT INCLUDES

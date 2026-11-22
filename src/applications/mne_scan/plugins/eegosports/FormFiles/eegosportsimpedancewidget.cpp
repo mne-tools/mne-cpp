@@ -18,14 +18,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "eegosportsimpedancewidget.h"
 
 #include "ui_eegosportsimpedancewidget.h"
 #include "../eegosports.h"
-#include <base/string_utils.h>
-#include <channels/layoutloader.h>
-#include <channels/layoutmaker.h>
+#include <mne/base/string_utils.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/channels/layoutmaker.h>
 
 //=============================================================================================================
 // QT INCLUDES

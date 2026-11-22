@@ -29,7 +29,7 @@
 #include "mne_setup_mri_settings.h"
 #include "setupmri.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

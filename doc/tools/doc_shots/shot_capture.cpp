@@ -13,7 +13,7 @@
 
 #include "shot_capture.h"
 
-#include <base/thread_pool.h>
+#include <mne/base/thread_pool.h>
 
 #include <QApplication>
 #include <QElapsedTimer>

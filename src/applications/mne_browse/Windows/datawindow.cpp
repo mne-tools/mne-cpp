@@ -16,14 +16,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "datawindow.h"
 
 #include "../Models/virtualchannelmodel.h"
-#include <base/string_utils.h>
-#include <disp/viewers/helpers/channeldatamodel.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_constants.h>
+#include <mne/base/string_utils.h>
+#include <mne/disp/viewers/helpers/channeldatamodel.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

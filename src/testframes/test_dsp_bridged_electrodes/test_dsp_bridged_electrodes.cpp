@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/bridged_electrodes.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/bridged_electrodes.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

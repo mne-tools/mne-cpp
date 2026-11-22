@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <math/linalg.h>
-#include <math/numerics.h>
-#include <base/log.h>
+#include <mne/math/linalg.h>
+#include <mne/math/numerics.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

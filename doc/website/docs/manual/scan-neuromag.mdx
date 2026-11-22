@@ -36,8 +36,8 @@ runs on the acquisition workstation.
 The same source is available to every program that links `mne_acq_devices`:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::register_neuromag_scheme();
 auto device = mne::AcqDevice::open("neuromag://?simulate=1&meg=306&eeg=64&rate=1000");

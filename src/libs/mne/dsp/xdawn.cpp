@@ -1,0 +1,255 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     xdawn.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the Xdawn class.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "xdawn.h"
+
+#include <mne/base/log.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+#include <algorithm>
+#include <map>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne;
+using namespace Eigen;
+
+//=============================================================================================================
+// PRIVATE HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+MatrixXd computePatterns(const MatrixXd& filters, const MatrixXd& dataCov)
+{
+    if (filters.size() == 0 || dataCov.size() == 0) {
+        return {};
+    }
+
+    MatrixXd gram = filters.transpose() * dataCov * filters;
+    CompleteOrthogonalDecomposition<MatrixXd> cod(gram);
+    return dataCov * filters * cod.pseudoInverse();
+}
+
+} // anonymous namespace
+
+//=============================================================================================================
+// MEMBER DEFINITIONS
+//=============================================================================================================
+
+XdawnResult Xdawn::fit(const std::vector<MNEEpochData>& epochs,
+                       int iTargetEvent,
+                       int nComponents,
+                       double dReg)
+{
+    XdawnResult result;
+    result.iTargetEvent = iTargetEvent;
+
+    if (epochs.empty()) {
+        Log::warning("Xdawn::fit: empty epoch list.");
+        return result;
+    }
+
+    std::vector<int> goodIdx;
+    goodIdx.reserve(epochs.size());
+    for (int i = 0; i < std::ssize(epochs); ++i) {
+        if (!epochs[i].bReject) {
+            goodIdx.push_back(i);
+        }
+    }
+
+    if (goodIdx.empty()) {
+        Log::warning("Xdawn::fit: no non-rejected epochs available.");
+        return result;
+    }
+
+    const int nCh = static_cast<int>(epochs[goodIdx[0]].epoch.rows());
+    const int nSamp = static_cast<int>(epochs[goodIdx[0]].epoch.cols());
+    if (nCh == 0 || nSamp == 0) {
+        Log::warning("Xdawn::fit: epoch matrices are empty.");
+        return result;
+    }
+
+    for (int idx : goodIdx) {
+        if (epochs[idx].epoch.rows() != nCh || epochs[idx].epoch.cols() != nSamp) {
+            Log::warning("Xdawn::fit: epoch dimension mismatch.");
+            return result;
+        }
+    }
+
+    nComponents = std::max(1, std::min(nComponents, nCh));
+
+    std::map<int, MatrixXd> classSums;
+    std::map<int, int> classCounts;
+    MatrixXd targetSum = MatrixXd::Zero(nCh, nSamp);
+    int nTarget = 0;
+
+    for (int idx : goodIdx) {
+        const MNEEpochData& ep = epochs[idx];
+        auto [sum, added] = classSums.try_emplace(ep.event, ep.epoch);
+        if (!added) {
+            sum->second += ep.epoch;
+        }
+        classCounts[ep.event] += 1;
+
+        if (ep.event == iTargetEvent) {
+            targetSum += ep.epoch;
+            ++nTarget;
+        }
+    }
+
+    if (nTarget == 0) {
+        Log::warning("Xdawn::fit: no target epochs found for event {}", iTargetEvent);
+        return result;
+    }
+
+    result.matTargetEvoked = targetSum / static_cast<double>(nTarget);
+
+    MatrixXd noiseCov = MatrixXd::Zero(nCh, nCh);
+    MatrixXd dataCov = MatrixXd::Zero(nCh, nCh);
+    long long nNoiseSamples = 0;
+    long long nDataSamples = 0;
+
+    // The sums become the class means
+    for (auto& [event, sum] : classSums) {
+        sum /= static_cast<double>(classCounts[event]);
+    }
+
+    for (int idx : goodIdx) {
+        const MNEEpochData& ep = epochs[idx];
+        const MatrixXd residual = ep.epoch - classSums.at(ep.event);
+
+        dataCov += ep.epoch * ep.epoch.transpose();
+        noiseCov += residual * residual.transpose();
+        nDataSamples += nSamp;
+        nNoiseSamples += nSamp;
+    }
+
+    if (nNoiseSamples <= 0 || nDataSamples <= 0) {
+        Log::warning("Xdawn::fit: failed to accumulate covariance samples.");
+        return result;
+    }
+
+    result.matSignalCov = result.matTargetEvoked * result.matTargetEvoked.transpose() / static_cast<double>(nSamp);
+    result.matNoiseCov = noiseCov / static_cast<double>(nNoiseSamples);
+    dataCov = dataCov / static_cast<double>(nDataSamples);
+
+    const double traceNoise = result.matNoiseCov.trace();
+    const double regValue = std::max(dReg, 0.0) * ((traceNoise > 0.0) ? traceNoise / static_cast<double>(nCh) : 1.0);
+    MatrixXd regNoiseCov = result.matNoiseCov;
+    regNoiseCov.diagonal().array() += regValue;
+
+    SelfAdjointEigenSolver<MatrixXd> noiseEig(regNoiseCov);
+    if (noiseEig.info() != Success) {
+        Log::warning("Xdawn::fit: noise covariance eigendecomposition failed.");
+        return result;
+    }
+
+    VectorXd noiseVals = noiseEig.eigenvalues().cwiseMax(1e-12);
+    MatrixXd noiseVecs = noiseEig.eigenvectors();
+    MatrixXd invSqrtNoise = noiseVecs * noiseVals.cwiseInverse().cwiseSqrt().asDiagonal() * noiseVecs.transpose();
+
+    MatrixXd whitenedSignal = invSqrtNoise * result.matSignalCov * invSqrtNoise;
+    SelfAdjointEigenSolver<MatrixXd> signalEig(whitenedSignal);
+    if (signalEig.info() != Success) {
+        Log::warning("Xdawn::fit: signal covariance eigendecomposition failed.");
+        return result;
+    }
+
+    result.matFilters.resize(nCh, nComponents);
+    const MatrixXd signalVecsAsc = signalEig.eigenvectors().rightCols(nComponents);
+    MatrixXd signalVecs(signalVecsAsc.rows(), signalVecsAsc.cols());
+    for (int i = 0; i < nComponents; ++i) {
+        signalVecs.col(i) = signalVecsAsc.col(nComponents - 1 - i);
+    }
+
+    result.matFilters = invSqrtNoise * signalVecs;
+
+    for (int col = 0; col < result.matFilters.cols(); ++col) {
+        const double noiseNorm = std::sqrt(result.matFilters.col(col).transpose() * regNoiseCov * result.matFilters.col(col));
+        if (noiseNorm > 1e-12) {
+            result.matFilters.col(col) /= noiseNorm;
+        }
+    }
+
+    result.matPatterns = computePatterns(result.matFilters, dataCov);
+    result.bValid = true;
+    return result;
+}
+
+//=============================================================================================================
+
+MatrixXd Xdawn::apply(const MatrixXd& matEpoch, const XdawnResult& result)
+{
+    if (!result.bValid || result.matFilters.size() == 0) {
+        return {};
+    }
+
+    if (matEpoch.rows() != result.matFilters.rows()) {
+        Log::warning("Xdawn::apply: channel count mismatch.");
+        return {};
+    }
+
+    return result.matFilters.transpose() * matEpoch;
+}
+
+//=============================================================================================================
+
+MatrixXd Xdawn::denoise(const MatrixXd& matEpoch, const XdawnResult& result, int nComponents)
+{
+    if (!result.bValid || result.matFilters.size() == 0 || result.matPatterns.size() == 0) {
+        return matEpoch;
+    }
+
+    if (matEpoch.rows() != result.matFilters.rows()) {
+        Log::warning("Xdawn::denoise: channel count mismatch.");
+        return {};
+    }
+
+    if (nComponents <= 0 || nComponents > result.matFilters.cols()) {
+        nComponents = result.matFilters.cols();
+    }
+
+    MatrixXd filters = result.matFilters.leftCols(nComponents);
+    MatrixXd patterns = result.matPatterns.leftCols(nComponents);
+
+    return patterns * (filters.transpose() * matEpoch);
+}
+
+//=============================================================================================================
+
+std::vector<MNEEpochData> Xdawn::denoiseEpochs(std::vector<MNEEpochData> epochs,
+                                               const XdawnResult& result,
+                                               int nComponents)
+{
+    for (MNEEpochData& epoch : epochs) {
+        epoch.epoch = denoise(epoch.epoch, result, nComponents);
+    }
+    return epochs;
+}

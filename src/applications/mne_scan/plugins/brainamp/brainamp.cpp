@@ -21,10 +21,10 @@
 
 #include "FormFiles/brainampsetupwidget.h"
 #include "FormFiles/brainampsetupprojectwidget.h"
-#include <base/log.h>
-#include <acq/devices/acq_devices.h>
-#include <acq/fiff/acq_fiff.h>
-#include <fiff/fiff.h>
+#include <mne/base/log.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

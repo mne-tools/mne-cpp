@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_ctf_comp.h>
-#include <base/log.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -24,8 +24,8 @@
 
 #include "surfacechecks.h"
 
-#include <base/log.h>
-#include <fiff/fiff_constants.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

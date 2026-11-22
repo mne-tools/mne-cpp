@@ -16,13 +16,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <bids/readers/bids_edf_reader.h>
-#include <base/string_utils.h>
+#include <mne/bids/readers/bids_edf_reader.h>
+#include <mne/base/string_utils.h>
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_raw_data.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

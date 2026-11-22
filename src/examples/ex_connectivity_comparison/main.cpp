@@ -18,25 +18,25 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view/brainview.h>
-#include <base/string_utils.h>
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/model/items/networktreeitem.h>
-#include <connectivity/compute_connectivity.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
-#include <connectivity/metrics/abstractmetric.h>
-#include <fiff/fiff_raw_data.h>
-#include <fs/fs_label.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_surfaceset.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <base/log.h>
-#include <fiff/fiff_events.h>
-#include <disp/viewers/connectivitysettingsview.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/base/string_utils.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/model/items/networktreeitem.h>
+#include <mne/connectivity/compute_connectivity.h>
+#include <mne/connectivity/connectivitysettings.h>
+#include <mne/connectivity/network/network.h>
+#include <mne/connectivity/metrics/abstractmetric.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/mne/mne.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/disp/viewers/connectivitysettingsview.h>
 
 //=============================================================================================================
 // QT INCLUDES

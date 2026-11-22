@@ -26,20 +26,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "watershedbem.h"
 #include "mne_watershed_bem_settings.h"
 
-#include <fs/fs_surface.h>
+#include <mne/fs/fs_surface.h>
 
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
-#include <mri/mri_mgh_io.h>
-#include <mri/mri_vol_data.h>
+#include <mne/mri/mri_mgh_io.h>
+#include <mne/mri/mri_vol_data.h>
 
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -16,15 +16,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "writetofile.h"
 
 #include "FormFiles/writetofilesetupwidget.h"
 #include "FormFiles/writetofilestatuswidget.h"
-#include <disp/viewers/projectsettingsview.h>
+#include <mne/disp/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES

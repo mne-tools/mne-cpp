@@ -15,8 +15,8 @@
 #include <backendchannel.h>
 #include <jsonrpcmessage.h>
 
-#include <com/tcp_server.h>
-#include <com/tcp_socket.h>
+#include <mne/com/tcp_server.h>
+#include <mne/com/tcp_socket.h>
 
 #include <QJsonArray>
 #include <QElapsedTimer>

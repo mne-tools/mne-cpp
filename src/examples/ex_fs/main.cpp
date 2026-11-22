@@ -19,15 +19,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/fs_annotation.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_atlas_lookup.h>
-#include <fs/fs_colortable.h>
-#include <fs/fs_label.h>
-#include <fs/fs_label_utils.h>
-#include <fs/fs_surface.h>
-#include <fs/fs_surfaceset.h>
-#include <base/string_utils.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_atlas_lookup.h>
+#include <mne/fs/fs_colortable.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_label_utils.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

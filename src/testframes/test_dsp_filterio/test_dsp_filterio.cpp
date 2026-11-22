@@ -12,8 +12,8 @@
 
 #include <QtTest/QtTest>
 
-#include <base/byte_stream.h>
-#include <dsp/filterio.h>
+#include <mne/base/byte_stream.h>
+#include <mne/dsp/filterio.h>
 
 #include <filesystem>
 #include <string>

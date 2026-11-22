@@ -23,7 +23,7 @@
 
 #include "babymeg_global.h"
 
-#include <acq/acq_device.h>
+#include <mne/acq/acq_device.h>
 #include <scShared/Plugins/abstractsensor.h>
 
 //=============================================================================================================

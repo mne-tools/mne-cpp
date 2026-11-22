@@ -22,9 +22,9 @@
 
 #include "scdisp_global.h"
 #include "measurementwidget.h"
-#include <fiff/fiff_coord_trans.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES

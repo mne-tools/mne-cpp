@@ -18,7 +18,7 @@
 
 #include "dataloader.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
@@ -28,10 +28,10 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_constants.h>
-#include <disp/viewers/progressview.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/disp/viewers/progressview.h>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/fs_annotation.h>
-#include <fs/fs_surface.h>
-#include <fs/fs_label.h>
-#include <base/log.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_label.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

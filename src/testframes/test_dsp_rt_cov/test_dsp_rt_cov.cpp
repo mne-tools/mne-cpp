@@ -16,9 +16,9 @@
 #include <limits>
 #include <memory>
 
-#include <dsp/rt/rt_cov.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/rt/rt_cov.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 using namespace mne;
 using namespace Eigen;

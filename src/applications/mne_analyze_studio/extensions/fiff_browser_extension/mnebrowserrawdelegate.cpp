@@ -14,9 +14,9 @@
 
 #include <algorithm>
 #include "mnebrowserrawdelegate.h"
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_constants.h>
 
 #include <QApplication>
 #include <QPainter>

@@ -22,9 +22,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/devices/polhemus/polhemus_coregistration.h>
-#include <acq/devices/polhemus/acquired_points.h>
-#include <base/json.h>
+#include <mne/acq/devices/polhemus/polhemus_coregistration.h>
+#include <mne/acq/devices/polhemus/acquired_points.h>
+#include <mne/base/json.h>
 
 #include <digitizer.h>
 

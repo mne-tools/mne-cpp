@@ -18,11 +18,11 @@
 //=============================================================================================================
 
 #include <math.h>
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/lineplot.h>
-#include <math/spectral.h>
-#include <base/log.h>
-#include <mne/mne.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/lineplot.h>
+#include <mne/math/spectral.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne.h>
 
 //=============================================================================================================
 // Eigen

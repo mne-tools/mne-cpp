@@ -13,7 +13,7 @@
 #ifndef MNE_ACQ_VIEW_H
 #define MNE_ACQ_VIEW_H
 
-#include <acq/acq.h>
+#include <mne/acq/acq.h>
 
 #include <QString>
 

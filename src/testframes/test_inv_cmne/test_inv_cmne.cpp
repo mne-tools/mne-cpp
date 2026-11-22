@@ -17,10 +17,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/minimum_norm/inv_cmne.h>
-#include <base/log.h>
+#include <mne/inv/minimum_norm/inv_cmne.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <inv/minimum_norm/inv_cmne_settings.h>
+#include <mne/inv/minimum_norm/inv_cmne_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES

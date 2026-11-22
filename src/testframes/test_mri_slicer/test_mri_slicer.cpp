@@ -16,9 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mri/mri_slicer.h>
-#include <mri/mri_vol_data.h>
-#include <fiff/fiff_file.h>
+#include <mne/mri/mri_slicer.h>
+#include <mne/mri/mri_vol_data.h>
+#include <mne/fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -22,9 +22,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/viewers/abstractview.h>
+#include <mne/disp/viewers/abstractview.h>
 #include "analyzecore.h"
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // Qt INCLUDES

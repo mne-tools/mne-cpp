@@ -25,7 +25,7 @@
 #include <scShared/Management/pluginoutputdata.h>
 #include <scShared/Management/plugininputdata.h>
 #include <scShared/Plugins/abstractplugin.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

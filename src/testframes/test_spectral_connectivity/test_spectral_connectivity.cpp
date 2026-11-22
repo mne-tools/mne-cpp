@@ -17,20 +17,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <math/matrix_io.h>
-#include <connectivity/metrics/coherency.h>
-#include <connectivity/metrics/coherence.h>
-#include <connectivity/metrics/imagcoherence.h>
-#include <connectivity/metrics/phaselockingvalue.h>
-#include <connectivity/metrics/phaselagindex.h>
-#include <connectivity/metrics/unbiasedsquaredphaselagindex.h>
-#include <connectivity/metrics/weightedphaselagindex.h>
-#include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
-#include <connectivity/metrics/crosscorrelation.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
+#include <mne/math/matrix_io.h>
+#include <mne/connectivity/metrics/coherency.h>
+#include <mne/connectivity/metrics/coherence.h>
+#include <mne/connectivity/metrics/imagcoherence.h>
+#include <mne/connectivity/metrics/phaselockingvalue.h>
+#include <mne/connectivity/metrics/phaselagindex.h>
+#include <mne/connectivity/metrics/unbiasedsquaredphaselagindex.h>
+#include <mne/connectivity/metrics/weightedphaselagindex.h>
+#include <mne/connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <mne/connectivity/metrics/crosscorrelation.h>
+#include <mne/connectivity/connectivitysettings.h>
+#include <mne/connectivity/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES

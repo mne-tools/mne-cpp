@@ -19,12 +19,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "statusbar.h"
 #include "communicator.h"
 #include "event.h"
 
-#include <disp/viewers/progressview.h>
+#include <mne/disp/viewers/progressview.h>
 
 //=============================================================================================================
 // QT INCLUDES

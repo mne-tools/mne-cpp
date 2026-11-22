@@ -16,14 +16,14 @@
 
 #include <Eigen/Core>
 
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
 
 #include <jsonrpcmessage.h>
 #include <capabilityutils.h>
 
-#include <dsp/welch_psd.h>
-#include <base/string_utils.h>
+#include <mne/dsp/welch_psd.h>
+#include <mne/base/string_utils.h>
 
 #include <QJsonArray>
 #include <QFile>

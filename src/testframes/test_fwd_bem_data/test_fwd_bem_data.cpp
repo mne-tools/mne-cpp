@@ -21,26 +21,26 @@
 #include <QDir>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
-#include <fwd/fwd_bem_model.h>
-#include <fwd/fwd_bem_solution.h>
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_coil.h>
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_bem_solution.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_coil.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_eeg_sphere_model_set.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 
 using namespace mne;
 using namespace Eigen;

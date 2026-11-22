@@ -46,8 +46,8 @@
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
 
-#include <disp3D/scene/multimodalscene.h>
-#include <disp3D/scene/pickresult.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/disp3D/scene/pickresult.h>
 
 #include <QApplication>
 #include <QDockWidget>

@@ -18,9 +18,9 @@
 
 #include "rtfwdsetupwidget.h"
 
-#include <base/log.h>
-#include <fiff/fiff_stream.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 
 //=============================================================================================================
 // USED NAMESPACES

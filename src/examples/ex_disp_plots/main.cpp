@@ -18,15 +18,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/plots/bar.h>
-#include <disp/plots/graph.h>
-#include <disp/plots/helpers/colormap.h>
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/imagesc.h>
-#include <disp/plots/lineplot.h>
-#include <disp/plots/plot.h>
-#include <disp/plots/spline.h>
-#include <disp/plots/tfplot.h>
+#include <mne/disp/plots/bar.h>
+#include <mne/disp/plots/graph.h>
+#include <mne/disp/plots/helpers/colormap.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/imagesc.h>
+#include <mne/disp/plots/lineplot.h>
+#include <mne/disp/plots/plot.h>
+#include <mne/disp/plots/spline.h>
+#include <mne/disp/plots/tfplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

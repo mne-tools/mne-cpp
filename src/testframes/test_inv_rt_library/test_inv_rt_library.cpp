@@ -19,43 +19,43 @@
 #include <QCoreApplication>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
 
-#include <fiff/fiff_cov.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_spaces.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_source_spaces.h>
 
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_ecd.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/rap_music/inv_rap_music.h>
-#include <inv/rap_music/inv_dipole.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/hpi/inv_hpi_model_parameters.h>
-#include <inv/hpi/inv_sensor_set.h>
-#include <inv/hpi/inv_hpi_data_updater.h>
-#include <inv/hpi/inv_hpi_fit.h>
-#include <inv/hpi/inv_hpi_fit_data.h>
-#include <inv/hpi/inv_signal_model.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_ecd.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/inv/rap_music/inv_dipole.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/hpi/inv_hpi_model_parameters.h>
+#include <mne/inv/hpi/inv_sensor_set.h>
+#include <mne/inv/hpi/inv_hpi_data_updater.h>
+#include <mne/inv/hpi/inv_hpi_fit.h>
+#include <mne/inv/hpi/inv_hpi_fit_data.h>
+#include <mne/inv/hpi/inv_signal_model.h>
 
-#include <dsp/rt/rt_connectivity.h>
-#include <dsp/rt/rt_cov.h>
-#include <dsp/rt/rt_hpi.h>
-#include <dsp/rt/rt_inv_op.h>
-#include <dsp/rt/rt_averaging.h>
-#include <dsp/rt/rt_noise.h>
-#include <dsp/rt/rt_filter.h>
-#include <dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_connectivity.h>
+#include <mne/dsp/rt/rt_cov.h>
+#include <mne/dsp/rt/rt_hpi.h>
+#include <mne/dsp/rt/rt_inv_op.h>
+#include <mne/dsp/rt/rt_averaging.h>
+#include <mne/dsp/rt/rt_noise.h>
+#include <mne/dsp/rt/rt_filter.h>
+#include <mne/dsp/filterkernel.h>
 
-#include <connectivity/compute_connectivity.h>
-#include <connectivity/connectivitysettings.h>
+#include <mne/connectivity/compute_connectivity.h>
+#include <mne/connectivity/connectivitysettings.h>
 #include <cmath>
 #include <numbers>
 

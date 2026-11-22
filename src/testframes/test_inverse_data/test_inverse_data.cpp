@@ -19,31 +19,31 @@
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_forward_solution.h>
 
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/rap_music/inv_rap_music.h>
-#include <inv/rap_music/inv_dipole.h>
-#include <inv/dipole_fit/inv_ecd.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/hpi/inv_hpi_model_parameters.h>
-#include <inv/hpi/inv_sensor_set.h>
-#include <inv/hpi/inv_signal_model.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/inv/rap_music/inv_dipole.h>
+#include <mne/inv/dipole_fit/inv_ecd.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/hpi/inv_hpi_model_parameters.h>
+#include <mne/inv/hpi/inv_sensor_set.h>
+#include <mne/inv/hpi/inv_signal_model.h>
 
 using namespace mne;
 using namespace Eigen;

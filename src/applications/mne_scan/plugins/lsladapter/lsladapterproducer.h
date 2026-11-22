@@ -23,7 +23,7 @@
 #include "lsladapter_global.h"
 #include <scMeas/realtimemultisamplearray.h>
 #include <scShared/Management/pluginoutputdata.h>
-#include <lsl/lsl.h>
+#include <mne/lsl/lsl.h>
 
 //=============================================================================================================
 // QT INCLUDES

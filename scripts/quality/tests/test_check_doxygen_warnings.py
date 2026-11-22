@@ -33,10 +33,10 @@ sys.modules["check_doxygen_warnings"] = checker
 _spec.loader.exec_module(checker)
 
 ROOT = "/checkout/mne-cpp"
-LOG = f"""{ROOT}/src/libraries/fiff/a.h:12: warning: unable to resolve reference to 'Foo' for \\ref command
-{ROOT}/src/libraries/fiff/a.h:40: warning: The following parameter of mne::f(int x) is not documented:
+LOG = f"""{ROOT}/src/libs/mne/fiff/a.h:12: warning: unable to resolve reference to 'Foo' for \\ref command
+{ROOT}/src/libs/mne/fiff/a.h:40: warning: The following parameter of mne::f(int x) is not documented:
   parameter 'x'
-{ROOT}/src/libraries/fiff/b.h:7: warning: end of comment block while expecting command </tt> (Probable start '{ROOT}/src/libraries/fiff/b.h' at line 6)
+{ROOT}/src/libs/mne/fiff/b.h:7: warning: end of comment block while expecting command </tt> (Probable start '{ROOT}/src/libs/mne/fiff/b.h' at line 6)
 """
 
 
@@ -62,11 +62,11 @@ class TestKeys(unittest.TestCase):
     def test_keys_are_relative_and_line_free(self) -> None:
         keys = checker.parse_log(LOG, Path(ROOT))
         self.assertEqual(3, sum(keys.values()))
-        self.assertIn("src/libraries/fiff/a.h: warning: The following parameter of mne::f(int x) "
+        self.assertIn("src/libs/mne/fiff/a.h: warning: The following parameter of mne::f(int x) "
                       "is not documented: | parameter 'x'", keys)
-        self.assertIn("src/libraries/fiff/b.h: warning: end of comment block while expecting command </tt> "
-                      "(Probable start 'src/libraries/fiff/b.h' at line N)", keys)
-        self.assertIn("src/libraries/fiff/a.h: warning: unable to resolve reference to 'Foo' for \\ref command", keys)
+        self.assertIn("src/libs/mne/fiff/b.h: warning: end of comment block while expecting command </tt> "
+                      "(Probable start 'src/libs/mne/fiff/b.h' at line N)", keys)
+        self.assertIn("src/libs/mne/fiff/a.h: warning: unable to resolve reference to 'Foo' for \\ref command", keys)
         self.assertFalse(any(ROOT in key for key in keys))
 
     def test_shifted_lines_keep_the_same_key(self) -> None:
@@ -88,10 +88,10 @@ class TestRatchet(RatchetTestCase):
     def test_new_warning_fails(self) -> None:
         """A warning outside the allowlist fails the check."""
         self.seed()
-        extra = f"{ROOT}/src/libraries/fiff/c.h:3: warning: Found unknown command '@bogus'\n"
+        extra = f"{ROOT}/src/libs/mne/fiff/c.h:3: warning: Found unknown command '@bogus'\n"
         code, text = self.run_checker(LOG + extra)
         self.assertEqual(1, code)
-        self.assertIn("NEW: src/libraries/fiff/c.h: warning: Found unknown command '@bogus'", text)
+        self.assertIn("NEW: src/libs/mne/fiff/c.h: warning: Found unknown command '@bogus'", text)
 
     def test_extra_occurrence_of_a_known_warning_fails(self) -> None:
         self.seed()
@@ -101,7 +101,7 @@ class TestRatchet(RatchetTestCase):
         """--update refuses a new key or a higher count and leaves the file untouched."""
         self.seed()
         before = self.allowlist.read_text(encoding="utf-8")
-        extra = f"{ROOT}/src/libraries/fiff/c.h:3: warning: Found unknown command '@bogus'\n"
+        extra = f"{ROOT}/src/libs/mne/fiff/c.h:3: warning: Found unknown command '@bogus'\n"
         self.assertEqual(1, self.run_checker(LOG + extra, "--update")[0])
         self.assertEqual(before, self.allowlist.read_text(encoding="utf-8"))
 

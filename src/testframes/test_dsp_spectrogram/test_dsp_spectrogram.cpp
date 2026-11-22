@@ -12,7 +12,7 @@
 
 #include <QtTest/QtTest>
 
-#include <dsp/spectrogram.h>
+#include <mne/dsp/spectrogram.h>
 
 #include <Eigen/Core>
 

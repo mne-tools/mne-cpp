@@ -14,13 +14,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/annotate_artifact.h>
-#include <base/log.h>
+#include <mne/dsp/annotate_artifact.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <dsp/firfilter.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/firfilter.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

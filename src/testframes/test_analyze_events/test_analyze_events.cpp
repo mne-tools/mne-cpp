@@ -19,8 +19,8 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <disp/viewers/triggerdetectionview.h>
-#include <base/thread_pool.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

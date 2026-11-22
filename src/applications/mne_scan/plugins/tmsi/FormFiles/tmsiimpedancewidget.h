@@ -22,8 +22,8 @@
 #include "../tmsi_global.h"
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
-#include "disp/plots/helpers/colormap.h"
-#include <channels/layoutloader.h>
+#include "mne/disp/plots/helpers/colormap.h"
+#include <mne/channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

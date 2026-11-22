@@ -17,7 +17,7 @@
  */
 
 #include <pipelineparser.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <workflowgraph.h>
 #include <workflowmanager.h>
 #include <iskilloperator.h>

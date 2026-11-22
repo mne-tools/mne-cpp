@@ -9,7 +9,7 @@
   },
   "modules": {
     "fiff": {
-      "dir": "src/libraries/fiff",
+      "dir": "src/libs/mne/fiff",
       "sidebar_label": "FIFF Library",
       "origin": "mne-c",
       "include": "fiff",
@@ -18,7 +18,7 @@
       "namespace": "mne"
     },
     "mne": {
-      "dir": "src/libraries/mne",
+      "dir": "src/libs/mne/mne",
       "sidebar_label": "MNE Library",
       "origin": "mne-c",
       "include": "mne",
@@ -27,7 +27,7 @@
       "namespace": "mne"
     },
     "fwd": {
-      "dir": "src/libraries/fwd",
+      "dir": "src/libs/mne/fwd",
       "sidebar_label": "Forward Library",
       "origin": "mne-c",
       "include": "fwd",
@@ -36,7 +36,7 @@
       "namespace": "mne"
     },
     "inv": {
-      "dir": "src/libraries/inv",
+      "dir": "src/libs/mne/inv",
       "sidebar_label": "Inverse Library",
       "origin": "mne-c + mne-python",
       "include": "inv",
@@ -45,7 +45,7 @@
       "namespace": "mne"
     },
     "dsp": {
-      "dir": "src/libraries/dsp",
+      "dir": "src/libs/mne/dsp",
       "sidebar_label": "DSP Library",
       "origin": "mne-python + custom",
       "include": "dsp",
@@ -54,7 +54,7 @@
       "namespace": "mne"
     },
     "connectivity": {
-      "dir": "src/libraries/connectivity",
+      "dir": "src/libs/mne/connectivity",
       "sidebar_label": "Connectivity Library",
       "origin": "mne-python",
       "include": "connectivity",
@@ -63,7 +63,7 @@
       "namespace": "mne"
     },
     "ieeg": {
-      "dir": "src/libraries/ieeg",
+      "dir": "src/libs/mne/ieeg",
       "sidebar_label": "iEEG Library",
       "origin": "mne-python + custom",
       "include": "ieeg",
@@ -72,7 +72,7 @@
       "namespace": "mne"
     },
     "decoding": {
-      "dir": "src/libraries/decoding",
+      "dir": "src/libs/mne/decoding",
       "sidebar_label": "Decoding Library",
       "origin": "mne-python",
       "include": "decoding",
@@ -81,7 +81,7 @@
       "namespace": "mne"
     },
     "ml": {
-      "dir": "src/libraries/ml",
+      "dir": "src/libs/mne/ml",
       "sidebar_label": "Machine Learning Library",
       "origin": "custom",
       "include": "ml",
@@ -90,7 +90,7 @@
       "namespace": "mne"
     },
     "sts": {
-      "dir": "src/libraries/sts",
+      "dir": "src/libs/mne/sts",
       "sidebar_label": "Statistics Library",
       "origin": "mne-python (scipy/sklearn)",
       "include": "sts",
@@ -99,7 +99,7 @@
       "namespace": "mne"
     },
     "fs": {
-      "dir": "src/libraries/fs",
+      "dir": "src/libs/mne/fs",
       "sidebar_label": "FreeSurfer Library",
       "origin": "mne-c + mne-python",
       "include": "fs",
@@ -108,7 +108,7 @@
       "namespace": "mne"
     },
     "math": {
-      "dir": "src/libraries/math",
+      "dir": "src/libs/mne/math",
       "sidebar_label": "Math Library",
       "origin": "mne-c + scipy",
       "include": "math",
@@ -117,7 +117,7 @@
       "namespace": "mne"
     },
     "mri": {
-      "dir": "src/libraries/mri",
+      "dir": "src/libs/mne/mri",
       "sidebar_label": "MRI Library",
       "origin": "mne-c",
       "include": "mri",
@@ -126,7 +126,7 @@
       "namespace": "mne"
     },
     "bids": {
-      "dir": "src/libraries/bids",
+      "dir": "src/libs/mne/bids",
       "sidebar_label": "BIDS Library",
       "origin": "mne-bids",
       "include": "bids",
@@ -135,7 +135,7 @@
       "namespace": "mne"
     },
     "base": {
-      "dir": "src/libraries/base",
+      "dir": "src/libs/mne/base",
       "sidebar_label": "Base Library",
       "origin": "custom",
       "include": "base",
@@ -144,7 +144,7 @@
       "namespace": "mne"
     },
     "channels": {
-      "dir": "src/libraries/channels",
+      "dir": "src/libs/mne/channels",
       "sidebar_label": "Channels Library",
       "origin": "mne-c + custom",
       "include": "channels",
@@ -153,7 +153,7 @@
       "namespace": "mne"
     },
     "pybridge": {
-      "dir": "src/libraries/pybridge",
+      "dir": "src/libs/mne/pybridge",
       "sidebar_label": "Python Bridge Library",
       "origin": "custom",
       "include": "pybridge",
@@ -162,7 +162,7 @@
       "namespace": "mne"
     },
     "report": {
-      "dir": "src/libraries/report",
+      "dir": "src/libs/mne/report",
       "sidebar_label": "Report Library",
       "origin": "mne-python",
       "include": "report",
@@ -171,7 +171,7 @@
       "namespace": "mne"
     },
     "com": {
-      "dir": "src/libraries/com",
+      "dir": "src/libs/mne/com",
       "sidebar_label": "Communication Library",
       "origin": "custom",
       "include": "com",
@@ -180,7 +180,7 @@
       "namespace": "mne"
     },
     "lsl": {
-      "dir": "src/libraries/lsl",
+      "dir": "src/libs/mne/lsl",
       "sidebar_label": "LSL Library",
       "origin": "custom",
       "include": "lsl",
@@ -189,7 +189,7 @@
       "namespace": "mne"
     },
     "mna": {
-      "dir": "src/libraries/mna",
+      "dir": "src/libs/mne/mna",
       "sidebar_label": "MNA Library",
       "origin": "custom",
       "include": "mna",
@@ -198,7 +198,7 @@
       "namespace": "mne"
     },
     "disp": {
-      "dir": "src/libraries/disp",
+      "dir": "src/libs/mne/disp",
       "sidebar_label": "Display Library",
       "origin": "custom",
       "include": "disp",
@@ -207,7 +207,7 @@
       "namespace": "mne::disp"
     },
     "disp3D": {
-      "dir": "src/libraries/disp3D",
+      "dir": "src/libs/mne/disp3D",
       "sidebar_label": "3D Display Library",
       "origin": "custom",
       "include": "disp3D",
@@ -216,7 +216,7 @@
       "namespace": "mne::disp"
     },
     "acq": {
-      "dir": "src/libraries/acq",
+      "dir": "src/libs/mne/acq",
       "sidebar_label": "Acquisition Library",
       "origin": "custom",
       "include": "acq",
@@ -12588,7 +12588,7 @@
         "python": "mne.BiHemiLabel",
         "status": "missing",
         "mne_cpp": "",
-        "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)"
+        "note": "FsLabel is deliberately single-hemisphere (src/libs/mne/fs/fs_label.h:170)"
       },
       {
         "python": "mne.Dipole",
@@ -14623,7 +14623,7 @@
         "python": "mne.read_source_morph",
         "status": "missing",
         "mne_cpp": "",
-        "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120)"
+        "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libs/mne/mne/mne_morph_map.h:120)"
       },
       {
         "python": "mne.read_source_spaces",

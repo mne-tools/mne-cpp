@@ -23,9 +23,9 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
-#include <disp/viewers/scalingview.h>
+#include <mne/disp/viewers/scalingview.h>
 
-#include <dsp/filterkernel.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

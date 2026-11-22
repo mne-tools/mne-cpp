@@ -29,25 +29,25 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "setupforwardmodel.h"
 #include "mne_setup_forward_model_settings.h"
 
-#include <fs/fs_surface.h>
+#include <mne/fs/fs_surface.h>
 
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_stream.h>
 
-#include <fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_bem_model.h>
 
-#include <mne/mne_surface.h>
-#include <mne/mne_triangle.h>
+#include <mne/mne/mne_surface.h>
+#include <mne/mne/mne_triangle.h>
 
-#include <fiff/fiff_byte_swap.h>
+#include <mne/fiff/fiff_byte_swap.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -32,7 +32,7 @@
 #include "mne_watershed_bem_settings.h"
 #include "watershedbem.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

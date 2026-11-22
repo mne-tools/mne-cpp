@@ -18,9 +18,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "datamanager.h"
-#include <disp/viewers/bidsview.h>
+#include <mne/disp/viewers/bidsview.h>
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>

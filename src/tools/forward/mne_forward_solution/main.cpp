@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fwd/compute_fwd/compute_fwd.h>
-#include <mne/mne_forward_solution.h>
-#include <base/log.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/compute_fwd/compute_fwd.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

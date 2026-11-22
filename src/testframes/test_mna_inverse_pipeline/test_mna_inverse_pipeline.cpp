@@ -25,24 +25,24 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <mna/mna_graph.h>
-#include <mna/mna_graph_executor.h>
-#include <mna/mna_op_registry.h>
-#include <mna/mna_node.h>
-#include <mna/mna_port.h>
-#include <mna/mna_types.h>
-#include <mna/mna_io.h>
-#include <mna/mna_project.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_forward_solution.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
-#include <base/string_utils.h>
+#include <mne/base/log.h>
+#include <mne/mna/mna_graph.h>
+#include <mne/mna/mna_graph_executor.h>
+#include <mne/mna/mna_op_registry.h>
+#include <mne/mna/mna_node.h>
+#include <mne/mna/mna_port.h>
+#include <mne/mna/mna_types.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mna/mna_project.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

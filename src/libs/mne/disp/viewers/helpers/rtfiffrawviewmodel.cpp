@@ -1,0 +1,1090 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2014-2026 MNE-CPP Authors
+ *
+ * @file     rtfiffrawviewmodel.cpp
+ * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Robert Dicamillo <rd521@nmr.mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     May 2014
+ * @brief    Implementation of the RtFiffRawViewModel ring-buffer table model.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtfiffrawviewmodel.h"
+
+#include <mne/base/string_utils.h>
+#include <mne/base/thread_pool.h>
+#include <mne/fiff/fiff_types.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/math/matrix_io.h>
+#include <mne/dsp/sphara.h>
+#include <mne/dsp/rt/rt_detect_trigger.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QBrush>
+#include <QCoreApplication>
+#include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <memory>
+#include <vector>
+#include <iostream>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne::disp;
+using namespace mne;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** Calls fn(iColumn, iOffset, iLength) for each piece of the span [iStart, iStart + iLength) wrapped into [0, iSize). */
+template<typename Fn>
+void forWrappedSpan(int iStart, int iLength, int iSize, Fn fn)
+{
+    iStart = ((iStart % iSize) + iSize) % iSize;
+    for (int iDone = 0; iDone < iLength;) {
+        const int iPiece = std::min(iLength - iDone, iSize - iStart);
+        fn(iStart, iDone, iPiece);
+        iDone += iPiece;
+        iStart = 0;
+    }
+}
+
+} // namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RtFiffRawViewModel::RtFiffRawViewModel(QObject* parent)
+: QAbstractTableModel(parent)
+, m_bProjActivated(false)
+, m_bCompActivated(false)
+, m_bSpharaActivated(false)
+, m_bIsFreezed(false)
+, m_bDrawFilterFront(true)
+, m_bPerformFiltering(false)
+, m_bTriggerDetectionActive(false)
+, m_fSps(1024.0f)
+, m_dTriggerThreshold(0.01)
+, m_iT(10)
+, m_iDownsampling(10)
+, m_iMaxSamples(1024)
+, m_iCurrentSample(0)
+, m_iCurrentStartingSample(0)
+, m_iCurrentSampleFreeze(0)
+, m_iMaxFilterLength(128)
+, m_iCurrentBlockSize(0)
+, m_iCurrentTriggerChIndex(0)
+, m_iDistanceTimerSpacer(1000)
+, m_iDetectedTriggers(0)
+, m_sFilterChannelType("MEG")
+, m_pFiffInfo(std::make_shared<FiffInfo>())
+, m_colBackground(Qt::white)
+{
+}
+
+//=============================================================================================================
+
+RtFiffRawViewModel::~RtFiffRawViewModel()
+{
+}
+
+//=============================================================================================================
+//virtual functions
+int RtFiffRawViewModel::rowCount(const QModelIndex& /*parent*/) const
+{
+    if (!m_pFiffInfo->chs.empty()) {
+        return static_cast<int>(m_pFiffInfo->chs.size());
+    } else {
+        return 0;
+    }
+}
+
+//=============================================================================================================
+
+int RtFiffRawViewModel::columnCount(const QModelIndex& /*parent*/) const
+{
+    return 3;
+}
+
+//=============================================================================================================
+
+QVariant RtFiffRawViewModel::data(const QModelIndex& index, int role) const
+{
+    if (role != Qt::DisplayRole && role != Qt::BackgroundRole) {
+        return QVariant();
+    }
+
+    if (role == Qt::BackgroundRole) {
+        return QVariant(QBrush(m_colBackground));
+    }
+
+    if (index.isValid()) {
+        qint32 row = m_qMapIdxRowSelection.value(index.row(), 0);
+
+        //******** first column (chname) ********
+        if (index.column() == 0 && role == Qt::DisplayRole)
+            return QString::fromStdString(m_pFiffInfo->ch_names[row]);
+
+        //******** second column (data plot) ********
+        if (index.column() == 1) {
+            QVariant v;
+            RowVectorPair rowVectorPair;
+
+            switch (role) {
+                case Qt::DisplayRole: {
+                    if (m_bIsFreezed) {
+                        // data freeze
+                        if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
+                            rowVectorPair.first = m_matDataFilteredFreeze.data() + row * m_matDataFilteredFreeze.cols();
+                            rowVectorPair.second = m_matDataFilteredFreeze.cols();
+                            v.setValue(rowVectorPair);
+                        } else {
+                            rowVectorPair.first = m_matDataRawFreeze.data() + row * m_matDataRawFreeze.cols();
+                            rowVectorPair.second = m_matDataRawFreeze.cols();
+                            v.setValue(rowVectorPair);
+                        }
+                    } else {
+                        // data stream
+                        if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
+                            rowVectorPair.first = m_matDataFiltered.data() + row * m_matDataFiltered.cols();
+                            rowVectorPair.second = m_matDataFiltered.cols();
+                            v.setValue(rowVectorPair);
+                        } else {
+                            rowVectorPair.first = m_matDataRaw.data() + row * m_matDataRaw.cols();
+                            rowVectorPair.second = m_matDataRaw.cols();
+                            v.setValue(rowVectorPair);
+                        }
+                    }
+
+                    return v;
+                }
+            } // end role switch
+        } // end column check
+
+        //******** third column (bad channel) ********
+        if (index.column() == 2 && role == Qt::DisplayRole) {
+            return QVariant(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[row]));
+        } // end column check
+
+    } // end index.valid() check
+
+    return QVariant();
+}
+
+//=============================================================================================================
+
+QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+        return QVariant();
+
+    if (orientation == Qt::Horizontal) {
+        switch (section) {
+            case 0: //chname column
+                return QVariant();
+            case 1: //data plot column
+                switch (role) {
+                    case Qt::DisplayRole:
+                        return QVariant("data plot");
+                    case Qt::TextAlignmentRole:
+                        return QVariant(Qt::AlignLeft);
+                }
+                return QVariant("data plot");
+        }
+    } else if (orientation == Qt::Vertical) {
+        QModelIndex chname = createIndex(section, 0);
+        switch (role) {
+            case Qt::DisplayRole:
+                return QVariant(data(chname).toString());
+        }
+    }
+
+    return QVariant();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::initSphara()
+{
+    //Load SPHARA matrices for babymeg and vectorview
+    mne::read_matrix(m_matSpharaVVGradLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt")).toStdString());
+    mne::read_matrix(m_matSpharaVVMagLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt")).toStdString());
+
+    mne::read_matrix(m_matSpharaBabyMEGInnerLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt")).toStdString());
+    mne::read_matrix(m_matSpharaBabyMEGOuterLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt")).toStdString());
+
+    mne::read_matrix(m_matSpharaEEGLoaded, (QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt")).toStdString());
+
+    //Generate indices used to create the SPHARA operators for VectorView
+    m_vecIndicesFirstVV.resize(0);
+    m_vecIndicesSecondVV.resize(0);
+
+    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
+        //Find GRADIOMETERS
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3012) {
+            m_vecIndicesFirstVV.conservativeResize(m_vecIndicesFirstVV.rows() + 1);
+            m_vecIndicesFirstVV(m_vecIndicesFirstVV.rows() - 1) = r;
+        }
+
+        //Find Magnetometers
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 3024) {
+            m_vecIndicesSecondVV.conservativeResize(m_vecIndicesSecondVV.rows() + 1);
+            m_vecIndicesSecondVV(m_vecIndicesSecondVV.rows() - 1) = r;
+        }
+    }
+
+    //Generate indices used to create the SPHARA operators for babyMEG
+    m_vecIndicesFirstBabyMEG.resize(0);
+    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
+        //Find INNER LAYER
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7002) {
+            m_vecIndicesFirstBabyMEG.conservativeResize(m_vecIndicesFirstBabyMEG.rows() + 1);
+            m_vecIndicesFirstBabyMEG(m_vecIndicesFirstBabyMEG.rows() - 1) = r;
+        }
+
+        //Find outer layer (FIFFV_COIL_BABY_REF_MAG)
+        if (m_pFiffInfo->chs.at(r).chpos.coil_type == 7003) {
+            m_vecIndicesSecondBabyMEG.conservativeResize(m_vecIndicesSecondBabyMEG.rows() + 1);
+            m_vecIndicesSecondBabyMEG(m_vecIndicesSecondBabyMEG.rows() - 1) = r;
+        }
+    }
+
+    //Generate indices used to create the SPHARA operators for EEG layouts
+    m_vecIndicesFirstEEG.resize(0);
+    for (int r = 0; r < std::ssize(m_pFiffInfo->chs); ++r) {
+        //Find EEG
+        if (m_pFiffInfo->chs.at(r).kind == FIFFV_EEG_CH) {
+            m_vecIndicesFirstEEG.conservativeResize(m_vecIndicesFirstEEG.rows() + 1);
+            m_vecIndicesFirstEEG(m_vecIndicesFirstEEG.rows() - 1) = r;
+        }
+    }
+
+    //Create Sphara operator for the first time
+    updateSpharaOptions("BabyMEG", 270, 105);
+
+    qDebug() << "RtFiffRawViewModel::initSphara - Read VectorView mag matrix " << m_matSpharaVVMagLoaded.rows() << m_matSpharaVVMagLoaded.cols() << "and grad matrix" << m_matSpharaVVGradLoaded.rows() << m_matSpharaVVGradLoaded.cols();
+    qDebug() << "RtFiffRawViewModel::initSphara - Read BabyMEG inner layer matrix " << m_matSpharaBabyMEGInnerLoaded.rows() << m_matSpharaBabyMEGInnerLoaded.cols() << "and outer layer matrix" << m_matSpharaBabyMEGOuterLoaded.rows() << m_matSpharaBabyMEGOuterLoaded.cols();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setFiffInfo(std::shared_ptr<mne::FiffInfo>& p_pFiffInfo)
+{
+    if (p_pFiffInfo) {
+        RowVectorXi sel; // = RowVectorXi(0,0);
+        StringList emptyExclude;
+
+        if (p_pFiffInfo->bads.size() > 0) {
+            sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
+        }
+
+        m_vecBadIdcs = sel;
+
+        m_pFiffInfo = p_pFiffInfo;
+
+        resetSelection();
+
+        //Resize data matrix without touching the stored values
+        m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+        m_matDataRaw.setZero();
+
+        m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+        m_matDataFiltered.setZero();
+
+        m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
+        m_vecLastBlockFirstValuesFiltered.setZero();
+
+        m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
+        m_vecLastBlockFirstValuesRaw.setZero();
+
+        m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+
+        m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+        m_matSparseProjMult.setIdentity();
+        m_matSparseCompMult.setIdentity();
+        m_matSparseSpharaMult.setIdentity();
+        m_matSparseProjCompMult.setIdentity();
+
+        //Create the initial Compensator projector
+        updateCompensator(0);
+
+        setFilterChannelType(m_sFilterChannelType);
+
+        //Init the sphara operators
+        initSphara();
+    } else {
+        m_vecBadIdcs = RowVectorXi(0, 0);
+        m_matProj = MatrixXd(0, 0);
+        m_matComp = MatrixXd(0, 0);
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
+{
+    beginResetModel();
+
+    m_iT = T;
+
+    m_iMaxSamples = static_cast<qint32>(ceil(static_cast<double>(sps) * T));
+
+    //Resize data matrix without touching the stored values
+    m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+    m_matDataFiltered.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
+    m_vecLastBlockFirstValuesRaw.conservativeResize(m_pFiffInfo->chs.size());
+    m_vecLastBlockFirstValuesFiltered.conservativeResize(m_pFiffInfo->chs.size());
+
+    if (bSetZero) {
+        m_matDataRaw.setZero();
+        m_matDataFiltered.setZero();
+        m_vecLastBlockFirstValuesRaw.setZero();
+        m_vecLastBlockFirstValuesFiltered.setZero();
+    }
+
+    if (m_iCurrentSample > m_iMaxSamples) {
+        m_iCurrentStartingSample += m_iCurrentSample;
+        m_iCurrentSample = 0;
+    }
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+MatrixXd RtFiffRawViewModel::getLastBlock()
+{
+    const MatrixXdR& matData = (!m_filterKernel.isEmpty() && m_bPerformFiltering) ? m_matDataFiltered : m_matDataRaw;
+
+    MatrixXd matBlock(matData.rows(), m_iCurrentBlockSize);
+    if (m_iCurrentBlockSize > 0) {
+        forWrappedSpan(m_iCurrentSample - m_iCurrentBlockSize, m_iCurrentBlockSize, static_cast<int>(matData.cols()), [&](int iCol, int iOffset, int iLength) {
+            matBlock.middleCols(iOffset, iLength) = matData.middleCols(iCol, iLength);
+        });
+    }
+
+    return matBlock;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::addData(const QList<MatrixXd>& data)
+{
+    //SSP
+    bool doProj = m_bProjActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matProj.cols() ? true : false;
+
+    //Compensator
+    bool doComp = m_bCompActivated && m_matDataRaw.cols() > 0 && m_matDataRaw.rows() == m_matComp.cols() ? true : false;
+
+    //SPHARA
+    bool doSphara = m_bSpharaActivated && m_matSparseSpharaMult.cols() > 0 && m_matDataRaw.rows() == m_matSparseSpharaMult.cols() ? true : false;
+
+    const int iMaxCols = static_cast<int>(m_matDataRaw.cols());
+    if (iMaxCols == 0) {
+        return;
+    }
+
+    //Copy new data into the ring buffer: stream sample s goes to column s mod iMaxCols
+    for (qint32 b = 0; b < data.size(); ++b) {
+        int nRow = data.at(b).rows();
+
+        if (nRow != m_matDataRaw.rows()) {
+            qDebug() << "incoming data does not match internal data row size. Returning...";
+            return;
+        }
+
+        const MatrixXd& matBlock = data.at(b);
+        const int nCol = static_cast<int>(matBlock.cols());
+
+        MatrixXd matCorrected;
+        if (doComp) {
+            matCorrected = doProj ? MatrixXd(m_matSparseProjCompMult * matBlock) : MatrixXd(m_matSparseCompMult * matBlock);
+        } else {
+            matCorrected = doProj ? MatrixXd(m_matSparseProjMult * matBlock) : matBlock;
+        }
+
+        std::vector<mne::TriggerFlank> lTriggers;
+        if (m_bTriggerDetectionActive) {
+            lTriggers = mne::detect_trigger_flanks_max(matBlock, m_iCurrentTriggerChIndex, 0, m_dTriggerThreshold, true, 500);
+        }
+
+        forWrappedSpan(m_iCurrentSample, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+            if (iCol == 0 && m_iCurrentSample == iMaxCols) {
+                startNewSweep();
+            }
+
+            m_matDataRaw.middleCols(iCol, iLength) = matCorrected.middleCols(iOffset, iLength);
+            if (m_filterKernel.isEmpty() || !m_bPerformFiltering) {
+                m_matDataFiltered.middleCols(iCol, iLength).setZero();
+                if (doSphara) {
+                    m_matDataRaw.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataRaw.middleCols(iCol, iLength);
+                }
+            }
+
+            for (const mne::TriggerFlank& trigger : lTriggers) {
+                if (trigger.sample >= iOffset && trigger.sample < iOffset + iLength) {
+                    m_qMapDetectedTrigger[m_iCurrentTriggerChIndex].append({iCol + trigger.sample - iOffset, trigger.value});
+                }
+            }
+
+            m_iCurrentSample = iCol + iLength;
+        });
+
+        if (!lTriggers.empty()) {
+            m_iDetectedTriggers += static_cast<int>(lTriggers.size());
+            emit triggerDetected(m_iDetectedTriggers, m_qMapDetectedTrigger);
+        }
+
+        //Filter the whole block at once so the overlap-add stays continuous across the wrap
+        if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
+            const int iBlockStart = m_iCurrentSample - nCol;
+            filterDataBlock(matCorrected, iBlockStart);
+
+            //Perform SPHARA on filtered data after actual filtering - SPHARA should be applied on the best possible data
+            if (doSphara) {
+                forWrappedSpan(iBlockStart - m_iMaxFilterLength / 2, nCol, iMaxCols, [&](int iCol, int, int iLength) {
+                    m_matDataFiltered.middleCols(iCol, iLength) = m_matSparseSpharaMult * m_matDataFiltered.middleCols(iCol, iLength);
+                });
+            }
+        }
+
+        m_iCurrentBlockSize = std::min(nCol, iMaxCols);
+    }
+
+    //Update data content
+    QModelIndex topLeft = this->index(0, 1);
+    QModelIndex bottomRight = this->index(static_cast<int>(m_pFiffInfo->ch_names.size()) - 1, 1);
+    QVector<int> roles;
+    roles << Qt::DisplayRole;
+
+    emit dataChanged(topLeft, bottomRight, roles);
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::startNewSweep()
+{
+    m_iCurrentStartingSample += m_iCurrentSample;
+    m_iCurrentSample = 0;
+
+    if (!m_bIsFreezed) {
+        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
+        m_vecLastBlockFirstValuesRaw = m_matDataRaw.col(0);
+    }
+
+    //Store old detected triggers
+    m_qMapDetectedTriggerOld = m_qMapDetectedTrigger;
+
+    //Clear detected triggers
+    if (m_bTriggerDetectionActive) {
+        QMutableMapIterator<int, QList<QPair<int, double>>> i(m_qMapDetectedTrigger);
+        while (i.hasNext()) {
+            i.next();
+            i.value().clear();
+        }
+    }
+}
+
+//=============================================================================================================
+
+fiff_int_t RtFiffRawViewModel::getKind(qint32 row) const
+{
+    if (row < m_qMapIdxRowSelection.size()) {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_pFiffInfo->chs.at(chRow).kind;
+    }
+
+    return 0;
+}
+
+//=============================================================================================================
+
+fiff_int_t RtFiffRawViewModel::getUnit(qint32 row) const
+{
+    if (row < m_qMapIdxRowSelection.size()) {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_pFiffInfo->chs.at(chRow).unit;
+    }
+
+    return FIFF_UNIT_NONE;
+}
+
+//=============================================================================================================
+
+fiff_int_t RtFiffRawViewModel::getCoil(qint32 row) const
+{
+    if (row < m_qMapIdxRowSelection.size()) {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_pFiffInfo->chs.at(chRow).chpos.coil_type;
+    }
+
+    return FIFFV_COIL_NONE;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::selectRows(const QList<qint32>& selection)
+{
+    beginResetModel();
+
+    m_qMapIdxRowSelection.clear();
+
+    qint32 count = 0;
+    for (qint32 i = 0; i < selection.size(); ++i) {
+        if (selection[i] < std::ssize(m_pFiffInfo->chs)) {
+            m_qMapIdxRowSelection.insert(count, selection[i]);
+            ++count;
+        }
+    }
+
+    emit newSelection(selection);
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::hideRows(const QList<qint32>& selection)
+{
+    beginResetModel();
+
+    for (qint32 i = 0; i < selection.size(); ++i) {
+        if (m_qMapIdxRowSelection.contains(selection.at(i))) {
+            m_qMapIdxRowSelection.remove(selection.at(i));
+        }
+    }
+
+    emit newSelection(selection);
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::resetSelection()
+{
+    beginResetModel();
+
+    m_qMapIdxRowSelection.clear();
+
+    for (qint32 i = 0; i < std::ssize(m_pFiffInfo->chs); ++i) {
+        m_qMapIdxRowSelection.insert(i, i);
+    }
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::toggleFreeze(const QModelIndex&)
+{
+    m_bIsFreezed = !m_bIsFreezed;
+
+    if (m_bIsFreezed) {
+        m_matDataRawFreeze = m_matDataRaw;
+        m_matDataFilteredFreeze = m_matDataFiltered;
+        m_qMapDetectedTriggerFreeze = m_qMapDetectedTrigger;
+        m_qMapDetectedTriggerOldFreeze = m_qMapDetectedTriggerOld;
+
+        m_iCurrentSampleFreeze = m_iCurrentSample;
+    }
+
+    //Update data content
+    QModelIndex topLeft = this->index(0, 1);
+    QModelIndex bottomRight = this->index(static_cast<int>(m_pFiffInfo->chs.size()) - 1, 1);
+    QVector<int> roles;
+    roles << Qt::DisplayRole;
+
+    emit dataChanged(topLeft, bottomRight, roles);
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setScaling(const QMap<qint32, float>& p_qMapChScaling)
+{
+    beginResetModel();
+    m_qMapChScaling = p_qMapChScaling;
+    endResetModel();
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::updateProjection(const std::vector<mne::FiffProj>& projs)
+{
+    //  Update the SSP projector
+    if (m_pFiffInfo) {
+        //If a minimum of one projector is active set m_bProjActivated to true so that this model applies the ssp to the incoming data
+        m_bProjActivated = false;
+        m_pFiffInfo->projs = projs;
+
+        for (qint32 i = 0; i < std::ssize(this->m_pFiffInfo->projs); ++i) {
+            if (this->m_pFiffInfo->projs[i].active) {
+                m_bProjActivated = true;
+                break;
+            }
+        }
+
+        this->m_pFiffInfo->make_projector(m_matProj);
+
+        qDebug() << "RtFiffRawViewModel::updateProjection - New projection calculated.";
+
+        //set columns of matrix to zero depending on bad channels indexes
+        for (qint32 j = 0; j < m_vecBadIdcs.cols(); ++j) {
+            m_matProj.col(m_vecBadIdcs[j]).setZero();
+        }
+
+        m_matSparseProjMult = m_matProj.sparseView();
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::updateCompensator(int to)
+{
+    //  Update the compensator
+    if (m_pFiffInfo) {
+        if (to == 0) {
+            m_bCompActivated = false;
+        } else {
+            m_bCompActivated = true;
+        }
+
+        //        qDebug()<<"to"<<to;
+        //        qDebug()<<"from"<<from;
+        //        qDebug()<<"m_bCompActivated"<<m_bCompActivated;
+
+        FiffCtfComp newComp;
+        this->m_pFiffInfo->make_compensator(0, to, newComp); //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+
+        //We do not need to call this->m_pFiffInfo->set_current_comp(to);
+        //Because we will set the compensators to the coil in the same FiffInfo which is already used to write to file.
+        //Note that the data is written in raw form not in compensated form.
+        m_matComp = newComp.data.data;
+
+        m_matSparseCompMult = m_matComp.sparseView();
+
+        //Create full multiplication matrix
+        m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::updateSpharaActivation(bool state)
+{
+    m_bSpharaActivated = state;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
+{
+    if (m_pFiffInfo) {
+        qDebug() << "RtFiffRawViewModel::updateSpharaOptions - Creating SPHARA operator for" << sSytemType;
+
+        MatrixXd matSpharaMultFirst = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+        MatrixXd matSpharaMultSecond = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+        if (sSytemType == "VectorView" && m_matSpharaVVGradLoaded.size() != 0 && m_matSpharaVVMagLoaded.size() != 0) {
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaVVGradLoaded, m_vecIndicesFirstVV, m_pFiffInfo->nchan, nBaseFctsFirst, 1);   //GRADIOMETERS
+            matSpharaMultSecond = mne::makeSpharaProjector(m_matSpharaVVMagLoaded, m_vecIndicesSecondVV, m_pFiffInfo->nchan, nBaseFctsSecond, 0); //Magnetometers
+        }
+
+        if (sSytemType == "BabyMEG" && m_matSpharaBabyMEGInnerLoaded.size() != 0) {
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaBabyMEGInnerLoaded, m_vecIndicesFirstBabyMEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+        }
+
+        if (sSytemType == "EEG" && m_matSpharaEEGLoaded.size() != 0) {
+            matSpharaMultFirst = mne::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
+        }
+
+
+        //Create full multiplication matrix
+        const SparseMatrix<double> matSparseSpharaMultFirst = matSpharaMultFirst.sparseView();
+        const SparseMatrix<double> matSparseSpharaMultSecond = matSpharaMultSecond.sparseView();
+        m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setFilter(QList<FilterKernel> filterData)
+{
+    m_filterKernel = filterData;
+
+    m_iMaxFilterLength = 1;
+    for (int i = 0; i < filterData.size(); ++i) {
+        if (m_iMaxFilterLength < filterData.at(i).filter_order()) {
+            m_iMaxFilterLength = filterData.at(i).filter_order();
+        }
+    }
+
+    m_matOverlap.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxFilterLength);
+    m_matOverlap.setZero();
+
+    m_bDrawFilterFront = false;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setFilterActive(bool state)
+{
+    m_bPerformFiltering = state;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
+{
+    m_colBackground = color;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setFilterChannelType(const QString& channelType)
+{
+    m_sFilterChannelType = channelType;
+    m_filterChannelList.clear();
+
+    for (const FiffChInfo& ch : std::as_const(m_pFiffInfo->chs)) {
+        if (ch.kind == FIFFV_MEG_CH || ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_EOG_CH ||
+            ch.kind == FIFFV_ECG_CH || ch.kind == FIFFV_EMG_CH) {
+            if (m_sFilterChannelType == "All" || (ch.ch_name.find(m_sFilterChannelType.toStdString()) != std::string::npos)) {
+                m_filterChannelList << QString::fromStdString(ch.ch_name);
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
+{
+    const std::vector<FiffChInfo>& chInfolist = m_pFiffInfo->chs;
+
+    if (status) {
+        if (!std::ranges::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name))
+            m_pFiffInfo->bads.push_back(chInfolist[ch.row()].ch_name);
+        qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
+    } else if (std::ranges::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name)) {
+        int index = mne::index_of(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name);
+        m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
+        qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    StringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
+
+    emit dataChanged(ch, ch);
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
+{
+    m_qMapTriggerColor = colorMap;
+    m_bTriggerDetectionActive = active;
+    m_dTriggerThreshold = threshold;
+
+    //Find channel index and initialise detected trigger map if channel name changed
+    if (m_sCurrentTriggerCh != triggerCh) {
+        m_sCurrentTriggerCh = triggerCh;
+
+        QList<QPair<int, double>> temp;
+        m_qMapDetectedTrigger.clear();
+
+        for (int i = 0; i < std::ssize(m_pFiffInfo->chs); ++i) {
+            if (m_pFiffInfo->chs[i].ch_name == m_sCurrentTriggerCh) {
+                m_iCurrentTriggerChIndex = i;
+                m_qMapDetectedTrigger.insert(i, temp);
+                break;
+            }
+        }
+    }
+
+    m_sCurrentTriggerCh = triggerCh;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::distanceTimeSpacerChanged(int value)
+{
+    if (value <= 0) {
+        m_iDistanceTimerSpacer = 1000;
+    } else {
+        m_iDistanceTimerSpacer = value;
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::resetTriggerCounter()
+{
+    m_iDetectedTriggers = 0;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
+{
+    const std::vector<FiffChInfo>& chInfolist = m_pFiffInfo->chs;
+
+    for (int i = 0; i < chlist.size(); ++i) {
+        if (status) {
+            if (!std::ranges::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name))
+                m_pFiffInfo->bads.push_back(chInfolist[chlist[i].row()].ch_name);
+        } else {
+            if (std::ranges::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name)) {
+                int index = mne::index_of(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name);
+                m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
+            }
+        }
+
+        emit dataChanged(chlist[i], chlist[i]);
+    }
+
+    //Update indeices of bad channels (this vector is needed when creating new ssp operators)
+    StringList emptyExclude;
+    m_vecBadIdcs = FiffInfoBase::pick_channels(m_pFiffInfo->ch_names, m_pFiffInfo->bads, emptyExclude);
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>& channelDataTime)
+{
+    for (int i = 0; i < channelDataTime.first.size(); ++i) {
+        channelDataTime.first[i].apply_fft_filter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
+    }
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
+{
+    if (data.cols() < m_iMaxFilterLength) {
+        return;
+    }
+
+    //Generate QList structure which can be filtered in parallel
+    QList<QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>> timeData;
+    QList<int> notFilterChannelIndex;
+
+    for (qint32 i = 0; i < data.rows(); ++i) {
+        if (m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
+            timeData.append(QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>(m_filterKernel, QPair<int, RowVectorXd>(i, data.row(i))));
+        } else {
+            notFilterChannelIndex.append(i);
+        }
+    }
+
+    const int iMaxCols = static_cast<int>(m_matDataFiltered.cols());
+    const int nCol = static_cast<int>(data.cols());
+    const int iFilterDelay = m_iMaxFilterLength / 2;
+
+    //Do the concurrent filtering
+    if (!timeData.isEmpty()) {
+        auto* pTimeData = timeData.data();
+        ThreadPool::global().parallel_for(0, static_cast<std::size_t>(timeData.size()), [pTimeData](std::size_t i) {
+            doFilterPerChannelRTMSA(pTimeData[i]);
+        });
+
+        //Overlap-add: output sample k of this block is convolution sample iDataIndex + k, drawn iFilterDelay earlier
+        for (int r = 0; r < timeData.size(); ++r) {
+            const int iRow = timeData.at(r).second.first;
+            RowVectorXd tempData = timeData.at(r).second.second;
+
+            if (m_bDrawFilterFront) {
+                tempData.head(m_iMaxFilterLength) += m_matOverlap.row(iRow);
+                forWrappedSpan(iDataIndex - iFilterDelay, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(iOffset, iLength);
+                });
+            } else {
+                //The overlap belongs to the previous filter, so skip the start-up transient of the new one
+                forWrappedSpan(iDataIndex - iFilterDelay, m_iMaxFilterLength, iMaxCols, [&](int iCol, int, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength).setZero();
+                });
+                forWrappedSpan(iDataIndex - iFilterDelay + m_iMaxFilterLength, nCol - m_iMaxFilterLength, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+                    m_matDataFiltered.row(iRow).segment(iCol, iLength) = tempData.segment(m_iMaxFilterLength + iOffset, iLength);
+                });
+            }
+
+            m_matOverlap.row(iRow) = tempData.tail(m_iMaxFilterLength);
+        }
+    }
+
+    m_bDrawFilterFront = true;
+
+    //Fill filtered data with raw data if the channel was not filtered
+    forWrappedSpan(iDataIndex, nCol, iMaxCols, [&](int iCol, int iOffset, int iLength) {
+        for (int i : std::as_const(notFilterChannelIndex)) {
+            m_matDataFiltered.row(i).segment(iCol, iLength) = data.row(i).segment(iOffset, iLength);
+        }
+    });
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::clearModel()
+{
+    beginResetModel();
+
+    m_matDataRaw.setZero();
+    m_matDataFiltered.setZero();
+    m_matDataRawFreeze.setZero();
+    m_matDataFilteredFreeze.setZero();
+    m_vecLastBlockFirstValuesFiltered.setZero();
+    m_vecLastBlockFirstValuesRaw.setZero();
+    m_matOverlap.setZero();
+
+    endResetModel();
+}
+
+//=============================================================================================================
+
+double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
+{
+    double dMaxValue;
+    qint32 kind = getKind(row);
+
+    switch (kind) {
+        case FIFFV_MEG_CH: {
+            dMaxValue = 1e-11f;
+            qint32 unit = getUnit(row);
+            if (unit == FIFF_UNIT_T_M) { //gradiometers
+                dMaxValue = 1e-10f;
+                if (getScaling().contains(FIFF_UNIT_T_M))
+                    dMaxValue = getScaling()[FIFF_UNIT_T_M];
+            } else if (unit == FIFF_UNIT_T) //magnetometers
+            {
+                dMaxValue = 1e-11f;
+                if (getScaling().contains(FIFF_UNIT_T))
+                    dMaxValue = getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {
+            dMaxValue = 1e-11f;
+            if (getScaling().contains(FIFF_UNIT_T))
+                dMaxValue = getScaling()[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = 1e-4f;
+            if (getScaling().contains(FIFFV_EEG_CH))
+                dMaxValue = getScaling()[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = 1e-3f;
+            if (getScaling().contains(FIFFV_EOG_CH))
+                dMaxValue = getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = 5;
+            if (getScaling().contains(FIFFV_STIM_CH))
+                dMaxValue = getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = 1e-3f;
+            if (getScaling().contains(FIFFV_MISC_CH))
+                dMaxValue = getScaling()[FIFFV_MISC_CH];
+            break;
+        }
+        default:
+            dMaxValue = 1e-9f;
+            break;
+    }
+
+    return dMaxValue;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::addEvent(int iSample)
+{
+    if (m_fnAddEvent) {
+        m_fnAddEvent(iSample);
+    }
+}
+
+//=============================================================================================================
+
+int RtFiffRawViewModel::getSampleAtColumn(int iColumn) const
+{
+    if (iColumn < 0 || iColumn >= m_iMaxSamples) {
+        return -1;
+    }
+
+    // Left of the write position is the current sweep, from it on the previous one
+    const int iWritePosition = m_bIsFreezed ? m_iCurrentSampleFreeze : m_iCurrentSample;
+    const int iSample = getFirstSampleOffset() + iColumn - (iColumn < iWritePosition ? 0 : m_iMaxSamples);
+
+    return iSample >= 0 ? iSample : -1;
+}
+
+//=============================================================================================================
+
+double RtFiffRawViewModel::getValueAtColumn(int iRow, int iColumn) const
+{
+    const RowVectorPair rowData = data(index(iRow, 1)).value<RowVectorPair>();
+    if (!rowData.first || iColumn < 0 || iColumn >= rowData.second) {
+        return 0.0;
+    }
+
+    return rowData.first[iColumn];
+}
+
+//=============================================================================================================
+
+std::vector<int> RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
+{
+    if (m_fnGetEventSamples) {
+        return m_fnGetEventSamples(iBegin, iEnd);
+    }
+    return {};
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::setEventCallbacks(std::function<void(int)> addFn,
+                                           std::function<std::vector<int>(int, int)> getFn)
+{
+    m_fnAddEvent = std::move(addFn);
+    m_fnGetEventSamples = std::move(getFn);
+}

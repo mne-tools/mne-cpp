@@ -29,7 +29,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EXAMPLES = REPO_ROOT / "src" / "examples"
-LIBRARIES = REPO_ROOT / "src" / "libraries"
+LIBRARIES = REPO_ROOT / "src" / "libs" / "mne"
 REFERENCE_HEADER = LIBRARIES / "fiff" / "fiff_raw_data.h"
 REFERENCE_EXAMPLE = EXAMPLES / "ex_read_raw" / "main.cpp"
 REFERENCE_REGIONS = ("fiff_raw_data_open", "fiff_raw_data_read_segment")

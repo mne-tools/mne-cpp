@@ -20,10 +20,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <decoding/decoding_csp.h>
-#include <decoding/decoding_ica_label.h>
-#include <decoding/decoding_spoc.h>
-#include <decoding/decoding_ssd.h>
+#include <mne/decoding/decoding_csp.h>
+#include <mne/decoding/decoding_ica_label.h>
+#include <mne/decoding/decoding_spoc.h>
+#include <mne/decoding/decoding_ssd.h>
 
 //=============================================================================================================
 // QT INCLUDES

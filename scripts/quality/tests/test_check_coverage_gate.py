@@ -36,7 +36,7 @@ _spec.loader.exec_module(gate)
 
 def _lcov(hit: int, missed: int) -> str:
     records = [f"DA:{i},3" for i in range(1, hit + 1)] + [f"DA:{i},0" for i in range(hit + 1, hit + missed + 1)]
-    return "SF:/src/libraries/a.cpp\n" + "\n".join(records) + "\nend_of_record\n"
+    return "SF:/src/libs/mne/a.cpp\n" + "\n".join(records) + "\nend_of_record\n"
 
 
 class GateTestCase(unittest.TestCase):

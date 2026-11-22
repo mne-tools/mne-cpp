@@ -3,7 +3,7 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 """cmake/MneQtFree.cmake: only the display libraries may use Qt.
 
-src/libraries/CMakeLists.txt calls mne_require_qt_free() on every library added before disp and disp3D; the
+src/libs/CMakeLists.txt calls mne_require_qt_free() on every library added before disp and disp3D; the
 configuration fails if one links a Qt target or runs one of Qt's code generators.
 
 @since 3.0.0

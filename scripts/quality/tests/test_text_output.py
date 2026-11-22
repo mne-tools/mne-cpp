@@ -40,7 +40,7 @@ def text_mode_writers(files: list[Path], base: Path) -> list[str]:
 
 class TestTextOutput(unittest.TestCase):
     def test_library_writers_are_binary(self):
-        names = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files", "src/libraries"], capture_output=True, text=True,
+        names = subprocess.run(["git", "-C", str(REPO_ROOT), "ls-files", "src/libs/mne"], capture_output=True, text=True,
                                check=True).stdout.split()
         files = [REPO_ROOT / n for n in names if n.endswith((".cpp", ".h"))]
         self.assertEqual(text_mode_writers(files, REPO_ROOT), [])

@@ -30,7 +30,7 @@ RESULTS_DIR="${COV_WORKING_PATH}/cov-int"
 # day a large new application pushes us past the Coverity Scan 500 MiB
 # upload cap; if that happens we will need to drop a sub-tree again.
 COVERITY_SCAN_WHITELIST=(
-    "${BaseFolder}/src/libraries"
+    "${BaseFolder}/src/libs/mne"
     "${BaseFolder}/src/applications"
     "${BaseFolder}/src/tools"
 )

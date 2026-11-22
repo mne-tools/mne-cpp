@@ -18,18 +18,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <mne/mne.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

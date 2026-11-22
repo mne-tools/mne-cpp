@@ -81,7 +81,7 @@ A summary lists the BEM, cap, captured counts, ICP source / RMSE, and the path o
 
 ## Hardware: Polhemus FASTRAK
 
-`mne_align` talks to the FASTRAK over a serial port through the `polhemus://` source of `mne_acq_devices` (`src/libraries/acq/devices/polhemus/`). Use **Digitizer → Connect…** to attach: a dialog lists the serial ports, USB-serial adapters first, and a *Simulated digitizer* that sweeps a stylus over a head for offline testing. A port not listed can be typed in.
+`mne_align` talks to the FASTRAK over a serial port through the `polhemus://` source of `mne_acq_devices` (`src/libs/mne/acq/devices/polhemus/`). Use **Digitizer → Connect…** to attach: a dialog lists the serial ports, USB-serial adapters first, and a *Simulated digitizer* that sweeps a stylus over a head for offline testing. A port not listed can be typed in.
 
 The active pen station (1 – 4) is selected from the toolbar `Pen:` combo. Only samples from the active station are treated as captures — additional sensors (e.g. a reference attached to the subject's forehead) can stream concurrently without polluting the capture buffer.
 
@@ -128,8 +128,8 @@ The digitisation `.fif` written in parallel can be merged back into a raw record
 - `src/applications/mne_align/align_wizard.{h,cpp}` — seven-step wizard.
 - `src/applications/mne_align/align_3d_view.{h,cpp}` — 3D scene + camera presets.
 - `src/applications/mne_align/digitizer.{h,cpp}` — the `polhemus://` stream as Qt signals.
-- `src/libraries/acq/devices/polhemus/` — the `polhemus://` source (FASTRAK records, serial port, simulator), the `AcquiredPoints` store and `PolhemusCoregistration`.
-- `src/libraries/mne/mne_icp.{h,cpp}` — ICP refinement entry point (`mne::performIcp`).
+- `src/libs/mne/acq/devices/polhemus/` — the `polhemus://` source (FASTRAK records, serial port, simulator), the `AcquiredPoints` store and `PolhemusCoregistration`.
+- `src/libs/mne/mne/mne_icp.{h,cpp}` — ICP refinement entry point (`mne::performIcp`).
 
 ## Related manual pages
 

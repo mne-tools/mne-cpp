@@ -10,8 +10,8 @@
  * @brief    Tests for MaxwellMovementComp class.
  */
 
-#include <base/byte_stream.h>
-#include <dsp/maxwell_movement_comp.h>
+#include <mne/base/byte_stream.h>
+#include <mne/dsp/maxwell_movement_comp.h>
 
 #include <QtTest>
 #include <QObject>

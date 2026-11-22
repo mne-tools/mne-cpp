@@ -170,6 +170,7 @@ class TestQualityPage(unittest.TestCase):
                          gates["Library branch coverage"][1])
 
         libraries = _table(page, "| Library |")
+        # The v2.4.0 baseline predates src/libs/mne and keys its libraries by src/libraries/
         expected = {key.split("/")[2] for key in coverage["components"] if key.startswith("src/libraries/")}
         self.assertEqual(expected, set(libraries))
         for lib, cells in libraries.items():

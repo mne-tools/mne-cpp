@@ -21,7 +21,7 @@
 
 #include "scmeas_global.h"
 #include "measurement.h"
-#include <inv/hpi/inv_hpi_fit.h>
+#include <mne/inv/hpi/inv_hpi_fit.h>
 
 //=============================================================================================================
 // QT INCLUDES

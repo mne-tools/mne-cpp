@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <base/process.h>
-#include <base/string_utils.h>
+#include <mne/base/log.h>
+#include <mne/base/process.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

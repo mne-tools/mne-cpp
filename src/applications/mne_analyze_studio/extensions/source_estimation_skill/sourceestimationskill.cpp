@@ -25,12 +25,12 @@
 
 #include <workflowgraph.h>
 
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/base/string_utils.h>
 
 #include <Eigen/Core>
 

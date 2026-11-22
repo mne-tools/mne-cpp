@@ -12,7 +12,7 @@
 
 #include "httprequest.h"
 
-#include <base/process.h>
+#include <mne/base/process.h>
 
 #include <QDir>
 #include <QEventLoop>

@@ -16,9 +16,9 @@
 
 #include "acq_view.h"
 
-#include <acq/acq_eigen.h>
-#include <acq/fiff/acq_fiff.h>
-#include <disp/viewers/channeldataview.h>
+#include <mne/acq/acq_eigen.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/disp/viewers/channeldataview.h>
 
 //=============================================================================================================
 // QT INCLUDES

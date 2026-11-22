@@ -15,19 +15,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "controlmanager.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 
-#include <disp/viewers/scalingview.h>
-#include <disp/viewers/applytoview.h>
-#include <disp/viewers/control3dview.h>
-#include <disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/applytoview.h>
+#include <mne/disp/viewers/control3dview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
 
 #ifdef MNE_DISP3D
-#include <disp3D/model/braintreemodel.h>
+#include <mne/disp3D/model/braintreemodel.h>
 #endif
 
 //=============================================================================================================

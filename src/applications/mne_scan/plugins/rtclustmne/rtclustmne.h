@@ -21,9 +21,9 @@
 
 #include "rtclustmne_global.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
-#include <fiff/fiff_evoked.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/base/circular_buffer.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

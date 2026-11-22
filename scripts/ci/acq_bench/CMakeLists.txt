@@ -16,6 +16,11 @@ set(BUILD_SHARED_LIBS OFF)
 
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
-add_subdirectory("${ACQ_ROOT}/src/libraries/acq" acq)
+# Commits before the move to src/libs/mne compare against this one
+if(EXISTS "${ACQ_ROOT}/src/libs/mne/acq")
+  add_subdirectory("${ACQ_ROOT}/src/libs/mne/acq" acq)
+else()
+  add_subdirectory("${ACQ_ROOT}/src/libraries/acq" acq)
+endif()
 add_executable(mne_acq_bench "${ACQ_ROOT}/src/tools/acquisition/mne_acq_bench/main.cpp")
 target_link_libraries(mne_acq_bench PRIVATE Qt6::Core mne_acq)

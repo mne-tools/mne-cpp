@@ -15,15 +15,15 @@
 #include <QTemporaryDir>
 #include <QDataStream>
 
-#include <fs/fs_surface.h>
-#include <base/log.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotation.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_label.h>
-#include <fs/fs_colortable.h>
-#include <mne/mne_source_space.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_colortable.h>
+#include <mne/mne/mne_source_space.h>
 
 #include <memory>
 

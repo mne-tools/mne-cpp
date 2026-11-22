@@ -30,17 +30,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_source_space.h>
-#include <base/log.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_surface.h>
-#include <mne/mne_patch_info.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_morph_map.h>
-#include <fs/fs_surface.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_constants.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_surface.h>
+#include <mne/mne/mne_patch_info.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_morph_map.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

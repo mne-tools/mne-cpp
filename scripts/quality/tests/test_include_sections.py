@@ -90,12 +90,12 @@ class TestIncludeSections(unittest.TestCase):
     def test_duplicates_go_and_local_headers_come_before_library_headers(self):
         text = (
             banner("INCLUDES")
-            + '\n#include "foo.h"\n#include <base/log.h>\n#include "bar.h"\n#include <base/log.h>\n#include <vector>\n'
+            + '\n#include "foo.h"\n#include <mne/base/log.h>\n#include "bar.h"\n#include <mne/base/log.h>\n#include <vector>\n'
         )
         self.assertEqual(
             include_sections.fix(text, "foo.h"),
             banner("INCLUDES")
-            + '\n#include "foo.h"\n\n#include "bar.h"\n#include <base/log.h>\n\n'
+            + '\n#include "foo.h"\n\n#include "bar.h"\n#include <mne/base/log.h>\n\n'
             + banner("STL INCLUDES")
             + "\n#include <vector>\n",
         )

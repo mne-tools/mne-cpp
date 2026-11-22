@@ -17,9 +17,9 @@
 //=============================================================================================================
 
 #include <math.h>
-#include <base/log.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
 
 //=============================================================================================================
 // QT INCLUDES

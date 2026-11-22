@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <fiff/fiff_constants.h>
-#include <fs/fs_surface.h>
-#include <base/log.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

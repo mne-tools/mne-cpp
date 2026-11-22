@@ -16,10 +16,10 @@
 
 #include "../../tools/forward/mne_surf2bem/surfacechecks.h"
 
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_stream.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES

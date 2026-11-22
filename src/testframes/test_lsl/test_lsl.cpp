@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/base_global.h>
-#include <lsl/lsl.h>
-#include <lsl/lsl_protocol.h>
+#include <mne/base/base_global.h>
+#include <mne/lsl/lsl.h>
+#include <mne/lsl/lsl_protocol.h>
 
 //=============================================================================================================
 // QT INCLUDES

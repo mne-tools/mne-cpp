@@ -7,20 +7,20 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <fwd/fwd_eeg_sphere_layer.h>
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/fwd_coil.h>
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_bem_model.h>
-#include <fwd/fwd_bem_solution.h>
-#include <fwd/fwd_comp_data.h>
-#include <fwd/fwd_thread_arg.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/fwd_eeg_sphere_layer.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_eeg_sphere_model_set.h>
+#include <mne/fwd/fwd_coil.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_bem_solution.h>
+#include <mne/fwd/fwd_comp_data.h>
+#include <mne/fwd/fwd_thread_arg.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
 
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
 
 using namespace mne;
 using namespace Eigen;

@@ -18,7 +18,7 @@
 
 #include "eventmanager.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // USED NAMESPACES

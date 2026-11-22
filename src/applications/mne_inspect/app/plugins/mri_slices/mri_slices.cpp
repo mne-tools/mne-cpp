@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mri_slices.h"
 
-#include <disp3D/scene/multimodalscene.h>
-#include <mri/mri_slicer.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/mri/mri_slicer.h>
 
 //=============================================================================================================
 // QT INCLUDES

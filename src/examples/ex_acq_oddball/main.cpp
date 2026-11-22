@@ -28,10 +28,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq.h>
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/lineplot.h>
-#include <dsp/firfilter.h>
+#include <mne/acq/acq.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/lineplot.h>
+#include <mne/dsp/firfilter.h>
 
 //=============================================================================================================
 // QT INCLUDES

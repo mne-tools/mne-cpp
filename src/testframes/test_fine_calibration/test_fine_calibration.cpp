@@ -10,8 +10,8 @@
  * @brief    Tests for FineCalibration class.
  */
 
-#include <base/byte_stream.h>
-#include <dsp/fine_calibration.h>
+#include <mne/base/byte_stream.h>
+#include <mne/dsp/fine_calibration.h>
 
 #include <QtTest>
 #include <QObject>

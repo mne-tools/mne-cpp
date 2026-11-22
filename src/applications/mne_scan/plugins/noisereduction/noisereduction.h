@@ -20,9 +20,9 @@
 //=============================================================================================================
 
 #include "noisereduction_global.h"
-#include <base/circular_buffer.h>
-#include <fiff/fiff_proj.h>
-#include <dsp/filterkernel.h>
+#include <mne/base/circular_buffer.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/dsp/filterkernel.h>
 #include <scShared/Plugins/abstractalgorithm.h>
 
 //=============================================================================================================

@@ -21,9 +21,9 @@
 
 #include "fiffsimulator_global.h"
 #include <rtserver_connector/iconnector.h>
-#include <acq/acq_device.h>
-#include <acq/acq_reader.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/acq_reader.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

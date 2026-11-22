@@ -26,15 +26,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fwd/fwd_field_map.h>
-#include <base/string_utils.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fwd/fwd_coil_set.h>
-#include <mne/mne_bem.h>
+#include <mne/base/log.h>
+#include <mne/fwd/fwd_field_map.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/mne/mne_bem.h>
 
 //=============================================================================================================
 // QT INCLUDES

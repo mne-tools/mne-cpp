@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

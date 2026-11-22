@@ -8,9 +8,9 @@
 #include <cmath>
 #include <complex>
 
-#include <dsp/filterkernel.h>
-#include <dsp/parksmcclellan.h>
-#include <dsp/cosinefilter.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/parksmcclellan.h>
+#include <mne/dsp/cosinefilter.h>
 #include <numbers>
 
 using namespace mne;

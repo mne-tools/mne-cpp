@@ -1,0 +1,140 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2017-2026 MNE-CPP Authors
+ *
+ * @file     compute_fwd_settings.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Johannes Vorwerk <johannes.vorwerk@umit.at>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     February 2017
+ * @brief    Parameter object holding the CLI/script-level configuration consumed by ComputeFwd.
+ *
+ * ComputeFwdSettings is the in-memory image of the command-line
+ * arguments accepted by @c mne_forward_solution — paths to the
+ * source-space, BEM or sphere model, measurement FIFF, MRI/head
+ * transform and coil-definition files; sensor selection (MEG-only,
+ * EEG-only, both); coil-integration accuracy (point / normal /
+ * accurate); whether to include the magnetic-dipole approximation; and
+ * the destination file for the resulting forward solution. Centralising
+ * these fields keeps ComputeFwd's constructor signature short and lets
+ * GUI front-ends (@c mne_forward_gui) and batch scripts share the same
+ * validation logic via @ref mne::ComputeFwdSettings::checkIntegrity "checkIntegrity".
+ */
+
+#ifndef COMPUTE_FWD_SETTINGS_H
+#define COMPUTE_FWD_SETTINGS_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../fwd_global.h"
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <filesystem>
+#include <memory>
+#include <vector>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * Holds the full parameter set for a single forward-solution computation.
+ *
+ * @brief Settings struct — source-space / BEM / sphere paths, sensor selection, coordinate transforms and accuracy level consumed by ComputeFwd.
+ */
+class FWDSHARED_EXPORT ComputeFwdSettings
+{
+public:
+    //=========================================================================================================
+    /**
+     * Default Constructor
+     */
+    explicit ComputeFwdSettings();
+
+    //=========================================================================================================
+    /**
+     * Destructs the Compute Forward Settings
+     */
+    virtual ~ComputeFwdSettings();
+
+    //=========================================================================================================
+    /**
+     * Check whether Compute Forward Settings are correctly set.
+     *
+     * @return true if all required settings are present; otherwise the missing one is reported.
+     */
+    bool checkIntegrity() const;
+
+public:
+    std::string srcname;        /**< Source space. */
+    std::string measname;       /**< Measurement file. */
+    std::string mriname;        /**< MRI file for head <-> MRI transformation. */
+    std::string transname;      /**< head2mri transformation file. */
+    bool mri_head_ident;        /**< Are the head and MRI coordinates the same? */
+    std::string bemname;        /**< BEM model file. */
+    std::string solname;        /**< Solution file. */
+    std::string mindistoutname; /**< Output file for omitted source space points. */
+    bool filter_spaces;         /**< Filter the source space points. */
+    Eigen::Vector3f r0;         /**< Sphere model origin . */
+    bool accurate;              /**< Use accurate calculations. */
+    bool fixed_ori;             /**< Fixed-orientation dipoles? */
+    bool include_meg;
+    bool include_eeg;
+    bool compute_grad;
+    std::string command; /**< Saves the recognized command line for future use. */
+    float mindist;       /**< Minimum allowed distance of the sources from the inner skull surface. */
+    int coord_frame;     /**< Can be changed with the --mricoord option. */
+    bool do_all;
+    std::vector<std::filesystem::path> labels; /**< Compute the solution only for these labels. */
+    int nlabel;
+    int ncluster; /**< Number of sources desired in clustered solution. */
+
+    std::string eeg_model_file; /**< File of EEG sphere model specifications. */
+    std::string eeg_model_name; /**< Name of the EEG model to use. */
+    float eeg_sphere_rad;       /**< Scalp radius to use in EEG sphere model. */
+    bool scale_eeg_pos;         /**< Scale the electrode locations to scalp in the sphere model. */
+    bool use_equiv_eeg;         /**< Use the equivalent source approach for the EEG sphere model. */
+    bool use_threads;           /**< Parallelize? */
+
+    std::shared_ptr<mne::FiffInfo> pFiffInfo; /**< The FiffInfo file from the measurement.*/
+    mne::FiffCoordTrans meg_head_t;           /**< The meg <-> head transformation.*/
+
+private:
+    void initMembers();
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} //NAMESPACE
+
+#endif // COMPUTE_FWD_SETTINGS_H

@@ -21,7 +21,7 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

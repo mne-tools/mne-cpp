@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_device.h>
-#include <acq/acq_device_registry.h>
-#include <acq/detail/acq_control_queue.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/detail/acq_control_queue.h>
 
 //=============================================================================================================
 // QT INCLUDES

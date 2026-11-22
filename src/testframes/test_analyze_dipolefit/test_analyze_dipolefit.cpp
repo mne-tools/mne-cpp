@@ -24,9 +24,9 @@
 #include <anShared/Management/event.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-#include <inv/dipole_fit/inv_dipole_fit.h>
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

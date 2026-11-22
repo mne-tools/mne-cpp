@@ -9,7 +9,7 @@
 #
 #
 # @brief    Generate the BrainFlow board layouts that streaming_board:// knows without BrainFlow.
-"""Generate ``src/libraries/acq/devices/brainflow/brainflow_boards.inc``.
+"""Generate ``src/libs/mne/acq/devices/brainflow/brainflow_boards.inc``.
 
 The receiver of BrainFlow's multicast streamer needs the row layout of the board behind the stream. With BrainFlow
 installed it asks BrainFlow; the boards listed here it knows without. Run with BrainFlow installed
@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 
 BOARDS = (-1, 0, 1, 2)  # synthetic, Cyton, Ganglion, Cyton + Daisy
-OUTPUT = Path(__file__).resolve().parents[2] / "src/libraries/acq/devices/brainflow/brainflow_boards.inc"
+OUTPUT = Path(__file__).resolve().parents[2] / "src/libs/mne/acq/devices/brainflow/brainflow_boards.inc"
 
 
 def generate():

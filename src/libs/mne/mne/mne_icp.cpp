@@ -1,0 +1,280 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2020-2026 MNE-CPP Authors
+ *
+ * @file     mne_icp.cpp
+ * @author   Ruben Doerfel <doerfelruben@aol.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     July 2020
+ * @brief    Implementation of the ICP rigid alignment in @ref mne::performIcp and @ref mne::fitMatchedPoints.
+ *
+ * Implements the per-iteration nearest-triangle search, the Horn / SVD
+ * rigid solve, the convergence criterion (mean / max residual) and the
+ * fall-back to point-to-vertex matching when projection fails.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_icp.h"
+
+#include "mne/fiff/fiff_coord_trans.h"
+#include "mne_project_to_surface.h"
+#include <mne/base/log.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <iostream>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace mne;
+using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+bool mne::performIcp(const std::shared_ptr<MNEProjectToSurface>& mneSurfacePoints,
+                     const Eigen::MatrixXf& matPointCloud,
+                     FiffCoordTrans& transFromTo,
+                     float& fRMSE,
+                     bool bScale,
+                     int iMaxIter,
+                     float fTol,
+                     const VectorXf& vecWeights)
+/**
+ * Follow notation of P.J. Besl and N.D. McKay, A Method for
+ * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
+ * 239 - 255, 1992.
+ */
+{
+    if (matPointCloud.rows() == 0) {
+        mne::Log::warning("[mne::icp] Passed point cloud is empty.");
+        return false;
+    }
+
+    // Initialization
+    int iNP = matPointCloud.rows(); // The number of points
+    float fMSEPrev = 0.0f;
+    float fMSE = 0.0f; // The mean square error
+    float fScale = 1.0f;
+    MatrixXf matP0 = matPointCloud;             // Initial Set of points
+    MatrixXf matPk = matP0;                     // Transformed Set of points
+    MatrixXf matYk(matPk.rows(), matPk.cols()); // Iterative closest points on the surface
+    MatrixXf matDiff = matYk;
+    VectorXf vecSE(matDiff.rows());
+    Matrix4f matTrans;   // the transformation matrix
+    VectorXi vecNearest; // Triangle of the new point
+    VectorXf vecDist;    // The Distance between matX and matP
+
+    // Initial transformation - From point cloud To surface
+    FiffCoordTrans transICP = transFromTo;
+    matPk = transICP.apply_trans(matPk);
+
+    // Icp algorithm:
+    for (int iIter = 0; iIter < iMaxIter; ++iIter) {
+        // Step a: compute the closest point on the surface; eq 29
+        if (!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
+            mne::Log::warning("[mne::icp] find_closest_on_surface was not successful.");
+            return false;
+        }
+
+        // Step b: compute the registration; eq 30
+        if (!fitMatchedPoints(matP0, matYk, matTrans, fScale, bScale, vecWeights)) {
+            mne::Log::warning("[mne::icp] point cloud registration not successful");
+        }
+
+        // Step c: apply registration
+        transICP.trans = matTrans;
+        matPk = transICP.apply_trans(matP0);
+
+        // step d: compute mean-square-error and terminate if below fTol
+        vecDist = vecDist.cwiseProduct(vecDist);
+        fMSE = vecDist.sum() / iNP;
+        fRMSE = std::sqrt(fMSE);
+
+        if (std::sqrt(std::fabs(fMSE - fMSEPrev)) < fTol) {
+            transFromTo = transICP;
+            mne::Log::info("[mne::icp] ICP was successful and converged after {} iterations with RMSE dist: {} mm.", iIter + 1, fRMSE * 1000);
+            return true;
+        }
+        fMSEPrev = fMSE;
+        mne::Log::info("[mne::icp] ICP iteration {} with RMSE: {} mm.", iIter + 1, fRMSE * 1000);
+    }
+    transFromTo = transICP;
+
+    mne::Log::warning("[mne::icp] Maximum number of {} iterations exceeded with RMSE: {} mm.", iMaxIter, fRMSE * 1000);
+    return true;
+}
+
+//=============================================================================================================
+
+bool mne::fitMatchedPoints(const MatrixXf& matSrcPoint,
+                           const MatrixXf& matDstPoint,
+                           Eigen::Matrix4f& matTrans,
+                           float fScale,
+                           bool bScale,
+                           const VectorXf& vecWeights)
+/**
+ * Follow notation of P.J. Besl and N.D. McKay, A Method for
+ * Registration of 3-D Shapes, IEEE Trans. Patt. Anal. Machine Intell., 14,
+ * 239 - 255, 1992.
+ *
+ * The code is further adapted from MNE Python function _fitMatched_points(...).
+ */
+{
+    // init values
+    MatrixXf matP = matSrcPoint;
+    MatrixXf matX = matDstPoint;
+    VectorXf vecW = vecWeights;
+    VectorXf vecMuP; // column wise mean - center of mass
+    VectorXf vecMuX; // column wise mean - center of mass
+    MatrixXf matDot;
+    MatrixXf matSigmaPX; // cross-covariance
+    MatrixXf matAij;     // Anti-Symmetric matrix
+    Vector3f vecDelta;   // column vector, elements of matAij
+    Matrix4f matQ = Matrix4f::Identity(4, 4);
+    Matrix3f matScale = Matrix3f::Identity(3, 3); // scaling matrix
+    Matrix3f matRot = Matrix3f::Identity(3, 3);
+    Vector3f vecTrans;
+    float fTrace = 0.0;
+    fScale = 1.0;
+
+    // test size of point clouds
+    if (matSrcPoint.size() != matDstPoint.size()) {
+        mne::Log::warning("[mne::fitMatchedPoints] Point clouds do not match.");
+        return false;
+    }
+
+    // get center of mass
+    if (vecWeights.isZero()) {
+        vecMuP = matP.colwise().mean(); // eq 23
+        vecMuX = matX.colwise().mean();
+        matDot = matP.transpose() * matX;
+        matDot = matDot / matP.rows();
+    } else {
+        vecW = vecWeights / vecWeights.sum();
+        vecMuP = vecW.transpose() * matP;
+        vecMuX = vecW.transpose() * matX;
+
+        MatrixXf matXWeighted = matX;
+        for (int i = 0; i < (vecW.size()); ++i) {
+            matXWeighted.row(i) = matXWeighted.row(i) * vecW(i);
+        }
+        matDot = matP.transpose() * (matXWeighted);
+    }
+
+    // get cross-covariance
+    matSigmaPX = matDot - (vecMuP * vecMuX.transpose()); // eq 24
+    matAij = matSigmaPX - matSigmaPX.transpose();
+    vecDelta(0) = matAij(1, 2);
+    vecDelta(1) = matAij(2, 0);
+    vecDelta(2) = matAij(0, 1);
+    fTrace = matSigmaPX.trace();
+    matQ(0, 0) = fTrace; // eq 25
+    matQ.block(0, 1, 1, 3) = vecDelta.transpose();
+    matQ.block(1, 0, 3, 1) = vecDelta;
+    matQ.block(1, 1, 3, 3) = matSigmaPX + matSigmaPX.transpose() - fTrace * MatrixXf::Identity(3, 3);
+
+    // unit eigenvector coresponding to maximum eigenvalue of matQ is selected as optimal rotation quaterions q0,q1,q2,q3
+    SelfAdjointEigenSolver<MatrixXf> es(matQ);
+    Vector4f vecEigVec = es.eigenvectors().col(matQ.cols() - 1); // only take last Eigen-Vector since this corresponds to the maximum Eigenvalue
+
+    // quatRot(w,x,y,z)
+    Quaternionf quatRot(vecEigVec(0), vecEigVec(1), vecEigVec(2), vecEigVec(3));
+    quatRot.normalize();
+    matRot = quatRot.matrix();
+
+    // get scaling factor and matrix
+    if (bScale) {
+        MatrixXf matDevX = matX.rowwise() - vecMuX.transpose();
+        MatrixXf matDevP = matP.rowwise() - vecMuP.transpose();
+        matDevX = matDevX.cwiseProduct(matDevX);
+        matDevP = matDevP.cwiseProduct(matDevP);
+
+        if (!vecWeights.isZero()) {
+            for (int i = 0; i < (vecW.size()); ++i) {
+                matDevX.row(i) = matDevX.row(i) * vecW(i);
+                matDevP.row(i) = matDevP.row(i) * vecW(i);
+            }
+        }
+        // get scaling factor and set scaling matrix
+        fScale = std::sqrt(matDevX.sum() / matDevP.sum());
+        matScale *= fScale;
+    }
+
+    // get translation and Rotation
+    vecTrans = vecMuX - fScale * matRot * vecMuP;
+    matRot *= matScale;
+
+    matTrans.block<3, 3>(0, 0) = matRot;
+    matTrans.block<3, 1>(0, 3) = vecTrans;
+    matTrans(3, 3) = 1.0f;
+    matTrans.block<1, 3>(3, 0) = MatrixXf::Zero(1, 3);
+    return true;
+}
+
+//=========================================================================================================
+
+bool mne::discard3DPointOutliers(const std::shared_ptr<mne::MNEProjectToSurface>& mneSurfacePoints,
+                                 const MatrixXf& matPointCloud,
+                                 const FiffCoordTrans& transFromTo,
+                                 VectorXi& vecTake,
+                                 MatrixXf& matTakePoint,
+                                 float fMaxDist)
+{
+    // Initialization
+    int iNP = matPointCloud.rows();                             // The number of points
+    MatrixXf matP = matPointCloud;                              // Initial Set of points
+    MatrixXf matYk(matPointCloud.rows(), matPointCloud.cols()); // Iterative losest points on the surface
+    VectorXi vecNearest;                                        // Triangle of the new point
+    VectorXf vecDist;                                           // The Distance between matX and matP
+
+    // Initial transformation - From point cloud To surface
+    matP = transFromTo.apply_trans(matP);
+
+    int iDiscarded = 0;
+
+    // discard outliers if necessary
+    if (fMaxDist > 0.0) {
+        if (!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
+            mne::Log::warning("[mne::icp] find_closest_on_surface was not successful.");
+            return false;
+        }
+
+        for (int i = 0; i < vecDist.size(); ++i) {
+            if (std::fabs(vecDist(i)) < fMaxDist) {
+                vecTake.conservativeResize(vecTake.size() + 1);
+                vecTake(vecTake.size() - 1) = i;
+                matTakePoint.conservativeResize(matTakePoint.rows() + 1, 3);
+                matTakePoint.row(matTakePoint.rows() - 1) = matPointCloud.row(i);
+            } else {
+                iDiscarded++;
+            }
+        }
+    }
+    mne::Log::info("[mne::discardOutliers] {} digitizers discarded.", iDiscarded);
+    return true;
+}
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================

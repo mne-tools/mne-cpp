@@ -74,10 +74,10 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_io.h>
-#include <mne/mne.h>
-#include <dsp/parksmcclellan.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/mne/mne.h>
+#include <mne/dsp/parksmcclellan.h>
 
 
 //*************************************************************************************************************

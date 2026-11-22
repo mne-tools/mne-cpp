@@ -16,10 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/string_utils.h>
-#include <channels/layoutloader.h>
-#include <channels/layoutmaker.h>
-#include <fiff/fiff.h>
+#include <mne/base/string_utils.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/channels/layoutmaker.h>
+#include <mne/fiff/fiff.h>
 
 //=============================================================================================================
 // STL INCLUDES

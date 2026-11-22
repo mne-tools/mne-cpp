@@ -31,8 +31,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq.h>
-#include <disp/plots/helpers/figureexporter.h>
+#include <mne/acq/acq.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES

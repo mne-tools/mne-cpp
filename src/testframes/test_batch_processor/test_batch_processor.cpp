@@ -16,11 +16,11 @@
 
 #include "../../tools/preprocessing/mne_process_raw/batchprocessor.h"
 
-#include <mne/mne_process_description.h>
+#include <mne/mne/mne_process_description.h>
 
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

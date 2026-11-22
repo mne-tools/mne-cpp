@@ -21,11 +21,11 @@ PROJECT_BRIEF          = "MEG/EEG real-time analysis library (C++17 / Qt)"
 # ---------------------------------------------------------------------------
 # Input
 # ---------------------------------------------------------------------------
-INPUT                  = ../src/libraries
+INPUT                  = ../src/libs/mne
 RECURSIVE              = YES
 FILE_PATTERNS          = *.h *.hpp
 EXCLUDE_PATTERNS       = */internal/* */detail/* */moc_* */ui_*
-STRIP_FROM_PATH        = ../src/libraries/
+STRIP_FROM_PATH        = ../src/libs/mne/
 # Every example is main.cpp, so @snippet names <example dir>/main.cpp; a bare
 # basename is ambiguous. Regions are marked //! [<class>_<action>].
 EXAMPLE_PATH           = ../src/examples

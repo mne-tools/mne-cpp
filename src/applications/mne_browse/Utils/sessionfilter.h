@@ -18,9 +18,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
-#include <dsp/filterkernel.h>
-#include <dsp/iirfilter.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/iirfilter.h>
 
 //=============================================================================================================
 // QT INCLUDES

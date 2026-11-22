@@ -21,14 +21,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/dipole_fit/inv_dipole_fit.h>
-#include <inv/dipole_fit/inv_dipole_fit_data.h>
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_dipole_forward.h>
-#include <inv/dipole_fit/inv_ecd.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/dipole_fit/inv_guess_data.h>
-#include <fiff/fiff_evoked_set.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_dipole_forward.h>
+#include <mne/inv/dipole_fit/inv_ecd.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_guess_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

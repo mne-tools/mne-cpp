@@ -24,7 +24,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <com/tcp_server.h>
+#include <mne/com/tcp_server.h>
 #include <core/llmtoolplanner.h>
 #include <core/jsonrpcmessage.h>
 #include <core/fiffbuffer.h>

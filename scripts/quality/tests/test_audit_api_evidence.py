@@ -38,13 +38,13 @@ class FixtureTree:
     """A minimal repository with one library, one example, and one test."""
 
     def __init__(self, root: Path) -> None:
-        _write(root, "src/libraries/fiff/fiff_reader.h",
+        _write(root, "src/libs/mne/fiff/fiff_reader.h",
                "class FIFFSHARED_EXPORT FiffReader : public QObject\n{\n};\n"
                "struct FIFFSHARED_EXPORT FiffRecord\n{\n};\n"               "class FIFFSHARED_EXPORT FiffWorker\n{\n};\n"               "FIFFSHARED_EXPORT int countTags(const QString& path);\n")
-        _write(root, "src/libraries/fiff/fiff_utils.h", "namespace mne { int helper(); }\n")
-        _write(root, "src/libraries/disp/viewers/rawview.h", "class DISPSHARED_EXPORT RawView\n{\n};\n")
+        _write(root, "src/libs/mne/fiff/fiff_utils.h", "namespace mne { int helper(); }\n")
+        _write(root, "src/libs/mne/disp/viewers/rawview.h", "class DISPSHARED_EXPORT RawView\n{\n};\n")
         _write(root, "src/examples/CMakeLists.txt", "add_subdirectory(ex_read)\n")
-        _write(root, "src/examples/ex_read/main.cpp", "#include <fiff/fiff_reader.h>\n")
+        _write(root, "src/examples/ex_read/main.cpp", "#include <mne/fiff/fiff_reader.h>\n")
         _write(root, "src/examples/ex_orphan/main.cpp", "int main() {}\n")
         _write(root, "src/testframes/test_reader/CMakeLists.txt", "")
         registry = {
@@ -71,7 +71,7 @@ class AuditTests(unittest.TestCase):
             return audit.build_report(root)
 
     def test_exports_and_free_functions_are_found(self) -> None:
-        classes, functions = audit.exported_symbols(Path(__file__).resolve().parents[3] / "src" / "libraries")
+        classes, functions = audit.exported_symbols(Path(__file__).resolve().parents[3] / "src" / "libs" / "mne")
         self.assertTrue(any(c["name"] == "FiffStream" for c in classes))
         self.assertTrue(any(f["name"] == "apply_inverse_raw" for f in functions))
 

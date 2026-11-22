@@ -16,8 +16,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <inv/hpi/inv_hpi_model_parameters.h>
+#include <mne/base/log.h>
+#include <mne/inv/hpi/inv_hpi_model_parameters.h>
 
 //=============================================================================================================
 // QT INCLUDES

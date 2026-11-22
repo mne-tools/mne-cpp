@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/workers/rtsensordataworker.h>
-#include <disp3D/workers/rtsensordatacontroller.h>
+#include <mne/disp3D/workers/rtsensordataworker.h>
+#include <mne/disp3D/workers/rtsensordatacontroller.h>
 
 //=============================================================================================================
 // QT INCLUDES

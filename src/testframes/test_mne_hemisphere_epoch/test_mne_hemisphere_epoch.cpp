@@ -8,30 +8,30 @@
 #include <Eigen/SparseCore>
 #include <cmath>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_forward_solution.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <mne/mne_epoch_data.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_named_matrix.h>
-#include <mne/mne_cov_matrix.h>
-#include <mne/mne_proj_op.h>
-#include <mne/mne_ctf_comp_data.h>
-#include <mne/mne_inverse_operator.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/mne/mne_epoch_data.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/mne/mne_named_matrix.h>
+#include <mne/mne/mne_cov_matrix.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/mne/mne_ctf_comp_data.h>
+#include <mne/mne/mne_inverse_operator.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 using namespace mne;
 using namespace Eigen;

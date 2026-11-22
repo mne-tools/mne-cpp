@@ -17,8 +17,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <pybridge/python_runner.h>
-#include <pybridge/python_test_helper.h>
+#include <mne/pybridge/python_runner.h>
+#include <mne/pybridge/python_test_helper.h>
 
 //=============================================================================================================
 // QT INCLUDES

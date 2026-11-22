@@ -19,12 +19,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffanonymizer.h"
 
-#include <base/base_global.h>
+#include <mne/base/base_global.h>
 
-#include <fiff/fiff_dir_entry.h>
+#include <mne/fiff/fiff_dir_entry.h>
 
 //=============================================================================================================
 // QT INCLUDES

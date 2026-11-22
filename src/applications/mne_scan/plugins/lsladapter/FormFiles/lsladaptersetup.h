@@ -22,7 +22,7 @@
 
 #include "ui_lsladaptersetup.h"
 
-#include <lsl/lsl.h>
+#include <mne/lsl/lsl.h>
 
 //=============================================================================================================
 // QT INCLUDES

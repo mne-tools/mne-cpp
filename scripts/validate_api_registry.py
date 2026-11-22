@@ -8,7 +8,7 @@ Validator for doc/api_registry.json.
 
 Enforces the following invariants:
 1. JSON is well-formed.
-2. Every 'header' path exists under 'src/libraries/' (relative).
+2. Every 'header' path exists under 'src/libs/mne/' (relative).
 3. Every 'test' (when not null) corresponds to a directory under 'src/testframes/'.
 4. No entry carries the retired Skigen port fields (skigen_candidate, skigen_target).
 5. Example evidence: example targets, snippets, modes, data,
@@ -69,7 +69,7 @@ def validate_headers(repo_root: Path, registry: Dict[str, Any]) -> Tuple[bool, L
         if "header" not in cls:
             continue
         header_rel = cls["header"]
-        header_full = repo_root / "src" / "libraries" / header_rel
+        header_full = repo_root / "src" / "libs" / "mne" / header_rel
         if not header_full.exists():
             missing.append(f"{header_rel} (class: {cls.get('name', 'UNNAMED')})")
     return (len(missing) == 0, missing)
@@ -289,7 +289,7 @@ def example_markers(examples_dir: Path) -> Tuple[Dict[str, Counter], List[str]]:
 
 
 def header_snippets(libraries_dir: Path) -> Dict[str, Set[str]]:
-    """Header (relative to src/libraries) -> '<path>#<region>' @snippet references."""
+    """Header (relative to src/libs/mne) -> '<path>#<region>' @snippet references."""
     refs: Dict[str, Set[str]] = {}
     for header in sorted(libraries_dir.rglob("*.h")):
         found = _SNIPPET_RE.findall(header.read_text(encoding="utf-8", errors="replace"))
@@ -335,7 +335,7 @@ def validate_examples(repo_root: Path, registry: Dict[str, Any],
     """
     examples_dir = repo_root / "src" / "examples"
     markers, issues = example_markers(examples_dir)
-    snippets_in_headers = header_snippets(repo_root / "src" / "libraries")
+    snippets_in_headers = header_snippets(repo_root / "src" / "libs" / "mne")
     targets = example_targets(examples_dir)
     shots = {shot.get("id") for shot in manifest.get("shots", [])}
     debt = policy.get("example_debt", {}).get("names", [])
@@ -456,7 +456,7 @@ def main() -> int:
     else:
         print("  OK")
 
-    print("[2/7] Header paths under src/libraries/...")
+    print("[2/7] Header paths under src/libs/mne/...")
     ok, missing = validate_headers(repo_root, registry)
     if not ok:
         all_passed = False

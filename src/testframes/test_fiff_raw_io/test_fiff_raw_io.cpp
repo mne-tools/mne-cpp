@@ -21,28 +21,28 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_info_base.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_ctf_comp.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_dir_entry.h>
-#include <fiff/fiff_id.h>
-#include <fiff/fiff_sparse_matrix.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_info_base.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_dir_entry.h>
+#include <mne/fiff/fiff_id.h>
+#include <mne/fiff/fiff_sparse_matrix.h>
 
 using namespace mne;
 using namespace Eigen;

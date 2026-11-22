@@ -1,0 +1,104 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     bad_channels_maxwell.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.2.1
+ * @date     May 2026
+ * @brief    Bad channel detection via SSS reconstruction residuals.
+ *
+ * Channels whose SSS reconstruction error is anomalously high are flagged
+ * as bad. This mirrors MNE-Python's mne.preprocessing.find_bad_channels_maxwell().
+ *
+ * Reference:
+ *   Taulu, S., Kajola, M. (2005). J. Appl. Phys. 97, 124905.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
+ */
+
+#ifndef BAD_CHANNELS_MAXWELL_H
+#define BAD_CHANNELS_MAXWELL_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "dsp_global.h"
+
+#include <mne/fiff/fiff_info.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+/**
+ * @brief Parameters for SSS-based bad channel detection.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
+ */
+struct DSPSHARED_EXPORT BadChannelsMaxwellParams
+{
+    int iOrderIn = 8;                       /**< Internal SSS order. */
+    int iOrderOut = 3;                      /**< External SSS order. */
+    Eigen::Vector3d origin{0.0, 0.0, 0.04}; /**< Expansion origin (metres, head frame). */
+    double dZThreshold = 4.0;               /**< Z-score threshold for flagging bad channels. */
+    int iBlockSize = 0;                     /**< Block size for averaging (0 = use all data). */
+    double dMinRatio = 1e-4;                /**< Minimum relative residual to consider (skip near-zero). */
+};
+
+//=============================================================================================================
+/**
+ * @brief Result of SSS-based bad channel detection.
+ *
+ * @snippet ex_dsp_maxwell/main.cpp bad_channels_maxwell_usage
+ */
+struct DSPSHARED_EXPORT BadChannelsMaxwellResult
+{
+    mne::StringList badChannels; /**< Names of detected bad channels. */
+    std::vector<int> badIndices; /**< Indices in the MEG channel list. */
+    Eigen::VectorXd residuals;   /**< Per-channel reconstruction residuals. */
+    Eigen::VectorXd zScores;     /**< Per-channel z-scores of residuals. */
+};
+
+//=============================================================================================================
+/**
+ * @brief Detect bad MEG channels using SSS reconstruction residuals.
+ *
+ * Computes the SSS reconstruction of the data, then flags channels whose
+ * residual (difference between original and reconstructed) is anomalously
+ * large relative to the population of channels.
+ *
+ * @param[in] matData   MEG data (n_channels x n_times). Should include all
+ *                      channels (MEG and non-MEG).
+ * @param[in] info      Measurement info with channel positions.
+ * @param[in] params    Detection parameters.
+ *
+ * @return Detection result with bad channel names, indices, residuals, z-scores.
+ */
+DSPSHARED_EXPORT BadChannelsMaxwellResult findBadChannelsMaxwell(
+    const Eigen::MatrixXd& matData,
+    const mne::FiffInfo& info,
+    const BadChannelsMaxwellParams& params = BadChannelsMaxwellParams());
+
+} // namespace mne
+
+#endif // BAD_CHANNELS_MAXWELL_H

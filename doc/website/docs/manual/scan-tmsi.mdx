@@ -29,8 +29,8 @@ The ExG inputs are named and placed after the electrodes of the cap layout chose
 The same source is available to every program that links `mne_acq_devices`:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::registerTmsiScheme();
 auto device = mne::AcqDevice::open("tmsi://?simulate=1&exg=32&rate=1024");

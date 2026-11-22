@@ -16,7 +16,7 @@
 //=============================================================================================================
 
 #include <stdio.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "Windows/mainwindow.h"
 #include "Utils/info.h"
 

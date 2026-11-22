@@ -1,0 +1,170 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     inv_dipole_fit_settings.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Command-line and programmatic settings struct for the @c mne_dipole_fit driver.
+ *
+ * @ref mne::InvDipoleFitSettings collects every option that the
+ * classic @c mne_dipole_fit command-line tool accepts — BEM file, sphere
+ * origin, EEG model, guess-grid parameters, noise-covariance file,
+ * measurement file and time window, projection list, regularisation per
+ * channel type, and output dip/bdip file names. The class can be
+ * populated from @c argc / @c argv (for the @c mne_dipole_fit binary)
+ * or directly by application code, and @c checkIntegrity validates the
+ * combination of choices before the fit workspace is built. Refactored
+ * from @c setup.c / argument-parsing code in MNE-C.
+ */
+
+#ifndef INV_DIPOLE_FIT_SETTINGS_H
+#define INV_DIPOLE_FIT_SETTINGS_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../inv_global.h"
+#include "inv_ecd_set.h"
+
+#include <mne/mne/mne_filter_def.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+// CONSTANTS
+//=============================================================================================================
+
+inline constexpr double BIG_TIME = 1e6;
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * Command-line and programmatic settings for the @c mne_dipole_fit driver:
+ * BEM / sphere model, EEG model, guess-grid parameters, noise-covariance
+ * file, measurement file + time window, projection list, per-channel-type
+ * regularisation and output dip/bdip file names. Can be populated from
+ * @c argc / @c argv or directly by application code.
+ *
+ * @brief Settings for the @c mne_dipole_fit driver (forward model, guess grid, data, projections, output).
+ */
+class INVSHARED_EXPORT InvDipoleFitSettings
+{
+public:
+    //=========================================================================================================
+    /**
+     * Default Constructor
+     */
+    explicit InvDipoleFitSettings();
+
+    //=========================================================================================================
+    /**
+     * Constructs Dipole Fit Settings
+     *
+     * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+     * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+     */
+    explicit InvDipoleFitSettings(int* argc, char** argv);
+
+    //=========================================================================================================
+    /**
+     * Destructs the Dipole Fit Settings
+     */
+    virtual ~InvDipoleFitSettings();
+
+    //=========================================================================================================
+    /**
+     * Check whether Dipole Fit Settings are correctly set and report them.
+     *
+     * @return true if all required settings are present; otherwise the missing one is reported.
+     */
+    bool checkIntegrity();
+
+public:
+    std::string bemname; /**< Boundary-element model. */
+    Eigen::Vector3f r0;  /**< Sphere model origin. */
+    bool accurate;       /**< Use accurate coil definitions? */
+    std::string mriname; /**< Gives the MRI <-> head transform. */
+
+    std::string guessname;      /**< Initial guess grid (if not present, the values below will be employed to generate the grid). */
+    std::string guess_surfname; /**< Load the inner skull surface from this BEM file. */
+    float guess_rad;            /**< Radius of spherical guess surface. */
+    float guess_mindist;        /**< Minimum allowed distance to the surface. */
+    float guess_exclude;        /**< Exclude points closer than this to the origin. */
+    float guess_grid;           /**< Grid spacing. */
+
+    std::string noisename; /**< Noise-covariance matrix. */
+    float grad_std;        /**< Standard deviation for gradiometers if noise covariance is not specified. */
+    float mag_std;         /**< Standard deviation for magnetometers if noise covariance is not specified. */
+    float eeg_std;         /**< Standard deviation for EEG if noise covariance is not specified. */
+    bool diagnoise;        /**< Use only the diagonals of the noise-covariance matrix. */
+
+    std::string measname;               /**< Data file. */
+    bool is_raw;                        /**< Is this a raw data file. */
+    std::string badname;                /**< Bad channel list file. */
+    bool include_meg;                   /**< Use MEG? */
+    bool include_eeg;                   /**< Use EEG? */
+    float tmin;                         /**< Fit start time (s). */
+    float tmax;                         /**< Fit end time (s). */
+    float tstep;                        /**< Step between fits (s). */
+    float integ;                        /**< Integration time for each fit (s). */
+    float bmin;                         /**< Baseline start time (s). */
+    float bmax;                         /**< Baseline end time (s). */
+    bool do_baseline;                   /**< Are both baseline limits set? */
+    int setno;                          /**< Which data set. */
+    bool verbose;                       /**< Verbose output. */
+    mne::MNEFilterDef filter;           /**< Data filter definition. */
+    std::vector<std::string> projnames; /**< Projection file names. */
+    bool omit_data_proj;                /**< Omit the projection in the data file. */
+
+    std::string eeg_model_file; /**< File of EEG sphere model specifications. */
+    std::string eeg_model_name; /**< Name of the EEG model to use. */
+    float eeg_sphere_rad;       /**< Scalp radius to use in EEG sphere model. */
+    bool scale_eeg_pos;         /**< Scale the electrode locations to scalp in the sphere model. */
+    float mag_reg;              /**< Noise-covariance matrix regularization for MEG (magnetometers and axial gradiometers). */
+    bool fit_mag_dipoles;       /**< Fit magnetic dipoles? */
+
+    float grad_reg;       /**< Noise-covariance matrix regularization for planar gradiometers. */
+    float eeg_reg;        /**< Noise-covariance matrix regularization for EEG. */
+    std::string dipname;  /**< Output file in dip format. */
+    std::string bdipname; /**< Output file in bdip format. */
+
+    bool gui; /**< Should the GUI be shown? */
+
+private:
+    void initMembers();
+    void usage(const char* name);
+    bool check_unrecognized_args(int argc, char** argv);
+    bool check_args(int* argc, char** argv);
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} //NAMESPACE
+
+#endif // INV_DIPOLE_FIT_SETTINGS_H

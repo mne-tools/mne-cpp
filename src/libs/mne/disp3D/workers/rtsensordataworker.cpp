@@ -1,0 +1,265 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     rtsensordataworker.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.0.0
+ * @date     March 2026
+ * @brief    Per-tick dense sensor-to-vertex mat-vec, symmetric normalisation and ABGR colour packing.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "rtsensordataworker.h"
+
+#include "core/rendertypes.h"
+#include <mne/disp/plots/helpers/colormap.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QMutexLocker>
+#include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+
+using namespace mne::disp;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+RtSensorDataWorker::RtSensorDataWorker(QObject* parent)
+: QObject(parent)
+{
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::addData(const Eigen::VectorXf& data)
+{
+    QMutexLocker locker(&m_mutex);
+
+    // Cap queue size at sampling frequency (1 second of data)
+    if (m_lDataQ.size() < static_cast<int>(m_dSFreq)) {
+        m_lDataQ.append(data);
+    }
+
+    // Also store for looping
+    if (m_bIsLooping) {
+        m_lDataLoopQ.append(data);
+        // Cap loop queue at 10 seconds of data
+        if (m_lDataLoopQ.size() > static_cast<int>(m_dSFreq) * 10) {
+            m_lDataLoopQ.removeFirst();
+        }
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::clear()
+{
+    QMutexLocker locker(&m_mutex);
+    m_lDataQ.clear();
+    m_lDataLoopQ.clear();
+    m_vecAverage = Eigen::VectorXf();
+    m_iSampleCtr = 0;
+    m_iCurrentSample = 0;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
+{
+    QMutexLocker locker(&m_mutex);
+    m_sSurfaceKey = surfaceKey;
+    m_mappingMat = mat;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setNumberAverages(int numAvr)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iNumAverages = qMax(1, numAvr);
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setColormapType(const QString& name)
+{
+    QMutexLocker locker(&m_mutex);
+    m_sColormapType = name;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setThresholds(double min, double max)
+{
+    QMutexLocker locker(&m_mutex);
+    if (min == 0.0 && max == 0.0) {
+        m_bUseAutoNorm = true;
+        m_dThreshMin = 0.0;
+        m_dThreshMax = 0.0;
+    } else {
+        m_bUseAutoNorm = false;
+        m_dThreshMin = min;
+        m_dThreshMax = max;
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setLoopState(bool enabled)
+{
+    QMutexLocker locker(&m_mutex);
+    m_bIsLooping = enabled;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setSFreq(double sFreq)
+{
+    QMutexLocker locker(&m_mutex);
+    m_dSFreq = qMax(1.0, sFreq);
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    QMutexLocker locker(&m_mutex);
+    m_bStreamSmoothedData = bStreamSmoothedData;
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::streamData()
+{
+    QMutexLocker locker(&m_mutex);
+
+    // Try to get data from queue
+    Eigen::VectorXf vecCurrentData;
+
+    if (!m_lDataQ.isEmpty()) {
+        vecCurrentData = m_lDataQ.takeFirst();
+    } else if (m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+        // Loop: replay from stored data
+        vecCurrentData = m_lDataLoopQ[m_iCurrentSample % m_lDataLoopQ.size()];
+        m_iCurrentSample++;
+    } else {
+        // No data available
+        return;
+    }
+
+    // Averaging
+    if (m_iNumAverages > 1) {
+        if (m_vecAverage.size() != vecCurrentData.size()) {
+            m_vecAverage = vecCurrentData;
+            m_iSampleCtr = 1;
+        } else {
+            m_vecAverage += vecCurrentData;
+            m_iSampleCtr++;
+        }
+
+        if (m_iSampleCtr < m_iNumAverages) {
+            return; // Accumulate more samples
+        }
+
+        vecCurrentData = m_vecAverage / static_cast<float>(m_iSampleCtr);
+        m_vecAverage = Eigen::VectorXf();
+        m_iSampleCtr = 0;
+    }
+
+    // Check streaming mode
+    if (!m_bStreamSmoothedData) {
+        // Raw mode: emit measurement vector without mapping
+        Eigen::VectorXf rawData = vecCurrentData;
+        locker.unlock();
+        emit newRtRawSensorData(rawData);
+        return;
+    }
+
+    // Compute per-vertex colors using the dense mapping matrix
+    QVector<uint32_t> colors = computeSurfaceColors(vecCurrentData);
+    const QString surfaceKey = m_sSurfaceKey;
+
+    // Unlock before emitting (avoid deadlock if slot is direct connection)
+    locker.unlock();
+
+    if (!colors.isEmpty()) {
+        emit newRtSensorColors(surfaceKey, colors);
+    }
+}
+
+//=============================================================================================================
+
+QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf& sensorData) const
+{
+    if (sensorData.size() == 0 || !m_mappingMat || m_mappingMat->rows() == 0) {
+        return QVector<uint32_t>();
+    }
+
+    // Validate dimensions
+    if (m_mappingMat->cols() != sensorData.size()) {
+        qWarning() << "RtSensorDataWorker: Mapping matrix cols" << m_mappingMat->cols()
+                   << "!= sensor data size" << sensorData.size();
+        return QVector<uint32_t>();
+    }
+
+    // Map sensor data to surface vertices: mapped = M * meas
+    Eigen::VectorXf mapped = (*m_mappingMat) * sensorData;
+
+    int nVertices = mapped.size();
+
+    // Determine normalization range
+    float normMin, normMax;
+    if (m_bUseAutoNorm) {
+        // Symmetric auto-normalization: ±maxAbs
+        float maxAbs = 0.0f;
+        for (int i = 0; i < nVertices; ++i) {
+            maxAbs = std::max(maxAbs, std::abs(mapped(i)));
+        }
+        if (maxAbs <= 0.0f)
+            maxAbs = 1.0f;
+        normMin = -maxAbs;
+        normMax = maxAbs;
+    } else {
+        // Explicit thresholds
+        normMin = static_cast<float>(m_dThreshMin);
+        normMax = static_cast<float>(m_dThreshMax);
+        if (normMax <= normMin)
+            normMax = normMin + 1.0f;
+    }
+
+    float range = normMax - normMin;
+
+    // Convert to per-vertex ABGR colours
+    QVector<uint32_t> colors(nVertices);
+
+    for (int i = 0; i < nVertices; ++i) {
+        // Normalisation: map [normMin, normMax] → [0, 1]
+        double norm = static_cast<double>(mapped(i) - normMin) / static_cast<double>(range);
+        norm = qBound(0.0, norm, 1.0);
+
+        QRgb rgb = mne::disp::ColorMap::valueToColor(norm, m_sColormapType);
+
+        uint32_t r = qRed(rgb);
+        uint32_t g = qGreen(rgb);
+        uint32_t b = qBlue(rgb);
+
+        // Pack as ABGR (same format as BrainSurface uses)
+        colors[i] = packABGR(r, g, b);
+    }
+
+    return colors;
+}

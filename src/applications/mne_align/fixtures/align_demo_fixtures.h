@@ -15,7 +15,7 @@
 #ifndef MNEALIGN_ALIGN_DEMO_FIXTURES_H
 #define MNEALIGN_ALIGN_DEMO_FIXTURES_H
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include <mne/acq/devices/polhemus/acquired_points.h>
 
 #include <vector>
 

@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
-#include <fiff/fiff_stream.h>
-#include <base/log.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

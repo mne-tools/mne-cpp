@@ -4,16 +4,16 @@
 
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <connectivity/compute_connectivity.h>
-#include <connectivity/connectivitysettings.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_info.h>
-#include <connectivity/network/network.h>
-#include <connectivity/metrics/correlation.h>
-#include <connectivity/metrics/coherence.h>
-#include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
-#include <connectivity/metrics/mvar_model.h>
-#include <connectivity/metrics/weightedphaselagindex.h>
+#include <mne/connectivity/compute_connectivity.h>
+#include <mne/connectivity/connectivitysettings.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/connectivity/network/network.h>
+#include <mne/connectivity/metrics/correlation.h>
+#include <mne/connectivity/metrics/coherence.h>
+#include <mne/connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <mne/connectivity/metrics/mvar_model.h>
+#include <mne/connectivity/metrics/weightedphaselagindex.h>
 
 #include <cmath>
 #include <random>

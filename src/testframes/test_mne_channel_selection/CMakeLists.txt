@@ -17,7 +17,7 @@ set(SOURCES test_mne_channel_selection.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core

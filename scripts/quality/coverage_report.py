@@ -12,7 +12,7 @@
 """Report line coverage using the same scope Codecov does.
 
 Codecov's number comes from the Linux CI job, which runs gcov via fastcov with
-``--process-gcno`` and then filters to ``src/libraries``, ``src/applications``
+``--process-gcno`` and then filters to ``src/libs/mne``, ``src/applications``
 and ``src/tools``.  The ``--process-gcno`` part matters: it pulls in objects
 that were compiled but never executed, so a source file no test ever reaches is
 counted at 0 percent instead of being left out of the denominator entirely.
@@ -62,7 +62,7 @@ from pathlib import Path
 
 # The three trees Codecov keeps, straight from the --include list in
 # .github/workflows/_reusable-tests.yml.
-INCLUDED_ROOTS = ("src/libraries/", "src/applications/", "src/tools/")
+INCLUDED_ROOTS = ("src/libs/mne/", "src/applications/", "src/tools/")
 
 # Generated and third-party code is excluded from the report the same way the CI
 # job excludes it, so the denominator reflects code someone actually maintains.

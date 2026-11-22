@@ -18,8 +18,8 @@
 
 #include "averagewindow.h"
 
-#include <base/string_utils.h>
-#include <disp/viewers/helpers/averagesceneitem.h>
+#include <mne/base/string_utils.h>
+#include <mne/disp/viewers/helpers/averagesceneitem.h>
 
 //=============================================================================================================
 // QT INCLUDES

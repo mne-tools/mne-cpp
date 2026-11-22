@@ -8,6 +8,12 @@ All notable changes to MNE-CPP will be documented in this file.
 
 **Breaking changes**
 
+Library headers are included with an `mne/` prefix: `#include <mne/fiff/fiff_raw_data.h>`
+instead of `#include <fiff/fiff_raw_data.h>`, which marks them as MNE-CPP headers
+the way `Q` marks Qt's. The library sources moved from `src/libraries/<lib>` to
+`src/libs/mne/<lib>`; `src/libs` is the include root, and installed headers land in
+`include/mne/<lib>`. The library named `mne` keeps its name (`<mne/mne/...>`).
+
 All libraries share one namespace, `mne`. The per-library namespaces are gone;
 type names already carry their library prefix (`FiffInfo`, `BidsChannel`,
 `MnaProject`), so the qualification only repeated it. The Qt-based display

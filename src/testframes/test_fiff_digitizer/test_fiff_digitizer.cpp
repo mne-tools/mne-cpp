@@ -16,9 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_digitizer_data.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

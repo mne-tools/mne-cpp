@@ -21,9 +21,9 @@
 //=============================================================================================================
 
 #include "hpi_global.h"
-#include <base/circular_buffer.h>
+#include <mne/base/circular_buffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

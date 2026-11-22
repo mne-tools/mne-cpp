@@ -34,13 +34,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_cov.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

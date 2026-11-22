@@ -42,7 +42,7 @@ class ClassifierTests(unittest.TestCase):
         levels = self.classify({
             "test_static": "// Reference values were produced with mne.read_evokeds\nQCOMPARE(n, 55);",
             "test_live": 'QProcess p; p.start("python3", {"-c", "import mne"});',
-            "test_helper": "#include <pybridge/python_test_helper.h>\nPythonTestHelper h;",
+            "test_helper": "#include <mne/pybridge/python_test_helper.h>\nPythonTestHelper h;",
             "test_inspired": "// Inspired by mne-python test_surface.py\nQVERIFY(ok);",
             "test_record": 'MnaScript s; s.interpreter = "python3";\n\nQCOMPARE(s.language, x);',
             "test_plain": "QVERIFY(true);",

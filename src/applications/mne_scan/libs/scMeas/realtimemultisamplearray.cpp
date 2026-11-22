@@ -18,9 +18,9 @@
 
 #include "realtimemultisamplearray.h"
 
-#include <base/log.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_digitizer_data.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // STL INCLUDES

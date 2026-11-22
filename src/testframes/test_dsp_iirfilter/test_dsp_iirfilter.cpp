@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <dsp/iirfilter.h>
+#include <mne/dsp/iirfilter.h>
 #include <numbers>
 
 using namespace mne;

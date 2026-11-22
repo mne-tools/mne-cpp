@@ -15,8 +15,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_cov_matrix.h>
-#include <fiff/fiff_constants.h>
+#include <mne/mne/mne_cov_matrix.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

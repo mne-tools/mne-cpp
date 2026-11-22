@@ -1,8 +1,8 @@
 
 #include <iostream>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <memory>
-#include <mne/mne_surface.h> 
+#include <mne/mne/mne_surface.h> 
 
  
 //************************************************************************************************************* 

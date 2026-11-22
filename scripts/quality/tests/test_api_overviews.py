@@ -26,7 +26,7 @@ _FIRST_COLUMN = re.compile(r"^\|\s*`([A-Za-z_][A-Za-z0-9_:]*)`", re.MULTILINE)
 
 
 def missing_names(repo_root: Path) -> list[str]:
-    files = subprocess.run(["git", "ls-files", "src/libraries", "src/applications"], cwd=repo_root, check=True,
+    files = subprocess.run(["git", "ls-files", "src/libs/mne", "src/applications"], cwd=repo_root, check=True,
                            capture_output=True, text=True).stdout.split()
     headers = "\n".join((repo_root / f).read_text(encoding="utf-8", errors="replace")
                         for f in files if f.endswith((".h", ".hpp")))

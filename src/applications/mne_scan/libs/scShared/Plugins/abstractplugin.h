@@ -23,7 +23,7 @@
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
-#include <disp/viewers/abstractview.h>
+#include <mne/disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES

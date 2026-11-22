@@ -10,7 +10,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <memory>
 #include <QCoreApplication>
 #include <QDir>
@@ -20,17 +20,17 @@
 
 #include <Eigen/Core>
 
-#include <fiff/fiff_io.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_evoked_set.h>
 
-#include <mne/mne_raw_info.h>
+#include <mne/mne/mne_raw_info.h>
 
-#include <inv/inv_source_estimate.h>
-#include <inv/inv_source_estimate_token.h>
-#include <inv/inv_token.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate_token.h>
+#include <mne/inv/inv_token.h>
 
 using namespace mne;
 

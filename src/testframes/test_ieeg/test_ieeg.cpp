@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <ieeg/ieeg_implantation.h>
-#include <ieeg/ieeg_reference.h>
-#include <ieeg/ieeg_surface_map.h>
-#include <dsp/eeg_reference.h>
-#include <fiff/fiff_info.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/ieeg/ieeg_reference.h>
+#include <mne/ieeg/ieeg_surface_map.h>
+#include <mne/dsp/eeg_reference.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

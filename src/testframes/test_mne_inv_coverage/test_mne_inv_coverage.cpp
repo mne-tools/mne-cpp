@@ -14,23 +14,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_source_space.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_epoch_data.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <base/log.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/mne/mne_epoch_data.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

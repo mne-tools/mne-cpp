@@ -22,8 +22,8 @@
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
-#include <fiff/fiff_stream.h>
-#include <mne/mne_bem.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/mne/mne_bem.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -6,13 +6,13 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_id.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_id.h>
 
 using namespace mne;
 using namespace Eigen;

@@ -12,7 +12,7 @@
 
 #include <QtTest/QtTest>
 
-#include <dsp/xdawn.h>
+#include <mne/dsp/xdawn.h>
 
 #include <Eigen/Dense>
 

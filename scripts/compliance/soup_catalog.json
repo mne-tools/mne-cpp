@@ -64,7 +64,7 @@
       "url": "https://zlib.net",
       "purl": "pkg:generic/zlib@{version}",
       "version": {
-        "cmake_set": "src/libraries/base/CMakeLists.txt",
+        "cmake_set": "src/libs/mne/base/CMakeLists.txt",
         "variable": "MNE_CPP_ZLIB_VERSION"
       },
       "build_version": {

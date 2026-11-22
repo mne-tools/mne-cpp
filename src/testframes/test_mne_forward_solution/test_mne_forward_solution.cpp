@@ -17,15 +17,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fwd/compute_fwd/compute_fwd.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_named_matrix.h>
+#include <mne/base/log.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/compute_fwd/compute_fwd.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_named_matrix.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -22,22 +22,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/model/items/digitizersettreeitem.h>
-#include <disp3D/model/items/bemtreeitem.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/model/items/digitizersettreeitem.h>
+#include <mne/disp3D/model/items/bemtreeitem.h>
 
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
 
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_bem.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_bem.h>
 
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
-#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

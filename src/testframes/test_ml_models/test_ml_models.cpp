@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <ml/ml_model.h>
-#include <ml/ml_onnx_model.h>
-#include <ml/ml_tensor.h>
+#include <mne/ml/ml_model.h>
+#include <mne/ml/ml_onnx_model.h>
+#include <mne/ml/ml_tensor.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -15,8 +15,8 @@
 
 #include "ibuffer.h"
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 #include <QFile>
 

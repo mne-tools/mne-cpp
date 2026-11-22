@@ -24,19 +24,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq.h>
-#include <acq/devices/acq_devices.h>
-#include <acq/devices/brainflow/brainflow_stream.h>
-#include <acq/fiff/acq_fiff_replay.h>
-#include <acq/fiff/acq_recorder.h>
-#include <acq/lsl/acq_lsl.h>
+#include <mne/acq/acq.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/acq/devices/brainflow/brainflow_stream.h>
+#include <mne/acq/fiff/acq_fiff_replay.h>
+#include <mne/acq/fiff/acq_recorder.h>
+#include <mne/acq/lsl/acq_lsl.h>
 #if defined(MNE_ACQ_VIEW)
 #include "acq_view.h"
 
 #include <QApplication>
 #endif
-#include <lsl/lsl_stream_info.h>
-#include <lsl/lsl_stream_outlet.h>
+#include <mne/lsl/lsl_stream_info.h>
+#include <mne/lsl/lsl_stream_outlet.h>
 
 //=============================================================================================================
 // QT INCLUDES

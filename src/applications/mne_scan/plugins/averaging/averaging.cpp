@@ -16,12 +16,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "averaging.h"
 
 #include "FormFiles/averagingsetupwidget.h"
-#include <disp/viewers/averagingsettingsview.h>
-#include <disp/viewers/artifactsettingsview.h>
+#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp/viewers/artifactsettingsview.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
 

@@ -16,15 +16,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffsimulator.h"
 
-#include <acq/acq_device_registry.h>
-#include <acq/acq_eigen.h>
-#include <acq/fiff/acq_fiff_replay.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_types.h>
-#include <base/string_utils.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/acq_eigen.h>
+#include <mne/acq/fiff/acq_fiff_replay.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_types.h>
+#include <mne/base/string_utils.h>
 
 #include <rtserver_connector/command.h>
 

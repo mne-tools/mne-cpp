@@ -16,27 +16,27 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "cortical_surface.h"
 
 #include <anShared/Management/communicator.h>
-#include <disp3D/scene/multimodalscene.h>
-#include <fs/fs_annotation.h>
-#include <fs/fs_label.h>
-#include <fs/fs_label_utils.h>
-#include <fs/fs_surface.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/inv_label_time_course.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/minimum_norm/inv_cmne.h>
-#include <inv/minimum_norm/inv_cmne_settings.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/sparse/inv_gamma_map.h>
-#include <inv/sparse/inv_mxne.h>
-#include <base/string_utils.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/fs/fs_annotation.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_label_utils.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/inv_label_time_course.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_cmne.h>
+#include <mne/inv/minimum_norm/inv_cmne_settings.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/sparse/inv_gamma_map.h>
+#include <mne/inv/sparse/inv_mxne.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

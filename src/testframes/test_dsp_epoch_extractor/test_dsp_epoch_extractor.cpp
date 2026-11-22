@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/epoch_extractor.h>
-#include <mne/mne_epoch_data.h>
+#include <mne/dsp/epoch_extractor.h>
+#include <mne/mne/mne_epoch_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

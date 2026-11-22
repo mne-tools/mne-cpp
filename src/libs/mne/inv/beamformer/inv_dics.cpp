@@ -1,0 +1,332 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     inv_dics.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the DICS beamformer pipeline (per-frequency filter design + application paths).
+ *
+ * For each frequency bin in the CSD stack the implementation extracts
+ * the (optionally real-cast) cross-spectral density, calls into
+ * @ref InvBeamformerCompute to derive the spatial filter, and stores
+ * the result in the @ref InvBeamformer container. The application
+ * methods then re-project new CSDs (source-power) or new
+ * time-domain data (narrow-band time-course) through the cached
+ * per-frequency filters.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "inv_dics.h"
+#include <mne/base/log.h>
+#include "inv_beamformer_compute.h"
+
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace mne;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+InvBeamformer InvDICS::makeDICS([[maybe_unused]] const FiffInfo& info,
+                                const MNEForwardSolution& forward,
+                                const std::vector<MatrixXd>& csdMatrices,
+                                const VectorXd& frequencies,
+                                double reg,
+                                bool realFilter,
+                                const FiffCov& noiseCov,
+                                BeamformerPickOri pickOri,
+                                BeamformerWeightNorm weightNorm,
+                                bool reduceRank,
+                                BeamformerInversion invMethod)
+{
+    InvBeamformer result;
+    result.kind = "DICS";
+
+    const int nFreqs = static_cast<int>(csdMatrices.size());
+    if (nFreqs == 0) {
+        mne::Log::warning("InvDICS::makeDICS - No CSD matrices provided!");
+        return result;
+    }
+    if (frequencies.size() != nFreqs) {
+        mne::Log::warning("InvDICS::makeDICS - Frequency vector size mismatch with CSD count!");
+        return result;
+    }
+
+    // -----------------------------------------------------------------------
+    // Extract leadfield
+    // -----------------------------------------------------------------------
+    if (forward.sol.data.size() == 0) {
+        mne::Log::warning("InvDICS::makeDICS - Forward solution has no gain matrix!");
+        return result;
+    }
+
+    MatrixXd G = forward.sol.data;
+    const int nChannels = static_cast<int>(G.rows());
+    const int nOrient = (forward.source_ori == FIFFV_MNE_FREE_ORI) ? 3 : 1;
+    const int nSources = static_cast<int>(G.cols()) / nOrient;
+
+    mne::Log::info("InvDICS::makeDICS - Leadfield: {} channels x {} sources (n_orient={}), {} frequencies", nChannels, nSources, nOrient, nFreqs);
+
+    // -----------------------------------------------------------------------
+    // Whitening matrix
+    // -----------------------------------------------------------------------
+    MatrixXd whitener;
+    if (noiseCov.data.size() > 0 && noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
+        VectorXd invSqrtEig(noiseCov.eig.size());
+        for (int i = 0; i < noiseCov.eig.size(); ++i) {
+            invSqrtEig(i) = (noiseCov.eig(i) > 1e-30)
+                ? 1.0 / std::sqrt(noiseCov.eig(i))
+                : 0.0;
+        }
+        // Rows of FiffCov::eigvec are the eigenvectors.
+        whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec;
+    } else {
+        whitener = MatrixXd::Identity(nChannels, nChannels);
+    }
+
+    MatrixXd projMat = MatrixXd::Identity(nChannels, nChannels);
+
+    // Whiten leadfield (shared across all frequencies)
+    MatrixXd Gw = whitener * G;
+
+    // Source normals
+    MatrixX3d nn = forward.source_nn.cast<double>();
+    if (nOrient == 3 && nn.rows() == 3 * nSources) {
+        // Free orientation stores three rows per source; mne-python uses nn[2::3].
+        MatrixX3d perSource(nSources, 3);
+        for (int s = 0; s < nSources; ++s)
+            perSource.row(s) = nn.row(3 * s + 2);
+        nn = perSource;
+    }
+
+    // -----------------------------------------------------------------------
+    // Compute filter for each frequency
+    // -----------------------------------------------------------------------
+    for (int fi = 0; fi < nFreqs; ++fi) {
+        MatrixXd Cm = csdMatrices[fi];
+
+        if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
+            mne::Log::warning("InvDICS::makeDICS - CSD[{}] dimension mismatch!", fi);
+            return InvBeamformer();
+        }
+
+        // Optional: take real part of CSD
+        if (realFilter) {
+            // CSD is provided as real-valued after user extracts real part,
+            // or we ensure it here
+            Cm = Cm.real();
+        }
+
+        // Whiten CSD
+        MatrixXd CmW = whitener * Cm * whitener.transpose();
+        CmW = (CmW + CmW.transpose()) * 0.5; // Ensure symmetry
+
+        // Compute filter
+        MatrixXd W;
+        MatrixX3d mpOri;
+
+        bool ok = InvBeamformerCompute::computeBeamformer(
+            Gw, CmW, reg, nOrient,
+            weightNorm, pickOri, reduceRank, invMethod,
+            nn, W, mpOri);
+
+        if (!ok) {
+            mne::Log::warning("InvDICS::makeDICS - Filter computation failed at frequency {} ({:.1f} Hz)!", fi, frequencies(fi));
+            return InvBeamformer();
+        }
+
+        result.weights.push_back(W);
+
+        // Store max-power orientation from first frequency
+        if (fi == 0 && pickOri == BeamformerPickOri::MaxPower) {
+            result.maxPowerOri = mpOri;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Populate metadata
+    // -----------------------------------------------------------------------
+    result.whitener = whitener;
+    result.proj = projMat;
+    result.chNames = forward.sol.row_names;
+    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal && pickOri != BeamformerPickOri::MaxPower);
+    result.nSourcesTotal = nSources;
+    result.srcType = "surface";
+    result.weightNorm = weightNorm;
+    result.pickOri = pickOri;
+    result.inversion = invMethod;
+    result.reg = reg;
+    result.rank = static_cast<int>(nChannels);
+    result.sourceNn = forward.source_nn;
+    result.frequencies = frequencies;
+
+    VectorXi verts(0);
+    if (forward.src.size() >= 2) {
+        verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
+        verts << forward.src[0].vertno, forward.src[1].vertno;
+        // Keep where the left hemisphere ends. The concatenation above is the
+        // only place that knows it, and without it the result cannot be
+        // written as the -lh/-rh pair mne-python expects.
+        result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
+    } else if (forward.src.size() == 1) {
+        verts = forward.src[0].vertno;
+    }
+    result.vertices = verts;
+
+    mne::Log::info("InvDICS::makeDICS - Done. {} frequency filters computed.", nFreqs);
+
+    return result;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvDICS::applyDICSCsd(const std::vector<MatrixXd>& csdMatrices,
+                                        const VectorXd& frequencies,
+                                        const InvBeamformer& filters)
+{
+    if (!filters.isValid() || filters.kind != "DICS") {
+        mne::Log::warning("InvDICS::applyDICSCsd - Invalid or non-DICS filters!");
+        return InvSourceEstimate();
+    }
+
+    const int nFreqs = static_cast<int>(csdMatrices.size());
+    const int nFilterFreqs = filters.nFreqs();
+
+    if (nFreqs != nFilterFreqs) {
+        mne::Log::warning("InvDICS::applyDICSCsd - CSD count ({}) does not match filter count ({})!", nFreqs, nFilterFreqs);
+        return InvSourceEstimate();
+    }
+
+    const int nOrient = filters.nOrient();
+    const int nSources = filters.nSources();
+
+
+    // Power matrix: (nSources, nFreqs)
+    MatrixXd powerMat(nSources, nFreqs);
+
+    for (int fi = 0; fi < nFreqs; ++fi) {
+        MatrixXd Cm = csdMatrices[fi];
+
+        // Whiten CSD
+        if (filters.whitener.size() > 0) {
+            Cm = filters.whitener * Cm * filters.whitener.transpose();
+        }
+
+        VectorXd power = InvBeamformerCompute::computePower(Cm, filters.weights[fi], nOrient);
+        powerMat.col(fi) = power;
+    }
+
+    // Use frequency as "time" axis for the source estimate
+    float fmin = (frequencies.size() > 0) ? static_cast<float>(frequencies(0)) : 0.0f;
+    float fstep = (frequencies.size() > 1)
+        ? static_cast<float>(frequencies(1) - frequencies(0))
+        : 1.0f;
+
+    InvSourceEstimate stc(powerMat, filters.vertices, fmin, fstep);
+    stc.method = InvEstimateMethod::DICS;
+    stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
+    stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
+
+    return stc;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvDICS::applyDICS(const MatrixXd& data,
+                                     float tmin,
+                                     float tstep,
+                                     const InvBeamformer& filters,
+                                     int freqIdx)
+{
+    if (!filters.isValid() || filters.kind != "DICS") {
+        mne::Log::warning("InvDICS::applyDICS - Invalid or non-DICS filters!");
+        return InvSourceEstimate();
+    }
+    if (freqIdx < 0 || freqIdx >= filters.nFreqs()) {
+        mne::Log::warning("InvDICS::applyDICS - freqIdx {} out of range (0..{})!", freqIdx, filters.nFreqs() - 1);
+        return InvSourceEstimate();
+    }
+
+    // Apply projection + whitening + spatial filter
+    MatrixXd processed = data;
+    if (filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
+        processed = filters.proj * processed;
+    }
+    if (filters.whitener.size() > 0 && filters.whitener.rows() == processed.rows()) {
+        processed = filters.whitener * processed;
+    }
+
+    MatrixXd sol = filters.weights[freqIdx] * processed;
+
+    // Combine XYZ if needed
+    const int nOrient = filters.nOrient();
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+        const int nSources = static_cast<int>(sol.rows()) / 3;
+        const int nTimes = static_cast<int>(sol.cols());
+        MatrixXd combined(nSources, nTimes);
+        for (int s = 0; s < nSources; ++s) {
+            combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
+        }
+        sol = combined;
+    }
+
+    InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
+    stc.method = InvEstimateMethod::DICS;
+    stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
+    stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
+
+    return stc;
+}
+
+//=============================================================================================================
+
+std::vector<InvSourceEstimate> InvDICS::applyDICSEpochs(const std::vector<MatrixXd>& epochs,
+                                                        float tmin,
+                                                        float tstep,
+                                                        const InvBeamformer& filters,
+                                                        int freqIdx)
+{
+    std::vector<InvSourceEstimate> results;
+
+    if (epochs.empty()) {
+        mne::Log::warning("InvDICS::applyDICSEpochs - No epochs provided.");
+        return results;
+    }
+    if (!filters.isValid() || filters.kind != "DICS") {
+        mne::Log::warning("InvDICS::applyDICSEpochs - Invalid or non-DICS filters!");
+        return results;
+    }
+
+    results.reserve(epochs.size());
+    for (const MatrixXd& epoch : epochs) {
+        results.push_back(applyDICS(epoch, tmin, tstep, filters, freqIdx));
+        if (results.back().empty()) {
+            mne::Log::warning("InvDICS::applyDICSEpochs - Epoch {} produced empty source estimate.", results.size() - 1);
+        }
+    }
+
+    return results;
+}

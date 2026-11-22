@@ -17,17 +17,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "rtfwd.h"
 
 #include "FormFiles/rtfwdsetupwidget.h"
-#include <disp/viewers/fwdsettingsview.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fwd/compute_fwd/compute_fwd.h>
-#include <inv/hpi/inv_hpi_fit.h>
-#include <fs/fs_annotationset.h>
-#include <mne/mne_forward_solution.h>
-#include <base/string_utils.h>
+#include <mne/disp/viewers/fwdsettingsview.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/compute_fwd/compute_fwd.h>
+#include <mne/inv/hpi/inv_hpi_fit.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/base/string_utils.h>
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
 #include <scMeas/realtimemultisamplearray.h>

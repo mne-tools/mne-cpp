@@ -10,8 +10,8 @@
  * @brief    Tests for SourceMorph class.
  */
 
-#include <inv/morph/source_morph.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/morph/source_morph.h>
+#include <mne/inv/inv_source_estimate.h>
 
 #include <QtTest>
 #include <QObject>

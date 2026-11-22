@@ -16,13 +16,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
+#include <mne/fiff/fiff.h>
 
-#include <dsp/spectrogram.h>
-#include <base/log.h>
+#include <mne/dsp/spectrogram.h>
+#include <mne/base/log.h>
 
-#include <disp/plots/tfplot.h>
-#include <disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/tfplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES

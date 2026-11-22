@@ -21,9 +21,9 @@
 #include "mne_show_fiff_settings.h"
 
 
-#include <fiff/fiff_explain.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_explain.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_stream.h>
 
 
 //*************************************************************************************************************

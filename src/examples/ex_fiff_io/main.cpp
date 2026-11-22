@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/fiff/fiff_io.h>
 
 //=============================================================================================================
 // QT INCLUDES

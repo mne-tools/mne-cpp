@@ -513,7 +513,7 @@ All CBOR map keys are **identical to their JSON counterparts** — no abbreviati
 `MnaIO` automatically selects the format based on the file extension:
 
 ```cpp
-#include <mna/mna_io.h>
+#include <mne/mna/mna_io.h>
 
 // Read (dispatches by extension: .mna → JSON, .mnx → CBOR)
 auto project = mne::MnaIO::read("pipeline.mnx");

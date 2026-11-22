@@ -17,8 +17,8 @@
 #ifndef MNEINSPECT_DEMO_FIXTURES_H
 #define MNEINSPECT_DEMO_FIXTURES_H
 
-#include <ieeg/ieeg_implantation.h>
-#include <mri/mri_vol_data.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/mri/mri_vol_data.h>
 
 #include <QVector>
 

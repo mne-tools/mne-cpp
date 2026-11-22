@@ -19,7 +19,7 @@
 #include "butterflysceneitem.h"
 
 #include "rawsettings.h"
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES

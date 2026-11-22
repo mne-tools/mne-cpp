@@ -18,11 +18,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mna/mna_registry_loader.h>
-#include <mna/mna_op_registry.h>
-#include <mna/mna_op_schema.h>
-#include <mna/mna_types.h>
-#include <base/string_utils.h>
+#include <mne/mna/mna_registry_loader.h>
+#include <mne/mna/mna_op_registry.h>
+#include <mne/mna/mna_op_schema.h>
+#include <mne/mna/mna_types.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

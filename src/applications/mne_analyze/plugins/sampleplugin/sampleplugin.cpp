@@ -15,7 +15,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "sampleplugin.h"
 
 #include <anShared/Management/analyzedata.h>

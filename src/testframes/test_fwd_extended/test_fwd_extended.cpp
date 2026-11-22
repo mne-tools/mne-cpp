@@ -12,11 +12,11 @@
 #include <QCoreApplication>
 #include <QFile>
 
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/fwd_eeg_sphere_layer.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_eeg_sphere_model_set.h>
+#include <mne/fwd/fwd_eeg_sphere_layer.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/fwd_coil_set.h>
 
 using namespace mne;
 using namespace Eigen;

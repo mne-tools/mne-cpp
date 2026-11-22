@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mne_rt_server.h"
 
 #include <rtserver_connector/iconnector.h>
-#include <base/process.h>
+#include <mne/base/process.h>
 #include <stdio.h>
 #include <stdlib.h>
 

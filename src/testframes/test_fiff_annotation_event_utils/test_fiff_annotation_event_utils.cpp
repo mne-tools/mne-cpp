@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_annotation_event_utils.h>
-#include <fiff/fiff_annotations.h>
+#include <mne/fiff/fiff_annotation_event_utils.h>
+#include <mne/fiff/fiff_annotations.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -20,9 +20,9 @@
 #include "plugins/electrodes/electrodes.h"
 #include "plugins/mri_slices/mri_slices.h"
 #include "pickreadoutmodel.h"
-#include <mna/mna_types.h>
-#include <mna/mna_project.h>
-#include <disp3D/scene/multimodalscene.h>
+#include <mne/mna/mna_types.h>
+#include <mne/mna/mna_project.h>
+#include <mne/disp3D/scene/multimodalscene.h>
 
 //=============================================================================================================
 // QT INCLUDES

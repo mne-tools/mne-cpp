@@ -21,7 +21,7 @@
 
 #include "mne_anonymize.h"
 #include "apphandler.h"
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

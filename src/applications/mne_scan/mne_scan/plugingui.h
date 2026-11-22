@@ -25,7 +25,7 @@
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 
-#include <mna/mna_project.h>
+#include <mne/mna/mna_project.h>
 
 //=============================================================================================================
 // QT INCLUDES

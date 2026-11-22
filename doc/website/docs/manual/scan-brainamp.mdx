@@ -35,8 +35,8 @@ The amplifier samples at 5000 Hz. The marker word arrives as the stimulus channe
 The same source is available to every program that links `mne_acq_devices`:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::registerBrainAmpScheme();
 auto device = mne::AcqDevice::open("brainamp://?simulate=1&channels=64&resolution=500nV");

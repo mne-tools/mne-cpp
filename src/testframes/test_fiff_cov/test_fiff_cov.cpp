@@ -17,12 +17,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked_set.h>
-#include <math/matrix_io.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/math/matrix_io.h>
 
 //=============================================================================================================
 // QT INCLUDES

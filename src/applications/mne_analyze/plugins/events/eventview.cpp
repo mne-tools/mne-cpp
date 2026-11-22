@@ -18,15 +18,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "eventview.h"
 
 #include "ui_eventview.h"
-#include <fiff/fiff.h>
-#include <fiff/fiff_events.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <disp/viewers/triggerdetectionview.h>
-#include <base/thread_pool.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

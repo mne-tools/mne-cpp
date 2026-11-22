@@ -17,7 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "connectormanager.h"
 #include "mne_rt_server.h"
 #include "commandserver.h"

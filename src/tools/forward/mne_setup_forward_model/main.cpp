@@ -33,7 +33,7 @@
 #include "mne_setup_forward_model_settings.h"
 #include "setupforwardmodel.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

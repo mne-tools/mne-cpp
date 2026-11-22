@@ -15,19 +15,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_device.h>
-#include <acq/acq_device_registry.h>
-#include <acq/acq_reader.h>
-#include <acq/acq_stream.h>
-#include <acq/fiff/acq_fiff.h>
-#include <acq/fiff/acq_fiff_replay.h>
-#include <acq/fiff/acq_recorder.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/acq_reader.h>
+#include <mne/acq/acq_stream.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/acq/fiff/acq_fiff_replay.h>
+#include <mne/acq/fiff/acq_recorder.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
 
 //=============================================================================================================
 // QT INCLUDES

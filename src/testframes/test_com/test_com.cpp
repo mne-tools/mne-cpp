@@ -14,10 +14,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <com/serial_port.h>
-#include <com/tcp_server.h>
-#include <com/tcp_socket.h>
-#include <com/udp_socket.h>
+#include <mne/com/serial_port.h>
+#include <mne/com/tcp_server.h>
+#include <mne/com/tcp_socket.h>
+#include <mne/com/udp_socket.h>
 #ifndef _WIN32
 #include <arpa/inet.h>
 #include <fcntl.h>

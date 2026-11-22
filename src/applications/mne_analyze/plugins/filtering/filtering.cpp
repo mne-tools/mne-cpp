@@ -18,13 +18,13 @@
 
 #include "filtering.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <disp/viewers/filtersettingsview.h>
-#include <disp/viewers/filterdesignview.h>
-#include <dsp/filterkernel.h>
+#include <mne/disp/viewers/filtersettingsview.h>
+#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // USED NAMESPACES

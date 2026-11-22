@@ -12,7 +12,7 @@
 
 #include <QtTest/QtTest>
 
-#include <dsp/sphara.h>
+#include <mne/dsp/sphara.h>
 
 #include <Eigen/Core>
 

@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/filter_chpi.h>
+#include <mne/dsp/filter_chpi.h>
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/eeg_reference.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
+#include <mne/dsp/eeg_reference.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

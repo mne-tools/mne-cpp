@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <dsp/ica.h>
+#include <mne/dsp/ica.h>
 #include <numbers>
 
 using namespace mne;

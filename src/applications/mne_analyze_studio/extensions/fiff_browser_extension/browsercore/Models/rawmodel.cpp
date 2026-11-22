@@ -17,12 +17,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "rawmodel.h"
 
-#include <base/string_utils.h>
-#include <math/numerics.h>
-#include <base/thread_pool.h>
+#include <mne/base/string_utils.h>
+#include <mne/math/numerics.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // STL INCLUDES

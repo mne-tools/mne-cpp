@@ -10,7 +10,7 @@
  * @brief    Tests for standard montage definitions.
  */
 
-#include <channels/standard_montage.h>
+#include <mne/channels/standard_montage.h>
 
 #include <QtTest>
 #include <QObject>

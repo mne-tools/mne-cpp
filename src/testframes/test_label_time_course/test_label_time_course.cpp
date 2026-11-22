@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_label_time_course.h>
-#include <inv/inv_source_estimate.h>
-#include <fs/fs_label.h>
+#include <mne/inv/inv_label_time_course.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/fs/fs_label.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -16,15 +16,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mna/mna_graph.h>
-#include <base/log.h>
+#include <mne/mna/mna_graph.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mna/mna_graph_executor.h>
-#include <mna/mna_op_registry.h>
-#include <mna/mna_node.h>
-#include <mna/mna_port.h>
-#include <mna/mna_types.h>
-#include <mna/mna_verification.h>
+#include <mne/mna/mna_graph_executor.h>
+#include <mne/mna/mna_op_registry.h>
+#include <mne/mna/mna_node.h>
+#include <mne/mna/mna_port.h>
+#include <mne/mna/mna_types.h>
+#include <mne/mna/mna_verification.h>
 
 //=============================================================================================================
 // QT INCLUDES

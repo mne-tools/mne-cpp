@@ -14,15 +14,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <analyzecore.h>
 #include <mainwindow.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Plugins/abstractplugin.h>
-#include <disp3D/model/braintreemodel.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

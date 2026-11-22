@@ -79,8 +79,8 @@ class SnippetRenderingTestCase(unittest.TestCase):
         example = self.root / "src" / "examples" / "ex_widget"
         example.mkdir(parents=True)
         (example / "main.cpp").write_text(EXAMPLE, encoding="utf-8")
-        (self.root / "src" / "libraries" / "demo").mkdir(parents=True)
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text(HEADER, encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo").mkdir(parents=True)
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text(HEADER, encoding="utf-8")
         self.entry = {"name": "Widget", "module": "demo", "header": "demo/widget.h", "documented": True,
                       "example": "ex_widget", "example_snippet": ["ex_widget/main.cpp#widget_use"],
                       "example_mode": "run", "required_data": ["mne-cpp-test-data"],

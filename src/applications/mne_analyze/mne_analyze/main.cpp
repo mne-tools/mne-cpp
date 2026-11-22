@@ -17,7 +17,7 @@
 //=============================================================================================================
 
 #include <stdio.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 
 #include "info.h"
 #include "analyzecore.h"

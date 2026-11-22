@@ -21,9 +21,9 @@
 //=============================================================================================================
 
 #include "writetofile_global.h"
-#include <base/circular_buffer.h>
+#include <mne/base/circular_buffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <fiff/fiff_file_sharer.h>
+#include <mne/fiff/fiff_file_sharer.h>
 
 //=============================================================================================================
 // QT INCLUDES

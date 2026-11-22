@@ -16,7 +16,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-ACQ = ROOT / "src" / "libraries" / "acq"
+ACQ = ROOT / "src" / "libs" / "mne" / "acq"
 # Object-like macros from <windows.h> (minwindef.h, rpcndr.h) that silently replace an identifier.
 WINDOWS_MACROS = ("small", "hyper", "far", "near", "pascal", "cdecl", "interface")
 CODE_WORD = re.compile(r"\b(" + "|".join(WINDOWS_MACROS) + r")\b")

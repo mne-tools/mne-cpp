@@ -21,7 +21,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 # The only sources that report the build date and commit
-BUILD_STAMP_SOURCES = {"src/libraries/base/base_global.cpp", "src/libraries/acq/acq_global.cpp"}
+BUILD_STAMP_SOURCES = {"src/libs/mne/base/base_global.cpp", "src/libs/mne/acq/acq_global.cpp"}
 
 _TIME_MACRO = re.compile(r"__DATE__|__TIME__|__TIMESTAMP__")
 _HASH_DEFINITION = re.compile(r"MNE_GIT_HASH_\w+\s*=")

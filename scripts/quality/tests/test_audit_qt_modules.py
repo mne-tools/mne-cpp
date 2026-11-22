@@ -26,7 +26,7 @@ audit = importlib.util.module_from_spec(_spec)
 sys.modules["audit_qt_modules"] = audit
 _spec.loader.exec_module(audit)
 
-SCOPES = {"disp": "src/libraries/disp", "applications": "src/applications"}
+SCOPES = {"disp": "src/libs/mne/disp", "applications": "src/applications"}
 
 
 def make_repo(root: Path, files: dict[str, str]) -> None:
@@ -88,16 +88,16 @@ class ScanTests(unittest.TestCase):
 
     def test_renders_vs_chrome(self) -> None:
         report = self.scan({
-            "src/libraries/disp/CMakeLists.txt": "set(QT_REQUIRED_COMPONENTS Core Widgets)\nadd_library(d a.cpp)\n",
-            "src/libraries/disp/plot.h": "#include <QWidget>\nclass DISPSHARED_EXPORT Plot : public QWidget {\n"
+            "src/libs/mne/disp/CMakeLists.txt": "set(QT_REQUIRED_COMPONENTS Core Widgets)\nadd_library(d a.cpp)\n",
+            "src/libs/mne/disp/plot.h": "#include <QWidget>\nclass DISPSHARED_EXPORT Plot : public QWidget {\n"
                                          "protected:\n void paintEvent(QPaintEvent* e) override;\n};\n",
-            "src/libraries/disp/subplot.h": "class SubPlot : public Plot { };\n",
-            "src/libraries/disp/graph.h": "#include <QWidget>\nclass Graph : public QWidget { void draw(); };\n",
-            "src/libraries/disp/graph.cpp": "void Graph::draw() { QPainter painter(this); }\n",
-            "src/libraries/disp/rhiview.h": "class RhiView : public QRhiWidget { };\n",
-            "src/libraries/disp/settings.h": "#include <QDialog>\nclass Settings : public QDialog {\n"
+            "src/libs/mne/disp/subplot.h": "class SubPlot : public Plot { };\n",
+            "src/libs/mne/disp/graph.h": "#include <QWidget>\nclass Graph : public QWidget { void draw(); };\n",
+            "src/libs/mne/disp/graph.cpp": "void Graph::draw() { QPainter painter(this); }\n",
+            "src/libs/mne/disp/rhiview.h": "class RhiView : public QRhiWidget { };\n",
+            "src/libs/mne/disp/settings.h": "#include <QDialog>\nclass Settings : public QDialog {\n"
                                              " QVBoxLayout* m_layout; QPushButton* m_ok; };\n",
-            "src/libraries/disp/settings.ui": "<ui/>\n",
+            "src/libs/mne/disp/settings.ui": "<ui/>\n",
         })
         widgets = report["scopes"]["disp"]["widgets"]
         render = {c["class"]: c["reasons"] for c in widgets["render_classes"]}
@@ -107,9 +107,9 @@ class ScanTests(unittest.TestCase):
         self.assertIn("QPainter on this/viewport()", render["Graph"])
         self.assertIn("derives QRhiWidget", render["RhiView"])
         self.assertEqual([c["class"] for c in widgets["chrome_classes"]], ["Settings"])
-        self.assertIn("src/libraries/disp/settings.h", widgets["chrome_files"])
-        self.assertIn("src/libraries/disp/plot.h", widgets["renders_files"])
-        self.assertEqual(report["units"]["src/libraries/disp"]["ui_forms"], 1)
+        self.assertIn("src/libs/mne/disp/settings.h", widgets["chrome_files"])
+        self.assertIn("src/libs/mne/disp/plot.h", widgets["renders_files"])
+        self.assertEqual(report["units"]["src/libs/mne/disp"]["ui_forms"], 1)
 
     def test_cmake_requested_vs_used_per_target(self) -> None:
         report = self.scan({
@@ -141,12 +141,12 @@ class ScanTests(unittest.TestCase):
 
     def test_gui_private_findings(self) -> None:
         report = self.scan({
-            "src/libraries/disp/CMakeLists.txt": "add_library(d a.cpp)\ntarget_link_libraries(d Qt6::GuiPrivate)\n",
-            "src/libraries/disp/a.cpp": "#include <rhi/qrhi.h>\n#include <private/qrhi_p.h>\nQRhiBuffer* b;\n",
+            "src/libs/mne/disp/CMakeLists.txt": "add_library(d a.cpp)\ntarget_link_libraries(d Qt6::GuiPrivate)\n",
+            "src/libs/mne/disp/a.cpp": "#include <rhi/qrhi.h>\n#include <private/qrhi_p.h>\nQRhiBuffer* b;\n",
         })
         kinds = {(f["header"], f["kind"]) for f in report["gui_private"]}
         self.assertEqual(kinds, {("rhi/qrhi.h", "rhi"), ("private/qrhi_p.h", "private"), (None, "rhi")})
-        self.assertEqual(report["units"]["src/libraries/disp"]["requested_unused"], [])
+        self.assertEqual(report["units"]["src/libs/mne/disp"]["requested_unused"], [])
 
 
 class PolicyTests(unittest.TestCase):

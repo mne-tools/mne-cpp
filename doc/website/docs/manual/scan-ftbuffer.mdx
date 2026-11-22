@@ -53,8 +53,8 @@ acquisition computer itself.
 The same source is available to every program that links `mne_acq_devices`:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::register_ftbuffer_scheme();
 auto device = mne::AcqDevice::open("ftbuffer://megacq:1972");

@@ -21,8 +21,8 @@
 
 #include "studio_core_global.h"
 
-#include <com/tcp_server.h>
-#include <com/tcp_socket.h>
+#include <mne/com/tcp_server.h>
+#include <mne/com/tcp_socket.h>
 
 #include <QByteArray>
 #include <QObject>

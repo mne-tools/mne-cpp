@@ -26,7 +26,7 @@
 
 #include "cortical_surface_global.h"
 #include <anShared/Plugins/abstractplugin.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

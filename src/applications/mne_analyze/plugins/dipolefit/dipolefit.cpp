@@ -16,7 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "dipolefit.h"
 
 #include <anShared/Management/analyzedata.h>
@@ -31,13 +31,13 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 
-#include <disp/viewers/dipolefitview.h>
+#include <mne/disp/viewers/dipolefitview.h>
 
-#include <inv/dipole_fit/inv_dipole_fit_data.h>
-#include <inv/dipole_fit/inv_dipole_fit.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
 
-#include <base/thread_pool.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -17,23 +17,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "realtimemultisamplearraywidget.h"
 
-#include <disp/viewers/filterdesignview.h>
-#include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/helpers/channelinfomodel.h>
-#include <disp/viewers/rtfiffrawview.h>
-#include <disp/viewers/scalingview.h>
-#include <disp/viewers/projectorsview.h>
-#include <disp/viewers/filtersettingsview.h>
-#include <disp/viewers/compensatorview.h>
-#include <disp/viewers/spharasettingsview.h>
-#include <disp/viewers/fiffrawviewsettings.h>
-#include <disp/viewers/triggerdetectionview.h>
+#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp/viewers/helpers/channelinfomodel.h>
+#include <mne/disp/viewers/rtfiffrawview.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/projectorsview.h>
+#include <mne/disp/viewers/filtersettingsview.h>
+#include <mne/disp/viewers/compensatorview.h>
+#include <mne/disp/viewers/spharasettingsview.h>
+#include <mne/disp/viewers/fiffrawviewsettings.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <dsp/filterkernel.h>
-#include <fiff/fiff_info.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

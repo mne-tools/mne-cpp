@@ -455,8 +455,8 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 # look similar to the headers of unrelated 2012 files. We therefore do
 # *not* use ``--follow``; instead we maintain a small hand-curated map
 # of the project's real historical paths so that a current file like
-# ``src/libraries/connectivity/connectivity_global.h`` also sees the
-# history of ``src/libraries/conn/conn_global.h`` (the Mar-Jun 2026
+# ``src/libs/mne/connectivity/connectivity_global.h`` also sees the
+# history of ``src/libs/mne/conn/conn_global.h`` (the Mar-Jun 2026
 # interlude) and (further back)
 # ``libraries/connectivity/connectivity_global.h``.
 #
@@ -469,11 +469,11 @@ def parse_legacy_header(text: str) -> LegacyHeader | None:
 # ---------------------------------------------------------------------------
 
 _PROJECT_RENAMES: tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...] = (
-    # Oct 2022, commit 41c19654d4: pure tree move libraries/ -> src/libraries/
-    ("src/libraries/", "libraries/", ()),
+    # Oct 2022, commit 41c19654d4: pure tree move libraries/ -> src/libs/mne/
+    ("src/libs/mne/", "libraries/", ()),
     # Sep 2017: pure tree move MNE/ -> libraries/ ("Changed folder name
     # MNE to libraries"). Cascades with the rule above so today's
-    # src/libraries/<lib>/<file> also picks up the MNE/<lib>/<file>
+    # src/libs/mne/<lib>/<file> also picks up the MNE/<lib>/<file>
     # history from 2012-2017.
     ("libraries/", "MNE/", ()),
     # Oct 2012: per-library ``include/`` subfolders were flattened
@@ -485,11 +485,11 @@ _PROJECT_RENAMES: tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...] = (
     # Jun 2026: conn/ -> connectivity/ plus the ``conn_global.{h,cpp}`` ->
     # ``connectivity_global.{h,cpp}`` basename rename, restoring the
     # original name to match mne-python's ``mne_connectivity``. Applies to
-    # the current src/libraries/connectivity/ layout (and cascades to the
+    # the current src/libs/mne/connectivity/ layout (and cascades to the
     # pre-Oct-2022 libraries/ layout and the Mar 2026 conn/ interlude).
     (
-        "src/libraries/connectivity/",
-        "src/libraries/conn/",
+        "src/libs/mne/connectivity/",
+        "src/libs/mne/conn/",
         (("conn_global.", "connectivity_global."),),
     ),
     (
@@ -499,11 +499,11 @@ _PROJECT_RENAMES: tuple[tuple[str, str, tuple[tuple[str, str], ...]], ...] = (
     ),
     # Mar 2026, commit b3dfbd1a5f: connectivity/ -> conn/ plus the
     # ``connectivity_global.{h,cpp}`` -> ``conn_global.{h,cpp}`` basename
-    # rename. Applies to the (now historical) src/libraries/conn/ layout
+    # rename. Applies to the (now historical) src/libs/mne/conn/ layout
     # and (via cascade) to the pre-Oct-2022 layout.
     (
-        "src/libraries/conn/",
-        "src/libraries/connectivity/",
+        "src/libs/mne/conn/",
+        "src/libs/mne/connectivity/",
         (("connectivity_global.", "conn_global."),),
     ),
     (

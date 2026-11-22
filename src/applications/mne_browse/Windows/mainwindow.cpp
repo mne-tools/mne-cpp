@@ -17,16 +17,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mainwindow.h"
 
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_stream.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
-#include <base/byte_stream.h>
-#include <base/string_utils.h>
-#include <base/thread_pool.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

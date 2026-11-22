@@ -18,7 +18,7 @@
 
 #include "sourcelocalization.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <anShared/Management/communicator.h>
 
 //=============================================================================================================

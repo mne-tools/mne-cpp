@@ -43,18 +43,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_convenience.h>
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/inv/inv_convenience.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_raw_data.h>
-#include <fs/fs_label.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fs/fs_label.h>
 
 //=============================================================================================================
 // QT INCLUDES

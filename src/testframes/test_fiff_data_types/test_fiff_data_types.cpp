@@ -8,17 +8,17 @@
 #include <QTemporaryFile>
 #include <Eigen/Dense>
 
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_dig_point.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_coord_trans.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_digitizer_data.h>
-#include <fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff_dir_node.h>
 
 using namespace mne;
 using namespace Eigen;

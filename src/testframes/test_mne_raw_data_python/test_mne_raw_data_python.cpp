@@ -26,17 +26,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <mne/mne_raw_data.h>
-#include <base/string_utils.h>
-#include <mne/mne_raw_info.h>
-#include <mne/mne_ch_selection.h>
-#include <mne/mne_proj_op.h>
-#include <mne/mne_filter_def.h>
-#include <mne/mne_deriv.h>
-#include <mne/mne_deriv_set.h>
-#include <mne/mne_sparse_named_matrix.h>
-#include <fiff/fiff_sparse_matrix.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne_raw_data.h>
+#include <mne/base/string_utils.h>
+#include <mne/mne/mne_raw_info.h>
+#include <mne/mne/mne_ch_selection.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/mne/mne_filter_def.h>
+#include <mne/mne/mne_deriv.h>
+#include <mne/mne/mne_deriv_set.h>
+#include <mne/mne/mne_sparse_named_matrix.h>
+#include <mne/fiff/fiff_sparse_matrix.h>
 
 //=============================================================================================================
 // QT INCLUDES

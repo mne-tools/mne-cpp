@@ -21,7 +21,7 @@
 
 #include "lsladapter_global.h"
 #include <scShared/Plugins/abstractsensor.h>
-#include <lsl/lsl.h>
+#include <mne/lsl/lsl.h>
 
 //=============================================================================================================
 // QT INCLUDES

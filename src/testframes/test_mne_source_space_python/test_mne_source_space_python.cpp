@@ -30,9 +30,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_source_space.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -15,11 +15,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "averagingdatamodel.h"
 
-#include <fiff/fiff_evoked_set.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/base/string_utils.h>
 #ifdef WASMBUILD
 #include <QFileDialog>
 #include <QTemporaryDir>

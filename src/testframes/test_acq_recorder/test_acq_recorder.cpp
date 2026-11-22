@@ -18,17 +18,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <acq/acq_convert.h>
-#include <acq/acq_reader.h>
-#include <acq/acq_stream.h>
-#include <acq/fiff/acq_fiff.h>
-#include <acq/fiff/acq_recorder.h>
-#include <fiff/fiff_annotations.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
+#include <mne/base/log.h>
+#include <mne/acq/acq_convert.h>
+#include <mne/acq/acq_reader.h>
+#include <mne/acq/acq_stream.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/acq/fiff/acq_recorder.h>
+#include <mne/fiff/fiff_annotations.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
 #if !defined(_WIN32)
 #include <csignal>
 #include <sys/resource.h>

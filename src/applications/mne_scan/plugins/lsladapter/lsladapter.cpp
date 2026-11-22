@@ -17,14 +17,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "lsladapter.h"
 
 #include "lsladapterproducer.h"
 #include "FormFiles/lsladaptersetup.h"
-#include <fiff/fiff.h>
+#include <mne/fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
-#include <base/thread_pool.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

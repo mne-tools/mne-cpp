@@ -29,8 +29,8 @@ without their hardware filters, unipolar, with no common reference or ground.
 The same source is available to every program that links `mne_acq_devices`:
 
 ```cpp
-#include <acq/acq_device.h>
-#include <acq/devices/acq_devices.h>
+#include <mne/acq/acq_device.h>
+#include <mne/acq/devices/acq_devices.h>
 
 mne::register_gusbamp_scheme();
 auto device = mne::AcqDevice::open("gusbamp://UB-1,UB-2?simulate=1&inputs=1-8&rate=512&trigger=1");

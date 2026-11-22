@@ -15,10 +15,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <channels/layoutloader.h>
-#include <channels/layoutmaker.h>
-#include <channels/selectionio.h>
-#include <base/log.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/channels/layoutmaker.h>
+#include <mne/channels/selectionio.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

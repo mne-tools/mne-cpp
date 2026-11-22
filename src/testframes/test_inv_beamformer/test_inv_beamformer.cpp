@@ -17,22 +17,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne_forward_solution.h>
+#include <mne/mne/mne_forward_solution.h>
 
-#include <inv/beamformer/inv_lcmv.h>
-#include <inv/beamformer/inv_dics.h>
-#include <inv/beamformer/inv_beamformer.h>
-#include <inv/beamformer/inv_beamformer_compute.h>
-#include <inv/beamformer/inv_beamformer_settings.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/beamformer/inv_lcmv.h>
+#include <mne/inv/beamformer/inv_dics.h>
+#include <mne/inv/beamformer/inv_beamformer.h>
+#include <mne/inv/beamformer/inv_beamformer_compute.h>
+#include <mne/inv/beamformer/inv_beamformer_settings.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -16,12 +16,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
 
-#include <fs/fs_surfaceset.h>
+#include <mne/fs/fs_surfaceset.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

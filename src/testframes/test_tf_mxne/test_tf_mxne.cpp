@@ -10,7 +10,7 @@
  * @brief    Tests for TF-MxNE sparse inverse solver.
  */
 
-#include <inv/sparse/inv_tf_mxne.h>
+#include <mne/inv/sparse/inv_tf_mxne.h>
 
 #include <QtTest>
 #include <QObject>

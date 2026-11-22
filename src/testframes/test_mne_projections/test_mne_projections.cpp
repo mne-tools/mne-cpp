@@ -10,7 +10,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -19,19 +19,19 @@
 
 #include <Eigen/Core>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_types.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_types.h>
 
-#include <mne/mne_proj_op.h>
-#include <mne/mne_proj_item.h>
-#include <mne/mne_named_matrix.h>
-#include <mne/mne_ctf_comp_data_set.h>
-#include <mne/mne_cov_matrix.h>
-#include <mne/mne_description_parser.h>
-#include <mne/mne_process_description.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/mne/mne_proj_item.h>
+#include <mne/mne/mne_named_matrix.h>
+#include <mne/mne/mne_ctf_comp_data_set.h>
+#include <mne/mne/mne_cov_matrix.h>
+#include <mne/mne/mne_description_parser.h>
+#include <mne/mne/mne_process_description.h>
 
 using namespace mne;
 

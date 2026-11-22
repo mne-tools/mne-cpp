@@ -18,13 +18,13 @@
 
 #include <electrodes.h>
 
-#include <disp3D/renderable/electrodeobject.h>
-#include <disp3D/scene/multimodalscene.h>
-#include <disp3D/scene/pickresult.h>
-#include <ieeg/ieeg_implantation.h>
-#include <base/log.h>
+#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/disp3D/scene/pickresult.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mri/mri_types.h>
+#include <mne/mri/mri_types.h>
 
 //=============================================================================================================
 // QT INCLUDES

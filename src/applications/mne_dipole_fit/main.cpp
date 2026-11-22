@@ -16,16 +16,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_dipole_fit.h>
-#include <base/log.h>
-#include <mne/mne_bem.h>
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/model/items/dipoletreeitem.h>
-#include <fs/fs_label.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/model/items/dipoletreeitem.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES

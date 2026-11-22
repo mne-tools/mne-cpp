@@ -16,9 +16,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/core/viewstate.h>
-#include <disp3D/core/rendertypes.h>
-#include <disp3D/core/surfacekeys.h>
+#include <mne/disp3D/core/viewstate.h>
+#include <mne/disp3D/core/rendertypes.h>
+#include <mne/disp3D/core/surfacekeys.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <connectivity/network/network.h>
+#include <mne/base/log.h>
+#include <mne/connectivity/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES

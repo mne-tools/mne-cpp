@@ -8,15 +8,15 @@
       "reason": "Generated in the build tree by Qt AUTOMOC/AUTOUIC/AUTORCC; not maintained source, not in the repository, and not mappable by Codecov."
     },
     {
-      "pattern": "src/libraries/acq/devices/brainamp/brainamp_driver_win32.cpp",
+      "pattern": "src/libs/mne/acq/devices/brainamp/brainamp_driver_win32.cpp",
       "reason": "Built only on Windows with Brain Products' BrainAmpIoCtl.h; needs the BrainAmp USB/PCI driver and an amplifier. brainamp://?simulate=1 covers the rest of the source."
     },
     {
-      "pattern": "src/libraries/acq/devices/gusbamp/gusbamp_driver_win32.cpp",
+      "pattern": "src/libs/mne/acq/devices/gusbamp/gusbamp_driver_win32.cpp",
       "reason": "Built only on Windows; needs the g.USBamp API DLL and amplifiers. gusbamp://?simulate=1 covers the rest of the source."
     },
     {
-      "pattern": "src/libraries/acq/devices/tmsi/tmsi_driver_win32.cpp",
+      "pattern": "src/libs/mne/acq/devices/tmsi/tmsi_driver_win32.cpp",
       "reason": "Built only on Windows; needs the TMSi SDK DLL and an amplifier. tmsi://?simulate=1 covers the rest of the source."
     },
     {

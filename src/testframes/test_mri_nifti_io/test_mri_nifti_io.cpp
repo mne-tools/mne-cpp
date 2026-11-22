@@ -21,10 +21,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mri/mri_nifti_io.h>
-#include <mri/mri_types.h>
-#include <mri/mri_vol_data.h>
-#include <fiff/fiff_file.h>
+#include <mne/mri/mri_nifti_io.h>
+#include <mne/mri/mri_types.h>
+#include <mne/mri/mri_vol_data.h>
+#include <mne/fiff/fiff_file.h>
 #include <zlib.h>
 
 //=============================================================================================================

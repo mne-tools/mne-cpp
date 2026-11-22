@@ -48,7 +48,7 @@ def _ratio(part: int, whole: int) -> str:
 
 
 def library_rows(coverage: dict, api: dict, tests: dict, registry: dict) -> list[dict]:
-    """One row per library under src/libraries, joined across the quality reports."""
+    """One row per library under src/libs/mne, joined across the quality reports."""
     module_of_class = {c["name"]: c["module"] for c in registry.get("classes", [])}
     tests_per_lib: dict[str, int] = defaultdict(int)
     for test in tests.get("tests", []):

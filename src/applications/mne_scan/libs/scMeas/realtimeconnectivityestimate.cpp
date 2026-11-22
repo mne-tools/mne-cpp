@@ -18,11 +18,11 @@
 
 #include "realtimeconnectivityestimate.h"
 
-#include <connectivity/network/network.h>
-#include <mne/mne_forward_solution.h>
-#include <fs/fs_surfaceset.h>
-#include <fs/fs_annotationset.h>
-#include <fiff/fiff_info.h>
+#include <mne/connectivity/network/network.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // STL INCLUDES

@@ -17,19 +17,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "coregistration.h"
 
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <disp/viewers/coregsettingsview.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_project_to_surface.h>
-#include <mne/mne_icp.h>
-#include <base/string_utils.h>
-#include <base/thread_pool.h>
+#include <mne/disp/viewers/coregsettingsview.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_project_to_surface.h>
+#include <mne/mne/mne_icp.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

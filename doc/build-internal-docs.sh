@@ -18,7 +18,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Doxyfile.internal uses paths relative to the doc/ directory
-# (INPUT=../src/libraries ../src/applications), so doxygen must be invoked
+# (INPUT=../src/libs ../src/applications), so doxygen must be invoked
 # with doc/ as the working directory.
 ( cd doc && doxygen Doxyfile.internal )
 

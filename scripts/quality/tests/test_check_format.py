@@ -47,18 +47,18 @@ def _pinned_clang_format() -> str | None:
 
 class ScopeTests(unittest.TestCase):
     def test_in_scope(self) -> None:
-        self.assertTrue(fmt.in_scope("src/libraries/fiff/fiff_raw_data.cpp"))
-        self.assertTrue(fmt.in_scope("src/libraries/fiff/fiff_raw_data.h"))
+        self.assertTrue(fmt.in_scope("src/libs/mne/fiff/fiff_raw_data.cpp"))
+        self.assertTrue(fmt.in_scope("src/libs/mne/fiff/fiff_raw_data.h"))
         self.assertFalse(fmt.in_scope("src/external/eigen/Eigen/Core.h"))
         self.assertFalse(fmt.in_scope("scripts/quality/check_format.py"))
-        self.assertFalse(fmt.in_scope("src/libraries/fiff/CMakeLists.txt"))
+        self.assertFalse(fmt.in_scope("src/libs/mne/fiff/CMakeLists.txt"))
         self.assertFalse(fmt.in_scope("doc/snippet.cpp"))
 
     def test_changed_files_include_new_untracked_sources(self) -> None:
-        new = _REPO_ROOT / "src" / "libraries" / "fiff" / "zz_untracked_format_probe.cpp"
+        new = _REPO_ROOT / "src" / "libs" / "mne" / "fiff" / "zz_untracked_format_probe.cpp"
         new.write_text("int x;\n", encoding="utf-8")
         self.addCleanup(new.unlink)
-        self.assertIn("src/libraries/fiff/zz_untracked_format_probe.cpp", fmt.changed_files("HEAD"))
+        self.assertIn("src/libs/mne/fiff/zz_untracked_format_probe.cpp", fmt.changed_files("HEAD"))
 
     def test_all_files_are_tracked_sources(self) -> None:
         files = fmt.all_files()

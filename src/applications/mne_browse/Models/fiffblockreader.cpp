@@ -15,12 +15,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffblockreader.h"
 
-#include <base/byte_stream.h>
-#include <base/string_utils.h>
-#include <base/thread_pool.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES

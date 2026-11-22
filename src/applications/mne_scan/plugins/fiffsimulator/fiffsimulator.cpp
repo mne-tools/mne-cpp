@@ -16,16 +16,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffsimulator.h"
 
 #include "FormFiles/fiffsimulatorsetupwidget.h"
 
-#include <acq/acq_device_registry.h>
-#include <acq/devices/acq_devices.h>
-#include <acq/fiff/acq_fiff.h>
-#include <fiff/fiff_digitizer_data.h>
-#include <fiff/fiff_info.h>
+#include <mne/acq/acq_device_registry.h>
+#include <mne/acq/devices/acq_devices.h>
+#include <mne/acq/fiff/acq_fiff.h>
+#include <mne/fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff_info.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/sparse/inv_mxne.h>
-#include <inv/sparse/inv_gamma_map.h>
+#include <mne/inv/sparse/inv_mxne.h>
+#include <mne/inv/sparse/inv_gamma_map.h>
 
 //=============================================================================================================
 // QT INCLUDES

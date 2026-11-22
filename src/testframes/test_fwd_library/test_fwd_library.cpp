@@ -14,25 +14,25 @@
 #include <QCoreApplication>
 #include <Eigen/Dense>
 
-#include <base/base_global.h>
-#include <base/log.h>
+#include <mne/base/base_global.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
-#include <mne/mne_surface.h>
-#include <mne/mne_source_space.h>
+#include <mne/mne/mne_surface.h>
+#include <mne/mne/mne_source_space.h>
 
-#include <fwd/fwd_bem_model.h>
-#include <fwd/fwd_bem_solution.h>
-#include <fwd/fwd_eeg_sphere_model.h>
-#include <fwd/fwd_eeg_sphere_model_set.h>
-#include <fwd/fwd_comp_data.h>
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_coil.h>
-#include <fwd/compute_fwd/compute_fwd_settings.h>
-#include <fwd/fwd_global.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_bem_solution.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_eeg_sphere_model_set.h>
+#include <mne/fwd/fwd_comp_data.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_coil.h>
+#include <mne/fwd/compute_fwd/compute_fwd_settings.h>
+#include <mne/fwd/fwd_global.h>
 
 using namespace mne;
 using namespace Eigen;

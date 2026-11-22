@@ -20,12 +20,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_bem.h>
-#include <disp3D/helpers/geometryinfo.h>
-#include <disp3D/helpers/interpolation.h>
-#include <fiff/fiff_constants.h>
-#include <base/log.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/disp3D/helpers/geometryinfo.h>
+#include <mne/disp3D/helpers/interpolation.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

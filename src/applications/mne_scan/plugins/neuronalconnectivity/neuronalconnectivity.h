@@ -21,9 +21,9 @@
 
 #include "neuronalconnectivity_global.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
-#include <connectivity/connectivitysettings.h>
-#include <connectivity/network/network.h>
+#include <mne/base/circular_buffer.h>
+#include <mne/connectivity/connectivitysettings.h>
+#include <mne/connectivity/network/network.h>
 
 //=============================================================================================================
 // QT INCLUDES

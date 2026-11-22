@@ -15,8 +15,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/renderable/electrodeobject.h>
-#include <ieeg/ieeg_implantation.h>
+#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
 // QT INCLUDES

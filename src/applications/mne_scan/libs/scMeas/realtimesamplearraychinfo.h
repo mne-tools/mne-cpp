@@ -19,8 +19,8 @@
 //=============================================================================================================
 
 #include "scmeas_global.h"
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_types.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_types.h>
 
 //=============================================================================================================
 // QT INCLUDES

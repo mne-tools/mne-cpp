@@ -31,7 +31,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq.h>
+#include <mne/acq/acq.h>
 #if defined(_WIN32)
 #define NOMINMAX
 #include <io.h>

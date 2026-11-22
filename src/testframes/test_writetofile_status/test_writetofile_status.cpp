@@ -13,15 +13,15 @@
  */
 
 #include <writetofile/writetofile.h>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
 #include <memory>
 #include <writetofile/FormFiles/writetofilestatuswidget.h>
 
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_stream.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_stream.h>
 
 #include <QApplication>
 #include <QFile>

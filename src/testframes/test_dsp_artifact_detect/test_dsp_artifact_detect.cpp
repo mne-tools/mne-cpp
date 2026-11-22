@@ -12,17 +12,17 @@
  */
 
 #include <QtTest/QtTest>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <Eigen/Dense>
 #include <cmath>
 
-#include <dsp/artifact_detect.h>
-#include <dsp/epoch_extractor.h>
-#include <dsp/peak_finder.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/artifact_detect.h>
+#include <mne/dsp/epoch_extractor.h>
+#include <mne/dsp/peak_finder.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 #include <numbers>
 
 using namespace mne;

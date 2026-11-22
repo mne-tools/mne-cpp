@@ -25,20 +25,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_annotations.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_digitizer_data.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_explain.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_annotations.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_explain.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -19,19 +19,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "surf2bem.h"
 #include "mne_surf2bem_settings.h"
 #include "surfacechecks.h"
 
-#include <fs/fs_surface.h>
+#include <mne/fs/fs_surface.h>
 
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
 
-#include <fiff/fiff_file.h>
+#include <mne/fiff/fiff_file.h>
 
-#include <fiff/fiff_byte_swap.h>
+#include <mne/fiff/fiff_byte_swap.h>
 
 //=============================================================================================================
 // QT INCLUDES

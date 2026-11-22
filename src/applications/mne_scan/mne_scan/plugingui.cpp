@@ -17,7 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "plugingui.h"
 
 #include "arrow.h"
@@ -28,13 +28,13 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <scShared/Plugins/abstractalgorithm.h>
 
-#include <mna/mna_project.h>
-#include <mna/mna_io.h>
-#include <mna/mna_graph.h>
-#include <mna/mna_node.h>
+#include <mne/mna/mna_project.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mna/mna_graph.h>
+#include <mne/mna/mna_node.h>
 #include <scShared/Management/mna_scan_types.h>
 
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -16,20 +16,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
 
-#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
 
-#include <fs/fs_label.h>
+#include <mne/fs/fs_label.h>
 
 //=============================================================================================================
 // QT INCLUDES

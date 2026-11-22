@@ -6,7 +6,7 @@
 #ifndef MNE_ALIGN_ALIGN_POINTS_H
 #define MNE_ALIGN_ALIGN_POINTS_H
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include <mne/acq/devices/polhemus/acquired_points.h>
 
 #include <QObject>
 

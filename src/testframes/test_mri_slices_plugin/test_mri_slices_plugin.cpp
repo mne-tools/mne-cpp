@@ -18,8 +18,8 @@
 
 #include <mri_slices.h>
 
-#include <disp3D/scene/multimodalscene.h>
-#include <disp3D/scene/pickresult.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/disp3D/scene/pickresult.h>
 
 //=============================================================================================================
 // QT INCLUDES

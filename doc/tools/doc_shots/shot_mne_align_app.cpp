@@ -45,7 +45,7 @@
 #include "fixtures/align_demo_fixtures.h"
 #include "mne_align.h"
 
-#include <acq/devices/polhemus/acquired_points.h>
+#include <mne/acq/devices/polhemus/acquired_points.h>
 
 #include <QApplication>
 #include <QJsonArray>

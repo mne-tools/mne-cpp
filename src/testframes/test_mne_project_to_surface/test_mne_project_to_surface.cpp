@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <mne/mne_project_to_surface.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <math/matrix_io.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne_project_to_surface.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/math/matrix_io.h>
 
 //=============================================================================================================
 // QT INCLUDES

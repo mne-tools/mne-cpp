@@ -18,15 +18,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/connectivity_aec.h>
-#include <dsp/filterkernel.h>
-#include <dsp/firfilter.h>
-#include <dsp/peak_finder.h>
-#include <dsp/simulate.h>
-#include <dsp/sphara.h>
-#include <dsp/welch_psd.h>
+#include <mne/dsp/connectivity_aec.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/firfilter.h>
+#include <mne/dsp/peak_finder.h>
+#include <mne/dsp/simulate.h>
+#include <mne/dsp/sphara.h>
+#include <mne/dsp/welch_psd.h>
 
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

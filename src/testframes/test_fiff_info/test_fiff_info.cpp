@@ -4,26 +4,26 @@
 
 #include <algorithm>
 #include <QtTest/QtTest>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <Eigen/Dense>
 
 #include <cstring>
 #include <new>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_info_base.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_info_base.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 using namespace mne;
 using namespace Eigen;

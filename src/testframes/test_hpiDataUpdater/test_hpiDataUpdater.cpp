@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <base/string_utils.h>
-#include <inv/hpi/inv_hpi_data_updater.h>
-#include <inv/hpi/inv_sensor_set.h>
-#include <fiff/fiff.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
+#include <mne/inv/hpi/inv_hpi_data_updater.h>
+#include <mne/inv/hpi/inv_sensor_set.h>
+#include <mne/fiff/fiff.h>
 
 //=============================================================================================================
 // QT INCLUDES

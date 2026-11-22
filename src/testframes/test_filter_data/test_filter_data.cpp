@@ -4,15 +4,15 @@
 
 #include <QtTest/QtTest>
 #include <memory>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <QTemporaryDir>
 #include <Eigen/Dense>
 
-#include <dsp/filterkernel.h>
-#include <dsp/rt/rt_filter.h>
-#include <dsp/rt/rt_detect_trigger.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_info.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_filter.h>
+#include <mne/dsp/rt/rt_detect_trigger.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_info.h>
 
 using namespace mne;
 using namespace Eigen;

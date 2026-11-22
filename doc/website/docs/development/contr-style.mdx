@@ -27,7 +27,7 @@ QString sChName = "MEG0000";
 void loadTxtFile(const QString& sPath);
 ```
 
-In general, try to make your code match the surrounding style — indentation, line breaks, etc. Use Doxygen-style comments to document your code (see [example](https://github.com/mne-tools/mne-cpp/blob/main/libraries/connectivity/network/network.h)). When introducing new functions, include the `@since` tag with the current version. Always align function parameters in `.h` and `.cpp` files:
+In general, try to make your code match the surrounding style — indentation, line breaks, etc. Use Doxygen-style comments to document your code (see [example](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/connectivity/network/network.h)). When introducing new functions, include the `@since` tag with the current version. Always align function parameters in `.h` and `.cpp` files:
 
 ```cpp
 //=========================================================================================================
@@ -70,7 +70,7 @@ their kind, in this order, and leaves out a banner without includes:
 #include "fiff_info.h"          // the file's own header first
 
 #include "fiff_constants.h"     // headers next to the file
-#include <base/string_utils.h>  // other MNE-CPP and third-party headers
+#include <mne/base/string_utils.h>  // other MNE-CPP and third-party headers
 
 //=============================================================================================================
 // QT INCLUDES
@@ -112,7 +112,7 @@ GitHub's blame view reads `.git-blame-ignore-revs` automatically.
 MNE-CPP draws a deliberate line between the **reusable library contract** and
 the **application/plugin code** that consumes it:
 
-- **Libraries (`src/libraries/`)** are the public API. They are documented with
+- **Libraries (`src/libs/mne/`)** are the public API. They are documented with
   full Doxygen comments and published to the website [API reference](/docs/api/).
   The public [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile)
   extracts XML from these headers only.

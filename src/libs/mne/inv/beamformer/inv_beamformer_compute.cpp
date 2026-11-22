@@ -1,0 +1,383 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     inv_beamformer_compute.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the shared LCMV / DICS math kernels declared in @c inv_beamformer_compute.h.
+ *
+ * Implements eigen-decomposition based regularised pseudo-inverse of
+ * the data covariance, the per-source filter derivation loop, the
+ * max-power orientation search via eigendecomposition of the per-source
+ * power matrix, and the symmetric matrix power used by the
+ * rotation-invariant unit-noise-gain normalisation. Each routine is a
+ * direct translation of the formulas given by Sekihara &amp; Nagarajan
+ * (2008) and matches the numerical conventions used by the MNE-Python
+ * beamformer pipeline.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "inv_beamformer_compute.h"
+
+#include <mne/base/log.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+#include <Eigen/SVD>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <algorithm>
+#include <limits>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace mne;
+
+//=============================================================================================================
+// STATIC HELPERS
+//=============================================================================================================
+
+namespace
+{
+
+/**
+ * Invert a small symmetric positive-definite matrix using eigendecomposition.
+ * Handles 1x1 (scalar) and 3x3 (free orientation) cases.
+ */
+MatrixXd invertSmallSym(const MatrixXd& X, bool reduceRank)
+{
+    const int n = static_cast<int>(X.rows());
+    if (n == 1) {
+        MatrixXd result(1, 1);
+        double val = X(0, 0);
+        result(0, 0) = (std::abs(val) > 1e-30) ? 1.0 / val : 1.0;
+        return result;
+    }
+    return InvBeamformerCompute::symMatPow(X, -1.0, reduceRank);
+}
+
+} // anonymous namespace
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+void InvBeamformerCompute::regPinv(const MatrixXd& C,
+                                   double reg,
+                                   MatrixXd& CInv,
+                                   double& loadingFactor,
+                                   int& rankOut)
+{
+    const int n = static_cast<int>(C.rows());
+
+    // Eigendecomposition of symmetric matrix
+    SelfAdjointEigenSolver<MatrixXd> eig(C);
+    VectorXd eigVals = eig.eigenvalues(); // ascending order
+    MatrixXd eigVecs = eig.eigenvectors();
+
+    // Rank tolerance as in mne-python's _estimate_rank_from_s(tol="auto").
+    double maxEig = eigVals.maxCoeff();
+    double threshold = n * maxEig * std::numeric_limits<double>::epsilon();
+    rankOut = 0;
+    for (int i = 0; i < n; ++i) {
+        if (eigVals(i) > threshold)
+            ++rankOut;
+    }
+
+    if (rankOut == 0) {
+        mne::Log::warning("InvBeamformerCompute::regPinv - Covariance matrix has zero rank!");
+        CInv = MatrixXd::Zero(n, n);
+        loadingFactor = 0.0;
+        return;
+    }
+
+    // Loading factor: reg * mean of all eigenvalues (mne-python _reg_pinv), not trace / rank.
+    loadingFactor = reg * eigVals.mean();
+
+    // Regularize: lambda_i += loading_factor (for significant eigenvalues)
+    // Then invert: 1 / (lambda_i + loading)
+    VectorXd eigValsInv(n);
+    for (int i = 0; i < n; ++i) {
+        if (eigVals(i) > threshold) {
+            eigValsInv(i) = 1.0 / (eigVals(i) + loadingFactor);
+        } else {
+            eigValsInv(i) = 0.0;
+        }
+    }
+
+    // Reconstruct inverse: V diag(1/lambda) V^T
+    CInv = eigVecs * eigValsInv.asDiagonal() * eigVecs.transpose();
+}
+
+//=============================================================================================================
+
+void InvBeamformerCompute::reduceLeadfieldRank(MatrixXd& Gk)
+{
+    // SVD of per-source leadfield: Gk (n_channels, n_orient)
+    JacobiSVD<MatrixXd> svd(Gk, ComputeThinU | ComputeThinV);
+    MatrixXd U = svd.matrixU();
+    VectorXd S = svd.singularValues();
+    MatrixXd V = svd.matrixV();
+
+    // Drop the smallest singular value
+    const int keep = static_cast<int>(S.size()) - 1;
+    if (keep <= 0)
+        return;
+
+    // Reconstruct without smallest component
+    Gk = U.leftCols(keep) * S.head(keep).asDiagonal() * V.leftCols(keep).transpose();
+}
+
+//=============================================================================================================
+
+MatrixXd InvBeamformerCompute::symMatPow(const MatrixXd& X, double p, bool reduceRank)
+{
+    const int n = static_cast<int>(X.rows());
+    SelfAdjointEigenSolver<MatrixXd> eig(X);
+    VectorXd eigVals = eig.eigenvalues();
+    MatrixXd eigVecs = eig.eigenvectors();
+
+    // As mne-python _sym_mat_pow: reduce_rank drops the smallest eigenvalue even if already below the limit.
+    const double limit = eigVals(n - 1) * 1e-7;
+    const int startIdx = reduceRank ? 1 : 0;
+
+    VectorXd eigPow = VectorXd::Zero(n);
+    for (int i = startIdx; i < n; ++i) {
+        if (eigVals(i) > limit) {
+            eigPow(i) = std::pow(eigVals(i), p);
+        }
+    }
+
+    return eigVecs * eigPow.asDiagonal() * eigVecs.transpose();
+}
+
+//=============================================================================================================
+
+bool InvBeamformerCompute::computeBeamformer(const MatrixXd& G,
+                                             const MatrixXd& Cm,
+                                             double reg,
+                                             int nOrient,
+                                             BeamformerWeightNorm weightNorm,
+                                             BeamformerPickOri pickOri,
+                                             bool reduceRank,
+                                             BeamformerInversion invMethod,
+                                             const MatrixX3d& nn,
+                                             MatrixXd& W,
+                                             MatrixX3d& maxPowerOri)
+{
+    const int nChannels = static_cast<int>(G.rows());
+    const int nDipoles = static_cast<int>(G.cols());
+    const int nSources = nDipoles / nOrient;
+
+    if (nSources * nOrient != nDipoles) {
+        mne::Log::warning("InvBeamformerCompute::computeBeamformer - G.cols() not divisible by nOrient!");
+        return false;
+    }
+    if (Cm.rows() != nChannels || Cm.cols() != nChannels) {
+        mne::Log::warning("InvBeamformerCompute::computeBeamformer - Cm dimension mismatch with leadfield!");
+        return false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Step 1: Regularized pseudo-inverse of covariance
+    // -----------------------------------------------------------------------
+    MatrixXd CmInv;
+    double loadingFactor = 0.0;
+    int cmRank = 0;
+    regPinv(Cm, reg, CmInv, loadingFactor, cmRank);
+
+    // NAI noise level: the rank-th largest eigenvalue of Cm or the loading factor, whichever is larger.
+    double noiseLevel = loadingFactor;
+    if (weightNorm == BeamformerWeightNorm::NAI && cmRank > 0) {
+        const VectorXd cmEig = SelfAdjointEigenSolver<MatrixXd>(Cm, EigenvaluesOnly).eigenvalues();
+        noiseLevel = std::max(cmEig(nChannels - cmRank), loadingFactor);
+    }
+
+    // -----------------------------------------------------------------------
+    // Step 2--6: Per-source computation
+    // -----------------------------------------------------------------------
+    // Determine output orientation count
+    int nOrientOut = nOrient;
+    if (pickOri == BeamformerPickOri::Normal || pickOri == BeamformerPickOri::MaxPower) {
+        nOrientOut = 1;
+    }
+    // For Vector mode, keep all 3
+    if (pickOri == BeamformerPickOri::Vector) {
+        nOrientOut = nOrient;
+    }
+
+    W.resize(static_cast<Eigen::Index>(nSources) * nOrientOut, nChannels);
+    W.setZero();
+
+    if (pickOri == BeamformerPickOri::MaxPower) {
+        maxPowerOri.resize(nSources, 3);
+        maxPowerOri.setZero();
+    } else {
+        maxPowerOri.resize(0, 3);
+    }
+
+    for (int s = 0; s < nSources; ++s) {
+        // Extract per-source leadfield block: Gk (n_channels, n_orient)
+        MatrixXd Gk = G.middleCols(static_cast<Eigen::Index>(s) * nOrient, nOrient);
+
+        // Step 3: Optional rank reduction
+        if (reduceRank && nOrient > 1) {
+            reduceLeadfieldRank(Gk);
+        }
+
+        // ------------------------------------------------------------------
+        // Step 4: Orientation selection
+        // ------------------------------------------------------------------
+        int orientForFilter = nOrient;
+
+        if (pickOri == BeamformerPickOri::MaxPower) {
+            // Compute optimal orientation via max eigenvalue criterion
+            // bf_numer = Gk^T Cm^{-1}   (n_orient, n_channels)
+            // bf_denom = Gk^T Cm^{-1} Gk (n_orient, n_orient)
+            MatrixXd bfNumer = Gk.transpose() * CmInv; // (n_orient, n_ch)
+            MatrixXd bfDenom = bfNumer * Gk;           // (n_orient, n_orient)
+
+            MatrixXd oriNumer, oriDenom;
+            if (weightNorm == BeamformerWeightNorm::None) {
+                oriNumer = MatrixXd::Identity(nOrient, nOrient);
+                oriDenom = bfDenom;
+            } else {
+                // Sekihara & Nagarajan 2008, eq. 4.47
+                oriNumer = bfDenom;
+                oriDenom = Gk.transpose() * (CmInv * CmInv) * Gk; // (n_orient, n_orient)
+            }
+
+            // Compute oriDenom^{-1} @ oriNumer
+            MatrixXd oriDenomInv = invertSmallSym(oriDenom, reduceRank);
+            MatrixXd oriPick = oriDenomInv * oriNumer;
+
+            // Pick eigenvector with maximum absolute eigenvalue
+            // Note: oriPick is NOT necessarily symmetric -> use general eigensolver
+            EigenSolver<MatrixXd> eigSolve(oriPick);
+            VectorXcd eigVals = eigSolve.eigenvalues();
+            MatrixXcd eigVecs = eigSolve.eigenvectors();
+
+            int maxIdx = 0;
+            double maxVal = 0.0;
+            for (int i = 0; i < eigVals.size(); ++i) {
+                double absVal = std::abs(eigVals(i));
+                if (absVal > maxVal) {
+                    maxVal = absVal;
+                    maxIdx = i;
+                }
+            }
+
+            // Optimal orientation (real part)
+            Vector3d ori = eigVecs.col(maxIdx).real().head(3).normalized();
+
+            // Align sign with surface normal
+            if (nn.rows() > s) {
+                double dot = ori.dot(nn.row(s).transpose());
+                if (dot < 0.0)
+                    ori = -ori;
+            }
+
+            maxPowerOri.row(s) = ori.transpose();
+
+            // Project leadfield to optimal orientation
+            Gk = Gk * ori; // (n_channels, 1)
+            orientForFilter = 1;
+
+        } else if (pickOri == BeamformerPickOri::Normal && nOrient >= 3) {
+            // Extract Z-component (normal to surface in local source coords)
+            Gk = Gk.col(2).eval(); // (n_channels, 1); eval() avoids self-aliasing on resize
+            orientForFilter = 1;
+        }
+
+        // ------------------------------------------------------------------
+        // Step 5: Compute unit-gain filter
+        //   bf_numer = Gk^T Cm^{-1}          (n_ori_filt, n_channels)
+        //   bf_denom = Gk^T Cm^{-1} Gk       (n_ori_filt, n_ori_filt)
+        //   W_ug     = bf_denom^{-1} bf_numer (n_ori_filt, n_channels)
+        // ------------------------------------------------------------------
+        MatrixXd bfNumer = Gk.transpose() * CmInv; // (orientForFilter, n_ch)
+        MatrixXd bfDenom = bfNumer * Gk;           // (orientForFilter, orientForFilter)
+
+        MatrixXd bfDenomInv;
+        if (invMethod == BeamformerInversion::Single && orientForFilter > 1) {
+            // Scalar inversion of diagonal elements
+            bfDenomInv = MatrixXd::Zero(orientForFilter, orientForFilter);
+            for (int d = 0; d < orientForFilter; ++d) {
+                double val = bfDenom(d, d);
+                bfDenomInv(d, d) = (std::abs(val) > 1e-30) ? 1.0 / val : 0.0;
+            }
+        } else {
+            bfDenomInv = invertSmallSym(bfDenom, reduceRank);
+        }
+
+        MatrixXd Wug = bfDenomInv * bfNumer; // (orientForFilter, n_channels)
+
+        // ------------------------------------------------------------------
+        // Step 6: Weight normalization
+        // ------------------------------------------------------------------
+        if (weightNorm == BeamformerWeightNorm::UnitNoiseGain || weightNorm == BeamformerWeightNorm::NAI) {
+            // Sekihara 2008: normalize by sqrt(diag(W W^T))
+            MatrixXd noiseNorm = Wug * Wug.transpose(); // (orientForFilter, orientForFilter)
+
+            for (int d = 0; d < orientForFilter; ++d) {
+                double normVal = std::sqrt(std::abs(noiseNorm(d, d)));
+                if (normVal > 1e-30) {
+                    Wug.row(d) /= normVal;
+                }
+            }
+
+            if (weightNorm == BeamformerWeightNorm::NAI && noiseLevel > 1e-30) {
+                Wug /= std::sqrt(noiseLevel);
+            }
+
+        } else if (weightNorm == BeamformerWeightNorm::UnitNoiseGainInv) {
+            // Rotation-invariant version: sqrtm(inner)^{-0.5} @ G^T Cm^{-1}
+            MatrixXd inner = bfNumer * bfNumer.transpose(); // (orientForFilter, orientForFilter)
+            MatrixXd innerPow = symMatPow(inner, -0.5, false);
+            Wug = innerPow * bfNumer;
+        }
+
+        // Store result
+        W.middleRows(static_cast<Eigen::Index>(s) * nOrientOut, nOrientOut) = Wug;
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+VectorXd InvBeamformerCompute::computePower(const MatrixXd& Cm,
+                                            const MatrixXd& W,
+                                            int nOrient)
+{
+    const int nTotal = static_cast<int>(W.rows());
+    const int nSources = nTotal / nOrient;
+
+    VectorXd power(nSources);
+    for (int s = 0; s < nSources; ++s) {
+        // W_k: (n_orient, n_channels)
+        MatrixXd Wk = W.middleRows(static_cast<Eigen::Index>(s) * nOrient, nOrient);
+        // power = trace(W_k Cm W_k^T)
+        MatrixXd WCW = Wk * Cm * Wk.transpose();
+        power(s) = WCW.trace();
+    }
+
+    return power;
+}

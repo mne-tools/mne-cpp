@@ -20,10 +20,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <com/tcp_socket.h>
+#include <mne/com/tcp_socket.h>
 
 //=============================================================================================================
 // QT INCLUDES

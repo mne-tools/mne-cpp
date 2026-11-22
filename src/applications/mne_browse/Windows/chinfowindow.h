@@ -20,8 +20,8 @@
 //=============================================================================================================
 
 #include "ui_chinfowindow.h"
-#include <fiff/fiff.h>
-#include <disp/viewers/helpers/channelinfomodel.h>
+#include <mne/fiff/fiff.h>
+#include <mne/disp/viewers/helpers/channelinfomodel.h>
 
 //=============================================================================================================
 // QT INCLUDES

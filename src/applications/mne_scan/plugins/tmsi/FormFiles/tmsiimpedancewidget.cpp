@@ -16,12 +16,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "tmsiimpedancewidget.h"
 
 #include "ui_tmsiimpedancewidget.h"
 #include "../tmsi.h"
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

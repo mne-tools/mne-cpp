@@ -28,7 +28,7 @@
 #include "mne_surf2bem_settings.h"
 #include "surf2bem.h"
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

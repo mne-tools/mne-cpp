@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+cmake_minimum_required(VERSION 3.14)
+project(mne_bids
+  LANGUAGES CXX
+)
+
+set(SOURCES
+  bids_path.cpp
+  bids_tsv.cpp
+  bids_channel.cpp
+  bids_electrode.cpp
+  bids_coordinate_system.cpp
+  bids_event.cpp
+  bids_dataset_description.cpp
+  bids_raw_data.cpp
+  readers/bids_edf_reader.cpp
+  readers/bids_brain_vision_reader.cpp
+)
+
+set(HEADERS
+  bids_global.h
+  bids_const.h
+  bids_event.h
+  bids_channel.h
+  bids_electrode.h
+  bids_coordinate_system.h
+  bids_path.h
+  bids_tsv.h
+  bids_dataset_description.h
+  bids_raw_data.h
+  readers/bids_abstract_format_reader.h
+  readers/bids_edf_reader.h
+  readers/bids_brain_vision_reader.h
+)
+
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
+
+# FiffInfo/FiffRawData appear in the public headers, so consumers need mne_fiff too
+target_link_libraries(${PROJECT_NAME} PUBLIC mne_fiff)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  mne_base
+  Eigen3::Eigen)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_BIDS_LIBRARY)
+
+if(NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
+
+install(TARGETS ${PROJECT_NAME} ${MNE_CPP_EXPORT_SET}
+    RUNTIME DESTINATION bin COMPONENT runtime
+    LIBRARY DESTINATION lib COMPONENT runtime
+    ARCHIVE DESTINATION lib COMPONENT sdk
+)
+
+# Install public headers for SDK
+foreach(_header ${HEADERS})
+    get_filename_component(_dir "${_header}" DIRECTORY)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${_header}"
+        DESTINATION include/mne/bids/${_dir}
+        COMPONENT sdk
+    )
+endforeach()

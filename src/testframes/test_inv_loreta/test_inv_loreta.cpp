@@ -16,21 +16,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_forward_solution.h>
 
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

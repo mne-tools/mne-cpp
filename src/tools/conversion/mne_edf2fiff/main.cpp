@@ -15,12 +15,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <bids/readers/bids_edf_reader.h>
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/bids/readers/bids_edf_reader.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

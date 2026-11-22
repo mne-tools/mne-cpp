@@ -22,13 +22,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "../anshared_global.h"
 #include "../Utils/types.h"
 #include "abstractmodel.h"
-#include <fiff/fiff_io.h>
-#include <fiff/fiff_file_sharer.h>
-#include <dsp/filterkernel.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/fiff/fiff_file_sharer.h>
+#include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
 // QT INCLUDES

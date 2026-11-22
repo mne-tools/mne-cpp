@@ -14,12 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq.h>
-#include <base/string_utils.h>
-#include <com/udp_socket.h>
-#include <fiff/fiff_raw_data.h>
-#include <lsl/lsl_stream_discovery.h>
-#include <lsl/lsl_stream_inlet.h>
+#include <mne/acq/acq.h>
+#include <mne/base/string_utils.h>
+#include <mne/com/udp_socket.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/lsl/lsl_stream_discovery.h>
+#include <mne/lsl/lsl_stream_inlet.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -1,6 +1,6 @@
 {
   "$comment": "Policy for scripts/quality/audit_qt_usage.py (gate G13). Ceilings may only fall: lower them in the commit that removes Qt (audit_qt_usage.py --print-ceilings).",
-  "scan_root": "src/libraries",
+  "scan_root": "src/libs/mne",
   "exclude_path_fragments": {
     "/FormFiles/": "Qt Designer generated forms (uic input); not hand-maintained C++.",
     "_autogen/": "moc/uic/rcc output; generated at build time."
@@ -428,7 +428,7 @@
         "Gui",
         "Widgets"
       ],
-      "src/libraries/disp": [
+      "src/libs/mne/disp": [
         "Core",
         "Gui",
         "GuiPrivate",
@@ -436,7 +436,7 @@
         "Svg",
         "Widgets"
       ],
-      "src/libraries/disp3D": [
+      "src/libs/mne/disp3D": [
         "Core",
         "Gui",
         "GuiPrivate",

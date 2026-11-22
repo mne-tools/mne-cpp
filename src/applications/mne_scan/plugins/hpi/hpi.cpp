@@ -17,17 +17,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "hpi.h"
 
 #include "FormFiles/hpisetupwidget.h"
-#include <base/string_utils.h>
-#include <disp/viewers/hpisettingsview.h>
+#include <mne/base/string_utils.h>
+#include <mne/disp/viewers/hpisettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
-#include <dsp/rt/rt_hpi.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_digitizer_data.h>
+#include <mne/dsp/rt/rt_hpi.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

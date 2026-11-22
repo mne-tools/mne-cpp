@@ -25,7 +25,7 @@ Includes are grouped under banners in this order; a section without includes has
 //=============================================================================================================
 
 #include "own_header.h"
-#include <base/other_mne_cpp_header.h>
+#include <mne/base/other_mne_cpp_header.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -15,18 +15,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_source_estimate.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_dir_node.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_dig_point.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_dig_point.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

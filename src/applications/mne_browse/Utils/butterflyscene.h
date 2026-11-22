@@ -21,8 +21,8 @@
 
 #include "butterflysceneitem.h"
 
-#include <disp/viewers/helpers/layoutscene.h>
-#include <disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/layoutscene.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
 
 
 //*************************************************************************************************************

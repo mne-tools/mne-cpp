@@ -4,29 +4,29 @@
 
 #include <QtTest/QtTest>
 #include <memory>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <Eigen/Dense>
 #include <format>
 #include <algorithm>
 #include <cmath>
 #include <random>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <dsp/rt/rt_averaging.h>
-#include <dsp/rt/rt_noise.h>
-#include <dsp/rt/rt_connectivity.h>
-#include <dsp/rt/rt_filter.h>
-#include <dsp/rt/rt_detect_trigger.h>
+#include <mne/dsp/rt/rt_averaging.h>
+#include <mne/dsp/rt/rt_noise.h>
+#include <mne/dsp/rt/rt_connectivity.h>
+#include <mne/dsp/rt/rt_filter.h>
+#include <mne/dsp/rt/rt_detect_trigger.h>
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked_set.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_epoch_data_list.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_epoch_data_list.h>
 
 #include "../../applications/mne_browse/Utils/filteroperator.h"
 #include "../../applications/mne_browse/Utils/sessionfilter.h"

@@ -16,10 +16,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "mne_show_fiff_settings.h"
 
-#include <base/base_global.h>
+#include <mne/base/base_global.h>
 #include <stdio.h>
 
 

@@ -19,18 +19,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
-#include <mne/mne.h>
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_source_spaces.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_source_spaces.h>
 
-#include <fs/fs_surface.h>
-#include <fs/fs_surfaceset.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_surfaceset.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

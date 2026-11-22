@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forward_solution.h>
-#include <fs/fs_annotationset.h>
-#include <math/matrix_io.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/math/matrix_io.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

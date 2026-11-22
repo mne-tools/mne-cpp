@@ -22,10 +22,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_types.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_types.h>
 
 //=============================================================================================================
 // QT INCLUDES

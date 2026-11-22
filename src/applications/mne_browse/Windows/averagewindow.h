@@ -24,9 +24,9 @@
 #include "../Utils/types.h"
 #include "../Models/averagemodel.h"
 #include "../Delegates/averagedelegate.h"
-#include <channels/layoutloader.h>
-#include <disp/viewers/helpers/averagescene.h>
-#include <disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/channels/layoutloader.h>
+#include <mne/disp/viewers/helpers/averagescene.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
 
 //=============================================================================================================
 // QT INCLUDES

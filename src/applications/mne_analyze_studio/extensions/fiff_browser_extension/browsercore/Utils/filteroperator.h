@@ -30,12 +30,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/viewers/helpers/mneoperator.h>
+#include <mne/disp/viewers/helpers/mneoperator.h>
 //*************************************************************************************************************
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <dsp/parksmcclellan.h>
-#include <dsp/cosinefilter.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/dsp/parksmcclellan.h>
+#include <mne/dsp/cosinefilter.h>
 
 //*************************************************************************************************************
 //=============================================================================================================

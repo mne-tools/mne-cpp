@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <sts/sts_adjacency.h>
-#include <sts/sts_cluster.h>
-#include <sts/sts_ttest.h>
-#include <sts/sts_ftest.h>
-#include <sts/sts_correction.h>
+#include <mne/sts/sts_adjacency.h>
+#include <mne/sts/sts_cluster.h>
+#include <mne/sts/sts_ttest.h>
+#include <mne/sts/sts_ftest.h>
+#include <mne/sts/sts_correction.h>
 
 //=============================================================================================================
 // QT INCLUDES

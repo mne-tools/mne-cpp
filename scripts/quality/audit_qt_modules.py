@@ -10,8 +10,8 @@
 # @brief    Attribute Qt use of the display stack and applications to Qt modules, per file and class.
 """Qt modules used by the display stack and the applications.
 
-Plans shrinking the Qt dependency to Qt Core + Gui. For each scope (``src/libraries/disp``,
-``src/libraries/disp3D``, ``src/applications``) and each CMake target inside it, it reports:
+Plans shrinking the Qt dependency to Qt Core + Gui. For each scope (``src/libs/mne/disp``,
+``src/libs/mne/disp3D``, ``src/applications``) and each CMake target inside it, it reports:
 
 * which Qt module every ``#include`` and every Q-identifier in code belongs to (comments and string literals are
   removed); the class -> module map is built from the Qt headers in ``src/external/qt/dynamic`` (forwarding headers
@@ -45,7 +45,7 @@ from audit_maintainability import strip_comments_and_strings  # noqa: E402
 REPO_ROOT = Path(__file__).resolve().parents[2]
 POLICY_FILE = Path(__file__).resolve().parent / "qt_usage_policy.json"
 QT_ROOT = REPO_ROOT / "src" / "external" / "qt" / "dynamic"
-SCOPES = {"disp": "src/libraries/disp", "disp3D": "src/libraries/disp3D", "applications": "src/applications"}
+SCOPES = {"disp": "src/libs/mne/disp", "disp3D": "src/libs/mne/disp3D", "applications": "src/applications"}
 EXTENSIONS = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".mm"}
 BASE_MODULES = {"Core", "Gui"}
 
@@ -110,13 +110,13 @@ FALLBACK_RHI_HEADERS = {"qrhi.h": ["QRhi", "QRhiBuffer", "QRhiTexture", "QRhiSam
 RULES: dict[str, dict[str, Any]] = {
     "Concurrent": {
         "verdict": "std",
-        "replacement": "mne::ThreadPool (src/libraries/base/thread_pool.h), std::async / std::jthread "
+        "replacement": "mne::ThreadPool (src/libs/mne/base/thread_pool.h), std::async / std::jthread "
                        "(QFuture/QFutureWatcher are QtCore, counted there)",
         "classes": {},
     },
     "Network": {
         "verdict": "own",
-        "replacement": "com library sockets (src/libraries/com: tcp_socket, tcp_server, udp_socket)",
+        "replacement": "com library sockets (src/libs/mne/com: tcp_socket, tcp_server, udp_socket)",
         "classes": {"QNetworkAccessManager": "no HTTP client in com; needs an own one or a third-party library",
                     "QNetworkRequest": "no HTTP client in com; needs an own one or a third-party library",
                     "QNetworkReply": "no HTTP client in com; needs an own one or a third-party library",
@@ -125,7 +125,7 @@ RULES: dict[str, dict[str, Any]] = {
                     "QLocalServer": "com has no local (Unix socket / named pipe) server; TCP loopback via com "
                                     "tcp_server, or add a local server to com"},
     },
-    "SerialPort": {"verdict": "own", "replacement": "com library serial_port (src/libraries/com/serial_port.h)",
+    "SerialPort": {"verdict": "own", "replacement": "com library serial_port (src/libs/mne/com/serial_port.h)",
                    "classes": {}},
     "Svg": {
         "verdict": "own/gui",

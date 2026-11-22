@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/bad_channels_lof.h>
-#include <base/string_utils.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/dsp/bad_channels_lof.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

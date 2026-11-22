@@ -18,18 +18,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/string_utils.h>
-#include <bids/bids_channel.h>
-#include <bids/bids_coordinate_system.h>
-#include <bids/bids_dataset_description.h>
-#include <bids/bids_electrode.h>
-#include <bids/bids_event.h>
-#include <bids/bids_path.h>
-#include <bids/bids_raw_data.h>
-#include <bids/bids_tsv.h>
-#include <bids/readers/bids_abstract_format_reader.h>
-#include <bids/readers/bids_brain_vision_reader.h>
-#include <bids/readers/bids_edf_reader.h>
+#include <mne/base/string_utils.h>
+#include <mne/bids/bids_channel.h>
+#include <mne/bids/bids_coordinate_system.h>
+#include <mne/bids/bids_dataset_description.h>
+#include <mne/bids/bids_electrode.h>
+#include <mne/bids/bids_event.h>
+#include <mne/bids/bids_path.h>
+#include <mne/bids/bids_raw_data.h>
+#include <mne/bids/bids_tsv.h>
+#include <mne/bids/readers/bids_abstract_format_reader.h>
+#include <mne/bids/readers/bids_brain_vision_reader.h>
+#include <mne/bids/readers/bids_edf_reader.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_vector_source_estimate.h>
-#include <inv/inv_volume_source_estimate.h>
+#include <mne/inv/inv_vector_source_estimate.h>
+#include <mne/inv/inv_volume_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

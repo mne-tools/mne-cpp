@@ -18,12 +18,12 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/event.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <disp/viewers/coregsettingsview.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <base/string_utils.h>
-#include <base/thread_pool.h>
-#include <fiff/fiff_dig_point_set.h>
+#include <mne/disp/viewers/coregsettingsview.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/thread_pool.h>
+#include <mne/fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

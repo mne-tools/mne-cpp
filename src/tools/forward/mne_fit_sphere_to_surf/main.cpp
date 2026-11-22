@@ -14,14 +14,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <fs/fs_surface.h>
-#include <math/sphere.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/math/sphere.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -27,8 +27,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/beamformer/inv_beamformer_compute.h>
-#include <inv/beamformer/inv_beamformer_settings.h>
+#include <mne/inv/beamformer/inv_beamformer_compute.h>
+#include <mne/inv/beamformer/inv_beamformer_settings.h>
 
 //=============================================================================================================
 // QT INCLUDES

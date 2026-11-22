@@ -11,7 +11,7 @@
 # @brief    Classify every exported library class by the evidence that backs it.
 """Audit API evidence for gate G3.
 
-For every class exported from ``src/libraries`` (``class|struct <LIB>SHARED_EXPORT``)
+For every class exported from ``src/libs/mne`` (``class|struct <LIB>SHARED_EXPORT``)
 and every ``doc/api_registry.json`` record, report:
 
 * whether the class is registered, and whether a registry record names a class
@@ -46,7 +46,7 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-LIBRARIES_DIR = REPO_ROOT / "src" / "libraries"
+LIBRARIES_DIR = REPO_ROOT / "src" / "libs" / "mne"
 EXAMPLES_DIR = REPO_ROOT / "src" / "examples"
 REGISTRY = REPO_ROOT / "doc" / "api_registry.json"
 API_DOCS_DIR = REPO_ROOT / "doc" / "website" / "docs" / "api"
@@ -91,7 +91,8 @@ def example_includes(examples_dir: Path) -> dict[str, list[str]]:
             continue
         example = source.relative_to(examples_dir).parts[0]
         for header in _INCLUDE_RE.findall(source.read_text(encoding="utf-8", errors="replace")):
-            includes.setdefault(header, set()).add(example)
+            # <mne/fiff/x.h> names the header fiff/x.h of src/libs/mne
+            includes.setdefault(header.removeprefix("mne/"), set()).add(example)
     return {header: sorted(names) for header, names in includes.items()}
 
 
@@ -116,7 +117,7 @@ def exemption(name: str, header: str, policy: dict[str, Any]) -> str | None:
 
 
 def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
-    libraries_dir = repo_root / "src" / "libraries"
+    libraries_dir = repo_root / "src" / "libs" / "mne"
     examples_dir = repo_root / "src" / "examples"
     registry = json.loads((repo_root / "doc" / "api_registry.json").read_text(encoding="utf-8"))
     policy = json.loads(POLICY_FILE.read_text(encoding="utf-8"))

@@ -15,13 +15,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "channelselection.h"
 
-#include <disp/viewers/helpers/selectionsceneitem.h>
-#include <disp/viewers/helpers/channelinfomodel.h>
-#include <disp/viewers/channelselectionview.h>
-#include <disp/viewers/applytoview.h>
+#include <mne/disp/viewers/helpers/selectionsceneitem.h>
+#include <mne/disp/viewers/helpers/channelinfomodel.h>
+#include <mne/disp/viewers/channelselectionview.h>
+#include <mne/disp/viewers/applytoview.h>
 #include <anShared/Management/communicator.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/analyzedata.h>

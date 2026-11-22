@@ -92,16 +92,16 @@ class RatchetTests(unittest.TestCase):
     def test_growth_in_total_or_single_file_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            (root / "src/libraries/a").mkdir(parents=True)
-            (root / "src/libraries/a/a.cpp").write_text("int* p = NULL;\n", encoding="utf-8")
-            (root / "src/libraries/a/b.cpp").write_text("int* q = NULL;\n", encoding="utf-8")
-            policy = {"scan_roots": ["src/libraries"], "extensions": [".cpp"]}
+            (root / "src/libs/mne/a").mkdir(parents=True)
+            (root / "src/libs/mne/a/a.cpp").write_text("int* p = NULL;\n", encoding="utf-8")
+            (root / "src/libs/mne/a/b.cpp").write_text("int* q = NULL;\n", encoding="utf-8")
+            policy = {"scan_roots": ["src/libs/mne"], "extensions": [".cpp"]}
             baseline = audit.build_report(root, policy)
             self.assertEqual(baseline["metrics"]["null_macro"]["total"], 2)
             self.assertEqual(audit.check(baseline, baseline), [])
 
-            (root / "src/libraries/a/a.cpp").write_text("int* p = NULL; int* r = NULL;\n", encoding="utf-8")
-            (root / "src/libraries/a/b.cpp").write_text("int* q = nullptr;\n", encoding="utf-8")
+            (root / "src/libs/mne/a/a.cpp").write_text("int* p = NULL; int* r = NULL;\n", encoding="utf-8")
+            (root / "src/libs/mne/a/b.cpp").write_text("int* q = nullptr;\n", encoding="utf-8")
             moved = audit.build_report(root, policy)
             self.assertEqual(moved["metrics"]["null_macro"]["total"], 2)
             failures = audit.check(moved, baseline)

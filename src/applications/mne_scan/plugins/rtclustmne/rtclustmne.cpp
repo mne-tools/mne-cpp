@@ -16,22 +16,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "rtclustmne.h"
 
 #include "FormFiles/rtclustmnesetupwidget.h"
-#include <base/string_utils.h>
-#include <disp/viewers/minimumnormsettingsview.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_surfaceset.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_info.h>
-#include <mne/mne_forward_solution.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_epoch_data_list.h>
-#include <dsp/rt/rt_inv_op.h>
-#include <inv/minimum_norm/inv_cmne.h>
-#include <inv/minimum_norm/inv_cmne_settings.h>
+#include <mne/base/string_utils.h>
+#include <mne/disp/viewers/minimumnormsettingsview.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_surfaceset.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/dsp/rt/rt_inv_op.h>
+#include <mne/inv/minimum_norm/inv_cmne.h>
+#include <mne/inv/minimum_norm/inv_cmne_settings.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimecov.h>

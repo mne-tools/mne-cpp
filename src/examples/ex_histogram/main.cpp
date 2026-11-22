@@ -17,20 +17,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <math/numerics.h>
-#include <base/log.h>
-#include <disp/plots/bar.h>
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/spline.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/math/numerics.h>
+#include <mne/base/log.h>
+#include <mne/disp/plots/bar.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/spline.h>
 //includes for source localization data
-#include <fs/fs_label.h>
-#include <fs/fs_surface.h>
-#include <fs/fs_annotationset.h>
-#include <fiff/fiff_evoked.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
 
 //=============================================================================================================
 // QT INCLUDES

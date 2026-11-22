@@ -18,13 +18,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <sts/sts_adjacency.h>
-#include <sts/sts_cluster.h>
-#include <sts/sts_correction.h>
-#include <sts/sts_cov_estimators.h>
-#include <sts/sts_ftest.h>
-#include <sts/sts_source_metrics.h>
-#include <sts/sts_ttest.h>
+#include <mne/sts/sts_adjacency.h>
+#include <mne/sts/sts_cluster.h>
+#include <mne/sts/sts_correction.h>
+#include <mne/sts/sts_cov_estimators.h>
+#include <mne/sts/sts_ftest.h>
+#include <mne/sts/sts_source_metrics.h>
+#include <mne/sts/sts_ttest.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -8,7 +8,7 @@
 # This config is deliberately separate from the public-API ``Doxyfile``:
 #
 #   * The public ``Doxyfile`` documents ONLY the reusable library contract
-#     (INPUT = ../src/libraries), emits XML, and is consumed by
+#     (INPUT = ../src/libs), emits XML, and is consumed by
 #     scripts/doxy2mdx/doxy2mdx.py to publish the website API reference.
 #
 #   * This file additionally covers the application & plugin code under
@@ -32,7 +32,7 @@ PROJECT_BRIEF          = "Application & plugin internals (not the public API)"
 # ---------------------------------------------------------------------------
 # Input — libraries AND applications/plugins (the maintainer surface)
 # ---------------------------------------------------------------------------
-INPUT                  = ../src/libraries ../src/applications
+INPUT                  = ../src/libs ../src/applications
 RECURSIVE              = YES
 FILE_PATTERNS          = *.h *.hpp *.cpp
 EXCLUDE_PATTERNS       = */moc_* */ui_* */qrc_* */*_autogen/*

@@ -16,10 +16,10 @@
 
 #include <workflowgraph.h>
 
-#include <mna/mna_io.h>
-#include <mna/mna_project.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mna/mna_project.h>
 
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 
 #include <QFileInfo>
 #include <QJsonArray>

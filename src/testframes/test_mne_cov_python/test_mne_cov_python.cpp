@@ -32,14 +32,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_cov_matrix.h>
-#include <base/string_utils.h>
-#include <mne/mne_proj_op.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_file.h>
-#include <fiff/fiff_stream.h>
+#include <mne/mne/mne_cov_matrix.h>
+#include <mne/base/string_utils.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/fiff/fiff_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES

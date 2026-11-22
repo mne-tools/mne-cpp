@@ -20,30 +20,30 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/viewers/abstractview.h>
-#include <disp/viewers/scalingview.h>
-#include <disp/viewers/compensatorview.h>
-#include <disp/viewers/projectorsview.h>
-#include <disp/viewers/modalityselectionview.h>
-#include <disp/viewers/minimumnormsettingsview.h>
-#include <disp/viewers/filtersettingsview.h>
-#include <disp/viewers/filterdesignview.h>
-#include <disp/viewers/spectrumsettingsview.h>
-#include <disp/viewers/averagingsettingsview.h>
-#include <disp/viewers/covariancesettingsview.h>
-#include <disp/viewers/spharasettingsview.h>
-#include <disp/viewers/tfsettingsview.h>
-#include <disp/viewers/connectivitysettingsview.h>
-#include <disp/viewers/triggerdetectionview.h>
-#include <disp/viewers/progressview.h>
-#include <disp/viewers/quickcontrolview.h>
-#include <disp/viewers/multiview.h>
+#include <mne/disp/viewers/abstractview.h>
+#include <mne/disp/viewers/scalingview.h>
+#include <mne/disp/viewers/compensatorview.h>
+#include <mne/disp/viewers/projectorsview.h>
+#include <mne/disp/viewers/modalityselectionview.h>
+#include <mne/disp/viewers/minimumnormsettingsview.h>
+#include <mne/disp/viewers/filtersettingsview.h>
+#include <mne/disp/viewers/filterdesignview.h>
+#include <mne/disp/viewers/spectrumsettingsview.h>
+#include <mne/disp/viewers/averagingsettingsview.h>
+#include <mne/disp/viewers/covariancesettingsview.h>
+#include <mne/disp/viewers/spharasettingsview.h>
+#include <mne/disp/viewers/tfsettingsview.h>
+#include <mne/disp/viewers/connectivitysettingsview.h>
+#include <mne/disp/viewers/triggerdetectionview.h>
+#include <mne/disp/viewers/progressview.h>
+#include <mne/disp/viewers/quickcontrolview.h>
+#include <mne/disp/viewers/multiview.h>
 
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_ctf_comp.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_ctf_comp.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,11 +14,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
 
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

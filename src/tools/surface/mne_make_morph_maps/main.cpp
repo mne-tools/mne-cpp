@@ -18,9 +18,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/fs_surface.h>
-#include <mne/mne_morph_map.h>
-#include <base/log.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/mne/mne_morph_map.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

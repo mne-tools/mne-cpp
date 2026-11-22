@@ -9,11 +9,11 @@
  */
 //=============================================================================================================
 
-#include <fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_ch_name.h>
 
 #include <QtTest/QtTest>
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
 #include <QCoreApplication>
 #include <QDir>
@@ -24,17 +24,17 @@
 
 #include <cmath>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_raw_data.h>
 
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_spaces.h>
-#include <fiff/fiff_evoked.h>
-#include <inv/inv_convenience.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/inv/inv_convenience.h>
+#include <mne/inv/inv_source_estimate.h>
 
 using namespace mne;
 using Eigen::MatrixXd;

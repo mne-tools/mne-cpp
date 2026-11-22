@@ -21,11 +21,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
-#include <disp/viewers/helpers/bidsviewmodel.h>
+#include <mne/disp/viewers/helpers/bidsviewmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES

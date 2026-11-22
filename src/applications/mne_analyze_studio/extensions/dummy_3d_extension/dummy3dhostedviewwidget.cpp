@@ -17,11 +17,11 @@
 #include <extensionviewfactoryregistry.h>
 #include <iextensionviewfactory.h>
 
-#include <disp3D/model/braintreemodel.h>
-#include <disp3D/view/brainview.h>
-#include <fiff/fiff_stream.h>
-#include <fs/fs_surface.h>
-#include <mne/mne_bem.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/mne/mne_bem.h>
 
 #include <QComboBox>
 #include <QDir>

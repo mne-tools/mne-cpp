@@ -14,16 +14,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mna/mna_io.h>
-#include <mna/mna_project.h>
-#include <mna/mna_subject.h>
-#include <mna/mna_session.h>
-#include <mna/mna_recording.h>
-#include <mna/mna_file_ref.h>
-#include <mna/mna_types.h>
-#include <base/json.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mna/mna_project.h>
+#include <mne/mna/mna_subject.h>
+#include <mne/mna/mna_session.h>
+#include <mne/mna/mna_recording.h>
+#include <mne/mna/mna_file_ref.h>
+#include <mne/mna/mna_types.h>
+#include <mne/base/json.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

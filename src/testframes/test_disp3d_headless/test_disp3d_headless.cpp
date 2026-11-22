@@ -16,14 +16,14 @@
 #include <QColor>
 #include <QFile>
 
-#include <disp3D/helpers/interpolation.h>
-#include <disp3D/helpers/geometryinfo.h>
-#include <disp3D/geometry/meshfactory.h>
-#include <disp3D/core/dataloader.h>
-#include <disp3D/workers/rtsourcedatacontroller.h>
-#include <disp3D/workers/rtsensordatacontroller.h>
+#include <mne/disp3D/helpers/interpolation.h>
+#include <mne/disp3D/helpers/geometryinfo.h>
+#include <mne/disp3D/geometry/meshfactory.h>
+#include <mne/disp3D/core/dataloader.h>
+#include <mne/disp3D/workers/rtsourcedatacontroller.h>
+#include <mne/disp3D/workers/rtsensordatacontroller.h>
 
-#include <fiff/fiff.h>
+#include <mne/fiff/fiff.h>
 
 using namespace mne::disp;
 using namespace Eigen;

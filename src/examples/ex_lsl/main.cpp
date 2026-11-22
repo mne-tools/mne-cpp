@@ -18,10 +18,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <lsl/lsl_stream_discovery.h>
-#include <lsl/lsl_stream_info.h>
-#include <lsl/lsl_stream_inlet.h>
-#include <lsl/lsl_stream_outlet.h>
+#include <mne/lsl/lsl_stream_discovery.h>
+#include <mne/lsl/lsl_stream_info.h>
+#include <mne/lsl/lsl_stream_inlet.h>
+#include <mne/lsl/lsl_stream_outlet.h>
 
 //=============================================================================================================
 // QT INCLUDES

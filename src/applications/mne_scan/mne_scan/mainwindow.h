@@ -23,7 +23,7 @@
 #include "mainsplashscreen.h"
 #include "mainsplashscreencloser.h"
 
-#include <disp/viewers/abstractview.h>
+#include <mne/disp/viewers/abstractview.h>
 
 //=============================================================================================================
 // QT INCLUDES

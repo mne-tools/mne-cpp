@@ -11,7 +11,7 @@
 # @brief    Fixtures proving the dependency audit rejects the graphs it claims to reject.
 """Fixtures for ``scripts/quality/audit_dependencies.py``.
 
-Each case builds a synthetic ``src/libraries`` in a temporary directory that
+Each case builds a synthetic ``src/libs/mne`` in a temporary directory that
 breaks exactly one architectural rule, and asserts the matching finding code.
 The last two cases run the real tool against the real tree, so the shipped
 policy cannot drift away from the repository it describes.
@@ -64,7 +64,7 @@ class AuditTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
-        self.libraries = Path(self._tmp.name) / "src" / "libraries"
+        self.libraries = Path(self._tmp.name) / "src" / "libs" / "mne"
         self.libraries.mkdir(parents=True)
 
     def add_library(self, directory: str, deps: list[str] | None = None, external: str = "") -> None:
@@ -135,7 +135,7 @@ class TestGraphExtraction(AuditTestCase):
         )
         graph = self.graph()
         self.assertEqual(["mne_acq", "mne_fiff"], graph["mne_acq_bridge"].depends_on)
-        self.assertEqual("src/libraries/acq/bridge/CMakeLists.txt", graph["mne_acq_bridge"].cmake_path)
+        self.assertEqual("src/libs/mne/acq/bridge/CMakeLists.txt", graph["mne_acq_bridge"].cmake_path)
         policy = self.policy([("core", ["mne_acq", "mne_fiff"])])
         self.assertIn("DEP001", self.evaluate(policy))
 

@@ -39,19 +39,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/beamformer/inv_lcmv.h>
-#include <base/string_utils.h>
-#include <base/log.h>
+#include <mne/inv/beamformer/inv_lcmv.h>
+#include <mne/base/string_utils.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <inv/beamformer/inv_dics.h>
-#include <inv/beamformer/inv_beamformer.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_forward_solution.h>
-#include <fs/fs_label.h>
-#include <fiff/fiff_ch_name.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_info.h>
+#include <mne/inv/beamformer/inv_dics.h>
+#include <mne/inv/beamformer/inv_beamformer.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fs/fs_label.h>
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

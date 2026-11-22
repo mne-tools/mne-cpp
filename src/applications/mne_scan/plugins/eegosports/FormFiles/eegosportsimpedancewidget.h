@@ -24,8 +24,8 @@
 #include "../eegosports_global.h"
 #include "../eegosportselectrodeitem.h"
 #include "../eegosportsimpedancescene.h"
-#include "disp/plots/helpers/colormap.h"
-#include <channels/layoutloader.h>
+#include "mne/disp/plots/helpers/colormap.h"
+#include <mne/channels/layoutloader.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

@@ -51,9 +51,9 @@
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
 
-#include <mna/mna_project.h>
-#include <mna/mna_io.h>
-#include <mna/mna_types.h>
+#include <mne/mna/mna_project.h>
+#include <mne/mna/mna_io.h>
+#include <mne/mna/mna_types.h>
 
 #include "filterwindow.h"
 #include "eventwindow.h"
@@ -70,7 +70,7 @@
 #include "chinfowindow.h"
 #include "noisereductionwindow.h"
 
-#include <disp/viewers/channelselectionview.h>
+#include <mne/disp/viewers/channelselectionview.h>
 
 
 //*************************************************************************************************************
@@ -103,9 +103,9 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
+#include <mne/fiff/fiff.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_inverse_operator.h>
 
 
 //*************************************************************************************************************

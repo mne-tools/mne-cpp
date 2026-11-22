@@ -16,8 +16,8 @@
 
 #include "icawindow.h"
 
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_constants.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
 // QT INCLUDES

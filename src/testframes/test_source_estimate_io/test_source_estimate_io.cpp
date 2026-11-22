@@ -10,9 +10,9 @@
  * @brief    Tests for source estimate extended I/O (CSV, matrix export).
  */
 
-#include <inv/inv_source_estimate_io.h>
-#include <inv/inv_source_estimate.h>
-#include <fs/fs_label.h>
+#include <mne/inv/inv_source_estimate_io.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/fs/fs_label.h>
 
 #include <QtTest>
 #include <QObject>

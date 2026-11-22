@@ -21,28 +21,28 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_convenience.h>
-#include <inv/inv_label_time_course.h>
-#include <inv/inv_resolution_matrix.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/inv_source_estimate_io.h>
-#include <inv/inv_source_estimate_token.h>
-#include <inv/inv_vector_source_estimate.h>
-#include <inv/inv_volume_source_estimate.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/morph/source_morph.h>
-#include <inv/sparse/inv_gamma_map.h>
-#include <inv/sparse/inv_mxne.h>
-#include <inv/sparse/inv_tf_mxne.h>
-#include <mne/mne_cluster_info.h>
-#include <mne/mne_cortical_map.h>
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_evoked.h>
-#include <fs/fs_annotationset.h>
-#include <fs/fs_label.h>
+#include <mne/inv/inv_convenience.h>
+#include <mne/inv/inv_label_time_course.h>
+#include <mne/inv/inv_resolution_matrix.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate_io.h>
+#include <mne/inv/inv_source_estimate_token.h>
+#include <mne/inv/inv_vector_source_estimate.h>
+#include <mne/inv/inv_volume_source_estimate.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/morph/source_morph.h>
+#include <mne/inv/sparse/inv_gamma_map.h>
+#include <mne/inv/sparse/inv_mxne.h>
+#include <mne/inv/sparse/inv_tf_mxne.h>
+#include <mne/mne/mne_cluster_info.h>
+#include <mne/mne/mne_cortical_map.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fs/fs_annotationset.h>
+#include <mne/fs/fs_label.h>
 
 //=============================================================================================================
 // QT INCLUDES

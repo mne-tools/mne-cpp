@@ -15,17 +15,17 @@
 #include <QTemporaryFile>
 #include <QTemporaryDir>
 
-#include <mne/mne.h>
-#include <base/log.h>
+#include <mne/mne/mne.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_cluster_info.h>
-#include <mne/mne_epoch_data.h>
-#include <mne/mne_epoch_data_list.h>
-#include <mne/mne_named_matrix.h>
-#include <fiff/fiff.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_cluster_info.h>
+#include <mne/mne/mne_epoch_data.h>
+#include <mne/mne/mne_epoch_data_list.h>
+#include <mne/mne/mne_named_matrix.h>
+#include <mne/fiff/fiff.h>
 
 using namespace mne;
 using namespace Eigen;

@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "eventmanager.h"
 
 #include "communicator.h"

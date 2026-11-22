@@ -31,14 +31,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "../common/python_guard.h"
-#include <sts/sts_cov_estimators.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_raw_data.h>
-#include <math/matrix_io.h>
-#include <pybridge/python_test_helper.h>
-#include <base/string_utils.h>
+#include <mne/sts/sts_cov_estimators.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/math/matrix_io.h>
+#include <mne/pybridge/python_test_helper.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -19,7 +19,7 @@
 #include "realtimehpiresult.h"
 
 #include <time.h>
-#include <fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // STL INCLUDES

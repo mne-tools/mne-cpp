@@ -19,9 +19,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_description_parser.h>
-#include <mne/mne_process_description.h>
-#include <fiff/fiff_evoked_set.h>
+#include <mne/mne/mne_description_parser.h>
+#include <mne/mne/mne_process_description.h>
+#include <mne/fiff/fiff_evoked_set.h>
 
 //=============================================================================================================
 // QT INCLUDES

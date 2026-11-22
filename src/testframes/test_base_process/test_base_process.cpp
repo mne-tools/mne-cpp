@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/process.h>
-#include <base/string_utils.h>
+#include <mne/base/process.h>
+#include <mne/base/string_utils.h>
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>

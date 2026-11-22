@@ -12,10 +12,10 @@
 
 #include <algorithm>
 #include <browsercore/Models/rawmodel.h>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <rawdatabrowserwidget.h>
 
-#include <fiff/fiff_events.h>
+#include <mne/fiff/fiff_events.h>
 
 #include <QPushButton>
 #include <QTableView>

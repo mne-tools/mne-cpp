@@ -21,41 +21,41 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
-#include <base/base_global.h>
-#include <base/log.h>
+#include <mne/base/base_global.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
 
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_source_spaces.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_source_spaces.h>
 
-#include <inv/inv_source_estimate.h>
-#include <inv/inv_source_estimate_token.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/rap_music/inv_rap_music.h>
-#include <inv/rap_music/inv_pwl_rap_music.h>
-#include <inv/rap_music/inv_dipole.h>
-#include <inv/dipole_fit/inv_dipole_fit.h>
-#include <inv/dipole_fit/inv_dipole_fit_data.h>
-#include <inv/dipole_fit/inv_dipole_fit_settings.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/dipole_fit/inv_ecd.h>
-#include <inv/dipole_fit/inv_guess_data.h>
-#include <inv/beamformer/inv_beamformer.h>
-#include <inv/beamformer/inv_beamformer_compute.h>
-#include <inv/inv_global.h>
-#include <inv/inv_source_coupling.h>
-#include <inv/inv_focal_dipole.h>
-#include <inv/inv_connectivity.h>
-#include <inv/inv_types.h>
-#include <inv/inv_token.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/inv_source_estimate_token.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/inv/rap_music/inv_pwl_rap_music.h>
+#include <mne/inv/rap_music/inv_dipole.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
+#include <mne/inv/dipole_fit/inv_dipole_fit_settings.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/dipole_fit/inv_ecd.h>
+#include <mne/inv/dipole_fit/inv_guess_data.h>
+#include <mne/inv/beamformer/inv_beamformer.h>
+#include <mne/inv/beamformer/inv_beamformer_compute.h>
+#include <mne/inv/inv_global.h>
+#include <mne/inv/inv_source_coupling.h>
+#include <mne/inv/inv_focal_dipole.h>
+#include <mne/inv/inv_connectivity.h>
+#include <mne/inv/inv_types.h>
+#include <mne/inv/inv_token.h>
 
 using namespace mne;
 using namespace Eigen;

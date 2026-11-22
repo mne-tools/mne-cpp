@@ -50,8 +50,8 @@ class ExampleEvidenceTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root)
-        (self.root / "src" / "libraries" / "demo").mkdir(parents=True)
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text(HEADER, encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo").mkdir(parents=True)
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text(HEADER, encoding="utf-8")
         example = self.root / "src" / "examples" / "ex_widget"
         example.mkdir(parents=True)
         (example / "main.cpp").write_text(EXAMPLE, encoding="utf-8")
@@ -100,7 +100,7 @@ class TestSnippets(ExampleEvidenceTestCase):
                 self.assert_issue("must be 'ex_widget/<file>#<region>'", self.check(self.with_(example_snippet=[ref])))
 
     def test_snippet_must_be_referenced_by_the_header(self) -> None:
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
         self.assert_issue("is not referenced by @snippet", self.check(GOOD))
 
     def test_header_snippet_must_be_registered(self) -> None:
@@ -117,7 +117,7 @@ class TestEligibility(ExampleEvidenceTestCase):
 
     def test_debt_admits_listed_classes_and_only_shrinks(self) -> None:
         bare = {"name": "Widget", "module": "demo", "header": "demo/widget.h"}
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
         self.policy = {"example_debt": {"ceiling": 1, "names": ["Widget"]}}
         self.assertEqual([], self.check(bare))
         self.policy = {"example_debt": {"ceiling": 0, "names": ["Widget"]}}
@@ -132,14 +132,14 @@ class TestEligibility(ExampleEvidenceTestCase):
     def test_policy_exemption_counts_as_exempt(self) -> None:
         self.policy = {"exempt_name_suffixes": {"Widget": "demo"}, "example_debt": {"ceiling": 0, "names": []}}
         bare = {"name": "Widget", "module": "demo", "header": "demo/widget.h"}
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
         self.assertEqual([], self.check(bare))
 
 
 class TestExemptions(ExampleEvidenceTestCase):
     def setUp(self) -> None:
         super().setUp()
-        (self.root / "src" / "libraries" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
+        (self.root / "src" / "libs" / "mne" / "demo" / "widget.h").write_text("class Widget {};\n", encoding="utf-8")
 
     def test_exemption_needs_a_reason(self) -> None:
         """``example_exempt`` without a non-empty reason fails."""

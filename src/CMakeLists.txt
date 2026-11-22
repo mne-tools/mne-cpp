@@ -117,7 +117,7 @@ if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
-# NOTE: WITH_CODE_COV coverage flags are applied in src/libraries/,
+# NOTE: WITH_CODE_COV coverage flags are applied in src/libs/,
 # src/applications/, and src/tools/ CMakeLists.txt so that gcov data
 # is generated for libraries, applications, and CLI tools.
 
@@ -426,7 +426,7 @@ endif()
 ##==============================================================================
 ## Add subdirectories
 
-add_subdirectory(libraries)
+add_subdirectory(libs)
 
 # The applications (with their plugins) and the CLI tools are Qt programs.
 if(MNE_BUILD_QT AND BUILD_APPLICATIONS)
@@ -488,7 +488,7 @@ endif()
 # what the requested COMPONENTS need.
 set(MNECPP_LIBRARIES "")
 set(MNECPP_COMPONENT_MAP "")
-get_property(_mnecpp_dirs DIRECTORY libraries PROPERTY SUBDIRECTORIES)
+get_property(_mnecpp_dirs DIRECTORY libs PROPERTY SUBDIRECTORIES)
 foreach(_dir IN LISTS _mnecpp_dirs)
     get_property(_targets DIRECTORY "${_dir}" PROPERTY BUILDSYSTEM_TARGETS)
     foreach(_t IN LISTS _targets)

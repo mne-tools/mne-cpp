@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <QtTest/QtTest>
 #include <memory>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <QDir>
 #include <QFile>
 #include <QBuffer>
@@ -23,21 +23,21 @@
 
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_io.h>
-#include <fiff/fiff_digitizer_data.h>
-#include <fiff/fiff_file_sharer.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_dig_point.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/fiff/fiff_digitizer_data.h>
+#include <mne/fiff/fiff_file_sharer.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_dig_point.h>
 
 using namespace mne;
 using namespace Eigen;

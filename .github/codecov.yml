@@ -37,10 +37,10 @@ comment:
 # scripts/quality/tests/test_summarize_coverage.py keeps this list complete.
 component_management:
   individual_components:
-    - component_id: libraries
+    - component_id: libs
       name: Libraries
       paths:
-        - src/libraries/**
+        - src/libs/**
       statuses:
         - type: project
           target: auto
@@ -61,102 +61,102 @@ component_management:
         - type: project
           target: auto
           threshold: 0.1%
-    - component_id: libraries_acq
-      name: libraries/acq
+    - component_id: libs_acq
+      name: libs/mne/acq
       paths:
-        - src/libraries/acq/**
-    - component_id: libraries_bids
-      name: libraries/bids
+        - src/libs/mne/acq/**
+    - component_id: libs_bids
+      name: libs/mne/bids
       paths:
-        - src/libraries/bids/**
-    - component_id: libraries_com
-      name: libraries/com
+        - src/libs/mne/bids/**
+    - component_id: libs_com
+      name: libs/mne/com
       paths:
-        - src/libraries/com/**
-    - component_id: libraries_connectivity
-      name: libraries/connectivity
+        - src/libs/mne/com/**
+    - component_id: libs_connectivity
+      name: libs/mne/connectivity
       paths:
-        - src/libraries/connectivity/**
-    - component_id: libraries_decoding
-      name: libraries/decoding
+        - src/libs/mne/connectivity/**
+    - component_id: libs_decoding
+      name: libs/mne/decoding
       paths:
-        - src/libraries/decoding/**
-    - component_id: libraries_disp
-      name: libraries/disp
+        - src/libs/mne/decoding/**
+    - component_id: libs_disp
+      name: libs/mne/disp
       paths:
-        - src/libraries/disp/**
-    - component_id: libraries_disp3D
-      name: libraries/disp3D
+        - src/libs/mne/disp/**
+    - component_id: libs_disp3D
+      name: libs/mne/disp3D
       paths:
-        - src/libraries/disp3D/**
-    - component_id: libraries_dsp
-      name: libraries/dsp
+        - src/libs/mne/disp3D/**
+    - component_id: libs_dsp
+      name: libs/mne/dsp
       paths:
-        - src/libraries/dsp/**
-    - component_id: libraries_fiff
-      name: libraries/fiff
+        - src/libs/mne/dsp/**
+    - component_id: libs_fiff
+      name: libs/mne/fiff
       paths:
-        - src/libraries/fiff/**
-    - component_id: libraries_fs
-      name: libraries/fs
+        - src/libs/mne/fiff/**
+    - component_id: libs_fs
+      name: libs/mne/fs
       paths:
-        - src/libraries/fs/**
-    - component_id: libraries_fwd
-      name: libraries/fwd
+        - src/libs/mne/fs/**
+    - component_id: libs_fwd
+      name: libs/mne/fwd
       paths:
-        - src/libraries/fwd/**
-    - component_id: libraries_ieeg
-      name: libraries/ieeg
+        - src/libs/mne/fwd/**
+    - component_id: libs_ieeg
+      name: libs/mne/ieeg
       paths:
-        - src/libraries/ieeg/**
-    - component_id: libraries_inv
-      name: libraries/inv
+        - src/libs/mne/ieeg/**
+    - component_id: libs_inv
+      name: libs/mne/inv
       paths:
-        - src/libraries/inv/**
-    - component_id: libraries_lsl
-      name: libraries/lsl
+        - src/libs/mne/inv/**
+    - component_id: libs_lsl
+      name: libs/mne/lsl
       paths:
-        - src/libraries/lsl/**
-    - component_id: libraries_math
-      name: libraries/math
+        - src/libs/mne/lsl/**
+    - component_id: libs_math
+      name: libs/mne/math
       paths:
-        - src/libraries/math/**
-    - component_id: libraries_ml
-      name: libraries/ml
+        - src/libs/mne/math/**
+    - component_id: libs_ml
+      name: libs/mne/ml
       paths:
-        - src/libraries/ml/**
-    - component_id: libraries_mna
-      name: libraries/mna
+        - src/libs/mne/ml/**
+    - component_id: libs_mna
+      name: libs/mne/mna
       paths:
-        - src/libraries/mna/**
-    - component_id: libraries_mne
-      name: libraries/mne
+        - src/libs/mne/mna/**
+    - component_id: libs_mne
+      name: libs/mne/mne
       paths:
-        - src/libraries/mne/**
-    - component_id: libraries_mri
-      name: libraries/mri
+        - src/libs/mne/mne/**
+    - component_id: libs_mri
+      name: libs/mne/mri
       paths:
-        - src/libraries/mri/**
-    - component_id: libraries_sts
-      name: libraries/sts
+        - src/libs/mne/mri/**
+    - component_id: libs_sts
+      name: libs/mne/sts
       paths:
-        - src/libraries/sts/**
-    - component_id: libraries_base
-      name: libraries/base
+        - src/libs/mne/sts/**
+    - component_id: libs_base
+      name: libs/mne/base
       paths:
-        - src/libraries/base/**
-    - component_id: libraries_channels
-      name: libraries/channels
+        - src/libs/mne/base/**
+    - component_id: libs_channels
+      name: libs/mne/channels
       paths:
-        - src/libraries/channels/**
-    - component_id: libraries_pybridge
-      name: libraries/pybridge
+        - src/libs/mne/channels/**
+    - component_id: libs_pybridge
+      name: libs/mne/pybridge
       paths:
-        - src/libraries/pybridge/**
-    - component_id: libraries_report
-      name: libraries/report
+        - src/libs/mne/pybridge/**
+    - component_id: libs_report
+      name: libs/mne/report
       paths:
-        - src/libraries/report/**
+        - src/libs/mne/report/**
     - component_id: applications_mne_align
       name: applications/mne_align
       paths:

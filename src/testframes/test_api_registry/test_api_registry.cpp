@@ -9,7 +9,7 @@
  * @date     May, 2026
  * @brief    Validates invariants of doc/api_registry.json:
  *             1. JSON is well-formed and has a `classes` array.
- *             2. Every `header` path exists under `src/libraries/`.
+ *             2. Every `header` path exists under `src/libs/mne/`.
  *             3. Every `test` directory (when not null) exists under `src/testframes/`.
  *             4. No entry carries the retired Skigen port fields `skigen_candidate` and `skigen_target`.
  *
@@ -19,7 +19,7 @@
 //=============================================================================================================
 
 #include <QtTest/QtTest>
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -91,7 +91,7 @@ private slots:
             if (!cls.contains("header"))
                 continue;
             const QString headerRel = cls.value("header").toString();
-            const QString headerFull = m_repoRoot + "/src/libraries/" + headerRel;
+            const QString headerFull = m_repoRoot + "/src/libs/mne/" + headerRel;
             if (!QFile::exists(headerFull)) {
                 mne::Log::warning("Missing header: {} (class: {} )", headerRel.toStdString(), cls.value("name").toString().toStdString());
                 ++missing;

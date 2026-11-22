@@ -27,9 +27,9 @@
 #include "../Models/fiffblockreader.h"
 #include "../Utils/sessionfilter.h"
 #include "../Views/rawview.h"
-#include <disp/viewers/channeldataview.h>
-#include <disp/viewers/helpers/channelrhiview.h>
-#include <fiff/fiff_cov.h>
+#include <mne/disp/viewers/channeldataview.h>
+#include <mne/disp/viewers/helpers/channelrhiview.h>
+#include <mne/fiff/fiff_cov.h>
 
 //=============================================================================================================
 // QT INCLUDES

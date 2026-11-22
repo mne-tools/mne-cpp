@@ -19,19 +19,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/csd.h>
-#include <dsp/dpss.h>
-#include <dsp/iirfilter.h>
-#include <dsp/morlet_tfr.h>
-#include <dsp/multitaper_psd.h>
-#include <dsp/multitaper_tfr.h>
-#include <dsp/peak_finder.h>
-#include <dsp/resample.h>
-#include <dsp/spectrogram.h>
+#include <mne/dsp/csd.h>
+#include <mne/dsp/dpss.h>
+#include <mne/dsp/iirfilter.h>
+#include <mne/dsp/morlet_tfr.h>
+#include <mne/dsp/multitaper_psd.h>
+#include <mne/dsp/multitaper_tfr.h>
+#include <mne/dsp/peak_finder.h>
+#include <mne/dsp/resample.h>
+#include <mne/dsp/spectrogram.h>
 
-#include <disp/plots/helpers/figureexporter.h>
-#include <disp/plots/imagesc.h>
-#include <disp/plots/lineplot.h>
+#include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/imagesc.h>
+#include <mne/disp/plots/lineplot.h>
 
 //=============================================================================================================
 // QT INCLUDES

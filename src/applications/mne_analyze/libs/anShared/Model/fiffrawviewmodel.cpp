@@ -19,14 +19,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffrawviewmodel.h"
 
 #include "eventmodel.h"
-#include <base/string_utils.h>
-#include <fiff/fiff.h>
-#include <dsp/filterkernel.h>
-#include <dsp/rt/rt_filter.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_filter.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -26,7 +26,7 @@
 
 #include "align_points.h"
 #include "digitizer.h"
-#include <channels/standard_montage.h>
+#include <mne/channels/standard_montage.h>
 
 //=============================================================================================================
 // QT INCLUDES

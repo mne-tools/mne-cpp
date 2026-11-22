@@ -1,0 +1,264 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2012-2026 MNE-CPP Authors
+ *
+ * @file     inv_minimum_norm.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     July 2012
+ * @brief    Linear minimum-norm inverse solver — MNE, dSPM, sLORETA and eLORETA from a precomputed @c MNEInverseOperator.
+ *
+ * @ref mne::InvMinimumNorm wraps an @c mne::MNEInverseOperator
+ * and turns it into a runnable inverse pipeline. The class can compute
+ * the regularised L2 minimum-norm estimate, the dSPM noise-normalised
+ * estimate (Dale et al., Neuron 26, 55-67, 2000), the sLORETA estimate
+ * (Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12,
+ * 2002) and the iterative eLORETA estimate (Pascual-Marqui, 2007) from
+ * either an @c FiffEvoked or a raw data matrix. @ref mne::InvMinimumNorm::doInverseSetup "doInverseSetup"
+ * re-prepares the operator for a given number of averages and assembles
+ * the kernel matrix once, after which @c calculateInverse becomes a
+ * single dense matmul per input epoch.
+ *
+ * References:
+ *   - Hamalainen &amp; Ilmoniemi, Med. &amp; Biol. Eng. &amp; Comput. 32, 35-42, 1994.
+ *   - Dale et al., Neuron 26, 55-67, 2000 (dSPM).
+ *   - Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
+ */
+
+#ifndef INV_MINIMUM_NORM_H
+#define INV_MINIMUM_NORM_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../inv_global.h"
+#include "../inv_source_estimate.h"
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_mne_data.h>
+#include <mne/fs/fs_label.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <string_view>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//=============================================================================================================
+/**
+ * Minimum norm estimation algorithm.
+ *
+ * Computes L2 minimum-norm, dSPM, or sLORETA source estimates from MEG/EEG data
+ * using a pre-computed inverse operator.
+ *
+ * References:
+ * - Hamalainen & Ilmoniemi, Med. & Biol. Eng. & Comput. 32, 35-42, 1994.
+ * - Dale et al., Neuron 26, 55-67, 2000 (dSPM).
+ * - Pascual-Marqui, Methods Find. Exp. Clin. Pharmacol. 24D, 5-12, 2002 (sLORETA).
+ *
+ * @brief Minimum norm estimation
+ *
+ * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
+ */
+class INVSHARED_EXPORT InvMinimumNorm
+{
+public:
+    //=========================================================================================================
+    /**
+     * Constructs minimum norm inverse algorithm
+     *
+     * @param[in] p_inverseOperator  The inverse operator.
+     * @param[in] lambda             The regularization factor.
+     * @param[in] method             Use mininum norm, dSPM or sLORETA. ("MNE" | "dSPM" | "sLORETA").
+     */
+    explicit InvMinimumNorm(const mne::MNEInverseOperator& p_inverseOperator, float lambda, std::string_view method);
+
+    //=========================================================================================================
+    /**
+     * Constructs minimum norm inverse algorithm
+     *
+     * @param[in] p_inverseOperator  The inverse operator.
+     * @param[in] lambda             The regularization factor.
+     * @param[in] dSPM               Compute the noise-normalization factors for dSPM?.
+     * @param[in] sLORETA            Compute the noise-normalization factors for sLORETA?.
+     */
+    explicit InvMinimumNorm(const mne::MNEInverseOperator& p_inverseOperator, float lambda, bool dSPM, bool sLORETA);
+
+    virtual ~InvMinimumNorm()
+    {
+    }
+
+    //=========================================================================================================
+    /**
+     * Computes a L2-norm inverse solution Actual code using these principles might be different because the
+     * inverse operator is often reused across data sets.
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the.
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     *
+     * @return the calculated source estimation.
+     */
+    virtual InvSourceEstimate calculateInverse(const mne::FiffEvoked& p_fiffEvoked, bool pick_normal = false);
+
+    virtual InvSourceEstimate calculateInverse(const Eigen::MatrixXd& data, float tmin, float tstep, bool pick_normal = false) const;
+
+    //=========================================================================================================
+    /**
+     * Sets the inverse up for the evoked data and computes their MNE data: eigenfield projections,
+     * SNR and lambda2 per time point and the predicted data (MNE-C @c mne_analyze; see
+     * @ref mne::MNEMneData::compute).
+     *
+     * @param[in] p_fiffEvoked   Evoked data.
+     * @param[in] snr            Power SNR for a fixed lambda2, <= 0 to use the estimated lambda2 per time point.
+     *
+     * @return The MNE data; empty if the channels do not match the inverse operator.
+     */
+    mne::MNEMneData mneData(const mne::FiffEvoked& p_fiffEvoked, double snr = 0.0);
+
+    //=========================================================================================================
+    /**
+     * Perform the inverse setup: Prepares this inverse operator and assembles the kernel.
+     *
+     * @param[in] nave           Number of averages to use.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the.
+     *                           radial component is kept. This is only applied when working with loose orientations.
+     */
+    virtual void doInverseSetup(int nave, bool pick_normal = false);
+
+    //=========================================================================================================
+    /**
+     * Get the name of the inverse operator.
+     *
+     * @return the name of the inverse operator.
+     */
+    virtual const char* getName() const;
+
+    //=========================================================================================================
+    /**
+     * Get the source space corresponding to this inverse operator.
+     *
+     * @return the source space corresponding to this inverse operator.
+     */
+    virtual const mne::MNESourceSpaces& getSourceSpace() const;
+
+    //=========================================================================================================
+    /**
+     * Get the prepared inverse operator.
+     *
+     * @return the prepared inverse operator.
+     */
+    inline mne::MNEInverseOperator& getPreparedInverseOperator();
+
+    //=========================================================================================================
+    /**
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA")
+     *
+     * @param[in] method   Use minimum norm, dSPM, sLORETA, or eLORETA.
+     */
+    void setMethod(std::string_view method);
+
+    //=========================================================================================================
+    /**
+     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA" | "eLORETA")
+     *
+     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?.
+     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?.
+     * @param[in] eLoreta   Compute the eLORETA source weights?.
+     */
+    void setMethod(bool dSPM, bool sLORETA, bool eLoreta = false);
+
+    //=========================================================================================================
+    /**
+     * Set regularization factor
+     *
+     * @param[in] lambda   The regularization factor.
+     */
+    void setRegularization(float lambda);
+
+    //=========================================================================================================
+    /**
+     * Set eLORETA options.
+     *
+     * @param[in] maxIter   Maximum number of eLORETA weight iterations (default: 20).
+     * @param[in] eps       Convergence threshold for weight fitting (default: 1e-6).
+     * @param[in] forceEqual  If true, use uniform orientation weights (default: false).
+     */
+    void setELoretaOptions(int maxIter = 20, double eps = 1e-6, bool forceEqual = false);
+
+    //=========================================================================================================
+    /**
+     * Get the assembled kernel
+     *
+     * @return the assembled kernel.
+     */
+    inline Eigen::MatrixXd& getKernel();
+
+private:
+    //=========================================================================================================
+    /**
+     * Compute the eLORETA optimized source covariance and update the inverse operator.
+     *
+     * Iteratively adjusts source weights R so that the spatial resolution is uniform
+     * across depth, providing exact localization for single dipoles.
+     *
+     * Reference: Pascual-Marqui, 2007. Discrete, 3D distributed, linear imaging
+     * methods of electric neuronal activity.
+     */
+    void computeELoreta();
+
+    mne::MNEInverseOperator m_inverseOperator; /**< The inverse operator. */
+    float m_fLambda;                           /**< Regularization parameter. */
+    std::string m_sMethod;                     /**< Selected method. */
+    bool m_bsLORETA;                           /**< Do sLORETA method. */
+    bool m_bdSPM;                              /**< Do dSPM method. */
+    bool m_beLoreta;                           /**< Do eLORETA method. */
+
+    // eLORETA parameters
+    int m_iELoretaMaxIter;     /**< eLORETA max iterations. */
+    double m_dELoretaEps;      /**< eLORETA convergence threshold. */
+    bool m_bELoretaForceEqual; /**< eLORETA uniform orientation weights. */
+
+    bool inverseSetup;                      /**< Inverse Setup Calculated. */
+    mne::MNEInverseOperator inv;            /**< The setup inverse operator. */
+    Eigen::SparseMatrix<double> noise_norm; /**< The noise normalization. */
+    std::vector<Eigen::VectorXi> vertno;    /**< The vertices numbers. */
+    mne::FsLabel label;                     /**< The corresponding labels. */
+    Eigen::MatrixXd K;                      /**< Imaging kernel. */
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline Eigen::MatrixXd& InvMinimumNorm::getKernel()
+{
+    return K;
+}
+
+//=============================================================================================================
+
+inline mne::MNEInverseOperator& InvMinimumNorm::getPreparedInverseOperator()
+{
+    return inv;
+}
+} //NAMESPACE
+
+#endif // INV_MINIMUM_NORM_H

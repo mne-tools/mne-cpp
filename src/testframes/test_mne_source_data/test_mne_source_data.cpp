@@ -20,23 +20,23 @@
 #include <QDir>
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
 
-#include <mne/mne.h>
-#include <inv/inv_source_estimate.h>
-#include <mne/mne_source_spaces.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_bem.h>
-#include <mne/mne_bem_surface.h>
-#include <mne/mne_hemisphere.h>
-#include <mne/mne_epoch_data.h>
-#include <mne/mne_epoch_data_list.h>
+#include <mne/mne/mne.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_bem.h>
+#include <mne/mne/mne_bem_surface.h>
+#include <mne/mne/mne_hemisphere.h>
+#include <mne/mne/mne_epoch_data.h>
+#include <mne/mne/mne_epoch_data_list.h>
 
 using namespace mne;
 using namespace Eigen;

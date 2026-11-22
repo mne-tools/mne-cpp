@@ -14,16 +14,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_evoked_set.h>
-#include <mne/mne.h>
-#include <mne/mne_inverse_operator.h>
-#include <inv/minimum_norm/inv_minimum_norm.h>
-#include <inv/inv_source_estimate.h>
-#include <fs/fs_surface.h>
-#include <fs/fs_label.h>
-#include <base/log.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/inv/minimum_norm/inv_minimum_norm.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/fs/fs_surface.h>
+#include <mne/fs/fs_label.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

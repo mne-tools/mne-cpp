@@ -19,25 +19,25 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/helpers/geometryinfo.h>
-#include <disp3D/helpers/interpolation.h>
-#include <disp3D/renderable/brainsurface.h>
-#include <disp3D/renderable/dipoleobject.h>
-#include <disp3D/renderable/electrodeobject.h>
-#include <ieeg/ieeg_implantation.h>
-#include <disp3D/renderable/networkobject.h>
-#include <disp3D/renderable/polylineobject.h>
-#include <disp3D/renderable/sliceobject.h>
-#include <disp3D/renderable/sourceestimateoverlay.h>
-#include <disp3D/renderable/videooverlay.h>
-#include <disp3D/scene/multimodalscene.h>
-#include <disp3D/scene/sensorfieldmapper.h>
-#include <disp3D/view/brainview.h>
-#include <disp3D/view/multiviewlayout.h>
+#include <mne/disp3D/helpers/geometryinfo.h>
+#include <mne/disp3D/helpers/interpolation.h>
+#include <mne/disp3D/renderable/brainsurface.h>
+#include <mne/disp3D/renderable/dipoleobject.h>
+#include <mne/disp3D/renderable/electrodeobject.h>
+#include <mne/ieeg/ieeg_implantation.h>
+#include <mne/disp3D/renderable/networkobject.h>
+#include <mne/disp3D/renderable/polylineobject.h>
+#include <mne/disp3D/renderable/sliceobject.h>
+#include <mne/disp3D/renderable/sourceestimateoverlay.h>
+#include <mne/disp3D/renderable/videooverlay.h>
+#include <mne/disp3D/scene/multimodalscene.h>
+#include <mne/disp3D/scene/sensorfieldmapper.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/view/multiviewlayout.h>
 
-#include <connectivity/network/network.h>
-#include <inv/dipole_fit/inv_ecd_set.h>
-#include <inv/inv_source_estimate.h>
+#include <mne/connectivity/network/network.h>
+#include <mne/inv/dipole_fit/inv_ecd_set.h>
+#include <mne/inv/inv_source_estimate.h>
 
 //=============================================================================================================
 // QT INCLUDES

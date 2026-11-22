@@ -29,9 +29,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_info.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

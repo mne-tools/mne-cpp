@@ -4,7 +4,7 @@
 
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
-#include <math/kmeans.h>
+#include <mne/math/kmeans.h>
 
 #include <algorithm>
 #include <numeric>

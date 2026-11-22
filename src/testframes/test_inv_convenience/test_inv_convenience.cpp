@@ -14,12 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/inv_convenience.h>
-#include <inv/inv_source_estimate.h>
-#include <inv/beamformer/inv_lcmv.h>
-#include <inv/beamformer/inv_dics.h>
-#include <mne/mne_inverse_operator.h>
-#include <fiff/fiff_cov.h>
+#include <mne/inv/inv_convenience.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/inv/beamformer/inv_lcmv.h>
+#include <mne/inv/beamformer/inv_dics.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/fiff/fiff_cov.h>
 
 //=============================================================================================================
 // QT INCLUDES

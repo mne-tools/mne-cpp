@@ -4,7 +4,7 @@
 
 #include <QtTest/QtTest>
 #include <QColor>
-#include <disp/plots/helpers/colormap.h>
+#include <mne/disp/plots/helpers/colormap.h>
 
 using namespace mne::disp;
 

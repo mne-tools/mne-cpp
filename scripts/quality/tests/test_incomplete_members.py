@@ -75,7 +75,7 @@ class TestIncompleteMembers(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "a.h").write_text("class FsLabel;\nclass X_EXPORT A\n{\n    ~A();\n    std::vector<FsLabel> m_labels;\n};\n")
-            (root / "b.h").write_text('#include <fs/fs_label.h>\nclass FsLabel;\nclass X_EXPORT B\n{\n    std::vector<FsLabel> m_labels;\n};\n')
+            (root / "b.h").write_text('#include <mne/fs/fs_label.h>\nclass FsLabel;\nclass X_EXPORT B\n{\n    std::vector<FsLabel> m_labels;\n};\n')
             self.assertEqual(incomplete_members([root], root), [])
 
 

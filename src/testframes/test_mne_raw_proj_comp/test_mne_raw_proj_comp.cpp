@@ -24,37 +24,37 @@
 
 #include <Eigen/Dense>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_evoked_set.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_evoked_set.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
 
-#include <mne/mne.h>
-#include <mne/mne_raw_data.h>
-#include <mne/mne_raw_info.h>
-#include <mne/mne_raw_buf_def.h>
-#include <mne/mne_proj_op.h>
-#include <mne/mne_sss_data.h>
-#include <mne/mne_ctf_comp_data.h>
-#include <mne/mne_ctf_comp_data_set.h>
-#include <mne/mne_filter_def.h>
-#include <mne/mne_named_vector.h>
-#include <mne/mne_deriv.h>
-#include <mne/mne_sparse_named_matrix.h>
-#include <fiff/fiff_sparse_matrix.h>
-#include <mne/mne_deriv_set.h>
-#include <mne/mne_description_parser.h>
-#include <mne/mne_meas_data.h>
-#include <mne/mne_meas_data_set.h>
-#include <mne/mne_named_matrix.h>
-#include <mne/mne_inverse_operator.h>
-#include <mne/mne_types.h>
+#include <mne/mne/mne.h>
+#include <mne/mne/mne_raw_data.h>
+#include <mne/mne/mne_raw_info.h>
+#include <mne/mne/mne_raw_buf_def.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/mne/mne_sss_data.h>
+#include <mne/mne/mne_ctf_comp_data.h>
+#include <mne/mne/mne_ctf_comp_data_set.h>
+#include <mne/mne/mne_filter_def.h>
+#include <mne/mne/mne_named_vector.h>
+#include <mne/mne/mne_deriv.h>
+#include <mne/mne/mne_sparse_named_matrix.h>
+#include <mne/fiff/fiff_sparse_matrix.h>
+#include <mne/mne/mne_deriv_set.h>
+#include <mne/mne/mne_description_parser.h>
+#include <mne/mne/mne_meas_data.h>
+#include <mne/mne/mne_meas_data_set.h>
+#include <mne/mne/mne_named_matrix.h>
+#include <mne/mne/mne_inverse_operator.h>
+#include <mne/mne/mne_types.h>
 
 using namespace mne;
 using namespace Eigen;

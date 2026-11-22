@@ -1,0 +1,138 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     xdawn.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Declaration of the Xdawn class for event-related response enhancement.
+ *
+ * xDAWN estimates spatial filters that maximise the signal-to-noise ratio of a target
+ * event-related response. The implementation here operates on epoched data and follows the
+ * standard generalised-eigenvalue formulation using a target evoked covariance and a
+ * residual-noise covariance estimated from class-wise residual epochs.
+ */
+
+#ifndef XDAWN_DSP_H
+#define XDAWN_DSP_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "dsp_global.h"
+#include <mne/mne/mne_epoch_data.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+//=============================================================================================================
+/**
+ * @brief Result of an xDAWN decomposition.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp xdawn_fit
+ */
+struct DSPSHARED_EXPORT XdawnResult
+{
+    Eigen::MatrixXd matFilters;      /**< Spatial filters W (n_channels x n_components). */
+    Eigen::MatrixXd matPatterns;     /**< Spatial patterns A (n_channels x n_components). */
+    Eigen::MatrixXd matSignalCov;    /**< Target-evoked covariance (n_channels x n_channels). */
+    Eigen::MatrixXd matNoiseCov;     /**< Residual-noise covariance (n_channels x n_channels). */
+    Eigen::MatrixXd matTargetEvoked; /**< Average target evoked response (n_channels x n_samples). */
+    int iTargetEvent = 1;            /**< Event code used as the target class. */
+    bool bValid = false;             /**< True if fit() produced a usable decomposition. */
+};
+
+//=============================================================================================================
+/**
+ * @brief Event-related response enhancement with xDAWN spatial filtering.
+ *
+ * @snippet ex_dsp_preprocessing/main.cpp xdawn_fit
+ */
+class DSPSHARED_EXPORT Xdawn
+{
+public:
+    //=========================================================================================================
+    /**
+     * Fit xDAWN spatial filters for a target event code.
+     *
+     * Uses non-rejected epochs only. The target signal covariance is estimated from the
+     * average of epochs whose MNEEpochData::event equals @p iTargetEvent. The noise covariance
+     * is estimated from residuals around the class-wise average for each event type.
+     *
+     * @param[in] epochs         Input epochs.
+     * @param[in] iTargetEvent   Event code whose ERP/ERF should be enhanced.
+     * @param[in] nComponents    Number of xDAWN components to retain.
+     * @param[in] dReg           Relative diagonal regularisation added to the noise covariance.
+     *
+     * @return XdawnResult containing filters, patterns, and covariances.
+     */
+    static XdawnResult fit(const std::vector<mne::MNEEpochData>& epochs,
+                           int iTargetEvent = 1,
+                           int nComponents = 2,
+                           double dReg = 1e-6);
+
+    //=========================================================================================================
+    /**
+     * Project one epoch into xDAWN component space.
+     *
+     * @param[in] matEpoch   Epoch data (n_channels x n_samples).
+     * @param[in] result     Result from fit().
+     *
+     * @return Component activations (n_components x n_samples).
+     */
+    static Eigen::MatrixXd apply(const Eigen::MatrixXd& matEpoch,
+                                 const XdawnResult& result);
+
+    //=========================================================================================================
+    /**
+     * Reconstruct one epoch from the first @p nComponents xDAWN components.
+     *
+     * If @p nComponents <= 0 or exceeds the fitted dimensionality, all fitted components are used.
+     *
+     * @param[in] matEpoch      Epoch data (n_channels x n_samples).
+     * @param[in] result        Result from fit().
+     * @param[in] nComponents   Number of leading xDAWN components to keep.
+     *
+     * @return Denoised epoch (n_channels x n_samples).
+     */
+    static Eigen::MatrixXd denoise(const Eigen::MatrixXd& matEpoch,
+                                   const XdawnResult& result,
+                                   int nComponents = -1);
+
+    //=========================================================================================================
+    /**
+     * Apply denoise() to all epochs in the vector, preserving metadata.
+     *
+     * @param[in] epochs         Input epochs.
+     * @param[in] result         Result from fit().
+     * @param[in] nComponents    Number of leading xDAWN components to keep.
+     *
+     * @return Copy of the input epochs with denoised epoch matrices.
+     */
+    static std::vector<mne::MNEEpochData> denoiseEpochs(std::vector<mne::MNEEpochData> epochs,
+                                                        const XdawnResult& result,
+                                                        int nComponents = -1);
+};
+
+} // namespace mne
+
+#endif // XDAWN_DSP_H

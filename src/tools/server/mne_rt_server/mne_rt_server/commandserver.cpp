@@ -17,7 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "commandserver.h"
 
 #include "commandthread.h"

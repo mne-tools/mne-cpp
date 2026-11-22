@@ -22,8 +22,8 @@
 
 #include "rtfwd_global.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/base/circular_buffer.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

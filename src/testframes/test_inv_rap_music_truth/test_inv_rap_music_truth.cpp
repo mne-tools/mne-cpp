@@ -21,13 +21,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inv/rap_music/inv_rap_music.h>
-#include <inv/rap_music/inv_pwl_rap_music.h>
-#include <inv/rap_music/inv_dipole.h>
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_source_space.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_named_matrix.h>
+#include <mne/inv/rap_music/inv_rap_music.h>
+#include <mne/inv/rap_music/inv_pwl_rap_music.h>
+#include <mne/inv/rap_music/inv_dipole.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_named_matrix.h>
 
 //=============================================================================================================
 // QT INCLUDES

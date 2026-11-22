@@ -17,12 +17,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "eegosportssetupprojectwidget.h"
 #include "ui_eegosportssetupprojectwidget.h"
 #include "../eegosports.h"
 
-#include <channels/layoutloader.h>
+#include <mne/channels/layoutloader.h>
 
 //=============================================================================================================
 // QT INCLUDES

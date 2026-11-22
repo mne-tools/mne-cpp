@@ -14,8 +14,8 @@
 
 #include "inspect_demo_fixtures.h"
 
-#include <fiff/fiff_file.h>
-#include <mri/mri_types.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/mri/mri_types.h>
 
 #include <QString>
 

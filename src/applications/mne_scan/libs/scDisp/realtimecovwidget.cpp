@@ -18,11 +18,11 @@
 
 #include "realtimecovwidget.h"
 
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <scMeas/realtimecov.h>
-#include <disp/viewers/modalityselectionview.h>
-#include <disp/plots/imagesc.h>
-#include <fiff/fiff_info.h>
+#include <mne/disp/viewers/modalityselectionview.h>
+#include <mne/disp/plots/imagesc.h>
+#include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES

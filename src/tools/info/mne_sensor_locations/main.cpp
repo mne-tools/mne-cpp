@@ -14,13 +14,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_dir_node.h>
-#include <base/log.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_dir_node.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

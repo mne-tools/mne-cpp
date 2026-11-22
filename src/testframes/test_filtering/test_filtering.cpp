@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include <math.h>
-#include <fiff/fiff.h>
-#include <dsp/filterkernel.h>
-#include <dsp/rt/rt_filter.h>
+#include <mne/fiff/fiff.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/dsp/rt/rt_filter.h>
 
 //=============================================================================================================
 // QT INCLUDES

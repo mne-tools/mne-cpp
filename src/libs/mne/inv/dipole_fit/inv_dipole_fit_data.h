@@ -1,0 +1,416 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2016-2026 MNE-CPP Authors
+ *
+ * @file     inv_dipole_fit_data.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ * @since    0.1.0
+ * @date     December 2016
+ * @brief    Dipole-fit workspace bundling sensor geometry, forward-model function pointers, noise covariance and SSP projection.
+ *
+ * @ref mne::InvDipoleFitData replaces the @c dipoleFitDataRec record
+ * of MNE-C and aggregates everything that the dipole-fit objective
+ * function needs to evaluate a candidate dipole: coordinate transforms,
+ * channel selection, MEG coil and EEG electrode definitions, the
+ * forward-model function pointers (sphere model and/or BEM), the
+ * regularised noise covariance and the SSP projector. The static
+ * @c setup_dipole_fit_data factory reads every input from disk and
+ * returns a fully-initialised workspace ready to be passed into the
+ * fitting loop. Also declares the @ref mne::dipoleFitFuncsRec / @ref mne::FitDipUserRec
+ * helpers used by the per-iteration cost function.
+ */
+
+#ifndef INV_DIPOLE_FIT_DATA_H
+#define INV_DIPOLE_FIT_DATA_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../inv_global.h"
+#include "inv_dipole_forward.h"
+#include <mne/fiff/fiff_types.h>
+#include <mne/mne/mne_cov_matrix.h>
+#include <mne/mne/mne_proj_op.h>
+#include <mne/fwd/fwd_types.h>
+#include <mne/fwd/fwd_eeg_sphere_model.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/fwd/fwd_comp_data.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+#include <ostream>
+#include <memory>
+
+namespace mne
+{
+class FiffCoordTrans;
+}
+namespace mne
+{
+class MNEMeasData;
+}
+
+constexpr int COLUMN_NORM_NONE = 0; /**< No column normalization requested. */
+constexpr int COLUMN_NORM_COMP = 1; /**< Componentwise normalization. */
+constexpr int COLUMN_NORM_LOC = 2;  /**< Dipole locationwise normalization. */
+
+//=============================================================================================================
+// DEFINE NAMESPACE mne
+//=============================================================================================================
+
+namespace mne
+{
+
+// (Replaces *dipoleFitFuncs,dipoleFitFuncsRec struct of MNE-C fit_types.h).
+
+/**
+ * @brief Forward field computation function pointers and client data for MEG and EEG dipole fitting.
+ */
+struct dipoleFitFuncsRec
+{
+    fwdFieldFunc meg_field = nullptr;           /**< MEG forward calculation function. */
+    fwdVecFieldFunc meg_vec_field = nullptr;    /**< MEG vectorized forward calculation function. */
+    void* meg_client = nullptr;                 /**< Client data for MEG field computations. */
+    std::unique_ptr<mne::FwdCompData> meg_comp; /**< Owns @ref meg_client when it is a compensation wrapper. */
+
+    fwdFieldFunc eeg_pot = nullptr;        /**< EEG forward calculation function. */
+    fwdVecFieldFunc eeg_vec_pot = nullptr; /**< EEG vectorized forward calculation function. */
+    void* eeg_client = nullptr;            /**< Client data for EEG field computations (not owned). */
+};
+
+/**
+ * @brief Pointer alias for dipoleFitFuncsRec, used throughout the dipole fitting module.
+ */
+using dipoleFitFuncs = dipoleFitFuncsRec*;
+
+/**
+ * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
+ */
+struct FitDipUserRec
+{
+    float limit;
+    int report_dim;
+    float* B;
+    double B2;
+    std::unique_ptr<InvDipoleForward> fwd;
+};
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class InvGuessData;
+class InvEcd;
+
+//=============================================================================================================
+/**
+ * @brief Dipole fit workspace holding sensor geometry, forward model, noise
+ *        covariance, and projection data.
+ *
+ * InvDipoleFitData aggregates everything needed to evaluate the dipole
+ * fitting objective function: coordinate transforms, channel lists, coil/
+ * electrode definitions, forward-model function pointers (sphere or BEM),
+ * noise covariance, and SSP projection.  The static factory
+ * setup_dipole_fit_data() reads all inputs from disk and returns a
+ * fully initialised instance.
+ *
+ * Refactored from dipoleFitDataRec / fit_types.h (MNE-C).
+ *
+ * @snippet ex_inv_dipole_fit/main.cpp inv_dipole_fit_data_usage
+ */
+class INVSHARED_EXPORT InvDipoleFitData
+{
+public:
+    //=========================================================================================================
+    /**
+     * Default Constructor
+     */
+    explicit InvDipoleFitData();
+
+    //=========================================================================================================
+    /**
+     * Destructs the Dipole Fit Data
+     * Refactored: free_dipole_fit_data (dipole_fit_setup.c)
+     */
+    virtual ~InvDipoleFitData();
+
+    //=========================================================================================================
+    /**
+     * @brief Set up the sphere-model and (optionally) BEM forward functions.
+     *
+     * Initialises sphere_funcs, bem_funcs, and mag_dipole_funcs, applies
+     * CTF compensation if needed, and selects the active forward model.
+     *
+     * Refactored: setup_forward_model (dipole_fit_setup.c)
+     *
+     * @param[in,out] d           Dipole fit data to populate.
+     * @param[in]     comp_data   CTF compensation data (may be nullptr).
+     * @param[in]     comp_coils  Compensation coil set (may be nullptr).
+     *
+     * @return OK on success, FAIL on error.
+     */
+    static int setup_forward_model(InvDipoleFitData* d, mne::MNECTFCompDataSet* comp_data, mne::FwdCoilSet* comp_coils);
+
+    //=========================================================================================================
+    /**
+     * @brief Create an ad-hoc diagonal noise-covariance matrix.
+     *
+     * Builds a diagonal noise covariance from fixed standard deviations
+     * for gradiometers, magnetometers, and EEG channels.
+     *
+     * Refactored: ad_hoc_noise (dipole_fit_setup.c)
+     *
+     * @param[in] meg       MEG coil set (used to classify grad vs. mag channels).
+     * @param[in] eeg       EEG electrode set.
+     * @param[in] grad_std  Standard deviation for planar gradiometers (T/m).
+     * @param[in] mag_std   Standard deviation for magnetometers (T).
+     * @param[in] eeg_std   Standard deviation for EEG channels (V).
+     *
+     * @return The noise-covariance matrix, or nullptr on error.
+     */
+    static std::unique_ptr<mne::MNECovMatrix> ad_hoc_noise(mne::FwdCoilSet* meg,
+                                                           mne::FwdCoilSet* eeg,
+                                                           float grad_std,
+                                                           float mag_std,
+                                                           float eeg_std);
+
+    //=========================================================================================================
+    /**
+     * @brief Scale the noise-covariance matrix for a given number of averages.
+     *
+     * Re-decomposes the covariance after scaling by nave_old / nave_new.
+     *
+     * Refactored: scale_noise_cov (dipole_fit_setup.c)
+     *
+     * @param[in,out] f     Dipole fit data whose noise member is scaled.
+     * @param[in]     nave  Number of averages in the current data.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    static int scale_noise_cov(InvDipoleFitData* f, int nave);
+
+    //=========================================================================================================
+    /**
+     * @brief Scale dipole-fit noise covariance for a given number of averages.
+     *
+     * Wrapper around scale_noise_cov() called from the dipole-fit pipeline.
+     *
+     * Refactored: scale_dipole_fit_noise_cov (dipole_fit_setup.c)
+     *
+     * @param[in,out] f     Dipole fit data whose noise member is scaled.
+     * @param[in]     nave  Number of averages.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    static int scale_dipole_fit_noise_cov(InvDipoleFitData* f, int nave);
+
+    //=========================================================================================================
+    /**
+     * @brief Select and weight the noise-covariance for the active channel set.
+     *
+     * Channels present in the measurement data selection receive unit
+     * weight; omitted channels receive a reduced weight.
+     *
+     * When @p meas is nullptr the function simply scales the noise
+     * covariance for nave = 1 (initial setup case).
+     *
+     * Refactored: select_dipole_fit_noise_cov (dipole_fit_setup.c)
+     *
+     * @param[in,out] f     Dipole fit data whose noise_orig is used to
+     *                       build the weighted noise member.
+     * @param[in]     meas  Measurement data with channel info (may be nullptr).
+     * @param[in]     nave  Number of averages override (< 0 to use meas->current->nave).
+     * @param[in]     sels  Per-channel selection flags (size >= meas->nchan, may be nullptr).
+     *
+     * @return OK on success, FAIL on error.
+     */
+    static int select_dipole_fit_noise_cov(InvDipoleFitData* f,
+                                           mne::MNEMeasData* meas,
+                                           int nave,
+                                           const int* sels);
+
+    //=========================================================================================================
+    /**
+     * @brief Master setup: read all inputs and build a ready-to-use fit workspace.
+     *
+     * Reads coordinate transforms, channel info, BEM/sphere model, noise
+     * covariance, SSP projections, and compiles the forward model.
+     *
+     * Refactored: setup_dipole_fit_data (dipole_fit_setup.c)
+     *
+     * @param[in] mriname         MRI-to-head transform file.
+     * @param[in] measname        Measurement file (provides MEG-to-head transform and channels).
+     * @param[in] bemname         BEM model file (empty string to use sphere model only).
+     * @param[in] r0              Sphere-model origin in head coordinates (may be nullptr).
+     * @param[in] eeg_model       EEG sphere model definition (may be nullptr).
+     * @param[in] accurate_coils  Use accurate coil definitions.
+     * @param[in] badname         Bad-channel list file (empty to skip).
+     * @param[in] noisename       Noise-covariance file (empty for ad-hoc noise).
+     * @param[in] grad_std        Ad-hoc noise std for planar gradiometers (T/m).
+     * @param[in] mag_std         Ad-hoc noise std for magnetometers (T).
+     * @param[in] eeg_std         Ad-hoc noise std for EEG channels (V).
+     * @param[in] mag_reg         Magnetometer noise-covariance regularization factor.
+     * @param[in] grad_reg        Gradiometer noise-covariance regularization factor.
+     * @param[in] eeg_reg         EEG noise-covariance regularization factor.
+     * @param[in] diagnoise       Use only the diagonal of the noise covariance.
+     * @param[in] projnames       SSP projection file paths.
+     * @param[in] include_meg     Include MEG channels in the fit.
+     * @param[in] include_eeg     Include EEG channels in the fit.
+     *
+     * @return Fully initialised fit data, or nullptr on error. Caller takes ownership.
+     */
+    static InvDipoleFitData* setup_dipole_fit_data(
+        const std::string& mriname,
+        const std::string& measname,
+        const std::string& bemname,
+        Eigen::Vector3f* r0,
+        mne::FwdEegSphereModel* eeg_model,
+        int accurate_coils,
+        const std::string& badname,
+        const std::string& noisename,
+        float grad_std,
+        float mag_std,
+        float eeg_std,
+        float mag_reg,
+        float grad_reg,
+        float eeg_reg,
+        int diagnoise,
+        const std::vector<std::string>& projnames,
+        int include_meg,
+        int include_eeg);
+
+    //=========================================================================================================
+    /**
+     * @brief Fit a single dipole to the given data.
+     *
+     * Refactored: fit_one (fit_dipoles.c)
+     *
+     * @param[in]     fit        Precomputed fitting data.
+     * @param[in]     guess      The initial guesses.
+     * @param[in]     time       Time point (s).
+     * @param[in,out] B          The field to fit (modified in-place by projection and whitening).
+     * @param[in]     verbose    Verbose output flag.
+     * @param[out]    res        The fitted dipole.
+     *
+     * @return true on success, false on fitting failure.
+     */
+    static bool fit_one(InvDipoleFitData* fit, InvGuessData* guess, float time, Eigen::Ref<Eigen::VectorXf> B, int verbose, InvEcd& res);
+
+    //=========================================================================================================
+    /**
+     * @brief Compute the forward field for a dipole at the given location.
+     *
+     * Evaluates the MEG and/or EEG forward model at position @p rd and
+     * optionally applies noise whitening.
+     *
+     * Refactored: compute_dipole_field (fit_dipoles.c)
+     *
+     * @param[in]     d        Dipole fit workspace.
+     * @param[in]     rd       Dipole position in head coordinates (m).
+     * @param[in]     whiten   If non-zero, whiten the result using the noise covariance.
+     * @param[in,out] fwd      Forward field matrix (nchan x 3), filled on output.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    static int compute_dipole_field(InvDipoleFitData& d, const Eigen::Vector3f& rd, int whiten, Eigen::Ref<Eigen::MatrixXf> fwd);
+
+    //=========================================================================================================
+    /**
+     * @brief Write the measured and the predicted field of a dipole, channel by channel.
+     *
+     * A debugging aid: one line per fit channel with its name, the measured value at @p time and
+     * the value predicted by the dipole (MEG x 1e15, EEG x 1e6), both after projection.
+     *
+     * Refactored: print_fields (fit_dipoles.c), which printed only CTF reference gradiometers.
+     *
+     * @param[in]  rd     Dipole position in head coordinates (m).
+     * @param[in]  Q      Dipole moment (A m).
+     * @param[in]  time   Time point (s).
+     * @param[in]  integ  Integration window (s).
+     * @param[in]  fit    Dipole fit workspace.
+     * @param[in]  data   Measurement data read for the fit channels.
+     * @param[out] out    Stream the table is written to.
+     *
+     * @return true on success, false if the time cannot be picked or the channels do not match.
+     */
+    static bool print_fields(const Eigen::Vector3f& rd,
+                             const Eigen::Vector3f& Q,
+                             float time,
+                             float integ,
+                             InvDipoleFitData& fit,
+                             const mne::MNEMeasData& data,
+                             std::ostream& out);
+
+    //=========================================================================================================
+    /**
+     * @brief Compute the forward solution for a single dipole position.
+     *
+     * Returns a fully initialised InvDipoleForward with the forward
+     * field, its SVD, and noise-normalised goodness-of-fit limit.  An
+     * existing object may be recycled via @p old.
+     *
+     * Refactored: dipole_forward_one (fit_dipoles.c)
+     *
+     * @param[in]     d    Dipole fit workspace.
+     * @param[in]     rd   Dipole position in head coordinates (m).
+     * @param[in]     old  Existing forward to recycle when its size matches (may be nullptr).
+     *
+     * @return The populated forward object, or nullptr on error.
+     */
+    static std::unique_ptr<InvDipoleForward> dipole_forward_one(InvDipoleFitData* d,
+                                                                const Eigen::Vector3f& rd,
+                                                                std::unique_ptr<InvDipoleForward> old);
+
+public:
+    std::unique_ptr<mne::FiffCoordTrans> mri_head_t; /**< MRI <-> head coordinate transformation. */
+    std::unique_ptr<mne::FiffCoordTrans> meg_head_t; /**< MEG <-> head coordinate transformation. */
+    int coord_frame;                                 /**< Common coordinate frame. */
+    std::vector<mne::FiffChInfo> chs;                /**< Channels. */
+    int nmeg;                                        /**< How many MEG. */
+    int neeg;                                        /**< How many EEG. */
+    StringList ch_names;                             /**< List of all channel names. */
+    std::unique_ptr<mne::FiffSparseMatrix> pick;     /**< Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused). */
+    std::unique_ptr<mne::FwdCoilSet> meg_coils;      /**< MEG coil definitions. */
+    std::unique_ptr<mne::FwdCoilSet> eeg_els;        /**< EEG electrode definitions. */
+    Eigen::Vector3f r0;                              /**< Sphere model origin. */
+    std::string bemname;                             /**< Using a BEM? */
+
+    std::unique_ptr<mne::FwdEegSphereModel> eeg_model; /**< EEG sphere model definition. */
+    std::unique_ptr<mne::FwdBemModel> bem_model;       /**< BEM model definition. */
+
+    std::unique_ptr<dipoleFitFuncsRec> sphere_funcs;     /**< These are the sphere model forward functions. */
+    std::unique_ptr<dipoleFitFuncsRec> bem_funcs;        /**< These are the BEM forward functions. */
+    dipoleFitFuncsRec* funcs = nullptr;                  /**< Non-owning alias — points to one of the two above. */
+    std::unique_ptr<dipoleFitFuncsRec> mag_dipole_funcs; /**< Functions to fit a magnetic dipole. */
+
+    int fixed_noise;                               /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
+    std::unique_ptr<mne::MNECovMatrix> noise_orig; /**< Noise covariance matrix (original, currently unused). */
+    std::unique_ptr<mne::MNECovMatrix> noise;      /**< Noise covariance matrix (weighted to take the selection into account). */
+    int nave;                                      /**< How many averages does this correspond to? */
+    std::unique_ptr<mne::MNEProjOp> proj;          /**< The projection operator to use. */
+    int column_norm;                               /**< What kind of column normalization to apply to the forward solution. */
+    int fit_mag_dipoles;                           /**< Fit magnetic dipoles? */
+    FitDipUserRec* user;                           /**< Non-owning pointer to dipole fit workspace (set during fit_one). */
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} //NAMESPACE
+
+#endif // INV_DIPOLE_FIT_DATA_H

@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/byte_stream.h>
-#include <base/endian.h>
-#include <base/string_utils.h>
+#include <mne/base/byte_stream.h>
+#include <mne/base/endian.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

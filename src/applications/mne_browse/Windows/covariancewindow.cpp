@@ -19,8 +19,8 @@
 
 #include "covariancewindow.h"
 
-#include <base/string_utils.h>
-#include <fiff/fiff_ch_name.h>
+#include <mne/base/string_utils.h>
+#include <mne/fiff/fiff_ch_name.h>
 
 //=============================================================================================================
 // QT INCLUDES

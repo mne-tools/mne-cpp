@@ -15,16 +15,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "batchprocessor.h"
 
-#include <mne/mne_description_parser.h>
-#include <fiff/fiff_raw_data.h>
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_file.h>
-#include <mne/mne.h>
-#include <base/string_utils.h>
+#include <mne/mne/mne_description_parser.h>
+#include <mne/fiff/fiff_raw_data.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_file.h>
+#include <mne/mne/mne.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

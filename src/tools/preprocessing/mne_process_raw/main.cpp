@@ -28,8 +28,8 @@
 //=============================================================================================================
 
 #include "batchprocessor.h"
-#include <mne/mne_process_description.h>
-#include <base/log.h>
+#include <mne/mne/mne_process_description.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

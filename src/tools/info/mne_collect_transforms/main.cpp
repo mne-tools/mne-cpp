@@ -14,15 +14,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_coord_trans_set.h>
-#include <fiff/fiff_stream.h>
-#include <base/string_utils.h>
-#include <mri/mri_mgh_io.h>
-#include <mri/mri_vol_data.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_coord_trans_set.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/base/string_utils.h>
+#include <mne/mri/mri_mgh_io.h>
+#include <mne/mri/mri_vol_data.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

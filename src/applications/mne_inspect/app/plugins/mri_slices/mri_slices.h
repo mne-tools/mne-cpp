@@ -24,9 +24,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/renderable/sliceobject.h>
-#include <disp3D/scene/pickresult.h>
-#include <mri/mri_vol_data.h>
+#include <mne/disp3D/renderable/sliceobject.h>
+#include <mne/disp3D/scene/pickresult.h>
+#include <mne/mri/mri_vol_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,13 +14,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/mne_forward_solution.h>
-#include <mne/mne_source_space.h>
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_proj.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_types.h>
-#include <base/log.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_proj.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_types.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

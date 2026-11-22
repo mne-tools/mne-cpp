@@ -14,8 +14,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <bids/bids_coordinate_system.h>
-#include <fiff/fiff_coord_trans.h>
+#include <mne/bids/bids_coordinate_system.h>
+#include <mne/fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES

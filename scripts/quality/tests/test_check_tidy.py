@@ -47,11 +47,11 @@ class RatchetTests(unittest.TestCase):
         self.assertTrue(tidy.compare({"src/b.cpp": {"bugprone-x": 1}}, baseline, {"src/b.cpp"}))
 
     def test_clean_modules_allow_nothing(self) -> None:
-        baseline = {"clean_modules": ["src/libraries/fiff/"],
-                    "findings": {"src/libraries/fiff/a.cpp": {"bugprone-x": 5}}}
-        problems = tidy.compare({"src/libraries/fiff/a.cpp": {"bugprone-x": 1}}, baseline,
-                                {"src/libraries/fiff/a.cpp"})
-        self.assertEqual(problems, ["src/libraries/fiff/a.cpp: bugprone-x: 1 finding(s), 0 accepted"])
+        baseline = {"clean_modules": ["src/libs/mne/fiff/"],
+                    "findings": {"src/libs/mne/fiff/a.cpp": {"bugprone-x": 5}}}
+        problems = tidy.compare({"src/libs/mne/fiff/a.cpp": {"bugprone-x": 1}}, baseline,
+                                {"src/libs/mne/fiff/a.cpp"})
+        self.assertEqual(problems, ["src/libs/mne/fiff/a.cpp: bugprone-x: 1 finding(s), 0 accepted"])
 
     def test_problems_list_their_locations(self) -> None:
         findings = [("src/a.cpp", 12, 5, "bugprone-x"), ("src/a.cpp", 3, 1, "bugprone-x"), ("src/a.cpp", 7, 2, "perf-y")]
@@ -60,10 +60,10 @@ class RatchetTests(unittest.TestCase):
                          ["src/a.cpp: bugprone-x: 2 finding(s), 0 accepted", "    src/a.cpp:3:1", "    src/a.cpp:12:5"])
 
     def test_findings_are_parsed_per_check(self) -> None:
-        output = (f"{_REPO_ROOT}/src/libraries/fiff/a.cpp:12:5: warning: text [bugprone-x,cert-y]\n"
+        output = (f"{_REPO_ROOT}/src/libs/mne/fiff/a.cpp:12:5: warning: text [bugprone-x,cert-y]\n"
                   f"{_REPO_ROOT}/src/external/eigen/x.h:1:1: warning: text [bugprone-x]\n")
         matches = [(tidy.relative(m.group("file")), m.group("checks")) for m in tidy.FINDING_RE.finditer(output)]
-        self.assertEqual(matches[0], ("src/libraries/fiff/a.cpp", "bugprone-x,cert-y"))
+        self.assertEqual(matches[0], ("src/libs/mne/fiff/a.cpp", "bugprone-x,cert-y"))
         self.assertFalse(tidy.in_scope(matches[1][0]))
 
     def test_errors_without_a_location_fail_the_unit(self) -> None:

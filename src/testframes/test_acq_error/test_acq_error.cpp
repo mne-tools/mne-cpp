@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <acq/acq_error.h>
-#include <acq/acq_global.h>
-#include <acq/acq_sample_format.h>
+#include <mne/acq/acq_error.h>
+#include <mne/acq/acq_global.h>
+#include <mne/acq/acq_sample_format.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -33,7 +33,7 @@
 //=============================================================================================================
 
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <base/string_utils.h>
+#include <mne/base/string_utils.h>
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/bemdatamodel.h>
@@ -42,10 +42,10 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Management/communicator.h>
-#include <dsp/filterkernel.h>
-#include <fiff/fiff_events.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_raw_data.h>
+#include <mne/dsp/filterkernel.h>
+#include <mne/fiff/fiff_events.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -19,8 +19,8 @@
 
 #include "../scshared_global.h"
 #include "pluginconnectorconnection.h"
-#include <mna/mna_types.h>
-#include <base/json.h>
+#include <mne/mna/mna_types.h>
+#include <mne/base/json.h>
 
 //=============================================================================================================
 // QT INCLUDES

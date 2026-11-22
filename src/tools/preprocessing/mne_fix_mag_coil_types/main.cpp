@@ -14,12 +14,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_stream.h>
-#include <fiff/fiff_tag.h>
-#include <fiff/fiff_dir_entry.h>
-#include <fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_stream.h>
+#include <mne/fiff/fiff_tag.h>
+#include <mne/fiff/fiff_dir_entry.h>
+#include <mne/fiff/fiff_ch_info.h>
 
-#include <base/log.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

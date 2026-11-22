@@ -16,15 +16,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff/fiff_dig_point_set.h"
-#include "fiff/fiff_dig_point.h"
-#include "fiff/fiff_coord_trans.h"
-#include "mne/mne_bem.h"
-#include "mne/mne_bem_surface.h"
-#include "mne/mne_project_to_surface.h"
-#include "mne/mne_icp.h"
-#include <base/log.h>
-#include <base/string_utils.h>
+#include "mne/fiff/fiff_dig_point_set.h"
+#include "mne/fiff/fiff_dig_point.h"
+#include "mne/fiff/fiff_coord_trans.h"
+#include "mne/mne/mne_bem.h"
+#include "mne/mne/mne_bem_surface.h"
+#include "mne/mne/mne_project_to_surface.h"
+#include "mne/mne/mne_icp.h"
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES

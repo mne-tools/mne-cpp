@@ -18,7 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "fiffstreamthread.h"
 
 #include "fiffstreamserver.h"
@@ -40,9 +40,9 @@
 // Fiff INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_byte_swap.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_tag.h>
+#include <mne/fiff/fiff_byte_swap.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_tag.h>
 
 //=============================================================================================================
 // QT INCLUDES

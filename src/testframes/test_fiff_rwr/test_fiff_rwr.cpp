@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <fiff/fiff.h>
-#include <fiff/fiff_dig_point_set.h>
-#include <mne/mne_forward_solution.h>
-#include <base/byte_stream.h>
+#include <mne/base/log.h>
+#include <mne/fiff/fiff.h>
+#include <mne/fiff/fiff_dig_point_set.h>
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/base/byte_stream.h>
 
 //=============================================================================================================
 // QT INCLUDES

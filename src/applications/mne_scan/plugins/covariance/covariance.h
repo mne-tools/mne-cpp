@@ -21,7 +21,7 @@
 
 #include "covariance_global.h"
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <base/circular_buffer.h>
+#include <mne/base/circular_buffer.h>
 
 //=============================================================================================================
 // QT INCLUDES

@@ -14,9 +14,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/fwd_coil_set.h>
-#include <fwd/fwd_coil.h>
-#include <base/log.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fwd/fwd_coil.h>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES

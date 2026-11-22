@@ -14,14 +14,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <dsp/simulate.h>
-#include <inv/inv_source_estimate.h>
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_cov.h>
-#include <fiff/fiff_named_matrix.h>
-#include <fiff/fiff_constants.h>
-#include <mne/mne_forward_solution.h>
+#include <mne/dsp/simulate.h>
+#include <mne/inv/inv_source_estimate.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES

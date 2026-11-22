@@ -1,0 +1,398 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     inv_lcmv.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.1.0
+ * @date     March 2026
+ * @brief    Implementation of the LCMV beamformer pipeline (filter design + multiple application paths).
+ *
+ * Builds the leadfield ↔ data-covariance pipeline, delegates the
+ * numerical core to @ref InvBeamformerCompute, then exposes the
+ * project-through-filter loop for evoked, raw and per-epoch inputs.
+ * The resolution-matrix path multiplies the derived filter through the
+ * same leadfield used for design, giving the point-spread diagnostics
+ * consumed by @ref InvResolutionMatrix.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "inv_lcmv.h"
+#include <mne/fiff/fiff_ch_name.h>
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
+#include "inv_beamformer_compute.h"
+
+#include <mne/mne/mne_forward_solution.h>
+#include <mne/fiff/fiff_cov.h>
+#include <mne/fiff/fiff_evoked.h>
+#include <mne/fiff/fiff_info.h>
+#include <mne/math/linalg.h>
+
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Dense>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+using namespace mne;
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+InvBeamformer InvLCMV::makeLCMV([[maybe_unused]] const FiffInfo& info,
+                                const MNEForwardSolution& forward,
+                                const FiffCov& dataCov,
+                                double reg,
+                                const FiffCov& noiseCov,
+                                BeamformerPickOri pickOri,
+                                BeamformerWeightNorm weightNorm,
+                                bool reduceRank,
+                                BeamformerInversion invMethod)
+{
+    InvBeamformer result;
+    result.kind = "LCMV";
+
+    // -----------------------------------------------------------------------
+    // Extract leadfield G from forward solution
+    // -----------------------------------------------------------------------
+    if (forward.sol.data.size() == 0) {
+        Log::warning("InvLCMV::makeLCMV - Forward solution has no gain matrix!");
+        return result;
+    }
+
+    MatrixXd G = forward.sol.data; // (n_channels, n_sources * n_orient)
+    const int nChannels = static_cast<int>(G.rows());
+    const int nOrient = (forward.source_ori == FIFFV_MNE_FREE_ORI) ? 3 : 1;
+    const int nSources = static_cast<int>(G.cols()) / nOrient;
+
+    Log::info("InvLCMV::makeLCMV - Leadfield: {} channels x {} sources (n_orient={})", nChannels, nSources, nOrient);
+
+    // -----------------------------------------------------------------------
+    // Build whitening matrix from noise covariance
+    // -----------------------------------------------------------------------
+    MatrixXd whitener;
+    if (noiseCov.data.size() > 0) {
+        // Compute whitener from noise covariance eigendecomposition
+        //   whitener = diag(1/sqrt(eig)) @ eigvec  (rows of eigvec are the eigenvectors)
+        if (noiseCov.eig.size() > 0 && noiseCov.eigvec.size() > 0) {
+            VectorXd invSqrtEig(noiseCov.eig.size());
+            for (int i = 0; i < noiseCov.eig.size(); ++i) {
+                invSqrtEig(i) = (noiseCov.eig(i) > 1e-30)
+                    ? 1.0 / std::sqrt(noiseCov.eig(i))
+                    : 0.0;
+            }
+            whitener = invSqrtEig.asDiagonal() * noiseCov.eigvec;
+        } else {
+            // Fallback: identity whitening
+            whitener = MatrixXd::Identity(nChannels, nChannels);
+        }
+    } else {
+        whitener = MatrixXd::Identity(nChannels, nChannels);
+    }
+
+    // -----------------------------------------------------------------------
+    // Build SSP projection matrix
+    // -----------------------------------------------------------------------
+    MatrixXd projMat = MatrixXd::Identity(nChannels, nChannels);
+    // Note: SSP projections from info.projs are typically pre-applied to
+    // the forward solution. If not, they should be applied here.
+
+    // -----------------------------------------------------------------------
+    // Whiten leadfield and data covariance
+    //   G_w = whitener @ G
+    //   Cm_w = whitener @ Cm @ whitener^T
+    // -----------------------------------------------------------------------
+    MatrixXd Gw = whitener * G;
+
+    MatrixXd CmData = dataCov.data;
+    if (CmData.rows() != nChannels || CmData.cols() != nChannels) {
+        Log::warning("InvLCMV::makeLCMV - Data covariance dimension ({} x {}) does not match leadfield channels ({})!", CmData.rows(), CmData.cols(), nChannels);
+        return result;
+    }
+
+    MatrixXd CmW = whitener * CmData * whitener.transpose();
+    // Ensure Hermitian (for numerical stability)
+    CmW = (CmW + CmW.transpose()) * 0.5;
+
+    // -----------------------------------------------------------------------
+    // Source normals for orientation picking
+    // -----------------------------------------------------------------------
+    MatrixX3d nn = forward.source_nn.cast<double>();
+    if (nOrient == 3 && nn.rows() == 3 * nSources) {
+        // Free orientation stores three rows per source; mne-python uses nn[2::3].
+        MatrixX3d perSource(nSources, 3);
+        for (int s = 0; s < nSources; ++s)
+            perSource.row(s) = nn.row(3 * s + 2);
+        nn = perSource;
+    }
+
+    // -----------------------------------------------------------------------
+    // Compute spatial filter
+    // -----------------------------------------------------------------------
+    MatrixXd W;
+    MatrixX3d mpOri;
+
+    bool ok = InvBeamformerCompute::computeBeamformer(
+        Gw, CmW, reg, nOrient,
+        weightNorm, pickOri, reduceRank, invMethod,
+        nn, W, mpOri);
+
+    if (!ok) {
+        Log::warning("InvLCMV::makeLCMV - Beamformer computation failed!");
+        return result;
+    }
+
+    // -----------------------------------------------------------------------
+    // Populate result
+    // -----------------------------------------------------------------------
+    result.weights.push_back(W);
+    result.whitener = whitener;
+    result.proj = projMat;
+    result.chNames = forward.sol.row_names;
+    result.isFreOri = (nOrient == 3 && pickOri != BeamformerPickOri::Normal && pickOri != BeamformerPickOri::MaxPower);
+    result.nSourcesTotal = nSources;
+    result.srcType = "surface";
+    result.weightNorm = weightNorm;
+    result.pickOri = pickOri;
+    result.inversion = invMethod;
+    result.reg = reg;
+    result.rank = static_cast<int>(CmW.rows());
+    result.maxPowerOri = mpOri;
+    result.sourceNn = forward.source_nn;
+
+    // Vertex indices
+    VectorXi verts(0);
+    if (forward.src.size() >= 2) {
+        verts.resize(forward.src[0].vertno.size() + forward.src[1].vertno.size());
+        verts << forward.src[0].vertno, forward.src[1].vertno;
+        // Keep where the left hemisphere ends. The concatenation above is the
+        // only place that knows it, and without it the result cannot be
+        // written as the -lh/-rh pair mne-python expects.
+        result.nVerticesLh = static_cast<int>(forward.src[0].vertno.size());
+    } else if (forward.src.size() == 1) {
+        verts = forward.src[0].vertno;
+    }
+    result.vertices = verts;
+
+    Log::info("InvLCMV::makeLCMV - Done. Filter: {} x {} (sources={}, orient={})", W.rows(), W.cols(), nSources, result.nOrient());
+
+    return result;
+}
+
+//=============================================================================================================
+
+MatrixXd InvLCMV::applyFilter(const MatrixXd& data, const InvBeamformer& filters)
+{
+    // Apply projection + whitening + spatial filter
+    MatrixXd processed = data;
+
+    // Project
+    if (filters.proj.size() > 0 && filters.proj.rows() == data.rows()) {
+        processed = filters.proj * processed;
+    }
+
+    // Whiten
+    if (filters.whitener.size() > 0 && filters.whitener.cols() == processed.rows()) {
+        processed = filters.whitener * processed;
+    }
+
+    // Apply spatial filter: sol = W @ processed
+    return filters.weights[0] * processed;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked& evoked, const InvBeamformer& filters)
+{
+    if (!filters.isValid() || filters.kind != "LCMV") {
+        Log::warning("InvLCMV::applyLCMV - Invalid or non-LCMV filters!");
+        return InvSourceEstimate();
+    }
+
+    // Pick the filter's channels from evoked by name, as mne's apply_lcmv (the order may differ)
+    MatrixXd data;
+    if (filters.chNames.size() > 0) {
+        const int nFilterCh = static_cast<int>(filters.chNames.size());
+        const int nTimes = static_cast<int>(evoked.data.cols());
+        data.resize(nFilterCh, nTimes);
+        for (int i = 0; i < nFilterCh; ++i) {
+            int idx = mne::channel_index(evoked.info.ch_names, filters.chNames[i]);
+            if (idx < 0) {
+                Log::warning("InvLCMV::applyLCMV - Channel {} not found in evoked!", filters.chNames[i]);
+                return InvSourceEstimate();
+            }
+            data.row(i) = evoked.data.row(idx);
+        }
+    } else {
+        data = evoked.data;
+    }
+
+    MatrixXd sol = applyFilter(data, filters);
+
+    // Combine XYZ for free orientation if needed
+    const int nOrient = filters.nOrient();
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+        // Combine: sqrt(x^2 + y^2 + z^2) per source per time
+        const int nSources = static_cast<int>(sol.rows()) / 3;
+        const int nTimes = static_cast<int>(sol.cols());
+        MatrixXd combined(nSources, nTimes);
+        for (int s = 0; s < nSources; ++s) {
+            combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
+        }
+        sol = combined;
+    }
+
+    float tmin = evoked.times.size() > 0 ? evoked.times[0] : 0.0f;
+    float tstep = (evoked.info.sfreq > 0) ? 1.0f / evoked.info.sfreq : 1.0f;
+
+    InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
+    stc.method = InvEstimateMethod::LCMV;
+    stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
+    stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
+
+    return stc;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvLCMV::applyLCMVRaw(const MatrixXd& data,
+                                        float tmin,
+                                        float tstep,
+                                        const InvBeamformer& filters)
+{
+    if (!filters.isValid() || filters.kind != "LCMV") {
+        Log::warning("InvLCMV::applyLCMVRaw - Invalid or non-LCMV filters!");
+        return InvSourceEstimate();
+    }
+
+    MatrixXd sol = applyFilter(data, filters);
+
+    const int nOrient = filters.nOrient();
+    if (nOrient == 3 && filters.pickOri != BeamformerPickOri::Vector) {
+        const int nSources = static_cast<int>(sol.rows()) / 3;
+        const int nTimes = static_cast<int>(sol.cols());
+        MatrixXd combined(nSources, nTimes);
+        for (int s = 0; s < nSources; ++s) {
+            combined.row(s) = sol.middleRows(s * 3, 3).colwise().norm();
+        }
+        sol = combined;
+    }
+
+    InvSourceEstimate stc(sol, filters.vertices, tmin, tstep);
+    stc.method = InvEstimateMethod::LCMV;
+    stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
+    stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
+
+    return stc;
+}
+
+//=============================================================================================================
+
+InvSourceEstimate InvLCMV::applyLCMVCov(const FiffCov& dataCov,
+                                        const InvBeamformer& filters)
+{
+    if (!filters.isValid() || filters.kind != "LCMV") {
+        Log::warning("InvLCMV::applyLCMVCov - Invalid or non-LCMV filters!");
+        return InvSourceEstimate();
+    }
+
+    // Whiten data covariance
+    MatrixXd CmW = dataCov.data;
+    if (filters.whitener.size() > 0) {
+        CmW = filters.whitener * CmW * filters.whitener.transpose();
+    }
+
+    const int nOrient = filters.nOrient();
+    VectorXd power = InvBeamformerCompute::computePower(CmW, filters.weights[0], nOrient);
+
+    // Return as 1-column source estimate
+    MatrixXd powerMat = power; // (nSources, 1) implicitly via VectorXd
+
+    InvSourceEstimate stc(powerMat, filters.vertices, 0.0f, 1.0f);
+    stc.method = InvEstimateMethod::LCMV;
+    stc.sourceSpaceType = InvSourceSpaceType::Surface;
+    stc.nVerticesLh = filters.nVerticesLh;
+    stc.orientationType = filters.isFreOri ? InvOrientationType::Free : InvOrientationType::Fixed;
+
+    return stc;
+}
+
+//=============================================================================================================
+
+std::vector<InvSourceEstimate> InvLCMV::applyLCMVEpochs(const std::vector<MatrixXd>& epochs,
+                                                        float tmin,
+                                                        float tstep,
+                                                        const InvBeamformer& filters)
+{
+    std::vector<InvSourceEstimate> results;
+
+    if (epochs.empty()) {
+        Log::warning("InvLCMV::applyLCMVEpochs - No epochs provided.");
+        return results;
+    }
+    if (!filters.isValid() || filters.kind != "LCMV") {
+        Log::warning("InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!");
+        return results;
+    }
+
+    results.reserve(epochs.size());
+    for (const MatrixXd& epoch : epochs) {
+        results.push_back(applyLCMVRaw(epoch, tmin, tstep, filters));
+        if (results.back().empty()) {
+            Log::warning("InvLCMV::applyLCMVEpochs - Epoch {} produced empty source estimate.", results.size() - 1);
+        }
+    }
+
+    return results;
+}
+
+//=============================================================================================================
+
+MatrixXd InvLCMV::makeLCMVResolutionMatrix(
+    const MNEForwardSolution& forward,
+    const FiffInfo& info,
+    const FiffCov& dataCov,
+    double reg,
+    const FiffCov& noiseCov)
+{
+    // Build the LCMV filter
+    InvBeamformer filters = makeLCMV(info, forward, dataCov, reg, noiseCov);
+
+    if (!filters.isValid() || filters.weights.empty()) {
+        Log::warning("InvLCMV::makeLCMVResolutionMatrix - Could not compute LCMV filter.");
+        return MatrixXd();
+    }
+
+    // Extract leadfield: G (n_channels x n_dipoles)
+    MatrixXd G = forward.sol.data;
+
+    // Apply whitening to leadfield
+    MatrixXd Gw = G;
+    if (filters.proj.size() > 0 && filters.proj.rows() == G.rows()) {
+        Gw = filters.proj * Gw;
+    }
+    if (filters.whitener.size() > 0 && filters.whitener.cols() == Gw.rows()) {
+        Gw = filters.whitener * Gw;
+    }
+
+    // Resolution matrix: R = W @ G_whitened
+    MatrixXd R = filters.weights[0] * Gw;
+
+    Log::info("InvLCMV::makeLCMVResolutionMatrix - Resolution matrix: {} x {}", R.rows(), R.cols());
+
+    return R;
+}

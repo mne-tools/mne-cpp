@@ -20,16 +20,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fwd/fwd_bem_model.h>
-#include <base/log.h>
+#include <mne/fwd/fwd_bem_model.h>
+#include <mne/base/log.h>
 #include "../common/scoped_log_capture.h"
-#include <fwd/fwd_coil_set.h>
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_named_matrix.h>
-#include <mne/mne_source_space.h>
-#include <mne/mne_surface.h>
+#include <mne/fwd/fwd_coil_set.h>
+#include <mne/fiff/fiff_ch_info.h>
+#include <mne/fiff/fiff_constants.h>
+#include <mne/fiff/fiff_coord_trans.h>
+#include <mne/fiff/fiff_named_matrix.h>
+#include <mne/mne/mne_source_space.h>
+#include <mne/mne/mne_surface.h>
 
 //=============================================================================================================
 // QT INCLUDES

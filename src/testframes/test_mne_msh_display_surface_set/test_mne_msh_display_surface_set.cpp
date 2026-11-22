@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
-#include <mne/mne_msh_display_surface_set.h>
-#include <mne/mne_msh_display_surface.h>
-#include <mne/mne_surface.h>
-#include <fiff/fiff_file.h>
+#include <mne/base/log.h>
+#include <mne/mne/mne_msh_display_surface_set.h>
+#include <mne/mne/mne_msh_display_surface.h>
+#include <mne/mne/mne_surface.h>
+#include <mne/fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

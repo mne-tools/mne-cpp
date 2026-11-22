@@ -16,11 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/log.h>
+#include <mne/base/log.h>
 #include "averagemodel.h"
 
-#include <fiff/fiff_io.h>
-#include <base/string_utils.h>
+#include <mne/fiff/fiff_io.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // STL INCLUDES
