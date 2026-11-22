@@ -269,10 +269,8 @@ if(MNE_BUILD_QT)
   # makes the subdirectory calls no-ops and prints the warning at most once.
 
   # Define required Qt components for MNE-CPP (Qt6 only, no OpenGL, require GuiPrivate for QRhi)
-  set(_MNE_QT_COMPONENTS Core Concurrent Gui Multimedia Network Widgets Svg Xml)
-  if(NOT WASM)
-    list(APPEND _MNE_QT_COMPONENTS PrintSupport)
-  endif()
+  # Only modules a target requests (scripts/quality/audit_qt_modules.py --check), so a Qt without the others builds
+  set(_MNE_QT_COMPONENTS Core Concurrent Gui Network Widgets Svg)
   list(APPEND _MNE_QT_COMPONENTS ShaderTools GuiPrivate)
   if(BUILD_TESTS)
     list(APPEND _MNE_QT_COMPONENTS Test)

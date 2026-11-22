@@ -149,5 +149,40 @@ class ScanTests(unittest.TestCase):
         self.assertEqual(report["units"]["src/libraries/disp"]["requested_unused"], [])
 
 
+class PolicyTests(unittest.TestCase):
+    REPORT = {"units": {
+        "src/applications/viewer": {"requested": ["Core", "Widgets"], "used": ["Core", "Gui", "Svg", "Widgets"],
+                                    "requested_unused": []},
+        "src/applications/tool": {"requested": ["Core", "PrintSupport"], "used": ["Core"],
+                                  "requested_unused": ["PrintSupport"]},
+    }}
+
+    def test_modules_outside_the_allowlist_and_unused_requests_fail(self) -> None:
+        policy = {"default": ["Core", "Gui", "Widgets"],
+                  "targets": {"src/applications/tool": ["Core", "PrintSupport"], "src/applications/gone": ["Core"]}}
+        self.assertEqual(audit.check_policy(self.REPORT, policy), [
+            "src/applications/tool: requests Qt PrintSupport but does not use it",
+            "src/applications/viewer: Qt Svg is not in its allowlist (Core Gui Widgets)",
+            "src/applications/gone: listed in the allowlist but no such target",
+        ])
+
+    def test_allowed_modules_pass(self) -> None:
+        policy = {"default": ["Core"], "targets": {"src/applications/viewer": ["Core", "Gui", "Svg", "Widgets"],
+                                                   "src/applications/tool": ["Core", "PrintSupport"]}}
+        report = {"units": dict(self.REPORT["units"])}
+        report["units"]["src/applications/tool"] = dict(report["units"]["src/applications/tool"], requested_unused=[])
+        self.assertEqual(audit.check_policy(report, policy), [])
+
+    def test_modules_found_for_the_whole_tree_must_be_requested(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            make_repo(root, {
+                "src/CMakeLists.txt": "set(_MNE_QT_COMPONENTS Core Gui Xml)\nif(NOT WASM)\n"
+                                      "  list(APPEND _MNE_QT_COMPONENTS PrintSupport)\nendif()\n",
+                "src/applications/a/CMakeLists.txt": "set(QT_REQUIRED_COMPONENTS Core Gui)\n",
+            })
+            self.assertEqual(audit.unrequested_prefetched(root), ["PrintSupport", "Xml"])
+
+
 if __name__ == "__main__":
     unittest.main()

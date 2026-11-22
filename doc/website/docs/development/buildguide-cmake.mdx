@@ -84,6 +84,11 @@ Qt 6 is the only dependency you need to install manually if you choose not to us
 2. Install **Qt 6.10 or higher** to a path without spaces. During installation, select:
    - The compiler target for your platform (e.g., `MSVC 2022 64-bit`, `Desktop gcc 64-bit`, or `macOS`)
    - **Qt Shader Tools** (required)
+   - **Qt SVG** (required)
+
+   MNE-CPP needs the Qt modules Core, Gui, Widgets, Concurrent, Network, SVG and Shader Tools, plus Qt Test for the
+   tests; it no longer needs Multimedia, XML or Print Support. `scripts/quality/audit_qt_modules.py --check` keeps
+   every target within the modules allowed for it in `scripts/quality/qt_usage_policy.json`.
 3. After installation, add the Qt `bin` folder to your `PATH`:
    The default Qt version is recorded as `QT_VERSION` in `src/external/external_deps.env`.
    - **Windows:** e.g. `C:\Qt\<version>\msvc2022_64\bin`

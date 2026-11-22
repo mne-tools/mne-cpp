@@ -43,6 +43,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from audit_maintainability import strip_comments_and_strings  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+POLICY_FILE = Path(__file__).resolve().parent / "qt_usage_policy.json"
 QT_ROOT = REPO_ROOT / "src" / "external" / "qt" / "dynamic"
 SCOPES = {"disp": "src/libraries/disp", "disp3D": "src/libraries/disp3D", "applications": "src/applications"}
 EXTENSIONS = {".h", ".hpp", ".cpp", ".cc", ".cxx", ".mm"}
@@ -663,17 +664,59 @@ def render_markdown(report: dict[str, Any], top: int = 10) -> str:
     return "\n".join(lines) + "\n"
 
 
+def check_policy(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
+    """Lists every module a target requests or uses beyond its allowlist, and every module it requests unused."""
+    allowed = policy["targets"]
+    default = set(policy["default"])
+    problems = []
+    for unit, info in sorted(report["units"].items()):
+        permitted = set(allowed.get(unit, default))
+        for module in sorted((set(info["requested"]) | set(info["used"])) - permitted):
+            problems.append(f"{unit}: Qt {module} is not in its allowlist ({' '.join(sorted(permitted))})")
+        for module in info["requested_unused"]:
+            problems.append(f"{unit}: requests Qt {module} but does not use it")
+    for unit in sorted(set(allowed) - set(report["units"])):
+        problems.append(f"{unit}: listed in the allowlist but no such target")
+    return problems
+
+
+def unrequested_prefetched(repo_root: Path = REPO_ROOT) -> list[str]:
+    """Qt modules src/CMakeLists.txt finds for the whole tree that no target requests, so the Qt build can drop them."""
+    top = _strip_cmake_comments((repo_root / "src" / "CMakeLists.txt").read_text(encoding="utf-8"))
+    prefetched = set()
+    for match in re.finditer(r"(?:set|list)\s*\(\s*(?:APPEND\s+)?_MNE_QT_COMPONENTS\s+([^)]*)\)", top):
+        prefetched.update(w for w in match.group(1).split() if re.fullmatch(r"[A-Z]\w*", w))
+    requested: set[str] = set()
+    for cmake in (repo_root / "src").rglob("CMakeLists.txt"):
+        if cmake.parent == repo_root / "src" or "external" in cmake.parts:
+            continue
+        requested.update(cmake_components(cmake.read_text(encoding="utf-8", errors="replace"))["requested"])
+    return sorted(prefetched - requested)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--json", type=Path, dest="json_path", help="write the JSON report")
     parser.add_argument("--markdown", type=Path, help="write the Markdown summary")
     parser.add_argument("--qt-root", type=Path, default=QT_ROOT, help="Qt install with lib/ or include/ headers")
+    parser.add_argument("--check", action="store_true",
+                        help="fail when a target requests or uses a Qt module outside its allowlist in "
+                             "qt_usage_policy.json (qt_modules), or requests one it does not use")
     args = parser.parse_args(argv)
 
     qt = build_qt_map(args.qt_root)
     if qt.source == "fallback":
         print(f"WARNING Qt headers not found under {args.qt_root}; using the built-in class map", file=sys.stderr)
     report = scan(REPO_ROOT, qt)
+    if args.check:
+        policy = json.loads(POLICY_FILE.read_text(encoding="utf-8"))["qt_modules"]
+        problems = check_policy(report, policy)
+        problems += [f"src/CMakeLists.txt: finds Qt {m}, which no target requests" for m in unrequested_prefetched()]
+        for problem in problems:
+            print(f"FAIL: {problem}")
+        if not problems:
+            print(f"PASS: {len(report['units'])} targets use only the Qt modules they are allowed.")
+        return 1 if problems else 0
     if args.json_path:
         args.json_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     if args.markdown:

@@ -175,6 +175,12 @@ aliases; replace the old spelling as below.
   files in CI. Only `base_global.cpp` and `acq_global.cpp` see them now;
   `base/buildinfo.h` is gone. `scripts/quality/tests/test_compiler_cache.py`
   keeps it that way.
+- Qt Multimedia, Qt XML and Qt Print Support are no longer needed; MNE Browse
+  requested Print Support without using it. Every target of `disp`, `disp3D`
+  and the applications has an allowlist of Qt modules (`qt_modules` in
+  `scripts/quality/qt_usage_policy.json`), which
+  `scripts/quality/audit_qt_modules.py --check` enforces in CI, together with
+  the per-file audit of what each module is used for.
 - macOS packages need macOS 26 or later (was 14.4). The libraries parse
   floating-point numbers with `std::from_chars`, which Apple's C++ library
   provides from macOS 26 on. `scripts/quality/tests/test_macos_availability.py`

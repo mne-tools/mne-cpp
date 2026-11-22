@@ -169,5 +169,300 @@
       "public_header_includes": 0,
       "modules": []
     }
+  },
+  "qt_modules": {
+    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent, Svg and Network go.",
+    "default": [
+      "Core",
+      "Gui",
+      "Widgets"
+    ],
+    "targets": {
+      "src/applications/mne_align": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/libs/anShared": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/libs/events": [
+        "Core"
+      ],
+      "src/applications/mne_analyze/mne_analyze": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/averaging": [
+        "Concurrent",
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/channelselection": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/controlmanager": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/coregistration": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/cortical_surface": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/dataloader": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/datamanager": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/dipolefit": [
+        "Concurrent",
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/events": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/filtering": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/rawdataviewer": [
+        "Core",
+        "Gui",
+        "Svg",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/sampleplugin": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/sourcelocalization": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze/plugins/view3d": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/core": [
+        "Core",
+        "Network"
+      ],
+      "src/applications/mne_analyze_studio/extensions/analysis_results_extension": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/extensions/dummy_3d_extension": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/extensions/fiff_browser_extension": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/extensions/mna_skills": [
+        "Core"
+      ],
+      "src/applications/mne_analyze_studio/extensions/psd_analysis_extension": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/extensions/source_estimation_skill": [
+        "Core"
+      ],
+      "src/applications/mne_analyze_studio/extensions/temporal_filter_skill": [
+        "Core"
+      ],
+      "src/applications/mne_analyze_studio/neuro_kernel": [
+        "Core",
+        "Network"
+      ],
+      "src/applications/mne_analyze_studio/sdk": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_analyze_studio/skill_host": [
+        "Core",
+        "Network"
+      ],
+      "src/applications/mne_analyze_studio/workbench": [
+        "Core",
+        "Gui",
+        "Network",
+        "Widgets"
+      ],
+      "src/applications/mne_browse": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "Svg",
+        "Widgets"
+      ],
+      "src/applications/mne_dipole_fit": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_inspect": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_inspect/app/plugins/electrodes": [
+        "Core",
+        "Gui"
+      ],
+      "src/applications/mne_inspect/app/plugins/mri_slices": [
+        "Core",
+        "Gui"
+      ],
+      "src/applications/mne_scan/libs/scDisp": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/libs/scMeas": [
+        "Core",
+        "Gui"
+      ],
+      "src/applications/mne_scan/libs/scShared": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/mne_scan": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/averaging": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/babymeg": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/brainamp": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/brainflowboard": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/covariance": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/dummytoolbox": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/eegosports": [
+        "Core",
+        "Gui",
+        "Svg",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/fiffsimulator": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/ftbuffer": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/gusbamp": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/hpi": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/lsladapter": [
+        "Concurrent",
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/natus": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/neuromag": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/neuronalconnectivity": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/noisereduction": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/rtclustmne": [
+        "Concurrent",
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/rtfwd": [
+        "Core",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/tmsi": [
+        "Core",
+        "Gui",
+        "Svg",
+        "Widgets"
+      ],
+      "src/applications/mne_scan/plugins/writetofile": [
+        "Core",
+        "Gui",
+        "Widgets"
+      ],
+      "src/libraries/disp": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "GuiPrivate",
+        "ShaderTools",
+        "Svg",
+        "Widgets"
+      ],
+      "src/libraries/disp3D": [
+        "Concurrent",
+        "Core",
+        "Gui",
+        "GuiPrivate",
+        "ShaderTools",
+        "Widgets"
+      ]
+    }
   }
 }
