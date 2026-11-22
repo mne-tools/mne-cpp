@@ -7,7 +7,7 @@ sidebar_position: 0
 
 # Forward Library
 
-**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/fwd`
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libs/mne/fwd`
 The Forward library computes MEG and EEG forward solutions — the mapping from source currents in the brain to sensor measurements. It supports BEM (Boundary Element Method) models with constant or linear collocation, multi-layer concentric-sphere EEG head models, and arbitrary coil/electrode configurations. The library also provides sensor-to-surface field mapping for topographic interpolation. All classes reside in the `mne_fwd` namespace.
 
 ## Architecture
@@ -137,7 +137,7 @@ flowchart TD
 ## Usage Example
 
 ```cpp
-#include <fwd/fwd.h>
+#include <mne/fwd/fwd.h>
 
 using namespace mne;
 

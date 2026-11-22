@@ -7,7 +7,7 @@ sidebar_position: 0
 
 # 3D Display Library
 
-**Namespace:** `mne::disp` &nbsp;·&nbsp; **Source:** `src/libraries/disp3D`
+**Namespace:** `mne::disp` &nbsp;·&nbsp; **Source:** `src/libs/mne/disp3D`
 Starting with MNE-CPP v2.0, the 3D visualization library has been rebuilt on top of Qt's **Rendering Hardware Interface (RHI)**. The library is called `disp3D` (namespace `mne_disp3D`). Unlike the previous Qt3D-based implementation, the RHI backend talks directly to the platform's native graphics API — Metal on macOS, Vulkan on Linux, Direct3D 11/12 on Windows, or OpenGL as a fallback — giving MNE-CPP a thinner, more portable rendering stack.
 
 :::info Why RHI?
@@ -198,10 +198,10 @@ Workers implement the **Producer–Consumer pattern** on Qt's thread infrastruct
 ### Quick Start — Visualizing a Brain Surface
 
 ```cpp
-#include <disp3D/view/brainview.h>
-#include <disp3D/model/braintreemodel.h>
-#include <fs/surface.h>
-#include <fs/annotation.h>
+#include <mne/disp3D/view/brainview.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/fs/surface.h>
+#include <mne/fs/annotation.h>
 
 // Create view and model
 BrainView *view = new BrainView();
@@ -224,8 +224,8 @@ view->show();
 ### Adding a Connectivity Network
 
 ```cpp
-#include <disp3D/model/braintreemodel.h>
-#include <connectivity/network/network.h>
+#include <mne/disp3D/model/braintreemodel.h>
+#include <mne/connectivity/network/network.h>
 
 // After computing connectivity (see Connectivity library docs)
 std::vector<Network> networks = compute_connectivity(settings);

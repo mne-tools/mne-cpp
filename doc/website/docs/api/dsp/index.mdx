@@ -7,7 +7,7 @@ sidebar_position: 0
 
 # DSP Library
 
-**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/dsp`
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libs/mne/dsp`
 The DSP library provides digital signal processing algorithms for MEG/EEG data, covering both offline batch processing and real-time streaming scenarios. All classes reside in the `mne_dsp` namespace and depend only on Qt and Eigen.
 
 <Connections topic="spectral-analysis" context="manual" />
@@ -77,9 +77,9 @@ These classes are designed for streaming data and run in background threads:
 ## Usage Example
 
 ```cpp
-#include <dsp/firfilter.h>
-#include <dsp/welch_psd.h>
-#include <dsp/ica.h>
+#include <mne/dsp/firfilter.h>
+#include <mne/dsp/welch_psd.h>
+#include <mne/dsp/ica.h>
 
 using namespace mne;
 

@@ -7,7 +7,7 @@ sidebar_position: 0
 
 # Machine Learning Library
 
-**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/ml`
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libs/mne/ml`
 The `mne_ml` library (`mne_ml` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators live in the libraries that use them, such as the covariance shrinkage in `mne_sts` and the Local Outlier Factor in `mne_dsp`. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
 
 ```cmake
@@ -40,7 +40,7 @@ Dependencies: `mne_base`, `mne_math`, `mne_pybridge` (except on WebAssembly), Qt
 All ML models implement this interface:
 
 ```cpp
-#include <ml/ml_model.h>
+#include <mne/ml/ml_model.h>
 
 class MlModel {
 public:
@@ -69,7 +69,7 @@ public:
 ONNX Runtime backed model for deploying pre-trained neural networks (e.g., CMNE LSTM):
 
 ```cpp
-#include <ml/ml_onnx_model.h>
+#include <mne/ml/ml_onnx_model.h>
 
 mne::MlOnnxModel model;
 if (model.load("cmne_lstm.onnx")) {
@@ -105,7 +105,7 @@ When built without `USE_ONNXRUNTIME`, all methods throw `std::runtime_error`. Th
 N-dimensional tensor with contiguous row-major (C-order) float32 storage. Data is held in a reference-counted buffer, making copy, reshape, and slice O(1). Storage layout is row-major to match ONNX Runtime, PyTorch, and NumPy conventions.
 
 ```cpp
-#include <ml/ml_tensor.h>
+#include <mne/ml/ml_tensor.h>
 
 // From moved buffer
 std::vector<float> buf(1 * 20 * 204, 0.0f);
@@ -150,7 +150,7 @@ auto eigenMap = t2.matrix();  // RowMajorMatrixMap
 ML-specific convenience wrapper over `mne::PythonRunner` for launching Python training scripts. Not available in WASM builds.
 
 ```cpp
-#include <ml/ml_trainer.h>
+#include <mne/ml/ml_trainer.h>
 
 mne::MLTrainer trainer;
 

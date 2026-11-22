@@ -7,7 +7,7 @@ sidebar_position: 0
 
 # MNA Library
 
-**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libraries/mna`
+**Namespace:** `mne` &nbsp;·&nbsp; **Source:** `src/libs/mne/mna`
 The `mne_mna` library (namespace `mne`) implements the MNA graph-execution engine — a framework for defining, validating, serializing, and executing MEG/EEG analysis pipelines as directed acyclic graphs (DAGs). It is the runtime behind the [MNA project format](/docs/manual/mna-format).
 
 ```cmake
@@ -65,7 +65,7 @@ Dependencies: `mne_base` only. The library and its headers use no Qt.
 Top-level container. Holds subjects, the processing pipeline, and project metadata.
 
 ```cpp
-#include <mna/mna_project.h>
+#include <mne/mna/mna_project.h>
 
 mne::MnaProject project;           // mna_version, created and modified are set
 project.name        = "audvis_dspm";
@@ -154,7 +154,7 @@ if (auto embedded = ref.embed("/data/sample_audvis_raw.fif"); !embedded) {
 The graph container manages nodes, ports, connections, and validation:
 
 ```cpp
-#include <mna/mna_graph.h>
+#include <mne/mna/mna_graph.h>
 
 mne::MnaGraph graph;
 graph.add_node(read_raw);
@@ -247,7 +247,7 @@ node.outputs.push_back({.name = "filtered_raw", .data_kind = mne::MnaDataKind::F
 Declarative contract for an operation:
 
 ```cpp
-#include <mna/mna_op_schema.h>
+#include <mne/mna/mna_op_schema.h>
 
 mne::MnaOpSchema schema;
 schema.op_type     = "dsp.band_pass_filter";
@@ -289,7 +289,7 @@ schema.attributes.push_back({.name = "low_freq", .type = mne::MnaAttrType::Doubl
 Singleton catalog of all registered operations:
 
 ```cpp
-#include <mna/mna_op_registry.h>
+#include <mne/mna/mna_op_registry.h>
 
 auto& registry = mne::MnaOpRegistry::instance();
 registry.register_op(schema);
@@ -333,7 +333,7 @@ Loads operator schemas from declarative JSON manifest files:
 ### MnaGraphExecutor
 
 ```cpp
-#include <mna/mna_graph_executor.h>
+#include <mne/mna/mna_graph_executor.h>
 
 // Full execution
 auto context = mne::MnaGraphExecutor::execute(graph, {{"raw_file", std::string("/data/sample_audvis_raw.fif")}});
@@ -373,7 +373,7 @@ The execution context (`MnaGraphExecutor::Context`) holds:
 ### MnaParamTree
 
 ```cpp
-#include <mna/mna_param_tree.h>
+#include <mne/mna/mna_param_tree.h>
 
 mne::MnaParamTree tree;
 tree.set_param("filter_01/low_freq", 1.0);
@@ -497,7 +497,7 @@ script.code        = "import mne\nraw = mne.io.read_raw_fif('{{raw_path}}')\nraw
 Read/write MNA project files. Dispatches by file extension:
 
 ```cpp
-#include <mna/mna_io.h>
+#include <mne/mna/mna_io.h>
 
 auto project = mne::MnaIO::read("pipeline.mna");
 if (!project) {

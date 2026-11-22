@@ -1498,7 +1498,7 @@
       "domain": "core",
       "status": "missing",
       "mne_cpp": "",
-      "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)",
+      "note": "FsLabel is deliberately single-hemisphere (src/libs/mne/fs/fs_label.h:170)",
       "evidence": "parity-record",
       "equivalence": ""
     },
@@ -4294,7 +4294,7 @@
       "domain": "source_space",
       "status": "missing",
       "mne_cpp": "",
-      "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120)",
+      "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libs/mne/mne/mne_morph_map.h:120)",
       "evidence": "parity-record",
       "equivalence": ""
     },

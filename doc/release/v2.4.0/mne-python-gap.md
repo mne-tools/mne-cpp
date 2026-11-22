@@ -103,7 +103,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.split_label` | partial | mne (partial) | split limited |
 | `mne.vertex_to_mni` | partial | FiffCoordTransSet::headToMni | head points only; no vertex/surface-RAS input |
 | `mne.write_label` | partial | writeLabel | tool-private writer; FsLabel has no write |
-| `mne.BiHemiLabel` | missing | — | FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170) |
+| `mne.BiHemiLabel` | missing | — | FsLabel is deliberately single-hemisphere (src/libs/mne/fs/fs_label.h:170) |
 | `mne.random_parcellation` | missing | — | random parcellation not ported |
 | `mne.read_lta` | missing | — | FreeSurfer LTA transform reader not ported |
 | `mne.write_labels_to_annot` | missing | — | no .annot writer |
@@ -245,7 +245,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.dig_mri_distances` | missing | — | dig<->MRI distance QA not ported |
 | `mne.get_volume_labels_from_src` | missing | — |  |
 | `mne.morph_source_spaces` | missing | — |  |
-| `mne.read_source_morph` | missing | — | no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120) |
+| `mne.read_source_morph` | missing | — | no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libs/mne/mne/mne_morph_map.h:120) |
 | `mne.source_space.add_source_space_distances` | missing | — | geodesic src distances not ported |
 | `mne.source_space.compute_distance_to_sensors` | missing | — | src-sensor distance not ported |
 | `mne.source_space.get_decimated_surfaces` | missing | — | MNESourceSpace stores use_itris; no helper extracts the decimated surfaces |
