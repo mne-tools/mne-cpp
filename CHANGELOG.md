@@ -168,6 +168,10 @@ aliases; replace the old spelling as below.
   gone from `doc/api_registry.json`, `validate_api_registry.py` rejects them
   and no longer cross-checks a Skigen registry (`--skigen-registry` is gone).
   Migration: delete an old `src/external/skigen` clone.
+- macOS packages need macOS 26 or later (was 14.4). The libraries parse
+  floating-point numbers with `std::from_chars`, which Apple's C++ library
+  provides from macOS 26 on. `scripts/quality/tests/test_macos_availability.py`
+  compiles every unit that uses it for the minimum macOS.
 - The libraries build, install and link without Qt. `MNE_BUILD_QT` (default
   `ON`) builds the Qt-based parts: `mne_disp`, `mne_disp3D`, the applications
   with their plugins, the CLI tools and the QtTest tests and examples. With

@@ -42,7 +42,7 @@ REQUIRED = {
 SIGNED = {".exe": "signed", ".zip": "signed", ".dmg": "signed-notarized"}
 SMOKE_TOOL = "mne_check_surface"
 # Oldest macOS the release runs on: CMAKE_OSX_DEPLOYMENT_TARGET in src/CMakeLists.txt and the download page
-MACOS_MINIMUM = "14.4"
+MACOS_MINIMUM = "26.0"
 _LC_BUILD_VERSION = 0x32
 
 

@@ -744,7 +744,7 @@ Get-FileHash <downloaded-file> -Algorithm SHA256`}</code></pre>
                                     </tr>
                                     <tr>
                                         <td>macOS</td>
-                                        <td>macOS 14.4 or later</td>
+                                        <td>macOS 26.0 or later</td>
                                         <td>ARM64</td>
                                     </tr>
                                     <tr>
