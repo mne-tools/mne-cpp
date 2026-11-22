@@ -1,4 +1,10 @@
-"""The WebAssembly-only code paths compile, checked with the native compiler."""
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+"""The WebAssembly-only code paths compile, checked with the native compiler.
+
+@since 3.0.0
+"""
 
 import subprocess
 import sys

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
 """Syntax-check the WebAssembly-only code paths with the native compiler.
 
 Code under ``#ifdef WASMBUILD`` is compiled by the WebAssembly CI job only. This
@@ -7,6 +10,8 @@ script takes every translation unit of a configured native build that mentions
 it, so such code is checked in seconds instead of in a full Emscripten build.
 
 Usage: wasm_syntax_check.py [--build build/developer-dynamic] [-j N]
+
+@since 3.0.0
 """
 
 from __future__ import annotations

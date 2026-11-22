@@ -1,4 +1,10 @@
-"""Headers with over-aligned members silence MSVC's C4324 padding warning, which /WX turns into an error."""
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+"""Headers with over-aligned members silence MSVC's C4324 padding warning, which /WX turns into an error.
+
+@since 3.0.0
+"""
 
 import re
 import unittest

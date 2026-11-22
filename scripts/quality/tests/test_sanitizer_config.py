@@ -1,4 +1,10 @@
-"""The sanitizer build links a test_acq_* test to mne_acq alone unless its CMakeLists names more libraries."""
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+"""The sanitizer build links a test_acq_* test to mne_acq alone unless its CMakeLists names more libraries.
+
+@since 3.0.0
+"""
 
 import re
 import unittest
@@ -12,7 +18,7 @@ class TestSanitizerAcqTests(unittest.TestCase):
         cmake = (_REPO_ROOT / "scripts" / "ci" / "sanitizers" / "CMakeLists.txt").read_text(encoding="utf-8")
         special = set(re.findall(r'_name STREQUAL "(test_acq_\w+)"', cmake))
         offending = []
-        for source in sorted((_REPO_ROOT / "src" / "testframes").glob("test_acq_*/test_acq_*.cpp")):
+        for source in sorted((_REPO_ROOT / "src" / "tests").glob("test_acq_*/test_acq_*.cpp")):
             if source.stem in special:
                 continue
             for library in re.findall(r"#include\s*<mne/(\w+)/", source.read_text(encoding="utf-8")):
