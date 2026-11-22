@@ -23,11 +23,11 @@
  * every fully-received multichannel sample in one call, which is the
  * pattern that real-time acquisition pipelines in mne-cpp (sensor
  * plug-ins under @c applications/mne_scan_plugins) consume most
- * efficiently. The templated @ref mne::stream_inlet::pull_chunk "pull_chunk" is provided purely for
- * source-level compatibility with liblsl; in this implementation
- * only the @c float specialisation is wired up: samples of every
- * numeric channel format are converted to float (int32, int64 and
- * double64 values beyond float precision are rounded).
+ * efficiently. The templated @ref mne::stream_inlet::pull_chunk "pull_chunk" mirrors liblsl's; samples
+ * are decoded as double, which holds every float32, double64, int32, int16 and int8 value exactly, so
+ * @ref mne::stream_inlet::pull_chunk_double "pull_chunk_double" delivers the native values without loss
+ * (int64 beyond 2^53 excepted). @ref mne::stream_inlet::pull_chunk_float "pull_chunk_float" rounds to float.
+ * @ref mne::stream_inlet::info "info" fetches the outlet's full info, including the channel description.
  */
 
 #ifndef LSL_STREAM_INLET_H
@@ -44,6 +44,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
+#include <cstddef>
 #include <vector>
 #include <memory>
 #include <type_traits>
@@ -66,7 +68,7 @@ class StreamInletPrivate;
 
 //=============================================================================================================
 /**
- * @brief Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float chunks.
+ * @brief Client-side LSL endpoint: connects to a resolved outlet over TCP and exposes pulled samples as float or double chunks.
  *
  * @snippet ex_lsl/main.cpp lsl_stream_inlet_usage
  *
@@ -118,18 +120,30 @@ public:
     /**
      * Pull a chunk of multichannel data from the inlet.
      *
-     * Returns all complete samples currently in the buffer. Template is provided for API
-     * compatibility with liblsl; only float is supported in this implementation.
+     * Returns all complete samples currently in the buffer, converted to @p T as liblsl's pull_chunk<T> does
+     * (integers rounded to the nearest value).
      *
-     * @tparam T  The data type (must be float).
+     * @tparam T  The data type: float, double or an integer type.
      * @return    A vector of samples, where each sample is a vector of channel values.
      */
     template<typename T>
     [[nodiscard]] std::vector<std::vector<T>> pull_chunk()
     {
-        static_assert(std::is_same_v<T, float>,
-                      "lsl::stream_inlet::pull_chunk<T>: only float is supported");
-        return pull_chunk_float();
+        static_assert(std::is_arithmetic_v<T>, "mne::stream_inlet::pull_chunk<T>: T must be a numeric type");
+        if constexpr (std::is_same_v<T, float>) {
+            return pull_chunk_float();
+        } else if constexpr (std::is_same_v<T, double>) {
+            return pull_chunk_double();
+        } else {
+            std::vector<std::vector<T>> chunk;
+            for (const std::vector<double>& sample : pull_chunk_double()) {
+                std::vector<T>& out = chunk.emplace_back(sample.size());
+                for (std::size_t c = 0; c < sample.size(); ++c) {
+                    out[c] = static_cast<T>(std::llround(sample[c]));
+                }
+            }
+            return chunk;
+        }
     }
 
     //=========================================================================================================
@@ -149,6 +163,37 @@ public:
      * @return A vector of samples, where each sample is a vector of float channel values.
      */
     [[nodiscard]] std::vector<std::vector<float>> pull_chunk_float(std::vector<double>& timestamps);
+
+    //=========================================================================================================
+    /**
+     * Pull a chunk of double data: the native values of float32, double64, int32, int16 and int8 streams.
+     *
+     * @return A vector of samples, where each sample is a vector of double channel values.
+     */
+    [[nodiscard]] std::vector<std::vector<double>> pull_chunk_double();
+
+    //=========================================================================================================
+    /**
+     * Pull a chunk of double data with the timestamp of every sample.
+     *
+     * @param[out] timestamps   One timestamp per returned sample, in the outlet host's local_clock() seconds.
+     *
+     * @return A vector of samples, where each sample is a vector of double channel values.
+     */
+    [[nodiscard]] std::vector<std::vector<double>> pull_chunk_double(std::vector<double>& timestamps);
+
+    //=========================================================================================================
+    /**
+     * The full info of the stream, as liblsl's stream_inlet::info(): fetched from the outlet once (fullinfo
+     * request), then cached. Unlike the info from discovery it carries the channel description.
+     *
+     * @param[in] timeout   Maximum wait in seconds.
+     *
+     * @return The stream info with its channel description.
+     *
+     * @throws std::runtime_error if the outlet cannot be reached or sends no valid info within @p timeout.
+     */
+    [[nodiscard]] stream_info info(double timeout = 5.0);
 
     //=========================================================================================================
     /**

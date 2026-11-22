@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implements the receive path of liblsl's data protocol 1.10 and its time-correction exchange.
+ * @brief    Implements the receive path of liblsl's data protocol 1.10, its fullinfo request and its time-correction exchange.
  *
  * open_stream() sends the stream-feed request, checks the response headers and the two test-pattern samples,
  * and keeps the bytes that follow. Pulls decode every complete sample in the buffer; a sample whose timestamp
@@ -149,9 +149,10 @@ public:
         return m_reader.read(m_buffer, pos, tag, timestamp, m_values) == 1;
     }
 
-    std::vector<std::vector<float>> pullChunk(std::vector<double>* timestamps)
+    template<typename T>
+    std::vector<std::vector<T>> pullChunk(std::vector<double>* timestamps)
     {
-        std::vector<std::vector<float>> chunk;
+        std::vector<std::vector<T>> chunk;
         if (timestamps != nullptr) {
             timestamps->clear();
         }
@@ -179,6 +180,43 @@ public:
             m_pos = 0;
         }
         return chunk;
+    }
+
+    stream_info fullInfo(double timeout)
+    {
+        if (m_hasFullInfo) {
+            return m_info;
+        }
+        const std::string& host = m_info.data_host();
+        const int port = m_info.data_port();
+        if (host.empty() || port <= 0 || port > 65535) {
+            throw failure("Invalid data host or port in stream_info");
+        }
+        const Clock::time_point deadline = Clock::now() + std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(timeout));
+        auto connection = TcpSocket::connect(host, static_cast<std::uint16_t>(port), left(deadline));
+        if (!connection) {
+            throw failure("Failed to connect to outlet: " + connection.error().message());
+        }
+        if (const std::error_code error = connection->write(bytes("LSL:fullinfo\r\n"))) {
+            throw failure("Failed to send the fullinfo request: " + error.message());
+        }
+        // The outlet sends the XML and closes the connection.
+        std::string xml;
+        std::array<std::byte, 65536> chunk{};
+        while (xml.find("</info>") == std::string::npos) {
+            const auto got = connection->read_some(chunk, left(deadline));
+            if (!got) {
+                break;
+            }
+            xml.append(reinterpret_cast<const char*>(chunk.data()), *got);
+        }
+        const stream_info full = stream_info::from_string(xml);
+        if (full.name().empty()) {
+            throw failure("The outlet sent no valid stream info");
+        }
+        m_info.set_channels(full.channels());
+        m_hasFullInfo = true;
+        return m_info;
     }
 
     double timeCorrection(double timeout)
@@ -320,6 +358,7 @@ private:
     std::size_t m_pos = 0;        /**< Read position in m_buffer. */
     std::vector<double> m_values; /**< Scratch for one decoded sample. */
     double m_lastTimestamp = 0.0; /**< Timestamp of the last decoded sample. */
+    bool m_hasFullInfo = false;   /**< Whether m_info holds the description from the outlet's full info. */
 };
 
 //=============================================================================================================
@@ -360,14 +399,35 @@ bool stream_inlet::samples_available()
 
 std::vector<std::vector<float>> stream_inlet::pull_chunk_float()
 {
-    return m_pImpl->pullChunk(nullptr);
+    return m_pImpl->pullChunk<float>(nullptr);
 }
 
 //=============================================================================================================
 
 std::vector<std::vector<float>> stream_inlet::pull_chunk_float(std::vector<double>& timestamps)
 {
-    return m_pImpl->pullChunk(&timestamps);
+    return m_pImpl->pullChunk<float>(&timestamps);
+}
+
+//=============================================================================================================
+
+std::vector<std::vector<double>> stream_inlet::pull_chunk_double()
+{
+    return m_pImpl->pullChunk<double>(nullptr);
+}
+
+//=============================================================================================================
+
+std::vector<std::vector<double>> stream_inlet::pull_chunk_double(std::vector<double>& timestamps)
+{
+    return m_pImpl->pullChunk<double>(&timestamps);
+}
+
+//=============================================================================================================
+
+stream_info stream_inlet::info(double timeout)
+{
+    return m_pImpl->fullInfo(timeout);
 }
 
 //=============================================================================================================

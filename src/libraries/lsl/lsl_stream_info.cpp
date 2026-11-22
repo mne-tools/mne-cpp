@@ -36,6 +36,7 @@
 #include <format>
 #include <random>
 #include <sstream>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -249,7 +250,35 @@ double stream_info::created_at() const noexcept
 
 //=============================================================================================================
 
+const std::vector<channel_description>& stream_info::channels() const noexcept
+{
+    return m_channels;
+}
+
+//=============================================================================================================
+
+void stream_info::set_channels(std::vector<channel_description> channels)
+{
+    m_channels = std::move(channels);
+}
+
+//=============================================================================================================
+
 std::string stream_info::to_string() const
+{
+    return xml(false);
+}
+
+//=============================================================================================================
+
+std::string stream_info::as_xml() const
+{
+    return xml(true);
+}
+
+//=============================================================================================================
+
+std::string stream_info::xml(bool full) const
 {
     std::ostringstream xml;
     xml << "<?xml version=\"1.0\"?>\n<info>\n"
@@ -269,8 +298,20 @@ std::string stream_info::to_string() const
         << "\t<v4service_port>" << m_service_port << "</v4service_port>\n"
         << "\t<v6address></v6address>\n"
         << "\t<v6data_port>0</v6data_port>\n"
-        << "\t<v6service_port>0</v6service_port>\n"
-        << "\t<desc />\n</info>\n";
+        << "\t<v6service_port>0</v6service_port>\n";
+    if (!full || m_channels.empty()) {
+        xml << "\t<desc />\n</info>\n";
+        return xml.str();
+    }
+    xml << "\t<desc>\n\t\t<channels>\n";
+    for (const channel_description& channel : m_channels) {
+        xml << "\t\t\t<channel>\n"
+            << "\t\t\t\t<label>" << escaped(channel.label) << "</label>\n"
+            << "\t\t\t\t<type>" << escaped(channel.type) << "</type>\n"
+            << "\t\t\t\t<unit>" << escaped(channel.unit) << "</unit>\n"
+            << "\t\t\t</channel>\n";
+    }
+    xml << "\t\t</channels>\n\t</desc>\n</info>\n";
     return xml.str();
 }
 
@@ -310,6 +351,26 @@ stream_info stream_info::from_string(const std::string& data)
             info.m_service_port = to_int(value).value_or(0);
         } else if (key == "v4address" && !value.empty()) {
             info.m_data_host = value;
+        } else if (key == "desc") {
+            if (const XmlElement* channels = element.child("channels")) {
+                for (const XmlElement& channel : channels->children) {
+                    if (channel.local_name() != "channel") {
+                        continue;
+                    }
+                    channel_description description;
+                    for (const XmlElement& property : channel.children) {
+                        const std::string_view tag = property.local_name();
+                        if (tag == "label") {
+                            description.label = property.text;
+                        } else if (tag == "type") {
+                            description.type = property.text;
+                        } else if (tag == "unit") {
+                            description.unit = property.text;
+                        }
+                    }
+                    info.m_channels.push_back(std::move(description));
+                }
+            }
         }
     }
     if (info.m_name.empty()) {

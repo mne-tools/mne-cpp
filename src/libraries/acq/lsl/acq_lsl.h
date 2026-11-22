@@ -10,16 +10,13 @@
  * @brief    The lsl:// source: reads a Lab Streaming Layer stream.
  *
  * lsl://NAME opens the LSL stream called NAME (or the first stream matching type= or source_id=) as a device
- * with one input stream. liblsl is loaded at runtime when it is installed: MNE_CPP_LIBLSL (a file path), the
- * library that pylsl ships (pip install pylsl), then the system library paths. Without liblsl the in-tree
- * mne_lsl implementation is used, which speaks the same protocol (discovery, data protocol 1.10, time
- * correction) with any LSL outlet. AcqDeviceDescription::backendVersion names the path in use ("liblsl 1.16"
- * or "in-tree"); library=liblsl or library=intree forces one.
+ * with one input stream. It uses only the in-tree mne_lsl implementation, which speaks the LSL protocol
+ * (discovery, data protocol 1.10, full info, time correction) with any LSL outlet, liblsl's included; liblsl
+ * is not loaded. AcqDeviceDescription::backendVersion is "in-tree".
  *
- * With liblsl, samples keep the stream's format (float32, double64, int32, int16; int8 is widened to int16 and
- * int64 is read as double) and channel names, kinds and units come from the stream description
- * (desc/channels/channel with label, type and unit). The in-tree path delivers float32 (exact for float32,
- * int16 and int8 streams) and names channels after the stream type. On both paths the clock model maps
+ * Samples keep the stream's format (float32, double64, int32, int16; int8 is widened to int16 and int64 is
+ * read as double), and channel names, kinds and units come from the stream description (desc/channels/channel
+ * with label, type and unit), falling back to the stream type and "TYPE n" names. The clock model maps
  * samples to LSL timestamps plus time_correction(), refreshed every second. Irregular-rate and string
  * (marker) streams are not supported yet.
  *
@@ -40,12 +37,6 @@
 #include "../acq_error.h"
 
 //=============================================================================================================
-// STL INCLUDES
-//=============================================================================================================
-
-#include <string>
-
-//=============================================================================================================
 // DEFINE NAMESPACE mne
 //=============================================================================================================
 
@@ -60,12 +51,6 @@ namespace mne
  * @return Success, or the error of the registration.
  */
 ACQLSLSHARED_EXPORT AcqError registerLslScheme();
-
-//=============================================================================================================
-/**
- * @return "liblsl <version> (<path>)" for a liblsl that loads, otherwise "in-tree" and why liblsl is missing.
- */
-ACQLSLSHARED_EXPORT std::string lslRuntime();
 
 } // namespace mne
 

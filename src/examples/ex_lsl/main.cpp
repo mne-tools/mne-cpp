@@ -75,6 +75,18 @@ int main(int argc, char* argv[])
     stream_info info("ex_lsl_eeg", "EEG", 3, 250.0, ChannelFormat::Float32, "ex_lsl"); // name, type, channels, Hz
     stream_outlet outlet(info);                                                        // starts serving immediately
     //! [lsl_stream_outlet_usage]
+
+    //! [lsl_channel_description_usage]
+    stream_info described("ex_lsl_labelled", "EEG", 2, 250.0, ChannelFormat::Float32, "ex_lsl_labelled");
+    described.set_channels({{"Fz", "EEG", "microvolts"}, {"Cz", "EEG", "microvolts"}}); // sent with the full info
+    stream_outlet labelled(described);
+    //! [lsl_channel_description_usage]
+    stream_info labelledSource = labelled.info();
+    labelledSource.set_data_host("127.0.0.1");
+    stream_inlet labelledInlet(labelledSource);
+    const stream_info full = labelledInlet.info(); // the full info, fetched from the outlet once
+    ok &= expect(full.channels().size() == 2 && full.channels()[0].label == "Fz" && full.channels()[1].unit == "microvolts",
+                 "channel_description: labels and units travel with the stream's full info");
     ok &= expect(outlet.info().name() == "ex_lsl_eeg" && outlet.info().channel_count() == 3 && outlet.info().nominal_srate() == 250.0 && outlet.info().data_port() > 0 && !outlet.info().uid().empty(),
                  std::format("stream_info: 3 channels at 250 Hz, served on port {}", outlet.info().data_port()));
 

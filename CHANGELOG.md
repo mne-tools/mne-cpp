@@ -249,6 +249,19 @@ aliases; replace the old spelling as below.
   multicast, such as the macOS CI runners, instead of failing them.
 - The sanitizer job (`scripts/ci/sanitizers`) builds again: it compiled
   `test_acq_devices` without `mne_acq_devices` and its stand-in SDK
+- `lsl://` uses only the in-tree LSL implementation (`mne_lsl`): liblsl is no
+  longer loaded, and the `library=` parameter is gone (it is now rejected as
+  unknown; `mne::lslRuntime()` is removed). Channel labels, types and units
+  come from the stream description and samples keep their native format
+  (float32, double64, int32, int16), as they did with liblsl; the in-tree path
+  used to name channels `EEG 1..n` and read everything as float. For this
+  `mne_lsl` gained `stream_info::channels()` / `set_channels()` and
+  `as_xml()` (the full info with `desc/channels/channel`, served to fullinfo
+  requests), `stream_inlet::info()` (fetches the full info),
+  `stream_inlet::pull_chunk_double()` and `pull_chunk<T>` for any numeric
+  type, and `stream_outlet::push_chunk_double()` and `push_sample<T>` /
+  `push_chunk<T>`. liblsl and pylsl remain only in `test_acq_lsl`, as the
+  reference peer whose outlets the in-tree inlet must read.
   libraries. In that static build the test found no `streaming_board://` or
   `brainflow_file://` source, because it registered every scheme but those
   two by hand; it registers them and checks `register_device_schemes()`.
@@ -1307,8 +1320,8 @@ aliases; replace the old spelling as below.
 - `fiff/fiff.h`, `connectivity/connectivity.h` and `mne/mne.h` are umbrella
   headers for their library.
 - `lsl://?simulate=1` publishes a synthetic EEG session as an LSL stream
-  (`channels=`, `sfreq=`, `seed=`) and reads it, through liblsl or the in-tree
-  LSL. It used to fail for want of a stream.
+  (`channels=`, `sfreq=`, `seed=`) and reads it. It used to fail for want of a
+  stream.
 - `ChannelDataView` draws magnetometers at their own default scale (1.2 pT);
   they used the gradiometer scale, 33 times larger, so the traces of
   magnetometer systems such as BabyMEG looked flat.

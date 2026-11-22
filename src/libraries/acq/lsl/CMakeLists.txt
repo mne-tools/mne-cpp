@@ -2,7 +2,7 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-# mne_acq_lsl: the lsl:// source. liblsl is loaded at runtime; the in-tree mne_lsl is the fallback.
+# mne_acq_lsl: the lsl:// source, on the in-tree mne_lsl (liblsl is not loaded).
 cmake_minimum_required(VERSION 3.14)
 project(mne_acq_lsl
   LANGUAGES CXX

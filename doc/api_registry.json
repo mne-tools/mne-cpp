@@ -5931,7 +5931,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_lsl",
       "example": "ex_lsl",
       "example_snippet": [
         "ex_lsl/main.cpp#lsl_stream_outlet_usage"
@@ -5945,6 +5945,27 @@
       "python_url": null
     },
     {
+      "name": "channel_description",
+      "module": "lsl",
+      "header": "lsl/lsl_stream_info.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_lsl",
+      "example": "ex_lsl",
+      "example_snippet": [
+        "ex_lsl/main.cpp#lsl_channel_description_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
       "name": "stream_inlet",
       "module": "lsl",
       "header": "lsl/lsl_stream_inlet.h",
@@ -5952,7 +5973,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_lsl",
       "example": "ex_lsl",
       "example_snippet": [
         "ex_lsl/main.cpp#lsl_stream_inlet_usage",
@@ -5974,7 +5995,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_lsl",
       "example": "ex_lsl",
       "example_snippet": [
         "ex_lsl/main.cpp#lsl_stream_outlet_usage"

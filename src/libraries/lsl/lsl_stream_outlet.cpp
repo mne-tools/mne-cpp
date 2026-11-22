@@ -133,7 +133,8 @@ public:
     }
 
     /** Encodes @p samples as one block; the first sample carries the timestamp of the first, the others are deduced. */
-    void enqueue(const std::vector<std::vector<float>>& samples)
+    template<typename T>
+    void enqueue(const std::vector<std::vector<T>>& samples)
     {
         if (samples.empty()) {
             return;
@@ -183,6 +184,7 @@ private:
         m_info.set_data_port(server->port());
         m_info.set_service_port(service ? service->port() : 0);
         m_shortinfo = m_info.to_string();
+        m_fullinfo = m_info.as_xml();
         m_listening.set_value();
 
         std::vector<Client> clients;
@@ -270,11 +272,10 @@ private:
         }
     }
 
-    /** Answers a complete TCP request: stream feed, shortinfo or fullinfo; anything else closes the connection. */
-    /** Writes the stream info to a client that asked for it. */
-    void sendInfo(Client& client) const
+    /** Writes the stream info, with its description if @p full, to a client that asked for it. */
+    void sendInfo(Client& client, bool full) const
     {
-        if (const std::error_code error = client.socket.write(bytes(m_shortinfo))) {
+        if (const std::error_code error = client.socket.write(bytes(full ? m_fullinfo : m_shortinfo))) {
             mne::Log::debug("[lsl::stream_outlet] Cannot send the stream info: {}", error.message());
         }
     }
@@ -319,12 +320,12 @@ private:
             }
             client.closing = true;
             if (matchesQuery(m_info, std::string(trimmed(std::string_view(r).substr(15, end - 15))))) {
-                sendInfo(client);
+                sendInfo(client, false);
             }
         } else if (r.starts_with("LSL:fullinfo")) {
             if (r.find('\n') != std::string::npos) {
                 client.closing = true;
-                sendInfo(client);
+                sendInfo(client, true);
             }
         } else if (r.find('\n') != std::string::npos || r.size() > kMaxRequestBytes) {
             client.closing = true; // e.g. a protocol 1.00 stream feed, which is not served
@@ -333,6 +334,7 @@ private:
 
     stream_info m_info;                  /**< Stream description, ports set once listening. */
     std::string m_shortinfo;             /**< m_info as XML, written by the worker before m_listening. */
+    std::string m_fullinfo;              /**< m_info as XML with its description, written with m_shortinfo. */
     std::atomic<bool> m_bRunning{false}; /**< Worker running flag. */
     std::thread m_bgThread;              /**< Worker thread owning all sockets. */
     std::promise<void> m_listening;      /**< Fulfilled once the ports are recorded in m_info. */
@@ -357,12 +359,19 @@ stream_outlet::~stream_outlet() = default;
 
 void stream_outlet::push_sample(const std::vector<float>& sample)
 {
-    m_pImpl->enqueue({sample});
+    m_pImpl->enqueue(std::vector<std::vector<float>>{sample});
 }
 
 //=============================================================================================================
 
 void stream_outlet::push_chunk(const std::vector<std::vector<float>>& chunk)
+{
+    m_pImpl->enqueue(chunk);
+}
+
+//=============================================================================================================
+
+void stream_outlet::push_chunk_double(const std::vector<std::vector<double>>& chunk)
 {
     m_pImpl->enqueue(chunk);
 }

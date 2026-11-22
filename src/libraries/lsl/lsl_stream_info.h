@@ -45,6 +45,7 @@
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -67,6 +68,19 @@ enum class ChannelFormat : int
     Int16 = 5,     /**< 16-bit signed integer. */
     Int8 = 6,      /**< 8-bit signed integer. */
     Int64 = 7      /**< 64-bit signed integer. */
+};
+
+//=============================================================================================================
+/**
+ * Description of one channel, as liblsl's stream description carries it in desc/channels/channel.
+ *
+ * @snippet ex_lsl/main.cpp lsl_channel_description_usage
+ */
+struct channel_description
+{
+    std::string label; /**< Channel name, e.g. "Fz". */
+    std::string type;  /**< Content type of the channel, e.g. "EEG"; empty to take the stream's type. */
+    std::string unit;  /**< Measurement unit, e.g. "microvolts". */
 };
 
 //=============================================================================================================
@@ -169,6 +183,28 @@ public:
     /** @} */
 
     //=========================================================================================================
+    /** @name Stream Description
+     *  @{ */
+
+    /**
+     * @brief Per-channel description, as liblsl's desc/channels/channel elements (label, type, unit).
+     *
+     * Discovery replies carry no description (as in liblsl); stream_inlet::info() fetches the full one.
+     *
+     * @return One entry per described channel; empty if the stream has no channel description.
+     */
+    [[nodiscard]] const std::vector<channel_description>& channels() const noexcept;
+
+    /**
+     * @brief Sets the per-channel description an outlet publishes with its full info.
+     *
+     * @param[in] channels          One entry per channel, in channel order.
+     */
+    void set_channels(std::vector<channel_description> channels);
+
+    /** @} */
+
+    //=========================================================================================================
     /** @name Network / Identity Properties
      *  @{ */
 
@@ -255,9 +291,18 @@ public:
     [[nodiscard]] std::string to_string() const;
 
     /**
+     * @brief The full info XML, as liblsl's stream_info::as_xml(): the shortinfo plus the stream description.
+     *
+     * @return The XML that an outlet sends in reply to a fullinfo request.
+     */
+    [[nodiscard]] std::string as_xml() const;
+
+    /**
      * @brief Deserialize a stream_info from a network transport string.
      *
-     * @param[in] data              Pipe-delimited string as produced by to_string().
+     * A desc/channels/channel description, as in as_xml() and liblsl's full info, is read into channels().
+     *
+     * @param[in] data              Pipe-delimited string as produced by to_string() or as_xml().
      *
      * @return The parsed stream_info, or a default-constructed (empty) one if the header or field count is invalid.
      */
@@ -266,19 +311,23 @@ public:
     /** @} */
 
 private:
-    std::string m_name;             /**< Stream name. */
-    std::string m_type;             /**< Stream content type. */
-    int m_channel_count;            /**< Number of channels. */
-    double m_nominal_srate;         /**< Nominal sampling rate (Hz). */
-    ChannelFormat m_channel_format; /**< Channel data format. */
-    std::string m_source_id;        /**< Source identifier. */
-    std::string m_uid;              /**< Unique per-instance identifier. */
-    std::string m_hostname;         /**< Hostname of the originating machine. */
+    std::string m_name;                          /**< Stream name. */
+    std::string m_type;                          /**< Stream content type. */
+    int m_channel_count;                         /**< Number of channels. */
+    double m_nominal_srate;                      /**< Nominal sampling rate (Hz). */
+    ChannelFormat m_channel_format;              /**< Channel data format. */
+    std::string m_source_id;                     /**< Source identifier. */
+    std::string m_uid;                           /**< Unique per-instance identifier. */
+    std::string m_hostname;                      /**< Hostname of the originating machine. */
+    std::vector<channel_description> m_channels; /**< Channel description (desc/channels/channel). */
 
     int m_data_port;           /**< TCP data port (set during discovery). */
     std::string m_data_host;   /**< Data host address (set during discovery). */
     int m_service_port = 0;    /**< UDP service port. */
     double m_created_at = 0.0; /**< Creation time in local_clock() seconds. */
+
+    /** @return The info XML; with the stream description if @p full. */
+    [[nodiscard]] std::string xml(bool full) const;
 };
 
 //=============================================================================================================

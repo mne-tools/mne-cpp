@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <numeric>
 #include <array>
+#include <cstdint>
 #include <chrono>
 #include <span>
 #include <string>
@@ -93,6 +94,8 @@ private slots:
     void testStreamInfoDeserializationEmptyString();
     void testStreamInfoSpecialCharacters();
     void testStreamInfoPreservesDataPort();
+    void testStreamInfoChannelDescription();
+    void testStreamInfoParsesLiblslDescription();
 
     //=========================================================================================================
     // stream_outlet tests
@@ -118,6 +121,9 @@ private slots:
     void testOutletInletMultiChannel();
     void testOutletInletLargeChunk();
     void testOutletMultipleInlets();
+    void testInletFetchesFullInfo();
+    void testOutletInletNativeFormats_data();
+    void testOutletInletNativeFormats();
 
     //=========================================================================================================
     // Discovery tests
@@ -402,6 +408,48 @@ void TestLsl::testStreamInfoPreservesDataPort()
 }
 
 //=============================================================================================================
+
+void TestLsl::testStreamInfoChannelDescription()
+{
+    stream_info info("Described", "EEG", 2, 100.0, ChannelFormat::Float32, "desc_src");
+    info.set_channels({{"Fz", "EEG", "microvolts"}, {"<Trig>", "STIM", ""}});
+
+    // The shortinfo carries no description, as in liblsl; the full info does.
+    QVERIFY(stream_info::from_string(info.to_string()).channels().empty());
+    const stream_info restored = stream_info::from_string(info.as_xml());
+    QCOMPARE(restored.channels().size(), std::size_t(2));
+    QCOMPARE(restored.channels()[0].label, std::string("Fz"));
+    QCOMPARE(restored.channels()[0].type, std::string("EEG"));
+    QCOMPARE(restored.channels()[0].unit, std::string("microvolts"));
+    QCOMPARE(restored.channels()[1].label, std::string("<Trig>"));
+    QCOMPARE(restored.channels()[1].type, std::string("STIM"));
+    QVERIFY(restored.channels()[1].unit.empty());
+    QCOMPARE(restored.uid(), info.uid());
+}
+
+//=============================================================================================================
+
+void TestLsl::testStreamInfoParsesLiblslDescription()
+{
+    // Full info as liblsl's outlets send it: other desc children and any order of channel fields.
+    const std::string xml =
+        "<?xml version=\"1.0\"?>\n<info><name>Amp</name><type>EEG</type><channel_count>2</channel_count>"
+        "<channel_format>double64</channel_format><nominal_srate>500</nominal_srate><uid>u1</uid>"
+        "<desc><manufacturer>X</manufacturer><channels>"
+        "<channel><unit>uV</unit><label>C3</label><type>EEG</type></channel>"
+        "<channel><label>EOG</label><type>EOG</type><unit>microvolts</unit><location><X>1</X></location></channel>"
+        "</channels></desc></info>";
+    const stream_info info = stream_info::from_string(xml);
+    QCOMPARE(info.channel_format(), ChannelFormat::Double64);
+    QCOMPARE(info.channels().size(), std::size_t(2));
+    QCOMPARE(info.channels()[0].label, std::string("C3"));
+    QCOMPARE(info.channels()[0].unit, std::string("uV"));
+    QCOMPARE(info.channels()[1].label, std::string("EOG"));
+    QCOMPARE(info.channels()[1].type, std::string("EOG"));
+    QCOMPARE(info.channels()[1].unit, std::string("microvolts"));
+}
+
+//=============================================================================================================
 // stream_outlet tests
 //=============================================================================================================
 
@@ -673,6 +721,87 @@ void TestLsl::testOutletMultipleInlets()
 
     inlet1.close_stream();
     inlet2.close_stream();
+}
+
+//=============================================================================================================
+
+void TestLsl::testInletFetchesFullInfo()
+{
+    stream_info outInfo("E2E_FullInfo", "EEG", 2, 100.0, ChannelFormat::Float32, "fullinfo_src");
+    outInfo.set_channels({{"Fz", "EEG", "microvolts"}, {"Cz", "EEG", "microvolts"}});
+    stream_outlet outlet(outInfo);
+
+    stream_info resolvedInfo = stream_info::from_string(outlet.info().to_string()); // as discovery delivers it
+    resolvedInfo.set_data_host("127.0.0.1");
+    QVERIFY(resolvedInfo.channels().empty());
+
+    stream_inlet inlet(resolvedInfo);
+    const stream_info full = inlet.info(5.0);
+    QCOMPARE(full.name(), std::string("E2E_FullInfo"));
+    QCOMPARE(full.data_host(), std::string("127.0.0.1"));
+    QCOMPARE(full.channels().size(), std::size_t(2));
+    QCOMPARE(full.channels()[1].label, std::string("Cz"));
+    QCOMPARE(full.channels()[1].unit, std::string("microvolts"));
+
+    // The info does not disturb the stream feed.
+    inlet.open_stream();
+    outlet.push_sample(std::vector<float>{1.0f, 2.0f});
+    QTRY_VERIFY_WITH_TIMEOUT(inlet.samples_available(), 2000);
+    const auto chunk = inlet.pull_chunk_float();
+    QCOMPARE(chunk.size(), std::size_t(1));
+    QCOMPARE(chunk[0][1], 2.0f);
+}
+
+//=============================================================================================================
+
+void TestLsl::testOutletInletNativeFormats_data()
+{
+    QTest::addColumn<int>("format");
+    QTest::addColumn<double>("big");
+    // Values beyond float precision show that nothing goes through float.
+    QTest::newRow("double64") << int(ChannelFormat::Double64) << 16777217.123456789;
+    QTest::newRow("int32") << int(ChannelFormat::Int32) << 2147483001.0;
+    QTest::newRow("int16") << int(ChannelFormat::Int16) << -32767.0;
+    QTest::newRow("int8") << int(ChannelFormat::Int8) << -127.0;
+}
+
+void TestLsl::testOutletInletNativeFormats()
+{
+    QFETCH(int, format);
+    QFETCH(double, big);
+    stream_info outInfo("E2E_Native", "EEG", 2, 100.0, static_cast<ChannelFormat>(format), "native_src");
+    stream_outlet outlet(outInfo);
+    stream_info resolvedInfo = outlet.info();
+    resolvedInfo.set_data_host("127.0.0.1");
+    stream_inlet inlet(resolvedInfo);
+    inlet.open_stream();
+
+    outlet.push_sample(std::vector<double>{big, -3.0});
+    outlet.push_chunk_double({{1.0, big}});
+    std::vector<std::vector<double>> chunk;
+    std::vector<double> stamps;
+    const auto collect = [&] {
+        std::vector<double> more;
+        for (std::vector<double>& sample : inlet.pull_chunk_double(more)) {
+            chunk.push_back(std::move(sample));
+        }
+        stamps.insert(stamps.end(), more.begin(), more.end());
+        return chunk.size() >= 2;
+    };
+    QTRY_VERIFY_WITH_TIMEOUT(collect(), 2000);
+    QCOMPARE(chunk.size(), std::size_t(2));
+    QCOMPARE(stamps.size(), std::size_t(2));
+    QCOMPARE(chunk[0], (std::vector<double>{big, -3.0}));
+    QCOMPARE(chunk[1], (std::vector<double>{1.0, big}));
+
+    if (static_cast<ChannelFormat>(format) == ChannelFormat::Int32) {
+        outlet.push_sample(std::vector<std::int32_t>{2147483001, -7});
+        QTRY_VERIFY_WITH_TIMEOUT(inlet.samples_available(), 2000);
+        const auto ints = inlet.pull_chunk<std::int32_t>();
+        QCOMPARE(ints.size(), std::size_t(1));
+        QCOMPARE(ints[0], (std::vector<std::int32_t>{2147483001, -7}));
+    }
+    inlet.close_stream();
 }
 
 //=============================================================================================================

@@ -44,6 +44,7 @@
 
 #include <vector>
 #include <memory>
+#include <type_traits>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne
@@ -101,6 +102,46 @@ public:
      * @param[in] chunk  A vector of samples, where each sample is a vector of channel values.
      */
     void push_chunk(const std::vector<std::vector<float>>& chunk);
+
+    //=========================================================================================================
+    /**
+     * Push a chunk of double samples; double64 and int32 streams carry them without loss through float.
+     *
+     * @param[in] chunk  A vector of samples, where each sample is a vector of channel values.
+     */
+    void push_chunk_double(const std::vector<std::vector<double>>& chunk);
+
+    //=========================================================================================================
+    /**
+     * Push a single sample of any numeric type, as liblsl's push_sample<T>; float takes the overload above.
+     *
+     * @tparam T         Arithmetic value type; values are converted to the stream's channel format.
+     * @param[in] sample A vector of channel values (must match the stream's channel_count).
+     */
+    template<typename T>
+    void push_sample(const std::vector<T>& sample)
+    {
+        push_chunk(std::vector<std::vector<T>>{sample});
+    }
+
+    //=========================================================================================================
+    /**
+     * Push a chunk of samples of any numeric type, as liblsl's push_chunk<T>; float takes the overload above.
+     *
+     * @tparam T         Arithmetic value type; values are converted to the stream's channel format.
+     * @param[in] chunk  A vector of samples, where each sample is a vector of channel values.
+     */
+    template<typename T>
+    void push_chunk(const std::vector<std::vector<T>>& chunk)
+    {
+        static_assert(std::is_arithmetic_v<T>, "mne::stream_outlet::push_chunk<T>: T must be a numeric type");
+        std::vector<std::vector<double>> values;
+        values.reserve(chunk.size());
+        for (const std::vector<T>& sample : chunk) {
+            values.emplace_back(sample.begin(), sample.end());
+        }
+        push_chunk_double(values);
+    }
 
     //=========================================================================================================
     /**
