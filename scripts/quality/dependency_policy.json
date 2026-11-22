@@ -110,7 +110,6 @@
   "$allowed_external_comment": "Third-party targets the libraries are permitted to link. Qt targets are normalised to a version-independent Qt:: spelling. Adding an entry here is an architectural decision and should be reviewed as one.",
   "allowed_external": [
     "Qt::Core",
-    "Qt::Concurrent",
     "Qt::Gui",
     "Qt::GuiPrivate",
     "Qt::Svg",

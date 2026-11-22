@@ -72,10 +72,9 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6027,
+      "tokens": 6025,
       "public_header_includes": 110,
       "modules": [
-        "Concurrent",
         "Core",
         "GuiPrivate",
         "Svg",
@@ -83,10 +82,9 @@
       ]
     },
     "disp3D": {
-      "tokens": 2895,
+      "tokens": 2882,
       "public_header_includes": 142,
       "modules": [
-        "Concurrent",
         "Core",
         "Gui",
         "GuiPrivate",
@@ -171,7 +169,7 @@
     }
   },
   "qt_modules": {
-    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent, Svg and Network go.",
+    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent and Network are gone (mne::ThreadPool, mne_com); Svg goes next.",
     "default": [
       "Core",
       "Gui",
@@ -184,7 +182,6 @@
         "Widgets"
       ],
       "src/applications/mne_analyze/libs/anShared": [
-        "Concurrent",
         "Core",
         "Gui",
         "Widgets"
@@ -198,7 +195,6 @@
         "Widgets"
       ],
       "src/applications/mne_analyze/plugins/averaging": [
-        "Concurrent",
         "Core",
         "Widgets"
       ],
@@ -212,7 +208,6 @@
         "Widgets"
       ],
       "src/applications/mne_analyze/plugins/coregistration": [
-        "Concurrent",
         "Core",
         "Gui",
         "Widgets"
@@ -232,12 +227,10 @@
         "Widgets"
       ],
       "src/applications/mne_analyze/plugins/dipolefit": [
-        "Concurrent",
         "Core",
         "Widgets"
       ],
       "src/applications/mne_analyze/plugins/events": [
-        "Concurrent",
         "Core",
         "Gui",
         "Widgets"
@@ -266,8 +259,7 @@
         "Widgets"
       ],
       "src/applications/mne_analyze_studio/core": [
-        "Core",
-        "Network"
+        "Core"
       ],
       "src/applications/mne_analyze_studio/extensions/analysis_results_extension": [
         "Core",
@@ -278,7 +270,6 @@
         "Widgets"
       ],
       "src/applications/mne_analyze_studio/extensions/fiff_browser_extension": [
-        "Concurrent",
         "Core",
         "Gui",
         "Widgets"
@@ -298,25 +289,21 @@
         "Core"
       ],
       "src/applications/mne_analyze_studio/neuro_kernel": [
-        "Core",
-        "Network"
+        "Core"
       ],
       "src/applications/mne_analyze_studio/sdk": [
         "Core",
         "Widgets"
       ],
       "src/applications/mne_analyze_studio/skill_host": [
-        "Core",
-        "Network"
+        "Core"
       ],
       "src/applications/mne_analyze_studio/workbench": [
         "Core",
         "Gui",
-        "Network",
         "Widgets"
       ],
       "src/applications/mne_browse": [
-        "Concurrent",
         "Core",
         "Gui",
         "Svg",
@@ -406,7 +393,6 @@
         "Widgets"
       ],
       "src/applications/mne_scan/plugins/lsladapter": [
-        "Concurrent",
         "Core",
         "Widgets"
       ],
@@ -427,7 +413,6 @@
         "Widgets"
       ],
       "src/applications/mne_scan/plugins/rtclustmne": [
-        "Concurrent",
         "Core",
         "Widgets"
       ],
@@ -447,7 +432,6 @@
         "Widgets"
       ],
       "src/libraries/disp": [
-        "Concurrent",
         "Core",
         "Gui",
         "GuiPrivate",
@@ -456,7 +440,6 @@
         "Widgets"
       ],
       "src/libraries/disp3D": [
-        "Concurrent",
         "Core",
         "Gui",
         "GuiPrivate",

@@ -39,16 +39,12 @@ endif()
 
 list(PREPEND CMAKE_PREFIX_PATH "${_qt_candidate}")
 
+# The modules src/CMakeLists.txt finds (scripts/quality/audit_qt_modules.py --check)
 set(_mne_qt_components
     Core
-    Concurrent
     Gui
-    Multimedia
-    Network
-    PrintSupport
     Svg
     Widgets
-    Xml
     ShaderTools
 )
 

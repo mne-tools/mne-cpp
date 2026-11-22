@@ -175,8 +175,17 @@ aliases; replace the old spelling as below.
   files in CI. Only `base_global.cpp` and `acq_global.cpp` see them now;
   `base/buildinfo.h` is gone. `scripts/quality/tests/test_compiler_cache.py`
   keeps it that way.
-- Qt Multimedia, Qt XML and Qt Print Support are no longer needed; MNE Browse
-  requested Print Support without using it. Every target of `disp`, `disp3D`
+- Qt Concurrent, Qt Network, Qt Multimedia, Qt XML and Qt Print Support are
+  no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets, SVG and
+  Shader Tools (plus Qt Test for the tests). Background work runs on
+  `mne::ThreadPool` (new: `active_count()`), sockets are `mne_com`'s:
+  `mne_rt_server` serves its command and data ports through them, and MNE
+  Analyze Studio's services talk over loopback TCP whose port and access
+  token the server writes to an owner-only file in the user's runtime
+  directory. Studio's LLM requests go through the system `curl` (7.76 or
+  newer), with the API key and body in owner-only temporary files so they do
+  not show in the process list. MNE Browse requested Print Support without
+  using it. Every target of `disp`, `disp3D`
   and the applications has an allowlist of Qt modules (`qt_modules` in
   `scripts/quality/qt_usage_policy.json`), which
   `scripts/quality/audit_qt_modules.py --check` enforces in CI, together with
@@ -231,6 +240,19 @@ aliases; replace the old spelling as below.
   thread preempted in between shifted the stream's clock by the wait (5.6 ms
   on a loaded CI runner). `test_acq_lsl` computes its expected values the same
   way.
+- `lsl://` uses only the in-tree LSL implementation (`mne_lsl`): liblsl is no
+  longer loaded, and the `library=` parameter is gone (it is now rejected as
+  unknown; `mne::lslRuntime()` is removed). Channel labels, types and units
+  come from the stream description and samples keep their native format
+  (float32, double64, int32, int16), as they did with liblsl; the in-tree path
+  used to name channels `EEG 1..n` and read everything as float. For this
+  `mne_lsl` gained `stream_info::channels()` / `set_channels()` and
+  `as_xml()` (the full info with `desc/channels/channel`, served to fullinfo
+  requests), `stream_inlet::info()` (fetches the full info),
+  `stream_inlet::pull_chunk_double()` and `pull_chunk<T>` for any numeric
+  type, and `stream_outlet::push_chunk_double()` and `push_sample<T>` /
+  `push_chunk<T>`. liblsl and pylsl remain only in `test_acq_lsl`, as the
+  reference peer whose outlets the in-tree inlet must read.
 - The `run_mna_graph` skill of MNE Analyze Studio reads its graph inputs from
   a JSON document it keeps alive; it iterated over the members of a temporary
   that compilers before C++23's lifetime extension (GCC 14) destroy first.
@@ -249,19 +271,6 @@ aliases; replace the old spelling as below.
   multicast, such as the macOS CI runners, instead of failing them.
 - The sanitizer job (`scripts/ci/sanitizers`) builds again: it compiled
   `test_acq_devices` without `mne_acq_devices` and its stand-in SDK
-- `lsl://` uses only the in-tree LSL implementation (`mne_lsl`): liblsl is no
-  longer loaded, and the `library=` parameter is gone (it is now rejected as
-  unknown; `mne::lslRuntime()` is removed). Channel labels, types and units
-  come from the stream description and samples keep their native format
-  (float32, double64, int32, int16), as they did with liblsl; the in-tree path
-  used to name channels `EEG 1..n` and read everything as float. For this
-  `mne_lsl` gained `stream_info::channels()` / `set_channels()` and
-  `as_xml()` (the full info with `desc/channels/channel`, served to fullinfo
-  requests), `stream_inlet::info()` (fetches the full info),
-  `stream_inlet::pull_chunk_double()` and `pull_chunk<T>` for any numeric
-  type, and `stream_outlet::push_chunk_double()` and `push_sample<T>` /
-  `push_chunk<T>`. liblsl and pylsl remain only in `test_acq_lsl`, as the
-  reference peer whose outlets the in-tree inlet must read.
   libraries. In that static build the test found no `streaming_board://` or
   `brainflow_file://` source, because it registered every scheme but those
   two by hand; it registers them and checks `register_device_schemes()`.
