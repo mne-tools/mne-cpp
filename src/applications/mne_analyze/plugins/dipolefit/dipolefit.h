@@ -33,6 +33,12 @@
 #include <QPointer>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <future>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -277,8 +283,8 @@ private:
 
     QMutex m_FitMutex; /**< Mutex for thread-safing. */
 
-    QFutureWatcher<mne::InvEcdSet> m_FutureWatcher; /**< Future watcher for notifing of completed fit calculations. */
-    QFuture<mne::InvEcdSet> m_Future;               /**< Future for performing fit calculations of separate thread. */
+    std::future<mne::InvEcdSet> m_Future; /**< Future for performing fit calculations of separate thread. */
+    quint64 m_iFitGeneration = 0;         /**< Counts started fits, so that only the latest one reports its result. */
 
 signals:
 

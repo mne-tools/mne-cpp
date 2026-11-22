@@ -37,6 +37,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 #include <vector>
 
@@ -54,7 +55,8 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QPalette>
-#include <QtConcurrent>
+#include <QFile>
+#include <QPointer>
 #include <QProgressDialog>
 
 
@@ -292,11 +294,12 @@ private:
     bool m_bEndReached;   /**< True when the buffered window touches the file end. */
     bool m_bReloadBefore; /**< True if the most recent reload prepended data. */
 
-    QFutureWatcher<QPair<MatrixXd, MatrixXd>> m_reloadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data. */
-    bool m_bReloading;                                               /**< True while a background reload is in progress. */
+    std::future<void> m_reloadFuture; /**< Background reload of fiff data. */
+    quint64 m_iReloadGeneration = 0;  /**< Counts started reloads, so that only the latest one is inserted. */
+    bool m_bReloading;                /**< True while a background reload is in progress. */
 
-    //    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
-    QFutureWatcher<void> m_operatorFutureWatcher;   /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data. */
+    std::future<void> m_operatorFuture;             /**< Background application of Operators to reloaded fiff data. */
+    quint64 m_iOperatorGeneration = 0;              /**< Counts started operator runs, so that only the latest one is inserted. */
     QList<QPair<int, RowVectorXd>> m_listTmpChData; /**< Temporary per-channel processing results. */
     bool m_bProcessing;                             /**< True while operator processing runs in the background. */
     QString m_filterChType;                         /**< Channel-name filter applied to bulk operator updates. */

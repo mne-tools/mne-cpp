@@ -29,13 +29,13 @@
 
 #include <QObject>
 #include <QThread>
-#include <QFutureWatcher>
 #include <QMutex>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 
 //=============================================================================================================
@@ -149,7 +149,7 @@ protected:
 private slots:
     //=========================================================================================================
     /**
-     * This is called by the QFutureWatcher, indicating that the background scanning is complete.
+     * This is called on the plugin's thread by the background scan, indicating that the background scanning is complete.
      */
     void onLSLStreamScanReady();
 
@@ -180,7 +180,7 @@ private:
     QSharedPointer<mne::scan::PluginOutputData<mne::scan::RealTimeMultiSampleArray>> m_pRTMSA;
 
     // LSL stream management
-    QFutureWatcher<QVector<mne::stream_info>> m_updateStreamsFutureWatcher;
+    std::future<QVector<mne::stream_info>> m_updateStreamsFuture; /**< Background stream scan; valid until its result is taken. */
     QVector<mne::stream_info> m_vAvailableStreams;
     mne::stream_info m_currentStream;
     bool m_bHasValidStream;

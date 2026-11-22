@@ -19,12 +19,14 @@
 
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -48,38 +50,14 @@ FiffBlockReader::FiffBlockReader(QObject* parent)
 : QObject(parent)
 , m_file(new QFile(this))
 {
-    connect(&m_watcher, &QFutureWatcher<MatrixXd>::finished, this, [this]() {
-        bool shouldEmit = m_loading;
-        int emitFrom = m_inFlightFrom;
-        m_loading = false;
-
-        if (m_hasPending) {
-            // A newer request arrived while we were reading — start it now.
-            int from = m_pendingFrom;
-            int to = m_pendingTo;
-            m_hasPending = false;
-            m_inFlightFrom = from;
-            m_loading = true;
-            m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
-                return doRead(from, to);
-            }));
-            return; // discard the superseded result
-        }
-
-        if (!shouldEmit)
-            return;
-        MatrixXd result = m_watcher.result();
-        if (result.rows() > 0 && result.cols() > 0)
-            emit blockLoaded(result, emitFrom);
-    });
 }
 
 //=============================================================================================================
 
 FiffBlockReader::~FiffBlockReader()
 {
-    if (m_watcher.isRunning()) {
-        m_watcher.waitForFinished();
+    if (m_readFuture.valid()) {
+        m_readFuture.wait();
     }
 }
 
@@ -160,9 +138,9 @@ bool FiffBlockReader::openBuffer(const QByteArray& data, const QString& displayN
 
 void FiffBlockReader::close()
 {
-    if (m_watcher.isRunning()) {
+    if (m_readFuture.valid()) {
         m_loading = false; // discard incoming result
-        m_watcher.waitForFinished();
+        m_readFuture.wait();
     }
     m_raw.reset();
     m_fiffInfo.reset();
@@ -184,7 +162,7 @@ void FiffBlockReader::loadBlockAsync(int from, int to)
     if (from > to)
         return;
 
-    if (m_watcher.isRunning()) {
+    if (m_readFuture.valid()) {
         // A read is already in flight — queue this request instead of blocking.
         // The finished handler will start it immediately when the current read ends.
         m_pendingFrom = from;
@@ -195,11 +173,44 @@ void FiffBlockReader::loadBlockAsync(int from, int to)
     }
 
     m_hasPending = false;
+    startRead(from, to);
+}
+
+//=============================================================================================================
+
+void FiffBlockReader::startRead(int from, int to)
+{
     m_inFlightFrom = from;
     m_loading = true;
-    m_watcher.setFuture(QtConcurrent::run([this, from, to]() {
-        return doRead(from, to);
-    }));
+    m_readFuture = ThreadPool::global().submit([this, pThis = QPointer<FiffBlockReader>(this), from, to]() {
+        MatrixXd result = doRead(from, to);
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, &FiffBlockReader::onReadFinished, Qt::QueuedConnection);
+        }
+        return result;
+    });
+}
+
+//=============================================================================================================
+
+void FiffBlockReader::onReadFinished()
+{
+    MatrixXd result = m_readFuture.get();
+    bool shouldEmit = m_loading;
+    int emitFrom = m_inFlightFrom;
+    m_loading = false;
+
+    if (m_hasPending) {
+        // A newer request arrived while we were reading — start it now.
+        m_hasPending = false;
+        startRead(m_pendingFrom, m_pendingTo);
+        return; // discard the superseded result
+    }
+
+    if (!shouldEmit)
+        return;
+    if (result.rows() > 0 && result.cols() > 0)
+        emit blockLoaded(result, emitFrom);
 }
 
 //=============================================================================================================

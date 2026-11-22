@@ -36,11 +36,12 @@
 #include <inv/dipole_fit/inv_dipole_fit.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 
+#include <base/thread_pool.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtConcurrent/QtConcurrent>
 #include <QDebug>
 
 //=============================================================================================================
@@ -62,6 +63,9 @@ InvDipoleFit::InvDipoleFit()
 
 InvDipoleFit::~InvDipoleFit()
 {
+    if (m_Future.valid()) {
+        m_Future.wait();
+    }
 }
 
 //=============================================================================================================
@@ -149,8 +153,6 @@ QDockWidget* InvDipoleFit::getControl()
     //Fit
     connect(pDipoleView, &mne::disp::DipoleFitView::performDipoleFit,
             this, &InvDipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
-    connect(&m_FutureWatcher, &QFutureWatcher<mne::InvEcdSet>::finished,
-            this, &InvDipoleFit::dipoleFitResults, Qt::UniqueConnection);
 
     QDockWidget* pDockWidgt = new QDockWidget(getName());
     pDockWidgt->setWidget(pDipoleView);
@@ -204,11 +206,18 @@ void InvDipoleFit::onPerformDipoleFit(const QString& sFitName)
 
     triggerLoadingStart("Performing Dipole Fit...");
 
-    m_Future = QtConcurrent::run([this] {
-        return this->dipoleFitCalculation();
+    // Only the most recently started fit reports its result
+    const quint64 iGeneration = ++m_iFitGeneration;
+    m_Future = mne::ThreadPool::global().submit([this, pThis = QPointer<InvDipoleFit>(this), iGeneration] {
+        mne::InvEcdSet ecdSet = this->dipoleFitCalculation();
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, [this, iGeneration] {
+                if (iGeneration == m_iFitGeneration) {
+                    dipoleFitResults();
+                } }, Qt::QueuedConnection);
+        }
+        return ecdSet;
     });
-
-    m_FutureWatcher.setFuture(m_Future);
 }
 
 //=============================================================================================================
@@ -447,7 +456,7 @@ mne::InvEcdSet InvDipoleFit::dipoleFitCalculation()
 
 void InvDipoleFit::dipoleFitResults()
 {
-    newDipoleFit(m_Future.result(), m_sFitName);
+    newDipoleFit(m_Future.get(), m_sFitName);
 
     triggerLoadingEnd("Performing Dipole Fit...");
 }

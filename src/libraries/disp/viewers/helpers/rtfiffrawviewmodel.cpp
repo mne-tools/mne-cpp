@@ -21,6 +21,7 @@
 #include "rtfiffrawviewmodel.h"
 
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 #include <math/matrix_io.h>
@@ -33,8 +34,6 @@
 
 #include <QBrush>
 #include <QCoreApplication>
-#include <QtConcurrent>
-#include <QFuture>
 #include <QDebug>
 
 //=============================================================================================================
@@ -899,7 +898,7 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
         return;
     }
 
-    //Generate QList structure which can be handled by the QConcurrent framework
+    //Generate QList structure which can be filtered in parallel
     QList<QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>> timeData;
     QList<int> notFilterChannelIndex;
 
@@ -917,10 +916,10 @@ void RtFiffRawViewModel::filterDataBlock(const MatrixXd& data, int iDataIndex)
 
     //Do the concurrent filtering
     if (!timeData.isEmpty()) {
-        QFuture<void> future = QtConcurrent::map(timeData,
-                                                 doFilterPerChannelRTMSA);
-
-        future.waitForFinished();
+        auto* pTimeData = timeData.data();
+        ThreadPool::global().parallel_for(0, static_cast<std::size_t>(timeData.size()), [pTimeData](std::size_t i) {
+            doFilterPerChannelRTMSA(pTimeData[i]);
+        });
 
         //Overlap-add: output sample k of this block is convolution sample iDataIndex + k, drawn iFilterDelay earlier
         for (int r = 0; r < timeData.size(); ++r) {

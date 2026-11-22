@@ -89,13 +89,12 @@
 #include <QMessageBox>
 #include <QLabel>
 #include <QPixmap>
-#include <QFutureWatcher>
 #include <QProgressDialog>
 #include <QMessageBox>
-#include <QtConcurrent>
 
 #include <QTemporaryDir>
 
+#include <future>
 #include <memory>
 
 

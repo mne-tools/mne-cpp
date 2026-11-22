@@ -13,6 +13,8 @@
 
 #include "shot_capture.h"
 
+#include <base/thread_pool.h>
+
 #include <QApplication>
 #include <QColor>
 #include <QDir>
@@ -27,7 +29,6 @@
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QThread>
-#include <QThreadPool>
 #include <QTimer>
 #include <QWidget>
 #include <QtTest/QtTest>
@@ -154,7 +155,7 @@ void TestDocShots::waitsForThreadPoolWork()
     ColourWidget widget;
     widget.resize(64, 48);
     widget.show();
-    QThreadPool::globalInstance()->start([&widget]() {
+    mne::ThreadPool::global().submit([&widget]() {
         QThread::msleep(600);
         QMetaObject::invokeMethod(&widget, [&widget]() { widget.setColour(Qt::blue); }, Qt::QueuedConnection);
     });

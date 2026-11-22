@@ -25,6 +25,7 @@
 #include <inv/inv_source_estimate.h>
 #include <base/byte_stream.h>
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -3080,23 +3081,15 @@ void MainWindow::writeFile()
         return;
     }
 
-    //Create output file, progress dialog and future watcher
+    //Create output file and progress dialog
     QFile qFileOutput(filename);
     if (qFileOutput.isOpen())
         qFileOutput.close();
 
-    QFutureWatcher<bool> writeFileFutureWatcher;
     QProgressDialog progressDialog("Writing to fif file...", QString(), 0, 0, this, Qt::Dialog);
     const QSharedPointer<SessionFilter> activeFilter = m_pDataWindow->activeSessionFilter();
     const bool useFilteredWrite = activeFilter && activeFilter->isValid();
     const SessionFilter filterCopy = useFilteredWrite ? *activeFilter : SessionFilter();
-
-    //Connect future watcher and dialog
-    connect(&writeFileFutureWatcher, &QFutureWatcher<bool>::finished,
-            &progressDialog, &QProgressDialog::reset);
-
-    connect(&progressDialog, &QProgressDialog::canceled,
-            &writeFileFutureWatcher, &QFutureWatcher<bool>::cancel);
 
     if (!useFilteredWrite) {
         connect(rawModel(), &RawModel::writeProgressRangeChanged,
@@ -3106,20 +3099,17 @@ void MainWindow::writeFile()
                 &progressDialog, &QProgressDialog::setValue);
     }
 
-    //Run the file writing in seperate thread
-    writeFileFutureWatcher.setFuture(QtConcurrent::run([this, &qFileOutput, filterCopy, useFilteredWrite]() {
-        if (useFilteredWrite) {
-            return writeFilteredRawFile(m_qFileRaw.fileName(), qFileOutput.fileName(), filterCopy);
-        }
-
-        return rawModel()->writeFiffData(qFileOutput.fileName());
-    }));
+    //Run the file writing in seperate thread; the dialog lives until the result has been taken below
+    std::future<bool> writeFileFuture = ThreadPool::global().submit([this, &qFileOutput, &progressDialog, filterCopy, useFilteredWrite]() {
+        const bool bWritten = useFilteredWrite ? writeFilteredRawFile(m_qFileRaw.fileName(), qFileOutput.fileName(), filterCopy)
+                                               : rawModel()->writeFiffData(qFileOutput.fileName());
+        QMetaObject::invokeMethod(&progressDialog, &QProgressDialog::reset, Qt::QueuedConnection);
+        return bWritten;
+    });
 
     progressDialog.exec();
 
-    writeFileFutureWatcher.waitForFinished();
-
-    if (!writeFileFutureWatcher.future().result())
+    if (!writeFileFuture.get())
         qWarning() << "MainWindow: ERROR writing fiff data file" << qFileOutput.fileName();
     else
         qInfo() << "MainWindow: Successfully written to" << qFileOutput.fileName();

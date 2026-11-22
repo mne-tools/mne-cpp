@@ -31,13 +31,13 @@
 #include <QWidget>
 #include <QColorDialog>
 #include <QStringListModel>
-#include <QFuture>
-#include <QFutureWatcher>
+#include <QMap>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 
 //=============================================================================================================
@@ -235,7 +235,7 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Gets event map from QFuture and creates new groups baseed on it.
+     * Gets event map from the trigger detection future and creates new groups baseed on it.
      */
     void createGroupsFromTriggers();
 
@@ -389,9 +389,8 @@ private:
 
     QColorDialog* m_pColordialog; /** < Used for Prompting users for event type colors */
 
-    QFutureWatcher<QMap<double, QList<int>>> m_FutureWatcher; /** < Watches m_Future and signals when calculations are done */
-    QFuture<QMap<double, QList<int>>> m_Future;               /** < Used to perfom trigger detection on a separate thread */
-    QString m_sDetectedStimChannel;                           /** < Stimulus channel of the running detection. */
+    std::future<QMap<double, QList<int>>> m_Future; /** < Used to perfom trigger detection on a separate thread; valid until the result is consumed */
+    QString m_sDetectedStimChannel;                 /** < Stimulus channel of the running detection. */
 
     QPointer<QMenu> m_pEventContexMenu;
     QPointer<QMenu> m_pGroupContexMenu;

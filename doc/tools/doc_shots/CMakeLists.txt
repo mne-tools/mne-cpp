@@ -37,7 +37,7 @@ find_package(Eigen3 REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui Widgets SerialPort Concurrent Network)
+set(QT_REQUIRED_COMPONENTS Core Gui Widgets SerialPort)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -82,6 +82,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_disp3D
     mne_mri
     mne_fiff
+    mne_base
     Eigen3::Eigen
 )
 

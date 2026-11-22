@@ -20,6 +20,7 @@
 
 #include <connectivity/connectivity.h>
 #include <base/log_qt.h>
+#include <base/process.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -38,9 +39,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QCoreApplication>
-#include <QHostInfo>
 #include <QElapsedTimer>
-#include <QThreadPool>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -122,8 +121,7 @@ int main(int argc, char* argv[])
 
     m_sCurrentDir = QCoreApplication::applicationDirPath();
 
-    //    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());
-    //    QThreadPool::globalInstance()->setMaxThreadCount(24);
+    //    printf("ThreadPool::global().thread_count(): %zu\n", ThreadPool::global().thread_count());
 
     //Parameters for performance test
     QStringList sConnectivityMethodList = QStringList() << "COR" << "XCOR" << "COH" << "IMAGCOH" << "PLI" << "WPLI" << "USPLI" << "DSWPLI" << "PLV";
@@ -205,7 +203,7 @@ int main(int argc, char* argv[])
                     m_iNumberSamples = lNumberSamples.at(j);
 
                     //Create new folder
-                    m_sCurrentDir = QCoreApplication::applicationDirPath() + QString("/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(connectivitySettings.frequency_bins().second).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    m_sCurrentDir = QCoreApplication::applicationDirPath() + QString("/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QString::fromStdString(mne::host_name())).arg(connectivitySettings.frequency_bins().second).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file

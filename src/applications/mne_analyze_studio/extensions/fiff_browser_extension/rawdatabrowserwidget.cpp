@@ -24,6 +24,7 @@
 #include <QEvent>
 #include <QFileInfo>
 #include <QHeaderView>
+#include <QJsonObject>
 #include <QDebug>
 #include <QLabel>
 #include <QFile>

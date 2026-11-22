@@ -34,7 +34,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QFutureWatcher>
 #include <QMutex>
 #include <QBuffer>
 #include <QFile>
@@ -610,10 +609,8 @@ private:
     bool m_bStartOfFileReached; /**< Flag for having reached the start of the file. */
     bool m_bEndOfFileReached;   /**< Flag for having reached the end of the file. */
 
-    // concurrent reloading
-    QFutureWatcher<int> m_blockLoadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data. */
-    bool m_bCurrentlyLoading;                     /**< Flag to indicate whether or not a background operation is going on. */
-    mutable QMutex m_dataMutex;                   /**< Using mutable is not a pretty solution. */
+    bool m_bCurrentlyLoading;   /**< Flag to indicate whether or not a background operation is going on. */
+    mutable QMutex m_dataMutex; /**< Using mutable is not a pretty solution. */
 
     // data stuff
     QFile m_file;

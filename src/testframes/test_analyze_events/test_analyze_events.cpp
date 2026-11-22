@@ -20,6 +20,7 @@
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -31,15 +32,14 @@
 #include <QDockWidget>
 #include <QDoubleSpinBox>
 #include <QPushButton>
-#include <QSemaphore>
 #include <QSpinBox>
 #include <QTableView>
-#include <QThreadPool>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <map>
 #include <memory>
 #include <vector>
@@ -104,19 +104,21 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     view->findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_detectionThresholdFirst"))->setValue(1.0);
     view->findChild<QSpinBox*>(QStringLiteral("m_spinBox_detectionThresholdSecond"))->setValue(0);
 
-    // The detection runs on a worker; hold the pool so it starts only after the click has returned
-    QThreadPool* pool = QThreadPool::globalInstance();
-    const int maxThreads = pool->maxThreadCount();
-    pool->setMaxThreadCount(1);
-    QSemaphore gate;
-    pool->start([&gate] { gate.acquire(); });
+    // The detection runs on a worker; hold every pool worker so it starts only after the click has returned
+    mne::ThreadPool& pool = mne::ThreadPool::global();
+    std::promise<void> gate;
+    const std::shared_future<void> open = gate.get_future().share();
+    std::vector<std::future<void>> held;
+    held.reserve(pool.thread_count());
+    for (std::size_t i = 0; i < pool.thread_count(); ++i)
+        held.push_back(pool.submit([open] { open.wait(); }));
     view->findChild<QPushButton*>(QStringLiteral("m_pushButton_DetectTriggers"))->click();
     QVERIFY(channel->count() > 1);
     channel->setCurrentIndex(channel->currentIndex() == 0 ? 1 : 0); // the user picks another channel meanwhile
-    gate.release();
+    gate.set_value();
     QTRY_VERIFY_WITH_TIMEOUT(events->getNumberOfGroups() >= 6, 10000);
-    pool->waitForDone();
-    pool->setMaxThreadCount(maxThreads);
+    for (std::future<void>& f : held)
+        f.get();
 
     // mne.find_events(raw, "STI 014") (mne 1.11.0): one event per onset, grouped by code
     const std::map<int, std::vector<int>> expected{

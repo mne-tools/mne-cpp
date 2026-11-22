@@ -28,6 +28,7 @@
 #include <mne/mne_project_to_surface.h>
 #include <mne/mne_icp.h>
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -36,7 +37,6 @@
 #include <QListWidgetItem>
 #include <QDebug>
 #include <QVector>
-#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -95,6 +95,9 @@ CoRegistration::CoRegistration()
 
 CoRegistration::~CoRegistration()
 {
+    if (m_Future.valid()) {
+        m_Future.wait();
+    }
 }
 
 //=============================================================================================================
@@ -172,10 +175,6 @@ QDockWidget* CoRegistration::getControl()
 
     // automaticly load Bem if available
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
-
-    // Thread handling
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
-            this, &CoRegistration::createNewTrans, Qt::UniqueConnection);
 
     return pControlDock;
 }
@@ -510,7 +509,7 @@ void CoRegistration::onFitICP()
         return;
     }
 
-    if (m_FutureWatcher.isRunning()) {
+    if (m_Future.valid()) {
         qWarning() << "ICP computation already taking place.";
         return;
     }
@@ -521,13 +520,15 @@ void CoRegistration::onFitICP()
     triggerLoadingStart("Performing ICP ...");
 
     // start icp
-    m_Future = QtConcurrent::run([&, this] {
-        return this->computeICP(m_transHeadMri,
-                                m_digSetHead,
-                                *m_pBem);
+    m_Future = mne::ThreadPool::global().submit([this, pThis = QPointer<CoRegistration>(this)] {
+        FiffCoordTrans transResult = this->computeICP(m_transHeadMri,
+                                                      m_digSetHead,
+                                                      *m_pBem);
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, &CoRegistration::createNewTrans, Qt::QueuedConnection);
+        }
+        return transResult;
     });
-
-    m_FutureWatcher.setFuture(m_Future);
 
     return;
 }
@@ -656,7 +657,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
 
 void CoRegistration::createNewTrans()
 {
-    m_transHeadMri = m_Future.result();
+    m_transHeadMri = m_Future.get();
 
     // update GUI
     Vector3f vecRot;

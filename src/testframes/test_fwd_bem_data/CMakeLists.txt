@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(test_fwd_bem_data LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent Network Test)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Test)
 qt_standard_project_setup()
 
 qt_add_executable(test_fwd_bem_data test_fwd_bem_data.cpp)
@@ -25,7 +25,7 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 target_link_libraries(test_fwd_bem_data PRIVATE
-    Qt6::Core Qt6::Widgets Qt6::Concurrent Qt6::Network Qt6::Test
+    Qt6::Core Qt6::Widgets Qt6::Test
     mne_dsp
     mne_connectivity
     mne_inv

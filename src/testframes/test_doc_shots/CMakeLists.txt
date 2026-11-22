@@ -39,7 +39,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${_doc_shots_dir})
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${QT_REQUIRED_COMPONENT_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${QT_REQUIRED_COMPONENT_LIBS} mne_base)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     MNE_DOC_SHOTS_PATH="$<TARGET_FILE:mne_doc_shots>"
 )

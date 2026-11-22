@@ -22,6 +22,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_coord_trans.h>
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 #include <fiff/fiff_dig_point_set.h>
 
 //=============================================================================================================
@@ -32,15 +33,15 @@
 #include <QCheckBox>
 #include <QDockWidget>
 #include <QLabel>
-#include <QSemaphore>
-#include <QThreadPool>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <functional>
+#include <future>
 #include <memory>
+#include <vector>
 
 using namespace COREGISTRATIONPLUGIN;
 using namespace mne::analyze;
@@ -91,18 +92,20 @@ FiffCoordTrans runIcp(CoRegistration& plugin, CoregSettingsView* view, const QSt
     auto* pRmse = view->findChild<QLabel*>(QStringLiteral("m_qLabel_RMSE"));
     pRmse->setText(QString());
 
-    // Hold the only pool thread until the panel has been edited
-    QThreadPool* pPool = QThreadPool::globalInstance();
-    const int iMaxThreads = pPool->maxThreadCount();
-    pPool->setMaxThreadCount(1);
-    QSemaphore gate;
-    pPool->start([&gate] { gate.acquire(); });
+    // Hold every pool worker until the panel has been edited, so the fit is queued behind them
+    ThreadPool& pool = ThreadPool::global();
+    std::promise<void> gate;
+    const std::shared_future<void> open = gate.get_future().share();
+    std::vector<std::future<void>> held;
+    held.reserve(pool.thread_count());
+    for (std::size_t i = 0; i < pool.thread_count(); ++i)
+        held.push_back(pool.submit([open] { open.wait(); }));
     emit view->fitICP();
     if (change)
         change();
-    gate.release();
-    pPool->waitForDone();
-    pPool->setMaxThreadCount(iMaxThreads);
+    gate.set_value();
+    for (std::future<void>& f : held)
+        f.get();
 
     if (!QTest::qWaitFor([pRmse] { return !pRmse->text().isEmpty(); }, 10000))
         return FiffCoordTrans();

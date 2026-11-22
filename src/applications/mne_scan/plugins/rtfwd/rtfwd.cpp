@@ -94,8 +94,6 @@ RtFwd::RtFwd()
 
 RtFwd::~RtFwd()
 {
-    m_future.waitForFinished();
-
     if (this->isRunning()) {
         stop();
     }
@@ -137,7 +135,6 @@ void RtFwd::init()
 
 void RtFwd::unload()
 {
-    m_future.waitForFinished();
 }
 
 //=============================================================================================================

@@ -33,6 +33,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 
 //=============================================================================================================
@@ -214,13 +215,13 @@ private:
 
     //=========================================================================================================
     /**
-     * Triggers averageCalculations to be run with QFuture.
+     * Triggers averageCalculations to be run on a worker thread.
      */
     void computeAverage();
 
     //=========================================================================================================
     /**
-     * Calculates average and returns FiffEvoked Set. (Run in separate thread with QFuture)
+     * Calculates average and returns FiffEvoked Set. (Run in separate thread)
      *
      * @return Retruns FiffEvoked setwith averaged data.
      */
@@ -231,7 +232,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Receives FiffEvoked set from QFuture and created new averaging model
+     * Receives FiffEvoked set from the worker thread and created new averaging model
      */
     void createNewAverage();
 
@@ -327,8 +328,7 @@ private:
 
     mne::FilterKernel m_filterKernel; /**< List of currently active filters. */
 
-    QFutureWatcher<std::shared_ptr<mne::FiffEvokedSet>> m_FutureWatcher; /**< Future watcher for notifing of completed average calculations. */
-    QFuture<std::shared_ptr<mne::FiffEvokedSet>> m_Future;               /**< Future for performing average calculations of separate thread. */
+    std::future<std::shared_ptr<mne::FiffEvokedSet>> m_Future; /**< Future for performing average calculations of separate thread; valid until the result is consumed. */
 
     QMutex m_ParameterMutex; /**< Mutex for thread-safing. */
 };

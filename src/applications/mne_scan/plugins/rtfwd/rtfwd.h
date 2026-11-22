@@ -194,8 +194,7 @@ private:
     void onAtlasDirChanged(const QString& sDirPath,
                            const std::shared_ptr<mne::FsAnnotationSet>& pAnnotationSet);
 
-    QMutex m_mutex;         /**< The threads mutex.*/
-    QFuture<void> m_future; /**< The future monitoring the clustering and forward calculation. */
+    QMutex m_mutex; /**< The threads mutex.*/
 
     float m_fThreshRot;      /**< The allowed rotation in degree.**/
     float m_fThreshMove;     /**< The Allowed movement in mm.**/

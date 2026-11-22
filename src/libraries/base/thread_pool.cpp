@@ -128,6 +128,7 @@ void ThreadPool::enqueue(std::function<void()> task)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_queue.push_back(std::move(task));
+        m_active.fetch_add(1, std::memory_order_acq_rel);
     }
     m_wake.notify_one();
 }
@@ -148,6 +149,7 @@ void ThreadPool::worker_loop()
             m_queue.pop_front();
         }
         task();
+        m_active.fetch_sub(1, std::memory_order_acq_rel);
     }
 }
 

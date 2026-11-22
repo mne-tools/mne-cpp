@@ -27,8 +27,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtConcurrent>
-#include <QFuture>
 #include <QPair>
 #include <QColor>
 #include <QDebug>

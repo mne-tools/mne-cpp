@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    3.0.0
  * @date     November 2026
- * @brief    Tests ThreadPool and benchmarks it against QtConcurrent.
+ * @brief    Tests and benchmarks ThreadPool.
  */
 
 //=============================================================================================================
@@ -20,7 +20,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtConcurrent>
 #include <QtTest>
 
 //=============================================================================================================
@@ -30,6 +29,7 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <future>
 #include <numeric>
 #include <set>
 #include <stdexcept>
@@ -80,8 +80,8 @@ private slots:
     void parallelForNestsWithoutDeadlock();
     void parallelMapKeepsOrder();
     void destructorRunsQueuedTasks();
+    void activeCountTracksQueuedAndRunningTasks();
     void globalPoolUsesEveryCore();
-    void benchmarkMap_data();
     void benchmarkMap();
 };
 
@@ -216,6 +216,23 @@ void TestUtilsThreadPool::destructorRunsQueuedTasks()
 
 //=============================================================================================================
 
+void TestUtilsThreadPool::activeCountTracksQueuedAndRunningTasks()
+{
+    ThreadPool pool(1);
+    QCOMPARE(pool.active_count(), std::size_t(0));
+    std::promise<void> gate;
+    std::shared_future<void> open = gate.get_future().share();
+    std::future<void> running = pool.submit([open] { open.wait(); });
+    std::future<void> queued = pool.submit([] {});
+    QCOMPARE(pool.active_count(), std::size_t(2));
+    gate.set_value();
+    running.get();
+    queued.get();
+    QTRY_COMPARE(pool.active_count(), std::size_t(0));
+}
+
+//=============================================================================================================
+
 void TestUtilsThreadPool::globalPoolUsesEveryCore()
 {
     const std::size_t cores = std::max(1u, std::thread::hardware_concurrency());
@@ -226,31 +243,14 @@ void TestUtilsThreadPool::globalPoolUsesEveryCore()
 
 //=============================================================================================================
 
-void TestUtilsThreadPool::benchmarkMap_data()
-{
-    QTest::addColumn<bool>("qt");
-    QTest::newRow("QtConcurrent::blockingMapped") << true;
-    QTest::newRow("ThreadPool::parallel_map") << false;
-}
-
-//=============================================================================================================
-
 void TestUtilsThreadPool::benchmarkMap()
 {
-    QFETCH(bool, qt);
     std::vector<int> input(kBenchItems);
     std::iota(input.begin(), input.end(), 0);
     std::vector<double> out;
-    if (qt) {
-        QBENCHMARK
-        {
-            out = QtConcurrent::blockingMapped<std::vector<double>>(input, work);
-        }
-    } else {
-        QBENCHMARK
-        {
-            out = ThreadPool::global().parallel_map(input, work);
-        }
+    QBENCHMARK
+    {
+        out = ThreadPool::global().parallel_map(input, work);
     }
     QCOMPARE(out.size(), input.size());
     QCOMPARE(out[1234], work(1234));

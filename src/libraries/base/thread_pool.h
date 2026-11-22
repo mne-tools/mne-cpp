@@ -23,6 +23,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
@@ -75,6 +76,12 @@ public:
     std::size_t thread_count() const
     {
         return m_workers.size();
+    }
+
+    /** @return The number of tasks that are queued or running; 0 once the pool is idle. */
+    std::size_t active_count() const
+    {
+        return m_active.load(std::memory_order_acquire);
     }
 
     //=========================================================================================================
@@ -131,6 +138,7 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_wake;
     bool m_stopping = false;
+    std::atomic<std::size_t> m_active{0};
 };
 
 } // namespace mne

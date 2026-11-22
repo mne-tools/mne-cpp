@@ -41,6 +41,7 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
 #include <events/eventmanager.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,7 +49,7 @@
 
 #include <QDebug>
 #include <QTabWidget>
-#include <QtConcurrent/QtConcurrent>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -93,6 +94,9 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
+    if (m_Future.valid()) {
+        m_Future.wait();
+    }
 }
 
 //=============================================================================================================
@@ -199,8 +203,6 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onComputeButtonClicked, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeDropActive,
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
-            this, &Averaging::createNewAverage, Qt::UniqueConnection);
     connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::setAutoCompute,
             this, &Averaging::setAutoCompute, Qt::UniqueConnection);
 
@@ -374,21 +376,24 @@ void Averaging::computeAverage()
         return;
     }
 
-    if (m_FutureWatcher.isRunning()) {
+    if (m_Future.valid()) {
         // qWarning() << "Averaging computation already taking place.";
         return;
-        //m_FutureWatcher.waitForFinished();
+        //m_Future.wait();
     }
 
     triggerLoadingStart("Calculating average...");
 
-    m_Future = QtConcurrent::run([&, this] {
-        return this->averageCalculation(*this->m_pFiffRawModel->getFiffIO()->raw.front().get(),
-                                        m_pFiffRawModel->getEventModel()->getEventMatrix(),
-                                        m_filterKernel,
-                                        *m_pFiffRawModel->getFiffInfo());
+    m_Future = mne::ThreadPool::global().submit([this, pThis = QPointer<Averaging>(this)] {
+        std::shared_ptr<mne::FiffEvokedSet> pEvokedSet = this->averageCalculation(*this->m_pFiffRawModel->getFiffIO()->raw.front().get(),
+                                                                                  m_pFiffRawModel->getEventModel()->getEventMatrix(),
+                                                                                  m_filterKernel,
+                                                                                  *m_pFiffRawModel->getFiffInfo());
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, &Averaging::createNewAverage, Qt::QueuedConnection);
+        }
+        return pEvokedSet;
     });
-    m_FutureWatcher.setFuture(m_Future);
 }
 
 //=============================================================================================================
@@ -442,7 +447,7 @@ std::shared_ptr<mne::FiffEvokedSet> Averaging::averageCalculation(const mne::Fif
 
 void Averaging::createNewAverage()
 {
-    std::shared_ptr<mne::FiffEvokedSet> pEvokedSet = m_Future.result();
+    std::shared_ptr<mne::FiffEvokedSet> pEvokedSet = m_Future.get();
 
     if (pEvokedSet) {
         if (m_bSavingAverage) {

@@ -38,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 
 //=============================================================================================================
@@ -194,7 +195,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Triggers computeICP to be run with QFuture.
+     * Triggers computeICP to be run on a worker thread.
      */
     void onFitICP();
 
@@ -214,7 +215,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Receives FiffCoordTrans set from QFuture and create respectively update transformation
+     * Receives FiffCoordTrans set from the worker thread and create respectively update transformation
      */
     void createNewTrans();
 
@@ -330,8 +331,7 @@ private:
 
     mne::disp::CoregSettingsView* m_pCoregSettingsView; /**< Pointer to coreg GUI. */
 
-    QFutureWatcher<mne::FiffCoordTrans> m_FutureWatcher;
-    QFuture<mne::FiffCoordTrans> m_Future;
+    std::future<mne::FiffCoordTrans> m_Future; /**< Pending ICP fit; valid until its result is consumed. */
     QMutex m_ParameterMutex;
 };
 

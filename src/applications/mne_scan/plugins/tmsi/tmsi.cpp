@@ -21,6 +21,7 @@
 #include <acq/devices/acq_devices.h>
 #include <acq/fiff/acq_fiff.h>
 #include <base/string_utils.h>
+#include <base/thread_pool.h>
 #include <channels/layoutloader.h>
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -35,7 +36,6 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QThreadPool>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -72,7 +72,7 @@ constexpr int kBeepCode = 252;
 void beep()
 {
 #if defined(_WIN32)
-    QThreadPool::globalInstance()->start([] { Beep(450, 700); });
+    mne::ThreadPool::global().submit([] { Beep(450, 700); });
 #else
     QMetaObject::invokeMethod(qApp, [] { QApplication::beep(); }, Qt::QueuedConnection);
 #endif

@@ -21,6 +21,7 @@
 
 #include <base/string_utils.h>
 #include <math/numerics.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -87,19 +88,10 @@ RawModel::RawModel(QObject* parent)
     // Generate default filter operator - This needs to be done here so that the filter design tool works without loading a file
     genStdFilterOps();
 
-    //connect data reloading - this is done concurrently
-    connect(&m_reloadFutureWatcher, &QFutureWatcher<QPair<MatrixXd, MatrixXd>>::finished, [this]() {
-        insertReloadedData(m_reloadFutureWatcher.future().result());
-    });
-
     //connect filtering reloading - this is done after a new block has been loaded
     connect(this, &RawModel::dataReloaded, [this]() {
         if (!m_assignedOperators.empty())
             updateOperatorsConcurrently();
-    });
-
-    connect(&m_operatorFutureWatcher, &QFutureWatcher<void>::finished, [this]() {
-        insertProcessedDataAll();
     });
 }
 
@@ -108,8 +100,10 @@ RawModel::RawModel(QObject* parent)
 
 RawModel::~RawModel()
 {
-    m_reloadFutureWatcher.waitForFinished();
-    m_operatorFutureWatcher.waitForFinished();
+    if (m_reloadFuture.valid())
+        m_reloadFuture.wait();
+    if (m_operatorFuture.valid())
+        m_operatorFuture.wait();
 }
 
 //*************************************************************************************************************
@@ -137,17 +131,9 @@ RawModel::RawModel(QFile& qFile, QObject* parent)
     genStdFilterOps();
 
     //connect signal and slots
-    connect(&m_reloadFutureWatcher, &QFutureWatcher<QPair<MatrixXd, MatrixXd>>::finished, [this]() {
-        insertReloadedData(m_reloadFutureWatcher.future().result());
-    });
-
     connect(this, &RawModel::dataReloaded, [this]() {
         if (!m_assignedOperators.empty())
             updateOperatorsConcurrently();
-    });
-
-    connect(&m_operatorFutureWatcher, &QFutureWatcher<void>::finished, [this]() {
-        insertProcessedDataAll();
     });
 }
 
@@ -605,16 +591,16 @@ void RawModel::reloadFiffData(bool before)
 
     m_bReloading = true;
 
-    //read data with respect to start and end point
-    QFuture<QPair<MatrixXd, MatrixXd>> future = QtConcurrent::run([this, start, end]() {
-        return this->readSegment(start, end);
+    //read data with respect to start and end point, then insert the reloaded data on the model's thread; only the latest reload is inserted
+    const quint64 iGeneration = ++m_iReloadGeneration;
+    m_reloadFuture = ThreadPool::global().submit([this, pThis = QPointer<RawModel>(this), start, end, iGeneration]() {
+        QPair<MatrixXd, MatrixXd> datatime = this->readSegment(start, end);
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, [this, iGeneration, datatime]() {
+                if (iGeneration == m_iReloadGeneration)
+                    insertReloadedData(datatime); }, Qt::QueuedConnection);
+        }
     });
-
-    //Wait for thread reloading is finished, then insert reloaded data
-    //future.waitForFinished();
-    //insertReloadedData(future.result());
-
-    m_reloadFutureWatcher.setFuture(future);
 }
 
 
@@ -1071,26 +1057,20 @@ void RawModel::updateOperatorsConcurrently()
 
     qInfo() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 
-    //************* here it could be also performed QtConcurrent::mapped() *************
-    // advantage: QFutureWatcher would give partial results -> signal resultsReadyAt(int idx)
-    // disadvantage: data needs to be copied twice (also to QFuture<QPair<int,RowVectorXd> > object) instead of once (to m_listTmpChData)
-
-    //generate lambda function
-    //    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
-    //        return applyOperatorsConcurrently(chdata);
-    //    };
-
-    //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
-    //**************************************************************************************************************************************************************************
-
-    QFuture<void> future = QtConcurrent::map(m_listTmpChData, [this](QPair<int, RowVectorXd>& chdata) {
-        return applyOperatorsConcurrently(chdata);
+    //Process the data in the background, then insert it on the model's thread; only the latest run is inserted
+    QPair<int, RowVectorXd>* pChData = m_listTmpChData.data();
+    const std::size_t iNumChData = static_cast<std::size_t>(m_listTmpChData.size());
+    const quint64 iGeneration = ++m_iOperatorGeneration;
+    m_operatorFuture = ThreadPool::global().submit([this, pThis = QPointer<RawModel>(this), pChData, iNumChData, iGeneration]() {
+        ThreadPool::global().parallel_for(0, iNumChData, [this, pChData](std::size_t i) {
+            applyOperatorsConcurrently(pChData[i]);
+        });
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, [this, iGeneration]() {
+                if (iGeneration == m_iOperatorGeneration)
+                    insertProcessedDataAll(); }, Qt::QueuedConnection);
+        }
     });
-
-    m_operatorFutureWatcher.setFuture(future);
-
-    //Wait for thread to be finished processig the data, then insert data
-    //future.waitForFinished();
 
     qInfo() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 
@@ -1115,24 +1095,10 @@ void RawModel::updateOperatorsConcurrently(int windowIndex)
 
     qInfo() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items in m_data block" << windowIndex;
 
-    //************* here it could be also performed QtConcurrent::mapped() *************
-    // advantage: QFutureWatcher would give partial results -> signal resultsReadyAt(int idx)
-    // disadvantage: data needs to be copied twice (also to QFuture<QPair<int,RowVectorXd> > object) instead of once (to m_listTmpChData)
-
-    //generate lambda function
-    //    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
-    //        return applyOperatorsConcurrently(chdata);
-    //    };
-
-    //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
-    //**************************************************************************************************************************************************************************
-
-    QFuture<void> future = QtConcurrent::map(m_listTmpChData, [this](QPair<int, RowVectorXd>& chdata) {
-        return applyOperatorsConcurrently(chdata);
+    QPair<int, RowVectorXd>* pChData = m_listTmpChData.data();
+    ThreadPool::global().parallel_for(0, static_cast<std::size_t>(m_listTmpChData.size()), [this, pChData](std::size_t i) {
+        applyOperatorsConcurrently(pChData[i]);
     });
-
-    //Wait for thread to be finished processig the data, then insert data
-    future.waitForFinished();
 
     qInfo() << "RawModel: finished concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 

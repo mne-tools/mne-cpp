@@ -25,6 +25,7 @@
 #include <fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,7 +40,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QtConcurrent/QtConcurrent>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -169,9 +170,6 @@ void EventView::initGUIFunctionality()
 
     connect(m_pTriggerDetectView.get(), &mne::disp::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers, Qt::UniqueConnection);
-
-    connect(&m_FutureWatcher, &QFutureWatcher<QMap<double, QList<int>>>::finished,
-            this, &EventView::createGroupsFromTriggers, Qt::UniqueConnection);
 
     m_pEventModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
 }
@@ -473,7 +471,7 @@ void EventView::onDetectTriggers(const QString& sChannelName,
         return;
     }
 
-    if (m_FutureWatcher.isRunning()) {
+    if (m_Future.valid()) {
         return;
     }
 
@@ -482,10 +480,13 @@ void EventView::onDetectTriggers(const QString& sChannelName,
     // The arguments are temporaries of the emitting call, so the worker gets copies
     m_sDetectedStimChannel = sChannelName;
     std::shared_ptr<mne::FiffRawData> raw = m_pFiffRawModel->getFiffIO()->raw.front();
-    m_Future = QtConcurrent::run([sChannelName = QString(sChannelName), dThreshold, raw] {
-        return detectTriggerCalculations(sChannelName, dThreshold, *raw);
+    m_Future = mne::ThreadPool::global().submit([sChannelName = QString(sChannelName), dThreshold, raw, pThis = QPointer<EventView>(this)] {
+        QMap<double, QList<int>> mEventsinTypes = detectTriggerCalculations(sChannelName, dThreshold, *raw);
+        if (pThis) {
+            QMetaObject::invokeMethod(pThis, &EventView::createGroupsFromTriggers, Qt::QueuedConnection);
+        }
+        return mEventsinTypes;
     });
-    m_FutureWatcher.setFuture(m_Future);
 }
 
 //=============================================================================================================
@@ -538,7 +539,7 @@ bool EventView::newStimGroup(const QString& sName,
 
 void EventView::createGroupsFromTriggers()
 {
-    QMap<double, QList<int>> mEventGroupMap = m_Future.result();
+    QMap<double, QList<int>> mEventGroupMap = m_Future.get();
 
     QList<double> keyList = mEventGroupMap.keys();
 

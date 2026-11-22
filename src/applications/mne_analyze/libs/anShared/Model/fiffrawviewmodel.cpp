@@ -31,7 +31,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtConcurrent/QtConcurrent>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QBrush>
@@ -85,7 +84,6 @@ FiffRawViewModel::FiffRawViewModel(const QString& sFilePath,
 , m_iFiffCursorBegin(-1)
 , m_bStartOfFileReached(true)
 , m_bEndOfFileReached(false)
-, m_blockLoadFutureWatcher()
 , m_bCurrentlyLoading(false)
 , m_pRtFilter(std::make_shared<FilterOverlapAdd>())
 , m_bPerformFiltering(false)
@@ -97,12 +95,6 @@ FiffRawViewModel::FiffRawViewModel(const QString& sFilePath,
 , m_iLastFileEndSample(0)
 //, m_pEventModel(QSharedPointer<EventModel>::create())
 {
-    // connect data reloading: this will be run concurrently
-    connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
-            [this]() {
-                postBlockLoad(m_blockLoadFutureWatcher.future().result());
-            });
-
     auto io = QSharedPointer<FiffIO>::create();
     if (byteLoadedData.isEmpty()) {
         m_file.setFileName(sFilePath);
@@ -826,7 +818,7 @@ void FiffRawViewModel::postBlockLoad(int result)
 {
     switch (result) {
         case -1:
-            qWarning() << "[FiffRawViewModel::postBlockLoad] QFuture returned an error: " << result;
+            qWarning() << "[FiffRawViewModel::postBlockLoad] block load returned an error: " << result;
             break;
         case 0: {
             // insertion of earlier blocks

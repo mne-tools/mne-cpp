@@ -28,8 +28,6 @@
 #include <QObject>
 #include <QFile>
 #include <QSharedPointer>
-#include <QFutureWatcher>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -41,6 +39,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <future>
 #include <memory>
 
 //=============================================================================================================
@@ -222,13 +221,28 @@ private:
      */
     Eigen::MatrixXd doRead(int from, int to);
 
+    //=========================================================================================================
+    /**
+     * Starts an async block read; onReadFinished() runs on this object's thread when it is done.
+     *
+     * @param[in] from  First sample to load.
+     * @param[in] to    Last sample to load.
+     */
+    void startRead(int from, int to);
+
+    //=========================================================================================================
+    /**
+     * Takes the result of the finished async read and either starts the pending request or emits blockLoaded().
+     */
+    void onReadFinished();
+
     QFile* m_file = nullptr;                   /**< File-backed source device for desktop paths. */
     std::shared_ptr<mne::FiffRawData> m_raw;   /**< Raw FIFF reader used for header and block access. */
     std::shared_ptr<mne::FiffInfo> m_fiffInfo; /**< Cached measurement information of the open file. */
     int m_firstSample = 0;                     /**< First sample index of the open raw file. */
     int m_lastSample = 0;                      /**< Last sample index of the open raw file. */
 
-    QFutureWatcher<Eigen::MatrixXd> m_watcher; /**< Watcher for the currently running async block read. */
+    std::future<Eigen::MatrixXd> m_readFuture; /**< Currently running async block read; valid until its result is taken. */
     int m_inFlightFrom = 0;                    /**< First sample of the currently running async read. */
     bool m_loading = false;                    /**< True while an async read is running. */
 

@@ -13,6 +13,8 @@
 
 #include "shot_capture.h"
 
+#include <base/thread_pool.h>
+
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QSaveFile>
@@ -32,7 +34,6 @@
 #include <QStyleHints>
 #include <QTextStream>
 #include <QThread>
-#include <QThreadPool>
 #include <QWidget>
 
 #include <algorithm>
@@ -190,7 +191,7 @@ bool waitUntilSettled(QWidget& window, QString& err, int settleMs, int timeoutMs
         const qint64 quietWhenEventsRan = unchanged.elapsed();
         const QImage frame = window.grab().toImage();
         ++frames;
-        if (frame != last || QThreadPool::globalInstance()->activeThreadCount() > 0) {
+        if (frame != last || mne::ThreadPool::global().active_count() > 0) {
             last = frame;
             unchanged.restart();
         } else if (quietWhenEventsRan >= settleMs) {
@@ -201,7 +202,7 @@ bool waitUntilSettled(QWidget& window, QString& err, int settleMs, int timeoutMs
                                  "running): something keeps repainting or loading")
                       .arg(timeoutMs)
                       .arg(frames)
-                      .arg(QThreadPool::globalInstance()->activeThreadCount());
+                      .arg(mne::ThreadPool::global().active_count());
             return false;
         }
         QThread::msleep(10);

@@ -18,14 +18,17 @@
 
 #include "geometryinfo.h"
 
+#include <base/thread_pool.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDebug>
+#include <QHash>
+#include <QSet>
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -77,38 +80,12 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f& matVertices,
 #endif
 
     qint32 iSubArraySize = static_cast<int>(static_cast<double>(vecVertSubset.size()) / static_cast<double>(iCores));
-    QVector<QFuture<void>> vecThreads(iCores);
-    qint32 iBegin = 0;
-    qint32 iEnd = iSubArraySize;
-
-    for (int i = 0; i < vecThreads.size(); ++i) {
-        if (i == vecThreads.size() - 1) {
-            vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
-                                                        returnMat,
-                                                        std::cref(matVertices),
-                                                        std::cref(vecNeighborVertices),
-                                                        std::cref(vecVertSubset),
-                                                        iBegin,
-                                                        static_cast<qint32>(vecVertSubset.size()),
-                                                        dCancelDist));
-            break;
-        } else {
-            vecThreads[i] = QtConcurrent::run(std::bind(iterativeDijkstra,
-                                                        returnMat,
-                                                        std::cref(matVertices),
-                                                        std::cref(vecNeighborVertices),
-                                                        std::cref(vecVertSubset),
-                                                        iBegin,
-                                                        iEnd,
-                                                        dCancelDist));
-            iBegin += iSubArraySize;
-            iEnd += iSubArraySize;
-        }
-    }
-
-    for (QFuture<void>& f : vecThreads) {
-        f.waitForFinished();
-    }
+    ThreadPool::global().parallel_for(0, static_cast<std::size_t>(iCores), [&](std::size_t i) {
+        const qint32 iBegin = static_cast<qint32>(i) * iSubArraySize;
+        const qint32 iEnd = (static_cast<int>(i) == iCores - 1) ? static_cast<qint32>(vecVertSubset.size())
+                                                                : iBegin + iSubArraySize;
+        iterativeDijkstra(returnMat, matVertices, vecNeighborVertices, vecVertSubset, iBegin, iEnd, dCancelDist);
+    });
 
     return returnMat;
 }
@@ -268,17 +245,13 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     if (iCores <= 1) {
         worker(0, 0, nSources);
     } else {
-        QVector<QFuture<void>> vecThreads;
-        vecThreads.reserve(iCores);
         const qint32 chunk = nSources / iCores;
-        qint32 sBegin = 0;
-        for (int t = 0; t < iCores; ++t) {
+        ThreadPool::global().parallel_for(0, static_cast<std::size_t>(iCores), [&](std::size_t i) {
+            const int t = static_cast<int>(i);
+            const qint32 sBegin = t * chunk;
             const qint32 sEnd = (t == iCores - 1) ? nSources : (sBegin + chunk);
-            vecThreads.push_back(QtConcurrent::run(worker, t, sBegin, sEnd));
-            sBegin = sEnd;
-        }
-        for (QFuture<void>& f : vecThreads)
-            f.waitForFinished();
+            worker(t, sBegin, sEnd);
+        });
     }
 
     if (cancelView->load(std::memory_order_relaxed))
@@ -363,37 +336,17 @@ VectorXi GeometryInfo::projectSensors(const MatrixX3f& matVertices,
         return nearestNeighbor(matVertices, matSensorPositions, 0, iNumSensors);
     }
 
-    QVector<QFuture<VectorXi>> vecThreads(iCores);
-    qint32 iBeginOffset = 0;
-    qint32 iEndOffset = iBeginOffset + iSubArraySize;
-    for (qint32 i = 0; i < vecThreads.size(); ++i) {
-        if (i == vecThreads.size() - 1) {
-            vecThreads[i] = QtConcurrent::run(nearestNeighbor,
-                                              matVertices,
-                                              matSensorPositions,
-                                              iBeginOffset,
-                                              iNumSensors);
-            break;
-        } else {
-            vecThreads[i] = QtConcurrent::run(nearestNeighbor,
-                                              matVertices,
-                                              matSensorPositions,
-                                              iBeginOffset,
-                                              iEndOffset);
-            iBeginOffset = iEndOffset;
-            iEndOffset += iSubArraySize;
-        }
-    }
-
-    for (QFuture<VectorXi>& f : vecThreads) {
-        f.waitForFinished();
-    }
+    std::vector<VectorXi> vecPartials(static_cast<std::size_t>(iCores));
+    ThreadPool::global().parallel_for(0, vecPartials.size(), [&](std::size_t i) {
+        const qint32 iBeginOffset = static_cast<qint32>(i) * iSubArraySize;
+        const qint32 iEndOffset = (static_cast<qint32>(i) == iCores - 1) ? iNumSensors : iBeginOffset + iSubArraySize;
+        vecPartials[i] = nearestNeighbor(matVertices, matSensorPositions, iBeginOffset, iEndOffset);
+    });
 
     // concatenate partial results
     VectorXi vecOutputArray(iNumSensors);
     qint32 iOffset = 0;
-    for (qint32 i = 0; i < vecThreads.size(); ++i) {
-        const VectorXi& partial = vecThreads[i].result();
+    for (const VectorXi& partial : vecPartials) {
         vecOutputArray.segment(iOffset, partial.size()) = partial;
         iOffset += static_cast<qint32>(partial.size());
     }

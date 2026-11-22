@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(test_fiff_fs_library LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Concurrent Network Test)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Test)
 qt_standard_project_setup()
 
 qt_add_executable(test_fiff_fs_library test_fiff_fs_library.cpp)
@@ -38,7 +38,5 @@ target_link_libraries(test_fiff_fs_library PRIVATE
     Eigen3::Eigen
     Qt6::Core
     Qt6::Widgets
-    Qt6::Concurrent
-    Qt6::Network
     Qt6::Test
 )

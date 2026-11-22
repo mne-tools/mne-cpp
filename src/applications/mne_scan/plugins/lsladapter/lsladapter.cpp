@@ -23,13 +23,14 @@
 #include "FormFiles/lsladaptersetup.h"
 #include <fiff/fiff.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <base/thread_pool.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QListWidgetItem>
-#include <QtConcurrent>
+#include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -57,7 +58,6 @@ LSLAdapter::LSLAdapter()
 , m_iOutputBlockSize(100)
 , m_pFiffInfo(std::make_shared<FiffInfo>())
 , m_pRTMSA(PluginOutputData<RealTimeMultiSampleArray>::create(this, "LSL Adapter", "LSL stream data"))
-, m_updateStreamsFutureWatcher()
 , m_vAvailableStreams()
 , m_currentStream()
 , m_bHasValidStream(false)
@@ -100,12 +100,6 @@ void LSLAdapter::init()
     // make RTMSA accessible
     m_pRTMSA->measurementData()->setName(this->getName());
     m_outputConnectors.append(m_pRTMSA);
-
-    // connect finished signal for background lsl stream scanning
-    connect(&m_updateStreamsFutureWatcher,
-            &QFutureWatcher<QVector<mne::stream_info>>::finished,
-            this,
-            &LSLAdapter::onLSLStreamScanReady);
 
     // try to start background scan for available LSL streams
     onRefreshAvailableStreams();
@@ -207,9 +201,14 @@ void LSLAdapter::run()
 void LSLAdapter::onRefreshAvailableStreams()
 {
     // lsl stream scanning is time-consuming, run in background:
-    if (m_updateStreamsFutureWatcher.isFinished()) {
-        QFuture<QVector<mne::stream_info>> future = QtConcurrent::run(scanAvailableLSLStreams);
-        m_updateStreamsFutureWatcher.setFuture(future);
+    if (!m_updateStreamsFuture.valid()) {
+        m_updateStreamsFuture = mne::ThreadPool::global().submit([pThis = QPointer<LSLAdapter>(this)]() {
+            QVector<mne::stream_info> vStreams = scanAvailableLSLStreams();
+            if (pThis) {
+                QMetaObject::invokeMethod(pThis, &LSLAdapter::onLSLStreamScanReady, Qt::QueuedConnection);
+            }
+            return vStreams;
+        });
     }
 }
 
@@ -218,7 +217,7 @@ void LSLAdapter::onRefreshAvailableStreams()
 void LSLAdapter::onLSLStreamScanReady()
 {
     // save result streams
-    m_vAvailableStreams = m_updateStreamsFutureWatcher.result();
+    m_vAvailableStreams = m_updateStreamsFuture.get();
 
     // check whether any streams are available
     if (m_vAvailableStreams.size() == 0) {

@@ -32,7 +32,6 @@
 
 #include <QDebug>
 #include <QFileDialog>
-#include <QtConcurrent>
 
 //=============================================================================================================
 // STL INCLUDES

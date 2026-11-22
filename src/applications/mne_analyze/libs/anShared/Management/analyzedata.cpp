@@ -29,7 +29,6 @@
 #include <QVector>
 #include <QSharedPointer>
 #include <QString>
-#include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
 
 //=============================================================================================================
