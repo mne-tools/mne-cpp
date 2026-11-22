@@ -19,6 +19,7 @@
 #include "averagewindow.h"
 
 #include <mne/base/string_utils.h>
+#include <mne/disp/plots/helpers/svgwriter.h>
 #include <mne/disp/viewers/helpers/averagesceneitem.h>
 
 //=============================================================================================================
@@ -1079,7 +1080,7 @@ void AverageWindow::exportAverageLayoutPlot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            QSvgGenerator svgGen;
+            mne::disp::SvgWriter svgGen;
 
             svgGen.setFileName(fileName);
             QRectF rect = m_pAverageScene->itemsBoundingRect();
@@ -1117,7 +1118,7 @@ void AverageWindow::exportAverageButterflyPlot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            QSvgGenerator svgGen;
+            mne::disp::SvgWriter svgGen;
 
             svgGen.setFileName(fileName);
             QRectF rect = m_pButterflyScene->itemsBoundingRect();

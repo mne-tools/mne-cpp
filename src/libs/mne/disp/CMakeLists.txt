@@ -12,7 +12,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Widgets Svg)
+set(QT_REQUIRED_COMPONENTS Core Widgets)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
@@ -38,6 +38,7 @@ set(SOURCES
     plots/lineplot.cpp
     plots/helpers/colormap.cpp
     plots/helpers/figureexporter.cpp
+    plots/helpers/svgwriter.cpp
     plots/detail/niceticks.h
     viewers/abstractview.cpp
     viewers/applytoview.cpp
@@ -109,6 +110,7 @@ set(HEADERS
     plots/lineplot.h
     plots/helpers/colormap.h
     plots/helpers/figureexporter.h
+    plots/helpers/svgwriter.h
     viewers/abstractview.h
     viewers/applytoview.h
     viewers/coregsettingsview.h

@@ -10,7 +10,10 @@
     "disp3D"
   ],
   "kept": {
-    "$comment": "Library -> { use: reason } for Qt kept by decision D16."
+    "$comment": "Library -> { use: reason } for Qt kept by decision D16.",
+    "disp": {
+      "SvgWriter (QPaintEngine)": "Replaces QSvgGenerator so the vector export of widgets needs Qt Gui only; dropping the Qt Svg module raised the disp ceilings once (tokens 6025 -> 6159, public header includes 110 -> 112)."
+    }
   },
   "ceilings": {
     "acq": {
@@ -69,12 +72,11 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6020,
-      "public_header_includes": 110,
+      "tokens": 6159,
+      "public_header_includes": 112,
       "modules": [
         "Core",
         "GuiPrivate",
-        "Svg",
         "Widgets"
       ]
     },
@@ -166,7 +168,7 @@
     }
   },
   "qt_modules": {
-    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent and Network are gone (mne::ThreadPool, mne_com); Svg goes next.",
+    "$comment": "Qt modules each target of disp, disp3D and the applications may request or use (audit_qt_modules.py --check). Entries may only shrink; a new target gets 'default'. Decisions 2026-11-22: disp and disp3D end at Core, Gui, GuiPrivate (QRhi include path only), ShaderTools (build time) and Widgets; Concurrent and Network are gone (mne::ThreadPool, mne_com); Svg is gone (mne::disp::SvgWriter).",
     "default": [
       "Core",
       "Gui",
@@ -239,7 +241,6 @@
       "src/apps/mne_analyze/plugins/rawdataviewer": [
         "Core",
         "Gui",
-        "Svg",
         "Widgets"
       ],
       "src/apps/mne_analyze/plugins/sampleplugin": [
@@ -303,7 +304,6 @@
       "src/apps/mne_browse": [
         "Core",
         "Gui",
-        "Svg",
         "Widgets"
       ],
       "src/apps/mne_dipole_fit": [
@@ -370,7 +370,6 @@
       "src/apps/mne_scan/plugins/eegosports": [
         "Core",
         "Gui",
-        "Svg",
         "Widgets"
       ],
       "src/apps/mne_scan/plugins/fiffsimulator": [
@@ -420,7 +419,6 @@
       "src/apps/mne_scan/plugins/tmsi": [
         "Core",
         "Gui",
-        "Svg",
         "Widgets"
       ],
       "src/apps/mne_scan/plugins/writetofile": [
@@ -433,7 +431,6 @@
         "Gui",
         "GuiPrivate",
         "ShaderTools",
-        "Svg",
         "Widgets"
       ],
       "src/libs/mne/disp3D": [

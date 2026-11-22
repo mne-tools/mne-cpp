@@ -22,7 +22,6 @@
         "Qt::Gui",
         "Qt::GuiPrivate",
         "Qt::Widgets",
-        "Qt::Svg",
         "Qt::ShaderTools"
       ],
       "used_by": "disp, disp3D, applications, CLI tools; not the acquisition, processing or file I/O libraries",

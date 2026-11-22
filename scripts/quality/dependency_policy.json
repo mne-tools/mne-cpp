@@ -112,7 +112,6 @@
     "Qt::Core",
     "Qt::Gui",
     "Qt::GuiPrivate",
-    "Qt::Svg",
     "Qt::Widgets",
     "Qt::ShaderTools",
     "Eigen3::Eigen",

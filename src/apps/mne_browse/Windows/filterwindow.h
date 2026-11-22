@@ -32,7 +32,6 @@
 #include <QWidget>
 #include <QSettings>
 #include <QGraphicsScene>
-#include <QSvgGenerator>
 
 //=============================================================================================================
 // STL INCLUDES

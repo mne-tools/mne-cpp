@@ -43,7 +43,6 @@ list(PREPEND CMAKE_PREFIX_PATH "${_qt_candidate}")
 set(_mne_qt_components
     Core
     Gui
-    Svg
     Widgets
     ShaderTools
 )

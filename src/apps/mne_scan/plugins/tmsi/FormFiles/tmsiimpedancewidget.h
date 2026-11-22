@@ -34,7 +34,6 @@
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QtAlgorithms>
-#include <QtSvg/QSvgGenerator>
 
 //=============================================================================================================
 // STL INCLUDES

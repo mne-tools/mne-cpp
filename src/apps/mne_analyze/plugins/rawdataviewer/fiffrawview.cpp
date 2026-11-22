@@ -26,6 +26,7 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/eventmodel.h>
 
+#include <mne/disp/plots/helpers/svgwriter.h>
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
@@ -39,7 +40,7 @@
 #include <QScrollBar>
 #include <QDate>
 #include <QDir>
-#include <QSvgGenerator>
+#include <QPainter>
 #include <QAbstractScrollArea>
 #include <QEvent>
 #include <QKeyEvent>
@@ -334,12 +335,14 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
     if (imageType.contains("SVG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
 
-        QSvgGenerator svgGen;
+        mne::disp::SvgWriter svgGen;
         svgGen.setFileName(fileName);
         svgGen.setSize(m_pTableView->size());
         svgGen.setViewBox(m_pTableView->rect());
 
-        m_pTableView->render(&svgGen);
+        QPainter painter(&svgGen);
+        m_pTableView->render(&painter);
+        painter.end();
         Log::info("[FiffRawView::onMakeScreenshot] Saving SVG Screenshot");
     } else if (imageType.contains("PNG")) {
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.png").arg(sDate).arg(sTime);

@@ -18,6 +18,8 @@
 
 #include "filterwindow.h"
 
+#include <mne/disp/plots/helpers/svgwriter.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -440,7 +442,7 @@ void FilterWindow::exportFilterPlot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            QSvgGenerator svgGen;
+            SvgWriter svgGen;
 
             svgGen.setFileName(fileName);
             QRectF rect = m_pFilterPlotScene->itemsBoundingRect();

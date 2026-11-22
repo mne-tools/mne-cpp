@@ -22,6 +22,7 @@
 
 #include "helpers/rtfiffrawviewdelegate.h"
 #include "helpers/rtfiffrawviewmodel.h"
+#include "../plots/helpers/svgwriter.h"
 #include <mne/dsp/filterkernel.h>
 #include <mne/fiff/fiff_info.h>
 #include <mne/fiff/fiff_explain.h>
@@ -34,7 +35,7 @@
 #include <QHeaderView>
 #include <QTableView>
 #include <QMenu>
-#include <QSvgGenerator>
+#include <QPainter>
 #include <QSettings>
 #include <QScrollBar>
 #include <QMouseEvent>
@@ -469,12 +470,13 @@ void RtFiffRawView::takeScreenshot(const QString& fileName)
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
-        QSvgGenerator svgGen;
+        SvgWriter svgGen;
         svgGen.setFileName(fileName);
         svgGen.setSize(m_pTableView->size());
         svgGen.setViewBox(m_pTableView->rect());
 
-        m_pTableView->render(&svgGen);
+        QPainter painter(&svgGen);
+        m_pTableView->render(&painter);
     }
 
     if (fileName.contains(".png", Qt::CaseInsensitive)) {

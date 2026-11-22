@@ -22,6 +22,7 @@
 #include <mne/disp/plots/graph.h>
 #include <mne/disp/plots/helpers/colormap.h>
 #include <mne/disp/plots/helpers/figureexporter.h>
+#include <mne/disp/plots/helpers/svgwriter.h>
 #include <mne/disp/plots/imagesc.h>
 #include <mne/disp/plots/lineplot.h>
 #include <mne/disp/plots/plot.h>
@@ -33,7 +34,9 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QBuffer>
 #include <QImage>
+#include <QPainter>
 #include <QVector3D>
 
 //=============================================================================================================
@@ -228,6 +231,19 @@ int main(int argc, char* argv[])
     FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
     FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
     FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz bins.");
+
+    //! [svg_export]
+    QBuffer svgBuffer; // or svg.setFileName("line_plot.svg")
+    SvgWriter svg;
+    svg.setOutputDevice(&svgBuffer);
+    svg.setSize(line.size());
+    svg.setTitle("LinePlot");
+    QPainter svgPainter(&svg);
+    line.render(&svgPainter); // render(QPainter*) keeps child widgets in the same document
+    svgPainter.end();
+    //! [svg_export]
+    ok &= expect(svgBuffer.data().startsWith("<?xml") && svgBuffer.data().contains("<path") && svgBuffer.data().trimmed().endsWith("</svg>"),
+                 "SvgWriter writes the line plot as an SVG document with paths");
 
     std::println("{}", ok ? "All disp plot checks passed." : "disp plot checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -22,6 +22,7 @@
 #include "scalingview.h"
 #include "helpers/evokedsetmodel.h"
 #include "helpers/channelinfomodel.h"
+#include "../plots/helpers/svgwriter.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,7 +31,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QDebug>
-#include <QSvgGenerator>
 #include <QSettings>
 
 //=============================================================================================================
@@ -168,7 +168,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
     const QImage frame = grab().toImage();
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
-        QSvgGenerator svgGen;
+        SvgWriter svgGen;
         svgGen.setFileName(fileName);
         svgGen.setSize(this->size());
         svgGen.setViewBox(this->rect());

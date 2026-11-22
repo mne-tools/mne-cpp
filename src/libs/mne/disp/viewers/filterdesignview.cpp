@@ -24,6 +24,7 @@
 #include "ui_filterdesignview.h"
 
 #include "helpers/filterplotscene.h"
+#include "../plots/helpers/svgwriter.h"
 
 #include <mne/base/string_utils.h>
 #include <mne/dsp/filterio.h>
@@ -37,7 +38,7 @@
 #include <QDate>
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QSvgGenerator>
+#include <QPainter>
 #include <QCheckBox>
 #include <QSettings>
 #include <QApplication>
@@ -450,7 +451,7 @@ void FilterDesignView::onBtnExportFilterPlot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            QSvgGenerator svgGen;
+            SvgWriter svgGen;
 
             svgGen.setFileName(fileName);
             QRectF rect = m_pFilterPlotScene->itemsBoundingRect();

@@ -194,9 +194,12 @@ aliases; replace the old spelling as below.
   traceability matrix from `doc/api_registry.json` with per-library floors
   that may only rise (`scripts/compliance/traceability.py`). The
   "Medical-Device Readiness" page lists what is in place and the roadmap.
-- Qt Concurrent, Qt Network, Qt Multimedia, Qt XML and Qt Print Support are
-  no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets, SVG and
-  Shader Tools (plus Qt Test for the tests). Background work runs on
+- Qt Concurrent, Qt Network, Qt Multimedia, Qt XML, Qt Print Support and Qt
+  SVG are no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets and
+  Shader Tools (plus Qt Test for the tests). The SVG export of the viewers,
+  MNE Browse, MNE Analyze and the impedance widgets of MNE Scan goes through
+  the new `mne::disp::SvgWriter`, a paint device that writes SVG 1.1 with Qt
+  Gui only, in place of `QSvgGenerator`. Background work runs on
   `mne::ThreadPool` (new: `active_count()`), sockets are `mne_com`'s:
   `mne_rt_server` serves its command and data ports through them, and MNE
   Analyze Studio's services talk over loopback TCP whose port and access

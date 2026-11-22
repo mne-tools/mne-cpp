@@ -215,6 +215,7 @@ add_subdirectory(test_com)
 # Utils, disp, and disp3D coverage tests
 add_subdirectory(test_channels_layout_selection)
 add_subdirectory(test_disp_plots)
+add_subdirectory(test_disp_svg_writer)
 add_subdirectory(test_disp3d_viewstate)
 add_subdirectory(test_disp3d_brainsurface)
 add_subdirectory(test_disp3d_brainview)

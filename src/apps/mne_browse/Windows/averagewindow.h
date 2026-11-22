@@ -37,7 +37,6 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QSvgGenerator>
 
 //=============================================================================================================
 // STL INCLUDES

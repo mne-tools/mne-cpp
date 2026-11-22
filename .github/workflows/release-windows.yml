@@ -206,7 +206,7 @@ jobs:
         $vcvarsPath = Join-Path $vsInstallPath 'VC\Auxiliary\Build\vcvars64.bat'
         cmd.exe /c "call `"$vcvarsPath`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\.qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\Qt6_static" -skip webengine -nomake tests -nomake examples -opensource -confirm-license -init-submodules -submodules qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
+        ..\.qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\Qt6_static" -skip webengine -nomake tests -nomake examples -opensource -confirm-license -init-submodules -submodules qtbase,qtmultimedia,qtshadertools,qtserialport
         cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
         cmake --install .
     - name: Configure and compile MNE-CPP (static)

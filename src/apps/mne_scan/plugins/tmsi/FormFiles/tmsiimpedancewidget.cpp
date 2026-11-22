@@ -22,6 +22,7 @@
 #include "ui_tmsiimpedancewidget.h"
 #include "../tmsi.h"
 #include <mne/base/string_utils.h>
+#include <mne/disp/plots/helpers/svgwriter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,6 +30,7 @@
 
 #include <QCoreApplication>
 #include <QFileDialog>
+#include <QPainter>
 #include <QString>
 
 //=============================================================================================================
@@ -208,7 +210,7 @@ void TMSIImpedanceWidget::takeScreenshot()
     if (!fileName.isEmpty()) {
         // Generate screenshot
         if (fileName.contains(".svg")) {
-            QSvgGenerator svgGen;
+            mne::disp::SvgWriter svgGen;
 
             svgGen.setFileName(fileName);
             QRectF rect = m_qGScene->itemsBoundingRect();

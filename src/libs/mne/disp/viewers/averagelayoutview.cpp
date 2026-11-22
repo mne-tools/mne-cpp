@@ -25,6 +25,7 @@
 #include "helpers/channelinfomodel.h"
 #include "helpers/averagesceneitem.h"
 #include "helpers/selectionsceneitem.h"
+#include "../plots/helpers/svgwriter.h"
 #include <mne/fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -34,7 +35,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QGraphicsView>
-#include <QSvgGenerator>
+#include <QPainter>
 #include <QDebug>
 #include <QGraphicsItem>
 #include <QSettings>
@@ -158,7 +159,7 @@ void AverageLayoutView::takeScreenshot(const QString& fileName)
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
-        QSvgGenerator svgGen;
+        SvgWriter svgGen;
         svgGen.setFileName(fileName);
         QRectF rect = m_pAverageScene->itemsBoundingRect();
         svgGen.setSize(QSize(rect.width(), rect.height()));
