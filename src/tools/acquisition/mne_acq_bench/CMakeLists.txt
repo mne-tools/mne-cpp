@@ -15,7 +15,7 @@ else()
     add_executable(${PROJECT_NAME} main.cpp)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core mne_acq)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core mne_acq mne_base)
 if(TARGET mne_acq_fiff)
     target_link_libraries(${PROJECT_NAME} PRIVATE mne_acq_fiff)
     target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_ACQ_BENCH_RECORDING)

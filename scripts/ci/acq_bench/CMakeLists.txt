@@ -24,3 +24,8 @@ else()
 endif()
 add_executable(mne_acq_bench "${ACQ_ROOT}/src/tools/acquisition/mne_acq_bench/main.cpp")
 target_link_libraries(mne_acq_bench PRIVATE Qt6::Core mne_acq)
+# The tool logs through mne_base since 3.0; older commits do not need it
+if(EXISTS "${ACQ_ROOT}/src/libs/mne/base")
+  add_subdirectory("${ACQ_ROOT}/src/libs/mne/base" base)
+  target_link_libraries(mne_acq_bench PRIVATE mne_base)
+endif()
