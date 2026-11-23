@@ -194,6 +194,41 @@ Returns the rank of a matrix A.
 
 ---
 
+### thin_svd(A)
+
+Thin singular value decomposition that uses all cores for strongly rectangular matrices, such as whitened lead fields with a few hundred channels and tens of thousands of sources.
+
+The long dimension is split into blocks that are QR-factorised in parallel (tall-skinny QR); the stacked triangular factors are reduced by a second QR, whose small square factor goes to a divide-and-conquer SVD. Every step is Householder based, so the result is as accurate as a direct divide-and-conquer SVD; only the signs of singular vector pairs may differ. Nearly square or small matrices use the direct SVD.
+
+**Parameters:**
+
+- **A** : *const Eigen::MatrixXd &*
+  Matrix to decompose.
+
+**Returns:**
+
+- *ThinSvd* — The singular values and vectors.
+
+---
+
+### parallel_product(A, B)
+
+Matrix product A * B computed on all cores, by splitting B into column blocks.
+
+**Parameters:**
+
+- **A** : *const Eigen::MatrixXd &*
+  Left factor.
+
+- **B** : *const Eigen::MatrixXd &*
+  Right factor; A.cols() must equal B.rows().
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The product A * B.
+
+---
+
 ### sort(v, desc)
 
 Sorts a vector (ascending order) in place and returns the track of the original indices.
