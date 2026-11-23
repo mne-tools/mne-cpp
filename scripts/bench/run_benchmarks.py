@@ -244,8 +244,11 @@ def suite_inverse(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]
     cov = SAMPLE / "MEG/sample/sample_audvis-cov.fif"
     raw = SAMPLE / "MEG/sample/sample_audvis_raw.fif"
     with tempfile.TemporaryDirectory() as tmp:
+        # Like MNE-C, the tool regularises the noise covariance by default; MNE-Python's make_inverse_operator does
+        # not, so regularisation is switched off to compute the same operator (equal to single precision)
         command = [str(binary(build, "mne_inverse_operator")), "--fwd", str(fwd), "--noisecov", str(cov), "--meg",
-                   "--eeg", "--loose", "0.2", "--depth", "--inv", str(Path(tmp) / "cpp-inv.fif")]
+                   "--eeg", "--loose", "0.2", "--depth", "--magreg", "0", "--gradreg", "0", "--eegreg", "0",
+                   "--inv", str(Path(tmp) / "cpp-inv.fif")]
         cpp = repeated(args.repeats, lambda: measured(command, tool_env(build))[0])
         series = [{"label": "MNE-CPP", "points": [{"x": "MEG+EEG, loose 0.2, depth", "y": cpp["median"]}]}]
         if args.python:
@@ -258,7 +261,8 @@ def suite_inverse(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]
             py = repeated(args.repeats, lambda: python_timed(args.python, code))
             series.append({"label": "MNE-Python", "points": [{"x": "MEG+EEG, loose 0.2, depth", "y": py["median"]}]})
     return [{"id": "inverse", "title": "Inverse operator", "unit": "s", "higher_is_better": False,
-             "subtitle": "MNE sample data; read forward and covariance, assemble, write; median of runs",
+             "subtitle": ("MNE sample data; read forward and covariance, assemble, write; median of runs. MNE-CPP includes "
+                          "process start, MNE-Python excludes interpreter start and import"),
              "command": "python3 scripts/bench/run_benchmarks.py --suites inverse", "series": series}]
 
 
