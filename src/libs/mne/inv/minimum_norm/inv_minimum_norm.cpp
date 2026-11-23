@@ -583,7 +583,8 @@ void InvMinimumNorm::computeELoreta()
 
     // SVD of A = G * R^{1/2}, shape (nChan, nSrc*nOrient)
     // A = U * Σ * V^T  →  U: (nChan, ncomp), V: (nSrc*nOrient, ncomp)
-    JacobiSVD<MatrixXd> svd(A, ComputeThinU | ComputeThinV);
+    // Divide and conquer, like LAPACK's gesdd in MNE-Python: the one-sided Jacobi SVD takes several times longer
+    BDCSVD<MatrixXd, ComputeThinU | ComputeThinV> svd(A);
     const VectorXd newSing = svd.singularValues(); // (ncomp,)
     const MatrixXd newU = svd.matrixU();           // (nChan, ncomp)
     const MatrixXd newV = svd.matrixV();           // (nSrc*nOrient, ncomp)

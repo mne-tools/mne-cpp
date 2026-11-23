@@ -621,7 +621,8 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     // 12. Decompose the combined matrix
     //
     Log::info("Computing SVD of whitened and weighted lead field matrix.\n");
-    JacobiSVD<MatrixXd> svd(gain, ComputeThinU | ComputeThinV);
+    // Divide and conquer, like LAPACK's gesdd in MNE-Python: the one-sided Jacobi SVD takes several times longer
+    BDCSVD<MatrixXd, ComputeThinU | ComputeThinV> svd(gain);
     // TODO: verify whether explicit sorting is necessary
     VectorXd p_sing = svd.singularValues();
     MatrixXd t_U = svd.matrixU();

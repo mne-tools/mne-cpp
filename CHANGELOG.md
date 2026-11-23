@@ -194,6 +194,10 @@ aliases; replace the old spelling as below.
   traceability matrix from `doc/api_registry.json` with per-library floors
   that may only rise (`scripts/compliance/traceability.py`). The
   "Medical-Device Readiness" page lists what is in place and the roadmap.
+- The inverse operator's decomposition of the whitened lead field uses Eigen's
+  divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
+  CPU time for the MNE sample data, with the same source estimates to single
+  precision.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
