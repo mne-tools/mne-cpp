@@ -194,6 +194,13 @@ aliases; replace the old spelling as below.
   traceability matrix from `doc/api_registry.json` with per-library floors
   that may only rise (`scripts/compliance/traceability.py`). The
   "Medical-Device Readiness" page lists what is in place and the roadmap.
+- `scripts/bench/` measures MNE-CPP for the website's Performance page:
+  acquisition throughput, wake-up latency and loss-free paced rates
+  (`mne_acq_bench`), forward and inverse computation against MNE-Python on
+  the same sample data, and start-up time and memory. `refresh.sh` measures,
+  writes the results JSON, renders SVG charts that name the machine, OS,
+  compiler, commit and the command to reproduce them, and regenerates the
+  page. A run that loses samples is reported on the chart, not hidden.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single
