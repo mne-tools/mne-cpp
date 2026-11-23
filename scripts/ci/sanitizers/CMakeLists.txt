@@ -39,7 +39,7 @@ foreach(_dir ${_acq_tests})
         target_compile_definitions(${_name} PRIVATE ACQ_RECORDER_CHECK_SCRIPT="${_dir}/check_recording.py")
     elseif(_name STREQUAL "test_acq_devices")
         # The stand-ins for the eego SDK and BrainFlow libraries the drivers load at run time
-        target_link_libraries(${_name} PRIVATE Qt6::Core Qt6::Test mne_acq_devices)
+        target_link_libraries(${_name} PRIVATE Qt6::Core Qt6::Test mne_acq_devices mne_base)
         add_library(eego_sdk_stub SHARED "${_dir}/eego_sdk_stub.cpp")
         set_target_properties(eego_sdk_stub PROPERTIES PREFIX "" OUTPUT_NAME "eego-SDK-stub")
         add_library(brainflow_stub SHARED "${_dir}/brainflow_stub.cpp")
