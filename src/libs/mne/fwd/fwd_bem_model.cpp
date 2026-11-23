@@ -1283,12 +1283,10 @@ void FwdBemModel::fwd_bem_pot_grad_calc(const Eigen::Vector3f& rd, const Eigen::
         if (els) {
             FwdBemSolution* sol = els->user_data.get();
             nSolutions = sol->ncoil;
-            for (k = 0; k < nSolutions; k++)
-                grad[k] = sol->solution.row(k).dot(v0);
+            grad.head(nSolutions).noalias() = sol->solution.topRows(nSolutions) * v0;
         } else {
             nSolutions = all_surfs ? this->nsol : surfs[0]->ntri;
-            for (k = 0; k < nSolutions; k++)
-                grad[k] = solution.row(k).dot(v0);
+            grad.head(nSolutions).noalias() = solution.topRows(nSolutions) * v0;
         }
     }
     return;
@@ -1325,12 +1323,10 @@ void FwdBemModel::fwd_bem_lin_pot_calc(const Eigen::Vector3f& rd, const Eigen::V
     if (els) {
         FwdBemSolution* sol = els->user_data.get();
         nSolutions = sol->ncoil;
-        for (k = 0; k < nSolutions; k++)
-            pot[k] = sol->solution.row(k).dot(v0);
+        pot.head(nSolutions).noalias() = sol->solution.topRows(nSolutions) * v0;
     } else {
         nSolutions = all_surfs ? this->nsol : surfs[0]->np;
-        for (k = 0; k < nSolutions; k++)
-            pot[k] = solution.row(k).dot(v0);
+        pot.head(nSolutions).noalias() = solution.topRows(nSolutions) * v0;
     }
     return;
 }
@@ -1376,12 +1372,10 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(const Eigen::Vector3f& rd, const Eig
         if (els) {
             FwdBemSolution* sol = els->user_data.get();
             nSolutions = sol->ncoil;
-            for (k = 0; k < nSolutions; k++)
-                grad[k] = sol->solution.row(k).dot(v0);
+            grad.head(nSolutions).noalias() = sol->solution.topRows(nSolutions) * v0;
         } else {
             nSolutions = all_surfs ? this->nsol : surfs[0]->np;
-            for (k = 0; k < nSolutions; k++)
-                grad[k] = solution.row(k).dot(v0);
+            grad.head(nSolutions).noalias() = solution.topRows(nSolutions) * v0;
         }
     }
     return;
@@ -1419,12 +1413,10 @@ void FwdBemModel::fwd_bem_pot_calc(const Eigen::Vector3f& rd, const Eigen::Vecto
     if (els) {
         FwdBemSolution* sol = els->user_data.get();
         nSolutions = sol->ncoil;
-        for (k = 0; k < nSolutions; k++)
-            pot[k] = sol->solution.row(k).dot(v0);
+        pot.head(nSolutions).noalias() = sol->solution.topRows(nSolutions) * v0;
     } else {
         nSolutions = all_surfs ? this->nsol : surfs[0]->ntri;
-        for (k = 0; k < nSolutions; k++)
-            pot[k] = solution.row(k).dot(v0);
+        pot.head(nSolutions).noalias() = solution.topRows(nSolutions) * v0;
     }
     return;
 }
@@ -2029,8 +2021,7 @@ void FwdBemModel::fwd_bem_lin_field_calc(const Eigen::Vector3f& rd, const Eigen:
     /*
        * Volume current contribution
        */
-    for (k = 0; k < coils.ncoil(); k++)
-        B[k] = B[k] + sol->solution.row(k).dot(v0);
+    B.head(coils.ncoil()).noalias() += sol->solution * v0;
     /*
        * Scale correctly
        */
@@ -2089,8 +2080,7 @@ void FwdBemModel::fwd_bem_field_calc(const Eigen::Vector3f& rd, const Eigen::Vec
     /*
        * Volume current contribution
        */
-    for (k = 0; k < coils.ncoil(); k++)
-        B[k] = B[k] + sol->solution.row(k).dot(v0);
+    B.head(coils.ncoil()).noalias() += sol->solution * v0;
     /*
        * Scale correctly
        */
@@ -2161,8 +2151,7 @@ void FwdBemModel::fwd_bem_field_grad_calc(const Eigen::Vector3f& rd, const Eigen
         /*
          * Volume current contribution
          */
-        for (k = 0; k < coils.ncoil(); k++)
-            grad[k] = grad[k] + sol->solution.row(k).dot(v0);
+        grad.head(coils.ncoil()).noalias() += sol->solution * v0;
         /*
          * Scale correctly
          */
@@ -2268,8 +2257,7 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(const Eigen::Vector3f& rd, const E
         /*
          * Volume current contribution
          */
-        for (k = 0; k < coils.ncoil(); k++)
-            grad[k] = grad[k] + sol->solution.row(k).dot(v0);
+        grad.head(coils.ncoil()).noalias() += sol->solution * v0;
         /*
          * Scale correctly
          */

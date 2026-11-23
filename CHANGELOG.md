@@ -214,6 +214,12 @@ aliases; replace the old spelling as below.
   5 s, faster than MNE-Python on the same machine. The benchmark disables the
   tool's MNE-C style noise-covariance regularisation, so both compute the same
   operator.
+- The BEM forward model multiplies its coil and electrode solution matrices
+  with the infinite-medium potentials in one matrix-vector product instead of
+  one strided dot product per sensor. The MNE sample forward solution (oct-6,
+  MEG and EEG, three-layer BEM) takes 3.5 s instead of 19 s and 7 s of CPU
+  time instead of 93 s; MNE-Python takes 13 s. With `--accurate`, the coil
+  definitions MNE-Python uses, both agree to 2e-5; the benchmark passes it.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
