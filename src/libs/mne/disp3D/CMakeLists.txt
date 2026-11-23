@@ -168,28 +168,11 @@ set(MNE_LIBS_REQUIRED
     mne_connectivity
 )
 
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-  if (WIN32)
-    set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-  elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-  endif()
-endif()
-
 # The public headers include Qt
 target_link_libraries(${PROJECT_NAME} PUBLIC ${QT_REQUIRED_COMPONENT_LIBS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
-    Eigen3::Eigen
-    ${FFTW_LIBS})
+    Eigen3::Eigen)
 
 # Qt6::GuiPrivate is PRIVATE — QRhi details are fully encapsulated in .cpp files.
 # Public headers use only forward declarations and lightweight rendertypes.h enums.

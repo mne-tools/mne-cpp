@@ -95,10 +95,6 @@ std::vector<MatrixXcd> Spectral::computeTaperedSpectraMatrix(const MatrixXd& mat
                                                              int iNfft,
                                                              bool bUseThreads)
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     std::vector<MatrixXcd> finalResult;
 
     if (!bUseThreads) {

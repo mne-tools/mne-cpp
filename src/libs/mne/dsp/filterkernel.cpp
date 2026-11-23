@@ -34,9 +34,6 @@
 //=============================================================================================================
 
 #include <Eigen/SparseCore>
-//#ifndef EIGEN_FFTW_DEFAULT
-//#define EIGEN_FFTW_DEFAULT
-//#endif
 #include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
@@ -168,10 +165,6 @@ RowVectorXd FilterKernel::apply_conv_filter(const RowVectorXd& vecData,
 void FilterKernel::apply_fft_filter(RowVectorXd& vecData,
                                     bool bKeepOverhead)
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     // Make sure we always have the correct FFT length for the given input data and filter overlap
     int iFftLength = vecData.cols() + m_vecCoeff.cols();
     int exp = ceil(Numerics::log2(iFftLength));
@@ -356,10 +349,6 @@ void FilterKernel::set_fft_coefficients(const Eigen::RowVectorXcd& vecFftCoeff)
 
 bool FilterKernel::fft_transform_coeffs(int iFftLength)
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     if (m_vecCoeff.cols() > iFftLength) {
         Log::warning("[FilterKernel::fft_transform_coeffs] The number of filter taps is bigger than the FFT length.");
         return false;

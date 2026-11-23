@@ -64,8 +64,6 @@ Makefile
 mne-cpp.pro.user*
 compile_commands.json
 
-# FFTW
-/src/3rdparty/fftw
 /src/3rdparty/qt/
 /src/3rdparty/eigen/
 /src/3rdparty/eigen-*/

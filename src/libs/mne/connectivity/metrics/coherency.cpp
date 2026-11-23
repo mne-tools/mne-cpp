@@ -68,10 +68,6 @@ void Coherency::calculateAbs(Network& finalNetwork,
         return;
     }
 
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getFFTSize();
 
@@ -122,10 +118,6 @@ void Coherency::calculateImag(Network& finalNetwork,
         Log::debug("Coherency::calculateImag - Input data is empty");
         return;
     }
-
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
 
     int iSignalLength = connectivitySettings.at(0).matData.cols();
     int iNfft = connectivitySettings.getFFTSize();

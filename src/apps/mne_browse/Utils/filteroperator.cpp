@@ -91,10 +91,6 @@ FilterOperator::~FilterOperator()
 
 void FilterOperator::fftTransformCoeffs()
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     //This function only nneds to be called when using the Tschebyscheff design method
     //zero-pad m_dCoeffA to m_iFFTlength
     RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
@@ -114,10 +110,6 @@ void FilterOperator::fftTransformCoeffs()
 
 RowVectorXd FilterOperator::applyFFTFilter(const RowVectorXd& data) const
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     if (data.size() == 0 || m_dCoeffA.size() == 0) {
         return data;
     }

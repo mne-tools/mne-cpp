@@ -23,9 +23,6 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-//#ifndef EIGEN_FFTW_DEFAULT
-//#define EIGEN_FFTW_DEFAULT
-//#endif
 #include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
@@ -62,10 +59,6 @@ CosineFilter::CosineFilter(int fftLength,
                            double sFreq,
                            TPassType type)
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     m_iFilterOrder = fftLength;
 
     int highpasss, lowpasss;

@@ -194,6 +194,9 @@ aliases; replace the old spelling as below.
   traceability matrix from `doc/api_registry.json` with per-library floors
   that may only rise (`scripts/compliance/traceability.py`). The
   "Medical-Device Readiness" page lists what is in place and the roadmap.
+- The `USE_FFTW` option is gone. It never reached the compiler (no build
+  defined `EIGEN_FFTW_DEFAULT`), so every FFT has always run on Eigen's
+  built-in KISS FFT; the dead FFTW plumbing in the build is removed.
 - Qt Concurrent, Qt Network, Qt Multimedia, Qt XML, Qt Print Support and Qt
   SVG are no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets and
   Shader Tools (plus Qt Test for the tests). The SVG export of the viewers,

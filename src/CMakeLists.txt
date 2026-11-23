@@ -43,8 +43,6 @@ option(NO_IPC "Build project with no interprocess communication features (shared
 
 option(WASM "Setup build for wasm" OFF)
 
-option(USE_FFTW "Use fftw backend for Eigen3::Eigen" OFF)
-
 option(USE_ONNXRUNTIME "Enable ONNX Runtime backend for the ml library" ON)
 
 # Keep the build warning-free. Enabling this treats compiler warnings on
@@ -110,12 +108,6 @@ if(MNE_LOG_MODE STREQUAL "FORMATTED")
     add_compile_definitions(MNE_LOG_MODE_FORMATTED)
 endif()
 message(STATUS "[MNE-CPP] Log mode: ${MNE_LOG_MODE}")
-
-set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/3rdparty/fftw")
-set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/3rdparty/fftw")
-if(USE_FFTW)
-  set(EIGEN_FFTW_DEFAULT)
-endif()
 
 # NOTE: WITH_CODE_COV coverage flags are applied in src/libs/,
 # src/apps/, and src/tools/ CMakeLists.txt so that gcov data

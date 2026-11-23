@@ -61,9 +61,6 @@ MatrixXd Spectrogram::make_spectrogram(VectorXd signal, int windowSize)
     const double norm = std::pow(2.0, 0.25) / std::sqrt(scale);
     const ArrayXd samples = ArrayXd::LinSpaced(n, 0.0, static_cast<double>(n - 1));
 
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
     ThreadPool& pool = ThreadPool::global();
     const Index chunks = std::min<Index>(n, 4 * static_cast<Index>(pool.thread_count()) + 1);
     pool.parallel_for(0, static_cast<std::size_t>(chunks), [&](std::size_t chunk) {

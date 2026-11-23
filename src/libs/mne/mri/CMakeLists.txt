@@ -32,22 +32,6 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${PRIVATE_HEADERS})
 include(${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/MneWarnings.cmake)
 mne_warn_on_narrowing(${PROJECT_NAME})
 
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-  if (WIN32)
-    set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-  elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-  endif()
-endif()
-
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
 set(MNE_LIBS_REQUIRED

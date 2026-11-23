@@ -25,9 +25,6 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-//#ifndef EIGEN_FFTW_DEFAULT
-//#define EIGEN_FFTW_DEFAULT
-//#endif
 #include <unsupported/Eigen/FFT>
 
 //=============================================================================================================

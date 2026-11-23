@@ -215,25 +215,9 @@ if(MNE_DISP_HAS_RHIWIDGET)
     )
 endif()
 
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-  if(WIN32)
-    set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-  elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-  endif()
-endif()
-
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
-target_include_directories(${PROJECT_NAME} PRIVATE . ${FFTW_LIBS})
+target_include_directories(${PROJECT_NAME} PRIVATE .)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")

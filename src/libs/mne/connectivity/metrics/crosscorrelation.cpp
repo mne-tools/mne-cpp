@@ -60,10 +60,6 @@ CrossCorrelation::CrossCorrelation()
 
 Network CrossCorrelation::calculate(ConnectivitySettings& connectivitySettings)
 {
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     Network finalNetwork("XCOR");
 
     if (connectivitySettings.empty()) {

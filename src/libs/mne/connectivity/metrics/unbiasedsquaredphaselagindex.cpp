@@ -75,10 +75,6 @@ Network UnbiasedSquaredPhaseLagIndex::calculate(ConnectivitySettings& connectivi
 
     finalNetwork.set_sampling_frequency(connectivitySettings.getSamplingFrequency());
 
-#ifdef EIGEN_FFTW_DEFAULT
-    fftw_make_planner_thread_safe();
-#endif
-
     //Create nodes
     int rows = connectivitySettings.at(0).matData.rows();
     add_nodes(finalNetwork, rows, connectivitySettings.getNodePositions());

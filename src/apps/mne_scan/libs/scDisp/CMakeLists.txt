@@ -48,22 +48,6 @@ set(RESOURCES
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-  if (WIN32)
-    set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-  elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-  endif()
-endif()
-
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
@@ -87,8 +71,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
-    scMeas
-    ${FFTW_LIBS})
+    scMeas)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE SCDISP_LIBRARY)
 

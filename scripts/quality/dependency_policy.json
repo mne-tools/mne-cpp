@@ -126,8 +126,6 @@
     "ws2_32"
   ],
   "ignored_variables": [
-    "FFTW_LIBS",
-    "FFTW_DIR_LIBS",
     "CMAKE_DL_LIBS"
   ],
   "$exception_schema": {

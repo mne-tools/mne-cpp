@@ -94,22 +94,6 @@ list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/fiff_explanations.cpp")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-  if (WIN32)
-    set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-  elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-  endif()
-endif()
-
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..> $<INSTALL_INTERFACE:include>)
 
 set(MNE_LIBS_REQUIRED 
@@ -119,8 +103,7 @@ set(MNE_LIBS_REQUIRED
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
-    Eigen3::Eigen
-    ${FFTW_LIBS})
+    Eigen3::Eigen)
 
 # The public headers return std::expected.
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
