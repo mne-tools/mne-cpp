@@ -186,6 +186,50 @@ public:
 
     //=========================================================================================================
     /**
+     * Result of thin_svd(): A = U * diag(singularValues) * V^T.
+     *
+     * @since 3.0.0
+     */
+    struct ThinSvd
+    {
+        Eigen::VectorXd singularValues; /**< min(rows, cols) singular values in descending order. */
+        Eigen::MatrixXd U;              /**< Left singular vectors, rows x min(rows, cols). */
+        Eigen::MatrixXd V;              /**< Right singular vectors, cols x min(rows, cols). */
+    };
+
+    //=========================================================================================================
+    /**
+     * Thin singular value decomposition that uses all cores for strongly rectangular matrices, such as
+     * whitened lead fields with a few hundred channels and tens of thousands of sources.
+     *
+     * The long dimension is split into blocks that are QR-factorised in parallel (tall-skinny QR); the stacked
+     * triangular factors are reduced by a second QR, whose small square factor goes to a divide-and-conquer SVD.
+     * Every step is Householder based, so the result is as accurate as a direct divide-and-conquer SVD; only the
+     * signs of singular vector pairs may differ. Nearly square or small matrices use the direct SVD.
+     *
+     * @param[in] A   Matrix to decompose.
+     *
+     * @return The singular values and vectors.
+     *
+     * @since 3.0.0
+     */
+    static ThinSvd thin_svd(const Eigen::MatrixXd& A);
+
+    //=========================================================================================================
+    /**
+     * Matrix product A * B computed on all cores, by splitting B into column blocks.
+     *
+     * @param[in] A   Left factor.
+     * @param[in] B   Right factor; A.cols() must equal B.rows().
+     *
+     * @return The product A * B.
+     *
+     * @since 3.0.0
+     */
+    static Eigen::MatrixXd parallel_product(const Eigen::MatrixXd& A, const Eigen::MatrixXd& B);
+
+    //=========================================================================================================
+    /**
      * Sorts a vector (ascending order) in place and returns the track of the original indices.
      *
      * @param[in, out] v     Vector to sort; it's sorted in place.

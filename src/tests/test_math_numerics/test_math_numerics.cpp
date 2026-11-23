@@ -34,6 +34,13 @@
 #include <Eigen/SparseCore>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <random>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -111,6 +118,11 @@ private slots:
     // pinv (pseudo-inverse) - inspired by mne-python test_linalg.py _reg_pinv tests
     void testPinv();
     void testPinvRankDeficient();
+
+    // thin_svd
+    void testThinSvd_data();
+    void testThinSvd();
+    void testParallelProduct();
 
     void cleanupTestCase();
 
@@ -203,10 +215,7 @@ void TestMNEMath::testConditionSlope()
 void TestMNEMath::testGetWhitener()
 {
     // Create a simple 3x3 symmetric positive definite matrix (covariance)
-    MatrixXd cov(3, 3);
-    cov << 4.0, 2.0, 0.0,
-        2.0, 3.0, 1.0,
-        0.0, 1.0, 2.0;
+    const Matrix3d cov{{4.0, 2.0, 0.0}, {2.0, 3.0, 1.0}, {0.0, 1.0, 2.0}};
 
     VectorXd eig;
     MatrixXd eigvec;
@@ -676,6 +685,90 @@ void TestMNEMath::testPinvRankDeficient()
     // Moore-Penrose: A * A+ * A ≈ A
     MatrixXd reconstructed = A * A_pinv * A;
     QVERIFY(reconstructed.isApprox(A, 1e-8));
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+MatrixXd randomMatrix(Index rows, Index cols, unsigned int seed)
+{
+    std::mt19937 generator(seed);
+    std::uniform_real_distribution<double> uniform(-1.0, 1.0);
+    MatrixXd matrix(rows, cols);
+    for (Index j = 0; j < cols; ++j)
+        for (Index i = 0; i < rows; ++i)
+            matrix(i, j) = uniform(generator);
+    return matrix;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestMNEMath::testThinSvd_data()
+{
+    QTest::addColumn<int>("rows");
+    QTest::addColumn<int>("cols");
+    QTest::addColumn<int>("rank");
+    QTest::newRow("small, direct") << 40 << 7 << 7;
+    QTest::newRow("tall, blocked") << 9000 << 120 << 120;
+    QTest::newRow("wide, blocked") << 120 << 9000 << 120;
+    QTest::newRow("wide, rank deficient") << 120 << 9000 << 100;
+}
+
+void TestMNEMath::testThinSvd()
+{
+    QFETCH(int, rows);
+    QFETCH(int, cols);
+    QFETCH(int, rank);
+
+    const int k = std::min(rows, cols);
+    MatrixXd left = randomMatrix(rows, rank, 7);
+    left.array().rowwise() *= RowVectorXd::LinSpaced(rank, 1.0, 1e3).array();
+    const MatrixXd A = left * randomMatrix(rank, cols, 8);
+
+    const Linalg::ThinSvd svd = Linalg::thin_svd(A);
+    QCOMPARE(svd.singularValues.size(), static_cast<Index>(k));
+    QCOMPARE(svd.U.rows(), static_cast<Index>(rows));
+    QCOMPARE(svd.U.cols(), static_cast<Index>(k));
+    QCOMPARE(svd.V.rows(), static_cast<Index>(cols));
+    QCOMPARE(svd.V.cols(), static_cast<Index>(k));
+
+    const BDCSVD<MatrixXd> reference(A);
+    const double scale = reference.singularValues()(0);
+    QVERIFY((svd.singularValues - reference.singularValues()).cwiseAbs().maxCoeff() < 1e-12 * scale);
+    for (Index i = 1; i < k; ++i)
+        QVERIFY(svd.singularValues(i) <= svd.singularValues(i - 1));
+
+    MatrixXd reconstructed = svd.U;
+    reconstructed.array().rowwise() *= svd.singularValues.transpose().array();
+    reconstructed = reconstructed * svd.V.transpose();
+    QVERIFY((reconstructed - A).cwiseAbs().maxCoeff() < 1e-12 * scale);
+    // Vectors of non-zero singular values are orthonormal
+    const MatrixXd Ur = svd.U.leftCols(rank);
+    const MatrixXd Vr = svd.V.leftCols(rank);
+    QVERIFY((Ur.transpose() * Ur - MatrixXd::Identity(rank, rank)).cwiseAbs().maxCoeff() < 1e-10);
+    QVERIFY((Vr.transpose() * Vr - MatrixXd::Identity(rank, rank)).cwiseAbs().maxCoeff() < 1e-10);
+}
+
+//=============================================================================================================
+
+void TestMNEMath::testParallelProduct()
+{
+    const MatrixXd A = randomMatrix(300, 200, 11);
+    const MatrixXd B = randomMatrix(200, 1001, 12);
+    const MatrixXd expected = A * B;
+    const MatrixXd product = Linalg::parallel_product(A, B);
+    QCOMPARE(product.rows(), expected.rows());
+    QCOMPARE(product.cols(), expected.cols());
+    QVERIFY((product - expected).cwiseAbs().maxCoeff() < 1e-12);
+
+    const MatrixXd topA = A.topRows(3);
+    const MatrixXd leftB = B.leftCols(2);
+    const MatrixXd small = Linalg::parallel_product(topA, leftB);
+    QVERIFY((small - expected.topLeftCorner(3, 2)).cwiseAbs().maxCoeff() < 1e-12);
 }
 
 //=============================================================================================================

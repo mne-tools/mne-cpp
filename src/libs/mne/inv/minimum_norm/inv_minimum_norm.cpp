@@ -583,11 +583,10 @@ void InvMinimumNorm::computeELoreta()
 
     // SVD of A = G * R^{1/2}, shape (nChan, nSrc*nOrient)
     // A = U * Σ * V^T  →  U: (nChan, ncomp), V: (nSrc*nOrient, ncomp)
-    // Divide and conquer, like LAPACK's gesdd in MNE-Python: the one-sided Jacobi SVD takes several times longer
-    BDCSVD<MatrixXd, ComputeThinU | ComputeThinV> svd(A);
-    const VectorXd newSing = svd.singularValues(); // (ncomp,)
-    const MatrixXd newU = svd.matrixU();           // (nChan, ncomp)
-    const MatrixXd newV = svd.matrixV();           // (nSrc*nOrient, ncomp)
+    Linalg::ThinSvd svd = Linalg::thin_svd(A);
+    const VectorXd newSing = std::move(svd.singularValues); // (ncomp,)
+    const MatrixXd newU = std::move(svd.U);                 // (nChan, ncomp)
+    const MatrixXd newV = std::move(svd.V);                 // (nSrc*nOrient, ncomp)
 
     // Build R^{1/2}-weighted eigen_leads: weightedLeads[i,:] = R_sqrt[i] * V[i,:]
     MatrixXd weightedLeads = newV; // (nSrc*nOrient, ncomp)

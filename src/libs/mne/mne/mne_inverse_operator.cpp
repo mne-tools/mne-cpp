@@ -594,7 +594,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     // 9. Apply whitening to the forward computation matrix
     //
     Log::info("\tWhitening the forward solution.\n");
-    gain = whitener * gain;
+    gain = Linalg::parallel_product(whitener, gain);
 
     // 10. Exclude the source space points within the labels (not done)
 
@@ -607,10 +607,9 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     Log::info("\tAdjusting source covariance matrix.\n");
     RowVectorXd source_std = p_source_cov.data.array().sqrt().transpose();
 
-    for (std::int32_t i = 0; i < gain.rows(); ++i)
-        gain.row(i) = gain.row(i).array() * source_std.array();
+    gain.array().rowwise() *= source_std.array();
 
-    double trace_GRGT = (gain * gain.transpose()).trace();
+    double trace_GRGT = gain.squaredNorm();
     double scaling_source_cov = static_cast<double>(n_nzero) / trace_GRGT;
 
     p_source_cov.data.array() *= scaling_source_cov;
@@ -621,26 +620,20 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     // 12. Decompose the combined matrix
     //
     Log::info("Computing SVD of whitened and weighted lead field matrix.\n");
-    // Divide and conquer, like LAPACK's gesdd in MNE-Python: the one-sided Jacobi SVD takes several times longer
-    BDCSVD<MatrixXd, ComputeThinU | ComputeThinV> svd(gain);
-    // TODO: verify whether explicit sorting is necessary
-    VectorXd p_sing = svd.singularValues();
-    MatrixXd t_U = svd.matrixU();
-    Linalg::sort<double>(p_sing, t_U);
-    FiffNamedMatrix p_eigen_fields(svd.matrixU().cols(),
-                                   svd.matrixU().rows(),
+    // Parallel tall-skinny QR followed by divide and conquer; singular values come in descending order
+    Linalg::ThinSvd svd = Linalg::thin_svd(gain);
+    VectorXd p_sing = std::move(svd.singularValues);
+    FiffNamedMatrix p_eigen_fields(svd.U.cols(),
+                                   svd.U.rows(),
                                    {},
                                    gain_info.ch_names,
-                                   t_U.transpose());
+                                   svd.U.transpose());
 
-    p_sing = svd.singularValues();
-    MatrixXd t_V = svd.matrixV();
-    Linalg::sort<double>(p_sing, t_V);
-    FiffNamedMatrix p_eigen_leads(svd.matrixV().rows(),
-                                  svd.matrixV().cols(),
+    FiffNamedMatrix p_eigen_leads(svd.V.rows(),
+                                  svd.V.cols(),
                                   {},
                                   {},
-                                  t_V);
+                                  svd.V);
     Log::info("\tlargest singular value = {:f}\n", p_sing.maxCoeff());
     Log::info("\tscaling factor to adjust the trace = {:f}\n", trace_GRGT);
 
@@ -700,7 +693,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo& inf
     inv.nsource = forward.nsource;
     inv.coord_frame = forward.coord_frame;
     inv.source_nn = forward.source_nn;
-    inv.src = forward.src;
+    inv.src = std::move(forward.src);
     inv.info = forward.info;
     inv.info.bads = info.bads;
 

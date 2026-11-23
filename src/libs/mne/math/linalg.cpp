@@ -31,6 +31,8 @@
 
 #include "linalg.h"
 
+#include <mne/base/thread_pool.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -41,6 +43,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cstdio>
 #include <string>
 
@@ -71,6 +74,102 @@ VectorXd Linalg::combine_xyz(const VectorXd& vec)
         comb[i] = sC.coeff(i, i);
 
     return comb;
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+// Thin SVD of a matrix with at least as many rows as columns
+Linalg::ThinSvd thin_svd_tall(const MatrixXd& A)
+{
+    const Index m = A.rows();
+    const Index n = A.cols();
+    ThreadPool& pool = ThreadPool::global();
+    // Each block must hold at least two square factors' worth of rows to pay for the extra reduction
+    const Index blocks = std::min<Index>(static_cast<Index>(pool.thread_count()) + 1, n > 0 ? m / (2 * n) : 1);
+
+    Linalg::ThinSvd result;
+    if (blocks < 2 || m * n < 1000000) {
+        BDCSVD<MatrixXd, ComputeThinU | ComputeThinV> svd(A);
+        result.singularValues = svd.singularValues();
+        result.U = svd.matrixU();
+        result.V = svd.matrixV();
+        return result;
+    }
+
+    std::vector<Index> starts(static_cast<std::size_t>(blocks) + 1);
+    for (Index b = 0; b <= blocks; ++b)
+        starts[static_cast<std::size_t>(b)] = b * m / blocks;
+
+    std::vector<HouseholderQR<MatrixXd>> local(static_cast<std::size_t>(blocks));
+    MatrixXd stacked(blocks * n, n);
+    pool.parallel_for(0, static_cast<std::size_t>(blocks), [&](std::size_t b) {
+        const Index rows = starts[b + 1] - starts[b];
+        local[b].compute(A.middleRows(starts[b], rows));
+        stacked.middleRows(static_cast<Index>(b) * n, n) =
+            local[b].matrixQR().topRows(n).triangularView<Upper>().toDenseMatrix();
+    });
+
+    const HouseholderQR<MatrixXd> top(stacked);
+    const MatrixXd R = top.matrixQR().topRows(n).triangularView<Upper>();
+    BDCSVD<MatrixXd, ComputeFullU | ComputeFullV> small(R);
+
+    // The columns of W are independent, so the reduction's orthogonal factor is applied block by block in parallel
+    MatrixXd W = MatrixXd::Zero(blocks * n, n);
+    W.topRows(n) = small.matrixU();
+    pool.parallel_for(0, static_cast<std::size_t>(blocks), [&](std::size_t b) {
+        const Index first = static_cast<Index>(b) * n / blocks;
+        const Index last = (static_cast<Index>(b) + 1) * n / blocks;
+        auto columns = W.middleCols(first, last - first);
+        columns.applyOnTheLeft(top.householderQ());
+    });
+
+    result.singularValues = small.singularValues();
+    result.V = small.matrixV();
+    result.U.resize(m, n);
+    pool.parallel_for(0, static_cast<std::size_t>(blocks), [&](std::size_t b) {
+        const Index rows = starts[b + 1] - starts[b];
+        MatrixXd Y = MatrixXd::Zero(rows, n);
+        Y.topRows(n) = W.middleRows(static_cast<Index>(b) * n, n);
+        Y.applyOnTheLeft(local[b].householderQ());
+        result.U.middleRows(starts[b], rows) = Y;
+    });
+    return result;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+Linalg::ThinSvd Linalg::thin_svd(const MatrixXd& A)
+{
+    if (A.rows() >= A.cols())
+        return thin_svd_tall(A);
+    ThinSvd transposed = thin_svd_tall(A.transpose());
+    std::swap(transposed.U, transposed.V);
+    return transposed;
+}
+
+//=============================================================================================================
+
+MatrixXd Linalg::parallel_product(const MatrixXd& A, const MatrixXd& B)
+{
+    ThreadPool& pool = ThreadPool::global();
+    // Below a few million multiply-adds the hand-over costs more than it saves
+    const Index blocks = A.rows() * A.cols() * B.cols() < 4000000
+        ? 1
+        : std::min<Index>(static_cast<Index>(pool.thread_count()) + 1, B.cols());
+    if (blocks < 2)
+        return A * B;
+    MatrixXd C(A.rows(), B.cols());
+    pool.parallel_for(0, static_cast<std::size_t>(blocks), [&](std::size_t b) {
+        const Index first = static_cast<Index>(b) * B.cols() / blocks;
+        const Index last = (static_cast<Index>(b) + 1) * B.cols() / blocks;
+        C.middleCols(first, last - first).noalias() = A * B.middleCols(first, last - first);
+    });
+    return C;
 }
 
 //=============================================================================================================

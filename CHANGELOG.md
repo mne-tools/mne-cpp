@@ -205,6 +205,15 @@ aliases; replace the old spelling as below.
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single
   precision.
+- `Linalg::thin_svd()` decomposes strongly rectangular matrices on all cores
+  (blocked tall-skinny QR, then a divide-and-conquer SVD of the small factor)
+  and `Linalg::parallel_product()` multiplies by column blocks. The inverse
+  operator uses both, reads and assembles without copying the source spaces,
+  and `FiffStream` writes arrays and matrices in one call instead of one per
+  value. Building the MNE sample inverse operator takes about 0.7 s instead of
+  5 s, faster than MNE-Python on the same machine. The benchmark disables the
+  tool's MNE-C style noise-covariance regularisation, so both compute the same
+  operator.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
