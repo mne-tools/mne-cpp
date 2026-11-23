@@ -136,6 +136,11 @@ const config: Config = {
                     label: 'Examples',
                 },
                 {
+                    to: '/docs/performance',
+                    label: 'Performance',
+                    position: 'left',
+                },
+                {
                     to: '/download',
                     label: 'Download',
                     position: 'left',
@@ -172,6 +177,7 @@ const config: Config = {
                     items: [
                         { label: 'Get Started', to: '/docs/get-started' },
                         { label: 'Manual', to: '/docs/manual/intro' },
+                        { label: 'Performance', to: '/docs/performance' },
                         { label: 'Publications', to: '/docs/publications' },
                     ],
                 },

@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
     docsSidebar: [
         'overview',
         'get-started',
+        'performance',
         {
             type: 'category',
             label: 'Manual',

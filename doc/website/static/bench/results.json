@@ -1,0 +1,253 @@
+{
+  "generated_by": "scripts/bench/run_benchmarks.py",
+  "environment": {
+    "machine": "Apple M4, 10 cores, 16 GB",
+    "os": "macOS 27.2.1",
+    "compiler": "AppleClang 21.0.0.21000334 Release",
+    "commit": "80f5f8730e",
+    "date": "2026-11-23",
+    "reference": "MNE-Python 1.11.0, NumPy 2.4.0, SciPy 1.16.3, Python 3.14.2"
+  },
+  "charts": [
+    {
+      "id": "acq_throughput",
+      "title": "Acquisition ring throughput",
+      "unit": "GB/s",
+      "higher_is_better": true,
+      "subtitle": "int16 samples through the lock-free ring, producer and two readers, verified",
+      "command": "mne_acq_bench --repeats 3 --json acq.json",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "1 channel",
+              "y": 2.6145201770224924
+            },
+            {
+              "x": "64 channels",
+              "y": 17.872909107554538
+            },
+            {
+              "x": "1024 channels",
+              "y": 19.494311865976155
+            },
+            {
+              "x": "4096 channels",
+              "y": 20.63700860097487
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acq_latency",
+      "title": "Commit-to-wake latency",
+      "unit": "µs",
+      "higher_is_better": false,
+      "subtitle": "time from a producer's commit until the reader runs, per percentile",
+      "command": "mne_acq_bench --repeats 3 --json acq.json",
+      "series": [
+        {
+          "label": "p50",
+          "points": [
+            {
+              "x": "spin reader",
+              "y": 0.125
+            },
+            {
+              "x": "output reader",
+              "y": 0.125
+            },
+            {
+              "x": "block reader",
+              "y": 0.208
+            }
+          ]
+        },
+        {
+          "label": "p99",
+          "points": [
+            {
+              "x": "spin reader",
+              "y": 0.25
+            },
+            {
+              "x": "output reader",
+              "y": 0.25
+            },
+            {
+              "x": "block reader",
+              "y": 3.25
+            }
+          ]
+        },
+        {
+          "label": "p99.9",
+          "points": [
+            {
+              "x": "spin reader",
+              "y": 8.291
+            },
+            {
+              "x": "output reader",
+              "y": 9.875
+            },
+            {
+              "x": "block reader",
+              "y": 21.75
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acq_paced",
+      "title": "Loss-free real-time acquisition",
+      "unit": "MS/s",
+      "higher_is_better": true,
+      "subtitle": "paced streams that must not lose a sample (channels × rate)",
+      "command": "mne_acq_bench --repeats 3 --json acq.json",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "64 ch × 1 kHz",
+              "y": 0.06400170457659851
+            },
+            {
+              "x": "1000 ch × 20 kHz",
+              "y": 20.00077436198066
+            },
+            {
+              "x": "256 ch × 20 kHz to FIFF",
+              "y": 5.120271417395402
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "forward",
+      "title": "Forward solution",
+      "unit": "s",
+      "higher_is_better": false,
+      "subtitle": "MNE sample subject; read inputs, compute, write; median of runs",
+      "command": "python3 scripts/bench/run_benchmarks.py --suites forward",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "oct-6, MEG+EEG, 3-layer BEM",
+              "y": 2.6137173750903457
+            }
+          ]
+        },
+        {
+          "label": "MNE-Python (n_jobs=1)",
+          "points": [
+            {
+              "x": "oct-6, MEG+EEG, 3-layer BEM",
+              "y": 12.450374791049398
+            }
+          ]
+        },
+        {
+          "label": "MNE-Python (n_jobs=10)",
+          "points": [
+            {
+              "x": "oct-6, MEG+EEG, 3-layer BEM",
+              "y": 9.763733000028878
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inverse",
+      "title": "Inverse operator",
+      "unit": "s",
+      "higher_is_better": false,
+      "subtitle": "MNE sample data; read forward and covariance, assemble, write; median of runs. MNE-CPP includes process start, MNE-Python excludes interpreter start and import",
+      "command": "python3 scripts/bench/run_benchmarks.py --suites inverse",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "MEG+EEG, loose 0.2, depth",
+              "y": 0.5925320839742199
+            }
+          ]
+        },
+        {
+          "label": "MNE-Python",
+          "points": [
+            {
+              "x": "MEG+EEG, loose 0.2, depth",
+              "y": 0.7033901249524206
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "startup_time",
+      "title": "Start-up time",
+      "unit": "ms",
+      "higher_is_better": false,
+      "subtitle": "process start to exit, median of runs",
+      "command": "python3 scripts/bench/run_benchmarks.py --suites startup",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "CLI tool (mne_show_fiff --version)",
+              "y": 20.40541695896536
+            }
+          ]
+        },
+        {
+          "label": "MNE-Python",
+          "points": [
+            {
+              "x": "import mne",
+              "y": 126.10574997961521
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "startup_memory",
+      "title": "Peak memory at start-up",
+      "unit": "MB",
+      "higher_is_better": false,
+      "subtitle": "maximum resident set size",
+      "command": "python3 scripts/bench/run_benchmarks.py --suites startup",
+      "series": [
+        {
+          "label": "MNE-CPP",
+          "points": [
+            {
+              "x": "CLI tool (mne_show_fiff --version)",
+              "y": 16.125
+            }
+          ]
+        },
+        {
+          "label": "MNE-Python",
+          "points": [
+            {
+              "x": "import mne",
+              "y": 43.09375
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

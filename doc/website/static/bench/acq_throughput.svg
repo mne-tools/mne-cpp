@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="290" viewBox="0 0 760 290" role="img" aria-label="Acquisition ring throughput">
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="12" y="24" font-size="16" font-weight="600" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Acquisition ring throughput</text>
+<text x="12" y="40" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">int16 samples through the lock-free ring, producer and two readers, verified</text>
+<text x="142" y="69" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">1 channel</text>
+<rect x="150" y="59" width="54.4" height="20" fill="#0b6ea8"><title>MNE-CPP: 2.61 GB/s</title></rect>
+<text x="209.4" y="69" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">2.61</text>
+<text x="142" y="107" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">64 channels</text>
+<rect x="150" y="97" width="371.8" height="20" fill="#0b6ea8"><title>MNE-CPP: 17.9 GB/s</title></rect>
+<text x="526.8" y="107" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">17.9</text>
+<text x="142" y="145" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">1024 channels</text>
+<rect x="150" y="135" width="405.5" height="20" fill="#0b6ea8"><title>MNE-CPP: 19.5 GB/s</title></rect>
+<text x="560.5" y="145" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">19.5</text>
+<text x="142" y="183" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">4096 channels</text>
+<rect x="150" y="173" width="429.2" height="20" fill="#0b6ea8"><title>MNE-CPP: 20.6 GB/s</title></rect>
+<text x="584.2" y="183" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">20.6</text>
+<line x1="150" y1="52" x2="150" y2="208" stroke="#999"/>
+<line x1="150.0" y1="208" x2="150.0" y2="212" stroke="#999"/>
+<text x="150.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0</text>
+<line x1="254.0" y1="208" x2="254.0" y2="212" stroke="#999"/>
+<text x="254.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">5.00</text>
+<line x1="358.0" y1="208" x2="358.0" y2="212" stroke="#999"/>
+<text x="358.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">10.0</text>
+<line x1="462.0" y1="208" x2="462.0" y2="212" stroke="#999"/>
+<text x="462.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">15.0</text>
+<line x1="566.0" y1="208" x2="566.0" y2="212" stroke="#999"/>
+<text x="566.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">20.0</text>
+<line x1="670.0" y1="208" x2="670.0" y2="212" stroke="#999"/>
+<text x="670.0" y="224" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">25.0</text>
+<text x="410" y="240" font-size="11" text-anchor="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">GB/s (higher is better)</text>
+<text x="12" y="264" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Apple M4, 10 cores, 16 GB · macOS 27.2.1 · AppleClang 21.0.0.21000334 Release · commit 80f5f8730e · 2026-11-23</text>
+<text x="12" y="280" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Reproduce: mne_acq_bench --repeats 3 --json acq.json</text>
+</svg>

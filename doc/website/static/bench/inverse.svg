@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="240" viewBox="0 0 760 240" role="img" aria-label="Inverse operator">
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="12" y="24" font-size="16" font-weight="600" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Inverse operator</text>
+<text x="12" y="40" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">MNE sample data; read forward and covariance, assemble, write; median of runs. MNE-CPP includes process start, MNE-Python excludes interpreter start and import</text>
+<rect x="189" y="52" width="12" height="12" fill="#0b6ea8"/>
+<text x="205" y="62" font-size="12" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">MNE-CPP</text>
+<rect x="272" y="52" width="12" height="12" fill="#e8833a"/>
+<text x="288" y="62" font-size="12" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">MNE-Python</text>
+<text x="181" y="104" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">MEG+EEG, loose 0.2, depth</text>
+<rect x="189" y="81" width="285.0" height="20" fill="#0b6ea8"><title>MNE-CPP: 0.59 s</title></rect>
+<text x="479.0" y="91" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.59</text>
+<rect x="189" y="107" width="338.3" height="20" fill="#e8833a"><title>MNE-Python: 0.70 s</title></rect>
+<text x="532.3" y="117" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.70</text>
+<line x1="189" y1="74" x2="189" y2="142" stroke="#999"/>
+<line x1="189.0" y1="142" x2="189.0" y2="146" stroke="#999"/>
+<text x="189.0" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0</text>
+<line x1="285.2" y1="142" x2="285.2" y2="146" stroke="#999"/>
+<text x="285.2" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.20</text>
+<line x1="381.4" y1="142" x2="381.4" y2="146" stroke="#999"/>
+<text x="381.4" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.40</text>
+<line x1="477.6" y1="142" x2="477.6" y2="146" stroke="#999"/>
+<text x="477.6" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.60</text>
+<line x1="573.8" y1="142" x2="573.8" y2="146" stroke="#999"/>
+<text x="573.8" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.80</text>
+<line x1="670.0" y1="142" x2="670.0" y2="146" stroke="#999"/>
+<text x="670.0" y="158" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">1.00</text>
+<text x="430" y="174" font-size="11" text-anchor="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">s (lower is better)</text>
+<text x="12" y="198" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Apple M4, 10 cores, 16 GB · macOS 27.2.1 · AppleClang 21.0.0.21000334 Release · commit 80f5f8730e · 2026-11-23</text>
+<text x="12" y="214" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Reference: MNE-Python 1.11.0, NumPy 2.4.0, SciPy 1.16.3, Python 3.14.2</text>
+<text x="12" y="230" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Reproduce: python3 scripts/bench/run_benchmarks.py --suites inverse</text>
+</svg>

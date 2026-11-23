@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="430" viewBox="0 0 760 430" role="img" aria-label="Commit-to-wake latency">
+<rect width="100%" height="100%" fill="#fff"/>
+<text x="12" y="24" font-size="16" font-weight="600" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Commit-to-wake latency</text>
+<text x="12" y="40" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">time from a producer&#x27;s commit until the reader runs, per percentile</text>
+<rect x="150" y="52" width="12" height="12" fill="#0b6ea8"/>
+<text x="166" y="62" font-size="12" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">p50</text>
+<rect x="205" y="52" width="12" height="12" fill="#e8833a"/>
+<text x="221" y="62" font-size="12" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">p99</text>
+<rect x="260" y="52" width="12" height="12" fill="#5aa05a"/>
+<text x="276" y="62" font-size="12" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">p99.9</text>
+<text x="142" y="117" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">spin reader</text>
+<rect x="150" y="81" width="2.6" height="20" fill="#0b6ea8"><title>p50: 0.12 µs</title></rect>
+<text x="157.6" y="91" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.12</text>
+<rect x="150" y="107" width="5.2" height="20" fill="#e8833a"><title>p99: 0.25 µs</title></rect>
+<text x="160.2" y="117" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.25</text>
+<rect x="150" y="133" width="172.5" height="20" fill="#5aa05a"><title>p99.9: 8.29 µs</title></rect>
+<text x="327.5" y="143" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">8.29</text>
+<text x="142" y="207" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">output reader</text>
+<rect x="150" y="171" width="2.6" height="20" fill="#0b6ea8"><title>p50: 0.12 µs</title></rect>
+<text x="157.6" y="181" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.12</text>
+<rect x="150" y="197" width="5.2" height="20" fill="#e8833a"><title>p99: 0.25 µs</title></rect>
+<text x="160.2" y="207" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.25</text>
+<rect x="150" y="223" width="205.4" height="20" fill="#5aa05a"><title>p99.9: 9.88 µs</title></rect>
+<text x="360.4" y="233" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">9.88</text>
+<text x="142" y="297" font-size="12" text-anchor="end" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">block reader</text>
+<rect x="150" y="261" width="4.3" height="20" fill="#0b6ea8"><title>p50: 0.21 µs</title></rect>
+<text x="159.3" y="271" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0.21</text>
+<rect x="150" y="287" width="67.6" height="20" fill="#e8833a"><title>p99: 3.25 µs</title></rect>
+<text x="222.6" y="297" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">3.25</text>
+<rect x="150" y="313" width="452.4" height="20" fill="#5aa05a"><title>p99.9: 21.8 µs</title></rect>
+<text x="607.4" y="323" font-size="11" dominant-baseline="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">21.8</text>
+<line x1="150" y1="74" x2="150" y2="348" stroke="#999"/>
+<line x1="150.0" y1="348" x2="150.0" y2="352" stroke="#999"/>
+<text x="150.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">0</text>
+<line x1="254.0" y1="348" x2="254.0" y2="352" stroke="#999"/>
+<text x="254.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">5.00</text>
+<line x1="358.0" y1="348" x2="358.0" y2="352" stroke="#999"/>
+<text x="358.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">10.0</text>
+<line x1="462.0" y1="348" x2="462.0" y2="352" stroke="#999"/>
+<text x="462.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">15.0</text>
+<line x1="566.0" y1="348" x2="566.0" y2="352" stroke="#999"/>
+<text x="566.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">20.0</text>
+<line x1="670.0" y1="348" x2="670.0" y2="352" stroke="#999"/>
+<text x="670.0" y="364" font-size="10" text-anchor="middle" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">25.0</text>
+<text x="410" y="380" font-size="11" text-anchor="middle" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">µs (lower is better)</text>
+<text x="12" y="404" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Apple M4, 10 cores, 16 GB · macOS 27.2.1 · AppleClang 21.0.0.21000334 Release · commit 80f5f8730e · 2026-11-23</text>
+<text x="12" y="420" font-size="11" fill="#555" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">Reproduce: mne_acq_bench --repeats 3 --json acq.json</text>
+</svg>
