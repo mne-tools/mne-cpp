@@ -75,7 +75,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_bCrosshairEnabled(false)
 {
     m_sSettingsPath = sSettingsPath;
-    m_pTableView = new QTableView;
+    m_pTableView = new QTableView(this);
     updateViewport();
 
     // Set layout

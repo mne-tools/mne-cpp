@@ -30,6 +30,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <memory>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -45,7 +46,7 @@ bool hasQtSignal(const QObject* object, const char* normalizedSignal)
     return object->metaObject()->indexOfSignal(normalizedSignal) >= 0;
 }
 
-QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
+std::unique_ptr<QTreeWidgetItem> buildJsonTreeItem(const QString& key, const QJsonValue& value)
 {
     QString displayValue;
     if (value.isObject()) {
@@ -64,16 +65,16 @@ QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
         displayValue = QString::fromUtf8(QJsonDocument::fromVariant(value.toVariant()).toJson(QJsonDocument::Compact));
     }
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << key << displayValue);
+    auto item = std::make_unique<QTreeWidgetItem>(QStringList() << key << displayValue);
     if (value.isObject()) {
         const QJsonObject object = value.toObject();
         for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            item->addChild(buildJsonTreeItem(it.key(), it.value()));
+            item->addChild(buildJsonTreeItem(it.key(), it.value()).release());
         }
     } else if (value.isArray()) {
         const QJsonArray array = value.toArray();
         for (int i = 0; i < array.size(); ++i) {
-            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)));
+            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)).release());
         }
     }
 
@@ -161,7 +162,7 @@ void AnalysisResultWidget::setResult(const QString& toolName, const QJsonObject&
     }
 
     for (auto it = result.constBegin(); it != result.constEnd(); ++it) {
-        m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
+        m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()).release());
     }
     m_tree->expandToDepth(1);
     for (int column = 0; column < m_tree->columnCount(); ++column) {

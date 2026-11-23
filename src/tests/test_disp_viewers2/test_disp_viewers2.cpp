@@ -4772,7 +4772,7 @@ void TestDispViewers2::bidsView_treeMovesAndSelection()
     // Context menu on the raw file: move it to sub-Secondsubject/ses-preop
     auto openMenuAt = [&view, tree](const QModelIndex& index) {
         emit tree->customContextMenuRequested(tree->visualRect(index).center());
-        return view.findChildren<QMenu*>().last();
+        return view.findChildren<QMenu*>(Qt::FindDirectChildrenOnly).last();
     };
     auto actionNamed = [](QMenu* menu, const QString& text) -> QAction* {
         QList<QAction*> pending = menu->actions();

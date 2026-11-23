@@ -103,11 +103,10 @@ QMenu* ChannelSelection::getMenu()
 
 QDockWidget* ChannelSelection::getControl()
 {
-    QDockWidget* pControlDockWidget = new QDockWidget(getName());
-    QWidget* pControlWidget = new QWidget(pControlDockWidget);
+    auto pControlDockWidget = std::make_unique<QDockWidget>(getName());
+    QWidget* pControlWidget = new QWidget(pControlDockWidget.get());
 
-    m_pControlLayout = new QVBoxLayout();
-    pControlWidget->setLayout(m_pControlLayout);
+    m_pControlLayout = new QVBoxLayout(pControlWidget);
     pControlDockWidget->setWidget(pControlWidget);
 
     pControlDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -115,21 +114,20 @@ QDockWidget* ChannelSelection::getControl()
     pControlDockWidget->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                                   QSizePolicy::Preferred));
 
-    QLabel* pTempLabel = new QLabel("No File Loaded");
+    QLabel* pTempLabel = new QLabel("No File Loaded", pControlWidget);
     m_pControlLayout->addWidget(pTempLabel);
 
-    return pControlDockWidget;
+    return pControlDockWidget.release();
 }
 
 //=============================================================================================================
 
 QWidget* ChannelSelection::getView()
 {
-    QWidget* pViewWidget = new QWidget();
-    m_pViewLayout = new QHBoxLayout();
-    pViewWidget->setLayout(m_pViewLayout);
+    auto pViewWidget = std::make_unique<QWidget>();
+    m_pViewLayout = new QHBoxLayout(pViewWidget.get());
 
-    return pViewWidget;
+    return pViewWidget.release();
 }
 
 //=============================================================================================================
@@ -185,7 +183,7 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
     }
 
     //First time set up only
-    m_pControlLayout->takeAt(0)->widget()->hide();
+    std::unique_ptr<QLayoutItem>(m_pControlLayout->takeAt(0))->widget()->hide();
 
     m_pChannelInfoModel = std::make_shared<mne::disp::ChannelInfoModel>(m_pFiffInfo);
 
@@ -197,7 +195,7 @@ void ChannelSelection::setFiffSettings(std::shared_ptr<mne::FiffInfo> pFiffInfo)
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
 
-    m_pApplyToView = new mne::disp::ApplyToView("", m_pControlLayout->widget());
+    m_pApplyToView = new mne::disp::ApplyToView("", m_pControlLayout->parentWidget());
 
     m_pControlLayout->addWidget(m_pApplyToView);
 

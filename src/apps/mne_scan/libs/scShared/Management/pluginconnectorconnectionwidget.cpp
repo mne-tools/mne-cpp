@@ -41,10 +41,10 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
 : QWidget(parent)
 , m_pPluginConnectorConnection(pPluginConnectorConnection)
 {
-    QWidget* rightFiller = new QWidget;
+    QWidget* rightFiller = new QWidget(this);
     rightFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QWidget* bottomFiller = new QWidget;
+    QWidget* bottomFiller = new QWidget(this);
     bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QString sSender = m_pPluginConnectorConnection->getSender()->getName();
@@ -55,7 +55,7 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
 
     qint32 curRow = 0;
 
-    QGridLayout* layout = new QGridLayout;
+    QGridLayout* layout = new QGridLayout(this);
     layout->addWidget(m_pLabel, curRow, 0, 1, 3);
     ++curRow;
 
@@ -102,8 +102,6 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
     ++curRow;
 
     layout->addWidget(rightFiller, 1, 3, curRow - 1, 1);
-
-    this->setLayout(layout);
 }
 
 //=============================================================================================================

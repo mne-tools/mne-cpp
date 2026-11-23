@@ -30,6 +30,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <memory>
 
 using namespace MNEANALYZESTUDIO;
 
@@ -84,7 +85,7 @@ PsdResultWidget::PsdResultWidget(QWidget* parent)
     m_nfftSpin->setValue(256);
     m_compareCombo->addItem("No comparison");
 
-    QHBoxLayout* controlsLayout = new QHBoxLayout;
+    auto controlsLayout = std::make_unique<QHBoxLayout>();
     controlsLayout->setContentsMargins(0, 0, 0, 0);
     controlsLayout->setSpacing(8);
     controlsLayout->addWidget(new QLabel("PSD Match", this));
@@ -98,7 +99,7 @@ PsdResultWidget::PsdResultWidget(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(8);
-    layout->addLayout(controlsLayout);
+    layout->addLayout(controlsLayout.release());
     layout->addWidget(m_plot);
 
     connect(m_updateButton, &QPushButton::clicked, this, &PsdResultWidget::emitRerunCommand);

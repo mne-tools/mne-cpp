@@ -70,7 +70,7 @@ BrainAMP::~BrainAMP()
 
 QSharedPointer<AbstractPlugin> BrainAMP::clone() const
 {
-    QSharedPointer<BrainAMP> pBrainAMPClone(new BrainAMP());
+    auto pBrainAMPClone = QSharedPointer<BrainAMP>::create();
     return pBrainAMPClone;
 }
 

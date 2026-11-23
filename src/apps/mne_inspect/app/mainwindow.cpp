@@ -280,7 +280,7 @@ static QWidget* createFlatDockTitleBar(QDockWidget* dock, const QString& title)
     lay->setContentsMargins(10, 8, 10, 8);
     lay->setSpacing(0);
 
-    QLabel* lbl = new QLabel(title.toUpper());
+    QLabel* lbl = new QLabel(title.toUpper(), bar);
     lbl->setStyleSheet(
         "font-size: 11px;"
         "font-weight: 600;"
@@ -290,7 +290,7 @@ static QWidget* createFlatDockTitleBar(QDockWidget* dock, const QString& title)
         "border: none;");
     lay->addWidget(lbl, 1, Qt::AlignVCenter);
 
-    QPushButton* closeBtn = new QPushButton("\u00D7"); // multiplication sign ×
+    QPushButton* closeBtn = new QPushButton("\u00D7", bar); // multiplication sign ×
     closeBtn->setFixedSize(20, 20);
     closeBtn->setFlat(true);
     closeBtn->setCursor(Qt::ArrowCursor);
@@ -362,14 +362,14 @@ MainWindow::MainWindow(QWidget* parent)
 void MainWindow::setupUI()
 {
     // Side Panel (Controls) with Scroll Area
-    QScrollArea* scrollArea = new QScrollArea;
+    QScrollArea* scrollArea = new QScrollArea(this);
     scrollArea->setMinimumWidth(280);
     scrollArea->setMaximumWidth(320);
     scrollArea->setWidgetResizable(true);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setFrameShape(QFrame::NoFrame);
 
-    QWidget* sidePanel = new QWidget;
+    QWidget* sidePanel = new QWidget(scrollArea);
     sidePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     sidePanel->setMaximumWidth(280);
     QVBoxLayout* sideLayout = new QVBoxLayout(sidePanel);
@@ -378,52 +378,52 @@ void MainWindow::setupUI()
     scrollArea->setWidget(sidePanel);
 
     // ===== Brain Surface Group =====
-    m_surfGroup = new QGroupBox("Brain Surface");
+    m_surfGroup = new QGroupBox("Brain Surface", sidePanel);
     m_surfGroup->setEnabled(false);
     QVBoxLayout* surfLayout = new QVBoxLayout(m_surfGroup);
     surfLayout->setContentsMargins(6, 12, 6, 6);
     surfLayout->setSpacing(8);
 
     // Surface Selector
-    QLabel* surfLabel = new QLabel("Surface Type:");
-    m_surfCombo = new QComboBox;
+    QLabel* surfLabel = new QLabel("Surface Type:", m_surfGroup);
+    m_surfCombo = new QComboBox(m_surfGroup);
     m_surfCombo->addItems({"pial", "inflated", "white"});
 
     // Shader Mode
-    QLabel* shaderLabel = new QLabel("Brain Shader:");
-    m_shaderCombo = new QComboBox;
+    QLabel* shaderLabel = new QLabel("Brain Shader:", m_surfGroup);
+    m_shaderCombo = new QComboBox(m_surfGroup);
     m_shaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
 
-    QLabel* bemShaderLabel = new QLabel("Head Shader:");
-    m_bemShaderCombo = new QComboBox;
+    QLabel* bemShaderLabel = new QLabel("Head Shader:", this);
+    m_bemShaderCombo = new QComboBox(this);
     m_bemShaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
     m_bemShaderCombo->setEnabled(false);
 
-    m_linkShadersCheck = new QCheckBox("Link Shaders to Brain Surface");
+    m_linkShadersCheck = new QCheckBox("Link Shaders to Brain Surface", this);
     m_linkShadersCheck->setChecked(true);
     m_linkShadersCheck->setToolTip("When checked, Head Shader follows Brain Shader selection.");
 
-    m_bemColorCheck = new QCheckBox("Show BEM Colors");
+    m_bemColorCheck = new QCheckBox("Show BEM Colors", this);
     m_bemColorCheck->setChecked(true);
     m_bemColorCheck->setToolTip("Toggle between standard Red/Green/Blue colors and White/Overlay colors.");
 
     // Overlay
-    QLabel* overlayLabel = new QLabel("Overlay:");
-    m_overlayCombo = new QComboBox;
+    QLabel* overlayLabel = new QLabel("Overlay:", m_surfGroup);
+    m_overlayCombo = new QComboBox(m_surfGroup);
     m_overlayCombo->addItems({"Surface", "Annotation", "Scientific"});
 
-    m_lhCheck = new QCheckBox("Left Hemisphere");
+    m_lhCheck = new QCheckBox("Left Hemisphere", m_surfGroup);
     m_lhCheck->setChecked(true);
 
-    m_rhCheck = new QCheckBox("Right Hemisphere");
+    m_rhCheck = new QCheckBox("Right Hemisphere", m_surfGroup);
     m_rhCheck->setChecked(true);
 
     // BEM Checks
-    m_headCheck = new QCheckBox("Head Surface");
+    m_headCheck = new QCheckBox("Head Surface", this);
     m_headCheck->setChecked(true);
-    m_outerCheck = new QCheckBox("Outer Skull");
+    m_outerCheck = new QCheckBox("Outer Skull", this);
     m_outerCheck->setChecked(true);
-    m_innerCheck = new QCheckBox("Inner Skull");
+    m_innerCheck = new QCheckBox("Inner Skull", this);
     m_innerCheck->setChecked(true);
 
     surfLayout->addWidget(surfLabel);
@@ -436,7 +436,7 @@ void MainWindow::setupUI()
     surfLayout->addWidget(m_rhCheck);
 
     // ===== BEM Surface Group =====
-    m_bemGroup = new QGroupBox("BEM Surface");
+    m_bemGroup = new QGroupBox("BEM Surface", sidePanel);
     m_bemGroup->setEnabled(false);
     QVBoxLayout* bemLayout = new QVBoxLayout(m_bemGroup);
     bemLayout->setContentsMargins(6, 12, 6, 6);
@@ -451,138 +451,138 @@ void MainWindow::setupUI()
     bemLayout->addWidget(m_linkShadersCheck);
 
     // ===== MRI Volume Group =====
-    m_mriGroup = new QGroupBox("MRI Volume");
+    m_mriGroup = new QGroupBox("MRI Volume", sidePanel);
     m_mriGroup->setEnabled(false);
     QVBoxLayout* mriLayout = new QVBoxLayout(m_mriGroup);
     mriLayout->setContentsMargins(6, 12, 6, 6);
     mriLayout->setSpacing(6);
 
     // Volume selector combo
-    m_mriVolumeCombo = new QComboBox;
+    m_mriVolumeCombo = new QComboBox(m_mriGroup);
     m_mriVolumeCombo->setToolTip("Select active MRI volume (T1, T2, …)");
     mriLayout->addWidget(m_mriVolumeCombo);
 
     // Show-all / hide-all toggle
-    m_mriShowAllCheck = new QCheckBox("Show MRI Slices");
+    m_mriShowAllCheck = new QCheckBox("Show MRI Slices", m_mriGroup);
     m_mriShowAllCheck->setChecked(true);
     mriLayout->addWidget(m_mriShowAllCheck);
 
-    m_mriFileLabel = new QLabel("No MRI loaded");
+    m_mriFileLabel = new QLabel("No MRI loaded", m_mriGroup);
     m_mriFileLabel->setWordWrap(true);
     m_mriFileLabel->setStyleSheet("color: #888;");
     mriLayout->addWidget(m_mriFileLabel);
 
     // Axial (Z) slice
-    m_mriAxialCheck = new QCheckBox("Axial");
+    m_mriAxialCheck = new QCheckBox("Axial", m_mriGroup);
     m_mriAxialCheck->setChecked(true);
-    m_mriAxialLabel = new QLabel("Slice: 0");
-    m_mriAxialSlider = new QSlider(Qt::Horizontal);
+    m_mriAxialLabel = new QLabel("Slice: 0", m_mriGroup);
+    m_mriAxialSlider = new QSlider(Qt::Horizontal, m_mriGroup);
     m_mriAxialSlider->setMinimum(0);
     m_mriAxialSlider->setMaximum(0);
     {
-        QHBoxLayout* row = new QHBoxLayout;
+        auto row = std::make_unique<QHBoxLayout>();
         row->addWidget(m_mriAxialCheck);
         row->addStretch(1);
         row->addWidget(m_mriAxialLabel);
-        mriLayout->addLayout(row);
+        mriLayout->addLayout(row.release());
     }
     mriLayout->addWidget(m_mriAxialSlider);
 
     // Coronal (Y) slice
-    m_mriCoronalCheck = new QCheckBox("Coronal");
+    m_mriCoronalCheck = new QCheckBox("Coronal", m_mriGroup);
     m_mriCoronalCheck->setChecked(true);
-    m_mriCoronalLabel = new QLabel("Slice: 0");
-    m_mriCoronalSlider = new QSlider(Qt::Horizontal);
+    m_mriCoronalLabel = new QLabel("Slice: 0", m_mriGroup);
+    m_mriCoronalSlider = new QSlider(Qt::Horizontal, m_mriGroup);
     m_mriCoronalSlider->setMinimum(0);
     m_mriCoronalSlider->setMaximum(0);
     {
-        QHBoxLayout* row = new QHBoxLayout;
+        auto row = std::make_unique<QHBoxLayout>();
         row->addWidget(m_mriCoronalCheck);
         row->addStretch(1);
         row->addWidget(m_mriCoronalLabel);
-        mriLayout->addLayout(row);
+        mriLayout->addLayout(row.release());
     }
     mriLayout->addWidget(m_mriCoronalSlider);
 
     // Sagittal (X) slice
-    m_mriSagittalCheck = new QCheckBox("Sagittal");
+    m_mriSagittalCheck = new QCheckBox("Sagittal", m_mriGroup);
     m_mriSagittalCheck->setChecked(true);
-    m_mriSagittalLabel = new QLabel("Slice: 0");
-    m_mriSagittalSlider = new QSlider(Qt::Horizontal);
+    m_mriSagittalLabel = new QLabel("Slice: 0", m_mriGroup);
+    m_mriSagittalSlider = new QSlider(Qt::Horizontal, m_mriGroup);
     m_mriSagittalSlider->setMinimum(0);
     m_mriSagittalSlider->setMaximum(0);
     {
-        QHBoxLayout* row = new QHBoxLayout;
+        auto row = std::make_unique<QHBoxLayout>();
         row->addWidget(m_mriSagittalCheck);
         row->addStretch(1);
         row->addWidget(m_mriSagittalLabel);
-        mriLayout->addLayout(row);
+        mriLayout->addLayout(row.release());
     }
     mriLayout->addWidget(m_mriSagittalSlider);
 
     // Window / Level controls (clinical MRI convention)
     {
-        QLabel* wlHeader = new QLabel("<b>Image Adjustment</b>");
+        QLabel* wlHeader = new QLabel("<b>Image Adjustment</b>", m_mriGroup);
         mriLayout->addWidget(wlHeader);
 
-        QHBoxLayout* wcRow = new QHBoxLayout;
+        auto wcRow = std::make_unique<QHBoxLayout>();
         wcRow->addWidget(new QLabel("Brightness:"));
-        m_mriWindowCenterSlider = new QSlider(Qt::Horizontal);
+        m_mriWindowCenterSlider = new QSlider(Qt::Horizontal, m_mriGroup);
         m_mriWindowCenterSlider->setRange(0, 100);
         m_mriWindowCenterSlider->setValue(50);
-        m_mriWindowCenterLabel = new QLabel("50%");
+        m_mriWindowCenterLabel = new QLabel("50%", m_mriGroup);
         m_mriWindowCenterLabel->setFixedWidth(32);
         wcRow->addWidget(m_mriWindowCenterSlider, 1);
         wcRow->addWidget(m_mriWindowCenterLabel);
-        mriLayout->addLayout(wcRow);
+        mriLayout->addLayout(wcRow.release());
 
-        QHBoxLayout* wwRow = new QHBoxLayout;
+        auto wwRow = std::make_unique<QHBoxLayout>();
         wwRow->addWidget(new QLabel("Contrast:"));
-        m_mriWindowWidthSlider = new QSlider(Qt::Horizontal);
+        m_mriWindowWidthSlider = new QSlider(Qt::Horizontal, m_mriGroup);
         m_mriWindowWidthSlider->setRange(1, 100);
         m_mriWindowWidthSlider->setValue(100);
-        m_mriWindowWidthLabel = new QLabel("100%");
+        m_mriWindowWidthLabel = new QLabel("100%", m_mriGroup);
         m_mriWindowWidthLabel->setFixedWidth(32);
         wwRow->addWidget(m_mriWindowWidthSlider, 1);
         wwRow->addWidget(m_mriWindowWidthLabel);
-        mriLayout->addLayout(wwRow);
+        mriLayout->addLayout(wwRow.release());
 
-        QHBoxLayout* opRow = new QHBoxLayout;
+        auto opRow = std::make_unique<QHBoxLayout>();
         opRow->addWidget(new QLabel("Opacity:"));
-        m_mriOpacitySlider = new QSlider(Qt::Horizontal);
+        m_mriOpacitySlider = new QSlider(Qt::Horizontal, m_mriGroup);
         m_mriOpacitySlider->setRange(0, 100);
         m_mriOpacitySlider->setValue(70);
-        m_mriOpacityLabel = new QLabel("70%");
+        m_mriOpacityLabel = new QLabel("70%", m_mriGroup);
         m_mriOpacityLabel->setFixedWidth(32);
         opRow->addWidget(m_mriOpacitySlider, 1);
         opRow->addWidget(m_mriOpacityLabel);
-        mriLayout->addLayout(opRow);
+        mriLayout->addLayout(opRow.release());
     }
 
     // ===== Source Estimate Group =====
-    m_stcGroup = new QGroupBox("Source Estimate");
+    m_stcGroup = new QGroupBox("Source Estimate", sidePanel);
     m_stcGroup->setEnabled(false);
     QVBoxLayout* stcLayout = new QVBoxLayout(m_stcGroup);
     stcLayout->setContentsMargins(6, 12, 6, 6);
     stcLayout->setSpacing(8);
 
-    QLabel* stcSelectLabel = new QLabel("Source Estimate:");
-    m_stcCombo = new QComboBox;
+    QLabel* stcSelectLabel = new QLabel("Source Estimate:", m_stcGroup);
+    m_stcCombo = new QComboBox(m_stcGroup);
     m_stcCombo->setEnabled(false);
     m_stcCombo->setToolTip("Select which loaded source estimate to display");
 
-    QLabel* colormapLabel = new QLabel("Colormap:");
-    m_colormapCombo = new QComboBox;
+    QLabel* colormapLabel = new QLabel("Colormap:", m_stcGroup);
+    m_colormapCombo = new QComboBox(m_stcGroup);
     m_colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
 
-    m_timeLabel = new QLabel("Time: 0.000 s");
-    m_timeSlider = new QSlider(Qt::Horizontal);
+    m_timeLabel = new QLabel("Time: 0.000 s", m_stcGroup);
+    m_timeSlider = new QSlider(Qt::Horizontal, m_stcGroup);
     m_timeSlider->setEnabled(false);
 
-    QLabel* threshLabel = new QLabel("Thresholds:");
-    m_minThresh = new QDoubleSpinBox;
-    m_midThresh = new QDoubleSpinBox;
-    m_maxThresh = new QDoubleSpinBox;
+    QLabel* threshLabel = new QLabel("Thresholds:", m_stcGroup);
+    m_minThresh = new QDoubleSpinBox(m_stcGroup);
+    m_midThresh = new QDoubleSpinBox(m_stcGroup);
+    m_maxThresh = new QDoubleSpinBox(m_stcGroup);
     m_minThresh->setDecimals(6);
     m_midThresh->setDecimals(6);
     m_maxThresh->setDecimals(6);
@@ -593,7 +593,7 @@ void MainWindow::setupUI()
     m_midThresh->setValue(0.5);
     m_maxThresh->setValue(10.0);
 
-    QGridLayout* threshGrid = new QGridLayout;
+    auto threshGrid = std::make_unique<QGridLayout>();
     threshGrid->addWidget(new QLabel("Min"), 0, 0);
     threshGrid->addWidget(m_minThresh, 0, 1);
     threshGrid->addWidget(new QLabel("Mid"), 1, 0);
@@ -601,10 +601,10 @@ void MainWindow::setupUI()
     threshGrid->addWidget(new QLabel("Max"), 2, 0);
     threshGrid->addWidget(m_maxThresh, 2, 1);
 
-    QLabel* playbackLabel = new QLabel("Playback:");
-    QHBoxLayout* playbackLayout = new QHBoxLayout;
-    m_playButton = new QPushButton("Play");
-    m_speedCombo = new QComboBox;
+    QLabel* playbackLabel = new QLabel("Playback:", m_stcGroup);
+    auto playbackLayout = std::make_unique<QHBoxLayout>();
+    m_playButton = new QPushButton("Play", m_stcGroup);
+    m_speedCombo = new QComboBox(m_stcGroup);
     m_speedCombo->addItem("0.01x", 0.01);
     m_speedCombo->addItem("0.05x", 0.05);
     m_speedCombo->addItem("0.1x", 0.1);
@@ -618,23 +618,23 @@ void MainWindow::setupUI()
     playbackLayout->addWidget(m_playButton);
     playbackLayout->addWidget(m_speedCombo);
 
-    m_realtimeCheck = new QCheckBox("Realtime Streaming");
+    m_realtimeCheck = new QCheckBox("Realtime Streaming", m_stcGroup);
     m_realtimeCheck->setToolTip("Use threaded real-time streaming pipeline instead of simple timer playback");
-    m_loopCheck = new QCheckBox("Loop");
+    m_loopCheck = new QCheckBox("Loop", m_stcGroup);
     m_loopCheck->setChecked(true);
     m_loopCheck->setToolTip("Loop data when the end of the stream is reached");
-    QHBoxLayout* rtLayout = new QHBoxLayout;
+    auto rtLayout = std::make_unique<QHBoxLayout>();
     rtLayout->addWidget(m_realtimeCheck);
     rtLayout->addWidget(m_loopCheck);
 
     m_stcTimer = new QTimer(this);
 
-    m_stcStatusLabel = new QLabel("");
+    m_stcStatusLabel = new QLabel("", m_stcGroup);
     m_stcStatusLabel->setStyleSheet("color: #666; font-style: italic;");
     m_stcStatusLabel->setWordWrap(true);
     m_stcStatusLabel->hide();
 
-    m_stcProgressBar = new QProgressBar;
+    m_stcProgressBar = new QProgressBar(m_stcGroup);
     m_stcProgressBar->setRange(0, 100);
     m_stcProgressBar->setValue(0);
     m_stcProgressBar->hide();
@@ -646,59 +646,59 @@ void MainWindow::setupUI()
     stcLayout->addWidget(colormapLabel);
     stcLayout->addWidget(m_colormapCombo);
     stcLayout->addWidget(threshLabel);
-    stcLayout->addLayout(threshGrid);
+    stcLayout->addLayout(threshGrid.release());
     stcLayout->addWidget(playbackLabel);
-    stcLayout->addLayout(playbackLayout);
-    stcLayout->addLayout(rtLayout);
+    stcLayout->addLayout(playbackLayout.release());
+    stcLayout->addLayout(rtLayout.release());
     stcLayout->addWidget(m_timeSlider);
     stcLayout->addWidget(m_timeLabel);
     stcLayout->addStretch();
 
     // ===== Dipole Group =====
-    m_dipoleGroup = new QGroupBox("Dipoles");
+    m_dipoleGroup = new QGroupBox("Dipoles", sidePanel);
     m_dipoleGroup->setEnabled(false);
     QVBoxLayout* dipoleLayout = new QVBoxLayout(m_dipoleGroup);
     dipoleLayout->setContentsMargins(6, 12, 6, 6);
     dipoleLayout->setSpacing(8);
 
-    m_showDipoleCheck = new QCheckBox("Show Dipoles");
+    m_showDipoleCheck = new QCheckBox("Show Dipoles", m_dipoleGroup);
     m_showDipoleCheck->setChecked(true);
     m_showDipoleCheck->setEnabled(false);
 
     dipoleLayout->addWidget(m_showDipoleCheck);
 
     // ===== Source Space Group =====
-    m_srcSpaceGroup = new QGroupBox("Source Space");
+    m_srcSpaceGroup = new QGroupBox("Source Space", sidePanel);
     m_srcSpaceGroup->setEnabled(false);
     QVBoxLayout* srcSpaceLayout = new QVBoxLayout(m_srcSpaceGroup);
     srcSpaceLayout->setContentsMargins(6, 12, 6, 6);
     srcSpaceLayout->setSpacing(8);
 
-    m_showSrcSpaceCheck = new QCheckBox("Show Source Space");
+    m_showSrcSpaceCheck = new QCheckBox("Show Source Space", m_srcSpaceGroup);
     m_showSrcSpaceCheck->setChecked(false);
     m_showSrcSpaceCheck->setEnabled(false);
 
     srcSpaceLayout->addWidget(m_showSrcSpaceCheck);
 
     // ===== Connectivity Network Group =====
-    m_networkGroup = new QGroupBox("Connectivity Network");
+    m_networkGroup = new QGroupBox("Connectivity Network", sidePanel);
     m_networkGroup->setEnabled(false);
     QVBoxLayout* networkLayout = new QVBoxLayout(m_networkGroup);
     networkLayout->setContentsMargins(6, 12, 6, 6);
     networkLayout->setSpacing(8);
 
-    m_showNetworkCheck = new QCheckBox("Show Network");
+    m_showNetworkCheck = new QCheckBox("Show Network", m_networkGroup);
     m_showNetworkCheck->setChecked(false);
     m_showNetworkCheck->setEnabled(false);
 
-    QLabel* netThreshLabel = new QLabel("Threshold:");
-    m_networkThresholdSlider = new QSlider(Qt::Horizontal);
+    QLabel* netThreshLabel = new QLabel("Threshold:", m_networkGroup);
+    m_networkThresholdSlider = new QSlider(Qt::Horizontal, m_networkGroup);
     m_networkThresholdSlider->setRange(0, 100);
     m_networkThresholdSlider->setValue(50);
     m_networkThresholdSlider->setEnabled(false);
 
-    QLabel* netCmapLabel = new QLabel("Colormap:");
-    m_networkColormapCombo = new QComboBox;
+    QLabel* netCmapLabel = new QLabel("Colormap:", m_networkGroup);
+    m_networkColormapCombo = new QComboBox(m_networkGroup);
     m_networkColormapCombo->addItems({"Hot", "Jet", "Bone", "RedBlue", "Plasma"});
     m_networkColormapCombo->setEnabled(false);
 
@@ -709,47 +709,47 @@ void MainWindow::setupUI()
     networkLayout->addWidget(m_networkColormapCombo);
 
     // ===== Evoked Group =====
-    m_evokedGroup = new QGroupBox("Evoked");
+    m_evokedGroup = new QGroupBox("Evoked", sidePanel);
     m_evokedGroup->setEnabled(false);
     QVBoxLayout* evokedLayout = new QVBoxLayout(m_evokedGroup);
     evokedLayout->setContentsMargins(6, 12, 6, 6);
     evokedLayout->setSpacing(6);
 
-    QLabel* evokedSetLabel = new QLabel("Evoked Set:");
-    m_evokedSetCombo = new QComboBox;
+    QLabel* evokedSetLabel = new QLabel("Evoked Set:", m_evokedGroup);
+    m_evokedSetCombo = new QComboBox(m_evokedGroup);
     m_evokedSetCombo->setEnabled(false);
     m_evokedSetCombo->setToolTip("Select which evoked/average data set to display");
 
-    m_showMegFieldCheck = new QCheckBox("Show MEG Field Map");
+    m_showMegFieldCheck = new QCheckBox("Show MEG Field Map", m_evokedGroup);
     m_showMegFieldCheck->setChecked(false);
     m_showMegFieldCheck->setEnabled(false);
 
-    m_showEegFieldCheck = new QCheckBox("Show EEG Potential Map");
+    m_showEegFieldCheck = new QCheckBox("Show EEG Potential Map", m_evokedGroup);
     m_showEegFieldCheck->setChecked(false);
     m_showEegFieldCheck->setEnabled(false);
 
-    m_showMegContourCheck = new QCheckBox("Show MEG Isofield Lines");
+    m_showMegContourCheck = new QCheckBox("Show MEG Isofield Lines", m_evokedGroup);
     m_showMegContourCheck->setChecked(false);
     m_showMegContourCheck->setEnabled(false);
 
-    m_showEegContourCheck = new QCheckBox("Show EEG Equipotential Lines");
+    m_showEegContourCheck = new QCheckBox("Show EEG Equipotential Lines", m_evokedGroup);
     m_showEegContourCheck->setChecked(false);
     m_showEegContourCheck->setEnabled(false);
 
-    QLabel* megSurfLabel = new QLabel("MEG Surface:");
-    m_megHelmetCombo = new QComboBox;
+    QLabel* megSurfLabel = new QLabel("MEG Surface:", m_evokedGroup);
+    m_megHelmetCombo = new QComboBox(m_evokedGroup);
     m_megHelmetCombo->addItems({"Helmet", "Head"});
     m_megHelmetCombo->setToolTip("Choose whether MEG field mapping uses the helmet or head surface.");
     m_megHelmetCombo->setEnabled(false);
 
-    m_sensorFieldTimeSlider = new QSlider(Qt::Horizontal);
+    m_sensorFieldTimeSlider = new QSlider(Qt::Horizontal, m_evokedGroup);
     m_sensorFieldTimeSlider->setRange(0, 0);
     m_sensorFieldTimeSlider->setValue(0);
     m_sensorFieldTimeSlider->setEnabled(false);
 
-    m_sensorFieldTimeLabel = new QLabel("Field Time: 0.000 s");
+    m_sensorFieldTimeLabel = new QLabel("Field Time: 0.000 s", m_evokedGroup);
 
-    m_syncTimesCheck = new QCheckBox("Sync STC \u2194 Evoked");
+    m_syncTimesCheck = new QCheckBox("Sync STC \u2194 Evoked", m_evokedGroup);
     m_syncTimesCheck->setChecked(true);
     m_syncTimesCheck->setToolTip("Synchronize STC and sensor field time points");
     m_syncTimesCheck->setEnabled(false);
@@ -767,32 +767,32 @@ void MainWindow::setupUI()
     evokedLayout->addWidget(m_syncTimesCheck);
 
     // ===== Sensor Streaming Group =====
-    m_sensorStreamGroup = new QGroupBox("Sensor Streaming");
+    m_sensorStreamGroup = new QGroupBox("Sensor Streaming", sidePanel);
     m_sensorStreamGroup->setEnabled(false);
     QVBoxLayout* sensorStreamLayout = new QVBoxLayout(m_sensorStreamGroup);
     sensorStreamLayout->setContentsMargins(6, 12, 6, 6);
     sensorStreamLayout->setSpacing(6);
 
-    QLabel* ssModalityLabel = new QLabel("Modality:");
-    m_sensorStreamModalityCombo = new QComboBox;
+    QLabel* ssModalityLabel = new QLabel("Modality:", m_sensorStreamGroup);
+    m_sensorStreamModalityCombo = new QComboBox(m_sensorStreamGroup);
     m_sensorStreamModalityCombo->addItems({"MEG", "EEG"});
     m_sensorStreamModalityCombo->setEnabled(false);
 
-    m_sensorStreamBtn = new QPushButton("Start Sensor Streaming");
+    m_sensorStreamBtn = new QPushButton("Start Sensor Streaming", m_sensorStreamGroup);
     m_sensorStreamBtn->setEnabled(false);
 
-    m_sensorStreamLoopCheck = new QCheckBox("Loop");
+    m_sensorStreamLoopCheck = new QCheckBox("Loop", m_sensorStreamGroup);
     m_sensorStreamLoopCheck->setChecked(true);
     m_sensorStreamLoopCheck->setEnabled(false);
 
-    QLabel* ssAvgLabel = new QLabel("Averages:");
-    m_sensorStreamAvgSpin = new QSpinBox;
+    QLabel* ssAvgLabel = new QLabel("Averages:", m_sensorStreamGroup);
+    m_sensorStreamAvgSpin = new QSpinBox(m_sensorStreamGroup);
     m_sensorStreamAvgSpin->setRange(1, 100);
     m_sensorStreamAvgSpin->setValue(1);
     m_sensorStreamAvgSpin->setEnabled(false);
 
-    QLabel* ssCmapLabel = new QLabel("Colormap:");
-    m_sensorStreamColormapCombo = new QComboBox;
+    QLabel* ssCmapLabel = new QLabel("Colormap:", m_sensorStreamGroup);
+    m_sensorStreamColormapCombo = new QComboBox(m_sensorStreamGroup);
     m_sensorStreamColormapCombo->addItems({"MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue"});
     m_sensorStreamColormapCombo->setEnabled(false);
 
@@ -806,46 +806,46 @@ void MainWindow::setupUI()
     sensorStreamLayout->addWidget(m_sensorStreamColormapCombo);
 
     // ===== Sensor Group =====
-    m_sensorGroup = new QGroupBox("Sensors");
+    m_sensorGroup = new QGroupBox("Sensors", sidePanel);
     m_sensorGroup->setEnabled(false);
     QVBoxLayout* sensorLayout = new QVBoxLayout(m_sensorGroup);
     sensorLayout->setContentsMargins(6, 12, 6, 6);
     sensorLayout->setSpacing(8);
 
-    m_showMegCheck = new QCheckBox("Show MEG");
+    m_showMegCheck = new QCheckBox("Show MEG", m_sensorGroup);
     m_showMegCheck->setChecked(false);
     m_showMegCheck->setEnabled(false);
 
-    m_showEegCheck = new QCheckBox("Show EEG");
+    m_showEegCheck = new QCheckBox("Show EEG", m_sensorGroup);
     m_showEegCheck->setChecked(false);
     m_showEegCheck->setEnabled(false);
 
-    m_showDigCheck = new QCheckBox("Show Digitizer");
+    m_showDigCheck = new QCheckBox("Show Digitizer", m_sensorGroup);
     m_showDigCheck->setChecked(false);
     m_showDigCheck->setEnabled(false);
 
     // Per-category digitizer visibility
-    m_showDigCardinalCheck = new QCheckBox("  Cardinal (NAS/LPA/RPA)");
+    m_showDigCardinalCheck = new QCheckBox("  Cardinal (NAS/LPA/RPA)", m_sensorGroup);
     m_showDigCardinalCheck->setChecked(false);
     m_showDigCardinalCheck->setEnabled(false);
 
-    m_showDigHpiCheck = new QCheckBox("  HPI Coils");
+    m_showDigHpiCheck = new QCheckBox("  HPI Coils", m_sensorGroup);
     m_showDigHpiCheck->setChecked(false);
     m_showDigHpiCheck->setEnabled(false);
 
-    m_showDigEegCheck = new QCheckBox("  EEG Points");
+    m_showDigEegCheck = new QCheckBox("  EEG Points", m_sensorGroup);
     m_showDigEegCheck->setChecked(false);
     m_showDigEegCheck->setEnabled(false);
 
-    m_showDigExtraCheck = new QCheckBox("  Head Shape");
+    m_showDigExtraCheck = new QCheckBox("  Head Shape", m_sensorGroup);
     m_showDigExtraCheck->setChecked(false);
     m_showDigExtraCheck->setEnabled(false);
 
-    m_showHelmetCheck = new QCheckBox("Show MEG Helmet");
+    m_showHelmetCheck = new QCheckBox("Show MEG Helmet", m_sensorGroup);
     m_showHelmetCheck->setChecked(false);
     m_showHelmetCheck->setEnabled(false);
 
-    m_helmetShapeCombo = new QComboBox;
+    m_helmetShapeCombo = new QComboBox(m_sensorGroup);
     m_helmetShapeCombo->blockSignals(true); // prevent premature loadMegHelmetSurface during addItems
     m_helmetShapeCombo->addItems({"306m", "122m", "306m RT", "BabyMEG",
                                   "BabySQUID", "CTF 275", "KIT", "Magnes 2500WH", "Magnes 3600WH"});
@@ -853,7 +853,7 @@ void MainWindow::setupUI()
     m_helmetShapeCombo->setToolTip("Select MEG helmet shape to display.");
     m_helmetShapeCombo->setEnabled(false);
 
-    m_applyTransCheck = new QCheckBox("Apply Transformation");
+    m_applyTransCheck = new QCheckBox("Apply Transformation", m_sensorGroup);
     m_applyTransCheck->setChecked(true);
     m_applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
 
@@ -869,50 +869,50 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_applyTransCheck);
 
     // ===== View Group =====
-    QGroupBox* viewGroup = new QGroupBox("View");
+    QGroupBox* viewGroup = new QGroupBox("View", sidePanel);
     QVBoxLayout* viewLayout = new QVBoxLayout(viewGroup);
     viewLayout->setContentsMargins(6, 12, 6, 6);
     viewLayout->setSpacing(8);
 
     // Info Panel Toggle
-    m_showInfoCheck = new QCheckBox("Show Info Labels");
+    m_showInfoCheck = new QCheckBox("Show Info Labels", viewGroup);
     m_showInfoCheck->setChecked(true);
     m_showInfoCheck->setToolTip("Show or hide overlay info labels (FPS, shader, surface info).");
     viewLayout->addWidget(m_showInfoCheck);
 
     // View Count
-    QLabel* viewCountLabel = new QLabel("Layout:");
-    m_viewCountCombo = new QComboBox();
+    QLabel* viewCountLabel = new QLabel("Layout:", viewGroup);
+    m_viewCountCombo = new QComboBox(viewGroup);
     m_viewCountCombo->addItems({"Single View", "2 Views", "3 Views", "4 Views"});
     m_viewCountCombo->setCurrentIndex(0);
     m_viewCountCombo->setToolTip("Number of viewport panes (1 = single, 2 = side-by-side, 3 = two + one, 4 = 2×2 grid).");
-    QHBoxLayout* viewCountRow = new QHBoxLayout();
+    auto viewCountRow = std::make_unique<QHBoxLayout>();
     viewCountRow->addWidget(viewCountLabel);
     viewCountRow->addWidget(m_viewCountCombo);
-    viewLayout->addLayout(viewCountRow);
+    viewLayout->addLayout(viewCountRow.release());
 
     // Edit Target
-    m_editTargetLabel = new QLabel("Edit Target:");
-    m_editTargetCombo = new QComboBox();
+    m_editTargetLabel = new QLabel("Edit Target:", viewGroup);
+    m_editTargetCombo = new QComboBox(viewGroup);
     m_editTargetCombo->addItem("All Viewports");
     m_editTargetCombo->setToolTip("Select which viewport the surface, shader, and overlay controls apply to.");
     m_editTargetCombo->setEnabled(false);
-    QHBoxLayout* editTargetRow = new QHBoxLayout();
+    auto editTargetRow = std::make_unique<QHBoxLayout>();
     editTargetRow->addWidget(m_editTargetLabel);
     editTargetRow->addWidget(m_editTargetCombo);
-    viewLayout->addLayout(editTargetRow);
+    viewLayout->addLayout(editTargetRow.release());
 
     // Camera Preset (per-viewport)
-    m_cameraPresetLabel = new QLabel("Camera:");
-    m_cameraPresetCombo = new QComboBox();
+    m_cameraPresetLabel = new QLabel("Camera:", viewGroup);
+    m_cameraPresetCombo = new QComboBox(viewGroup);
     m_cameraPresetCombo->addItems({"Top", "Perspective", "Front", "Left", "Bottom", "Back", "Right"});
     m_cameraPresetCombo->setCurrentIndex(1); // Perspective
     m_cameraPresetCombo->setToolTip("Camera orientation preset for the selected viewport.");
     m_cameraPresetCombo->setEnabled(false);
-    QHBoxLayout* presetRow = new QHBoxLayout();
+    auto presetRow = std::make_unique<QHBoxLayout>();
     presetRow->addWidget(m_cameraPresetLabel);
     presetRow->addWidget(m_cameraPresetCombo);
-    viewLayout->addLayout(presetRow);
+    viewLayout->addLayout(presetRow.release());
 
     // Assemble side panel
     sideLayout->addWidget(m_surfGroup);
@@ -929,12 +929,12 @@ void MainWindow::setupUI()
     sideLayout->addStretch();
 
     // ===== Brain View =====
-    m_brainView = new BrainView;
+    m_brainView = new BrainView(this);
     m_model = new BrainTreeModel(m_brainView);
     m_brainView->setModel(m_model);
 
     // Wrap BrainView + per-viewport time strips in a vertical layout
-    QWidget* viewContainer = new QWidget;
+    QWidget* viewContainer = new QWidget(this);
     QVBoxLayout* viewContainerLayout = new QVBoxLayout(viewContainer);
     viewContainerLayout->setContentsMargins(0, 0, 0, 0);
     viewContainerLayout->setSpacing(0);
@@ -2947,8 +2947,8 @@ void MainWindow::createMenus()
 
 void MainWindow::createStatusBar()
 {
-    m_statusLabel = new QLabel("Ready");
-    m_statusTimeLabel = new QLabel("");
+    m_statusLabel = new QLabel("Ready", this);
+    m_statusTimeLabel = new QLabel("", this);
 
     statusBar()->addWidget(m_statusLabel, 1);
     statusBar()->addPermanentWidget(m_statusTimeLabel);
@@ -2963,7 +2963,7 @@ void MainWindow::createLoadedFilesDock()
     m_loadedFilesDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_loadedFilesDock->setTitleBarWidget(createFlatDockTitleBar(m_loadedFilesDock, "Loaded Files"));
 
-    m_loadedFilesTree = new QTreeWidget;
+    m_loadedFilesTree = new QTreeWidget(m_loadedFilesDock);
     m_loadedFilesTree->setHeaderLabels({"Name", "Type", "Path"});
     m_loadedFilesTree->setColumnCount(3);
     m_loadedFilesTree->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -3039,12 +3039,12 @@ void MainWindow::addLoadedFileEntry(const QString& path, int role)
     if (!m_loadedFilesTree)
         return;
 
-    QTreeWidgetItem* item = new QTreeWidgetItem;
+    auto item = std::make_unique<QTreeWidgetItem>();
     item->setText(0, QFileInfo(path).fileName());
     item->setText(1, QString::fromUtf8(to_string(static_cast<MnaFileRole>(role))));
     item->setText(2, path);
     item->setData(0, Qt::UserRole, role);
-    m_loadedFilesTree->addTopLevelItem(item);
+    m_loadedFilesTree->addTopLevelItem(item.release());
 
     // Update status bar
     if (m_statusLabel) {
@@ -3168,15 +3168,15 @@ void MainWindow::createPickDock()
     m_pickDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_pickDock->setTitleBarWidget(createFlatDockTitleBar(m_pickDock, "Pick"));
 
-    QWidget* body = new QWidget;
+    QWidget* body = new QWidget(m_pickDock);
     QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(4);
 
-    m_pickLabelLine = new QLabel(m_pickReadout.labelRow());
-    m_pickWorldLine = new QLabel(m_pickReadout.worldRow());
-    m_pickVoxelLine = new QLabel(m_pickReadout.voxelRow());
-    m_pickValueLine = new QLabel(m_pickReadout.valueRow());
+    m_pickLabelLine = new QLabel(m_pickReadout.labelRow(), body);
+    m_pickWorldLine = new QLabel(m_pickReadout.worldRow(), body);
+    m_pickVoxelLine = new QLabel(m_pickReadout.voxelRow(), body);
+    m_pickValueLine = new QLabel(m_pickReadout.valueRow(), body);
     for (QLabel* l : {m_pickLabelLine, m_pickWorldLine, m_pickVoxelLine, m_pickValueLine}) {
         l->setTextInteractionFlags(Qt::TextSelectableByMouse);
         lay->addWidget(l);
@@ -3199,16 +3199,16 @@ void MainWindow::createLayersDock()
     m_layersDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_layersDock->setTitleBarWidget(createFlatDockTitleBar(m_layersDock, "Layers"));
 
-    QWidget* body = new QWidget;
+    QWidget* body = new QWidget(m_layersDock);
     QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(6);
 
-    m_layerBrainCheck = new QCheckBox("Cortical Surface");
-    m_layerElectrodesCheck = new QCheckBox("Electrodes");
-    m_layerMriCheck = new QCheckBox("MRI Slices");
-    m_layerSensorsCheck = new QCheckBox("Sensors");
-    m_layerSourceOverlayCheck = new QCheckBox("Source Overlay");
+    m_layerBrainCheck = new QCheckBox("Cortical Surface", body);
+    m_layerElectrodesCheck = new QCheckBox("Electrodes", body);
+    m_layerMriCheck = new QCheckBox("MRI Slices", body);
+    m_layerSensorsCheck = new QCheckBox("Sensors", body);
+    m_layerSourceOverlayCheck = new QCheckBox("Source Overlay", body);
     for (QCheckBox* c : {m_layerBrainCheck, m_layerElectrodesCheck, m_layerMriCheck,
                          m_layerSensorsCheck, m_layerSourceOverlayCheck}) {
         c->setChecked(true);
@@ -3256,54 +3256,54 @@ void MainWindow::createOverlayDock()
     m_overlayDock->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable);
     m_overlayDock->setTitleBarWidget(createFlatDockTitleBar(m_overlayDock, "Overlay"));
 
-    QWidget* body = new QWidget;
+    QWidget* body = new QWidget(m_overlayDock);
     QVBoxLayout* lay = new QVBoxLayout(body);
     lay->setContentsMargins(8, 8, 8, 8);
     lay->setSpacing(6);
 
-    QFormLayout* form = new QFormLayout;
+    auto form = std::make_unique<QFormLayout>();
     form->setLabelAlignment(Qt::AlignLeft);
 
-    m_overlaySourceCombo = new QComboBox;
+    m_overlaySourceCombo = new QComboBox(body);
     m_overlaySourceCombo->addItems({"iEEG amplitude", "iEEG power",
                                     "Source value", "MRI intensity"});
     form->addRow("Data source", m_overlaySourceCombo);
 
-    m_overlayCmapCombo = new QComboBox;
+    m_overlayCmapCombo = new QComboBox(body);
     m_overlayCmapCombo->addItems({"Sequential", "Divergent", "Hot/Cool"});
     form->addRow("Colormap", m_overlayCmapCombo);
 
-    m_overlayFminSpin = new QDoubleSpinBox;
+    m_overlayFminSpin = new QDoubleSpinBox(body);
     m_overlayFminSpin->setRange(-1e6, 1e6);
     m_overlayFminSpin->setDecimals(4);
     m_overlayFminSpin->setValue(m_scene.overlayFmin());
     form->addRow("fmin", m_overlayFminSpin);
 
-    m_overlayFmidSpin = new QDoubleSpinBox;
+    m_overlayFmidSpin = new QDoubleSpinBox(body);
     m_overlayFmidSpin->setRange(-1e6, 1e6);
     m_overlayFmidSpin->setDecimals(4);
     m_overlayFmidSpin->setValue(m_scene.overlayFmid());
     form->addRow("fmid", m_overlayFmidSpin);
 
-    m_overlayFmaxSpin = new QDoubleSpinBox;
+    m_overlayFmaxSpin = new QDoubleSpinBox(body);
     m_overlayFmaxSpin->setRange(-1e6, 1e6);
     m_overlayFmaxSpin->setDecimals(4);
     m_overlayFmaxSpin->setValue(m_scene.overlayFmax());
     form->addRow("fmax", m_overlayFmaxSpin);
 
-    lay->addLayout(form);
+    lay->addLayout(form.release());
 
-    QHBoxLayout* timeRow = new QHBoxLayout;
+    auto timeRow = std::make_unique<QHBoxLayout>();
     timeRow->addWidget(new QLabel("Time"));
-    m_overlayTimeSlider = new QSlider(Qt::Horizontal);
+    m_overlayTimeSlider = new QSlider(Qt::Horizontal, body);
     m_overlayTimeSlider->setRange(0, 1000);
     m_overlayTimeSlider->setValue(0);
     timeRow->addWidget(m_overlayTimeSlider, 1);
-    m_overlayTimeLabel = new QLabel("0.000 s");
+    m_overlayTimeLabel = new QLabel("0.000 s", body);
     timeRow->addWidget(m_overlayTimeLabel);
-    lay->addLayout(timeRow);
+    lay->addLayout(timeRow.release());
 
-    m_overlayColorBar = new OverlayColorBar;
+    m_overlayColorBar = new OverlayColorBar(body);
     m_overlayColorBar->setRange(m_scene.overlayFmin(),
                                 m_scene.overlayFmid(),
                                 m_scene.overlayFmax());

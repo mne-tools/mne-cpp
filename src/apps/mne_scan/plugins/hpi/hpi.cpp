@@ -96,7 +96,7 @@ Hpi::~Hpi()
 
 QSharedPointer<AbstractPlugin> Hpi::clone() const
 {
-    QSharedPointer<Hpi> pHpiClone(new Hpi);
+    auto pHpiClone = QSharedPointer<Hpi>::create();
     return pHpiClone;
 }
 
@@ -287,10 +287,10 @@ void Hpi::initPluginControlWidgets()
     m_mutex.unlock();
 
     if (bFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         // Projects Settings
-        HpiSettingsView* pHpiSettingsView = new HpiSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        HpiSettingsView* pHpiSettingsView = makeControlWidget<HpiSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
 
         connect(this, &Hpi::guiModeChanged,
                 pHpiSettingsView, &HpiSettingsView::setGuiMode);
@@ -347,9 +347,8 @@ void Hpi::initPluginControlWidgets()
             pHpiSettingsView->newDigitizerList(digitizers);
         }
 
-        plControlWidgets.append(pHpiSettingsView);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         m_bPluginControlWidgetsInit = true;
     }

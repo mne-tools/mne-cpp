@@ -63,7 +63,7 @@ class PluginGui : public QMainWindow
     friend class PluginScene;
 
 public:
-    PluginGui(mne::scan::PluginManager* pPluginManager, mne::scan::PluginSceneManager* pPluginSceneManager);
+    PluginGui(mne::scan::PluginManager* pPluginManager, mne::scan::PluginSceneManager* pPluginSceneManager, QWidget* parent = nullptr);
 
     ~PluginGui();
 

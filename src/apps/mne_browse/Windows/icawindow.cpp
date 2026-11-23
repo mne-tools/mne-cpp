@@ -102,14 +102,14 @@ void IcaWindow::setupUi()
     // ── Scrollable component list ───────────────────────────────────
     m_pScrollArea = new QScrollArea(m_pCentralWidget);
     m_pScrollArea->setWidgetResizable(true);
-    m_pComponentListWidget = new QWidget();
+    m_pComponentListWidget = new QWidget(m_pScrollArea);
     m_pComponentListLayout = new QVBoxLayout(m_pComponentListWidget);
     m_pComponentListLayout->setAlignment(Qt::AlignTop);
     m_pScrollArea->setWidget(m_pComponentListWidget);
     m_pMainLayout->addWidget(m_pScrollArea, 1);
 
     // ── Apply / Reset buttons ───────────────────────────────────────
-    auto* buttonLayout = new QHBoxLayout();
+    auto buttonLayout = std::make_unique<QHBoxLayout>();
     m_pApplyButton = new QPushButton(tr("Apply Exclusion"), m_pCentralWidget);
     m_pApplyButton->setToolTip(tr("Remove the checked components from the raw data"));
     m_pApplyButton->setEnabled(false);
@@ -118,7 +118,7 @@ void IcaWindow::setupUi()
     m_pResetButton->setEnabled(false);
     buttonLayout->addWidget(m_pApplyButton);
     buttonLayout->addWidget(m_pResetButton);
-    m_pMainLayout->addLayout(buttonLayout);
+    m_pMainLayout->addLayout(buttonLayout.release());
 
     setWidget(m_pCentralWidget);
 

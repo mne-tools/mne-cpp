@@ -16,13 +16,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "dipolefit.h"
 
+#include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
-
-
 #include <anShared/Model/abstractmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/bemdatamodel.h>
@@ -30,13 +28,10 @@
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
-
 #include <mne/disp/viewers/dipolefitview.h>
-
 #include <mne/inv/dipole_fit/inv_dipole_fit_data.h>
 #include <mne/inv/dipole_fit/inv_dipole_fit.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
-
 #include <mne/base/thread_pool.h>
 
 //=============================================================================================================
@@ -44,6 +39,12 @@
 //=============================================================================================================
 
 #include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -108,7 +109,8 @@ QMenu* InvDipoleFit::getMenu()
 
 QDockWidget* InvDipoleFit::getControl()
 {
-    mne::disp::DipoleFitView* pDipoleView = new mne::disp::DipoleFitView();
+    auto pDockWidgt = std::make_unique<QDockWidget>(getName());
+    mne::disp::DipoleFitView* pDipoleView = new mne::disp::DipoleFitView(pDockWidgt.get());
 
     //Send Gui updates
     connect(this, &InvDipoleFit::newBemModel,
@@ -155,14 +157,13 @@ QDockWidget* InvDipoleFit::getControl()
     connect(pDipoleView, &mne::disp::DipoleFitView::performDipoleFit,
             this, &InvDipoleFit::onPerformDipoleFit, Qt::UniqueConnection);
 
-    QDockWidget* pDockWidgt = new QDockWidget(getName());
     pDockWidgt->setWidget(pDipoleView);
     pDockWidgt->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pDockWidgt->setObjectName(getName());
 
     emit getUpdate();
 
-    return pDockWidgt;
+    return pDockWidgt.release();
 }
 
 //=============================================================================================================

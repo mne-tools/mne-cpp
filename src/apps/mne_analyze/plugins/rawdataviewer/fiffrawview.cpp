@@ -61,7 +61,7 @@ using namespace mne;
 
 FiffRawView::FiffRawView(QWidget* parent)
 : mne::disp::AbstractView(parent)
-, m_pTableView(new QTableView())
+, m_pTableView(new QTableView(this))
 , m_fDefaultSectionSize(80.0f)
 {
     //set vertical layout

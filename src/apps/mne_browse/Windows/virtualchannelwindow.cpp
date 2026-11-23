@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <memory>
 
 using namespace MNEBROWSE;
 
@@ -211,7 +212,7 @@ bool VirtualChannelWindow::promptForReferenceSet(VirtualReferenceSetDefinition& 
     dialog.setWindowTitle(QStringLiteral("Add Reference Set"));
 
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
-    QFormLayout* formLayout = new QFormLayout();
+    auto formLayout = std::make_unique<QFormLayout>();
 
     QLineEdit* nameEdit = new QLineEdit(&dialog);
     QListWidget* channelListWidget = new QListWidget(&dialog);
@@ -220,7 +221,7 @@ bool VirtualChannelWindow::promptForReferenceSet(VirtualReferenceSetDefinition& 
 
     formLayout->addRow(QStringLiteral("Name"), nameEdit);
     formLayout->addRow(QStringLiteral("Channels"), channelListWidget);
-    mainLayout->addLayout(formLayout);
+    mainLayout->addLayout(formLayout.release());
 
     QLabel* hintLabel = new QLabel(QStringLiteral("Reference sets can be reused by average-reference and weighted-reference virtual channels."), &dialog);
     hintLabel->setWordWrap(true);
@@ -258,7 +259,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     dialog.resize(620, 560);
 
     QVBoxLayout* mainLayout = new QVBoxLayout(&dialog);
-    QFormLayout* formLayout = new QFormLayout();
+    auto formLayout = std::make_unique<QFormLayout>();
 
     QLineEdit* nameEdit = new QLineEdit(&dialog);
     QComboBox* typeComboBox = new QComboBox(&dialog);
@@ -300,7 +301,7 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
     formLayout->addRow(QStringLiteral("References"), referenceSourceComboBox);
     formLayout->addRow(QStringLiteral("Channel List"), referenceListWidget);
     formLayout->addRow(QStringLiteral("Weights"), weightTable);
-    mainLayout->addLayout(formLayout);
+    mainLayout->addLayout(formLayout.release());
     mainLayout->addWidget(hintLabel);
 
     auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -350,13 +351,13 @@ bool VirtualChannelWindow::promptForVirtualChannel(VirtualChannelDefinition& def
         for (int row = 0; row < referenceChannels.size(); ++row) {
             const QString channelName = referenceChannels.at(row);
 
-            QTableWidgetItem* channelItem = new QTableWidgetItem(channelName);
+            auto channelItem = std::make_unique<QTableWidgetItem>(channelName);
             channelItem->setFlags(channelItem->flags() & ~Qt::ItemIsEditable);
-            weightTable->setItem(row, 0, channelItem);
+            weightTable->setItem(row, 0, channelItem.release());
 
             const double weight = weightByChannel.contains(channelName) ? weightByChannel.value(channelName) : 1.0;
-            QTableWidgetItem* weightItem = new QTableWidgetItem(QString::number(weight, 'g', 6));
-            weightTable->setItem(row, 1, weightItem);
+            auto weightItem = std::make_unique<QTableWidgetItem>(QString::number(weight, 'g', 6));
+            weightTable->setItem(row, 1, weightItem.release());
         }
         weightTable->resizeColumnsToContents();
     };
@@ -586,13 +587,13 @@ void VirtualChannelWindow::manageReferenceSets()
 
     reloadSets();
 
-    QHBoxLayout* buttonRow = new QHBoxLayout();
+    auto buttonRow = std::make_unique<QHBoxLayout>();
     QPushButton* addButton = new QPushButton(QStringLiteral("Add"), &dialog);
     QPushButton* removeButton = new QPushButton(QStringLiteral("Remove"), &dialog);
     buttonRow->addWidget(addButton);
     buttonRow->addWidget(removeButton);
     buttonRow->addStretch(1);
-    mainLayout->addLayout(buttonRow);
+    mainLayout->addLayout(buttonRow.release());
 
     QObject::connect(addButton, &QPushButton::clicked, &dialog, [this, &reloadSets]() {
         if (m_availableChannelNames.isEmpty()) {

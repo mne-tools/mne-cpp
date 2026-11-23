@@ -2644,11 +2644,11 @@ bool BrainView::loadSensors(const std::filesystem::path& fifPath)
     m_hasDevHead = r.hasDevHead;
 
     if (!r.megGradItems.empty())
-        m_model->addSensors("MEG/Grad", r.megGradItems);
+        m_model->addSensors("MEG/Grad", std::move(r.megGradItems));
     if (!r.megMagItems.empty())
-        m_model->addSensors("MEG/Mag", r.megMagItems);
+        m_model->addSensors("MEG/Mag", std::move(r.megMagItems));
     if (!r.eegItems.empty())
-        m_model->addSensors("EEG", r.eegItems);
+        m_model->addSensors("EEG", std::move(r.eegItems));
 
     if (r.helmetSurface) {
         m_surfaces["sens_surface_meg"] = r.helmetSurface;

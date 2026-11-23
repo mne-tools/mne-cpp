@@ -60,6 +60,7 @@
 #include <QComboBox>
 #include <QFileDialog>
 #include <QGraphicsView>
+#include <QPointer>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
@@ -97,6 +98,7 @@ private slots:
     void connectivityFollowsTheStream();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
+    void controlWidgetsHaveAnOwner();
     void passesTheStreamThrough();
     void brainAmpStreamsTheSimulatedAmplifier();
     void tmsiStreamsTheSimulatedAmplifier();
@@ -487,6 +489,47 @@ void TestMneScanPlugins::estimatesTheCovariance()
     QCOMPARE(estimate.names.size(), dataChannels);
     QVERIFY(estimate.data.isApprox(estimate.data.transpose()));
     QVERIFY(estimate.data.diagonal().minCoeff() >= 0.0);
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::controlWidgetsHaveAnOwner()
+{
+    if (!m_info)
+        QSKIP("Sample test data not found");
+
+    // Without a control view nobody adopts the settings widgets; the plugin keeps and deletes them
+    QList<QPointer<QWidget>> kept;
+    {
+        std::unique_ptr<AbstractPlugin> plugin = makePlugin("Covariance");
+        connect(plugin.get(), &AbstractPlugin::pluginControlWidgetsChanged, this,
+                [&kept](QList<QWidget*>& widgets, const QString&) {
+                    for (QWidget* widget : widgets)
+                        kept.append(widget);
+                });
+        stream(*plugin);
+        QVERIFY(!kept.isEmpty());
+    }
+    for (const QPointer<QWidget>& widget : kept)
+        QVERIFY(widget.isNull());
+
+    // A listener that shows them gives them a parent, which keeps them after the plugin is gone
+    QWidget panel;
+    QList<QPointer<QWidget>> adopted;
+    {
+        std::unique_ptr<AbstractPlugin> plugin = makePlugin("Covariance");
+        connect(plugin.get(), &AbstractPlugin::pluginControlWidgetsChanged, &panel,
+                [&panel, &adopted](QList<QWidget*>& widgets, const QString&) {
+                    for (QWidget* widget : widgets) {
+                        widget->setParent(&panel);
+                        adopted.append(widget);
+                    }
+                });
+        stream(*plugin);
+        QVERIFY(!adopted.isEmpty());
+    }
+    for (const QPointer<QWidget>& widget : adopted)
+        QVERIFY(!widget.isNull());
 }
 
 //=============================================================================================================

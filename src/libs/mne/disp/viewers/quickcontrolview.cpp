@@ -111,11 +111,10 @@ QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
         pTabWidgetLayout = qobject_cast<QVBoxLayout*>(pTabWidget->layout());
     } else {
         // Tab widget does not exist yet. Create it and return grid lyout.
-        pTabWidget = new QWidget();
+        pTabWidget = new QWidget(this);
         pTabWidget->setObjectName(sTabName + "TabWidget");
-        pTabWidgetLayout = new QVBoxLayout();
+        pTabWidgetLayout = new QVBoxLayout(pTabWidget);
         pTabWidgetLayout->setContentsMargins(4, 2, 4, 4);
-        pTabWidget->setLayout(pTabWidgetLayout);
         m_pUi->m_pTabWidget->insertTab(0, pTabWidget, sTabName);
     }
 
@@ -176,14 +175,13 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
 {
     if (QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
-        QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
+        QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName, this);
         pGroupBox->setObjectName(sGroupBoxName);
 
-        QVBoxLayout* pVBox = new QVBoxLayout;
+        QVBoxLayout* pVBox = new QVBoxLayout(pGroupBox);
 
         pVBox->setContentsMargins(0, 0, 0, 0);
         pVBox->addWidget(pWidget);
-        pGroupBox->setLayout(pVBox);
 
         pTabWidgetLayout->insertWidget(iPos,
                                        pGroupBox,
@@ -204,15 +202,15 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
 
         if (!pGroupBox) {
             int iPos = bAddToEnd ? -1 : 0;
-            pGroupBox = new QGroupBox(sGroupBoxName);
+            pGroupBox = new QGroupBox(sGroupBoxName, this);
             pGroupBox->setObjectName(sGroupBoxName);
 
             pTabWidgetLayout->insertWidget(iPos,
                                            pGroupBox,
                                            0);
 
-            QVBoxLayout* pVBox = new QVBoxLayout;
-            QTabWidget* pTabWidget = new QTabWidget;
+            QVBoxLayout* pVBox = new QVBoxLayout(pGroupBox);
+            QTabWidget* pTabWidget = new QTabWidget(pGroupBox);
             pTabWidget->setTabBarAutoHide(false);
             pTabWidget->setMovable(true);
             pTabWidget->setObjectName(sGroupBoxName + "TabWidget");
@@ -220,7 +218,6 @@ void QuickControlView::addGroupBoxWithTabs(QWidget* pWidget,
             pTabWidget->addTab(pWidget, sTabNameGroupBox);
             pVBox->setContentsMargins(4, 2, 4, 4);
             pVBox->addWidget(pTabWidget);
-            pGroupBox->setLayout(pVBox);
         } else {
             QTabWidget* pTabWidget = pGroupBox->findChild<QTabWidget*>(sGroupBoxName + "TabWidget");
 

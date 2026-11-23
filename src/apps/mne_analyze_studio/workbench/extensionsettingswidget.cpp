@@ -27,6 +27,8 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 ExtensionSettingsWidget::ExtensionSettingsWidget(const ExtensionManifest& manifest,
@@ -38,7 +40,7 @@ ExtensionSettingsWidget::ExtensionSettingsWidget(const ExtensionManifest& manife
 , m_titleLabel(new QLabel(QString("%1 Settings").arg(manifest.displayName), this))
 , m_subtitleLabel(new QLabel(QString("%1 | %2").arg(tab.title, tab.description), this))
 , m_statusLabel(new QLabel("Settings are stored per studio workspace profile.", this))
-, m_formLayout(new QFormLayout)
+, m_formLayout(nullptr)
 {
     m_titleLabel->setObjectName("terminalStatusLabel");
     m_subtitleLabel->setWordWrap(true);
@@ -46,12 +48,12 @@ ExtensionSettingsWidget::ExtensionSettingsWidget(const ExtensionManifest& manife
     m_statusLabel->setWordWrap(true);
 
     QWidget* formWidget = new QWidget(this);
-    formWidget->setLayout(m_formLayout);
+    m_formLayout = new QFormLayout(formWidget);
 
     QPushButton* saveButton = new QPushButton("Save Settings", this);
     QPushButton* restoreButton = new QPushButton("Restore Defaults", this);
 
-    QHBoxLayout* buttonLayout = new QHBoxLayout;
+    auto buttonLayout = std::make_unique<QHBoxLayout>();
     buttonLayout->setContentsMargins(0, 0, 0, 0);
     buttonLayout->setSpacing(8);
     buttonLayout->addWidget(saveButton);
@@ -65,7 +67,7 @@ ExtensionSettingsWidget::ExtensionSettingsWidget(const ExtensionManifest& manife
     layout->addWidget(m_subtitleLabel);
     layout->addWidget(m_statusLabel);
     layout->addWidget(formWidget);
-    layout->addLayout(buttonLayout);
+    layout->addLayout(buttonLayout.release());
     layout->addStretch(1);
 
     buildForm();

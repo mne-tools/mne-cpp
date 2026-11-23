@@ -563,7 +563,7 @@ void ScalingView::clearView()
 
 void ScalingView::createLinkMagGradCheckBox()
 {
-    m_pCheckBox = QPointer<QCheckBox>(new QCheckBox("Link MAGs -> GRADs"));
+    m_pCheckBox = QPointer<QCheckBox>(new QCheckBox("Link MAGs -> GRADs", this));
     m_pCheckBox->setChecked(m_bLinkMAGtoGRAD);
     connect(m_pCheckBox, &QCheckBox::checkStateChanged, this, &ScalingView::setMagGradLink);
     m_pUi->verticalLayout->addWidget(m_pCheckBox);

@@ -113,7 +113,7 @@ TMSI::~TMSI()
 
 QSharedPointer<AbstractPlugin> TMSI::clone() const
 {
-    QSharedPointer<TMSI> pTMSIClone(new TMSI());
+    auto pTMSIClone = QSharedPointer<TMSI>::create();
     return pTMSIClone;
 }
 

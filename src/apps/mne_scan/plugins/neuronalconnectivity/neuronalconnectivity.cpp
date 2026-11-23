@@ -85,7 +85,7 @@ NeuronalConnectivity::~NeuronalConnectivity()
 
 QSharedPointer<AbstractPlugin> NeuronalConnectivity::clone() const
 {
-    QSharedPointer<NeuronalConnectivity> pNeuronalConnectivityClone(new NeuronalConnectivity);
+    auto pNeuronalConnectivityClone = QSharedPointer<NeuronalConnectivity>::create();
     return pNeuronalConnectivityClone;
 }
 
@@ -119,9 +119,9 @@ void NeuronalConnectivity::init()
 
 void NeuronalConnectivity::initPluginControlWidgets()
 {
-    QList<QWidget*> plControlWidgets;
+    std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-    ConnectivitySettingsView* pConnectivitySettingsView = new ConnectivitySettingsView(QString("MNESCAN/%1").arg(this->getName()));
+    ConnectivitySettingsView* pConnectivitySettingsView = makeControlWidget<ConnectivitySettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
     connect(this, &NeuronalConnectivity::guiModeChanged,
             pConnectivitySettingsView, &ConnectivitySettingsView::setGuiMode);
     pConnectivitySettingsView->setObjectName("group_tab_Settings_Connectivity");
@@ -138,7 +138,6 @@ void NeuronalConnectivity::initPluginControlWidgets()
     connect(this, &NeuronalConnectivity::responsibleTriggerTypesChaged,
             pConnectivitySettingsView, &ConnectivitySettingsView::setTriggerTypes);
 
-    plControlWidgets.append(pConnectivitySettingsView);
 
     onFrequencyBandChanged(pConnectivitySettingsView->getLowerFreq(), pConnectivitySettingsView->getUpperFreq());
     onMetricChanged(pConnectivitySettingsView->getConnectivityMetric());
@@ -146,7 +145,7 @@ void NeuronalConnectivity::initPluginControlWidgets()
     onNumberTrialsChanged(pConnectivitySettingsView->getNumberTrials());
     onTriggerTypeChanged(pConnectivitySettingsView->getTriggerType());
 
-    emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+    offerControlWidgets(std::move(controlWidgets));
 
     m_bPluginControlWidgetsInit = true;
 }

@@ -57,7 +57,7 @@ SpectrumView::SpectrumView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 {
     m_sSettingsPath = sSettingsPath;
-    m_pTableView = new QTableView;
+    m_pTableView = new QTableView(this);
 
     m_pTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_pTableView->setMouseTracking(true);

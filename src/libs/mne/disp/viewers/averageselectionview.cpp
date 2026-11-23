@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include "averageselectionview.h"
+#include "../detail/layout_reset.h"
 #include "../detail/map_value.h"
 #include <mne/base/log.h>
 
@@ -197,13 +198,11 @@ void AverageSelectionView::redrawGUI()
     //Delete all widgets in the averages layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
     if (!topLayout) {
-        topLayout = new QGridLayout();
+        topLayout = new QGridLayout(this);
     }
 
     // The widgets go right away: the view is redrawn synchronously and looked up by name
-    while (std::unique_ptr<QLayoutItem> pItem{topLayout->takeAt(0)}) {
-        std::unique_ptr<QWidget> pWidget{pItem->widget()};
-    }
+    detail::clearLayout(topLayout);
 
     // Create new GUI elements
     int count = 0;
@@ -215,7 +214,7 @@ void AverageSelectionView::redrawGUI()
         const QString name = QString::fromStdString(key);
 
         //Create average active checkbox
-        QPointer<QCheckBox> pCheckBox = new QCheckBox(name);
+        QPointer<QCheckBox> pCheckBox = new QCheckBox(name, this);
         pCheckBox->setChecked(detail::valueOr(*m_qMapAverageActivation, key));
         pCheckBox->setObjectName(name);
         topLayout->addWidget(pCheckBox, count, 0);
@@ -223,7 +222,7 @@ void AverageSelectionView::redrawGUI()
                 this, &AverageSelectionView::onAverageSelectionColorChanged);
 
         //Create average color pushbutton
-        QPointer<QPushButton> pButton = new QPushButton("Click to change");
+        QPointer<QPushButton> pButton = new QPushButton("Click to change", this);
         pButton->setObjectName(name);
         pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);
@@ -232,8 +231,6 @@ void AverageSelectionView::redrawGUI()
 
         ++count;
     }
-
-    this->setLayout(topLayout);
 }
 
 //=============================================================================================================

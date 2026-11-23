@@ -96,7 +96,7 @@ RtClustMne::~RtClustMne()
 
 QSharedPointer<AbstractPlugin> RtClustMne::clone() const
 {
-    QSharedPointer<RtClustMne> pRtClustMneClone(new RtClustMne());
+    auto pRtClustMneClone = QSharedPointer<RtClustMne>::create();
     return pRtClustMneClone;
 }
 
@@ -154,9 +154,9 @@ void RtClustMne::init()
 
 void RtClustMne::initPluginControlWidgets()
 {
-    QList<QWidget*> plControlWidgets;
+    std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-    MinimumNormSettingsView* pMinimumNormSettingsView = new MinimumNormSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+    MinimumNormSettingsView* pMinimumNormSettingsView = makeControlWidget<MinimumNormSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
     connect(this, &RtClustMne::guiModeChanged,
             pMinimumNormSettingsView, &MinimumNormSettingsView::setGuiMode);
     pMinimumNormSettingsView->setObjectName("group_tab_Settings_Source Localization");
@@ -180,9 +180,8 @@ void RtClustMne::initPluginControlWidgets()
         m_sModelCheckpoint = QString::fromStdString(mne::utf8_from_path(pMinimumNormSettingsView->getModelCheckpoint()));
     }
 
-    plControlWidgets.append(pMinimumNormSettingsView);
 
-    emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+    offerControlWidgets(std::move(controlWidgets));
 
     m_bPluginControlWidgetsInit = true;
 }

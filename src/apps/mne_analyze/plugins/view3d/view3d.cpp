@@ -48,7 +48,7 @@ using namespace mne;
 View3D::View3D()
 : m_pCommu(nullptr)
 , m_pBemTreeCoreg(nullptr)
-, m_pView3D(nullptr)
+, m_pView3D()
 , m_bPickingActivated(false)
 {
     m_iFiducial = 1;
@@ -64,7 +64,7 @@ View3D::~View3D()
 
 QSharedPointer<AbstractPlugin> View3D::clone() const
 {
-    QSharedPointer<View3D> pView3DClone(new View3D);
+    auto pView3DClone = QSharedPointer<View3D>::create();
     return pView3DClone;
 }
 
@@ -100,8 +100,11 @@ QMenu* View3D::getMenu()
 
 QWidget* View3D::getView()
 {
+    // The main window adopts the view
+    std::unique_ptr<BrainView> view;
     if (!m_pView3D) {
-        m_pView3D = new BrainView();
+        view = std::make_unique<BrainView>();
+        m_pView3D = view.get();
     }
 
     m_pView3D->setModel(m_p3DModel.data());
@@ -111,12 +114,12 @@ QWidget* View3D::getView()
     // or light color/intensity via direct slots.
     // Use BrainView::saveSnapshot() for screenshots, setLightingEnabled() for lighting.
     connect(this, &View3D::takeScreenshotChanged,
-            m_pView3D, &BrainView::saveSnapshot);
+            m_pView3D.data(), &BrainView::saveSnapshot);
     connect(this, &View3D::rotationChanged,
-            m_pView3D, &BrainView::setAutomatedRotation);
+            m_pView3D.data(), &BrainView::setAutomatedRotation);
 
     // BrainView is a QWidget (QRhiWidget), can be embedded directly
-    return m_pView3D;
+    return view ? view.release() : m_pView3D.data();
 }
 
 //=============================================================================================================

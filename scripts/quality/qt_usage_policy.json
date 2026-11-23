@@ -72,7 +72,7 @@
       "modules": []
     },
     "disp": {
-      "tokens": 5180,
+      "tokens": 5149,
       "public_header_includes": 83,
       "modules": [
         "Core",
@@ -82,17 +82,17 @@
       "by_category": {
         "containers": 33,
         "files": 99,
-        "global": 1172,
-        "gui": 949,
+        "global": 1165,
+        "gui": 947,
         "objects_signals": 531,
-        "other": 1540,
+        "other": 1518,
         "strings": 847,
         "time": 9
       }
     },
     "disp3D": {
-      "tokens": 1641,
-      "public_header_includes": 76,
+      "tokens": 1633,
+      "public_header_includes": 75,
       "modules": [
         "Core",
         "Gui",
@@ -101,12 +101,12 @@
         "Widgets"
       ],
       "by_category": {
-        "containers": 8,
+        "containers": 3,
         "files": 13,
         "global": 166,
         "gui": 962,
         "objects_signals": 135,
-        "other": 223,
+        "other": 220,
         "strings": 129,
         "time": 5
       }

@@ -306,7 +306,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     m_archivedTranscript->setPlaceholderText(
         QStringLiteral("Open a prior session to inspect its transcript here."));
 
-    QHBoxLayout* detailHeaderLayout = new QHBoxLayout;
+    auto detailHeaderLayout = std::make_unique<QHBoxLayout>();
     detailHeaderLayout->setContentsMargins(0, 0, 0, 0);
     detailHeaderLayout->setSpacing(4);
     detailHeaderLayout->addWidget(m_backToSessionsButton);
@@ -315,7 +315,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     QVBoxLayout* detailLayout = new QVBoxLayout(m_historyDetailPage);
     detailLayout->setContentsMargins(10, 8, 10, 8);
     detailLayout->setSpacing(6);
-    detailLayout->addLayout(detailHeaderLayout);
+    detailLayout->addLayout(detailHeaderLayout.release());
     detailLayout->addWidget(m_archivedTranscript, 1);
 
     // ── Assemble main stack ───────────────────────────────────────────────
@@ -355,7 +355,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     m_connectionSettingsButton->setFixedWidth(36);
 
     // Controls row: [Mode] [Model] [Safety] [⚙]
-    QHBoxLayout* controlsRow = new QHBoxLayout;
+    auto controlsRow = std::make_unique<QHBoxLayout>();
     controlsRow->setContentsMargins(0, 0, 0, 0);
     controlsRow->setSpacing(4);
     controlsRow->addWidget(m_modeSelector, 2);
@@ -364,7 +364,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     controlsRow->addWidget(m_connectionSettingsButton, 0);
 
     // Profile row (only shown when profiles exist)
-    QHBoxLayout* profileRow = new QHBoxLayout;
+    auto profileRow = std::make_unique<QHBoxLayout>();
     profileRow->setContentsMargins(0, 0, 0, 0);
     profileRow->setSpacing(4);
     profileRow->addWidget(m_profileSelector, 1);
@@ -378,7 +378,7 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     m_sendButton->setFixedWidth(40);
     m_sendButton->setToolTip(QStringLiteral("Send (Enter)"));
 
-    QHBoxLayout* inputRow = new QHBoxLayout;
+    auto inputRow = std::make_unique<QHBoxLayout>();
     inputRow->setContentsMargins(0, 0, 0, 0);
     inputRow->setSpacing(6);
     inputRow->addWidget(m_input, 1);
@@ -394,9 +394,9 @@ AgentChatDockWidget::AgentChatDockWidget(QWidget* parent)
     QVBoxLayout* composerLayout = new QVBoxLayout(composer);
     composerLayout->setContentsMargins(10, 10, 10, 10);
     composerLayout->setSpacing(6);
-    composerLayout->addLayout(controlsRow);
-    composerLayout->addLayout(profileRow);
-    composerLayout->addLayout(inputRow);
+    composerLayout->addLayout(controlsRow.release());
+    composerLayout->addLayout(profileRow.release());
+    composerLayout->addLayout(inputRow.release());
     composerLayout->addWidget(m_validationHintLabel);
     composerLayout->addWidget(m_statusLabel);
 
@@ -665,7 +665,7 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
         QPushButton* dismissBtn = new QPushButton(QStringLiteral("Dismiss"), card);
         dismissBtn->setObjectName(QStringLiteral("agentDismissBtn"));
 
-        QHBoxLayout* btnRow = new QHBoxLayout;
+        auto btnRow = std::make_unique<QHBoxLayout>();
         btnRow->setContentsMargins(0, 0, 0, 0);
         btnRow->setSpacing(6);
         btnRow->addWidget(approveBtn);
@@ -676,7 +676,7 @@ void AgentChatDockWidget::setPendingConfirmations(const QJsonArray& confirmation
         cardLayout->addWidget(detailsLbl);
         cardLayout->addWidget(reasonLbl);
         cardLayout->addWidget(warningLbl);
-        cardLayout->addLayout(btnRow);
+        cardLayout->addLayout(btnRow.release());
         m_confirmationLayout->addWidget(card);
 
         connect(approveBtn, &QPushButton::clicked, this, [this, commandText]() {

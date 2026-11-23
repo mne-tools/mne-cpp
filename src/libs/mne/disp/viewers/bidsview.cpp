@@ -139,14 +139,14 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 pRemoveAction = new QAction("Remove Session", this);
 
-                QMenu* pMoveMenu = new QMenu("Move Session to ...");
+                QMenu* pMoveMenu = new QMenu("Move Session to ...", menu);
 
                 //Find all available subjects
                 for (int i = 0; i < pModel->rowCount(); i++) {
                     if (pModel->item(i)->index() != pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>()) {
                         mne::Log::debug("Relative model index {}", pModel->item(i)->index().row());
                         mne::Log::debug("Relative item index {}", pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>().row());
-                        QAction* pTargetAction = new QAction(pModel->item(i)->text());
+                        QAction* pTargetAction = new QAction(pModel->item(i)->text(), pMoveMenu);
                         connect(pTargetAction, &QAction::triggered, [=, this]() {
                             emit onMoveSession(pModel->item(i)->index(), pItem->index());
                         });
@@ -169,14 +169,14 @@ void BidsView::customMenuRequested(QPoint pos)
 
                 pRemoveAction = new QAction("Remove Data", this);
 
-                QMenu* pMoveMenu = new QMenu("Move Data to ...");
+                QMenu* pMoveMenu = new QMenu("Move Data to ...", menu);
 
                 //Find all available sessions
                 for (int i = 0; i < pModel->rowCount(); i++) {
-                    QMenu* pSubjectMenu = new QMenu(pModel->item(i)->text());
+                    QMenu* pSubjectMenu = new QMenu(pModel->item(i)->text(), pMoveMenu);
                     for (int j = 0; j < pModel->item(i)->rowCount(); j++) {
                         if (pModel->item(i)->child(j)->index() != pItem->data(BIDS_ITEM_SESSION).value<QModelIndex>()) {
-                            QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
+                            QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text(), pSubjectMenu);
                             connect(pTargetAction, &QAction::triggered, [=, this] {
                                 emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());
                             });

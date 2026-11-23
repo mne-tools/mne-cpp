@@ -15,9 +15,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "sampleplugin.h"
 
+#include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 
@@ -26,6 +26,12 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -88,17 +94,16 @@ QMenu* SamplePlugin::getMenu()
 QDockWidget* SamplePlugin::getControl()
 {
     //If plugin has dock controls:
-    QDockWidget* pControlDock = new QDockWidget(getName());
+    auto pControlDock = std::make_unique<QDockWidget>(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDock->setObjectName(getName());
 
-    QWidget* pWidget = new QWidget;
-    QVBoxLayout* pLayout = new QVBoxLayout;
+    QWidget* pWidget = new QWidget(pControlDock.get());
+    new QVBoxLayout(pWidget);
 
-    pWidget->setLayout(pLayout);
     pControlDock->setWidget(pWidget);
 
-    return pControlDock;
+    return pControlDock.release();
 
     //If plugin does not have dock controls:
     return nullptr;
@@ -109,12 +114,10 @@ QDockWidget* SamplePlugin::getControl()
 QWidget* SamplePlugin::getView()
 {
     //If the plugin has a view:
-    QWidget* pPluginView = new QWidget();
-    QVBoxLayout* pViewLayout = new QVBoxLayout();
+    auto pPluginView = std::make_unique<QWidget>();
+    new QVBoxLayout(pPluginView.get());
 
-    pPluginView->setLayout(pViewLayout);
-
-    return pPluginView;
+    return pPluginView.release();
 
     //If the plugin does not have a view:
     return nullptr;

@@ -51,7 +51,7 @@ FilterWindow::FilterWindow(MainWindow* mainWindow, QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::FilterWindowDockWidget)
 , m_pMainWindow(mainWindow)
-, m_pFilterPlotScene(new FilterPlotScene)
+, m_pFilterPlotScene(std::make_unique<FilterPlotScene>())
 {
     ui->setupUi(this);
 

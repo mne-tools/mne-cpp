@@ -108,8 +108,12 @@ void NoiseReductionWindow::createProjectorGroup()
 
         m_qListProjCheckBox.clear();
 
+        // The group box accepts the new layout only once the old one is gone
+        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_projections->layout());
+        pOldLayout.reset();
+
         // Projection Selection
-        QGridLayout* topLayout = new QGridLayout;
+        auto topLayout = std::make_unique<QGridLayout>();
 
         if (!m_pFiffInfo->projs.empty()) {
             bool bAllActivated = true;
@@ -117,7 +121,7 @@ void NoiseReductionWindow::createProjectorGroup()
             qint32 i = 0;
 
             for (; i < std::ssize(m_pFiffInfo->projs); ++i) {
-                QCheckBox* checkBox = new QCheckBox(QString::fromStdString(m_pFiffInfo->projs[i].desc));
+                QCheckBox* checkBox = new QCheckBox(QString::fromStdString(m_pFiffInfo->projs[i].desc), ui->m_groupBox_projections);
                 checkBox->setChecked(m_pFiffInfo->projs[i].active);
 
                 if (m_pFiffInfo->projs[i].active == false)
@@ -138,23 +142,19 @@ void NoiseReductionWindow::createProjectorGroup()
                 //            }
             }
 
-            QFrame* line = new QFrame();
+            QFrame* line = new QFrame(ui->m_groupBox_projections);
             line->setFrameShape(QFrame::HLine);
             line->setFrameShadow(QFrame::Sunken);
 
             topLayout->addWidget(line, i + 1, 0);
 
-            m_enableDisableProjectors = new QCheckBox("Enable all");
+            m_enableDisableProjectors = new QCheckBox("Enable all", ui->m_groupBox_projections);
             m_enableDisableProjectors->setChecked(bAllActivated);
             topLayout->addWidget(m_enableDisableProjectors, i + 2, 0);
             connect(m_enableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
                     this, &NoiseReductionWindow::enableDisableAllProj);
         }
-
-        // The group box accepts the new layout only once the old one is gone
-        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_projections->layout());
-        pOldLayout.reset();
-        ui->m_groupBox_projections->setLayout(topLayout);
+        ui->m_groupBox_projections->setLayout(topLayout.release());
     }
 }
 
@@ -171,15 +171,19 @@ void NoiseReductionWindow::createCompensatorGroup()
 
         m_qListCompCheckBox.clear();
 
+        // The group box accepts the new layout only once the old one is gone
+        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_compensators->layout());
+        pOldLayout.reset();
+
         // Compensation Selection
-        QGridLayout* topLayout = new QGridLayout;
+        auto topLayout = std::make_unique<QGridLayout>();
 
         if (!m_pFiffInfo->comps.empty()) {
             qint32 i = 0;
 
             for (; i < std::ssize(m_pFiffInfo->comps); ++i) {
                 QString numStr;
-                QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind));
+                QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pFiffInfo->comps[i].kind), ui->m_groupBox_compensators);
 
                 m_qListCompCheckBox.append(checkBox);
 
@@ -197,11 +201,7 @@ void NoiseReductionWindow::createCompensatorGroup()
             connect(this, &NoiseReductionWindow::compClicked,
                     this, &NoiseReductionWindow::checkCompStatusChanged);
         }
-
-        // The group box accepts the new layout only once the old one is gone
-        std::unique_ptr<QLayout> pOldLayout(ui->m_groupBox_compensators->layout());
-        pOldLayout.reset();
-        ui->m_groupBox_compensators->setLayout(topLayout);
+        ui->m_groupBox_compensators->setLayout(topLayout.release());
     }
 }
 

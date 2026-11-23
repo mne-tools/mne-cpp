@@ -27,6 +27,12 @@
 #include <mne/dsp/filterkernel.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -89,7 +95,8 @@ QMenu* Filtering::getMenu()
 
 QDockWidget* Filtering::getControl()
 {
-    m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE");
+    auto pControlDock = std::make_unique<QDockWidget>(getName());
+    m_pFilterSettingsView = new FilterSettingsView("MNEANALYZE", pControlDock.get());
 
     connect(this, &Filtering::guiModeChanged,
             m_pFilterSettingsView.data(), &FilterSettingsView::setGuiMode, Qt::UniqueConnection);
@@ -108,12 +115,11 @@ QDockWidget* Filtering::getControl()
 
     setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
 
-    QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
     pControlDock->setWidget(m_pFilterSettingsView);
     pControlDock->setObjectName(getName());
 
-    return pControlDock;
+    return pControlDock.release();
 }
 
 //=============================================================================================================

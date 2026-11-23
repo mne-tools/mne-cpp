@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget* parent)
 , m_iTimeoutMSec(1000)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_eLogLevelCurrent(_LogLvMax)
-, m_pTime(new QTime(0, 0))
+, m_pTime(QSharedPointer<QTime>::create(0, 0))
 , m_pPluginManager(new mne::scan::PluginManager(this))
 , m_pPluginSceneManager(new mne::scan::PluginSceneManager(this))
 , m_pDisplayManager(new mne::scan::DisplayManager(this))
@@ -161,10 +161,7 @@ void MainWindow::setupPlugins()
 void MainWindow::setupUI()
 {
     // Quick control selection
-    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
-                                               "MNE Scan",
-                                               Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint,
-                                               this);
+    m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"), "MNE Scan", Qt::Window | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint, this);
     createActions();
     createMenus();
     createToolBars();
@@ -422,7 +419,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setOverwriteMode(true);
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
-        QLabel* pLabel = new QLabel();
+        QLabel* pLabel = new QLabel(m_pAboutWindow.data());
         pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::build_date_time()) + " - " + QString(mne::build_hash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
@@ -783,8 +780,8 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
-    m_pPluginGui->setParent(m_pPluginGuiDockWidget);
+    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data(), m_pPluginGuiDockWidget);
+    m_pPluginGui->setParent(m_pPluginGuiDockWidget); // embeds the main window as a plain child widget
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
@@ -832,16 +829,14 @@ void MainWindow::updatePluginSetupWidget(mne::scan::AbstractPlugin::SPtr pPlugin
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
 
         if (pPlugin.isNull()) {
-            QWidget* pWidget = new QWidget;
-            setCentralWidget(pWidget);
+            setCentralWidget(new QWidget);
         } else {
             if (!m_bIsRunning) {
                 setCentralWidget(pPlugin->setupWidget());
             }
         }
     } else {
-        QWidget* pWidget = new QWidget;
-        setCentralWidget(pWidget);
+        setCentralWidget(new QWidget);
     }
 }
 
@@ -913,8 +908,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<mne::scan::AbstractPlu
             }
 
         } else {
-            QWidget* pWidget = new QWidget;
-            setCentralWidget(pWidget);
+            setCentralWidget(new QWidget);
         }
     }
 
@@ -1017,10 +1011,12 @@ void MainWindow::startMeasurement()
     startTimer(m_iTimeoutMSec);
 
     // setCentralWidget() deletes the previous view
-    m_pMultiView = new MultiView();
+    // A QMainWindow is always created as a window, so it stays parentless until it becomes the central widget
+    auto pMultiView = std::make_unique<MultiView>();
+    m_pMultiView = pMultiView.get();
     connect(m_pMultiView.data(), &MultiView::dockLocationChanged,
             this, &MainWindow::onDockLocationChanged);
-    setCentralWidget(m_pMultiView);
+    setCentralWidget(pMultiView.release());
 
     m_pActionQuickControl->setVisible(true);
     //m_pDynamicPluginToolBar->addAction(m_pActionQuickControl);

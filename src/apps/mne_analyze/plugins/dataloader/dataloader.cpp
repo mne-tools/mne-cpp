@@ -34,6 +34,12 @@
 #include <mne/disp/viewers/progressview.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -80,16 +86,16 @@ bool containsBemSurfaces(const QString& sFilePath)
 //=============================================================================================================
 
 DataLoader::DataLoader()
-: m_pProgressView(new mne::disp::ProgressView(false))
-, m_pProgressViewWidget(new QWidget())
+: m_pProgressViewWidget(std::make_unique<QWidget>())
 , m_sSettingsPath("MNEANALYZE/DataLoader")
 , m_sLastDir(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation))
 {
     m_pProgressViewWidget->setWindowFlags(Qt::Window);
 
-    QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.data());
-    layout->addWidget(m_pProgressView);
-    m_pProgressViewWidget->setLayout(layout);
+    QVBoxLayout* layout = new QVBoxLayout(m_pProgressViewWidget.get());
+    auto pProgressView = std::make_unique<mne::disp::ProgressView>(false);
+    m_pProgressView = pProgressView.get();
+    layout->addWidget(pProgressView.release());
     loadSettings();
 }
 
@@ -131,51 +137,51 @@ QString DataLoader::getName() const
 
 QMenu* DataLoader::getMenu()
 {
-    QMenu* pMenuFile = new QMenu(tr("File"));
+    auto pMenuFile = std::make_unique<QMenu>(tr("File"));
 
-    QAction* pActionLoadFile = new QAction(tr("Open File"));
+    QAction* pActionLoadFile = new QAction(tr("Open File"), pMenuFile.get());
     pActionLoadFile->setStatusTip(tr("Load a data file"));
     connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
-    QAction* pActionLoadScanSession = new QAction(tr("Open MNE Scan Session"));
+    QAction* pActionLoadScanSession = new QAction(tr("Open MNE Scan Session"), pMenuFile.get());
     pActionLoadScanSession->setStatusTip(tr("Load a recording saved by MNE Scan"));
     connect(pActionLoadScanSession, &QAction::triggered,
             this, &DataLoader::onLoadScanSessionPressed);
 
-    QAction* pActionLoadSubject = new QAction(tr("Open Subject"));
+    QAction* pActionLoadSubject = new QAction(tr("Open Subject"), pMenuFile.get());
     pActionLoadSubject->setStatusTip(tr("Load a subject folder"));
     connect(pActionLoadSubject, &QAction::triggered,
             this, &DataLoader::onLoadSubjectPressed);
 
-    QAction* pActionLoadSession = new QAction(tr("Open Session"));
+    QAction* pActionLoadSession = new QAction(tr("Open Session"), pMenuFile.get());
     pActionLoadSession->setStatusTip(tr("Load a session folder"));
     connect(pActionLoadSession, &QAction::triggered,
             this, &DataLoader::onLoadSessionPressed);
 
-    QAction* pActionSaveData = new QAction(tr("Save data"));
+    QAction* pActionSaveData = new QAction(tr("Save data"), pMenuFile.get());
     pActionSaveData->setStatusTip(tr("Save the selected data file"));
     connect(pActionSaveData, &QAction::triggered, [=, this] {
         onSaveFilePressed(DATA_FILE);
     });
 
-    QAction* pActionSaveAvg = new QAction(tr("Save average"));
+    QAction* pActionSaveAvg = new QAction(tr("Save average"), pMenuFile.get());
     pActionSaveAvg->setStatusTip(tr("Save the selected average"));
     connect(pActionSaveAvg, &QAction::triggered, [=, this] {
         onSaveFilePressed(AVERAGE_FILE);
     });
 
-    QAction* pActionSaveAnn = new QAction(tr("Save events"));
+    QAction* pActionSaveAnn = new QAction(tr("Save events"), pMenuFile.get());
     pActionSaveAnn->setStatusTip(tr("Save the events of the selected data file"));
     connect(pActionSaveAnn, &QAction::triggered, [=, this] {
         onSaveFilePressed(EVENT_FILE);
     });
 
-    QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
+    QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"), pMenuFile.get());
     pBIDSMenu->addAction(pActionLoadSubject);
     pBIDSMenu->addAction(pActionLoadSession);
 
-    QMenu* pSaveMenu = new QMenu(tr("Save"));
+    QMenu* pSaveMenu = new QMenu(tr("Save"), pMenuFile.get());
     pSaveMenu->addAction(pActionSaveData);
     pSaveMenu->addAction(pActionSaveAnn);
     pSaveMenu->addAction(pActionSaveAvg);
@@ -186,7 +192,7 @@ QMenu* DataLoader::getMenu()
     pMenuFile->addMenu(pSaveMenu);
     //pMenuFile->addAction(pActionSave);
 
-    return pMenuFile;
+    return pMenuFile.release();
 }
 
 //=============================================================================================================

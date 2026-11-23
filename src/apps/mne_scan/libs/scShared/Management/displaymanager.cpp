@@ -75,7 +75,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
                               QList<QAction*>& qListActions)
 {
     auto newDisp = std::make_unique<QWidget>();
-    QVBoxLayout* vboxLayout = new QVBoxLayout;
+    QVBoxLayout* vboxLayout = new QVBoxLayout(newDisp.get());
 
     foreach (QSharedPointer<PluginOutputConnector> pPluginOutputConnector, outputConnectorList) {
         if (pPluginOutputConnector.dynamicCast<PluginOutputData<RealTimeMultiSampleArray>>()) {
@@ -167,8 +167,6 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
             fsWidget->init();
         }
     }
-
-    newDisp->setLayout(vboxLayout);
 
     // If no display was attached return NULL pointer
     if (vboxLayout->count() == 0) {

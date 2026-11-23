@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include "compensatorview.h"
+#include "../detail/layout_reset.h"
 
 #include <mne/fiff/fiff_ctf_comp.h>
 
@@ -33,6 +34,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <vector>
 
 //=============================================================================================================
@@ -170,13 +172,14 @@ void CompensatorView::redrawGUI()
     }
 
     m_qListCompCheckBox.clear();
+    detail::resetLayout(this);
 
     // Compensation Selection
-    QGridLayout* topLayout = new QGridLayout;
+    auto topLayout = std::make_unique<QGridLayout>();
 
     for (int i = 0; i < std::ssize(m_pComps); ++i) {
         QString numStr;
-        QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pComps[i].kind));
+        QCheckBox* checkBox = new QCheckBox(numStr.setNum(m_pComps[i].kind), this);
 
         m_qListCompCheckBox.append(checkBox);
 
@@ -187,9 +190,7 @@ void CompensatorView::redrawGUI()
 
         topLayout->addWidget(checkBox, i, 0);
     }
-
-    //Find Comp tab and add current layout
-    this->setLayout(topLayout);
+    setLayout(topLayout.release());
 }
 
 //=============================================================================================================

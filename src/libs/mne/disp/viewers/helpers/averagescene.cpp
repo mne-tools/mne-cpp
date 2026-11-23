@@ -23,6 +23,12 @@
 #include "selectionsceneitem.h"
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -65,21 +71,21 @@ void AverageScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelItem
 
     while (i.hasNext()) {
         SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectionSceneItemTemp->m_sChannelName,
-                                                                      selectionSceneItemTemp->m_iChannelNumber,
-                                                                      selectionSceneItemTemp->m_qpChannelPosition,
-                                                                      selectionSceneItemTemp->m_iChannelKind,
-                                                                      selectionSceneItemTemp->m_iChannelUnit,
-                                                                      m_colGlobalItemSignalColor);
+        auto averageSceneItemTemp = std::make_unique<AverageSceneItem>(selectionSceneItemTemp->m_sChannelName,
+                                                                       selectionSceneItemTemp->m_iChannelNumber,
+                                                                       selectionSceneItemTemp->m_qpChannelPosition,
+                                                                       selectionSceneItemTemp->m_iChannelKind,
+                                                                       selectionSceneItemTemp->m_iChannelUnit,
+                                                                       m_colGlobalItemSignalColor);
 
-        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
+        connect(averageSceneItemTemp.get(), &AverageSceneItem::sceneUpdateRequested,
                 this, &AverageScene::updateScene);
 
         averageSceneItemTemp->setPos(160 * selectionSceneItemTemp->m_qpChannelPosition.x(),
                                      -160 * selectionSceneItemTemp->m_qpChannelPosition.y());
 
         averageSceneItemTemp->m_scaleMap = m_qMapChScaling;
-        this->addItem(averageSceneItemTemp);
+        this->addItem(averageSceneItemTemp.release());
     }
 }
 
@@ -90,21 +96,21 @@ void AverageScene::repaintSelectionItems(const mne::disp::SelectionItem& selecte
     this->clear();
 
     for (int i = 0; i < std::ssize(selectedChannelItems.m_iChannelKind); i++) {
-        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(QString::fromStdString(selectedChannelItems.m_sChannelName[i]),
-                                                                      selectedChannelItems.m_iChannelNumber[i],
-                                                                      selectedChannelItems.m_qpChannelPosition[i],
-                                                                      selectedChannelItems.m_iChannelKind[i],
-                                                                      selectedChannelItems.m_iChannelUnit[i],
-                                                                      m_colGlobalItemSignalColor);
+        auto averageSceneItemTemp = std::make_unique<AverageSceneItem>(QString::fromStdString(selectedChannelItems.m_sChannelName[i]),
+                                                                       selectedChannelItems.m_iChannelNumber[i],
+                                                                       selectedChannelItems.m_qpChannelPosition[i],
+                                                                       selectedChannelItems.m_iChannelKind[i],
+                                                                       selectedChannelItems.m_iChannelUnit[i],
+                                                                       m_colGlobalItemSignalColor);
 
-        connect(averageSceneItemTemp, &AverageSceneItem::sceneUpdateRequested,
+        connect(averageSceneItemTemp.get(), &AverageSceneItem::sceneUpdateRequested,
                 this, &AverageScene::updateScene);
 
         averageSceneItemTemp->setPos(160 * selectedChannelItems.m_qpChannelPosition[i].x(),
                                      -160 * selectedChannelItems.m_qpChannelPosition[i].y());
 
         averageSceneItemTemp->m_scaleMap = m_qMapChScaling;
-        this->addItem(averageSceneItemTemp);
+        this->addItem(averageSceneItemTemp.release());
     }
 }
 

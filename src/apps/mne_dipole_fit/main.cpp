@@ -110,10 +110,12 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    BrainView* pViewer = nullptr;
+    // The model outlives the view that shows it
+    std::unique_ptr<BrainTreeModel> pModel;
+    std::unique_ptr<BrainView> pViewer;
     if (settings.gui) {
-        pViewer = new BrainView();
-        BrainTreeModel* pModel = new BrainTreeModel();
+        pModel = std::make_unique<BrainTreeModel>();
+        pViewer = std::make_unique<BrainView>();
         pModel->addDipoles(set);
 
         // Load brain surface if available
@@ -124,7 +126,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        pViewer->setModel(pModel);
+        pViewer->setModel(pModel.get());
         pViewer->resize(800, 600);
         pViewer->show();
     }

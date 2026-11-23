@@ -25,6 +25,12 @@
 #include <anShared/Management/analyzedata.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -84,7 +90,8 @@ QMenu* Events::getMenu()
 
 QDockWidget* Events::getControl()
 {
-    EventView* pEventView = new EventView();
+    auto pControl = std::make_unique<QDockWidget>(getName());
+    EventView* pEventView = new EventView(pControl.get());
     pEventView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                           QSizePolicy::Preferred));
 
@@ -121,14 +128,13 @@ QDockWidget* Events::getControl()
     connect(this, &Events::clearView,
             pEventView, &EventView::clearView, Qt::UniqueConnection);
 
-    QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
     pControl->setWidget(pEventView);
     pControl->setObjectName(getName());
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
 
-    return pControl;
+    return pControl.release();
 }
 
 //=============================================================================================================

@@ -61,7 +61,7 @@ DummyToolbox::~DummyToolbox()
 
 QSharedPointer<AbstractPlugin> DummyToolbox::clone() const
 {
-    QSharedPointer<DummyToolbox> pClone(new DummyToolbox);
+    auto pClone = QSharedPointer<DummyToolbox>::create();
     return pClone;
 }
 
@@ -176,15 +176,14 @@ void DummyToolbox::update(mne::scan::Measurement::SPtr pMeasurement)
 void DummyToolbox::initPluginControlWidgets()
 {
     if (m_pFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         // The plugin's control widget
-        DummyYourWidget* pYourWidget = new DummyYourWidget(QString("MNESCAN/%1").arg(this->getName()));
+        DummyYourWidget* pYourWidget = makeControlWidget<DummyYourWidget>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
         pYourWidget->setObjectName("group_tab_Settings_Your Widget");
 
-        plControlWidgets.append(pYourWidget);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         m_bPluginControlWidgetsInit = true;
     }

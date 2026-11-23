@@ -31,6 +31,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <vector>
 
 namespace mne::disp
@@ -57,16 +58,17 @@ SurfaceTreeItem* BrainTreeModel::addSurface(const QString& subject, const QStrin
     }
 
     if (!hemiItem) {
-        hemiItem = new QStandardItem(hemi);
-        subjectItem->appendRow(hemiItem);
+        subjectItem->appendRow(new QStandardItem(hemi));
+        hemiItem = subjectItem->child(subjectItem->rowCount() - 1);
     }
 
     // Create FsSurface Item
-    SurfaceTreeItem* surfItem = new SurfaceTreeItem(surfType);
+    auto surfItem = std::make_unique<SurfaceTreeItem>(surfType);
     surfItem->setSurfaceData(surface);
 
-    hemiItem->appendRow(surfItem);
-    return surfItem;
+    SurfaceTreeItem* pSurfItem = surfItem.get();
+    hemiItem->appendRow(surfItem.release());
+    return pSurfItem;
 }
 
 bool BrainTreeModel::addAnnotation(const QString& subject, const QString& hemi, const mne::FsAnnotation& annotation)
@@ -109,9 +111,8 @@ QStandardItem* BrainTreeModel::getSubjectItem(const QString& subject)
     }
 
     // Create new
-    QStandardItem* item = new QStandardItem(subject);
-    appendRow(item);
-    return item;
+    appendRow(new QStandardItem(subject));
+    return this->item(rowCount() - 1);
 }
 
 BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString& bemName, const mne::MNEBemSurface& bemSurf)
@@ -121,7 +122,7 @@ BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString
     // Check if BEM item already exists to avoid duplicates?
     // Usually BEM is added once.
 
-    BemTreeItem* bemItem = new BemTreeItem(bemName, bemSurf);
+    auto bemItem = std::make_unique<BemTreeItem>(bemName, bemSurf);
     bemItem->setVisible(true); // Default to visible
 
     // Set default colors based on type/name
@@ -137,41 +138,42 @@ BemTreeItem* BrainTreeModel::addBemSurface(const QString& subject, const QString
         bemItem->setColor(QColor(100, 100, 100)); // Grey default
     }
 
-    subjItem->appendRow(bemItem);
+    BemTreeItem* pBemItem = bemItem.get();
+    subjItem->appendRow(bemItem.release());
 
-    return bemItem;
+    return pBemItem;
 }
 
 //=============================================================================================================
 
-void BrainTreeModel::addSensors(const QString& type, const QList<QStandardItem*>& items)
+void BrainTreeModel::addSensors(const QString& type, std::vector<std::unique_ptr<QStandardItem>> items)
 {
-    QStandardItem* parentItem = new QStandardItem(type);
+    auto parentItem = std::make_unique<QStandardItem>(type);
     parentItem->setCheckable(true);
     parentItem->setCheckState(Qt::Checked);
 
-    for (auto* item : items) {
-        parentItem->appendRow(item);
+    for (auto& item : items) {
+        parentItem->appendRow(item.release());
     }
 
-    this->appendRow(parentItem);
+    this->appendRow(parentItem.release());
 }
 
 //=============================================================================================================
 
 void BrainTreeModel::addDipoles(const mne::InvEcdSet& set)
 {
-    DipoleTreeItem* item = new DipoleTreeItem("Dipoles", set);
+    auto item = std::make_unique<DipoleTreeItem>("Dipoles", set);
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
-    this->appendRow(item);
+    this->appendRow(item.release());
 }
 
 //=============================================================================================================
 
 void BrainTreeModel::addSourceSpace(const mne::MNESourceSpaces& srcSpace)
 {
-    QStandardItem* parentItem = new QStandardItem("Source Space");
+    auto parentItem = std::make_unique<QStandardItem>("Source Space");
     parentItem->setCheckable(true);
     parentItem->setCheckState(Qt::Checked);
 
@@ -200,7 +202,7 @@ void BrainTreeModel::addSourceSpace(const mne::MNESourceSpaces& srcSpace)
         }
     }
 
-    this->appendRow(parentItem);
+    this->appendRow(parentItem.release());
 }
 
 //=============================================================================================================
@@ -210,10 +212,12 @@ void BrainTreeModel::addDigitizerData(std::span<const mne::FiffDigPoint> digitiz
     if (digitizerPoints.empty())
         return;
 
-    auto* setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
-    this->appendRow(setItem);
+    auto setItem = std::make_unique<DigitizerSetTreeItem>("Digitizer", digitizerPoints);
+    const auto totalPoints = setItem->totalPointCount();
+    const auto categories = setItem->rowCount();
+    this->appendRow(setItem.release());
 
-    mne::Log::info("BrainTreeModel: Added digitizer set with {} points in {} categories", setItem->totalPointCount(), setItem->rowCount());
+    mne::Log::info("BrainTreeModel: Added digitizer set with {} points in {} categories", totalPoints, categories);
 }
 
 //=============================================================================================================
@@ -229,13 +233,14 @@ NetworkTreeItem* BrainTreeModel::addNetwork(const mne::Network& network, const Q
 
     const std::string objectKey = "net_" + displayName.toLower().replace(" ", "_").toStdString();
 
-    auto* item = new NetworkTreeItem(displayName, objectKey);
+    auto item = std::make_unique<NetworkTreeItem>(displayName, objectKey);
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
 
-    this->appendRow(item);
+    NetworkTreeItem* pItem = item.get();
+    this->appendRow(item.release());
 
-    return item;
+    return pItem;
 }
 
 } // namespace mne::disp

@@ -47,7 +47,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <span>
+#include <vector>
 
 namespace mne
 {
@@ -83,7 +85,8 @@ public:
     BemTreeItem* addBemSurface(const QString& subject, const QString& bemName, const mne::MNEBemSurface& bemSurf);
 
     // Helpers to populate the tree
-    void addSensors(const QString& type, const QList<QStandardItem*>& items);
+    // Takes ownership of the sensor items and files them under a new checkable group item named @p type
+    void addSensors(const QString& type, std::vector<std::unique_ptr<QStandardItem>> items);
     void addDipoles(const mne::InvEcdSet& set);
 
     // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)

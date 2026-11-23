@@ -273,15 +273,15 @@ QWidget* AlignWizard::buildSetupPage()
                                              "to be used for the digitisation session."),
                               page));
 
-    auto* bemRow = new QHBoxLayout;
+    auto bemRow = std::make_unique<QHBoxLayout>();
     auto* bemBtn = new QPushButton(QStringLiteral("Load BEM…"), page);
     m_pSetupBemLabel = new QLabel(QStringLiteral("<i>(no BEM loaded)</i>"), page);
     m_pSetupBemLabel->setWordWrap(true);
     bemRow->addWidget(bemBtn);
     bemRow->addWidget(m_pSetupBemLabel, /*stretch*/ 1);
-    lay->addLayout(bemRow);
+    lay->addLayout(bemRow.release());
 
-    auto* capRow = new QHBoxLayout;
+    auto capRow = std::make_unique<QHBoxLayout>();
     capRow->addWidget(new QLabel(QStringLiteral("EEG cap:"), page));
     m_pSetupCapCombo = new QComboBox(page);
     m_pSetupCapCombo->addItem(QStringLiteral("10-20 (21 electrodes)"),
@@ -291,7 +291,7 @@ QWidget* AlignWizard::buildSetupPage()
     m_pSetupCapCombo->addItem(QStringLiteral("10-05 (345 electrodes)"),
                               QVariant::fromValue(int(StandardMontage::System::Standard_1005)));
     capRow->addWidget(m_pSetupCapCombo, 1);
-    lay->addLayout(capRow);
+    lay->addLayout(capRow.release());
 
     lay->addWidget(new QLabel(QStringLiteral(
                                   "<b>Twin fiducials:</b> Select a fiducial below, then "
@@ -299,7 +299,7 @@ QWidget* AlignWizard::buildSetupPage()
                               page));
 
     // Fiducial selection buttons
-    auto* fidRow = new QHBoxLayout;
+    auto fidRow = std::make_unique<QHBoxLayout>();
     m_pTwinNasBtn = new QPushButton(QStringLiteral("NAS"), page);
     m_pTwinLpaBtn = new QPushButton(QStringLiteral("LPA"), page);
     m_pTwinRpaBtn = new QPushButton(QStringLiteral("RPA"), page);
@@ -310,7 +310,7 @@ QWidget* AlignWizard::buildSetupPage()
     fidRow->addWidget(m_pTwinNasBtn);
     fidRow->addWidget(m_pTwinLpaBtn);
     fidRow->addWidget(m_pTwinRpaBtn);
-    lay->addLayout(fidRow);
+    lay->addLayout(fidRow.release());
 
     auto selectFid = [this](FiducialId id) {
         m_selectedTwinFid = id;
@@ -431,7 +431,7 @@ QWidget* AlignWizard::buildFiducialsPage()
     lay->addWidget(m_pFidStatusLabel);
 
     // Fiducial selection buttons — click to (re)select target
-    auto* fidRow = new QHBoxLayout;
+    auto fidRow = std::make_unique<QHBoxLayout>();
     m_pFidNasBtn = new QPushButton(QStringLiteral("NAS"), page);
     m_pFidLpaBtn = new QPushButton(QStringLiteral("LPA"), page);
     m_pFidRpaBtn = new QPushButton(QStringLiteral("RPA"), page);
@@ -442,7 +442,7 @@ QWidget* AlignWizard::buildFiducialsPage()
     fidRow->addWidget(m_pFidNasBtn);
     fidRow->addWidget(m_pFidLpaBtn);
     fidRow->addWidget(m_pFidRpaBtn);
-    lay->addLayout(fidRow);
+    lay->addLayout(fidRow.release());
 
     auto selectFidTarget = [this](FiducialId id) {
         m_selectedFiducial = id;
@@ -458,7 +458,7 @@ QWidget* AlignWizard::buildFiducialsPage()
     m_pFidLiveLabel = new QLabel(QStringLiteral("live: —"), page);
     lay->addWidget(m_pFidLiveLabel);
 
-    auto* btnRow = new QHBoxLayout;
+    auto btnRow = std::make_unique<QHBoxLayout>();
     m_pFidCaptureBtn = new QPushButton(QStringLiteral("Capture"), page);
     m_pFidUndoBtn = new QPushButton(QStringLiteral("Undo last"), page);
     auto* fidLoadBtn = new QPushButton(QStringLiteral("Load FIFF…"), page);
@@ -469,7 +469,7 @@ QWidget* AlignWizard::buildFiducialsPage()
     btnRow->addWidget(m_pFidUndoBtn);
     btnRow->addWidget(fidLoadBtn);
     btnRow->addStretch(1);
-    lay->addLayout(btnRow);
+    lay->addLayout(btnRow.release());
 
     lay->addStretch(1);
 
@@ -583,13 +583,13 @@ QWidget* AlignWizard::buildEegCapPage()
     m_pEegLiveLabel = new QLabel(QStringLiteral("live: —"), page);
     lay->addWidget(m_pEegLiveLabel);
 
-    auto* btnRow = new QHBoxLayout;
+    auto btnRow = std::make_unique<QHBoxLayout>();
     m_pEegCaptureBtn = new QPushButton(QStringLiteral("Capture"), page);
     m_pEegUndoBtn = new QPushButton(QStringLiteral("Undo last"), page);
     btnRow->addWidget(m_pEegCaptureBtn);
     btnRow->addWidget(m_pEegUndoBtn);
     btnRow->addStretch(1);
-    lay->addLayout(btnRow);
+    lay->addLayout(btnRow.release());
 
     connect(m_pEegCaptureBtn, &QPushButton::clicked, this, &AlignWizard::onCaptureEeg);
     connect(m_pEegUndoBtn, &QPushButton::clicked, this, &AlignWizard::onUndoEeg);
@@ -693,13 +693,13 @@ QWidget* AlignWizard::buildHeadShapePage()
     m_pHspLiveLabel = new QLabel(QStringLiteral("live: —"), page);
     lay->addWidget(m_pHspLiveLabel);
 
-    auto* btnRow = new QHBoxLayout;
+    auto btnRow = std::make_unique<QHBoxLayout>();
     m_pHspCaptureBtn = new QPushButton(QStringLiteral("Capture"), page);
     m_pHspUndoBtn = new QPushButton(QStringLiteral("Undo last"), page);
     btnRow->addWidget(m_pHspCaptureBtn);
     btnRow->addWidget(m_pHspUndoBtn);
     btnRow->addStretch(1);
-    lay->addLayout(btnRow);
+    lay->addLayout(btnRow.release());
 
     lay->addStretch(1);
 

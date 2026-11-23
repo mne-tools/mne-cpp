@@ -20,7 +20,6 @@
 //=============================================================================================================
 
 #include "dataloader_global.h"
-
 #include <anShared/Plugins/abstractplugin.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 
@@ -33,6 +32,12 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QStandardPaths>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -198,7 +203,7 @@ private:
 
     QPointer<mne::analyze::Communicator> m_pCommu;     /**< Used for sending events. */
     QPointer<mne::disp::ProgressView> m_pProgressView; /**< Holds loading bar and loading message. */
-    QPointer<QWidget> m_pProgressViewWidget;           /**< Window for ProgressView. */
+    std::unique_ptr<QWidget> m_pProgressViewWidget;    /**< Window for ProgressView. */
 
     QSharedPointer<mne::analyze::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
     QSharedPointer<mne::analyze::AbstractModel> m_pSelectedAverage;  /**< Pointer to the currently selected average. */

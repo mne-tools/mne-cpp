@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "projectorsview.h"
+#include "../detail/layout_reset.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -32,6 +33,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <memory>
 #include <vector>
 
 //=============================================================================================================
@@ -100,16 +102,17 @@ void ProjectorsView::redrawGUI()
     }
 
     m_qListProjCheckBox.clear();
+    detail::resetLayout(this);
 
     // Projection Selection
-    QGridLayout* topLayout = new QGridLayout;
+    QGridLayout* topLayout = new QGridLayout(this);
 
     bool bAllActivated = true;
 
     qint32 i = 0;
 
     for (; i < std::ssize(m_pProjs); ++i) {
-        QCheckBox* checkBox = new QCheckBox(QString::fromStdString(m_pProjs.at(i).desc));
+        QCheckBox* checkBox = new QCheckBox(QString::fromStdString(m_pProjs.at(i).desc), this);
 
         if (m_pProjs.at(i).active == false) {
             bAllActivated = false;
@@ -125,19 +128,17 @@ void ProjectorsView::redrawGUI()
         topLayout->addWidget(checkBox, i, 0);
     }
 
-    QFrame* line = new QFrame();
+    QFrame* line = new QFrame(this);
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
 
     topLayout->addWidget(line, i + 1, 0);
 
-    m_pEnableDisableProjectors = new QCheckBox("Enable all");
+    m_pEnableDisableProjectors = new QCheckBox("Enable all", this);
     m_pEnableDisableProjectors->setChecked(bAllActivated);
     topLayout->addWidget(m_pEnableDisableProjectors, i + 2, 0);
     connect(m_pEnableDisableProjectors, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &ProjectorsView::onEnableDisableAllProj);
-
-    this->setLayout(topLayout);
 
     onCheckProjStatusChanged();
 }

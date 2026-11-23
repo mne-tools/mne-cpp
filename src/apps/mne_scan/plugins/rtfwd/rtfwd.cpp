@@ -103,7 +103,7 @@ RtFwd::~RtFwd()
 
 QSharedPointer<AbstractPlugin> RtFwd::clone() const
 {
-    QSharedPointer<RtFwd> pRtFwdClone(new RtFwd);
+    auto pRtFwdClone = QSharedPointer<RtFwd>::create();
     return pRtFwdClone;
 }
 
@@ -245,9 +245,9 @@ void RtFwd::initPluginControlWidgets()
     m_mutex.unlock();
 
     if (bFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        FwdSettingsView* pFwdSettingsView = new FwdSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        FwdSettingsView* pFwdSettingsView = makeControlWidget<FwdSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &RtFwd::guiModeChanged,
                 pFwdSettingsView, &FwdSettingsView::setGuiMode);
         pFwdSettingsView->setObjectName("widget_");
@@ -272,9 +272,8 @@ void RtFwd::initPluginControlWidgets()
         connect(this, &RtFwd::clusteringAvailable,
                 pFwdSettingsView, &FwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
 
-        plControlWidgets.append(pFwdSettingsView);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         m_bPluginControlWidgetsInit = true;
     }

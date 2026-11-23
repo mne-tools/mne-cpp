@@ -209,7 +209,7 @@ private:
     QHash<const mne::analyze::AbstractModel*, QPersistentModelIndex> m_dipoleItems; /**< Scene item of each dipole fit model. */
     mne::disp::BemTreeItem* m_pBemTreeCoreg;                                        /**< TThe BEM head model of the coregistration plugin. */
 
-    mne::disp::BrainView* m_pView3D;            /**< The Disp3D view. */
+    QPointer<mne::disp::BrainView> m_pView3D;   /**< The Disp3D view; the main window owns it once getView() handed it over. */
     mne::disp::Control3DView* m_pControl3DView; /**< The 3D Control view. */
 
     bool m_bPickingActivated; /**< If Picking is activated*/

@@ -64,8 +64,10 @@ using namespace MNESCAN;
 //=============================================================================================================
 
 PluginGui::PluginGui(mne::scan::PluginManager* pPluginManager,
-                     mne::scan::PluginSceneManager* pPluginSceneManager)
-: m_pPluginManager(pPluginManager)
+                     mne::scan::PluginSceneManager* pPluginSceneManager,
+                     QWidget* parent)
+: QMainWindow(parent)
+, m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
 , m_pGraphicsView(nullptr)
@@ -552,8 +554,7 @@ void PluginGui::createActions()
     deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
     connect(deleteAction, &QAction::triggered, this, &PluginGui::deleteItem);
 
-    toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
-                                tr("Bring to &Front"), this);
+    toFrontAction = new QAction(QIcon(":/images/bringtofront.png"), tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front (Ctrl+F)"));
     connect(toFrontAction, &QAction::triggered, this, &PluginGui::bringToFront);
@@ -568,7 +569,7 @@ void PluginGui::createActions()
 
 void PluginGui::createMenuItem()
 {
-    m_pMenuItem = new QMenu;
+    m_pMenuItem = new QMenu(this);
     m_pMenuItem->addAction(deleteAction);
     m_pMenuItem->addSeparator();
     m_pMenuItem->addAction(toFrontAction);
@@ -586,8 +587,8 @@ void PluginGui::createToolbars()
             this, &PluginGui::actionGroupTriggered);
 
     //Sensors
-    m_pSensorToolButton = new QToolButton;
-    QMenu* menuSensors = new QMenu;
+    m_pSensorToolButton = new QToolButton(this);
+    QMenu* menuSensors = new QMenu(this);
     for (qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
 
@@ -598,8 +599,8 @@ void PluginGui::createToolbars()
     m_pSensorToolButton->setToolTip(tr("Sensor Plugins"));
 
     //Algorithms
-    m_pAlgorithmToolButton = new QToolButton;
-    QMenu* menuAlgorithms = new QMenu;
+    m_pAlgorithmToolButton = new QToolButton(this);
+    QMenu* menuAlgorithms = new QMenu(this);
     for (qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
 
@@ -620,7 +621,7 @@ void PluginGui::createToolbars()
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPlugins);
 
     //Pointers Toolbar
-    m_pPointerButton = new QToolButton;
+    m_pPointerButton = new QToolButton(this);
     m_pPointerButton->setCheckable(true);
     m_pPointerButton->setChecked(true);
     m_pPointerButton->setIcon(QIcon(":/images/pointer.png"));
@@ -628,7 +629,7 @@ void PluginGui::createToolbars()
     m_pPointerButton->setStatusTip(tr("Select/Place (Ctrl+P)"));
     m_pPointerButton->setToolTip(tr("Select/Place"));
 
-    m_pLinePointerButton = new QToolButton;
+    m_pLinePointerButton = new QToolButton(this);
     m_pLinePointerButton->setCheckable(true);
     m_pLinePointerButton->setIcon(QIcon(":/images/linepointer.png"));
     m_pLinePointerButton->setShortcut(tr("Ctrl+L"));

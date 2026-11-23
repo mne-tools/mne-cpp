@@ -94,7 +94,7 @@ Averaging::~Averaging()
 
 QSharedPointer<AbstractPlugin> Averaging::clone() const
 {
-    QSharedPointer<Averaging> pAveragingClone(new Averaging);
+    auto pAveragingClone = QSharedPointer<Averaging>::create();
     return pAveragingClone;
 }
 
@@ -198,10 +198,10 @@ void Averaging::init()
 void Averaging::initPluginControlWidgets()
 {
     if (m_pFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         //Add control widgets to output data (will be used by QuickControlView by the measurements display)
-        AveragingSettingsView* pAveragingSettingsView = new AveragingSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        AveragingSettingsView* pAveragingSettingsView = makeControlWidget<AveragingSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Averaging::guiModeChanged,
                 pAveragingSettingsView, &AveragingSettingsView::setGuiMode);
         pAveragingSettingsView->setObjectName("group_tab_Settings_Averaging");
@@ -229,9 +229,8 @@ void Averaging::initPluginControlWidgets()
 
         emit stimChannelsChanged(m_mapStimChsIndexNames);
 
-        plControlWidgets.append(pAveragingSettingsView);
 
-        ArtifactSettingsView* pArtifactSettingsView = new ArtifactSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        ArtifactSettingsView* pArtifactSettingsView = makeControlWidget<ArtifactSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Averaging::guiModeChanged,
                 pArtifactSettingsView, &ArtifactSettingsView::setGuiMode);
         pArtifactSettingsView->setObjectName("group_tab_Settings_Artifact");
@@ -243,9 +242,8 @@ void Averaging::initPluginControlWidgets()
 
         emit fiffChInfoChanged(m_pFiffInfo->chs);
 
-        plControlWidgets.append(pArtifactSettingsView);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         // Init the averaging settings
         const auto currentStimCh = m_mapStimChsIndexNames.find(pAveragingSettingsView->getCurrentStimCh());

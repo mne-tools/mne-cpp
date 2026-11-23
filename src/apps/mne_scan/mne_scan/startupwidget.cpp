@@ -41,22 +41,20 @@ using namespace MNESCAN;
 StartUpWidget::StartUpWidget(QWidget* parent)
 : QWidget(parent)
 {
-    QWidget* topFiller = new QWidget;
+    QWidget* topFiller = new QWidget(this);
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     m_pLabel_Info = new QLabel(tr("MNE Scan - Acquisition & Processing"), this);
     m_pLabel_Info->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     m_pLabel_Info->setAlignment(Qt::AlignCenter);
 
-    QWidget* bottomFiller = new QWidget;
+    QWidget* bottomFiller = new QWidget(this);
     bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QVBoxLayout* layout = new QVBoxLayout;
+    QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(topFiller);
     layout->addWidget(m_pLabel_Info);
     layout->addWidget(bottomFiller);
-
-    this->setLayout(layout);
 }
 
 //=============================================================================================================

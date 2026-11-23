@@ -21,10 +21,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "../anshared_global.h"
 #include "../Model/abstractmodel.h"
 #include "../Utils/types.h"
+#include <mne/base/log.h>
 #include <mne/disp/viewers/helpers/bidsviewmodel.h>
 
 //=============================================================================================================
@@ -37,6 +37,12 @@
 #include <QFileInfo>
 #include <QStandardItemModel>
 #include <QDateTime>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -225,7 +231,7 @@ public:
             }
         }
 
-        QStandardItem* pItem = new QStandardItem(temp->getModelName());
+        auto pItem = std::make_unique<QStandardItem>(temp->getModelName());
         pItem->setEditable(false);
         pItem->setDragEnabled(true);
         pItem->setToolTip(temp->getModelPath());
@@ -234,7 +240,7 @@ public:
         data.setValue(temp);
         pItem->setData(data);
         m_pData->addData(index,
-                         pItem,
+                         pItem.release(),
                          iType);
         return sm;
     }
@@ -245,7 +251,7 @@ public:
                                const QString& sModelName)
     {
         QSharedPointer<AbstractModel> temp = qSharedPointerCast<AbstractModel>(pNewModel);
-        QStandardItem* pItem = new QStandardItem(sModelName);
+        auto pItem = std::make_unique<QStandardItem>(sModelName);
         pItem->setEditable(true);
         pItem->setDragEnabled(true);
         pItem->setToolTip(temp->getModelPath());
@@ -257,21 +263,21 @@ public:
             case ANSHAREDLIB_AVERAGING_MODEL: {
                 pItem->setData(data);
                 m_pData->addData(m_SelectedFunctionalData,
-                                 pItem,
+                                 pItem.release(),
                                  BIDS_AVERAGE);
                 break;
             }
             case ANSHAREDLIB_EVENT_MODEL: {
                 pItem->setData(data);
                 m_pData->addData(m_SelectedFunctionalData,
-                                 pItem,
+                                 pItem.release(),
                                  BIDS_EVENT);
                 break;
             }
             case ANSHAREDLIB_DIPOLEFIT_MODEL: {
                 pItem->setData(data);
                 m_pData->addData(m_SelectedFunctionalData,
-                                 pItem,
+                                 pItem.release(),
                                  BIDS_DIPOLE);
                 break;
             }
@@ -279,7 +285,7 @@ public:
                 pItem->setData(data);
                 QModelIndex index = m_SelectedItem;
                 m_pData->addData(index,
-                                 pItem,
+                                 pItem.release(),
                                  BIDS_FUNCTIONALDATA);
                 break;
             }
@@ -304,7 +310,7 @@ private:
 
     QPointer<mne::disp::BidsViewModel> m_pData; /**< The BidsViewModel that holds all the subject, session, and data items. */
 
-    QPointer<mne::analyze::Communicator> m_pCommu; /**< Used to send events. */
+    std::unique_ptr<mne::analyze::Communicator> m_pCommu; /**< Used to send events. */
 
     QModelIndex m_SelectedItem;           /**< Index of currently selected item. */
     QModelIndex m_SelectedFunctionalData; /**< Index of currently selected data item. */

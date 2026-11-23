@@ -1852,12 +1852,12 @@ void TestDisp3dBrainView::brainTreeModel_advanced()
     QVERIFY(model.rowCount() >= 0); // items were added to invisible root
 
     // addSensors with empty list — no crash
-    model.addSensors("MEG", QList<QStandardItem*>());
+    model.addSensors("MEG", {});
 
     // addSensors with a real item
-    QList<QStandardItem*> sensorItems;
-    sensorItems << new QStandardItem("Sensor1");
-    model.addSensors("EEG", sensorItems);
+    std::vector<std::unique_ptr<QStandardItem>> sensorItems;
+    sensorItems.push_back(std::make_unique<QStandardItem>("Sensor1"));
+    model.addSensors("EEG", std::move(sensorItems));
 
     QApplication::processEvents();
 }

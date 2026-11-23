@@ -26,6 +26,12 @@
 #include <QGraphicsView>
 #include <QGraphicsSceneWheelEvent>
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -87,10 +93,10 @@ void ButterflyScene::repaintItems(const QList<QGraphicsItem*>& selectedChannelIt
     QListIterator<QGraphicsItem*> i(selectedChannelItems);
     while (i.hasNext()) {
         SelectionSceneItem* SelectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-        ButterflySceneItem* ButterflySceneItemTemp = new ButterflySceneItem(SelectionSceneItemTemp->m_sChannelName,
-                                                                            SelectionSceneItemTemp->m_iChannelKind);
+        auto ButterflySceneItemTemp = std::make_unique<ButterflySceneItem>(SelectionSceneItemTemp->m_sChannelName,
+                                                                           SelectionSceneItemTemp->m_iChannelKind);
 
-        this->addItem(ButterflySceneItemTemp);
+        this->addItem(ButterflySceneItemTemp.release());
     }
 }
 

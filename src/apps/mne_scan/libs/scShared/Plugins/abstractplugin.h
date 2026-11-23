@@ -33,6 +33,16 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 #include <QAction>
+#include <QWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::scan
@@ -222,8 +232,8 @@ signals:
     /**
      * Signal to notify that new plugin control widgets are available.
      *
-     * @param[in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender.
-     *                                  does not have ownership of these pointers.
+     * @param[in] lControlWidgets      The control widgets, without a parent; a listener that shows one gives it
+     *                                  a parent, the plugin keeps the others (see offerControlWidgets()).
      * @param[in] sPluginName          The plugin name emmiting the signal.
      */
     void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
@@ -248,6 +258,51 @@ protected:
 
     //=========================================================================================================
     /**
+     * Creates a control widget of type @p W into @p widgets, for offerControlWidgets().
+     *
+     * @param[in, out] widgets  The control widgets collected so far.
+     * @param[in] args          The arguments of W's constructor.
+     *
+     * @return The new widget; @p widgets owns it.
+     *
+     * @since 3.0.0
+     */
+    template<typename W, typename... Args>
+    static W* makeControlWidget(std::vector<std::unique_ptr<QWidget>>& widgets, Args&&... args)
+    {
+        auto pWidget = std::make_unique<W>(std::forward<Args>(args)...);
+        W* pRaw = pWidget.get();
+        widgets.push_back(std::move(pWidget));
+        return pRaw;
+    }
+
+    //=========================================================================================================
+    /**
+     * Offers @p widgets to the listeners of pluginControlWidgetsChanged(). A listener that shows a widget
+     * gives it a parent; the plugin keeps the ones nobody took, e.g. when MNE Scan runs without its control view.
+     *
+     * @param[in] widgets   The control widgets, without a parent.
+     *
+     * @since 3.0.0
+     */
+    void offerControlWidgets(std::vector<std::unique_ptr<QWidget>> widgets)
+    {
+        QList<QWidget*> lControlWidgets;
+        for (const std::unique_ptr<QWidget>& pWidget : widgets) {
+            lControlWidgets.append(pWidget.get());
+        }
+        emit pluginControlWidgetsChanged(lControlWidgets, getName());
+        for (std::unique_ptr<QWidget>& pWidget : widgets) {
+            if (pWidget->parent()) {
+                std::ignore = pWidget.release(); // its parent owns it now
+            } else {
+                m_unadoptedControlWidgets.push_back(std::move(pWidget));
+            }
+        }
+    }
+
+    //=========================================================================================================
+    /**
      * Adds a plugin action to the current plugin.
      *
      * @param[in] pAction  pointer to the action to be added to the plugin.
@@ -257,7 +312,8 @@ protected:
     InputConnectorList m_inputConnectors;   /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors; /**< Set of output connectors associated with this plug-in. */
 
-    bool m_bPluginControlWidgetsInit = false; /**< Flag to indicate if the plugin control widgets were initialized already. */
+    bool m_bPluginControlWidgetsInit = false;                        /**< Flag to indicate if the plugin control widgets were initialized already. */
+    std::vector<std::unique_ptr<QWidget>> m_unadoptedControlWidgets; /**< Control widgets no listener gave a parent. */
 
 private:
     QList<QAction*> m_qListPluginActions; /**< List of plugin actions. */

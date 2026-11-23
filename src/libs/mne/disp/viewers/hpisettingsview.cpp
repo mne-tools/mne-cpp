@@ -42,6 +42,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <system_error>
 
 //=============================================================================================================
@@ -63,6 +64,14 @@ constexpr std::string_view kVectorViewPresets = R"({
           {"name": "VV 293-328Hz", "coils": [293, 307, 314, 321, 328]},
           {"name": "VV 586-656Hz", "coils": [586, 614, 628, 642, 656]}]
 })";
+
+/** Puts a read-only item showing @p text (anything a table item can be built from) into cell (@p iRow, @p iColumn). */
+void setReadOnlyItem(QTableWidget* pTable, int iRow, int iColumn, const auto& text)
+{
+    auto pItem = std::make_unique<QTableWidgetItem>(text);
+    pItem->setFlags(Qt::ItemIsEnabled);
+    pTable->setItem(iRow, iColumn, pItem.release());
+}
 
 } // namespace
 
@@ -377,45 +386,25 @@ void HpiSettingsView::onAddCoil()
 
     // Add column 0 in freq table widget
     m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
-    QTableWidgetItem* pTableItemA = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-    pTableItemA->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
-                                              0,
-                                              pTableItemA);
+    setReadOnlyItem(m_pUi->m_tableWidget_Frequencies, m_pUi->m_tableWidget_Frequencies->rowCount() - 1, 0, QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
 
     // Add column 1 in freq table widget
     if (std::ssize(m_vCoilFreqs) >= m_pUi->m_tableWidget_Frequencies->rowCount()) {
-        m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
-                                                  1,
-                                                  new QTableWidgetItem(QString::number(m_vCoilFreqs.at(m_pUi->m_tableWidget_Frequencies->rowCount() - 1))));
+        m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1, 1, new QTableWidgetItem(QString::number(m_vCoilFreqs.at(m_pUi->m_tableWidget_Frequencies->rowCount() - 1))));
     } else {
-        m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
-                                                  1,
-                                                  new QTableWidgetItem("none"));
+        m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1, 1, new QTableWidgetItem("none"));
         m_vCoilFreqs.push_back(-1);
     }
 
     // Add column 0 in error table widget (coil number)
     m_pUi->m_tableWidget_results->insertRow(m_pUi->m_tableWidget_results->rowCount());
-    QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-    pTableItemB->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          0,
-                                          pTableItemB);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 0, QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
 
     // Add column 1 in error table widget (error)
-    QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
-    pTableItemC->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          1,
-                                          pTableItemC);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 1, "0mm");
 
     // Add column 2 in error table widget (gof)
-    QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00");
-    pTableItemD->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          2,
-                                          pTableItemD);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 2, "00.00");
 
     emit coilFrequenciesChanged(m_vCoilFreqs);
 }
@@ -527,16 +516,10 @@ void HpiSettingsView::addCoilFreqToGUI(int iCoilFreq)
 {
     // Add column 0 in freq table widget
     m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
-    QTableWidgetItem* pTableItemA = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-    pTableItemA->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
-                                              0,
-                                              pTableItemA);
+    setReadOnlyItem(m_pUi->m_tableWidget_Frequencies, m_pUi->m_tableWidget_Frequencies->rowCount() - 1, 0, QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
 
     // Add column 1 in freq table widget
-    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
-                                              1,
-                                              new QTableWidgetItem(QString::number(iCoilFreq)));
+    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1, 1, new QTableWidgetItem(QString::number(iCoilFreq)));
 }
 
 //=============================================================================================================
@@ -545,25 +528,13 @@ void HpiSettingsView::addCoilErrorToGUI()
 {
     // Add column 0 in error table widget
     m_pUi->m_tableWidget_results->insertRow(m_pUi->m_tableWidget_results->rowCount());
-    QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-    pTableItemB->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          0,
-                                          pTableItemB);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 0, QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
 
     // Add column 1 in error table widget
-    QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
-    pTableItemC->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          1,
-                                          pTableItemC);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 1, "0mm");
 
     // Add column 2 in error table widget
-    QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00%");
-    pTableItemD->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount() - 1,
-                                          2,
-                                          pTableItemD);
+    setReadOnlyItem(m_pUi->m_tableWidget_results, m_pUi->m_tableWidget_results->rowCount() - 1, 2, "00.00%");
 }
 
 //=============================================================================================================

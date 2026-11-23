@@ -97,7 +97,10 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 
 ChannelSelectionView::~ChannelSelectionView()
 {
-    //    saveSettings();
+    // The scene is a child of this view and outlives m_pUi; its selection changes while it clears must not reach us
+    if (m_pSelectionScene) {
+        disconnect(m_pSelectionScene, nullptr, this, nullptr);
+    }
 }
 
 //=============================================================================================================
@@ -123,7 +126,7 @@ void ChannelSelectionView::initListWidgets()
 void ChannelSelectionView::initSelectionSceneView()
 {
     //Create layout scene and set to view
-    m_pSelectionScene = new SelectionScene(m_pUi->m_graphicsView_layoutPlot);
+    m_pSelectionScene = new SelectionScene(m_pUi->m_graphicsView_layoutPlot, this);
     m_pUi->m_graphicsView_layoutPlot->setScene(m_pSelectionScene);
 
     connect(m_pSelectionScene, &QGraphicsScene::selectionChanged,
@@ -209,7 +212,7 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const std::vector<std:
     m_pUi->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
     //Update selection
-    updateSelectionGroupsList(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
+    updateSelectionGroupsList(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), nullptr);
 }
 
 //=============================================================================================================
@@ -283,7 +286,7 @@ QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget,
         if (listWidget->item(i)->text() == channelName)
             return listWidget->item(i);
 
-    return new QListWidgetItem();
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -603,7 +606,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     }
 
     //Update selection
-    updateSelectionGroupsList(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), new QListWidgetItem());
+    updateSelectionGroupsList(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), nullptr);
 
     //Set group all as slected item
     m_pUi->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);

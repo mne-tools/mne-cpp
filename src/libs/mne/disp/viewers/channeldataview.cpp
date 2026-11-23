@@ -173,12 +173,12 @@ void ChannelDataView::setupLayout()
     //     traceCol (VBox): [stimStrip(22px) | ruler(28px) | rhiView(flex)]
     //     rightCol (VBox): [spacer(22px) | scrollModeBtn(28px) | chanSB   ]
 
-    auto* renderRow = new QHBoxLayout();
+    auto renderRow = std::make_unique<QHBoxLayout>();
     renderRow->setContentsMargins(0, 0, 0, 0);
     renderRow->setSpacing(0);
 
     // ── Left column ───────────────────────────────────────────────────────
-    auto* leftCol = new QVBoxLayout();
+    auto leftCol = std::make_unique<QVBoxLayout>();
     leftCol->setContentsMargins(0, 0, 0, 0);
     leftCol->setSpacing(0);
 
@@ -189,10 +189,10 @@ void ChannelDataView::setupLayout()
     m_pLabelPanel = new ChannelLabelPanel(this);
     leftCol->addWidget(m_pLabelPanel, 1);
 
-    renderRow->addLayout(leftCol, 0);
+    renderRow->addLayout(leftCol.release(), 0);
 
     // ── Centre column: unified ruler (stim+time) + RHI view ──────────────
-    auto* traceColumn = new QVBoxLayout();
+    auto traceColumn = std::make_unique<QVBoxLayout>();
     traceColumn->setContentsMargins(0, 0, 0, 0);
     traceColumn->setSpacing(0);
 
@@ -206,10 +206,10 @@ void ChannelDataView::setupLayout()
     m_pRhiView->setFocusPolicy(Qt::ClickFocus);
     traceColumn->addWidget(m_pRhiView, 1);
 
-    renderRow->addLayout(traceColumn, 1);
+    renderRow->addLayout(traceColumn.release(), 1);
 
     // ── Right column: spacer (ruler height) + channel scrollbar ─────────
-    auto* rightCol = new QVBoxLayout();
+    auto rightCol = std::make_unique<QVBoxLayout>();
     rightCol->setContentsMargins(0, 0, 0, 0);
     rightCol->setSpacing(0);
 
@@ -229,9 +229,9 @@ void ChannelDataView::setupLayout()
     m_pChannelScrollBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     rightCol->addWidget(m_pChannelScrollBar, 1);
 
-    renderRow->addLayout(rightCol, 0);
+    renderRow->addLayout(rightCol.release(), 0);
 
-    outerLayout->addLayout(renderRow, 1);
+    outerLayout->addLayout(renderRow.release(), 1);
 
     // ── Overview bar (minimap) ───────────────────────────────────────────
     m_pOverviewBar = new OverviewBarWidget(this);
@@ -241,7 +241,7 @@ void ChannelDataView::setupLayout()
     // ── Bottom row: horizontal scroll bar + scroll-mode toggle ───────────
     // The scroll-mode button lives at the bottom-right corner, between the
     // horizontal and vertical scrollbars, so it doesn't crowd the ruler area.
-    auto* bottomRow = new QHBoxLayout();
+    auto bottomRow = std::make_unique<QHBoxLayout>();
     bottomRow->setContentsMargins(0, 0, 0, 0);
     bottomRow->setSpacing(0);
 
@@ -264,7 +264,7 @@ void ChannelDataView::setupLayout()
         "\u21c4 Time \u2013 scroll through time"));
     bottomRow->addWidget(m_pScrollModeButton, 0);
 
-    outerLayout->addLayout(bottomRow, 0);
+    outerLayout->addLayout(bottomRow.release(), 0);
 
     // ── Connections ──────────────────────────────────────────────────────
     connect(m_pScrollBar, &QScrollBar::valueChanged,

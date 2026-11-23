@@ -312,7 +312,7 @@
       "raw_delete": 0,
       "console_io": 0,
       "numeric_define": 0,
-      "qt_new_unparented": 878
+      "qt_new_unparented": 0
     },
     "G6_parity": {
       "reference": "1.11.0",

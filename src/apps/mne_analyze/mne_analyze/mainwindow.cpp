@@ -48,6 +48,12 @@
 #include <QMutexLocker>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -436,6 +442,8 @@ void MainWindow::createPluginMenus()
                 pPlugin->setMenuLoadingState(true);
                 pPlugin->setObjectName(pPlugin->getName());
                 if (QMenu* pMenu = pPlugin->getMenu()) {
+                    // The main window owns the plugin menu; it keeps the actions merged into the standard menus alive
+                    pMenu->setParent(this, pMenu->windowFlags());
                     // Check if the menu already exists. If it does add the actions to the exisiting menu.
                     if (pMenu->title() == "File") {
                         for (QAction* pAction : pMenu->actions()) {
@@ -500,11 +508,13 @@ void MainWindow::createPluginControls()
 void MainWindow::initPluginViews()
 {
     m_pGridLayout = new QGridLayout(this);
-    m_pMultiView = new MultiView(m_sSettingsPath);
+    // A QMainWindow is always created as a window, so it stays parentless until it becomes the central widget
+    auto pMultiView = std::make_unique<MultiView>(m_sSettingsPath);
+    m_pMultiView = pMultiView.get();
     m_pGridLayout->addWidget(m_pMultiView);
     m_pMultiView->show();
     m_pMultiView->setObjectName("multiview");
-    setCentralWidget(m_pMultiView);
+    setCentralWidget(pMultiView.release());
 }
 
 //=============================================================================================================
@@ -635,7 +645,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setOverwriteMode(true);
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
-        QLabel* pLabel = new QLabel();
+        QLabel* pLabel = new QLabel(m_pAboutWindow.data());
         pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::build_date_time()) + " - " + QString(mne::build_hash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);

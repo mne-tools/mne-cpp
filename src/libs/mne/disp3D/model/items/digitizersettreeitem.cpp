@@ -32,6 +32,7 @@
 //=============================================================================================================
 
 #include <format>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -94,46 +95,46 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
     // Create child items for each non-empty category
     // Color and size scheme matches disp3D conventions
     if (!cardinalPos.empty()) {
-        auto* item = new DigitizerTreeItem("Cardinal",
-                                           DigitizerTreeItem::Cardinal,
-                                           cardinalPos,
-                                           cardinalNames,
-                                           QColor(0, 255, 0), // Green
-                                           0.002f);           // 2mm
-        appendRow(item);
+        auto item = std::make_unique<DigitizerTreeItem>("Cardinal",
+                                                        DigitizerTreeItem::Cardinal,
+                                                        cardinalPos,
+                                                        cardinalNames,
+                                                        QColor(0, 255, 0), // Green
+                                                        0.002f);           // 2mm
+        appendRow(item.release());
         mne::Log::debug("DigitizerSetTreeItem: Cardinal points: {}", cardinalPos.size());
     }
 
     if (!hpiPos.empty()) {
-        auto* item = new DigitizerTreeItem("HPI",
-                                           DigitizerTreeItem::HPI,
-                                           hpiPos,
-                                           hpiNames,
-                                           QColor(128, 0, 0), // DarkRed
-                                           0.003f);           // 3mm - enlarged for better visibility
-        appendRow(item);
+        auto item = std::make_unique<DigitizerTreeItem>("HPI",
+                                                        DigitizerTreeItem::HPI,
+                                                        hpiPos,
+                                                        hpiNames,
+                                                        QColor(128, 0, 0), // DarkRed
+                                                        0.003f);           // 3mm - enlarged for better visibility
+        appendRow(item.release());
         mne::Log::debug("DigitizerSetTreeItem: HPI points: {}", hpiPos.size());
     }
 
     if (!eegPos.empty()) {
-        auto* item = new DigitizerTreeItem("EEG",
-                                           DigitizerTreeItem::EEG,
-                                           eegPos,
-                                           eegNames,
-                                           QColor(0, 255, 255), // Cyan
-                                           0.001f);             // 1mm
-        appendRow(item);
+        auto item = std::make_unique<DigitizerTreeItem>("EEG",
+                                                        DigitizerTreeItem::EEG,
+                                                        eegPos,
+                                                        eegNames,
+                                                        QColor(0, 255, 255), // Cyan
+                                                        0.001f);             // 1mm
+        appendRow(item.release());
         mne::Log::debug("DigitizerSetTreeItem: EEG dig points: {}", eegPos.size());
     }
 
     if (!extraPos.empty()) {
-        auto* item = new DigitizerTreeItem("Extra",
-                                           DigitizerTreeItem::Extra,
-                                           extraPos,
-                                           extraNames,
-                                           QColor(255, 0, 255), // Magenta
-                                           0.001f);             // 1mm
-        appendRow(item);
+        auto item = std::make_unique<DigitizerTreeItem>("Extra",
+                                                        DigitizerTreeItem::Extra,
+                                                        extraPos,
+                                                        extraNames,
+                                                        QColor(255, 0, 255), // Magenta
+                                                        0.001f);             // 1mm
+        appendRow(item.release());
         mne::Log::debug("DigitizerSetTreeItem: Extra/head shape points: {}", extraPos.size());
     }
 }

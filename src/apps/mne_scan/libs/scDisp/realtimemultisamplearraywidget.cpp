@@ -115,8 +115,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
 {
     if (m_pFiffInfo) {
         //Create table view and set layout
-        m_pChannelDataView = new RtFiffRawView(QString("MNESCAN/RTMSAW"),
-                                               this);
+        m_pChannelDataView = new RtFiffRawView(QString("MNESCAN/RTMSAW"), this);
         m_pChannelDataView->hide();
 
         QVBoxLayout* rtmsaLayout = new QVBoxLayout(this);
@@ -125,7 +124,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         this->setMinimumSize(300, 50);
 
         // Prepare actions
-        QToolBar* pToolBar = new QToolBar;
+        QToolBar* pToolBar = new QToolBar(this);
 
         QAction* pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Show the channel selection view"), this);
         pActionSelectSensors->setToolTip(tr("Show the channel selection view"));
@@ -235,7 +234,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         //                m_pChannelDataView.data(), &RtFiffRawView::updateSpharaOptions);
 
         // Quick control scaling
-        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"), 0, Qt::Widget, m_pFiffInfo->get_channel_types());
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTMSAW"), this, Qt::Widget, m_pFiffInfo->get_channel_types());
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -245,7 +244,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->setScalingMap(pScalingView->getScaleMap());
 
         // Quick control channel data settings
-        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTMSAW"));
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTMSAW"), this);
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
 
@@ -274,7 +273,7 @@ void RealTimeMultiSampleArrayWidget::initDisplayControllWidgets()
         m_pChannelDataView->setSignalColor(pChannelDataSettingsView->getSignalColor());
 
         // Quick control trigger detection settings
-        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("MNESCAN/RTMSAW"));
+        TriggerDetectionView* pTriggerDetectionView = new TriggerDetectionView(QString("MNESCAN/RTMSAW"), this);
         pTriggerDetectionView->setObjectName("group_tab_View_Triggers");
         lControlWidgets.append(pTriggerDetectionView);
 

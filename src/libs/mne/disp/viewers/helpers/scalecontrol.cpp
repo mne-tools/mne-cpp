@@ -249,17 +249,17 @@ void ScaleControl::initMenu()
 {
     m_pSettingsMenu = new QMenu(this); //Scale Control takes ownership of this QMenu and will trigger its deletion.
 
-    QAction* minVal = new QAction("Edit minimum value");
+    QAction* minVal = new QAction("Edit minimum value", m_pSettingsMenu);
     connect(minVal, &QAction::triggered,
             this, &ScaleControl::promptMinValueChange,
             Qt::UniqueConnection);
-    m_pSettingsMenu->addAction(minVal); //takes ownership
+    m_pSettingsMenu->addAction(minVal);
 
-    QAction* maxVal = new QAction("Edit maximum value");
+    QAction* maxVal = new QAction("Edit maximum value", m_pSettingsMenu);
     connect(maxVal, &QAction::triggered,
             this, &ScaleControl::promptMaxValueChange,
             Qt::UniqueConnection);
-    m_pSettingsMenu->addAction(maxVal); //takes ownership
+    m_pSettingsMenu->addAction(maxVal);
 
     m_pUi->toolButton->setMenu(m_pSettingsMenu);
     m_pUi->toolButton->setPopupMode(QToolButton::InstantPopup);

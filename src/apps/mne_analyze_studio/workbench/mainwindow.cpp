@@ -858,12 +858,12 @@ bool isWorkflowIoCapability(const QJsonObject& tool)
     return capabilityKind == QLatin1String("workflow_io") || toolName == QLatin1String("studio.workflow.load") || toolName == QLatin1String("studio.workflow.save");
 }
 
-QTreeWidgetItem* makeToolTreeItem(const QJsonObject& tool)
+std::unique_ptr<QTreeWidgetItem> makeToolTreeItem(const QJsonObject& tool)
 {
     const QString name = tool.value("name").toString().trimmed();
     const QString description = tool.value("description").toString().trimmed();
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << (name.isEmpty() ? QString("Unnamed Tool") : name));
+    auto item = std::make_unique<QTreeWidgetItem>(QStringList() << (name.isEmpty() ? QString("Unnamed Tool") : name));
     item->setToolTip(0, description);
     item->setData(0, Qt::UserRole, name);
     item->setData(0, Qt::UserRole + 1, tool);
@@ -871,7 +871,7 @@ QTreeWidgetItem* makeToolTreeItem(const QJsonObject& tool)
     return item;
 }
 
-QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
+std::unique_ptr<QTreeWidgetItem> buildJsonTreeItem(const QString& key, const QJsonValue& value)
 {
     QString displayValue;
     if (value.isObject()) {
@@ -890,16 +890,16 @@ QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
         displayValue = QString::fromUtf8(QJsonDocument::fromVariant(value.toVariant()).toJson(QJsonDocument::Compact));
     }
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << key << displayValue);
+    auto item = std::make_unique<QTreeWidgetItem>(QStringList() << key << displayValue);
     if (value.isObject()) {
         const QJsonObject object = value.toObject();
         for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            item->addChild(buildJsonTreeItem(it.key(), it.value()));
+            item->addChild(buildJsonTreeItem(it.key(), it.value()).release());
         }
     } else if (value.isArray()) {
         const QJsonArray array = value.toArray();
         for (int i = 0; i < array.size(); ++i) {
-            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)));
+            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)).release());
         }
     }
 
@@ -1291,12 +1291,12 @@ MainWindow::MainWindow(QWidget* parent)
 , m_rootWidget(new QWidget(this))
 , m_agentChatDock(new AgentChatDockWidget(this))
 , m_activityBar(new QWidget(this))
-, m_explorerButton(new QToolButton)
-, m_workflowButton(new QToolButton)
-, m_skillsButton(new QToolButton)
-, m_extensionsButton(new QToolButton)
-, m_workspaceExplorer(new QTreeWidget)
-, m_workflowExplorer(new QTreeWidget)
+, m_explorerButton(new QToolButton(this))
+, m_workflowButton(new QToolButton(this))
+, m_skillsButton(new QToolButton(this))
+, m_extensionsButton(new QToolButton(this))
+, m_workspaceExplorer(new QTreeWidget(this))
+, m_workflowExplorer(new QTreeWidget(this))
 , m_workflowPage(new QWidget(this))
 , m_workflowStatusBanner(new QLabel(this))
 , m_workflowMiniMapDockStateLabel(new QLabel(this))
@@ -1315,37 +1315,37 @@ MainWindow::MainWindow(QWidget* parent)
 , m_workflowSaveButton(new QPushButton("Save Workflow", this))
 , m_workflowOpenFileButton(new QPushButton("Open Selected File", this))
 , m_workflowRefreshButton(new QPushButton("Refresh Graph", this))
-, m_skillsExplorer(new QTreeWidget)
+, m_skillsExplorer(new QTreeWidget(this))
 , m_skillsPage(new QWidget(this))
 , m_skillDetailsView(new QPlainTextEdit(this))
 , m_skillRunButton(new QPushButton("Run Tool...", this))
 , m_extensionsPage(new QWidget(this))
-, m_extensionsExplorer(new QTreeWidget)
+, m_extensionsExplorer(new QTreeWidget(this))
 , m_extensionDetailsView(new QPlainTextEdit(this))
 , m_extensionInstallButton(new QPushButton("Install...", this))
 , m_extensionToggleButton(new QPushButton("Disable", this))
 , m_extensionSettingsButton(new QPushButton("Open Settings Tab", this))
-, m_leftSidebarStack(new QStackedWidget)
-, m_mainSplitter(new QSplitter(Qt::Horizontal))
-, m_centerSplitter(new QSplitter(Qt::Vertical))
-, m_centerTabs(new EditorTabWidget)
+, m_leftSidebarStack(new QStackedWidget(this))
+, m_mainSplitter(new QSplitter(Qt::Horizontal, this))
+, m_centerSplitter(new QSplitter(Qt::Vertical, this))
+, m_centerTabs(new EditorTabWidget(this))
 , m_centerTabBar(new EditorTabBar(this))
-, m_bottomPanelTabs(new QTabWidget)
-, m_outputPanel(new QListWidget)
-, m_problemPanel(new QListWidget)
+, m_bottomPanelTabs(new QTabWidget(this))
+, m_outputPanel(new QListWidget(this))
+, m_problemPanel(new QListWidget(this))
 , m_resultsTab(new QWidget(this))
-, m_resultsTitleLabel(new QLabel("Run a tool or open an Analysis artifact to populate Recent Results."))
+, m_resultsTitleLabel(new QLabel("Run a tool or open an Analysis artifact to populate Recent Results.", this))
 , m_resultsHistoryCombo(new QComboBox(this))
 , m_resultsStack(new QStackedWidget(this))
 , m_resultsTree(new QTreeWidget(this))
 , m_resultsTable(new QTableWidget(this))
 , m_resultsExtensionRenderer(nullptr)
 , m_terminalTab(new QWidget(this))
-, m_terminalStatusLabel(new QLabel("Active view state: idle"))
-, m_terminalPanel(new QTextEdit)
-, m_terminalInput(new QLineEdit)
-, m_terminalRunButton(new QPushButton("Run"))
-, m_activeStateItem(new QListWidgetItem("Active view state: idle"))
+, m_terminalStatusLabel(new QLabel("Active view state: idle", this))
+, m_terminalPanel(new QTextEdit(this))
+, m_terminalInput(new QLineEdit(this))
+, m_terminalRunButton(new QPushButton("Run", this))
+, m_activeStateItem(nullptr)
 , m_kernelSocket(new BackendConnection(this))
 , m_extensionSocket(new BackendConnection(this))
 , m_kernelProcess(new QProcess(this))
@@ -1549,26 +1549,26 @@ void MainWindow::createLayout()
     workflowPageLayout->setSpacing(8);
     workflowPageLayout->addWidget(m_workflowStatusBanner);
     workflowPageLayout->addWidget(m_workflowExplorer, 2);
-    QHBoxLayout* workflowGraphHeaderLayout = new QHBoxLayout;
+    auto workflowGraphHeaderLayout = std::make_unique<QHBoxLayout>();
     workflowGraphHeaderLayout->setContentsMargins(0, 0, 0, 0);
     workflowGraphHeaderLayout->setSpacing(8);
     QLabel* workflowGraphLabel = new QLabel("Dependency Map", m_workflowPage);
     workflowGraphHeaderLayout->addWidget(workflowGraphLabel);
     workflowGraphHeaderLayout->addStretch(1);
     workflowGraphHeaderLayout->addWidget(m_workflowOpenGraphButton);
-    workflowPageLayout->addLayout(workflowGraphHeaderLayout);
+    workflowPageLayout->addLayout(workflowGraphHeaderLayout.release());
     workflowPageLayout->addWidget(m_workflowMiniMapDockStateLabel);
     workflowPageLayout->addWidget(m_workflowMiniMap, 1);
     workflowPageLayout->addWidget(new QLabel("Workflow Inspector", m_workflowPage));
     workflowPageLayout->addWidget(m_workflowDetailsView, 1);
-    QHBoxLayout* workflowButtonsLayout = new QHBoxLayout;
+    auto workflowButtonsLayout = std::make_unique<QHBoxLayout>();
     workflowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     workflowButtonsLayout->setSpacing(8);
     workflowButtonsLayout->addWidget(m_workflowAddStepButton);
     workflowButtonsLayout->addWidget(m_workflowSaveButton);
     workflowButtonsLayout->addWidget(m_workflowOpenFileButton);
     workflowButtonsLayout->addWidget(m_workflowRefreshButton);
-    workflowPageLayout->addLayout(workflowButtonsLayout);
+    workflowPageLayout->addLayout(workflowButtonsLayout.release());
     rebuildWorkflowNavigatorUi();
     refreshWorkflowGraphDockingUi();
 
@@ -1587,13 +1587,13 @@ void MainWindow::createLayout()
     extensionsPageLayout->addWidget(m_extensionsExplorer, 2);
     extensionsPageLayout->addWidget(new QLabel("Extension Inspector", m_extensionsPage));
     extensionsPageLayout->addWidget(m_extensionDetailsView, 1);
-    QHBoxLayout* extensionButtonsLayout = new QHBoxLayout;
+    auto extensionButtonsLayout = std::make_unique<QHBoxLayout>();
     extensionButtonsLayout->setContentsMargins(0, 0, 0, 0);
     extensionButtonsLayout->setSpacing(8);
     extensionButtonsLayout->addWidget(m_extensionInstallButton);
     extensionButtonsLayout->addWidget(m_extensionToggleButton);
     extensionButtonsLayout->addWidget(m_extensionSettingsButton);
-    extensionsPageLayout->addLayout(extensionButtonsLayout);
+    extensionsPageLayout->addLayout(extensionButtonsLayout.release());
     refreshExtensionManagerUi();
 
     m_leftSidebarStack->addWidget(m_workspaceExplorer);
@@ -1623,7 +1623,7 @@ void MainWindow::createLayout()
     m_bottomPanelTabs->addTab(m_terminalTab, "Terminal");
     m_outputPanel->setAlternatingRowColors(true);
     m_problemPanel->setAlternatingRowColors(true);
-    m_outputPanel->addItem(m_activeStateItem);
+    m_activeStateItem = new QListWidgetItem("Active view state: idle", m_outputPanel);
     m_resultsHistoryCombo->addItem("Latest Result");
     m_resultsHistoryCombo->setToolTip("Recent Results: reopen a recently computed structured result.");
     m_resultsHistoryCombo->setMinimumWidth(320);
@@ -1643,14 +1643,14 @@ void MainWindow::createLayout()
     QVBoxLayout* resultsLayout = new QVBoxLayout(m_resultsTab);
     resultsLayout->setContentsMargins(0, 0, 0, 0);
     resultsLayout->setSpacing(8);
-    QHBoxLayout* resultsHistoryLayout = new QHBoxLayout;
+    auto resultsHistoryLayout = std::make_unique<QHBoxLayout>();
     resultsHistoryLayout->setContentsMargins(0, 0, 0, 0);
     resultsHistoryLayout->setSpacing(8);
     QLabel* resultsHistoryLabel = new QLabel("Recent Results", m_resultsTab);
     resultsHistoryLabel->setObjectName("resultsSectionLabel");
     resultsHistoryLayout->addWidget(resultsHistoryLabel);
     resultsHistoryLayout->addWidget(m_resultsHistoryCombo, 1);
-    resultsLayout->addLayout(resultsHistoryLayout);
+    resultsLayout->addLayout(resultsHistoryLayout.release());
     resultsLayout->addWidget(m_resultsTitleLabel);
     resultsLayout->addWidget(m_resultsStack, 1);
 
@@ -1663,7 +1663,7 @@ void MainWindow::createLayout()
     terminalLayout->setContentsMargins(0, 0, 0, 0);
     terminalLayout->setSpacing(8);
 
-    QHBoxLayout* terminalComposerLayout = new QHBoxLayout;
+    auto terminalComposerLayout = std::make_unique<QHBoxLayout>();
     terminalComposerLayout->setContentsMargins(0, 0, 0, 0);
     terminalComposerLayout->setSpacing(8);
     terminalComposerLayout->addWidget(m_terminalInput, 1);
@@ -1671,7 +1671,7 @@ void MainWindow::createLayout()
 
     terminalLayout->addWidget(m_terminalStatusLabel);
     terminalLayout->addWidget(m_terminalPanel, 1);
-    terminalLayout->addLayout(terminalComposerLayout);
+    terminalLayout->addLayout(terminalComposerLayout.release());
 
     QWidget* activitySection = createSidebarSection("Panel", m_bottomPanelTabs);
     QWidget* chatSection = createSidebarSection("Coworker", m_agentChatDock);
@@ -2284,10 +2284,10 @@ void MainWindow::addWorkspaceDirectory(const QString& directoryPath)
     }
 
     QFileInfo rootInfo(directoryPath);
-    QTreeWidgetItem* rootItem = new QTreeWidgetItem(QStringList() << rootInfo.fileName());
-    rootItem->setData(0, Qt::UserRole, directoryPath);
-    rootItem->setData(0, Qt::UserRole + 1, "directory");
-    rootItem->setExpanded(true);
+    auto pRootItem = std::make_unique<QTreeWidgetItem>(QStringList() << rootInfo.fileName());
+    pRootItem->setData(0, Qt::UserRole, directoryPath);
+    pRootItem->setData(0, Qt::UserRole + 1, "directory");
+    pRootItem->setExpanded(true);
 
     auto ensureChildItem = [](QTreeWidgetItem* parentItem,
                               const QString& name,
@@ -2304,10 +2304,11 @@ void MainWindow::addWorkspaceDirectory(const QString& directoryPath)
             }
         }
 
-        QTreeWidgetItem* childItem = new QTreeWidgetItem(QStringList() << name);
-        childItem->setData(0, Qt::UserRole, absolutePath);
-        childItem->setData(0, Qt::UserRole + 1, isDirectory ? "directory" : "file");
-        parentItem->addChild(childItem);
+        auto pChildItem = std::make_unique<QTreeWidgetItem>(QStringList() << name);
+        pChildItem->setData(0, Qt::UserRole, absolutePath);
+        pChildItem->setData(0, Qt::UserRole + 1, isDirectory ? "directory" : "file");
+        QTreeWidgetItem* childItem = pChildItem.get();
+        parentItem->addChild(pChildItem.release());
         return childItem;
     };
 
@@ -2322,7 +2323,7 @@ void MainWindow::addWorkspaceDirectory(const QString& directoryPath)
 
         const QString relativePath = QDir(directoryPath).relativeFilePath(path);
         const QStringList segments = relativePath.split('/', Qt::SkipEmptyParts);
-        QTreeWidgetItem* parentItem = rootItem;
+        QTreeWidgetItem* parentItem = pRootItem.get();
         QString accumulatedPath = directoryPath;
 
         for (int segmentIndex = 0; segmentIndex < segments.size(); ++segmentIndex) {
@@ -2342,7 +2343,7 @@ void MainWindow::addWorkspaceDirectory(const QString& directoryPath)
         parentItem->setToolTip(0, path);
     }
 
-    m_workspaceExplorer->addTopLevelItem(rootItem);
+    m_workspaceExplorer->addTopLevelItem(pRootItem.release());
     appendOutputMessage(QString("Workspace added: %1").arg(directoryPath));
 }
 
@@ -2364,7 +2365,7 @@ void MainWindow::refreshWorkspaceArtifacts()
         return;
     }
 
-    QTreeWidgetItem* analysisRoot = new QTreeWidgetItem(QStringList() << "Analysis");
+    auto analysisRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Analysis");
     analysisRoot->setData(0, Qt::UserRole, QString::fromLatin1(kWorkspaceArtifactRoot));
     analysisRoot->setExpanded(true);
     QTreeWidgetItem* pipelineRoot = nullptr;
@@ -2412,7 +2413,7 @@ void MainWindow::refreshWorkspaceArtifacts()
             label += QString(" | %1").arg(message.left(80));
         }
 
-        QTreeWidgetItem* artifactItem = new QTreeWidgetItem(QStringList() << label);
+        auto artifactItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
         artifactItem->setToolTip(0, message);
         if (toolName == "studio.pipeline.run") {
             artifactItem->setIcon(0, style()->standardIcon(pipelineArtifactIconType(status)));
@@ -2434,9 +2435,8 @@ void MainWindow::refreshWorkspaceArtifacts()
                 ++completedPipelineCount;
             }
             if (!pipelineRoot) {
-                pipelineRoot = new QTreeWidgetItem(QStringList() << "Pipeline Sessions");
+                pipelineRoot = new QTreeWidgetItem(analysisRoot.get(), QStringList() << "Pipeline Sessions");
                 pipelineRoot->setExpanded(true);
-                analysisRoot->addChild(pipelineRoot);
             }
 
             const QJsonArray steps = result.value("steps").toArray();
@@ -2463,7 +2463,7 @@ void MainWindow::refreshWorkspaceArtifacts()
                     stepLabel += QString(" | %1").arg(stepCommand.left(96));
                 }
 
-                QTreeWidgetItem* stepItem = new QTreeWidgetItem(QStringList() << stepLabel);
+                auto stepItem = std::make_unique<QTreeWidgetItem>(QStringList() << stepLabel);
                 stepItem->setData(0, Qt::UserRole, QString::fromLatin1(kWorkspaceArtifactStepEntry));
                 stepItem->setData(0, Qt::UserRole + 1, entry);
                 stepItem->setData(0, Qt::UserRole + 2, step);
@@ -2475,7 +2475,7 @@ void MainWindow::refreshWorkspaceArtifacts()
                     stepItem->setFont(0, stepFont);
                     stepItem->setForeground(0, m_workspaceExplorer->palette().brush(QPalette::Link));
                 }
-                artifactItem->addChild(stepItem);
+                artifactItem->addChild(stepItem.release());
             }
 
             artifactItem->setExpanded(status == QLatin1String("running") || status == QLatin1String("resumed") || status == QLatin1String("queued"));
@@ -2485,15 +2485,14 @@ void MainWindow::refreshWorkspaceArtifacts()
                 artifactItem->setFont(0, artifactFont);
                 artifactItem->setForeground(0, m_workspaceExplorer->palette().brush(QPalette::Highlight));
             }
-            pipelineRoot->addChild(artifactItem);
+            pipelineRoot->addChild(artifactItem.release());
         } else {
             ++resultCount;
             if (!resultRoot) {
-                resultRoot = new QTreeWidgetItem(QStringList() << "Tool Results");
+                resultRoot = new QTreeWidgetItem(analysisRoot.get(), QStringList() << "Tool Results");
                 resultRoot->setExpanded(true);
-                analysisRoot->addChild(resultRoot);
             }
-            resultRoot->addChild(artifactItem);
+            resultRoot->addChild(artifactItem.release());
         }
     }
 
@@ -2522,7 +2521,7 @@ void MainWindow::refreshWorkspaceArtifacts()
         resultRoot->setText(0, QString("Tool Results (%1)").arg(resultCount));
     }
 
-    m_workspaceExplorer->insertTopLevelItem(0, analysisRoot);
+    m_workspaceExplorer->insertTopLevelItem(0, analysisRoot.release());
 }
 
 void MainWindow::openAnalysisArtifact(const QJsonObject& entry, bool focusBottomResults)
@@ -2556,7 +2555,7 @@ void MainWindow::openAnalysisArtifact(const QJsonObject& entry, bool focusBottom
         }
     }
 
-    AnalysisResultWidget* resultWidget = new AnalysisResultWidget;
+    AnalysisResultWidget* resultWidget = new AnalysisResultWidget(this);
     connect(resultWidget, &AnalysisResultWidget::toolCommandRequested, this, &MainWindow::handleResultRendererToolCommand);
     connect(resultWidget, &AnalysisResultWidget::selectionContextChanged, this, &MainWindow::handleResultRendererSelectionContext);
     resultWidget->setResultHistory(resultHistoryForTool(toolName));
@@ -2674,7 +2673,7 @@ void MainWindow::openFileInView(const QString& filePath)
         appendTerminalMessage(QString("$ extension view open %1").arg(filePath));
         return;
     } else {
-        QTextEdit* editor = new QTextEdit;
+        QTextEdit* editor = new QTextEdit(this);
         editor->setReadOnly(true);
         if (dispatch.value("view").toString() == QLatin1String("CodeEditorView") || isWorkflowAnalysisFile(filePath)) {
             editor->setPlainText(loadTextFileForDisplay(filePath));
@@ -4511,7 +4510,7 @@ void MainWindow::updateStructuredResultView(const QString& toolName, const QJson
         {"has_secondary_action", false}};
 
     for (auto it = result.constBegin(); it != result.constEnd(); ++it) {
-        m_resultsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
+        m_resultsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()).release());
     }
     m_resultsTree->expandToDepth(1);
     for (int column = 0; column < m_resultsTree->columnCount(); ++column) {
@@ -6601,75 +6600,75 @@ void MainWindow::rebuildSkillsExplorer()
 
     const QJsonArray capabilityCatalog = availableToolDefinitions();
 
-    QTreeWidgetItem* localRoot = new QTreeWidgetItem(QStringList() << "Workbench Tools");
+    auto localRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Workbench Tools");
     const QJsonArray localTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workbench_local"));
     for (const QJsonValue& value : localTools) {
-        localRoot->addChild(makeToolTreeItem(value.toObject()));
+        localRoot->addChild(makeToolTreeItem(value.toObject()).release());
     }
     localRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(localRoot);
+    m_skillsExplorer->addTopLevelItem(localRoot.release());
 
-    QTreeWidgetItem* kernelRoot = new QTreeWidgetItem(QStringList() << "Neuro-Kernel Tools");
+    auto kernelRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Neuro-Kernel Tools");
     const QJsonArray kernelTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("neurokernel"));
     if (kernelTools.isEmpty()) {
         kernelRoot->addChild(new QTreeWidgetItem(QStringList() << "No tools discovered yet."));
     } else {
         for (const QJsonValue& value : kernelTools) {
-            kernelRoot->addChild(makeToolTreeItem(value.toObject()));
+            kernelRoot->addChild(makeToolTreeItem(value.toObject()).release());
         }
     }
     kernelRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(kernelRoot);
+    m_skillsExplorer->addTopLevelItem(kernelRoot.release());
 
-    QTreeWidgetItem* workflowSkillsRoot = new QTreeWidgetItem(QStringList() << "Workflow Skills");
+    auto workflowSkillsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Workflow Skills");
     const QJsonArray workflowSkillTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workflow_skill"));
     if (workflowSkillTools.isEmpty()) {
         workflowSkillsRoot->addChild(new QTreeWidgetItem(QStringList() << "No workflow skills discovered yet."));
     } else {
         for (const QJsonValue& value : workflowSkillTools) {
-            workflowSkillsRoot->addChild(makeToolTreeItem(value.toObject()));
+            workflowSkillsRoot->addChild(makeToolTreeItem(value.toObject()).release());
         }
     }
     workflowSkillsRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(workflowSkillsRoot);
+    m_skillsExplorer->addTopLevelItem(workflowSkillsRoot.release());
 
-    QTreeWidgetItem* workflowActionsRoot = new QTreeWidgetItem(QStringList() << "Workflow Actions");
+    auto workflowActionsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Workflow Actions");
     const QJsonArray workflowIoTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("workflow_io"));
     if (workflowIoTools.isEmpty()) {
         workflowActionsRoot->addChild(new QTreeWidgetItem(QStringList() << "No workflow graph actions discovered yet."));
     } else {
         for (const QJsonValue& value : workflowIoTools) {
-            workflowActionsRoot->addChild(makeToolTreeItem(value.toObject()));
+            workflowActionsRoot->addChild(makeToolTreeItem(value.toObject()).release());
         }
     }
     workflowActionsRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(workflowActionsRoot);
+    m_skillsExplorer->addTopLevelItem(workflowActionsRoot.release());
 
-    QTreeWidgetItem* extensionRoot = new QTreeWidgetItem(QStringList() << "Extension Tools");
+    auto extensionRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Extension Tools");
     const QJsonArray extensionTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("extension_host"));
     if (extensionTools.isEmpty()) {
         extensionRoot->addChild(new QTreeWidgetItem(QStringList() << "No extension tools discovered yet."));
     } else {
         for (const QJsonValue& value : extensionTools) {
-            extensionRoot->addChild(makeToolTreeItem(value.toObject()));
+            extensionRoot->addChild(makeToolTreeItem(value.toObject()).release());
         }
     }
     extensionRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(extensionRoot);
+    m_skillsExplorer->addTopLevelItem(extensionRoot.release());
 
-    QTreeWidgetItem* hostedToolsRoot = new QTreeWidgetItem(QStringList() << "Active Hosted View Tools");
+    auto hostedToolsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Active Hosted View Tools");
     const QJsonArray hostedTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("hosted_view"));
     if (hostedTools.isEmpty()) {
         hostedToolsRoot->addChild(new QTreeWidgetItem(QStringList() << "No active hosted view actions exposed as tools."));
     } else {
         for (const QJsonValue& value : hostedTools) {
-            hostedToolsRoot->addChild(makeToolTreeItem(value.toObject()));
+            hostedToolsRoot->addChild(makeToolTreeItem(value.toObject()).release());
         }
     }
     hostedToolsRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(hostedToolsRoot);
+    m_skillsExplorer->addTopLevelItem(hostedToolsRoot.release());
 
-    QTreeWidgetItem* pipelinesRoot = new QTreeWidgetItem(QStringList() << "Analysis Pipelines");
+    auto pipelinesRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Analysis Pipelines");
     const QJsonArray pipelineTools = capabilitiesFromCatalogBySource(capabilityCatalog, QStringLiteral("analysis_pipeline"));
     if (pipelineTools.isEmpty()) {
         pipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << "No analysis pipelines discovered yet."));
@@ -6679,18 +6678,18 @@ void MainWindow::rebuildSkillsExplorer()
             const QString label = QString("%1 (%2)")
                                       .arg(pipelineTool.value("display_name").toString(pipelineTool.value("pipeline_id").toString()),
                                            pipelineTool.value("extension_display_name").toString());
-            QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
+            auto item = std::make_unique<QTreeWidgetItem>(QStringList() << label);
             item->setToolTip(0, pipelineTool.value("description").toString());
             item->setData(0, Qt::UserRole, pipelineTool.value("name").toString());
             item->setData(0, Qt::UserRole + 1, pipelineTool);
             item->setData(0, Qt::UserRole + 2, pipelineTool.value("pipeline_id").toString());
-            pipelinesRoot->addChild(item);
+            pipelinesRoot->addChild(item.release());
         }
     }
     pipelinesRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(pipelinesRoot);
+    m_skillsExplorer->addTopLevelItem(pipelinesRoot.release());
 
-    QTreeWidgetItem* resourceRoot = new QTreeWidgetItem(QStringList() << "Live Resources");
+    auto resourceRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Live Resources");
     if (m_cachedExtensionResources.isEmpty()) {
         resourceRoot->addChild(new QTreeWidgetItem(QStringList() << "No live extension or workflow resources discovered yet."));
     } else {
@@ -6702,16 +6701,16 @@ void MainWindow::rebuildSkillsExplorer()
             const QString label = QString("%1 (%2)")
                                       .arg(resource.value("display_name").toString(),
                                            detail);
-            QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
+            auto item = std::make_unique<QTreeWidgetItem>(QStringList() << label);
             item->setToolTip(0, resource.value("root_path").toString());
             item->setData(0, Qt::UserRole + 1, resource);
-            resourceRoot->addChild(item);
+            resourceRoot->addChild(item.release());
         }
     }
     resourceRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(resourceRoot);
+    m_skillsExplorer->addTopLevelItem(resourceRoot.release());
 
-    QTreeWidgetItem* sessionsRoot = new QTreeWidgetItem(QStringList() << "Hosted Views");
+    auto sessionsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Hosted Views");
     if (m_cachedExtensionViewSessions.isEmpty()) {
         sessionsRoot->addChild(new QTreeWidgetItem(QStringList() << "No hosted extension view sessions yet."));
     } else {
@@ -6727,16 +6726,16 @@ void MainWindow::rebuildSkillsExplorer()
                 label += QString(" | %1").arg(state.value("hemisphere").toString());
             }
 
-            QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << label);
+            auto item = std::make_unique<QTreeWidgetItem>(QStringList() << label);
             item->setToolTip(0, session.value("session_id").toString());
             item->setData(0, Qt::UserRole + 1, session);
-            sessionsRoot->addChild(item);
+            sessionsRoot->addChild(item.release());
         }
     }
     sessionsRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(sessionsRoot);
+    m_skillsExplorer->addTopLevelItem(sessionsRoot.release());
 
-    QTreeWidgetItem* activePipelinesRoot = new QTreeWidgetItem(QStringList() << "Active Pipelines");
+    auto activePipelinesRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Active Pipelines");
     if (m_activePipelineId.isEmpty()) {
         activePipelinesRoot->addChild(new QTreeWidgetItem(QStringList() << "No pipeline currently running."));
     } else {
@@ -6752,16 +6751,16 @@ void MainWindow::rebuildSkillsExplorer()
         }
     }
     activePipelinesRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(activePipelinesRoot);
+    m_skillsExplorer->addTopLevelItem(activePipelinesRoot.release());
 
-    QTreeWidgetItem* statusRoot = new QTreeWidgetItem(QStringList() << "Planner Context");
+    auto statusRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Planner Context");
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << m_llmPlanner.statusSummary()));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("View Providers: %1")
                                                                   .arg(m_viewProviderRegistry ? m_viewProviderRegistry->manifests().size() : 0)));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("Live Resources: %1").arg(m_cachedExtensionResources.size())));
     statusRoot->addChild(new QTreeWidgetItem(QStringList() << QString("Hosted Sessions: %1").arg(m_cachedExtensionViewSessions.size())));
     statusRoot->setExpanded(true);
-    m_skillsExplorer->addTopLevelItem(statusRoot);
+    m_skillsExplorer->addTopLevelItem(statusRoot.release());
 }
 
 void MainWindow::updateSelectedSkillTool(QTreeWidgetItem* item)
@@ -7155,7 +7154,7 @@ void MainWindow::refreshExtensionManagerUi()
     }
 
     m_extensionsExplorer->clear();
-    QTreeWidgetItem* hostStateItem = new QTreeWidgetItem(QStringList() << "Extension Host State");
+    auto hostStateItem = std::make_unique<QTreeWidgetItem>(QStringList() << "Extension Host State");
     hostStateItem->setData(0, Qt::UserRole + 10, "host_state");
     hostStateItem->addChild(new QTreeWidgetItem(QStringList()
                                                 << QString("Live Tools: %1").arg(m_cachedExtensionToolDefinitions.size())));
@@ -7180,32 +7179,32 @@ void MainWindow::refreshExtensionManagerUi()
 
         const QJsonArray invalidatedSessionIds = m_lastExtensionReloadResult.value("invalidated_session_ids").toArray();
         if (!invalidatedSessionIds.isEmpty()) {
-            QTreeWidgetItem* invalidatedRoot = new QTreeWidgetItem(QStringList() << "Invalidated Session IDs");
+            auto invalidatedRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Invalidated Session IDs");
             for (const QJsonValue& value : invalidatedSessionIds) {
                 invalidatedRoot->addChild(new QTreeWidgetItem(QStringList() << value.toString()));
             }
-            hostStateItem->addChild(invalidatedRoot);
+            hostStateItem->addChild(invalidatedRoot.release());
         }
 
         const QJsonArray invalidatedSessions = m_lastExtensionReloadResult.value("invalidated_sessions").toArray();
         if (!invalidatedSessions.isEmpty()) {
-            QTreeWidgetItem* invalidatedSessionsRoot = new QTreeWidgetItem(QStringList() << "Invalidated Sessions");
+            auto invalidatedSessionsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Invalidated Sessions");
             for (const QJsonValue& value : invalidatedSessions) {
                 const QJsonObject session = value.toObject();
                 const QString label = QString("%1 | %2")
                                           .arg(session.value("title").toString(),
                                                session.value("session_id").toString());
-                QTreeWidgetItem* sessionItem = new QTreeWidgetItem(QStringList() << label);
+                auto sessionItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
                 sessionItem->setToolTip(0, session.value("file").toString());
-                invalidatedSessionsRoot->addChild(sessionItem);
+                invalidatedSessionsRoot->addChild(sessionItem.release());
             }
-            hostStateItem->addChild(invalidatedSessionsRoot);
+            hostStateItem->addChild(invalidatedSessionsRoot.release());
         }
     } else {
         hostStateItem->addChild(new QTreeWidgetItem(QStringList() << "Last Reload: Not requested yet"));
     }
     hostStateItem->setExpanded(true);
-    m_extensionsExplorer->addTopLevelItem(hostStateItem);
+    m_extensionsExplorer->addTopLevelItem(hostStateItem.release());
 
     const QVector<ExtensionManifest> manifests = m_viewProviderRegistry->allManifests();
     for (const ExtensionManifest& manifest : manifests) {
@@ -7213,7 +7212,7 @@ void MainWindow::refreshExtensionManagerUi()
         const QString label = QString("%1 %2")
                                   .arg(enabled ? "[Enabled]" : "[Disabled]",
                                        manifest.displayName);
-        QTreeWidgetItem* extensionItem = new QTreeWidgetItem(QStringList() << label);
+        auto extensionItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
         extensionItem->setToolTip(0, manifest.rootPath);
         extensionItem->setData(0, Qt::UserRole, manifest.id);
         extensionItem->setData(0, Qt::UserRole + 1, manifest.rawManifest);
@@ -7225,19 +7224,19 @@ void MainWindow::refreshExtensionManagerUi()
         extensionItem->addChild(new QTreeWidgetItem(QStringList() << QString("Tools: %1").arg(manifest.tools.size())));
 
         if (!manifest.ui.settingsTabs.isEmpty()) {
-            QTreeWidgetItem* settingsRoot = new QTreeWidgetItem(QStringList() << "Settings Tabs");
+            auto settingsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Settings Tabs");
             for (const UiContribution::SettingsTabContribution& tab : manifest.ui.settingsTabs) {
-                QTreeWidgetItem* tabItem = new QTreeWidgetItem(QStringList() << tab.title);
+                auto tabItem = std::make_unique<QTreeWidgetItem>(QStringList() << tab.title);
                 tabItem->setToolTip(0, tab.description);
                 tabItem->setData(0, Qt::UserRole, manifest.id);
                 tabItem->setData(0, Qt::UserRole + 2, tab.id);
-                settingsRoot->addChild(tabItem);
+                settingsRoot->addChild(tabItem.release());
             }
-            extensionItem->addChild(settingsRoot);
+            extensionItem->addChild(settingsRoot.release());
         }
 
         extensionItem->setExpanded(true);
-        m_extensionsExplorer->addTopLevelItem(extensionItem);
+        m_extensionsExplorer->addTopLevelItem(extensionItem.release());
     }
 
     updateSelectedExtension(m_extensionsExplorer->currentItem());
@@ -7462,13 +7461,11 @@ void MainWindow::openExtensionSettingsTab(const QString& extensionId, const QStr
                 }
             }
 
-            QWidget* container = new QWidget;
-            ExtensionSettingsWidget* settingsWidget = new ExtensionSettingsWidget(manifest, tab, nullptr);
+            ExtensionSettingsWidget* settingsWidget = new ExtensionSettingsWidget(manifest, tab, this);
             connect(settingsWidget, &ExtensionSettingsWidget::outputMessage, this, &MainWindow::appendOutputMessage);
             connect(settingsWidget, &ExtensionSettingsWidget::statusMessage, this, &MainWindow::setActivePanelState);
-            container = settingsWidget;
 
-            const int tabIndex = m_centerTabs->addTab(container, QString("%1: %2").arg(manifest.displayName, tab.title));
+            const int tabIndex = m_centerTabs->addTab(settingsWidget, QString("%1: %2").arg(manifest.displayName, tab.title));
             m_centerTabs->setTabToolTip(tabIndex, tabKey);
             m_centerTabs->setCurrentIndex(tabIndex);
             appendOutputMessage(QString("Opened extension settings tab %1 for %2").arg(tab.title, manifest.displayName));
@@ -7571,7 +7568,7 @@ void MainWindow::finalizeExtensionViewOpen(const QString& filePath, const QJsonO
             m_extensionViewWidgetsBySessionId.insert(sessionId, viewWidget);
         }
     } else {
-        ExtensionHostedViewWidget* hostedView = new ExtensionHostedViewWidget;
+        ExtensionHostedViewWidget* hostedView = new ExtensionHostedViewWidget(this);
         hostedView->setSessionDescriptor(sessionDescriptor);
         hostedView->setProperty("mne_session_id", sessionId);
         hostedView->setProperty("mne_session_descriptor", sessionDescriptor);
@@ -7661,7 +7658,7 @@ void MainWindow::openWorkflowCenterView(bool focusTab)
         centerSplitter->setStretchFactor(1, 2);
         containerLayout->addWidget(centerSplitter, 1);
 
-        QHBoxLayout* buttonLayout = new QHBoxLayout;
+        auto buttonLayout = std::make_unique<QHBoxLayout>();
         buttonLayout->setContentsMargins(0, 0, 0, 0);
         buttonLayout->setSpacing(8);
         m_workflowCenterOpenSourceButton = new QPushButton("Open Source File", m_workflowCenterView);
@@ -7673,7 +7670,7 @@ void MainWindow::openWorkflowCenterView(bool focusTab)
         buttonLayout->addWidget(m_workflowCenterAddStepButton);
         buttonLayout->addWidget(m_workflowCenterSaveButton);
         buttonLayout->addStretch(1);
-        containerLayout->addLayout(buttonLayout);
+        containerLayout->addLayout(buttonLayout.release());
 
         connect(m_workflowCenterMiniMap, &WorkflowMiniMapWidget::nodeActivated, this, [this](const QString& nodeUid) {
             if (QTreeWidgetItem* nodeItem = findWorkflowItemByStableId(m_workflowExplorer, QStringLiteral("node:%1").arg(nodeUid))) {
@@ -8190,16 +8187,17 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                 ? QStringLiteral("No active workflow graph. Open a .mne file to populate the workflow navigator.")
                 : QStringLiteral("Awaiting workflow graph activation for %1.")
                       .arg(QFileInfo(m_activeWorkflowFilePath).fileName());
-            QTreeWidgetItem* statusItem = new QTreeWidgetItem(QStringList() << message);
+            auto pStatusItem = std::make_unique<QTreeWidgetItem>(QStringList() << message);
             const QJsonObject payload{
                 {"kind", "workflow_status"},
                 {"message", message},
                 {"source_file", m_activeWorkflowFilePath},
                 {"graph_resource_uri", kActiveWorkflowGraphUri}};
-            statusItem->setData(0, kWorkflowPayloadRole, payload);
-            statusItem->setData(0, kWorkflowOpenPathRole, hasLocalWorkflowFile ? m_activeWorkflowFilePath : QString());
-            statusItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:status"));
-            m_workflowExplorer->addTopLevelItem(statusItem);
+            pStatusItem->setData(0, kWorkflowPayloadRole, payload);
+            pStatusItem->setData(0, kWorkflowOpenPathRole, hasLocalWorkflowFile ? m_activeWorkflowFilePath : QString());
+            pStatusItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:status"));
+            QTreeWidgetItem* statusItem = pStatusItem.get();
+            m_workflowExplorer->addTopLevelItem(pStatusItem.release());
             selectedItem = statusItem;
         } else {
             const QString sourceFilePath = m_activeWorkflowFilePath;
@@ -8233,43 +8231,44 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                 {"status_counts", statusCounts},
                 {"topological_order", topologicalOrder},
                 {"graph", m_activeWorkflowGraph}};
-            QTreeWidgetItem* summaryItem = new QTreeWidgetItem(QStringList()
-                                                               << QString("Active Workflow | %1 resources | %2 nodes")
-                                                                      .arg(summaryPayload.value(QStringLiteral("resource_count")).toInt())
-                                                                      .arg(summaryPayload.value(QStringLiteral("node_count")).toInt()));
-            summaryItem->setToolTip(0, sourceFilePath);
-            summaryItem->setData(0, kWorkflowPayloadRole, summaryPayload);
-            summaryItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
-            summaryItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:summary"));
-            summaryItem->addChild(new QTreeWidgetItem(QStringList()
-                                                      << QString("Source: %1")
-                                                             .arg(sourceInfo.fileName().isEmpty() ? sourceFilePath : sourceInfo.fileName())));
-            summaryItem->addChild(new QTreeWidgetItem(QStringList()
-                                                      << QString("Graph Resource: %1").arg(kActiveWorkflowGraphUri)));
-            summaryItem->setExpanded(true);
-            m_workflowExplorer->addTopLevelItem(summaryItem);
+            auto pSummaryItem = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                  << QString("Active Workflow | %1 resources | %2 nodes")
+                                                                         .arg(summaryPayload.value(QStringLiteral("resource_count")).toInt())
+                                                                         .arg(summaryPayload.value(QStringLiteral("node_count")).toInt()));
+            pSummaryItem->setToolTip(0, sourceFilePath);
+            pSummaryItem->setData(0, kWorkflowPayloadRole, summaryPayload);
+            pSummaryItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
+            pSummaryItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:summary"));
+            pSummaryItem->addChild(new QTreeWidgetItem(QStringList()
+                                                       << QString("Source: %1")
+                                                              .arg(sourceInfo.fileName().isEmpty() ? sourceFilePath : sourceInfo.fileName())));
+            pSummaryItem->addChild(new QTreeWidgetItem(QStringList()
+                                                       << QString("Graph Resource: %1").arg(kActiveWorkflowGraphUri)));
+            pSummaryItem->setExpanded(true);
+            QTreeWidgetItem* summaryItem = pSummaryItem.get();
+            m_workflowExplorer->addTopLevelItem(pSummaryItem.release());
 
-            QTreeWidgetItem* sourceRoot = new QTreeWidgetItem(QStringList() << "Source File");
+            auto sourceRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Source File");
             const QJsonObject sourcePayload{
                 {"kind", "source_file"},
                 {"source_file", sourceFilePath},
                 {"exists", sourceInfo.isFile()},
                 {"graph_resource_uri", kActiveWorkflowGraphUri}};
-            QTreeWidgetItem* sourceItem = new QTreeWidgetItem(QStringList()
-                                                              << (sourceInfo.fileName().isEmpty()
-                                                                      ? QStringLiteral("Unresolved workflow file")
-                                                                      : sourceInfo.fileName()));
+            auto sourceItem = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                << (sourceInfo.fileName().isEmpty()
+                                                                        ? QStringLiteral("Unresolved workflow file")
+                                                                        : sourceInfo.fileName()));
             sourceItem->setToolTip(0, sourceFilePath);
             sourceItem->setData(0, kWorkflowPayloadRole, sourcePayload);
             sourceItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
             sourceItem->setData(0, kWorkflowStableIdRole, QStringLiteral("workflow:source"));
-            sourceRoot->addChild(sourceItem);
+            sourceRoot->addChild(sourceItem.release());
             sourceRoot->setExpanded(true);
-            m_workflowExplorer->addTopLevelItem(sourceRoot);
+            m_workflowExplorer->addTopLevelItem(sourceRoot.release());
 
             const QJsonArray resources = m_activeWorkflowGraph.value(QStringLiteral("resources")).toArray();
-            QTreeWidgetItem* resourcesRoot = new QTreeWidgetItem(QStringList()
-                                                                 << QString("Resources (%1)").arg(resources.size()));
+            auto resourcesRoot = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                   << QString("Resources (%1)").arg(resources.size()));
             for (const QJsonValue& value : resources) {
                 const QJsonObject resource = value.toObject();
                 const QString resourceUid = resource.value(QStringLiteral("uid")).toString().trimmed();
@@ -8290,18 +8289,18 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                     {"source_file", sourceFilePath},
                     {"resource", resource},
                     {"resolved_local_path", resolvedLocalPath}};
-                QTreeWidgetItem* resourceItem = new QTreeWidgetItem(QStringList() << label);
+                auto resourceItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
                 resourceItem->setToolTip(0, resolvedLocalPath.isEmpty() ? resourceUri : resolvedLocalPath);
                 resourceItem->setData(0, kWorkflowPayloadRole, payload);
                 resourceItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty() ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString()) : resolvedLocalPath);
                 resourceItem->setData(0, kWorkflowStableIdRole, QStringLiteral("resource:%1").arg(resourceUid));
-                resourcesRoot->addChild(resourceItem);
+                resourcesRoot->addChild(resourceItem.release());
             }
             resourcesRoot->setExpanded(true);
-            m_workflowExplorer->addTopLevelItem(resourcesRoot);
+            m_workflowExplorer->addTopLevelItem(resourcesRoot.release());
 
-            QTreeWidgetItem* pipelineRoot = new QTreeWidgetItem(QStringList()
-                                                                << QString("Pipeline (%1 nodes)").arg(orderedNodes.size()));
+            auto pipelineRoot = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                  << QString("Pipeline (%1 nodes)").arg(orderedNodes.size()));
             for (int index = 0; index < orderedNodes.size(); ++index) {
                 const QJsonObject node = orderedNodes.at(index);
                 const QString nodeUid = node.value(QStringLiteral("uid")).toString().trimmed();
@@ -8334,8 +8333,8 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                 if (nodeLabel != nodeUid && !nodeUid.isEmpty()) {
                     nodeTitle += QString(" | %1").arg(nodeUid);
                 }
-                QTreeWidgetItem* nodeItem = new QTreeWidgetItem(QStringList()
-                                                                << nodeTitle);
+                auto nodeItem = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                  << nodeTitle);
                 const QString nodeDescription = node.value(QStringLiteral("description")).toString().trimmed();
                 nodeItem->setToolTip(0, nodeDescription.isEmpty() ? skillId : QString("%1\n%2").arg(skillId, nodeDescription));
                 nodeItem->setData(0, kWorkflowPayloadRole, nodePayload);
@@ -8344,7 +8343,7 @@ void MainWindow::rebuildWorkflowNavigatorUi()
 
                 const QJsonObject inputs = node.value(QStringLiteral("inputs")).toObject();
                 if (!inputs.isEmpty()) {
-                    QTreeWidgetItem* inputsRoot = new QTreeWidgetItem(QStringList() << "Inputs");
+                    auto inputsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Inputs");
                     for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
                         const QString inputUid = it.value().toString().trimmed();
                         const QJsonObject resolvedResource = resourceByUid.value(inputUid);
@@ -8363,21 +8362,21 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                         if (!resolvedResource.isEmpty()) {
                             label += QString(" [%1]").arg(resolvedResource.value(QStringLiteral("type")).toString());
                         }
-                        QTreeWidgetItem* inputItem = new QTreeWidgetItem(QStringList() << label);
+                        auto inputItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
                         inputItem->setToolTip(0, resolvedLocalPath.isEmpty() ? resolvedResource.value(QStringLiteral("uri")).toString() : resolvedLocalPath);
                         inputItem->setData(0, kWorkflowPayloadRole, payload);
                         inputItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty() ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString()) : resolvedLocalPath);
                         inputItem->setData(0,
                                            kWorkflowStableIdRole,
                                            QStringLiteral("node:%1:input:%2").arg(nodeUid, it.key()));
-                        inputsRoot->addChild(inputItem);
+                        inputsRoot->addChild(inputItem.release());
                     }
-                    nodeItem->addChild(inputsRoot);
+                    nodeItem->addChild(inputsRoot.release());
                 }
 
                 const QJsonObject parameters = node.value(QStringLiteral("parameters")).toObject();
                 if (!parameters.isEmpty()) {
-                    QTreeWidgetItem* parametersRoot = new QTreeWidgetItem(QStringList() << "Parameters");
+                    auto parametersRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Parameters");
                     for (auto it = parameters.constBegin(); it != parameters.constEnd(); ++it) {
                         const QJsonObject payload{
                             {"kind", "parameter"},
@@ -8385,17 +8384,17 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                             {"node_uid", nodeUid},
                             {"name", it.key()},
                             {"value", it.value()}};
-                        QTreeWidgetItem* parameterItem = new QTreeWidgetItem(QStringList()
-                                                                             << QString("%1 = %2")
-                                                                                    .arg(it.key(), summarizeJsonValue(it.value())));
+                        auto parameterItem = std::make_unique<QTreeWidgetItem>(QStringList()
+                                                                               << QString("%1 = %2")
+                                                                                      .arg(it.key(), summarizeJsonValue(it.value())));
                         parameterItem->setData(0, kWorkflowPayloadRole, payload);
                         parameterItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
                         parameterItem->setData(0,
                                                kWorkflowStableIdRole,
                                                QStringLiteral("node:%1:parameter:%2").arg(nodeUid, it.key()));
-                        parametersRoot->addChild(parameterItem);
+                        parametersRoot->addChild(parameterItem.release());
                     }
-                    nodeItem->addChild(parametersRoot);
+                    nodeItem->addChild(parametersRoot.release());
                 }
 
                 const QJsonObject declaredOutputs = node.value(QStringLiteral("outputs")).toObject();
@@ -8404,7 +8403,7 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                                                             .toObject()
                                                             .value(QStringLiteral("resolved_outputs"))
                                                             .toObject();
-                    QTreeWidgetItem* outputsRoot = new QTreeWidgetItem(QStringList() << "Outputs");
+                    auto outputsRoot = std::make_unique<QTreeWidgetItem>(QStringList() << "Outputs");
                     for (auto it = declaredOutputs.constBegin(); it != declaredOutputs.constEnd(); ++it) {
                         const QString outputUid = it.value().toString().trimmed();
                         QJsonObject resolvedResource = resolvedOutputs.value(it.key()).toObject();
@@ -8425,16 +8424,16 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                         if (!resolvedResource.isEmpty()) {
                             label += QString(" [%1]").arg(resolvedResource.value(QStringLiteral("type")).toString());
                         }
-                        QTreeWidgetItem* outputItem = new QTreeWidgetItem(QStringList() << label);
+                        auto outputItem = std::make_unique<QTreeWidgetItem>(QStringList() << label);
                         outputItem->setToolTip(0, resolvedLocalPath.isEmpty() ? resolvedResource.value(QStringLiteral("uri")).toString() : resolvedLocalPath);
                         outputItem->setData(0, kWorkflowPayloadRole, payload);
                         outputItem->setData(0, kWorkflowOpenPathRole, resolvedLocalPath.isEmpty() ? (sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString()) : resolvedLocalPath);
                         outputItem->setData(0,
                                             kWorkflowStableIdRole,
                                             QStringLiteral("node:%1:output:%2").arg(nodeUid, it.key()));
-                        outputsRoot->addChild(outputItem);
+                        outputsRoot->addChild(outputItem.release());
                     }
-                    nodeItem->addChild(outputsRoot);
+                    nodeItem->addChild(outputsRoot.release());
                 }
 
                 const QJsonObject lastResult = node.value(QStringLiteral("runtime"))
@@ -8447,19 +8446,19 @@ void MainWindow::rebuildWorkflowNavigatorUi()
                         {"source_file", sourceFilePath},
                         {"node_uid", nodeUid},
                         {"result", lastResult}};
-                    QTreeWidgetItem* resultItem = new QTreeWidgetItem(QStringList() << "Last Result");
+                    auto resultItem = std::make_unique<QTreeWidgetItem>(QStringList() << "Last Result");
                     resultItem->setData(0, kWorkflowPayloadRole, payload);
                     resultItem->setData(0, kWorkflowOpenPathRole, sourceInfo.isFile() ? sourceInfo.absoluteFilePath() : QString());
                     resultItem->setData(0,
                                         kWorkflowStableIdRole,
                                         QStringLiteral("node:%1:last_result").arg(nodeUid));
-                    nodeItem->addChild(resultItem);
+                    nodeItem->addChild(resultItem.release());
                 }
 
-                pipelineRoot->addChild(nodeItem);
+                pipelineRoot->addChild(nodeItem.release());
             }
             pipelineRoot->setExpanded(true);
-            m_workflowExplorer->addTopLevelItem(pipelineRoot);
+            m_workflowExplorer->addTopLevelItem(pipelineRoot.release());
 
             selectedItem = findWorkflowItemByStableId(m_workflowExplorer, previousStableId);
             if (!selectedItem) {

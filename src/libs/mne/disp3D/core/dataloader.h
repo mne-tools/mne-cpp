@@ -42,7 +42,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QList>
 #include <QStandardItem>
 #include <QVector3D>
 #include <QMatrix4x4>
@@ -92,10 +91,10 @@ public:
         bool hasInfo = false;
         bool hasDigitizer = false;
 
-        mne::FiffInfo info;                 ///< Channel / dig info
-        QList<QStandardItem*> megGradItems; ///< Ownership passes to caller
-        QList<QStandardItem*> megMagItems;
-        QList<QStandardItem*> eegItems;
+        mne::FiffInfo info;                                       ///< Channel / dig info
+        std::vector<std::unique_ptr<QStandardItem>> megGradItems; ///< Hand over with BrainTreeModel::addSensors()
+        std::vector<std::unique_ptr<QStandardItem>> megMagItems;
+        std::vector<std::unique_ptr<QStandardItem>> eegItems;
         mne::FiffDigPointSet digitizerPoints;
 
         std::shared_ptr<BrainSurface> helmetSurface; ///< May be null

@@ -51,6 +51,8 @@ class Communicator;
 namespace mne::disp
 {
 class AveragingSettingsView;
+class AverageSelectionView;
+class FiffRawViewSettings;
 class ChannelSelectionView;
 class AverageLayoutView;
 class ChannelInfoModel;
@@ -309,6 +311,9 @@ private:
     QPointer<mne::disp::AverageLayoutView> m_pAverageLayoutView; /**< The average layout plot view. */
 
     mne::disp::AveragingSettingsView* m_pAveragingSettingsView; /**< Pointer to averaging settings GUI. */
+
+    std::unique_ptr<mne::disp::AverageSelectionView> m_pAverageSelectionView;   /**< Holds the average selection; not shown. */
+    std::unique_ptr<mne::disp::FiffRawViewSettings> m_pChannelDataSettingsView; /**< Holds the view settings; not shown. */
 
     float m_fBaselineFromS;    /**< Baseline start - in seconds relative to stim(0) - can be negative*/
     float m_fBaselineToS;      /**< Baseline end - in seconds relative to stim(0) - can be negative*/

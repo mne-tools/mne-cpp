@@ -82,7 +82,8 @@ void RawDataViewer::init()
     m_pCommu = new Communicator(this);
 
     // Create viewer
-    m_pFiffRawView = new FiffRawView();
+    m_ownedView = std::make_unique<FiffRawView>();
+    m_pFiffRawView = m_ownedView.get();
     m_pFiffRawView->setMinimumSize(256, 256);
     m_pFiffRawView->setFocusPolicy(Qt::TabFocus);
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
@@ -125,6 +126,10 @@ QDockWidget* RawDataViewer::getControl()
 
 QWidget* RawDataViewer::getView()
 {
+    // The main window adopts the view
+    if (m_ownedView) {
+        return m_ownedView.release();
+    }
     return m_pFiffRawView;
 }
 

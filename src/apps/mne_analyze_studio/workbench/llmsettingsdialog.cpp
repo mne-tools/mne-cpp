@@ -38,6 +38,8 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 namespace
@@ -310,14 +312,14 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     m_toolInventoryView->hide();
     m_testStatusLabel->setWordWrap(true);
 
-    QHBoxLayout* profileRow = new QHBoxLayout;
+    auto profileRow = std::make_unique<QHBoxLayout>();
     profileRow->setContentsMargins(0, 0, 0, 0);
     profileRow->setSpacing(8);
     profileRow->addWidget(m_profileSelector, 1);
     profileRow->addWidget(m_saveProfileButton);
     profileRow->addWidget(m_deleteProfileButton);
 
-    QHBoxLayout* modelRow = new QHBoxLayout;
+    auto modelRow = std::make_unique<QHBoxLayout>();
     modelRow->setContentsMargins(0, 0, 0, 0);
     modelRow->setSpacing(8);
     modelRow->addWidget(m_modelLineEdit, 1);
@@ -326,19 +328,19 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     modelRow->addWidget(m_suggestedModelSelector);
     modelRow->addWidget(m_applySuggestedModelButton);
 
-    QHBoxLayout* onboardingRow = new QHBoxLayout;
+    auto onboardingRow = std::make_unique<QHBoxLayout>();
     onboardingRow->setContentsMargins(0, 0, 0, 0);
     onboardingRow->setSpacing(8);
     onboardingRow->addWidget(m_openConsoleButton);
     onboardingRow->addWidget(m_openDocsButton);
     onboardingRow->addStretch(1);
 
-    QFormLayout* formLayout = new QFormLayout;
+    auto formLayout = std::make_unique<QFormLayout>();
     formLayout->setContentsMargins(0, 0, 0, 0);
     formLayout->setSpacing(10);
-    formLayout->addRow("Profile", profileRow);
+    formLayout->addRow("Profile", profileRow.release());
     formLayout->addRow("Mode", m_modeSelector);
-    formLayout->addRow("Current Model", modelRow);
+    formLayout->addRow("Current Model", modelRow.release());
     formLayout->addRow("API Key", m_apiKeyLineEdit);
     formLayout->addRow("Status", m_testStatusLabel);
 
@@ -371,7 +373,7 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     connectionCardLayout->setSpacing(12);
     connectionCardLayout->addWidget(headingLabel);
     connectionCardLayout->addWidget(subheadingLabel);
-    connectionCardLayout->addLayout(formLayout);
+    connectionCardLayout->addLayout(formLayout.release());
 
     QLabel* providerSetupLabel = new QLabel("Provider Setup", this);
     providerSetupLabel->setObjectName("connectHeading");
@@ -384,7 +386,7 @@ LlmSettingsDialog::LlmSettingsDialog(const LlmPlannerConfig& config, QWidget* pa
     setupCardLayout->setSpacing(10);
     setupCardLayout->addWidget(providerSetupLabel);
     setupCardLayout->addWidget(m_providerInstructionsView);
-    setupCardLayout->addLayout(onboardingRow);
+    setupCardLayout->addLayout(onboardingRow.release());
     setupCardLayout->addWidget(m_testButton);
 
     QVBoxLayout* layout = new QVBoxLayout(this);

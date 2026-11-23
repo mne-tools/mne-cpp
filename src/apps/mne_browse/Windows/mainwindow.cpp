@@ -977,12 +977,12 @@ bool showComputeSourceEstimateDialog(QWidget* parent,
     outputHint->setWordWrap(true);
     outputLayout->addWidget(outputHint);
 
-    QHBoxLayout* directoryLayout = new QHBoxLayout();
+    auto directoryLayout = std::make_unique<QHBoxLayout>();
     QLineEdit* outputDirectoryEdit = new QLineEdit(outputDirectory, outputGroup);
     QPushButton* browseButton = new QPushButton(QStringLiteral("Browse..."), outputGroup);
     directoryLayout->addWidget(outputDirectoryEdit, 1);
     directoryLayout->addWidget(browseButton);
-    outputLayout->addLayout(directoryLayout);
+    outputLayout->addLayout(directoryLayout.release());
     mainLayout->addWidget(outputGroup);
 
     QObject::connect(browseButton, &QPushButton::clicked, &dialog, [&dialog, outputDirectoryEdit]() {
@@ -3521,13 +3521,13 @@ void MainWindow::handleAnnotationRangeSelected(int startSample, int endSample)
     dlg.setWindowTitle(QStringLiteral("Add Annotation"));
     auto* layout = new QVBoxLayout(&dlg);
     layout->addWidget(new QLabel(QStringLiteral("Annotation description:")));
-    auto* combo = new QComboBox;
+    auto* combo = new QComboBox(&dlg);
     combo->setEditable(true);
     combo->addItems(presets);
     // Set the last-used label as current text (even if it's custom)
     combo->setCurrentText(defaultLabel);
     layout->addWidget(combo);
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
     connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
     connect(buttons, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
     layout->addWidget(buttons);

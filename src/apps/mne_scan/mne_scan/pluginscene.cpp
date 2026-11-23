@@ -111,9 +111,7 @@ void PluginScene::insertItem(const QPointF& pos)
             }
             break;
         case InsertLine:
-            line = new QGraphicsLineItem(QLineF(pos, pos));
-            line->setPen(QPen(m_qColorLine, 1));
-            addItem(line);
+            line = addLine(QLineF(pos, pos), QPen(m_qColorLine, 1));
             break;
         default:;
     }

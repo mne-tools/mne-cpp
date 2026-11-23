@@ -72,7 +72,7 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime>& pTime,
     m_pRtcLayout->addWidget(m_pLabelInit);
     m_pRtcLayout->setContentsMargins(3, 0, 3, 0);
 
-    m_pImageSc = new ImageSc;
+    m_pImageSc = new ImageSc(this);
     m_pRtcLayout->addWidget(m_pImageSc);
 
     //set layouts
@@ -129,8 +129,7 @@ void RealTimeCovWidget::initDisplayControllWidgets()
         //Init control widgets
         QList<QWidget*> lControlWidgets;
 
-        mne::disp::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs,
-                                                                                               QString("MNESCAN/RTCW"));
+        mne::disp::ModalitySelectionView* pModalitySelectionWidget = new ModalitySelectionView(m_pRTC->getFiffInfo()->chs, QString("MNESCAN/RTCW"), this);
         pModalitySelectionWidget->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionWidget);
 

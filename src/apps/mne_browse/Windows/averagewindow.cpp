@@ -46,6 +46,7 @@
 #include <algorithm>
 #include <cmath>
 #include <numbers>
+#include <memory>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -553,13 +554,13 @@ void AverageWindow::initAverageSceneView()
         m_pSpinMag = makeSpinBox("Mag", 1.0);
         m_pSpinEEG = makeSpinBox("EEG", 1.0);
 
-        QHBoxLayout* scaleLayout = new QHBoxLayout;
+        auto scaleLayout = std::make_unique<QHBoxLayout>();
         scaleLayout->addStretch();
         scaleLayout->addWidget(m_pSpinGrad);
         scaleLayout->addWidget(m_pSpinMag);
         scaleLayout->addWidget(m_pSpinEEG);
 
-        layoutGrid->addLayout(scaleLayout, 2, 0, 1, 3);
+        layoutGrid->addLayout(scaleLayout.release(), 2, 0, 1, 3);
 
         auto updateScales = [this]() {
             std::map<int, float> scaleMap;
@@ -854,15 +855,15 @@ void AverageWindow::refreshPlots()
             setName.append(" [whitened]");
         }
 
-        ButterflySceneItem* butterflySceneItemTemp = new ButterflySceneItem(setName,
-                                                                            setKind,
-                                                                            setUnit,
-                                                                            m_lButterflyColors);
+        auto butterflySceneItemTemp = std::make_unique<ButterflySceneItem>(setName,
+                                                                           setKind,
+                                                                           setUnit,
+                                                                           m_lButterflyColors);
 
         butterflySceneItemTemp->setEvokedData(displayEvoked);
         butterflySceneItemTemp->m_bShowGFP = m_bShowGFP;
 
-        m_pButterflyScene->addItem(butterflySceneItemTemp);
+        m_pButterflyScene->addItem(butterflySceneItemTemp.release());
     }
 
     // Apply butterfly-specific auto-scale from the (possibly whitened) display data

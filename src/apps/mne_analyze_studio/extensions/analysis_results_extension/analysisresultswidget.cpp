@@ -31,12 +31,14 @@
 #include <QTreeWidgetItem>
 #include <QVBoxLayout>
 
+#include <memory>
+
 using namespace MNEANALYZESTUDIO;
 
 namespace
 {
 
-QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
+std::unique_ptr<QTreeWidgetItem> buildJsonTreeItem(const QString& key, const QJsonValue& value)
 {
     QString displayValue;
     if (value.isObject()) {
@@ -55,16 +57,16 @@ QTreeWidgetItem* buildJsonTreeItem(const QString& key, const QJsonValue& value)
         displayValue = QString::fromUtf8(QJsonDocument::fromVariant(value.toVariant()).toJson(QJsonDocument::Compact));
     }
 
-    QTreeWidgetItem* item = new QTreeWidgetItem(QStringList() << key << displayValue);
+    auto item = std::make_unique<QTreeWidgetItem>(QStringList() << key << displayValue);
     if (value.isObject()) {
         const QJsonObject object = value.toObject();
         for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            item->addChild(buildJsonTreeItem(it.key(), it.value()));
+            item->addChild(buildJsonTreeItem(it.key(), it.value()).release());
         }
     } else if (value.isArray()) {
         const QJsonArray array = value.toArray();
         for (int i = 0; i < array.size(); ++i) {
-            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)));
+            item->addChild(buildJsonTreeItem(QString("[%1]").arg(i), array.at(i)).release());
         }
     }
 
@@ -168,13 +170,13 @@ AnalysisResultsWidget::AnalysisResultsWidget(QWidget* parent)
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(8);
     layout->addWidget(m_titleLabel);
-    QHBoxLayout* actionLayout = new QHBoxLayout;
+    auto actionLayout = std::make_unique<QHBoxLayout>();
     actionLayout->setContentsMargins(0, 0, 0, 0);
     actionLayout->setSpacing(8);
     actionLayout->addWidget(m_primaryActionButton);
     actionLayout->addWidget(m_secondaryActionButton);
     actionLayout->addStretch(1);
-    layout->addLayout(actionLayout);
+    layout->addLayout(actionLayout.release());
     layout->addWidget(m_stack, 1);
 
     connect(m_table, &QTableWidget::itemSelectionChanged, this, &AnalysisResultsWidget::updatePrimaryActionFromSelection);
@@ -320,7 +322,7 @@ void AnalysisResultsWidget::updatePipelineSelection()
     const QVariant payload = m_pipelineStepsTable->item(row, 0)->data(Qt::UserRole);
     const QJsonObject step = payload.toJsonObject();
     for (auto it = step.constBegin(); it != step.constEnd(); ++it) {
-        m_pipelineStepDetailsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
+        m_pipelineStepDetailsTree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()).release());
     }
     m_pipelineStepDetailsTree->expandToDepth(1);
     for (int column = 0; column < m_pipelineStepDetailsTree->columnCount(); ++column) {
@@ -405,7 +407,7 @@ void AnalysisResultsWidget::setTreeResult(const QJsonObject& result)
 {
     m_stack->setCurrentWidget(m_tree);
     for (auto it = result.constBegin(); it != result.constEnd(); ++it) {
-        m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()));
+        m_tree->addTopLevelItem(buildJsonTreeItem(it.key(), it.value()).release());
     }
     m_tree->expandToDepth(1);
     for (int column = 0; column < m_tree->columnCount(); ++column) {
@@ -474,9 +476,9 @@ void AnalysisResultsWidget::setPipelineResult(const QJsonObject& result)
         if (!pipelineId.isEmpty() && !step.contains("pipeline_id")) {
             step.insert("pipeline_id", pipelineId);
         }
-        QTableWidgetItem* indexItem = new QTableWidgetItem(QString::number(step.value("step_number").toInt(row + 1)));
+        auto indexItem = std::make_unique<QTableWidgetItem>(QString::number(step.value("step_number").toInt(row + 1)));
         indexItem->setData(Qt::UserRole, step);
-        m_pipelineStepsTable->setItem(row, 0, indexItem);
+        m_pipelineStepsTable->setItem(row, 0, indexItem.release());
         m_pipelineStepsTable->setItem(row, 1, new QTableWidgetItem(step.value("status").toString()));
         m_pipelineStepsTable->setItem(row, 2, new QTableWidgetItem(step.value("started_at").toString()));
         m_pipelineStepsTable->setItem(row, 3, new QTableWidgetItem(step.value("completed_at").toString(step.value("failed_at").toString())));

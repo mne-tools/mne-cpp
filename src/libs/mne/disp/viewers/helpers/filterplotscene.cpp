@@ -42,7 +42,7 @@ using namespace mne;
 
 FilterPlotScene::FilterPlotScene(QGraphicsView* view, QObject* parent)
 : LayoutScene(view, parent)
-, m_pGraphicsItemPath(new QGraphicsPathItem())
+, m_pGraphicsItemPath(nullptr)
 , m_iScalingFactor(5)
 , m_iNumberHorizontalLines(4)
 , m_iNumberVerticalLines(3)

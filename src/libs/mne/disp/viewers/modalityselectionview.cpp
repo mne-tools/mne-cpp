@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "modalityselectionview.h"
+#include "../detail/layout_reset.h"
 
 #include <mne/base/string_utils.h>
 
@@ -200,19 +201,17 @@ void ModalitySelectionView::redrawGUI()
     //Delete all widgets in the averages layout
     QGridLayout* topLayout = static_cast<QGridLayout*>(this->layout());
     if (!topLayout) {
-        topLayout = new QGridLayout();
+        topLayout = new QGridLayout(this);
     }
 
     // The widgets go right away: the view is redrawn synchronously and looked up by name
-    while (std::unique_ptr<QLayoutItem> pItem{topLayout->takeAt(0)}) {
-        std::unique_ptr<QWidget> pWidget{pItem->widget()};
-    }
+    detail::clearLayout(topLayout);
 
     int count = 0;
     for (const auto& [modality, checked] : m_modalityMap) {
         const bool listed = std::ranges::any_of(m_lChannelTypeList, [&modality](const std::string& type) { return mne::iequals(type, modality); });
         if (listed) {
-            QCheckBox* t_pCheckBoxModality = new QCheckBox(QString::fromStdString(modality));
+            QCheckBox* t_pCheckBoxModality = new QCheckBox(QString::fromStdString(modality), this);
             t_pCheckBoxModality->setChecked(checked);
             m_qListModalityCheckBox.push_back(t_pCheckBoxModality);
             connect(t_pCheckBoxModality, &QCheckBox::checkStateChanged,
@@ -221,9 +220,6 @@ void ModalitySelectionView::redrawGUI()
             count++;
         }
     }
-
-    //Find Modalities tab and add current layout
-    this->setLayout(topLayout);
 }
 
 //=============================================================================================================

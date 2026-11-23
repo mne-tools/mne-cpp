@@ -110,7 +110,7 @@ WriteToFile::~WriteToFile()
 
 QSharedPointer<AbstractPlugin> WriteToFile::clone() const
 {
-    QSharedPointer<AbstractPlugin> pWriteToFileClone(new WriteToFile);
+    QSharedPointer<AbstractPlugin> pWriteToFileClone = QSharedPointer<WriteToFile>::create();
     return pWriteToFileClone;
 }
 
@@ -212,7 +212,7 @@ void WriteToFile::update(mne::scan::Measurement::SPtr pMeasurement)
 void WriteToFile::initPluginControlWidgets()
 {
     if (m_pFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         QSettings settings("MNECPP");
 
@@ -235,11 +235,11 @@ void WriteToFile::initPluginControlWidgets()
         }
 
         // Projects Settings
-        ProjectSettingsView* pProjectSettingsView = new ProjectSettingsView(QString("MNESCAN/%1").arg(this->getName()),
-                                                                            sMneScanDataPath,
-                                                                            sCurrentProject,
-                                                                            sCurrentSubject,
-                                                                            "");
+        ProjectSettingsView* pProjectSettingsView = makeControlWidget<ProjectSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()),
+                                                                                           sMneScanDataPath,
+                                                                                           sCurrentProject,
+                                                                                           sCurrentSubject,
+                                                                                           "");
         connect(this, &WriteToFile::guiModeChanged,
                 pProjectSettingsView, &ProjectSettingsView::setGuiMode);
         pProjectSettingsView->setObjectName("widget_");
@@ -261,9 +261,8 @@ void WriteToFile::initPluginControlWidgets()
         pProjectSettingsView->hideFileNameUi();
         pProjectSettingsView->hideParadigmUi();
 
-        plControlWidgets.append(pProjectSettingsView);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         if (!m_pUpdateTimeInfoTimer) {
             m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));

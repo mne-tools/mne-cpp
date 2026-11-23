@@ -79,8 +79,10 @@ public:
     //=========================================================================================================
     /**
      * Constructor
+     *
+     * @param[in] parent     Parent widget.
      */
-    EventView();
+    explicit EventView(QWidget* parent = nullptr);
 
     ~EventView();
 

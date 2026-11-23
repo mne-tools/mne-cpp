@@ -50,7 +50,6 @@
 #include <QDir>
 #include <QSettings>
 #include <QEvent>
-#include <QToolBar>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -105,10 +104,6 @@ RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime>& pTime,
     //Create toolboxes with butterfly and 2D layout plot
     m_pToolBox = new QToolBox(this);
     m_pToolBox->hide();
-
-    // Create tool bar
-    QToolBar* pToolBar = new QToolBar;
-    pToolBar->addAction(pActionSelectSensors);
 
     //Butterfly
     m_pButterflyView = new ButterflyView("MNESCAN/RTESW", this);
@@ -301,7 +296,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         //        }
 
         // Scaling
-        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), 0, Qt::Widget, m_pFiffInfo->get_channel_types());
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), this, Qt::Widget, m_pFiffInfo->get_channel_types());
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -315,7 +310,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pAverageLayoutView->setScaleMap(pScalingView->getScaleMap());
 
         // Quick control channel data settings
-        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTESW"));
+        FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTESW"), this);
         pChannelDataSettingsView->setWidgetList({"screenshot", "backgroundColor"});
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
@@ -333,8 +328,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
         // Quick control modality selection
-        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs,
-                                                                                  QString("MNESCAN/RTESW"));
+        ModalitySelectionView* pModalitySelectionView = new ModalitySelectionView(m_pFiffInfo->chs, QString("MNESCAN/RTESW"), this);
         pModalitySelectionView->setObjectName("group_tab_View_Modalities");
         lControlWidgets.append(pModalitySelectionView);
 
@@ -344,7 +338,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
         // Quick control average selection
-        AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("MNESCAN/RTESW"));
+        AverageSelectionView* pAverageSelectionView = new AverageSelectionView(QString("MNESCAN/RTESW"), this);
         pAverageSelectionView->setObjectName("group_tab_View_Selection");
         lControlWidgets.append(pAverageSelectionView);
 

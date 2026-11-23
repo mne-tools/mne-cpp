@@ -99,7 +99,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
                     pos = devHeadQTrans.map(pos);
                 }
 
-                auto* item = new SensorTreeItem(QString::fromStdString(ch.ch_name), pos, QColor(100, 100, 100), 0.01f);
+                auto item = std::make_unique<SensorTreeItem>(QString::fromStdString(ch.ch_name), pos, QColor(100, 100, 100), 0.01f);
 
                 // Store coil orientation
                 QMatrix4x4 orient;
@@ -116,18 +116,18 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path
                 item->setOrientation(orient);
 
                 if (ch.unit == FIFF_UNIT_T_M) {
-                    result.megGradItems.append(item);
+                    result.megGradItems.push_back(std::move(item));
                 } else {
-                    result.megMagItems.append(item);
+                    result.megMagItems.push_back(std::move(item));
                 }
             } else if (ch.kind == FIFFV_EEG_CH) {
                 QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-                result.eegItems.append(new SensorTreeItem(QString::fromStdString(ch.ch_name), pos, QColor(0, 200, 220), 0.002f));
+                result.eegItems.push_back(std::make_unique<SensorTreeItem>(QString::fromStdString(ch.ch_name), pos, QColor(0, 200, 220), 0.002f));
             }
         }
 
         // ── MEG helmet surface ──────────────────────────────────────
-        if (!result.megGradItems.isEmpty() || !result.megMagItems.isEmpty()) {
+        if (!result.megGradItems.empty() || !result.megMagItems.empty()) {
             auto pickHelmetFile = [&info]() -> std::filesystem::path {
                 int coilType = -1;
                 int nMeg = 0;

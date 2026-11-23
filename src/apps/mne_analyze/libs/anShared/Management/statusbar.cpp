@@ -62,10 +62,9 @@ StatusBar::StatusBar(QWidget* pParent)
     connect(m_pCommunicator.get(), &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
 
-    m_pProgressView = new mne::disp::ProgressView(true,
-                                                  "QLabel { color : red; }");
-
-    this->addPermanentWidget(m_pProgressView);
+    auto pProgressView = std::make_unique<mne::disp::ProgressView>(true, "QLabel { color : red; }");
+    m_pProgressView = pProgressView.get();
+    this->addPermanentWidget(pProgressView.release());
     m_pProgressView->hide();
 }
 
@@ -143,7 +142,7 @@ void StatusBar::enterEvent(QEnterEvent* event)
     QVBoxLayout* layout = new QVBoxLayout(m_pHoverWidget);
     m_pHoverWidget->setLayout(layout);
 
-    QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>");
+    QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>", m_pHoverWidget);
     layout->addWidget(pMessageHeader);
     for (auto& message : m_LoadingStack) {
         if (message != "") {

@@ -18,10 +18,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "datamanager.h"
-#include <mne/disp/viewers/bidsview.h>
 
+#include <mne/base/log.h>
+#include <mne/disp/viewers/bidsview.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
 
@@ -30,6 +30,12 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,7 +98,8 @@ QMenu* DataManager::getMenu()
 
 QDockWidget* DataManager::getControl()
 {
-    mne::disp::BidsView* pDataManagerBidsView = new mne::disp::BidsView;
+    auto pControlDock = std::make_unique<QDockWidget>(getName());
+    mne::disp::BidsView* pDataManagerBidsView = new mne::disp::BidsView(pControlDock.get());
 
     pDataManagerBidsView->setModel(m_pAnalyzeData->getDataModel());
 
@@ -105,12 +112,11 @@ QDockWidget* DataManager::getControl()
     connect(pDataManagerBidsView, &mne::disp::BidsView::removeItem,
             this, &DataManager::onRemoveItem, Qt::UniqueConnection);
 
-    QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDock->setWidget(pDataManagerBidsView);
     pControlDock->setObjectName(getName());
 
-    return pControlDock;
+    return pControlDock.release();
 }
 
 //=============================================================================================================

@@ -75,7 +75,7 @@ RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
 , m_iNumberBadChannels(0)
 , m_pData3DModel(QSharedPointer<BrainTreeModel>::create())
-, m_p3DView(new BrainView())
+, m_p3DView(new BrainView(this))
 , m_bRtSourceActive(false)
 {
     m_mriHeadTrans = FiffCoordTrans();
@@ -98,11 +98,9 @@ void RealTime3DWidget::createGUI()
     m_p3DView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_p3DView->setMinimumSize(400, 400);
 
-    QGridLayout* pMainLayoutView = new QGridLayout();
+    QGridLayout* pMainLayoutView = new QGridLayout(this);
     pMainLayoutView->addWidget(m_p3DView, 0, 0);
     pMainLayoutView->setContentsMargins(0, 0, 0, 0);
-
-    this->setLayout(pMainLayoutView);
 }
 
 //=============================================================================================================
@@ -312,7 +310,7 @@ void RealTime3DWidget::initDisplayControllWidgets()
     QList<QWidget*> lControlWidgets;
 
     const std::vector<std::string> slControlFlags{"Data", "View", "Light"};
-    Control3DView* pControl3DView = new Control3DView("MNESCAN/RT3DW", nullptr, slControlFlags);
+    Control3DView* pControl3DView = new Control3DView("MNESCAN/RT3DW", this, slControlFlags);
     pControl3DView->setObjectName("group_tab_View_General");
     lControlWidgets.append(pControl3DView);
 

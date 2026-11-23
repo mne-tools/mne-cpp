@@ -31,6 +31,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,11 +81,12 @@ void BidsViewModel::addData(QModelIndex selectedItem,
         case BIDS_AVERAGE:
         case BIDS_DIPOLE: {
             if (!selectedItem.isValid()) {
-                QStandardItem* pItem = new QStandardItem("Unknown");
-                pItem->setEditable(false);
-                pItem->setDragEnabled(true);
+                auto pOwnedItem = std::make_unique<QStandardItem>("Unknown");
+                pOwnedItem->setEditable(false);
+                pOwnedItem->setDragEnabled(true);
 
-                addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pItem, BIDS_UNKNOWN);
+                QStandardItem* pItem = pOwnedItem.get();
+                addDataToSession(addSessionToSubject(addSubject("sub-01"), "ses-01"), pOwnedItem.release(), BIDS_UNKNOWN);
                 addToData(pNewItem,
                           indexFromItem(pItem),
                           iDataType);
@@ -131,8 +133,8 @@ QModelIndex BidsViewModel::addSubject(const QString& sSubjectName)
     sNewSubjectName.remove(" ");
 
     //Add subject to model
-    QStandardItem* pSubjectItem = new QStandardItem(sNewSubjectName);
-    appendRow(pSubjectItem);
+    appendRow(new QStandardItem(sNewSubjectName));
+    QStandardItem* pSubjectItem = item(rowCount() - 1);
 
     pSubjectItem->setData(QVariant::fromValue(BIDS_SUBJECT), BIDS_ITEM_TYPE);
     pSubjectItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
@@ -182,9 +184,9 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString& sSubjectName,
             pSubjectItem->setText(pSubjectItem->text() + QString::number(i + 1));
         }
 
-        pNewSessionItem = new QStandardItem(sNewSessionName);
-        pSubjectItem->setChild(pSubjectItem->rowCount(),
-                               pNewSessionItem);
+        const int iRow = pSubjectItem->rowCount();
+        pSubjectItem->setChild(iRow, new QStandardItem(sNewSessionName));
+        pNewSessionItem = pSubjectItem->child(iRow);
 
         pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
         pNewSessionItem->setData(QVariant::fromValue(pSubjectItem->index()), BIDS_ITEM_SUBJECT);
@@ -217,9 +219,9 @@ QModelIndex BidsViewModel::addSessionToSubject(QModelIndex subjectIndex,
     sNewSessionName.remove(" ");
 
     QStandardItem* pSubjectItem = itemFromIndex(subjectIndex);
-    QStandardItem* pNewSessionItem = new QStandardItem(sNewSessionName);
-    pSubjectItem->setChild(pSubjectItem->rowCount(),
-                           pNewSessionItem);
+    const int iRow = pSubjectItem->rowCount();
+    pSubjectItem->setChild(iRow, new QStandardItem(sNewSessionName));
+    QStandardItem* pNewSessionItem = pSubjectItem->child(iRow);
 
     pNewSessionItem->setData(QVariant::fromValue(BIDS_SESSION), BIDS_ITEM_TYPE);
     pNewSessionItem->setData(QVariant::fromValue(subjectIndex), BIDS_ITEM_SUBJECT);
@@ -264,13 +266,14 @@ QModelIndex BidsViewModel::addDataToSession(QModelIndex sessionIndex,
     }
 
     if (!bFolder) {
-        QStandardItem* pFunctionalItem = new QStandardItem(sFolderName);
-        pFunctionalItem->setData(QVariant::fromValue(BIDS_FOLDER), BIDS_ITEM_TYPE);
-        pFunctionalItem->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
-        pFunctionalItem->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
+        auto pOwnedFolder = std::make_unique<QStandardItem>(sFolderName);
+        pOwnedFolder->setData(QVariant::fromValue(BIDS_FOLDER), BIDS_ITEM_TYPE);
+        pOwnedFolder->setData(QVariant::fromValue(sessionIndex), BIDS_ITEM_SESSION);
+        pOwnedFolder->setData(itemFromIndex(sessionIndex)->data(BIDS_ITEM_SUBJECT), BIDS_ITEM_SUBJECT);
 
+        QStandardItem* pFunctionalItem = pOwnedFolder.get();
         pSessionItem->setChild(pSessionItem->rowCount(),
-                               pFunctionalItem);
+                               pOwnedFolder.release());
         pFunctionalItem->setChild(pFunctionalItem->rowCount(),
                                   pNewItem);
     } else {

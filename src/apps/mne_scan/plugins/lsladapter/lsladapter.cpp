@@ -84,7 +84,7 @@ LSLAdapter::~LSLAdapter()
 
 QSharedPointer<AbstractPlugin> LSLAdapter::clone() const
 {
-    return qSharedPointerCast<AbstractPlugin>(QSharedPointer<LSLAdapter>(new LSLAdapter()));
+    return QSharedPointer<LSLAdapter>::create();
 }
 
 //=============================================================================================================
@@ -171,11 +171,11 @@ QWidget* LSLAdapter::setupWidget()
 {
     // apparently the widget may get deleted during runtime,
     // so we have to return a new one everytime this method is called
-    LSLAdapterSetup* temp = new LSLAdapterSetup(m_iOutputBlockSize);
-    connect(temp, &LSLAdapterSetup::refreshAvailableStreams, this, &LSLAdapter::onRefreshAvailableStreams);
-    connect(temp, &LSLAdapterSetup::streamSelectionChanged, this, &LSLAdapter::onStreamSelectionChanged);
-    connect(temp, &LSLAdapterSetup::blockSizeChanged, this, &LSLAdapter::onBlockSizeChanged);
-    connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp, &LSLAdapterSetup::onLSLScanResults);
+    auto temp = std::make_unique<LSLAdapterSetup>(m_iOutputBlockSize);
+    connect(temp.get(), &LSLAdapterSetup::refreshAvailableStreams, this, &LSLAdapter::onRefreshAvailableStreams);
+    connect(temp.get(), &LSLAdapterSetup::streamSelectionChanged, this, &LSLAdapter::onStreamSelectionChanged);
+    connect(temp.get(), &LSLAdapterSetup::blockSizeChanged, this, &LSLAdapter::onBlockSizeChanged);
+    connect(this, &LSLAdapter::updatedAvailableLSLStreams, temp.get(), &LSLAdapterSetup::onLSLScanResults);
 
     // check if we have some information about previously available lsl streams:
     if (m_vAvailableStreams.isEmpty() == false && m_bHasValidStream) {
@@ -186,7 +186,8 @@ QWidget* LSLAdapter::setupWidget()
     // try to start background scan for available LSL streams
     onRefreshAvailableStreams();
 
-    return temp;
+    // The caller owns the widget
+    return temp.release();
 }
 
 //=============================================================================================================

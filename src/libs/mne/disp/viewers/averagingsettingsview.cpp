@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "averagingsettingsview.h"
+#include "../detail/layout_reset.h"
 #include "ui_averagingsettingsview.h"
 
 #include <mne/fiff/fiff_evoked_set.h>
@@ -226,13 +227,11 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
 
     QGridLayout* topLayout = static_cast<QGridLayout*>(m_pUi->m_groupBox_detectedTrials->layout());
     if (!topLayout) {
-        topLayout = new QGridLayout();
+        topLayout = new QGridLayout(m_pUi->m_groupBox_detectedTrials);
     }
 
     // The widgets go right away: the view is redrawn synchronously and looked up by name
-    while (std::unique_ptr<QLayoutItem> pItem{topLayout->takeAt(0)}) {
-        std::unique_ptr<QWidget> pWidget{pItem->widget()};
-    }
+    detail::clearLayout(topLayout);
 
     topLayout->addWidget(new QLabel("Type"), 0, 0);
     topLayout->addWidget(new QLabel("#"), 0, 1);
@@ -244,9 +243,6 @@ void AveragingSettingsView::setDetectedEpochs(const FiffEvokedSet& evokedSet)
             topLayout->addWidget(new QLabel(QString::number(evokedSet.evoked.at(i).nave)), i + 1, 1);
         }
     }
-
-    //Find Filter tab and add current layout
-    m_pUi->m_groupBox_detectedTrials->setLayout(topLayout);
 }
 
 //=============================================================================================================

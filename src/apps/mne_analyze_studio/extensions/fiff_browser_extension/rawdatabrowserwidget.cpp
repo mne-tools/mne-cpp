@@ -196,13 +196,13 @@ void RawDataBrowserWidget::registerViewFactory()
 RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
 : QWidget(parent)
 , m_file(new QFile(this))
-, m_zoomOutButton(new QPushButton("-"))
-, m_zoomResetButton(new QPushButton("1:1"))
-, m_zoomInButton(new QPushButton("+"))
-, m_dcButton(new QPushButton("DC"))
-, m_tableView(new QTableView)
-, m_markerLine(new QFrame)
-, m_timeRuler(new TimeRulerWidget)
+, m_zoomOutButton(new QPushButton("-", this))
+, m_zoomResetButton(new QPushButton("1:1", this))
+, m_zoomInButton(new QPushButton("+", this))
+, m_dcButton(new QPushButton("DC", this))
+, m_tableView(new QTableView(this))
+, m_markerLine(new QFrame(m_tableView->viewport()))
+, m_timeRuler(new TimeRulerWidget(this))
 , m_rawModel(new MNEBROWSE::RawModel(this))
 , m_eventModel(new MNEBROWSE::EventModel(this))
 , m_delegate(new MneBrowseRawDelegate(this))
@@ -212,7 +212,7 @@ RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
     layout->setContentsMargins(12, 12, 12, 12);
     layout->setSpacing(8);
 
-    QHBoxLayout* controlLayout = new QHBoxLayout;
+    auto controlLayout = std::make_unique<QHBoxLayout>();
     controlLayout->setContentsMargins(0, 0, 0, 0);
     controlLayout->setSpacing(8);
 
@@ -263,7 +263,6 @@ RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
 
     m_delegate->setEventModel(m_eventModel);
 
-    m_markerLine->setParent(m_tableView->viewport());
     m_markerLine->setObjectName("rawDataBrowserMarkerLine");
     m_markerLine->setFrameShape(QFrame::VLine);
     m_markerLine->setLineWidth(2);
@@ -276,7 +275,7 @@ RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
     controlLayout->addWidget(m_zoomResetButton);
     controlLayout->addWidget(m_zoomInButton);
 
-    layout->addLayout(controlLayout);
+    layout->addLayout(controlLayout.release());
     layout->addWidget(m_tableView, 1);
     layout->addWidget(m_timeRuler);
 }

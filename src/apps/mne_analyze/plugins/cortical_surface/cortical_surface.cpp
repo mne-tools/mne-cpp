@@ -211,7 +211,7 @@ private:
 //=============================================================================================================
 
 CorticalSurface::CorticalSurface()
-: m_pScene(new MultimodalScene())
+: m_pScene(std::make_unique<MultimodalScene>())
 {
 }
 
@@ -267,7 +267,8 @@ QString CorticalSurface::getBuildInfo()
 QMenu* CorticalSurface::getMenu()
 {
     if (!m_pMenu) {
-        m_pMenu = new QMenu(getName());
+        m_ownedMenu = std::make_unique<QMenu>(getName());
+        m_pMenu = m_ownedMenu.get();
         m_pLoadSurfaceAction = m_pMenu->addAction(QStringLiteral("Load Surface…"));
         connect(m_pLoadSurfaceAction.data(), &QAction::triggered,
                 this, &CorticalSurface::onLoadSurfaceTriggered);
@@ -278,6 +279,10 @@ QMenu* CorticalSurface::getMenu()
         connect(m_pComputeSourceEstimateAction.data(), &QAction::triggered,
                 this, &CorticalSurface::onComputeSourceEstimateTriggered);
     }
+    // The main window adopts the menu
+    if (m_ownedMenu) {
+        return m_ownedMenu.release();
+    }
     return m_pMenu;
 }
 
@@ -285,6 +290,10 @@ QMenu* CorticalSurface::getMenu()
 
 QDockWidget* CorticalSurface::getControl()
 {
+    // The main window adopts the dock
+    if (m_ownedControlDock) {
+        return m_ownedControlDock.release();
+    }
     return m_pControlDock;
 }
 
@@ -318,7 +327,7 @@ QVector<EVENT_TYPE> CorticalSurface::getEventSubscriptions() const
 
 MultimodalScene* CorticalSurface::scene() const
 {
-    return m_pScene.data();
+    return m_pScene.get();
 }
 
 //=============================================================================================================
@@ -328,7 +337,8 @@ void CorticalSurface::buildControlDock()
     if (m_pControlDock) {
         return;
     }
-    m_pControlDock = new QDockWidget(getName());
+    m_ownedControlDock = std::make_unique<QDockWidget>(getName());
+    m_pControlDock = m_ownedControlDock.get();
     auto* container = new QWidget(m_pControlDock);
     auto* form = new QFormLayout(container);
 
@@ -1048,7 +1058,8 @@ void CorticalSurface::buildTimeCourseDock()
     if (m_pTimeCourseDock) {
         return;
     }
-    m_pTimeCourseDock = new QDockWidget(QStringLiteral("Source Time Course"));
+    m_ownedTimeCourseDock = std::make_unique<QDockWidget>(QStringLiteral("Source Time Course"));
+    m_pTimeCourseDock = m_ownedTimeCourseDock.get();
 
     auto* container = new QWidget(m_pTimeCourseDock);
     auto* layout = new QVBoxLayout(container);
@@ -1062,7 +1073,7 @@ void CorticalSurface::buildTimeCourseDock()
             this, &CorticalSurface::onTimeCourseManagerSelectionChanged);
     layout->addWidget(m_pTimeCourseList);
 
-    auto* btnRow = new QHBoxLayout();
+    auto btnRow = std::make_unique<QHBoxLayout>();
     m_pTcRenameBtn = new QPushButton(QStringLiteral("Rename"), container);
     m_pTcColorBtn = new QPushButton(QStringLiteral("Colour..."), container);
     m_pTcRemoveBtn = new QPushButton(QStringLiteral("Remove"), container);
@@ -1076,7 +1087,7 @@ void CorticalSurface::buildTimeCourseDock()
     btnRow->addWidget(m_pTcRemoveBtn);
     btnRow->addStretch();
     btnRow->addWidget(m_pTcExportBtn);
-    layout->addLayout(btnRow);
+    layout->addLayout(btnRow.release());
 
     m_pTimeCourseDock->setWidget(container);
 }
@@ -1249,9 +1260,9 @@ void CorticalSurface::refreshTimeCourseManager()
     QSignalBlocker block(m_pTimeCourseList.data());
     m_pTimeCourseList->clear();
     for (const TraceEntry& t : m_traces) {
-        auto* item = new QListWidgetItem(t.name);
+        auto item = std::make_unique<QListWidgetItem>(t.name);
         item->setForeground(QBrush(t.color));
-        m_pTimeCourseList->addItem(item);
+        m_pTimeCourseList->addItem(item.release());
     }
 }
 
@@ -1592,7 +1603,8 @@ void CorticalSurface::buildLabelsDock()
     if (m_pLabelsDock) {
         return;
     }
-    m_pLabelsDock = new QDockWidget(QStringLiteral("Labels"));
+    m_ownedLabelsDock = std::make_unique<QDockWidget>(QStringLiteral("Labels"));
+    m_pLabelsDock = m_ownedLabelsDock.get();
 
     auto* container = new QWidget(m_pLabelsDock);
     auto* layout = new QVBoxLayout(container);

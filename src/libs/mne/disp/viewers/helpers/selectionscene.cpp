@@ -34,6 +34,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,15 +59,15 @@ void SelectionScene::repaintItems(const std::map<std::string, QPointF>& layoutMa
     this->clear();
 
     for (const auto& [name, position] : layoutMap) {
-        SelectionSceneItem* SelectionSceneItemTemp = new SelectionSceneItem(QString::fromStdString(name),
-                                                                            0,
-                                                                            position,
-                                                                            name.contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH,
-                                                                            FIFF_UNIT_T_M,
-                                                                            Qt::blue,
-                                                                            std::ranges::contains(badChannels, name));
+        auto SelectionSceneItemTemp = std::make_unique<SelectionSceneItem>(QString::fromStdString(name),
+                                                                           0,
+                                                                           position,
+                                                                           name.contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH,
+                                                                           FIFF_UNIT_T_M,
+                                                                           Qt::blue,
+                                                                           std::ranges::contains(badChannels, name));
 
-        this->addItem(SelectionSceneItemTemp);
+        this->addItem(SelectionSceneItemTemp.release());
     }
 }
 

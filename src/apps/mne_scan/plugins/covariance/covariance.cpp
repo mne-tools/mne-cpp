@@ -74,7 +74,7 @@ Covariance::~Covariance()
 
 QSharedPointer<AbstractPlugin> Covariance::clone() const
 {
-    QSharedPointer<Covariance> pCovarianceClone(new Covariance);
+    auto pCovarianceClone = QSharedPointer<Covariance>::create();
     return pCovarianceClone;
 }
 
@@ -103,9 +103,9 @@ void Covariance::init()
 void Covariance::initPluginControlWidgets()
 {
     if (m_pFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
-        CovarianceSettingsView* pCovarianceWidget = new CovarianceSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        CovarianceSettingsView* pCovarianceWidget = makeControlWidget<CovarianceSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &Covariance::guiModeChanged,
                 pCovarianceWidget, &CovarianceSettingsView::setGuiMode);
         connect(pCovarianceWidget, &CovarianceSettingsView::samplesChanged,
@@ -113,9 +113,8 @@ void Covariance::initPluginControlWidgets()
         pCovarianceWidget->setMinSamples(m_pFiffInfo->sfreq);
         pCovarianceWidget->setCurrentSamples(m_iEstimationSamples);
         pCovarianceWidget->setObjectName("group_Settings");
-        plControlWidgets.append(pCovarianceWidget);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
 
         m_bPluginControlWidgetsInit = true;
     }

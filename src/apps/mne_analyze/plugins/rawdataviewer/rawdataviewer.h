@@ -33,6 +33,12 @@
 #include <QDebug>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -144,7 +150,8 @@ private:
     int m_iVisibleBlocks;   /**< The amount of visible data blocks. Default is set to 10. */
     int m_iBufferBlocks;    /**< The amount of buffered data blocks. Default is set to 10. */
 
-    QPointer<FiffRawView> m_pFiffRawView; /**< View for Fiff data. */
+    std::unique_ptr<FiffRawView> m_ownedView; /**< The view until getView() hands it to the main window. */
+    QPointer<FiffRawView> m_pFiffRawView;     /**< View for Fiff data. */
 };
 
 //=============================================================================================================

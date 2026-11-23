@@ -308,7 +308,7 @@ public:
     // Vertex picking + Time Course dock
     //=========================================================================================================
 
-    /** @return The "Source Time Course" dock (built on first call). */
+    /** @return The "Source Time Course" dock (built on first call); the plugin keeps owning it. */
     QDockWidget* getTimeCourseDock();
 
     /**
@@ -363,7 +363,7 @@ public:
     // Labels dock (FreeSurfer annotation / atlas browser)
     //=========================================================================================================
 
-    /** @return The "Labels" dock (built on first call). */
+    /** @return The "Labels" dock (built on first call); the plugin keeps owning it. */
     QDockWidget* getLabelsDock();
 
     /** @return Snapshot of all labels currently loaded in the labels dock. */
@@ -507,6 +507,12 @@ private:
     static bool writeLabelFile(const mne::FsLabel& label, const QString& path);
 
     mne::analyze::Communicator* m_pCommu = nullptr;
+    // The plugin owns the menu and docks it built until getMenu() / getControl() hand them to the main window;
+    // the time-course and labels docks stay with the plugin.
+    std::unique_ptr<QMenu> m_ownedMenu;
+    std::unique_ptr<QDockWidget> m_ownedControlDock;
+    std::unique_ptr<QDockWidget> m_ownedTimeCourseDock;
+    std::unique_ptr<QDockWidget> m_ownedLabelsDock;
     QPointer<QMenu> m_pMenu;
     QPointer<QAction> m_pLoadSurfaceAction;
     QPointer<QAction> m_pLoadStcAction;
@@ -533,7 +539,7 @@ private:
 
     /** Per-plugin scene; a future slice will share this with the
      *  MNE Inspect application via the AnalyzeData store. */
-    QScopedPointer<mne::disp::MultimodalScene> m_pScene;
+    std::unique_ptr<mne::disp::MultimodalScene> m_pScene;
 
     QString m_lastSubjectsDir;
     QString m_lastSubjectId;

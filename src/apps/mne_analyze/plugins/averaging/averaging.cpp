@@ -138,9 +138,9 @@ QMenu* Averaging::getMenu()
 
 QWidget* Averaging::getView()
 {
-    QWidget* pAveragingViewWidget = new QWidget();
-    QTabWidget* pTabView = new QTabWidget(pAveragingViewWidget);
-    QVBoxLayout* pAveragingViewLayout = new QVBoxLayout();
+    auto pAveragingViewWidget = std::make_unique<QWidget>();
+    QTabWidget* pTabView = new QTabWidget(pAveragingViewWidget.get());
+    QVBoxLayout* pAveragingViewLayout = new QVBoxLayout(pAveragingViewWidget.get());
 
     m_pButterflyView = new mne::disp::ButterflyView("", pTabView);
     m_pAverageLayoutView = new mne::disp::AverageLayoutView("", pTabView);
@@ -162,27 +162,26 @@ QWidget* Averaging::getView()
     pTabView->addTab(m_pAverageLayoutView, "2D Layout View");
 
     pAveragingViewLayout->addWidget(pTabView);
-    pAveragingViewWidget->setLayout(pAveragingViewLayout);
 
     pAveragingViewWidget->setMinimumSize(256, 256);
     pAveragingViewWidget->setFocusPolicy(Qt::TabFocus);
     pAveragingViewWidget->setAttribute(Qt::WA_DeleteOnClose, false);
 
-    return pAveragingViewWidget;
+    return pAveragingViewWidget.release();
 }
 
 //=============================================================================================================
 
 QDockWidget* Averaging::getControl()
 {
-    QDockWidget* pControl = new QDockWidget(getName());
-    QScrollArea* pWidget = new QScrollArea();
+    auto pControl = std::make_unique<QDockWidget>(getName());
+    QScrollArea* pWidget = new QScrollArea(pControl.get());
 
-    m_pLayout = new QVBoxLayout;
-    m_pTabView = new QTabWidget();
+    m_pLayout = new QVBoxLayout(pWidget);
+    m_pTabView = new QTabWidget(pWidget);
 
     //Average Settings View
-    m_pAveragingSettingsView = new mne::disp::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+    m_pAveragingSettingsView = new mne::disp::AveragingSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), {}, m_pTabView);
 
     connect(m_pAveragingSettingsView, &mne::disp::AveragingSettingsView::changeNumAverages,
             this, &Averaging::onChangeNumAverages, Qt::UniqueConnection);
@@ -220,14 +219,13 @@ QDockWidget* Averaging::getControl()
 
     m_pLayout->addWidget(m_pTabView);
     m_pLayout->addStretch();
-    pWidget->setLayout(m_pLayout);
 
     pControl->setWidget(pWidget);
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControl->setObjectName("Averaging");
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
-    return pControl;
+    return pControl.release();
 }
 
 //=============================================================================================================
@@ -484,8 +482,7 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
 
     //Modality selection
-    mne::disp::ModalitySelectionView* pModalitySelectionView = new mne::disp::ModalitySelectionView(m_pFiffInfo->chs,
-                                                                                                    QString("MNEANALYZE/AVERAGING"));
+    mne::disp::ModalitySelectionView* pModalitySelectionView = new mne::disp::ModalitySelectionView(m_pFiffInfo->chs, QString("MNEANALYZE/AVERAGING"), m_pTabView);
     pModalitySelectionView->setObjectName("group_tab_View_Modalities");
 
     connect(pModalitySelectionView, &mne::disp::ModalitySelectionView::modalitiesChanged,
@@ -494,7 +491,9 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pButterflyView->setModalityMap(pModalitySelectionView->getModalityMap());
 
     // Quick control average selection
-    mne::disp::AverageSelectionView* pAverageSelectionView = new mne::disp::AverageSelectionView(QString("MNEANALYZE/AVERAGING"));
+    // Never shown: it only holds the average selection, so the plugin keeps it
+    m_pAverageSelectionView = std::make_unique<mne::disp::AverageSelectionView>(QString("MNEANALYZE/AVERAGING"));
+    mne::disp::AverageSelectionView* pAverageSelectionView = m_pAverageSelectionView.get();
     pAverageSelectionView->setObjectName("group_tab_View_Selection");
 
     connect(m_pEvokedModel.get(), &mne::disp::EvokedSetModel::newAverageActivationMap,
@@ -530,7 +529,9 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
     m_pAverageLayoutView->setAverageColor(pAverageSelectionView->getAverageColor());
 
     //Data customization:
-    mne::disp::FiffRawViewSettings* pChannelDataSettingsView = new mne::disp::FiffRawViewSettings(QString("MNESCAN/RTESW"));
+    // Never shown: it only provides the view settings, so the plugin keeps it
+    m_pChannelDataSettingsView = std::make_unique<mne::disp::FiffRawViewSettings>(QString("MNESCAN/RTESW"));
+    mne::disp::FiffRawViewSettings* pChannelDataSettingsView = m_pChannelDataSettingsView.get();
     pChannelDataSettingsView->setWidgetList({"screenshot", "backgroundColor"});
     pChannelDataSettingsView->setObjectName("group_tab_View_General");
 

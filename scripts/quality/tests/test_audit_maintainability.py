@@ -50,6 +50,108 @@ class PatternTests(unittest.TestCase):
         self.assertEqual(counted("auto* l = new QGridLayout();"), {"qt_new_unparented": 1})
         self.assertEqual(counted("QScopedArrayPointer<char> d(new char[n]);"), {})
 
+    def test_qt_new_passed_into_an_ownership_taking_call_is_owned(self) -> None:
+        for snippet in (
+            "layout->addWidget(new QLabel(tr(\"Name\")));",
+            "layout->addWidget(new QLabel(tr(\"Name\")), 0, 1);",
+            "layout->insertWidget(0, new QPushButton(icon, text));",
+            "layout->addLayout(new QHBoxLayout());",
+            "layout->insertLayout(1, new QHBoxLayout);",
+            "widget->setLayout(new QVBoxLayout);",
+            "layout->addItem(new QSpacerItem(20, 40));",
+            "scene.addItem(new QGraphicsRectItem(rect));",
+            "layout->insertItem(2, new QSpacerItem(1, 1));",
+            "form->addRow(tr(\"Gain\"), new QSpinBox);",
+            "scroll->setWidget(new QWidget());",
+            "window.setCentralWidget(new QTextEdit);",
+            "setMenuBar(new QMenuBar);",
+            "setStatusBar(new QStatusBar());",
+            "addDockWidget(Qt::LeftDockWidgetArea, new QDockWidget(title));",
+            "addToolBar(new QToolBar(tr(\"Tools\")));",
+            "tabs->addTab(new QWidget, tr(\"Info\"));",
+            "tabs->insertTab(0, new QWidget(), label);",
+            "wizard.addPage(new QWizardPage);",
+            "model->setItem(row, 0, new QStandardItem(text));",
+            "table->setItem(r, c, new QTableWidgetItem(QString::number(v)));",
+            "parentItem->setChild(0, 1, new QStandardItem(value));",
+            "model->appendRow(new QStandardItem(name));",
+            "model->insertRow(0, new QStandardItem(name));",
+            "model->appendColumn({new QStandardItem(name)});",
+            "model->setHorizontalHeaderItem(0, new QStandardItem(tr(\"A\")));",
+            "table->setVerticalHeaderItem(0, new QTableWidgetItem(tr(\"B\")));",
+            "tree->addTopLevelItem(new QTreeWidgetItem(columns));",
+            "tree->insertTopLevelItem(0, new QTreeWidgetItem(columns));",
+            "item->addChild(new QTreeWidgetItem(columns));",
+            "view->setViewport(new QOpenGLWidget);",
+            "area->setCornerWidget(new QLabel(text));",
+            "action->setDefaultWidget(new QSlider(Qt::Horizontal));",
+            "menu->addAction(new QAction(tr(\"Open\")));",
+            "button->setMenu(new QMenu(tr(\"More\")));",
+            "box->addWidget(new QLabel);",
+        ):
+            self.assertEqual(counted(snippet), {}, snippet)
+
+    def test_qt_new_with_a_parent_as_last_constructor_argument_is_owned(self) -> None:
+        for snippet in (
+            "auto* label = new QLabel(text, pGroupBox);",
+            "auto* menu = new QMenu(tr(\"Move\"), m_pMenu);",
+            "auto* layout = new QVBoxLayout(pWidget);",
+            "auto* box = new QGroupBox(name, m_pUi->m_groupBox_detectedTrials);",
+            "auto* action = new QAction(QString::number(i), pData->pMenu);",
+            "auto* item = new QTreeWidgetItem(parentItem);",
+            "m_pView = new QDialog(this, Qt::Window);",
+            "auto* label = new QLabel(m_pAboutWindow.data());",
+            "auto* layout = new QVBoxLayout(newDisp.get());",
+            "auto* view = new QLabel(text, m_pLayout->parentWidget());",
+            "m_pRoot = new QTreeWidgetItem(m_pTree.data(), {name});",
+            "auto* line = new QFrame(m_tableView->viewport());",
+            "auto* item = new QTreeWidgetItem(pRoot,",
+        ):
+            self.assertEqual(counted(snippet), {}, snippet)
+        for snippet in (
+            "auto* label = new QLabel(text);",
+            "auto* label = new QLabel(pName->text());",
+            "auto* item = new QStandardItem(name,",
+            "auto* view = new QWidget(0, Qt::Window);",
+        ):
+            self.assertEqual(counted(snippet), {"qt_new_unparented": 1}, snippet)
+
+    def test_qt_new_with_a_parent_declared_in_the_file_is_owned(self) -> None:
+        code = ("QWidget* container = makeContainer();\n"
+                "auto* row = new QWidget(container);\n"
+                "auto* edit = new QLineEdit(row);\n"
+                "QDialog dlg(this);\n"
+                "auto* box = new QComboBox(&dlg);\n"
+                "auto* view = new QDialog(row, Qt::Window);\n"
+                "QString text;\n"
+                "auto* label = new QLabel(text);\n"
+                "auto* other = new QLabel(&text);\n")
+        self.assertEqual(counted(code), {"qt_new_unparented": 1})
+
+    def test_members_declared_in_the_own_header_name_parents(self) -> None:
+        source = "auto* layout = new QVBoxLayout(m_panel);\n"
+        self.assertEqual({k: v for k, v in audit.count_file(source).items() if v}, {"qt_new_unparented": 1})
+        self.assertEqual({k: v for k, v in audit.count_file(source, header="QWidget* m_panel;").items() if v}, {})
+
+    def test_qt_new_whose_parent_follows_on_a_later_line_is_owned(self) -> None:
+        self.assertEqual(counted("auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok,\n"
+                                 "                                     Qt::Horizontal,\n"
+                                 "                                     this);\n"), {})
+        self.assertEqual(counted("auto* label = new QLabel(text,\n"
+                                 "                         font);\n"
+                                 "foo(this);\n"), {"qt_new_unparented": 1})
+
+    def test_qt_new_into_a_call_that_does_not_take_ownership_still_counts(self) -> None:
+        for snippet in (
+            "view->setModel(new QStandardItemModel);",
+            ", m_view(new QTableView)",
+            "view->setItemDelegate(new QStyledItemDelegate);",
+            "layout->addWidget(wrap(new QLabel(text)));",
+            "menu->addAction(new QIcon(path), text);",
+            "auto* label = new QLabel(text); layout->addWidget(label);",
+        ):
+            self.assertEqual(counted(snippet), {"qt_new_unparented": 1}, snippet)
+
     def test_project_classes_derived_from_qt_count_as_qt_allocations(self) -> None:
         headers = ("class DISPSHARED_EXPORT View : public QWidget, private Ui::Form\n{",
                    "class ScaleView final : public View {",
@@ -61,10 +163,18 @@ class PatternTests(unittest.TestCase):
         code = "auto* a = new mne::disp::ScaleView(label); auto* b = new Item(x); auto* c = new Plain();"
         self.assertEqual({k: v for k, v in audit.count_file(code, classes).items() if v},
                          {"qt_new_unparented": 2, "raw_new": 1})
+        self.assertEqual({k: v for k, v in audit.count_file(", ui(new Ui::View)", classes).items() if v}, {})
 
     def test_comments_and_strings_do_not_count(self) -> None:
         for snippet in ('// new Foo; NULL (int)x', '/* delete p; */', 'qInfo("NULL printf(")', "int n = 1'000;"):
             self.assertEqual(counted(snippet), {}, snippet)
+
+    def test_raw_string_literals_keep_line_structure(self) -> None:
+        code = 'auto s = R"json(\n{"a": "NULL", "b": 1}\n)json";\nint y = (int)x;\n'
+        stripped = audit.strip_comments_and_strings(code)
+        self.assertEqual(stripped.count("\n"), code.count("\n"))
+        self.assertEqual(stripped.splitlines()[3], "int y = (int)x;")
+        self.assertEqual(counted(code), {"c_style_cast": 1})
 
     def test_legacy_constructs_are_counted(self) -> None:
         self.assertEqual(counted("int y = (int)x;"), {"c_style_cast": 1})

@@ -194,6 +194,13 @@ aliases; replace the old spelling as below.
   traceability matrix from `doc/api_registry.json` with per-library floors
   that may only rise (`scripts/compliance/traceability.py`). The
   "Medical-Device Readiness" page lists what is in place and the roadmap.
+- Every object created with `new` has an owner: a Qt parent, an
+  ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
+  `release()`. The maintainability audit counts raw `new`, raw `delete` and
+  unowned Qt objects, and all three ceilings are 0. MNE Scan plugins offer
+  their settings widgets with `AbstractPlugin::offerControlWidgets()`, which
+  keeps the ones no control view adopted instead of leaking them; MNE Analyze
+  plugins hand out the menus, docks and views they built the same way.
 - The `USE_FFTW` option is gone. It never reached the compiler (no build
   defined `EIGEN_FFTW_DEFAULT`), so every FFT has always run on Eigen's
   built-in KISS FFT; the dead FFTW plumbing in the build is removed.

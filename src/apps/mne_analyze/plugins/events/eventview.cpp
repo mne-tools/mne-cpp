@@ -57,8 +57,9 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventView::EventView()
-: m_pUi(std::make_unique<Ui::EventWindowDockWidget>())
+EventView::EventView(QWidget* parent)
+: QWidget(parent)
+, m_pUi(std::make_unique<Ui::EventWindowDockWidget>())
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pEventModel(nullptr)
@@ -589,12 +590,13 @@ void EventView::redrawGroups()
     m_pUi->m_listWidget_groupListWidget->clear();
 
     for (auto& eventGroup : *groups) {
-        QListWidgetItem* newItem = new QListWidgetItem(QString::fromStdString(eventGroup.name));
-        newItem->setData(Qt::UserRole, QVariant(eventGroup.id));
-        newItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
-        newItem->setFlags(newItem->flags() | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+        auto pItem = std::make_unique<QListWidgetItem>(QString::fromStdString(eventGroup.name));
+        pItem->setData(Qt::UserRole, QVariant(eventGroup.id));
+        pItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
+        pItem->setFlags(pItem->flags() | Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
 
-        m_pUi->m_listWidget_groupListWidget->addItem(newItem);
+        QListWidgetItem* newItem = pItem.get();
+        m_pUi->m_listWidget_groupListWidget->addItem(pItem.release());
         for (auto group : selection) {
             if (group == eventGroup.id) {
                 m_pUi->m_listWidget_groupListWidget->setCurrentItem(newItem);

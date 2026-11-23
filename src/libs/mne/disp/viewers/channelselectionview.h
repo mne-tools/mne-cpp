@@ -153,7 +153,7 @@ public:
      * @param[in] listWidget QListWidget which inhibits the needed item.
      * @param[in] channelName the corresponding channel name.
      *
-     * @return Matching list item, or a newly allocated empty item owned by the caller if none matches.
+     * @return Matching list item, or nullptr if none matches.
      */
     QListWidgetItem* getItemForChName(QListWidget* listWidget,
                                       const QString& channelName);

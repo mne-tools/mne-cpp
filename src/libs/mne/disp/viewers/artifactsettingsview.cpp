@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "artifactsettingsview.h"
+#include "../detail/layout_reset.h"
 
 #include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_ch_info.h>
@@ -215,17 +216,11 @@ void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void ArtifactSettingsView::redrawGUI()
 {
-    // The view accepts the new layout only once the old one is gone, and deleting a layout leaves its widgets on the view
-    if (std::unique_ptr<QLayout> pLayout{this->layout()}) {
-        while (std::unique_ptr<QLayoutItem> pItem{pLayout->takeAt(0)}) {
-            std::unique_ptr<QWidget> pWidget{pItem->widget()};
-        }
-    }
+    detail::resetLayout(this);
     m_mapChThresholdsDoubleSpinBoxes.clear();
     m_mapChThresholdsSpinBoxes.clear();
 
-    QGridLayout* pGroupBoxArtifactRejection = new QGridLayout();
-    this->setLayout(pGroupBoxArtifactRejection);
+    auto pGroupBoxArtifactRejection = std::make_unique<QGridLayout>();
 
     //Artifact rejection
     if (!m_fiffChInfoList.empty()) {
@@ -262,17 +257,17 @@ void ArtifactSettingsView::redrawGUI()
         }
 
         if (!channelTypes.empty()) {
-            m_pArtifactRejectionCheckBox = new QCheckBox("Activate artifact rejection");
+            m_pArtifactRejectionCheckBox = new QCheckBox("Activate artifact rejection", this);
             pGroupBoxArtifactRejection->addWidget(m_pArtifactRejectionCheckBox, 0, 0, 1, 2);
             m_pArtifactRejectionCheckBox->setChecked(m_bDoArtifactThresholdReduction);
             connect(m_pArtifactRejectionCheckBox.data(), &QCheckBox::clicked,
                     this, &ArtifactSettingsView::onChangeArtifactThreshold);
 
             for (int i = 0; i < std::ssize(channelTypes); ++i) {
-                QLabel* pLabel = new QLabel(QString::fromStdString(channelTypes.at(i)));
+                QLabel* pLabel = new QLabel(QString::fromStdString(channelTypes.at(i)), this);
                 pGroupBoxArtifactRejection->addWidget(pLabel, i + 1, 0);
 
-                QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox();
+                QDoubleSpinBox* pDoubleSpinBox = new QDoubleSpinBox(this);
                 pDoubleSpinBox->setPrefix("+/-");
                 pDoubleSpinBox->setMinimum(0.0);
                 pDoubleSpinBox->setMaximum(100000.0);
@@ -282,7 +277,7 @@ void ArtifactSettingsView::redrawGUI()
                         this, &ArtifactSettingsView::onChangeArtifactThreshold);
                 m_mapChThresholdsDoubleSpinBoxes[channelTypes.at(i)] = pDoubleSpinBox;
 
-                QSpinBox* pSpinBox = new QSpinBox();
+                QSpinBox* pSpinBox = new QSpinBox(this);
                 pSpinBox->setPrefix("e");
                 pSpinBox->setMaximum(0);
                 pSpinBox->setMinimum(-10000);
@@ -294,6 +289,7 @@ void ArtifactSettingsView::redrawGUI()
             }
         }
     }
+    setLayout(pGroupBoxArtifactRejection.release());
 }
 
 //=============================================================================================================

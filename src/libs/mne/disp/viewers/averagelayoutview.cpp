@@ -68,7 +68,7 @@ AverageLayoutView::AverageLayoutView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Layout");
 
-    m_pAverageLayoutView = new QGraphicsView();
+    m_pAverageLayoutView = new QGraphicsView(this);
 
 
     m_pAverageLayoutView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

@@ -36,6 +36,8 @@
 #include <QThread>
 #include <QTimer>
 
+#include <memory>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -188,7 +190,8 @@ int main(int argc, char* argv[])
     splash.show();
     QThread::sleep(1);
 
-    mainWindow = new MainWindow();
+    auto pMainWindow = std::make_unique<MainWindow>();
+    mainWindow = pMainWindow.get();
     mainWindow->show();
 
     splash.finish(mainWindow);
@@ -203,5 +206,9 @@ int main(int argc, char* argv[])
         });
     }
 
-    return a.exec();
+    const int iResult = a.exec();
+
+    // The log handler writes to the main window only while it exists
+    mainWindow = nullptr;
+    return iResult;
 }

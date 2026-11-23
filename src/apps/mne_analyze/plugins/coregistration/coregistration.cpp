@@ -140,9 +140,9 @@ QMenu* CoRegistration::getMenu()
 QDockWidget* CoRegistration::getControl()
 {
     // Coregistration Settings
-    m_pCoregSettingsView = new CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()));
+    auto pControlDock = std::make_unique<QDockWidget>(getName());
+    m_pCoregSettingsView = new CoregSettingsView(QString("MNEANALYZE/%1").arg(this->getName()), pControlDock.get());
 
-    QDockWidget* pControlDock = new QDockWidget(getName());
     pControlDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
     pControlDock->setWidget(m_pCoregSettingsView);
     pControlDock->setObjectName(getName());
@@ -176,7 +176,7 @@ QDockWidget* CoRegistration::getControl()
     // automaticly load Bem if available
     onChangeSelectedBem(m_pCoregSettingsView->getCurrentSelectedBem());
 
-    return pControlDock;
+    return pControlDock.release();
 }
 
 //=============================================================================================================

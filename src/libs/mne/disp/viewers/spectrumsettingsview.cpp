@@ -46,14 +46,14 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Spectrum Settings");
 
-    QGridLayout* t_pGridLayout = new QGridLayout;
+    QGridLayout* t_pGridLayout = new QGridLayout(this);
 
-    QLabel* t_pLabelLower = new QLabel;
+    QLabel* t_pLabelLower = new QLabel(this);
     t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel* t_pLabelUpper = new QLabel;
+    m_pSliderLowerBound = new QSlider(Qt::Horizontal, this);
+    QLabel* t_pLabelUpper = new QLabel(this);
     t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
+    m_pSliderUpperBound = new QSlider(Qt::Horizontal, this);
 
     m_pSliderUpperBound->setMinimum(0);
     m_pSliderUpperBound->setMaximum(100);
@@ -67,8 +67,6 @@ SpectrumSettingsView::SpectrumSettingsView(const QString& sSettingsPath,
     t_pGridLayout->addWidget(m_pSliderLowerBound, 0, 1);
     t_pGridLayout->addWidget(t_pLabelUpper, 1, 0);
     t_pGridLayout->addWidget(m_pSliderUpperBound, 1, 1);
-
-    this->setLayout(t_pGridLayout);
 
     loadSettings();
 }

@@ -41,6 +41,7 @@ set(SOURCES
     plots/helpers/svgwriter.cpp
     plots/detail/niceticks.h
     detail/map_value.h
+    detail/layout_reset.h
     viewers/abstractview.cpp
     viewers/applytoview.cpp
     viewers/coregsettingsview.cpp

@@ -97,7 +97,7 @@ NoiseReduction::~NoiseReduction()
 
 QSharedPointer<AbstractPlugin> NoiseReduction::clone() const
 {
-    QSharedPointer<NoiseReduction> pNoiseReductionClone(new NoiseReduction);
+    auto pNoiseReductionClone = QSharedPointer<NoiseReduction>::create();
     return pNoiseReductionClone;
 }
 
@@ -221,14 +221,13 @@ void NoiseReduction::update(mne::scan::Measurement::SPtr pMeasurement)
 void NoiseReduction::initPluginControlWidgets()
 {
     if (m_pFiffInfo) {
-        QList<QWidget*> plControlWidgets;
+        std::vector<std::unique_ptr<QWidget>> controlWidgets;
 
         // Projectors
-        ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/%1/").arg(this->getName()));
+        ProjectorsView* pProjectorsView = makeControlWidget<ProjectorsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
                 pProjectorsView, &ProjectorsView::setGuiMode);
         pProjectorsView->setObjectName("group_tab_Settings_SSP");
-        plControlWidgets.append(pProjectorsView);
 
         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
                 this, &NoiseReduction::updateProjection);
@@ -236,11 +235,10 @@ void NoiseReduction::initPluginControlWidgets()
         pProjectorsView->setProjectors(m_pFiffInfo->projs);
 
         // Compensators
-        CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/%1/").arg(this->getName()));
+        CompensatorView* pCompensatorView = makeControlWidget<CompensatorView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
                 pCompensatorView, &CompensatorView::setGuiMode);
         pCompensatorView->setObjectName("group_tab_Settings_Comp");
-        plControlWidgets.append(pCompensatorView);
 
         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
                 this, &NoiseReduction::updateCompensator);
@@ -248,11 +246,10 @@ void NoiseReduction::initPluginControlWidgets()
         pCompensatorView->setCompensators(m_pFiffInfo->comps);
 
         // Filter
-        FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+        FilterSettingsView* pFilterSettingsView = makeControlWidget<FilterSettingsView>(controlWidgets, QString("MNESCAN/%1/").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
                 pFilterSettingsView, &FilterSettingsView::setGuiMode);
         pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
-        plControlWidgets.append(pFilterSettingsView);
 
         connect(pFilterSettingsView->getFilterView().get(), &FilterDesignView::filterChannelTypeChanged,
                 this, &NoiseReduction::setFilterChannelType);
@@ -270,11 +267,10 @@ void NoiseReduction::initPluginControlWidgets()
         this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
 
         // SPHARA settings
-        SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView(QString("MNESCAN/%1").arg(this->getName()));
+        SpharaSettingsView* pSpharaSettingsView = makeControlWidget<SpharaSettingsView>(controlWidgets, QString("MNESCAN/%1").arg(this->getName()));
         connect(this, &NoiseReduction::guiModeChanged,
                 pSpharaSettingsView, &SpharaSettingsView::setGuiMode);
         pSpharaSettingsView->setObjectName("group_tab_Settings_SPHARA");
-        plControlWidgets.append(pSpharaSettingsView);
 
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
                 this, &NoiseReduction::setSpharaActive);
@@ -282,7 +278,7 @@ void NoiseReduction::initPluginControlWidgets()
         connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
                 this, &NoiseReduction::setSpharaOptions);
 
-        emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
+        offerControlWidgets(std::move(controlWidgets));
     }
 }
 
@@ -320,7 +316,7 @@ void NoiseReduction::run()
 
     // Init
     MatrixXd matData;
-    QScopedPointer<mne::FilterOverlapAdd> pRtFilter(new mne::FilterOverlapAdd());
+    auto pRtFilter = std::make_unique<mne::FilterOverlapAdd>();
 
     while (!isInterruptionRequested()) {
         // Get the current data

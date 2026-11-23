@@ -15,17 +15,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <mne/base/log.h>
 #include "controlmanager.h"
 
+#include <mne/base/log.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Management/communicator.h>
-
 #include <mne/disp/viewers/scalingview.h>
 #include <mne/disp/viewers/applytoview.h>
 #include <mne/disp/viewers/control3dview.h>
 #include <mne/disp/viewers/fiffrawviewsettings.h>
-
 #ifdef MNE_DISP3D
 #include <mne/disp3D/model/braintreemodel.h>
 #endif
@@ -35,6 +33,12 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -97,13 +101,13 @@ QMenu* ControlManager::getMenu()
 
 QDockWidget* ControlManager::getControl()
 {
-    QDockWidget* pControlDock = new QDockWidget(getName());
+    auto pControlDock = std::make_unique<QDockWidget>(getName());
     pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     pControlDock->setObjectName(getName());
-    QTabWidget* pTabWidget = new QTabWidget();
 
-    QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
-    QVBoxLayout* pLayout = new QVBoxLayout;
+    QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock.get());
+    QVBoxLayout* pLayout = new QVBoxLayout(wrappedScrollArea);
+    QTabWidget* pTabWidget = new QTabWidget(wrappedScrollArea);
 
     const std::vector<std::string> slControlFlags{"Data", "View", "Light"};
 
@@ -142,7 +146,7 @@ QDockWidget* ControlManager::getControl()
     m_ViewParameters.m_sImageType = "";
 
     //View3D Settings
-    m_pControl3DView = new mne::disp::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), nullptr, slControlFlags);
+    m_pControl3DView = new mne::disp::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), pTabWidget, slControlFlags);
 
     pTabWidget->addTab(m_pControl3DView, "3D");
 
@@ -161,14 +165,13 @@ QDockWidget* ControlManager::getControl()
     connect(m_pControl3DView, &mne::disp::Control3DView::takeScreenshotChanged,
             this, &ControlManager::onTakeScreenshotChanged);
 
-    m_pApplyToView = new mne::disp::ApplyToView();
+    m_pApplyToView = new mne::disp::ApplyToView("", wrappedScrollArea);
     pLayout->addWidget(pTabWidget);
     pLayout->addWidget(m_pApplyToView);
     pLayout->addStretch();
-    wrappedScrollArea->setLayout(pLayout);
     pControlDock->setWidget(wrappedScrollArea);
 
-    return pControlDock;
+    return pControlDock.release();
 }
 
 //=============================================================================================================

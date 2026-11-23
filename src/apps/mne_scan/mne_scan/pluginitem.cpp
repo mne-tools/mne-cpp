@@ -90,11 +90,11 @@ PluginItem::PluginItem(mne::scan::AbstractPlugin::SPtr pPlugin, QMenu* contextMe
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 
     // Drop shadow
-    auto* shadow = new QGraphicsDropShadowEffect();
+    auto shadow = std::make_unique<QGraphicsDropShadowEffect>();
     shadow->setBlurRadius(12);
     shadow->setOffset(0, 2);
     shadow->setColor(QColor(0, 0, 0, 35));
-    setGraphicsEffect(shadow);
+    setGraphicsEffect(shadow.release());
 }
 
 //=============================================================================================================
