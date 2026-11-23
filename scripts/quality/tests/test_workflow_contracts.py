@@ -98,6 +98,13 @@ class WorkflowContracts(unittest.TestCase):
                               if p.startswith(("~", "/", "$HOME", "${{ runner")) or re.match(r"[A-Za-z]:", p) or ".." in p]
         self.assertEqual([], offending)
 
+    def test_windows_links_are_not_made_with_mklink_from_bash(self) -> None:
+        # Git Bash rewrites cmd's /J and /D switches into paths ("Invalid switch - C:\\Users\\...")
+        offending = [f"{name}:{number}" for name, text in _workflow_texts().items()
+                     for number, line in enumerate(text.splitlines(), 1)
+                     if "mklink" in line and "cmd //c" in line]
+        self.assertEqual([], offending)
+
     def test_coverage_floor_is_the_release_minimum(self) -> None:
         policy = json.loads((REPO_ROOT / "scripts" / "quality" / "coverage_policy.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(policy["line_floor_percent"],

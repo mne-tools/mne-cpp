@@ -65,7 +65,9 @@ jobs:
       run: |
         mkdir -p "$GITHUB_WORKSPACE/mne_data"
         if [ "$RUNNER_OS" = "Windows" ]; then
-          cmd //c mklink /J "$(cygpath -w "$HOME/mne_data")" "$(cygpath -w "$GITHUB_WORKSPACE/mne_data")"
+          # Git Bash would rewrite mklink's /J switch into a path; PowerShell expands $HOME and $env here
+          # shellcheck disable=SC2016
+          powershell -NoProfile -Command 'New-Item -ItemType Junction -Path "$HOME\mne_data" -Target "$env:GITHUB_WORKSPACE\mne_data" | Out-Null'
         else
           ln -sfn "$GITHUB_WORKSPACE/mne_data" "$HOME/mne_data"
         fi
