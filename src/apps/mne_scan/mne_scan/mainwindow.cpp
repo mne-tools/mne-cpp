@@ -780,8 +780,11 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data(), m_pPluginGuiDockWidget);
-    m_pPluginGui->setParent(m_pPluginGuiDockWidget); // embeds the main window as a plain child widget
+    // A QMainWindow is created as a window; setParent() makes it a plain child that fills the dock. Given the dock
+    // as its constructor's parent it would stay a window, and setParent() to the same parent would change nothing.
+    auto pPluginGui = std::make_unique<PluginGui>(m_pPluginManager.data(), m_pPluginSceneManager.data());
+    pPluginGui->setParent(m_pPluginGuiDockWidget);
+    m_pPluginGui = pPluginGui.release();
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);

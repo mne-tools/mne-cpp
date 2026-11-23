@@ -37,6 +37,7 @@
 #include <tmsi/tmsi.h>
 #include <tmsi/tmsielectrodeitem.h>
 #include <mainwindow.h>
+#include <plugingui.h>
 #include <mne/connectivity/network/network.h>
 #include <scMeas/realtimeconnectivityestimate.h>
 #include <scMeas/realtimecov.h>
@@ -113,6 +114,7 @@ private slots:
     void eegoImpedanceViewShowsTheMeasuredElectrodes();
     void tmsiImpedanceViewShowsTheMeasuredElectrodes();
     void mainWindowSwitchesStyle();
+    void mainWindowShowsThePluginScene();
     void lslAdapterUnloadsAndCloses();
 
 private:
@@ -1103,6 +1105,25 @@ void TestMneScanPlugins::mainWindowSwitchesStyle()
     QCOMPARE(qApp->font().family(), QStringLiteral("Roboto"));
     action("Default")->trigger();
     QVERIFY(qApp->styleSheet().isEmpty());
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::mainWindowShowsThePluginScene()
+{
+    QTemporaryDir noPlugins;
+    qputenv("MNE_SCAN_PLUGIN_DIR", noPlugins.path().toLocal8Bit());
+    MNESCAN::MainWindow window;
+    qunsetenv("MNE_SCAN_PLUGIN_DIR");
+    window.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&window));
+
+    // The plugin scene fills the "Plugins" dock as a plain child, not as a window of its own
+    auto* gui = window.findChild<MNESCAN::PluginGui*>();
+    QVERIFY(gui);
+    QVERIFY(!gui->isWindow());
+    QVERIFY(gui->isVisible());
+    QCOMPARE(gui->window(), &window);
 }
 
 //=============================================================================================================
