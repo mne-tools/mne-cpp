@@ -30,7 +30,6 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QDebug>
 #include <QStaticText>
 
 //=============================================================================================================
@@ -155,11 +154,11 @@ void AverageSceneItem::paintAveragePath(QPainter* painter)
     double dScaleY = (boundingRect.height()) / (2 * fMaxValue);
 
     //do for all currently stored evoked set data
-    for (int dataIndex = 0; dataIndex < m_lAverageData.size(); ++dataIndex) {
-        QString sAvrComment = m_lAverageData.at(dataIndex).first;
+    for (int dataIndex = 0; dataIndex < std::ssize(m_lAverageData); ++dataIndex) {
+        const std::string& sAvrComment = m_lAverageData.at(dataIndex).first;
 
         // Default to active when no activation map has been configured
-        if (!m_qMapAverageActivation.contains(sAvrComment) || m_qMapAverageActivation[sAvrComment]) {
+        if (!m_qMapAverageActivation.contains(sAvrComment) || m_qMapAverageActivation.at(sAvrComment)) {
             const double* averageData = m_lAverageData.at(dataIndex).second.first;
             int totalCols = m_lAverageData.at(dataIndex).second.second;
             if (totalCols <= 0)
@@ -176,7 +175,7 @@ void AverageSceneItem::paintAveragePath(QPainter* painter)
             pen.setColor(m_colorDefault);
 
             if (m_qMapAverageColor.contains(sAvrComment)) {
-                pen.setColor(m_qMapAverageColor[sAvrComment]);
+                pen.setColor(m_qMapAverageColor.at(sAvrComment));
             }
 
             pen.setWidthF(0);
@@ -212,7 +211,7 @@ void AverageSceneItem::paintStimLine(QPainter* painter)
 
     //Plot vertical and horizontal lines
     QRectF boundingRect = this->boundingRect();
-    int totalCols = m_lAverageData.first().second.second;
+    int totalCols = m_lAverageData.front().second.second;
     if (totalCols <= 0)
         return;
 

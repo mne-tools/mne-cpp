@@ -166,13 +166,13 @@ int main(int argc, char* argv[])
     std::println("  CMNE peak: {}", describePeak(cmne.stcCmne, from, to));
 
     // Mean over the auditory sources of each hemisphere
-    QVector<double> ms(n);
+    std::vector<double> ms(n);
     for (int s = 0; s < n; ++s) {
         ms[s] = 1000.0 * (evoked.times(0) + s / evoked.info.sfreq);
     }
     const auto meanOver = [](const MatrixXd& m, int first, int count) {
         const VectorXd mean = m.middleRows(first, count).colwise().mean().transpose();
-        return QVector<double>(mean.data(), mean.data() + mean.size());
+        return std::vector<double>(mean.data(), mean.data() + mean.size());
     };
     const QList<std::tuple<QString, int, int>> hemispheres = {{"left", 0, nLh}, {"right", nLh, fwd.nsource - nLh}};
     for (const auto& [hemi, first, count] : hemispheres) {
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
         courses.setYLabel("z-score");
         courses.addSeries(ms, meanOver(cmne.stcSensing.data, first, count), "dSPM, rectified and z-scored", QColor(150, 150, 150));
         courses.addSeries(ms, meanOver(cmne.stcCmne.data, first, count), settings.onnxModelPath.empty() ? "CMNE, control estimate" : "CMNE, LSTM context");
-        FigureExporter::save(courses, "cmne_" + hemi, QString("'Left Auditory' response in the %1 superior and transverse temporal sources: CMNE weights each sample by its %2-sample context.").arg(hemi).arg(k));
+        FigureExporter::save(courses, "cmne_" + hemi.toStdString(), QString("'Left Auditory' response in the %1 superior and transverse temporal sources: CMNE weights each sample by its %2-sample context.").arg(hemi).arg(k).toStdString());
     }
 
     if (parser.isSet(stcOption)) {

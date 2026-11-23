@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include "dipolefitview.h"
+#include <mne/base/log.h>
 #include "ui_dipolefitview.h"
 
 //=============================================================================================================
@@ -24,7 +25,6 @@
 //=============================================================================================================
 
 #include <QDateTime>
-#include <QtDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -370,7 +370,7 @@ void DipoleFitView::removeModel(const QString& sModelName, int iType)
             break;
         }
         default: {
-            qWarning() << "[DipoleFitView::removeModel] Model type not recognized";
+            mne::Log::warning("[DipoleFitView::removeModel] Model type not recognized");
             break;
         }
     }

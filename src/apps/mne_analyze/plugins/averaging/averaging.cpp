@@ -531,7 +531,7 @@ void Averaging::loadFullGui(std::shared_ptr<mne::FiffInfo> pInfo)
 
     //Data customization:
     mne::disp::FiffRawViewSettings* pChannelDataSettingsView = new mne::disp::FiffRawViewSettings(QString("MNESCAN/RTESW"));
-    pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
+    pChannelDataSettingsView->setWidgetList({"screenshot", "backgroundColor"});
     pChannelDataSettingsView->setObjectName("group_tab_View_General");
 
     connect(pChannelDataSettingsView, &mne::disp::FiffRawViewSettings::backgroundColorChanged,
@@ -594,10 +594,10 @@ void Averaging::onMakeScreenshot(const QString& imageType)
 
 void Averaging::setChannelSelection(const QVariant& data)
 {
-    if (data.value<mne::disp::SelectionItem*>()->m_sViewsToApply.contains("layoutview")) {
+    if (std::ranges::contains(data.value<mne::disp::SelectionItem*>()->m_sViewsToApply, "layoutview")) {
         emit channelSelectionManagerChanged(data);
     }
-    if (data.value<mne::disp::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")) {
+    if (std::ranges::contains(data.value<mne::disp::SelectionItem*>()->m_sViewsToApply, "butterflyview")) {
         if (data.value<mne::disp::SelectionItem*>()->m_bShowAll) {
             emit showAllChannels();
         } else {
@@ -614,10 +614,10 @@ void Averaging::setScalingMap(const QVariant& data)
         return;
     }
 
-    if (data.value<mne::analyze::ScalingParameters>().m_sViewsToApply.contains("layoutview")) {
+    if (std::ranges::contains(data.value<mne::analyze::ScalingParameters>().m_sViewsToApply, "layoutview")) {
         m_pAverageLayoutView->setScaleMap(data.value<mne::analyze::ScalingParameters>().m_mScalingMap);
     }
-    if (data.value<mne::analyze::ScalingParameters>().m_sViewsToApply.contains("butterflyview")) {
+    if (std::ranges::contains(data.value<mne::analyze::ScalingParameters>().m_sViewsToApply, "butterflyview")) {
         m_pButterflyView->setScaleMap(data.value<mne::analyze::ScalingParameters>().m_mScalingMap);
     }
 }
@@ -626,14 +626,14 @@ void Averaging::setScalingMap(const QVariant& data)
 
 void Averaging::setViewSettings(mne::analyze::ViewParameters viewParams)
 {
-    if (viewParams.m_sViewsToApply.contains("layoutview")) {
+    if (std::ranges::contains(viewParams.m_sViewsToApply, "layoutview")) {
         if (viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::all || viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::background) {
             m_pAverageLayoutView->setBackgroundColor(viewParams.m_colorBackground);
             m_pAverageLayoutView->update();
         }
     }
 
-    if (viewParams.m_sViewsToApply.contains("butterflyview")) {
+    if (std::ranges::contains(viewParams.m_sViewsToApply, "butterflyview")) {
         if (viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::all || viewParams.m_sSettingsToApply == mne::analyze::ViewParameters::background) {
             m_pButterflyView->setBackgroundColor(viewParams.m_colorBackground);
             m_pButterflyView->update();

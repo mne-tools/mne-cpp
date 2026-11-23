@@ -25,19 +25,22 @@
 
 #include <QMatrix4x4>
 #include <QQuaternion>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstring>
+#include <format>
 #include <limits>
 #include <map>
-#include <vector>
-#include <cmath>
 #include <numbers>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,14 +56,8 @@ struct MeshVertex
     float x, y, z, nx, ny, nz;
 };
 
-template<typename T>
-QByteArray toBytes(const std::vector<T>& v)
-{
-    return QByteArray(reinterpret_cast<const char*>(v.data()), qsizetype(v.size() * sizeof(T)));
-}
-
 // Unit icosphere, subdivided twice (320 triangles)
-void unitSphere(QByteArray& vertices, QByteArray& indices, int& indexCount)
+void unitSphere(std::vector<std::byte>& vertices, std::vector<std::byte>& indices, int& indexCount)
 {
     const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
     std::vector<QVector3D> v = {{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
@@ -90,13 +87,13 @@ void unitSphere(QByteArray& vertices, QByteArray& indices, int& indexCount)
     mv.reserve(v.size());
     for (const auto& p : v)
         mv.push_back({p.x(), p.y(), p.z(), p.x(), p.y(), p.z()});
-    vertices = toBytes(mv);
-    indices = toBytes(idx);
+    vertices = toByteBuffer(mv);
+    indices = toByteBuffer(idx);
     indexCount = int(idx.size());
 }
 
 // Unit cylinder along +y from -0.5 to 0.5, with caps
-void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
+void unitCylinder(std::vector<std::byte>& vertices, std::vector<std::byte>& indices, int& indexCount)
 {
     constexpr int kSides = 12;
     std::vector<MeshVertex> mv;
@@ -127,8 +124,8 @@ void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
                 idx.insert(idx.end(), {centre, cur, next});
         }
     }
-    vertices = toBytes(mv);
-    indices = toBytes(idx);
+    vertices = toByteBuffer(mv);
+    indices = toByteBuffer(idx);
     indexCount = int(idx.size());
 }
 
@@ -160,19 +157,26 @@ void ElectrodeObject::setImplantation(const mne::IeegImplantation& implantation)
 {
     m_implantation = implantation;
     const int contactCount = int(m_implantation.contacts().size());
-    m_leadOfContact.fill(-1, contactCount);
+    m_leadOfContact.assign(contactCount, -1);
     const auto& leads = m_implantation.leads();
     for (int l = 0; l < int(leads.size()); ++l) {
         for (const int c : leads[l].contacts)
             m_leadOfContact[c] = l;
     }
-    m_contactColors.fill(QColor(), contactCount);
+    m_contactColors.assign(contactCount, QColor());
     m_contactValues.clear();
     m_selectedContact = -1;
     m_hoveredContact = -1;
     computeBoundingBox();
     buildBodies();
     buildContactInstances();
+}
+
+//=============================================================================================================
+
+int ElectrodeObject::leadOf(int contact) const
+{
+    return contact >= 0 && contact < std::ssize(m_leadOfContact) ? m_leadOfContact[static_cast<std::size_t>(contact)] : -1;
 }
 
 //=============================================================================================================
@@ -184,9 +188,9 @@ int ElectrodeObject::totalContactCount() const
 
 //=============================================================================================================
 
-void ElectrodeObject::setContactValues(const QMap<QString, float>& values, const QString& colormap)
+void ElectrodeObject::setContactValues(const std::map<std::string, float>& values, const std::string& colormap)
 {
-    if (values.isEmpty()) {
+    if (values.empty()) {
         clearContactValues();
         return;
     }
@@ -194,17 +198,18 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values, const
     m_colormap = colormap;
     m_valueMin = 0.0f;
     m_valueMax = std::numeric_limits<float>::lowest();
-    for (const float v : values) {
+    for (const auto& [name, v] : values) {
         m_valueMin = std::min(m_valueMin, v);
         m_valueMax = std::max(m_valueMax, v);
     }
 
     const auto& contacts = m_implantation.contacts();
-    m_contactColors.fill(QColor());
+    std::ranges::fill(m_contactColors, QColor());
+    const QString colormapName = QString::fromStdString(colormap);
     for (int c = 0; c < int(contacts.size()); ++c) {
-        const auto it = values.find(QString::fromStdString(contacts[c].name));
+        const auto it = values.find(contacts[c].name);
         if (it != values.end())
-            m_contactColors[c] = QColor::fromRgb(mne::disp::ColorMap::valueToColor(normalized(it.value()), colormap));
+            m_contactColors[c] = QColor::fromRgb(mne::disp::ColorMap::valueToColor(normalized(it->second), colormapName));
     }
     buildContactInstances();
 }
@@ -214,7 +219,7 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values, const
 void ElectrodeObject::clearContactValues()
 {
     m_contactValues.clear();
-    m_contactColors.fill(QColor());
+    std::ranges::fill(m_contactColors, QColor());
     buildContactInstances();
 }
 
@@ -222,14 +227,14 @@ void ElectrodeObject::clearContactValues()
 
 float ElectrodeObject::normalized(float value) const
 {
-    return m_valueMax > m_valueMin ? qBound(0.0f, (value - m_valueMin) / (m_valueMax - m_valueMin), 1.0f) : 1.0f;
+    return m_valueMax > m_valueMin ? std::clamp((value - m_valueMin) / (m_valueMax - m_valueMin), 0.0f, 1.0f) : 1.0f;
 }
 
 //=============================================================================================================
 
-QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertices, double distance) const
+std::vector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertices, double distance) const
 {
-    if (m_contactValues.isEmpty() || vertices.rows() == 0)
+    if (m_contactValues.empty() || vertices.rows() == 0)
         return {};
 
     // Weights (vertices x contacts) of ECoG contacts moved onto the surface plus depth contacts in place
@@ -241,13 +246,13 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
     Eigen::VectorXd value = Eigen::VectorXd::Zero(n);
     Eigen::VectorXd hasValue = Eigen::VectorXd::Zero(n);
     for (int c = 0; c < n; ++c) {
-        const auto it = m_contactValues.find(QString::fromStdString(contacts[c].name));
+        const auto it = m_contactValues.find(contacts[c].name);
         if (it == m_contactValues.end())
             continue;
-        const int lead = m_leadOfContact.value(c, -1);
+        const int lead = leadOf(c);
         const bool isDepth = lead < 0 || leads[lead].type == mne::IeegLeadType::Depth;
         (isDepth ? depth : subdural).row(c) = contacts[c].position.transpose();
-        value(c) = it.value();
+        value(c) = it->second;
         hasValue(c) = 1.0;
     }
     const Eigen::SparseMatrix<double> weights = mne::IeegSurfaceMap::weights(subdural, vertices, distance, mne::IeegSurfaceMapMode::Sum, true) +
@@ -255,11 +260,12 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
     const Eigen::VectorXd weighted = weights * value;
     const Eigen::VectorXd reach = weights * hasValue;
 
-    QVector<uint32_t> colors(static_cast<int>(vertices.rows()), packABGR(0, 0, 0, 0));
-    for (int v = 0; v < colors.size(); ++v) {
+    std::vector<uint32_t> colors(static_cast<std::size_t>(vertices.rows()), packABGR(0, 0, 0, 0));
+    const QString colormapName = QString::fromStdString(m_colormap);
+    for (int v = 0; v < std::ssize(colors); ++v) {
         if (reach(v) <= 0.0)
             continue;
-        const QRgb rgb = mne::disp::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), m_colormap);
+        const QRgb rgb = mne::disp::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), colormapName);
         colors[v] = packABGR(qRed(rgb), qGreen(rgb), qBlue(rgb), static_cast<uint32_t>(255.0 * std::min(1.0, reach(v))));
     }
     return colors;
@@ -267,9 +273,9 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
 
 //=============================================================================================================
 
-void ElectrodeObject::selectContact(const QString& name)
+void ElectrodeObject::selectContact(const std::string& name)
 {
-    m_selectedContact = name.isEmpty() ? -1 : m_implantation.index_of(name.toStdString());
+    m_selectedContact = name.empty() ? -1 : m_implantation.index_of(name);
     buildContactInstances();
 }
 
@@ -277,7 +283,7 @@ void ElectrodeObject::selectContact(const QString& name)
 
 void ElectrodeObject::clearSelection()
 {
-    selectContact(QString());
+    selectContact(std::string());
 }
 
 //=============================================================================================================
@@ -292,9 +298,9 @@ void ElectrodeObject::setHoveredContact(int index)
 
 //=============================================================================================================
 
-QString ElectrodeObject::selectedContact() const
+std::string ElectrodeObject::selectedContact() const
 {
-    return m_selectedContact >= 0 ? QString::fromStdString(m_implantation.contacts()[m_selectedContact].name) : QString();
+    return m_selectedContact >= 0 ? m_implantation.contacts()[m_selectedContact].name : std::string();
 }
 
 //=============================================================================================================
@@ -309,7 +315,7 @@ QColor ElectrodeObject::leadColor(int index)
 
 float ElectrodeObject::contactRadius(int contact) const
 {
-    const int lead = m_leadOfContact.value(contact, -1);
+    const int lead = leadOf(contact);
     const bool depth = lead < 0 || m_implantation.leads()[lead].type == mne::IeegLeadType::Depth;
     return depth ? kDepthContactRadius : kSubduralContactRadius;
 }
@@ -326,7 +332,7 @@ void ElectrodeObject::buildContactInstances()
         QMatrix4x4 model;
         model.translate(p.x(), p.y(), p.z());
         model.scale(contactRadius(c));
-        const QColor color = m_contactColors.value(c).isValid() ? m_contactColors[c] : leadColor(std::max(0, m_leadOfContact.value(c, 0)));
+        const QColor color = (c < std::ssize(m_contactColors) && m_contactColors[c].isValid()) ? m_contactColors[c] : leadColor(std::max(0, leadOf(c)));
         InstanceData d;
         std::memcpy(d.model, model.constData(), sizeof(d.model));
         d.color[0] = float(color.redF());
@@ -336,7 +342,7 @@ void ElectrodeObject::buildContactInstances()
         d.isSelected = (c == m_selectedContact || c == m_hoveredContact) ? 1.0f : 0.0f;
         instances.push_back(d);
     }
-    m_contactInstances = toBytes(instances);
+    m_contactInstances = toByteBuffer(instances);
     ++m_contactGeneration;
 }
 
@@ -397,7 +403,7 @@ void ElectrodeObject::buildBodies()
                 tie(i, i + cols);
         }
     }
-    m_bodyInstances = toBytes(instances);
+    m_bodyInstances = toByteBuffer(instances);
     m_bodyCount = int(instances.size());
     ++m_bodyGeneration;
 }
@@ -437,26 +443,26 @@ const mne::IeegContact* ElectrodeObject::contactAt(int index) const
 
 //=============================================================================================================
 
-QString ElectrodeObject::contactLabel(int index) const
+std::string ElectrodeObject::contactLabel(int index) const
 {
     const mne::IeegContact* contact = contactAt(index);
-    const int lead = m_leadOfContact.value(index, -1);
+    const int lead = leadOf(index);
     if (!contact || lead < 0)
-        return QString();
+        return std::string();
     const mne::IeegLead& l = m_implantation.leads()[lead];
-    const QString kind = l.type == mne::IeegLeadType::Depth ? QStringLiteral("depth lead")
-        : l.type == mne::IeegLeadType::Strip                ? QStringLiteral("strip")
-                                                            : QStringLiteral("grid");
-    return QStringLiteral("%1 (%2 %3)").arg(QString::fromStdString(contact->name), kind, QString::fromStdString(l.name));
+    const std::string_view kind = l.type == mne::IeegLeadType::Depth ? "depth lead"
+        : l.type == mne::IeegLeadType::Strip                         ? "strip"
+                                                                     : "grid";
+    return std::format("{} ({} {})", contact->name, kind, l.name);
 }
 
 //=============================================================================================================
 
 InstancedStreams ElectrodeObject::contactStreams() const
 {
-    return {{m_sphereVertices.constData(), quint32(m_sphereVertices.size()), 0},
-            {m_sphereIndices.constData(), quint32(m_sphereIndices.size()), 0},
-            {m_contactInstances.constData(), quint32(m_contactInstances.size()), m_contactGeneration},
+    return {{m_sphereVertices.data(), quint32(m_sphereVertices.size()), 0},
+            {m_sphereIndices.data(), quint32(m_sphereIndices.size()), 0},
+            {m_contactInstances.data(), quint32(m_contactInstances.size()), m_contactGeneration},
             m_sphereIndexCount,
             totalContactCount()};
 }
@@ -465,9 +471,9 @@ InstancedStreams ElectrodeObject::contactStreams() const
 
 InstancedStreams ElectrodeObject::bodyStreams() const
 {
-    return {{m_cylinderVertices.constData(), quint32(m_cylinderVertices.size()), 0},
-            {m_cylinderIndices.constData(), quint32(m_cylinderIndices.size()), 0},
-            {m_bodyInstances.constData(), quint32(m_bodyInstances.size()), m_bodyGeneration},
+    return {{m_cylinderVertices.data(), quint32(m_cylinderVertices.size()), 0},
+            {m_cylinderIndices.data(), quint32(m_cylinderIndices.size()), 0},
+            {m_bodyInstances.data(), quint32(m_bodyInstances.size()), m_bodyGeneration},
             m_cylinderIndexCount,
             m_bodyCount};
 }

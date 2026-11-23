@@ -43,6 +43,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 
 //=============================================================================================================
@@ -199,7 +200,7 @@ protected:
      *
      * @param[in] sPath  New absolute path to the model checkpoint file.
      */
-    void onModelCheckpointChanged(const QString& sPath);
+    void onModelCheckpointChanged(const std::filesystem::path& sPath);
 
     //=========================================================================================================
     /**

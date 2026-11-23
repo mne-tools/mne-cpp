@@ -233,7 +233,7 @@ int main(int argc, char* argv[])
                  "peaks [1, 3, 5, 7], prominences [1, 3, 2, 5], prominence >= 2.5 keeps [3, 7] (scipy)");
 
     const auto toVector = [](const auto& v) {
-        return QVector<double>(v.data(), v.data() + v.size());
+        return std::vector<double>(v.data(), v.data() + v.size());
     };
 
     LinePlot psdPlot(toVector(psd.vecFreqs), toVector(RowVectorXd(psd.matPsd.row(0))), "Multitaper PSD of 20 Hz + 0.5 x 55 Hz");
@@ -254,17 +254,20 @@ int main(int argc, char* argv[])
     tfrImage.setExtent(0.0, (n - 1) / kSFreq, scanFreqs(0), scanFreqs(scanFreqs.size() - 1)); // bottom row 5 Hz, top 95 Hz
     FigureExporter::save(tfrImage, "morlet_tfr", "MorletTfr::compute from 5 to 95 Hz: constant power in the 20 Hz and 55 Hz bands, blurred at the edges by the wavelet length.");
 
-    QVector<double> times(n);
+    std::vector<double> times(n);
     for (int t = 0; t < n; ++t) {
         times[t] = t / kSFreq;
     }
+    const auto mid = [](const std::vector<double>& v, int from, int count) {
+        return std::vector<double>(v.begin() + from, v.begin() + from + count);
+    };
     LinePlot butterworth;
     butterworth.setTitle("Zero-phase 4th-order Butterworth low-pass at 30 Hz");
     butterworth.setXLabel("Time [s]");
     butterworth.setYLabel("Amplitude");
-    butterworth.addSeries(times.mid(100, 100), toVector(signal).mid(100, 100), "input", QColor(190, 190, 190));
-    butterworth.addSeries(times.mid(100, 100), toVector(lowPassed).mid(100, 100), "applyZeroPhase");
-    butterworth.addSeries(times.mid(100, 100), toVector(only20).mid(100, 100), "20 Hz component", QColor(), Qt::DashLine);
+    butterworth.addSeries(mid(times, 100, 100), mid(toVector(signal), 100, 100), "input", QColor(190, 190, 190));
+    butterworth.addSeries(mid(times, 100, 100), mid(toVector(lowPassed), 100, 100), "applyZeroPhase");
+    butterworth.addSeries(mid(times, 100, 100), mid(toVector(only20), 100, 100), "20 Hz component", QColor(), Qt::DashLine);
     FigureExporter::save(butterworth, "butterworth", "IirFilter::applyZeroPhase removes the 55 Hz tone and leaves the 20 Hz tone in phase.");
 
     std::println("{}", ok ? "All dsp spectral checks passed." : "dsp spectral checks FAILED.");

@@ -18,6 +18,8 @@
 //=============================================================================================================
 
 #include "butterflyview.h"
+#include "../detail/map_value.h"
+#include <mne/base/log.h>
 
 #include "scalingview.h"
 #include "helpers/evokedsetmodel.h"
@@ -30,13 +32,13 @@
 
 #include <QPainter>
 #include <QPainterPath>
-#include <QDebug>
 #include <QSettings>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <memory>
 #include <utility>
 
@@ -63,8 +65,8 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 , m_sSettingsPath(sSettingsPath)
 , m_colCurrentBackgroundColor(Qt::white)
 , m_pEvokedSetModel(nullptr)
-, m_qMapAverageActivation(std::make_shared<QMap<QString, bool>>())
-, m_qMapAverageColor(std::make_shared<QMap<QString, QColor>>())
+, m_qMapAverageActivation(std::make_shared<std::map<std::string, bool>>())
+, m_qMapAverageColor(std::make_shared<std::map<std::string, QColor>>())
 {
     m_sSettingsPath = sSettingsPath;
 
@@ -110,14 +112,14 @@ void ButterflyView::dataUpdate()
 
 //=============================================================================================================
 
-QMap<QString, bool> ButterflyView::getModalityMap()
+std::map<std::string, bool> ButterflyView::getModalityMap()
 {
     return m_modalityMap;
 }
 
 //=============================================================================================================
 
-void ButterflyView::setModalityMap(const QMap<QString, bool>& modalityMap)
+void ButterflyView::setModalityMap(const std::map<std::string, bool>& modalityMap)
 {
     m_modalityMap = modalityMap;
     update();
@@ -125,7 +127,7 @@ void ButterflyView::setModalityMap(const QMap<QString, bool>& modalityMap)
 
 //=============================================================================================================
 
-void ButterflyView::setScaleMap(const QMap<qint32, float>& scaleMap)
+void ButterflyView::setScaleMap(const std::map<int, float>& scaleMap)
 {
     m_scaleMap = scaleMap;
     update();
@@ -133,7 +135,7 @@ void ButterflyView::setScaleMap(const QMap<qint32, float>& scaleMap)
 
 //=============================================================================================================
 
-void ButterflyView::setSelectedChannels(const QList<int>& selectedChannels)
+void ButterflyView::setSelectedChannels(const std::vector<int>& selectedChannels)
 {
     m_lSelectedChannels = selectedChannels;
     update();
@@ -169,7 +171,7 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         SvgWriter svgGen;
-        svgGen.setFileName(fileName);
+        svgGen.setFileName(fileName.toStdString());
         svgGen.setSize(this->size());
         svgGen.setViewBox(this->rect());
 
@@ -184,21 +186,21 @@ void ButterflyView::takeScreenshot(const QString& fileName)
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, QColor>> ButterflyView::getAverageColor() const
+std::shared_ptr<std::map<std::string, QColor>> ButterflyView::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, bool>> ButterflyView::getAverageActivation() const
+std::shared_ptr<std::map<std::string, bool>> ButterflyView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
 
 //=============================================================================================================
 
-void ButterflyView::setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor)
+void ButterflyView::setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
     update();
@@ -208,13 +210,13 @@ void ButterflyView::setAverageColor(const std::shared_ptr<QMap<QString, QColor>>
 
 void ButterflyView::setSingleAverageColor(const QColor& avgColor)
 {
-    for (QString mapKey : m_qMapAverageColor->keys())
-        m_qMapAverageColor->insert(mapKey, avgColor);
+    for (auto& [key, color] : *m_qMapAverageColor)
+        color = avgColor;
 }
 
 //=============================================================================================================
 
-void ButterflyView::setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation)
+void ButterflyView::setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     update();
@@ -229,24 +231,25 @@ void ButterflyView::setChannelInfoModel(std::shared_ptr<ChannelInfoModel>& pChan
 
 //=============================================================================================================
 
-void ButterflyView::showSelectedChannelsOnly(const QStringList& selectedChannels)
+void ButterflyView::showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels)
 {
     if (!m_pChannelInfoModel) {
-        qDebug() << "ButterflyView::showSelectedChannelsOnly - m_pChannelInfoModel is NULL. Returning. ";
+        mne::Log::debug("ButterflyView::showSelectedChannelsOnly - m_pChannelInfoModel is NULL. Returning. ");
         return;
     }
 
-    QList<int> selectedChannelsIndexes;
+    std::vector<int> selectedChannelsIndexes;
+    selectedChannelsIndexes.reserve(selectedChannels.size());
 
-    for (int i = 0; i < selectedChannels.size(); i++)
-        selectedChannelsIndexes << m_pChannelInfoModel->getIndexFromOrigChName(selectedChannels.at(i));
+    for (const std::string& channel : selectedChannels)
+        selectedChannelsIndexes.push_back(m_pChannelInfoModel->getIndexFromOrigChName(channel));
 
     setSelectedChannels(selectedChannelsIndexes);
 }
 
 //=============================================================================================================
 
-void ButterflyView::showSelectedChannels(const QList<int>& selectedChannelsIndexes)
+void ButterflyView::showSelectedChannels(const std::vector<int>& selectedChannelsIndexes)
 {
     setSelectedChannels(selectedChannelsIndexes);
 }
@@ -256,9 +259,9 @@ void ButterflyView::showSelectedChannels(const QList<int>& selectedChannelsIndex
 void ButterflyView::showAllChannels()
 {
     if (m_pEvokedSetModel) {
-        QList<int> lAllChannels;
+        std::vector<int> lAllChannels;
         for (int i = 0; i < m_pEvokedSetModel->rowCount(); i++) {
-            lAllChannels.append(i);
+            lAllChannels.push_back(i);
         }
         setSelectedChannels(lAllChannels);
     }
@@ -303,10 +306,8 @@ void ButterflyView::paintEvent(QPaintEvent* /*event*/)
 
     if (m_bIsInit && m_pEvokedSetModel) {
         //Draw baseline correction area
-        if (m_pEvokedSetModel->getBaselineInfo().first.toString() != "None" &&
-            m_pEvokedSetModel->getBaselineInfo().second.toString() != "None") {
-            float from = m_pEvokedSetModel->getBaselineInfo().first.toFloat();
-            float to = m_pEvokedSetModel->getBaselineInfo().second.toFloat();
+        {
+            const auto [from, to] = m_pEvokedSetModel->getBaselineInfo();
 
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
@@ -314,7 +315,7 @@ void ButterflyView::paintEvent(QPaintEvent* /*event*/)
             painter.setOpacity(0.1);
 
             if (m_pEvokedSetModel->getNumSamples() == 0) {
-                qDebug() << "Unable to get data. Returning early.";
+                mne::Log::debug("Unable to get data. Returning early.");
                 return;
             }
 
@@ -403,7 +404,7 @@ void ButterflyView::paintEvent(QPaintEvent* /*event*/)
 
         //Actual average data
         for (qint32 r = 0; r < m_pEvokedSetModel->rowCount(); ++r) {
-            if (m_lSelectedChannels.contains(r)) {
+            if (std::ranges::contains(m_lSelectedChannels, r)) {
                 qint32 kind = m_pEvokedSetModel->getKind(r);
 
                 //Display only selected kinds
@@ -484,22 +485,22 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     float fDx = static_cast<float>(this->width() - 2) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()) - 1.0f); //((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
 
-    QList<mne::disp::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<QList<mne::disp::AvrTypeRowVector>>();
+    const std::vector<mne::disp::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<std::vector<mne::disp::AvrTypeRowVector>>();
 
     //Do for all average types
-    for (int j = 0; j < rowVec.size(); ++j) {
-        QString sAvrComment = rowVec.at(j).first;
+    for (int j = 0; j < std::ssize(rowVec); ++j) {
+        const std::string& sAvrComment = rowVec.at(j).first;
 
         // Select color for each average
         if (m_pEvokedSetModel->isFreezed()) {
-            QColor freezeColor = m_qMapAverageColor->value(sAvrComment);
+            QColor freezeColor = detail::valueOr(*m_qMapAverageColor, sAvrComment);
             freezeColor.setAlphaF(0.5);
             painter.setPen(QPen(freezeColor, 1));
         } else {
-            painter.setPen(QPen(m_qMapAverageColor->value(sAvrComment)));
+            painter.setPen(QPen(detail::valueOr(*m_qMapAverageColor, sAvrComment)));
         }
 
-        if (m_qMapAverageActivation->value(sAvrComment)) {
+        if (detail::valueOr(*m_qMapAverageActivation, sAvrComment)) {
             //Calculate downsampling factor of averaged data in respect to the items width
             int dsFactor;
             rowVec.at(j).second.cols() / this->width() < 1 ? dsFactor = 1 : dsFactor = rowVec.at(j).second.cols() / this->width();

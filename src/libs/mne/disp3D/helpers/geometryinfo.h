@@ -40,13 +40,6 @@
 #include <mne/fiff/fiff_evoked.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-#include <QVector>
-
-//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -57,9 +50,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
 #include <atomic>
-#include <limits>
 #include <functional>
+#include <limits>
 #include <vector>
 
 //=============================================================================================================
@@ -95,10 +90,10 @@ public:
      * @param[in] dCancelDist            Maximum geodesic distance to explore, in vertex coordinate units.
      * @return Distance table (nVertices x nSubset); entries beyond dCancelDist stay infinite.
      */
-    static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f& matVertices,
-                                                const std::vector<Eigen::VectorXi>& vecNeighborVertices,
-                                                Eigen::VectorXi& vecVertSubset,
-                                                double dCancelDist = FLOAT_INFINITY);
+    static std::shared_ptr<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f& matVertices,
+                                                 const std::vector<Eigen::VectorXi>& vecNeighborVertices,
+                                                 Eigen::VectorXi& vecVertSubset,
+                                                 double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
     /**
@@ -116,7 +111,7 @@ public:
      * @param[in] cancelledFlag            Optional pointer to an atomic bool; when set to true the computation aborts early.
      * @return Sparse interpolation matrix (nVertices x nSources), or empty matrix if cancelled.
      */
-    static QSharedPointer<Eigen::SparseMatrix<float>> scdcInterpolationMat(
+    static std::shared_ptr<Eigen::SparseMatrix<float>> scdcInterpolationMat(
         const Eigen::MatrixX3f& matVertices,
         const std::vector<Eigen::VectorXi>& vecNeighborVertices,
         const Eigen::VectorXi& vecVertSubset,
@@ -145,24 +140,24 @@ public:
      * @param[in] iSensorType             FIFF channel kind selecting the sensors that form the table columns.
      * @return Column indices of the bad channels that were found.
      */
-    static Eigen::VectorXi filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+    static Eigen::VectorXi filterBadChannels(const std::shared_ptr<Eigen::MatrixXd>& matDistanceTable,
                                              const mne::FiffInfo& fiffInfo,
-                                             qint32 iSensorType);
+                                             std::int32_t iSensorType);
 
 protected:
     static inline double squared(double dBase);
 
     static Eigen::VectorXi nearestNeighbor(const Eigen::MatrixX3f& matVertices,
                                            const Eigen::MatrixX3f& matSensorPositions,
-                                           qint32 iBegin,
-                                           qint32 iEnd);
+                                           std::int32_t iBegin,
+                                           std::int32_t iEnd);
 
-    static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
+    static void iterativeDijkstra(const std::shared_ptr<Eigen::MatrixXd>& matOutputDistMatrix,
                                   const Eigen::MatrixX3f& matVertices,
                                   const std::vector<Eigen::VectorXi>& vecNeighborVertices,
                                   const Eigen::VectorXi& vecVertSubset,
-                                  qint32 iBegin,
-                                  qint32 iEnd,
+                                  std::int32_t iBegin,
+                                  std::int32_t iEnd,
                                   double dCancelDistance);
 };
 

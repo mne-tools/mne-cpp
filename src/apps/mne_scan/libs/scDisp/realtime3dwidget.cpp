@@ -214,7 +214,8 @@ void RealTime3DWidget::update(mne::scan::Measurement::SPtr pMeasurement)
             // Draw where the subject's head has been over the course of the
             // measurement, so drift is visible rather than just the current
             // position.
-            m_p3DView->setHeadMovementPath(pRTHR->headPositionHistory());
+            const QVector<Eigen::Vector3f> history = pRTHR->headPositionHistory();
+            m_p3DView->setHeadMovementPath(std::vector<Eigen::Vector3f>(history.cbegin(), history.cend()));
 
             // Note: Per-item transforms for HPI tracking are not yet supported in disp3D.
             // The BrainSurface renderable supports applyTransform() but tree items do not
@@ -310,8 +311,7 @@ void RealTime3DWidget::initDisplayControllWidgets()
     //Init control widgets
     QList<QWidget*> lControlWidgets;
 
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
+    const std::vector<std::string> slControlFlags{"Data", "View", "Light"};
     Control3DView* pControl3DView = new Control3DView("MNESCAN/RT3DW", nullptr, slControlFlags);
     pControl3DView->setObjectName("group_tab_View_General");
     lControlWidgets.append(pControl3DView);

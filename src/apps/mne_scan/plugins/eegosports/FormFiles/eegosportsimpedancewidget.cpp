@@ -238,7 +238,7 @@ void EEGoSportsImpedanceWidget::takeScreenshot()
         if (fileName.contains(".svg")) {
             mne::disp::SvgWriter svgGen;
 
-            svgGen.setFileName(fileName);
+            svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_qGScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
             //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));

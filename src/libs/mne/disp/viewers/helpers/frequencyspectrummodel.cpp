@@ -19,6 +19,7 @@
 //=============================================================================================================
 
 #include "frequencyspectrummodel.h"
+#include "../../detail/map_value.h"
 
 #include <mne/fiff/fiff_info.h>
 
@@ -57,7 +58,7 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject* parent)
 int FrequencySpectrumModel::rowCount(const QModelIndex& /*parent*/) const
 {
     if (!m_qMapIdxRowSelection.empty())
-        return m_qMapIdxRowSelection.size();
+        return static_cast<int>(m_qMapIdxRowSelection.size());
     else
         return 0;
 }
@@ -77,7 +78,7 @@ QVariant FrequencySpectrumModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     if (index.isValid()) {
-        qint32 r = m_qMapIdxRowSelection[index.row()];
+        qint32 r = detail::valueOr(m_qMapIdxRowSelection, index.row());
 
         //******** first column (chname) ********
         if (index.column() == 0 && role == Qt::DisplayRole)
@@ -90,7 +91,7 @@ QVariant FrequencySpectrumModel::data(const QModelIndex& index, int role) const
 
             switch (role) {
                 case Qt::DisplayRole: {
-                    //pack all adjacent (after reload) RowVectorPairs into a QList
+                    //pack the spectrum row
                     const MatrixXd& data = m_bIsFreezed ? m_dataCurrentFreeze : m_dataCurrent;
                     // Rows exist from setInfo() on; the spectrum only once data has arrived
                     if (r < 0 || r >= data.rows()) {
@@ -201,23 +202,21 @@ void FrequencySpectrumModel::addData(const MatrixXd& data)
     //Update data content
     QModelIndex topLeft = this->index(0, 1);
     QModelIndex bottomRight = this->index(m_dataCurrent.rows() - 1, 1);
-    QVector<int> roles;
-    roles << Qt::DisplayRole;
-    emit dataChanged(topLeft, bottomRight, roles);
+    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
 }
 
 //=============================================================================================================
 
-void FrequencySpectrumModel::selectRows(const QList<qint32>& selection)
+void FrequencySpectrumModel::selectRows(const std::vector<int>& selection)
 {
     beginResetModel();
 
     m_qMapIdxRowSelection.clear();
 
     qint32 count = 0;
-    for (qint32 i = 0; i < selection.size(); ++i) {
+    for (qint32 i = 0; i < std::ssize(selection); ++i) {
         if (selection[i] < std::ssize(m_pFiffInfo->chs)) {
-            m_qMapIdxRowSelection.insert(count, selection[i]);
+            m_qMapIdxRowSelection.insert_or_assign(count, selection[i]);
             ++count;
         }
     }
@@ -236,7 +235,7 @@ void FrequencySpectrumModel::resetSelection()
     m_qMapIdxRowSelection.clear();
 
     for (qint32 i = 0; i < std::ssize(m_pFiffInfo->chs); ++i)
-        m_qMapIdxRowSelection.insert(i, i);
+        m_qMapIdxRowSelection.insert_or_assign(i, i);
 
     endResetModel();
 }
@@ -255,9 +254,7 @@ void FrequencySpectrumModel::toggleFreeze(const QModelIndex& index)
     //Update data content
     QModelIndex topLeft = this->index(0, 1);
     QModelIndex bottomRight = this->index(m_dataCurrent.rows() - 1, 1);
-    QVector<int> roles;
-    roles << Qt::DisplayRole;
-    emit dataChanged(topLeft, bottomRight, roles);
+    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
 }
 
 //=============================================================================================================

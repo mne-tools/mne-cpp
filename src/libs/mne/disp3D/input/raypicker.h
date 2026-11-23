@@ -40,14 +40,15 @@
 #include <QRect>
 #include <QMatrix4x4>
 #include <QVector3D>
-#include <QMap>
 #include <QStandardItem>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
 
 namespace mne::disp
 {
@@ -68,15 +69,15 @@ struct DISP3DSHARED_EXPORT RayHit
     QVector3D hitPoint;    ///< World-space intersection point
 
     QStandardItem* item = nullptr; ///< Tree item that was hit (nullable)
-    QString surfaceKey;            ///< FsSurface map key of the hit surface
+    std::string surfaceKey;        ///< FsSurface map key of the hit surface
     int vertexIndex = -1;          ///< Vertex or element index at hit
 
     bool isDipole = false; ///< True if a dipole was hit
     int dipoleIndex = -1;  ///< Index within the dipole set
 
     // FsAnnotation info (brain surfaces only)
-    QString regionName; ///< FsAnnotation region label (if available)
-    int regionId = -1;  ///< FsAnnotation label ID
+    std::string regionName; ///< FsAnnotation region label (if available)
+    int regionId = -1;      ///< FsAnnotation label ID
 
     //=========================================================================================================
     /**
@@ -85,7 +86,7 @@ struct DISP3DSHARED_EXPORT RayHit
      *
      * @return Display label string, empty if no hit.
      */
-    QString displayLabel() const;
+    std::string displayLabel() const;
 };
 
 //=============================================================================================================
@@ -134,9 +135,9 @@ public:
     static RayHit pick(const QVector3D& rayOrigin,
                        const QVector3D& rayDir,
                        const SubView& subView,
-                       const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                       const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
-                       const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap);
+                       const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                       const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                       const std::map<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap);
 
     //=========================================================================================================
     /**
@@ -150,9 +151,9 @@ public:
      * @param[in] surfaces        FsSurface map for key-based lookup.
      * @return                    Display label string.
      */
-    static QString buildLabel(const RayHit& result,
-                              const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
-                              const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
+    static std::string buildLabel(const RayHit& result,
+                                  const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                                  const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
 };
 
 } // namespace mne::disp

@@ -32,7 +32,6 @@
 //=============================================================================================================
 
 #include <QPaintDevice>
-#include <QString>
 
 class QIODevice;
 
@@ -41,6 +40,7 @@ class QIODevice;
 //=============================================================================================================
 
 #include <memory>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -82,9 +82,9 @@ public:
     /**
      * Writes the document to the file @p fileName; clears a previously set output device.
      *
-     * @param[in] fileName   Path of the SVG file.
+     * @param[in] fileName   Path of the SVG file, UTF-8.
      */
-    void setFileName(const QString& fileName);
+    void setFileName(const std::string& fileName);
 
     //=========================================================================================================
     /**
@@ -92,7 +92,7 @@ public:
      *
      * @return The file name.
      */
-    QString fileName() const;
+    std::string fileName() const;
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ public:
      *
      * @param[in] title      The title; no title element is written when it is empty.
      */
-    void setTitle(const QString& title);
+    void setTitle(const std::string& title);
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
      *
      * @return The title.
      */
-    QString title() const;
+    std::string title() const;
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
      *
      * @param[in] description    The description; no desc element is written when it is empty.
      */
-    void setDescription(const QString& description);
+    void setDescription(const std::string& description);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
      *
      * @return The description.
      */
-    QString description() const;
+    std::string description() const;
 
     //=========================================================================================================
     /**
@@ -221,12 +221,12 @@ protected:
 private:
     friend class SvgPaintEngine;
 
-    QString m_fileName;                        /**< File the document is written to. */
+    std::string m_fileName;                    /**< File the document is written to, UTF-8. */
     QIODevice* m_pDevice = nullptr;            /**< Output device, owned by the caller. */
     QSize m_size;                              /**< Document size in pixels. */
     QRectF m_viewBox;                          /**< Shown part of the painting coordinate system. */
-    QString m_title;                           /**< Text of the title element. */
-    QString m_description;                     /**< Text of the desc element. */
+    std::string m_title;                       /**< Text of the title element. */
+    std::string m_description;                 /**< Text of the desc element. */
     int m_resolution = 72;                     /**< Reported dots per inch. */
     std::unique_ptr<SvgPaintEngine> m_pEngine; /**< The engine writing the document. */
 };

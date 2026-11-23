@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 namespace mne::disp
 {
@@ -151,10 +152,10 @@ Qt::CursorShape MultiViewLayout::cursorForHit(SplitterHit hit)
 //=============================================================================================================
 
 int MultiViewLayout::viewportIndexAt(const QPoint& pos,
-                                     const QVector<int>& enabledViewports,
+                                     const std::vector<int>& enabledViewports,
                                      const QSize& outputSize) const
 {
-    const int numEnabled = enabledViewports.size();
+    const int numEnabled = static_cast<int>(enabledViewports.size());
     for (int slot = 0; slot < numEnabled; ++slot) {
         if (slotRect(slot, numEnabled, outputSize).contains(pos)) {
             return enabledViewports[slot];

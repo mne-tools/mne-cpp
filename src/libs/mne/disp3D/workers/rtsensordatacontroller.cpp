@@ -18,14 +18,15 @@
 
 #include "rtsensordataworker.h"
 #include "rtsensorinterpolationmatworker.h"
+#include "periodictask.h"
+#include <mne/base/log.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QTimer>
-#include <QDebug>
+#include <vector>
 
 namespace mne::disp
 {
@@ -38,14 +39,9 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    m_pWorker = new mne::disp::RtSensorDataWorker();
-
-    // Create and configure data thread
-    m_pWorkerThread = new QThread(this);
-    m_pWorker->moveToThread(m_pWorkerThread);
-
-    // Clean up worker when thread finishes
-    connect(m_pWorkerThread, &QThread::finished, m_pWorker, &QObject::deleteLater);
+    // The worker stays on the GUI thread; streamData() runs on the streaming thread, so its signals reach
+    // this controller queued.
+    m_pWorker = new mne::disp::RtSensorDataWorker(this);
 
     // Forward worker signals to controller signals
     connect(m_pWorker, &mne::disp::RtSensorDataWorker::newRtSensorColors,
@@ -53,20 +49,13 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
     connect(m_pWorker, &mne::disp::RtSensorDataWorker::newRtRawSensorData,
             this, &RtSensorDataController::newRawSensorDataAvailable);
 
-    // Create timer for driving the streaming cadence
-    m_pTimer = new QTimer(this);
-    m_pTimer->setTimerType(Qt::PreciseTimer);
-    connect(m_pTimer, &QTimer::timeout, m_pWorker, &mne::disp::RtSensorDataWorker::streamData);
-
-    // Start the data worker thread
-    m_pWorkerThread->start();
+    // Streaming thread driving the cadence
+    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker] { worker->streamData(); });
 
     // Create interpolation matrix worker
-    m_pInterpWorker = new mne::disp::RtSensorInterpolationMatWorker();
-    m_pInterpThread = new QThread(this);
-    m_pInterpWorker->moveToThread(m_pInterpThread);
-
-    connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
+    // One pool thread runs the recomputations in request order.
+    m_pInterpWorker = new mne::disp::RtSensorInterpolationMatWorker(this);
+    m_pInterpPool = std::make_unique<mne::ThreadPool>(1);
 
     // Forward interpolation results: auto-apply to data worker + re-emit for external listeners
     connect(m_pInterpWorker, &mne::disp::RtSensorInterpolationMatWorker::newMegMappingAvailable,
@@ -74,31 +63,18 @@ RtSensorDataController::RtSensorDataController(QObject* parent)
     connect(m_pInterpWorker, &mne::disp::RtSensorInterpolationMatWorker::newEegMappingAvailable,
             this, &RtSensorDataController::onNewEegMapping);
 
-    m_pInterpThread->start();
-
-    qDebug() << "RtSensorDataController: Initialized with" << m_iTimeInterval << "ms interval";
+    mne::Log::debug("RtSensorDataController: Initialized with {} ms interval", m_iTimeInterval);
 }
 
 //=============================================================================================================
 
 RtSensorDataController::~RtSensorDataController()
 {
-    // Stop timer
-    if (m_pTimer) {
-        m_pTimer->stop();
-    }
-
-    // Stop the data worker thread
-    if (m_pWorkerThread) {
-        m_pWorkerThread->quit();
-        m_pWorkerThread->wait();
-    }
-
-    // Stop the interpolation worker thread
-    if (m_pInterpThread) {
-        m_pInterpThread->quit();
-        m_pInterpThread->wait();
-    }
+    // Join the threads while the workers (children of this object) are still alive. Pending
+    // recomputations are skipped.
+    m_bShuttingDown.store(true, std::memory_order_release);
+    m_pStreamTask.reset();
+    m_pInterpPool.reset();
 }
 
 //=============================================================================================================
@@ -113,7 +89,7 @@ void RtSensorDataController::addData(const Eigen::VectorXf& data)
 
 //=============================================================================================================
 
-void RtSensorDataController::setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
+void RtSensorDataController::setMappingMatrix(const std::string& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
 {
     if (m_pWorker) {
         m_pWorker->setMappingMatrix(surfaceKey, mat);
@@ -127,11 +103,11 @@ void RtSensorDataController::setStreamingState(bool state)
     m_bIsStreaming = state;
 
     if (state) {
-        m_pTimer->start(m_iTimeInterval);
-        qDebug() << "RtSensorDataController: Streaming started at" << m_iTimeInterval << "ms interval";
+        m_pStreamTask->start(std::chrono::milliseconds(m_iTimeInterval));
+        mne::Log::debug("RtSensorDataController: Streaming started at {} ms interval", m_iTimeInterval);
     } else {
-        m_pTimer->stop();
-        qDebug() << "RtSensorDataController: Streaming stopped";
+        m_pStreamTask->stop();
+        mne::Log::debug("RtSensorDataController: Streaming stopped");
     }
 }
 
@@ -149,10 +125,10 @@ void RtSensorDataController::setTimeInterval(int msec)
     m_iTimeInterval = qMax(1, msec);
 
     if (m_bIsStreaming) {
-        m_pTimer->setInterval(m_iTimeInterval);
+        m_pStreamTask->setInterval(std::chrono::milliseconds(m_iTimeInterval));
     }
 
-    qDebug() << "RtSensorDataController: Time interval set to" << m_iTimeInterval << "ms";
+    mne::Log::debug("RtSensorDataController: Time interval set to {} ms", m_iTimeInterval);
 }
 
 //=============================================================================================================
@@ -166,7 +142,7 @@ void RtSensorDataController::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSensorDataController::setColormapType(const QString& name)
+void RtSensorDataController::setColormapType(const std::string& name)
 {
     if (m_pWorker) {
         m_pWorker->setColormapType(name);
@@ -250,7 +226,7 @@ void RtSensorDataController::setMegFieldMapOnHead(bool onHead)
 
 //=============================================================================================================
 
-void RtSensorDataController::setMegSurface(const QString& surfaceKey,
+void RtSensorDataController::setMegSurface(const std::string& surfaceKey,
                                            const Eigen::MatrixX3f& vertices,
                                            const Eigen::MatrixX3f& normals,
                                            const Eigen::MatrixX3i& triangles)
@@ -262,7 +238,7 @@ void RtSensorDataController::setMegSurface(const QString& surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorDataController::setEegSurface(const QString& surfaceKey,
+void RtSensorDataController::setEegSurface(const std::string& surfaceKey,
                                            const Eigen::MatrixX3f& vertices)
 {
     if (m_pInterpWorker) {
@@ -272,7 +248,7 @@ void RtSensorDataController::setEegSurface(const QString& surfaceKey,
 
 //=============================================================================================================
 
-void RtSensorDataController::setBadChannels(const QStringList& bads)
+void RtSensorDataController::setBadChannels(const std::vector<std::string>& bads)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setBadChannels(bads);
@@ -284,17 +260,19 @@ void RtSensorDataController::setBadChannels(const QStringList& bads)
 void RtSensorDataController::recomputeMapping()
 {
     if (m_pInterpWorker) {
-        // Use QMetaObject::invokeMethod with queued connection to ensure
-        // computeMapping() runs on the interpolation worker thread.
-        QMetaObject::invokeMethod(m_pInterpWorker, "computeMapping", Qt::QueuedConnection);
+        m_pInterpPool->submit([this] {
+            if (!m_bShuttingDown.load(std::memory_order_acquire)) {
+                m_pInterpWorker->computeMapping();
+            }
+        });
     }
 }
 
 //=============================================================================================================
 
-void RtSensorDataController::onNewMegMapping(const QString& surfaceKey,
+void RtSensorDataController::onNewMegMapping(const std::string& surfaceKey,
                                              std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                             const QVector<int>& pick)
+                                             const std::vector<int>& pick)
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {
@@ -304,15 +282,14 @@ void RtSensorDataController::onNewMegMapping(const QString& surfaceKey,
     // Re-emit for external listeners (e.g. BrainView)
     emit newMegMappingAvailable(surfaceKey, mappingMat, pick);
 
-    qDebug() << "RtSensorDataController: New MEG mapping received and forwarded"
-             << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
+    mne::Log::debug("RtSensorDataController: New MEG mapping received and forwarded ({}x{})", mappingMat->rows(), mappingMat->cols());
 }
 
 //=============================================================================================================
 
-void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
+void RtSensorDataController::onNewEegMapping(const std::string& surfaceKey,
                                              std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                             const QVector<int>& pick)
+                                             const std::vector<int>& pick)
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {
@@ -322,8 +299,7 @@ void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
     // Re-emit for external listeners (e.g. BrainView)
     emit newEegMappingAvailable(surfaceKey, mappingMat, pick);
 
-    qDebug() << "RtSensorDataController: New EEG mapping received and forwarded"
-             << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
+    mne::Log::debug("RtSensorDataController: New EEG mapping received and forwarded ({}x{})", mappingMat->rows(), mappingMat->cols());
 }
 
 } // namespace mne::disp

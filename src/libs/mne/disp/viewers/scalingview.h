@@ -34,14 +34,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
 #include <QPointer>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -93,7 +94,7 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
  *
  * @return The scaling value as a float.
  */
-DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling,
+DISPSHARED_EXPORT float getScalingValue(const std::map<int, float>& qMapChScaling,
                                         int iChannelKind,
                                         int iChannelUnit);
 
@@ -123,7 +124,7 @@ public:
     ScalingView(const QString& sSettingsPath = "",
                 QWidget* parent = 0,
                 Qt::WindowFlags f = Qt::Widget,
-                const QStringList& lChannelsToShow = QStringList() << "all");
+                const std::vector<std::string>& lChannelsToShow = {"all"});
 
     //=========================================================================================================
     /**
@@ -137,7 +138,7 @@ public:
      *
      * @return The current scaling map.
      */
-    QMap<qint32, float> getScaleMap() const;
+    std::map<int, float> getScaleMap() const;
 
     //=========================================================================================================
     /**
@@ -145,7 +146,7 @@ public:
      *
      * @param[in] qMapChScaling  Map from FIFF channel kind/unit key to amplitude scale.
      */
-    void setScaleMap(const QMap<qint32, float>& qMapChScaling);
+    void setScaleMap(const std::map<int, float>& qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -181,7 +182,7 @@ signals:
      * @param[in] scalingMap this is a list of scaling values ordered by integer keys. These keys are resolved with
      * the use of defined macros with names of channel-types, vendors, etc.
      */
-    void scalingChanged(const QMap<qint32, float>& scalingMap);
+    void scalingChanged(const std::map<int, float>& scalingMap);
 
 private:
     //=============================================================================================================
@@ -330,13 +331,13 @@ private:
      */
     void keyPressEvent(QKeyEvent* event) override;
 
-    QMap<qint32, float> m_qMapChScaling;                           /**< Channel scaling values. */
-    QMap<qint32, QPointer<ScaleControl>> m_qMapScaleControls;      /**< Map of channel scaling controls. */
+    std::map<int, float> m_qMapChScaling;                          /**< Channel scaling values. */
+    std::map<int, QPointer<ScaleControl>> m_qMapScaleControls;     /**< Map of channel scaling controls. */
     std::vector<std::unique_ptr<ScaleControl>> m_vecScaleControls; /**< Owns every scale control created; the map refers to the current ones. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    QStringList m_lChannelTypesToShow; /**< The channel types as strings to show the sliders for. */
+    std::vector<std::string> m_lChannelTypesToShow; /**< The channel types as strings to show the sliders for. */
 
     std::unique_ptr<Ui::ScalingViewWidget> m_pUi; /**< Pointer to the user interface object. */
     bool m_bLinkMAGtoGRAD;                        /**< If this member is set, we link MAGs and GRad scales. */

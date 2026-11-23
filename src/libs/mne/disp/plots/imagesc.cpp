@@ -256,9 +256,9 @@ void ImageSc::paintEvent(QPaintEvent* event)
     const double y1 = bottom + halfY;
 
     // No ticks between cell centres: whole numbers for indices, at least one cell apart in data units
-    const QVector<double> xTicks = niceTicks(std::min(x0, x1), std::max(x0, x1), 8, std::fabs(2.0 * halfX));
-    const QVector<double> yTicks = niceTicks(std::min(y0, y1), std::max(y0, y1), 6, std::fabs(2.0 * halfY));
-    const QVector<double> cTicks = niceTicks(m_dMinValue, m_dMaxValue, 6);
+    const std::vector<double> xTicks = niceTicks(std::min(x0, x1), std::max(x0, x1), 8, std::fabs(2.0 * halfX));
+    const std::vector<double> yTicks = niceTicks(std::min(y0, y1), std::max(y0, y1), 6, std::fabs(2.0 * halfY));
+    const std::vector<double> cTicks = niceTicks(m_dMinValue, m_dMaxValue, 6);
 
     int yTickWidth = 0;
     for (double v : yTicks) {

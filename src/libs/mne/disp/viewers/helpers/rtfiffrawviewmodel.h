@@ -51,8 +51,12 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <functional>
+#include <map>
+#include <memory>
+#include <span>
+#include <string>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -79,7 +83,7 @@ namespace mne::disp
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*, qint32> RowVectorPair;
+typedef std::pair<const double*, int> RowVectorPair;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
 
 //=============================================================================================================
@@ -186,7 +190,7 @@ public:
      *
      * @param[in] data       data to add (Time points of channel samples).
      */
-    void addData(const QList<Eigen::MatrixXd>& data);
+    void addData(std::span<const Eigen::MatrixXd> data);
 
     //=========================================================================================================
     /**
@@ -250,7 +254,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    inline const QMap<qint32, qint32>& getIdxSelMap() const;
+    inline const std::map<int, int>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -258,7 +262,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32>& selection);
+    void selectRows(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -266,7 +270,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void hideRows(const QList<qint32>& selection);
+    void hideRows(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -288,7 +292,7 @@ public:
      *
      * @param[in] p_qMapChScaling    Map of scaling factors.
      */
-    void setScaling(const QMap<qint32, float>& p_qMapChScaling);
+    void setScaling(const std::map<int, float>& p_qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -322,7 +326,7 @@ public:
      * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator.
      * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator.
      */
-    void updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
+    void updateSpharaOptions(const std::string& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond);
 
     //=========================================================================================================
     /**
@@ -330,7 +334,7 @@ public:
      *
      * @param[in] filterData    list of the new filter.
      */
-    void setFilter(QList<mne::FilterKernel> filterData);
+    void setFilter(const std::vector<mne::FilterKernel>& filterData);
 
     //=========================================================================================================
     /**
@@ -354,7 +358,7 @@ public:
      *
      * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All).
      */
-    void setFilterChannelType(const QString& channelType);
+    void setFilterChannelType(const std::string& channelType);
 
     //=========================================================================================================
     /**
@@ -383,7 +387,7 @@ public:
      * @param[in] triggerCh      current trigger channel to scan.
      * @param[in] threshold      threshold for the detection process.
      */
-    void triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold);
+    void triggerInfoChanged(const std::map<double, QColor>& colorMap, bool active, const std::string& triggerCh, double threshold);
 
     //=========================================================================================================
     /**
@@ -421,7 +425,7 @@ public:
      *
      * @return the current scaling.
      */
-    inline const QMap<qint32, float>& getScaling() const;
+    inline const std::map<int, float>& getScaling() const;
 
     //=========================================================================================================
     /**
@@ -429,7 +433,7 @@ public:
      *
      * @return the current detected trigger flanks.
      */
-    inline QList<QPair<int, double>> getDetectedTriggers() const;
+    inline std::vector<std::pair<int, double>> getDetectedTriggers() const;
 
     //=========================================================================================================
     /**
@@ -437,7 +441,7 @@ public:
      *
      * @return the old detected trigger flanks.
      */
-    inline QList<QPair<int, double>> getDetectedTriggersOld() const;
+    inline std::vector<std::pair<int, double>> getDetectedTriggersOld() const;
 
     //=========================================================================================================
     /**
@@ -445,7 +449,7 @@ public:
      *
      * @return the current trigger color map fpr each detected type.
      */
-    inline QMap<double, QColor> getTriggerColor() const;
+    inline std::map<double, QColor> getTriggerColor() const;
 
     //=========================================================================================================
     /**
@@ -469,7 +473,7 @@ public:
      *
      * @return the current trigger name.
      */
-    inline QString getTriggerName() const;
+    inline std::string getTriggerName() const;
 
     //=========================================================================================================
     /**
@@ -569,7 +573,7 @@ private:
      */
     void initSphara();
 
-    static void doFilterPerChannelRTMSA(QPair<QList<mne::FilterKernel>, QPair<int, Eigen::RowVectorXd>>& channelDataTime);
+    static void doFilterPerChannelRTMSA(std::pair<std::vector<mne::FilterKernel>, std::pair<int, Eigen::RowVectorXd>>& channelDataTime);
 
     //=========================================================================================================
     /**
@@ -613,8 +617,8 @@ private:
     int m_iDistanceTimerSpacer;      /**< The distance for the horizontal time spacers in the view in ms. */
     int m_iDetectedTriggers;         /**< Detected triggers since the last reset. */
 
-    QString m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
-    QString m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
+    std::string m_sCurrentTriggerCh;  /**< Current trigger channel which is beeing scanned. */
+    std::string m_sFilterChannelType; /**< Kind of channel which is to be filtered. */
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff info. */
 
@@ -648,16 +652,16 @@ private:
     Eigen::MatrixXd m_matSpharaBabyMEGOuterLoaded; /**< The loaded babyMEG outer layer basis functions.*/
     Eigen::MatrixXd m_matSpharaEEGLoaded;          /**< The loaded EEG basis functions.*/
 
-    QMap<double, QColor> m_qMapTriggerColor;                             /**< Current colors for all trigger channels. */
-    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
-    QList<int> m_lTriggerChannelIndices;                                 /**< List of all trigger channel indices. */
-    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerFreeze;    /**< Detected trigger for each trigger channel while display is freezed. */
-    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
-    QMap<int, QList<QPair<int, double>>> m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
-    QMap<qint32, float> m_qMapChScaling;                                 /**< Channel scaling map. */
-    QList<mne::FilterKernel> m_filterKernel;                             /**< List of currently active filters. */
-    QStringList m_filterChannelList;                                     /**< List of channels which are to be filtered.*/
-    QMap<qint32, qint32> m_qMapIdxRowSelection;                          /**< Selection mapping.*/
+    std::map<double, QColor> m_qMapTriggerColor;                                       /**< Current colors for all trigger channels. */
+    std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTrigger;          /**< Detected trigger for each trigger channel. */
+    std::vector<int> m_lTriggerChannelIndices;                                         /**< List of all trigger channel indices. */
+    std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTriggerFreeze;    /**< Detected trigger for each trigger channel while display is freezed. */
+    std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTriggerOld;       /**< Old detected trigger for each trigger channel. */
+    std::map<int, std::vector<std::pair<int, double>>> m_qMapDetectedTriggerOldFreeze; /**< Old detected trigger for each trigger channel while display is freezed. */
+    std::map<int, float> m_qMapChScaling;                                              /**< Channel scaling map. */
+    std::vector<mne::FilterKernel> m_filterKernel;                                     /**< List of currently active filters. */
+    std::vector<std::string> m_filterChannelList;                                      /**< List of channels which are to be filtered.*/
+    std::map<int, int> m_qMapIdxRowSelection;                                          /**< Selection mapping.*/
 
     QColor m_colBackground; /**< The background color.*/
 
@@ -671,7 +675,7 @@ signals:
      *
      * @param[in] selection     list of all selected channels.
      */
-    void newSelection(const QList<qint32>& selection);
+    void newSelection(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -685,7 +689,7 @@ signals:
     /**
      * Emmited when trigger detection was performed
      */
-    void triggerDetected(int numberDetectedTriggers, const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
+    void triggerDetected(int numberDetectedTriggers, const std::map<int, std::vector<std::pair<int, double>>>& mapDetectedTriggers);
 };
 
 //=============================================================================================================
@@ -705,7 +709,7 @@ inline qint32 RtFiffRawViewModel::getCurrentSampleIndex() const
         return m_iCurrentSampleFreeze;
     }
 
-    if (!m_filterKernel.isEmpty() && m_bPerformFiltering) {
+    if (!m_filterKernel.empty() && m_bPerformFiltering) {
         return m_iCurrentSample - m_iMaxFilterLength / 2;
     }
 
@@ -719,7 +723,7 @@ inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
     if (row > m_vecLastBlockFirstValuesFiltered.rows() || row > m_vecLastBlockFirstValuesRaw.rows())
         return 0;
 
-    if (!m_filterKernel.isEmpty())
+    if (!m_filterKernel.empty())
         return m_vecLastBlockFirstValuesFiltered[row];
 
     return m_vecLastBlockFirstValuesRaw[row];
@@ -727,7 +731,7 @@ inline double RtFiffRawViewModel::getLastBlockFirstValue(int row) const
 
 //=============================================================================================================
 
-inline const QMap<qint32, qint32>& RtFiffRawViewModel::getIdxSelMap() const
+inline const std::map<int, int>& RtFiffRawViewModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -748,49 +752,49 @@ inline bool RtFiffRawViewModel::isFreezed() const
 
 //=============================================================================================================
 
-inline const QMap<qint32, float>& RtFiffRawViewModel::getScaling() const
+inline const std::map<int, float>& RtFiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }
 
 //=============================================================================================================
 
-inline QMap<double, QColor> RtFiffRawViewModel::getTriggerColor() const
+inline std::map<double, QColor> RtFiffRawViewModel::getTriggerColor() const
 {
     if (m_bTriggerDetectionActive) {
         return m_qMapTriggerColor;
     }
 
-    QMap<double, QColor> map;
+    std::map<double, QColor> map;
     return map;
 }
 
 //=============================================================================================================
 
-inline QList<QPair<int, double>> RtFiffRawViewModel::getDetectedTriggers() const
+inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTriggers() const
 {
-    QList<QPair<int, double>> triggerIndices;
+    std::vector<std::pair<int, double>> triggerIndices;
 
     if (m_bIsFreezed)
-        return m_qMapDetectedTriggerFreeze[m_iCurrentTriggerChIndex];
+        return m_qMapDetectedTriggerFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
 
     if (m_bTriggerDetectionActive) {
-        return m_qMapDetectedTrigger[m_iCurrentTriggerChIndex];
+        return m_qMapDetectedTrigger.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTrigger.at(m_iCurrentTriggerChIndex) : triggerIndices;
     } else
         return triggerIndices;
 }
 
 //=============================================================================================================
 
-inline QList<QPair<int, double>> RtFiffRawViewModel::getDetectedTriggersOld() const
+inline std::vector<std::pair<int, double>> RtFiffRawViewModel::getDetectedTriggersOld() const
 {
-    QList<QPair<int, double>> triggerIndices;
+    std::vector<std::pair<int, double>> triggerIndices;
 
     if (m_bIsFreezed)
-        return m_qMapDetectedTriggerOldFreeze[m_iCurrentTriggerChIndex];
+        return m_qMapDetectedTriggerOldFreeze.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerOldFreeze.at(m_iCurrentTriggerChIndex) : triggerIndices;
 
     if (m_bTriggerDetectionActive) {
-        return m_qMapDetectedTriggerOld[m_iCurrentTriggerChIndex];
+        return m_qMapDetectedTriggerOld.contains(m_iCurrentTriggerChIndex) ? m_qMapDetectedTriggerOld.at(m_iCurrentTriggerChIndex) : triggerIndices;
     } else
         return triggerIndices;
 }
@@ -812,7 +816,7 @@ inline double RtFiffRawViewModel::getTriggerThreshold() const
 
 //=============================================================================================================
 
-inline QString RtFiffRawViewModel::getTriggerName() const
+inline std::string RtFiffRawViewModel::getTriggerName() const
 {
     return m_sCurrentTriggerCh;
 }
@@ -835,7 +839,7 @@ inline bool RtFiffRawViewModel::triggerDetectionActive() const
 
 inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
 {
-    if (!m_filterKernel.isEmpty())
+    if (!m_filterKernel.empty())
         return m_iMaxFilterLength / 2;
     else
         return 0;

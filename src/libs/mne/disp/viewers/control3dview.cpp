@@ -33,6 +33,12 @@
 #include <QColorDialog>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -44,7 +50,7 @@ using namespace mne::disp;
 
 Control3DView::Control3DView(const QString& sSettingsPath,
                              QWidget* parent,
-                             const QStringList& slFlags,
+                             const std::vector<std::string>& slFlags,
                              Qt::WindowType type)
 : AbstractView(parent, type)
 , m_pUi(std::make_unique<Ui::Control3DViewWidget>())
@@ -79,16 +85,16 @@ Control3DView::~Control3DView()
 
 //=============================================================================================================
 
-void Control3DView::setFlags(const QStringList& slFlags)
+void Control3DView::setFlags(const std::vector<std::string>& slFlags)
 {
     //Parse flags
-    if (slFlags.contains("Data")) {
+    if (std::ranges::contains(slFlags, "Data")) {
         m_pUi->m_treeView_loadedData->show();
     } else {
         m_pUi->m_treeView_loadedData->hide();
     }
 
-    if (slFlags.contains("View")) {
+    if (std::ranges::contains(slFlags, "View")) {
         m_pUi->m_groupBox_viewOptions->show();
 
         connect(m_pUi->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
@@ -114,7 +120,7 @@ void Control3DView::setFlags(const QStringList& slFlags)
         m_pUi->m_groupBox_viewOptions->hide();
     }
 
-    if (slFlags.contains("Light")) {
+    if (std::ranges::contains(slFlags, "Light")) {
         m_pUi->m_groupBox_lightOptions->show();
 
         connect(m_pUi->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),

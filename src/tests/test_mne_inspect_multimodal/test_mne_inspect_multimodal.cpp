@@ -97,15 +97,15 @@ void TestMneInspectMultimodal::twoPluginsShareSceneAndToggleIndependently()
     // Electrodes layer registered. (MRI plugin has no volume loaded so it
     // does not register slice layers — that path is tested in
     // test_mri_slices_plugin and is not the focus here.)
-    const SceneLayer* eLayer = scene.findLayer(electrodes.sceneLayerId());
+    const SceneLayer* eLayer = scene.findLayer(electrodes.sceneLayerId().toStdString());
     QVERIFY(eLayer != nullptr);
     QVERIFY(eLayer->visible);
 
     // Synthesise a third layer of MriSlice kind so we can verify per-kind
     // toggling without an MGH file.
     SceneLayer fake;
-    fake.id = QStringLiteral("mri_axial");
-    fake.displayName = QStringLiteral("MRI Axial");
+    fake.id = "mri_axial";
+    fake.displayName = "MRI Axial";
     fake.kind = SceneLayerKind::MriSlice;
     fake.payload = std::shared_ptr<void>(reinterpret_cast<void*>(0x1), [](void*) {});
     scene.addLayer(fake);
@@ -114,20 +114,20 @@ void TestMneInspectMultimodal::twoPluginsShareSceneAndToggleIndependently()
     QSignalSpy layersSpy(&scene, &MultimodalScene::layersChanged);
 
     // Toggle electrodes off; MRI layer remains visible.
-    scene.setLayerVisible(electrodes.sceneLayerId(), false);
-    QCOMPARE(scene.findLayer(electrodes.sceneLayerId())->visible, false);
+    scene.setLayerVisible(electrodes.sceneLayerId().toStdString(), false);
+    QCOMPARE(scene.findLayer(electrodes.sceneLayerId().toStdString())->visible, false);
     QCOMPARE(scene.findLayer(fake.id)->visible, true);
     QVERIFY(layersSpy.count() >= 1);
 
     // Toggle MRI off; electrodes still hidden.
     scene.setLayerVisible(fake.id, false);
-    QCOMPARE(scene.findLayer(electrodes.sceneLayerId())->visible, false);
+    QCOMPARE(scene.findLayer(electrodes.sceneLayerId().toStdString())->visible, false);
     QCOMPARE(scene.findLayer(fake.id)->visible, false);
 
     // Bring both back.
-    scene.setLayerVisible(electrodes.sceneLayerId(), true);
+    scene.setLayerVisible(electrodes.sceneLayerId().toStdString(), true);
     scene.setLayerVisible(fake.id, true);
-    QCOMPARE(scene.findLayer(electrodes.sceneLayerId())->visible, true);
+    QCOMPARE(scene.findLayer(electrodes.sceneLayerId().toStdString())->visible, true);
     QCOMPARE(scene.findLayer(fake.id)->visible, true);
 }
 

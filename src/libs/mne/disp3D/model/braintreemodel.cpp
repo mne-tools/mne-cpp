@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "braintreemodel.h"
+
 #include "model/items/surfacetreeitem.h"
 #include "model/items/bemtreeitem.h"
 #include "model/items/sensortreeitem.h"
@@ -22,8 +23,15 @@
 #include "model/items/sourcespacetreeitem.h"
 #include "model/items/digitizersettreeitem.h"
 #include "model/items/networktreeitem.h"
+#include <mne/base/log.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
 #include <mne/mne/mne_hemisphere.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 namespace mne::disp
 {
@@ -96,8 +104,8 @@ QStandardItem* BrainTreeModel::getSubjectItem(const QString& subject)
 {
     // Search top level
     QList<QStandardItem*> items = findItems(subject);
-    if (!items.isEmpty()) {
-        return items.first();
+    if (!items.empty()) {
+        return items.front();
     }
 
     // Create new
@@ -175,23 +183,20 @@ void BrainTreeModel::addSourceSpace(const mne::MNESourceSpaces& srcSpace)
         QString hemiLabel = (h == 0) ? "LH" : "RH";
 
         // Collect all source point positions for this hemisphere
-        QVector<QVector3D> positions;
+        std::vector<QVector3D> positions;
         positions.reserve(hemi.vertno.size());
         for (int i = 0; i < hemi.vertno.size(); ++i) {
             int vIdx = hemi.vertno(i);
             if (vIdx < 0 || vIdx >= hemi.rr.rows())
                 continue;
-            positions.append(QVector3D(hemi.rr(vIdx, 0), hemi.rr(vIdx, 1), hemi.rr(vIdx, 2)));
+            positions.push_back(QVector3D(hemi.rr(vIdx, 0), hemi.rr(vIdx, 1), hemi.rr(vIdx, 2)));
         }
 
         // One item per hemisphere with all positions batched (0.00075 = 0.75mm radius, same as disp3D)
         parentItem->appendRow(new SourceSpaceTreeItem(hemiLabel, positions, srcColor, 0.00075f));
-        qDebug() << "BrainTreeModel: Source space" << hemiLabel
-                 << "- points:" << positions.size()
-                 << "coord_frame:" << hemi.coord_frame;
-        if (!positions.isEmpty()) {
-            qDebug() << "  First point:" << positions.first()
-                     << "  Last point:" << positions.last();
+        mne::Log::debug("BrainTreeModel: Source space {} - points: {} coord_frame: {}", hemiLabel.toStdString(), positions.size(), hemi.coord_frame);
+        if (!positions.empty()) {
+            mne::Log::debug("First point: ({}, {}, {}) Last point: ({}, {}, {})", positions.front().x(), positions.front().y(), positions.front().z(), positions.back().x(), positions.back().y(), positions.back().z());
         }
     }
 
@@ -208,9 +213,7 @@ void BrainTreeModel::addDigitizerData(std::span<const mne::FiffDigPoint> digitiz
     auto* setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
     this->appendRow(setItem);
 
-    qInfo() << "BrainTreeModel: Added digitizer set with"
-            << setItem->totalPointCount() << "points in"
-            << setItem->rowCount() << "categories";
+    mne::Log::info("BrainTreeModel: Added digitizer set with {} points in {} categories", setItem->totalPointCount(), setItem->rowCount());
 }
 
 //=============================================================================================================
@@ -224,7 +227,7 @@ NetworkTreeItem* BrainTreeModel::addNetwork(const mne::Network& network, const Q
             displayName = "Network";
     }
 
-    QString objectKey = "net_" + displayName.toLower().replace(" ", "_");
+    const std::string objectKey = "net_" + displayName.toLower().replace(" ", "_").toStdString();
 
     auto* item = new NetworkTreeItem(displayName, objectKey);
     item->setCheckable(true);

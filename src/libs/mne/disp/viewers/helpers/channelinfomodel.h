@@ -147,7 +147,7 @@ public:
      *
      * @param[in] layoutMap the layout map with the 2D positions.
      */
-    void layoutChanged(const QMap<QString, QPointF>& layoutMap);
+    void layoutChanged(const std::map<std::string, QPointF>& layoutMap);
 
     //=========================================================================================================
     /**
@@ -155,7 +155,7 @@ public:
      *
      * @return the current mapped channel list.
      */
-    const QStringList& getMappedChannelsList();
+    const std::vector<std::string>& getMappedChannelsList();
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      * @param[in] chName the channel name for which the model index is needed.
      * @return the index number. if channel was not found in the data this functions returns -1.
      */
-    int getIndexFromOrigChName(QString chName);
+    int getIndexFromOrigChName(const std::string& chName);
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ public:
      * @param[in] chName the channel name for which the model index is needed.
      * @return the index number. if channel was not found in the data this functions returns -1.
      */
-    int getIndexFromMappedChName(QString chName);
+    int getIndexFromMappedChName(const std::string& chName);
 
     //=========================================================================================================
     /**
@@ -199,10 +199,10 @@ protected:
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The fiff info of the currently loaded fiff file. */
 
     QMultiMap<int, std::shared_ptr<MNEOperator>> m_assignedOperators; /**< Map of MNEOperator types to channels.*/
-    QMap<QString, QPointF> m_layoutMap;                               /**< The current layout map with a position for all MEG and EEG channels. */
+    std::map<std::string, QPointF> m_layoutMap;                       /**< The current layout map with a position for all MEG and EEG channels. */
 
-    QStringList m_aliasNames;          /**< list of given channel aliases. */
-    QStringList m_mappedLayoutChNames; /**< list of the mapped layout channel names. */
+    std::vector<std::string> m_aliasNames;          /**< list of given channel aliases. */
+    std::vector<std::string> m_mappedLayoutChNames; /**< list of the mapped layout channel names. */
 
 signals:
     //=========================================================================================================
@@ -210,7 +210,7 @@ signals:
      * Emit this signal whenever channels where mapped to a layout
      *
      */
-    void channelsMappedToLayout(const QStringList& mappedLayoutChNames);
+    void channelsMappedToLayout(const std::vector<std::string>& mappedLayoutChNames);
 };
 } // NAMESPACE mne_disp
 

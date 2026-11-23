@@ -93,7 +93,7 @@ void Plot::updateData(VectorXd& p_dVec)
             m_dMaxY = 0;
         }
 
-        QVector<QPointF> t_qVecPointFPaths;
+        std::vector<QPointF> t_qVecPointFPaths;
         //No X data given
         m_dMinX = 0 < m_dMinX ? 0 : m_dMinX;
         m_dMaxX = p_dVec.size() - 1 > m_dMaxX ? p_dVec.size() - 1 : m_dMaxX;
@@ -103,11 +103,11 @@ void Plot::updateData(VectorXd& p_dVec)
 
         double t_dX = 0;
         for (qint32 i = 0; i < p_dVec.size(); ++i) {
-            t_qVecPointFPaths.append(QPointF(t_dX, p_dVec[i]));
+            t_qVecPointFPaths.push_back(QPointF(t_dX, p_dVec[i]));
             t_dX += 1;
         }
 
-        m_qListVecPointFPaths.append(t_qVecPointFPaths);
+        m_qListVecPointFPaths.push_back(t_qVecPointFPaths);
 
         update();
     }
@@ -149,8 +149,8 @@ void Plot::paintEvent(QPaintEvent* event)
         const double scale_x = t_qSizePlot.width() / rangeX;
         const double scale_y = 0.9 * t_qSizePlot.height() / rangeY;
         const double bottom = t_qPointTopLeft.y() + 0.95 * t_qSizePlot.height();
-        for (const QVector<QPointF>& path : std::as_const(m_qListVecPointFPaths)) {
-            for (qsizetype k = 1; k < path.size(); ++k) {
+        for (const std::vector<QPointF>& path : std::as_const(m_qListVecPointFPaths)) {
+            for (qsizetype k = 1; k < std::ssize(path); ++k) {
                 painter.drawLine(QPointF(t_qPointTopLeft.x() + (path[k - 1].x() - m_dMinX) * scale_x, bottom - (path[k - 1].y() - m_dMinY) * scale_y),
                                  QPointF(t_qPointTopLeft.x() + (path[k].x() - m_dMinX) * scale_x, bottom - (path[k].y() - m_dMinY) * scale_y));
             }

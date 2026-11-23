@@ -31,7 +31,13 @@
 
 #include <QWidget>
 #include <QColor>
-#include <QVector>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
 
 class QContextMenuEvent;
 
@@ -48,9 +54,9 @@ namespace mne::disp
  */
 struct TimeRulerEventMark
 {
-    int sample = 0; ///< Absolute sample index.
-    QColor color;   ///< Display colour.
-    QString label;  ///< Short text (event type number).
+    int sample = 0;    ///< Absolute sample index.
+    QColor color;      ///< Display colour.
+    std::string label; ///< Short text (event type number).
 };
 
 //=============================================================================================================
@@ -59,9 +65,9 @@ struct TimeRulerEventMark
  */
 struct TimeRulerReferenceMark
 {
-    int sample = 0; ///< Absolute sample index.
-    QColor color;   ///< Display colour.
-    QString label;  ///< Short text identifier, e.g. M1.
+    int sample = 0;    ///< Absolute sample index.
+    QColor color;      ///< Display colour.
+    std::string label; ///< Short text identifier, e.g. M1.
 };
 
 //=============================================================================================================
@@ -117,7 +123,7 @@ public:
      *
      * @param[in] events  Event marks (sample position + colour + label).
      */
-    void setEvents(const QVector<TimeRulerEventMark>& events);
+    void setEvents(const std::vector<TimeRulerEventMark>& events);
 
     //=========================================================================================================
     /**
@@ -125,7 +131,7 @@ public:
      *
      * @param[in] markers  Reference/sample markers.
      */
-    void setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers);
+    void setReferenceMarkers(const std::vector<TimeRulerReferenceMark>& markers);
 
     //=========================================================================================================
     /**
@@ -230,8 +236,8 @@ private:
     float m_spp = 1.f;           // samples per pixel
     bool m_useClockTime = false; // false = float seconds, true = HH:MM:SS
 
-    QVector<TimeRulerEventMark> m_events;
-    QVector<TimeRulerReferenceMark> m_referenceMarkers;
+    std::vector<TimeRulerEventMark> m_events;
+    std::vector<TimeRulerReferenceMark> m_referenceMarkers;
 };
 
 } // namespace mne::disp

@@ -609,8 +609,8 @@ void CorticalSurface::refreshSceneLayers()
         return;
     }
     // Remove any prior cortex layers.
-    m_pScene->removeLayer(QStringLiteral("cortex_lh"));
-    m_pScene->removeLayer(QStringLiteral("cortex_rh"));
+    m_pScene->removeLayer("cortex_lh");
+    m_pScene->removeLayer("cortex_rh");
 
     auto registerHemi = [&](const QString& id, const QString& display,
                             const std::shared_ptr<FsSurface>& surf) {
@@ -618,8 +618,8 @@ void CorticalSurface::refreshSceneLayers()
             return;
         }
         SceneLayer layer;
-        layer.id = id;
-        layer.displayName = display;
+        layer.id = id.toStdString();
+        layer.displayName = display.toStdString();
         layer.kind = SceneLayerKind::BrainSurface;
         layer.opacity = 1.0f;
         layer.visible = true;
@@ -973,14 +973,14 @@ void CorticalSurface::refreshOverlayLayer()
     if (!m_pScene) {
         return;
     }
-    const QString layerId = QStringLiteral("stc_overlay");
+    const std::string layerId = "stc_overlay";
     if (m_stc.empty() || m_stc.data.size() == 0) {
         m_pScene->removeLayer(layerId);
         return;
     }
     SceneLayer layer;
     layer.id = layerId;
-    layer.displayName = QStringLiteral("Source estimate");
+    layer.displayName = "Source estimate";
     layer.kind = SceneLayerKind::SourceOverlay;
     layer.opacity = 1.0f;
     layer.visible = true;

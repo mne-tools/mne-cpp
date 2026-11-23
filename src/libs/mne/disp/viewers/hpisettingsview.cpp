@@ -32,7 +32,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
@@ -41,7 +40,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <iostream>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -109,7 +110,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::selectCoilPreset);
 
     //Init coil freqs
-    m_vCoilFreqs << 293 << 307 << 314 << 321;
+    m_vCoilFreqs = {293, 307, 314, 321};
 
     loadSettings();
 }
@@ -123,13 +124,13 @@ HpiSettingsView::~HpiSettingsView()
 
 //=============================================================================================================
 
-void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
+void HpiSettingsView::setErrorLabels(const std::vector<double>& vError,
                                      const double dMeanErrorDist)
 {
     //Update eror labels and change from m to mm
     QString sGof("0mm");
 
-    for (int i = 0; i < vError.size(); ++i) {
+    for (int i = 0; i < std::ssize(vError); ++i) {
         if (i < m_pUi->m_tableWidget_results->rowCount()) {
             sGof = QString::number(vError[i] * 1000, 'f', 2) + QString(" mm");
             m_pUi->m_tableWidget_results->item(i, 1)->setText(sGof);
@@ -243,7 +244,7 @@ void HpiSettingsView::saveSettings()
     QSettings settings("MNECPP");
 
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"),
-                      QVariant::fromValue(m_vCoilFreqs));
+                      QVariant::fromValue(QList<int>(m_vCoilFreqs.begin(), m_vCoilFreqs.end())));
 
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useSSP"),
                       QVariant::fromValue(m_pUi->m_checkBox_useSSP->isChecked()));
@@ -272,8 +273,9 @@ void HpiSettingsView::loadSettings()
     QSettings settings("MNECPP");
     QVariant defaultData;
 
-    defaultData.setValue(m_vCoilFreqs);
-    m_vCoilFreqs = settings.value(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"), defaultData).value<QVector<int>>();
+    defaultData.setValue(QList<int>(m_vCoilFreqs.begin(), m_vCoilFreqs.end()));
+    const QList<int> coilFreqs = settings.value(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"), defaultData).value<QList<int>>();
+    m_vCoilFreqs.assign(coilFreqs.begin(), coilFreqs.end());
     emit coilFrequenciesChanged(m_vCoilFreqs);
 
     m_pUi->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), false).toBool());
@@ -324,13 +326,15 @@ void HpiSettingsView::onLoadDigitizers()
     //Load Polhemus file
     if (!fileName_HPI.isEmpty()) {
         fileName_HPI = fileName_HPI.trimmed();
-        QFileInfo checkFile(fileName_HPI);
+        const std::filesystem::path digitizerFile = path_from_utf8(fileName_HPI.toStdString());
+        std::error_code error;
+        const bool isFile = std::filesystem::is_regular_file(digitizerFile, error);
 
-        const FiffDigPointSet digitizers = checkFile.isFile() ? readDigitizersFromFile(fileName_HPI) : FiffDigPointSet();
+        const FiffDigPointSet digitizers = isFile ? readDigitizersFromFile(digitizerFile) : FiffDigPointSet();
         if (!digitizers.empty()) {
             // Stop cont HPI first
             m_pUi->m_checkBox_continousHPI->setChecked(false);
-            emit digitizersChanged(digitizers, fileName_HPI);
+            emit digitizersChanged(digitizers, digitizerFile);
         } else {
             QMessageBox msgBox;
             msgBox.setText("File could not be loaded!");
@@ -345,7 +349,7 @@ void HpiSettingsView::onLoadDigitizers()
 void HpiSettingsView::onFrequencyCellChanged(int row,
                                              int col)
 {
-    if (col != 1 || row >= m_vCoilFreqs.size()) {
+    if (col != 1 || row >= std::ssize(m_vCoilFreqs)) {
         return;
     }
 
@@ -380,7 +384,7 @@ void HpiSettingsView::onAddCoil()
                                               pTableItemA);
 
     // Add column 1 in freq table widget
-    if (m_vCoilFreqs.size() >= m_pUi->m_tableWidget_Frequencies->rowCount()) {
+    if (std::ssize(m_vCoilFreqs) >= m_pUi->m_tableWidget_Frequencies->rowCount()) {
         m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
                                                   1,
                                                   new QTableWidgetItem(QString::number(m_vCoilFreqs.at(m_pUi->m_tableWidget_Frequencies->rowCount() - 1))));
@@ -388,7 +392,7 @@ void HpiSettingsView::onAddCoil()
         m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount() - 1,
                                                   1,
                                                   new QTableWidgetItem("none"));
-        m_vCoilFreqs.append(-1);
+        m_vCoilFreqs.push_back(-1);
     }
 
     // Add column 0 in error table widget (coil number)
@@ -422,8 +426,8 @@ void HpiSettingsView::onRemoveCoil()
 {
     int row = m_pUi->m_tableWidget_Frequencies->currentRow();
 
-    if (row >= 0 && row < m_vCoilFreqs.size()) {
-        m_vCoilFreqs.remove(row);
+    if (row >= 0 && row < std::ssize(m_vCoilFreqs)) {
+        m_vCoilFreqs.erase(m_vCoilFreqs.begin() + row);
         m_pUi->m_tableWidget_Frequencies->removeRow(row);
 
         for (int i = 0; i < m_pUi->m_tableWidget_Frequencies->rowCount(); ++i) {
@@ -442,9 +446,9 @@ void HpiSettingsView::onRemoveCoil()
 
 //=============================================================================================================
 
-FiffDigPointSet HpiSettingsView::readDigitizersFromFile(const QString& fileName)
+FiffDigPointSet HpiSettingsView::readDigitizersFromFile(const std::filesystem::path& fileName)
 {
-    auto dig = FiffDigPointSet::read(mne::path_from_utf8(fileName.toStdString()));
+    auto dig = FiffDigPointSet::read(fileName);
     if (!dig || dig->empty()) {
         return {};
     }
@@ -475,8 +479,8 @@ void HpiSettingsView::updateDigitizerInfoGUI(const FiffDigPointSet& digSet)
     for (const FiffDigPoint& point : digSet) {
         switch (point.kind) {
             case FIFFV_POINT_HPI:
-                if (m_vCoilFreqs.size() <= numHPI) {
-                    m_vCoilFreqs.append(-1);
+                if (std::ssize(m_vCoilFreqs) <= numHPI) {
+                    m_vCoilFreqs.push_back(-1);
                 }
                 numHPI++;
                 break;
@@ -586,9 +590,9 @@ void HpiSettingsView::clearView()
 
 //=============================================================================================================
 
-bool HpiSettingsView::loadCoilPresets(const QString& sFilePath)
+bool HpiSettingsView::loadCoilPresets(const std::filesystem::path& sFilePath)
 {
-    const Expected<std::string> text = read_text_file(path_from_utf8(sFilePath.toStdString()));
+    const Expected<std::string> text = read_text_file(sFilePath);
     if (!text) {
         Log::warning("Cannot read HPI coil presets: {}", text.error().what());
         return false;
@@ -596,7 +600,7 @@ bool HpiSettingsView::loadCoilPresets(const QString& sFilePath)
     JsonParseError error;
     const JsonDocument presets = JsonDocument::from_json(*text, &error);
     if (error.error != JsonParseError::NoError || !presets.is_object()) {
-        Log::warning("{} holds no JSON object of HPI coil presets", sFilePath.toStdString());
+        Log::warning("{} holds no JSON object of HPI coil presets", utf8_from_path(sFilePath));
         return false;
     }
     m_CoilPresets = presets.object();
@@ -620,9 +624,9 @@ void HpiSettingsView::populatePresetGUI(const JsonArray& presetData)
 
     for (const JsonValue& entry : presetData) {
         const JsonObject& preset = entry.to_object();
-        QVector<int> vecCoils;
+        std::vector<int> vecCoils;
         for (const JsonValue& coil : preset["coils"].to_array()) {
-            vecCoils.append(coil.to_int());
+            vecCoils.push_back(coil.to_int());
         }
         m_pUi->comboBox_coilPreset->addItem(QString::fromStdString(preset["name"].to_std_string()),
                                             QVariant::fromValue(vecCoils));
@@ -635,8 +639,8 @@ void HpiSettingsView::selectCoilPreset(int iCoilPresetIndex)
 {
     if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count())) {
         auto coilFreqData = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
-        if (!coilFreqData.isNull() && coilFreqData.canConvert<QVector<int>>()) {
-            m_vCoilFreqs = coilFreqData.value<QVector<int>>();
+        if (!coilFreqData.isNull() && coilFreqData.canConvert<std::vector<int>>()) {
+            m_vCoilFreqs = coilFreqData.value<std::vector<int>>();
             clearCoilGUI();
             populateCoilGUI();
 

@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "evokedsetmodel.h"
+#include "../../detail/map_value.h"
 
 #include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_info.h>
@@ -27,9 +28,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPair>
+
 #include <QColor>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -55,10 +55,10 @@ using namespace Eigen;
 
 EvokedSetModel::EvokedSetModel(QObject* parent)
 : QAbstractTableModel(parent)
-, m_qMapAverageColor(std::make_shared<QMap<QString, QColor>>())
-, m_qMapAverageActivation(std::make_shared<QMap<QString, bool>>())
-, m_qMapAverageColorOld(std::make_shared<QMap<QString, QColor>>())
-, m_qMapAverageActivationOld(std::make_shared<QMap<QString, bool>>())
+, m_qMapAverageColor(std::make_shared<std::map<std::string, QColor>>())
+, m_qMapAverageActivation(std::make_shared<std::map<std::string, bool>>())
+, m_qMapAverageColorOld(std::make_shared<std::map<std::string, QColor>>())
+, m_qMapAverageActivationOld(std::make_shared<std::map<std::string, bool>>())
 , m_bIsInit(false)
 , m_bIsFreezed(false)
 , m_bProjActivated(false)
@@ -100,7 +100,7 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
     }
 
     if (index.isValid()) {
-        qint32 row = m_qMapIdxRowSelection[index.row()];
+        qint32 row = detail::valueOr(m_qMapIdxRowSelection, index.row());
 
         //******** first column (chname) ********
         if (index.column() == 0 && role == Qt::DisplayRole) {
@@ -115,7 +115,7 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
         if (index.column() == 1) {
             QVariant v;
 
-            QList<mne::disp::AvrTypeRowVector> lRowDataPerTrigType;
+            std::vector<mne::disp::AvrTypeRowVector> lRowDataPerTrigType;
             mne::disp::AvrTypeRowVector pairItem;
 
             switch (role) {
@@ -124,17 +124,17 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
 
                     if (m_bIsFreezed) {
                         // data freeze
-                        for (int i = 0; i < m_matDataFreeze.size(); ++i) {
+                        for (int i = 0; i < std::ssize(m_matDataFreeze); ++i) {
                             pairItem.first = m_lAvrTypesFreeze.at(i);
                             pairItem.second = m_matDataFreeze.at(i).row(row);
-                            lRowDataPerTrigType.append(pairItem);
+                            lRowDataPerTrigType.push_back(pairItem);
                         }
                     } else {
                         // data stream
-                        for (int i = 0; i < m_matData.size(); ++i) {
+                        for (int i = 0; i < std::ssize(m_matData); ++i) {
                             pairItem.first = m_lAvrTypes.at(i);
                             pairItem.second = m_matData.at(i).row(row);
-                            lRowDataPerTrigType.append(pairItem);
+                            lRowDataPerTrigType.push_back(pairItem);
                         }
                     }
 
@@ -159,27 +159,27 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
         //******** third column (2D layout data plot, this third column is needed because the te data needs to be in another structure for the 2D layout to work) ********
         if (index.column() == 2) {
             QVariant v;
-            QList<mne::disp::AvrTypeRowVectorPair> lRowDataPerTrigType;
+            std::vector<mne::disp::AvrTypeRowVectorPair> lRowDataPerTrigType;
             mne::disp::AvrTypeRowVectorPair averagedData;
 
             switch (role) {
                 case EvokedSetModelRoles::GetAverageData: {
                     if (m_bIsFreezed) {
                         // data freeze
-                        for (int i = 0; i < m_matDataFreeze.size(); ++i) {
+                        for (int i = 0; i < std::ssize(m_matDataFreeze); ++i) {
                             averagedData.first = m_lAvrTypesFreeze.at(i);
                             averagedData.second.first = m_matDataFreeze.at(i).data();
-                            averagedData.second.second = m_matDataFreeze.at(i).cols();
+                            averagedData.second.second = static_cast<int>(m_matDataFreeze.at(i).cols());
 
-                            lRowDataPerTrigType.append(averagedData);
+                            lRowDataPerTrigType.push_back(averagedData);
                         }
                     } else {
-                        for (int i = 0; i < m_matData.size(); ++i) {
+                        for (int i = 0; i < std::ssize(m_matData); ++i) {
                             averagedData.first = m_lAvrTypes.at(i);
                             averagedData.second.first = m_matData.at(i).data();
-                            averagedData.second.second = m_matData.at(i).cols();
+                            averagedData.second.second = static_cast<int>(m_matData.at(i).cols());
 
-                            lRowDataPerTrigType.append(averagedData);
+                            lRowDataPerTrigType.push_back(averagedData);
                         }
                     }
 
@@ -307,70 +307,68 @@ void EvokedSetModel::updateData()
         if (doComp) {
             if (doProj) {
                 //Comp + Proj
-                m_matData.append(m_matSparseProjCompMult * m_pEvokedSet->evoked.at(i).data);
+                m_matData.push_back(m_matSparseProjCompMult * m_pEvokedSet->evoked.at(i).data);
             } else {
                 //Comp
-                m_matData.append(m_matSparseCompMult * m_pEvokedSet->evoked.at(i).data);
+                m_matData.push_back(m_matSparseCompMult * m_pEvokedSet->evoked.at(i).data);
             }
         } else {
             if (doProj) {
                 //Proj
-                m_matData.append(m_matSparseProjMult * m_pEvokedSet->evoked.at(i).data);
+                m_matData.push_back(m_matSparseProjMult * m_pEvokedSet->evoked.at(i).data);
             } else {
                 //None - Raw
-                m_matData.append(m_pEvokedSet->evoked.at(i).data);
+                m_matData.push_back(m_pEvokedSet->evoked.at(i).data);
             }
         }
 
         m_pairBaseline = m_pEvokedSet->evoked.at(i).baseline;
 
-        m_lAvrTypes.append(QString::fromStdString(m_pEvokedSet->evoked.at(i).comment));
+        m_lAvrTypes.push_back(m_pEvokedSet->evoked.at(i).comment);
     }
 
     // Update average selection information map. Use old colors if existing.
-    QStringList slCurrentAvrComments;
-    int iSizeAvrActivation = m_qMapAverageActivation->size();
-    int iSizeAvrColor = m_qMapAverageColor->size();
+    std::vector<std::string> slCurrentAvrComments;
+    const std::size_t iSizeAvrActivation = m_qMapAverageActivation->size();
+    const std::size_t iSizeAvrColor = m_qMapAverageColor->size();
 
     for (int i = 0; i < std::ssize(m_pEvokedSet->evoked); ++i) {
-        const QString comment = QString::fromStdString(m_pEvokedSet->evoked.at(i).comment);
-        slCurrentAvrComments << comment;
+        const std::string& comment = m_pEvokedSet->evoked.at(i).comment;
+        slCurrentAvrComments.push_back(comment);
 
         if (!m_qMapAverageActivation->contains(comment)) {
             if (m_qMapAverageActivationOld->contains(comment)) {
-                m_qMapAverageActivation->insert(comment, m_qMapAverageActivationOld->value(comment));
+                m_qMapAverageActivation->insert_or_assign(comment, m_qMapAverageActivationOld->at(comment));
             } else {
-                m_qMapAverageActivation->insert(comment, true);
+                m_qMapAverageActivation->insert_or_assign(comment, true);
             }
         }
 
         if (!m_qMapAverageColor->contains(comment)) {
             if (m_qMapAverageColorOld->contains(comment)) {
-                m_qMapAverageColor->insert(comment, m_qMapAverageColorOld->value(comment));
+                m_qMapAverageColor->insert_or_assign(comment, m_qMapAverageColorOld->at(comment));
             } else {
-                m_qMapAverageColor->insert(comment, Qt::yellow);
+                m_qMapAverageColor->insert_or_assign(comment, Qt::yellow);
             }
         }
     }
 
     // Delete average color and activation if they are no longer present in the evoked set
-    QMutableMapIterator<QString, bool> itrActivation(*m_qMapAverageActivation);
-    while (itrActivation.hasNext()) {
-        itrActivation.next();
-        if (!slCurrentAvrComments.contains(itrActivation.key())) {
-            m_qMapAverageActivationOld->insert(itrActivation.key(), itrActivation.value());
-            itrActivation.remove();
+    std::erase_if(*m_qMapAverageActivation, [&](const auto& item) {
+        if (std::ranges::contains(slCurrentAvrComments, item.first)) {
+            return false;
         }
-    }
+        m_qMapAverageActivationOld->insert_or_assign(item.first, item.second);
+        return true;
+    });
 
-    QMutableMapIterator<QString, QColor> itrColor(*m_qMapAverageColor);
-    while (itrColor.hasNext()) {
-        itrColor.next();
-        if (!slCurrentAvrComments.contains(itrColor.key())) {
-            m_qMapAverageColorOld->insert(itrColor.key(), itrColor.value());
-            itrColor.remove();
+    std::erase_if(*m_qMapAverageColor, [&](const auto& item) {
+        if (std::ranges::contains(slCurrentAvrComments, item.first)) {
+            return false;
         }
-    }
+        m_qMapAverageColorOld->insert_or_assign(item.first, item.second);
+        return true;
+    });
 
     // Only emit new colors and activations if evoked types were added or deleted
     if (iSizeAvrColor != m_qMapAverageColor->size()) {
@@ -384,36 +382,33 @@ void EvokedSetModel::updateData()
     //Update data content
     QModelIndex topLeft = this->index(0, 1);
     QModelIndex bottomRight = this->index(m_pEvokedSet->info.nchan - 1, 1);
-    QVector<int> roles;
-    roles << Qt::DisplayRole;
-
-    emit dataChanged(topLeft, bottomRight, roles);
+    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
 }
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, QColor>> EvokedSetModel::getAverageColor() const
+std::shared_ptr<std::map<std::string, QColor>> EvokedSetModel::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, bool>> EvokedSetModel::getAverageActivation() const
+std::shared_ptr<std::map<std::string, bool>> EvokedSetModel::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
 
 //=============================================================================================================
 
-void EvokedSetModel::setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor)
+void EvokedSetModel::setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
 }
 
 //=============================================================================================================
 
-void EvokedSetModel::setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation)
+void EvokedSetModel::setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
 }
@@ -422,8 +417,8 @@ void EvokedSetModel::setAverageActivation(const std::shared_ptr<QMap<QString, bo
 
 fiff_int_t EvokedSetModel::getKind(qint32 row) const
 {
-    if (row < m_qMapIdxRowSelection.size()) {
-        qint32 chRow = m_qMapIdxRowSelection[row];
+    if (row < std::ssize(m_qMapIdxRowSelection)) {
+        qint32 chRow = detail::valueOr(m_qMapIdxRowSelection, row);
         return m_pEvokedSet->info.chs[chRow].kind;
     }
 
@@ -436,8 +431,8 @@ bool EvokedSetModel::getIsChannelBad(qint32 row) const
 {
     bool bIsBad = false;
 
-    if (row < m_qMapIdxRowSelection.size()) {
-        qint32 chRow = m_qMapIdxRowSelection[row];
+    if (row < std::ssize(m_qMapIdxRowSelection)) {
+        qint32 chRow = detail::valueOr(m_qMapIdxRowSelection, row);
         bIsBad = std::ranges::contains(m_pEvokedSet->info.bads, m_pEvokedSet->info.chs[chRow].ch_name);
     }
 
@@ -448,8 +443,8 @@ bool EvokedSetModel::getIsChannelBad(qint32 row) const
 
 fiff_int_t EvokedSetModel::getUnit(qint32 row) const
 {
-    if (row < m_qMapIdxRowSelection.size()) {
-        qint32 chRow = m_qMapIdxRowSelection[row];
+    if (row < std::ssize(m_qMapIdxRowSelection)) {
+        qint32 chRow = detail::valueOr(m_qMapIdxRowSelection, row);
         return m_pEvokedSet->info.chs[chRow].unit;
     }
 
@@ -460,8 +455,8 @@ fiff_int_t EvokedSetModel::getUnit(qint32 row) const
 
 fiff_int_t EvokedSetModel::getCoil(qint32 row) const
 {
-    if (row < m_qMapIdxRowSelection.size()) {
-        qint32 chRow = m_qMapIdxRowSelection[row];
+    if (row < std::ssize(m_qMapIdxRowSelection)) {
+        qint32 chRow = detail::valueOr(m_qMapIdxRowSelection, row);
         return m_pEvokedSet->info.chs[chRow].chpos.coil_type;
     }
 
@@ -481,8 +476,8 @@ qint32 EvokedSetModel::getNumSamples() const
 {
     qint32 iNumSamples = 0;
 
-    if (!m_matData.isEmpty()) {
-        iNumSamples = m_matData.first().cols();
+    if (!m_matData.empty()) {
+        iNumSamples = m_matData.front().cols();
     }
 
     return m_bIsInit ? iNumSamples : 0;
@@ -497,7 +492,7 @@ QVariant EvokedSetModel::data(int row, int column, int role) const
 
 //=============================================================================================================
 
-const QMap<qint32, qint32>& EvokedSetModel::getIdxSelMap() const
+const std::map<int, int>& EvokedSetModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -508,8 +503,8 @@ qint32 EvokedSetModel::numVLines() const
 {
     qint32 iNumSamples = 0;
 
-    if (!m_matData.isEmpty()) {
-        iNumSamples = m_matData.first().cols();
+    if (!m_matData.empty()) {
+        iNumSamples = m_matData.front().cols();
     }
 
     return static_cast<qint32>(iNumSamples / m_fSps) - 1;
@@ -562,8 +557,8 @@ int EvokedSetModel::getNumberOfTimeSpacers() const
     //std::cout<<floor((m_matData.cols()/m_fSps)*10)<<std::endl;
     qint32 iNumSamples = 0;
 
-    if (!m_matData.isEmpty()) {
-        iNumSamples = m_matData.first().cols();
+    if (!m_matData.empty()) {
+        iNumSamples = m_matData.front().cols();
     }
 
     return std::floor(static_cast<double>((iNumSamples / m_fSps) * 10));
@@ -571,7 +566,7 @@ int EvokedSetModel::getNumberOfTimeSpacers() const
 
 //=============================================================================================================
 
-QPair<QVariant, QVariant> EvokedSetModel::getBaselineInfo() const
+std::pair<float, float> EvokedSetModel::getBaselineInfo() const
 {
     //qDebug()<<floor((m_matData.cols()/m_fSps)*10);
     return m_pairBaseline;
@@ -581,12 +576,12 @@ QPair<QVariant, QVariant> EvokedSetModel::getBaselineInfo() const
 
 int EvokedSetModel::getNumAverages() const
 {
-    return m_matData.size();
+    return static_cast<int>(m_matData.size());
 }
 
 //=============================================================================================================
 
-void EvokedSetModel::selectRows(const QList<qint32>& selection)
+void EvokedSetModel::selectRows(const std::vector<int>& selection)
 {
     if (!m_pEvokedSet) {
         return;
@@ -597,9 +592,9 @@ void EvokedSetModel::selectRows(const QList<qint32>& selection)
     m_qMapIdxRowSelection.clear();
 
     qint32 count = 0;
-    for (qint32 i = 0; i < selection.size(); ++i) {
+    for (qint32 i = 0; i < std::ssize(selection); ++i) {
         if (selection[i] < m_pEvokedSet->info.nchan) {
-            m_qMapIdxRowSelection.insert(count, selection[i]);
+            m_qMapIdxRowSelection.insert_or_assign(count, selection[i]);
             ++count;
         }
     }
@@ -622,7 +617,7 @@ void EvokedSetModel::resetSelection()
     m_qMapIdxRowSelection.clear();
 
     for (qint32 i = 0; i < m_pEvokedSet->info.nchan; ++i) {
-        m_qMapIdxRowSelection.insert(i, i);
+        m_qMapIdxRowSelection.insert_or_assign(i, i);
     }
 
     endResetModel();
@@ -769,9 +764,7 @@ void EvokedSetModel::toggleFreeze()
     //Update data content
     QModelIndex topLeft = this->index(0, 1);
     QModelIndex bottomRight = this->index(this->rowCount(), 1);
-    QVector<int> roles;
-    roles << Qt::DisplayRole;
-    emit dataChanged(topLeft, bottomRight, roles);
+    emit dataChanged(topLeft, bottomRight, {Qt::DisplayRole});
 }
 
 //=============================================================================================================

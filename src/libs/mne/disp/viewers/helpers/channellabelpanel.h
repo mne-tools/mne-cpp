@@ -29,8 +29,14 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QVector>
 #include <QWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -86,7 +92,7 @@ public:
      *
      * @param[in] indices  Ordered list of model channel indices to display.
      */
-    void setChannelIndices(const QVector<int>& indices);
+    void setChannelIndices(const std::vector<int>& indices);
 
     //=========================================================================================================
     /**
@@ -136,13 +142,13 @@ protected:
     bool event(QEvent* e) override; // for QEvent::ToolTip
 
 private:
-    QVector<int> effectiveChannelIndices() const;
+    std::vector<int> effectiveChannelIndices() const;
 
     QPointer<ChannelDataModel> m_model;
     int m_firstVisibleChannel = 0;
     int m_visibleChannelCount = 12;
 
-    QVector<int> m_channelIndices; // empty = identity (all channels)
+    std::vector<int> m_channelIndices; // empty = identity (all channels)
     bool m_hideBadChannels = false;
     bool m_butterflyMode = false;
     int m_visSampleFirst = 0;

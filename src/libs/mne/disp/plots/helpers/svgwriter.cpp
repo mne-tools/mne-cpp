@@ -17,13 +17,13 @@
 #include "svgwriter.h"
 
 #include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QBuffer>
-#include <QFile>
 #include <QGradient>
 #include <QImage>
 #include <QPaintEngine>
@@ -36,7 +36,10 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cerrno>
+#include <cstring>
 #include <format>
+#include <fstream>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -164,7 +167,8 @@ private:
     void writeCosmetic();
 
     QXmlStreamWriter m_xml;
-    std::unique_ptr<QFile> m_pFile;
+    std::ofstream m_file; // the target when the writer has a file name
+    QBuffer m_fileBuffer; // collects the document for m_file
 
     QPen m_pen;
     QBrush m_brush;
@@ -221,14 +225,16 @@ bool SvgPaintEngine::begin(QPaintDevice* pdev)
     auto* writer = static_cast<SvgWriter*>(pdev);
     QIODevice* device = writer->m_pDevice;
 
-    if (!writer->m_fileName.isEmpty()) {
-        m_pFile = std::make_unique<QFile>(writer->m_fileName);
-        if (!m_pFile->open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            Log::warning("SvgWriter: cannot open {} for writing: {}", writer->m_fileName.toStdString(), m_pFile->errorString().toStdString());
-            m_pFile.reset();
+    if (!writer->m_fileName.empty()) {
+        m_file.open(path_from_utf8(writer->m_fileName), std::ios::binary | std::ios::trunc);
+        if (!m_file) {
+            Log::warning("SvgWriter: cannot open {} for writing: {}", writer->m_fileName, std::strerror(errno));
+            m_file.clear();
             return false;
         }
-        device = m_pFile.get();
+        m_fileBuffer.buffer().clear();
+        m_fileBuffer.open(QIODevice::WriteOnly);
+        device = &m_fileBuffer;
     } else if (!device) {
         Log::warning("SvgWriter: neither a file name nor an output device is set");
         return false;
@@ -265,9 +271,9 @@ bool SvgPaintEngine::begin(QPaintDevice* pdev)
     attribute("height", std::to_string(size.height()));
     attribute("viewBox", std::format("{} {} {} {}", number(viewBox.x()), number(viewBox.y()), number(viewBox.width()), number(viewBox.height())));
     for (const auto& [name, text] : {std::pair{"title", writer->m_title}, std::pair{"desc", writer->m_description}}) {
-        if (!text.isEmpty()) {
+        if (!text.empty()) {
             startElement(name);
-            m_xml.writeCharacters(QString::fromStdString(xmlText(text.toStdString())));
+            m_xml.writeCharacters(QString::fromStdString(xmlText(text)));
             endElement();
         }
     }
@@ -281,11 +287,15 @@ bool SvgPaintEngine::end()
     closeGroups();
     endElement();
     m_xml.writeEndDocument();
-    const bool ok = !m_xml.hasError();
+    bool ok = !m_xml.hasError();
     m_xml.setDevice(nullptr);
-    if (m_pFile) {
-        m_pFile->close();
-        m_pFile.reset();
+    if (m_file.is_open()) {
+        m_file.write(m_fileBuffer.data().constData(), m_fileBuffer.size());
+        m_file.close();
+        ok = ok && !m_file.fail();
+        m_file.clear();
+        m_fileBuffer.close();
+        m_fileBuffer.buffer().clear();
     }
     if (!ok) {
         Log::warning("SvgWriter: writing the SVG document failed");
@@ -636,7 +646,7 @@ SvgWriter::~SvgWriter() = default;
 
 //=============================================================================================================
 
-void SvgWriter::setFileName(const QString& fileName)
+void SvgWriter::setFileName(const std::string& fileName)
 {
     m_fileName = fileName;
     m_pDevice = nullptr;
@@ -644,7 +654,7 @@ void SvgWriter::setFileName(const QString& fileName)
 
 //=============================================================================================================
 
-QString SvgWriter::fileName() const
+std::string SvgWriter::fileName() const
 {
     return m_fileName;
 }
@@ -701,28 +711,28 @@ QRectF SvgWriter::viewBox() const
 
 //=============================================================================================================
 
-void SvgWriter::setTitle(const QString& title)
+void SvgWriter::setTitle(const std::string& title)
 {
     m_title = title;
 }
 
 //=============================================================================================================
 
-QString SvgWriter::title() const
+std::string SvgWriter::title() const
 {
     return m_title;
 }
 
 //=============================================================================================================
 
-void SvgWriter::setDescription(const QString& description)
+void SvgWriter::setDescription(const std::string& description)
 {
     m_description = description;
 }
 
 //=============================================================================================================
 
-QString SvgWriter::description() const
+std::string SvgWriter::description() const
 {
     return m_description;
 }

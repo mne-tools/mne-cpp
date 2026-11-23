@@ -36,12 +36,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QByteArray>
 #include <QColor>
-#include <QMap>
-#include <QString>
-#include <QVector>
 #include <QVector3D>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cstddef>
+#include <map>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -106,7 +111,7 @@ public:
      * @param[in] values    Map of contact name -> scalar value.
      * @param[in] colormap  mne::disp::ColorMap name.
      */
-    void setContactValues(const QMap<QString, float>& values, const QString& colormap = QStringLiteral("Hot"));
+    void setContactValues(const std::map<std::string, float>& values, const std::string& colormap = "Hot");
 
     /**
      * Restore the lead colours of all contacts.
@@ -122,7 +127,7 @@ public:
      * @param[in] distance  Reach of each contact in metres.
      * @return ABGR colour per vertex, transparent away from the contacts; empty without values.
      */
-    QVector<uint32_t> surfaceColors(const Eigen::MatrixX3f& vertices, double distance = 0.01) const;
+    std::vector<uint32_t> surfaceColors(const Eigen::MatrixX3f& vertices, double distance = 0.01) const;
 
     //=========================================================================================================
     /**
@@ -130,7 +135,7 @@ public:
      *
      * @param[in] name  Contact name to select.
      */
-    void selectContact(const QString& name);
+    void selectContact(const std::string& name);
 
     /**
      * Clear the contact selection.
@@ -140,7 +145,7 @@ public:
     /**
      * @return Name of the currently selected contact, or empty string if none.
      */
-    QString selectedContact() const;
+    std::string selectedContact() const;
 
     //=========================================================================================================
     /**
@@ -179,7 +184,7 @@ public:
      * @param[in] index  Contact index.
      * @return Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
      */
-    QString contactLabel(int index) const;
+    std::string contactLabel(int index) const;
 
     //=========================================================================================================
     /**
@@ -238,10 +243,10 @@ private:
     float contactRadius(int contact) const;
 
     mne::IeegImplantation m_implantation;
-    QVector<int> m_leadOfContact;    /**< Lead index per contact. */
-    QVector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
-    QMap<QString, float> m_contactValues;
-    QString m_colormap;
+    std::vector<int> m_leadOfContact;    /**< Lead index per contact. */
+    std::vector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
+    std::map<std::string, float> m_contactValues;
+    std::string m_colormap;
     float m_valueMin = 0.0f;
     float m_valueMax = 0.0f;
     int m_selectedContact = -1;
@@ -251,15 +256,15 @@ private:
     bool m_visible = true;
 
     // Unit sphere and unit cylinder (along +y, centred) shared by all instances
-    QByteArray m_sphereVertices;
-    QByteArray m_sphereIndices;
-    QByteArray m_cylinderVertices;
-    QByteArray m_cylinderIndices;
+    std::vector<std::byte> m_sphereVertices;
+    std::vector<std::byte> m_sphereIndices;
+    std::vector<std::byte> m_cylinderVertices;
+    std::vector<std::byte> m_cylinderIndices;
     int m_sphereIndexCount = 0;
     int m_cylinderIndexCount = 0;
 
-    QByteArray m_contactInstances;
-    QByteArray m_bodyInstances;
+    std::vector<std::byte> m_contactInstances;
+    std::vector<std::byte> m_bodyInstances;
     int m_bodyCount = 0;
     quint64 m_contactGeneration = 0;
     quint64 m_bodyGeneration = 0;
@@ -269,6 +274,8 @@ private:
     void computeBoundingBox();
 
     float normalized(float value) const;
+
+    int leadOf(int contact) const;
 };
 
 } // namespace mne::disp

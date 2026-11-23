@@ -16,21 +16,19 @@
 
 #include "rtsourcedataworker.h"
 
+#include <mne/base/log.h>
+
 #include "core/rendertypes.h"
 #include <mne/disp/plots/helpers/colormap.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMutexLocker>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <vector>
+#include <utility>
 
 using namespace mne::disp;
 
@@ -47,19 +45,19 @@ RtSourceDataWorker::RtSourceDataWorker(QObject* parent)
 
 void RtSourceDataWorker::addData(const Eigen::VectorXd& data)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
 
     // Cap queue size at sampling frequency (1 second of data)
-    if (m_lDataQ.size() < static_cast<int>(m_dSFreq)) {
-        m_lDataQ.append(data);
+    if (std::ssize(m_lDataQ) < static_cast<int>(m_dSFreq)) {
+        m_lDataQ.push_back(data);
     }
 
     // Also store for looping
     if (m_bIsLooping) {
-        m_lDataLoopQ.append(data);
+        m_lDataLoopQ.push_back(data);
         // Cap loop queue too
-        if (m_lDataLoopQ.size() > static_cast<int>(m_dSFreq) * 10) {
-            m_lDataLoopQ.removeFirst();
+        if (std::ssize(m_lDataLoopQ) > static_cast<int>(m_dSFreq) * 10) {
+            m_lDataLoopQ.pop_front();
         }
     }
 }
@@ -68,7 +66,7 @@ void RtSourceDataWorker::addData(const Eigen::VectorXd& data)
 
 void RtSourceDataWorker::clear()
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_lDataQ.clear();
     m_lDataLoopQ.clear();
     m_vecAverage = Eigen::VectorXd();
@@ -78,41 +76,41 @@ void RtSourceDataWorker::clear()
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> mat)
+void RtSourceDataWorker::setInterpolationMatrixLeft(std::shared_ptr<Eigen::SparseMatrix<float>> mat)
 {
-    QMutexLocker locker(&m_mutex);
-    m_interpMatLh = mat;
+    std::scoped_lock locker(m_mutex);
+    m_interpMatLh = std::move(mat);
 }
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> mat)
+void RtSourceDataWorker::setInterpolationMatrixRight(std::shared_ptr<Eigen::SparseMatrix<float>> mat)
 {
-    QMutexLocker locker(&m_mutex);
-    m_interpMatRh = mat;
+    std::scoped_lock locker(m_mutex);
+    m_interpMatRh = std::move(mat);
 }
 
 //=============================================================================================================
 
 void RtSourceDataWorker::setNumberAverages(int numAvr)
 {
-    QMutexLocker locker(&m_mutex);
-    m_iNumAverages = qMax(1, numAvr);
+    std::scoped_lock locker(m_mutex);
+    m_iNumAverages = std::max(1, numAvr);
 }
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setColormapType(const QString& name)
+void RtSourceDataWorker::setColormapType(const std::string& name)
 {
-    QMutexLocker locker(&m_mutex);
-    m_sColormapType = name;
+    std::scoped_lock locker(m_mutex);
+    m_sColormapType = QString::fromStdString(name);
 }
 
 //=============================================================================================================
 
 void RtSourceDataWorker::setThresholds(double min, double mid, double max)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_dThreshMin = min;
     m_dThreshMid = mid;
     m_dThreshMax = max;
@@ -122,7 +120,7 @@ void RtSourceDataWorker::setThresholds(double min, double mid, double max)
 
 void RtSourceDataWorker::setLoopState(bool enabled)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_bIsLooping = enabled;
 }
 
@@ -130,16 +128,16 @@ void RtSourceDataWorker::setLoopState(bool enabled)
 
 void RtSourceDataWorker::setSFreq(double sFreq)
 {
-    QMutexLocker locker(&m_mutex);
-    m_dSFreq = qMax(1.0, sFreq);
+    std::scoped_lock locker(m_mutex);
+    m_dSFreq = std::max(1.0, sFreq);
 }
 
 //=============================================================================================================
 
-void RtSourceDataWorker::setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
-                                         const QVector<uint32_t>& baseColorsRh)
+void RtSourceDataWorker::setSurfaceColor(const std::vector<uint32_t>& baseColorsLh,
+                                         const std::vector<uint32_t>& baseColorsRh)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_baseColorsLh = baseColorsLh;
     m_baseColorsRh = baseColorsRh;
 }
@@ -148,7 +146,7 @@ void RtSourceDataWorker::setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
 
 void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_bStreamSmoothedData = bStreamSmoothedData;
 }
 
@@ -156,14 +154,15 @@ void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
 
 void RtSourceDataWorker::streamData()
 {
-    QMutexLocker locker(&m_mutex);
+    std::unique_lock locker(m_mutex);
 
     // Try to get data from queue
     Eigen::VectorXd vecCurrentData;
 
-    if (!m_lDataQ.isEmpty()) {
-        vecCurrentData = m_lDataQ.takeFirst();
-    } else if (m_bIsLooping && !m_lDataLoopQ.isEmpty()) {
+    if (!m_lDataQ.empty()) {
+        vecCurrentData = std::move(m_lDataQ.front());
+        m_lDataQ.pop_front();
+    } else if (m_bIsLooping && !m_lDataLoopQ.empty()) {
         // Loop: replay from stored data
         vecCurrentData = m_lDataLoopQ[m_iCurrentSample % m_lDataLoopQ.size()];
         m_iCurrentSample++;
@@ -211,8 +210,7 @@ void RtSourceDataWorker::streamData()
     if (vecAbsData.size() != nTotalExpected && nTotalExpected > 0) {
         // Try to use whatever data we have
         if (vecAbsData.size() < nTotalExpected) {
-            qWarning() << "RtSourceDataWorker: Data size" << vecAbsData.size()
-                       << "< expected" << nTotalExpected;
+            mne::Log::warning("RtSourceDataWorker: Data size {} < expected {}", vecAbsData.size(), nTotalExpected);
             return;
         }
     }
@@ -238,8 +236,8 @@ void RtSourceDataWorker::streamData()
     }
 
     // Compute per-vertex colors for each hemisphere
-    QVector<uint32_t> colorsLh = computeHemiColors(dataLh, m_interpMatLh, m_baseColorsLh);
-    QVector<uint32_t> colorsRh = computeHemiColors(dataRh, m_interpMatRh, m_baseColorsRh);
+    std::vector<uint32_t> colorsLh = computeHemiColors(dataLh, m_interpMatLh, m_baseColorsLh);
+    std::vector<uint32_t> colorsRh = computeHemiColors(dataRh, m_interpMatRh, m_baseColorsRh);
 
     // Unlock before emitting (avoid deadlock if slot is direct connection)
     locker.unlock();
@@ -249,22 +247,22 @@ void RtSourceDataWorker::streamData()
 
 //=============================================================================================================
 
-QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
+std::vector<uint32_t> RtSourceDataWorker::computeHemiColors(
     const Eigen::VectorXf& sourceData,
-    const QSharedPointer<Eigen::SparseMatrix<float>>& interpMat,
-    const QVector<uint32_t>& baseColors) const
+    const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat,
+    const std::vector<uint32_t>& baseColors) const
 {
     if (sourceData.size() == 0 || !interpMat || interpMat->rows() == 0) {
-        return QVector<uint32_t>();
+        return std::vector<uint32_t>();
     }
 
     // Interpolate source data to all surface vertices
     Eigen::VectorXf interpolated = (*interpMat) * sourceData;
 
     int nVertices = interpolated.size();
-    QVector<uint32_t> colors(nVertices);
+    std::vector<uint32_t> colors(nVertices);
 
-    bool hasBaseColors = (baseColors.size() == nVertices);
+    bool hasBaseColors = (std::ssize(baseColors) == nVertices);
 
     double range = m_dThreshMax - m_dThreshMin;
     if (range <= 0.0)
@@ -275,7 +273,7 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
 
         // Normalize based on thresholds
         double normalized = (static_cast<double>(value) - m_dThreshMin) / range;
-        normalized = qBound(0.0, normalized, 1.0);
+        normalized = std::clamp(normalized, 0.0, 1.0);
 
         // Calculate alpha based on threshold
         uint8_t alpha = 255;

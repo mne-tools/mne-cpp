@@ -46,7 +46,7 @@ using namespace mne;
 //=============================================================================================================
 
 AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
-                                             const QMap<QString, int>& mapStimChsIndexNames,
+                                             const std::map<std::string, int>& mapStimChsIndexNames,
                                              QWidget* parent)
 : AbstractView(parent)
 , m_pUi(std::make_unique<Ui::AverageSettingsViewWidget>())
@@ -72,9 +72,9 @@ AveragingSettingsView::~AveragingSettingsView()
 
 //=============================================================================================================
 
-void AveragingSettingsView::setStimChannels(const QMap<QString, int>& mapStimChsIndexNames)
+void AveragingSettingsView::setStimChannels(const std::map<std::string, int>& mapStimChsIndexNames)
 {
-    if (!mapStimChsIndexNames.isEmpty()) {
+    if (!mapStimChsIndexNames.empty()) {
         m_mapStimChsIndexNames = mapStimChsIndexNames;
         fillStimChannels();
     }
@@ -88,13 +88,11 @@ void AveragingSettingsView::fillStimChannels()
         const QSignalBlocker blocker(m_pUi->m_pComboBoxChSelection);
         m_pUi->m_pComboBoxChSelection->clear();
 
-        QMapIterator<QString, int> i(m_mapStimChsIndexNames);
-        while (i.hasNext()) {
-            i.next();
-            m_pUi->m_pComboBoxChSelection->addItem(i.key(), i.value());
+        for (const auto& [name, index] : m_mapStimChsIndexNames) {
+            m_pUi->m_pComboBoxChSelection->addItem(QString::fromStdString(name), index);
         }
 
-        m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
+        m_pUi->m_pComboBoxChSelection->setCurrentText(QString::fromStdString(m_sCurrentStimChan));
     }
 
     connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
@@ -103,7 +101,7 @@ void AveragingSettingsView::fillStimChannels()
 
 //=============================================================================================================
 
-QString AveragingSettingsView::getCurrentStimCh()
+std::string AveragingSettingsView::getCurrentStimCh()
 {
     return m_sCurrentStimChan;
 }
@@ -161,7 +159,7 @@ int AveragingSettingsView::getStimChannelIdx()
 
 void AveragingSettingsView::redrawGUI()
 {
-    if (!m_mapStimChsIndexNames.isEmpty()) {
+    if (!m_mapStimChsIndexNames.empty()) {
         fillStimChannels();
     }
 
@@ -265,7 +263,7 @@ void AveragingSettingsView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/preStimSeconds"), m_iPreStimSeconds);
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/postStimSeconds"), m_iPostStimSeconds);
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), m_iNumAverages);
-    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), m_sCurrentStimChan);
+    settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), QString::fromStdString(m_sCurrentStimChan));
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineFromSeconds"), m_iBaselineFromSeconds);
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/baselineToSeconds"), m_iBaselineToSeconds);
     settings.setValue(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), m_bDoBaselineCorrection);
@@ -296,7 +294,7 @@ void AveragingSettingsView::loadSettings()
     }
 
     m_iNumAverages = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/numAverages"), 10).toInt();
-    m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), "STI 014").toString();
+    m_sCurrentStimChan = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/currentStimChannel"), "STI 014").toString().toStdString();
     m_bDoBaselineCorrection = settings.value(m_sSettingsPath + QString("/AveragingSettingsView/doBaselineCorrection"), false).toBool();
 }
 
@@ -423,7 +421,7 @@ void AveragingSettingsView::onChangeBaselineActive(bool bActive)
 
 void AveragingSettingsView::onChangeStimChannel()
 {
-    m_sCurrentStimChan = m_pUi->m_pComboBoxChSelection->currentText();
+    m_sCurrentStimChan = m_pUi->m_pComboBoxChSelection->currentText().toStdString();
 
     emit changeStimChannel(m_sCurrentStimChan);
 

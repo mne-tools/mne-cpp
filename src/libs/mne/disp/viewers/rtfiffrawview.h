@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -49,7 +48,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <span>
+#include <string>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -149,7 +152,7 @@ public:
      *
      * @param[in] lMatData    The new data.
      */
-    void addData(const QList<Eigen::MatrixXd>& lMatData);
+    void addData(std::span<const Eigen::MatrixXd> lMatData);
 
     //=========================================================================================================
     /**
@@ -193,7 +196,7 @@ public:
      *
      * @return    The current scaling map.
      */
-    QMap<qint32, float> getScalingMap();
+    std::map<int, float> getScalingMap();
 
     //=========================================================================================================
     /**
@@ -201,7 +204,7 @@ public:
      *
      * @param[in] scaleMap QMap with scaling values which is to be broadcasted to the model.
      */
-    void setScalingMap(const QMap<qint32, float>& scaleMap);
+    void setScalingMap(const std::map<int, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -239,7 +242,7 @@ public:
      *
      * @param[in] selectedChannels list of all channel names which are currently selected in the selection manager.
      */
-    void showSelectedChannelsOnly(const QStringList& selectedChannels);
+    void showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -350,9 +353,9 @@ public:
      * @param[in] triggerCh      current trigger channel to scan.
      * @param[in] threshold      threshold for the detection process.
      */
-    void triggerInfoChanged(const QMap<double, QColor>& colorMap,
+    void triggerInfoChanged(const std::map<double, QColor>& colorMap,
                             bool active,
-                            const QString& triggerCh,
+                            const std::string& triggerCh,
                             double threshold);
 
     //=========================================================================================================
@@ -512,18 +515,18 @@ protected:
     QPointer<mne::disp::RtFiffRawViewDelegate> m_pDelegate; /**< The channel data delegate. */
     QPointer<mne::disp::RtFiffRawViewModel> m_pModel;       /**< The channel data model. */
 
-    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
+    std::map<int, float> m_qMapChScaling; /**< Channel scaling values. */
 
-    qint32 m_iT;                                /**< Display window size in seconds. */
-    std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< FiffInfo, which is used insteadd of ListChInfo*/
-    float m_fSamplingRate;                      /**< Sampling rate. */
-    float m_fZoomFactor;                        /**< Zoom factor. */
-    QList<qint32> m_qListBadChannels;           /**< Current list of bad channels . */
-    QList<qint32> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda . */
-    bool m_bHideBadChannels;                    /**< hide bad channels flag. */
-    QStringList m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
-    QColor m_backgroundColor;                   /**< Current background color. */
-    int m_iDistanceTimeSpacer;                  /**< Current distance between time spacer. */
+    qint32 m_iT;                                   /**< Display window size in seconds. */
+    std::shared_ptr<mne::FiffInfo> m_pFiffInfo;    /**< FiffInfo, which is used insteadd of ListChInfo*/
+    float m_fSamplingRate;                         /**< Sampling rate. */
+    float m_fZoomFactor;                           /**< Zoom factor. */
+    std::vector<int> m_qListBadChannels;           /**< Current list of bad channels . */
+    std::vector<int> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda . */
+    bool m_bHideBadChannels;                       /**< hide bad channels flag. */
+    std::vector<std::string> m_slSelectedChannels; /**< the currently selected channels from the selection manager window. */
+    QColor m_backgroundColor;                      /**< Current background color. */
+    int m_iDistanceTimeSpacer;                     /**< Current distance between time spacer. */
     int m_iClickPosX;
     bool m_bCrosshairEnabled; /**< Whether the crosshair follows the mouse. */
 
@@ -545,7 +548,7 @@ signals:
      * Emmited when trigger detection was performed
      */
     void triggerDetected(int numberDetectedTriggers,
-                         const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
+                         const std::map<int, std::vector<std::pair<int, double>>>& mapDetectedTriggers);
 
     //=========================================================================================================
     /**

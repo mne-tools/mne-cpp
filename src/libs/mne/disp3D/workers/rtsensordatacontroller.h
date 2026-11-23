@@ -37,8 +37,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,19 +48,25 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QThread;
-class QTimer;
+namespace mne
+{
+class ThreadPool;
+}
 
 namespace mne::disp
 {
 
 class RtSensorDataWorker;
+class PeriodicTask;
 class RtSensorInterpolationMatWorker;
 
 //=============================================================================================================
@@ -130,7 +134,7 @@ public:
      * @param[in] surfaceKey Key of the surface the matrix maps onto; colours are emitted for it.
      * @param[in] mat        Dense mapping matrix.
      */
-    void setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
+    void setMappingMatrix(const std::string& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
 
     //=========================================================================================================
     /**
@@ -170,7 +174,7 @@ public:
      *
      * @param[in] name       Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString& name);
+    void setColormapType(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -252,7 +256,7 @@ public:
      * @param[in] normals       Vertex normals (nVerts x 3).
      * @param[in] triangles     Triangle indices (nTris x 3).
      */
-    void setMegSurface(const QString& surfaceKey,
+    void setMegSurface(const std::string& surfaceKey,
                        const Eigen::MatrixX3f& vertices,
                        const Eigen::MatrixX3f& normals,
                        const Eigen::MatrixX3i& triangles);
@@ -264,7 +268,7 @@ public:
      * @param[in] surfaceKey    The key identifying the surface.
      * @param[in] vertices      Vertex positions (nVerts x 3).
      */
-    void setEegSurface(const QString& surfaceKey,
+    void setEegSurface(const std::string& surfaceKey,
                        const Eigen::MatrixX3f& vertices);
 
     //=========================================================================================================
@@ -273,7 +277,7 @@ public:
      *
      * @param[in] bads    List of bad channel names.
      */
-    void setBadChannels(const QStringList& bads);
+    void setBadChannels(const std::vector<std::string>& bads);
 
     //=========================================================================================================
     /**
@@ -291,8 +295,8 @@ signals:
      * @param[in] surfaceKey  Key identifying the target surface.
      * @param[in] colors      Per-vertex ABGR color array.
      */
-    void newSensorColorsAvailable(const QString& surfaceKey,
-                                  const QVector<uint32_t>& colors);
+    void newSensorColorsAvailable(const std::string& surfaceKey,
+                                  const std::vector<uint32_t>& colors);
 
     //=========================================================================================================
     /**
@@ -310,9 +314,9 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newMegMappingAvailable(const QString& surfaceKey,
+    void newMegMappingAvailable(const std::string& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int>& pick);
+                                const std::vector<int>& pick);
 
     //=========================================================================================================
     /**
@@ -322,26 +326,26 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newEegMappingAvailable(const QString& surfaceKey,
+    void newEegMappingAvailable(const std::string& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int>& pick);
+                                const std::vector<int>& pick);
 
 private slots:
-    void onNewMegMapping(const QString& surfaceKey,
+    void onNewMegMapping(const std::string& surfaceKey,
                          std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const QVector<int>& pick);
-    void onNewEegMapping(const QString& surfaceKey,
+                         const std::vector<int>& pick);
+    void onNewEegMapping(const std::string& surfaceKey,
                          std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                         const QVector<int>& pick);
+                         const std::vector<int>& pick);
 
 private:
-    QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
     mne::disp::RtSensorDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
-    QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
+    std::unique_ptr<PeriodicTask> m_pStreamTask;        /**< Streaming thread driving the cadence. */
     bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
-    QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
+    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                       /**< Single thread running interpolation recomputations in order. */
+    std::atomic<bool> m_bShuttingDown{false};                             /**< Set in the destructor; queued recomputations are skipped. */
     mne::disp::RtSensorInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 

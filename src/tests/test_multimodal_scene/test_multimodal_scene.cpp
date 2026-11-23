@@ -105,7 +105,7 @@ void TestMultimodalScene::testIsHitHelper()
 namespace
 {
 
-SceneLayer makeLayer(const QString& id,
+SceneLayer makeLayer(const std::string& id,
                      SceneLayerKind kind = SceneLayerKind::Custom,
                      int drawOrder = 0)
 {
@@ -127,7 +127,7 @@ void TestMultimodalScene::testAddAndFindLayer()
     s.addLayer(makeLayer("cortex_lh", SceneLayerKind::BrainSurface));
 
     QCOMPARE(spy.count(), 1);
-    QCOMPARE(s.layers().size(), 1);
+    QCOMPARE(s.layers().size(), std::size_t(1));
     const SceneLayer* l = s.findLayer("cortex_lh");
     QVERIFY(l != nullptr);
     QCOMPARE(l->kind, SceneLayerKind::BrainSurface);
@@ -143,7 +143,7 @@ void TestMultimodalScene::testAddReplacesByIdInPlace()
     replacement.displayName = "replaced";
     s.addLayer(replacement);
 
-    QCOMPARE(s.layers().size(), 1);
+    QCOMPARE(s.layers().size(), std::size_t(1));
     QCOMPARE(s.findLayer("seeg_LH")->displayName, QString("replaced"));
 }
 
@@ -156,8 +156,8 @@ void TestMultimodalScene::testRemoveLayer()
     QSignalSpy spy(&s, &MultimodalScene::layersChanged);
     QVERIFY(s.removeLayer("a"));
     QCOMPARE(spy.count(), 1);
-    QCOMPARE(s.layers().size(), 1);
-    QCOMPARE(s.layers().first().id, QString("b"));
+    QCOMPARE(s.layers().size(), std::size_t(1));
+    QCOMPARE(s.layers().front().id, std::string("b"));
 }
 
 void TestMultimodalScene::testRemoveUnknownLayerReturnsFalse()
@@ -174,7 +174,7 @@ void TestMultimodalScene::testClearEmitsLayersChanged()
     QSignalSpy spy(&s, &MultimodalScene::layersChanged);
     s.clear();
     QCOMPARE(spy.count(), 1);
-    QVERIFY(s.layers().isEmpty());
+    QVERIFY(s.layers().empty());
 
     // Clearing an already-empty scene is a no-op (no spurious signal).
     s.clear();
@@ -187,7 +187,7 @@ void TestMultimodalScene::testRejectsEmptyId()
     QSignalSpy spy(&s, &MultimodalScene::layersChanged);
     s.addLayer(makeLayer(""));
     QCOMPARE(spy.count(), 0);
-    QVERIFY(s.layers().isEmpty());
+    QVERIFY(s.layers().empty());
 }
 
 //=============================================================================================================
@@ -203,7 +203,7 @@ void TestMultimodalScene::testLayersSortedByKindThenDrawOrder()
     s.addLayer(makeLayer("cortex", SceneLayerKind::BrainSurface));
 
     const auto layers = s.layers();
-    QCOMPARE(layers.size(), 3);
+    QCOMPARE(layers.size(), std::size_t(3));
     QCOMPARE(layers[0].kind, SceneLayerKind::BrainSurface);
     QCOMPARE(layers[1].kind, SceneLayerKind::Electrode);
     QCOMPARE(layers[2].kind, SceneLayerKind::Network);
@@ -216,8 +216,8 @@ void TestMultimodalScene::testDrawOrderTieBreaker()
     s.addLayer(makeLayer("seeg_a", SceneLayerKind::Electrode, /*drawOrder*/ 1));
 
     const auto layers = s.layers();
-    QCOMPARE(layers.first().id, QString("seeg_a"));
-    QCOMPARE(layers.last().id, QString("seeg_b"));
+    QCOMPARE(layers.front().id, std::string("seeg_a"));
+    QCOMPARE(layers.back().id, std::string("seeg_b"));
 }
 
 //=============================================================================================================
@@ -334,7 +334,7 @@ void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
     // Each Custom layer reports a fixed AABB via the extras map.
     s.registerBoundsFn(SceneLayerKind::Custom,
                        [](const SceneLayer& l, QVector3D& mn, QVector3D& mx) {
-                           if (l.id == QString("a")) {
+                           if (l.id == "a") {
                                mn = QVector3D(-1, -1, -1);
                                mx = QVector3D(1, 1, 1);
                                return true;

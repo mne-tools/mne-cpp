@@ -36,9 +36,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <memory>
+#include <string>
 #include <utility>
 
 //*************************************************************************************************************
@@ -181,8 +183,12 @@ void DataWindow::scaleData(const QMap<QString, double>& scaleMap)
     updateDataTableViews();
 
     // Forward to the GPU-based channel data view
-    if (m_pChannelDataView && m_pChannelDataView->model())
-        m_pChannelDataView->model()->setScaleMapFromStrings(scaleMap);
+    if (m_pChannelDataView && m_pChannelDataView->model()) {
+        std::map<std::string, double> scales;
+        for (auto it = scaleMap.cbegin(); it != scaleMap.cend(); ++it)
+            scales[it.key().toStdString()] = it.value();
+        m_pChannelDataView->model()->setScaleMapFromStrings(scales);
+    }
 }
 
 
@@ -256,7 +262,7 @@ void DataWindow::computeAutoScale()
     }
 
     // Compute auto-scale: use 3× RMS as the half-range so ~99% of signal fits
-    QMap<qint32, float> autoScaleMap;
+    std::map<int, float> autoScaleMap;
     for (auto it = typeStats.constBegin(); it != typeStats.constEnd(); ++it) {
         if (it.value().count > 0) {
             double rms = std::sqrt(it.value().sumSq / it.value().count);
@@ -267,11 +273,11 @@ void DataWindow::computeAutoScale()
     }
 
     // Apply to the GPU model (and cache in the view for restartChannelView)
-    if (m_pChannelDataView && !autoScaleMap.isEmpty()) {
+    if (m_pChannelDataView && !autoScaleMap.empty()) {
         m_pChannelDataView->setScalingMap(autoScaleMap);
         mne::Log::warning("[DataWindow] Auto-scale applied: {} channel types.", autoScaleMap.size());
-        for (auto it = autoScaleMap.constBegin(); it != autoScaleMap.constEnd(); ++it)
-            mne::Log::warning("  typeKey= {} scale= {}", it.key(), it.value());
+        for (auto it = autoScaleMap.cbegin(); it != autoScaleMap.cend(); ++it)
+            mne::Log::warning("  typeKey= {} scale= {}", it->first, it->second);
     }
 }
 
@@ -296,7 +302,7 @@ void DataWindow::updateDataTableViews()
 
 //=============================================================================================================
 
-const QVector<mne::disp::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
+const std::vector<mne::disp::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
 {
     return m_stimEvents;
 }
@@ -333,16 +339,16 @@ QColor DataWindow::eventTypeColor(int type)
 
 //*************************************************************************************************************
 
-void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
+void DataWindow::showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels)
 {
     m_slSelectedChannels = selectedChannels;
 
     //Hide non selected channels/rows in the data views
     for (int i = 0; i < m_pRawModel->rowCount(); i++) {
-        QString channel = m_pRawModel->data(m_pRawModel->index(i, 0), Qt::DisplayRole).toString();
+        const std::string channel = m_pRawModel->data(m_pRawModel->index(i, 0), Qt::DisplayRole).toString().toStdString();
         QVariant v = m_pRawModel->data(m_pRawModel->index(i, 1), Qt::BackgroundRole);
 
-        if (!selectedChannels.contains(channel))
+        if (!std::ranges::contains(selectedChannels, channel))
             ui->m_tableView_rawTableView->hideRow(i);
         else
             ui->m_tableView_rawTableView->showRow(i);
@@ -385,7 +391,7 @@ void DataWindow::hideBadChannels(bool hideChannels)
         //Check if channel is marked as bad
         if (v.canConvert<QBrush>() && m_bHideBadChannels)
             ui->m_tableView_rawTableView->hideRow(i);
-        else if (m_slSelectedChannels.contains(chName))
+        else if (std::ranges::contains(m_slSelectedChannels, chName.toStdString()))
             ui->m_tableView_rawTableView->showRow(i);
     }
 
@@ -397,7 +403,7 @@ void DataWindow::hideBadChannels(bool hideChannels)
 
 //*************************************************************************************************************
 
-void DataWindow::setAnnotations(const QVector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations)
+void DataWindow::setAnnotations(const std::vector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations)
 {
     if (m_pChannelDataView) {
         m_pChannelDataView->setAnnotations(annotations);
@@ -617,14 +623,14 @@ void DataWindow::updateTimeRulerMarkers()
         return;
     }
 
-    QVector<mne::disp::TimeRulerReferenceMark> marks;
+    std::vector<mne::disp::TimeRulerReferenceMark> marks;
     marks.reserve(m_dataMarkers.size());
     for (const PersistentMarker& marker : std::as_const(m_dataMarkers)) {
         QString label = QStringLiteral("M%1").arg(marker.id);
         if (marker.id == m_iActiveMarkerId) {
             label.append(QLatin1Char('*'));
         }
-        marks.append({marker.sample, marker.color, label});
+        marks.push_back({marker.sample, marker.color, label.toStdString()});
     }
 
     m_pChannelDataView->setReferenceMarkers(marks);
@@ -1048,10 +1054,10 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
                         ev.sample = absSample;
                         ev.type = type;
                         ev.color = eventTypeColor(type);
-                        ev.label = QString::number(type);
+                        ev.label = std::to_string(type);
 
                         m_seenStimEventKeys.insert(key);
-                        m_stimEvents.append(ev);
+                        m_stimEvents.push_back(ev);
                         eventsChanged = true;
                     }
                 }
@@ -1103,7 +1109,7 @@ void DataWindow::rebuildVirtualChannels()
         channelIndexByName.insert(QString::fromStdString(fiffInfo->ch_names.at(channelIndex)).trimmed(), channelIndex);
     }
 
-    QVector<mne::disp::ChannelDisplayInfo> virtualDisplayInfo;
+    std::vector<mne::disp::ChannelDisplayInfo> virtualDisplayInfo;
     virtualDisplayInfo.reserve(m_virtualChannelDefinitions.size());
 
     for (const VirtualChannelDefinition& definition : std::as_const(m_virtualChannelDefinitions)) {
@@ -1195,7 +1201,7 @@ void DataWindow::rebuildVirtualChannels()
         resolvedChannel.primaryChannel = primaryChannel;
         resolvedChannel.referenceChannels = referenceChannels;
         resolvedChannel.referenceWeights = referenceWeights;
-        resolvedChannel.displayInfo.name = definition.name;
+        resolvedChannel.displayInfo.name = definition.name.toStdString();
         bool sameKind = true;
         float amplitudeMax = amplitudeForChannel(primaryChannelInfo);
         for (int referenceChannel : referenceChannels) {
@@ -1204,8 +1210,8 @@ void DataWindow::rebuildVirtualChannels()
             amplitudeMax = qMax(amplitudeMax, amplitudeForChannel(referenceChannelInfo));
         }
         resolvedChannel.displayInfo.typeLabel = sameKind
-            ? typeLabelForKind(primaryChannelInfo.kind)
-            : QStringLiteral("MISC");
+            ? typeLabelForKind(primaryChannelInfo.kind).toStdString()
+            : std::string("MISC");
         resolvedChannel.displayInfo.color = colorForKind(primaryChannelInfo.kind).darker(115);
         resolvedChannel.displayInfo.amplitudeMax = amplitudeMax;
         if (resolvedChannel.displayInfo.amplitudeMax <= 0.f) {
@@ -1215,7 +1221,7 @@ void DataWindow::rebuildVirtualChannels()
         resolvedChannel.displayInfo.isVirtualChannel = true;
 
         m_resolvedVirtualChannels.append(resolvedChannel);
-        virtualDisplayInfo.append(resolvedChannel.displayInfo);
+        virtualDisplayInfo.push_back(resolvedChannel.displayInfo);
     }
 
     m_pChannelDataView->model()->setVirtualChannels(virtualDisplayInfo);

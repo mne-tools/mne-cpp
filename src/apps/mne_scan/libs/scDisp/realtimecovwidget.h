@@ -39,7 +39,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -130,7 +132,7 @@ protected:
     /**
      * Show modality view.
      */
-    void onNewModalitySelection(const QMap<QString, bool>& modalityMap);
+    void onNewModalitySelection(const std::map<std::string, bool>& modalityMap);
 
     QSharedPointer<mne::scan::RealTimeCov> m_pRTC; /**< The real-time covariance measurement. */
 
@@ -139,7 +141,7 @@ protected:
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< The Fiff Info. */
 
-    QMap<QString, bool> m_modalityMap; /**< Map of different modalities. */
+    std::map<std::string, bool> m_modalityMap; /**< Map of different modalities. */
 
     QPointer<mne::disp::ImageSc> m_pImageSc; /**< The covariance colormap. */
 

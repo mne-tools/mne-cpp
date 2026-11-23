@@ -42,8 +42,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
 class QDoubleSpinBox;
 
@@ -140,7 +141,7 @@ public:
      *
      * @param [in] mappedChannelNames all mapped channel names
      */
-    void setMappedChannelNames(QStringList mappedChannelNames);
+    void setMappedChannelNames(const std::vector<std::string>& mappedChannelNames);
 
     //=========================================================================================================
     /**
@@ -317,7 +318,7 @@ private:
 
     QList<QColor> m_lButterflyColors; /**< List which holds 500 randomly generated colors.*/
 
-    QStringList m_mappedChannelNames; /**< List which holds the mapped channel names.*/
+    std::vector<std::string> m_mappedChannelNames; /**< List which holds the mapped channel names.*/
 
     AverageModel* m_pAverageModel;       /**< The QAbstractTable average model being part of the model/view framework of Qt. */
     AverageDelegate* m_pAverageDelegate; /**< The QItemDelegateaverage delegate being part of the model/view framework of Qt. */

@@ -23,7 +23,6 @@
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QVector3D>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -31,6 +30,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <vector>
 
 namespace mne::disp
 {
@@ -58,7 +58,7 @@ PolylineObject::~PolylineObject() = default;
 
 //=============================================================================================================
 
-void PolylineObject::setPoints(const QVector<Eigen::Vector3f>& vecPoints)
+void PolylineObject::setPoints(const std::vector<Eigen::Vector3f>& vecPoints)
 {
     // A single point has no segment, so it is treated the same as no data at
     // all rather than drawn as a degenerate line.
@@ -103,7 +103,7 @@ void PolylineObject::setGradient(const QColor& startColor,
 
 void PolylineObject::createSegmentGeometry()
 {
-    if (!m_vertexData.isEmpty()) {
+    if (!m_vertexData.empty()) {
         return;
     }
 
@@ -143,10 +143,8 @@ void PolylineObject::createSegmentGeometry()
         indices.push_back(uNextBottom);
     }
 
-    m_vertexData = QByteArray(reinterpret_cast<const char*>(vertices.data()),
-                              static_cast<qsizetype>(vertices.size() * sizeof(VertexData)));
-    m_indexData = QByteArray(reinterpret_cast<const char*>(indices.data()),
-                             static_cast<qsizetype>(indices.size() * sizeof(quint32)));
+    m_vertexData = toByteBuffer(vertices);
+    m_indexData = toByteBuffer(indices);
     m_iIndexCount = static_cast<int>(indices.size());
     ++m_geometryGeneration;
 }
@@ -161,7 +159,7 @@ void PolylineObject::buildInstances()
         return;
     }
 
-    const int iSegmentCount = m_vecPoints.size() - 1;
+    const int iSegmentCount = static_cast<int>(m_vecPoints.size()) - 1;
     std::vector<InstanceData> instances;
     instances.reserve(static_cast<size_t>(iSegmentCount));
 
@@ -213,8 +211,7 @@ void PolylineObject::buildInstances()
         instances.push_back(instance);
     }
 
-    m_instanceData = QByteArray(reinterpret_cast<const char*>(instances.data()),
-                                static_cast<qsizetype>(instances.size() * sizeof(InstanceData)));
+    m_instanceData = toByteBuffer(instances);
     m_iInstanceCount = static_cast<int>(instances.size());
     ++m_instanceGeneration;
 }
@@ -223,9 +220,9 @@ void PolylineObject::buildInstances()
 
 InstancedStreams PolylineObject::streams() const
 {
-    return {{m_vertexData.constData(), quint32(m_vertexData.size()), m_geometryGeneration},
-            {m_indexData.constData(), quint32(m_indexData.size()), m_geometryGeneration},
-            {m_instanceData.constData(), quint32(m_iInstanceCount * sizeof(InstanceData)), m_instanceGeneration},
+    return {{m_vertexData.data(), quint32(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.data(), quint32(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.data(), quint32(m_iInstanceCount * sizeof(InstanceData)), m_instanceGeneration},
             m_iIndexCount,
             m_iInstanceCount};
 }

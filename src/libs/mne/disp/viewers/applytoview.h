@@ -34,6 +34,8 @@
 //=============================================================================================================
 
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -106,7 +108,7 @@ public:
      */
     void clearView();
 
-    QList<QString> getSelectedViews();
+    std::vector<std::string> getSelectedViews();
 
 protected:
     //=========================================================================================================
@@ -127,7 +129,7 @@ protected:
 
     QString m_sSettingsPath;
 
-    QList<QString> m_lViewList;
+    std::vector<std::string> m_lViewList;
 
     std::unique_ptr<Ui::ApplyToViewWidget> m_pUi;
 };

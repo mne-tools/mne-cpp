@@ -81,10 +81,10 @@ void ProjectorsView::setProjectors(const std::vector<mne::FiffProj>& projs)
     m_pProjs = projs;
 
     for (int i = 0; i < std::ssize(m_pProjs); ++i) {
-        if (!m_mapProjActive.contains(QString::fromStdString(m_pProjs.at(i).desc))) {
-            m_mapProjActive.insert(QString::fromStdString(m_pProjs.at(i).desc), m_pProjs.at(i).active);
+        if (!m_mapProjActive.contains(m_pProjs.at(i).desc)) {
+            m_mapProjActive.insert_or_assign(m_pProjs.at(i).desc, m_pProjs.at(i).active);
         } else {
-            m_pProjs[i].active = m_mapProjActive[QString::fromStdString(m_pProjs.at(i).desc)];
+            m_pProjs[i].active = m_mapProjActive[m_pProjs.at(i).desc];
         }
     }
 
@@ -154,9 +154,9 @@ void ProjectorsView::saveSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
 
-    QMap<QString, bool>::const_iterator iProj = m_mapProjActive.constBegin();
-    while (iProj != m_mapProjActive.constEnd()) {
-        settings.setValue(iProj.key(), iProj.value());
+    std::map<std::string, bool>::const_iterator iProj = m_mapProjActive.cbegin();
+    while (iProj != m_mapProjActive.cend()) {
+        settings.setValue(QString::fromStdString(iProj->first), iProj->second);
         ++iProj;
     }
 
@@ -175,9 +175,8 @@ void ProjectorsView::loadSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/ProjectorsView/projectorsActive"));
 
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
-        m_mapProjActive[key] = settings.value(key).toBool();
+    for (const QString& key : settings.childKeys()) {
+        m_mapProjActive[key.toStdString()] = settings.value(key).toBool();
     }
     settings.endGroup();
 }
@@ -218,7 +217,7 @@ void ProjectorsView::onEnableDisableAllProj(bool status)
     //Set all projection activation states to status
     for (int i = 0; i < std::ssize(m_pProjs); ++i) {
         m_pProjs[i].active = status;
-        m_mapProjActive[QString::fromStdString(m_pProjs.at(i).desc)] = status;
+        m_mapProjActive[m_pProjs.at(i).desc] = status;
     }
 
     if (m_pEnableDisableProjectors) {
@@ -242,7 +241,7 @@ void ProjectorsView::onCheckProjStatusChanged()
         }
 
         m_pProjs[i].active = m_qListProjCheckBox.at(i)->isChecked();
-        m_mapProjActive[QString::fromStdString(m_pProjs.at(i).desc)] = m_qListProjCheckBox.at(i)->isChecked();
+        m_mapProjActive[m_pProjs.at(i).desc] = m_qListProjCheckBox.at(i)->isChecked();
     }
 
     if (m_pEnableDisableProjectors) {

@@ -301,10 +301,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
         //        }
 
         // Scaling
-        QStringList channelTypes;
-        for (const std::string& type : m_pFiffInfo->get_channel_types())
-            channelTypes << QString::fromStdString(type);
-        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), 0, Qt::Widget, channelTypes);
+        ScalingView* pScalingView = new ScalingView(QString("MNESCAN/RTESW"), 0, Qt::Widget, m_pFiffInfo->get_channel_types());
         pScalingView->setObjectName("group_tab_View_Scaling");
         lControlWidgets.append(pScalingView);
 
@@ -319,7 +316,7 @@ void RealTimeEvokedSetWidget::initDisplayControllWidgets()
 
         // Quick control channel data settings
         FiffRawViewSettings* pChannelDataSettingsView = new FiffRawViewSettings(QString("MNESCAN/RTESW"));
-        pChannelDataSettingsView->setWidgetList(QStringList() << "screenshot" << "backgroundColor");
+        pChannelDataSettingsView->setWidgetList({"screenshot", "backgroundColor"});
         pChannelDataSettingsView->setObjectName("group_tab_View_General");
         lControlWidgets.append(pChannelDataSettingsView);
 

@@ -33,10 +33,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -126,11 +127,12 @@ int runAcqView(AcqDevice& device, double window, double duration, const QString&
             const auto bar = static_cast<int>(next % static_cast<std::uint64_t>(width));
             // Events older than one sweep have been overwritten.
             std::erase_if(events, [&](const AcqEvent& e) { return e.sample + static_cast<std::uint64_t>(width) < next; });
-            QVector<ChannelRhiView::EventMarker> markers;
+            std::vector<ChannelRhiView::EventMarker> markers;
+            markers.reserve(events.size() + 1);
             for (const AcqEvent& e : events) {
-                markers.append({static_cast<int>(e.sample % static_cast<std::uint64_t>(width)), e.code, QColor(), QString::number(e.code)});
+                markers.push_back({static_cast<int>(e.sample % static_cast<std::uint64_t>(width)), e.code, QColor(), std::to_string(e.code)});
             }
-            markers.append({bar, 0, QColor(0, 110, 230), QStringLiteral("now")});
+            markers.push_back({bar, 0, QColor(0, 110, 230), "now"});
             // The time ruler lays out the chips from left to right.
             std::sort(markers.begin(), markers.end(), [](const auto& a, const auto& b) { return a.sample < b.sample; });
             view.setData(sweep, 0);

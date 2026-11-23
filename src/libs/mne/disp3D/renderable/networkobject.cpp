@@ -52,25 +52,25 @@ NetworkObject::~NetworkObject() = default;
 
 InstancedStreams NetworkObject::nodeStreams() const
 {
-    return {{m_nodeVertexData.constData(), static_cast<quint32>(m_nodeVertexData.size()), m_nodeGeometryGeneration},
-            {m_nodeIndexData.constData(), static_cast<quint32>(m_nodeIndexData.size()), m_nodeGeometryGeneration},
-            {m_nodeInstanceData.constData(), static_cast<quint32>(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
+    return {{m_nodeVertexData.data(), static_cast<quint32>(m_nodeVertexData.size()), m_nodeGeometryGeneration},
+            {m_nodeIndexData.data(), static_cast<quint32>(m_nodeIndexData.size()), m_nodeGeometryGeneration},
+            {m_nodeInstanceData.data(), static_cast<quint32>(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
             m_nodeIndexCount,
             m_nodeInstanceCount};
 }
 
 InstancedStreams NetworkObject::edgeStreams() const
 {
-    return {{m_edgeVertexData.constData(), static_cast<quint32>(m_edgeVertexData.size()), m_edgeGeometryGeneration},
-            {m_edgeIndexData.constData(), static_cast<quint32>(m_edgeIndexData.size()), m_edgeGeometryGeneration},
-            {m_edgeInstanceData.constData(), static_cast<quint32>(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
+    return {{m_edgeVertexData.data(), static_cast<quint32>(m_edgeVertexData.size()), m_edgeGeometryGeneration},
+            {m_edgeIndexData.data(), static_cast<quint32>(m_edgeIndexData.size()), m_edgeGeometryGeneration},
+            {m_edgeInstanceData.data(), static_cast<quint32>(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
             m_edgeIndexCount,
             m_edgeInstanceCount};
 }
 
 //=============================================================================================================
 
-void NetworkObject::load(const Network& network, const QString& sColormap)
+void NetworkObject::load(const Network& network, const std::string& sColormap)
 {
     m_network = network;
     m_colormap = sColormap;
@@ -92,7 +92,7 @@ void NetworkObject::setThreshold(double dThreshold)
 
 //=============================================================================================================
 
-void NetworkObject::setColormap(const QString& sColormap)
+void NetworkObject::setColormap(const std::string& sColormap)
 {
     m_colormap = sColormap;
     buildNodeInstances();
@@ -103,7 +103,7 @@ void NetworkObject::setColormap(const QString& sColormap)
 
 void NetworkObject::createNodeGeometry()
 {
-    if (!m_nodeVertexData.isEmpty())
+    if (!m_nodeVertexData.empty())
         return;
 
     // Create an icosphere (subdivision level 1) for nodes
@@ -247,7 +247,7 @@ void NetworkObject::createNodeGeometry()
 
 void NetworkObject::createEdgeGeometry()
 {
-    if (!m_edgeVertexData.isEmpty())
+    if (!m_edgeVertexData.empty())
         return;
 
     // Create a unit cylinder along Y axis (height=1, radius=1, scaled per-instance)
@@ -352,7 +352,7 @@ void NetworkObject::buildNodeInstances()
         iMaxDegree = 1;
 
     const VisualizationInfo& vizInfo = m_network.visualization_info();
-    const QString colormap = vizInfo.colormap.empty() ? m_colormap : QString::fromStdString(vizInfo.colormap);
+    const QString colormap = QString::fromStdString(vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap);
 
     std::vector<InstanceData> instances;
     instances.reserve(nodes.size());
@@ -425,7 +425,7 @@ void NetworkObject::buildEdgeInstances()
         dWeightRange = 1.0;
 
     const VisualizationInfo& vizInfo = m_network.visualization_info();
-    const QString colormap = vizInfo.colormap.empty() ? m_colormap : QString::fromStdString(vizInfo.colormap);
+    const QString colormap = QString::fromStdString(vizInfo.colormap.empty() ? m_colormap : vizInfo.colormap);
 
     std::vector<InstanceData> instances;
     instances.reserve(m_network.edge_count(EdgeSet::thresholded));

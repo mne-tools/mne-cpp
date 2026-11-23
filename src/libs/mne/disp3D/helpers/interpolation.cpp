@@ -17,18 +17,16 @@
 
 #include "interpolation.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSet>
-#include <QDebug>
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,22 +39,22 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float>> Interpolation::createInterpolationMat(const VectorXi& vecProjectedSensors,
-                                                                          const QSharedPointer<MatrixXd> matDistanceTable,
-                                                                          double (*interpolationFunction)(double),
-                                                                          const double dCancelDist,
-                                                                          const VectorXi& vecExcludeIndex)
+std::shared_ptr<SparseMatrix<float>> Interpolation::createInterpolationMat(const VectorXi& vecProjectedSensors,
+                                                                           const std::shared_ptr<MatrixXd>& matDistanceTable,
+                                                                           double (*interpolationFunction)(double),
+                                                                           const double dCancelDist,
+                                                                           const VectorXi& vecExcludeIndex)
 {
     if (matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {
-        qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table.";
-        return QSharedPointer<SparseMatrix<float>>::create();
+        mne::Log::warning("Interpolation::createInterpolationMat - received an empty distance table.");
+        return std::make_shared<SparseMatrix<float>>();
     }
 
-    QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationMatrix = QSharedPointer<SparseMatrix<float>>::create(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
+    std::shared_ptr<Eigen::SparseMatrix<float>> matInterpolationMatrix = std::make_shared<SparseMatrix<float>>(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
 
-    QVector<Triplet<float>> vecNonZeroEntries;
-    const qint32 iRows = matInterpolationMatrix->rows();
-    const qint32 iCols = matInterpolationMatrix->cols();
+    std::vector<Triplet<float>> vecNonZeroEntries;
+    const std::int32_t iRows = matInterpolationMatrix->rows();
+    const std::int32_t iCols = matInterpolationMatrix->cols();
 
     // Build exclude set for O(1) lookup
     std::unordered_set<int> excludeSet;
@@ -64,30 +62,30 @@ QSharedPointer<SparseMatrix<float>> Interpolation::createInterpolationMat(const 
         excludeSet.insert(vecExcludeIndex[i]);
     }
 
-    QSet<qint32> sensorLookup;
+    std::unordered_set<std::int32_t> sensorLookup;
     for (Eigen::Index idx = 0; idx < vecProjectedSensors.size(); ++idx) {
         if (excludeSet.count(static_cast<int>(idx)) == 0) {
             sensorLookup.insert(vecProjectedSensors[idx]);
         }
     }
 
-    for (qint32 r = 0; r < iRows; ++r) {
-        if (sensorLookup.contains(r) == false) {
-            QVector<QPair<qint32, float>> vecBelowThresh;
+    for (std::int32_t r = 0; r < iRows; ++r) {
+        if (!sensorLookup.contains(r)) {
+            std::vector<std::pair<std::int32_t, float>> vecBelowThresh;
             float dWeightsSum = 0.0;
             const RowVectorXd& rowVec = matDistanceTable->row(r);
 
-            for (qint32 c = 0; c < iCols; ++c) {
+            for (std::int32_t c = 0; c < iCols; ++c) {
                 const float dDist = rowVec[c];
 
                 if (dDist < dCancelDist) {
                     const float dValueWeight = std::fabs(1.0 / interpolationFunction(dDist));
                     dWeightsSum += dValueWeight;
-                    vecBelowThresh.push_back(qMakePair(c, dValueWeight));
+                    vecBelowThresh.emplace_back(c, dValueWeight);
                 }
             }
 
-            for (const QPair<qint32, float>& qp : vecBelowThresh) {
+            for (const auto& qp : vecBelowThresh) {
                 vecNonZeroEntries.push_back(Eigen::Triplet<float>(r, qp.first, qp.second / dWeightsSum));
             }
         } else {
@@ -110,11 +108,11 @@ QSharedPointer<SparseMatrix<float>> Interpolation::createInterpolationMat(const 
 
 //=============================================================================================================
 
-VectorXf Interpolation::interpolateSignal(const QSharedPointer<SparseMatrix<float>> matInterpolationMatrix,
-                                          const QSharedPointer<VectorXf>& vecMeasurementData)
+VectorXf Interpolation::interpolateSignal(const std::shared_ptr<SparseMatrix<float>>& matInterpolationMatrix,
+                                          const std::shared_ptr<VectorXf>& vecMeasurementData)
 {
     if (matInterpolationMatrix->cols() != vecMeasurementData->rows()) {
-        qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+        mne::Log::warning("Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...");
         return VectorXf();
     }
 
@@ -128,7 +126,7 @@ VectorXf Interpolation::interpolateSignal(const SparseMatrix<float>& matInterpol
                                           const VectorXf& vecMeasurementData)
 {
     if (matInterpolationMatrix.cols() != vecMeasurementData.rows()) {
-        qDebug() << "[WARNING] Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...";
+        mne::Log::warning("Interpolation::interpolateSignal - Dimension mismatch. Return null pointer...");
         return VectorXf();
     }
 

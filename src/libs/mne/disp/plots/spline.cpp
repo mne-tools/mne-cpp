@@ -22,6 +22,7 @@
 //=============================================================================================================
 
 #include "spline.h"
+#include <mne/base/log.h>
 
 #include "detail/niceticks.h"
 #include "helpers/colormap.h"
@@ -35,7 +36,6 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QLinearGradient>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -178,12 +178,12 @@ void Spline::paintEvent(QPaintEvent* /*event*/)
         painter.restore();
     }
 
-    if (!m_bHasData || m_seriesData.isEmpty())
+    if (!m_bHasData || m_seriesData.empty())
         return;
 
     // Draw spline curve using Catmull-Rom to cubic Bezier conversion
     QPainterPath path;
-    const int n = m_seriesData.size();
+    const int n = static_cast<int>(m_seriesData.size());
 
     if (n == 1) {
         // Single point: draw a dot
@@ -194,7 +194,7 @@ void Spline::paintEvent(QPaintEvent* /*event*/)
     } else {
         // Catmull-Rom spline
         auto getPoint = [this](int idx) -> QPointF {
-            const int count = m_seriesData.size();
+            const int count = static_cast<int>(m_seriesData.size());
             if (idx < 0)
                 idx = 0;
             if (idx >= count)
@@ -245,8 +245,8 @@ void Spline::paintEvent(QPaintEvent* /*event*/)
 
 void Spline::mousePressEvent(QMouseEvent* event)
 {
-    if (!m_bHasData || m_seriesData.isEmpty()) {
-        qDebug() << "Data set not found.";
+    if (!m_bHasData || m_seriesData.empty()) {
+        mne::Log::debug("Data set not found.");
         return;
     }
 
@@ -283,8 +283,8 @@ void Spline::mousePressEvent(QMouseEvent* event)
 
 void Spline::setThreshold(const QVector3D& vecThresholdValues)
 {
-    if (!m_bHasData || m_seriesData.isEmpty()) {
-        qDebug() << "Data set not found.";
+    if (!m_bHasData || m_seriesData.empty()) {
+        mne::Log::debug("Data set not found.");
         return;
     }
 
@@ -293,7 +293,7 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
     // Check if all values are within range
     if (correctedVectorThreshold.x() < m_dMinAxisX || correctedVectorThreshold.y() < m_dMinAxisX || correctedVectorThreshold.z() < m_dMinAxisX ||
         correctedVectorThreshold.x() > m_dMaxAxisX || correctedVectorThreshold.y() > m_dMaxAxisX || correctedVectorThreshold.z() > m_dMaxAxisX) {
-        qDebug() << "One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.";
+        mne::Log::debug("One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.");
         // 1 % inside each end of the span; scaling the limits themselves leaves the axis for negative values
         const double span = m_dMaxAxisX - m_dMinAxisX;
         m_dLeftThreshold = m_dMinAxisX + 0.01 * span;

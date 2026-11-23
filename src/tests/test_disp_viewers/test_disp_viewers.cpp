@@ -227,17 +227,17 @@ void TestDispViewers::scalingView_constructAndGetSet()
     ScalingView view("test_disp_viewers");
 
     // getScaleMap may be empty until channels are added — call must not crash
-    QMap<qint32, float> scaleMap = view.getScaleMap();
+    std::map<int, float> scaleMap = view.getScaleMap();
     Q_UNUSED(scaleMap);
 
     // setScaleMap round-trip
-    QMap<qint32, float> customMap;
+    std::map<int, float> customMap;
     customMap[FIFFV_MEG_CH] = 1e-12f;
     customMap[FIFFV_EEG_CH] = 1e-6f;
     view.setScaleMap(customMap);
-    QMap<qint32, float> returned = view.getScaleMap();
-    QVERIFY(qFuzzyCompare(returned.value(FIFFV_MEG_CH, 0.0f), 1e-12f));
-    QVERIFY(qFuzzyCompare(returned.value(FIFFV_EEG_CH, 0.0f), 1e-6f));
+    std::map<int, float> returned = view.getScaleMap();
+    QVERIFY(qFuzzyCompare(returned.at(FIFFV_MEG_CH), 1e-12f));
+    QVERIFY(qFuzzyCompare(returned.at(FIFFV_EEG_CH), 1e-6f));
 
     view.setGuiMode(AbstractView::GuiMode::Clinical);
     view.setGuiMode(AbstractView::GuiMode::Research);
@@ -325,18 +325,18 @@ void TestDispViewers::modalitySelectionView_setAndGet()
 
     ModalitySelectionView view(chList, "test_disp_viewers");
 
-    QMap<QString, bool> modalMap = view.getModalityMap();
-    QVERIFY(!modalMap.isEmpty());
+    std::map<std::string, bool> modalMap = view.getModalityMap();
+    QVERIFY(!modalMap.empty());
 
     // Flip all to false and round-trip
-    QMap<QString, bool> allOff;
-    for (auto it = modalMap.constBegin(); it != modalMap.constEnd(); ++it)
-        allOff[it.key()] = false;
+    std::map<std::string, bool> allOff;
+    for (auto it = modalMap.cbegin(); it != modalMap.cend(); ++it)
+        allOff[it->first] = false;
     view.setModalityMap(allOff);
 
-    QMap<QString, bool> returned = view.getModalityMap();
-    for (auto it = returned.constBegin(); it != returned.constEnd(); ++it)
-        QVERIFY(!it.value());
+    std::map<std::string, bool> returned = view.getModalityMap();
+    for (auto it = returned.cbegin(); it != returned.cend(); ++it)
+        QVERIFY(!it->second);
 
     view.setGuiMode(AbstractView::GuiMode::Research);
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
@@ -437,7 +437,7 @@ void TestDispViewers::spectrumSettingsView_boundaries()
 
 void TestDispViewers::averagingSettingsView_setAndGet()
 {
-    QMap<QString, int> stimMap;
+    std::map<std::string, int> stimMap;
     stimMap["STI 014"] = 0;
     stimMap["STI 001"] = 1;
 
@@ -453,7 +453,7 @@ void TestDispViewers::averagingSettingsView_setAndGet()
     Q_UNUSED(view.getBaselineToSeconds());
 
     // Update stim channels
-    QMap<QString, int> newStimMap;
+    std::map<std::string, int> newStimMap;
     newStimMap["STI 016"] = 2;
     view.setStimChannels(newStimMap);
 

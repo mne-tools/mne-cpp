@@ -157,7 +157,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->setFilter(e->getData().value<FilterKernel>());
             break;
         case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
-            if (e->getData().value<mne::disp::SelectionItem*>()->m_sViewsToApply.contains("signalview")) {
+            if (std::ranges::contains(e->getData().value<mne::disp::SelectionItem*>()->m_sViewsToApply, "signalview")) {
                 if (m_pFiffRawView->getModel().isNull()) {
                     return;
                 }
@@ -169,12 +169,12 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             }
             break;
         case EVENT_TYPE::SCALING_MAP_CHANGED:
-            if (e->getData().value<mne::analyze::ScalingParameters>().m_sViewsToApply.contains("signalview")) {
+            if (std::ranges::contains(e->getData().value<mne::analyze::ScalingParameters>().m_sViewsToApply, "signalview")) {
                 m_pFiffRawView->setScalingMap(e->getData().value<mne::analyze::ScalingParameters>().m_mScalingMap);
             }
             break;
         case EVENT_TYPE::VIEW_SETTINGS_CHANGED:
-            if (e->getData().value<mne::analyze::ViewParameters>().m_sViewsToApply.contains("signalview")) {
+            if (std::ranges::contains(e->getData().value<mne::analyze::ViewParameters>().m_sViewsToApply, "signalview")) {
                 updateViewParameters(e->getData().value<mne::analyze::ViewParameters>());
             }
             break;

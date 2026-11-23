@@ -64,15 +64,15 @@ void TestSensorFieldMapper::defaultsAndBaseline()
     QVERIFY(!mapper.isLoaded());
     QCOMPARE(mapper.timePoint(), 0);
     QVERIFY(!mapper.megFieldMapOnHead());
-    QCOMPARE(mapper.colormap(), QStringLiteral("MNE"));
+    QCOMPARE(mapper.colormap(), std::string("MNE"));
     QVERIFY(!mapper.hasMappingFor(FiffEvoked()));
 
     mapper.setTimePoint(2);
     mapper.setMegFieldMapOnHead(true);
-    mapper.setColormap(QStringLiteral("RdBu_r"));
+    mapper.setColormap("RdBu_r");
     QCOMPARE(mapper.timePoint(), 2);
     QVERIFY(mapper.megFieldMapOnHead());
-    QCOMPARE(mapper.colormap(), QStringLiteral("RdBu_r"));
+    QCOMPARE(mapper.colormap(), std::string("RdBu_r"));
 
     FiffEvoked evoked;
     evoked.nave = 1;
@@ -88,7 +88,7 @@ void TestSensorFieldMapper::defaultsAndBaseline()
     QVERIFY(std::abs(mapper.evoked().data(0, 1) - 1.0) < 1.0e-12);
     QVERIFY(std::abs(mapper.evoked().data(0, 2) - 6.0) < 1.0e-12);
 
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
     QVERIFY(!mapper.buildMapping(surfaces, FiffCoordTrans(), false));
 }
 
@@ -101,20 +101,18 @@ void TestSensorFieldMapper::unloadedAndSurfaceLookup()
     QVERIFY(!mapper.buildMapping({}, FiffCoordTrans(), false));
     mapper.computeNormRange();
 
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
-    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces), QString());
-    QCOMPARE(SensorFieldMapper::findHelmetSurfaceKey(surfaces), QString());
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
+    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces), std::string());
+    QCOMPARE(SensorFieldMapper::findHelmetSurfaceKey(surfaces), std::string());
 
-    surfaces.insert(QStringLiteral("bem_outer_skin"), nullptr);
-    surfaces.insert(QStringLiteral("bem_head"), nullptr);
-    surfaces.insert(QStringLiteral("sens_surface_meg"), nullptr);
-    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces), QStringLiteral("bem_head"));
-    QCOMPARE(SensorFieldMapper::findHelmetSurfaceKey(surfaces),
-             QStringLiteral("sens_surface_meg"));
+    surfaces.insert_or_assign("bem_outer_skin", nullptr);
+    surfaces.insert_or_assign("bem_head", nullptr);
+    surfaces.insert_or_assign("sens_surface_meg", nullptr);
+    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces), std::string("bem_head"));
+    QCOMPARE(SensorFieldMapper::findHelmetSurfaceKey(surfaces), std::string("sens_surface_meg"));
 
-    surfaces.remove(QStringLiteral("bem_head"));
-    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces),
-             QStringLiteral("bem_outer_skin"));
+    surfaces.erase("bem_head");
+    QCOMPARE(SensorFieldMapper::findHeadSurfaceKey(surfaces), std::string("bem_outer_skin"));
 
     FiffEvoked loadedEvoked;
     loadedEvoked.nave = 1;
@@ -200,12 +198,12 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
     tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
     auto head = std::make_shared<BrainSurface>();
     head->createFromData(rr, tris, Qt::gray);
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces{{QStringLiteral("bem_head"), head}};
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces{{"bem_head", head}};
 
     SensorFieldMapper mapper;
     mapper.setEvoked(evoked);
     QVERIFY(mapper.buildMapping(surfaces, FiffCoordTrans(), false));
-    QCOMPARE(mapper.eegSurfaceKey(), QStringLiteral("bem_head"));
+    QCOMPARE(mapper.eegSurfaceKey(), std::string("bem_head"));
     QVERIFY(mapper.eegMapping());
     QCOMPARE(mapper.eegPick().size(), 59);
     QVERIFY(mapper.hasMappingFor(evoked));
@@ -233,11 +231,11 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
     mapper.setTimePoint(t);
     mapper.apply(surfaces, view, {});
     QVERIFY(head->colorsRef()[5] != plain);
-    QVERIFY(surfaces.contains(QStringLiteral("sens_contour_eeg_neg")));
-    QVERIFY(surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
+    QVERIFY(surfaces.contains("sens_contour_eeg_neg"));
+    QVERIFY(surfaces.at("sens_contour_eeg_neg")->isVisible());
     view.visibility.eegFieldMap = false;
     mapper.apply(surfaces, view, {});
-    QVERIFY(!surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
+    QVERIFY(!surfaces.at("sens_contour_eeg_neg")->isVisible());
 
     // MEG onto six helmet points in head coordinates with outward normals, against
     // _make_surface_mapping(info, surf, "meg", origin="auto") at the same time
@@ -247,9 +245,9 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
     const MatrixX3f helmetNn = helmetRr.rowwise().normalized();
     auto helmet = std::make_shared<BrainSurface>();
     helmet->createFromData(helmetRr, helmetNn, tris, Qt::gray);
-    surfaces.insert(QStringLiteral("sens_surface_meg"), helmet);
+    surfaces.insert_or_assign("sens_surface_meg", helmet);
     QVERIFY(mapper.buildMapping(surfaces, FiffCoordTrans(), false));
-    QCOMPARE(mapper.megSurfaceKey(), QStringLiteral("sens_surface_meg"));
+    QCOMPARE(mapper.megSurfaceKey(), std::string("sens_surface_meg"));
     QCOMPARE(mapper.megPick().size(), 305);
     VectorXf megMeas(mapper.megPick().size());
     for (int i = 0; i < megMeas.size(); ++i) {

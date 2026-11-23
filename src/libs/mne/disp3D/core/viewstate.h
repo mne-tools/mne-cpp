@@ -37,7 +37,6 @@
 //=============================================================================================================
 
 #include <QString>
-#include <QMap>
 #include <QQuaternion>
 #include <QVector2D>
 #include <QVariant>
@@ -48,7 +47,10 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <map>
 #include <memory>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -105,7 +107,7 @@ struct DISP3DSHARED_EXPORT ViewVisibilityProfile
      * @param[in] object   Object key (e.g. "lh", "bem_head", "sens_meg").
      * @return             True if visible.
      */
-    bool isObjectVisible(const QString& object) const;
+    bool isObjectVisible(std::string_view object) const;
 
     //=========================================================================================================
     /**
@@ -114,7 +116,7 @@ struct DISP3DSHARED_EXPORT ViewVisibilityProfile
      * @param[in] object   Object key.
      * @param[in] visible  New visibility state.
      */
-    void setObjectVisible(const QString& object, bool visible);
+    void setObjectVisible(std::string_view object, bool visible);
 
     //=========================================================================================================
     /**
@@ -149,7 +151,7 @@ struct DISP3DSHARED_EXPORT ViewVisibilityProfile
 struct DISP3DSHARED_EXPORT SubView
 {
     // ── Per-view render configuration ──────────────────────────────────
-    QString surfaceType = "pial";
+    std::string surfaceType = "pial";
     ShaderMode brainShader = Standard;
     ShaderMode bemShader = Standard;
     VisualizationMode overlayMode = ModeSurface;
@@ -177,7 +179,7 @@ struct DISP3DSHARED_EXPORT SubView
      * @param[in] key   Surface map key to classify.
      * @return True if the key is non-empty and has no bem_, sens_, srcsp_ or dig_ prefix.
      */
-    static bool isBrainSurfaceKey(const QString& key);
+    static bool isBrainSurfaceKey(std::string_view key);
 
     /**
      * True when the brain-surface @p key matches this view's surfaceType
@@ -186,7 +188,7 @@ struct DISP3DSHARED_EXPORT SubView
      * @param[in] key   Surface map key to test.
      * @return True if the key is a brain surface key ending with surfaceType.
      */
-    bool matchesSurfaceType(const QString& key) const;
+    bool matchesSurfaceType(std::string_view key) const;
 
     /**
      * True when the surface identified by @p key should be rendered
@@ -195,7 +197,7 @@ struct DISP3DSHARED_EXPORT SubView
      * @param[in] key   Surface map key to test.
      * @return True if the visibility profile enables this surface; unknown keys return true.
      */
-    bool shouldRenderSurface(const QString& key) const;
+    bool shouldRenderSurface(std::string_view key) const;
 
     /**
      * Apply this view's overlayMode to every brain surface whose key
@@ -204,7 +206,7 @@ struct DISP3DSHARED_EXPORT SubView
      * @param[in, out] surfaces  Surface map keyed by surface name; matching surfaces get their visualization mode updated.
      */
     void applyOverlayToSurfaces(
-        QMap<QString, std::shared_ptr<BrainSurface>>& surfaces) const;
+        std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces) const;
 
     // ── Serialisation ──────────────────────────────────────────────────
 
@@ -258,7 +260,7 @@ DISP3DSHARED_EXPORT QQuaternion perspectivePresetRotation();
  * @param[in] preset  Preset index (0=Top, 1=Perspective, ..., 6=Right).
  * @return Preset name such as "Front"; out-of-range indices return "Top".
  */
-DISP3DSHARED_EXPORT QString multiViewPresetName(int preset);
+DISP3DSHARED_EXPORT std::string multiViewPresetName(int preset);
 
 /**
  * Camera rotation quaternion for a multi-view preset index (0–6).
@@ -297,7 +299,7 @@ DISP3DSHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex =
  * @param[in] name  Shader name; "XRay" is also recognised.
  * @return Matching ShaderMode, or Standard for unknown names.
  */
-DISP3DSHARED_EXPORT ShaderMode shaderModeFromName(const QString& name);
+DISP3DSHARED_EXPORT ShaderMode shaderModeFromName(std::string_view name);
 
 /**
  * Convert a ShaderMode enum to display string.
@@ -305,7 +307,7 @@ DISP3DSHARED_EXPORT ShaderMode shaderModeFromName(const QString& name);
  * @param[in] mode  Shader mode to convert.
  * @return "Holographic", "Anatomical", or "Standard" for all other modes.
  */
-DISP3DSHARED_EXPORT QString shaderModeName(ShaderMode mode);
+DISP3DSHARED_EXPORT std::string shaderModeName(ShaderMode mode);
 
 /**
  * Convert a visualization mode name to enum.
@@ -313,7 +315,7 @@ DISP3DSHARED_EXPORT QString shaderModeName(ShaderMode mode);
  * @param[in] name  Mode name ("Annotation", "Scientific", "Source Estimate").
  * @return Matching VisualizationMode, or ModeSurface for unknown names.
  */
-DISP3DSHARED_EXPORT VisualizationMode visualizationModeFromName(const QString& name);
+DISP3DSHARED_EXPORT VisualizationMode visualizationModeFromName(std::string_view name);
 
 /**
  * Convert a VisualizationMode enum to display string.
@@ -321,7 +323,7 @@ DISP3DSHARED_EXPORT VisualizationMode visualizationModeFromName(const QString& n
  * @param[in] mode  Visualization mode to convert.
  * @return "Annotation", "Scientific", "Source Estimate", or "Surface".
  */
-DISP3DSHARED_EXPORT QString visualizationModeName(VisualizationMode mode);
+DISP3DSHARED_EXPORT std::string visualizationModeName(VisualizationMode mode);
 
 //=============================================================================================================
 // FREE FUNCTIONS — colormap

@@ -35,7 +35,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
 #include <QWidget>
 #include <QtGlobal>
 
@@ -43,7 +42,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -129,7 +131,7 @@ public:
      *
      * @return The current modality map.
      */
-    QMap<QString, bool> getModalityMap();
+    std::map<std::string, bool> getModalityMap();
 
     //=========================================================================================================
     /**
@@ -137,7 +139,7 @@ public:
      *
      * @param[in] modalityMap    The modality map.
      */
-    void setModalityMap(const QMap<QString, bool>& modalityMap);
+    void setModalityMap(const std::map<std::string, bool>& modalityMap);
 
     //=========================================================================================================
     /**
@@ -145,7 +147,7 @@ public:
      *
      * @param[in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<qint32, float>& scaleMap);
+    void setScaleMap(const std::map<int, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -153,7 +155,7 @@ public:
      *
      * @param[in] selectedChannels     The new selected channels.
      */
-    void setSelectedChannels(const QList<int>& selectedChannels);
+    void setSelectedChannels(const std::vector<int>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -191,7 +193,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    std::shared_ptr<QMap<QString, QColor>> getAverageColor() const;
+    std::shared_ptr<std::map<std::string, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -199,7 +201,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    std::shared_ptr<QMap<QString, bool>> getAverageActivation() const;
+    std::shared_ptr<std::map<std::string, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -207,7 +209,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -223,7 +225,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation);
+    void setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -239,7 +241,7 @@ public:
      *
      * @param[in] selectedChannels list of all channel names which are currently selected in the selection manager.
      */
-    void showSelectedChannelsOnly(const QStringList& selectedChannels);
+    void showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -247,7 +249,7 @@ public:
      *
      * @param[in] selectedChannelsIndexes  list of indices of channels channels to be displayed.
      */
-    void showSelectedChannels(const QList<int>& selectedChannelsIndexes);
+    void showSelectedChannels(const std::vector<int>& selectedChannelsIndexes);
 
     //=========================================================================================================
     /**
@@ -304,16 +306,16 @@ protected:
 
     QColor m_colCurrentBackgroundColor; /**< The current background color. */
 
-    QList<int> m_lSelectedChannels; /**< The currently selected channels. */
+    std::vector<int> m_lSelectedChannels; /**< The currently selected channels. */
 
-    QMap<QString, bool> m_modalityMap; /**< Map of different modalities. */
-    QMap<qint32, float> m_scaleMap;    /**< Map with all channel types and their current scaling value.*/
+    std::map<std::string, bool> m_modalityMap; /**< Map of different modalities. */
+    std::map<int, float> m_scaleMap;           /**< Map with all channel types and their current scaling value.*/
 
     std::shared_ptr<EvokedSetModel> m_pEvokedSetModel;     /**< The evoked model. */
     std::shared_ptr<ChannelInfoModel> m_pChannelInfoModel; /**< The channel info model. */
 
-    std::shared_ptr<QMap<QString, bool>> m_qMapAverageActivation; /**< Average activation status. */
-    std::shared_ptr<QMap<QString, QColor>> m_qMapAverageColor;    /**< Average colors. */
+    std::shared_ptr<std::map<std::string, bool>> m_qMapAverageActivation; /**< Average activation status. */
+    std::shared_ptr<std::map<std::string, QColor>> m_qMapAverageColor;    /**< Average colors. */
 };
 
 //=============================================================================================================

@@ -380,7 +380,7 @@ int main(int argc, char* argv[])
             best = e;
         }
     }
-    QVector<double> ms(static_cast<int>(length)), standardUv(ms.size()), targetUv(ms.size()), differenceUv(ms.size());
+    std::vector<double> ms(static_cast<int>(length)), standardUv(ms.size()), targetUv(ms.size()), differenceUv(ms.size());
     std::vector<double> difference(length), standardWave(length);
     for (std::size_t t = 0; t < length; ++t) {
         const auto i = static_cast<int>(t);
@@ -420,7 +420,8 @@ int main(int argc, char* argv[])
                              .arg(QString::fromStdString(name))
                              .arg(ms[static_cast<int>(p300.index)], 0, 'f', 0)
                              .arg(p300.value * 1e6, 0, 'f', 1)
-                             .arg(tValue, 0, 'f', 1));
+                             .arg(tValue, 0, 'f', 1)
+                             .toStdString());
 
     return tValue > 5.0 ? 0 : 1;
 }

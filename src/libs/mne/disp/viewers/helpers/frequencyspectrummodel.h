@@ -47,7 +47,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -197,7 +199,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    inline const QMap<qint32, qint32>& getIdxSelMap() const;
+    inline const std::map<int, int>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -205,7 +207,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32>& selection);
+    void selectRows(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -261,12 +263,12 @@ signals:
      *
      * @param[in] selection     list of all selected channels.
      */
-    void newSelection(QList<qint32> selection);
+    void newSelection(const std::vector<int>& selection);
 
 private:
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Fiff Information.*/
 
-    QMap<qint32, qint32> m_qMapIdxRowSelection; /**< Selection mapping.*/
+    std::map<int, int> m_qMapIdxRowSelection; /**< Selection mapping.*/
 
     Eigen::RowVectorXd m_vecFreqScale;      /**< Frequency scale. */
     Eigen::RowVectorXd m_vecFreqScaleBound; /**< Frequency scaled to boundaries. */
@@ -314,7 +316,7 @@ inline qint32 FrequencySpectrumModel::getNumStems() const
 
 //=============================================================================================================
 
-inline const QMap<qint32, qint32>& FrequencySpectrumModel::getIdxSelMap() const
+inline const std::map<int, int>& FrequencySpectrumModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }

@@ -29,16 +29,14 @@
 #include "abstractview.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -112,7 +110,7 @@ public:
      * @param[in] mapDetectedTriggers       The currently detected triggers.
      */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
-                                           const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers);
+                                           const std::map<int, std::vector<std::pair<int, double>>>& mapDetectedTriggers);
 
     //=========================================================================================================
     /**
@@ -120,7 +118,7 @@ public:
      *
      * @return currently selected STIM channel.
      */
-    QString getSelectedStimChannel();
+    std::string getSelectedStimChannel();
 
     //=========================================================================================================
     /**
@@ -195,7 +193,7 @@ protected:
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
 
-    QMap<double, QColor> m_qMapTriggerColor; /**< Trigger colors per detected type. */
+    std::map<double, QColor> m_qMapTriggerColor; /**< Trigger colors per detected type. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -210,17 +208,16 @@ signals:
     /**
      * Emit this signal whenever the trigger information changed.
      */
-    void triggerInfoChanged(const QMap<double,
-                                       QColor>& value,
+    void triggerInfoChanged(const std::map<double, QColor>& value,
                             bool bActive,
-                            const QString& sTriggerCh,
+                            const std::string& sTriggerCh,
                             double dThreshold);
 
     //=========================================================================================================
     /**
      * Emit this signal when user clicks detect trigger button.
      */
-    void detectTriggers(const QString& sChannelName,
+    void detectTriggers(const std::string& sChannelName,
                         double iThreshold);
 };
 } // NAMESPACE

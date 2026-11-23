@@ -33,7 +33,6 @@
 //=============================================================================================================
 
 #include <QColor>
-#include <QElapsedTimer>
 #include <QImage>
 #include <QMouseEvent>
 #include <QPaintEvent>
@@ -47,7 +46,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
+#include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -91,10 +93,10 @@ public:
      */
     struct EventMarker
     {
-        int sample = 0; ///< Absolute sample index of the event onset.
-        int type = 1;   ///< Numeric event type (stimulus code).
-        QColor color;   ///< Display colour of the line and label chip.
-        QString label;  ///< Short text label (shown at the bottom strip); defaults to type number.
+        int sample = 0;    ///< Absolute sample index of the event onset.
+        int type = 1;      ///< Numeric event type (stimulus code).
+        QColor color;      ///< Display colour of the line and label chip.
+        std::string label; ///< Short text label (shown at the bottom strip); defaults to type number.
     };
 
     //=========================================================================================================
@@ -106,7 +108,7 @@ public:
         int startSample = 0; ///< Absolute first sample covered by the annotation.
         int endSample = 0;   ///< Absolute last sample covered by the annotation.
         QColor color;        ///< Fill / border colour for the highlighted span.
-        QString label;       ///< Annotation label shown near the top edge.
+        std::string label;   ///< Annotation label shown near the top edge.
     };
 
     explicit ChannelRhiView(QWidget* parent = nullptr);
@@ -129,9 +131,9 @@ public:
      *
      * @param[in] events  List of EventMarker objects.
      */
-    void setEvents(const QVector<EventMarker>& events);
+    void setEvents(const std::vector<EventMarker>& events);
 
-    void setEpochMarkers(const QVector<int>& triggerSamples);
+    void setEpochMarkers(const std::vector<int>& triggerSamples);
     void setEpochMarkersVisible(bool visible);
     bool epochMarkersVisible() const
     {
@@ -156,7 +158,7 @@ public:
      *
      * @param[in] annotations  List of AnnotationSpan objects.
      */
-    void setAnnotations(const QVector<AnnotationSpan>& annotations);
+    void setAnnotations(const std::vector<AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -277,7 +279,7 @@ public:
      * @param[in] indices  Ordered list of model channel indices to display.
      *                     Pass an empty vector to clear the filter.
      */
-    void setChannelIndices(const QVector<int>& indices);
+    void setChannelIndices(const std::vector<int>& indices);
 
     //=========================================================================================================
     /**
@@ -645,22 +647,22 @@ private:
     struct VelocitySample
     {
         int x;
-        qint64 t;
+        std::int64_t t;
     };
-    QVector<VelocitySample> m_velocityHistory;
-    QElapsedTimer m_dragTimer;
+    std::vector<VelocitySample> m_velocityHistory;
+    std::chrono::steady_clock::time_point m_dragStart;
     QPropertyAnimation* m_pInertialAnim = nullptr;
     QPointer<QPropertyAnimation> m_pScrollAnim;
     float m_scrollTarget = 0.f;
 
     // ── Channel index filter ──────────────────────────────────────────
     // When non-empty, only these model channel indices are rendered/scrolled.
-    QVector<int> m_filteredChannels;
+    std::vector<int> m_filteredChannels;
 
     // ── Event / stimulus markers ──────────────────────────────────────
-    QVector<EventMarker> m_events;
-    QVector<int> m_epochTriggerSamples;
-    QVector<AnnotationSpan> m_annotations;
+    std::vector<EventMarker> m_events;
+    std::vector<int> m_epochTriggerSamples;
+    std::vector<AnnotationSpan> m_annotations;
     bool m_annotationSelectionEnabled = false;
     bool m_bShowEvents = true;
     bool m_bShowAnnotations = true;
@@ -685,7 +687,7 @@ private:
 
     // Helper — use instead of firstCh+i for actual model channel index
     int actualChannelAt(int logicalIdx) const; // maps logical → model channel index
-    QVector<int> effectiveChannelIndices() const;
+    std::vector<int> effectiveChannelIndices() const;
 
     // ── Prefetch window tracking ───────────────────────────────────────
     int m_vboWindowFirst = 0;
@@ -723,13 +725,13 @@ private:
 
     struct ButterflyTypeGroup
     {
-        QString typeLabel;           // e.g. "MEG", "EEG"
-        QColor color;                // representative type colour
-        float amplitudeMax;          // per-type amplitude scale
-        QVector<int> channelIndices; // model channel indices in this group
+        std::string typeLabel;           // e.g. "MEG", "EEG"
+        QColor color;                    // representative type colour
+        float amplitudeMax;              // per-type amplitude scale
+        std::vector<int> channelIndices; // model channel indices in this group
     };
 
-    QVector<ButterflyTypeGroup> butterflyTypeGroups() const;
+    std::vector<ButterflyTypeGroup> butterflyTypeGroups() const;
     int butterflyLaneCount() const;
 
     void drawOverlays(); // QPainter-based overlays on top of the QRHI-rendered traces

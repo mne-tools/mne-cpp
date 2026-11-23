@@ -19,6 +19,7 @@
 #include "coregsettingsview.h"
 
 #include "ui_coregsettingsview.h"
+#include <mne/base/string_utils.h>
 #include <mne/fiff/fiff_stream.h>
 #include <mne/fiff/fiff_coord_trans.h>
 
@@ -27,8 +28,6 @@
 //=============================================================================================================
 
 #include <QSettings>
-#include <QDebug>
-#include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QVector3D>
@@ -244,7 +243,7 @@ void CoregSettingsView::onLoadFidFile()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        emit fidFileChanged(sFileName);
+        emit fidFileChanged(mne::path_from_utf8(sFileName.toStdString()));
     }
 }
 
@@ -333,7 +332,7 @@ void CoregSettingsView::onStoreFidFile()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        emit fidStoreFileChanged(sFileName);
+        emit fidStoreFileChanged(mne::path_from_utf8(sFileName.toStdString()));
     }
 }
 
@@ -349,7 +348,7 @@ void CoregSettingsView::onLoadDigFile()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        emit digFileChanged(sFileName);
+        emit digFileChanged(mne::path_from_utf8(sFileName.toStdString()));
     }
 }
 
@@ -365,7 +364,7 @@ void CoregSettingsView::onLoadTrans()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        emit loadTrans(sFileName);
+        emit loadTrans(mne::path_from_utf8(sFileName.toStdString()));
     }
 }
 
@@ -380,7 +379,7 @@ void CoregSettingsView::onStoreTrans()
     if (sFileName.isEmpty()) {
         return;
     } else {
-        emit storeTrans(sFileName);
+        emit storeTrans(mne::path_from_utf8(sFileName.toStdString()));
     }
 }
 

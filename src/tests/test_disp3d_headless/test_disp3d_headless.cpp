@@ -102,14 +102,14 @@ private slots:
 
     void interpolation_interpolateSignalSPtr()
     {
-        auto mat = QSharedPointer<SparseMatrix<float>>::create(3, 3);
+        auto mat = std::make_shared<SparseMatrix<float>>(3, 3);
         mat->insert(0, 0) = 0.5f;
         mat->insert(0, 1) = 0.5f;
         mat->insert(1, 1) = 1.0f;
         mat->insert(2, 2) = 1.0f;
         mat->makeCompressed();
 
-        auto data = QSharedPointer<VectorXf>::create(3);
+        auto data = std::make_shared<VectorXf>(3);
         (*data) << 2.0f, 4.0f, 6.0f;
 
         VectorXf result = Interpolation::interpolateSignal(mat, data);
@@ -126,7 +126,7 @@ private slots:
         projectedSensors << 0, 2;
 
         // Distance table: nVertices x nSensors (4 x 2)
-        auto matDist = QSharedPointer<MatrixXd>::create(4, 2);
+        auto matDist = std::make_shared<MatrixXd>(4, 2);
         (*matDist) << 0.0, 0.3,
             0.1, 0.2,
             0.2, 0.0,
@@ -238,10 +238,10 @@ private slots:
 
     void meshFactory_createBatchedSpheres()
     {
-        QVector<QVector3D> positions;
-        positions.append(QVector3D(0, 0, 0));
-        positions.append(QVector3D(0.1f, 0, 0));
-        positions.append(QVector3D(0, 0.1f, 0));
+        std::vector<QVector3D> positions;
+        positions.push_back(QVector3D(0, 0, 0));
+        positions.push_back(QVector3D(0.1f, 0, 0));
+        positions.push_back(QVector3D(0, 0.1f, 0));
 
         auto batched = MeshFactory::createBatchedSpheres(positions, 0.005f, Qt::white, 0);
         QVERIFY(batched != nullptr);
@@ -272,7 +272,7 @@ private slots:
             QSKIP("Raw sample file not available");
         }
 
-        auto result = DataLoader::loadSensors(rawFile);
+        auto result = DataLoader::loadSensors(rawFile.toStdU16String());
         QVERIFY(result.hasInfo);
         QVERIFY(result.info.nchan > 0);
     }
@@ -290,7 +290,7 @@ private slots:
             QSKIP("Evoked sample file not available");
         }
 
-        auto evoked = DataLoader::loadEvoked(evokedFile, 0);
+        auto evoked = DataLoader::loadEvoked(evokedFile.toStdU16String(), 0);
         QVERIFY(evoked.data.rows() > 0);
     }
 
@@ -301,7 +301,7 @@ private slots:
             QSKIP("Evoked sample file not available");
         }
 
-        QStringList sets = DataLoader::probeEvokedSets(evokedFile);
+        const std::vector<std::string> sets = DataLoader::probeEvokedSets(evokedFile.toStdU16String());
         QVERIFY(sets.size() > 0);
     }
 
@@ -315,7 +315,7 @@ private slots:
             QSKIP("Forward solution file not available");
         }
 
-        auto srcSpace = DataLoader::loadSourceSpace(fwdFile);
+        auto srcSpace = DataLoader::loadSourceSpace(fwdFile.toStdU16String());
         // Should have loaded something if file exists
         QVERIFY(!srcSpace.empty());
     }
@@ -334,7 +334,7 @@ private slots:
         }
 
         mne::FiffCoordTrans trans;
-        bool ok = DataLoader::loadHeadToMriTransform(transFile, trans);
+        bool ok = DataLoader::loadHeadToMriTransform(transFile.toStdU16String(), trans);
         QVERIFY(ok);
     }
 

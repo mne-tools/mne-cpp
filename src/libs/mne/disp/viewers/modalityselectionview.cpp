@@ -19,6 +19,8 @@
 
 #include "modalityselectionview.h"
 
+#include <mne/base/string_utils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -27,12 +29,12 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QSettings>
-#include <QMapIterator>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -59,23 +61,23 @@ ModalitySelectionView::ModalitySelectionView(const std::vector<mne::FiffChInfo>&
 
     // Specify which channel types are needed
     for (int i = 0; i < std::ssize(lChannelList); ++i) {
-        if (lChannelList.at(i).unit == FIFF_UNIT_T && !m_lChannelTypeList.contains("MAG")) {
-            m_lChannelTypeList << "MAG";
+        if (lChannelList.at(i).unit == FIFF_UNIT_T && !std::ranges::contains(m_lChannelTypeList, "MAG")) {
+            m_lChannelTypeList.push_back("MAG");
         }
-        if (lChannelList.at(i).unit == FIFF_UNIT_T_M && !m_lChannelTypeList.contains("GRAD")) {
-            m_lChannelTypeList << "GRAD";
+        if (lChannelList.at(i).unit == FIFF_UNIT_T_M && !std::ranges::contains(m_lChannelTypeList, "GRAD")) {
+            m_lChannelTypeList.push_back("GRAD");
         }
-        if (lChannelList.at(i).kind == FIFFV_EEG_CH && !m_lChannelTypeList.contains("EEG")) {
-            m_lChannelTypeList << "EEG";
+        if (lChannelList.at(i).kind == FIFFV_EEG_CH && !std::ranges::contains(m_lChannelTypeList, "EEG")) {
+            m_lChannelTypeList.push_back("EEG");
         }
-        if (lChannelList.at(i).kind == FIFFV_EOG_CH && !m_lChannelTypeList.contains("EOG")) {
-            m_lChannelTypeList << "EOG";
+        if (lChannelList.at(i).kind == FIFFV_EOG_CH && !std::ranges::contains(m_lChannelTypeList, "EOG")) {
+            m_lChannelTypeList.push_back("EOG");
         }
-        if (lChannelList.at(i).kind == FIFFV_STIM_CH && !m_lChannelTypeList.contains("STIM")) {
-            m_lChannelTypeList << "STIM";
+        if (lChannelList.at(i).kind == FIFFV_STIM_CH && !std::ranges::contains(m_lChannelTypeList, "STIM")) {
+            m_lChannelTypeList.push_back("STIM");
         }
-        if (lChannelList.at(i).kind == FIFFV_MISC_CH && !m_lChannelTypeList.contains("MISC")) {
-            m_lChannelTypeList << "MISC";
+        if (lChannelList.at(i).kind == FIFFV_MISC_CH && !std::ranges::contains(m_lChannelTypeList, "MISC")) {
+            m_lChannelTypeList.push_back("MISC");
         }
     }
 
@@ -92,7 +94,7 @@ ModalitySelectionView::~ModalitySelectionView()
 
 //=============================================================================================================
 
-QMap<QString, bool> ModalitySelectionView::getModalityMap()
+std::map<std::string, bool> ModalitySelectionView::getModalityMap()
 {
     return m_modalityMap;
 }
@@ -138,22 +140,22 @@ void ModalitySelectionView::loadSettings()
     QSettings settings("MNECPP");
 
     bool flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityMAG"), true).toBool();
-    m_modalityMap.insert("MAG", flag);
+    m_modalityMap.insert_or_assign("MAG", flag);
 
     flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityGRAD"), true).toBool();
-    m_modalityMap.insert("GRAD", flag);
+    m_modalityMap.insert_or_assign("GRAD", flag);
 
     flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityEEG"), true).toBool();
-    m_modalityMap.insert("EEG", flag);
+    m_modalityMap.insert_or_assign("EEG", flag);
 
     flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityEOG"), true).toBool();
-    m_modalityMap.insert("EOG", flag);
+    m_modalityMap.insert_or_assign("EOG", flag);
 
     flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalitySTIM"), true).toBool();
-    m_modalityMap.insert("STIM", flag);
+    m_modalityMap.insert_or_assign("STIM", flag);
 
     flag = settings.value(m_sSettingsPath + QString("/ModalitySelectionView/modalityMISC"), true).toBool();
-    m_modalityMap.insert("MISC", flag);
+    m_modalityMap.insert_or_assign("MISC", flag);
 }
 
 //=============================================================================================================
@@ -182,7 +184,7 @@ void ModalitySelectionView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void ModalitySelectionView::setModalityMap(const QMap<QString, bool>& modalityMap)
+void ModalitySelectionView::setModalityMap(const std::map<std::string, bool>& modalityMap)
 {
     m_modalityMap = modalityMap;
 
@@ -206,16 +208,13 @@ void ModalitySelectionView::redrawGUI()
         std::unique_ptr<QWidget> pWidget{pItem->widget()};
     }
 
-    QMapIterator<QString, bool> i(m_modalityMap);
-
     int count = 0;
-    while (i.hasNext()) {
-        i.next();
-
-        if (m_lChannelTypeList.contains(i.key(), Qt::CaseInsensitive)) {
-            QCheckBox* t_pCheckBoxModality = new QCheckBox(i.key());
-            t_pCheckBoxModality->setChecked(i.value());
-            m_qListModalityCheckBox << t_pCheckBoxModality;
+    for (const auto& [modality, checked] : m_modalityMap) {
+        const bool listed = std::ranges::any_of(m_lChannelTypeList, [&modality](const std::string& type) { return mne::iequals(type, modality); });
+        if (listed) {
+            QCheckBox* t_pCheckBoxModality = new QCheckBox(QString::fromStdString(modality));
+            t_pCheckBoxModality->setChecked(checked);
+            m_qListModalityCheckBox.push_back(t_pCheckBoxModality);
             connect(t_pCheckBoxModality, &QCheckBox::checkStateChanged,
                     this, &ModalitySelectionView::onUpdateModalityCheckbox);
             topLayout->addWidget(t_pCheckBoxModality, count, 0);
@@ -233,8 +232,8 @@ void ModalitySelectionView::onUpdateModalityCheckbox(Qt::CheckState state)
 {
     Q_UNUSED(state)
 
-    for (qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i) {
-        m_modalityMap[m_qListModalityCheckBox.at(i)->text()] = m_qListModalityCheckBox.at(i)->isChecked();
+    for (QCheckBox* pCheckBox : m_qListModalityCheckBox) {
+        m_modalityMap[pCheckBox->text().toStdString()] = pCheckBox->isChecked();
     }
 
     emit modalitiesChanged(m_modalityMap);

@@ -25,7 +25,6 @@
 #include <QtTest>
 #include <QSignalSpy>
 #include <QVector>
-#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -33,6 +32,12 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,7 +77,7 @@ private:
      * Build a simple identity-like sparse matrix (nVerts x nSources).
      * Each source maps to one vertex with weight 1.0.
      */
-    QSharedPointer<SparseMatrix<float>> makeIdentityInterpMat(int nVerts, int nSources);
+    std::shared_ptr<SparseMatrix<float>> makeIdentityInterpMat(int nVerts, int nSources);
 
     int m_iNumSourcesLh = 10; /**< Test LH source count. */
     int m_iNumSourcesRh = 8;  /**< Test RH source count. */
@@ -95,9 +100,9 @@ void TestRtSourceStreaming::initTestCase()
 
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float>> TestRtSourceStreaming::makeIdentityInterpMat(int nVerts, int nSources)
+std::shared_ptr<SparseMatrix<float>> TestRtSourceStreaming::makeIdentityInterpMat(int nVerts, int nSources)
 {
-    auto mat = QSharedPointer<SparseMatrix<float>>::create(nVerts, nSources);
+    auto mat = std::make_shared<SparseMatrix<float>>(nVerts, nSources);
     QVector<Triplet<float>> triplets;
     for (int s = 0; s < nSources && s < nVerts; ++s) {
         triplets.append(Triplet<float>(s, s, 1.0f));
@@ -177,8 +182,8 @@ void TestRtSourceStreaming::testWorkerStreamWithIdentityInterpolation()
 
     // Extract arguments
     QList<QVariant> args = spy.takeFirst();
-    QVector<uint32_t> colorsLh = args.at(0).value<QVector<uint32_t>>();
-    QVector<uint32_t> colorsRh = args.at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsLh = args.at(0).value<std::vector<uint32_t>>();
+    std::vector<uint32_t> colorsRh = args.at(1).value<std::vector<uint32_t>>();
 
     // Color arrays should match vertex counts
     QCOMPARE(colorsLh.size(), m_iNumVertsLh);
@@ -221,7 +226,7 @@ void TestRtSourceStreaming::testWorkerThresholds()
 
     QCOMPARE(spy.count(), 1);
     QList<QVariant> args = spy.takeFirst();
-    QVector<uint32_t> colorsLh = args.at(0).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsLh = args.at(0).value<std::vector<uint32_t>>();
 
     // Values below min threshold should be transparent (alpha = 0)
     for (int i = 0; i < m_iNumSourcesLh; ++i) {
@@ -239,7 +244,7 @@ void TestRtSourceStreaming::testWorkerThresholds()
 
     QCOMPARE(spy2.count(), 1);
     QList<QVariant> args2 = spy2.takeFirst();
-    QVector<uint32_t> colorsLh2 = args2.at(0).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsLh2 = args2.at(0).value<std::vector<uint32_t>>();
 
     for (int i = 0; i < m_iNumSourcesLh; ++i) {
         uint32_t c = colorsLh2[i];
@@ -269,7 +274,7 @@ void TestRtSourceStreaming::testWorkerColormapSwitch()
     QSignalSpy spyHot(&worker, &RtSourceDataWorker::newRtSmoothedData);
     worker.streamData();
     QCOMPARE(spyHot.count(), 1);
-    QVector<uint32_t> colorsHot = spyHot.takeFirst().at(0).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsHot = spyHot.takeFirst().at(0).value<std::vector<uint32_t>>();
 
     // Get colors with "Jet" colormap
     worker.setColormapType("Jet");
@@ -277,7 +282,7 @@ void TestRtSourceStreaming::testWorkerColormapSwitch()
     QSignalSpy spyJet(&worker, &RtSourceDataWorker::newRtSmoothedData);
     worker.streamData();
     QCOMPARE(spyJet.count(), 1);
-    QVector<uint32_t> colorsJet = spyJet.takeFirst().at(0).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsJet = spyJet.takeFirst().at(0).value<std::vector<uint32_t>>();
 
     // Colors should differ between colormaps (at least for the first source-mapped vertex)
     bool bDiffer = false;
@@ -374,8 +379,8 @@ void TestRtSourceStreaming::testControllerStreaming()
 
     // Verify first frame has correct structure
     QList<QVariant> firstArgs = spy.first();
-    QVector<uint32_t> colorsLh = firstArgs.at(0).value<QVector<uint32_t>>();
-    QVector<uint32_t> colorsRh = firstArgs.at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsLh = firstArgs.at(0).value<std::vector<uint32_t>>();
+    std::vector<uint32_t> colorsRh = firstArgs.at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colorsLh.size(), m_iNumVertsLh);
     QCOMPARE(colorsRh.size(), m_iNumVertsRh);
 }

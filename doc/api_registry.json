@@ -4933,6 +4933,23 @@
       "python_url": null
     },
     {
+      "name": "PeriodicTask",
+      "module": "disp3D",
+      "header": "disp3D/workers/periodictask.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_sensor_streaming",
+      "example": null,
+      "status": "documented",
+      "documented": true,
+      "sidebar_position": 52,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
       "name": "RtSensorDataWorker",
       "module": "disp3D",
       "header": "disp3D/workers/rtsensordataworker.h",

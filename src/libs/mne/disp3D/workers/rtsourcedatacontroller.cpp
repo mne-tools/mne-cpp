@@ -18,15 +18,17 @@
 
 #include "rtsourcedataworker.h"
 #include "rtsourceinterpolationmatworker.h"
+#include "periodictask.h"
 #include <mne/fs/fs_label.h>
+#include <mne/base/log.h>
+#include <mne/base/thread_pool.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QTimer>
-#include <QDebug>
+#include <vector>
+#include <utility>
 
 namespace mne::disp
 {
@@ -39,14 +41,9 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
 : QObject(parent)
 {
     // Create data worker
-    m_pWorker = new mne::disp::RtSourceDataWorker();
-
-    // Create and configure data thread
-    m_pWorkerThread = new QThread(this);
-    m_pWorker->moveToThread(m_pWorkerThread);
-
-    // Clean up worker when thread finishes
-    connect(m_pWorkerThread, &QThread::finished, m_pWorker, &QObject::deleteLater);
+    // The worker stays on the GUI thread; streamData() runs on the streaming thread, so its signals reach
+    // this controller queued.
+    m_pWorker = new mne::disp::RtSourceDataWorker(this);
 
     // Forward worker signals to controller signals
     connect(m_pWorker, &mne::disp::RtSourceDataWorker::newRtSmoothedData,
@@ -54,20 +51,13 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
     connect(m_pWorker, &mne::disp::RtSourceDataWorker::newRtRawData,
             this, &RtSourceDataController::newRawDataAvailable);
 
-    // Create timer for driving the streaming cadence
-    m_pTimer = new QTimer(this);
-    m_pTimer->setTimerType(Qt::PreciseTimer);
-    connect(m_pTimer, &QTimer::timeout, m_pWorker, &mne::disp::RtSourceDataWorker::streamData);
-
-    // Start the data worker thread
-    m_pWorkerThread->start();
+    // Streaming thread driving the cadence
+    m_pStreamTask = std::make_unique<PeriodicTask>([worker = m_pWorker] { worker->streamData(); });
 
     // Create interpolation matrix worker
-    m_pInterpWorker = new mne::disp::RtSourceInterpolationMatWorker();
-    m_pInterpThread = new QThread(this);
-    m_pInterpWorker->moveToThread(m_pInterpThread);
-
-    connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
+    // One pool thread runs the recomputations in request order.
+    m_pInterpWorker = new mne::disp::RtSourceInterpolationMatWorker(this);
+    m_pInterpPool = std::make_unique<mne::ThreadPool>(1);
 
     // Forward interpolation results: auto-apply to data worker + re-emit
     connect(m_pInterpWorker, &mne::disp::RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
@@ -75,31 +65,18 @@ RtSourceDataController::RtSourceDataController(QObject* parent)
     connect(m_pInterpWorker, &mne::disp::RtSourceInterpolationMatWorker::newInterpolationMatrixRightAvailable,
             this, &RtSourceDataController::onNewInterpolationMatrixRight);
 
-    m_pInterpThread->start();
-
-    qDebug() << "RtSourceDataController: Initialized with" << m_iTimeInterval << "ms interval";
+    mne::Log::debug("RtSourceDataController: Initialized with {} ms interval", m_iTimeInterval);
 }
 
 //=============================================================================================================
 
 RtSourceDataController::~RtSourceDataController()
 {
-    // Stop timer
-    if (m_pTimer) {
-        m_pTimer->stop();
-    }
-
-    // Stop the data worker thread
-    if (m_pWorkerThread) {
-        m_pWorkerThread->quit();
-        m_pWorkerThread->wait();
-    }
-
-    // Stop the interpolation worker thread
-    if (m_pInterpThread) {
-        m_pInterpThread->quit();
-        m_pInterpThread->wait();
-    }
+    // Join the threads while the workers (children of this object) are still alive. Pending
+    // recomputations are skipped.
+    m_bShuttingDown.store(true, std::memory_order_release);
+    m_pStreamTask.reset();
+    m_pInterpPool.reset();
 }
 
 //=============================================================================================================
@@ -114,19 +91,19 @@ void RtSourceDataController::addData(const Eigen::VectorXd& data)
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> mat)
+void RtSourceDataController::setInterpolationMatrixLeft(std::shared_ptr<Eigen::SparseMatrix<float>> mat)
 {
     if (m_pWorker) {
-        m_pWorker->setInterpolationMatrixLeft(mat);
+        m_pWorker->setInterpolationMatrixLeft(std::move(mat));
     }
 }
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> mat)
+void RtSourceDataController::setInterpolationMatrixRight(std::shared_ptr<Eigen::SparseMatrix<float>> mat)
 {
     if (m_pWorker) {
-        m_pWorker->setInterpolationMatrixRight(mat);
+        m_pWorker->setInterpolationMatrixRight(std::move(mat));
     }
 }
 
@@ -137,11 +114,11 @@ void RtSourceDataController::setStreamingState(bool state)
     m_bIsStreaming = state;
 
     if (state) {
-        m_pTimer->start(m_iTimeInterval);
-        qDebug() << "RtSourceDataController: Streaming started at" << m_iTimeInterval << "ms interval";
+        m_pStreamTask->start(std::chrono::milliseconds(m_iTimeInterval));
+        mne::Log::debug("RtSourceDataController: Streaming started at {} ms interval", m_iTimeInterval);
     } else {
-        m_pTimer->stop();
-        qDebug() << "RtSourceDataController: Streaming stopped";
+        m_pStreamTask->stop();
+        mne::Log::debug("RtSourceDataController: Streaming stopped");
     }
 }
 
@@ -159,10 +136,10 @@ void RtSourceDataController::setTimeInterval(int msec)
     m_iTimeInterval = qMax(1, msec);
 
     if (m_bIsStreaming) {
-        m_pTimer->setInterval(m_iTimeInterval);
+        m_pStreamTask->setInterval(std::chrono::milliseconds(m_iTimeInterval));
     }
 
-    qDebug() << "RtSourceDataController: Time interval set to" << m_iTimeInterval << "ms";
+    mne::Log::debug("RtSourceDataController: Time interval set to {} ms", m_iTimeInterval);
 }
 
 //=============================================================================================================
@@ -176,7 +153,7 @@ void RtSourceDataController::setNumberAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSourceDataController::setColormapType(const QString& name)
+void RtSourceDataController::setColormapType(const std::string& name)
 {
     if (m_pWorker) {
         m_pWorker->setColormapType(name);
@@ -221,8 +198,8 @@ void RtSourceDataController::clearData()
 
 //=============================================================================================================
 
-void RtSourceDataController::setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
-                                             const QVector<uint32_t>& baseColorsRh)
+void RtSourceDataController::setSurfaceColor(const std::vector<uint32_t>& baseColorsLh,
+                                             const std::vector<uint32_t>& baseColorsRh)
 {
     if (m_pWorker) {
         m_pWorker->setSurfaceColor(baseColorsLh, baseColorsRh);
@@ -240,7 +217,7 @@ void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
 
 //=============================================================================================================
 
-void RtSourceDataController::setInterpolationFunction(const QString& sInterpolationFunction)
+void RtSourceDataController::setInterpolationFunction(const std::string& sInterpolationFunction)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationFunction(sInterpolationFunction);
@@ -283,13 +260,17 @@ void RtSourceDataController::setInterpolationInfoRight(const Eigen::MatrixX3f& m
 void RtSourceDataController::recomputeInterpolation()
 {
     if (m_pInterpWorker) {
-        QMetaObject::invokeMethod(m_pInterpWorker, "computeInterpolationMatrix", Qt::QueuedConnection);
+        m_pInterpPool->submit([this] {
+            if (!m_bShuttingDown.load(std::memory_order_acquire)) {
+                m_pInterpWorker->computeInterpolationMatrix();
+            }
+        });
     }
 }
 
 //=============================================================================================================
 
-void RtSourceDataController::onNewInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> interpMat)
+void RtSourceDataController::onNewInterpolationMatrixLeft(const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat)
 {
     // Auto-forward to data worker so it immediately uses the new matrix
     if (m_pWorker) {
@@ -301,7 +282,7 @@ void RtSourceDataController::onNewInterpolationMatrixLeft(QSharedPointer<Eigen::
 
 //=============================================================================================================
 
-void RtSourceDataController::onNewInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> interpMat)
+void RtSourceDataController::onNewInterpolationMatrixRight(const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat)
 {
     // Auto-forward to data worker so it immediately uses the new matrix
     if (m_pWorker) {

@@ -513,7 +513,7 @@ int main(int argc, char* argv[])
         pBrainView->setRealtimeInterval(17);
         pBrainView->startRealtimeStreaming();
     });
-    pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
+    pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
 
     std::vector<FsLabel> t_qListLabels;
     std::vector<RowVector4i> t_qListRGBAs;

@@ -36,8 +36,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QString>
-#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,6 +48,9 @@
 //=============================================================================================================
 
 #include <atomic>
+#include <filesystem>
+#include <memory>
+#include <string>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -83,8 +84,8 @@ public:
      * @param[in] cancelDist     Cancel distance for interpolation.
      * @param[in] parent         Parent object.
      */
-    StcLoadingWorker(const QString& lhPath,
-                     const QString& rhPath,
+    StcLoadingWorker(const std::filesystem::path& lhPath,
+                     const std::filesystem::path& rhPath,
                      BrainSurface* lhSurface,
                      BrainSurface* rhSurface,
                      double cancelDist = 0.05,
@@ -124,7 +125,7 @@ public:
      *
      * @return Shared pointer to the interpolation matrix.
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const
+    std::shared_ptr<Eigen::SparseMatrix<float>> interpolationMatLh() const
     {
         return m_interpMatLh;
     }
@@ -135,7 +136,7 @@ public:
      *
      * @return Shared pointer to the interpolation matrix.
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const
+    std::shared_ptr<Eigen::SparseMatrix<float>> interpolationMatRh() const
     {
         return m_interpMatRh;
     }
@@ -194,7 +195,7 @@ signals:
      * @param[in] percent    Progress percentage (0-100).
      * @param[in] message    Status message describing current operation.
      */
-    void progress(int percent, const QString& message);
+    void progress(int percent, const std::string& message);
 
     //=========================================================================================================
     /**
@@ -210,31 +211,31 @@ signals:
      *
      * @param[in] message    Error description.
      */
-    void error(const QString& message);
+    void error(const std::string& message);
 
 private:
-    QSharedPointer<Eigen::SparseMatrix<float>> computeInterpolationMatrix(
+    std::shared_ptr<Eigen::SparseMatrix<float>> computeInterpolationMatrix(
         const Eigen::MatrixX3f& matVertices,
         Eigen::VectorXi& vecSourceVertices,
         double cancelDist,
-        const QString& hemiLabel,
+        const std::string& hemiLabel,
         int progressStart,
         int progressEnd);
 
-    QString m_lhPath;          /**< Path to LH STC file. */
-    QString m_rhPath;          /**< Path to RH STC file. */
-    BrainSurface* m_lhSurface; /**< Pointer to LH surface. */
-    BrainSurface* m_rhSurface; /**< Pointer to RH surface. */
-    double m_cancelDist;       /**< Cancel distance for interpolation. */
+    std::filesystem::path m_lhPath; /**< Path to LH STC file. */
+    std::filesystem::path m_rhPath; /**< Path to RH STC file. */
+    BrainSurface* m_lhSurface;      /**< Pointer to LH surface. */
+    BrainSurface* m_rhSurface;      /**< Pointer to RH surface. */
+    double m_cancelDist;            /**< Cancel distance for interpolation. */
 
     mne::InvSourceEstimate m_stcLh; /**< Loaded LH source estimate. */
     mne::InvSourceEstimate m_stcRh; /**< Loaded RH source estimate. */
     bool m_hasLh = false;           /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;           /**< Flag indicating RH data loaded. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
-    std::atomic<bool> m_cancelled{false};                     /**< Cancellation flag. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
+    std::atomic<bool> m_cancelled{false};                      /**< Cancellation flag. */
 };
 
 } // namespace mne::disp

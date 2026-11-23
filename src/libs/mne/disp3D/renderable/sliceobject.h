@@ -38,7 +38,6 @@
 
 #include <QImage>
 #include <QMatrix4x4>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -46,6 +45,12 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE mne::disp
@@ -160,7 +165,7 @@ public:
      *
      * @param[out] vertices     Output vertex data.
      */
-    void generateQuadVertices(QVector<float>& vertices) const;
+    void generateQuadVertices(std::vector<float>& vertices) const;
 
     //=========================================================================================================
     /**
@@ -168,7 +173,7 @@ public:
      *
      * @param[out] indices      Output index data.
      */
-    static void generateQuadIndices(QVector<unsigned int>& indices);
+    static void generateQuadIndices(std::vector<unsigned int>& indices);
 
 private:
     QImage m_image;

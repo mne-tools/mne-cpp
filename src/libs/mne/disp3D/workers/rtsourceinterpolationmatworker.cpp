@@ -18,13 +18,14 @@
 
 #include "helpers/interpolation.h"
 #include "helpers/geometryinfo.h"
+#include <mne/base/log.h>
 #include <mne/fs/fs_label.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <algorithm>
 
 using namespace mne::disp;
 
@@ -39,9 +40,9 @@ RtSourceInterpolationMatWorker::RtSourceInterpolationMatWorker(QObject* parent)
 
 //=============================================================================================================
 
-void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString& sInterpolationFunction)
+void RtSourceInterpolationMatWorker::setInterpolationFunction(const std::string& sInterpolationFunction)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_sInterpolationFunction = sInterpolationFunction;
 }
 
@@ -49,7 +50,7 @@ void RtSourceInterpolationMatWorker::setInterpolationFunction(const QString& sIn
 
 void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_dCancelDist = dCancelDist;
 }
 
@@ -60,7 +61,7 @@ void RtSourceInterpolationMatWorker::setInterpolationInfoLeft(
     const std::vector<Eigen::VectorXi>& vecNeighborVertices,
     const Eigen::VectorXi& vecSourceVertices)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_matVerticesLh = matVertices;
     m_vecNeighborsLh = vecNeighborVertices;
     m_vecSourceVerticesLh = vecSourceVertices;
@@ -74,7 +75,7 @@ void RtSourceInterpolationMatWorker::setInterpolationInfoRight(
     const std::vector<Eigen::VectorXi>& vecNeighborVertices,
     const Eigen::VectorXi& vecSourceVertices)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_matVerticesRh = matVertices;
     m_vecNeighborsRh = vecNeighborVertices;
     m_vecSourceVerticesRh = vecSourceVertices;
@@ -85,7 +86,7 @@ void RtSourceInterpolationMatWorker::setInterpolationInfoRight(
 
 void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
 {
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_iVisualizationType = iVisType;
 }
 
@@ -96,19 +97,19 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi
                                                            const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.empty()) {
-        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoLeft - FsAnnotation data is empty.";
+        mne::Log::debug("RtSourceInterpolationMatWorker::setAnnotationInfoLeft - FsAnnotation data is empty.");
         return;
     }
 
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_lLabelsLh = lLabels;
     m_nAnnotationVerticesLh = static_cast<int>(vecLabelIds.rows());
     m_mapLabelIdSourcesLh.clear();
     m_vertNosLh.clear();
 
-    for (qint32 i = 0; i < vecVertNo.rows(); ++i) {
-        m_mapLabelIdSourcesLh.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
-        m_vertNosLh.append(vecVertNo(i));
+    for (std::int32_t i = 0; i < vecVertNo.rows(); ++i) {
+        m_mapLabelIdSourcesLh.insert_or_assign(vecVertNo(i), vecLabelIds(vecVertNo(i)));
+        m_vertNosLh.push_back(vecVertNo(i));
     }
 
     m_bAnnotationLhInit = true;
@@ -121,19 +122,19 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorX
                                                             const Eigen::VectorXi& vecVertNo)
 {
     if (vecLabelIds.rows() == 0 || lLabels.empty()) {
-        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoRight - FsAnnotation data is empty.";
+        mne::Log::debug("RtSourceInterpolationMatWorker::setAnnotationInfoRight - FsAnnotation data is empty.");
         return;
     }
 
-    QMutexLocker locker(&m_mutex);
+    std::scoped_lock locker(m_mutex);
     m_lLabelsRh = lLabels;
     m_nAnnotationVerticesRh = static_cast<int>(vecLabelIds.rows());
     m_mapLabelIdSourcesRh.clear();
     m_vertNosRh.clear();
 
-    for (qint32 i = 0; i < vecVertNo.rows(); ++i) {
-        m_mapLabelIdSourcesRh.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
-        m_vertNosRh.append(vecVertNo(i));
+    for (std::int32_t i = 0; i < vecVertNo.rows(); ++i) {
+        m_mapLabelIdSourcesRh.insert_or_assign(vecVertNo(i), vecLabelIds(vecVertNo(i)));
+        m_vertNosRh.push_back(vecVertNo(i));
     }
 
     m_bAnnotationRhInit = true;
@@ -141,15 +142,15 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorX
 
 //=============================================================================================================
 
-double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QString& name))(double)
+double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const std::string& name))(double)
 {
-    if (name == QStringLiteral("linear"))
+    if (name == "linear")
         return Interpolation::linear;
-    if (name == QStringLiteral("gaussian"))
+    if (name == "gaussian")
         return Interpolation::gaussian;
-    if (name == QStringLiteral("square"))
+    if (name == "square")
         return Interpolation::square;
-    if (name == QStringLiteral("cubic"))
+    if (name == "cubic")
         return Interpolation::cubic;
 
     // Default to cubic
@@ -158,7 +159,7 @@ double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QStr
 
 //=============================================================================================================
 
-QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeHemi(
+std::shared_ptr<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeHemi(
     const Eigen::MatrixX3f& matVertices,
     const std::vector<Eigen::VectorXi>& vecNeighborVertices,
     Eigen::VectorXi vecSourceVertices,
@@ -166,19 +167,19 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
     double (*interpFunc)(double))
 {
     if (matVertices.rows() == 0 || vecSourceVertices.size() == 0) {
-        return QSharedPointer<Eigen::SparseMatrix<float>>();
+        return std::shared_ptr<Eigen::SparseMatrix<float>>();
     }
 
     // Compute surface-constrained distances (SCDC / geodesic)
-    QSharedPointer<Eigen::MatrixXd> distTable = GeometryInfo::scdc(
+    std::shared_ptr<Eigen::MatrixXd> distTable = GeometryInfo::scdc(
         matVertices,
         vecNeighborVertices,
         vecSourceVertices,
         dCancelDist);
 
     if (!distTable || distTable->rows() == 0) {
-        qWarning() << "RtSourceInterpolationMatWorker: SCDC computation failed.";
-        return QSharedPointer<Eigen::SparseMatrix<float>>();
+        mne::Log::warning("RtSourceInterpolationMatWorker: SCDC computation failed.");
+        return std::shared_ptr<Eigen::SparseMatrix<float>>();
     }
 
     // Create interpolation matrix
@@ -201,18 +202,18 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     Eigen::VectorXi srcVertsLh, srcVertsRh;
     bool hasLh, hasRh;
     double cancelDist;
-    QString interpFuncName;
+    std::string interpFuncName;
     int visType;
 
     // FsAnnotation data snapshots
     std::vector<mne::FsLabel> labelsLh, labelsRh;
-    QMap<qint32, qint32> mapLabelIdSrcLh, mapLabelIdSrcRh;
-    QList<int> vertNosLh, vertNosRh;
+    std::map<std::int32_t, std::int32_t> mapLabelIdSrcLh, mapLabelIdSrcRh;
+    std::vector<int> vertNosLh, vertNosRh;
     bool annotLhInit, annotRhInit;
     int nAnnotVertsLh, nAnnotVertsRh;
 
     {
-        QMutexLocker locker(&m_mutex);
+        std::scoped_lock locker(m_mutex);
         vertsLh = m_matVerticesLh;
         vertsRh = m_matVerticesRh;
         neighborsLh = m_vecNeighborsLh;
@@ -239,13 +240,12 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 
     // ── FsAnnotation-based mode ──────────────────────────────────────────
     if (visType == AnnotationBased) {
-        qDebug() << "RtSourceInterpolationMatWorker: Computing annotation matrices...";
+        mne::Log::debug("RtSourceInterpolationMatWorker: Computing annotation matrices...");
 
         if (annotLhInit) {
             auto mat = computeAnnotationOperator(labelsLh, mapLabelIdSrcLh, vertNosLh, nAnnotVertsLh);
             if (mat && mat->rows() > 0) {
-                qDebug() << "RtSourceInterpolationMatWorker: LH annotation matrix:"
-                         << mat->rows() << "x" << mat->cols();
+                mne::Log::debug("RtSourceInterpolationMatWorker: LH annotation matrix: {} x {}", mat->rows(), mat->cols());
                 emit newInterpolationMatrixLeftAvailable(mat);
             }
         }
@@ -253,87 +253,87 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         if (annotRhInit) {
             auto mat = computeAnnotationOperator(labelsRh, mapLabelIdSrcRh, vertNosRh, nAnnotVertsRh);
             if (mat && mat->rows() > 0) {
-                qDebug() << "RtSourceInterpolationMatWorker: RH annotation matrix:"
-                         << mat->rows() << "x" << mat->cols();
+                mne::Log::debug("RtSourceInterpolationMatWorker: RH annotation matrix: {} x {}", mat->rows(), mat->cols());
                 emit newInterpolationMatrixRightAvailable(mat);
             }
         }
 
-        qDebug() << "RtSourceInterpolationMatWorker: FsAnnotation matrix computation complete.";
+        mne::Log::debug("RtSourceInterpolationMatWorker: FsAnnotation matrix computation complete.");
         return;
     }
 
     // ── Interpolation-based mode (default) ─────────────────────────────
     if (!hasLh && !hasRh) {
-        qDebug() << "RtSourceInterpolationMatWorker: No hemisphere data set, skipping.";
+        mne::Log::debug("RtSourceInterpolationMatWorker: No hemisphere data set, skipping.");
         return;
     }
 
     auto interpFunc = resolveInterpolationFunction(interpFuncName);
 
-    qDebug() << "RtSourceInterpolationMatWorker: Computing interpolation matrices"
-             << "(cancelDist=" << cancelDist << ", func=" << interpFuncName << ")...";
+    mne::Log::debug("RtSourceInterpolationMatWorker: Computing interpolation matrices (cancelDist={}, func={})...", cancelDist, interpFuncName);
 
     // ── LH ─────────────────────────────────────────────────────────────
     if (hasLh) {
-        qDebug() << "RtSourceInterpolationMatWorker: Computing LH matrix ("
-                 << vertsLh.rows() << "verts," << srcVertsLh.size() << "sources)...";
+        mne::Log::debug("RtSourceInterpolationMatWorker: Computing LH matrix ({} verts, {} sources)...", vertsLh.rows(), srcVertsLh.size());
 
         auto mat = computeHemi(vertsLh, neighborsLh, srcVertsLh, cancelDist, interpFunc);
 
         if (mat && mat->rows() > 0) {
-            qDebug() << "RtSourceInterpolationMatWorker: LH matrix computed:"
-                     << mat->rows() << "x" << mat->cols();
+            mne::Log::debug("RtSourceInterpolationMatWorker: LH matrix computed: {} x {}", mat->rows(), mat->cols());
             emit newInterpolationMatrixLeftAvailable(mat);
         } else {
-            qWarning() << "RtSourceInterpolationMatWorker: LH interpolation matrix computation failed.";
+            mne::Log::warning("RtSourceInterpolationMatWorker: LH interpolation matrix computation failed.");
         }
     }
 
     // ── RH ─────────────────────────────────────────────────────────────
     if (hasRh) {
-        qDebug() << "RtSourceInterpolationMatWorker: Computing RH matrix ("
-                 << vertsRh.rows() << "verts," << srcVertsRh.size() << "sources)...";
+        mne::Log::debug("RtSourceInterpolationMatWorker: Computing RH matrix ({} verts, {} sources)...", vertsRh.rows(), srcVertsRh.size());
 
         auto mat = computeHemi(vertsRh, neighborsRh, srcVertsRh, cancelDist, interpFunc);
 
         if (mat && mat->rows() > 0) {
-            qDebug() << "RtSourceInterpolationMatWorker: RH matrix computed:"
-                     << mat->rows() << "x" << mat->cols();
+            mne::Log::debug("RtSourceInterpolationMatWorker: RH matrix computed: {} x {}", mat->rows(), mat->cols());
             emit newInterpolationMatrixRightAvailable(mat);
         } else {
-            qWarning() << "RtSourceInterpolationMatWorker: RH interpolation matrix computation failed.";
+            mne::Log::warning("RtSourceInterpolationMatWorker: RH interpolation matrix computation failed.");
         }
     }
 
-    qDebug() << "RtSourceInterpolationMatWorker: Interpolation matrix computation complete.";
+    mne::Log::debug("RtSourceInterpolationMatWorker: Interpolation matrix computation complete.");
 }
 
 //=============================================================================================================
 
-QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
+std::shared_ptr<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
     const std::vector<mne::FsLabel>& lLabels,
-    const QMap<qint32, qint32>& mapLabelIdSrc,
-    const QList<int>& vertNos,
+    const std::map<std::int32_t, std::int32_t>& mapLabelIdSrc,
+    const std::vector<int>& vertNos,
     int nVertices)
 {
-    if (lLabels.empty() || vertNos.isEmpty() || nVertices <= 0) {
-        return QSharedPointer<Eigen::SparseMatrix<float>>();
+    if (lLabels.empty() || vertNos.empty() || nVertices <= 0) {
+        return std::shared_ptr<Eigen::SparseMatrix<float>>();
     }
 
     // One row per surface vertex: labels need not cover the surface, and their vertex indices are surface indices
-    auto mat = QSharedPointer<Eigen::SparseMatrix<float>>::create(nVertices, vertNos.size());
+    auto mat = std::make_shared<Eigen::SparseMatrix<float>>(nVertices, static_cast<Eigen::Index>(vertNos.size()));
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < std::ssize(lLabels); ++i) {
         const mne::FsLabel& label = lLabels.at(i);
-        QList<qint32> listSourcesVertNoLabel = mapLabelIdSrc.keys(label.label_id);
+        std::vector<std::int32_t> listSourcesVertNoLabel;
+        for (const auto& [vertNo, labelId] : mapLabelIdSrc) {
+            if (labelId == label.label_id) {
+                listSourcesVertNoLabel.push_back(vertNo);
+            }
+        }
 
         for (int j = 0; j < label.vertices.rows(); ++j) {
-            for (int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
-                int colIdx = vertNos.indexOf(listSourcesVertNoLabel.at(k));
+            for (const std::int32_t sourceVertNo : listSourcesVertNoLabel) {
+                const auto col = std::ranges::find(vertNos, sourceVertNo);
+                const int colIdx = col == vertNos.end() ? -1 : static_cast<int>(col - vertNos.begin());
                 if (colIdx >= 0 && label.vertices(j) >= 0 && label.vertices(j) < nVertices) {
-                    mat->coeffRef(label.vertices(j), colIdx) = 1.0f / listSourcesVertNoLabel.size();
+                    mat->coeffRef(label.vertices(j), colIdx) = 1.0f / static_cast<float>(listSourcesVertNoLabel.size());
                 }
             }
         }

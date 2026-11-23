@@ -39,6 +39,13 @@
 #include <QPainterPath>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
+#include <vector>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -64,7 +71,7 @@ class RtFiffRawView;
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*, qint32> RowVectorPair;
+typedef std::pair<const double*, int> RowVectorPair;
 
 //=============================================================================================================
 /**
@@ -264,9 +271,9 @@ private:
      */
     inline double retrieveSamplingPeriod() const;
 
-    RtFiffRawView* m_pParent;           /**< Pointer to parent class. **/
-    QPoint m_markerPosition;            /**< Current mouse position used to draw the marker in the plot. */
-    QList<QPainterPath> m_painterPaths; /**< List of all current painter paths for each row. */
+    RtFiffRawView* m_pParent;                 /**< Pointer to parent class. **/
+    QPoint m_markerPosition;                  /**< Current mouse position used to draw the marker in the plot. */
+    std::vector<QPainterPath> m_painterPaths; /**< List of all current painter paths for each row. */
 
     double m_dMaxValue;    /**< Maximum value of the data to plot. */
     double m_dScaleY;      /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
@@ -286,7 +293,7 @@ private:
     QPen m_penNormalBad;         /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
     QPen m_penNormalSelectedBad; /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
 
-    QMap<double, QColor> m_mapTriggerColors; /**< Colors per trigger. */
+    std::map<double, QColor> m_mapTriggerColors; /**< Colors per trigger. */
 };
 } // NAMESPACE
 

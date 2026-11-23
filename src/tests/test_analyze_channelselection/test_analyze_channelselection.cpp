@@ -86,12 +86,12 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
     plugin.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
 
     Communicator listener(QVector<EVENT_TYPE>{CHANNEL_SELECTION_ITEMS});
-    QList<QStringList> names;
-    QList<QList<int>> indices;
+    std::vector<std::vector<std::string>> names;
+    std::vector<std::vector<int>> indices;
     connect(&listener, &Communicator::receivedEvent, this, [&](const QSharedPointer<Event> e) {
         const auto* item = e->getData().value<mne::disp::SelectionItem*>();
-        names << item->m_sChannelName;
-        indices << item->m_iChannelNumber;
+        names.push_back(item->m_sChannelName);
+        indices.push_back(item->m_iChannelNumber);
     });
 
     auto* selection = view->findChild<mne::disp::ChannelSelectionView*>();
@@ -104,19 +104,19 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
     QVERIFY(selection);
 
     // Selecting two sensors, twice: each time the same names and the indices of those channels in the recording
-    const QStringList wanted{QStringLiteral("MEG 0113"), QStringLiteral("MEG 0112")};
+    const std::vector<std::string> wanted{"MEG 0113", "MEG 0112"};
     for (int pass = 0; pass < 2; ++pass) {
         selection->selectChannels(wanted);
-        QTRY_VERIFY_WITH_TIMEOUT(names.size() > pass, 5000);
-        QStringList got = names.last();
-        got.sort();
-        QStringList expected = wanted;
-        expected.sort();
+        QTRY_VERIFY_WITH_TIMEOUT(std::ssize(names) > pass, 5000);
+        std::vector<std::string> got = names.back();
+        std::ranges::sort(got);
+        std::vector<std::string> expected = wanted;
+        std::ranges::sort(expected);
         QCOMPARE(got, expected);
-        QList<int> idx = indices.last();
+        std::vector<int> idx = indices.back();
         std::sort(idx.begin(), idx.end());
-        QList<int> expectedIdx{static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0112")),
-                               static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0113"))};
+        std::vector<int> expectedIdx{static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0112")),
+                                     static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0113"))};
         std::sort(expectedIdx.begin(), expectedIdx.end());
         QCOMPARE(idx, expectedIdx);
     }

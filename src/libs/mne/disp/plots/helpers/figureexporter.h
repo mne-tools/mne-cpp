@@ -32,7 +32,13 @@
 //=============================================================================================================
 
 #include <QSize>
-#include <QString>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <string>
 
 class QImage;
 class QWidget;
@@ -57,9 +63,9 @@ public:
     /**
      * Returns the directory figures are written to.
      *
-     * @return The value of @c MNE_CPP_FIGURE_DIR, or an empty string when figures are not written.
+     * @return The value of @c MNE_CPP_FIGURE_DIR, or an empty path when figures are not written.
      */
-    static QString directory();
+    static std::filesystem::path directory();
 
     //=========================================================================================================
     /**
@@ -70,12 +76,12 @@ public:
      * @param[in] caption    Caption shown below the figure.
      * @param[in] size       Logical size of the figure in pixels.
      *
-     * @return The path of the written PNG, or an empty string when figures are not written or writing failed.
+     * @return The path of the written PNG, or an empty path when figures are not written or writing failed.
      */
-    static QString save(QWidget& widget,
-                        const QString& name,
-                        const QString& caption,
-                        const QSize& size = QSize(800, 450));
+    static std::filesystem::path save(QWidget& widget,
+                                      const std::string& name,
+                                      const std::string& caption,
+                                      const QSize& size = QSize(800, 450));
 
     //=========================================================================================================
     /**
@@ -85,11 +91,11 @@ public:
      * @param[in] name       File name stem; characters other than letters, digits, '-' and '_' become '_'.
      * @param[in] caption    Caption shown below the figure.
      *
-     * @return The path of the written PNG, or an empty string when figures are not written or writing failed.
+     * @return The path of the written PNG, or an empty path when figures are not written or writing failed.
      */
-    static QString save(const QImage& image,
-                        const QString& name,
-                        const QString& caption);
+    static std::filesystem::path save(const QImage& image,
+                                      const std::string& name,
+                                      const std::string& caption);
 };
 
 } // namespace mne::disp

@@ -19,12 +19,7 @@
 #include "sensorfieldmapper.h"
 #include "../renderable/brainsurface.h"
 #include "../workers/rtsensordatacontroller.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
+#include <mne/base/log.h>
 
 namespace mne::disp
 {
@@ -47,48 +42,46 @@ RtSensorStreamManager::~RtSensorStreamManager()
 
 //=============================================================================================================
 
-bool RtSensorStreamManager::startStreaming(const QString& modality,
+bool RtSensorStreamManager::startStreaming(const std::string& modality,
                                            const SensorFieldMapper& fieldMapper,
-                                           const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
+                                           const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces)
 {
     if (m_isStreaming) {
-        qDebug() << "RtSensorStreamManager: Real-time sensor streaming already active";
+        mne::Log::debug("RtSensorStreamManager: Real-time sensor streaming already active");
         return false;
     }
 
     // Require loaded evoked data and a built mapping matrix
     if (!fieldMapper.isLoaded() || fieldMapper.evoked().empty()) {
-        qWarning() << "RtSensorStreamManager: Cannot start sensor streaming — no evoked data loaded";
+        mne::Log::warning("RtSensorStreamManager: Cannot start sensor streaming — no evoked data loaded");
         return false;
     }
 
     // Select the mapping matrix and pick vector based on modality
     std::shared_ptr<Eigen::MatrixXf> mappingMat;
     Eigen::VectorXi pick;
-    QString surfaceKey;
+    std::string surfaceKey;
 
-    if (modality == QStringLiteral("MEG")) {
+    if (modality == "MEG") {
         mappingMat = fieldMapper.megMapping();
         pick = fieldMapper.megPick();
         surfaceKey = fieldMapper.megSurfaceKey();
-    } else if (modality == QStringLiteral("EEG")) {
+    } else if (modality == "EEG") {
         mappingMat = fieldMapper.eegMapping();
         pick = fieldMapper.eegPick();
         surfaceKey = fieldMapper.eegSurfaceKey();
     } else {
-        qWarning() << "RtSensorStreamManager: Unknown modality:" << modality;
+        mne::Log::warning("RtSensorStreamManager: Unknown modality: {}", modality);
         return false;
     }
 
     if (!mappingMat || mappingMat->rows() == 0 || pick.size() == 0) {
-        qWarning() << "RtSensorStreamManager: Mapping matrix not built for" << modality
-                   << "— call loadSensorField() first";
+        mne::Log::warning("RtSensorStreamManager: Mapping matrix not built for {} — call loadSensorField() first", modality);
         return false;
     }
 
-    if (surfaceKey.isEmpty() || !surfaces.contains(surfaceKey)) {
-        qWarning() << "RtSensorStreamManager: Target surface not found for" << modality
-                   << "streaming (key:" << surfaceKey << ")";
+    if (surfaceKey.empty() || !surfaces.contains(surfaceKey)) {
+        mne::Log::warning("RtSensorStreamManager: Target surface not found for {} streaming (key: {})", modality, surfaceKey);
         return false;
     }
 
@@ -118,8 +111,7 @@ bool RtSensorStreamManager::startStreaming(const QString& modality,
 
     // Feed evoked time points as data into the queue
     const int nTimePoints = static_cast<int>(fieldMapper.evoked().times.size());
-    qDebug() << "RtSensorStreamManager: Feeding" << nTimePoints << modality
-             << "sensor time points into real-time queue";
+    mne::Log::debug("RtSensorStreamManager: Feeding {} {} sensor time points into real-time queue", nTimePoints, modality);
     m_controller->clearData();
 
     for (int t = 0; t < nTimePoints; ++t) {
@@ -134,7 +126,7 @@ bool RtSensorStreamManager::startStreaming(const QString& modality,
     m_controller->setStreamingState(true);
     m_isStreaming = true;
 
-    qDebug() << "RtSensorStreamManager: Real-time sensor streaming started for" << modality;
+    mne::Log::debug("RtSensorStreamManager: Real-time sensor streaming started for {}", modality);
     return true;
 }
 
@@ -149,7 +141,7 @@ void RtSensorStreamManager::stopStreaming()
         m_controller->setStreamingState(false);
 
     m_isStreaming = false;
-    qDebug() << "RtSensorStreamManager: Real-time sensor streaming stopped";
+    mne::Log::debug("RtSensorStreamManager: Real-time sensor streaming stopped");
 }
 
 //=============================================================================================================
@@ -186,7 +178,7 @@ void RtSensorStreamManager::setAverages(int numAvr)
 
 //=============================================================================================================
 
-void RtSensorStreamManager::setColormap(const QString& name)
+void RtSensorStreamManager::setColormap(const std::string& name)
 {
     if (m_controller)
         m_controller->setColormapType(name);

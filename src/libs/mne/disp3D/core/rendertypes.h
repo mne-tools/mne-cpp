@@ -42,8 +42,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
+#include <vector>
 
 namespace mne::disp
 {
@@ -159,6 +162,20 @@ public:
 private:
     std::shared_ptr<char> m_token;
 };
+
+//=============================================================================================================
+/**
+ * Copy a vector of trivially copyable GPU records into a raw byte buffer.
+ *
+ * @param[in] records   Vertex, index or instance records.
+ * @return The bytes of @p records.
+ */
+template<typename T>
+std::vector<std::byte> toByteBuffer(const std::vector<T>& records)
+{
+    const std::span<const std::byte> bytes = std::as_bytes(std::span(records));
+    return {bytes.begin(), bytes.end()};
+}
 
 } // namespace mne::disp
 

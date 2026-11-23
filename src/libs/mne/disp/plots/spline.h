@@ -48,6 +48,12 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -246,18 +252,18 @@ protected:
         return 60;
     }
 
-    QString m_sTitle;            /**< Title. */
-    QString m_sXLabel;           /**< X axis label. */
-    QString m_sYLabel;           /**< Y axis label. */
-    QList<QPointF> m_seriesData; /**< Spline data points (classMark, frequency). */
-    double m_dLeftThreshold;     /**< X-axis value of the left threshold line. */
-    double m_dMiddleThreshold;   /**< X-axis value of the middle threshold line. */
-    double m_dRightThreshold;    /**< X-axis value of the right threshold line. */
-    bool m_bHasData;             /**< Whether data has been loaded. */
-    bool m_bHasThresholds;       /**< Whether thresholds have been set. */
-    int m_iMaximumFrequency;     /**< Highest value of frequency (y-axis). */
-    QString m_colorMap;          /**< Color map name for background gradient. */
-    QVector3D m_vecReturnVector; /**< Cached return value for getThreshold. */
+    QString m_sTitle;                  /**< Title. */
+    QString m_sXLabel;                 /**< X axis label. */
+    QString m_sYLabel;                 /**< Y axis label. */
+    std::vector<QPointF> m_seriesData; /**< Spline data points (classMark, frequency). */
+    double m_dLeftThreshold;           /**< X-axis value of the left threshold line. */
+    double m_dMiddleThreshold;         /**< X-axis value of the middle threshold line. */
+    double m_dRightThreshold;          /**< X-axis value of the right threshold line. */
+    bool m_bHasData;                   /**< Whether data has been loaded. */
+    bool m_bHasThresholds;             /**< Whether thresholds have been set. */
+    int m_iMaximumFrequency;           /**< Highest value of frequency (y-axis). */
+    QString m_colorMap;                /**< Color map name for background gradient. */
+    QVector3D m_vecReturnVector;       /**< Cached return value for getThreshold. */
 
 signals:
     //=========================================================================================================
@@ -313,7 +319,7 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 
     for (int ir = 0; ir < iClassAmount; ++ir) {
         double classMark = (static_cast<double>(matClassLimitData(ir)) + static_cast<double>(matClassLimitData(ir + 1))) / 2.0;
-        m_seriesData.append(QPointF(classMark, matClassFrequencyData(ir)));
+        m_seriesData.push_back(QPointF(classMark, matClassFrequencyData(ir)));
         if (matClassFrequencyData(ir) > m_iMaximumFrequency) {
             m_iMaximumFrequency = matClassFrequencyData(ir);
         }

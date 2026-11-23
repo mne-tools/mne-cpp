@@ -29,6 +29,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -39,7 +40,7 @@ namespace mne::disp
 // ViewVisibilityProfile
 //=============================================================================================================
 
-bool ViewVisibilityProfile::isObjectVisible(const QString& object) const
+bool ViewVisibilityProfile::isObjectVisible(std::string_view object) const
 {
     if (object == "lh")
         return lh;
@@ -92,7 +93,7 @@ bool ViewVisibilityProfile::isObjectVisible(const QString& object) const
 
 //=============================================================================================================
 
-void ViewVisibilityProfile::setObjectVisible(const QString& object, bool visible)
+void ViewVisibilityProfile::setObjectVisible(std::string_view object, bool visible)
 {
     if (object == "lh")
         lh = visible;
@@ -206,35 +207,35 @@ void ViewVisibilityProfile::save(QSettings& settings, const QString& prefix) con
 // SubView
 //=============================================================================================================
 
-bool SubView::isBrainSurfaceKey(const QString& key)
+bool SubView::isBrainSurfaceKey(std::string_view key)
 {
-    if (key.isEmpty())
+    if (key.empty())
         return false;
-    if (key.startsWith("bem_"))
+    if (key.starts_with("bem_"))
         return false;
-    if (key.startsWith("sens_"))
+    if (key.starts_with("sens_"))
         return false;
-    if (key.startsWith("srcsp_"))
+    if (key.starts_with("srcsp_"))
         return false;
-    if (key.startsWith("dig_"))
+    if (key.starts_with("dig_"))
         return false;
     return true;
 }
 
 //=============================================================================================================
 
-bool SubView::matchesSurfaceType(const QString& key) const
+bool SubView::matchesSurfaceType(std::string_view key) const
 {
-    return isBrainSurfaceKey(key) && key.endsWith(surfaceType);
+    return isBrainSurfaceKey(key) && key.ends_with(surfaceType);
 }
 
 //=============================================================================================================
 
-bool SubView::shouldRenderSurface(const QString& key) const
+bool SubView::shouldRenderSurface(std::string_view key) const
 {
-    if (key.startsWith("lh_"))
+    if (key.starts_with("lh_"))
         return visibility.lh;
-    if (key.startsWith("rh_"))
+    if (key.starts_with("rh_"))
         return visibility.rh;
 
     if (key == "bem_head")
@@ -244,41 +245,41 @@ bool SubView::shouldRenderSurface(const QString& key) const
     if (key == "bem_inner_skull")
         return visibility.bemInnerSkull;
 
-    if (key.startsWith("sens_contour_meg"))
+    if (key.starts_with("sens_contour_meg"))
         return visibility.megFieldMap && visibility.megFieldContours;
-    if (key.startsWith("sens_contour_eeg"))
+    if (key.starts_with("sens_contour_eeg"))
         return visibility.eegFieldMap && visibility.eegFieldContours;
-    if (key.startsWith("sens_surface_meg"))
+    if (key.starts_with("sens_surface_meg"))
         return visibility.sensMegHelmet;
-    if (key.startsWith("sens_meg_grad_"))
+    if (key.starts_with("sens_meg_grad_"))
         return visibility.sensMeg && visibility.sensMegGrad;
-    if (key.startsWith("sens_meg_mag_"))
+    if (key.starts_with("sens_meg_mag_"))
         return visibility.sensMeg && visibility.sensMegMag;
-    if (key.startsWith("sens_meg_"))
+    if (key.starts_with("sens_meg_"))
         return visibility.sensMeg;
-    if (key.startsWith("sens_eeg_"))
+    if (key.starts_with("sens_eeg_"))
         return visibility.sensEeg;
 
-    if (key.startsWith("dig_live_"))
+    if (key.starts_with("dig_live_"))
         return true; // always show live tracker
-    if (key.startsWith("dig_static_"))
+    if (key.starts_with("dig_static_"))
         return true; // always show static markers
-    if (key.startsWith("dig_ray_"))
+    if (key.starts_with("dig_ray_"))
         return true; // always show optical ray
-    if (key.startsWith("dig_probe_"))
+    if (key.starts_with("dig_probe_"))
         return true; // always show catheter probe
-    if (key.startsWith("dig_cardinal"))
+    if (key.starts_with("dig_cardinal"))
         return visibility.dig && visibility.digCardinal;
-    if (key.startsWith("dig_hpi"))
+    if (key.starts_with("dig_hpi"))
         return visibility.dig && visibility.digHpi;
-    if (key.startsWith("dig_eeg"))
+    if (key.starts_with("dig_eeg"))
         return visibility.dig && visibility.digEeg;
-    if (key.startsWith("dig_extra"))
+    if (key.starts_with("dig_extra"))
         return visibility.dig && visibility.digExtra;
-    if (key.startsWith("dig_"))
+    if (key.starts_with("dig_"))
         return visibility.dig;
 
-    if (key.startsWith("srcsp_"))
+    if (key.starts_with("srcsp_"))
         return visibility.sourceSpace;
 
     return true;
@@ -287,11 +288,11 @@ bool SubView::shouldRenderSurface(const QString& key) const
 //=============================================================================================================
 
 void SubView::applyOverlayToSurfaces(
-    QMap<QString, std::shared_ptr<BrainSurface>>& surfaces) const
+    std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces) const
 {
-    for (auto it = surfaces.begin(); it != surfaces.end(); ++it) {
-        if (matchesSurfaceType(it.key())) {
-            it.value()->setVisualizationMode(overlayMode);
+    for (auto& [key, surface] : surfaces) {
+        if (matchesSurfaceType(key)) {
+            surface->setVisualizationMode(overlayMode);
         }
     }
 }
@@ -307,25 +308,25 @@ QQuaternion perspectivePresetRotation()
 
 //=============================================================================================================
 
-QString multiViewPresetName(int preset)
+std::string multiViewPresetName(int preset)
 {
     switch (preset) {
         case 0:
-            return QStringLiteral("Top");
+            return "Top";
         case 1:
-            return QStringLiteral("Perspective");
+            return "Perspective";
         case 2:
-            return QStringLiteral("Front");
+            return "Front";
         case 3:
-            return QStringLiteral("Left");
+            return "Left";
         case 4:
-            return QStringLiteral("Bottom");
+            return "Bottom";
         case 5:
-            return QStringLiteral("Back");
+            return "Back";
         case 6:
-            return QStringLiteral("Right");
+            return "Right";
         default:
-            return QStringLiteral("Top");
+            return "Top";
     }
 }
 
@@ -392,7 +393,7 @@ int normalizedVisualizationTarget(int target, int maxIndex)
 
 //=============================================================================================================
 
-ShaderMode shaderModeFromName(const QString& name)
+ShaderMode shaderModeFromName(std::string_view name)
 {
     if (name == "Holographic")
         return Holographic;
@@ -405,18 +406,18 @@ ShaderMode shaderModeFromName(const QString& name)
 
 //=============================================================================================================
 
-QString shaderModeName(ShaderMode mode)
+std::string shaderModeName(ShaderMode mode)
 {
     if (mode == Holographic)
-        return QStringLiteral("Holographic");
+        return "Holographic";
     if (mode == Anatomical)
-        return QStringLiteral("Anatomical");
-    return QStringLiteral("Standard");
+        return "Anatomical";
+    return "Standard";
 }
 
 //=============================================================================================================
 
-VisualizationMode visualizationModeFromName(const QString& name)
+VisualizationMode visualizationModeFromName(std::string_view name)
 {
     if (name == "Annotation")
         return ModeAnnotation;
@@ -429,15 +430,15 @@ VisualizationMode visualizationModeFromName(const QString& name)
 
 //=============================================================================================================
 
-QString visualizationModeName(VisualizationMode mode)
+std::string visualizationModeName(VisualizationMode mode)
 {
     if (mode == ModeAnnotation)
-        return QStringLiteral("Annotation");
+        return "Annotation";
     if (mode == ModeScientific)
-        return QStringLiteral("Scientific");
+        return "Scientific";
     if (mode == ModeSourceEstimate)
-        return QStringLiteral("Source Estimate");
-    return QStringLiteral("Surface");
+        return "Source Estimate";
+    return "Surface";
 }
 
 //=============================================================================================================
@@ -484,10 +485,10 @@ QRgb mneAnalyzeColor(double v)
 void SubView::load(const QSettings& settings, const QString& prefix,
                    const QQuaternion& fallbackRotation)
 {
-    surfaceType = settings.value(prefix + "surfaceType", surfaceType).toString();
-    brainShader = shaderModeFromName(settings.value(prefix + "shader", shaderModeName(brainShader)).toString());
-    bemShader = shaderModeFromName(settings.value(prefix + "bemShader", shaderModeName(bemShader)).toString());
-    overlayMode = visualizationModeFromName(settings.value(prefix + "overlay", visualizationModeName(overlayMode)).toString());
+    surfaceType = settings.value(prefix + "surfaceType", QString::fromStdString(surfaceType)).toString().toStdString();
+    brainShader = shaderModeFromName(settings.value(prefix + "shader", QString::fromStdString(shaderModeName(brainShader))).toString().toStdString());
+    bemShader = shaderModeFromName(settings.value(prefix + "bemShader", QString::fromStdString(shaderModeName(bemShader))).toString().toStdString());
+    overlayMode = visualizationModeFromName(settings.value(prefix + "overlay", QString::fromStdString(visualizationModeName(overlayMode))).toString().toStdString());
 
     visibility.load(settings, prefix + "vis_");
 
@@ -518,10 +519,10 @@ void SubView::load(const QSettings& settings, const QString& prefix,
 
 void SubView::save(QSettings& settings, const QString& prefix) const
 {
-    settings.setValue(prefix + "surfaceType", surfaceType);
-    settings.setValue(prefix + "shader", shaderModeName(brainShader));
-    settings.setValue(prefix + "bemShader", shaderModeName(bemShader));
-    settings.setValue(prefix + "overlay", visualizationModeName(overlayMode));
+    settings.setValue(prefix + "surfaceType", QString::fromStdString(surfaceType));
+    settings.setValue(prefix + "shader", QString::fromStdString(shaderModeName(brainShader)));
+    settings.setValue(prefix + "bemShader", QString::fromStdString(shaderModeName(bemShader)));
+    settings.setValue(prefix + "overlay", QString::fromStdString(visualizationModeName(overlayMode)));
 
     visibility.save(settings, prefix + "vis_");
 

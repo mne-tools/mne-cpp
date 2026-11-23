@@ -14,10 +14,10 @@
 #define DISPLIB_DETAIL_NICETICKS_H
 
 #include <QString>
-#include <QVector>
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 namespace mne::disp
 {
@@ -25,9 +25,9 @@ namespace detail
 {
 
 /** Ticks at 1, 2 or 5 times a power of ten, about @p target of them across [lo, hi], at least @p minStep apart. */
-inline QVector<double> niceTicks(double lo, double hi, int target, double minStep = 0.0)
+inline std::vector<double> niceTicks(double lo, double hi, int target, double minStep = 0.0)
 {
-    QVector<double> ticks;
+    std::vector<double> ticks;
     if (!(hi > lo) || target < 1) {
         return ticks;
     }
@@ -49,7 +49,7 @@ inline QVector<double> niceTicks(double lo, double hi, int target, double minSte
     };
     const double step = tick(1.0);
     for (auto k = static_cast<long long>(std::ceil(lo / step - 1e-9)); tick(static_cast<double>(k)) <= hi + step * 1e-9; ++k) {
-        ticks.append(k == 0 ? 0.0 : tick(static_cast<double>(k)));
+        ticks.push_back(k == 0 ? 0.0 : tick(static_cast<double>(k)));
     }
     return ticks;
 }

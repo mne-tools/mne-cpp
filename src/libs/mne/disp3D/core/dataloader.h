@@ -42,7 +42,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStringList>
 #include <QList>
 #include <QStandardItem>
 #include <QVector3D>
@@ -52,7 +51,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -111,8 +113,8 @@ public:
      * @param[in] megHelmetOverridePath  Optional override for the helmet surface file.
      * @return Populated SensorLoadResult.
      */
-    static SensorLoadResult loadSensors(const QString& fifPath,
-                                        const QString& megHelmetOverridePath = {});
+    static SensorLoadResult loadSensors(const std::filesystem::path& fifPath,
+                                        const std::filesystem::path& megHelmetOverridePath = {});
 
     /**
      * Load a standalone MEG helmet surface from a BEM FIF file.
@@ -123,7 +125,7 @@ public:
      * @return Shared pointer to the loaded BrainSurface, or nullptr on failure.
      */
     static std::shared_ptr<BrainSurface> loadHelmetSurface(
-        const QString& helmetFilePath,
+        const std::filesystem::path& helmetFilePath,
         const QMatrix4x4& devHeadTrans = QMatrix4x4(),
         bool applyTrans = false);
 
@@ -133,7 +135,7 @@ public:
      * @param[in] dipPath  Path to the dipole file.
      * @return The loaded InvEcdSet (may be empty on failure).
      */
-    static mne::InvEcdSet loadDipoles(const QString& dipPath);
+    static mne::InvEcdSet loadDipoles(const std::filesystem::path& dipPath);
 
     /**
      * Load source space from a forward-solution FIF file.
@@ -141,7 +143,7 @@ public:
      * @param[in] fwdPath  Path to the FIF file with source space.
      * @return The loaded source space (may be empty on failure).
      */
-    static mne::MNESourceSpaces loadSourceSpace(const QString& fwdPath);
+    static mne::MNESourceSpaces loadSourceSpace(const std::filesystem::path& fwdPath);
 
     /**
      * Load the Head ↔ MRI transformation from a FIF file and normalise it
@@ -151,7 +153,7 @@ public:
      * @param[out] trans     The resulting transform (Head → MRI).
      * @return true on success; false if the file holds no Head ↔ MRI transform.
      */
-    static bool loadHeadToMriTransform(const QString& transPath,
+    static bool loadHeadToMriTransform(const std::filesystem::path& transPath,
                                        mne::FiffCoordTrans& trans);
 
     /**
@@ -161,7 +163,7 @@ public:
      * @param[in] aveIndex    Set index to load.
      * @return The loaded FiffEvoked (may be empty on failure).
      */
-    static mne::FiffEvoked loadEvoked(const QString& evokedPath, int aveIndex = 0);
+    static mne::FiffEvoked loadEvoked(const std::filesystem::path& evokedPath, int aveIndex = 0);
 
     /**
      * Probe a FIF file for the available evoked data sets.
@@ -169,7 +171,7 @@ public:
      * @param[in] evokedPath  Path to the FIF file.
      * @return List of human-readable labels for each set.
      */
-    static QStringList probeEvokedSets(const QString& evokedPath);
+    static std::vector<std::string> probeEvokedSets(const std::filesystem::path& evokedPath);
 };
 
 } // namespace mne::disp

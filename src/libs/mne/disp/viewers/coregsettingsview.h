@@ -46,6 +46,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -349,7 +350,7 @@ signals:
      *
      * @param[in] sFilePath    The file path to the fiduical file.
      */
-    void fidFileChanged(const QString& sFilePath);
+    void fidFileChanged(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -365,7 +366,7 @@ signals:
      *
      * @param[in] sFilePath    The file path to the stored fiducials.
      */
-    void fidStoreFileChanged(const QString& sFilePath);
+    void fidStoreFileChanged(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -373,7 +374,7 @@ signals:
      *
      * @param[in] sFilePath    The file path to the digitizers.
      */
-    void digFileChanged(const QString& sFilePath);
+    void digFileChanged(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -393,7 +394,7 @@ signals:
      *
      * @param[in] sFilePath    The file path to store the transformation.
      */
-    void storeTrans(const QString& sFilePath);
+    void storeTrans(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -401,7 +402,7 @@ signals:
      *
      * @param[in] sFilePath    The file path to load the transformation.
      */
-    void loadTrans(const QString& sFilePath);
+    void loadTrans(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**

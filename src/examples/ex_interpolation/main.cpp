@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 
     //SCDC with cancel distance 0.03
     qint64 startTimeScdc = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0].rr, t_sensorSurfaceVV[0].neighbor_vert, mappedSubSet, 0.2);
+    std::shared_ptr<MatrixXd> distanceMatrix = GeometryInfo::scdc(t_sensorSurfaceVV[0].rr, t_sensorSurfaceVV[0].neighbor_vert, mappedSubSet, 0.2);
     std::cout << "SCDC duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeScdc << " ms " << std::endl;
 
     //filter out bad MEG channels
@@ -135,10 +135,10 @@ int main(int argc, char* argv[])
 
     //weight matrix
     qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-    QSharedPointer<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
-                                                                                                    distanceMatrix,
-                                                                                                    Interpolation::linear,
-                                                                                                    FLOAT_INFINITY);
+    std::shared_ptr<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
+                                                                                                     distanceMatrix,
+                                                                                                     Interpolation::linear,
+                                                                                                     FLOAT_INFINITY);
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat << " ms " << std::endl;
 
     //realtime interpolation (1 iteration)

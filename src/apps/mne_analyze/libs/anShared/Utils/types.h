@@ -39,6 +39,14 @@
 #include <QString>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <map>
+#include <string>
+#include <vector>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -119,8 +127,8 @@ enum EVENT_TYPE
      */
 struct ScalingParameters
 {
-    QList<QString> m_sViewsToApply;    /**< Which views should apply changes. */
-    QMap<qint32, float> m_mScalingMap; /**< Scaling map. */
+    std::vector<std::string> m_sViewsToApply; /**< Which views should apply changes. */
+    std::map<int, float> m_mScalingMap;       /**< Scaling map. */
 };
 
 //=========================================================================================================
@@ -141,7 +149,7 @@ struct ViewParameters
     };
 
     // Defaults are those of mne::disp::FiffRawViewSettings
-    QList<QString> m_sViewsToApply;
+    std::vector<std::string> m_sViewsToApply;
     ViewSetting m_sSettingsToApply = all;
     QColor m_colorSignal = Qt::blue;
     QColor m_colorBackground = Qt::white;

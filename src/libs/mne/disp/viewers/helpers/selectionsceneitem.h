@@ -36,6 +36,13 @@
 #include <QGraphicsItem>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -69,13 +76,13 @@ public:
     }
     SelectionItem(const SelectionItem&);
 
-    QList<QString> m_sViewsToApply;
-    QList<QString> m_sChannelName;      /**< The channel's name.*/
-    QList<int> m_iChannelNumber;        /**< The channel number.*/
-    QList<int> m_iChannelKind;          /**< The channel kind.*/
-    QList<int> m_iChannelUnit;          /**< The channel unit.*/
-    QList<QPointF> m_qpChannelPosition; /**< The channel's 2D position in the scene.*/
-    bool m_bShowAll;                    /**< Whether to show all channels. */
+    std::vector<std::string> m_sViewsToApply;
+    std::vector<std::string> m_sChannelName;  /**< The channel's name.*/
+    std::vector<int> m_iChannelNumber;        /**< The channel number.*/
+    std::vector<int> m_iChannelKind;          /**< The channel kind.*/
+    std::vector<int> m_iChannelUnit;          /**< The channel unit.*/
+    std::vector<QPointF> m_qpChannelPosition; /**< The channel's 2D position in the scene.*/
+    bool m_bShowAll;                          /**< Whether to show all channels. */
 };
 
 /**

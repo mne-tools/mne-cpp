@@ -78,9 +78,9 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<QTime>& pTime,
     //set layouts
     this->setLayout(m_pRtcLayout);
 
-    m_modalityMap.insert("EEG", true);
-    m_modalityMap.insert("MAG", true);
-    m_modalityMap.insert("GRAD", true);
+    m_modalityMap.insert_or_assign("EEG", true);
+    m_modalityMap.insert_or_assign("MAG", true);
+    m_modalityMap.insert_or_assign("GRAD", true);
 }
 
 //=============================================================================================================
@@ -147,8 +147,12 @@ void RealTimeCovWidget::initDisplayControllWidgets()
 
 //=============================================================================================================
 
-void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool>& modalityMap)
+void RealTimeCovWidget::onNewModalitySelection(const std::map<std::string, bool>& modalityMap)
 {
+    const auto shown = [&modalityMap](const char* modality) {
+        const auto it = modalityMap.find(modality);
+        return it != modalityMap.end() && it->second;
+    };
     if (m_pRTC && m_pFiffInfo) {
         const StringList& chNames = m_pRTC->getValue()->names;
         m_qListSelChannel.clear();
@@ -156,15 +160,15 @@ void RealTimeCovWidget::onNewModalitySelection(const QMap<QString, bool>& modali
         for (qint32 i = 0; i < static_cast<qint32>(chNames.size()); ++i) {
             int unit = m_pFiffInfo->chs.at(mne::index_of(m_pFiffInfo->ch_names, chNames.at(i))).unit;
 
-            if (unit == FIFF_UNIT_T && modalityMap["MAG"]) {
+            if (unit == FIFF_UNIT_T && shown("MAG")) {
                 m_qListSelChannel.append(i);
             }
 
-            if (unit == FIFF_UNIT_T_M && modalityMap["GRAD"]) {
+            if (unit == FIFF_UNIT_T_M && shown("GRAD")) {
                 m_qListSelChannel.append(i);
             }
 
-            if (unit == FIFF_UNIT_V && (modalityMap["EEG"] || modalityMap["EOG"] || modalityMap["STIM"] || modalityMap["MISC"])) {
+            if (unit == FIFF_UNIT_V && (shown("EEG") || shown("EOG") || shown("STIM") || shown("MISC"))) {
                 m_qListSelChannel.append(i);
             }
         }

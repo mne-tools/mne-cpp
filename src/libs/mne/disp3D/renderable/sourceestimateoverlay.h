@@ -38,17 +38,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
 #include <QString>
-#include <QSharedPointer>
-#include <QHash>
-#include <QPair>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Sparse>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <map>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -91,7 +99,7 @@ public:
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      * @return True if successful.
      */
-    bool loadStc(const QString& path, int hemi);
+    bool loadStc(const std::filesystem::path& path, int hemi);
 
     //=========================================================================================================
     /**
@@ -127,7 +135,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormap(const QString& name);
+    void setColormap(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -135,7 +143,7 @@ public:
      *
      * @return The colormap name.
      */
-    QString colormap() const
+    std::string colormap() const
     {
         return m_colormap;
     }
@@ -228,7 +236,7 @@ public:
      * @param[in] mat        The interpolation matrix.
      * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      */
-    void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float>> mat, int hemi);
+    void setInterpolationMatrix(std::shared_ptr<Eigen::SparseMatrix<float>> mat, int hemi);
 
     //=========================================================================================================
     /**
@@ -242,7 +250,7 @@ public:
      *
      * @return Shared pointer to the LH interpolation matrix (may be null).
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const
+    std::shared_ptr<Eigen::SparseMatrix<float>> interpolationMatLh() const
     {
         return m_interpolationMatLh;
     }
@@ -253,7 +261,7 @@ public:
      *
      * @return Shared pointer to the RH interpolation matrix (may be null).
      */
-    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const
+    std::shared_ptr<Eigen::SparseMatrix<float>> interpolationMatRh() const
     {
         return m_interpolationMatRh;
     }
@@ -284,13 +292,14 @@ private:
     bool m_hasLh = false;           /**< Flag indicating LH data loaded. */
     bool m_hasRh = false;           /**< Flag indicating RH data loaded. */
 
-    QString m_colormap = "Hot"; /**< Current colormap name. */
-    float m_threshMin = 0.0f;   /**< Minimum threshold. */
-    float m_threshMid = 0.5f;   /**< Mid threshold. */
-    float m_threshMax = 1.0f;   /**< Maximum threshold. */
+    std::string m_colormap = "Hot";               /**< Current colormap name. */
+    QString m_colormapQt = QStringLiteral("Hot"); /**< Same name as QString, for mne::disp::ColorMap. */
+    float m_threshMin = 0.0f;                     /**< Minimum threshold. */
+    float m_threshMid = 0.5f;                     /**< Mid threshold. */
+    float m_threshMax = 1.0f;                     /**< Maximum threshold. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatLh; /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatRh; /**< RH interpolation matrix. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpolationMatLh; /**< LH interpolation matrix. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpolationMatRh; /**< RH interpolation matrix. */
 
     // ── Per-time-point color cache ─────────────────────────────────────
     // Keyed by (hemi, vertexCount). The inner hash maps timeIndex →
@@ -299,9 +308,9 @@ private:
     // and auto-loop playback effectively free after the first pass: only
     // the per-vertex color blend + GPU upload happens, never the sparse
     // interpolation matvec or the per-vertex colormap calculation.
-    using ColorCacheKey = QPair<int, int>;                       /**< (hemi, vertexCount). */
-    using ColorCacheBucket = QHash<int, QVector<uint32_t>>;      /**< timeIndex → ABGR colors. */
-    mutable QHash<ColorCacheKey, ColorCacheBucket> m_colorCache; /**< Lazy color cache. */
+    using ColorCacheKey = std::pair<int, int>;                               /**< (hemi, vertexCount). */
+    using ColorCacheBucket = std::unordered_map<int, std::vector<uint32_t>>; /**< timeIndex → ABGR colors. */
+    mutable std::map<ColorCacheKey, ColorCacheBucket> m_colorCache;          /**< Lazy color cache. */
     void invalidateColorCache()
     {
         m_colorCache.clear();

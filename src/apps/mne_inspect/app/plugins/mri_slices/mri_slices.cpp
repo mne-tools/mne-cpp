@@ -217,7 +217,7 @@ void MriSlicesPlugin::attachScene(MultimodalScene* scene)
         QObject::disconnect(m_scene, &MultimodalScene::picked,
                             this, &MriSlicesPlugin::handlePick);
         for (const QString& id : sceneLayerIds()) {
-            m_scene->removeLayer(id);
+            m_scene->removeLayer(id.toStdString());
         }
     }
 
@@ -306,12 +306,12 @@ void MriSlicesPlugin::publishToScene()
 
     for (int i = 0; i < 3; ++i) {
         if (!m_slices[i]) {
-            m_scene->removeLayer(ids[i]);
+            m_scene->removeLayer(ids[i].toStdString());
             continue;
         }
         SceneLayer layer;
-        layer.id = ids[i];
-        layer.displayName = QString::fromLatin1(names[i]);
+        layer.id = ids[i].toStdString();
+        layer.displayName = names[i];
         layer.kind = SceneLayerKind::MriSlice;
         layer.drawOrder = i;
         // Non-owning shared_ptr: the plugin retains ownership of the object.

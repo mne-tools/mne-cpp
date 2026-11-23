@@ -105,7 +105,7 @@ int ElectrodesPlugin::contactCount() const
 
 QString ElectrodesPlugin::selectedContact() const
 {
-    return m_object->selectedContact();
+    return QString::fromStdString(m_object->selectedContact());
 }
 
 //=============================================================================================================
@@ -116,7 +116,7 @@ void ElectrodesPlugin::selectContact(const QString& name)
         clearSelection();
         return;
     }
-    m_object->selectContact(name);
+    m_object->selectContact(name.toStdString());
     emit contactPicked(name);
 }
 
@@ -137,7 +137,7 @@ QString ElectrodesPlugin::highlightNearest(const QVector3D& worldPosition)
     if (bestName.isEmpty()) {
         return QString();
     }
-    m_object->selectContact(bestName);
+    m_object->selectContact(bestName.toStdString());
     emit contactPicked(bestName);
     return bestName;
 }
@@ -311,7 +311,7 @@ void ElectrodesPlugin::attachScene(MultimodalScene* scene)
     if (m_scene) {
         QObject::disconnect(m_scene, &MultimodalScene::picked,
                             this, &ElectrodesPlugin::handlePick);
-        m_scene->removeLayer(sceneLayerId());
+        m_scene->removeLayer(sceneLayerId().toStdString());
     }
 
     m_scene = scene;
@@ -336,7 +336,7 @@ void ElectrodesPlugin::handlePick(const PickResult& pick)
     if (pick.label.isEmpty()) {
         return;
     }
-    m_object->selectContact(pick.label);
+    m_object->selectContact(pick.label.toStdString());
     emit contactPicked(pick.label);
 }
 
@@ -426,8 +426,8 @@ void ElectrodesPlugin::publishToScene()
         return;
     }
     SceneLayer layer;
-    layer.id = sceneLayerId();
-    layer.displayName = QStringLiteral("Electrodes");
+    layer.id = sceneLayerId().toStdString();
+    layer.displayName = "Electrodes";
     layer.kind = SceneLayerKind::Electrode;
     // Non-owning shared_ptr: the plugin retains ownership of the object.
     layer.payload = std::shared_ptr<void>(m_object.get(), [](void*) {});

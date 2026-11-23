@@ -27,7 +27,6 @@
 
 #include <QGraphicsPathItem>
 #include <QGraphicsView>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES

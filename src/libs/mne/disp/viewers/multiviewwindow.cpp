@@ -26,7 +26,6 @@
 #include <QGridLayout>
 #include <QListView>
 #include <QDockWidget>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES

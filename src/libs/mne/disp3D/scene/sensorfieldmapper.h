@@ -39,8 +39,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
-#include <QVector>
 #include <QString>
 
 //=============================================================================================================
@@ -53,7 +51,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace mne::disp
@@ -148,12 +148,13 @@ public:
      *
      * @param[in] name  Colormap identifier (e.g. "MNE", "hot", "RdBu_r").
      */
-    void setColormap(const QString& name)
+    void setColormap(const std::string& name)
     {
         m_colormap = name;
+        m_colormapQt = QString::fromStdString(name);
     }
 
-    const QString& colormap() const
+    const std::string& colormap() const
     {
         return m_colormap;
     }
@@ -223,7 +224,7 @@ public:
      * @param[in] applySensorTrans  Whether to apply the sensor → MRI transform.
      * @return @c true on success (at least one mapping built).
      */
-    bool buildMapping(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    bool buildMapping(const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
                       const mne::FiffCoordTrans& headToMriTrans,
                       bool applySensorTrans);
 
@@ -238,15 +239,15 @@ public:
      * @param[in]     singleView    The single-view SubView for visibility flags.
      * @param[in]     subViews      The four multi-view SubViews.
      */
-    void apply(QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    void apply(std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
                const SubView& singleView,
-               const QVector<SubView>& subViews);
+               const std::vector<SubView>& subViews);
 
     //=========================================================================================================
     /**
      * @return The surface key used for the MEG mapping target.
      */
-    const QString& megSurfaceKey() const
+    const std::string& megSurfaceKey() const
     {
         return m_megSurfaceKey;
     }
@@ -254,7 +255,7 @@ public:
     /**
      * @return The surface key used for the EEG mapping target.
      */
-    const QString& eegSurfaceKey() const
+    const std::string& eegSurfaceKey() const
     {
         return m_eegSurfaceKey;
     }
@@ -271,7 +272,7 @@ public:
      * @param[in] surfaces   Surface map keyed by surface name.
      * @return Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
      */
-    static QString findHeadSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
+    static std::string findHeadSurfaceKey(const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
 
     /**
      * Find the MEG helmet surface key ("sens_surface_meg") if present.
@@ -279,7 +280,7 @@ public:
      * @param[in] surfaces   Surface map keyed by surface name.
      * @return "sens_surface_meg" if present, otherwise an empty string.
      */
-    static QString findHelmetSurfaceKey(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
+    static std::string findHelmetSurfaceKey(const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
 
     /**
      * Compute a "nice" iso-contour step given a value range and target number of ticks.
@@ -341,10 +342,10 @@ private:
      * @param[in]     step      Iso-step distance.
      * @param[in]     visible   Whether contours should be shown.
      */
-    void updateContourSurfaces(QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                               const QString& prefix,
+    void updateContourSurfaces(std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                               const std::string& prefix,
                                const BrainSurface& surface,
-                               const QVector<float>& values,
+                               const std::vector<float>& values,
                                float step,
                                bool visible);
 
@@ -355,12 +356,13 @@ private:
     bool m_loaded = false;
     int m_timePoint = 0;
     bool m_megOnHead = false;
-    QString m_colormap = QStringLiteral("MNE");
+    std::string m_colormap = "MNE";
+    QString m_colormapQt = QStringLiteral("MNE"); // Same name for mne::disp::ColorMap, which takes a QString
 
-    QString m_megSurfaceKey;
-    QString m_eegSurfaceKey;
-    QString m_megContourPrefix = QStringLiteral("sens_contour_meg");
-    QString m_eegContourPrefix = QStringLiteral("sens_contour_eeg");
+    std::string m_megSurfaceKey;
+    std::string m_eegSurfaceKey;
+    std::string m_megContourPrefix = "sens_contour_meg";
+    std::string m_eegContourPrefix = "sens_contour_eeg";
 
     Eigen::VectorXi m_megPick;
     Eigen::VectorXi m_eegPick;

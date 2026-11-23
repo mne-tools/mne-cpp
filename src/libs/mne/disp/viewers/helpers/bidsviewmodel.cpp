@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "bidsviewmodel.h"
+#include <mne/base/log.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,7 +71,7 @@ void BidsViewModel::addData(QModelIndex selectedItem,
                                      pNewItem,
                                      iDataType);
                 } else {
-                    qDebug() << "[BidsViewModel::addData] Prompt user to select a session";
+                    mne::Log::debug("[BidsViewModel::addData] Prompt user to select a session");
                 }
             }
             break;
@@ -162,10 +163,10 @@ QModelIndex BidsViewModel::addSessionToSubject(const QString& sSubjectName,
 
     //Check for repeated names, no names
     if (listItems.size() > 1) {
-        qWarning() << "[BidsViewModel::addSessionToSubject] Multiple subjects with same name";
+        mne::Log::warning("[BidsViewModel::addSessionToSubject] Multiple subjects with same name");
         bRepeat = true;
     } else if (listItems.size() == 0) {
-        qWarning() << "[BidsViewModel::addSessionToSubject] No Subject found with name:" << sSubjectName;
+        mne::Log::warning("[BidsViewModel::addSessionToSubject] No Subject found with name: {}", sSubjectName.toStdString());
         return QModelIndex();
     }
 
@@ -370,7 +371,7 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
 
     QStandardItem* pItem = itemFromIndex(itemIndex);
 
-    qInfo() << "Deleting" << pItem->text();
+    mne::Log::info("Deleting {}", pItem->text().toStdString());
 
     switch (pItem->data(BIDS_ITEM_TYPE).value<int>()) {
         case BIDS_SUBJECT:

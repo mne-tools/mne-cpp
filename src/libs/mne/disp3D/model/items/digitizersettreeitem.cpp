@@ -16,6 +16,8 @@
 
 #include "digitizersettreeitem.h"
 
+#include <mne/base/log.h>
+
 #include "digitizertreeitem.h"
 #include <mne/fiff/fiff_constants.h>
 
@@ -24,7 +26,14 @@
 //=============================================================================================================
 
 #include <QVector3D>
-#include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <string>
+#include <vector>
 
 namespace mne::disp
 {
@@ -42,8 +51,8 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
 
     // Categorize points by kind
     // Cardinal points are further split by ident (Nasion, LPA, RPA) but grouped together
-    QVector<QVector3D> cardinalPos, hpiPos, eegPos, extraPos;
-    QStringList cardinalNames, hpiNames, eegNames, extraNames;
+    std::vector<QVector3D> cardinalPos, hpiPos, eegPos, extraPos;
+    std::vector<std::string> cardinalNames, hpiNames, eegNames, extraNames;
 
     int hpiIdx = 0, eegIdx = 0, extraIdx = 0;
 
@@ -52,39 +61,39 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
 
         switch (p.kind) {
             case FIFFV_POINT_CARDINAL: {
-                cardinalPos.append(pos);
+                cardinalPos.push_back(pos);
                 if (p.ident == FIFFV_POINT_NASION)
-                    cardinalNames.append("Nasion");
+                    cardinalNames.push_back("Nasion");
                 else if (p.ident == FIFFV_POINT_LPA)
-                    cardinalNames.append("LPA");
+                    cardinalNames.push_back("LPA");
                 else if (p.ident == FIFFV_POINT_RPA)
-                    cardinalNames.append("RPA");
+                    cardinalNames.push_back("RPA");
                 else
-                    cardinalNames.append(QString("Cardinal %1").arg(p.ident));
+                    cardinalNames.push_back(std::format("Cardinal {}", p.ident));
                 break;
             }
             case FIFFV_POINT_HPI:
-                hpiPos.append(pos);
-                hpiNames.append(QString("HPI %1").arg(++hpiIdx));
+                hpiPos.push_back(pos);
+                hpiNames.push_back(std::format("HPI {}", ++hpiIdx));
                 break;
             case FIFFV_POINT_EEG:
-                eegPos.append(pos);
-                eegNames.append(QString("EEG %1").arg(++eegIdx));
+                eegPos.push_back(pos);
+                eegNames.push_back(std::format("EEG {}", ++eegIdx));
                 break;
             case FIFFV_POINT_EXTRA:
-                extraPos.append(pos);
-                extraNames.append(QString("Extra %1").arg(++extraIdx));
+                extraPos.push_back(pos);
+                extraNames.push_back(std::format("Extra {}", ++extraIdx));
                 break;
             default:
-                extraPos.append(pos);
-                extraNames.append(QString("Unknown %1").arg(extraPos.size()));
+                extraPos.push_back(pos);
+                extraNames.push_back(std::format("Unknown {}", extraPos.size()));
                 break;
         }
     }
 
     // Create child items for each non-empty category
     // Color and size scheme matches disp3D conventions
-    if (!cardinalPos.isEmpty()) {
+    if (!cardinalPos.empty()) {
         auto* item = new DigitizerTreeItem("Cardinal",
                                            DigitizerTreeItem::Cardinal,
                                            cardinalPos,
@@ -92,10 +101,10 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
                                            QColor(0, 255, 0), // Green
                                            0.002f);           // 2mm
         appendRow(item);
-        qDebug() << "DigitizerSetTreeItem: Cardinal points:" << cardinalPos.size();
+        mne::Log::debug("DigitizerSetTreeItem: Cardinal points: {}", cardinalPos.size());
     }
 
-    if (!hpiPos.isEmpty()) {
+    if (!hpiPos.empty()) {
         auto* item = new DigitizerTreeItem("HPI",
                                            DigitizerTreeItem::HPI,
                                            hpiPos,
@@ -103,10 +112,10 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
                                            QColor(128, 0, 0), // DarkRed
                                            0.003f);           // 3mm - enlarged for better visibility
         appendRow(item);
-        qDebug() << "DigitizerSetTreeItem: HPI points:" << hpiPos.size();
+        mne::Log::debug("DigitizerSetTreeItem: HPI points: {}", hpiPos.size());
     }
 
-    if (!eegPos.isEmpty()) {
+    if (!eegPos.empty()) {
         auto* item = new DigitizerTreeItem("EEG",
                                            DigitizerTreeItem::EEG,
                                            eegPos,
@@ -114,10 +123,10 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
                                            QColor(0, 255, 255), // Cyan
                                            0.001f);             // 1mm
         appendRow(item);
-        qDebug() << "DigitizerSetTreeItem: EEG dig points:" << eegPos.size();
+        mne::Log::debug("DigitizerSetTreeItem: EEG dig points: {}", eegPos.size());
     }
 
-    if (!extraPos.isEmpty()) {
+    if (!extraPos.empty()) {
         auto* item = new DigitizerTreeItem("Extra",
                                            DigitizerTreeItem::Extra,
                                            extraPos,
@@ -125,7 +134,7 @@ DigitizerSetTreeItem::DigitizerSetTreeItem(const QString& text,
                                            QColor(255, 0, 255), // Magenta
                                            0.001f);             // 1mm
         appendRow(item);
-        qDebug() << "DigitizerSetTreeItem: Extra/head shape points:" << extraPos.size();
+        mne::Log::debug("DigitizerSetTreeItem: Extra/head shape points: {}", extraPos.size());
     }
 }
 

@@ -57,8 +57,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <limits>
+#include <memory>
+#include <vector>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -221,7 +222,7 @@ public:
      *
      * @return The event markers, sorted by sample.
      */
-    const QVector<mne::disp::ChannelRhiView::EventMarker>& stimEvents() const;
+    const std::vector<mne::disp::ChannelRhiView::EventMarker>& stimEvents() const;
 
     //=========================================================================================================
     /**
@@ -229,7 +230,7 @@ public:
      *
      * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
      */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
+    void showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -265,7 +266,7 @@ public:
     /**
      * Set the browser annotation spans shown in the GPU raw view.
      */
-    void setAnnotations(const QVector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations);
+    void setAnnotations(const std::vector<mne::disp::ChannelRhiView::AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -507,7 +508,7 @@ private:
 
     QScroller* m_pKineticScroller; /**< the kinetic scroller of the QTableView. */
 
-    QStringList m_slSelectedChannels; /**< the currently selected channels from the selection manager window. */
+    std::vector<std::string> m_slSelectedChannels; /**< the currently selected channels from the selection manager window. */
 
     bool m_bHideBadChannels; /**< hide bad channels flag. */
 
@@ -530,12 +531,12 @@ private:
     QString m_sFiffFilePath;                  /**< Path of the currently open FIFF file. */
 
     // ── STIM event cache ───────────────────────────────────────────────
-    QVector<mne::disp::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
-    QMap<int, QColor> m_eventTypeColors;                          /**< Palette colours of codes the event model has no colour for. */
-    QSet<quint64> m_seenStimEventKeys;                            /**< De-duplicates events when blocks are revisited. */
-    int m_iStimChannel = -1;                                      /**< Selected trigger channel index (prefer STI 014). */
-    int m_iStimLastSample = std::numeric_limits<int>::min();      /**< Last scanned sample on the trigger channel. */
-    int m_iStimLastValue = 0;                                     /**< Trigger value at m_iStimLastSample. */
+    std::vector<mne::disp::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
+    QMap<int, QColor> m_eventTypeColors;                              /**< Palette colours of codes the event model has no colour for. */
+    QSet<quint64> m_seenStimEventKeys;                                /**< De-duplicates events when blocks are revisited. */
+    int m_iStimChannel = -1;                                          /**< Selected trigger channel index (prefer STI 014). */
+    int m_iStimLastSample = std::numeric_limits<int>::min();          /**< Last scanned sample on the trigger channel. */
+    int m_iStimLastValue = 0;                                         /**< Trigger value at m_iStimLastSample. */
 
     struct ResolvedVirtualChannel
     {

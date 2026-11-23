@@ -37,6 +37,12 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -55,7 +61,7 @@ namespace mne::disp
 /**
  * @brief MATLAB-style line plot for an Eigen vector, derived from @ref Graph.
  *
- * Owns a list of @c QVector<QPointF> trace paths and supports a
+ * Owns a list of @c std::vector<QPointF> trace paths and supports a
  * @c m_bHoldOn flag for overlaying multiple curves. @c updateData()
  * replaces the visible curve in place.
  *
@@ -113,7 +119,7 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QList<QVector<QPointF>> m_qListVecPointFPaths; /**< List of point series. */
+    std::vector<std::vector<QPointF>> m_qListVecPointFPaths; /**< List of point series. */
 
     bool m_bHoldOn; /**< If multiple plots. */
     double m_dMinX; /**< Minimal X value. */

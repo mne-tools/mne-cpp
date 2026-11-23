@@ -26,12 +26,13 @@
 #include <QMouseEvent>
 #include <QHelpEvent>
 #include <QToolTip>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
+#include <map>
 #include <utility>
 
 //=============================================================================================================
@@ -89,7 +90,7 @@ void ChannelLabelPanel::setModel(ChannelDataModel* model)
 
 //=============================================================================================================
 
-void ChannelLabelPanel::setChannelIndices(const QVector<int>& indices)
+void ChannelLabelPanel::setChannelIndices(const std::vector<int>& indices)
 {
     m_channelIndices = indices;
     update();
@@ -162,30 +163,30 @@ void ChannelLabelPanel::paintEvent(QPaintEvent*)
         // Collect unique types in order
         struct TypeGroup
         {
-            QString typeLabel;
+            std::string typeLabel;
             QColor color;
             int count = 0;
         };
-        QVector<TypeGroup> groups;
-        QMap<QString, int> typeToGroup;
+        std::vector<TypeGroup> groups;
+        std::map<std::string, int> typeToGroup;
 
-        const QVector<int> allCh = effectiveChannelIndices();
+        const std::vector<int> allCh = effectiveChannelIndices();
         for (int ch : allCh) {
             auto info = m_model->channelInfo(ch);
             if (typeToGroup.contains(info.typeLabel)) {
                 groups[typeToGroup[info.typeLabel]].count++;
             } else {
-                int idx = groups.size();
+                int idx = static_cast<int>(groups.size());
                 typeToGroup[info.typeLabel] = idx;
                 TypeGroup g;
                 g.typeLabel = info.typeLabel;
                 g.color = info.color;
                 g.count = 1;
-                groups.append(g);
+                groups.push_back(g);
             }
         }
 
-        int nLanes = groups.size();
+        int nLanes = static_cast<int>(groups.size());
         if (nLanes <= 0)
             return;
 
@@ -217,7 +218,7 @@ void ChannelLabelPanel::paintEvent(QPaintEvent*)
             p.setPen(QColor(25, 25, 25));
             QRectF nameRect(kStripWidth + 4, yTop + 1,
                             pw - kStripWidth - 8, laneH * 0.50f);
-            p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, groups[i].typeLabel);
+            p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, QString::fromStdString(groups[i].typeLabel));
 
             // Channel count
             p.setFont(countFont);
@@ -232,8 +233,8 @@ void ChannelLabelPanel::paintEvent(QPaintEvent*)
 
     // ── Normal mode: per-channel labels ─────────────────────────────
 
-    const QVector<int> displayChannels = effectiveChannelIndices();
-    const int totalCh = displayChannels.size();
+    const std::vector<int> displayChannels = effectiveChannelIndices();
+    const int totalCh = static_cast<int>(displayChannels.size());
     int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
     if (visibleCount <= 0)
         return;
@@ -256,7 +257,7 @@ void ChannelLabelPanel::paintEvent(QPaintEvent*)
     float yTop = 0.f;
     for (int i = 0; i < visibleCount; ++i) {
         int logIdx = m_firstVisibleChannel + i;
-        int ch = (logIdx >= 0 && logIdx < displayChannels.size()) ? displayChannels.at(logIdx) : -1;
+        int ch = (logIdx >= 0 && logIdx < std::ssize(displayChannels)) ? displayChannels.at(logIdx) : -1;
         if (ch < 0) {
             yTop += laneH;
             continue;
@@ -296,11 +297,11 @@ void ChannelLabelPanel::paintEvent(QPaintEvent*)
                         pw - kStripWidth - nameBadgeGap - 4,
                         laneH * 0.48f);
         QString elidedName = p.fontMetrics().elidedText(
-            info.name, Qt::ElideRight, static_cast<int>(nameRect.width()));
+            QString::fromStdString(info.name), Qt::ElideRight, static_cast<int>(nameRect.width()));
         p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter, elidedName);
 
         // ── Status line: type · bad · dc ─────────────────────────────────
-        QString statusLine = info.typeLabel;
+        QString statusLine = QString::fromStdString(info.typeLabel);
         if (info.bad)
             statusLine += QStringLiteral(" \u00B7 bad");
         if (info.isVirtualChannel)
@@ -377,7 +378,7 @@ void ChannelLabelPanel::mouseMoveEvent(QMouseEvent* event)
         return;
     }
 
-    const int totalCh = effectiveChannelIndices().size();
+    const int totalCh = static_cast<int>(effectiveChannelIndices().size());
     const int maxFirst = qMax(0, totalCh - m_visibleChannelCount);
     const float laneH = (m_visibleChannelCount > 0 && height() > 0)
         ? static_cast<float>(height()) / m_visibleChannelCount
@@ -404,9 +405,9 @@ void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent* event)
         if (wasClick && m_model && m_visibleChannelCount > 0) {
             const float laneH = static_cast<float>(height()) / m_visibleChannelCount;
             const int row = static_cast<int>(event->position().y() / laneH);
-            const QVector<int> vis = effectiveChannelIndices();
+            const std::vector<int> vis = effectiveChannelIndices();
             const int idx = m_firstVisibleChannel + row;
-            if (idx >= 0 && idx < vis.size()) {
+            if (idx >= 0 && idx < std::ssize(vis)) {
                 int ch = vis[idx];
                 auto info = m_model->channelInfo(ch);
                 bool newBad = !info.bad;
@@ -422,18 +423,18 @@ void ChannelLabelPanel::mouseReleaseEvent(QMouseEvent* event)
 
 //=============================================================================================================
 
-QVector<int> ChannelLabelPanel::effectiveChannelIndices() const
+std::vector<int> ChannelLabelPanel::effectiveChannelIndices() const
 {
-    QVector<int> indices;
+    std::vector<int> indices;
 
     if (!m_model) {
         return indices;
     }
 
-    if (m_channelIndices.isEmpty()) {
+    if (m_channelIndices.empty()) {
         indices.reserve(m_model->channelCount());
         for (int channelIndex = 0; channelIndex < m_model->channelCount(); ++channelIndex) {
-            indices.append(channelIndex);
+            indices.push_back(channelIndex);
         }
     } else {
         indices = m_channelIndices;
@@ -443,7 +444,7 @@ QVector<int> ChannelLabelPanel::effectiveChannelIndices() const
         return indices;
     }
 
-    QVector<int> visibleIndices;
+    std::vector<int> visibleIndices;
     visibleIndices.reserve(indices.size());
     for (int channelIndex : std::as_const(indices)) {
         if (channelIndex < 0) {
@@ -452,7 +453,7 @@ QVector<int> ChannelLabelPanel::effectiveChannelIndices() const
 
         const ChannelDisplayInfo info = m_model->channelInfo(channelIndex);
         if (!info.bad) {
-            visibleIndices.append(channelIndex);
+            visibleIndices.push_back(channelIndex);
         }
     }
 
@@ -463,15 +464,15 @@ bool ChannelLabelPanel::event(QEvent* e)
 {
     if (e->type() == QEvent::ToolTip && m_model) {
         auto* he = static_cast<QHelpEvent*>(e);
-        const QVector<int> displayChannels = effectiveChannelIndices();
-        int totalCh = displayChannels.size();
+        const std::vector<int> displayChannels = effectiveChannelIndices();
+        int totalCh = static_cast<int>(displayChannels.size());
         int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
         if (visibleCount > 0) {
             const float laneH = static_cast<float>(height()) / visibleCount;
             const int i = qBound(0, static_cast<int>(he->pos().y() / laneH), visibleCount - 1);
             if (i >= 0 && i < visibleCount) {
                 const int logIdx = m_firstVisibleChannel + i;
-                const int ch = (logIdx >= 0 && logIdx < displayChannels.size())
+                const int ch = (logIdx >= 0 && logIdx < std::ssize(displayChannels))
                     ? displayChannels.at(logIdx)
                     : -1;
                 if (ch < 0)
@@ -489,8 +490,8 @@ bool ChannelLabelPanel::event(QEvent* e)
                                              "Level: %4 %<br>"
                                              "Bad: %5<br>"
                                              "Virtual: %6")
-                                  .arg(info.name)
-                                  .arg(info.typeLabel)
+                                  .arg(QString::fromStdString(info.name))
+                                  .arg(QString::fromStdString(info.typeLabel))
                                   .arg(info.amplitudeMax, 0, 'e', 2)
                                   .arg(static_cast<int>(level))
                                   .arg(info.bad ? QStringLiteral("yes") : QStringLiteral("no"))

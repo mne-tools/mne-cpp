@@ -37,13 +37,15 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QMap>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -86,7 +88,7 @@ class DISPSHARED_EXPORT AveragingSettingsView : public AbstractView
 
 public:
     explicit AveragingSettingsView(const QString& sSettingsPath = "",
-                                   const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
+                                   const std::map<std::string, int>& mapStimChsIndexNames = std::map<std::string, int>(),
                                    QWidget* parent = nullptr);
 
     //=========================================================================================================
@@ -95,9 +97,9 @@ public:
      */
     ~AveragingSettingsView();
 
-    void setStimChannels(const QMap<QString, int>& mapStimChsIndexNames);
+    void setStimChannels(const std::map<std::string, int>& mapStimChsIndexNames);
 
-    QString getCurrentStimCh();
+    std::string getCurrentStimCh();
 
     bool getDoBaselineCorrection();
 
@@ -179,9 +181,9 @@ protected:
 
     std::unique_ptr<Ui::AverageSettingsViewWidget> m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
-    QString m_sCurrentStimChan = QStringLiteral("STI 014");
+    std::string m_sCurrentStimChan = "STI 014";
 
-    QMap<QString, int> m_mapStimChsIndexNames;
+    std::map<std::string, int> m_mapStimChsIndexNames;
 
     int m_iNumAverages = 10;
     int m_iPreStimSeconds = 100;
@@ -196,7 +198,7 @@ signals:
     void changeBaselineFrom(qint32 value);
     void changeBaselineTo(qint32 value);
     void changeNumAverages(qint32 value);
-    void changeStimChannel(const QString& sStimName);
+    void changeStimChannel(const std::string& sStimName);
     void changeBaselineActive(bool state);
     void resetAverage(bool state);
     void changeAverageMode(qint32 index);

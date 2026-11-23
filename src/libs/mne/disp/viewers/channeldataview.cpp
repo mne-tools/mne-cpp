@@ -36,15 +36,17 @@
 #include <QSettings>
 #include <QLabel>
 #include <QPainter>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <memory>
 #include <algorithm>
+#include <array>
+#include <cmath>
+#include <memory>
 #include <numeric>
+#include <string_view>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -387,7 +389,7 @@ void ChannelDataView::init(const std::shared_ptr<FiffInfo>& pInfo)
     m_pModel->init(pInfo);
 
     // Re-apply scale map and colour after re-init
-    if (!m_scaleMap.isEmpty())
+    if (!m_scaleMap.empty())
         m_pModel->setScaleMap(m_scaleMap);
     m_pModel->setSignalColor(m_signalColor);
 
@@ -519,7 +521,7 @@ QColor ChannelDataView::signalColor() const
 
 //=============================================================================================================
 
-void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
+void ChannelDataView::setScalingMap(const std::map<int, float>& scaleMap)
 {
     m_scaleMap = scaleMap;
     m_pModel->setScaleMap(scaleMap);
@@ -527,7 +529,7 @@ void ChannelDataView::setScalingMap(const QMap<qint32, float>& scaleMap)
 
 //=============================================================================================================
 
-QMap<qint32, float> ChannelDataView::scalingMap() const
+std::map<int, float> ChannelDataView::scalingMap() const
 {
     return m_scaleMap;
 }
@@ -553,15 +555,15 @@ bool ChannelDataView::badChannelsHidden() const
 
 //=============================================================================================================
 
-void ChannelDataView::setChannelFilter(const QStringList& names)
+void ChannelDataView::setChannelFilter(const std::vector<std::string>& names)
 {
-    QVector<int> indices;
-    if (!names.isEmpty() && m_pModel) {
+    std::vector<int> indices;
+    if (!names.empty() && m_pModel) {
         int total = m_pModel->channelCount();
         for (int i = 0; i < total; ++i) {
             const ChannelDisplayInfo info = m_pModel->channelInfo(i);
-            if (info.isVirtualChannel || names.contains(info.name))
-                indices.append(i);
+            if (info.isVirtualChannel || std::ranges::contains(names, info.name))
+                indices.push_back(i);
         }
     }
 
@@ -597,7 +599,7 @@ DetrendMode ChannelDataView::detrendMode() const
 
 //=============================================================================================================
 
-void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker>& events)
+void ChannelDataView::setEvents(const std::vector<ChannelRhiView::EventMarker>& events)
 {
     if (m_pRhiView)
         m_pRhiView->setEvents(events);
@@ -606,17 +608,17 @@ void ChannelDataView::setEvents(const QVector<ChannelRhiView::EventMarker>& even
         m_pOverviewBar->setEvents(events);
 
     if (m_pTimeRuler) {
-        QVector<TimeRulerEventMark> rulerMarks;
+        std::vector<TimeRulerEventMark> rulerMarks;
         rulerMarks.reserve(events.size());
         for (const auto& ev : events)
-            rulerMarks.append({ev.sample, ev.color, ev.label});
+            rulerMarks.push_back({ev.sample, ev.color, ev.label});
         m_pTimeRuler->setEvents(rulerMarks);
     }
 }
 
 //=============================================================================================================
 
-void ChannelDataView::setEpochMarkers(const QVector<int>& triggerSamples)
+void ChannelDataView::setEpochMarkers(const std::vector<int>& triggerSamples)
 {
     if (m_pRhiView)
         m_pRhiView->setEpochMarkers(triggerSamples);
@@ -657,7 +659,7 @@ bool ChannelDataView::zScoreMode() const
 
 //=============================================================================================================
 
-void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers)
+void ChannelDataView::setReferenceMarkers(const std::vector<TimeRulerReferenceMark>& markers)
 {
     if (m_pTimeRuler)
         m_pTimeRuler->setReferenceMarkers(markers);
@@ -665,7 +667,7 @@ void ChannelDataView::setReferenceMarkers(const QVector<TimeRulerReferenceMark>&
 
 //=============================================================================================================
 
-void ChannelDataView::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations)
+void ChannelDataView::setAnnotations(const std::vector<ChannelRhiView::AnnotationSpan>& annotations)
 {
     if (m_pRhiView)
         m_pRhiView->setAnnotations(annotations);
@@ -742,21 +744,18 @@ void ChannelDataView::sortChannelsByType()
         return;
 
     // Define a canonical type ordering
-    static const QStringList typeOrder = {
+    static constexpr std::array<std::string_view, 8> typeOrder = {
         "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC"};
+    const auto rank = [](const std::string& type) {
+        return static_cast<int>(std::ranges::find(typeOrder, type) - typeOrder.begin());
+    };
 
     const int n = m_pModel->channelCount();
-    QVector<int> indices(n);
+    std::vector<int> indices(n);
     std::iota(indices.begin(), indices.end(), 0);
 
     std::stable_sort(indices.begin(), indices.end(), [&](int a, int b) {
-        int ia = typeOrder.indexOf(m_pModel->channelInfo(a).typeLabel);
-        int ib = typeOrder.indexOf(m_pModel->channelInfo(b).typeLabel);
-        if (ia < 0)
-            ia = typeOrder.size();
-        if (ib < 0)
-            ib = typeOrder.size();
-        return ia < ib;
+        return rank(m_pModel->channelInfo(a).typeLabel) < rank(m_pModel->channelInfo(b).typeLabel);
     });
 
     if (m_pRhiView)

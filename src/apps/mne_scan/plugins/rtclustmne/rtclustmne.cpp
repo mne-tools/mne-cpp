@@ -174,10 +174,10 @@ void RtClustMne::initPluginControlWidgets()
 
     // Push any restored checkpoint path to the view so the user sees the persisted value.
     if (!m_sModelCheckpoint.isEmpty()) {
-        pMinimumNormSettingsView->setModelCheckpoint(m_sModelCheckpoint);
-    } else if (!pMinimumNormSettingsView->getModelCheckpoint().isEmpty()) {
+        pMinimumNormSettingsView->setModelCheckpoint(mne::path_from_utf8(m_sModelCheckpoint.toStdString()));
+    } else if (!pMinimumNormSettingsView->getModelCheckpoint().empty()) {
         // The view loaded a previously persisted path via its own QSettings.
-        m_sModelCheckpoint = pMinimumNormSettingsView->getModelCheckpoint();
+        m_sModelCheckpoint = QString::fromStdString(mne::utf8_from_path(pMinimumNormSettingsView->getModelCheckpoint()));
     }
 
     plControlWidgets.append(pMinimumNormSettingsView);
@@ -490,11 +490,11 @@ void RtClustMne::onMethodChanged(const QString& method)
 
 //=============================================================================================================
 
-void RtClustMne::onModelCheckpointChanged(const QString& sPath)
+void RtClustMne::onModelCheckpointChanged(const std::filesystem::path& sPath)
 {
     QMutexLocker locker(&m_qMutex);
 
-    m_sModelCheckpoint = sPath;
+    m_sModelCheckpoint = QString::fromStdString(mne::utf8_from_path(sPath));
 }
 
 //=============================================================================================================

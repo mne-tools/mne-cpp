@@ -16,6 +16,8 @@
 
 #include "sourceestimateoverlay.h"
 
+#include <mne/base/log.h>
+
 #include "renderable/brainsurface.h"
 #include "core/rendertypes.h"
 #include "helpers/interpolation.h"
@@ -23,17 +25,13 @@
 #include <mne/disp/plots/helpers/colormap.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-#include <QDebug>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <vector>
+#include <utility>
 
 namespace mne::disp
 {
@@ -54,11 +52,11 @@ SourceEstimateOverlay::~SourceEstimateOverlay()
 
 //=============================================================================================================
 
-bool SourceEstimateOverlay::loadStc(const QString& path, int hemi)
+bool SourceEstimateOverlay::loadStc(const std::filesystem::path& path, int hemi)
 {
-    auto read = mne::InvSourceEstimate::read(path.toStdU16String());
+    auto read = mne::InvSourceEstimate::read(path);
     if (!read) {
-        qWarning() << "SourceEstimateOverlay::loadStc -" << read.error().what();
+        mne::Log::warning("SourceEstimateOverlay::loadStc - {}", read.error().what());
         return false;
     }
     mne::InvSourceEstimate& stc = *read;
@@ -66,13 +64,11 @@ bool SourceEstimateOverlay::loadStc(const QString& path, int hemi)
     if (hemi == 0) {
         m_stcLh = stc;
         m_hasLh = true;
-        qDebug() << "SourceEstimateOverlay: Loaded LH with" << stc.data.rows() << "vertices,"
-                 << stc.data.cols() << "time points";
+        mne::Log::debug("SourceEstimateOverlay: Loaded LH with {} vertices, {} time points", stc.data.rows(), stc.data.cols());
     } else {
         m_stcRh = stc;
         m_hasRh = true;
-        qDebug() << "SourceEstimateOverlay: Loaded RH with" << stc.data.rows() << "vertices,"
-                 << stc.data.cols() << "time points";
+        mne::Log::debug("SourceEstimateOverlay: Loaded RH with {} vertices, {} time points", stc.data.rows(), stc.data.cols());
     }
     invalidateColorCache();
 
@@ -83,7 +79,7 @@ bool SourceEstimateOverlay::loadStc(const QString& path, int hemi)
         m_threshMin = minVal;
         m_threshMax = maxVal;
         m_threshMid = (minVal + maxVal) / 2.0;
-        qDebug() << "SourceEstimateOverlay: Auto thresholds set to" << m_threshMin << m_threshMid << m_threshMax;
+        mne::Log::debug("SourceEstimateOverlay: Auto thresholds set to {} {} {}", m_threshMin, m_threshMid, m_threshMax);
     }
 
     return true;
@@ -105,7 +101,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
 
     int hemi = surface->hemi();
     const mne::InvSourceEstimate* stc = nullptr;
-    QSharedPointer<Eigen::SparseMatrix<float>> interpMat;
+    std::shared_ptr<Eigen::SparseMatrix<float>> interpMat;
 
     if (hemi == 0 && m_hasLh) {
         stc = &m_stcLh;
@@ -121,7 +117,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
         return;
 
     // Clamp time index
-    int tIdx = qBound(0, timeIndex, static_cast<int>(stc->data.cols()) - 1);
+    int tIdx = std::clamp(timeIndex, 0, std::max(0, static_cast<int>(stc->data.cols()) - 1));
     const uint32_t vertexCount = surface->vertexCount();
 
     // ── Color cache fast-path ──────────────────────────────────────
@@ -133,9 +129,9 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
     const ColorCacheKey cacheKey(hemi, static_cast<int>(vertexCount));
     auto bucketIt = m_colorCache.find(cacheKey);
     if (bucketIt != m_colorCache.end()) {
-        auto frameIt = bucketIt.value().constFind(tIdx);
-        if (frameIt != bucketIt.value().constEnd()) {
-            surface->applySourceEstimateColors(frameIt.value());
+        auto frameIt = bucketIt->second.find(tIdx);
+        if (frameIt != bucketIt->second.end()) {
+            surface->applySourceEstimateColors(frameIt->second);
             return;
         }
     }
@@ -144,7 +140,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
     Eigen::VectorXf sourceData = stc->data.col(tIdx).cwiseAbs().cast<float>();
 
     // Create color array for all surface vertices
-    QVector<uint32_t> colors(vertexCount, 0xFF808080); // Default gray
+    std::vector<uint32_t> colors(vertexCount, 0xFF808080); // Default gray
 
     // Determine if we have an interpolation matrix
     Eigen::VectorXf interpolatedData;
@@ -152,8 +148,8 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
     if (interpMat && interpMat->rows() == static_cast<int>(vertexCount) &&
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
-        // Note: interpolateSignal returns by value, not QSharedPointer, so assignment matches
-        interpolatedData = mne::disp::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
+        // Note: interpolateSignal returns by value, not a shared pointer, so assignment matches
+        interpolatedData = mne::disp::Interpolation::interpolateSignal(interpMat, std::make_shared<Eigen::VectorXf>(sourceData));
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
@@ -174,7 +170,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
         double normalized = 0.0;
         if (m_threshMax > m_threshMin) {
             normalized = (value - m_threshMin) / (m_threshMax - m_threshMin);
-            normalized = qBound(0.0, normalized, 1.0);
+            normalized = std::clamp(normalized, 0.0, 1.0);
         }
 
         // Calculate alpha based on threshold
@@ -194,18 +190,19 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface* surface, int timeIndex)
 
     // Store in cache before handing off to the surface so back-scrubs
     // and auto-loop iterations are free.
-    m_colorCache[cacheKey].insert(tIdx, colors);
+    m_colorCache[cacheKey].insert_or_assign(tIdx, colors);
 
     surface->applySourceEstimateColors(colors);
 }
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setColormap(const QString& name)
+void SourceEstimateOverlay::setColormap(const std::string& name)
 {
     if (m_colormap == name)
         return;
     m_colormap = name;
+    m_colormapQt = QString::fromStdString(name);
     invalidateColorCache();
 }
 
@@ -277,8 +274,8 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
     // applyToSurface() colours |data|, so the range is that of the magnitudes
     for (const mne::InvSourceEstimate* stc : {m_hasLh ? &m_stcLh : nullptr, m_hasRh ? &m_stcRh : nullptr}) {
         if (stc && stc->data.size() > 0) {
-            minVal = qMin(minVal, stc->data.cwiseAbs().minCoeff());
-            maxVal = qMax(maxVal, stc->data.cwiseAbs().maxCoeff());
+            minVal = std::min(minVal, stc->data.cwiseAbs().minCoeff());
+            maxVal = std::max(maxVal, stc->data.cwiseAbs().maxCoeff());
         }
     }
 
@@ -293,7 +290,7 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
 
 uint32_t SourceEstimateOverlay::valueToColor(double value, uint8_t alpha) const
 {
-    QRgb rgb = mne::disp::ColorMap::valueToColor(value, m_colormap);
+    QRgb rgb = mne::disp::ColorMap::valueToColor(value, m_colormapQt);
 
     uint32_t r = qRed(rgb);
     uint32_t g = qGreen(rgb);
@@ -311,7 +308,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
         return;
 
     const mne::InvSourceEstimate* stc = nullptr;
-    QSharedPointer<Eigen::SparseMatrix<float>>* pMatPtr = nullptr;
+    std::shared_ptr<Eigen::SparseMatrix<float>>* pMatPtr = nullptr;
 
     if (hemi == 0 && m_hasLh) {
         stc = &m_stcLh;
@@ -326,7 +323,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
     if (stc->empty())
         return;
 
-    qDebug() << "SourceEstimateOverlay: Computing interpolation matrix for hemi" << hemi;
+    mne::Log::debug("SourceEstimateOverlay: Computing interpolation matrix for hemi {}", hemi);
 
     // Get vertices and neighbor information needed for Dijkstra (SCDC)
     Eigen::MatrixX3f matVertices = surface->verticesAsMatrix();
@@ -335,31 +332,30 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
     // Source vertex subset from STC (already a VectorXi)
     Eigen::VectorXi vecSourceVertices = stc->vertices;
 
-    qDebug() << "SourceEstimateOverlay: FsSurface has" << matVertices.rows() << "vertices,"
-             << vecSourceVertices.size() << "sources";
+    mne::Log::debug("SourceEstimateOverlay: FsSurface has {} vertices, {} sources", matVertices.rows(), vecSourceVertices.size());
 
     if (vecSourceVertices.size() == 0) {
-        qWarning() << "SourceEstimateOverlay: No source vertices found";
+        mne::Log::warning("SourceEstimateOverlay: No source vertices found");
         return;
     }
 
     // 1. Calculate Distance Table (Geodesic distance on surface)
     // This uses Dijkstra's algorithm via GeometryInfo::scdc
     // Note: This can be slow for many sources!
-    qDebug() << "SourceEstimateOverlay: Computing distance table (SCDC)...";
-    QSharedPointer<Eigen::MatrixXd> distTable = mne::disp::GeometryInfo::scdc(
+    mne::Log::debug("SourceEstimateOverlay: Computing distance table (SCDC)...");
+    std::shared_ptr<Eigen::MatrixXd> distTable = mne::disp::GeometryInfo::scdc(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
         cancelDist);
 
     if (!distTable || distTable->rows() == 0) {
-        qWarning() << "SourceEstimateOverlay: Failed to compute distance table";
+        mne::Log::warning("SourceEstimateOverlay: Failed to compute distance table");
         return;
     }
 
     // 2. Create Interpolation Matrix
-    qDebug() << "SourceEstimateOverlay: Creating interpolation matrix...";
+    mne::Log::debug("SourceEstimateOverlay: Creating interpolation matrix...");
     *pMatPtr = mne::disp::Interpolation::createInterpolationMat(
         vecSourceVertices,
         distTable,
@@ -367,10 +363,9 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface* surface, in
         cancelDist);
 
     if (*pMatPtr && (*pMatPtr)->rows() > 0) {
-        qDebug() << "SourceEstimateOverlay: Interpolation matrix created:"
-                 << (*pMatPtr)->rows() << "x" << (*pMatPtr)->cols();
+        mne::Log::debug("SourceEstimateOverlay: Interpolation matrix created: {} x {}", (*pMatPtr)->rows(), (*pMatPtr)->cols());
     } else {
-        qWarning() << "SourceEstimateOverlay: Failed to compute interpolation matrix";
+        mne::Log::warning("SourceEstimateOverlay: Failed to compute interpolation matrix");
     }
 }
 
@@ -390,12 +385,12 @@ void SourceEstimateOverlay::setStcData(const mne::InvSourceEstimate& stc, int he
 
 //=============================================================================================================
 
-void SourceEstimateOverlay::setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float>> mat, int hemi)
+void SourceEstimateOverlay::setInterpolationMatrix(std::shared_ptr<Eigen::SparseMatrix<float>> mat, int hemi)
 {
     if (hemi == 0) {
-        m_interpolationMatLh = mat;
+        m_interpolationMatLh = std::move(mat);
     } else {
-        m_interpolationMatRh = mat;
+        m_interpolationMatRh = std::move(mat);
     }
     invalidateColorCache();
 }
@@ -411,7 +406,7 @@ void SourceEstimateOverlay::updateThresholdsFromData()
         m_threshMax = maxVal;
         m_threshMid = (minVal + maxVal) / 2.0;
         invalidateColorCache();
-        qDebug() << "SourceEstimateOverlay: Auto thresholds set to" << m_threshMin << m_threshMid << m_threshMax;
+        mne::Log::debug("SourceEstimateOverlay: Auto thresholds set to {} {} {}", m_threshMin, m_threshMid, m_threshMax);
     }
 }
 
@@ -429,12 +424,12 @@ Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
     Eigen::VectorXd result(nLh + nRh);
 
     if (m_hasLh) {
-        int tIdx = qBound(0, timeIndex, static_cast<int>(m_stcLh.data.cols()) - 1);
+        int tIdx = std::clamp(timeIndex, 0, std::max(0, static_cast<int>(m_stcLh.data.cols()) - 1));
         result.head(nLh) = m_stcLh.data.col(tIdx);
     }
 
     if (m_hasRh) {
-        int tIdx = qBound(0, timeIndex, static_cast<int>(m_stcRh.data.cols()) - 1);
+        int tIdx = std::clamp(timeIndex, 0, std::max(0, static_cast<int>(m_stcRh.data.cols()) - 1));
         result.segment(nLh, nRh) = m_stcRh.data.col(tIdx);
     }
 

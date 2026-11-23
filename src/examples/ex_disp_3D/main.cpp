@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
     }
 
     //Read and show sensor helmets
-    pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
+    pBrainView->loadSensors((QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif").toStdU16String());
 
     // Read and show digitizer points
     FiffDigPointSet t_Dig((QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif").toStdString());
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
     pModel->addDigitizerData(t_Dig.points());
 
     // Load sensor field data from evoked file for MEG/EEG field mapping
-    pBrainView->loadSensorField(parser.value(evokedFileOption), parser.value(evokedIndexOption).toInt());
+    pBrainView->loadSensorField(parser.value(evokedFileOption).toStdU16String(), parser.value(evokedIndexOption).toInt());
 
     if (bAddRtSourceLoc) {
         // Write source estimate to temp files for visualization
@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
             pBrainView->setSourceColormap("Jet");
             pBrainView->setSourceThresholds(0.0f, 0.5f, 10.0f);
         });
-        pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
+        pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
     }
 
     pBrainView->show();

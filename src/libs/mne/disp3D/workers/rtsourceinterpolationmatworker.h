@@ -37,12 +37,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QMutex>
-#include <QSharedPointer>
-#include <QVector>
-#include <QMap>
-#include <QList>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -55,6 +49,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -117,7 +116,7 @@ public:
      *
      * @param[in] sInterpolationFunction    Function name.
      */
-    void setInterpolationFunction(const QString& sInterpolationFunction);
+    void setInterpolationFunction(const std::string& sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -201,7 +200,7 @@ signals:
      *
      * @param[in] interpMat    Sparse interpolation matrix (nVertices x nSources).
      */
-    void newInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void newInterpolationMatrixLeftAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
 
     //=========================================================================================================
     /**
@@ -209,7 +208,7 @@ signals:
      *
      * @param[in] interpMat    Sparse interpolation matrix (nVertices x nSources).
      */
-    void newInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void newInterpolationMatrixRightAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
 
 private:
     //=========================================================================================================
@@ -219,7 +218,7 @@ private:
      * @param[in] name    Function name ("linear", "gaussian", "square", "cubic").
      * @return Function pointer for use with Interpolation::createInterpolationMat().
      */
-    static double (*resolveInterpolationFunction(const QString& name))(double);
+    static double (*resolveInterpolationFunction(const std::string& name))(double);
 
     //=========================================================================================================
     /**
@@ -232,7 +231,7 @@ private:
      * @param[in] interpFunc           Interpolation kernel function.
      * @return Shared pointer to the computed sparse interpolation matrix.
      */
-    static QSharedPointer<Eigen::SparseMatrix<float>> computeHemi(
+    static std::shared_ptr<Eigen::SparseMatrix<float>> computeHemi(
         const Eigen::MatrixX3f& matVertices,
         const std::vector<Eigen::VectorXi>& vecNeighborVertices,
         Eigen::VectorXi vecSourceVertices,
@@ -251,13 +250,13 @@ private:
      * @param[in] nVertices     Number of surface vertices (rows of the result).
      * @return FsAnnotation matrix (nVertices x nSources).
      */
-    static QSharedPointer<Eigen::SparseMatrix<float>> computeAnnotationOperator(
+    static std::shared_ptr<Eigen::SparseMatrix<float>> computeAnnotationOperator(
         const std::vector<mne::FsLabel>& lLabels,
-        const QMap<qint32, qint32>& mapLabelIdSrc,
-        const QList<int>& vertNos,
+        const std::map<std::int32_t, std::int32_t>& mapLabelIdSrc,
+        const std::vector<int>& vertNos,
         int nVertices);
 
-    mutable QMutex m_mutex; /**< Protects all data members. */
+    mutable std::mutex m_mutex; /**< Protects all data members. */
 
     // LH geometry
     Eigen::MatrixX3f m_matVerticesLh;              /**< LH vertex positions. */
@@ -272,25 +271,25 @@ private:
     bool m_hasRh = false;                          /**< Whether RH data has been set. */
 
     // Interpolation parameters
-    double m_dCancelDist = 0.05;                                /**< Cancel distance in meters. */
-    QString m_sInterpolationFunction = QStringLiteral("cubic"); /**< Active interpolation function name. */
+    double m_dCancelDist = 0.05;                    /**< Cancel distance in meters. */
+    std::string m_sInterpolationFunction = "cubic"; /**< Active interpolation function name. */
 
     // Visualization type
     int m_iVisualizationType = InterpolationBased; /**< Current visualization type. */
 
     // LH annotation data
-    std::vector<mne::FsLabel> m_lLabelsLh;      /**< LH FreeSurfer labels. */
-    QMap<qint32, qint32> m_mapLabelIdSourcesLh; /**< LH source vertex → label ID map. */
-    QList<int> m_vertNosLh;                     /**< LH source vertex numbers. */
-    int m_nAnnotationVerticesLh = 0;            /**< LH surface vertex count (size of the label-id vector). */
-    bool m_bAnnotationLhInit = false;           /**< Whether LH annotation data is set. */
+    std::vector<mne::FsLabel> m_lLabelsLh;                      /**< LH FreeSurfer labels. */
+    std::map<std::int32_t, std::int32_t> m_mapLabelIdSourcesLh; /**< LH source vertex → label ID map. */
+    std::vector<int> m_vertNosLh;                               /**< LH source vertex numbers. */
+    int m_nAnnotationVerticesLh = 0;                            /**< LH surface vertex count (size of the label-id vector). */
+    bool m_bAnnotationLhInit = false;                           /**< Whether LH annotation data is set. */
 
     // RH annotation data
-    std::vector<mne::FsLabel> m_lLabelsRh;      /**< RH FreeSurfer labels. */
-    QMap<qint32, qint32> m_mapLabelIdSourcesRh; /**< RH source vertex → label ID map. */
-    QList<int> m_vertNosRh;                     /**< RH source vertex numbers. */
-    int m_nAnnotationVerticesRh = 0;            /**< RH surface vertex count (size of the label-id vector). */
-    bool m_bAnnotationRhInit = false;           /**< Whether RH annotation data is set. */
+    std::vector<mne::FsLabel> m_lLabelsRh;                      /**< RH FreeSurfer labels. */
+    std::map<std::int32_t, std::int32_t> m_mapLabelIdSourcesRh; /**< RH source vertex → label ID map. */
+    std::vector<int> m_vertNosRh;                               /**< RH source vertex numbers. */
+    int m_nAnnotationVerticesRh = 0;                            /**< RH surface vertex count (size of the label-id vector). */
+    bool m_bAnnotationRhInit = false;                           /**< Whether RH annotation data is set. */
 };
 
 } // namespace mne::disp

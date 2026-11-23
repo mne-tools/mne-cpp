@@ -36,6 +36,8 @@
 //=============================================================================================================
 
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -84,7 +86,7 @@ public:
      */
     explicit Control3DView(const QString& sSettingsPath = "",
                            QWidget* parent = 0,
-                           const QStringList& slFlags = QStringList() << "Data" << "View" << "Light",
+                           const std::vector<std::string>& slFlags = {"Data", "View", "Light"},
                            Qt::WindowType type = Qt::Widget);
 
     //=========================================================================================================
@@ -99,7 +101,7 @@ public:
      *
      * @param[in] slFlags   flags.
      */
-    void setFlags(const QStringList& slFlags);
+    void setFlags(const std::vector<std::string>& slFlags);
 
     //=========================================================================================================
     /**

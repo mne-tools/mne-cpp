@@ -46,8 +46,6 @@
 //=============================================================================================================
 
 #include <QRhiWidget>
-#include <QMap>
-#include <QElapsedTimer>
 #include <QQuaternion>
 #include <QRect>
 #include <QImage>
@@ -62,7 +60,14 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
+#include <filesystem>
+#include <initializer_list>
+#include <map>
 #include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -166,14 +171,14 @@ public:
 
 public slots:
     void onRowsInserted(const QModelIndex& parent, int first, int last);
-    void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles);
+    void onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles);
     //=========================================================================================================
     /**
      * Set the active surface type to search for (e.g. "pial").
      *
      * @param[in] type       The surface type to activate.
      */
-    void setActiveSurface(const QString& type);
+    void setActiveSurface(const std::string& type);
 
     //=========================================================================================================
     /**
@@ -181,7 +186,7 @@ public slots:
      *
      * @param[in] mode       The shader mode to set.
      */
-    void setShaderMode(const QString& mode);
+    void setShaderMode(const std::string& mode);
 
     //=========================================================================================================
     /**
@@ -189,7 +194,7 @@ public slots:
      *
      * @param[in] mode       The shader mode to set.
      */
-    void setBemShaderMode(const QString& mode);
+    void setBemShaderMode(const std::string& mode);
 
     /**
      * Synchronize all BEM shader targets to their respective brain shader targets.
@@ -202,7 +207,7 @@ public slots:
      *
      * @param[in] mode       The visualization mode to set.
      */
-    void setVisualizationMode(const QString& mode);
+    void setVisualizationMode(const std::string& mode);
 
     //=========================================================================================================
     /**
@@ -220,7 +225,7 @@ public slots:
      * @param[in] name       "head", "outer_skull", or "inner_skull".
      * @param[in] visible    Visibility state.
      */
-    void setBemVisible(const QString& name, bool visible);
+    void setBemVisible(const std::string& name, bool visible);
 
     //=========================================================================================================
     /**
@@ -237,7 +242,7 @@ public slots:
      * @param[in] type       "MEG", "EEG", or "Digitizer".
      * @param[in] visible    Visibility state.
      */
-    void setSensorVisible(const QString& type, bool visible);
+    void setSensorVisible(const std::string& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -253,7 +258,7 @@ public slots:
      *
      * @param[in] path       Absolute path to a helmet surface file. Empty to use auto selection.
      */
-    void setMegHelmetOverride(const QString& path);
+    void setMegHelmetOverride(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -265,7 +270,7 @@ public slots:
      * @param[in] helmetFilePath   Absolute path to a helmet BEM FIF file.
      * @return True if the helmet surface was loaded successfully.
      */
-    bool loadMegHelmetSurface(const QString& helmetFilePath);
+    bool loadMegHelmetSurface(const std::filesystem::path& helmetFilePath);
 
     //=========================================================================================================
     /**
@@ -307,7 +312,7 @@ public slots:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", etc.).
      */
-    void setNetworkColormap(const QString& name);
+    void setNetworkColormap(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -350,7 +355,7 @@ public slots:
      *
      * @param[in] vecPositions   Head positions in metres, oldest first.
      */
-    void setHeadMovementPath(const QVector<Eigen::Vector3f>& vecPositions);
+    void setHeadMovementPath(const std::vector<Eigen::Vector3f>& vecPositions);
 
     //=========================================================================================================
     /**
@@ -373,7 +378,7 @@ public slots:
      * @param[in] fileName   Output file; the format follows the suffix (e.g. .png, .jpg).
      * @return false if there is no rendered frame or the file cannot be written.
      */
-    bool takeScreenshot(const QString& fileName);
+    bool takeScreenshot(const std::filesystem::path& fileName);
 
     //=========================================================================================================
     /**
@@ -390,8 +395,8 @@ public slots:
      * @param[in] surfaceType Surface type to match (default "pial").
      * @return true on success, false on failure.
      */
-    bool savePng(const QString& path, int width = 1200, int height = 800,
-                 const QString& surfaceType = QStringLiteral("pial"));
+    bool savePng(const std::filesystem::path& path, int width = 1200, int height = 800,
+                 const std::string& surfaceType = "pial");
 
     //=========================================================================================================
     /**
@@ -490,22 +495,22 @@ public slots:
     /**
      * Get configured surface type for a target view.
      */
-    QString activeSurfaceForTarget(int target) const;
+    std::string activeSurfaceForTarget(int target) const;
 
     /**
      * Get configured shader mode name for a target view.
      */
-    QString shaderModeForTarget(int target) const;
+    std::string shaderModeForTarget(int target) const;
 
     /**
      * Get configured BEM shader mode name for a target view.
      */
-    QString bemShaderModeForTarget(int target) const;
+    std::string bemShaderModeForTarget(int target) const;
 
     /**
      * Get configured overlay mode name for a target view.
      */
-    QString overlayModeForTarget(int target) const;
+    std::string overlayModeForTarget(int target) const;
 
     /**
      * Check object visibility for a given target view.
@@ -514,7 +519,7 @@ public slots:
      * @param[in] target     -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
      * @return               True if visible, false otherwise.
      */
-    bool objectVisibleForTarget(const QString& object, int target) const;
+    bool objectVisibleForTarget(const std::string& object, int target) const;
 
     /**
      * Check whether MEG field mapping uses head surface for a target.
@@ -570,7 +575,7 @@ public slots:
      * @param[in] rhPath     Path to right hemisphere .stc file.
      * @return True if successful.
      */
-    bool loadSourceEstimate(const QString& lhPath, const QString& rhPath);
+    bool loadSourceEstimate(const std::filesystem::path& lhPath, const std::filesystem::path& rhPath);
 
     //=========================================================================================================
     /**
@@ -579,7 +584,7 @@ public slots:
      * @param[in] fifPath    Path to the FIF file.
      * @return True if successful; false without a tree model (see setModel()).
      */
-    bool loadSensors(const QString& fifPath);
+    bool loadSensors(const std::filesystem::path& fifPath);
 
     /**
      * @brief Return cardinal fiducials (NAS/LPA/RPA) transformed to MRI coordinates.
@@ -588,7 +593,7 @@ public slots:
      * head-to-MRI transform is available.  Keys are the FIFF ident values
      * (FIFFV_POINT_LPA=1, FIFFV_POINT_NASION=2, FIFFV_POINT_RPA=3).
      */
-    QMap<int, QVector3D> cardinalFiducialsInMri() const;
+    std::map<int, QVector3D> cardinalFiducialsInMri() const;
 
     /**
      * @brief Return the highest-Z vertex of the BEM head surface in MRI coords.
@@ -608,7 +613,7 @@ public slots:
      * @param[in] dipPath    Path to the dipole file.
      * @return True if successful; false without a tree model (see setModel()).
      */
-    bool loadDipoles(const QString& dipPath);
+    bool loadDipoles(const std::filesystem::path& dipPath);
 
     //=========================================================================================================
     /**
@@ -617,7 +622,7 @@ public slots:
      * @param[in] fwdPath    Path to the FIF file containing source space data.
      * @return True if successful; false without a tree model (see setModel()).
      */
-    bool loadSourceSpace(const QString& fwdPath);
+    bool loadSourceSpace(const std::filesystem::path& fwdPath);
 
     //=========================================================================================================
     /**
@@ -630,7 +635,7 @@ public slots:
      * @param[in] evokedPath   Path to the evoked/average FIF file.
      * @return Descriptive labels for each evoked set.
      */
-    static QStringList probeEvokedSets(const QString& evokedPath);
+    static std::vector<std::string> probeEvokedSets(const std::filesystem::path& evokedPath);
 
     /**
      * Load sensor measurements from an evoked/average FIF file.
@@ -639,7 +644,7 @@ public slots:
      * @param[in] aveIndex     Dataset index to load from the file.
      * @return True if successful.
      */
-    bool loadSensorField(const QString& evokedPath, int aveIndex = 0);
+    bool loadSensorField(const std::filesystem::path& evokedPath, int aveIndex = 0);
 
     //=========================================================================================================
     /**
@@ -656,7 +661,7 @@ public slots:
      * @param[in] transPath  Path to the transformation file.
      * @return True if successful.
      */
-    bool loadTransformation(const QString& transPath);
+    bool loadTransformation(const std::filesystem::path& transPath);
 
     //=========================================================================================================
     /**
@@ -680,7 +685,7 @@ public slots:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", etc.).
      */
-    void setSourceColormap(const QString& name);
+    void setSourceColormap(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -707,7 +712,7 @@ public slots:
      * @param[in] type       "MEG" or "EEG".
      * @param[in] visible    Visibility state.
      */
-    void setSensorFieldVisible(const QString& type, bool visible);
+    void setSensorFieldVisible(const std::string& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -716,7 +721,7 @@ public slots:
      * @param[in] type       "MEG" or "EEG".
      * @param[in] visible    Visibility state.
      */
-    void setSensorFieldContourVisible(const QString& type, bool visible);
+    void setSensorFieldContourVisible(const std::string& type, bool visible);
 
     //=========================================================================================================
     /**
@@ -732,7 +737,7 @@ public slots:
      *
      * @param[in] name       Colormap name.
      */
-    void setSensorFieldColormap(const QString& name);
+    void setSensorFieldColormap(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -847,7 +852,7 @@ public slots:
      *
      * @param[in] modality   "MEG" or "EEG".
      */
-    void startRealtimeSensorStreaming(const QString& modality = QStringLiteral("MEG"));
+    void startRealtimeSensorStreaming(const std::string& modality = "MEG");
 
     //=========================================================================================================
     /**
@@ -903,7 +908,7 @@ public slots:
      *
      * @param[in] name       Colormap name.
      */
-    void setRealtimeSensorColormap(const QString& name);
+    void setRealtimeSensorColormap(const std::string& name);
 
     // ── Data removal ───────────────────────────────────────────────────
 
@@ -945,7 +950,7 @@ public slots:
      * Renders each marker as a small sphere without touching the model
      * or recalculating scene bounds, so the camera stays locked.
      */
-    void setLiveMarkers(const QVector<LiveMarker>& markers);
+    void setLiveMarkers(const std::vector<LiveMarker>& markers);
 
     /** Remove all live overlay markers. */
     void clearLiveMarkers();
@@ -989,7 +994,7 @@ public slots:
      * Replace the set of static overlay markers (fiducials, acquired points).
      * These persist across frames and are always visible.
      */
-    void setStaticMarkers(const QVector<LiveMarker>& markers);
+    void setStaticMarkers(const std::vector<LiveMarker>& markers);
 
     /** Remove all static overlay markers. */
     void clearStaticMarkers();
@@ -1119,7 +1124,7 @@ public slots:
      *
      * @param[in] values  Map of contact name -> value.
      */
-    void setElectrodeValues(const QMap<QString, float>& values);
+    void setElectrodeValues(const std::map<std::string, float>& values);
 
 signals:
     //=========================================================================================================
@@ -1250,13 +1255,13 @@ private slots:
      * @param[in] colorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void onRealtimeColorsAvailable(const QVector<uint32_t>& colorsLh,
-                                   const QVector<uint32_t>& colorsRh);
+    void onRealtimeColorsAvailable(const std::vector<uint32_t>& colorsLh,
+                                   const std::vector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /** Repaint after sensor streaming produces new colours. */
-    void onSensorStreamColorsAvailable(const QString& surfaceKey,
-                                       const QVector<uint32_t>& colors);
+    void onSensorStreamColorsAvailable(const std::string& surfaceKey,
+                                       const std::vector<uint32_t>& colors);
 
 private:
     // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
@@ -1271,7 +1276,8 @@ private:
 
     void refreshSensorTransforms();
     QMatrix4x4 itemTransform(const QStandardItem* item) const;
-    void removeSurfacesByPrefix(const QStringList& prefixes);
+    const QStandardItem* itemForSurface(const std::shared_ptr<BrainSurface>& surface) const;
+    void removeSurfacesByPrefix(std::initializer_list<std::string_view> prefixes);
 
 protected:
     void initialize(QRhiCommandBuffer* cb) override;
@@ -1288,7 +1294,7 @@ protected:
 
 private:
     // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
-    QVector<int> enabledViewportIndices() const;
+    std::vector<int> enabledViewportIndices() const;
     int enabledViewportCount() const;
     int viewportIndexAt(const QPoint& pos) const;
     QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
@@ -1300,7 +1306,6 @@ private:
     void updateOverlayLayout();
     void updateViewportLabelHighlight();
     void showViewportPresetMenu(int viewport, const QPoint& globalPos);
-    void logPerspectiveRotation(const QString& context) const;
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
     void updateInflatedSurfaceTransforms();
@@ -1309,17 +1314,17 @@ private:
     std::unique_ptr<BrainRenderer> m_renderer; /**< GPU renderer for all surfaces/dipoles. */
     BrainTreeModel* m_model = nullptr;         /**< Data model driving the scene graph (not owned). */
 
-    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap; /**< Model-item → renderable surface. */
-    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;  /**< Model-item → dipole renderable. */
+    std::map<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap; /**< Model-item → renderable surface. */
+    std::map<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;  /**< Model-item → dipole renderable. */
 
-    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
-    std::shared_ptr<BrainSurface> m_activeSurface;           /**< Currently selected brain surface for stats. */
-    QString m_activeSurfaceType;                             /**< Type name of the active surface (e.g. "pial"). */
+    std::map<std::string, std::shared_ptr<BrainSurface>> m_surfaces; /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
+    std::shared_ptr<BrainSurface> m_activeSurface;                   /**< Currently selected brain surface for stats. */
+    std::string m_activeSurfaceType;                                 /**< Type name of the active surface (e.g. "pial"). */
 
     // ── SubView state ──────────────────────────────────────────────────
     static constexpr int kDefaultViewportCount = 4; /**< Default number of multi-view panes. */
     SubView m_singleView;                           /**< Render state for single-view mode. */
-    QVector<SubView> m_subViews;                    /**< Per-pane render state for multi-view mode. */
+    std::vector<SubView> m_subViews;                /**< Per-pane render state for multi-view mode. */
     int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
 
     // ── Active (runtime) copies — kept in sync with selected SubView ──
@@ -1346,14 +1351,14 @@ private:
     QTimer* m_pAutoRotateTimer = nullptr;         /**< Drives the automated rotation animation. */
 
     // ── UI overlays ────────────────────────────────────────────────────
-    int m_frameCount = 0;                    /**< Frames rendered since last FPS sample. */
-    QElapsedTimer m_fpsTimer;                /**< Timer for FPS measurement. */
-    QLabel* m_fpsLabel = nullptr;            /**< Overlay label showing FPS and vertex count. */
-    QLabel* m_singleViewInfoLabel = nullptr; /**< Overlay label for single-view shader/surface info. */
-    bool m_sceneDirty = true;                /**< Set when scene needs redraw; cleared after render. */
-    qint64 m_cachedVertexCount = 0;          /**< Cached visible vertex count (invalidated on surface changes). */
-    bool m_vertexCountDirty = true;          /**< Recount vertices on next FPS update when true. */
-    bool m_infoPanelVisible = true;          /**< Whether the info overlay panel is shown. */
+    int m_frameCount = 0;                             /**< Frames rendered since last FPS sample. */
+    std::chrono::steady_clock::time_point m_fpsStart; /**< Start of the current FPS measurement window. */
+    QLabel* m_fpsLabel = nullptr;                     /**< Overlay label showing FPS and vertex count. */
+    QLabel* m_singleViewInfoLabel = nullptr;          /**< Overlay label for single-view shader/surface info. */
+    bool m_sceneDirty = true;                         /**< Set when scene needs redraw; cleared after render. */
+    qint64 m_cachedVertexCount = 0;                   /**< Cached visible vertex count (invalidated on surface changes). */
+    bool m_vertexCountDirty = true;                   /**< Recount vertices on next FPS update when true. */
+    bool m_infoPanelVisible = true;                   /**< Whether the info overlay panel is shown. */
 
     // ── Scene objects ──────────────────────────────────────────────────
     std::unique_ptr<DipoleObject> m_dipoles;                 /**< Standalone dipole set (loaded via file). */
@@ -1371,23 +1376,23 @@ private:
     void updateSceneBounds();
 
     // ── Coordinate transforms ──────────────────────────────────────────
-    mne::FiffCoordTrans m_headToMriTrans;     /**< Head-to-MRI coordinate transform. */
-    mne::FiffDigPointSet m_cardinalDigPoints; /**< Cardinal dig points from last sensor load. */
-    bool m_applySensorTrans = true;           /**< Whether to apply the transform to sensors/digitizers. */
-    QString m_megHelmetOverridePath;          /**< Optional override path for MEG helmet surface. */
-    QMatrix4x4 m_devHeadTrans;                /**< Device→Head transformation from last sensor load. */
-    bool m_hasDevHead = false;                /**< Whether a valid Device→Head transform is available. */
-    bool m_dipolesVisible = true;             /**< Whether dipoles are rendered. */
-    bool m_networkVisible = false;            /**< Whether the connectivity network is rendered. */
+    mne::FiffCoordTrans m_headToMriTrans;          /**< Head-to-MRI coordinate transform. */
+    mne::FiffDigPointSet m_cardinalDigPoints;      /**< Cardinal dig points from last sensor load. */
+    bool m_applySensorTrans = true;                /**< Whether to apply the transform to sensors/digitizers. */
+    std::filesystem::path m_megHelmetOverridePath; /**< Optional override path for MEG helmet surface. */
+    QMatrix4x4 m_devHeadTrans;                     /**< Device→Head transformation from last sensor load. */
+    bool m_hasDevHead = false;                     /**< Whether a valid Device→Head transform is available. */
+    bool m_dipolesVisible = true;                  /**< Whether dipoles are rendered. */
+    bool m_networkVisible = false;                 /**< Whether the connectivity network is rendered. */
 
     // ── Ray-pick hover state ───────────────────────────────────────────
-    QStandardItem* m_hoveredItem = nullptr; /**< Model item currently under the cursor. */
-    int m_hoveredIndex = -1;                /**< Vertex index at the hover point. */
-    QString m_hoveredRegion;                /**< Atlas region name at the hover point. */
-    QString m_hoveredSurfaceKey;            /**< FsSurface map key at the hover point. */
-    QLabel* m_regionLabel = nullptr;        /**< Overlay label showing the hovered region name. */
-    QVector<QLabel*> m_viewportNameLabels;  /**< Per-viewport name labels (e.g. "Top", "Front"). */
-    QVector<QLabel*> m_viewportInfoLabels;  /**< Per-viewport info labels (shader, surface info). */
+    QStandardItem* m_hoveredItem = nullptr;    /**< Model item currently under the cursor. */
+    int m_hoveredIndex = -1;                   /**< Vertex index at the hover point. */
+    QString m_hoveredRegion;                   /**< Atlas region name at the hover point. */
+    std::string m_hoveredSurfaceKey;           /**< FsSurface map key at the hover point. */
+    QLabel* m_regionLabel = nullptr;           /**< Overlay label showing the hovered region name. */
+    std::vector<QLabel*> m_viewportNameLabels; /**< Per-viewport name labels (e.g. "Top", "Front"). */
+    std::vector<QLabel*> m_viewportInfoLabels; /**< Per-viewport info labels (shader, surface info). */
 
     // ── Debug intersection ─────────────────────────────────────────────
     std::shared_ptr<BrainSurface> m_debugPointerSurface; /**< Semi-transparent sphere at hit point. */

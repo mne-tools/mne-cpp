@@ -38,6 +38,15 @@
 #include <QGraphicsObject>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+//=============================================================================================================
 // DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
@@ -52,7 +61,7 @@ namespace mne::disp
 // DEFINE TYPEDEFS
 //=============================================================================================================
 
-typedef QPair<const double*, qint32> RowVectorPair;
+typedef std::pair<const double*, int> RowVectorPair;
 
 //=============================================================================================================
 /**
@@ -115,14 +124,14 @@ public:
 
     bool m_bIsBad; /**< Whether this channel is bad. */
 
-    QPointF m_qpChannelPosition;                         /**< The channels 2D position in the scene.*/
-    QList<QPair<QString, RowVectorPair>> m_lAverageData; /**< The channels average data which is to be plotted.*/
+    QPointF m_qpChannelPosition;                                       /**< The channels 2D position in the scene.*/
+    std::vector<std::pair<std::string, RowVectorPair>> m_lAverageData; /**< The channels average data which is to be plotted.*/
 
-    QPair<int, int> m_firstLastSample; /**< The first and last sample.*/
+    std::pair<int, int> m_firstLastSample; /**< The first and last sample.*/
 
-    QMap<qint32, float> m_scaleMap;              /**< Map with all channel types and their current scaling value.*/
-    QMap<QString, bool> m_qMapAverageActivation; /**< The average activation information.*/
-    QMap<QString, QColor> m_qMapAverageColor;    /**< The average color information.*/
+    std::map<int, float> m_scaleMap;                     /**< Map with all channel types and their current scaling value.*/
+    std::map<std::string, bool> m_qMapAverageActivation; /**< The average activation information.*/
+    std::map<std::string, QColor> m_qMapAverageColor;    /**< The average color information.*/
 
     QRectF m_rectBoundingRect; /**< The bounding rect. */
 

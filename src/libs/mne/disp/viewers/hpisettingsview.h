@@ -43,6 +43,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 
 //=============================================================================================================
@@ -100,7 +101,7 @@ public:
      * @param[in] vError            the new error values.
      * @param[in] dMeanErrorDist    the mean error value.
      */
-    void setErrorLabels(const QVector<double>& vError,
+    void setErrorLabels(const std::vector<double>& vError,
                         const double dMeanErrorDist);
 
     //=========================================================================================================
@@ -196,7 +197,7 @@ public:
      * @param[in] sFilePath     Path to the JSON file.
      * @return Whether the file could be read and parsed; if not, the presets are left unchanged.
      */
-    bool loadCoilPresets(const QString& sFilePath);
+    bool loadCoilPresets(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -269,7 +270,7 @@ protected:
      *
      * @return Digitizer points read from the file; empty if none could be read.
      */
-    mne::FiffDigPointSet readDigitizersFromFile(const QString& fileName);
+    mne::FiffDigPointSet readDigitizersFromFile(const std::filesystem::path& fileName);
 
     //=========================================================================================================
     /**
@@ -331,7 +332,7 @@ protected:
 
     std::unique_ptr<Ui::HpiSettingsViewWidget> m_pUi; /**< The HPI dialog. */
 
-    QVector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
+    std::vector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -344,7 +345,7 @@ signals:
      *
      * @param[in] vCoilFreqs    The new coil frequencies.
      */
-    void coilFrequenciesChanged(const QVector<int>& vCoilFreqs);
+    void coilFrequenciesChanged(const std::vector<int>& vCoilFreqs);
 
     //=========================================================================================================
     /**
@@ -354,7 +355,7 @@ signals:
      * @param[in] sFilePath    The file path to the new digitizers.
      */
     void digitizersChanged(const mne::FiffDigPointSet& digitizers,
-                           const QString& sFilePath);
+                           const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**

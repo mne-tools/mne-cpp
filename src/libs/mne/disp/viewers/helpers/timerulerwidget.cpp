@@ -25,7 +25,6 @@
 #include <QPaintEvent>
 #include <QFontDatabase>
 #include <QMenu>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -83,7 +82,7 @@ void TimeRulerWidget::setFirstFileSample(int firstFileSample)
 
 //=============================================================================================================
 
-void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark>& events)
+void TimeRulerWidget::setEvents(const std::vector<TimeRulerEventMark>& events)
 {
     m_events = events;
     update();
@@ -91,7 +90,7 @@ void TimeRulerWidget::setEvents(const QVector<TimeRulerEventMark>& events)
 
 //=============================================================================================================
 
-void TimeRulerWidget::setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers)
+void TimeRulerWidget::setReferenceMarkers(const std::vector<TimeRulerReferenceMark>& markers)
 {
     m_referenceMarkers = markers;
     update();
@@ -181,7 +180,7 @@ int TimeRulerWidget::sampleAtX(int x) const
 
 int TimeRulerWidget::nearestReferenceMarkerIndex(int sample, int tolerancePixels) const
 {
-    if (m_referenceMarkers.isEmpty() || m_spp <= 0.f) {
+    if (m_referenceMarkers.empty() || m_spp <= 0.f) {
         return -1;
     }
 
@@ -189,7 +188,7 @@ int TimeRulerWidget::nearestReferenceMarkerIndex(int sample, int tolerancePixels
     double nearestDistance = std::numeric_limits<double>::max();
     const double toleranceSamples = static_cast<double>(tolerancePixels) * static_cast<double>(m_spp);
 
-    for (int i = 0; i < m_referenceMarkers.size(); ++i) {
+    for (int i = 0; i < std::ssize(m_referenceMarkers); ++i) {
         const double distance = qAbs(static_cast<double>(m_referenceMarkers.at(i).sample - sample));
         if (distance <= toleranceSamples && distance < nearestDistance) {
             nearestDistance = distance;
@@ -234,7 +233,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent* /*event*/)
     p.drawLine(0, H - 1, W, H - 1);
 
     // ── Persistent sample markers ────────────────────────────────────
-    if (!m_referenceMarkers.isEmpty()) {
+    if (!m_referenceMarkers.empty()) {
         QFont markerFont = p.font();
         markerFont.setPixelSize(9);
         markerFont.setBold(true);
@@ -256,9 +255,9 @@ void TimeRulerWidget::paintEvent(QPaintEvent* /*event*/)
             p.setPen(QPen(markerColor, 1));
             p.drawLine(xi, 0, xi, H - 1);
 
-            const QString label = marker.label.isEmpty()
+            const QString label = marker.label.empty()
                 ? QString::number(marker.sample)
-                : marker.label;
+                : QString::fromStdString(marker.label);
             const int chipW = qMax(20, p.fontMetrics().horizontalAdvance(label) + 2 * kMarkerPadX);
             QRect chipRect(xi - chipW / 2, markerChipY, chipW, kMarkerChipH);
             chipRect.moveLeft(qBound(2, chipRect.left(), qMax(2, W - chipRect.width() - 2)));
@@ -272,7 +271,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent* /*event*/)
     }
 
     // ── Stim event chips ─────────────────────────────────────────────
-    if (!m_events.isEmpty()) {
+    if (!m_events.empty()) {
         QFont evFont;
         evFont.setPixelSize(9);
         evFont.setBold(true);
@@ -315,7 +314,7 @@ void TimeRulerWidget::paintEvent(QPaintEvent* /*event*/)
             fill.setAlpha(150);
             p.fillRect(chip, fill);
             p.setPen(Qt::white);
-            QString lbl = ev.label.isEmpty() ? QStringLiteral("?") : ev.label;
+            QString lbl = ev.label.empty() ? QStringLiteral("?") : QString::fromStdString(ev.label);
             p.drawText(chip, Qt::AlignCenter, lbl);
 
             lastChipRight = chipX + kChipW;
@@ -420,7 +419,7 @@ void TimeRulerWidget::contextMenuEvent(QContextMenuEvent* event)
         removeMarkerAction = menu.addAction(tr("Remove Nearest Marker"));
     }
 
-    if (!m_referenceMarkers.isEmpty()) {
+    if (!m_referenceMarkers.empty()) {
         menu.addSeparator();
         clearMarkersAction = menu.addAction(tr("Clear All Markers"));
     }

@@ -41,6 +41,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 #include <vector>
 
@@ -175,7 +176,7 @@ private:
      * @param[in] sFilePath    The file path to the new digitizers.
      */
     void onDigitizersChanged(const mne::FiffDigPointSet& digitizers,
-                             const QString& sFilePath);
+                             const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -195,7 +196,7 @@ private:
      *
      * @param[in] vCoilFreqs    The new coil frequencies.
      */
-    void onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs);
+    void onCoilFrequenciesChanged(const std::vector<int>& vCoilFreqs);
 
     //=========================================================================================================
     /**
@@ -279,7 +280,7 @@ private:
 
     std::vector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
 
-    QString m_sFilePathDigitzers; /**< The file path to the current digitzers. */
+    std::filesystem::path m_sFilePathDigitzers; /**< The file path to the current digitzers. */
 
     qint16 m_iNumberBadChannels; /**< The number of bad channels.*/
     qint16 m_iFittingWindowSize; /**< The number of samples in each fitting window.*/
@@ -305,7 +306,7 @@ private:
     mne::scan::PluginOutputData<mne::scan::RealTimeHpiResult>::SPtr m_pHpiOutput;      /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
-    void errorsChanged(const QVector<double>& vErrors,
+    void errorsChanged(const std::vector<double>& vErrors,
                        double dMeanErrorDist);
     void gofChanged(const Eigen::VectorXd& vGoF,
                     const double dMeanGoF);

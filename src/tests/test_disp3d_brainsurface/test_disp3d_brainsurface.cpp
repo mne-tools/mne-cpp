@@ -297,7 +297,7 @@ void TestDisp3dBrainSurface::testTriangleIndices()
     BrainSurface surf;
     createMinimalSurface(surf);
 
-    QVector<uint32_t> indices = surf.triangleIndices();
+    std::vector<uint32_t> indices = surf.triangleIndices();
     QCOMPARE(indices.size(), 3); // 1 triangle = 3 indices
     QCOMPARE(indices[0], (uint32_t)0);
     QCOMPARE(indices[1], (uint32_t)1);
@@ -344,10 +344,10 @@ void TestDisp3dBrainSurface::testApplySourceEstimateColors()
     createMinimalSurface(surf);
 
     // Apply 3 vertex colors (one per vertex)
-    QVector<uint32_t> colors;
-    colors.append(packABGR(255, 0, 0)); // Red
-    colors.append(packABGR(0, 255, 0)); // Green
-    colors.append(packABGR(0, 0, 255)); // Blue
+    std::vector<uint32_t> colors;
+    colors.push_back(packABGR(255, 0, 0)); // Red
+    colors.push_back(packABGR(0, 255, 0)); // Green
+    colors.push_back(packABGR(0, 0, 255)); // Blue
 
     surf.applySourceEstimateColors(colors);
     QCOMPARE(surf.colorsRef()[0] & 0x00FFFFFFu, packABGR(255, 0, 0) & 0x00FFFFFFu);
@@ -410,7 +410,7 @@ void TestDisp3dBrainSurface::testElementLabels()
     BrainSurface surf;
     createQuadSurface(surf);
     surf.labelElements(2);
-    const QVector<uint32_t>& keys = surf.annotationColorsRef();
+    const std::vector<uint32_t>& keys = surf.annotationColorsRef();
     QCOMPARE(keys[0], keys[1]);
     QVERIFY(keys[1] != keys[2]);
     QCOMPARE(keys[2] >> 24, 0u); // transparent, so never equal to an opaque atlas colour

@@ -24,8 +24,13 @@
 //=============================================================================================================
 
 #include "../../disp3D_global.h"
-
 #include "abstracttreeitem.h"
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
 
 namespace mne::disp
 {
@@ -47,7 +52,7 @@ public:
      * @param[in] objectKey      Unique key (e.g. "net_coherence").
      */
     explicit NetworkTreeItem(const QString& text = "Network",
-                             const QString& objectKey = QString());
+                             const std::string& objectKey = {});
 
     //=========================================================================================================
     /**
@@ -55,13 +60,13 @@ public:
      *
      * @return The object key.
      */
-    QString objectKey() const
+    std::string objectKey() const
     {
         return m_objectKey;
     }
 
 private:
-    QString m_objectKey; /**< Unique key for this network item. */
+    std::string m_objectKey; /**< Unique key for this network item. */
 };
 
 } // namespace mne::disp

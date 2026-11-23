@@ -33,8 +33,13 @@
 #include <QRect>
 #include <QSize>
 #include <QPoint>
-#include <QVector>
 #include <Qt>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 namespace mne::disp
 {
@@ -162,7 +167,7 @@ public:
      * @return                      Viewport index, or -1 if outside.
      */
     int viewportIndexAt(const QPoint& pos,
-                        const QVector<int>& enabledViewports,
+                        const std::vector<int>& enabledViewports,
                         const QSize& outputSize) const;
 
     //=========================================================================================================

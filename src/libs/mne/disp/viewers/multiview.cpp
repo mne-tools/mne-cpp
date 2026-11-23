@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "multiview.h"
+#include <mne/base/log.h>
 #include "multiviewwindow.h"
 #include "rtfiffrawview.h"
 #include "averagelayoutview.h"
@@ -25,7 +26,6 @@
 //=============================================================================================================
 
 #include <QHBoxLayout>
-#include <QDebug>
 #include <QSettings>
 
 //=============================================================================================================
@@ -107,15 +107,15 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
         pDockWidget->layout()->setContentsMargins(0, 0, 0, 0);
     }
 
-    if (m_lDockWidgets.isEmpty()) {
+    if (m_lDockWidgets.empty()) {
         this->addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, pDockWidget);
     }
 
-    for (int i = 0; i < m_lDockWidgets.size(); ++i) {
-        this->tabifyDockWidget(m_lDockWidgets.at(i), pDockWidget);
+    for (MultiViewWindow* pTabbed : m_lDockWidgets) {
+        this->tabifyDockWidget(pTabbed, pDockWidget);
     }
 
-    m_lDockWidgets.append(pDockWidget);
+    m_lDockWidgets.push_back(pDockWidget);
 
     connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=, this]() {
         emit dockLocationChanged(pWidget);
@@ -129,7 +129,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 void MultiView::saveSettings()
 {
     if (m_sSettingsPath.isEmpty()) {
-        qWarning() << "[MultiView::saveSettings] Settings path not set for main window. Cannot save central widget state.";
+        mne::Log::warning("[MultiView::saveSettings] Settings path not set for main window. Cannot save central widget state.");
         return;
     }
 
@@ -146,7 +146,7 @@ void MultiView::saveSettings()
 void MultiView::loadSettings()
 {
     if (m_sSettingsPath.isEmpty()) {
-        qWarning() << "[MultiView::loadSettings] Settings path not set for main window. Cannot load central widget state.";
+        mne::Log::warning("[MultiView::loadSettings] Settings path not set for main window. Cannot load central widget state.");
         return;
     }
 

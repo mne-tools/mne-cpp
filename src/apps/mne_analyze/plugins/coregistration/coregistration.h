@@ -38,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <future>
 #include <memory>
 
@@ -167,7 +168,7 @@ private:
      *
      * @param[in] sFilePath     The file path to the new digitzers.
      */
-    void onDigitizersChanged(const QString& sFilePath);
+    void onDigitizersChanged(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -175,7 +176,7 @@ private:
      *
      * @param[in] sFilePath     The file path to the new digitzers.
      */
-    void onFiducialsChanged(const QString& sFilePath);
+    void onFiducialsChanged(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -183,7 +184,7 @@ private:
      *
      * @param[in] sFilePath     The file path to the transformation.
      */
-    void onLoadTrans(const QString& sFilePath);
+    void onLoadTrans(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -191,7 +192,7 @@ private:
      *
      * @param[in] sFilePath     The file path to store the transformation.
      */
-    void onStoreTrans(const QString& sFilePath);
+    void onStoreTrans(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**
@@ -267,7 +268,7 @@ private:
      *
      * @param[in] sFilePath     The file path to store the fiducials.
      */
-    void onStoreFiducials(const QString& sFilePath);
+    void onStoreFiducials(const std::filesystem::path& sFilePath);
 
     //=========================================================================================================
     /**

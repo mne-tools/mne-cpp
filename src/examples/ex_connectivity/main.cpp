@@ -388,7 +388,7 @@ int main(int argc, char* argv[])
     //Read and show sensor helmets
     if (!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         //Read and show sensor helmets
-        pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
+        pBrainView->loadSensors((QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif").toStdU16String());
     } else {
         // Add source estimate for source-level visualization
         int nVertLh = t_clusteredFwd.src[0].nuse;
@@ -429,7 +429,7 @@ int main(int argc, char* argv[])
             pBrainView->setSourceColormap("Jet");
             pBrainView->setSourceThresholds(0.0f, 0.5f, 10.0f);
         });
-        pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
+        pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
     }
 
     pConnSettingsView->setNumberTrials(iNumTrials);

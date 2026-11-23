@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include <mne/disp/viewers/abstractview.h>
+#include <mne/disp/detail/map_value.h>
 #include <mne/base/string_utils.h>
 #include <mne/base/log.h>
 #include <mne/disp/viewers/hpisettingsview.h>
@@ -749,7 +750,7 @@ void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
     QCOMPARE(label("m_label_numberLoadedAdditional"), QStringLiteral("1"));
     QCOMPARE(freqTable->rowCount(), 4);
     QCOMPARE(resultTable->rowCount(), 4);
-    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{293, 307, 314, 321}));
+    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{293, 307, 314, 321}));
 
     // The VectorView presets are built in; a file that cannot be read keeps them
     auto* preset = view.findChild<QComboBox*>(QStringLiteral("comboBox_coilPreset"));
@@ -757,40 +758,40 @@ void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
     QCOMPARE(preset->itemText(2), QStringLiteral("VV 293-321Hz"));
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
-    QVERIFY(!view.loadCoilPresets(dir.filePath(QStringLiteral("missing.json"))));
+    QVERIFY(!view.loadCoilPresets(dir.filePath(QStringLiteral("missing.json")).toStdU16String()));
     QFile presets(dir.filePath(QStringLiteral("presets.json")));
     QVERIFY(presets.open(QIODevice::WriteOnly));
     presets.write("{\"4\": [");
     presets.close();
-    QVERIFY(!view.loadCoilPresets(presets.fileName()));
+    QVERIFY(!view.loadCoilPresets(presets.fileName().toStdU16String()));
     QCOMPARE(preset->count(), 4);
 
     // A preset file replaces them for the loaded number of coils; choosing a preset fills the table
     QVERIFY(presets.open(QIODevice::WriteOnly | QIODevice::Truncate));
     presets.write(R"({"4": [{"name": "VectorView", "coils": [154, 158, 162, 166]}]})");
     presets.close();
-    QVERIFY(view.loadCoilPresets(presets.fileName()));
+    QVERIFY(view.loadCoilPresets(presets.fileName().toStdU16String()));
     QCOMPARE(preset->count(), 2);
     preset->setCurrentIndex(1);
-    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{154, 158, 162, 166}));
+    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{154, 158, 162, 166}));
     QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("166"));
 
     // Editing a frequency cell, and "none" for an unused coil
     freqTable->item(0, 1)->setText(QStringLiteral("300"));
     freqTable->item(2, 1)->setText(QStringLiteral("none"));
-    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, 158, -1, 166}));
+    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, 158, -1, 166}));
 
     // Removing coil 2 renumbers both tables; adding one back appends an unset frequency
     freqTable->setCurrentCell(1, 1);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_removeCoil")), Qt::LeftButton);
-    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, -1, 166}));
+    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, -1, 166}));
     QCOMPARE(freqTable->rowCount(), 3);
     QCOMPARE(freqTable->item(2, 0)->text(), QStringLiteral("3"));
     QCOMPARE(resultTable->item(2, 0)->text(), QStringLiteral("3"));
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_addCoil")), Qt::LeftButton);
     QCOMPARE(freqTable->rowCount(), 4);
     QCOMPARE(freqTable->item(3, 1)->text(), QStringLiteral("none"));
-    QCOMPARE(freqSpy.last().at(0).value<QVector<int>>(), (QVector<int>{300, -1, 166, -1}));
+    QCOMPARE(freqSpy.last().at(0).value<std::vector<int>>(), (std::vector<int>{300, -1, 166, -1}));
 
     // Fit results: errors in mm, GoF in %, good/bad against the allowed mean error
     view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_maxHPIContinousDist"))->setValue(3.0);
@@ -863,7 +864,7 @@ void TestDispViewers2::hpiSettingsView_lifecycle()
     view.newDigitizerList(FiffDigPointSet());
 
     // Pass non-trivial error and GoF data
-    view.setErrorLabels(QVector<double>() << 1.2 << 0.8, 1.0);
+    view.setErrorLabels({1.2, 0.8}, 1.0);
     Eigen::VectorXd gof(2);
     gof << 0.95, 0.90;
     view.setGoFLabels(gof, 0.925);
@@ -1193,7 +1194,7 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
         QCOMPARE(view.getBaselineFromSeconds(), 0);
         QCOMPARE(view.getBaselineToSeconds(), 0);
         QVERIFY(!view.getDoBaselineCorrection());
-        QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI 014"));
+        QCOMPARE(view.getCurrentStimCh(), std::string("STI 014"));
     }
 
     // Stored settings, including a baseline that ends before the stimulus
@@ -1210,7 +1211,7 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     }
     const auto removeSettings = qScopeGuard([&sPath]() { QSettings("MNECPP").remove(sPath); });
 
-    const QMap<QString, int> stimChannels = {{QStringLiteral("STI 014"), 306}, {QStringLiteral("STI 101"), 312}};
+    const std::map<std::string, int> stimChannels = {{"STI 014", 306}, {"STI 101", 312}};
     AveragingSettingsView view(sPath, stimChannels);
     view.show();
     auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("m_pComboBoxChSelection"));
@@ -1241,18 +1242,18 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     QSignalSpy stimSpy(&view, &AveragingSettingsView::changeStimChannel);
     pChannels->setCurrentText(QStringLiteral("STI 014"));
     QCOMPARE(stimSpy.count(), 1);
-    QCOMPARE(stimSpy.last().at(0).toString(), QStringLiteral("STI 014"));
-    QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI 014"));
+    QCOMPARE(stimSpy.last().at(0).value<std::string>(), std::string("STI 014"));
+    QCOMPARE(view.getCurrentStimCh(), std::string("STI 014"));
     QCOMPARE(view.getStimChannelIdx(), 306);
 
     // New stim channels keep the selection and do not duplicate the reaction
-    view.setStimChannels({{QStringLiteral("STI 014"), 6}, {QStringLiteral("STI 201"), 7}});
+    view.setStimChannels(std::map<std::string, int>{{"STI 014", 6}, {"STI 201", 7}});
     QCOMPARE(pChannels->count(), 2);
     QCOMPARE(view.getStimChannelIdx(), 6);
     stimSpy.clear();
     pChannels->setCurrentText(QStringLiteral("STI 201"));
     QCOMPARE(stimSpy.count(), 1);
-    QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI 201"));
+    QCOMPARE(view.getCurrentStimCh(), std::string("STI 201"));
     QCOMPARE(view.getStimChannelIdx(), 7);
 
     // Epoch window and baseline: finished edits emit and constrain the baseline range
@@ -1361,7 +1362,7 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     view.init(info);
     QCOMPARE(pChannels->count(), 2);
     QCOMPARE(pChannels->itemText(0), QStringLiteral("STI 101"));
-    QCOMPARE(view.getSelectedStimChannel(), QStringLiteral("STI 101"));
+    QCOMPARE(view.getSelectedStimChannel(), std::string("STI 101"));
 
     QSignalSpy infoSpy(&view, &TriggerDetectionView::triggerInfoChanged);
     pFirst->setValue(2.5);
@@ -1372,7 +1373,7 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     pActive->setChecked(true);
     QCOMPARE(infoSpy.last().at(1).toBool(), true);
     pChannels->setCurrentIndex(1);
-    QCOMPARE(infoSpy.last().at(2).toString(), QStringLiteral("STI 014"));
+    QCOMPARE(infoSpy.last().at(2).value<std::string>(), std::string("STI 014"));
     QCOMPARE(infoSpy.count(), 4);
 
     // Detected triggers fill the count and the type list once per value
@@ -1392,8 +1393,8 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     });
     QTest::mouseClick(pColor, Qt::LeftButton);
     QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
-    using ColorMap = QMap<double, QColor>;
-    QCOMPARE(infoSpy.last().at(0).value<ColorMap>().value(4.0), QColor(10, 200, 30));
+    using ColorMap = std::map<double, QColor>;
+    QCOMPARE(mne::disp::detail::valueOr(infoSpy.last().at(0).value<ColorMap>(), 4.0), QColor(10, 200, 30));
     pTypes->setCurrentIndex(0);
     QVERIFY(pColor->palette().color(QPalette::Button) != QColor(10, 200, 30));
     pTypes->setCurrentIndex(1);
@@ -1422,7 +1423,7 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     QSignalSpy detectSpy(&view, &TriggerDetectionView::detectTriggers);
     QTest::mouseClick(pDetect, Qt::LeftButton);
     QCOMPARE(detectSpy.count(), 1);
-    QCOMPARE(detectSpy.last().at(0).toString(), QStringLiteral("STI 014"));
+    QCOMPARE(detectSpy.last().at(0).value<std::string>(), std::string("STI 014"));
     QVERIFY(qAbs(detectSpy.last().at(1).toDouble() - 2.5e-3) < 1e-15);
     view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
     QVERIFY(pDetect->isHidden());
@@ -1463,10 +1464,10 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     };
     QCOMPARE(visible(), QStringList({"eeg", "grad", "mag"}));
     QCOMPARE(thresholdSpy.count(), 1);
-    QMap<QString, double> map = view.getThresholdMap();
-    QCOMPARE(map.value(QStringLiteral("Active")), 0.0);
-    QCOMPARE(map.keys(), QStringList({"Active", "eeg", "grad", "mag"}));
-    QCOMPARE(map.value(QStringLiteral("grad")), 0.1);
+    std::map<std::string, double> map = view.getThresholdMap();
+    QCOMPARE(mne::disp::detail::valueOr(map, "Active"), 0.0);
+    QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eeg", "grad", "mag"}));
+    QCOMPARE(mne::disp::detail::valueOr(map, "grad"), 0.1);
 
     auto spin = [&view](int iRow, int iColumn) {
         auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
@@ -1483,15 +1484,15 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QVERIFY(iGradRow > 0);
     qobject_cast<QDoubleSpinBox*>(spin(iGradRow, 1))->setValue(4.0);
     qobject_cast<QSpinBox*>(spin(iGradRow, 2))->setValue(-11);
-    QVERIFY(qAbs(view.getThresholdMap().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
-    QVERIFY(qAbs(thresholdSpy.last().at(0).value<QMap<QString, double>>().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::disp::detail::valueOr(view.getThresholdMap(), "grad") - 4e-11) < 1e-20);
+    QVERIFY(qAbs(mne::disp::detail::valueOr(thresholdSpy.last().at(0).value<std::map<std::string, double>>(), "grad") - 4e-11) < 1e-20);
 
     // Activation is reported in the map
     auto* pActive = qobject_cast<QCheckBox*>(spin(0, 0));
     QVERIFY(pActive);
     QTest::mouseClick(pActive, Qt::LeftButton);
     QVERIFY(view.getDoArtifactThresholdRejection());
-    QCOMPARE(view.getThresholdMap().value(QStringLiteral("Active")), 1.0);
+    QCOMPARE(mne::disp::detail::valueOr(view.getThresholdMap(), "Active"), 1.0);
 
     // A new channel set replaces the rows and keeps the active state and the edited threshold
     view.setChInfo({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EOG_CH, FIFF_UNIT_V)});
@@ -1499,8 +1500,8 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QCOMPARE(view.findChildren<QCheckBox*>().size(), 1);
     QVERIFY(view.getDoArtifactThresholdRejection());
     map = view.getThresholdMap();
-    QCOMPARE(map.keys(), QStringList({"Active", "eog", "grad"}));
-    QVERIFY(qAbs(map.value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+    QCOMPARE(std::vector<std::string>(std::views::keys(map).begin(), std::views::keys(map).end()), (std::vector<std::string>{"Active", "eog", "grad"}));
+    QVERIFY(qAbs(mne::disp::detail::valueOr(map, "grad") - 4e-11) < 1e-20);
 
     view.saveSettings();
     view.loadSettings();
@@ -1606,7 +1607,7 @@ void TestDispViewers2::fwdSettingsView_lifecycle()
     QMetaObject::invokeMethod(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_AtlasDirDialog")), "released");
     QCOMPARE(atlasStat->text(), QStringLiteral("loaded"));
     QCOMPARE(atlasSpy.size(), 1);
-    QCOMPARE(atlasSpy.at(0).at(0).toString(), atlasDir.path());
+    QCOMPARE(atlasSpy.at(0).at(0).value<std::filesystem::path>(), std::filesystem::path(atlasDir.path().toStdU16String()));
     clustering->click();
     QVERIFY(view.getClusteringStatusChanged());
     QCOMPARE(clusteringSpy.takeFirst().at(0).toBool(), true);
@@ -1699,9 +1700,9 @@ void TestDispViewers2::channelSelectionView_lifecycle()
     view.setProcessingMode(AbstractView::ProcessingMode::Offline);
     view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
     view.newFiffFileLoaded(info);
-    QVERIFY(!view.getLayoutMap().isEmpty());
+    QVERIFY(!view.getLayoutMap().empty());
 
-    view.selectChannels(QStringList{QString::fromStdString(info->ch_names.front())});
+    view.selectChannels({info->ch_names.front()});
     view.updateBadChannels();
     view.updateDataView();
     view.saveSettings();
@@ -1731,7 +1732,7 @@ void TestDispViewers2::channelSelectionView_initialLayoutLoads()
     view.setCurrentLayoutFile(QStringLiteral("Vectorview-all.lout"));
     view.newFiffFileLoaded(info);
 
-    QVERIFY(!view.getLayoutMap().isEmpty());
+    QVERIFY(!view.getLayoutMap().empty());
 
     QApplication::processEvents();
 }
@@ -1764,12 +1765,12 @@ void TestDispViewers2::averageSelectionView_lifecycle()
     view->clearView();
 
     // One checkbox and one colour button per average
-    auto colors = std::make_shared<QMap<QString, QColor>>();
-    auto activation = std::make_shared<QMap<QString, bool>>();
-    colors->insert(QStringLiteral("aud"), Qt::red);
-    colors->insert(QStringLiteral("vis"), Qt::blue);
-    activation->insert(QStringLiteral("aud"), true);
-    activation->insert(QStringLiteral("vis"), false);
+    auto colors = std::make_shared<std::map<std::string, QColor>>();
+    auto activation = std::make_shared<std::map<std::string, bool>>();
+    colors->insert_or_assign("aud", Qt::red);
+    colors->insert_or_assign("vis", Qt::blue);
+    activation->insert_or_assign("aud", true);
+    activation->insert_or_assign("vis", false);
     view->setAverageActivation(activation);
     view->setAverageColor(colors);
     QCOMPARE(view->getAverageColor(), colors);
@@ -1783,7 +1784,7 @@ void TestDispViewers2::averageSelectionView_lifecycle()
     QSignalSpy activationSpy(view.get(), &AverageSelectionView::newAverageActivationMap);
     visBox->click();
     QCOMPARE(activationSpy.size(), 1);
-    QVERIFY(activation->value(QStringLiteral("vis")));
+    QVERIFY(mne::disp::detail::valueOr(*activation, "vis"));
 
     // Picking a colour stores it; cancelling the dialog keeps the old one
     QSignalSpy colorSpy(view.get(), &AverageSelectionView::newAverageColorMap);
@@ -1795,7 +1796,7 @@ void TestDispViewers2::averageSelectionView_lifecycle()
         static_cast<QDialog*>(pDialog)->accept();
     });
     visButton->click();
-    QCOMPARE(colors->value(QStringLiteral("vis")), QColor(10, 200, 30));
+    QCOMPARE(mne::disp::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
     QCOMPARE(colorSpy.size(), 1);
     answerNextModal([](QWidget* pModal) {
         auto* pDialog = qobject_cast<QColorDialog*>(pModal);
@@ -1803,26 +1804,26 @@ void TestDispViewers2::averageSelectionView_lifecycle()
         static_cast<QDialog*>(pDialog)->reject();
     });
     visButton->click();
-    QCOMPARE(colors->value(QStringLiteral("vis")), QColor(10, 200, 30));
+    QCOMPARE(mne::disp::detail::valueOr(*colors, "vis"), QColor(10, 200, 30));
     QCOMPARE(colorSpy.size(), 1);
 
     // Colours and activation are restored by a new view with the same settings path
     view.reset();
     view = std::make_unique<AverageSelectionView>(settingsPath);
-    QCOMPARE(view->getAverageColor()->value(QStringLiteral("vis")), QColor(10, 200, 30));
-    QVERIFY(view->getAverageActivation()->value(QStringLiteral("vis")));
+    QCOMPARE(mne::disp::detail::valueOr(*view->getAverageColor(), "vis"), QColor(10, 200, 30));
+    QVERIFY(mne::disp::detail::valueOr(*view->getAverageActivation(), "vis"));
     QCOMPARE(view->findChildren<QCheckBox*>().size(), 2);
 
     // At most 10 averages are listed; maps of different size are not drawn
     for (int i = 0; i < 12; ++i) {
-        colors->insert(QStringLiteral("avg%1").arg(i, 2, 10, QLatin1Char('0')), Qt::green);
-        activation->insert(QStringLiteral("avg%1").arg(i, 2, 10, QLatin1Char('0')), true);
+        colors->insert_or_assign(std::format("avg{:02}", i), Qt::green);
+        activation->insert_or_assign(std::format("avg{:02}", i), true);
     }
     view->setAverageActivation(activation);
     view->setAverageColor(colors);
     QApplication::processEvents();
     QCOMPARE(view->findChildren<QCheckBox*>().size(), 10);
-    activation->remove(QStringLiteral("aud"));
+    activation->erase("aud");
     view->setAverageActivation(activation);
     QApplication::processEvents();
     QCOMPARE(view->findChildren<QCheckBox*>().size(), 10);
@@ -1838,13 +1839,13 @@ void TestDispViewers2::butterflyView_lifecycle()
     ButterflyView view("test_disp_viewers2");
 
     // Scale map with some channel types
-    QMap<qint32, float> scaleMap;
+    std::map<int, float> scaleMap;
     scaleMap[FIFFV_MEG_CH] = 1e-12f;
     scaleMap[FIFFV_EEG_CH] = 1e-6f;
     view.setScaleMap(scaleMap);
 
     // Modality map
-    QMap<QString, bool> modalMap;
+    std::map<std::string, bool> modalMap;
     modalMap["MEG"] = true;
     modalMap["EEG"] = false;
     view.setModalityMap(modalMap);
@@ -1877,11 +1878,11 @@ void TestDispViewers2::butterflyView_drawsAveragesAcrossTheFullWidth()
     view.resize(400, 200);
     view.setEvokedSetModel(model);
     view.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
-    view.setModalityMap({{QStringLiteral("MAG"), true}});
+    view.setModalityMap(std::map<std::string, bool>{{"MAG", true}});
     view.setSelectedChannels({0});
     view.setBackgroundColor(Qt::white);
-    view.setAverageActivation(std::make_shared<QMap<QString, bool>>(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
-    view.setAverageActivation(std::make_shared<QMap<QString, bool>>(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
+    view.setAverageActivation(std::make_shared<std::map<std::string, bool>>(std::map<std::string, bool>{{"aud", true}}));
+    view.setAverageActivation(std::make_shared<std::map<std::string, bool>>(std::map<std::string, bool>{{"aud", true}}));
     view.setSingleAverageColor(Qt::black);
     view.show();
     view.dataUpdate();
@@ -1942,7 +1943,7 @@ void TestDispViewers2::rtFiffRawViewModel_basics()
     bool frozen = model.isFreezed();
     Q_UNUSED(frozen);
 
-    QString trigName = model.getTriggerName();
+    std::string trigName = model.getTriggerName();
     Q_UNUSED(trigName);
 
     double trigThreshold = model.getTriggerThreshold();
@@ -1952,10 +1953,10 @@ void TestDispViewers2::rtFiffRawViewModel_basics()
     Q_UNUSED(numSpacers);
 
     // Scale map round-trip (safe — no threading)
-    QMap<qint32, float> scaleMap;
+    std::map<int, float> scaleMap;
     scaleMap[FIFFV_MEG_CH] = 1e-12f;
     model.setScaling(scaleMap);
-    QVERIFY(qFuzzyCompare(model.getScaling().value(FIFFV_MEG_CH, 0.0f), 1e-12f));
+    QVERIFY(qFuzzyCompare(model.getScaling().at(FIFFV_MEG_CH), 1e-12f));
 
     QApplication::processEvents();
 }
@@ -1984,7 +1985,7 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     firstBlock.row(0).setConstant(1.0);
     firstBlock.row(1).setConstant(-1.0);
     firstBlock(3, 10) = 3.0;
-    model.addData({firstBlock});
+    model.addData(std::vector<Eigen::MatrixXd>{firstBlock});
     QCOMPARE(model.getCurrentSampleIndex(), 60);
     QCOMPARE(model.getLastBlock(), firstBlock);
     QCOMPARE(dataSpy.size(), 1);
@@ -1992,13 +1993,13 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     Eigen::MatrixXd secondBlock = Eigen::MatrixXd::Zero(4, 60);
     secondBlock.row(0).setConstant(2.0);
     secondBlock.row(2).setConstant(-2.0);
-    model.addData({secondBlock});
+    model.addData(std::vector<Eigen::MatrixXd>{secondBlock});
     QCOMPARE(model.getCurrentSampleIndex(), 20);
     QCOMPARE(model.getLastBlock(), secondBlock);
     QCOMPARE(model.getMaxValueFromRawViewModel(0), static_cast<double>(1e-11f));
     QCOMPARE(dataSpy.size(), 2);
 
-    model.addData({Eigen::MatrixXd::Zero(3, 10)});
+    model.addData(std::vector<Eigen::MatrixXd>{Eigen::MatrixXd::Zero(3, 10)});
     QCOMPARE(model.getCurrentSampleIndex(), 20);
     QCOMPARE(dataSpy.size(), 2);
 
@@ -2010,8 +2011,8 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QSignalSpy selectionSpy(&model, &RtFiffRawViewModel::newSelection);
     model.selectRows({0, 2, 99});
     QCOMPARE(model.getIdxSelMap().size(), 2);
-    QCOMPARE(model.getIdxSelMap().value(0), 0);
-    QCOMPARE(model.getIdxSelMap().value(1), 2);
+    QCOMPARE(mne::disp::detail::valueOr(model.getIdxSelMap(), 0), 0);
+    QCOMPARE(mne::disp::detail::valueOr(model.getIdxSelMap(), 1), 2);
     QCOMPARE(selectionSpy.size(), 1);
     model.hideRows({0});
     QCOMPARE(model.getIdxSelMap().size(), 1);
@@ -2026,9 +2027,9 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QVERIFY(std::ranges::contains(info->bads, "MEG 0111"));
     QVERIFY(std::ranges::contains(info->bads, "MEG 0113"));
 
-    QMap<double, QColor> triggerColors;
-    triggerColors.insert(3.0, Qt::red);
-    model.triggerInfoChanged(triggerColors, true, QStringLiteral("STI 014"), 1.0);
+    std::map<double, QColor> triggerColors;
+    triggerColors.insert_or_assign(3.0, Qt::red);
+    model.triggerInfoChanged(triggerColors, true, "STI 014", 1.0);
     QVERIFY(model.triggerDetectionActive());
     QCOMPARE(model.getTriggerName(), QStringLiteral("STI 014"));
     QCOMPARE(model.getTriggerThreshold(), 1.0);
@@ -2037,9 +2038,9 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     Eigen::MatrixXd triggerBlock = Eigen::MatrixXd::Zero(4, 20);
     triggerBlock(3, 5) = 3.0;
     model.updateSpharaActivation(true);
-    model.addData({triggerBlock});
+    model.addData(std::vector<Eigen::MatrixXd>{triggerBlock});
     model.updateSpharaActivation(false);
-    QVERIFY(!model.getDetectedTriggers().isEmpty());
+    QVERIFY(!model.getDetectedTriggers().empty());
 
     QApplication::processEvents();
 }
@@ -2067,7 +2068,7 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
             for (int s = 0; s < nBlock; ++s) {
                 block.col(s).setConstant(iTotal + s);
             }
-            model.addData({block});
+            model.addData(std::vector<Eigen::MatrixXd>{block});
             iTotal += nBlock;
 
             const int iCur = model.getCurrentSampleIndex();
@@ -2098,7 +2099,7 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
         const Eigen::RowVectorXd& h = kernel.coefficients();
         const int L = static_cast<int>(h.cols());
         const int iDelay = L / 2;
-        model.setFilterChannelType(QStringLiteral("MEG"));
+        model.setFilterChannelType("MEG");
         model.setFilter({kernel});
         model.setFilterActive(true);
 
@@ -2110,7 +2111,7 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
             stream(3, s) = s % 7;
         }
         for (int b = 0; b < iTotal / nBlock; ++b) {
-            model.addData({stream.middleCols(b * nBlock, nBlock)});
+            model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(b * nBlock, nBlock)});
         }
 
         // Samples from the second block on are final once the following half kernel has arrived.
@@ -2132,8 +2133,8 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
         }
 
         // A channel type that matches no channel leaves the MEG rows unfiltered.
-        model.setFilterChannelType(QStringLiteral("EEG"));
-        model.addData({stream.middleCols(0, nBlock)});
+        model.setFilterChannelType("EEG");
+        model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(0, nBlock)});
         for (int s = 0; s < nBlock; ++s) {
             QCOMPARE(column(model, 0, (iTotal + s) % N), stream(0, s));
         }
@@ -2145,21 +2146,21 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
         auto info = createBrowserTestInfo();
         model.setFiffInfo(info);
         model.setSamplingInfo(100.0f, 1, true);
-        model.triggerInfoChanged({{2.0, Qt::red}}, true, QStringLiteral("STI 014"), 1.0);
+        model.triggerInfoChanged({{2.0, Qt::red}}, true, "STI 014", 1.0);
         QSignalSpy triggerSpy(&model, &RtFiffRawViewModel::triggerDetected);
 
         // Pulses at stream samples 90 (before the wrap inside block 60..119) and 215 (after the wrap inside 180..239)
         Eigen::MatrixXd stream = Eigen::MatrixXd::Zero(4, 240);
         stream(3, 90) = 2.0;
         stream(3, 215) = 2.0;
-        model.addData({stream.middleCols(0, 60)});
-        model.addData({stream.middleCols(60, 60)});
-        QCOMPARE(model.getDetectedTriggersOld(), (QList<QPair<int, double>>{{90, 2.0}}));
-        QVERIFY(model.getDetectedTriggers().isEmpty());
-        model.addData({stream.middleCols(120, 60)});
-        model.addData({stream.middleCols(180, 60)});
-        QCOMPARE(model.getDetectedTriggers(), (QList<QPair<int, double>>{{15, 2.0}}));
-        QVERIFY(model.getDetectedTriggersOld().isEmpty());
+        model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(0, 60)});
+        model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(60, 60)});
+        QCOMPARE(model.getDetectedTriggersOld(), (std::vector<std::pair<int, double>>{{90, 2.0}}));
+        QVERIFY(model.getDetectedTriggers().empty());
+        model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(120, 60)});
+        model.addData(std::vector<Eigen::MatrixXd>{stream.middleCols(180, 60)});
+        QCOMPARE(model.getDetectedTriggers(), (std::vector<std::pair<int, double>>{{15, 2.0}}));
+        QVERIFY(model.getDetectedTriggersOld().empty());
         QCOMPARE(triggerSpy.size(), 2);
     }
 }
@@ -2192,7 +2193,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
             block(2, s) = 5.0 - std::sin(0.1 * t);
             block(3, s) = (s == 7) ? 2.0 : 0.0;
         }
-        model.addData({block});
+        model.addData(std::vector<Eigen::MatrixXd>{block});
     }
     QCOMPARE(model.getCurrentSampleIndex(), 20);
     const Eigen::MatrixXd last = model.getLastBlock();
@@ -2220,13 +2221,13 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
 
     // Freezing keeps serving the snapshot while new data arrives
     model.toggleFreeze(QModelIndex());
-    model.addData({block * 0.0});
+    model.addData(std::vector<Eigen::MatrixXd>{block * 0.0});
     const auto frozen = model.data(model.index(0, 1)).value<RowVectorPair>();
     QVERIFY(std::fabs(frozen.first[10] - std::sin(0.1 * 110)) < 1e-12);
     model.toggleFreeze(QModelIndex());
 
     // Real-time filtering: a 50-tap low-pass on the MEG channels only, a pass-through on STIM
-    model.setFilterChannelType(QStringLiteral("MEG"));
+    model.setFilterChannelType("MEG");
     model.setFilter({FilterKernel("lp", 0, 50, 0.2, 0.0, 0.05, 100.0, 0)});
     model.setFilterActive(true);
     Eigen::MatrixXd tone(4, 50);
@@ -2234,7 +2235,7 @@ void TestDispViewers2::rtFiffRawViewModel_projectionWrapFilterAndRoles()
         tone.col(s) << std::sin(0.2 * s), 0.0, 0.0, s % 5;
     }
     for (int b = 0; b < 4; ++b) {
-        model.addData({tone});
+        model.addData(std::vector<Eigen::MatrixXd>{tone});
     }
     const Eigen::MatrixXd filtered = model.getLastBlock();
     QVERIFY(filtered.allFinite());
@@ -2297,7 +2298,7 @@ void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
 
     // Two channels, one bad, laid out left and right
     SelectionItem selection;
-    selection.m_sChannelName = {QStringLiteral("MEG 0111"), QStringLiteral("MEG 0113")};
+    selection.m_sChannelName = {"MEG 0111", "MEG 0113"};
     selection.m_iChannelNumber = {0, 2};
     selection.m_iChannelKind = {FIFFV_MEG_CH, FIFFV_MEG_CH};
     selection.m_iChannelUnit = {FIFF_UNIT_T, FIFF_UNIT_T};
@@ -2305,11 +2306,11 @@ void TestDispViewers2::averageLayoutView_drawsEachChannelsAverage()
     selection.m_bShowAll = false;
     view.channelSelectionChanged(QVariant::fromValue(&selection));
     view.setScaleMap({{FIFF_UNIT_T, 1e-12f}});
-    view.setAverageColor(std::make_shared<QMap<QString, QColor>>(QMap<QString, QColor>{{QStringLiteral("aud"), Qt::red}}));
-    view.setAverageActivation(std::make_shared<QMap<QString, bool>>(QMap<QString, bool>{{QStringLiteral("aud"), true}}));
+    view.setAverageColor(std::make_shared<std::map<std::string, QColor>>(std::map<std::string, QColor>{{"aud", Qt::red}}));
+    view.setAverageActivation(std::make_shared<std::map<std::string, bool>>(std::map<std::string, bool>{{"aud", true}}));
     view.setSingleAverageColor(Qt::black);
-    QCOMPARE(view.getAverageColor()->value(QStringLiteral("aud")), QColor(Qt::black));
-    QVERIFY(view.getAverageActivation()->value(QStringLiteral("aud")));
+    QCOMPARE(mne::disp::detail::valueOr(*view.getAverageColor(), "aud"), QColor(Qt::black));
+    QVERIFY(mne::disp::detail::valueOr(*view.getAverageActivation(), "aud"));
 
     auto* scene = view.findChild<QGraphicsScene*>();
     QVERIFY(scene != nullptr);
@@ -2413,18 +2414,18 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     QCOMPARE(model.getNumPreStimSamples(), 10);
     QCOMPARE(model.getSamplingFrequency(), 1000.0f);
     QCOMPARE(model.getNumberOfTimeSpacers(), 0);
-    QCOMPARE(model.getBaselineInfo().first.toFloat(), -0.1f);
+    QCOMPARE(model.getBaselineInfo().first, -0.1f);
     QCOMPARE(colorSpy.size(), 1);
     QCOMPARE(activationSpy.size(), 1);
-    QCOMPARE(model.getAverageColor()->value(QStringLiteral("vis")), QColor(Qt::yellow));
-    QVERIFY(model.getAverageActivation()->value(QStringLiteral("aud")));
+    QCOMPARE(mne::disp::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::yellow));
+    QVERIFY(mne::disp::detail::valueOr(*model.getAverageActivation(), "aud"));
 
     // Column 1: one row per average type for the butterfly; column 2: whole matrices for the 2D layout
-    auto rows = model.data(2, 1).value<QList<AvrTypeRowVector>>();
+    auto rows = model.data(2, 1).value<std::vector<AvrTypeRowVector>>();
     QCOMPARE(rows.size(), 2);
     QCOMPARE(rows.at(1).first, QStringLiteral("vis"));
     QCOMPARE(rows.at(1).second, set->evoked.at(1).data.row(2));
-    const auto matrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>();
+    const auto matrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
     QCOMPARE(matrices.size(), 2);
     QCOMPARE(matrices.at(0).second.second, 30);
     // Column-major (nchan x nsamples), the layout AverageSceneItem indexes with sample * nchan + channel
@@ -2459,39 +2460,39 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     model.updateProjection({FiffProj(FIFFV_PROJ_ITEM_FIELD, true, "common", vectors)});
     model.updateCompensator(0);
     model.setEvokedSet(set);
-    rows = model.data(0, 1).value<QList<AvrTypeRowVector>>();
+    rows = model.data(0, 1).value<std::vector<AvrTypeRowVector>>();
     for (int s = 0; s < 30; ++s) {
         QVERIFY(std::fabs(rows.at(1).second(s) - 2.0 * std::sin(0.3 * s)) < 1e-12);
     }
-    QCOMPARE(model.data(3, 1).value<QList<AvrTypeRowVector>>().at(0).second, set->evoked.at(0).data.row(3));
+    QCOMPARE(model.data(3, 1).value<std::vector<AvrTypeRowVector>>().at(0).second, set->evoked.at(0).data.row(3));
 
     // Freezing keeps the projected data; dropping an average keeps its colour for when it returns
     model.toggleFreeze();
     QVERIFY(model.isFreezed());
-    model.getAverageColor()->insert(QStringLiteral("vis"), Qt::cyan);
+    model.getAverageColor()->insert_or_assign("vis", Qt::cyan);
     const FiffEvoked vis = set->evoked.back();
     set->evoked.pop_back();
     model.setEvokedSet(set);
     QCOMPARE(model.getNumAverages(), 1);
-    const auto frozenRows = model.data(0, 1).value<QList<AvrTypeRowVector>>();
+    const auto frozenRows = model.data(0, 1).value<std::vector<AvrTypeRowVector>>();
     QCOMPARE(frozenRows.size(), 2);
     QCOMPARE(frozenRows.at(1).first, QStringLiteral("vis"));
-    const auto frozenMatrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>();
+    const auto frozenMatrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<std::vector<AvrTypeRowVectorPair>>();
     QCOMPARE(frozenMatrices.size(), 2);
     QCOMPARE(frozenMatrices.at(1).first, QStringLiteral("vis"));
     QCOMPARE(colorSpy.size(), 2);
-    QVERIFY(!model.getAverageColor()->contains(QStringLiteral("vis")));
+    QVERIFY(!model.getAverageColor()->contains("vis"));
     model.toggleFreeze();
-    QCOMPARE(model.data(0, 1).value<QList<AvrTypeRowVector>>().size(), 1);
+    QCOMPARE(model.data(0, 1).value<std::vector<AvrTypeRowVector>>().size(), 1);
     set->evoked.push_back(vis);
     model.setEvokedSet(set);
-    QCOMPARE(model.getAverageColor()->value(QStringLiteral("vis")), QColor(Qt::cyan));
+    QCOMPARE(mne::disp::detail::valueOr(*model.getAverageColor(), "vis"), QColor(Qt::cyan));
     QCOMPARE(model.getEvokedSet(), set);
 
-    model.setAverageColor(std::make_shared<QMap<QString, QColor>>());
-    model.setAverageActivation(std::make_shared<QMap<QString, bool>>());
-    QVERIFY(model.getAverageColor()->isEmpty());
-    QVERIFY(model.getAverageActivation()->isEmpty());
+    model.setAverageColor(std::make_shared<std::map<std::string, QColor>>());
+    model.setAverageActivation(std::make_shared<std::map<std::string, bool>>());
+    QVERIFY(model.getAverageColor()->empty());
+    QVERIFY(model.getAverageActivation()->empty());
 }
 
 //=============================================================================================================
@@ -2516,14 +2517,14 @@ void TestDispViewers2::channelInfoModel_columnsRolesAndLayoutMapping()
     QCOMPARE(model.columnCount(), 13);
 
     // Layout names drop the kind prefix and separators and re-prefix MEG / EEG; other kinds keep their name
-    const QStringList mapped = {"MEG 0111", "MEG 0112", "MEG 0113", "STI 014", "EEG 007"};
+    const std::vector<std::string> mapped = {"MEG 0111", "MEG 0112", "MEG 0113", "STI 014", "EEG 007"};
     QCOMPARE(model.getMappedChannelsList(), mapped);
-    QCOMPARE(model.getIndexFromMappedChName(QStringLiteral("EEG 007")), 4);
-    QCOMPARE(model.getIndexFromOrigChName(QStringLiteral("MEG 0113")), 2);
-    QCOMPARE(model.getIndexFromOrigChName(QStringLiteral("MEG0113")), 2);
+    QCOMPARE(model.getIndexFromMappedChName("EEG 007"), 4);
+    QCOMPARE(model.getIndexFromOrigChName("MEG 0113"), 2);
+    QCOMPARE(model.getIndexFromOrigChName("MEG0113"), 2);
     QCOMPARE(model.getBadChannelList(), StringList{"MEG 0112"});
 
-    model.layoutChanged({{QStringLiteral("MEG 0111"), QPointF(1.5, -2.0)}, {QStringLiteral("EEG 007"), QPointF(3, 4)}});
+    model.layoutChanged(std::map<std::string, QPointF>{{"MEG 0111", QPointF(1.5, -2.0)}, {"EEG 007", QPointF(3, 4)}});
     QCOMPARE(mappedSpy.size(), 1);
 
     auto cell = [&model](int row, int column, int role) {
@@ -2565,7 +2566,7 @@ void TestDispViewers2::channelInfoModel_columnsRolesAndLayoutMapping()
     model.assignedOperatorsChanged({});
     model.clearModel();
     QCOMPARE(model.rowCount(), 0);
-    QVERIFY(model.getMappedChannelsList().isEmpty());
+    QVERIFY(model.getMappedChannelsList().empty());
 }
 
 //=============================================================================================================
@@ -2602,7 +2603,7 @@ void TestDispViewers2::channelInfoModel_basics()
     model.data(QModelIndex(), Qt::DisplayRole);
 
     // layoutChanged with empty map
-    model.layoutChanged(QMap<QString, QPointF>());
+    model.layoutChanged(std::map<std::string, QPointF>());
 
     // assignedOperatorsChanged with empty map
     QMultiMap<int, std::shared_ptr<MNEOperator>> emptyOps;
@@ -2643,10 +2644,10 @@ void TestDispViewers2::channelDataView_hideBadChannelsAndMapping()
     view.hideBadChannels(true);
     QCOMPARE(rhiView->totalLogicalChannels(), 3);
 
-    view.setChannelFilter(QStringList() << QStringLiteral("MEG 0111") << QStringLiteral("MEG 0113"));
+    view.setChannelFilter({"MEG 0111", "MEG 0113"});
     QCOMPARE(rhiView->totalLogicalChannels(), 2);
 
-    view.setChannelFilter(QStringList());
+    view.setChannelFilter({});
     QCOMPARE(rhiView->totalLogicalChannels(), 3);
 
     const QRect viewport = view.signalViewportRect();
@@ -2734,7 +2735,7 @@ void TestDispViewers2::channelRhiView_stateContracts()
     QCOMPARE(rhiView->backgroundColor(), QColor(Qt::darkBlue));
     rhiView->setSfreq(-1.0f);
 
-    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, QStringLiteral("event")}});
+    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, "event"}});
     rhiView->setEventsVisible(false);
     QVERIFY(!rhiView->eventsVisible());
     rhiView->setEpochMarkers({125, 150});
@@ -2745,7 +2746,7 @@ void TestDispViewers2::channelRhiView_stateContracts()
     rhiView->setZScoreMode(true);
     QVERIFY(rhiView->zScoreMode());
     rhiView->setAnnotations({ChannelRhiView::AnnotationSpan{130, 145, Qt::yellow,
-                                                            QStringLiteral("annotation")}});
+                                                            "annotation"}});
     rhiView->setAnnotationSelectionEnabled(true);
     rhiView->setAnnotationsVisible(false);
     QVERIFY(!rhiView->annotationsVisible());
@@ -2932,8 +2933,8 @@ void TestDispViewers2::channelRhiView_gpuFrame()
     view.setGridVisible(false);
     view.setBackgroundColor(Qt::white);
     view.setVisibleChannelCount(4);
-    view.setEvents({ChannelRhiView::EventMarker{150, 1, Qt::red, QStringLiteral("event")}});
-    view.setAnnotations({ChannelRhiView::AnnotationSpan{160, 170, Qt::blue, QStringLiteral("blink")}});
+    view.setEvents({ChannelRhiView::EventMarker{150, 1, Qt::red, "event"}});
+    view.setAnnotations({ChannelRhiView::AnnotationSpan{160, 170, Qt::blue, "blink"}});
     view.setEpochMarkers({180});
     QTest::failOnWarning(QRegularExpression(QStringLiteral("ChannelRhiView")));
 
@@ -3401,9 +3402,9 @@ void TestDispViewers2::channelRhiView_rendersAndDrawsOverlays()
     rhiView->setSamplesPerPixel(0.25f);
     rhiView->setScrollSample(100.0f);
     rhiView->setVisibleChannelCount(4);
-    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, QStringLiteral("event")}});
+    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, "event"}});
     rhiView->setEpochMarkers({125, 150});
-    rhiView->setAnnotations({ChannelRhiView::AnnotationSpan{130, 145, Qt::yellow, QStringLiteral("annotation")}});
+    rhiView->setAnnotations({ChannelRhiView::AnnotationSpan{130, 145, Qt::yellow, "annotation"}});
     const int laneCenterY = rhiView->height() / 8;
 
     QSignalSpy cursorSpy(rhiView, &ChannelRhiView::cursorDataChanged);
@@ -3502,7 +3503,7 @@ void TestDispViewers2::channelDataModel_bufferDetrendAndDecimation()
     info->nchan = kinds.size();
     for (int i = 0; i < kinds.size(); ++i) {
         FiffChInfo ch;
-        ch.ch_name = (QStringLiteral("CH%1").arg(i)).toStdString();
+        ch.ch_name = QStringLiteral("CH%1").arg(i).toStdString();
         ch.kind = kinds[i].first;
         ch.unit = kinds[i].second;
         info->chs.push_back(ch);
@@ -3549,8 +3550,8 @@ void TestDispViewers2::channelDataModel_bufferDetrendAndDecimation()
     // Virtual channels get defaults for every missing field
     model.setSignalColor(Qt::darkGreen);
     ChannelDisplayInfo named;
-    named.name = QStringLiteral("EOG bipolar");
-    named.typeLabel = QStringLiteral("EOG");
+    named.name = "EOG bipolar";
+    named.typeLabel = "EOG";
     named.color = Qt::red;
     named.amplitudeMax = 1e-4f;
     model.setVirtualChannels({named, ChannelDisplayInfo{}});
@@ -3595,7 +3596,7 @@ void TestDispViewers2::channelDataModel_bufferDetrendAndDecimation()
     // Raw path: one vertex per sample, detrended over the window
     int vboFirst = -1;
     ring.setDetrendMode(DetrendMode::Linear);
-    QVector<float> v = ring.decimatedVertices(0, 400, 450, 100, vboFirst);
+    std::vector<float> v = ring.decimatedVertices(0, 400, 450, 100, vboFirst);
     QCOMPARE(vboFirst, 400);
     QCOMPARE(v.size(), 100);
     for (int i = 0; i < 50; ++i) {
@@ -3610,8 +3611,8 @@ void TestDispViewers2::channelDataModel_bufferDetrendAndDecimation()
     v = ring.decimatedVertices(0, 100, 310, 400, vboFirst);
     QCOMPARE(vboFirst, 300);
     QCOMPARE(v[1], 152.0f);
-    QVERIFY(ring.decimatedVertices(0, 450, 400, 10, vboFirst).isEmpty());
-    QVERIFY(ring.decimatedVertices(9, 400, 450, 10, vboFirst).isEmpty());
+    QVERIFY(ring.decimatedVertices(0, 450, 400, 10, vboFirst).empty());
+    QVERIFY(ring.decimatedVertices(9, 400, 450, 10, vboFirst).empty());
 
     // Decimation path: max then min of each 10-sample bin
     v = ring.decimatedVertices(1, 300, 1300, 100, vboFirst);
@@ -3676,10 +3677,10 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     view.setBackgroundColor(Qt::white);
     QCOMPARE(view.getBackgroundColor(), QColor(Qt::white));
     view.setScalingMap({{FIFF_UNIT_T, 2.0f}, {FIFFV_STIM_CH, 4.0f}});
-    QCOMPARE(view.getScalingMap().value(FIFF_UNIT_T), 2.0f);
+    QCOMPARE(view.getScalingMap().at(FIFF_UNIT_T), 2.0f);
     view.setDistanceTimeSpacer(200);
     QCOMPARE(view.getDistanceTimeSpacer(), 200);
-    view.triggerInfoChanged({{3.0, Qt::red}}, true, QStringLiteral("STI 014"), 1.0);
+    view.triggerInfoChanged({{3.0, Qt::red}}, true, "STI 014", 1.0);
 
     // Four blocks of 300 samples: the trigger channel steps to 3 every 250 samples
     QSignalSpy triggerSpy(&view, &RtFiffRawView::triggerDetected);
@@ -3691,7 +3692,7 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
             block(2, s) = 0.5;
             block(3, s) = (t % 250 < 5) ? 3.0 : 0.0;
         }
-        view.addData({block});
+        view.addData(std::vector<Eigen::MatrixXd>{block});
     }
     QVERIFY(!triggerSpy.isEmpty());
     QCOMPARE(view.getLastBlock().cols(), 300);
@@ -3716,7 +3717,7 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QCOMPARE(view.getZoom(), 2.0);
     QCOMPARE(table->verticalHeader()->defaultSectionSize(), static_cast<int>(h / 2.0f));
 
-    view.showSelectedChannelsOnly({QStringLiteral("MEG 0111"), QStringLiteral("STI 014")});
+    view.showSelectedChannelsOnly(std::vector<std::string>{"MEG 0111", "STI 014"});
     QVERIFY(!table->isRowHidden(0));
     QVERIFY(table->isRowHidden(2));
     QVERIFY(!table->isRowHidden(3));
@@ -3973,10 +3974,10 @@ void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
     item.m_iTotalNumberChannels = 2;
     item.m_firstLastSample = qMakePair(-30, 90);
     item.m_scaleMap = {{FIFF_UNIT_T, 1e-12f}};
-    item.m_lAverageData = {{QStringLiteral("aud"), RowVectorPair(aud.data(), 120)},
-                           {QStringLiteral("vis"), RowVectorPair(vis.data(), 120)}};
-    item.m_qMapAverageColor = {{QStringLiteral("aud"), Qt::blue}};
-    item.m_qMapAverageActivation = {{QStringLiteral("aud"), true}, {QStringLiteral("vis"), false}};
+    item.m_lAverageData = {{"aud", RowVectorPair(aud.data(), 120)},
+                           {"vis", RowVectorPair(vis.data(), 120)}};
+    item.m_qMapAverageColor = {{"aud", Qt::blue}};
+    item.m_qMapAverageActivation = {{"aud", true}, {"vis", false}};
     QCOMPARE(item.boundingRect(), QRectF(-60, -30, 120, 60));
 
     // Render the 120 x 60 item 1:1 into an image whose origin is the item's top-left corner
@@ -4021,7 +4022,7 @@ void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
     QVERIFY(rowsWhere(image, 45, isGray).isEmpty());
 
     // Activating "vis" draws it in the default color a quarter below the centre
-    item.m_qMapAverageActivation[QStringLiteral("vis")] = true;
+    item.m_qMapAverageActivation["vis"] = true;
     image = render();
     const QList<int> gray = rowsWhere(image, 45, isGray);
     QVERIFY2(!gray.isEmpty() && std::abs(gray.first() - 45) <= 1, qPrintable(QString::number(gray.value(0, -1))));
@@ -4189,7 +4190,7 @@ void TestDispViewers2::dipoleFitView_lifecycle()
 
 void TestDispViewers2::control3dView_flagsSignalsAndTree()
 {
-    Control3DView view(QString{}, nullptr, {QStringLiteral("Data")});
+    Control3DView view(QString{}, nullptr, {"Data"});
     view.show();
     auto* pTree = view.findChild<QTreeView*>(QStringLiteral("m_treeView_loadedData"));
     auto* pViewBox = view.findChild<QWidget*>(QStringLiteral("m_groupBox_viewOptions"));
@@ -4202,8 +4203,8 @@ void TestDispViewers2::control3dView_flagsSignalsAndTree()
     QVERIFY(pLightBox->isHidden());
 
     // Enabling the tools (again) shows them and wires each control exactly once
-    view.setFlags({QStringLiteral("View"), QStringLiteral("Light")});
-    view.setFlags({QStringLiteral("View"), QStringLiteral("Light")});
+    view.setFlags({"View", "Light"});
+    view.setFlags({"View", "Light"});
     QVERIFY(pTree->isHidden());
     QVERIFY(!pViewBox->isHidden());
     QVERIFY(!pLightBox->isHidden());
@@ -4270,7 +4271,7 @@ void TestDispViewers2::control3dView_flagsSignalsAndTree()
     QVERIFY(pLight->styleSheet().contains(QStringLiteral("rgb(200, 100, 50)")));
 
     // Data tree: header toggle and confirmed removal through the context menu
-    view.setFlags({QStringLiteral("Data")});
+    view.setFlags({"Data"});
     QStandardItemModel model(0, 2);
     model.appendRow({new QStandardItem(QStringLiteral("lh.pial")), new QStandardItem(QStringLiteral("left"))});
     model.appendRow({new QStandardItem(QStringLiteral("rh.pial")), new QStandardItem(QStringLiteral("right"))});
@@ -4352,12 +4353,12 @@ void TestDispViewers2::rtFiffRawViewDelegate_paintsSignalCursorAndThreshold()
     model.setFiffInfo(info);
     model.setSamplingInfo(100.0f, 1, true);
     model.setScaling({{FIFF_UNIT_T, 1e-12f}, {FIFFV_STIM_CH, 5.0f}});
-    model.triggerInfoChanged({{4.0, Qt::red}}, true, QStringLiteral("STI 014"), 2.5);
+    model.triggerInfoChanged({{4.0, Qt::red}}, true, "STI 014", 2.5);
     Eigen::MatrixXd block = Eigen::MatrixXd::Zero(4, 60);
     block.row(0).setConstant(0.5e-12);
     block.row(3).tail(30).setConstant(4.0);
-    model.addData({block});
-    QCOMPARE(model.getDetectedTriggers(), (QList<QPair<int, double>>{{30, 4.0}}));
+    model.addData(std::vector<Eigen::MatrixXd>{block});
+    QCOMPARE(model.getDetectedTriggers(), (std::vector<std::pair<int, double>>{{30, 4.0}}));
 
     RtFiffRawViewDelegate delegate(nullptr);
     delegate.initPainterPaths(&model);
@@ -4496,8 +4497,8 @@ void TestDispViewers2::evokedSetModel_extended()
     QCOMPARE(model.getNumSamples(), 0);
 
     // getIdxSelMap — returns empty map
-    const QMap<qint32, qint32>& selMap = model.getIdxSelMap();
-    QVERIFY(selMap.isEmpty());
+    const std::map<int, int>& selMap = model.getIdxSelMap();
+    QVERIFY(selMap.empty());
 
     // numVLines — 0 before data
     QVERIFY(model.numVLines() >= -1);
@@ -4513,11 +4514,11 @@ void TestDispViewers2::evokedSetModel_extended()
     auto activations = model.getAverageActivation();
     Q_UNUSED(activations);
 
-    auto pColors = std::make_shared<QMap<QString, QColor>>();
+    auto pColors = std::make_shared<std::map<std::string, QColor>>();
     (*pColors)["avg"] = Qt::red;
     model.setAverageColor(pColors);
 
-    auto pActivations = std::make_shared<QMap<QString, bool>>();
+    auto pActivations = std::make_shared<std::map<std::string, bool>>();
     (*pActivations)["avg"] = true;
     model.setAverageActivation(pActivations);
 
@@ -4567,13 +4568,12 @@ void TestDispViewers2::frequencySpectrumModel_basics()
     model.setBoundaries(0.5f, 100.0f);
 
     // selectRows / resetSelection with empty selection
-    QList<qint32> empty;
+    std::vector<int> empty;
     model.selectRows(empty);
     model.resetSelection();
 
     // selectRows with a small selection (values exceed pInfo->chs.size() == 0, so skipped)
-    QList<qint32> sel;
-    sel << 0 << 1;
+    std::vector<int> sel{0, 1};
     model.selectRows(sel);
     model.resetSelection();
 
@@ -5047,10 +5047,10 @@ void TestDispViewers2::rtFiffRawViewModel_extended()
     model.resetTriggerCounter();
 
     // Scale map operations
-    QMap<qint32, float> scaleMap;
+    std::map<int, float> scaleMap;
     scaleMap[FIFFV_EEG_CH] = 1e-6f;
     model.setScaling(scaleMap);
-    QVERIFY(qFuzzyCompare(model.getScaling().value(FIFFV_EEG_CH, 0.0f), 1e-6f));
+    QVERIFY(qFuzzyCompare(model.getScaling().at(FIFFV_EEG_CH), 1e-6f));
 
     QApplication::processEvents();
 }

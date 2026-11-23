@@ -147,7 +147,7 @@ void TestGeometryInfo::testBadChannelFiltering()
     // projecting with MEG:
     VectorXi mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, matMegSensors);
     // SCDC with cancel distance 0.03:
-    QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
+    std::shared_ptr<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
     // filter for bad MEG channels:
     VectorXi vErasedColums = GeometryInfo::filterBadChannels(pDistanceMatrix, evoked.info, FIFFV_MEG_CH);
 
@@ -178,7 +178,7 @@ void TestGeometryInfo::testEmptyInputsForProjecting()
 void TestGeometryInfo::testEmptyInputsForSCDC()
 {
     VectorXi vVertSubset;
-    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vVertSubset);
+    std::shared_ptr<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vVertSubset);
     QVERIFY(pDistTable->rows() == pDistTable->cols());
 }
 
@@ -186,7 +186,7 @@ void TestGeometryInfo::testEmptyInputsForSCDC()
 
 void TestGeometryInfo::testDimensionsForSCDC()
 {
-    QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset);
+    std::shared_ptr<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset);
     QVERIFY(pDistTable->rows() == smallSurface.rr.rows());
     QVERIFY(pDistTable->cols() == vSmallSubset.size());
 }

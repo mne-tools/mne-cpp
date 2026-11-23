@@ -296,7 +296,7 @@ void TestElectrodesPlugin::attachScenePublishesLayer()
     MultimodalScene scene;
     plugin.attachScene(&scene);
 
-    const SceneLayer* layer = scene.findLayer(plugin.sceneLayerId());
+    const SceneLayer* layer = scene.findLayer(plugin.sceneLayerId().toStdString());
     QVERIFY(layer != nullptr);
     QCOMPARE(layer->kind, SceneLayerKind::Electrode);
     QVERIFY(layer->payload != nullptr);
@@ -304,7 +304,7 @@ void TestElectrodesPlugin::attachScenePublishesLayer()
              static_cast<void*>(plugin.electrodeObject()));
 
     plugin.attachScene(nullptr);
-    QVERIFY(scene.findLayer(plugin.sceneLayerId()) == nullptr);
+    QVERIFY(scene.findLayer(plugin.sceneLayerId().toStdString()) == nullptr);
 }
 
 //=============================================================================================================

@@ -21,11 +21,11 @@
 #include "helpers/geometryinfo.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QDebug>
+#include <format>
+#include <string>
 
 namespace mne::disp
 {
@@ -34,8 +34,8 @@ namespace mne::disp
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StcLoadingWorker::StcLoadingWorker(const QString& lhPath,
-                                   const QString& rhPath,
+StcLoadingWorker::StcLoadingWorker(const std::filesystem::path& lhPath,
+                                   const std::filesystem::path& rhPath,
                                    BrainSurface* lhSurface,
                                    BrainSurface* rhSurface,
                                    double cancelDist,
@@ -57,15 +57,15 @@ StcLoadingWorker::~StcLoadingWorker()
 
 //=============================================================================================================
 
-QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolationMatrix(
+std::shared_ptr<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolationMatrix(
     const Eigen::MatrixX3f& matVertices,
     Eigen::VectorXi& vecSourceVertices,
     double cancelDist,
-    const QString& hemiLabel,
+    const std::string& hemiLabel,
     int progressStart,
     int progressEnd)
 {
-    emit progress(progressStart, QString("Computing %1 geodesic interpolation...").arg(hemiLabel));
+    emit progress(progressStart, std::format("Computing {} geodesic interpolation...", hemiLabel));
 
     // Compute neighbors from the appropriate surface
     std::vector<Eigen::VectorXi> vecNeighbors;
@@ -84,7 +84,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
         if (m_cancelled.load(std::memory_order_relaxed))
             return;
         int pct = progressStart + (progressRange * current) / total;
-        emit progress(pct, QString("%1 geodesic interpolation %2/%3").arg(hemiLabel).arg(current).arg(total));
+        emit progress(pct, std::format("{} geodesic interpolation {}/{}", hemiLabel, current, total));
     };
 
     auto interpMat = mne::disp::GeometryInfo::scdcInterpolationMat(
@@ -97,9 +97,9 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
         &m_cancelled);
 
     if (m_cancelled.load(std::memory_order_relaxed))
-        return QSharedPointer<Eigen::SparseMatrix<float>>();
+        return std::shared_ptr<Eigen::SparseMatrix<float>>();
 
-    emit progress(progressEnd, QString("%1 interpolation matrix ready").arg(hemiLabel));
+    emit progress(progressEnd, std::format("{} interpolation matrix ready", hemiLabel));
     return interpMat;
 }
 
@@ -107,32 +107,32 @@ QSharedPointer<Eigen::SparseMatrix<float>> StcLoadingWorker::computeInterpolatio
 
 void StcLoadingWorker::process()
 {
-    emit progress(0, "Loading STC files...");
+    emit progress(0, std::string("Loading STC files..."));
 
     // Load LH STC file
-    if (!m_lhPath.isEmpty()) {
-        if (auto stc = mne::InvSourceEstimate::read(m_lhPath.toStdU16String())) {
+    if (!m_lhPath.empty()) {
+        if (auto stc = mne::InvSourceEstimate::read(m_lhPath)) {
             m_stcLh = std::move(*stc);
             m_hasLh = true;
         } else {
-            emit error(QString("Failed to read LH STC file: %1").arg(QString::fromStdString(stc.error().what())));
+            emit error(std::format("Failed to read LH STC file: {}", stc.error().what()));
         }
     }
 
-    emit progress(5, "Loading RH STC file...");
+    emit progress(5, std::string("Loading RH STC file..."));
 
     // Load RH STC file
-    if (!m_rhPath.isEmpty()) {
-        if (auto stc = mne::InvSourceEstimate::read(m_rhPath.toStdU16String())) {
+    if (!m_rhPath.empty()) {
+        if (auto stc = mne::InvSourceEstimate::read(m_rhPath)) {
             m_stcRh = std::move(*stc);
             m_hasRh = true;
         } else {
-            emit error(QString("Failed to read RH STC file: %1").arg(QString::fromStdString(stc.error().what())));
+            emit error(std::format("Failed to read RH STC file: {}", stc.error().what()));
         }
     }
 
     if (!m_hasLh && !m_hasRh) {
-        emit error("No STC data could be loaded.");
+        emit error(std::string("No STC data could be loaded."));
         emit finished(false);
         return;
     }
@@ -172,8 +172,8 @@ void StcLoadingWorker::process()
         }
     }
 
-    emit progress(95, "Finalizing...");
-    emit progress(100, "Complete");
+    emit progress(95, std::string("Finalizing..."));
+    emit progress(100, std::string("Complete"));
     emit finished(true);
 }
 

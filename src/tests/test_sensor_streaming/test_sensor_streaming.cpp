@@ -16,6 +16,7 @@
 
 #include <mne/disp3D/workers/rtsensordataworker.h>
 #include <mne/disp3D/workers/rtsensordatacontroller.h>
+#include <mne/disp3D/workers/periodictask.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -23,7 +24,6 @@
 
 #include <QtTest/QtTest>
 #include <QSignalSpy>
-#include <QThread>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -35,7 +35,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
+#include <chrono>
 #include <cmath>
+#include <thread>
 
 using namespace mne::disp;
 
@@ -75,6 +78,11 @@ private slots:
     void testEndToEndStreaming();
     void testMultipleStreamCycles();
     void testEmptyQueueBehavior();
+
+    // ── PeriodicTask (streaming thread) ────────────────────────────────
+
+    void testPeriodicTaskTicksOnlyWhileRunning();
+    void testPeriodicTaskDestroyDuringTick();
 };
 
 //=============================================================================================================
@@ -171,7 +179,7 @@ void TestSensorStreaming::testWorkerStreamDataWithMapping()
     const int nVertices = 20;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 1.0f, 0.5f, -0.5f, -1.0f, 0.0f;
@@ -183,12 +191,12 @@ void TestSensorStreaming::testWorkerStreamDataWithMapping()
     QCOMPARE(spy.count(), 1);
 
     QList<QVariant> args = spy.takeFirst();
-    QCOMPARE(args.at(0).toString(), QStringLiteral("head"));
-    QVector<uint32_t> colors = args.at(1).value<QVector<uint32_t>>();
+    QCOMPARE(args.at(0).value<std::string>(), std::string("head"));
+    std::vector<uint32_t> colors = args.at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 
     // All vertices should have full alpha (0xFF in high byte)
-    for (int i = 0; i < colors.size(); ++i) {
+    for (int i = 0; i < std::ssize(colors); ++i) {
         uint32_t alpha = (colors[i] >> 24) & 0xFF;
         QCOMPARE(alpha, 0xFFu);
     }
@@ -203,7 +211,7 @@ void TestSensorStreaming::testWorkerAveraging()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
     worker.setNumberAverages(3);
 
     // Add 3 samples
@@ -232,7 +240,7 @@ void TestSensorStreaming::testWorkerAveraging()
     worker.streamData();
     QCOMPARE(spy.count(), 1);
 
-    QVector<uint32_t> colors = spy.takeFirst().at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colors = spy.takeFirst().at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 }
 
@@ -245,7 +253,7 @@ void TestSensorStreaming::testWorkerLooping()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
     worker.setLoopState(true);
 
     Eigen::VectorXf data(nSensors);
@@ -293,7 +301,7 @@ void TestSensorStreaming::testWorkerMappingMatrixDimensionMismatch()
     const int nVertices = 10;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
 
     // Feed data with wrong number of sensors
     Eigen::VectorXf wrongData(nSensors + 3);
@@ -323,7 +331,7 @@ void TestSensorStreaming::testWorkerColorOutput()
     (*mapping)(2, 1) = 1.0f;
     (*mapping)(3, 1) = 1.0f;
 
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
 
     // Feed equal and opposite sensor values
     Eigen::VectorXf data(nSensors);
@@ -334,7 +342,7 @@ void TestSensorStreaming::testWorkerColorOutput()
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
-    QVector<uint32_t> colors = spy.takeFirst().at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colors = spy.takeFirst().at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 
     // Vertices 0,1 (sensor 0 = +1.0) should have opposite color to vertices 2,3 (sensor 1 = -1.0)
@@ -359,7 +367,7 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
     (*mapping)(1, 0) = 0.0f;  // Will get 0.0
     (*mapping)(2, 0) = -1.0f; // Will get -1.0 * data
 
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 2.0f;
@@ -369,7 +377,7 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
     worker.streamData();
 
     QCOMPARE(spy.count(), 1);
-    QVector<uint32_t> colors = spy.takeFirst().at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colors = spy.takeFirst().at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 
     // Mapped values: +2.0, 0.0, -2.0. maxAbs = 2.0
@@ -394,7 +402,7 @@ void TestSensorStreaming::testWorkerColormapChange()
     (*mapping)(1, 0) = 0.0f;
     (*mapping)(2, 0) = -1.0f;
 
-    worker.setMappingMatrix(QStringLiteral("head"), mapping);
+    worker.setMappingMatrix("head", mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 1.0f;
@@ -404,7 +412,7 @@ void TestSensorStreaming::testWorkerColormapChange()
     QSignalSpy spy1(&worker, &RtSensorDataWorker::newRtSensorColors);
     worker.streamData();
     QCOMPARE(spy1.count(), 1);
-    QVector<uint32_t> colorsDefault = spy1.takeFirst().at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsDefault = spy1.takeFirst().at(1).value<std::vector<uint32_t>>();
 
     // Change colormap and get new colors
     worker.setColormapType("Hot");
@@ -412,7 +420,7 @@ void TestSensorStreaming::testWorkerColormapChange()
     QSignalSpy spy2(&worker, &RtSensorDataWorker::newRtSensorColors);
     worker.streamData();
     QCOMPARE(spy2.count(), 1);
-    QVector<uint32_t> colorsHot = spy2.takeFirst().at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colorsHot = spy2.takeFirst().at(1).value<std::vector<uint32_t>>();
 
     // Colors should differ between colormaps for at least some vertices
     bool anyDifferent = false;
@@ -477,7 +485,7 @@ void TestSensorStreaming::testControllerSignalForwarding()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(QStringLiteral("head"), mapping);
+    controller.setMappingMatrix("head", mapping);
     controller.setColormapType("Hot");
     controller.setLoopState(true);
 
@@ -497,7 +505,7 @@ void TestSensorStreaming::testControllerSignalForwarding()
 
     // Verify the emitted data structure
     QList<QVariant> args = spy.first();
-    QVector<uint32_t> colors = args.at(1).value<QVector<uint32_t>>();
+    std::vector<uint32_t> colors = args.at(1).value<std::vector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 }
 
@@ -506,7 +514,7 @@ void TestSensorStreaming::testControllerSignalForwarding()
 void TestSensorStreaming::testControllerClearData()
 {
     RtSensorDataController controller;
-    controller.setMappingMatrix(QStringLiteral("head"), createUniformMapping(6, 5));
+    controller.setMappingMatrix("head", createUniformMapping(6, 5));
     controller.addData(Eigen::VectorXf::Constant(5, 1.0f));
     controller.addData(Eigen::VectorXf::Constant(5, 2.0f));
 
@@ -530,7 +538,7 @@ void TestSensorStreaming::testEndToEndStreaming()
     const int nVertices = 12;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    controller.setMappingMatrix(QStringLiteral("head"), mapping);
+    controller.setMappingMatrix("head", mapping);
     controller.setColormapType("MNE");
     controller.setLoopState(false);
     controller.setNumberAverages(1);
@@ -559,7 +567,7 @@ void TestSensorStreaming::testEndToEndStreaming()
 
     // Each emission should have the right number of vertices
     for (int i = 0; i < spy.count(); ++i) {
-        QVector<uint32_t> colors = spy.at(i).at(1).value<QVector<uint32_t>>();
+        std::vector<uint32_t> colors = spy.at(i).at(1).value<std::vector<uint32_t>>();
         QCOMPARE(colors.size(), nVertices);
     }
 }
@@ -574,7 +582,7 @@ void TestSensorStreaming::testMultipleStreamCycles()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(QStringLiteral("head"), mapping);
+    controller.setMappingMatrix("head", mapping);
     controller.setLoopState(true);
     controller.setTimeInterval(10);
 
@@ -607,7 +615,7 @@ void TestSensorStreaming::testEmptyQueueBehavior()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(QStringLiteral("head"), mapping);
+    controller.setMappingMatrix("head", mapping);
     controller.setLoopState(false); // No looping
 
     // Don't add any data
@@ -620,6 +628,52 @@ void TestSensorStreaming::testEmptyQueueBehavior()
 
     // Should not have emitted anything (empty queue, no looping)
     QCOMPARE(spy.count(), 0);
+}
+
+//=============================================================================================================
+
+void TestSensorStreaming::testPeriodicTaskTicksOnlyWhileRunning()
+{
+    std::atomic<int> ticks{0};
+    PeriodicTask task([&ticks] { ++ticks; });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    QCOMPARE(ticks.load(), 0);
+    QVERIFY(!task.isRunning());
+
+    task.start(std::chrono::milliseconds(5));
+    QVERIFY(task.isRunning());
+    QTRY_VERIFY_WITH_TIMEOUT(ticks.load() >= 3, 2000);
+
+    task.stop();
+    QVERIFY(!task.isRunning());
+    // A tick already in flight may still finish; afterwards the count must stay put.
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    const int stopped = ticks.load();
+    std::this_thread::sleep_for(std::chrono::milliseconds(60));
+    QCOMPARE(ticks.load(), stopped);
+
+    task.start(std::chrono::milliseconds(5));
+    QTRY_VERIFY_WITH_TIMEOUT(ticks.load() > stopped, 2000);
+}
+
+//=============================================================================================================
+
+void TestSensorStreaming::testPeriodicTaskDestroyDuringTick()
+{
+    std::atomic<bool> inTick{false};
+    std::atomic<bool> tickFinished{false};
+    {
+        PeriodicTask task([&] {
+            inTick = true;
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            tickFinished = true;
+        });
+        task.start(std::chrono::milliseconds(1));
+        QTRY_VERIFY_WITH_TIMEOUT(inTick.load(), 2000);
+    }
+    // The destructor joins: the running tick completed before it returned.
+    QVERIFY(tickFinished.load());
 }
 
 //=============================================================================================================

@@ -40,7 +40,7 @@ AverageScene::AverageScene(QGraphicsView* view, QObject* parent)
 
 //=============================================================================================================
 
-void AverageScene::setScaleMap(const QMap<qint32, float>& scaleMap)
+void AverageScene::setScaleMap(const std::map<int, float>& scaleMap)
 {
     m_qMapChScaling = scaleMap;
 
@@ -89,8 +89,8 @@ void AverageScene::repaintSelectionItems(const mne::disp::SelectionItem& selecte
 {
     this->clear();
 
-    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++) {
-        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(selectedChannelItems.m_sChannelName[i],
+    for (int i = 0; i < std::ssize(selectedChannelItems.m_iChannelKind); i++) {
+        AverageSceneItem* averageSceneItemTemp = new AverageSceneItem(QString::fromStdString(selectedChannelItems.m_sChannelName[i]),
                                                                       selectedChannelItems.m_iChannelNumber[i],
                                                                       selectedChannelItems.m_qpChannelPosition[i],
                                                                       selectedChannelItems.m_iChannelKind[i],
@@ -110,7 +110,7 @@ void AverageScene::repaintSelectionItems(const mne::disp::SelectionItem& selecte
 
 //=============================================================================================================
 
-void AverageScene::setActivationPerAverage(const std::shared_ptr<QMap<QString, bool>>& qMapActivationPerAverage)
+void AverageScene::setActivationPerAverage(const std::shared_ptr<std::map<std::string, bool>>& qMapActivationPerAverage)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);
@@ -125,7 +125,7 @@ void AverageScene::setActivationPerAverage(const std::shared_ptr<QMap<QString, b
 
 //=============================================================================================================
 
-void AverageScene::setColorPerAverage(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor)
+void AverageScene::setColorPerAverage(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor)
 {
     QList<QGraphicsItem*> items = this->items();
     QListIterator<QGraphicsItem*> i(items);

@@ -37,6 +37,12 @@
 #include <QScroller>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <map>
+
+//=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
 
@@ -130,7 +136,7 @@ public:
      *
      * @param[in] scaleMap QMap with scaling values which is to be broadcasted to the model.
      */
-    void setScalingMap(const QMap<qint32, float>& scaleMap);
+    void setScalingMap(const std::map<int, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -273,7 +279,7 @@ public:
      *
      * @param[in] selectedChannelsIndexes      list of channels to be shown.
      */
-    void showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes);
+    void showSelectedChannelsOnly(const std::vector<int>& selectedChannelsIndexes);
 
     //=========================================================================================================
     /**
@@ -372,7 +378,7 @@ private:
 
     QSharedPointer<FiffRawViewDelegate> m_pDelegate; /**< Pointer to associated Delegate. */
 
-    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
+    std::map<int, float> m_qMapChScaling; /**< Channel scaling values. */
 
     float m_fDefaultSectionSize;  /**< Default row height */
     float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (mne::disp::FiffRawViewSettings default) */

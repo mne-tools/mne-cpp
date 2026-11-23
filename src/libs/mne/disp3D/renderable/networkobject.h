@@ -45,8 +45,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace mne::disp
 {
@@ -82,7 +83,7 @@ public:
      * @param[in] network       The connectivity network to visualize.
      * @param[in] sColormap     Colormap name for weight-based coloring (e.g. "Viridis", "Hot").
      */
-    void load(const mne::Network& network, const QString& sColormap = "Viridis");
+    void load(const mne::Network& network, const std::string& sColormap = "Viridis");
 
     //=========================================================================================================
     /**
@@ -98,7 +99,7 @@ public:
      *
      * @param[in] sColormap     Colormap name (e.g. "Hot", "Viridis", "Jet").
      */
-    void setColormap(const QString& sColormap);
+    void setColormap(const std::string& sColormap);
 
     //=========================================================================================================
     /**
@@ -179,24 +180,24 @@ private:
 
     // ── Network data ────────────────────────────────────────────────────
     mne::Network m_network;
-    QString m_colormap = "Viridis";
+    std::string m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
     RenderKey m_nodeRenderKey;
     RenderKey m_edgeRenderKey;
 
-    QByteArray m_nodeVertexData;
-    QByteArray m_nodeIndexData;
-    QByteArray m_nodeInstanceData;
+    std::vector<std::byte> m_nodeVertexData;
+    std::vector<std::byte> m_nodeIndexData;
+    std::vector<std::byte> m_nodeInstanceData;
     int m_nodeIndexCount = 0;
     int m_nodeInstanceCount = 0;
     quint64 m_nodeGeometryGeneration = 0;
     quint64 m_nodeInstanceGeneration = 0;
 
     // ── Edge GPU resources ──────────────────────────────────────────────
-    QByteArray m_edgeVertexData;
-    QByteArray m_edgeIndexData;
-    QByteArray m_edgeInstanceData;
+    std::vector<std::byte> m_edgeVertexData;
+    std::vector<std::byte> m_edgeIndexData;
+    std::vector<std::byte> m_edgeInstanceData;
     int m_edgeIndexCount = 0;
     int m_edgeInstanceCount = 0;
     quint64 m_edgeGeometryGeneration = 0;

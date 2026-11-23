@@ -31,7 +31,12 @@
 //=============================================================================================================
 
 #include <QVector3D>
-#include <QVector>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
 
 namespace mne::disp
 {
@@ -57,7 +62,7 @@ public:
      * @param[in] type       Item type identifier.
      */
     explicit SourceSpaceTreeItem(const QString& text,
-                                 const QVector<QVector3D>& positions,
+                                 const std::vector<QVector3D>& positions,
                                  const QColor& color,
                                  float scale,
                                  int type = AbstractTreeItem::SourceSpaceItem);
@@ -69,7 +74,7 @@ public:
      *
      * @return Vector of position vectors.
      */
-    const QVector<QVector3D>& positions() const;
+    const std::vector<QVector3D>& positions() const;
 
     //=========================================================================================================
     /**
@@ -80,8 +85,8 @@ public:
     float scale() const;
 
 private:
-    QVector<QVector3D> m_positions; /**< 3D positions of all source points. */
-    float m_scale;                  /**< Radius/size for rendering. */
+    std::vector<QVector3D> m_positions; /**< 3D positions of all source points. */
+    float m_scale;                      /**< Radius/size for rendering. */
 };
 
 } // namespace mne::disp

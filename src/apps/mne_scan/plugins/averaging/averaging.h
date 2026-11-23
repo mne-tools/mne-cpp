@@ -35,7 +35,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -127,7 +129,7 @@ public:
      *
      * @param[in] sStimCh     the new stim channel name.
      */
-    void onChangeStimChannel(const QString& sStimCh);
+    void onChangeStimChannel(const std::string& sStimCh);
 
     //=========================================================================================================
     /**
@@ -151,7 +153,7 @@ public:
      *
      * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
-    void onChangeArtifactThreshold(const QMap<QString, double>& mapThresholds);
+    void onChangeArtifactThreshold(const std::map<std::string, double>& mapThresholds);
 
     //=========================================================================================================
     /**
@@ -205,10 +207,10 @@ private:
     bool m_bBaselineActive = false;        /**< Whether the baseline interval is subtracted. */
     std::pair<float, float> m_baseline;    /**< Baseline interval in seconds. */
 
-    QMap<QString, int> m_mapStimChsIndexNames; /**< The currently available stim channels and their corresponding index in the data. */
+    std::map<std::string, int> m_mapStimChsIndexNames; /**< The currently available stim channels and their corresponding index in the data. */
 
 signals:
-    void stimChannelsChanged(const QMap<QString, int>& mapStimChsIndexNames);
+    void stimChannelsChanged(const std::map<std::string, int>& mapStimChsIndexNames);
     void fiffChInfoChanged(const std::vector<mne::FiffChInfo>& fiffChInfoList);
     void evokedSetChanged(const mne::FiffEvokedSet& evokedSet);
 };

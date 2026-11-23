@@ -93,7 +93,7 @@ void TestMriSlicesPlugin::attachSceneWithoutVolumeDoesNotCrash()
 
     // No volume, so no layers should be published.
     for (const QString& id : MriSlicesPlugin::sceneLayerIds()) {
-        QVERIFY(scene.findLayer(id) == nullptr);
+        QVERIFY(scene.findLayer(id.toStdString()) == nullptr);
     }
 
     plugin.attachScene(nullptr);

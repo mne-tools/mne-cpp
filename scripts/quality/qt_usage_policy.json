@@ -72,8 +72,8 @@
       "modules": []
     },
     "disp": {
-      "tokens": 6159,
-      "public_header_includes": 112,
+      "tokens": 5180,
+      "public_header_includes": 83,
       "modules": [
         "Core",
         "GuiPrivate",
@@ -81,8 +81,8 @@
       ]
     },
     "disp3D": {
-      "tokens": 2882,
-      "public_header_includes": 142,
+      "tokens": 1641,
+      "public_header_includes": 76,
       "modules": [
         "Core",
         "Gui",

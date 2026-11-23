@@ -101,10 +101,10 @@ void Bar::paintEvent(QPaintEvent* /*event*/)
         painter.setFont(QFont());
     }
 
-    if (m_frequencies.isEmpty())
+    if (m_frequencies.empty())
         return;
 
-    const int nBars = m_frequencies.size();
+    const int nBars = static_cast<int>(m_frequencies.size());
     const int maxFreq = (m_iMaxFrequency > 0) ? m_iMaxFrequency : 1;
 
     // Draw axes
@@ -141,16 +141,17 @@ void Bar::paintEvent(QPaintEvent* /*event*/)
     painter.setFont(smallFont);
 
     const QFontMetrics labelMetrics(smallFont);
-    for (int i = 0; i < nBars && i < m_categories.size(); ++i) {
+    for (int i = 0; i < nBars && i < std::ssize(m_categories); ++i) {
+        const QString category = QString::fromStdString(m_categories[i]);
         double cx = marginLeft + (i + 0.5) * barWidth;
-        if (labelMetrics.horizontalAdvance(m_categories[i]) < barWidth - 4) {
-            painter.drawText(QRectF(cx - barWidth / 2.0, marginTop + plotH + 6, barWidth, 20), Qt::AlignHCenter | Qt::AlignTop, m_categories[i]);
+        if (labelMetrics.horizontalAdvance(category) < barWidth - 4) {
+            painter.drawText(QRectF(cx - barWidth / 2.0, marginTop + plotH + 6, barWidth, 20), Qt::AlignHCenter | Qt::AlignTop, category);
             continue;
         }
         painter.save();
         painter.translate(cx, marginTop + plotH + 5);
         painter.rotate(45);
-        painter.drawText(0, 0, m_categories[i]);
+        painter.drawText(0, 0, category);
         painter.restore();
     }
 

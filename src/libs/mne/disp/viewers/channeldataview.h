@@ -36,10 +36,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMap>
 #include <QRect>
-#include <QStringList>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -51,7 +48,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -209,8 +209,8 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to physical amplitude (e.g. 1.2e-12 for MEG).
      */
-    void setScalingMap(const QMap<qint32, float>& scaleMap);
-    QMap<qint32, float> scalingMap() const;
+    void setScalingMap(const std::map<int, float>& scaleMap);
+    std::map<int, float> scalingMap() const;
 
     //=========================================================================================================
     /**
@@ -229,7 +229,7 @@ public:
      *
      * @param[in] names  List of channel names to show (case-sensitive).
      */
-    void setChannelFilter(const QStringList& names);
+    void setChannelFilter(const std::vector<std::string>& names);
 
     //=========================================================================================================
     /**
@@ -268,9 +268,9 @@ public:
      *
      * @param[in] events  List of EventMarker objects.
      */
-    void setEvents(const QVector<ChannelRhiView::EventMarker>& events);
+    void setEvents(const std::vector<ChannelRhiView::EventMarker>& events);
 
-    void setEpochMarkers(const QVector<int>& triggerSamples);
+    void setEpochMarkers(const std::vector<int>& triggerSamples);
     void setEpochMarkersVisible(bool visible);
     bool epochMarkersVisible() const;
 
@@ -286,7 +286,7 @@ public:
      *
      * @param[in] markers  Reference markers to display in the ruler.
      */
-    void setReferenceMarkers(const QVector<TimeRulerReferenceMark>& markers);
+    void setReferenceMarkers(const std::vector<TimeRulerReferenceMark>& markers);
 
     //=========================================================================================================
     /**
@@ -294,7 +294,7 @@ public:
      *
      * @param[in] annotations  List of AnnotationSpan objects.
      */
-    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations);
+    void setAnnotations(const std::vector<ChannelRhiView::AnnotationSpan>& annotations);
 
     //=========================================================================================================
     /**
@@ -523,7 +523,7 @@ private:
     bool m_channelScrollBarUpdating = false;
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
-    QMap<qint32, float> m_scaleMap;
+    std::map<int, float> m_scaleMap;
     QColor m_signalColor{Qt::darkGreen};
     QColor m_bgColor{250, 250, 250};
 

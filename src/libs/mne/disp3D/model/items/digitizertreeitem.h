@@ -31,7 +31,13 @@
 //=============================================================================================================
 
 #include <QVector3D>
-#include <QVector>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
 
 namespace mne::disp
 {
@@ -75,8 +81,8 @@ public:
      */
     explicit DigitizerTreeItem(const QString& text,
                                PointKind kind,
-                               const QVector<QVector3D>& positions,
-                               const QStringList& names,
+                               const std::vector<QVector3D>& positions,
+                               const std::vector<std::string>& names,
                                const QColor& color,
                                float scale,
                                int type = AbstractTreeItem::DigitizerItem);
@@ -88,7 +94,7 @@ public:
      *
      * @return Vector of 3D position vectors.
      */
-    const QVector<QVector3D>& positions() const;
+    const std::vector<QVector3D>& positions() const;
 
     //=========================================================================================================
     /**
@@ -96,7 +102,7 @@ public:
      *
      * @return List of point names.
      */
-    const QStringList& pointNames() const;
+    const std::vector<std::string>& pointNames() const;
 
     //=========================================================================================================
     /**
@@ -115,10 +121,10 @@ public:
     PointKind pointKind() const;
 
 private:
-    PointKind m_kind;               /**< Digitizer point category. */
-    QVector<QVector3D> m_positions; /**< 3D positions of all points. */
-    QStringList m_names;            /**< Display names for individual points. */
-    float m_scale;                  /**< Radius/size for rendering. */
+    PointKind m_kind;                   /**< Digitizer point category. */
+    std::vector<QVector3D> m_positions; /**< 3D positions of all points. */
+    std::vector<std::string> m_names;   /**< Display names for individual points. */
+    float m_scale;                      /**< Radius/size for rendering. */
 };
 
 } // namespace mne::disp

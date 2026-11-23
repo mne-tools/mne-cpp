@@ -35,10 +35,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QSharedPointer>
-#include <QVector>
-#include <QList>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -51,17 +47,19 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <atomic>
+#include <memory>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QThread;
-class QTimer;
 
 namespace mne
 {
+class ThreadPool;
 class FsLabel;
 }
 
@@ -69,6 +67,7 @@ namespace mne::disp
 {
 
 class RtSourceDataWorker;
+class PeriodicTask;
 class RtSourceInterpolationMatWorker;
 
 //=============================================================================================================
@@ -135,7 +134,7 @@ public:
      *
      * @param[in] mat        Sparse interpolation matrix (nVerticesLH x nSourcesLH).
      */
-    void setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> mat);
+    void setInterpolationMatrixLeft(std::shared_ptr<Eigen::SparseMatrix<float>> mat);
 
     //=========================================================================================================
     /**
@@ -143,7 +142,7 @@ public:
      *
      * @param[in] mat        Sparse interpolation matrix (nVerticesRH x nSourcesRH).
      */
-    void setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> mat);
+    void setInterpolationMatrixRight(std::shared_ptr<Eigen::SparseMatrix<float>> mat);
 
     //=========================================================================================================
     /**
@@ -183,7 +182,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString& name);
+    void setColormapType(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -226,8 +225,8 @@ public:
      * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
-                         const QVector<uint32_t>& baseColorsRh);
+    void setSurfaceColor(const std::vector<uint32_t>& baseColorsLh,
+                         const std::vector<uint32_t>& baseColorsRh);
 
     //=========================================================================================================
     /**
@@ -248,7 +247,7 @@ public:
      * @param[in] sInterpolationFunction    Function name ("linear", "gaussian",
      *                                      "square", "cubic").
      */
-    void setInterpolationFunction(const QString& sInterpolationFunction);
+    void setInterpolationFunction(const std::string& sInterpolationFunction);
 
     //=========================================================================================================
     /**
@@ -332,8 +331,8 @@ signals:
      * @param[in] colorsLh   Per-vertex ABGR color array for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR color array for the right hemisphere.
      */
-    void newSmoothedDataAvailable(const QVector<uint32_t>& colorsLh,
-                                  const QVector<uint32_t>& colorsRh);
+    void newSmoothedDataAvailable(const std::vector<uint32_t>& colorsLh,
+                                  const std::vector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /**
@@ -351,7 +350,7 @@ signals:
      *
      * @param[in] interpMat   Sparse interpolation matrix (nVertices x nSources).
      */
-    void newInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void newInterpolationMatrixLeftAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
 
     //=========================================================================================================
     /**
@@ -359,20 +358,20 @@ signals:
      *
      * @param[in] interpMat   Sparse interpolation matrix (nVertices x nSources).
      */
-    void newInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void newInterpolationMatrixRightAvailable(std::shared_ptr<Eigen::SparseMatrix<float>> interpMat);
 
 private slots:
-    void onNewInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
-    void onNewInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void onNewInterpolationMatrixLeft(const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat);
+    void onNewInterpolationMatrixRight(const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat);
 
 private:
-    QThread* m_pWorkerThread = nullptr;                 /**< Background thread for the data worker. */
     mne::disp::RtSourceDataWorker* m_pWorker = nullptr; /**< Data streaming worker. */
-    QTimer* m_pTimer = nullptr;                         /**< Timer driving the streaming cadence. */
+    std::unique_ptr<PeriodicTask> m_pStreamTask;        /**< Streaming thread driving the cadence. */
     bool m_bIsStreaming = false;                        /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                           /**< Streaming interval in ms (~60fps). */
 
-    QThread* m_pInterpThread = nullptr;                                   /**< Background thread for interpolation matrix worker. */
+    std::unique_ptr<mne::ThreadPool> m_pInterpPool;                       /**< Single thread running interpolation recomputations in order. */
+    std::atomic<bool> m_bShuttingDown{false};                             /**< Set in the destructor; queued recomputations are skipped. */
     mne::disp::RtSourceInterpolationMatWorker* m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 

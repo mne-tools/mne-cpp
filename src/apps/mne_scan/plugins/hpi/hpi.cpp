@@ -435,7 +435,7 @@ void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 //=============================================================================================================
 
 void Hpi::onDigitizersChanged(const mne::FiffDigPointSet& digitizers,
-                              const QString& sFilePath)
+                              const std::filesystem::path& sFilePath)
 {
     m_mutex.lock();
     if (m_pFiffInfo) {
@@ -481,10 +481,10 @@ void Hpi::onDoFreqOrder()
 
 //=============================================================================================================
 
-void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
+void Hpi::onCoilFrequenciesChanged(const std::vector<int>& vCoilFreqs)
 {
     m_mutex.lock();
-    m_vCoilFreqs.assign(vCoilFreqs.begin(), vCoilFreqs.end());
+    m_vCoilFreqs = vCoilFreqs;
     m_mutex.unlock();
 }
 
@@ -582,7 +582,7 @@ void Hpi::run()
         rtHpi.set_max_error(m_dAllowedMeanErrorDist);
         const double dAllowedMovement = m_dAllowedMovement;
         const double dAllowedRotation = m_dAllowedRotation;
-        const std::filesystem::path digitizerFile = mne::path_from_utf8(m_sFilePathDigitzers.toStdString());
+        const std::filesystem::path& digitizerFile = m_sFilePathDigitzers;
         m_mutex.unlock();
 
         std::optional<HpiFitResult> fitResult = rtHpi.update(matData);
@@ -599,7 +599,7 @@ void Hpi::run()
         singlePending = false;
 
         const double dMeanErrorDist = std::accumulate(fitResult->errorDistances.begin(), fitResult->errorDistances.end(), .0) / static_cast<double>(fitResult->errorDistances.size());
-        emit errorsChanged(QVector<double>(fitResult->errorDistances.begin(), fitResult->errorDistances.end()), dMeanErrorDist);
+        emit errorsChanged(std::vector<double>(fitResult->errorDistances.begin(), fitResult->errorDistances.end()), dMeanErrorDist);
         emit gofChanged(fitResult->GoF, fitResult->GoF.mean());
 
         if (rtHpi.accepted(*fitResult)) {
@@ -634,7 +634,7 @@ QString Hpi::getBuildInfo()
 QVariantMap Hpi::getAttributes() const
 {
     QVariantMap attrs;
-    attrs[QStringLiteral("filePathDigitizers")] = m_sFilePathDigitzers;
+    attrs[QStringLiteral("filePathDigitizers")] = QString::fromStdString(mne::utf8_from_path(m_sFilePathDigitzers));
     attrs[QStringLiteral("fittingWindowSize")] = static_cast<int>(m_iFittingWindowSize);
     attrs[QStringLiteral("doFreqOrder")] = m_bDoFreqOrder;
     attrs[QStringLiteral("doContinuousHpi")] = m_bDoContinousHpi;
@@ -648,7 +648,7 @@ QVariantMap Hpi::getAttributes() const
 void Hpi::setAttributes(const QVariantMap& attributes)
 {
     if (attributes.contains(QStringLiteral("filePathDigitizers")))
-        m_sFilePathDigitzers = attributes[QStringLiteral("filePathDigitizers")].toString();
+        m_sFilePathDigitzers = mne::path_from_utf8(attributes[QStringLiteral("filePathDigitizers")].toString().toStdString());
     if (attributes.contains(QStringLiteral("fittingWindowSize")))
         m_iFittingWindowSize = static_cast<qint16>(attributes[QStringLiteral("fittingWindowSize")].toInt());
     if (attributes.contains(QStringLiteral("doFreqOrder")))

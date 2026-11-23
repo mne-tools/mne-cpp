@@ -223,8 +223,8 @@ int main(int argc, char* argv[])
 
     Log::debug("Histogram timer: {}", myTimerHistogram.elapsed());
 
-    FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 values of the %2 clustered sources at 100 ms in %3 classes, with markers at the 50th, 90th and 99th percentile.").arg(method).arg(sourceEstimateData.size()).arg(classAmount));
-    if (!FigureExporter::directory().isEmpty()) {
+    FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 values of the %2 clustered sources at 100 ms in %3 classes, with markers at the 50th, 90th and 99th percentile.").arg(method).arg(sourceEstimateData.size()).arg(classAmount).toStdString());
+    if (!FigureExporter::directory().empty()) {
         delete displayObj;
         return 0;
     }

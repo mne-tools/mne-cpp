@@ -35,9 +35,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QLatin1String>
-#include <QHash>
-#include <QString>
 #include <QMatrix4x4>
 
 //=============================================================================================================
@@ -45,6 +42,14 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <string_view>
+#include <unordered_map>
 
 //=============================================================================================================
 /**
@@ -59,39 +64,39 @@
 namespace mne::disp::surface_keys
 {
 // ── Hemisphere prefixes ────────────────────────────────────────────
-inline constexpr QLatin1String kLhPrefix{"lh_"};
-inline constexpr QLatin1String kRhPrefix{"rh_"};
+inline constexpr std::string_view kLhPrefix = "lh_";
+inline constexpr std::string_view kRhPrefix = "rh_";
 
 // ── BEM ────────────────────────────────────────────────────────────
-inline constexpr QLatin1String kBemPrefix{"bem_"};
-inline constexpr QLatin1String kBemHead{"bem_head"};
+inline constexpr std::string_view kBemPrefix = "bem_";
+inline constexpr std::string_view kBemHead = "bem_head";
 
 // ── Sensors ────────────────────────────────────────────────────────
-inline constexpr QLatin1String kSensPrefix{"sens_"};
-inline constexpr QLatin1String kSensMegGrad{"sens_meg_grad_"};
-inline constexpr QLatin1String kSensMegMag{"sens_meg_mag_"};
-inline constexpr QLatin1String kSensMeg{"sens_meg_"};
-inline constexpr QLatin1String kSensEeg{"sens_eeg_"};
-inline constexpr QLatin1String kSensDig{"sens_dig_"};
-inline constexpr QLatin1String kHelmet{"sens_surface_meg"};
+inline constexpr std::string_view kSensPrefix = "sens_";
+inline constexpr std::string_view kSensMegGrad = "sens_meg_grad_";
+inline constexpr std::string_view kSensMegMag = "sens_meg_mag_";
+inline constexpr std::string_view kSensMeg = "sens_meg_";
+inline constexpr std::string_view kSensEeg = "sens_eeg_";
+inline constexpr std::string_view kSensDig = "sens_dig_";
+inline constexpr std::string_view kHelmet = "sens_surface_meg";
 
 // ── Digitiser ──────────────────────────────────────────────────────
-inline constexpr QLatin1String kDigPrefix{"dig_"};
-inline constexpr QLatin1String kDigCardinal{"dig_cardinal"};
-inline constexpr QLatin1String kDigHpi{"dig_hpi"};
-inline constexpr QLatin1String kDigEeg{"dig_eeg"};
-inline constexpr QLatin1String kDigExtra{"dig_extra"};
+inline constexpr std::string_view kDigPrefix = "dig_";
+inline constexpr std::string_view kDigCardinal = "dig_cardinal";
+inline constexpr std::string_view kDigHpi = "dig_hpi";
+inline constexpr std::string_view kDigEeg = "dig_eeg";
+inline constexpr std::string_view kDigExtra = "dig_extra";
 
 // ── Source space ───────────────────────────────────────────────────
-inline constexpr QLatin1String kSrcSpPrefix{"srcsp_"};
+inline constexpr std::string_view kSrcSpPrefix = "srcsp_";
 
 // ── Contour overlays ───────────────────────────────────────────────
-inline constexpr QLatin1String kContourMeg{"sens_contour_meg"};
-inline constexpr QLatin1String kContourEeg{"sens_contour_eeg"};
+inline constexpr std::string_view kContourMeg = "sens_contour_meg";
+inline constexpr std::string_view kContourEeg = "sens_contour_eeg";
 
 // ── Inflated surface keys ──────────────────────────────────────────
-inline constexpr QLatin1String kLhInflated{"lh_inflated"};
-inline constexpr QLatin1String kRhInflated{"rh_inflated"};
+inline constexpr std::string_view kLhInflated = "lh_inflated";
+inline constexpr std::string_view kRhInflated = "rh_inflated";
 
 //=============================================================================================================
 /**
@@ -103,21 +108,22 @@ inline constexpr QLatin1String kRhInflated{"rh_inflated"};
  * @param[in] uiType   UI-facing type string.
  * @return              Corresponding object key, or empty string if unknown.
  */
-inline QString sensorTypeToObjectKey(const QString& uiType)
+inline std::string sensorTypeToObjectKey(std::string_view uiType)
 {
-    static const QHash<QString, QString> map = {
-        {QStringLiteral("MEG"), QStringLiteral("sens_meg")},
-        {QStringLiteral("MEG/Grad"), QStringLiteral("sens_meg_grad")},
-        {QStringLiteral("MEG/Mag"), QStringLiteral("sens_meg_mag")},
-        {QStringLiteral("MEG Helmet"), QStringLiteral("sens_meg_helmet")},
-        {QStringLiteral("EEG"), QStringLiteral("sens_eeg")},
-        {QStringLiteral("Digitizer"), QStringLiteral("dig")},
-        {QStringLiteral("Digitizer/Cardinal"), QStringLiteral("dig_cardinal")},
-        {QStringLiteral("Digitizer/HPI"), QStringLiteral("dig_hpi")},
-        {QStringLiteral("Digitizer/EEG"), QStringLiteral("dig_eeg")},
-        {QStringLiteral("Digitizer/Extra"), QStringLiteral("dig_extra")},
+    static const std::unordered_map<std::string_view, std::string_view> map = {
+        {"MEG", "sens_meg"},
+        {"MEG/Grad", "sens_meg_grad"},
+        {"MEG/Mag", "sens_meg_mag"},
+        {"MEG Helmet", "sens_meg_helmet"},
+        {"EEG", "sens_eeg"},
+        {"Digitizer", "dig"},
+        {"Digitizer/Cardinal", "dig_cardinal"},
+        {"Digitizer/HPI", "dig_hpi"},
+        {"Digitizer/EEG", "dig_eeg"},
+        {"Digitizer/Extra", "dig_extra"},
     };
-    return map.value(uiType, QString());
+    const auto it = map.find(uiType);
+    return it == map.end() ? std::string() : std::string(it->second);
 }
 
 //=============================================================================================================
@@ -128,19 +134,19 @@ inline QString sensorTypeToObjectKey(const QString& uiType)
  * @param[in] parentText   Text from the parent QStandardItem.
  * @return                 Key prefix string.
  */
-inline QString sensorParentToKeyPrefix(const QString& parentText)
+inline std::string sensorParentToKeyPrefix(std::string_view parentText)
 {
-    if (parentText.contains(QLatin1String("MEG/Grad")))
-        return QStringLiteral("sens_meg_grad_");
-    if (parentText.contains(QLatin1String("MEG/Mag")))
-        return QStringLiteral("sens_meg_mag_");
-    if (parentText.contains(QLatin1String("MEG")))
-        return QStringLiteral("sens_meg_");
-    if (parentText.contains(QLatin1String("EEG")))
-        return QStringLiteral("sens_eeg_");
-    if (parentText.contains(QLatin1String("Digitizer")))
-        return QStringLiteral("sens_dig_");
-    return QStringLiteral("sens_");
+    if (parentText.contains("MEG/Grad"))
+        return "sens_meg_grad_";
+    if (parentText.contains("MEG/Mag"))
+        return "sens_meg_mag_";
+    if (parentText.contains("MEG"))
+        return "sens_meg_";
+    if (parentText.contains("EEG"))
+        return "sens_eeg_";
+    if (parentText.contains("Digitizer"))
+        return "sens_dig_";
+    return "sens_";
 }
 
 //=============================================================================================================

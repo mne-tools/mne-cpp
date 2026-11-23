@@ -30,15 +30,10 @@
 #include "layoutscene.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
 
 //=============================================================================================================
@@ -83,7 +78,7 @@ public:
      *
      * @param[in] scaleMap map with all channel types and their current scaling value.
      */
-    void setScaleMap(const QMap<qint32, float>& scaleMap);
+    void setScaleMap(const std::map<int, float>& scaleMap);
 
     //=========================================================================================================
     /**
@@ -113,7 +108,7 @@ public:
      *
      * @param[in] qMapActivationPerAverage     The average activation information.
      */
-    void setActivationPerAverage(const std::shared_ptr<QMap<QString, bool>>& qMapActivationPerAverage);
+    void setActivationPerAverage(const std::shared_ptr<std::map<std::string, bool>>& qMapActivationPerAverage);
 
     //=========================================================================================================
     /**
@@ -121,7 +116,7 @@ public:
      *
      * @param[in] qMapAverageColor     The average color information.
      */
-    void setColorPerAverage(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void setColorPerAverage(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -140,8 +135,8 @@ public:
     void setSignalItemColor(const QColor& signalColor);
 
 private:
-    QColor m_colGlobalItemSignalColor;   /**< The color used in all items to draw the signals.*/
-    QMap<qint32, float> m_qMapChScaling; /**< Stored scale map applied to newly created items.*/
+    QColor m_colGlobalItemSignalColor;    /**< The color used in all items to draw the signals.*/
+    std::map<int, float> m_qMapChScaling; /**< Stored scale map applied to newly created items.*/
 
     QList<SelectionSceneItem*> m_lSelectedChannelItems; /**< Holds the selected channels from the selection manager.*/
 };

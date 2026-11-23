@@ -27,7 +27,6 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGestureEvent>
 #include <QScrollBar>
-#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES

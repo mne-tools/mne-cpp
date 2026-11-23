@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
     Log::info("Surfaces loaded, rendering offscreen ({}x{})...", width, height);
 
-    if (!view.savePng(outPath, width, height, QStringLiteral("white"))) {
+    if (!view.savePng(outPath.toStdU16String(), width, height, "white")) {
         Log::critical("Error: offscreen render failed.");
         return 1;
     }

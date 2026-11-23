@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include "filterdesignview.h"
+#include <mne/base/log.h>
 #include "ui_filterdesignview.h"
 
 #include "helpers/filterplotscene.h"
@@ -110,7 +111,7 @@ int FilterDesignView::getFilterTaps()
 void FilterDesignView::setSamplingRate(double dSamplingRate)
 {
     if (dSamplingRate <= 0) {
-        qWarning() << "[FilterDesignView::setSamplingRate] Sampling frequency is <= 0. Returning.";
+        mne::Log::warning("[FilterDesignView::setSamplingRate] Sampling frequency is <= 0. Returning.");
     }
 
     m_dSFreq = dSamplingRate;
@@ -453,7 +454,7 @@ void FilterDesignView::onBtnExportFilterPlot()
         if (fileName.contains(".svg")) {
             SvgWriter svgGen;
 
-            svgGen.setFileName(fileName);
+            svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_pFilterPlotScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
             //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
@@ -495,7 +496,7 @@ void FilterDesignView::onBtnExportFilterCoefficients()
         return;
     }
     if (const auto written = FilterIO::write_filter(path_from_utf8(fileName.toStdString()), filterWriteTemp); !written) {
-        qWarning() << written.error().what();
+        mne::Log::warning("{}", written.error().what());
     }
 }
 
@@ -512,7 +513,7 @@ void FilterDesignView::onBtnLoadFilter()
         //Replace old with new filter operator
         const auto filterLoadTemp = FilterIO::read_filter(path_from_utf8(path.toStdString()));
         if (!filterLoadTemp) {
-            qWarning() << filterLoadTemp.error().what();
+            mne::Log::warning("{}", filterLoadTemp.error().what());
             return;
         }
         updateGuiFromFilter(*filterLoadTemp);
@@ -522,7 +523,7 @@ void FilterDesignView::onBtnLoadFilter()
         filterParametersChanged();
 
     } else {
-        qDebug() << "Could not load filter.";
+        mne::Log::debug("Could not load filter.");
     }
 }
 

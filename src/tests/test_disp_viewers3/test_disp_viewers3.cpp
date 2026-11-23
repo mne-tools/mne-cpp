@@ -385,10 +385,10 @@ void TestDispViewers3::timeRulerAndOverviewBar_mapSamplesAndPaint()
     ruler.resize(800, TimeRulerWidget::kTotalH);
     ruler.setSfreq(1000.0);
     ruler.setFirstFileSample(100);
-    ruler.setEvents({TimeRulerEventMark{300, Qt::red, QStringLiteral("1")},
-                     TimeRulerEventMark{302, Qt::blue, QString()},
-                     TimeRulerEventMark{900, Qt::green, QStringLiteral("2")}});
-    ruler.setReferenceMarkers({TimeRulerReferenceMark{400, Qt::magenta, QStringLiteral("M1")}});
+    ruler.setEvents({TimeRulerEventMark{300, Qt::red, "1"},
+                     TimeRulerEventMark{302, Qt::blue, ""},
+                     TimeRulerEventMark{900, Qt::green, "2"}});
+    ruler.setReferenceMarkers({TimeRulerReferenceMark{400, Qt::magenta, "M1"}});
     ruler.show();
     // Every zoom level from 50 ms to minutes per tick, with seconds and with clock labels
     for (const float spp : {0.05f, 0.5f, 5.0f, 50.0f, 500.0f}) {
@@ -405,7 +405,7 @@ void TestDispViewers3::timeRulerAndOverviewBar_mapSamplesAndPaint()
 
     // An hour into the recording a 5-sample scroll still moves the event mark 10 px
     ruler.setSamplesPerPixel(0.5f);
-    ruler.setEvents({TimeRulerEventMark{3600200, Qt::red, QStringLiteral("1")}});
+    ruler.setEvents({TimeRulerEventMark{3600200, Qt::red, "1"}});
     ruler.setScrollSample(3600000.0f);
     const QImage before = ruler.grab().toImage();
     ruler.setScrollSample(3600005.0f);
@@ -423,8 +423,8 @@ void TestDispViewers3::timeRulerAndOverviewBar_mapSamplesAndPaint()
     bar.setFirstFileSample(0);
     bar.setLastFileSample(2000);
     bar.setViewport(500.0f, 200.0f);
-    bar.setEvents({ChannelRhiView::EventMarker{500, 1, Qt::red, QStringLiteral("1")}});
-    bar.setAnnotations({ChannelRhiView::AnnotationSpan{800, 1000, Qt::yellow, QStringLiteral("bad")}});
+    bar.setEvents({ChannelRhiView::EventMarker{500, 1, Qt::red, "1"}});
+    bar.setAnnotations({ChannelRhiView::AnnotationSpan{800, 1000, Qt::yellow, "bad"}});
     bar.show();
     QVERIFY(!bar.grab().isNull());
 

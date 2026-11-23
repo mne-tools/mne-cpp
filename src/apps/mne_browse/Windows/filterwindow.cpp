@@ -444,7 +444,7 @@ void FilterWindow::exportFilterPlot()
         if (fileName.contains(".svg")) {
             SvgWriter svgGen;
 
-            svgGen.setFileName(fileName);
+            svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_pFilterPlotScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
             //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));

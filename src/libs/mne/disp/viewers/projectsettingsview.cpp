@@ -20,6 +20,8 @@
 //=============================================================================================================
 
 #include "projectsettingsview.h"
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 #include "ui_projectsettingsview.h"
 
@@ -27,8 +29,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDir>
-#include <QDebug>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTime>
@@ -36,10 +36,58 @@
 #include <QFileDialog>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <ctime>
+#include <filesystem>
+#include <string>
+#include <system_error>
+#include <vector>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace mne::disp;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+std::filesystem::path toPath(const QString& path)
+{
+    return mne::path_from_utf8(path.toStdString());
+}
+
+/** The visible subdirectories of @p dir, sorted by name ignoring case as QDir lists them. */
+QStringList subdirectories(const QString& dir)
+{
+    std::vector<std::string> names;
+    std::error_code error;
+    for (const auto& entry : std::filesystem::directory_iterator(toPath(dir), error)) {
+        std::string name = mne::utf8_from_path(entry.path().filename());
+        if (entry.is_directory(error) && !name.starts_with('.')) {
+            names.push_back(std::move(name));
+        }
+    }
+    std::ranges::sort(names, [](const std::string& a, const std::string& b) {
+        return std::ranges::lexicographical_compare(a, b, {}, [](unsigned char c) { return std::tolower(c); }, [](unsigned char c) { return std::tolower(c); });
+    });
+    QStringList list;
+    for (const std::string& name : names) {
+        list.append(QString::fromStdString(name));
+    }
+    return list;
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -257,12 +305,12 @@ void ProjectSettingsView::deleteSubject()
 
         QString dirName = m_sDataPath + "/" + m_pUi->m_qComboBox_ProjectSelection->currentText() + "/" + m_pUi->m_qComboBox_SubjectSelection->currentText();
 
-        QDir dir(dirName);
-
-        bool result = dir.removeRecursively();
+        std::error_code error;
+        std::filesystem::remove_all(toPath(dirName), error);
+        const bool result = !error;
 
         if (!result)
-            qDebug() << "Could not remove all data from the subject folder!";
+            mne::Log::debug("Could not remove all data from the subject folder!");
         else
             m_pUi->m_qComboBox_SubjectSelection->removeItem(m_pUi->m_qComboBox_SubjectSelection->currentIndex());
     }
@@ -299,12 +347,12 @@ void ProjectSettingsView::deleteProject()
 
         QString dirName = m_sDataPath + "/" + m_pUi->m_qComboBox_ProjectSelection->currentText();
 
-        QDir dir(dirName);
-
-        bool result = dir.removeRecursively();
+        std::error_code error;
+        std::filesystem::remove_all(toPath(dirName), error);
+        const bool result = !error;
 
         if (!result)
-            qDebug() << "Could not remove all data from the project folder!";
+            mne::Log::debug("Could not remove all data from the project folder!");
         else
             m_pUi->m_qComboBox_ProjectSelection->removeItem(m_pUi->m_qComboBox_ProjectSelection->currentIndex());
     }
@@ -319,8 +367,8 @@ void ProjectSettingsView::addProject()
                                              tr("Add new Project:"), QLineEdit::Normal,
                                              tr("NewProject"), &ok);
     if (ok && !sProject.isEmpty()) {
-        if (!QDir(m_sDataPath + "/" + sProject).exists())
-            QDir().mkdir(m_sDataPath + "/" + sProject);
+        std::error_code error;
+        std::filesystem::create_directory(toPath(m_sDataPath + "/" + sProject), error);
 
         m_sCurrentProject = sProject;
         emit newProject(m_sCurrentProject);
@@ -341,8 +389,8 @@ void ProjectSettingsView::addSubject()
                                              tr("NewSubject"), &ok);
 
     if (ok && !sSubject.isEmpty()) {
-        if (!QDir(m_sDataPath + "/" + m_sCurrentProject + "/" + sSubject).exists())
-            QDir().mkdir(m_sDataPath + "/" + m_sCurrentProject + "/" + sSubject);
+        std::error_code error;
+        std::filesystem::create_directory(toPath(m_sDataPath + "/" + m_sCurrentProject + "/" + sSubject), error);
 
         m_sCurrentSubject = sSubject;
 
@@ -372,13 +420,7 @@ void ProjectSettingsView::scanForProjects()
     m_pUi->m_qComboBox_ProjectSelection->clear();
     m_sListProjects.clear();
 
-    QDir t_qDirData(m_sDataPath);
-
-    QFileInfoList t_qFileInfoList = t_qDirData.entryInfoList();
-    QFileInfoList::const_iterator it;
-    for (it = t_qFileInfoList.constBegin(); it != t_qFileInfoList.constEnd(); ++it)
-        if (it->isDir() && it->fileName() != "." && it->fileName() != "..")
-            m_sListProjects.append(it->fileName());
+    m_sListProjects = subdirectories(m_sDataPath);
 
     m_pUi->m_qComboBox_ProjectSelection->insertItems(0, m_sListProjects);
     m_pUi->m_qComboBox_ProjectSelection->setCurrentIndex(m_pUi->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
@@ -395,13 +437,7 @@ void ProjectSettingsView::scanForSubjects()
     m_pUi->m_qComboBox_SubjectSelection->clear();
     m_sListSubjects.clear();
 
-    QDir t_qDirProject(m_sDataPath + "/" + m_sCurrentProject);
-
-    QFileInfoList t_qFileInfoList = t_qDirProject.entryInfoList();
-    QFileInfoList::const_iterator it;
-    for (it = t_qFileInfoList.constBegin(); it != t_qFileInfoList.constEnd(); ++it)
-        if (it->isDir() && it->fileName() != "." && it->fileName() != "..")
-            m_sListSubjects.append(it->fileName());
+    m_sListSubjects = subdirectories(m_sDataPath + "/" + m_sCurrentProject);
 
     m_pUi->m_qComboBox_SubjectSelection->insertItems(0, m_sListSubjects);
 
@@ -444,7 +480,16 @@ void ProjectSettingsView::updateFileName(bool currentTime)
     QString sTimeStamp;
 
     if (currentTime) {
-        sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
+        const std::time_t seconds = std::time(nullptr);
+        std::tm local{};
+#ifdef _WIN32
+        localtime_s(&local, &seconds);
+#else
+        localtime_r(&seconds, &local);
+#endif
+        std::array<char, 32> stamp{};
+        std::strftime(stamp.data(), stamp.size(), "%y%m%d_%H%M%S", &local);
+        sTimeStamp = QString::fromLatin1(stamp.data());
     } else {
         sTimeStamp = "<YYMMDD_HMS>";
     }

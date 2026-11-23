@@ -16,11 +16,13 @@
 
 #include "brainsurface.h"
 
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QHash>
 #include <QMatrix3x3>
 #include <QMatrix4x4>
 
@@ -31,6 +33,9 @@
 #include <algorithm>
 #include <limits>
 #include <set>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace mne::disp
 {
@@ -42,9 +47,9 @@ uint32_t withAlpha(uint32_t color, uint32_t alpha)
     return (color & 0x00FFFFFFu) | ((alpha & 0xFFu) << 24);
 }
 
-uint32_t curvatureGray(const QVector<float>& curvature, int index)
+uint32_t curvatureGray(const std::vector<float>& curvature, int index)
 {
-    return (index >= 0 && index < curvature.size() && curvature[index] > 0.0f)
+    return (index >= 0 && index < std::ssize(curvature) && curvature[index] > 0.0f)
         ? 0x40u
         : 0xAAu;
 }
@@ -84,39 +89,39 @@ void BrainSurface::markGeometryDirty()
 
 GpuStream BrainSurface::geometryStream() const
 {
-    return {m_vertexData.constData(), quint32(m_vertexData.size() * sizeof(VertexData)), m_geometryGeneration};
+    return {m_vertexData.data(), quint32(m_vertexData.size() * sizeof(VertexData)), m_geometryGeneration};
 }
 
 GpuStream BrainSurface::colorStream() const
 {
-    return {m_colors.constData(), quint32(m_colors.size() * sizeof(uint32_t)), m_colorGeneration};
+    return {m_colors.data(), quint32(m_colors.size() * sizeof(uint32_t)), m_colorGeneration};
 }
 
 GpuStream BrainSurface::annotationStream() const
 {
-    return {m_annotationColors.constData(), quint32(m_annotationColors.size() * sizeof(uint32_t)), m_annotationGeneration};
+    return {m_annotationColors.data(), quint32(m_annotationColors.size() * sizeof(uint32_t)), m_annotationGeneration};
 }
 
 GpuStream BrainSurface::indexStream() const
 {
-    return {m_indexData.constData(), quint32(m_indexData.size() * sizeof(uint32_t)), m_indexGeneration};
+    return {m_indexData.data(), quint32(m_indexData.size() * sizeof(uint32_t)), m_indexGeneration};
 }
 
 //=============================================================================================================
 
-void BrainSurface::setGeometry(QVector<VertexData> vertices, QVector<uint32_t> indices, const QColor& color)
+void BrainSurface::setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const QColor& color)
 {
     m_vertexData = std::move(vertices);
     m_originalVertexData = m_vertexData;
     m_indexData = std::move(indices);
-    m_indexCount = m_indexData.size();
+    m_indexCount = static_cast<uint32_t>(m_indexData.size());
     ++m_indexGeneration;
     markGeometryDirty();
     m_defaultColor = color;
     m_baseColor = color;
     m_colors.resize(m_vertexData.size());
-    m_annotationColors.fill(0u, m_vertexData.size());
-    m_vertexLabelIds.fill(-1, m_vertexData.size());
+    m_annotationColors.assign(m_vertexData.size(), 0u);
+    m_vertexLabelIds.assign(m_vertexData.size(), -1);
     ++m_annotationGeneration;
     if (m_hasAnnotation)
         addAnnotation(m_annotation);
@@ -135,10 +140,10 @@ void BrainSurface::fromSurface(const mne::FsSurface& surf)
     for (int i = 0; i < curv.size(); ++i)
         m_curvature[i] = curv[i];
 
-    QVector<VertexData> vertices(rr.rows());
+    std::vector<VertexData> vertices(rr.rows());
     for (int i = 0; i < rr.rows(); ++i)
         vertices[i] = {QVector3D(rr(i, 0), rr(i, 1), rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
-    QVector<uint32_t> indices(tris.rows() * 3);
+    std::vector<uint32_t> indices(tris.rows() * 3);
     for (int i = 0; i < tris.rows(); ++i)
         for (int j = 0; j < 3; ++j)
             indices[3 * i + j] = tris(i, j);
@@ -156,10 +161,10 @@ void BrainSurface::fromBemSurface(const mne::MNEBemSurface& surf, const QColor& 
     if (nn.rows() != nVerts) {
         nn = mne::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
-    QVector<VertexData> vertices(nVerts);
+    std::vector<VertexData> vertices(nVerts);
     for (int i = 0; i < nVerts; ++i)
         vertices[i] = {QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
-    QVector<uint32_t> indices(surf.itris.rows() * 3);
+    std::vector<uint32_t> indices(surf.itris.rows() * 3);
     for (int i = 0; i < surf.itris.rows(); ++i)
         for (int j = 0; j < 3; ++j)
             indices[3 * i + j] = surf.itris(i, j);
@@ -175,10 +180,10 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen:
 {
     m_curvature.clear();
 
-    QVector<VertexData> verts(vertices.rows());
+    std::vector<VertexData> verts(vertices.rows());
     for (int i = 0; i < vertices.rows(); ++i)
         verts[i] = {QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2)), QVector3D(normals(i, 0), normals(i, 1), normals(i, 2))};
-    QVector<uint32_t> indices(triangles.rows() * 3);
+    std::vector<uint32_t> indices(triangles.rows() * 3);
     for (int i = 0; i < triangles.rows(); ++i)
         for (int j = 0; j < 3; ++j)
             indices[3 * i + j] = triangles(i, j);
@@ -190,7 +195,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen:
 Eigen::MatrixX3f BrainSurface::vertexPositions() const
 {
     Eigen::MatrixX3f rr(m_vertexData.size(), 3);
-    for (int i = 0; i < m_vertexData.size(); ++i) {
+    for (int i = 0; i < std::ssize(m_vertexData); ++i) {
         rr(i, 0) = m_vertexData[i].pos.x();
         rr(i, 1) = m_vertexData[i].pos.y();
         rr(i, 2) = m_vertexData[i].pos.z();
@@ -203,7 +208,7 @@ Eigen::MatrixX3f BrainSurface::vertexPositions() const
 Eigen::MatrixX3f BrainSurface::vertexNormals() const
 {
     Eigen::MatrixX3f nn(m_vertexData.size(), 3);
-    for (int i = 0; i < m_vertexData.size(); ++i) {
+    for (int i = 0; i < std::ssize(m_vertexData); ++i) {
         nn(i, 0) = m_vertexData[i].norm.x();
         nn(i, 1) = m_vertexData[i].norm.y();
         nn(i, 2) = m_vertexData[i].norm.z();
@@ -213,11 +218,11 @@ Eigen::MatrixX3f BrainSurface::vertexNormals() const
 
 //=============================================================================================================
 
-bool BrainSurface::loadAnnotation(const QString& path)
+bool BrainSurface::loadAnnotation(const std::filesystem::path& path)
 {
     mne::FsAnnotation annotation;
-    if (!mne::FsAnnotation::read(path.toStdU16String(), annotation)) {
-        qWarning() << "BrainSurface: Failed to load annotation from" << path;
+    if (!mne::FsAnnotation::read(path, annotation)) {
+        mne::Log::warning("BrainSurface: Failed to load annotation from {}", mne::utf8_from_path(path));
         return false;
     }
     addAnnotation(annotation);
@@ -233,17 +238,18 @@ void BrainSurface::addAnnotation(const mne::FsAnnotation& annotation)
     const Eigen::VectorXi& vertices = m_annotation.getVertices();
     const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
     const mne::FsColortable& ct = m_annotation.getColortable();
-    QHash<int, uint32_t> labelColors;
+    std::unordered_map<int, uint32_t> labelColors;
     for (int c = 0; c < ct.numEntries; ++c)
-        labelColors.insert(ct.table(c, 4), packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2)));
-    m_vertexLabelIds.fill(-1, m_vertexData.size());
-    m_annotationColors.fill(0u, m_vertexData.size());
+        labelColors.insert_or_assign(ct.table(c, 4), packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2)));
+    m_vertexLabelIds.assign(m_vertexData.size(), -1);
+    m_annotationColors.assign(m_vertexData.size(), 0u);
     for (int i = 0; i < labelIds.rows(); ++i) {
         const int v = vertices(i);
-        if (v < 0 || v >= m_vertexData.size())
+        if (v < 0 || v >= std::ssize(m_vertexData))
             continue;
         m_vertexLabelIds[v] = labelIds(i);
-        m_annotationColors[v] = labelColors.value(labelIds(i), 0u);
+        const auto color = labelColors.find(labelIds(i));
+        m_annotationColors[v] = color == labelColors.end() ? 0u : color->second;
     }
     ++m_annotationGeneration;
 }
@@ -255,7 +261,7 @@ void BrainSurface::labelElements(int verticesPerElement)
     if (verticesPerElement <= 0)
         return;
     // Alpha 0 keeps element keys apart from atlas colours, which are opaque
-    for (int v = 0; v < m_annotationColors.size(); ++v) {
+    for (int v = 0; v < std::ssize(m_annotationColors); ++v) {
         const uint32_t key = uint32_t(v / verticesPerElement + 1);
         m_annotationColors[v] = packABGR(key & 0xFFu, (key >> 8) & 0xFFu, (key >> 16) & 0xFFu, 0u);
     }
@@ -279,14 +285,14 @@ void BrainSurface::setVisualizationMode(VisualizationMode mode)
 
 //=============================================================================================================
 
-void BrainSurface::applySourceEstimateColors(const QVector<uint32_t>& colors)
+void BrainSurface::applySourceEstimateColors(const std::vector<uint32_t>& colors)
 {
     m_visMode = ModeSourceEstimate;
     m_stcColors = colors;
 
     // Preserve the neutral curvature grey in alpha so Surface mode can still render the light/dark
     // cortex while RGB carries the source-estimate colours.
-    const int n = qMin(colors.size(), m_colors.size());
+    const int n = static_cast<int>(std::min(colors.size(), m_colors.size()));
     for (int i = 0; i < n; ++i) {
         m_colors[i] = overCortex(colors[i], curvatureGray(m_curvature, i));
     }
@@ -322,17 +328,17 @@ void BrainSurface::setColor(const QColor& color)
 void BrainSurface::updateVertexColors()
 {
     // Cortex: curvature grey; other surfaces (BEM, sensors, ...): the base colour
-    if (!m_curvature.isEmpty() && m_curvature.size() == m_colors.size()) {
-        for (int i = 0; i < m_colors.size(); ++i) {
+    if (!m_curvature.empty() && m_curvature.size() == m_colors.size()) {
+        for (int i = 0; i < std::ssize(m_colors); ++i) {
             const uint32_t val = curvatureGray(m_curvature, i);
             m_colors[i] = packABGR(val, val, val, val);
         }
     } else {
-        m_colors.fill(packABGR(m_baseColor.red(), m_baseColor.green(), m_baseColor.blue(), m_baseColor.alpha()));
+        std::ranges::fill(m_colors, packABGR(m_baseColor.red(), m_baseColor.green(), m_baseColor.blue(), m_baseColor.alpha()));
     }
 
     // Source-estimate colours stay in the colour stream: each view selects its overlay by uniform
-    const int n = qMin(m_stcColors.size(), m_colors.size());
+    const int n = static_cast<int>(std::min(m_stcColors.size(), m_colors.size()));
     for (int i = 0; i < n; ++i) {
         m_colors[i] = overCortex(m_stcColors[i], curvatureGray(m_curvature, i));
     }
@@ -419,7 +425,7 @@ std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
     std::vector<std::set<int>> tempNeighbors(m_vertexData.size());
 
     // Triangles are stored in m_indexData as triplets
-    for (int i = 0; i + 2 < m_indexData.size(); i += 3) {
+    for (int i = 0; i + 2 < std::ssize(m_indexData); i += 3) {
         int v0 = m_indexData[i];
         int v1 = m_indexData[i + 1];
         int v2 = m_indexData[i + 2];
@@ -452,7 +458,7 @@ std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
 Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
 {
     Eigen::MatrixX3f mat(m_vertexData.size(), 3);
-    for (int i = 0; i < m_vertexData.size(); ++i) {
+    for (int i = 0; i < std::ssize(m_vertexData); ++i) {
         mat(i, 0) = m_vertexData[i].pos.x();
         mat(i, 1) = m_vertexData[i].pos.y();
         mat(i, 2) = m_vertexData[i].pos.z();
@@ -471,7 +477,7 @@ void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
         return;
     }
 
-    if (m_vertexData.isEmpty()) {
+    if (m_vertexData.empty()) {
         min = QVector3D(0, 0, 0);
         max = QVector3D(0, 0, 0);
         return;
@@ -648,7 +654,7 @@ const BrainSurface::Bvh& BrainSurface::bvh() const
 bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const
 {
     vertexIdx = -1;
-    if (m_vertexData.isEmpty() || m_indexData.size() < 3)
+    if (m_vertexData.empty() || m_indexData.size() < 3)
         return false;
 
     const Bvh& tree = bvh();
@@ -747,9 +753,9 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
 
 //=============================================================================================================
 
-QString BrainSurface::getAnnotationLabel(int vertexIdx) const
+std::string BrainSurface::getAnnotationLabel(int vertexIdx) const
 {
-    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexLabelIds.size()) {
+    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= std::ssize(m_vertexLabelIds)) {
         return "";
     }
     const int labelId = m_vertexLabelIds[vertexIdx];
@@ -759,10 +765,10 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
     const mne::FsColortable& ct = m_annotation.getColortable();
     for (int i = 0; i < ct.numEntries; ++i) {
         if (ct.table(i, 4) == labelId) {
-            QString name = QString::fromStdString(ct.struct_names[static_cast<std::size_t>(i)]);
+            std::string name = ct.struct_names[static_cast<std::size_t>(i)];
             // Remove null characters and trailing whitespace that might cause "strange signs"
-            while (!name.isEmpty() && (name.endsWith('\0') || name.endsWith(' '))) {
-                name.chop(1);
+            while (!name.empty() && (name.back() == '\0' || name.back() == ' ')) {
+                name.pop_back();
             }
             return name;
         }
@@ -773,7 +779,7 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
 
 int BrainSurface::getAnnotationLabelId(int vertexIdx) const
 {
-    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexLabelIds.size())
+    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= std::ssize(m_vertexLabelIds))
         return -1;
     return m_vertexLabelIds[vertexIdx];
 }
@@ -796,7 +802,7 @@ void BrainSurface::setSelectedVertexRange(int start, int count)
 
 std::optional<uint32_t> BrainSurface::selectedLabel() const
 {
-    if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0 && m_selectedVertexStart < m_annotationColors.size())
+    if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0 && m_selectedVertexStart < std::ssize(m_annotationColors))
         return m_annotationColors[m_selectedVertexStart];
     if (m_selected && m_selectedRegionId != -1 && m_hasAnnotation) {
         const mne::FsColortable& ct = m_annotation.getColortable();

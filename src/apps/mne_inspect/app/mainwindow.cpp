@@ -963,7 +963,12 @@ void MainWindow::setupConnections()
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::electrodesChanged, m_brainView, [this]() { m_brainView->update(); });
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::contactPicked, m_brainView, [this]() { m_brainView->update(); });
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::valuesChanged, m_brainView,
-            [this]() { m_brainView->setElectrodeValues(m_electrodesPlugin.values()); });
+            [this]() {
+                std::map<std::string, float> values;
+                for (auto it = m_electrodesPlugin.values().cbegin(); it != m_electrodesPlugin.values().cend(); ++it)
+                    values.emplace(it.key().toStdString(), it.value());
+                m_brainView->setElectrodeValues(values);
+            });
     connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
         mne::disp::PickResult pick;
         pick.kind = mne::disp::PickKind::ElectrodeContact;
@@ -1037,7 +1042,7 @@ void MainWindow::setupConnections()
     });
 
     // Surface type
-    connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
+    connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, [this](const QString& text) { m_brainView->setActiveSurface(text.toStdString()); });
 
     // Inflated surface logic
     connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
@@ -1053,13 +1058,13 @@ void MainWindow::setupConnections()
     });
 
     // Shaders
-    connect(m_shaderCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setShaderMode);
+    connect(m_shaderCombo, &QComboBox::currentTextChanged, m_brainView, [this](const QString& text) { m_brainView->setShaderMode(text.toStdString()); });
     connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
         if (m_linkShadersCheck->isChecked()) {
             m_bemShaderCombo->setCurrentText(text);
         }
     });
-    connect(m_bemShaderCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setBemShaderMode);
+    connect(m_bemShaderCombo, &QComboBox::currentTextChanged, m_brainView, [this](const QString& text) { m_brainView->setBemShaderMode(text.toStdString()); });
     connect(m_linkShadersCheck, &QCheckBox::toggled, [this](bool checked) {
         m_bemShaderCombo->setEnabled(!checked);
         if (checked) {
@@ -1069,7 +1074,7 @@ void MainWindow::setupConnections()
 
     // Overlay
     connect(m_overlayCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
-        m_brainView->setVisualizationMode(text);
+        m_brainView->setVisualizationMode(text.toStdString());
         if (text != "Source Estimate" && m_stcTimer->isActive()) {
             m_stcTimer->stop();
             m_playButton->setText("Play");
@@ -1121,7 +1126,7 @@ void MainWindow::setupConnections()
         if (isMulti) {
             for (int i = 0; i < count; ++i) {
                 const int preset = i; // defaultForIndex assigns preset = index
-                m_editTargetCombo->addItem(multiViewPresetName(preset), i);
+                m_editTargetCombo->addItem(QString::fromStdString(multiViewPresetName(preset)), i);
             }
             m_editTargetCombo->setCurrentIndex(0);
             m_brainView->setVisualizationEditTarget(0);
@@ -1321,7 +1326,7 @@ void MainWindow::setupConnections()
         m_stcProgressBar->setValue(0);
         m_stcProgressBar->show();
 
-        m_brainView->loadSourceEstimate(lhPath, rhPath);
+        m_brainView->loadSourceEstimate(lhPath.toStdU16String(), rhPath.toStdU16String());
     });
 
     connect(m_brainView, &BrainView::stcLoadingProgress, [this](int percent, const QString& message) {
@@ -1374,7 +1379,7 @@ void MainWindow::setupConnections()
         }
     });
 
-    connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setSourceColormap);
+    connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, [this](const QString& text) { m_brainView->setSourceColormap(text.toStdString()); });
 
     auto updateThresholds = [this]() {
         m_brainView->setSourceThresholds(
@@ -1504,7 +1509,7 @@ void MainWindow::setupConnections()
             if (path.isEmpty())
                 return;
 
-            if (m_brainView->loadSensors(path)) {
+            if (m_brainView->loadSensors(path.toStdU16String())) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
                 m_sensorGroup->setEnabled(true);
                 m_showMegCheck->setEnabled(true);
@@ -1519,7 +1524,7 @@ void MainWindow::setupConnections()
         if (path.isEmpty())
             return;
 
-        if (m_brainView->loadSensors(path)) {
+        if (m_brainView->loadSensors(path.toStdU16String())) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Digitizer));
             m_sensorGroup->setEnabled(true);
             m_showMegCheck->setEnabled(true);
@@ -1540,14 +1545,14 @@ void MainWindow::setupConnections()
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty())
                 return;
-            m_brainView->loadTransformation(path);
+            m_brainView->loadTransformation(path.toStdU16String());
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
         });
 #else
         QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
         if (path.isEmpty())
             return;
-        m_brainView->loadTransformation(path);
+        m_brainView->loadTransformation(path.toStdU16String());
         trackLoadedFile(path, static_cast<int>(MnaFileRole::Transform));
 #endif
     });
@@ -1590,8 +1595,8 @@ void MainWindow::setupConnections()
         QString fileName = helmetFileMap.value(text, "306m.fif");
         QString helmetPath = QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/" + fileName;
 
-        m_brainView->setMegHelmetOverride(helmetPath);
-        m_brainView->loadMegHelmetSurface(helmetPath);
+        m_brainView->setMegHelmetOverride(helmetPath.toStdU16String());
+        m_brainView->loadMegHelmetSurface(helmetPath.toStdU16String());
     });
 
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
@@ -1605,7 +1610,7 @@ void MainWindow::setupConnections()
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty())
                 return;
-            if (m_brainView->loadDipoles(path)) {
+            if (m_brainView->loadDipoles(path.toStdU16String())) {
                 m_dipoleGroup->setEnabled(true);
                 m_showDipoleCheck->setEnabled(true);
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::Custom));
@@ -1615,7 +1620,7 @@ void MainWindow::setupConnections()
         QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty())
             return;
-        if (m_brainView->loadDipoles(path)) {
+        if (m_brainView->loadDipoles(path.toStdU16String())) {
             m_dipoleGroup->setEnabled(true);
             m_showDipoleCheck->setEnabled(true);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Custom));
@@ -1634,7 +1639,7 @@ void MainWindow::setupConnections()
             QString path = wasmSaveToTemp(fileName, fileContent);
             if (path.isEmpty())
                 return;
-            if (m_brainView->loadSourceSpace(path)) {
+            if (m_brainView->loadSourceSpace(path.toStdU16String())) {
                 trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
                 m_srcSpaceGroup->setEnabled(true);
                 m_showSrcSpaceCheck->setEnabled(true);
@@ -1647,7 +1652,7 @@ void MainWindow::setupConnections()
                                                     "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
         if (path.isEmpty())
             return;
-        if (m_brainView->loadSourceSpace(path)) {
+        if (m_brainView->loadSourceSpace(path.toStdU16String())) {
             trackLoadedFile(path, static_cast<int>(MnaFileRole::SourceSpace));
             m_srcSpaceGroup->setEnabled(true);
             m_showSrcSpaceCheck->setEnabled(true);
@@ -1665,7 +1670,7 @@ void MainWindow::setupConnections()
         m_brainView->setNetworkThreshold(value / 100.0);
     });
     connect(m_networkColormapCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
-        m_brainView->setNetworkColormap(text);
+        m_brainView->setNetworkColormap(text.toStdString());
     });
 
     // ── Evoked ─────────────────────────────────────────────────────────
@@ -1680,23 +1685,24 @@ void MainWindow::setupConnections()
             if (path.isEmpty())
                 return;
 
-            QStringList sets = BrainView::probeEvokedSets(path);
+            const std::vector<std::string> sets = BrainView::probeEvokedSets(path.toStdU16String());
             m_evokedSetCombo->blockSignals(true);
             m_evokedSetCombo->clear();
-            if (sets.isEmpty()) {
+            if (sets.empty()) {
                 m_evokedSetCombo->addItem("(no evoked sets found)");
                 m_evokedSetCombo->setEnabled(false);
                 m_evokedSetCombo->blockSignals(false);
                 return;
             }
-            m_evokedSetCombo->addItems(sets);
+            for (const std::string& set : sets)
+                m_evokedSetCombo->addItem(QString::fromStdString(set));
             m_evokedSetCombo->setEnabled(sets.size() > 1);
             m_evokedSetCombo->setCurrentIndex(0);
             m_evokedSetCombo->blockSignals(false);
 
             m_evokedSetCombo->setProperty("evokedPath", path);
             trackLoadedFile(path, static_cast<int>(MnaFileRole::Evoked));
-            m_brainView->loadSensorField(path, 0);
+            m_brainView->loadSensorField(path.toStdU16String(), 0);
         });
 #else
         QString path = QFileDialog::getOpenFileName(this,
@@ -1706,16 +1712,17 @@ void MainWindow::setupConnections()
             return;
 
         // Probe available evoked sets and populate combo
-        QStringList sets = BrainView::probeEvokedSets(path);
+        const std::vector<std::string> sets = BrainView::probeEvokedSets(path.toStdU16String());
         m_evokedSetCombo->blockSignals(true);
         m_evokedSetCombo->clear();
-        if (sets.isEmpty()) {
+        if (sets.empty()) {
             m_evokedSetCombo->addItem("(no evoked sets found)");
             m_evokedSetCombo->setEnabled(false);
             m_evokedSetCombo->blockSignals(false);
             return;
         }
-        m_evokedSetCombo->addItems(sets);
+        for (const std::string& set : sets)
+            m_evokedSetCombo->addItem(QString::fromStdString(set));
         m_evokedSetCombo->setEnabled(sets.size() > 1);
         m_evokedSetCombo->setCurrentIndex(0);
         m_evokedSetCombo->blockSignals(false);
@@ -1725,7 +1732,7 @@ void MainWindow::setupConnections()
         trackLoadedFile(path, static_cast<int>(MnaFileRole::Evoked));
 
         // Load the first evoked set
-        m_brainView->loadSensorField(path, 0);
+        m_brainView->loadSensorField(path.toStdU16String(), 0);
 #endif
     });
 
@@ -1736,7 +1743,7 @@ void MainWindow::setupConnections()
         QString path = m_evokedSetCombo->property("evokedPath").toString();
         if (path.isEmpty())
             return;
-        m_brainView->loadSensorField(path, index);
+        m_brainView->loadSensorField(path.toStdU16String(), index);
     });
 
     connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numTimePoints, int initialTimePoint) {
@@ -1827,7 +1834,7 @@ void MainWindow::setupConnections()
             m_sensorStreamBtn->setText("Start Sensor Streaming");
         } else {
             QString modality = m_sensorStreamModalityCombo->currentText();
-            m_brainView->startRealtimeSensorStreaming(modality);
+            m_brainView->startRealtimeSensorStreaming(modality.toStdString());
             if (m_brainView->isRealtimeSensorStreaming()) {
                 m_sensorStreamBtn->setText("Stop Sensor Streaming");
             }
@@ -1843,7 +1850,7 @@ void MainWindow::setupConnections()
     });
 
     connect(m_sensorStreamColormapCombo, &QComboBox::currentTextChanged, [this](const QString& text) {
-        m_brainView->setRealtimeSensorColormap(text);
+        m_brainView->setRealtimeSensorColormap(text.toStdString());
     });
 
     // ── Sync UI widgets to saved BrainView state ──
@@ -1854,7 +1861,7 @@ void MainWindow::setupConnections()
     const int target = m_brainView->visualizationEditTarget();
 
     // FsSurface type
-    const QString savedSurf = m_brainView->activeSurfaceForTarget(target);
+    const QString savedSurf = QString::fromStdString(m_brainView->activeSurfaceForTarget(target));
     if (m_surfCombo->findText(savedSurf) >= 0) {
         m_surfCombo->blockSignals(true);
         m_surfCombo->setCurrentText(savedSurf);
@@ -1885,14 +1892,14 @@ void MainWindow::setupConnections()
     m_innerCheck->blockSignals(false);
 
     // Shader
-    const QString savedShader = m_brainView->shaderModeForTarget(target);
+    const QString savedShader = QString::fromStdString(m_brainView->shaderModeForTarget(target));
     if (m_shaderCombo->findText(savedShader) >= 0) {
         m_shaderCombo->blockSignals(true);
         m_shaderCombo->setCurrentText(savedShader);
         m_shaderCombo->blockSignals(false);
     }
 
-    const QString savedBemShader = m_brainView->bemShaderModeForTarget(target);
+    const QString savedBemShader = QString::fromStdString(m_brainView->bemShaderModeForTarget(target));
     if (m_bemShaderCombo->findText(savedBemShader) >= 0) {
         m_bemShaderCombo->blockSignals(true);
         m_bemShaderCombo->setCurrentText(savedBemShader);
@@ -1900,7 +1907,7 @@ void MainWindow::setupConnections()
     }
 
     // Overlay
-    const QString savedOverlay = m_brainView->overlayModeForTarget(target);
+    const QString savedOverlay = QString::fromStdString(m_brainView->overlayModeForTarget(target));
     if (m_overlayCombo->findText(savedOverlay) >= 0) {
         m_overlayCombo->blockSignals(true);
         m_overlayCombo->setCurrentText(savedOverlay);
@@ -2002,7 +2009,7 @@ void MainWindow::setupConnections()
     auto toggleMriPlane = [this](int planeIdx, bool visible) {
         const auto ids = MRISLICESPLUGIN::MriSlicesPlugin::sceneLayerIds();
         if (planeIdx >= 0 && planeIdx < 3) {
-            m_scene.setLayerVisible(ids[planeIdx], visible);
+            m_scene.setLayerVisible(ids[planeIdx].toStdString(), visible);
             m_brainView->setSliceVisible(planeIdx, visible);
         }
     };
@@ -2127,7 +2134,7 @@ void MainWindow::loadInitialData(const QString& subjectPath,
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
         Log::info("Auto-loading digitizer from: {}", digitizerPath.toStdString());
         trackLoadedFile(digitizerPath, static_cast<int>(MnaFileRole::Digitizer));
-        if (m_brainView->loadSensors(digitizerPath)) {
+        if (m_brainView->loadSensors(digitizerPath.toStdU16String())) {
             m_sensorGroup->setEnabled(true);
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
@@ -2160,14 +2167,14 @@ void MainWindow::loadInitialData(const QString& subjectPath,
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
         Log::info("Auto-loading transformation from: {}", transPath.toStdString());
         trackLoadedFile(transPath, static_cast<int>(MnaFileRole::Transform));
-        m_brainView->loadTransformation(transPath);
+        m_brainView->loadTransformation(transPath.toStdU16String());
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
         Log::info("Auto-loading source space from: {}", srcSpacePath.toStdString());
         trackLoadedFile(srcSpacePath, static_cast<int>(MnaFileRole::SourceSpace));
-        if (m_brainView->loadSourceSpace(srcSpacePath)) {
+        if (m_brainView->loadSourceSpace(srcSpacePath.toStdU16String())) {
             m_srcSpaceGroup->setEnabled(true);
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
@@ -2203,18 +2210,19 @@ void MainWindow::loadInitialData(const QString& subjectPath,
         Log::info("Auto-loading evoked from: {}", evokedPath.toStdString());
         trackLoadedFile(evokedPath, static_cast<int>(MnaFileRole::Evoked));
 
-        QStringList sets = BrainView::probeEvokedSets(evokedPath);
+        const std::vector<std::string> sets = BrainView::probeEvokedSets(evokedPath.toStdU16String());
         m_evokedSetCombo->blockSignals(true);
         m_evokedSetCombo->clear();
-        if (!sets.isEmpty()) {
-            m_evokedSetCombo->addItems(sets);
+        if (!sets.empty()) {
+            for (const std::string& set : sets)
+                m_evokedSetCombo->addItem(QString::fromStdString(set));
             m_evokedSetCombo->setEnabled(sets.size() > 1);
             m_evokedSetCombo->setCurrentIndex(0);
         }
         m_evokedSetCombo->blockSignals(false);
         m_evokedSetCombo->setProperty("evokedPath", evokedPath);
 
-        m_brainView->loadSensorField(evokedPath, 0);
+        m_brainView->loadSensorField(evokedPath.toStdU16String(), 0);
     }
 }
 
@@ -2364,19 +2372,19 @@ void MainWindow::syncUIToEditTarget(int target)
     // Block signals to avoid recursive updates.
 
     m_surfCombo->blockSignals(true);
-    m_surfCombo->setCurrentText(m_brainView->activeSurfaceForTarget(target));
+    m_surfCombo->setCurrentText(QString::fromStdString(m_brainView->activeSurfaceForTarget(target)));
     m_surfCombo->blockSignals(false);
 
     m_shaderCombo->blockSignals(true);
-    m_shaderCombo->setCurrentText(m_brainView->shaderModeForTarget(target));
+    m_shaderCombo->setCurrentText(QString::fromStdString(m_brainView->shaderModeForTarget(target)));
     m_shaderCombo->blockSignals(false);
 
     m_bemShaderCombo->blockSignals(true);
-    m_bemShaderCombo->setCurrentText(m_brainView->bemShaderModeForTarget(target));
+    m_bemShaderCombo->setCurrentText(QString::fromStdString(m_brainView->bemShaderModeForTarget(target)));
     m_bemShaderCombo->blockSignals(false);
 
     m_overlayCombo->blockSignals(true);
-    m_overlayCombo->setCurrentText(m_brainView->overlayModeForTarget(target));
+    m_overlayCombo->setCurrentText(QString::fromStdString(m_brainView->overlayModeForTarget(target)));
     m_overlayCombo->blockSignals(false);
 
     // Sync camera preset combo
@@ -2634,7 +2642,7 @@ void MainWindow::importMnaProject(const QString& path)
                             Log::info("Imported BEM: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::Digitizer:
-                            if (m_brainView->loadSensors(filePath)) {
+                            if (m_brainView->loadSensors(filePath.toStdU16String())) {
                                 m_sensorGroup->setEnabled(true);
                                 m_showMegCheck->setEnabled(true);
                                 m_showEegCheck->setEnabled(true);
@@ -2645,11 +2653,11 @@ void MainWindow::importMnaProject(const QString& path)
                             }
                             break;
                         case MnaFileRole::Transform:
-                            m_brainView->loadTransformation(filePath);
+                            m_brainView->loadTransformation(filePath.toStdU16String());
                             Log::info("Imported transformation: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::SourceSpace:
-                            if (m_brainView->loadSourceSpace(filePath)) {
+                            if (m_brainView->loadSourceSpace(filePath.toStdU16String())) {
                                 m_srcSpaceGroup->setEnabled(true);
                                 m_showSrcSpaceCheck->setEnabled(true);
                                 m_showSrcSpaceCheck->setChecked(false);
@@ -2662,17 +2670,18 @@ void MainWindow::importMnaProject(const QString& path)
                             Log::info("Imported STC: {}", refPath.toStdString());
                             break;
                         case MnaFileRole::Evoked: {
-                            QStringList sets = BrainView::probeEvokedSets(filePath);
+                            const std::vector<std::string> sets = BrainView::probeEvokedSets(filePath.toStdU16String());
                             m_evokedSetCombo->blockSignals(true);
                             m_evokedSetCombo->clear();
-                            if (!sets.isEmpty()) {
-                                m_evokedSetCombo->addItems(sets);
+                            if (!sets.empty()) {
+                                for (const std::string& set : sets)
+                                    m_evokedSetCombo->addItem(QString::fromStdString(set));
                                 m_evokedSetCombo->setEnabled(sets.size() > 1);
                                 m_evokedSetCombo->setCurrentIndex(0);
                             }
                             m_evokedSetCombo->blockSignals(false);
                             m_evokedSetCombo->setProperty("evokedPath", filePath);
-                            m_brainView->loadSensorField(filePath, 0);
+                            m_brainView->loadSensorField(filePath.toStdU16String(), 0);
                             Log::info("Imported evoked: {}", refPath.toStdString());
                             break;
                         }

@@ -57,15 +57,15 @@ namespace
 {
 
 // The artifact view adds an "Active" switch to the peak-to-peak limits; no limits switch the rejection off
-std::map<std::string, double> toRejection(const QMap<QString, double>& thresholds)
+std::map<std::string, double> toRejection(const std::map<std::string, double>& thresholds)
 {
     std::map<std::string, double> result;
-    if (thresholds.value("Active", 0.0) == 0.0) {
+    if (const auto active = thresholds.find("Active"); active == thresholds.end() || active->second == 0.0) {
         return result;
     }
-    for (auto it = thresholds.cbegin(); it != thresholds.cend(); ++it) {
-        if (it.key() != "Active") {
-            result.emplace(it.key().toStdString(), it.value());
+    for (const auto& [key, value] : thresholds) {
+        if (key != "Active") {
+            result.emplace(key, value);
         }
     }
     return result;
@@ -160,7 +160,7 @@ void Averaging::update(mne::scan::Measurement::SPtr pMeasurement)
             // Init the stim channels
             for (qint32 i = 0; i < std::ssize(m_pFiffInfo->chs); ++i) {
                 if (m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH) {
-                    m_mapStimChsIndexNames.insert(QString::fromStdString(m_pFiffInfo->chs[i].ch_name), i);
+                    m_mapStimChsIndexNames.insert_or_assign(m_pFiffInfo->chs[i].ch_name, i);
                 }
             }
         }
@@ -248,11 +248,12 @@ void Averaging::initPluginControlWidgets()
         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
 
         // Init the averaging settings
-        int iCurrentStimChIdx = m_mapStimChsIndexNames.value(pAveragingSettingsView->getCurrentStimCh());
+        const auto currentStimCh = m_mapStimChsIndexNames.find(pAveragingSettingsView->getCurrentStimCh());
+        int iCurrentStimChIdx = currentStimCh != m_mapStimChsIndexNames.end() ? currentStimCh->second : 0;
 
-        if (!m_mapStimChsIndexNames.contains(pAveragingSettingsView->getCurrentStimCh())) {
+        if (currentStimCh == m_mapStimChsIndexNames.end()) {
             Log::debug("Averaging::run() - Current stim channel is not present in data. Setting to first found stim channel instead.");
-            iCurrentStimChIdx = m_mapStimChsIndexNames.first();
+            iCurrentStimChIdx = m_mapStimChsIndexNames.empty() ? 0 : m_mapStimChsIndexNames.begin()->second;
         }
 
         QMutexLocker locker(&m_qMutex);
@@ -281,10 +282,11 @@ void Averaging::onChangeNumAverages(qint32 numAve)
 
 //=============================================================================================================
 
-void Averaging::onChangeStimChannel(const QString& sStimCh)
+void Averaging::onChangeStimChannel(const std::string& sStimCh)
 {
     QMutexLocker locker(&m_qMutex);
-    m_settings.trigger_channel = m_mapStimChsIndexNames.value(sStimCh, -1);
+    const auto stimCh = m_mapStimChsIndexNames.find(sStimCh);
+    m_settings.trigger_channel = stimCh != m_mapStimChsIndexNames.end() ? stimCh->second : -1;
     m_bSettingsChanged = true;
 }
 
@@ -322,7 +324,7 @@ void Averaging::onChangePostStim(qint32 mseconds)
 
 //=============================================================================================================
 
-void Averaging::onChangeArtifactThreshold(const QMap<QString, double>& mapThresholds)
+void Averaging::onChangeArtifactThreshold(const std::map<std::string, double>& mapThresholds)
 {
     QMutexLocker locker(&m_qMutex);
     m_settings.reject = toRejection(mapThresholds);

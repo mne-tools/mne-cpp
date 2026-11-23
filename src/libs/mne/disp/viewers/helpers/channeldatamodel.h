@@ -35,9 +35,6 @@
 
 #include <QObject>
 #include <QColor>
-#include <QMap>
-#include <QVector>
-#include <QReadWriteLock>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -49,7 +46,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <shared_mutex>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -84,8 +85,8 @@ enum class DetrendMode
  */
 struct ChannelDisplayInfo
 {
-    QString name;                  /**< Channel name for the label. */
-    QString typeLabel;             /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
+    std::string name;              /**< Channel name for the label. */
+    std::string typeLabel;         /**< Short type string: "MEG grad", "MEG mag", "EEG", "EOG", "ECG", "EMG", "STIM", "MISC". */
     QColor color;                  /**< Line colour to use in the GPU renderer. */
     float amplitudeMax;            /**< Amplitude value (physical units) that maps to full row height. */
     bool bad;                      /**< Whether the channel is currently marked bad. */
@@ -143,7 +144,7 @@ public:
      *
      * @param[in] scaleMap  Map from FIFF kind to amplitude max.
      */
-    void setScaleMap(const QMap<qint32, float>& scaleMap);
+    void setScaleMap(const std::map<int, float>& scaleMap);
 
     //=============================================================================================================
     /**
@@ -151,7 +152,7 @@ public:
      *
      * @param[in] scaleMap  Map from channel-type name (e.g. "MEG_grad") to amplitude max.
      */
-    void setScaleMapFromStrings(const QMap<QString, double>& scaleMap);
+    void setScaleMapFromStrings(const std::map<std::string, double>& scaleMap);
 
     //=============================================================================================================
     /**
@@ -167,7 +168,7 @@ public:
      *
      * @param[in] virtualChannels  Display metadata for each appended virtual channel.
      */
-    void setVirtualChannels(const QVector<ChannelDisplayInfo>& virtualChannels);
+    void setVirtualChannels(const std::vector<ChannelDisplayInfo>& virtualChannels);
 
     //=========================================================================================================
     /**
@@ -265,11 +266,11 @@ public:
      *                            (= firstSample, returned for the UBO uniform).
      * @return Flat float array: [x0, y0,  x1, y1, ...] where x is offset from vboFirstSample.
      */
-    QVector<float> decimatedVertices(int channelIdx,
-                                     int firstSample,
-                                     int lastSample,
-                                     int pixelWidth,
-                                     int& vboFirstSample) const;
+    std::vector<float> decimatedVertices(int channelIdx,
+                                         int firstSample,
+                                         int lastSample,
+                                         int pixelWidth,
+                                         int& vboFirstSample) const;
 
     //=========================================================================================================
     /**
@@ -299,20 +300,20 @@ private:
     void rebuildDisplayInfo();
     float amplitudeMaxForChannel(int ch) const;
     QColor colorForChannel(int ch) const;
-    QString typeLabelForChannel(int ch) const;
+    std::string typeLabelForChannel(int ch) const;
 
-    mutable QReadWriteLock m_lock;
+    mutable std::shared_mutex m_lock;
 
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo;
-    QVector<QVector<float>> m_channelData; // [ch][sample]
+    std::vector<std::vector<float>> m_channelData; // [ch][sample]
     int m_firstSample = 0;
     int m_maxStoredSamples = 0; // 0 = unlimited
 
-    QMap<qint32, float> m_scaleMap;
+    std::map<int, float> m_scaleMap;
     QColor m_signalColor{Qt::darkGreen};
 
-    QVector<ChannelDisplayInfo> m_virtualDisplayInfo;
-    QVector<ChannelDisplayInfo> m_displayInfo; // pre-computed, rebuild on meta change
+    std::vector<ChannelDisplayInfo> m_virtualDisplayInfo;
+    std::vector<ChannelDisplayInfo> m_displayInfo; // pre-computed, rebuild on meta change
     DetrendMode m_detrendMode = DetrendMode::None;
 };
 

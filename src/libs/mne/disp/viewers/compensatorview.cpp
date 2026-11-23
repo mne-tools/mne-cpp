@@ -28,7 +28,6 @@
 #include <QGridLayout>
 #include <QSignalMapper>
 #include <QSettings>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -84,7 +83,7 @@ void CompensatorView::setCompensators(const std::vector<mne::FiffCtfComp>& comps
 
     for (int i = 0; i < std::ssize(m_pComps); ++i) {
         if (!m_mapCompActive.contains(m_pComps.at(i).kind)) {
-            m_mapCompActive.insert(m_pComps.at(i).kind, false);
+            m_mapCompActive.insert_or_assign(m_pComps.at(i).kind, false);
         }
     }
 
@@ -103,9 +102,9 @@ void CompensatorView::saveSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/CompensatorView/compensatorActive"));
 
-    QMap<int, bool>::const_iterator iComp = m_mapCompActive.constBegin();
-    while (iComp != m_mapCompActive.constEnd()) {
-        settings.setValue(QString::number(iComp.key()), iComp.value());
+    std::map<int, bool>::const_iterator iComp = m_mapCompActive.cbegin();
+    while (iComp != m_mapCompActive.cend()) {
+        settings.setValue(QString::number(iComp->first), iComp->second);
         ++iComp;
     }
 
@@ -124,8 +123,7 @@ void CompensatorView::loadSettings()
 
     settings.beginGroup(m_sSettingsPath + QString("/CompensatorView/compensatorActive"));
 
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
+    for (const QString& key : settings.childKeys()) {
         m_mapCompActive[key.toInt()] = settings.value(key).toBool();
     }
 

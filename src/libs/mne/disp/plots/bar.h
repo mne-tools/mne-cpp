@@ -40,13 +40,20 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QStringList>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -144,12 +151,12 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    QString m_sTitle;         /**< Chart title. */
-    QString m_sXLabel;        /**< X axis label. */
-    QString m_sYLabel;        /**< Y axis label. */
-    QStringList m_categories; /**< Category labels for x-axis. */
-    QList<int> m_frequencies; /**< Frequency values for each bar. */
-    int m_iMaxFrequency;      /**< Maximum frequency value (for y-axis scaling). */
+    QString m_sTitle;                      /**< Chart title. */
+    QString m_sXLabel;                     /**< X axis label. */
+    QString m_sYLabel;                     /**< Y axis label. */
+    std::vector<std::string> m_categories; /**< Category labels for x-axis. */
+    std::vector<int> m_frequencies;        /**< Frequency values for each bar. */
+    int m_iMaxFrequency;                   /**< Maximum frequency value (for y-axis scaling). */
 };
 
 //=============================================================================================================
@@ -196,9 +203,8 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 
     for (int kr = 0; kr < iClassAmount; ++kr) {
         int classFreq = matClassFrequencyData(kr);
-        QString currentLimits = QString::number(static_cast<double>(matClassLimitData(kr)), 'g', iPrecisionValue) + " to " + QString::number(static_cast<double>(matClassLimitData(kr + 1)), 'g', iPrecisionValue);
-        m_categories << currentLimits;
-        m_frequencies << classFreq;
+        m_categories.push_back(std::format("{:.{}g} to {:.{}g}", static_cast<double>(matClassLimitData(kr)), iPrecisionValue, static_cast<double>(matClassLimitData(kr + 1)), iPrecisionValue));
+        m_frequencies.push_back(classFreq);
         if (classFreq > m_iMaxFrequency) {
             m_iMaxFrequency = classFreq;
         }

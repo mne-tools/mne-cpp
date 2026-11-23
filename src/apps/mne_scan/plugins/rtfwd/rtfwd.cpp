@@ -321,10 +321,10 @@ void RtFwd::onClusteringStatusChanged(bool bDoClustering)
 
 //=============================================================================================================
 
-void RtFwd::onAtlasDirChanged(const QString& sDirPath, const std::shared_ptr<FsAnnotationSet>& pAnnotationSet)
+void RtFwd::onAtlasDirChanged(const std::filesystem::path& sDirPath, const std::shared_ptr<FsAnnotationSet>& pAnnotationSet)
 {
     m_mutex.lock();
-    m_sAtlasDir = sDirPath;
+    m_sAtlasDir = QString::fromStdString(mne::utf8_from_path(sDirPath));
     m_pAnnotationSet = pAnnotationSet;
     m_mutex.unlock();
 }

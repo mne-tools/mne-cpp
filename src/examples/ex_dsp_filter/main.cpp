@@ -193,16 +193,16 @@ int main(int argc, char* argv[])
                  std::format("FilterIO round trip keeps all {} taps exactly", lowPass.coefficients().size()));
 
     // Magnitude responses of the three designs from 0 to 150 Hz
-    QVector<double> freqs;
-    QVector<double> gainCosine;
-    QVector<double> gainTscheb;
-    QVector<double> gainPm;
+    std::vector<double> freqs;
+    std::vector<double> gainCosine;
+    std::vector<double> gainTscheb;
+    std::vector<double> gainPm;
     for (int step = 0; step <= 300; ++step) {
         const double f = 0.5 * step;
-        freqs.append(f);
-        gainCosine.append(gain(lowPass.coefficients(), f, kSFreq));
-        gainTscheb.append(gain(lowPassPm.coefficients(), f, kSFreq));
-        gainPm.append(gain(parksMcClellan.coefficients, f, kSFreq));
+        freqs.push_back(f);
+        gainCosine.push_back(gain(lowPass.coefficients(), f, kSFreq));
+        gainTscheb.push_back(gain(lowPassPm.coefficients(), f, kSFreq));
+        gainPm.push_back(gain(parksMcClellan.coefficients, f, kSFreq));
     }
     LinePlot designs;
     designs.setTitle("40 Hz low-pass designs");
@@ -214,15 +214,15 @@ int main(int argc, char* argv[])
     FigureExporter::save(designs, "frequency_response", "Magnitude response of the three 40 Hz low-pass designs: 10 Hz passes, 100 Hz is stopped.");
 
     // The first 200 ms of the 10 + 100 Hz input, filtered at once and streamed block by block
-    QVector<double> ms;
-    QVector<double> input;
-    QVector<double> once;
-    QVector<double> stream;
+    std::vector<double> ms;
+    std::vector<double> input;
+    std::vector<double> once;
+    std::vector<double> stream;
     for (int t = 0; t < 200; ++t) {
-        ms.append(t);
-        input.append(data(0, t + 1000));
-        once.append(filtered(0, t + 1000));
-        stream.append(streamed(0, t + 1000 + delay));
+        ms.push_back(t);
+        input.push_back(data(0, t + 1000));
+        once.push_back(filtered(0, t + 1000));
+        stream.push_back(streamed(0, t + 1000 + delay));
     }
     LinePlot traces;
     traces.setTitle("10 Hz + 100 Hz through the 40 Hz low-pass");

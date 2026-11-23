@@ -30,12 +30,13 @@
 #include <QSettings>
 #include <QKeyEvent>
 #include <QCheckBox>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cmath>
 #include <memory>
 
 //=============================================================================================================
@@ -115,17 +116,21 @@ float mne::disp::getDefaultScalingValue(int iChannelKind,
 
 //=============================================================================================================
 
-float mne::disp::getScalingValue(const QMap<qint32, float>& qMapChScaling,
+float mne::disp::getScalingValue(const std::map<int, float>& qMapChScaling,
                                  int iChannelKind,
                                  int iChannelUnit)
 {
-    float fMaxScale = qMapChScaling.value(iChannelKind);
+    const auto valueOf = [&qMapChScaling](int key) {
+        const auto it = qMapChScaling.find(key);
+        return it != qMapChScaling.end() ? it->second : 0.0f;
+    };
+    float fMaxScale = valueOf(iChannelKind);
 
     if (iChannelKind == FIFFV_MEG_CH) {
-        fMaxScale = qMapChScaling.value(iChannelUnit);
+        fMaxScale = valueOf(iChannelUnit);
     }
 
-    if (qIsNaN(fMaxScale) || fMaxScale == 0) {
+    if (std::isnan(fMaxScale) || fMaxScale == 0) {
         fMaxScale = mne::disp::getDefaultScalingValue(iChannelKind, iChannelUnit);
     }
     return fMaxScale;
@@ -138,7 +143,7 @@ float mne::disp::getScalingValue(const QMap<qint32, float>& qMapChScaling,
 ScalingView::ScalingView(const QString& sSettingsPath,
                          QWidget* parent,
                          Qt::WindowFlags f,
-                         const QStringList& lChannelsToShow)
+                         const std::vector<std::string>& lChannelsToShow)
 : AbstractView(parent, f)
 , m_lChannelTypesToShow(lChannelsToShow)
 , m_pUi(std::make_unique<Ui::ScalingViewWidget>())
@@ -188,14 +193,14 @@ void ScalingView::keyPressEvent(QKeyEvent* event)
 
 //=============================================================================================================
 
-QMap<qint32, float> ScalingView::getScaleMap() const
+std::map<int, float> ScalingView::getScaleMap() const
 {
     return m_qMapChScaling;
 }
 
 //=============================================================================================================
 
-void ScalingView::setScaleMap(const QMap<qint32, float>& qMapChScaling)
+void ScalingView::setScaleMap(const std::map<int, float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;
 
@@ -252,25 +257,25 @@ void ScalingView::loadSettings()
     QSettings settings("MNECPP");
 
     float val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMAG"), m_fScaleMAG * 3).toFloat();
-    m_qMapChScaling.insert(FIFF_UNIT_T, val);
+    m_qMapChScaling.insert_or_assign(FIFF_UNIT_T, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleGRAD"), m_fScaleGRAD * 300 * 100 /*convert cm to m*/).toFloat();
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+    m_qMapChScaling.insert_or_assign(FIFF_UNIT_T_M, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEEG"), m_fScaleEEG * 10).toFloat();
-    m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+    m_qMapChScaling.insert_or_assign(FIFFV_EEG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleEOG"), m_fScaleEOG).toFloat();
-    m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+    m_qMapChScaling.insert_or_assign(FIFFV_EOG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleECG"), m_fScaleECG).toFloat();
-    m_qMapChScaling.insert(FIFFV_ECG_CH, val);
+    m_qMapChScaling.insert_or_assign(FIFFV_ECG_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleSTIM"), m_fScaleSTIM).toFloat();
-    m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+    m_qMapChScaling.insert_or_assign(FIFFV_STIM_CH, val);
 
     val = settings.value(m_sSettingsPath + QString("/ScalingView/scaleMISC"), m_fScaleMISC).toFloat();
-    m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+    m_qMapChScaling.insert_or_assign(FIFFV_MISC_CH, val);
 }
 
 //=============================================================================================================
@@ -309,7 +314,7 @@ void ScalingView::processScalingChange()
 
 void ScalingView::updateMAGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFF_UNIT_T, dScale * m_fScaleMAG);
+    m_qMapChScaling.insert_or_assign(FIFF_UNIT_T, dScale * m_fScaleMAG);
     linkMagToGrad();
     processScalingChange();
 }
@@ -340,7 +345,7 @@ void ScalingView::linkGradToMag()
 
 void ScalingView::updateGRADScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFF_UNIT_T_M, dScale * m_fScaleGRAD * 100.0); //*100 because we have data in fT/cm and we want it in ft/m.
+    m_qMapChScaling.insert_or_assign(FIFF_UNIT_T_M, dScale * m_fScaleGRAD * 100.0); //*100 because we have data in fT/cm and we want it in ft/m.
     linkGradToMag();
     processScalingChange();
 }
@@ -349,7 +354,7 @@ void ScalingView::updateGRADScale(double dScale)
 
 void ScalingView::updateEEGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EEG_CH, dScale * m_fScaleEEG);
+    m_qMapChScaling.insert_or_assign(FIFFV_EEG_CH, dScale * m_fScaleEEG);
     processScalingChange();
 }
 
@@ -357,7 +362,7 @@ void ScalingView::updateEEGScale(double dScale)
 
 void ScalingView::updateEOGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EOG_CH, dScale * m_fScaleEOG);
+    m_qMapChScaling.insert_or_assign(FIFFV_EOG_CH, dScale * m_fScaleEOG);
     processScalingChange();
 }
 
@@ -365,7 +370,7 @@ void ScalingView::updateEOGScale(double dScale)
 
 void ScalingView::updateEMGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_EMG_CH, dScale * m_fScaleEMG);
+    m_qMapChScaling.insert_or_assign(FIFFV_EMG_CH, dScale * m_fScaleEMG);
     processScalingChange();
 }
 
@@ -373,7 +378,7 @@ void ScalingView::updateEMGScale(double dScale)
 
 void ScalingView::updateECGScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_ECG_CH, dScale * m_fScaleECG);
+    m_qMapChScaling.insert_or_assign(FIFFV_ECG_CH, dScale * m_fScaleECG);
     processScalingChange();
 }
 
@@ -381,7 +386,7 @@ void ScalingView::updateECGScale(double dScale)
 
 void ScalingView::updateMISCScale(double dScale)
 {
-    m_qMapChScaling.insert(FIFFV_MISC_CH, dScale * m_fScaleMISC);
+    m_qMapChScaling.insert_or_assign(FIFFV_MISC_CH, dScale * m_fScaleMISC);
     processScalingChange();
 }
 
@@ -389,7 +394,7 @@ void ScalingView::updateMISCScale(double dScale)
 
 void ScalingView::updateSTIMScale(double scale)
 {
-    m_qMapChScaling.insert(FIFFV_STIM_CH, scale * m_fScaleSTIM);
+    m_qMapChScaling.insert_or_assign(FIFFV_STIM_CH, scale * m_fScaleSTIM);
     processScalingChange();
 }
 
@@ -452,7 +457,7 @@ void ScalingView::showLinkControl()
 void ScalingView::createScaleControls()
 {
     //MAG
-    if (m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFF_UNIT_T) && (std::ranges::contains(m_lChannelTypesToShow, "mag") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlMAG = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("MAG [pT])")).get();
         pControlMAG->setRange(0.2f, 20.0f);
         pControlMAG->setMaxSensitivityPoint(1.5);
@@ -460,11 +465,11 @@ void ScalingView::createScaleControls()
         pControlMAG->setSensitivity(0.7f);
         pControlMAG->invertSlider(true);
         connect(pControlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
-        m_qMapScaleControls.insert(FIFF_UNIT_T, pControlMAG);
+        m_qMapScaleControls.insert_or_assign(FIFF_UNIT_T, pControlMAG);
     }
 
     //GRAD
-    if (m_qMapChScaling.contains(FIFF_UNIT_T_M) && (m_lChannelTypesToShow.contains("grad") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFF_UNIT_T_M) && (std::ranges::contains(m_lChannelTypesToShow, "grad") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlGRAD = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("GRAD [fT/cm]")).get();
         pControlGRAD->setRange(30.0f, 5000.0f);
         pControlGRAD->setMaxSensitivityPoint(100.0f);
@@ -472,7 +477,7 @@ void ScalingView::createScaleControls()
         pControlGRAD->setSensitivity(0.7f);
         pControlGRAD->invertSlider(true);
         connect(pControlGRAD, &ScaleControl::valueChanged, this, &ScalingView::updateGRADScale);
-        m_qMapScaleControls.insert(FIFF_UNIT_T_M, pControlGRAD);
+        m_qMapScaleControls.insert_or_assign(FIFF_UNIT_T_M, pControlGRAD);
     }
 
     //MAGtoGRADlink only if we have Mags and Grads to link
@@ -484,11 +489,11 @@ void ScalingView::createScaleControls()
         pControlMAGtoGRADlink->setSensitivity(0.7f);
         connect(pControlMAGtoGRADlink, &ScaleControl::valueChanged, this, &ScalingView::updateMAGtoGRADlink);
         pControlMAGtoGRADlink->setVisible(m_bLinkMAGtoGRAD);
-        m_qMapScaleControls.insert(MAG_TO_GRAD_LINK, pControlMAGtoGRADlink);
+        m_qMapScaleControls.insert_or_assign(MAG_TO_GRAD_LINK, pControlMAGtoGRADlink);
     }
 
     //EEG
-    if (m_qMapChScaling.contains(FIFFV_EEG_CH) && (m_lChannelTypesToShow.contains("eeg") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFFV_EEG_CH) && (std::ranges::contains(m_lChannelTypesToShow, "eeg") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlEEG = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("EEG [uV]")).get();
         pControlEEG->setRange(3.0f, 100.0f);
         pControlEEG->setMaxSensitivityPoint(14.0f);
@@ -496,11 +501,11 @@ void ScalingView::createScaleControls()
         pControlEEG->setSensitivity(0.4f);
         pControlEEG->invertSlider(true);
         connect(pControlEEG, &ScaleControl::valueChanged, this, &ScalingView::updateEEGScale);
-        m_qMapScaleControls.insert(FIFFV_EEG_CH, pControlEEG);
+        m_qMapScaleControls.insert_or_assign(FIFFV_EEG_CH, pControlEEG);
     }
 
     //EOG
-    if (m_qMapChScaling.contains(FIFFV_EOG_CH) && (m_lChannelTypesToShow.contains("eog") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFFV_EOG_CH) && (std::ranges::contains(m_lChannelTypesToShow, "eog") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlEOG = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("EOG [uV]")).get();
         pControlEOG->setRange(3.0f, 100.0f);
         pControlEOG->setMaxSensitivityPoint(14.0f);
@@ -508,11 +513,11 @@ void ScalingView::createScaleControls()
         pControlEOG->setSensitivity(0.4f);
         pControlEOG->invertSlider(true);
         connect(pControlEOG, &ScaleControl::valueChanged, this, &ScalingView::updateEOGScale);
-        m_qMapScaleControls.insert(FIFFV_EOG_CH, pControlEOG);
+        m_qMapScaleControls.insert_or_assign(FIFFV_EOG_CH, pControlEOG);
     }
 
     //ECG
-    if (m_qMapChScaling.contains(FIFFV_ECG_CH) && (m_lChannelTypesToShow.contains("ecg") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFFV_ECG_CH) && (std::ranges::contains(m_lChannelTypesToShow, "ecg") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlECG = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("ECG [uV]")).get();
         pControlECG->setRange(3.0f, 100.0f);
         pControlECG->setMaxSensitivityPoint(14.0f);
@@ -520,11 +525,11 @@ void ScalingView::createScaleControls()
         pControlECG->setSensitivity(0.4f);
         pControlECG->invertSlider(true);
         connect(pControlECG, &ScaleControl::valueChanged, this, &ScalingView::updateECGScale);
-        m_qMapScaleControls.insert(FIFFV_ECG_CH, pControlECG);
+        m_qMapScaleControls.insert_or_assign(FIFFV_ECG_CH, pControlECG);
     }
 
     //STIM
-    if (m_qMapChScaling.contains(FIFFV_STIM_CH) && (m_lChannelTypesToShow.contains("stim") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFFV_STIM_CH) && (std::ranges::contains(m_lChannelTypesToShow, "stim") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlSTIM = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("STIM")).get();
         pControlSTIM->setRange(1.0f, 99999.0f);
         pControlSTIM->setMaxSensitivityPoint(5000.0f);
@@ -532,11 +537,11 @@ void ScalingView::createScaleControls()
         pControlSTIM->setSensitivity(0.8f);
         pControlSTIM->invertSlider(true);
         connect(pControlSTIM, &ScaleControl::valueChanged, this, &ScalingView::updateSTIMScale);
-        m_qMapScaleControls.insert(FIFFV_STIM_CH, pControlSTIM);
+        m_qMapScaleControls.insert_or_assign(FIFFV_STIM_CH, pControlSTIM);
     }
 
     //MISC
-    if (m_qMapChScaling.contains(FIFFV_MISC_CH) && (m_lChannelTypesToShow.contains("misc") || m_lChannelTypesToShow.contains("all"))) {
+    if (m_qMapChScaling.contains(FIFFV_MISC_CH) && (std::ranges::contains(m_lChannelTypesToShow, "misc") || std::ranges::contains(m_lChannelTypesToShow, "all"))) {
         QPointer<ScaleControl> pControlMISC = m_vecScaleControls.emplace_back(std::make_unique<ScaleControl>("MISC")).get();
         pControlMISC->setRange(3.0f, 100.0f);
         pControlMISC->setMaxSensitivityPoint(14.0f);
@@ -544,7 +549,7 @@ void ScalingView::createScaleControls()
         pControlMISC->setSensitivity(0.4f);
         pControlMISC->invertSlider(true);
         connect(pControlMISC, &ScaleControl::valueChanged, this, &ScalingView::updateMISCScale);
-        m_qMapScaleControls.insert(FIFFV_MISC_CH, pControlMISC);
+        m_qMapScaleControls.insert_or_assign(FIFFV_MISC_CH, pControlMISC);
     }
 }
 

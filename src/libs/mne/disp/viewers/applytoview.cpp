@@ -112,20 +112,20 @@ void ApplyToView::selectClear(bool bChecked)
 
 //=============================================================================================================
 
-QList<QString> ApplyToView::getSelectedViews()
+std::vector<std::string> ApplyToView::getSelectedViews()
 {
     m_lViewList.clear();
 
-    m_lViewList.append("null");
+    m_lViewList.push_back("null");
 
     if (m_pUi->m_checkBoxSignaViewer->isChecked()) {
-        m_lViewList.append("signalview");
+        m_lViewList.push_back("signalview");
     }
     if (m_pUi->m_checkBoxButterfly->isChecked()) {
-        m_lViewList.append("butterflyview");
+        m_lViewList.push_back("butterflyview");
     }
     if (m_pUi->m_checkBoxLayout->isChecked()) {
-        m_lViewList.append("layoutview");
+        m_lViewList.push_back("layoutview");
     }
 
     return m_lViewList;

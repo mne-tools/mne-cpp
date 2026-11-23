@@ -92,7 +92,7 @@ void TestElectrodeObject::testEmptyConstruction()
     ElectrodeObject obj;
     QCOMPARE(obj.totalContactCount(), 0);
     QVERIFY(obj.implantation().empty());
-    QVERIFY(obj.selectedContact().isEmpty());
+    QVERIFY(obj.selectedContact().empty());
     QCOMPARE(obj.contactStreams().instanceCount, 0);
 }
 
@@ -120,15 +120,15 @@ void TestElectrodeObject::testContactSelection()
     obj.setImplantation(createTestImplantation(2, 4));
 
     obj.selectContact("S0_C2");
-    QCOMPARE(obj.selectedContact(), QString("S0_C2"));
+    QCOMPARE(obj.selectedContact(), std::string("S0_C2"));
     obj.selectContact("S1_C0");
-    QCOMPARE(obj.selectedContact(), QString("S1_C0"));
+    QCOMPARE(obj.selectedContact(), std::string("S1_C0"));
     obj.selectContact("nope");
-    QVERIFY(obj.selectedContact().isEmpty());
+    QVERIFY(obj.selectedContact().empty());
 
     obj.selectContact("S0_C1");
     obj.clearSelection();
-    QVERIFY(obj.selectedContact().isEmpty());
+    QVERIFY(obj.selectedContact().empty());
 }
 
 //=============================================================================================================
@@ -139,16 +139,16 @@ void TestElectrodeObject::testContactValues()
     obj.setImplantation(createTestImplantation(1, 4));
     const quint64 generation = obj.contactStreams().instances.generation;
 
-    QMap<QString, float> values;
+    std::map<std::string, float> values;
     values["S0_C0"] = 0.0f;
     values["S0_C2"] = 1.0f;
-    obj.setContactValues(values, QStringLiteral("Jet"));
+    obj.setContactValues(values, "Jet");
     QCOMPARE(obj.contactStreams().instances.generation, generation + 1);
     QCOMPARE(obj.totalContactCount(), 4);
 
     obj.clearContactValues();
     QCOMPARE(obj.contactStreams().instances.generation, generation + 2);
-    QVERIFY(obj.surfaceColors(Eigen::MatrixX3f::Zero(3, 3)).isEmpty());
+    QVERIFY(obj.surfaceColors(Eigen::MatrixX3f::Zero(3, 3)).empty());
 
     // Painting the cortex: a depth contact stays in place and fades out linearly over 1 cm
     values.clear();
@@ -156,8 +156,8 @@ void TestElectrodeObject::testContactValues()
     obj.setContactValues(values);
     Eigen::MatrixX3f vertices(3, 3);
     vertices << 0.0f, 0.0f, 0.0f, -0.005f, 0.0f, 0.0f, -0.02f, 0.0f, 0.0f;
-    const QVector<uint32_t> colors = obj.surfaceColors(vertices);
-    QCOMPARE(colors.size(), 3);
+    const std::vector<uint32_t> colors = obj.surfaceColors(vertices);
+    QCOMPARE(colors.size(), std::size_t(3));
     QCOMPARE(colors[0] >> 24, 255u);
     QCOMPARE(colors[1] >> 24, 127u);
     QCOMPARE(colors[1] & 0xFFFFFFu, colors[0] & 0xFFFFFFu); // same value, same colour

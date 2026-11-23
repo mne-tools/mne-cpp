@@ -117,7 +117,7 @@ public:
      *
      * @param[in] mappedLayoutChNames the currently to layout mapped channels.
      */
-    void setCurrentlyMappedFiffChannels(const QStringList& mappedLayoutChNames);
+    void setCurrentlyMappedFiffChannels(const std::vector<std::string>& mappedLayoutChNames);
 
     //=========================================================================================================
     /**
@@ -135,7 +135,7 @@ public:
      *
      * @param[in] channelList channels which are be to set as selected.
      */
-    void selectChannels(const QStringList& channelList);
+    void selectChannels(const std::vector<std::string>& channelList);
 
     //=========================================================================================================
     /**
@@ -144,7 +144,7 @@ public:
      *
      * @return Names of the user-defined channels, or of the visible group channels if none were user-defined.
      */
-    QStringList getSelectedChannels();
+    std::vector<std::string> getSelectedChannels();
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @return Map from channel name to its 2-D layout position.
      */
-    const QMap<QString, QPointF>& getLayoutMap();
+    const std::map<std::string, QPointF>& getLayoutMap();
 
     //=========================================================================================================
     /**
@@ -399,12 +399,12 @@ private:
 
     std::shared_ptr<ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to the channel info model. */
 
-    QMap<QString, QPointF> m_layoutMap;                   /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMultiMap<QString, QStringList> m_selectionGroupsMap; /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    std::map<std::string, QPointF> m_layoutMap;                                /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
+    std::multimap<std::string, std::vector<std::string>> m_selectionGroupsMap; /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
     SelectionScene* m_pSelectionScene; /**< Pointer to the selection scene class. */
 
-    QStringList m_currentlyLoadedFiffChannels; /**< List of currently loaded fiff data channels.*/
+    std::vector<std::string> m_currentlyLoadedFiffChannels; /**< List of currently loaded fiff data channels.*/
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -416,7 +416,7 @@ signals:
      *
      * @param[in] selectedChannels currently user selected channels or items which are in the visible list widget.
      */
-    void showSelectedChannelsOnly(QStringList selectedChannels);
+    void showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels);
 
     //=========================================================================================================
     /**
@@ -432,7 +432,7 @@ signals:
      *
      * @param[in] layoutMap currently loaded layout.
      */
-    void loadedLayoutMap(const QMap<QString, QPointF>& layoutMap);
+    void loadedLayoutMap(const std::map<std::string, QPointF>& layoutMap);
 };
 } // NAMESPACE mne_disp
 

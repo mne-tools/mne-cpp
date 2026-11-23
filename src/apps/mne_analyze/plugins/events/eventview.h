@@ -348,7 +348,7 @@ private:
      * @param[in] sChannelName      name of stim channel from which we will be reading.
      * @param[in] dThreshold        threshold for a spike to count as a trigger.
      */
-    void onDetectTriggers(const QString& sChannelName,
+    void onDetectTriggers(const std::string& sChannelName,
                           double dThreshold);
 
     //=========================================================================================================

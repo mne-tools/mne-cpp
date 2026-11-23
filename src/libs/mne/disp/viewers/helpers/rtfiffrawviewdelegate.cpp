@@ -30,8 +30,13 @@
 //=============================================================================================================
 
 #include <QPainter>
-#include <QDebug>
 #include <QPainterPath>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -58,7 +63,7 @@ RtFiffRawViewDelegate::RtFiffRawViewDelegate(RtFiffRawView* parent)
 void RtFiffRawViewDelegate::initPainterPaths(const QAbstractTableModel* model)
 {
     for (int i = 0; i < model->rowCount(); i++)
-        m_painterPaths.append(QPainterPath());
+        m_painterPaths.push_back(QPainterPath());
 
     // Init pens
     QColor colorMarker(233, 0, 43);
@@ -263,7 +268,6 @@ QSize RtFiffRawViewDelegate::sizeHint(const QStyleOptionViewItem& option,
             size = QSize(20, option.rect.height());
             break;
         case 1:
-            QList<QVector<float>> data = index.model()->data(index).value<QList<QVector<float>>>();
             //        qint32 nsamples = (static_cast<const RtFiffRawViewModel*>(index.model()))->lastSample()-(static_cast<const RtFiffRawViewModel*>(index.model()))->firstSample();
             //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
             Q_UNUSED(option);
@@ -458,9 +462,9 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
 
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
-    QList<QPair<int, double>> detectedTriggers = t_pModel->getDetectedTriggers();
-    QList<QPair<int, double>> detectedTriggersOld = t_pModel->getDetectedTriggersOld();
-    QMap<double, QColor> mapTriggerTypeColors = t_pModel->getTriggerColor();
+    const std::vector<std::pair<int, double>> detectedTriggers = t_pModel->getDetectedTriggers();
+    const std::vector<std::pair<int, double>> detectedTriggersOld = t_pModel->getDetectedTriggersOld();
+    std::map<double, QColor> mapTriggerTypeColors = t_pModel->getTriggerColor();
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -469,7 +473,7 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
 
     //Newly detected triggers
-    for (int u = 0; u < detectedTriggers.size(); ++u) {
+    for (int u = 0; u < std::ssize(detectedTriggers); ++u) {
         QPainterPath markerPath;
 
         int triggerPos = detectedTriggers[u].first;
@@ -489,7 +493,7 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
     }
 
     //Old detected triggers
-    for (int u = 0; u < detectedTriggersOld.size(); ++u) {
+    for (int u = 0; u < std::ssize(detectedTriggersOld); ++u) {
         QPainterPath markerPath;
 
         int triggerPos = detectedTriggersOld[u].first;
@@ -530,7 +534,7 @@ void RtFiffRawViewDelegate::createTriggerThresholdPath(const QModelIndex& index,
         case FIFFV_STIM_CH: {
             dMaxValue = 5.0;
             if (t_pModel->getScaling().contains(FIFFV_STIM_CH))
-                dMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+                dMaxValue = t_pModel->getScaling().at(FIFFV_STIM_CH);
             break;
         }
     }

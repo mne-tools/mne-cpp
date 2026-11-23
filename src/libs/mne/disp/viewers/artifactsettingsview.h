@@ -37,12 +37,13 @@
 //=============================================================================================================
 
 #include <QPointer>
-#include <QMap>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -101,9 +102,9 @@ public:
 
     void setChInfo(const std::vector<mne::FiffChInfo>& fiffChInfoList);
 
-    QMap<QString, double> getThresholdMap();
+    std::map<std::string, double> getThresholdMap();
 
-    void setThresholdMap(const QMap<QString, double>& mapThresholds);
+    void setThresholdMap(const std::map<std::string, double>& mapThresholds);
 
     bool getDoArtifactThresholdRejection();
 
@@ -150,12 +151,12 @@ protected:
 
     void onChangeArtifactThreshold();
 
-    QMap<QString, QDoubleSpinBox*> m_mapChThresholdsDoubleSpinBoxes;
-    QMap<QString, QSpinBox*> m_mapChThresholdsSpinBoxes;
+    std::map<std::string, QDoubleSpinBox*> m_mapChThresholdsDoubleSpinBoxes;
+    std::map<std::string, QSpinBox*> m_mapChThresholdsSpinBoxes;
 
-    QMap<QString, double> m_mapThresholdsFirst;
-    QMap<QString, int> m_mapThresholdsSecond;
-    QMap<QString, double> m_mapThresholds;
+    std::map<std::string, double> m_mapThresholdsFirst;
+    std::map<std::string, int> m_mapThresholdsSecond;
+    std::map<std::string, double> m_mapThresholds;
 
     std::vector<mne::FiffChInfo> m_fiffChInfoList;
 
@@ -164,7 +165,7 @@ protected:
     QPointer<QCheckBox> m_pArtifactRejectionCheckBox;
 
 signals:
-    void changeArtifactThreshold(const QMap<QString, double>& mapThresholds);
+    void changeArtifactThreshold(const std::map<std::string, double>& mapThresholds);
 };
 } // NAMESPACE
 

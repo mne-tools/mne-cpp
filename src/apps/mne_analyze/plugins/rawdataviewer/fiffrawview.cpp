@@ -231,14 +231,13 @@ void FiffRawView::resizeEvent(QResizeEvent* event)
 
 //=============================================================================================================
 
-void FiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
+void FiffRawView::setScalingMap(const std::map<int, float>& scaleMap)
 {
     if (!m_pModel) {
         return;
     }
 
     m_qMapChScaling = scaleMap;
-    m_qMapChScaling.detach();
     m_pModel->setScaling(m_qMapChScaling);
 }
 
@@ -336,7 +335,7 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
         fileName = QString("./Screenshots/%1-%2-AnalyzeDataView.svg").arg(sDate).arg(sTime);
 
         mne::disp::SvgWriter svgGen;
-        svgGen.setFileName(fileName);
+        svgGen.setFileName(fileName.toStdString());
         svgGen.setSize(m_pTableView->size());
         svgGen.setViewBox(m_pTableView->rect());
 
@@ -656,15 +655,15 @@ void FiffRawView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void FiffRawView::showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes)
+void FiffRawView::showSelectedChannelsOnly(const std::vector<int>& selectedChannelsIndexes)
 {
-    if (selectedChannelsIndexes.contains(-1)) {
+    if (std::ranges::contains(selectedChannelsIndexes, -1)) {
         for (int i = 0; i < m_pModel->rowCount(); i++) {
             m_pTableView->showRow(i);
         }
     } else {
         for (int i = 0; i < m_pModel->rowCount(); i++) {
-            if (selectedChannelsIndexes.contains(i)) {
+            if (std::ranges::contains(selectedChannelsIndexes, i)) {
                 m_pTableView->showRow(i);
             } else {
                 m_pTableView->hideRow(i);

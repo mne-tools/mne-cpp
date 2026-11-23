@@ -127,7 +127,7 @@ void TestAnalyzeControlManager::publishesViewSettings()
     signalView->setChecked(true);
     butterfly->setChecked(false);
     layout->setChecked(false);
-    const QList<QString> views{"null", "signalview"};
+    const std::vector<std::string> views{"null", "signalview"};
 
     auto* settings = dock->findChild<mne::disp::FiffRawViewSettings*>();
     QVERIFY(settings);

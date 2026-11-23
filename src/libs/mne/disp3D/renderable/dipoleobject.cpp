@@ -21,7 +21,6 @@
 //=============================================================================================================
 
 #include <QQuaternion>
-#include <QRandomGenerator>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -29,6 +28,7 @@
 
 #include <cmath>
 #include <numbers>
+#include <random>
 
 namespace mne::disp
 {
@@ -43,9 +43,9 @@ DipoleObject::~DipoleObject() = default;
 
 InstancedStreams DipoleObject::streams() const
 {
-    return {{m_vertexData.constData(), quint32(m_vertexData.size()), m_geometryGeneration},
-            {m_indexData.constData(), quint32(m_indexData.size()), m_geometryGeneration},
-            {m_instanceData.constData(), quint32(m_instanceCount * sizeof(InstanceData)), m_instanceGeneration},
+    return {{m_vertexData.data(), quint32(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.data(), quint32(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.data(), quint32(m_instanceCount * sizeof(InstanceData)), m_instanceGeneration},
             m_indexCount,
             m_instanceCount};
 }
@@ -66,6 +66,9 @@ void DipoleObject::load(const mne::InvEcdSet& ecdSet)
         float mag = std::sqrt(std::pow(ecdSet[i].Q(0), 2) + std::pow(ecdSet[i].Q(1), 2) + std::pow(ecdSet[i].Q(2), 2));
         maxMag = std::max(maxMag, mag);
     }
+
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_real_distribution<float> colorDist(0.0f, 1.0f);
 
     for (int i = 0; i < ecdSet.size(); ++i) {
         const auto& dip = ecdSet[i];
@@ -100,9 +103,9 @@ void DipoleObject::load(const mne::InvEcdSet& ecdSet)
         }
 
         // Random Color
-        data[i].color[0] = QRandomGenerator::global()->generateDouble();
-        data[i].color[1] = QRandomGenerator::global()->generateDouble();
-        data[i].color[2] = QRandomGenerator::global()->generateDouble();
+        data[i].color[0] = colorDist(rng);
+        data[i].color[1] = colorDist(rng);
+        data[i].color[2] = colorDist(rng);
         data[i].color[3] = 1.0f;
 
         // Selection state
@@ -134,7 +137,7 @@ bool DipoleObject::boundingBox(QVector3D& min, QVector3D& max) const
 {
     if (m_instanceCount == 0)
         return false;
-    const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.constData());
+    const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.data());
     for (int i = 0; i < m_instanceCount; ++i) {
         // Column-major model matrix: the translation is elements 12..14
         const QVector3D pos(data[i].model[12], data[i].model[13], data[i].model[14]);
@@ -146,7 +149,7 @@ bool DipoleObject::boundingBox(QVector3D& min, QVector3D& max) const
 
 void DipoleObject::createGeometry()
 {
-    if (!m_vertexData.isEmpty())
+    if (!m_vertexData.empty())
         return;
 
     // Create a simple cone
@@ -263,7 +266,7 @@ int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir,
     int closestIdx = -1;
     float closestDist = std::numeric_limits<float>::max();
 
-    const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.constData());
+    const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.data());
 
     // Geometry radius ~ 0.005 (base) to 0.01 (height).
     // Let's use a slightly larger hit radius to make selection easier and more accurate.

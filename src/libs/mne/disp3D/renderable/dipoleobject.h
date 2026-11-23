@@ -38,15 +38,14 @@
 //=============================================================================================================
 
 #include <QMatrix4x4>
-#include <QVector>
 #include <QVector3D>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace mne::disp
 {
@@ -150,10 +149,10 @@ private:
         float isSelected; // 1.0 = selected, 0.0 = not
     };
 
-    QByteArray m_vertexData;
-    QByteArray m_indexData;
-    QByteArray m_instanceData;
-    QVector<QMatrix4x4> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
+    std::vector<std::byte> m_vertexData;
+    std::vector<std::byte> m_indexData;
+    std::vector<std::byte> m_instanceData;
+    std::vector<QMatrix4x4> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
 
     quint64 m_geometryGeneration = 0;
     quint64 m_instanceGeneration = 0;

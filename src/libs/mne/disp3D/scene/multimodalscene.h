@@ -34,18 +34,19 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QHash>
 #include <QObject>
-#include <QString>
-#include <QVector>
 #include <QVector3D>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstddef>
 #include <functional>
 #include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace mne::disp
 {
@@ -89,8 +90,8 @@ enum class SceneLayerKind
  */
 struct DISP3DSHARED_EXPORT SceneLayer
 {
-    QString id;          /**< Caller-supplied unique id ("cortex_lh", "seeg_LH", "mri_axial"). */
-    QString displayName; /**< Human-readable label for the scene tree dock. */
+    std::string id;          /**< Caller-supplied unique id ("cortex_lh", "seeg_LH", "mri_axial"). */
+    std::string displayName; /**< Human-readable label for the scene tree dock. */
     SceneLayerKind kind = SceneLayerKind::Custom;
     bool visible = true;
     float opacity = 1.0f;
@@ -149,7 +150,7 @@ public:
      * @param[in] id  Layer id supplied to @ref addLayer.
      * @return true if a layer was removed, false if the id was unknown.
      */
-    bool removeLayer(const QString& id);
+    bool removeLayer(const std::string& id);
 
     //=========================================================================================================
     /**
@@ -162,7 +163,7 @@ public:
      * @return All layers in current draw order (sorted by kind, then by
      *         drawOrder, then by insertion order).
      */
-    QVector<SceneLayer> layers() const;
+    std::vector<SceneLayer> layers() const;
 
     //=========================================================================================================
     /**
@@ -170,7 +171,7 @@ public:
      * @return Pointer to the layer with the given id, or nullptr.
      *         The pointer is valid only until the next mutation.
      */
-    const SceneLayer* findLayer(const QString& id) const;
+    const SceneLayer* findLayer(const std::string& id) const;
 
     //=========================================================================================================
     /**
@@ -179,7 +180,7 @@ public:
      * @param[in] id        Layer id.
      * @param[in] visible   True to show the layer, false to hide it.
      */
-    void setLayerVisible(const QString& id, bool visible);
+    void setLayerVisible(const std::string& id, bool visible);
 
     //=========================================================================================================
     /**
@@ -188,7 +189,7 @@ public:
      * @param[in] id        Layer id.
      * @param[in] opacity   Opacity, clamped to [0, 1].
      */
-    void setLayerOpacity(const QString& id, float opacity);
+    void setLayerOpacity(const std::string& id, float opacity);
 
     //=========================================================================================================
     /**
@@ -338,9 +339,9 @@ signals:
     void picked(const mne::disp::PickResult& pick);
 
 private:
-    QVector<SceneLayer> m_layers;     /**< Insertion-ordered layers. */
-    QHash<QString, int> m_indexById;  /**< id -> position in m_layers. */
-    QHash<int, BoundsFn> m_boundsFns; /**< kind -> AABB extractor. */
+    std::vector<SceneLayer> m_layers;                         /**< Insertion-ordered layers. */
+    std::unordered_map<std::string, std::size_t> m_indexById; /**< id -> position in m_layers. */
+    std::unordered_map<int, BoundsFn> m_boundsFns;            /**< kind -> AABB extractor. */
     int m_currentTimeSample = -1;
     double m_timeCursor = 0.0;
     float m_overlayFmin = 0.0f;

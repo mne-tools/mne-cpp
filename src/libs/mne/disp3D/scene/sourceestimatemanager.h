@@ -31,9 +31,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
-#include <QMap>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -45,13 +42,18 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <filesystem>
+#include <map>
 #include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QThread;
 
 namespace mne::disp
 {
@@ -102,9 +104,9 @@ public:
      * @param[in] activeSurfaceType  Active surface type name (e.g. "pial").
      * @return true if loading was started, false on error.
      */
-    bool load(const QString& lhPath, const QString& rhPath,
-              const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-              const QString& activeSurfaceType);
+    bool load(const std::filesystem::path& lhPath, const std::filesystem::path& rhPath,
+              const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+              const std::string& activeSurfaceType);
 
     /**
      * Cancel any in-progress STC loading / interpolation and wait for the thread to finish.
@@ -135,9 +137,9 @@ public:
      * @param[in] subViews   Multi-view states.
      */
     void setTimePoint(int index,
-                      const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                      const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
                       const SubView& singleView,
-                      const QVector<SubView>& subViews);
+                      const std::vector<SubView>& subViews);
 
     /** @return current time-point index. */
     int currentTimePoint() const
@@ -167,7 +169,7 @@ public:
      *
      * @param[in] name   Colormap name (e.g. "Hot", "Jet").
      */
-    void setColormap(const QString& name);
+    void setColormap(const std::string& name);
 
     /**
      * Set source estimate thresholds.
@@ -188,9 +190,9 @@ public:
      * @param[in] singleView Single-view state.
      * @param[in] subViews   Multi-view states.
      */
-    void startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+    void startStreaming(const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
                         const SubView& singleView,
-                        const QVector<SubView>& subViews);
+                        const std::vector<SubView>& subViews);
 
     /** Stop real-time streaming. */
     void stopStreaming();
@@ -239,15 +241,15 @@ signals:
     void timePointChanged(int index, float time);
 
     /** Emitted during async loading to report progress. */
-    void loadingProgress(int percent, const QString& message);
+    void loadingProgress(int percent, const std::string& message);
 
     /**
      * Emitted when the real-time pipeline produces a new set of
      * per-vertex colours.  The host widget should apply these to its
      * surfaces and repaint.
      */
-    void realtimeColorsAvailable(const QVector<uint32_t>& colorsLh,
-                                 const QVector<uint32_t>& colorsRh);
+    void realtimeColorsAvailable(const std::vector<uint32_t>& colorsLh,
+                                 const std::vector<uint32_t>& colorsRh);
 
 private slots:
     /** Handle background-thread STC loading completion. */
@@ -256,7 +258,8 @@ private slots:
 private:
     std::unique_ptr<SourceEstimateOverlay> m_overlay;       /**< Source estimate data / interpolation. */
     std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time streaming controller. */
-    std::unique_ptr<QThread> m_loadingThread;               /**< Background thread for STC file loading. */
+    std::jthread m_loadingThread;                           /**< Background thread for STC file loading. */
+    std::uint64_t m_loadGeneration = 0;                     /**< Bumped per cancel; stale finished signals are ignored. */
     std::unique_ptr<StcLoadingWorker> m_stcWorker;          /**< Worker performing the async STC load. */
     int m_currentTimePoint = 0;                             /**< Current time-point index. */
     bool m_isLoading = false;                               /**< True while async load is in progress. */

@@ -16,17 +16,25 @@
 
 #include "figureexporter.h"
 
+#include <mne/base/string_utils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QApplication>
-#include <QAtomicInt>
-#include <QDir>
 #include <QImage>
 #include <QPainter>
-#include <QRegularExpression>
 #include <QWidget>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <atomic>
+#include <cstdlib>
+#include <format>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -41,7 +49,7 @@ using namespace mne::disp;
 namespace
 {
 
-QAtomicInt figureCount;
+std::atomic<int> figureCount{0};
 
 constexpr qreal kPixelRatio = 2.0;
 
@@ -51,20 +59,21 @@ constexpr qreal kPixelRatio = 2.0;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QString FigureExporter::directory()
+std::filesystem::path FigureExporter::directory()
 {
-    return qEnvironmentVariable("MNE_CPP_FIGURE_DIR");
+    const char* dir = std::getenv("MNE_CPP_FIGURE_DIR");
+    return dir ? mne::path_from_utf8(dir) : std::filesystem::path();
 }
 
 //=============================================================================================================
 
-QString FigureExporter::save(QWidget& widget,
-                             const QString& name,
-                             const QString& caption,
-                             const QSize& size)
+std::filesystem::path FigureExporter::save(QWidget& widget,
+                                           const std::string& name,
+                                           const std::string& caption,
+                                           const QSize& size)
 {
-    if (directory().isEmpty()) {
-        return QString();
+    if (directory().empty()) {
+        return {};
     }
     widget.resize(size);
     widget.setAttribute(Qt::WA_DontShowOnScreen);
@@ -83,18 +92,26 @@ QString FigureExporter::save(QWidget& widget,
 
 //=============================================================================================================
 
-QString FigureExporter::save(const QImage& image,
-                             const QString& name,
-                             const QString& caption)
+std::filesystem::path FigureExporter::save(const QImage& image,
+                                           const std::string& name,
+                                           const std::string& caption)
 {
-    const QString dir = directory();
-    if (dir.isEmpty() || image.isNull() || !QDir().mkpath(dir)) {
-        return QString();
+    const std::filesystem::path dir = directory();
+    std::error_code error;
+    if (dir.empty() || image.isNull() || (std::filesystem::create_directories(dir, error), error)) {
+        return {};
     }
-    static const QRegularExpression unsafe("[^A-Za-z0-9_-]");
-    const QString stem = QString(name).replace(unsafe, "_");
-    const QString path = QDir(dir).filePath(QString("%1_%2.png").arg(figureCount.fetchAndAddOrdered(1) + 1, 2, 10, QChar('0')).arg(stem));
+    std::string stem;
+    for (const char c : name) {
+        const bool safe = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' || c == '-';
+        if (safe) {
+            stem += c;
+        } else if ((static_cast<unsigned char>(c) & 0xC0) != 0x80) {
+            stem += '_'; // one '_' per character, not per UTF-8 byte
+        }
+    }
+    const std::filesystem::path path = dir / mne::path_from_utf8(std::format("{:02}_{}.png", figureCount.fetch_add(1) + 1, stem));
     QImage figure = image.convertToFormat(QImage::Format_RGB32);
-    figure.setText("Description", caption);
-    return figure.save(path, "PNG") ? path : QString();
+    figure.setText("Description", QString::fromStdString(caption));
+    return figure.save(QString::fromStdString(mne::utf8_from_path(path)), "PNG") ? path : std::filesystem::path();
 }

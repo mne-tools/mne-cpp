@@ -32,15 +32,11 @@
 #include <mne/fiff/fiff_ch_info.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -99,7 +95,7 @@ public:
      *
      * @param[in] modalityMap    The modality map.
      */
-    void setModalityMap(const QMap<QString, bool>& modalityMap);
+    void setModalityMap(const std::map<std::string, bool>& modalityMap);
 
     //=========================================================================================================
     /**
@@ -107,7 +103,7 @@ public:
      *
      * @return The current modality map.
      */
-    QMap<QString, bool> getModalityMap();
+    std::map<std::string, bool> getModalityMap();
 
     //=========================================================================================================
     /**
@@ -158,10 +154,10 @@ protected:
      */
     void onUpdateModalityCheckbox(Qt::CheckState state);
 
-    QMap<QString, bool> m_modalityMap;         /**< Map of different modalities. */
-    QList<QCheckBox*> m_qListModalityCheckBox; /**< List of modality checkboxes. */
+    std::map<std::string, bool> m_modalityMap;       /**< Map of different modalities. */
+    std::vector<QCheckBox*> m_qListModalityCheckBox; /**< List of modality checkboxes. */
 
-    QStringList m_lChannelTypeList; /**< Channel type list. */
+    std::vector<std::string> m_lChannelTypeList; /**< Channel type list. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -170,7 +166,7 @@ signals:
     /**
      * Emit this signal whenever the user changed the modality.
      */
-    void modalitiesChanged(const QMap<QString, bool>& modalityMap);
+    void modalitiesChanged(const std::map<std::string, bool>& modalityMap);
 };
 } // NAMESPACE
 

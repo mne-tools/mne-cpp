@@ -28,7 +28,12 @@
 
 #include <QGraphicsScene>
 #include <QWidget>
-#include <QMutableListIterator>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -48,31 +53,18 @@ SelectionScene::SelectionScene(QGraphicsView* view, QObject* parent)
 
 //=============================================================================================================
 
-void SelectionScene::repaintItems(const QMap<QString, QPointF>& layoutMap, QStringList badChannels)
+void SelectionScene::repaintItems(const std::map<std::string, QPointF>& layoutMap, const std::vector<std::string>& badChannels)
 {
     this->clear();
 
-    QMapIterator<QString, QPointF> i(layoutMap);
-    while (i.hasNext()) {
-        i.next();
-        SelectionSceneItem* SelectionSceneItemTemp;
-
-        if (i.key().contains("EEG"))
-            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
-                                                            0,
-                                                            i.value(),
-                                                            FIFFV_EEG_CH,
-                                                            FIFF_UNIT_T_M,
-                                                            Qt::blue,
-                                                            badChannels.contains(i.key()));
-        else
-            SelectionSceneItemTemp = new SelectionSceneItem(i.key(),
-                                                            0,
-                                                            i.value(),
-                                                            FIFFV_MEG_CH,
-                                                            FIFF_UNIT_T_M,
-                                                            Qt::blue,
-                                                            badChannels.contains(i.key()));
+    for (const auto& [name, position] : layoutMap) {
+        SelectionSceneItem* SelectionSceneItemTemp = new SelectionSceneItem(QString::fromStdString(name),
+                                                                            0,
+                                                                            position,
+                                                                            name.contains("EEG") ? FIFFV_EEG_CH : FIFFV_MEG_CH,
+                                                                            FIFF_UNIT_T_M,
+                                                                            Qt::blue,
+                                                                            std::ranges::contains(badChannels, name));
 
         this->addItem(SelectionSceneItemTemp);
     }
@@ -80,7 +72,7 @@ void SelectionScene::repaintItems(const QMap<QString, QPointF>& layoutMap, QStri
 
 //=============================================================================================================
 
-void SelectionScene::hideItems(QStringList visibleItems)
+void SelectionScene::hideItems(const std::vector<std::string>& visibleItems)
 {
     //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
     QList<QGraphicsItem*> itemList = this->items();
@@ -91,7 +83,7 @@ void SelectionScene::hideItems(QStringList visibleItems)
         if (item->m_iChannelKind == m_iChannelTypeMode) {
             item->show();
 
-            if (!visibleItems.contains(item->m_sChannelName)) {
+            if (!std::ranges::contains(visibleItems, item->m_sChannelName.toStdString())) {
                 item->setFlag(QGraphicsItem::ItemIsSelectable, false);
                 item->setOpacity(0.25);
             } else {

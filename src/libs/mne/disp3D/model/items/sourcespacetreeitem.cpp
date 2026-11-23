@@ -16,6 +16,12 @@
 
 #include "sourcespacetreeitem.h"
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
 namespace mne::disp
 {
 
@@ -24,7 +30,7 @@ namespace mne::disp
 //=============================================================================================================
 
 SourceSpaceTreeItem::SourceSpaceTreeItem(const QString& text,
-                                         const QVector<QVector3D>& positions,
+                                         const std::vector<QVector3D>& positions,
                                          const QColor& color,
                                          float scale,
                                          int type)
@@ -37,7 +43,7 @@ SourceSpaceTreeItem::SourceSpaceTreeItem(const QString& text,
 
 //=============================================================================================================
 
-const QVector<QVector3D>& SourceSpaceTreeItem::positions() const
+const std::vector<QVector3D>& SourceSpaceTreeItem::positions() const
 {
     return m_positions;
 }

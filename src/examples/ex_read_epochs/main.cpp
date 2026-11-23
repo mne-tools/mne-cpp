@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
     epochsImage.setXLabel("Time [ms]");
     epochsImage.setYLabel("Epoch");
     epochsImage.setExtent(1000.0 * fTMin, 1000.0 * fTMax, kept.size(), 1.0);
-    FigureExporter::save(epochsImage, "epochs_image", QString("Every epoch of event %1 in %2, baseline-corrected: the evoked response after the stimulus recurs from trial to trial under the noise.").arg(event).arg(raw.info.ch_names[picks(channel)]));
+    FigureExporter::save(epochsImage, "epochs_image", QString("Every epoch of event %1 in %2, baseline-corrected: the evoked response after the stimulus recurs from trial to trial under the noise.").arg(event).arg(raw.info.ch_names[picks(channel)]).toStdString());
 
     return 0;
 }

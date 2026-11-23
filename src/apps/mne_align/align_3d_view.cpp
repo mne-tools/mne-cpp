@@ -102,7 +102,7 @@ void Align3DView::setRenderMode(const QString& modeName)
     }
     if (!m_pBrainView)
         return;
-    m_pBrainView->setShaderMode(modeName);
+    m_pBrainView->setShaderMode(modeName.toStdString());
     applyViewConfiguration();
 }
 
@@ -135,12 +135,12 @@ void Align3DView::setPenStation(int station)
 void Align3DView::setBem(std::shared_ptr<mne::MNEBem> bem)
 {
     m_pBem = std::move(bem);
-    m_pScene->removeLayer(QString::fromLatin1(kBemLayerId));
+    m_pScene->removeLayer(kBemLayerId);
 
     if (m_pBem) {
         SceneLayer layer;
-        layer.id = QString::fromLatin1(kBemLayerId);
-        layer.displayName = QStringLiteral("Head BEM");
+        layer.id = kBemLayerId;
+        layer.displayName = "Head BEM";
         layer.kind = SceneLayerKind::BrainSurface;
         layer.payload = std::shared_ptr<void>(m_pBem, m_pBem.get());
         m_pScene->addLayer(layer);
@@ -224,14 +224,14 @@ void Align3DView::onLiveUpdateTick()
     };
     constexpr int kMaxStationColors = 4;
 
-    QVector<LiveMarker> markers;
+    std::vector<LiveMarker> markers;
 
     const QMatrix4x4 devToMri = trackerToMri();
 
     // Base station (transmitter origin, transformed)
     if (m_digitizerConnected) {
-        markers.append({devToMri.map(QVector3D(0.0f, 0.0f, 0.0f)),
-                        QColor(60, 120, 255), kBaseRadius});
+        markers.push_back({devToMri.map(QVector3D(0.0f, 0.0f, 0.0f)),
+                           QColor(60, 120, 255), kBaseRadius});
     }
 
     QVector3D focusPos;
@@ -247,10 +247,10 @@ void Align3DView::onLiveUpdateTick()
 
         // Tracker tip — pen station gets a transparent aura sphere
         if (station == m_penStation) {
-            markers.append({pos, tipColor, 0.008f, true});   // 8 mm transparent aura
-            markers.append({pos, tipColor, kTrackerRadius}); // solid core
+            markers.push_back({pos, tipColor, 0.008f, true});   // 8 mm transparent aura
+            markers.push_back({pos, tipColor, kTrackerRadius}); // solid core
         } else {
-            markers.append({pos, tipColor, kTrackerRadius});
+            markers.push_back({pos, tipColor, kTrackerRadius});
         }
 
         // Orientation axes: R/G/B tip spheres (transformed)
@@ -261,9 +261,9 @@ void Align3DView::onLiveUpdateTick()
         const QVector3D zTip = devToMri.map(
             pose.position + pose.orientation.rotatedVector(QVector3D(0.0f, 0.0f, kAxisLength)));
 
-        markers.append({xTip, QColor(255, 50, 50), kAxisRadius});
-        markers.append({yTip, QColor(50, 220, 50), kAxisRadius});
-        markers.append({zTip, QColor(80, 140, 255), kAxisRadius});
+        markers.push_back({xTip, QColor(255, 50, 50), kAxisRadius});
+        markers.push_back({yTip, QColor(50, 220, 50), kAxisRadius});
+        markers.push_back({zTip, QColor(80, 140, 255), kAxisRadius});
 
         // Use pen station for camera focus
         if (station == m_penStation) {
@@ -300,15 +300,15 @@ void Align3DView::onPointsChanged()
 
 void Align3DView::rebuildAcquiredLayer()
 {
-    m_pScene->removeLayer(QString::fromLatin1(kAcquiredLayerId));
+    m_pScene->removeLayer(kAcquiredLayerId);
     if (!m_pPoints || m_pPoints->points().empty())
         return;
 
     auto snapshot = std::make_shared<std::vector<DigitizedPoint>>(m_pPoints->points());
 
     SceneLayer layer;
-    layer.id = QString::fromLatin1(kAcquiredLayerId);
-    layer.displayName = QStringLiteral("Digitised points");
+    layer.id = kAcquiredLayerId;
+    layer.displayName = "Digitised points";
     layer.kind = SceneLayerKind::Custom;
     layer.payload = std::shared_ptr<void>(snapshot, snapshot.get());
     m_pScene->addLayer(layer);
@@ -395,7 +395,7 @@ void Align3DView::rebuildStaticMarkers()
     if (!m_pBrainView || !m_pPoints)
         return;
 
-    QVector<LiveMarker> markers;
+    std::vector<LiveMarker> markers;
 
     constexpr float kFidRadius = 0.004f; // 4 mm
     constexpr float kEegRadius = 0.003f; // 3 mm
@@ -409,8 +409,8 @@ void Align3DView::rebuildStaticMarkers()
     };
     for (int i = 0; i < 3; ++i) {
         if (m_pPoints->has_twin_fiducial(kFiducialOrder[i])) {
-            markers.append({toQt(m_pPoints->twin_fiducial(kFiducialOrder[i])),
-                            kTwinColors[i], kFidRadius});
+            markers.push_back({toQt(m_pPoints->twin_fiducial(kFiducialOrder[i])),
+                               kTwinColors[i], kFidRadius});
         }
     }
 
@@ -430,19 +430,19 @@ void Align3DView::rebuildStaticMarkers()
             case PointKind::Fiducial: {
                 // Color per identity so captured NAS/LPA/RPA are visually distinct
                 const int idx = qBound(0, pt.ident_number - 1, 2); // FiducialId 1..3 → 0..2
-                markers.append({pos, kCapFidColors[idx], kCapFidRadius});
+                markers.push_back({pos, kCapFidColors[idx], kCapFidRadius});
                 break;
             }
             case PointKind::Eeg:
-                markers.append({pos, QColor(220, 120, 255), kEegRadius}); // purple
+                markers.push_back({pos, QColor(220, 120, 255), kEegRadius}); // purple
                 break;
             case PointKind::HeadShape:
-                markers.append({pos, QColor(200, 200, 200), kHspRadius}); // light grey
+                markers.push_back({pos, QColor(200, 200, 200), kHspRadius}); // light grey
                 break;
         }
     }
 
-    if (markers.isEmpty()) {
+    if (markers.empty()) {
         m_pBrainView->clearStaticMarkers();
     } else {
         m_pBrainView->setStaticMarkers(markers);
@@ -542,7 +542,7 @@ void Align3DView::applyViewConfiguration()
     // Read the authoritative state from BrainView itself — setters that
     // call us have already pushed their values down.
     const int viewCount = qBound(1, m_pBrainView->viewCount(), 4);
-    const QString renderMode = m_pBrainView->shaderModeForTarget(-1);
+    const std::string renderMode = m_pBrainView->shaderModeForTarget(-1);
 
     // Default per-pane preset assignment for the 2x2 multi-view grid.
     // Slot 0 mirrors the user-selected camera; the remaining slots show
@@ -566,7 +566,7 @@ void Align3DView::applyViewConfiguration()
         m_pBrainView->setVisualizationEditTarget(target);
         m_pBrainView->setShaderMode(renderMode);
         m_pBrainView->setBemShaderMode(renderMode);
-        m_pBrainView->setVisualizationMode(QStringLiteral("Scientific"));
+        m_pBrainView->setVisualizationMode("Scientific");
     };
 
     applyShaders(-1);

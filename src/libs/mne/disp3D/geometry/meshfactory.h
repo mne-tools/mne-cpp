@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <vector>
 
 namespace mne::disp
 {
@@ -130,7 +131,7 @@ public:
      * @param[in] subdivisions  Number of subdivision passes per sphere.
      * @return Shared pointer to the batched BrainSurface.
      */
-    static std::shared_ptr<BrainSurface> createBatchedSpheres(const QVector<QVector3D>& positions,
+    static std::shared_ptr<BrainSurface> createBatchedSpheres(const std::vector<QVector3D>& positions,
                                                               float radius,
                                                               const QColor& color,
                                                               int subdivisions = 1);
@@ -170,8 +171,8 @@ private:
      * @param[out] faces     Triangle index triplets.
      * @param[in]  subdivisions  Number of subdivision passes.
      */
-    static void buildIcosphere(QVector<Eigen::Vector3f>& vertices,
-                               QVector<Eigen::Vector3i>& faces,
+    static void buildIcosphere(std::vector<Eigen::Vector3f>& vertices,
+                               std::vector<Eigen::Vector3i>& faces,
                                int subdivisions);
 };
 

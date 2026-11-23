@@ -23,7 +23,13 @@
 
 #include <QPainter>
 #include <QMouseEvent>
-#include <QtMath>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <map>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -103,7 +109,7 @@ void OverviewBarWidget::setViewport(float scrollSample, float visibleSamples)
 
 //=============================================================================================================
 
-void OverviewBarWidget::setEvents(const QVector<ChannelRhiView::EventMarker>& events)
+void OverviewBarWidget::setEvents(const std::vector<ChannelRhiView::EventMarker>& events)
 {
     m_events = events;
     update();
@@ -111,7 +117,7 @@ void OverviewBarWidget::setEvents(const QVector<ChannelRhiView::EventMarker>& ev
 
 //=============================================================================================================
 
-void OverviewBarWidget::setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations)
+void OverviewBarWidget::setAnnotations(const std::vector<ChannelRhiView::AnnotationSpan>& annotations)
 {
     m_annotations = annotations;
     update();
@@ -158,23 +164,23 @@ void OverviewBarWidget::rebuildEnvelope()
     // Group channels by type and compute a per-pixel RMS envelope for each type
     struct TypeEnvelope
     {
-        QString typeLabel;
+        std::string typeLabel;
         QColor color;
-        QVector<float> envelope; // per-pixel RMS, size = pw
+        std::vector<float> envelope; // per-pixel RMS, size = pw
     };
-    QVector<TypeEnvelope> typeEnvelopes;
-    QMap<QString, int> typeIndex;
+    std::vector<TypeEnvelope> typeEnvelopes;
+    std::map<std::string, int> typeIndex;
 
     for (int ch = 0; ch < nChannels; ++ch) {
         auto info = m_model->channelInfo(ch);
         if (!typeIndex.contains(info.typeLabel)) {
-            int idx = typeEnvelopes.size();
+            const int idx = static_cast<int>(typeEnvelopes.size());
             typeIndex[info.typeLabel] = idx;
             TypeEnvelope te;
             te.typeLabel = info.typeLabel;
             te.color = info.color;
             te.envelope.resize(pw, 0.f);
-            typeEnvelopes.append(te);
+            typeEnvelopes.push_back(te);
         }
     }
 
@@ -190,7 +196,8 @@ void OverviewBarWidget::rebuildEnvelope()
         int step = qMax(1, (sampleEnd - sampleStart) / 4);
         for (int ch = 0; ch < nChannels; ++ch) {
             auto info = m_model->channelInfo(ch);
-            int ti = typeIndex.value(info.typeLabel, -1);
+            const auto tiIt = typeIndex.find(info.typeLabel);
+            const int ti = tiIt != typeIndex.end() ? tiIt->second : -1;
             if (ti < 0)
                 continue;
 
@@ -208,7 +215,7 @@ void OverviewBarWidget::rebuildEnvelope()
     }
 
     // Draw each type's envelope as a filled area from the bottom
-    const int nTypes = typeEnvelopes.size();
+    const int nTypes = static_cast<int>(typeEnvelopes.size());
     const float laneH = static_cast<float>(ph) / qMax(nTypes, 1);
 
     for (int ti = 0; ti < nTypes; ++ti) {
@@ -232,7 +239,7 @@ void OverviewBarWidget::rebuildEnvelope()
         p.setFont(f);
         p.setPen(QColor(200, 200, 200, 180));
         p.drawText(QRectF(2, static_cast<qreal>(ti) * laneH, 60, laneH * 0.5f),
-                   Qt::AlignLeft | Qt::AlignTop, te.typeLabel);
+                   Qt::AlignLeft | Qt::AlignTop, QString::fromStdString(te.typeLabel));
     }
 
     m_envelopeDirty = false;

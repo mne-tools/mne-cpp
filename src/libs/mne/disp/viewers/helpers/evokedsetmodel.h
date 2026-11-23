@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 //=============================================================================================================
@@ -87,9 +89,9 @@ enum ItemRole
 //=============================================================================================================
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixXdR;
-typedef QPair<const double*, qint32> RowVectorPair;
-typedef QPair<QString, Eigen::RowVectorXd> AvrTypeRowVector;
-typedef QPair<QString, mne::disp::RowVectorPair> AvrTypeRowVectorPair;
+typedef std::pair<const double*, int> RowVectorPair;
+typedef std::pair<std::string, Eigen::RowVectorXd> AvrTypeRowVector;
+typedef std::pair<std::string, mne::disp::RowVectorPair> AvrTypeRowVectorPair;
 
 //=============================================================================================================
 /**
@@ -216,7 +218,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    std::shared_ptr<QMap<QString, QColor>> getAverageColor() const;
+    std::shared_ptr<std::map<std::string, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -224,7 +226,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    std::shared_ptr<QMap<QString, bool>> getAverageActivation() const;
+    std::shared_ptr<std::map<std::string, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -232,7 +234,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -240,7 +242,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation);
+    void setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -288,7 +290,7 @@ public:
      *
      * @return the channel idx to selection status.
      */
-    const QMap<qint32, qint32>& getIdxSelMap() const;
+    const std::map<int, int>& getIdxSelMap() const;
 
     //=========================================================================================================
     /**
@@ -302,9 +304,9 @@ public:
     /**
      * Returns the current baseline information
      *
-     * @return the current baseline information as a from to QPair.
+     * @return the current baseline information as a from to pair in seconds.
      */
-    QPair<QVariant, QVariant> getBaselineInfo() const;
+    std::pair<float, float> getBaselineInfo() const;
 
     //=========================================================================================================
     /**
@@ -336,7 +338,7 @@ public:
      *
      * @param[in] selection      channel index list to select.
      */
-    void selectRows(const QList<qint32>& selection);
+    void selectRows(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -385,16 +387,16 @@ public:
 private:
     std::shared_ptr<mne::FiffEvokedSet> m_pEvokedSet; /**< The evoked set measurement. */
 
-    QMap<qint32, qint32> m_qMapIdxRowSelection;                      /**< Selection mapping.*/
-    std::shared_ptr<QMap<QString, QColor>> m_qMapAverageColor;       /**< Average colors. */
-    std::shared_ptr<QMap<QString, bool>> m_qMapAverageActivation;    /**< Average activation status. */
-    std::shared_ptr<QMap<QString, QColor>> m_qMapAverageColorOld;    /**< Average colors. */
-    std::shared_ptr<QMap<QString, bool>> m_qMapAverageActivationOld; /**< Average activation status. */
+    std::map<int, int> m_qMapIdxRowSelection;                                /**< Selection mapping.*/
+    std::shared_ptr<std::map<std::string, QColor>> m_qMapAverageColor;       /**< Average colors. */
+    std::shared_ptr<std::map<std::string, bool>> m_qMapAverageActivation;    /**< Average activation status. */
+    std::shared_ptr<std::map<std::string, QColor>> m_qMapAverageColorOld;    /**< Average colors. */
+    std::shared_ptr<std::map<std::string, bool>> m_qMapAverageActivationOld; /**< Average activation status. */
 
-    QList<Eigen::MatrixXd> m_matData;       /**< List that holds the data*/
-    QList<Eigen::MatrixXd> m_matDataFreeze; /**< List that holds the data when freezed*/
-    QStringList m_lAvrTypes;                /**< The average types. */
-    QStringList m_lAvrTypesFreeze;          /**< The average types of m_matDataFreeze. */
+    std::vector<Eigen::MatrixXd> m_matData;       /**< List that holds the data*/
+    std::vector<Eigen::MatrixXd> m_matDataFreeze; /**< List that holds the data when freezed*/
+    std::vector<std::string> m_lAvrTypes;         /**< The average types. */
+    std::vector<std::string> m_lAvrTypesFreeze;   /**< The average types of m_matDataFreeze. */
 
     Eigen::MatrixXd m_matProj;                           /**< SSP projector. */
     Eigen::MatrixXd m_matComp;                           /**< Compensator. */
@@ -404,7 +406,7 @@ private:
 
     Eigen::RowVectorXi m_vecBadIdcs; /**< Idcs of bad channels. */
 
-    QPair<QVariant, QVariant> m_pairBaseline; /**< Baseline information. */
+    std::pair<float, float> m_pairBaseline; /**< Baseline information. */
 
     bool m_bIsInit;        /**< Init flag. */
     bool m_bIsFreezed;     /**< Display is freezed. */
@@ -419,7 +421,7 @@ signals:
      *
      * @param[in] selection     list of all selected channels.
      */
-    void newSelection(QList<qint32> selection);
+    void newSelection(const std::vector<int>& selection);
 
     //=========================================================================================================
     /**
@@ -427,7 +429,7 @@ signals:
      *
      * @param[in] qMapAverageColor     the average color map.
      */
-    void newAverageColorMap(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void newAverageColorMap(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -435,7 +437,7 @@ signals:
      *
      * @param[in] qMapAverageActivation     the average activation map.
      */
-    void newAverageActivationMap(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation);
+    void newAverageActivationMap(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation);
 };
 
 //=============================================================================================================

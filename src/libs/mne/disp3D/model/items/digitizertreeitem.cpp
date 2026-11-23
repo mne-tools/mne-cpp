@@ -16,6 +16,12 @@
 
 #include "digitizertreeitem.h"
 
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
 namespace mne::disp
 {
 
@@ -25,8 +31,8 @@ namespace mne::disp
 
 DigitizerTreeItem::DigitizerTreeItem(const QString& text,
                                      PointKind kind,
-                                     const QVector<QVector3D>& positions,
-                                     const QStringList& names,
+                                     const std::vector<QVector3D>& positions,
+                                     const std::vector<std::string>& names,
                                      const QColor& color,
                                      float scale,
                                      int type)
@@ -41,14 +47,14 @@ DigitizerTreeItem::DigitizerTreeItem(const QString& text,
 
 //=============================================================================================================
 
-const QVector<QVector3D>& DigitizerTreeItem::positions() const
+const std::vector<QVector3D>& DigitizerTreeItem::positions() const
 {
     return m_positions;
 }
 
 //=============================================================================================================
 
-const QStringList& DigitizerTreeItem::pointNames() const
+const std::vector<std::string>& DigitizerTreeItem::pointNames() const
 {
     return m_names;
 }

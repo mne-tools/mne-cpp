@@ -32,10 +32,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QList>
-#include <QMutex>
-#include <QVector>
-#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -43,6 +39,16 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <deque>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -95,7 +101,7 @@ public:
      *
      * @param[in] mat        Sparse interpolation matrix (nVertices x nSourcesLH).
      */
-    void setInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> mat);
+    void setInterpolationMatrixLeft(std::shared_ptr<Eigen::SparseMatrix<float>> mat);
 
     //=========================================================================================================
     /**
@@ -103,7 +109,7 @@ public:
      *
      * @param[in] mat        Sparse interpolation matrix (nVertices x nSourcesRH).
      */
-    void setInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> mat);
+    void setInterpolationMatrixRight(std::shared_ptr<Eigen::SparseMatrix<float>> mat);
 
     //=========================================================================================================
     /**
@@ -119,7 +125,7 @@ public:
      *
      * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString& name);
+    void setColormapType(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -169,8 +175,8 @@ public:
      * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
      * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
      */
-    void setSurfaceColor(const QVector<uint32_t>& baseColorsLh,
-                         const QVector<uint32_t>& baseColorsRh);
+    void setSurfaceColor(const std::vector<uint32_t>& baseColorsLh,
+                         const std::vector<uint32_t>& baseColorsRh);
 
 public slots:
     //=========================================================================================================
@@ -188,8 +194,8 @@ signals:
      * @param[in] colorsLh   Per-vertex ABGR color array for the left hemisphere.
      * @param[in] colorsRh   Per-vertex ABGR color array for the right hemisphere.
      */
-    void newRtSmoothedData(const QVector<uint32_t>& colorsLh,
-                           const QVector<uint32_t>& colorsRh);
+    void newRtSmoothedData(const std::vector<uint32_t>& colorsLh,
+                           const std::vector<uint32_t>& colorsRh);
 
     //=========================================================================================================
     /**
@@ -221,33 +227,33 @@ private:
      * @param[in] baseColors Per-vertex base surface colors (ABGR).
      * @return Per-vertex ABGR color array.
      */
-    QVector<uint32_t> computeHemiColors(const Eigen::VectorXf& sourceData,
-                                        const QSharedPointer<Eigen::SparseMatrix<float>>& interpMat,
-                                        const QVector<uint32_t>& baseColors) const;
+    std::vector<uint32_t> computeHemiColors(const Eigen::VectorXf& sourceData,
+                                            const std::shared_ptr<Eigen::SparseMatrix<float>>& interpMat,
+                                            const std::vector<uint32_t>& baseColors) const;
 
-    mutable QMutex m_mutex; /**< Protects data members. */
+    mutable std::mutex m_mutex; /**< Protects data members. */
 
-    QList<Eigen::VectorXd> m_lDataQ;     /**< Incoming data queue. */
-    QList<Eigen::VectorXd> m_lDataLoopQ; /**< Copy for looping. */
-    Eigen::VectorXd m_vecAverage;        /**< Running average accumulator. */
-    int m_iSampleCtr = 0;                /**< Sample counter for averaging. */
-    int m_iCurrentSample = 0;            /**< Current sample index in queue. */
+    std::deque<Eigen::VectorXd> m_lDataQ;     /**< Incoming data queue. */
+    std::deque<Eigen::VectorXd> m_lDataLoopQ; /**< Copy for looping. */
+    Eigen::VectorXd m_vecAverage;             /**< Running average accumulator. */
+    int m_iSampleCtr = 0;                     /**< Sample counter for averaging. */
+    int m_iCurrentSample = 0;                 /**< Current sample index in queue. */
 
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
-    QSharedPointer<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatLh; /**< LH interpolation matrix. */
+    std::shared_ptr<Eigen::SparseMatrix<float>> m_interpMatRh; /**< RH interpolation matrix. */
 
     int m_iNumAverages = 1;            /**< Number of samples to average. */
     bool m_bIsLooping = true;          /**< Whether to loop data. */
     bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("Hot"); /**< Active colormap name. */
+    QString m_sColormapType = QStringLiteral("Hot"); /**< Active colormap name (QString: mne::disp::ColorMap takes one). */
     double m_dThreshMin = 0.0;                       /**< Lower normalization threshold. */
     double m_dThreshMid = 0.5;                       /**< Mid normalization threshold. */
     double m_dThreshMax = 1.0;                       /**< Upper normalization threshold. */
 
-    QVector<uint32_t> m_baseColorsLh; /**< LH base surface colors (curvature/annotation). */
-    QVector<uint32_t> m_baseColorsRh; /**< RH base surface colors (curvature/annotation). */
+    std::vector<uint32_t> m_baseColorsLh; /**< LH base surface colors (curvature/annotation). */
+    std::vector<uint32_t> m_baseColorsRh; /**< RH base surface colors (curvature/annotation). */
 };
 
 } // namespace mne::disp

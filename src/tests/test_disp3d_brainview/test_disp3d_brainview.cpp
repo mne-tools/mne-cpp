@@ -95,6 +95,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <format>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -413,10 +414,10 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     Q_UNUSED(view.megFieldMapOnHeadForTarget(0));
 
     // probeEvokedSets with non-existent path returns empty list
-    QStringList evoked = BrainView::probeEvokedSets("/nonexistent/path.fif");
-    QVERIFY(evoked.isEmpty());
+    const std::vector<std::string> evoked = BrainView::probeEvokedSets("/nonexistent/path.fif");
+    QVERIFY(evoked.empty());
     // ... and so does a FIFF file without averages
-    QVERIFY(BrainView::probeEvokedSets(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif").isEmpty());
+    QVERIFY(BrainView::probeEvokedSets((QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif").toStdU16String()).empty());
 
     // setMegHelmetOverride must not crash
     view.setMegHelmetOverride("");
@@ -441,9 +442,9 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     network.add_edge(mne::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
     const QString avePath = dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif");
     const QString fwdPath = dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QVERIFY(!view.loadSensors(avePath));
-    QVERIFY(!view.loadDipoles(dipPath));
-    QVERIFY(!view.loadSourceSpace(fwdPath));
+    QVERIFY(!view.loadSensors(avePath.toStdU16String()));
+    QVERIFY(!view.loadDipoles(dipPath.toStdU16String()));
+    QVERIFY(!view.loadSourceSpace(fwdPath.toStdU16String()));
     QVERIFY(view.loadNetwork(network, QStringLiteral("Coherence")));
 
     // Dipoles alone frame the camera: the view centre looks at an off-axis dipole
@@ -459,7 +460,7 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
         dipView.setModel(&dipModel);
         dipView.showSingleView();
         dipView.setDipoleVisible(true);
-        QVERIFY(dipView.loadDipoles(offAxisPath));
+        QVERIFY(dipView.loadDipoles(offAxisPath.toStdU16String()));
         QSignalSpy dipHovered(&dipView, &BrainView::hoveredRegionChanged);
         dipView.castRay(dipView.rect().center());
         QVERIFY(!dipHovered.isEmpty() && !dipHovered.last().at(0).toString().isEmpty());
@@ -468,18 +469,18 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     BrainTreeModel model;
     BrainView modelView;
     modelView.setModel(&model);
-    QVERIFY(modelView.loadDipoles(dipPath));
-    QVERIFY(modelView.loadSensors(avePath));
+    QVERIFY(modelView.loadDipoles(dipPath.toStdU16String()));
+    QVERIFY(modelView.loadSensors(avePath.toStdU16String()));
     QVERIFY(modelView.loadNetwork(network, QStringLiteral("Coherence")));
     QVERIFY(model.rowCount() >= 3);
 
     // Cardinal fiducials come in head coordinates, in MRI ones once the head <-> MRI transform is loaded
     // (MNE-Python: apply_trans(invert_transform(mri_head_t), dig[k]["r"]))
-    QMap<int, QVector3D> fiducials = modelView.cardinalFiducialsInMri();
+    std::map<int, QVector3D> fiducials = modelView.cardinalFiducialsInMri();
     QCOMPARE(fiducials.size(), 3);
     QVERIFY(std::fabs(fiducials[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
-    QVERIFY(!modelView.loadTransformation(dir.filePath(QStringLiteral("missing-trans.fif"))));
-    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    QVERIFY(!modelView.loadTransformation((dir.filePath(QStringLiteral("missing-trans.fif"))).toStdU16String()));
+    QVERIFY(modelView.loadTransformation((dataDir + QStringLiteral("MEG/sample/all-trans.fif")).toStdU16String()));
     // The dipole (head coordinates) follows the transform like the sensors: a ray through the view centre
     // picks it only where MNE-Python's apply_trans puts head (0, 0, 50) mm, 41 mm from the untransformed spot
     modelView.showSingleView();
@@ -513,14 +514,14 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     static_cast<AbstractTreeItem*>(*dipoleRow)->setTransform(shift);
     QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
     QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.15f)));
-    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    QVERIFY(modelView.loadTransformation((dataDir + QStringLiteral("MEG/sample/all-trans.fif")).toStdU16String()));
     QVERIFY(!dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
     QVERIFY(dipoleHitAt(QVector3D(0.00730404f, -0.07614912f, 0.09420224f)));
     QVERIFY(!dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
     static_cast<AbstractTreeItem*>(*dipoleRow)->setTransform(QMatrix4x4());
     QVERIFY(dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
     modelView.clearCameraFocusOverride();
-    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    QVERIFY(modelView.loadTransformation((dataDir + QStringLiteral("MEG/sample/all-trans.fif")).toStdU16String()));
 
     fiducials = modelView.cardinalFiducialsInMri();
     const QMap<int, QVector3D> expected{{FIFFV_POINT_LPA, QVector3D(-0.06925742f, 0.01058946f, -0.02500086f)},
@@ -549,12 +550,12 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
         stream->end_file();
         out.close();
     }
-    QVERIFY(modelView.loadTransformation(reordered));
+    QVERIFY(modelView.loadTransformation(reordered.toStdU16String()));
     fiducials = modelView.cardinalFiducialsInMri();
     for (auto it = expected.cbegin(); it != expected.cend(); ++it) {
         QVERIFY2((fiducials[it.key()] - it.value()).length() < 1e-6f, qPrintable(QString::number(it.key())));
     }
-    QVERIFY(!modelView.loadTransformation(devOnly));
+    QVERIFY(!modelView.loadTransformation(devOnly.toStdU16String()));
 
     QApplication::processEvents();
 }
@@ -658,16 +659,15 @@ void TestDisp3dBrainView::brainView_appearanceSetters()
     QTemporaryDir shots;
     const QString shot = shots.filePath(QStringLiteral("sub/view.png"));
     const bool renders = QGuiApplication::platformName() != QLatin1String("offscreen");
-    if (!renders)
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
-    QCOMPARE(view.takeScreenshot(shot), renders);
+    mne::LogCapture screenshotLog;
+    QCOMPARE(view.takeScreenshot(shot.toStdU16String()), renders);
+    QCOMPARE(screenshotLog.count(mne::Log::Level::Warning, "No rendered frame"), renders ? 0 : 1);
     QCOMPARE(QFileInfo::exists(shot), renders);
     QDir(shots.filePath(QStringLiteral("sub"))).removeRecursively();
     const QString cwd = QDir::currentPath();
     QDir::setCurrent(shots.path());
-    if (!renders)
-        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
     QCOMPARE(view.saveSnapshot(), renders);
+    QCOMPARE(screenshotLog.count(mne::Log::Level::Warning, "No rendered frame"), renders ? 0 : 2);
     QCOMPARE(QDir(shots.path()).isEmpty(), !renders);
     QDir::setCurrent(cwd);
 
@@ -706,10 +706,10 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     worker.setVisualizationType(0);
     worker.setVisualizationType(1);
 
-    QSharedPointer<Eigen::SparseMatrix<float>> lhMat;
+    std::shared_ptr<Eigen::SparseMatrix<float>> lhMat;
     int nLh = 0;
     QObject::connect(&worker, &RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
-                     [&](QSharedPointer<Eigen::SparseMatrix<float>> mat) {
+                     [&](const std::shared_ptr<Eigen::SparseMatrix<float>>& mat) {
                          lhMat = mat;
                          ++nLh;
                      });
@@ -761,7 +761,7 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     ends << 0, 2;
     worker.setInterpolationInfoLeft(rr, neighbors, ends);
     worker.setVisualizationType(RtSourceInterpolationMatWorker::InterpolationBased);
-    worker.setInterpolationFunction(QStringLiteral("linear"));
+    worker.setInterpolationFunction("linear");
     const int nBefore = nLh;
     worker.computeInterpolationMatrix();
     QCOMPARE(nLh, nBefore + 1);
@@ -777,15 +777,15 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     RtSourceDataController controller;
     int nCtrlLh = 0;
     int nCtrlRh = 0;
-    QVector<uint32_t> colorsLh;
-    QVector<uint32_t> colorsRh;
+    std::vector<uint32_t> colorsLh;
+    std::vector<uint32_t> colorsRh;
     Eigen::VectorXd rawLh;
     connect(&controller, &RtSourceDataController::newInterpolationMatrixLeftAvailable,
-            [&](const QSharedPointer<Eigen::SparseMatrix<float>>&) { ++nCtrlLh; });
+            [&](const std::shared_ptr<Eigen::SparseMatrix<float>>&) { ++nCtrlLh; });
     connect(&controller, &RtSourceDataController::newInterpolationMatrixRightAvailable,
-            [&](const QSharedPointer<Eigen::SparseMatrix<float>>&) { ++nCtrlRh; });
+            [&](const std::shared_ptr<Eigen::SparseMatrix<float>>&) { ++nCtrlRh; });
     connect(&controller, &RtSourceDataController::newSmoothedDataAvailable,
-            [&](const QVector<uint32_t>& lh, const QVector<uint32_t>& rh) {
+            [&](const std::vector<uint32_t>& lh, const std::vector<uint32_t>& rh) {
                 colorsLh = lh;
                 colorsRh = rh;
             });
@@ -805,8 +805,8 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     data << 0.0, 0.2, 1.0, 0.0, 0.2, 1.0;
     controller.addData(data);
     controller.setStreamingState(true);
-    QTRY_COMPARE(colorsLh.size(), 6);
-    QCOMPARE(colorsRh.size(), 6);
+    QTRY_COMPARE(colorsLh.size(), std::size_t(6));
+    QCOMPARE(colorsRh.size(), std::size_t(6));
     // Vertices of one label share its mean, so they share a colour; the two labels differ
     QCOMPARE(colorsLh[1], colorsLh[0]);
     QCOMPARE(colorsLh[5], colorsLh[3]);
@@ -830,15 +830,15 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     // Safe setters
     worker.setMegFieldMapOnHead(true);
     worker.setMegFieldMapOnHead(false);
-    worker.setBadChannels(QStringList() << "MEG 0111" << "MEG 0112");
-    worker.setBadChannels(QStringList());
+    worker.setBadChannels({"MEG 0111", "MEG 0112"});
+    worker.setBadChannels({});
 
     int eegCount = 0;
-    QString eegKey;
+    std::string eegKey;
     std::shared_ptr<Eigen::MatrixXf> mapping;
-    QVector<int> pick;
+    std::vector<int> pick;
     QObject::connect(&worker, &RtSensorInterpolationMatWorker::newEegMappingAvailable,
-                     [&](const QString& key, std::shared_ptr<Eigen::MatrixXf> mat, const QVector<int>& picked) {
+                     [&](const std::string& key, std::shared_ptr<Eigen::MatrixXf> mat, const std::vector<int>& picked) {
                          ++eegCount;
                          eegKey = key;
                          mapping = std::move(mat);
@@ -856,11 +856,11 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     scalp << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
     worker.setEvoked(evoked);
     worker.setTransform(mne::FiffCoordTrans(), false);
-    worker.setEegSurface(QStringLiteral("bem_head"), scalp);
+    worker.setEegSurface("bem_head", scalp);
     worker.computeMapping();
     QCOMPARE(eegCount, 1);
-    QCOMPARE(eegKey, QStringLiteral("bem_head"));
-    QVERIFY(mapping && mapping->rows() == scalp.rows() && mapping->cols() == pick.size());
+    QCOMPARE(eegKey, std::string("bem_head"));
+    QVERIFY(mapping && mapping->rows() == scalp.rows() && mapping->cols() == std::ssize(pick));
     // The file's own bad channels (EEG 053) are left out, as in SensorFieldMapper and MNE-Python
     QVERIFY(!evoked.info.bads.empty());
     for (int k : pick) {
@@ -870,6 +870,7 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
 
     // Same mapping as FwdFieldMap with the origin fitted to the head shape (MNE-Python's make_field_map origin="auto")
     std::vector<mne::FiffChInfo> eegChs;
+    eegChs.reserve(pick.size());
     for (int k : pick) {
         eegChs.push_back(evoked.info.chs[k]);
     }
@@ -877,10 +878,10 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     const auto expected = mne::FwdFieldMap::computeEegMapping(*coils, scalp, SensorFieldMapper::fitSphereOrigin(evoked.info), 0.06f, 1e-3f);
     QVERIFY((*mapping - *expected).cwiseAbs().maxCoeff() <= 1e-5f * expected->cwiseAbs().maxCoeff());
 
-    const auto nEeg = pick.size();
+    const int nEeg = static_cast<int>(pick.size());
 
     // Channels passed as bad are left out
-    const QString firstEeg = QString::fromStdString(evoked.info.chs[pick.first()].ch_name);
+    const std::string firstEeg = evoked.info.chs[pick.front()].ch_name;
     worker.setBadChannels({firstEeg});
     worker.computeMapping();
     QCOMPARE(eegCount, 2);
@@ -891,18 +892,18 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
 
     // The controller computes the same mapping on its worker thread and streams colours onto that surface
     RtSensorDataController controller;
-    QString controllerKey;
+    std::string controllerKey;
     int controllerPicks = 0;
-    QString colorKey;
-    QVector<uint32_t> colors;
+    std::string colorKey;
+    std::vector<uint32_t> colors;
     Eigen::VectorXf raw;
     connect(&controller, &RtSensorDataController::newEegMappingAvailable,
-            [&](const QString& key, const std::shared_ptr<Eigen::MatrixXf>&, const QVector<int>& picked) {
+            [&](const std::string& key, const std::shared_ptr<Eigen::MatrixXf>&, const std::vector<int>& picked) {
                 controllerKey = key;
-                controllerPicks = picked.size();
+                controllerPicks = static_cast<int>(picked.size());
             });
     connect(&controller, &RtSensorDataController::newSensorColorsAvailable,
-            [&](const QString& key, const QVector<uint32_t>& vertexColors) {
+            [&](const std::string& key, const std::vector<uint32_t>& vertexColors) {
                 colorKey = key;
                 colors = vertexColors;
             });
@@ -910,15 +911,15 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
             [&](const Eigen::VectorXf& data) { raw = data; });
     controller.setEvoked(evoked);
     controller.setTransform(mne::FiffCoordTrans(), false);
-    controller.setEegSurface(QStringLiteral("bem_head"), scalp);
+    controller.setEegSurface("bem_head", scalp);
     controller.recomputeMapping();
-    QTRY_COMPARE(controllerKey, QStringLiteral("bem_head"));
+    QTRY_COMPARE(controllerKey, std::string("bem_head"));
     QCOMPARE(controllerPicks, nEeg);
     controller.setTimeInterval(10);
     controller.addData(Eigen::VectorXf::Constant(nEeg, 1e-6f));
     controller.setStreamingState(true);
-    QTRY_COMPARE(colors.size(), static_cast<int>(scalp.rows()));
-    QCOMPARE(colorKey, QStringLiteral("bem_head"));
+    QTRY_COMPARE(colors.size(), static_cast<std::size_t>(scalp.rows()));
+    QCOMPARE(colorKey, std::string("bem_head"));
     controller.setStreamSmoothedData(false);
     controller.addData(Eigen::VectorXf::Constant(nEeg, 1e-6f));
     QTRY_COMPARE(raw.size(), static_cast<Eigen::Index>(nEeg));
@@ -947,8 +948,8 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     QCOMPARE(manager.closestIndex(0.0f), -1);
 
     // No brain surface: loading is refused
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
-    QVERIFY(!manager.load(QStringLiteral("a-lh.stc"), QString(), surfaces, QStringLiteral("pial")));
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
+    QVERIFY(!manager.load(QStringLiteral("a-lh.stc").toStdU16String(), {}, surfaces, "pial"));
 
     // Left STC: 2 sources on a 4-vertex "lh_pial" surface, 3 time points from -10 ms in 5 ms steps
     QTemporaryDir dir;
@@ -968,13 +969,13 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     auto lh = std::make_shared<BrainSurface>();
     lh->createFromData(rr, tris, Qt::gray);
     lh->setHemi(0);
-    surfaces.insert(QStringLiteral("lh_pial"), lh);
+    surfaces.insert_or_assign("lh_pial", lh);
 
     QSignalSpy loadedSpy(&manager, &SourceEstimateManager::loaded);
     QSignalSpy thresholdSpy(&manager, &SourceEstimateManager::thresholdsUpdated);
-    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QVERIFY(manager.load(lhPath.toStdU16String(), {}, surfaces, "pial"));
     QVERIFY(manager.isLoading());
-    QVERIFY(!manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QVERIFY(!manager.load(lhPath.toStdU16String(), {}, surfaces, "pial"));
     QTRY_COMPARE(loadedSpy.size(), 1);
     QVERIFY(!manager.isLoading());
     QVERIFY(manager.isLoaded());
@@ -992,7 +993,7 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     QSignalSpy timeSpy(&manager, &SourceEstimateManager::timePointChanged);
     const uint32_t before = lh->colorsRef()[3];
     SubView view;
-    view.surfaceType = QStringLiteral("pial");
+    view.surfaceType = "pial";
     manager.setTimePoint(5, surfaces, view, {});
     QCOMPARE(manager.currentTimePoint(), 2);
     QCOMPARE(timeSpy.size(), 1);
@@ -1002,12 +1003,12 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     // A finished load leaves the manager safe to reload, cancel and destroy (the worker used to be
     // freed behind its back; this faults under DYLD_INSERT_LIBRARIES=libgmalloc / glibc heap checks)
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
-    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QVERIFY(manager.load(lhPath.toStdU16String(), {}, surfaces, "pial"));
     QTRY_COMPARE(loadedSpy.size(), 2);
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
     manager.cancelLoading();
     QVERIFY(!manager.isLoading());
-    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QVERIFY(manager.load(lhPath.toStdU16String(), {}, surfaces, "pial"));
     manager.cancelLoading();
     QVERIFY(!manager.isLoading());
 
@@ -1025,8 +1026,8 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
 
     // Without evoked data or a mapping nothing can be streamed
     SensorFieldMapper mapper;
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
-    QVERIFY(!manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
+    QVERIFY(!manager.startStreaming("EEG", mapper, surfaces));
     QVERIFY(!manager.isStreaming());
 
     // EEG of the sample data mapped onto a small scalp surface
@@ -1037,24 +1038,24 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
     tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
     auto head = std::make_shared<BrainSurface>();
     head->createFromData(rr, tris, Qt::gray);
-    surfaces.insert(QStringLiteral("bem_head"), head);
+    surfaces.insert_or_assign("bem_head", head);
     QVERIFY(mapper.buildMapping(surfaces, mne::FiffCoordTrans(), false));
-    QVERIFY(!manager.startStreaming(QStringLiteral("ECoG"), mapper, surfaces));
+    QVERIFY(!manager.startStreaming("ECoG", mapper, surfaces));
 
     // Streaming sends colours for every vertex of the mapped surface, addressed by its key
-    QString key;
-    QVector<uint32_t> colors;
+    std::string key;
+    std::vector<uint32_t> colors;
     connect(&manager, &RtSensorStreamManager::colorsAvailable,
-            [&](const QString& surfaceKey, const QVector<uint32_t>& vertexColors) {
+            [&](const std::string& surfaceKey, const std::vector<uint32_t>& vertexColors) {
                 key = surfaceKey;
                 colors = vertexColors;
             });
     manager.setInterval(10);
-    QVERIFY(manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
+    QVERIFY(manager.startStreaming("EEG", mapper, surfaces));
     QVERIFY(manager.isStreaming());
-    QVERIFY(!manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
-    QTRY_COMPARE(colors.size(), 6);
-    QCOMPARE(key, QStringLiteral("bem_head"));
+    QVERIFY(!manager.startStreaming("EEG", mapper, surfaces));
+    QTRY_COMPARE(colors.size(), std::size_t(6));
+    QCOMPARE(key, std::string("bem_head"));
     manager.stopStreaming();
     QVERIFY(!manager.isStreaming());
 
@@ -1078,8 +1079,8 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     // Accessors must not crash and return sensible defaults
     QVERIFY(!worker.hasLh());
     QVERIFY(!worker.hasRh());
-    QVERIFY(worker.interpolationMatLh().isNull());
-    QVERIFY(worker.interpolationMatRh().isNull());
+    QVERIFY(!worker.interpolationMatLh());
+    QVERIFY(!worker.interpolationMatRh());
 
     // Neither file exists: two read errors, then failure
     QSignalSpy errorSpy(&worker, &StcLoadingWorker::error);
@@ -1105,7 +1106,7 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     Eigen::MatrixX3i tris(2, 3);
     tris << 0, 1, 2, 1, 3, 2;
     lhSurface.createFromData(rr, tris, Qt::gray);
-    StcLoadingWorker loader(lhPath, QString(), &lhSurface, &rhSurface, 0.05);
+    StcLoadingWorker loader(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
     QSignalSpy loadedSpy(&loader, &StcLoadingWorker::finished);
     QSignalSpy progressSpy(&loader, &StcLoadingWorker::progress);
     loader.process();
@@ -1125,14 +1126,14 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     QCOMPARE(progressSpy.last().at(0).toInt(), 100);
 
     // Cancelled before it starts: no matrix, failure
-    StcLoadingWorker cancelled(lhPath, QString(), &lhSurface, &rhSurface, 0.05);
+    StcLoadingWorker cancelled(lhPath.toStdU16String(), {}, &lhSurface, &rhSurface, 0.05);
     QSignalSpy cancelledSpy(&cancelled, &StcLoadingWorker::finished);
     cancelled.requestCancel();
     QVERIFY(cancelled.isCancelled());
     cancelled.process();
     QCOMPARE(cancelledSpy.size(), 1);
     QVERIFY(!cancelledSpy.at(0).at(0).toBool());
-    QVERIFY(cancelled.interpolationMatLh().isNull());
+    QVERIFY(!cancelled.interpolationMatLh());
 
     QApplication::processEvents();
 }
@@ -1195,7 +1196,7 @@ void TestDisp3dBrainView::multiViewLayout_geometry()
     QCOMPARE(MultiViewLayout::cursorForHit(SplitterHit::Both), Qt::SizeAllCursor);
 
     // viewportIndexAt
-    QVector<int> vp = {0, 1, 2, 3};
+    std::vector<int> vp = {0, 1, 2, 3};
     int idx = layout.viewportIndexAt(QPoint(100, 100), vp, sz);
     QVERIFY(idx >= 0 || idx == -1); // must not crash
 
@@ -1498,7 +1499,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     network.add_node(Eigen::Vector3f::Constant(0.02f));
     network.add_edge(mne::NetworkEdge(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5)));
     NetworkObject networkObject;
-    networkObject.load(network, QStringLiteral("Jet"));
+    networkObject.load(network, "Jet");
     networkObject.setThreshold(0.0);
     std::vector<mne::IeegContact> lead(3);
     for (int i = 0; i < 3; ++i) {
@@ -1564,7 +1565,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         int used = 5;
         int last = electrodeOffset;
         // One warning per frame, however many draws are skipped
-        QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
+        mne::LogCapture overflowLog;
         for (int offset = renderer.prepareSurfaceDraw(updates, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(updates, scene, &surface)) {
             QCOMPARE(offset % rhi->ubufAlignment(), 0);
             QVERIFY(offset > last);
@@ -1572,6 +1573,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
             ++used;
         }
         QCOMPARE(used, 16384);
+        QCOMPARE(overflowLog.count(mne::Log::Level::Warning, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped"), 1);
         QCOMPARE(renderer.prepareDipoleDraw(updates, scene, &dipoles), -1);
 
         // Draw phase: bind and draw only
@@ -1591,15 +1593,16 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
         // QRhi forbids resource updates inside a pass, so preparing one there is refused
         QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
-        for (const char* caller : {"prepareSurfaceDraw", "prepareDipoleDraw", "prepareVideoOverlayDraw", "prepareSliceDraw", "prepareSlice", "prepareVideoOverlay"}) {
-            QTest::ignoreMessage(QtWarningMsg, qPrintable(QStringLiteral("BrainRenderer: %1 called inside a render pass; resource updates must precede beginFrame()").arg(QLatin1String(caller))));
-        }
+        mne::LogCapture insidePassLog;
         QCOMPARE(renderer.prepareSurfaceDraw(late, scene, &surface), -1);
         QCOMPARE(renderer.prepareDipoleDraw(late, scene, &dipoles), -1);
         QCOMPARE(renderer.prepareVideoOverlayDraw(late, scene, &video, nullptr), -1);
         QCOMPARE(renderer.prepareSliceDraw(late, scene, 0), -1);
         renderer.prepareSlice(rhi.get(), late, &slice, 0);
         renderer.prepareVideoOverlay(rhi.get(), late, &video);
+        for (const char* caller : {"prepareSurfaceDraw", "prepareDipoleDraw", "prepareVideoOverlayDraw", "prepareSliceDraw", "prepareSlice", "prepareVideoOverlay"}) {
+            QCOMPARE(insidePassLog.count(mne::Log::Level::Warning, std::format("BrainRenderer: {} called inside a render pass; resource updates must precede beginFrame()", caller)), 1);
+        }
         late->release();
         renderer.endPass(cb);
 
@@ -1731,9 +1734,9 @@ void TestDisp3dBrainView::rayPicker_basics()
 
     // pick with empty maps — must return a no-hit result instantly
     SubView sv;
-    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
-    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> itemSurfaceMap;
-    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> itemDipoleMap;
+    std::map<std::string, std::shared_ptr<BrainSurface>> surfaces;
+    std::map<const QStandardItem*, std::shared_ptr<BrainSurface>> itemSurfaceMap;
+    std::map<const QStandardItem*, std::shared_ptr<DipoleObject>> itemDipoleMap;
 
     RayHit result = RayPicker::pick(
         QVector3D(0, 0, 1),
@@ -1743,12 +1746,12 @@ void TestDisp3dBrainView::rayPicker_basics()
     QCOMPARE(result.vertexIndex, -1);
 
     // buildLabel on a no-hit result must not crash
-    QString label = RayPicker::buildLabel(result, itemSurfaceMap, surfaces);
-    QVERIFY(label.isEmpty());
+    const std::string label = RayPicker::buildLabel(result, itemSurfaceMap, surfaces);
+    QVERIFY(label.empty());
 
     // displayLabel on a no-hit RayHit
     RayHit noHit;
-    QVERIFY(noHit.displayLabel().isEmpty());
+    QVERIFY(noHit.displayLabel().empty());
 
     // A perspective camera at z = 5 looking down -z: the pane centre unprojects to the view axis,
     // and a corner ray passes through the point that projects onto that corner
@@ -1778,39 +1781,39 @@ void TestDisp3dBrainView::rayPicker_basics()
         surface->createFromData(rr, tris, Qt::gray);
         return surface;
     };
-    surfaces.insert(QStringLiteral("bem_outer_skin"), plane(1.0f));
-    surfaces.insert(QStringLiteral("bem_inner_skull"), plane(-1.0f));
+    surfaces.insert_or_assign("bem_outer_skin", plane(1.0f));
+    surfaces.insert_or_assign("bem_inner_skull", plane(-1.0f));
     result = RayPicker::pick(QVector3D(0.2f, 0.1f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap);
     QVERIFY(result.hit);
-    QCOMPARE(result.surfaceKey, QStringLiteral("bem_outer_skin"));
+    QCOMPARE(result.surfaceKey, std::string("bem_outer_skin"));
     QVERIFY(std::fabs(result.distance - 4.0f) < 1e-4f);
     QVERIFY((result.hitPoint - QVector3D(0.2f, 0.1f, 1.0f)).length() < 1e-4f);
-    QCOMPARE(RayPicker::buildLabel(result, itemSurfaceMap, surfaces), QStringLiteral("BEM: Outer skin"));
-    QCOMPARE(result.displayLabel(), QStringLiteral("bem_outer_skin"));
+    QCOMPARE(RayPicker::buildLabel(result, itemSurfaceMap, surfaces), std::string("BEM: Outer skin"));
+    QCOMPARE(result.displayLabel(), std::string("bem_outer_skin"));
 
     // Hidden surfaces are not picked; a ray beside the planes misses
-    surfaces.value(QStringLiteral("bem_outer_skin"))->setVisible(false);
+    surfaces.at("bem_outer_skin")->setVisible(false);
     result = RayPicker::pick(QVector3D(0.2f, 0.1f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap);
-    QCOMPARE(result.surfaceKey, QStringLiteral("bem_inner_skull"));
+    QCOMPARE(result.surfaceKey, std::string("bem_inner_skull"));
     QVERIFY(!RayPicker::pick(QVector3D(3.0f, 0.0f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap).hit);
 
     // Labels for the other surface kinds
     RayHit hit;
     hit.hit = true;
-    hit.surfaceKey = QStringLiteral("sens_surface_meg");
-    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("MEG Helmet"));
-    hit.surfaceKey = QStringLiteral("dig_cardinal");
-    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Digitizer (Cardinal)"));
-    hit.surfaceKey = QStringLiteral("rh_pial");
-    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Right Hemisphere"));
-    hit.regionName = QStringLiteral("precentral");
-    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Region: precentral (rh)"));
-    QCOMPARE(hit.displayLabel(), QStringLiteral("Region: precentral (rh)"));
+    hit.surfaceKey = "sens_surface_meg";
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), std::string("MEG Helmet"));
+    hit.surfaceKey = "dig_cardinal";
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), std::string("Digitizer (Cardinal)"));
+    hit.surfaceKey = "rh_pial";
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), std::string("Right Hemisphere"));
+    hit.regionName = "precentral";
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), std::string("Region: precentral (rh)"));
+    QCOMPARE(hit.displayLabel(), std::string("Region: precentral (rh)"));
     hit.regionName.clear();
     hit.isDipole = true;
     hit.dipoleIndex = 3;
-    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Dipole (Dipole 3)"));
-    QCOMPARE(hit.displayLabel(), QStringLiteral("Dipole 3"));
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), std::string("Dipole (Dipole 3)"));
+    QCOMPARE(hit.displayLabel(), std::string("Dipole 3"));
 
     QApplication::processEvents();
 }
@@ -1903,11 +1906,10 @@ void TestDisp3dBrainView::treeItems_basics()
 
     // SourceSpaceTreeItem
     {
-        QVector<QVector3D> positions;
-        positions << QVector3D(0.01f, 0.02f, 0.03f) << QVector3D(-0.01f, 0.02f, 0.03f);
+        const std::vector<QVector3D> positions = {QVector3D(0.01f, 0.02f, 0.03f), QVector3D(-0.01f, 0.02f, 0.03f)};
         SourceSpaceTreeItem ssItem("LH", positions, QColor(200, 30, 90), 0.00075f);
         QCOMPARE(ssItem.text(), QString("LH"));
-        QCOMPARE(ssItem.positions().size(), 2);
+        QCOMPARE(ssItem.positions().size(), std::size_t(2));
         QVERIFY(qAbs(ssItem.scale() - 0.00075f) < 1e-6f);
     }
 
@@ -2021,7 +2023,7 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.setVisualizationMode(mne::disp::ModeAnnotation);
 
     // applySourceEstimateColors
-    QVector<uint32_t> colors(3, 0xFF808080u);
+    std::vector<uint32_t> colors(3, 0xFF808080u);
     surf.applySourceEstimateColors(colors);
 
     // verticesAsMatrix
@@ -2112,8 +2114,8 @@ void TestDisp3dBrainView::rtWorkers_extended()
         RtSensorInterpolationMatWorker worker;
         worker.setMegFieldMapOnHead(true);
         worker.setMegFieldMapOnHead(false);
-        worker.setBadChannels(QStringList() << "MEG 0111");
-        worker.setBadChannels(QStringList());
+        worker.setBadChannels({"MEG 0111"});
+        worker.setBadChannels({});
 
         mne::FiffCoordTrans emptyTrans;
         worker.setTransform(emptyTrans, false);
@@ -2242,13 +2244,13 @@ void TestDisp3dBrainView::brainView_streamingApi()
         scalp.itris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
         model.addBemSurface(QStringLiteral("sample"), QStringLiteral("head"), scalp);
         const QString avePath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
-        QCOMPARE(BrainView::probeEvokedSets(avePath).size(), 4);
+        QCOMPARE(BrainView::probeEvokedSets(avePath.toStdU16String()).size(), std::size_t(4));
         QSignalSpy loaded(&fieldView, &BrainView::sensorFieldLoaded);
-        QVERIFY(fieldView.loadSensorField(avePath, 0));
+        QVERIFY(fieldView.loadSensorField(avePath.toStdU16String(), 0));
         QCOMPARE(loaded.size(), 1);
         QVERIFY(fieldView.sensorFieldTimeRange(tmin, tmax));
         QVERIFY(tmin < 0.0f && tmax > 0.0f);
-        fieldView.startRealtimeSensorStreaming(QStringLiteral("EEG"));
+        fieldView.startRealtimeSensorStreaming("EEG");
         QVERIFY(fieldView.isRealtimeSensorStreaming());
         fieldView.stopRealtimeSensorStreaming();
         QVERIFY(!fieldView.isRealtimeSensorStreaming());
@@ -2262,7 +2264,7 @@ void TestDisp3dBrainView::brainView_streamingApi()
         QVERIFY((hit - QVector3D(0.01f, 0.01f, 0.11f)).length() < 1e-5f);
 
         // Clearing the evoked stops streaming; clearing the BEM removes the scalp from the model and the scene
-        fieldView.startRealtimeSensorStreaming(QStringLiteral("EEG"));
+        fieldView.startRealtimeSensorStreaming("EEG");
         fieldView.clearEvoked();
         QVERIFY(!fieldView.isRealtimeSensorStreaming());
         QVERIFY(!fieldView.sensorFieldTimeRange(tmin, tmax));
@@ -2292,7 +2294,7 @@ void TestDisp3dBrainView::rtDataWorkers_basics()
         worker.setSFreq(600.0);
         worker.setStreamSmoothedData(true);
         worker.setStreamSmoothedData(false);
-        worker.setSurfaceColor(QVector<uint32_t>(), QVector<uint32_t>());
+        worker.setSurfaceColor({}, {});
 
         // addData + clear
         Eigen::VectorXd dVec(5);
@@ -2302,7 +2304,7 @@ void TestDisp3dBrainView::rtDataWorkers_basics()
         worker.clear();
 
         // setInterpolationMatrix* with null (safe - just stores null pointer)
-        QSharedPointer<Eigen::SparseMatrix<float>> nullMat;
+        std::shared_ptr<Eigen::SparseMatrix<float>> nullMat;
         worker.setInterpolationMatrixLeft(nullMat);
         worker.setInterpolationMatrixRight(nullMat);
     }
@@ -2330,7 +2332,7 @@ void TestDisp3dBrainView::rtDataWorkers_basics()
 
         // setMappingMatrix with null
         std::shared_ptr<Eigen::MatrixXf> nullMap;
-        worker.setMappingMatrix(QString(), nullMap);
+        worker.setMappingMatrix({}, nullMap);
     }
 
     QApplication::processEvents();
@@ -2426,7 +2428,7 @@ void TestDisp3dBrainView::networkObject_thresholdAndInstances()
         network.add_edge(mne::NetworkEdge(i, i + 1, Eigen::MatrixXd::Constant(1, 1, weights[i])));
     }
 
-    obj.load(network, QStringLiteral("Jet"));
+    obj.load(network, "Jet");
     QVERIFY(obj.hasData());
     QVERIFY(obj.nodeStreams().indexCount > 0 && obj.nodeStreams().indexCount % 3 == 0);
     QVERIFY(obj.edgeStreams().indexCount > 0 && obj.edgeStreams().indexCount % 3 == 0);
@@ -2443,7 +2445,7 @@ void TestDisp3dBrainView::networkObject_thresholdAndInstances()
     QCOMPARE(obj.nodeInstanceCount(), 2);
 
     // A colour map change keeps the instances
-    obj.setColormap(QStringLiteral("Hot"));
+    obj.setColormap("Hot");
     QCOMPARE(obj.edgeInstanceCount(), 1);
 
     obj.setVisible(false);
@@ -2457,7 +2459,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     SourceEstimateOverlay overlay;
     QVERIFY(!overlay.isLoaded());
     QCOMPARE(overlay.numTimePoints(), 0);
-    QVERIFY(!overlay.loadStc(QStringLiteral("/nonexistent-lh.stc"), 0));
+    QVERIFY(!overlay.loadStc("/nonexistent-lh.stc", 0));
 
     // Left hemisphere: sources at vertices 0 and 2 of a 4-vertex surface, two time points
     Eigen::MatrixXd data(2, 2);
@@ -2487,7 +2489,7 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     surface.setHemi(0);
 
     // Time 0: vertex 2 is at the maximum (opaque, top of the map); vertex 0 at the minimum is transparent
-    overlay.setColormap(QStringLiteral("Hot"));
+    overlay.setColormap("Hot");
     overlay.applyToSurface(&surface, 0);
     const auto& colors = surface.colorsRef();
     const QRgb top = mne::disp::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
@@ -2538,7 +2540,7 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
 
     // Quad vertex i: position (x, y, z) at floats 5i..5i+2, UV at 5i+3, 5i+4; corners 00, 10, 01, 11
     const auto corners = [](const SliceObject& slice) {
-        QVector<float> vertices;
+        std::vector<float> vertices;
         slice.generateQuadVertices(vertices);
         QVector<QVector3D> points;
         for (int i = 0; i < 4; ++i) {
@@ -2576,12 +2578,12 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
     points = corners(slice);
     QCOMPARE(points[3], QVector3D(-2.0f, -14.0f, -30.0f));
 
-    QVector<float> vertices;
+    std::vector<float> vertices;
     slice.generateQuadVertices(vertices);
     QCOMPARE(vertices.size(), 20);
     QCOMPARE(vertices[3 * 5 + 3], 1.0f);
     QCOMPARE(vertices[3 * 5 + 4], 1.0f);
-    QVector<unsigned int> indices;
+    std::vector<unsigned int> indices;
     SliceObject::generateQuadIndices(indices);
     QCOMPARE(indices.size(), 6);
     for (unsigned int index : std::as_const(indices)) {
@@ -2625,8 +2627,8 @@ void TestDisp3dBrainView::brainView_clearRemovesObjectsAndRows()
         mne::MNEBem bem((dataDir + QStringLiteral("subjects/sample/bem/sample-5120-bem.fif")).toStdU16String());
         QVERIFY(bem.size() > 0);
         model.addBemSurface(QStringLiteral("sample"), QStringLiteral("inner_skull"), bem[0]);
-        QVERIFY(view.loadSensors(dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif")));
-        QVERIFY(view.loadSourceSpace(dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif")));
+        QVERIFY(view.loadSensors((dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif")).toStdU16String()));
+        QVERIFY(view.loadSourceSpace((dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif")).toStdU16String()));
     };
     loadAll();
     const int sensors = countItems(AbstractTreeItem::SensorItem);
@@ -2699,7 +2701,7 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
             view.showMultiView();
         }
         view.setVisualizationEditTarget(pane);
-        view.setActiveSurface(QStringLiteral("white"));
+        view.setActiveSurface("white");
         view.setHemiVisible(0, true);
         centre = (pane < 0) ? view.rect().center() : QPoint(view.width() * (1 + 2 * pane) / 4, view.height() / 4);
         clicked.clear();
@@ -2744,12 +2746,12 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     grid[0].position = lh.rr().row(0).transpose();
     ElectrodeObject electrodes;
     electrodes.setImplantation(mne::IeegImplantation(grid));
-    view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}}); // no electrodes yet: ignored
+    view.setElectrodeValues({{"G1", 1.0f}}); // no electrodes yet: ignored
     view.setElectrodes(&electrodes);
-    view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}});
-    QVERIFY(!electrodes.surfaceColors(lh.rr()).isEmpty());
+    view.setElectrodeValues({{"G1", 1.0f}});
+    QVERIFY(!electrodes.surfaceColors(lh.rr()).empty());
     view.setElectrodeValues({});
-    QVERIFY(electrodes.surfaceColors(lh.rr()).isEmpty());
+    QVERIFY(electrodes.surfaceColors(lh.rr()).empty());
     view.setElectrodes(nullptr);
 
     view.showSingleView();
@@ -2819,9 +2821,10 @@ void TestDisp3dBrainView::brainView_headMovementPath()
     view.setHeadMovementPath({Eigen::Vector3f(0.0f, 0.0f, 0.0f)});
 
     // A realistic short drift: a few centimetres over several fits.
-    QVector<Eigen::Vector3f> vecPositions;
+    std::vector<Eigen::Vector3f> vecPositions;
+    vecPositions.reserve(8);
     for (int i = 0; i < 8; ++i) {
-        vecPositions.append(Eigen::Vector3f(0.001f * i, 0.002f * i, 0.05f + 0.001f * i));
+        vecPositions.push_back(Eigen::Vector3f(0.001f * i, 0.002f * i, 0.05f + 0.001f * i));
     }
     view.setHeadMovementPath(vecPositions);
 
@@ -2851,9 +2854,10 @@ void TestDisp3dBrainView::polylineObject_segments()
     QCOMPARE(polyline.instanceCount(), 0);
 
     // N points must give exactly N-1 segments.
-    QVector<Eigen::Vector3f> vecPoints;
+    std::vector<Eigen::Vector3f> vecPoints;
+    vecPoints.reserve(8);
     for (int i = 0; i < 8; ++i) {
-        vecPoints.append(Eigen::Vector3f(0.001f * i, 0.0f, 0.0f));
+        vecPoints.push_back(Eigen::Vector3f(0.001f * i, 0.0f, 0.0f));
     }
     polyline.setPoints(vecPoints);
     QCOMPARE(polyline.instanceCount(), 7);
@@ -2876,9 +2880,10 @@ void TestDisp3dBrainView::polylineObject_segments()
     // Well past the qint16 range that the previous network based
     // implementation keyed nodes by, to show the index type no longer caps the
     // path length.
-    QVector<Eigen::Vector3f> vecLong;
+    std::vector<Eigen::Vector3f> vecLong;
+    vecLong.reserve(40000);
     for (int i = 0; i < 40000; ++i) {
-        vecLong.append(Eigen::Vector3f(0.0f, 0.0f, 1.0e-6f * i));
+        vecLong.push_back(Eigen::Vector3f(0.0f, 0.0f, 1.0e-6f * i));
     }
     polyline.setPoints(vecLong);
     QCOMPARE(polyline.instanceCount(), 39999);

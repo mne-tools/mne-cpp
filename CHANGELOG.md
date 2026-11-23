@@ -197,6 +197,48 @@ aliases; replace the old spelling as below.
 - The `USE_FFTW` option is gone. It never reached the compiler (no build
   defined `EIGEN_FFTW_DEFAULT`), so every FFT has always run on Eigen's
   built-in KISS FFT; the dead FFTW plumbing in the build is removed.
+- `disp3D` uses the standard library wherever Qt is not the API it talks to.
+  Data, keys, names and paths are `std::` types: `std::shared_ptr` instead of
+  `QSharedPointer` (`GeometryInfo`, `Interpolation`, the source workers and
+  controller, `SourceEstimateOverlay`, `StcLoadingWorker`), `std::vector`,
+  `std::map`, `std::unordered_map` and `std::pair` instead of the Qt
+  containers, `std::string` keys (the surface map of `BrainView`,
+  `SensorFieldMapper`, `RayPicker`/`RayHit`, `SceneLayer::id`/`displayName`,
+  `MultimodalScene`, `surface_keys`, colormap, shader and overlay names) and
+  `std::filesystem::path` for every file `DataLoader`, `BrainView`,
+  `SourceEstimateManager`, `SourceEstimateOverlay`, `BrainSurface` and
+  `StcLoadingWorker` read or write; `probeEvokedSets` returns
+  `std::vector<std::string>`. The signals carrying colours, keys and picks
+  use the same types. Signals consumed by widgets (`stcLoadingProgress`,
+  `hoveredRegionChanged`, `electrodeContactClicked`, `shaderModeChanged`),
+  the tree model and `PickResult` keep `QString`. The real-time controllers
+  stream on a `mne::disp::PeriodicTask` (`std::jthread`) and recompute
+  interpolation matrices in order on a one-thread `mne::ThreadPool` instead of
+  `QThread`s; locks are `std::mutex`, timing `std::chrono`, logging
+  `mne::Log`.
+- `disp` uses the standard library wherever Qt is not the API it talks to.
+  Scale maps are `std::map<int, float>` (`ScalingView`, `getScalingValue`,
+  `ButterflyView`, `AverageLayoutView`, `RtFiffRawView`, `ChannelDataView`);
+  average colours and activations, modality, projector, compensator and
+  artifact-threshold maps, layout maps and stim-channel maps are `std::map`
+  keyed by `std::string`; channel names and selections are
+  `std::vector<std::string>` and `std::vector<int>` (`ChannelInfoModel`,
+  `ChannelSelectionView`, `SelectionItem`, `ApplyToView::getSelectedViews`,
+  `showSelectedChannelsOnly`, `selectRows`, `setChannelFilter`); `LinePlot`
+  takes `std::vector<double>`; `ChannelDisplayInfo`, `EventMarker`,
+  `AnnotationSpan` and the time-ruler marks carry `std::string` labels;
+  `RtFiffRawViewModel::addData` and `RtFiffRawView::addData` take a
+  `std::span<const Eigen::MatrixXd>`; detected triggers are
+  `std::map<int, std::vector<std::pair<int, double>>>`; the trigger and stim
+  channel names, `EvokedSetModel::getBaselineInfo` (`std::pair<float, float>`),
+  the HPI coil frequencies and errors (`std::vector`) follow. Files are
+  `std::filesystem::path`: `FigureExporter::directory`/`save`, the coregistration
+  file signals, `HpiSettingsView::digitizersChanged`/`loadCoilPresets`,
+  `FwdSettingsView::atlasDirChanged` and the CMNE model checkpoint of
+  `MinimumNormSettingsView`; `SvgWriter` takes UTF-8 `std::string` file names,
+  titles and descriptions and writes through `std::ofstream`. Widget text,
+  model data, `QSettings` and signals consumed by widgets keep `QString`;
+  logging is `mne::Log`, locks `std::shared_mutex`, timing `std::chrono`.
 - Qt Concurrent, Qt Network, Qt Multimedia, Qt XML, Qt Print Support and Qt
   SVG are no longer needed; MNE-CPP builds against Qt Core, Gui, Widgets and
   Shader Tools (plus Qt Test for the tests). The SVG export of the viewers,

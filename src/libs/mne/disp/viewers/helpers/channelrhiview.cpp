@@ -15,6 +15,8 @@
 //=============================================================================================================
 
 #include "channelrhiview.h"
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 #include <rhi/qrhi.h>
 #include <rhi/qshader.h>
@@ -31,12 +33,17 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QPolygonF>
-#include <QtMath>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cmath>
+#include <map>
+#include <set>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 #include <utility>
 
 //=============================================================================================================
@@ -76,7 +83,7 @@ static QShader loadShader(const QString& filename)
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
-        qWarning() << "ChannelRhiView: cannot open shader" << filename;
+        mne::Log::warning("ChannelRhiView: cannot open shader {}", filename.toStdString());
         return {};
     }
     return QShader::fromSerialized(f.readAll());
@@ -510,14 +517,14 @@ void ChannelRhiView::setButterflyMode(bool enabled)
 
 //=============================================================================================================
 
-QVector<ChannelRhiView::ButterflyTypeGroup> ChannelRhiView::butterflyTypeGroups() const
+std::vector<ChannelRhiView::ButterflyTypeGroup> ChannelRhiView::butterflyTypeGroups() const
 {
-    QVector<ButterflyTypeGroup> groups;
+    std::vector<ButterflyTypeGroup> groups;
     if (!m_model)
         return groups;
 
-    const QVector<int> allCh = effectiveChannelIndices();
-    QMap<QString, int> typeToGroup; // typeLabel → index in groups
+    const std::vector<int> allCh = effectiveChannelIndices();
+    std::map<std::string, int> typeToGroup; // typeLabel → index in groups
 
     for (int ch : allCh) {
         auto info = m_model->channelInfo(ch);
@@ -527,15 +534,15 @@ QVector<ChannelRhiView::ButterflyTypeGroup> ChannelRhiView::butterflyTypeGroups(
         if (typeToGroup.contains(info.typeLabel)) {
             gIdx = typeToGroup[info.typeLabel];
         } else {
-            gIdx = groups.size();
+            gIdx = static_cast<int>(groups.size());
             typeToGroup[info.typeLabel] = gIdx;
             ButterflyTypeGroup g;
             g.typeLabel = info.typeLabel;
             g.color = info.color;
             g.amplitudeMax = info.amplitudeMax;
-            groups.append(g);
+            groups.push_back(g);
         }
-        groups[gIdx].channelIndices.append(ch);
+        groups[gIdx].channelIndices.push_back(ch);
     }
     return groups;
 }
@@ -546,20 +553,20 @@ int ChannelRhiView::butterflyLaneCount() const
 {
     if (!m_model)
         return 0;
-    const QVector<int> allCh = effectiveChannelIndices();
-    QSet<QString> types;
+    const std::vector<int> allCh = effectiveChannelIndices();
+    std::set<std::string> types;
     for (int ch : allCh) {
         auto info = m_model->channelInfo(ch);
         if (m_hideBadChannels && info.bad)
             continue;
         types.insert(info.typeLabel);
     }
-    return types.size();
+    return static_cast<int>(types.size());
 }
 
 //=============================================================================================================
 
-void ChannelRhiView::setChannelIndices(const QVector<int>& indices)
+void ChannelRhiView::setChannelIndices(const std::vector<int>& indices)
 {
     const int previousFirstVisibleChannel = m_firstVisibleChannel;
     m_filteredChannels = indices;
@@ -578,33 +585,33 @@ void ChannelRhiView::setChannelIndices(const QVector<int>& indices)
 
 int ChannelRhiView::totalLogicalChannels() const
 {
-    return effectiveChannelIndices().size();
+    return static_cast<int>(effectiveChannelIndices().size());
 }
 
 //=============================================================================================================
 
 int ChannelRhiView::actualChannelAt(int logicalIdx) const
 {
-    const QVector<int> indices = effectiveChannelIndices();
-    if (logicalIdx < 0 || logicalIdx >= indices.size())
+    const std::vector<int> indices = effectiveChannelIndices();
+    if (logicalIdx < 0 || logicalIdx >= std::ssize(indices))
         return -1;
     return indices.at(logicalIdx);
 }
 
 //=============================================================================================================
 
-QVector<int> ChannelRhiView::effectiveChannelIndices() const
+std::vector<int> ChannelRhiView::effectiveChannelIndices() const
 {
-    QVector<int> indices;
+    std::vector<int> indices;
 
     if (!m_model) {
         return indices;
     }
 
-    if (m_filteredChannels.isEmpty()) {
+    if (m_filteredChannels.empty()) {
         indices.reserve(m_model->channelCount());
         for (int channelIndex = 0; channelIndex < m_model->channelCount(); ++channelIndex) {
-            indices.append(channelIndex);
+            indices.push_back(channelIndex);
         }
     } else {
         indices = m_filteredChannels;
@@ -614,7 +621,7 @@ QVector<int> ChannelRhiView::effectiveChannelIndices() const
         return indices;
     }
 
-    QVector<int> visibleIndices;
+    std::vector<int> visibleIndices;
     visibleIndices.reserve(indices.size());
     for (int channelIndex : std::as_const(indices)) {
         if (channelIndex < 0) {
@@ -623,7 +630,7 @@ QVector<int> ChannelRhiView::effectiveChannelIndices() const
 
         const ChannelDisplayInfo info = m_model->channelInfo(channelIndex);
         if (!info.bad) {
-            visibleIndices.append(channelIndex);
+            visibleIndices.push_back(channelIndex);
         }
     }
 
@@ -632,7 +639,7 @@ QVector<int> ChannelRhiView::effectiveChannelIndices() const
 
 //=============================================================================================================
 
-void ChannelRhiView::setEvents(const QVector<EventMarker>& events)
+void ChannelRhiView::setEvents(const std::vector<EventMarker>& events)
 {
     m_events = events;
     m_overlayDirty = true;
@@ -641,7 +648,7 @@ void ChannelRhiView::setEvents(const QVector<EventMarker>& events)
 
 //=============================================================================================================
 
-void ChannelRhiView::setEpochMarkers(const QVector<int>& triggerSamples)
+void ChannelRhiView::setEpochMarkers(const std::vector<int>& triggerSamples)
 {
     m_epochTriggerSamples = triggerSamples;
     m_overlayDirty = true;
@@ -682,7 +689,7 @@ void ChannelRhiView::setZScoreMode(bool enabled)
 
 //=============================================================================================================
 
-void ChannelRhiView::setAnnotations(const QVector<AnnotationSpan>& annotations)
+void ChannelRhiView::setAnnotations(const std::vector<AnnotationSpan>& annotations)
 {
     m_annotations = annotations;
     m_overlayDirty = true;
@@ -732,7 +739,7 @@ bool ChannelRhiView::annotationsVisible() const
 
 int ChannelRhiView::hitTestAnnotationBoundary(int px, bool& isStart) const
 {
-    for (int i = 0; i < m_annotations.size(); ++i) {
+    for (int i = 0; i < std::ssize(m_annotations); ++i) {
         const float xStart = (static_cast<float>(m_annotations[i].startSample) - m_scrollSample) / m_samplesPerPixel;
         const float xEnd = (static_cast<float>(m_annotations[i].endSample + 1) - m_scrollSample) / m_samplesPerPixel;
 
@@ -827,8 +834,7 @@ void ChannelRhiView::ensurePipeline(QRhi* rhi, QRhiRenderTarget* target)
     QShader fs = loadShader(QStringLiteral(":/disp/shaders/viewers/helpers/shaders/channeldata.frag.qsb"));
 
     if (!vs.isValid() || !fs.isValid()) {
-        qWarning() << "ChannelRhiView: shaders not found. "
-                      "Ensure qt_add_shaders is configured in CMakeLists.";
+        mne::Log::warning("ChannelRhiView: shaders not found. Ensure qt_add_shaders is configured in CMakeLists.");
         return;
     }
 
@@ -860,7 +866,7 @@ void ChannelRhiView::ensurePipeline(QRhi* rhi, QRhiRenderTarget* target)
     m_pipeline->setTargetBlends({blend});
 
     if (!m_pipeline->create()) {
-        qWarning() << "ChannelRhiView: failed to create graphics pipeline";
+        mne::Log::warning("ChannelRhiView: failed to create graphics pipeline");
         m_pipeline.reset();
         return;
     }
@@ -922,17 +928,17 @@ void ChannelRhiView::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
             continue;
         }
         int vboFirst = 0;
-        QVector<float> verts = m_model->decimatedVertices(
+        std::vector<float> verts = m_model->decimatedVertices(
             ch, iFirst, iLast, static_cast<int>(prefetchedSamples / m_samplesPerPixel), vboFirst);
 
-        if (verts.isEmpty()) {
+        if (verts.empty()) {
             m_gpuChannels[logCh].vertexCount = 0;
             continue;
         }
 
         // Z-score normalization: replace raw amplitudes with (y - mean) / std
         if (m_bZScoreMode) {
-            int nv = verts.size() / 2;
+            int nv = static_cast<int>(verts.size()) / 2;
             if (nv > 1) {
                 double sum = 0.0, sumSq = 0.0;
                 for (int v = 0; v < nv; ++v) {
@@ -942,13 +948,13 @@ void ChannelRhiView::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
                 }
                 float mean = static_cast<float>(sum / nv);
                 double var = sumSq / nv - static_cast<double>(mean) * mean;
-                float sd = var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f;
+                float sd = var > 0.0 ? static_cast<float>(std::sqrt(var)) : 1.f;
                 for (int v = 0; v < nv; ++v)
                     verts[v * 2 + 1] = (verts[v * 2 + 1] - mean) / sd;
             }
         }
 
-        int vertexCount = verts.size() / 2; // each vertex is (x, y) = 2 floats
+        int vertexCount = static_cast<int>(verts.size()) / 2; // each vertex is (x, y) = 2 floats
         quint32 byteSize = static_cast<quint32>(verts.size() * sizeof(float));
 
         auto& gd = m_gpuChannels[logCh];
@@ -959,14 +965,14 @@ void ChannelRhiView::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
                                         QRhiBuffer::VertexBuffer,
                                         byteSize));
             if (!gd.vbo->create()) {
-                qWarning() << "ChannelRhiView: VBO create failed for channel" << logCh;
+                mne::Log::warning("ChannelRhiView: VBO create failed for channel {}", logCh);
                 gd.vertexCount = 0;
                 continue;
             }
         }
 
         batch->updateDynamicBuffer(gd.vbo.get(), 0, byteSize,
-                                   verts.constData());
+                                   verts.data());
         gd.vertexCount = vertexCount;
         gd.vboFirstSample = vboFirst;
     }
@@ -986,13 +992,13 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch* batch)
     // ── Butterfly mode: one UBO slot per channel, type-based lane positions ──
     if (m_butterflyMode) {
         const auto groups = butterflyTypeGroups();
-        int nLanes = groups.size();
+        int nLanes = static_cast<int>(groups.size());
         if (nLanes <= 0)
             return;
 
         // Build channel→lane map
-        QHash<int, int> chToLane; // model channel idx → lane index
-        for (int g = 0; g < groups.size(); ++g)
+        std::unordered_map<int, int> chToLane; // model channel idx → lane index
+        for (int g = 0; g < std::ssize(groups); ++g)
             for (int ch : groups[g].channelIndices)
                 chToLane[ch] = g;
 
@@ -1010,7 +1016,8 @@ void ChannelRhiView::updateUBO(QRhiResourceUpdateBatch* batch)
             auto info = (ch >= 0) ? m_model->channelInfo(ch) : ChannelDisplayInfo{};
             bool hideThis = (ch < 0) || (m_hideBadChannels && info.bad);
 
-            int lane = chToLane.value(ch, -1);
+            const auto laneIt = chToLane.find(ch);
+            int lane = laneIt != chToLane.end() ? laneIt->second : -1;
             if (lane < 0)
                 hideThis = true;
 
@@ -1145,7 +1152,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     // fragment shader — no QPainter band rendering here.
 
     // ── Annotation spans ────────────────────────────────────────────
-    if (m_bShowAnnotations && !m_annotations.isEmpty()) {
+    if (m_bShowAnnotations && !m_annotations.empty()) {
         QFont font = p.font();
         font.setPointSizeF(8.0);
         font.setBold(true);
@@ -1175,8 +1182,8 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
             p.drawLine(QPointF(clippedStart, 0.f), QPointF(clippedStart, static_cast<float>(logicalHeight)));
             p.drawLine(QPointF(clippedEnd, 0.f), QPointF(clippedEnd, static_cast<float>(logicalHeight)));
 
-            if (!annotation.label.trimmed().isEmpty()) {
-                QString label = annotation.label.trimmed();
+            if (!mne::trimmed(annotation.label).empty()) {
+                QString label = QString::fromStdString(std::string(mne::trimmed(annotation.label)));
                 QFontMetrics metrics(font);
                 QRect labelRect = metrics.boundingRect(label);
                 labelRect.adjust(-6, -2, 6, 2);
@@ -1194,7 +1201,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     }
 
     // ── Event / stimulus marker lines ───────────────────────────────
-    if (m_bShowEvents && !m_events.isEmpty()) {
+    if (m_bShowEvents && !m_events.empty()) {
         for (const EventMarker& ev : m_events) {
             float xF = (static_cast<float>(ev.sample) - overlayFirst) * overlayPixelsPerSample;
             if (xF < -2.f || xF > logicalWidth + 2.f)
@@ -1207,7 +1214,7 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
     }
 
     // ── Epoch trigger marker lines ──────────────────────────────────
-    if (m_bShowEpochMarkers && !m_epochTriggerSamples.isEmpty()) {
+    if (m_bShowEpochMarkers && !m_epochTriggerSamples.empty()) {
         QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
         p.setPen(epochPen);
         for (int trigSample : m_epochTriggerSamples) {
@@ -1297,7 +1304,7 @@ void ChannelRhiView::ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target)
     auto loadShader = [](const QString& path) -> QShader {
         QFile f(path);
         if (!f.open(QIODevice::ReadOnly)) {
-            qWarning() << "ChannelRhiView: cannot open shader" << path;
+            mne::Log::warning("ChannelRhiView: cannot open shader {}", path.toStdString());
             return {};
         }
         return QShader::fromSerialized(f.readAll());
@@ -1339,7 +1346,7 @@ void ChannelRhiView::ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target)
     m_overlayPipeline->setRenderPassDescriptor(target->renderPassDescriptor());
 
     if (!m_overlayPipeline->create()) {
-        qWarning() << "ChannelRhiView: overlay pipeline create failed";
+        mne::Log::warning("ChannelRhiView: overlay pipeline create failed");
         m_overlayPipeline.reset();
         return;
     }
@@ -1578,28 +1585,28 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
     const int firstFileSample = m_firstFileSample;
     const bool zScoreMode = m_bZScoreMode;
     const bool showClipping = m_bShowClipping;
-    const QVector<EventMarker> events = m_bShowEvents ? m_events : QVector<EventMarker>();
-    const QVector<AnnotationSpan> annotations = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
-    const QVector<int> epochMarkers = m_bShowEpochMarkers ? m_epochTriggerSamples : QVector<int>();
+    const std::vector<EventMarker> events = m_bShowEvents ? m_events : std::vector<EventMarker>();
+    const std::vector<AnnotationSpan> annotations = m_bShowAnnotations ? m_annotations : std::vector<AnnotationSpan>();
+    const std::vector<int> epochMarkers = m_bShowEpochMarkers ? m_epochTriggerSamples : std::vector<int>();
     const ChannelDataModel* model = m_model.data();
 
     // (model channel, lane) for every trace to draw, laid out exactly like updateUBO()
-    QVector<QPair<int, int>> traces;
+    std::vector<std::pair<int, int>> traces;
     int laneCount = 0;
     if (m_butterflyMode) {
-        const QVector<ButterflyTypeGroup> groups = butterflyTypeGroups();
+        const std::vector<ButterflyTypeGroup> groups = butterflyTypeGroups();
         laneCount = static_cast<int>(groups.size());
         for (int lane = 0; lane < laneCount; ++lane) {
             for (int ch : groups[lane].channelIndices) {
-                traces.append({ch, lane});
+                traces.push_back({ch, lane});
             }
         }
     } else {
-        const QVector<int> channelIndices = effectiveChannelIndices();
+        const std::vector<int> channelIndices = effectiveChannelIndices();
         const int firstCh = qBound(0, m_firstVisibleChannel, static_cast<int>(channelIndices.size()));
         laneCount = qMin(m_visibleChannelCount, static_cast<int>(channelIndices.size()) - firstCh);
         for (int lane = 0; lane < laneCount; ++lane) {
-            traces.append({channelIndices[firstCh + lane], lane});
+            traces.push_back({channelIndices[firstCh + lane], lane});
         }
     }
     if (laneCount <= 0) {
@@ -1693,7 +1700,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
     }
 
     // ── Annotation span pass ────────────────────────────────────────
-    if (!annotations.isEmpty()) {
+    if (!annotations.empty()) {
         QFont font = p.font();
         font.setPointSizeF(8.0);
         font.setBold(true);
@@ -1723,8 +1730,8 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
             p.drawLine(QPointF(xStart, 0.f), QPointF(xStart, static_cast<float>(ph)));
             p.drawLine(QPointF(xEnd, 0.f), QPointF(xEnd, static_cast<float>(ph)));
 
-            if (!annotation.label.trimmed().isEmpty()) {
-                const QString label = annotation.label.trimmed();
+            if (!mne::trimmed(annotation.label).empty()) {
+                const QString label = QString::fromStdString(std::string(mne::trimmed(annotation.label)));
                 QFontMetrics metrics(font);
                 QRect labelRect = metrics.boundingRect(label);
                 labelRect.adjust(-6, -2, 6, 2);
@@ -1746,7 +1753,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
         const ChannelDisplayInfo info = model->channelInfo(ch);
 
         int vboFirst = 0;
-        QVector<float> verts = model->decimatedVertices(ch, firstSample, lastSample, pw, vboFirst);
+        std::vector<float> verts = model->decimatedVertices(ch, firstSample, lastSample, pw, vboFirst);
         const int nVerts = static_cast<int>(verts.size() / 2);
         if (nVerts < 2) {
             continue;
@@ -1766,7 +1773,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
             const double mean = sum / nVerts;
             const double var = sumSq / nVerts - mean * mean;
             offset = static_cast<float>(mean);
-            amplitudeMax = 4.f * (var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f);
+            amplitudeMax = 4.f * (var > 0.0 ? static_cast<float>(std::sqrt(var)) : 1.f);
         }
 
         const QPen normalPen(info.bad ? QColor(200, 60, 60, 180) : info.color, 1.2);
@@ -1802,7 +1809,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
     // ── Event / stimulus marker pass ─────────────────────────────────
     // Draw coloured vertical lines spanning the full channel area.
     // Label chips are shown in the TimeRulerWidget stim lane.
-    if (!events.isEmpty() && spp > 0.f) {
+    if (!events.empty() && spp > 0.f) {
         for (const EventMarker& ev : events) {
             float xF = (static_cast<float>(ev.sample) - scrollSample) / spp;
             if (xF < -2.f || xF > pw + 2.f)
@@ -1818,7 +1825,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
 
     // ── Epoch trigger marker pass ────────────────────────────────────
     // Draw dashed grey vertical lines at epoch trigger positions.
-    if (!epochMarkers.isEmpty() && spp > 0.f) {
+    if (!epochMarkers.empty() && spp > 0.f) {
         QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
         p.setPen(epochPen);
         for (int trigSample : epochMarkers) {
@@ -1864,16 +1871,16 @@ static QString formatAmplitude(float amp, const QString& unit)
     return QString::number(amp, 'f', 3) + QStringLiteral(" ") + unit;
 }
 
-static QString unitForType(const QString& typeLabel)
+static QString unitForType(std::string_view typeLabel)
 {
-    if (typeLabel == QStringLiteral("MEG grad"))
+    if (typeLabel == "MEG grad")
         return QStringLiteral("T/m");
-    if (typeLabel == QStringLiteral("MEG mag") || typeLabel == QStringLiteral("MEG"))
+    if (typeLabel == "MEG mag" || typeLabel == "MEG")
         return QStringLiteral("T");
-    if (typeLabel == QStringLiteral("EEG") ||
-        typeLabel == QStringLiteral("EOG") ||
-        typeLabel == QStringLiteral("ECG") ||
-        typeLabel == QStringLiteral("EMG"))
+    if (typeLabel == "EEG" ||
+        typeLabel == "EOG" ||
+        typeLabel == "ECG" ||
+        typeLabel == "EMG")
         return QStringLiteral("V");
     return QStringLiteral("AU");
 }
@@ -1905,12 +1912,12 @@ void ChannelRhiView::drawCrosshair(QPainter& p)
     if (m_butterflyMode) {
         // In butterfly mode, lanes correspond to type groups
         const auto groups = butterflyTypeGroups();
-        int nLanes = groups.size();
+        int nLanes = static_cast<int>(groups.size());
         if (nLanes <= 0)
             return;
         float laneH = static_cast<float>(h) / nLanes;
         int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
-        channelLabel = groups[lane].typeLabel;
+        channelLabel = QString::fromStdString(groups[lane].typeLabel);
         unitStr = unitForType(groups[lane].typeLabel);
     } else {
         // Normal mode: determine the channel and sample under the cursor
@@ -1927,7 +1934,7 @@ void ChannelRhiView::drawCrosshair(QPainter& p)
 
         auto info = m_model->channelInfo(ch);
         value = m_model->sampleValueAt(ch, sample);
-        channelLabel = info.name;
+        channelLabel = QString::fromStdString(info.name);
         unitStr = unitForType(info.typeLabel);
     }
 
@@ -1983,13 +1990,13 @@ void ChannelRhiView::emitCursorData()
 
     if (m_butterflyMode) {
         const auto groups = butterflyTypeGroups();
-        int nLanes = groups.size();
+        int nLanes = static_cast<int>(groups.size());
         if (nLanes <= 0)
             return;
         float laneH = static_cast<float>(h) / nLanes;
         int lane = qBound(0, static_cast<int>(m_crosshairY / laneH), nLanes - 1);
         emit cursorDataChanged(timeSec, 0.f,
-                               groups[lane].typeLabel,
+                               QString::fromStdString(groups[lane].typeLabel),
                                unitForType(groups[lane].typeLabel));
     } else {
         int totalCh = totalLogicalChannels();
@@ -2003,7 +2010,7 @@ void ChannelRhiView::emitCursorData()
             return;
         auto info = m_model->channelInfo(ch);
         float value = m_model->sampleValueAt(ch, sample);
-        emit cursorDataChanged(timeSec, value, info.name, unitForType(info.typeLabel));
+        emit cursorDataChanged(timeSec, value, QString::fromStdString(info.name), unitForType(info.typeLabel));
     }
 }
 
@@ -2027,7 +2034,7 @@ void ChannelRhiView::drawScalebars(QPainter& p)
     float laneH = static_cast<float>(height()) / visCnt;
 
     // Collect unique channel types and their amplitude scales
-    QMap<QString, float> typeScales;
+    std::map<std::string, float> typeScales;
     if (m_butterflyMode) {
         const auto groups = butterflyTypeGroups();
         for (const auto& g : groups)
@@ -2044,7 +2051,7 @@ void ChannelRhiView::drawScalebars(QPainter& p)
         }
     }
 
-    if (typeScales.isEmpty())
+    if (typeScales.empty())
         return;
 
     QFont f = font();
@@ -2060,11 +2067,11 @@ void ChannelRhiView::drawScalebars(QPainter& p)
     int x = width() - margin;
     int y = height() - margin;
 
-    for (auto it = typeScales.constEnd(); it != typeScales.constBegin();) {
+    for (auto it = typeScales.cend(); it != typeScales.cbegin();) {
         --it;
-        QString unit = unitForType(it.key());
-        float ampValue = it.value() * static_cast<float>(barHeight) / scalePx;
-        QString label = it.key() + QStringLiteral(": ") + formatAmplitude(ampValue, unit);
+        QString unit = unitForType(it->first);
+        float ampValue = it->second * static_cast<float>(barHeight) / scalePx;
+        QString label = QString::fromStdString(it->first) + QStringLiteral(": ") + formatAmplitude(ampValue, unit);
 
         int textW = fm.horizontalAdvance(label);
         int barX = x - textW - 14;
@@ -2374,7 +2381,7 @@ void ChannelRhiView::mousePressEvent(QMouseEvent* event)
         stopScrollAnimations();
 
         // Check if clicking on an annotation boundary for drag-resize
-        if (m_annotationSelectionEnabled && !m_annotations.isEmpty()) {
+        if (m_annotationSelectionEnabled && !m_annotations.empty()) {
             bool isStart = false;
             int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
             if (hitIdx >= 0) {
@@ -2399,8 +2406,8 @@ void ChannelRhiView::mousePressEvent(QMouseEvent* event)
         m_leftDownX = event->position().toPoint().x();
         m_leftDownScroll = m_scrollSample;
         m_velocityHistory.clear();
-        m_dragTimer.start();
-        m_velocityHistory.append({m_leftDownX, 0});
+        m_dragStart = std::chrono::steady_clock::now();
+        m_velocityHistory.push_back({m_leftDownX, 0});
         event->accept();
         return;
     }
@@ -2419,7 +2426,7 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent* event)
         if (m_lastFileSample >= 0)
             newSample = qMin(newSample, m_lastFileSample);
 
-        if (m_annDragIndex >= 0 && m_annDragIndex < m_annotations.size()) {
+        if (m_annDragIndex >= 0 && m_annDragIndex < std::ssize(m_annotations)) {
             if (m_annDragIsStart)
                 m_annotations[m_annDragIndex].startSample = newSample;
             else
@@ -2498,11 +2505,11 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent* event)
             setScrollSample(newScroll);
 
             // Record velocity sample; keep only the last 100 ms
-            qint64 now = m_dragTimer.elapsed();
-            m_velocityHistory.append({x, now});
+            const std::int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_dragStart).count();
+            m_velocityHistory.push_back({x, now});
             while (m_velocityHistory.size() > 1 &&
-                   now - m_velocityHistory.first().t > 100)
-                m_velocityHistory.removeFirst();
+                   now - m_velocityHistory.front().t > 100)
+                m_velocityHistory.erase(m_velocityHistory.begin());
 
             event->accept();
             return;
@@ -2522,7 +2529,7 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent* event)
     }
 
     // ── Annotation boundary hover cursor ─────────────────────────────
-    if (m_annotationSelectionEnabled && !m_annotations.isEmpty()) {
+    if (m_annotationSelectionEnabled && !m_annotations.empty()) {
         bool isStart = false;
         int hitIdx = hitTestAnnotationBoundary(event->position().toPoint().x(), isStart);
         if (hitIdx >= 0) {
@@ -2621,8 +2628,8 @@ void ChannelRhiView::mouseReleaseEvent(QMouseEvent* event)
         } else {
             // Compute velocity from recent history and launch inertial animation
             if (m_velocityHistory.size() >= 2) {
-                auto oldest = m_velocityHistory.first();
-                auto newest = m_velocityHistory.last();
+                auto oldest = m_velocityHistory.front();
+                auto newest = m_velocityHistory.back();
                 float dt = static_cast<float>(newest.t - oldest.t);
                 if (dt > 5.f) {
                     float dx = static_cast<float>(newest.x - oldest.x);

@@ -29,15 +29,6 @@
 #include <mne/fs/fs_surface.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-#include <QFileInfo>
-#include <QDebug>
-#include <QCoreApplication>
-
-//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -47,7 +38,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
+#include <format>
 #include <memory>
+#include <string>
+#include <vector>
 
 using namespace mne;
 
@@ -58,18 +53,18 @@ namespace mne::disp
 // STATIC METHODS
 //=============================================================================================================
 
-DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
-                                                     const QString& megHelmetOverridePath)
+DataLoader::SensorLoadResult DataLoader::loadSensors(const std::filesystem::path& fifPath,
+                                                     const std::filesystem::path& megHelmetOverridePath)
 {
     SensorLoadResult result;
 
-    QFile file(fifPath);
-    if (!file.exists())
+    std::error_code error;
+    if (!std::filesystem::exists(fifPath, error))
         return result;
 
     FiffInfo info;
     FiffDigPointSet digSet;
-    FiffStream stream(fifPath.toStdU16String());
+    FiffStream stream(fifPath);
 
     if (stream.open()) {
         std::shared_ptr<FiffDirNode> tree = stream.dirtree();
@@ -133,7 +128,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
 
         // ── MEG helmet surface ──────────────────────────────────────
         if (!result.megGradItems.isEmpty() || !result.megMagItems.isEmpty()) {
-            auto pickHelmetFile = [&info]() -> QString {
+            auto pickHelmetFile = [&info]() -> std::filesystem::path {
                 int coilType = -1;
                 int nMeg = 0;
                 for (const auto& ch : info.chs) {
@@ -143,7 +138,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
                     }
                 }
 
-                QString fileName = "306m.fif";
+                std::string fileName = "306m.fif";
                 if (coilType == FIFFV_COIL_BABY_GRAD) {
                     fileName = "BabySQUID.fif";
                 } else if (coilType == FIFFV_COIL_NM_122) {
@@ -158,36 +153,40 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
                     fileName = "306m.fif";
                 }
 
-                return QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/" + fileName;
+                return mne::executable_dir() / ".." / "resources" / "general" / "sensorSurfaces" / fileName;
             };
 
-            QString helmetPath;
-            if (!megHelmetOverridePath.isEmpty()) {
+            const auto fileExists = [](const std::filesystem::path& path) {
+                std::error_code existsError;
+                return !path.empty() && std::filesystem::exists(path, existsError);
+            };
+
+            std::filesystem::path helmetPath;
+            if (!megHelmetOverridePath.empty()) {
                 helmetPath = megHelmetOverridePath;
-                if (!QFile::exists(helmetPath)) {
-                    qWarning() << "MEG helmet override file not found:" << helmetPath
-                               << "- falling back to auto selection.";
+                if (!fileExists(helmetPath)) {
+                    mne::Log::warning("MEG helmet override file not found: {} - falling back to auto selection.", mne::utf8_from_path(helmetPath));
                     helmetPath.clear();
                 }
             }
 
-            if (helmetPath.isEmpty()) {
+            if (helmetPath.empty()) {
                 helmetPath = pickHelmetFile();
 #ifdef __EMSCRIPTEN__
-                // WASM: applicationDirPath()/../ may not resolve correctly.
+                // WASM: the executable directory may not resolve correctly.
                 // Try the preloaded virtual FS path directly.
-                if (!QFile::exists(helmetPath)) {
-                    QString fn = QFileInfo(helmetPath).fileName();
-                    if (fn.isEmpty())
-                        fn = QStringLiteral("306m.fif");
-                    helmetPath = QStringLiteral("/resources/general/sensorSurfaces/") + fn;
+                if (!fileExists(helmetPath)) {
+                    std::filesystem::path fn = helmetPath.filename();
+                    if (fn.empty())
+                        fn = "306m.fif";
+                    helmetPath = std::filesystem::path("/resources/general/sensorSurfaces") / fn;
                 }
 #endif
             }
 
-            if (!QFile::exists(helmetPath)) {
-                QString fallback = QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m.fif";
-                if (QFile::exists(fallback)) {
+            if (!fileExists(helmetPath)) {
+                const std::filesystem::path fallback = mne::executable_dir() / ".." / "resources" / "general" / "sensorSurfaces" / "306m.fif";
+                if (fileExists(fallback)) {
                     helmetPath = fallback;
                 }
             }
@@ -195,23 +194,22 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
 #ifdef __EMSCRIPTEN__
             // WASM fallback: sensor surfaces are preloaded into the
             // Emscripten virtual FS at /resources/general/sensorSurfaces/.
-            // applicationDirPath() may not resolve the /../ correctly.
-            if (!QFile::exists(helmetPath)) {
-                QString wasmFallback = QStringLiteral("/resources/general/sensorSurfaces/") + QFileInfo(helmetPath).fileName();
-                if (wasmFallback.endsWith('/'))
-                    wasmFallback += "306m.fif";
-                if (QFile::exists(wasmFallback)) {
+            // The executable directory may not resolve the /../ correctly.
+            if (!fileExists(helmetPath)) {
+                std::filesystem::path fn = helmetPath.filename();
+                if (fn.empty())
+                    fn = "306m.fif";
+                const std::filesystem::path wasmFallback = std::filesystem::path("/resources/general/sensorSurfaces") / fn;
+                if (fileExists(wasmFallback)) {
                     helmetPath = wasmFallback;
                 }
             }
 #endif
 
-            if (!QFile::exists(helmetPath)) {
-                qWarning() << "MEG helmet surface file not found. Checked:" << helmetPath;
-            }
-
-            if (QFile::exists(helmetPath)) {
-                MNEBem helmetBem(helmetPath.toStdU16String());
+            if (!fileExists(helmetPath)) {
+                mne::Log::warning("MEG helmet surface file not found. Checked: {}", mne::utf8_from_path(helmetPath));
+            } else {
+                MNEBem helmetBem(helmetPath);
                 if (helmetBem.size() > 0) {
                     MNEBemSurface helmetSurf = helmetBem[0];
                     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
@@ -244,7 +242,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
                     helmetSurface->setVisible(true);
                     result.helmetSurface = helmetSurface;
                 } else {
-                    qWarning() << "DataLoader::loadSensors: helmetBem[0] has 0 verts/tris!";
+                    mne::Log::warning("DataLoader::loadSensors: helmetBem[0] has 0 verts/tris!");
                 }
             }
         }
@@ -255,7 +253,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
         result.digitizerPoints = info.dig;
         result.hasDigitizer = true;
     } else if (!result.hasInfo) {
-        if (auto dig = FiffDigPointSet::read(fifPath.toStdU16String()); dig && !dig->empty()) {
+        if (auto dig = FiffDigPointSet::read(fifPath); dig && !dig->empty()) {
             result.digitizerPoints = std::move(*dig);
             result.hasDigitizer = true;
         }
@@ -267,18 +265,19 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString& fifPath,
 //=============================================================================================================
 
 std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
-    const QString& helmetFilePath,
+    const std::filesystem::path& helmetFilePath,
     const QMatrix4x4& devHeadTrans,
     bool applyTrans)
 {
-    if (!QFile::exists(helmetFilePath)) {
-        qWarning() << "DataLoader::loadHelmetSurface: file not found:" << helmetFilePath;
+    std::error_code error;
+    if (!std::filesystem::exists(helmetFilePath, error)) {
+        mne::Log::warning("DataLoader::loadHelmetSurface: file not found: {}", mne::utf8_from_path(helmetFilePath));
         return nullptr;
     }
 
-    MNEBem helmetBem(helmetFilePath.toStdU16String());
+    MNEBem helmetBem(helmetFilePath);
     if (helmetBem.size() == 0) {
-        qWarning() << "DataLoader::loadHelmetSurface: no BEM surfaces in" << helmetFilePath;
+        mne::Log::warning("DataLoader::loadHelmetSurface: no BEM surfaces in {}", mne::utf8_from_path(helmetFilePath));
         return nullptr;
     }
 
@@ -318,22 +317,22 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
 
 //=============================================================================================================
 
-InvEcdSet DataLoader::loadDipoles(const QString& dipPath)
+InvEcdSet DataLoader::loadDipoles(const std::filesystem::path& dipPath)
 {
-    InvEcdSet ecdSet = InvEcdSet::read_dipoles_dip(dipPath.toStdU16String());
+    InvEcdSet ecdSet = InvEcdSet::read_dipoles_dip(dipPath);
     if (ecdSet.size() == 0) {
-        qWarning() << "DataLoader: Failed to load dipoles from" << dipPath;
+        mne::Log::warning("DataLoader: Failed to load dipoles from {}", mne::utf8_from_path(dipPath));
     }
     return ecdSet;
 }
 
 //=============================================================================================================
 
-MNESourceSpaces DataLoader::loadSourceSpace(const QString& fwdPath)
+MNESourceSpaces DataLoader::loadSourceSpace(const std::filesystem::path& fwdPath)
 {
-    auto srcSpace = MNESourceSpaces::read(fwdPath.toStdU16String());
+    auto srcSpace = MNESourceSpaces::read(fwdPath);
     if (!srcSpace) {
-        qWarning() << "DataLoader:" << srcSpace.error().what();
+        mne::Log::warning("DataLoader: {}", srcSpace.error().what());
         return {};
     }
     return std::move(*srcSpace);
@@ -341,11 +340,11 @@ MNESourceSpaces DataLoader::loadSourceSpace(const QString& fwdPath)
 
 //=============================================================================================================
 
-bool DataLoader::loadHeadToMriTransform(const QString& transPath,
+bool DataLoader::loadHeadToMriTransform(const std::filesystem::path& transPath,
                                         FiffCoordTrans& trans)
 {
     // A file may hold several transforms (e.g. all-trans.fif: device -> head and MRI -> head)
-    const auto read = FiffCoordTrans::read(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+    const auto read = FiffCoordTrans::read(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     if (!read) {
         mne::Log::warning("DataLoader: {}", read.error().what());
         return false;
@@ -356,44 +355,43 @@ bool DataLoader::loadHeadToMriTransform(const QString& transPath,
 
 //=============================================================================================================
 
-FiffEvoked DataLoader::loadEvoked(const QString& evokedPath, int aveIndex)
+FiffEvoked DataLoader::loadEvoked(const std::filesystem::path& evokedPath, int aveIndex)
 {
-    QFile file(evokedPath);
-    if (!file.exists()) {
-        qWarning() << "DataLoader: Sensor evoked file not found:" << evokedPath;
+    std::error_code error;
+    if (!std::filesystem::exists(evokedPath, error)) {
+        mne::Log::warning("DataLoader: Sensor evoked file not found: {}", mne::utf8_from_path(evokedPath));
         return {};
     }
 
-    FiffEvoked evoked(evokedPath.toStdU16String(), aveIndex);
+    FiffEvoked evoked(evokedPath, aveIndex);
     if (evoked.empty()) {
-        qWarning() << "DataLoader: Failed to read evoked data from" << evokedPath;
+        mne::Log::warning("DataLoader: Failed to read evoked data from {}", mne::utf8_from_path(evokedPath));
     }
     return evoked;
 }
 
 //=============================================================================================================
 
-QStringList DataLoader::probeEvokedSets(const QString& evokedPath)
+std::vector<std::string> DataLoader::probeEvokedSets(const std::filesystem::path& evokedPath)
 {
-    QStringList result;
-    QFile file(evokedPath);
-    if (!file.exists()) {
+    std::vector<std::string> result;
+    std::error_code error;
+    if (!std::filesystem::exists(evokedPath, error)) {
         return result;
     }
 
-    const auto read = FiffEvokedSet::read(evokedPath.toStdU16String());
+    const auto read = FiffEvokedSet::read(evokedPath);
     if (!read) {
         return result;
     }
     const FiffEvokedSet& evokedSet = *read;
     for (int i = 0; i < std::ssize(evokedSet.evoked); ++i) {
         const auto& ev = evokedSet.evoked.at(i);
-        QString label = QString("%1: %2 (%3, nave=%4)")
-                            .arg(i)
-                            .arg(ev.comment.empty() ? QStringLiteral("Set %1").arg(i) : QString::fromStdString(ev.comment))
-                            .arg(QString::fromStdString(ev.aspectKindToString()))
-                            .arg(ev.nave);
-        result.append(label);
+        result.push_back(std::format("{}: {} ({}, nave={})",
+                                     i,
+                                     ev.comment.empty() ? std::format("Set {}", i) : ev.comment,
+                                     ev.aspectKindToString(),
+                                     ev.nave));
     }
     return result;
 }

@@ -163,7 +163,7 @@ Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
             this,
             [this](const QString& surfaceType) {
                 if (!surfaceType.trimmed().isEmpty()) {
-                    m_brainView->setActiveSurface(surfaceType.trimmed());
+                    m_brainView->setActiveSurface(surfaceType.trimmed().toStdString());
                 }
             });
 
@@ -345,7 +345,7 @@ bool Dummy3DHostedViewWidget::loadSurfaceFile(const QString& filePath, QString* 
         m_surfaceTypes.append(surfaceType);
     }
 
-    m_brainView->setActiveSurface(surfaceType);
+    m_brainView->setActiveSurface(surfaceType.toStdString());
     return true;
 }
 

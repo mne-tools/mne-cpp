@@ -32,16 +32,12 @@
 #include "abstractview.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QStringList>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -102,7 +98,7 @@ public:
      * @param[in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,.
      *                                   backgroundcolor, signalColor, screenshot
      */
-    void setWidgetList(const QStringList& lVisibleWidgets = QStringList());
+    void setWidgetList(const std::vector<std::string>& lVisibleWidgets = {});
 
     //=========================================================================================================
     /**

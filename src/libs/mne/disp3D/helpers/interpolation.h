@@ -35,13 +35,6 @@
 #include "../disp3D_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-#include <QVector>
-
-//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -52,6 +45,8 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <memory>
 #include <limits>
 
 //=============================================================================================================
@@ -90,11 +85,11 @@ public:
      * @param[in] vecExcludeIndex         Sensor column indices that are not pinned to their own vertex.
      * @return Row-normalised sparse weight matrix (nVertices x nSensors), or an empty matrix if the table is empty.
      */
-    static QSharedPointer<Eigen::SparseMatrix<float>> createInterpolationMat(const Eigen::VectorXi& vecProjectedSensors,
-                                                                             const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                                                             double (*interpolationFunction)(double),
-                                                                             const double dCancelDist = FLOAT_INFINITY,
-                                                                             const Eigen::VectorXi& vecExcludeIndex = Eigen::VectorXi());
+    static std::shared_ptr<Eigen::SparseMatrix<float>> createInterpolationMat(const Eigen::VectorXi& vecProjectedSensors,
+                                                                              const std::shared_ptr<Eigen::MatrixXd>& matDistanceTable,
+                                                                              double (*interpolationFunction)(double),
+                                                                              const double dCancelDist = FLOAT_INFINITY,
+                                                                              const Eigen::VectorXi& vecExcludeIndex = Eigen::VectorXi());
 
     //=========================================================================================================
     /**
@@ -104,8 +99,8 @@ public:
      * @param[in] vecMeasurementData       Sensor values (nSensors).
      * @return Interpolated vertex values, or an empty vector on dimension mismatch.
      */
-    static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float>> matInterpolationMatrix,
-                                             const QSharedPointer<Eigen::VectorXf>& vecMeasurementData);
+    static Eigen::VectorXf interpolateSignal(const std::shared_ptr<Eigen::SparseMatrix<float>>& matInterpolationMatrix,
+                                             const std::shared_ptr<Eigen::VectorXf>& vecMeasurementData);
 
     //=========================================================================================================
     /**

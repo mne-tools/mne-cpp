@@ -36,6 +36,7 @@
 //=============================================================================================================
 
 #include <limits>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -330,21 +331,21 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex& index, const Q
 
         qint32 numLines = (m_iScaleType) ? static_cast<qint32>(ceil(log10(nf))) : 5;
 
-        QList<qint32> qListLineSamples;
+        std::vector<int> qListLineSamples;
 
-        qListLineSamples << 0;
+        qListLineSamples.push_back(0);
 
         if (m_iScaleType) { // log
             for (qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx) {
                 double val = pow(10, lineIdx);
                 qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
-                qListLineSamples.append(idx);
+                qListLineSamples.push_back(idx);
             }
         } else { // normal
             for (qint32 lineIdx = 1; lineIdx < numLines; ++lineIdx) {
                 double val = lineIdx * (nf / numLines);
                 qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
-                qListLineSamples.append(idx);
+                qListLineSamples.push_back(idx);
             }
         }
         //vertical lines
@@ -352,7 +353,7 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex& index, const Q
 
         float yEnd = option.rect.bottomRight().y();
 
-        for (qint32 i = 0; i < qListLineSamples.size(); ++i) {
+        for (qint32 i = 0; i < std::ssize(qListLineSamples); ++i) {
             if (qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound()) {
                 float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]]) * option.rect.width();
                 path.moveTo(x, yStart);
@@ -373,20 +374,20 @@ void FrequencySpectrumDelegate::createGridTick(const QModelIndex& index, const Q
 
         qint32 numLines = (m_iScaleType) ? static_cast<qint32>(ceil(log10(nf))) : 5;
 
-        QList<qint32> qListLineSamples;
+        std::vector<int> qListLineSamples;
 
-        qListLineSamples << 0;
+        qListLineSamples.push_back(0);
         if (m_iScaleType) { // log
             for (qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx) {
                 double val = pow(10, lineIdx);
                 qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
-                qListLineSamples.append(idx);
+                qListLineSamples.push_back(idx);
             }
         } else { // normal
             for (qint32 lineIdx = 1; lineIdx < numLines; ++lineIdx) {
                 double val = lineIdx * (nf / numLines);
                 qint32 idx = static_cast<qint32>(floor(val / (static_cast<float>(nf) / static_cast<float>(t_pModel->getNumStems()))));
-                qListLineSamples.append(idx);
+                qListLineSamples.push_back(idx);
             }
         }
 
@@ -399,7 +400,7 @@ void FrequencySpectrumDelegate::createGridTick(const QModelIndex& index, const Q
             painter->drawText(x, yStart, QString("%1Hz").arg(val));
         }
 
-        for (qint32 i = 1; i < qListLineSamples.size(); ++i) {
+        for (qint32 i = 1; i < std::ssize(qListLineSamples); ++i) {
             if (qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound()) {
                 double val = (m_iScaleType) ? pow(10, i - 1) : t_pModel->getFreqScaleBound()[qListLineSamples[i]] * nf;
                 float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]]) * option.rect.width();

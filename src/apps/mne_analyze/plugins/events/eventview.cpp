@@ -463,7 +463,7 @@ void EventView::initTriggerDetect(const std::shared_ptr<mne::FiffInfo> info)
 
 //=============================================================================================================
 
-void EventView::onDetectTriggers(const QString& sChannelName,
+void EventView::onDetectTriggers(const std::string& sChannelName,
                                  double dThreshold)
 {
     if (!m_pFiffRawModel) {
@@ -478,9 +478,9 @@ void EventView::onDetectTriggers(const QString& sChannelName,
     emit loadingStart("Detecting triggers...");
 
     // The arguments are temporaries of the emitting call, so the worker gets copies
-    m_sDetectedStimChannel = sChannelName;
+    m_sDetectedStimChannel = QString::fromStdString(sChannelName);
     std::shared_ptr<mne::FiffRawData> raw = m_pFiffRawModel->getFiffIO()->raw.front();
-    m_Future = mne::ThreadPool::global().submit([sChannelName = QString(sChannelName), dThreshold, raw, pThis = QPointer<EventView>(this)] {
+    m_Future = mne::ThreadPool::global().submit([sChannelName = QString::fromStdString(sChannelName), dThreshold, raw, pThis = QPointer<EventView>(this)] {
         QMap<double, QList<int>> mEventsinTypes = detectTriggerCalculations(sChannelName, dThreshold, *raw);
         if (pThis) {
             QMetaObject::invokeMethod(pThis, &EventView::createGroupsFromTriggers, Qt::QueuedConnection);

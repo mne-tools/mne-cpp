@@ -19,13 +19,6 @@
 #include "renderable/brainsurface.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-#include <QPair>
-
-//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -36,6 +29,9 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <map>
+#include <utility>
+#include <vector>
 
 namespace mne::disp
 {
@@ -62,8 +58,8 @@ Eigen::Matrix3f extractRotation(const QMatrix4x4& m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f>& vertices,
-                                 QVector<Eigen::Vector3i>& faces,
+void MeshFactory::buildIcosphere(std::vector<Eigen::Vector3f>& vertices,
+                                 std::vector<Eigen::Vector3i>& faces,
                                  int subdivisions)
 {
     // Golden ratio
@@ -71,51 +67,54 @@ void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f>& vertices,
 
     vertices.clear();
     vertices.reserve(12 + 30 * subdivisions); // rough estimate
-    vertices << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f(1, phi, 0)
-             << Eigen::Vector3f(-1, -phi, 0) << Eigen::Vector3f(1, -phi, 0)
-             << Eigen::Vector3f(0, -1, phi) << Eigen::Vector3f(0, 1, phi)
-             << Eigen::Vector3f(0, -1, -phi) << Eigen::Vector3f(0, 1, -phi)
-             << Eigen::Vector3f(phi, 0, -1) << Eigen::Vector3f(phi, 0, 1)
-             << Eigen::Vector3f(-phi, 0, -1) << Eigen::Vector3f(-phi, 0, 1);
+    vertices.insert(vertices.end(),
+                    {Eigen::Vector3f(-1, phi, 0), Eigen::Vector3f(1, phi, 0),
+                     Eigen::Vector3f(-1, -phi, 0), Eigen::Vector3f(1, -phi, 0),
+                     Eigen::Vector3f(0, -1, phi), Eigen::Vector3f(0, 1, phi),
+                     Eigen::Vector3f(0, -1, -phi), Eigen::Vector3f(0, 1, -phi),
+                     Eigen::Vector3f(phi, 0, -1), Eigen::Vector3f(phi, 0, 1),
+                     Eigen::Vector3f(-phi, 0, -1), Eigen::Vector3f(-phi, 0, 1)});
     for (auto& v : vertices)
         v.normalize();
 
     faces.clear();
     faces.reserve(20);
-    faces << Eigen::Vector3i(0, 11, 5) << Eigen::Vector3i(0, 5, 1)
-          << Eigen::Vector3i(0, 1, 7) << Eigen::Vector3i(0, 7, 10)
-          << Eigen::Vector3i(0, 10, 11) << Eigen::Vector3i(1, 5, 9)
-          << Eigen::Vector3i(5, 11, 4) << Eigen::Vector3i(11, 10, 2)
-          << Eigen::Vector3i(10, 7, 6) << Eigen::Vector3i(7, 1, 8)
-          << Eigen::Vector3i(3, 9, 4) << Eigen::Vector3i(3, 4, 2)
-          << Eigen::Vector3i(3, 2, 6) << Eigen::Vector3i(3, 6, 8)
-          << Eigen::Vector3i(3, 8, 9) << Eigen::Vector3i(4, 9, 5)
-          << Eigen::Vector3i(2, 4, 11) << Eigen::Vector3i(6, 2, 10)
-          << Eigen::Vector3i(8, 6, 7) << Eigen::Vector3i(9, 8, 1);
+    faces.insert(faces.end(),
+                 {Eigen::Vector3i(0, 11, 5), Eigen::Vector3i(0, 5, 1),
+                  Eigen::Vector3i(0, 1, 7), Eigen::Vector3i(0, 7, 10),
+                  Eigen::Vector3i(0, 10, 11), Eigen::Vector3i(1, 5, 9),
+                  Eigen::Vector3i(5, 11, 4), Eigen::Vector3i(11, 10, 2),
+                  Eigen::Vector3i(10, 7, 6), Eigen::Vector3i(7, 1, 8),
+                  Eigen::Vector3i(3, 9, 4), Eigen::Vector3i(3, 4, 2),
+                  Eigen::Vector3i(3, 2, 6), Eigen::Vector3i(3, 6, 8),
+                  Eigen::Vector3i(3, 8, 9), Eigen::Vector3i(4, 9, 5),
+                  Eigen::Vector3i(2, 4, 11), Eigen::Vector3i(6, 2, 10),
+                  Eigen::Vector3i(8, 6, 7), Eigen::Vector3i(9, 8, 1)});
 
     // Subdivide
     for (int s = 0; s < subdivisions; ++s) {
-        QMap<QPair<int, int>, int> cache;
+        std::map<std::pair<int, int>, int> cache;
         auto midpoint = [&](int a, int b) -> int {
-            auto key = qMakePair(qMin(a, b), qMax(a, b));
-            if (cache.contains(key))
-                return cache[key];
-            int idx = vertices.size();
-            vertices.append((vertices[a] + vertices[b]).normalized());
+            const std::pair<int, int> key(std::min(a, b), std::max(a, b));
+            if (const auto cached = cache.find(key); cached != cache.end())
+                return cached->second;
+            const int idx = static_cast<int>(vertices.size());
+            vertices.push_back((vertices[a] + vertices[b]).normalized());
             cache[key] = idx;
             return idx;
         };
 
-        QVector<Eigen::Vector3i> newFaces;
+        std::vector<Eigen::Vector3i> newFaces;
         newFaces.reserve(faces.size() * 4);
         for (const auto& f : faces) {
             int ab = midpoint(f(0), f(1));
             int bc = midpoint(f(1), f(2));
             int ca = midpoint(f(2), f(0));
-            newFaces << Eigen::Vector3i(f(0), ab, ca)
-                     << Eigen::Vector3i(f(1), bc, ab)
-                     << Eigen::Vector3i(f(2), ca, bc)
-                     << Eigen::Vector3i(ab, bc, ca);
+            newFaces.insert(newFaces.end(),
+                            {Eigen::Vector3i(f(0), ab, ca),
+                             Eigen::Vector3i(f(1), bc, ab),
+                             Eigen::Vector3i(f(2), ca, bc),
+                             Eigen::Vector3i(ab, bc, ca)});
         }
         faces = std::move(newFaces);
     }
@@ -125,10 +124,10 @@ void MeshFactory::buildIcosphere(QVector<Eigen::Vector3f>& vertices,
 
 int MeshFactory::sphereVertexCount(int subdivisions)
 {
-    QVector<Eigen::Vector3f> verts;
-    QVector<Eigen::Vector3i> faces;
+    std::vector<Eigen::Vector3f> verts;
+    std::vector<Eigen::Vector3i> faces;
     buildIcosphere(verts, faces, subdivisions);
-    return verts.size();
+    return static_cast<int>(verts.size());
 }
 
 //=============================================================================================================
@@ -138,12 +137,12 @@ std::shared_ptr<BrainSurface> MeshFactory::createSphere(const QVector3D& center,
                                                         const QColor& color,
                                                         int subdivisions)
 {
-    QVector<Eigen::Vector3f> verts;
-    QVector<Eigen::Vector3i> faces;
+    std::vector<Eigen::Vector3f> verts;
+    std::vector<Eigen::Vector3i> faces;
     buildIcosphere(verts, faces, subdivisions);
 
-    const int nV = verts.size();
-    const int nT = faces.size();
+    const int nV = static_cast<int>(verts.size());
+    const int nT = static_cast<int>(faces.size());
 
     Eigen::MatrixX3f rr(nV, 3), nn(nV, 3);
     for (int i = 0; i < nV; ++i) {
@@ -223,17 +222,17 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
     const float sphereR = size * 0.2f;
     const float rodR = size * 0.08f;
 
-    QVector<Eigen::Vector3f> allVerts;
-    QVector<Eigen::Vector3f> allNorms;
-    QVector<Eigen::Vector3i> allTris;
+    std::vector<Eigen::Vector3f> allVerts;
+    std::vector<Eigen::Vector3f> allNorms;
+    std::vector<Eigen::Vector3i> allTris;
 
     // ── Helper: append a sphere ────────────────────────────────────────
     auto appendSphere = [&](const QVector3D& pos, float radius) {
-        QVector<Eigen::Vector3f> sv;
-        QVector<Eigen::Vector3i> sf;
+        std::vector<Eigen::Vector3f> sv;
+        std::vector<Eigen::Vector3i> sf;
         buildIcosphere(sv, sf, 1); // single subdivision
 
-        const int base = allVerts.size();
+        const int base = static_cast<int>(allVerts.size());
         allVerts.reserve(base + sv.size());
         allNorms.reserve(base + sv.size());
         allTris.reserve(allTris.size() + sf.size());
@@ -241,11 +240,11 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
         for (const auto& v : sv) {
             Eigen::Vector3f vn = rot * v;
             Eigen::Vector3f vp = rot * (v * radius);
-            allVerts.append(Eigen::Vector3f(vp.x() + pos.x(), vp.y() + pos.y(), vp.z() + pos.z()));
-            allNorms.append(vn.normalized());
+            allVerts.push_back(Eigen::Vector3f(vp.x() + pos.x(), vp.y() + pos.y(), vp.z() + pos.z()));
+            allNorms.push_back(vn.normalized());
         }
         for (const auto& f : sf) {
-            allTris.append(Eigen::Vector3i(base + f(0), base + f(1), base + f(2)));
+            allTris.push_back(Eigen::Vector3i(base + f(0), base + f(1), base + f(2)));
         }
     };
 
@@ -260,7 +259,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
         const int faceIdx[6][4] = {
             {4, 5, 6, 7}, {1, 0, 3, 2}, {3, 7, 6, 2}, {0, 1, 5, 4}, {1, 2, 6, 5}, {0, 4, 7, 3}};
 
-        const int base = allVerts.size();
+        const int base = static_cast<int>(allVerts.size());
         for (int f = 0; f < 6; ++f) {
             Eigen::Vector3f v0 = corners[faceIdx[f][0]];
             Eigen::Vector3f v1 = corners[faceIdx[f][1]];
@@ -271,11 +270,11 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
             int faceBase = base + f * 4;
             for (int k = 0; k < 4; ++k) {
                 Eigen::Vector3f v = corners[faceIdx[f][k]];
-                allVerts.append(Eigen::Vector3f(v.x() + center.x(), v.y() + center.y(), v.z() + center.z()));
-                allNorms.append(fn);
+                allVerts.push_back(Eigen::Vector3f(v.x() + center.x(), v.y() + center.y(), v.z() + center.z()));
+                allNorms.push_back(fn);
             }
-            allTris.append(Eigen::Vector3i(faceBase, faceBase + 1, faceBase + 2));
-            allTris.append(Eigen::Vector3i(faceBase, faceBase + 2, faceBase + 3));
+            allTris.push_back(Eigen::Vector3i(faceBase, faceBase + 1, faceBase + 2));
+            allTris.push_back(Eigen::Vector3i(faceBase, faceBase + 2, faceBase + 3));
         }
     };
 
@@ -288,11 +287,11 @@ std::shared_ptr<BrainSurface> MeshFactory::createBarbell(const QVector3D& center
     // Pack into Eigen matrices
     Eigen::MatrixX3f rr(allVerts.size(), 3), nn(allNorms.size(), 3);
     Eigen::MatrixX3i tt(allTris.size(), 3);
-    for (int i = 0; i < allVerts.size(); ++i) {
+    for (int i = 0; i < std::ssize(allVerts); ++i) {
         rr.row(i) = allVerts[i].transpose();
         nn.row(i) = allNorms[i].transpose();
     }
-    for (int i = 0; i < allTris.size(); ++i)
+    for (int i = 0; i < std::ssize(allTris); ++i)
         tt.row(i) = allTris[i];
 
     auto surf = std::make_shared<BrainSurface>();
@@ -421,22 +420,22 @@ std::shared_ptr<BrainSurface> MeshFactory::createCylinder(const QVector3D& from,
 
 //=============================================================================================================
 
-std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QVector3D>& positions,
+std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const std::vector<QVector3D>& positions,
                                                                 float radius,
                                                                 const QColor& color,
                                                                 int subdivisions)
 {
-    if (positions.isEmpty())
+    if (positions.empty())
         return std::make_shared<BrainSurface>();
 
     // Build template sphere once
-    QVector<Eigen::Vector3f> tmplVerts;
-    QVector<Eigen::Vector3i> tmplFaces;
+    std::vector<Eigen::Vector3f> tmplVerts;
+    std::vector<Eigen::Vector3i> tmplFaces;
     buildIcosphere(tmplVerts, tmplFaces, subdivisions);
 
-    const int nVPerPt = tmplVerts.size();
-    const int nTPerPt = tmplFaces.size();
-    const int nPts = positions.size();
+    const int nVPerPt = static_cast<int>(tmplVerts.size());
+    const int nTPerPt = static_cast<int>(tmplFaces.size());
+    const int nPts = static_cast<int>(positions.size());
 
     // Scale template
     Eigen::MatrixX3f templateV(nVPerPt, 3), templateN(nVPerPt, 3);

@@ -32,7 +32,6 @@
 #include <QSettings>
 #include <QApplication>
 #include <QScreen>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES

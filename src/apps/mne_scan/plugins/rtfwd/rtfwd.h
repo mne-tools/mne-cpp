@@ -37,6 +37,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 
 //=============================================================================================================
@@ -191,7 +192,7 @@ private:
      * @param[in] sDirPath              The path to the atlas directory.
      * @param[in] pAnnotationSet        The FsAnnotation set.
      */
-    void onAtlasDirChanged(const QString& sDirPath,
+    void onAtlasDirChanged(const std::filesystem::path& sDirPath,
                            const std::shared_ptr<mne::FsAnnotationSet>& pAnnotationSet);
 
     QMutex m_mutex; /**< The threads mutex.*/

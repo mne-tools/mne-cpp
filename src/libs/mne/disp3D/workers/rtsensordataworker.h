@@ -34,9 +34,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QList>
-#include <QMutex>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -48,7 +45,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <deque>
 #include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -107,7 +108,7 @@ public:
      * @param[in] surfaceKey Key of the surface the matrix maps onto; colours are emitted for it.
      * @param[in] mat        Dense mapping matrix.
      */
-    void setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
+    void setMappingMatrix(const std::string& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
 
     //=========================================================================================================
     /**
@@ -123,7 +124,7 @@ public:
      *
      * @param[in] name       Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void setColormapType(const QString& name);
+    void setColormapType(const std::string& name);
 
     //=========================================================================================================
     /**
@@ -185,8 +186,8 @@ signals:
      * @param[in] surfaceKey  FsSurface key identifying the target surface.
      * @param[in] colors      Per-vertex ABGR color array.
      */
-    void newRtSensorColors(const QString& surfaceKey,
-                           const QVector<uint32_t>& colors);
+    void newRtSensorColors(const std::string& surfaceKey,
+                           const std::vector<uint32_t>& colors);
 
     //=========================================================================================================
     /**
@@ -205,25 +206,25 @@ private:
      * @param[in] sensorData    Measurement vector (nChannels x 1).
      * @return Per-vertex ABGR color array (nVertices).
      */
-    QVector<uint32_t> computeSurfaceColors(const Eigen::VectorXf& sensorData) const;
+    std::vector<uint32_t> computeSurfaceColors(const Eigen::VectorXf& sensorData) const;
 
-    mutable QMutex m_mutex; /**< Protects data members. */
+    mutable std::mutex m_mutex; /**< Protects data members. */
 
-    QList<Eigen::VectorXf> m_lDataQ;     /**< Incoming data queue. */
-    QList<Eigen::VectorXf> m_lDataLoopQ; /**< Copy for looping. */
-    Eigen::VectorXf m_vecAverage;        /**< Running average accumulator. */
-    int m_iSampleCtr = 0;                /**< Sample counter for averaging. */
-    int m_iCurrentSample = 0;            /**< Current sample index for loop replay. */
+    std::deque<Eigen::VectorXf> m_lDataQ;     /**< Incoming data queue. */
+    std::deque<Eigen::VectorXf> m_lDataLoopQ; /**< Copy for looping. */
+    Eigen::VectorXf m_vecAverage;             /**< Running average accumulator. */
+    int m_iSampleCtr = 0;                     /**< Sample counter for averaging. */
+    int m_iCurrentSample = 0;                 /**< Current sample index for loop replay. */
 
     std::shared_ptr<Eigen::MatrixXf> m_mappingMat; /**< Dense mapping matrix (nVerts x nChans). */
-    QString m_sSurfaceKey;                         /**< FsSurface key for the target surface. */
+    std::string m_sSurfaceKey;                     /**< FsSurface key for the target surface. */
 
     int m_iNumAverages = 1;            /**< Number of samples to average. */
     bool m_bIsLooping = true;          /**< Whether to loop data. */
     bool m_bStreamSmoothedData = true; /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;          /**< Sampling frequency in Hz. */
 
-    QString m_sColormapType = QStringLiteral("MNE"); /**< Active colormap name. */
+    QString m_sColormapType = QStringLiteral("MNE"); /**< Active colormap name (QString: mne::disp::ColorMap takes one). */
     double m_dThreshMin = 0.0;                       /**< Explicit min threshold (0 = auto). */
     double m_dThreshMax = 0.0;                       /**< Explicit max threshold (0 = auto). */
     bool m_bUseAutoNorm = true;                      /**< True = symmetric auto-norm (default). */

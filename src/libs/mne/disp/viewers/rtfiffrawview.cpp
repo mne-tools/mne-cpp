@@ -19,6 +19,8 @@
 //=============================================================================================================
 
 #include "rtfiffrawview.h"
+#include "../detail/map_value.h"
+#include <mne/base/log.h>
 
 #include "helpers/rtfiffrawviewdelegate.h"
 #include "helpers/rtfiffrawviewmodel.h"
@@ -44,6 +46,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -133,7 +136,7 @@ void RtFiffRawView::init(std::shared_ptr<mne::FiffInfo>& info)
     m_qListBadChannels.clear();
     for (int i = 0; i < m_pModel->rowCount(); i++) {
         if (m_pModel->data(m_pModel->index(i, 2)).toBool()) {
-            m_qListBadChannels << i;
+            m_qListBadChannels.push_back(i);
         }
     }
 
@@ -173,21 +176,21 @@ void RtFiffRawView::init(std::shared_ptr<mne::FiffInfo>& info)
 
 //=============================================================================================================
 
-void RtFiffRawView::addData(const QList<Eigen::MatrixXd>& lMatData)
+void RtFiffRawView::addData(std::span<const Eigen::MatrixXd> lMatData)
 {
-    if (!lMatData.isEmpty()) {
+    if (!lMatData.empty()) {
         m_pModel->addData(lMatData);
 
-        if (m_qListBadChannels.size() != static_cast<int>(m_pFiffInfo->bads.size())) {
+        if (m_qListBadChannels.size() != m_pFiffInfo->bads.size()) {
             m_qListBadChannels.clear();
             for (int i = 0; i < m_pModel->rowCount(); i++) {
                 if (m_pModel->data(m_pModel->index(i, 2)).toBool()) {
-                    m_qListBadChannels << i;
+                    m_qListBadChannels.push_back(i);
                 }
             }
 
             //Hide non selected channels/rows in the lMatData views
-            for (int i = 0; i < m_qListBadChannels.size(); i++) {
+            for (int i = 0; i < std::ssize(m_qListBadChannels); i++) {
                 if (m_bHideBadChannels) {
                     m_pTableView->hideRow(m_qListBadChannels.at(i));
                 } else {
@@ -199,7 +202,7 @@ void RtFiffRawView::addData(const QList<Eigen::MatrixXd>& lMatData)
             updateRowHeight();
         }
     } else {
-        qWarning() << "[RtFiffRawView::addData] Received lMatData list is empty.";
+        mne::Log::warning("[RtFiffRawView::addData] Received lMatData list is empty.");
     }
 }
 
@@ -301,14 +304,14 @@ QColor RtFiffRawView::getBackgroundColor()
 
 //=============================================================================================================
 
-QMap<qint32, float> RtFiffRawView::getScalingMap()
+std::map<int, float> RtFiffRawView::getScalingMap()
 {
     return m_qMapChScaling;
 }
 
 //=============================================================================================================
 
-void RtFiffRawView::setScalingMap(const QMap<qint32, float>& scaleMap)
+void RtFiffRawView::setScalingMap(const std::map<int, float>& scaleMap)
 {
     m_qMapChScaling = scaleMap;
     m_pModel->setScaling(scaleMap);
@@ -339,7 +342,7 @@ void RtFiffRawView::hideBadChannels()
     }
 
     //Hide non selected channels/rows in the data views
-    for (int i = 0; i < m_qListBadChannels.size(); i++) {
+    for (int i = 0; i < std::ssize(m_qListBadChannels); i++) {
         if (m_bHideBadChannels) {
             m_pTableView->hideRow(m_qListBadChannels.at(i));
         } else {
@@ -393,16 +396,16 @@ bool RtFiffRawView::getBadChannelHideStatus()
 
 //=============================================================================================================
 
-void RtFiffRawView::showSelectedChannelsOnly(const QStringList& selectedChannels)
+void RtFiffRawView::showSelectedChannelsOnly(const std::vector<std::string>& selectedChannels)
 {
     m_slSelectedChannels = selectedChannels;
 
     //Hide non selected channels/rows in the data views
     for (int i = 0; i < m_pModel->rowCount(); i++) {
-        QString channel = m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString();
+        const std::string channel = m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString().toStdString();
 
         //if channel is a bad channel and bad channels are to be hidden -> do not show
-        if (!selectedChannels.contains(channel) || (m_qListBadChannels.contains(i) && m_bHideBadChannels)) {
+        if (!std::ranges::contains(selectedChannels, channel) || (std::ranges::contains(m_qListBadChannels, i) && m_bHideBadChannels)) {
             m_pTableView->hideRow(i);
         } else {
             m_pTableView->showRow(i);
@@ -463,15 +466,14 @@ void RtFiffRawView::takeScreenshot(const QString& fileName)
     // Taking a screenshot before that, or after the view was destroyed, would
     // otherwise dereference a null pointer.
     if (m_pTableView.isNull()) {
-        qWarning() << "[RtFiffRawView::takeScreenshot] No data view available yet"
-                   << "- no screenshot was taken.";
+        mne::Log::warning("[RtFiffRawView::takeScreenshot] No data view available yet - no screenshot was taken.");
         return;
     }
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         // Generate screenshot
         SvgWriter svgGen;
-        svgGen.setFileName(fileName);
+        svgGen.setFileName(fileName.toStdString());
         svgGen.setSize(m_pTableView->size());
         svgGen.setViewBox(m_pTableView->rect());
 
@@ -510,14 +512,14 @@ void RtFiffRawView::updateSpharaActivation(bool state)
 
 void RtFiffRawView::updateSpharaOptions(const QString& sSytemType, int nBaseFctsFirst, int nBaseFctsSecond)
 {
-    m_pModel->updateSpharaOptions(sSytemType, nBaseFctsFirst, nBaseFctsSecond);
+    m_pModel->updateSpharaOptions(sSytemType.toStdString(), nBaseFctsFirst, nBaseFctsSecond);
 }
 
 //=============================================================================================================
 
 void RtFiffRawView::setFilter(const FilterKernel& filterData)
 {
-    m_pModel->setFilter(QList<FilterKernel>() << filterData);
+    m_pModel->setFilter({filterData});
 }
 
 //=============================================================================================================
@@ -531,14 +533,14 @@ void RtFiffRawView::setFilterActive(bool state)
 
 void RtFiffRawView::setFilterChannelType(const QString& channelType)
 {
-    m_pModel->setFilterChannelType(channelType);
+    m_pModel->setFilterChannelType(channelType.toStdString());
 }
 
 //=============================================================================================================
 
-void RtFiffRawView::triggerInfoChanged(const QMap<double, QColor>& colorMap,
+void RtFiffRawView::triggerInfoChanged(const std::map<double, QColor>& colorMap,
                                        bool active,
-                                       const QString& triggerCh,
+                                       const std::string& triggerCh,
                                        double threshold)
 {
     m_pModel->triggerInfoChanged(colorMap, active, triggerCh, threshold);
@@ -638,7 +640,7 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
 
     menu->addSection("Channel Marking");
 
-    if (!m_qListBadChannels.contains(index.row())) {
+    if (!std::ranges::contains(m_qListBadChannels, index.row())) {
         QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
         connect(doMarkChBad, &QAction::triggered,
                 this, &RtFiffRawView::markChBad);
@@ -652,7 +654,7 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     m_qListCurrentSelection.clear();
     for (qint32 i = 0; i < selected.size(); ++i)
         if (selected[i].column() == 1)
-            m_qListCurrentSelection.append(m_pModel->getIdxSelMap()[selected[i].row()]);
+            m_qListCurrentSelection.push_back(detail::valueOr(m_pModel->getIdxSelMap(), selected[i].row()));
 
     menu->addSection("Selection");
 
@@ -683,7 +685,7 @@ void RtFiffRawView::applySelection()
     //Hide non selected channels/rows in the data views
     for (int i = 0; i < m_pModel->rowCount(); i++) {
         //if channel is a bad channel and bad channels are to be hidden -> do not show
-        if (m_qListCurrentSelection.contains(i)) {
+        if (std::ranges::contains(m_qListCurrentSelection, i)) {
             m_pTableView->showRow(i);
         } else {
             m_pTableView->hideRow(i);
@@ -700,7 +702,7 @@ void RtFiffRawView::applySelection()
 
 void RtFiffRawView::hideSelection()
 {
-    for (int i = 0; i < m_qListCurrentSelection.size(); i++) {
+    for (int i = 0; i < std::ssize(m_qListCurrentSelection); i++) {
         m_pTableView->hideRow(m_qListCurrentSelection.at(i));
     }
 
@@ -713,7 +715,7 @@ void RtFiffRawView::hideSelection()
 void RtFiffRawView::resetSelection()
 {
     for (qint32 i = 0; i < std::ssize(m_pFiffInfo->chs); ++i) {
-        if (m_qListBadChannels.contains(i)) {
+        if (std::ranges::contains(m_qListBadChannels, i)) {
             if (!m_bHideBadChannels) {
                 m_pTableView->showRow(i);
             }
@@ -741,19 +743,19 @@ void RtFiffRawView::markChBad()
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 
     for (int i = 0; i < selected.size(); i++) {
-        if (m_qListBadChannels.contains(selected[i].row())) { //mark as good
+        if (std::ranges::contains(m_qListBadChannels, selected[i].row())) { //mark as good
             m_pModel->markChBad(selected[i], false);
-            m_qListBadChannels.removeAll(selected[i].row());
+            std::erase(m_qListBadChannels, selected[i].row());
         } else {
             m_pModel->markChBad(selected[i], true);
-            m_qListBadChannels.append(selected[i].row());
+            m_qListBadChannels.push_back(selected[i].row());
         }
     }
 
     m_pModel->updateProjection(m_pFiffInfo->projs);
 
     //Hide non selected channels/rows in the data views
-    for (int i = 0; i < m_qListBadChannels.size(); i++) {
+    for (int i = 0; i < std::ssize(m_qListBadChannels); i++) {
         if (m_bHideBadChannels) {
             m_pTableView->hideRow(m_qListBadChannels.at(i));
         } else {

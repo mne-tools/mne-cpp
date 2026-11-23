@@ -20,6 +20,8 @@
 //=============================================================================================================
 
 #include "channelselectionview.h"
+#include <mne/base/log.h>
+#include <mne/base/string_utils.h>
 
 #include "ui_channelselectionview.h"
 #include "helpers/selectionsceneitem.h"
@@ -37,13 +39,11 @@
 #include <QDate>
 #include <QVector3D>
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QListWidgetItem>
 #include <QSettings>
 #include <QApplication>
 #include <QKeyEvent>
 #include <QSignalBlocker>
-#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -183,7 +183,7 @@ void ChannelSelectionView::initCheckBoxes()
 
 //=============================================================================================================
 
-void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList& mappedLayoutChNames)
+void ChannelSelectionView::setCurrentlyMappedFiffChannels(const std::vector<std::string>& mappedLayoutChNames)
 {
     m_currentlyLoadedFiffChannels = mappedLayoutChNames;
 
@@ -198,11 +198,11 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList& map
     if (it != m_selectionGroupsMap.end()) {
         m_selectionGroupsMap.erase(it);
     }
-    m_selectionGroupsMap.insert("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap.emplace("All", m_currentlyLoadedFiffChannels);
 
     //Add selection groups to list widget
-    for (auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
-        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), i.key());
+    for (const auto& [name, channels] : m_selectionGroupsMap) {
+        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), QString::fromStdString(name));
     }
 
     //Set group all as slected item
@@ -216,17 +216,17 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList& map
 
 void ChannelSelectionView::highlightChannels(const QModelIndexList& channelIndexList)
 {
-    QStringList channelList;
+    std::vector<std::string> channelList;
     for (int i = 0; i < channelIndexList.size(); i++) {
         QModelIndex nameIndex = m_pChannelInfoModel->index(channelIndexList.at(i).row(), 3);
-        channelList << m_pChannelInfoModel->data(nameIndex, ChannelInfoModelRoles::GetMappedLayoutChName).toString();
+        channelList.push_back(m_pChannelInfoModel->data(nameIndex, ChannelInfoModelRoles::GetMappedLayoutChName).toString().toStdString());
     }
 
     QList<QGraphicsItem*> allSceneItems = m_pSelectionScene->items();
 
     for (int i = 0; i < allSceneItems.size(); i++) {
         SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
-        if (channelList.contains(item->m_sChannelName))
+        if (std::ranges::contains(channelList, item->m_sChannelName.toStdString()))
             item->m_bHighlightItem = true;
         else
             item->m_bHighlightItem = false;
@@ -237,13 +237,13 @@ void ChannelSelectionView::highlightChannels(const QModelIndexList& channelIndex
 
 //=============================================================================================================
 
-void ChannelSelectionView::selectChannels(const QStringList& channelList)
+void ChannelSelectionView::selectChannels(const std::vector<std::string>& channelList)
 {
     QList<QGraphicsItem*> allSceneItems = m_pSelectionScene->items();
 
     for (int i = 0; i < allSceneItems.size(); i++) {
         SelectionSceneItem* item = static_cast<SelectionSceneItem*>(allSceneItems.at(i));
-        if (channelList.contains(item->m_sChannelName))
+        if (std::ranges::contains(channelList, item->m_sChannelName.toStdString()))
             item->setSelected(true);
         else
             item->setSelected(false);
@@ -254,7 +254,7 @@ void ChannelSelectionView::selectChannels(const QStringList& channelList)
 
 //=============================================================================================================
 
-QStringList ChannelSelectionView::getSelectedChannels()
+std::vector<std::string> ChannelSelectionView::getSelectedChannels()
 {
     //if no channels have been selected by the user -> show selected group channels
     QListWidget* targetListWidget;
@@ -264,11 +264,11 @@ QStringList ChannelSelectionView::getSelectedChannels()
         targetListWidget = m_pUi->m_listWidget_visibleChannels;
 
     //Create list of channels which are to be visible in the view
-    QStringList selectedChannels;
+    std::vector<std::string> selectedChannels;
 
     for (int i = 0; i < targetListWidget->count(); i++) {
         QListWidgetItem* item = targetListWidget->item(i);
-        selectedChannels << item->text();
+        selectedChannels.push_back(item->text().toStdString());
     }
 
     return selectedChannels;
@@ -288,7 +288,7 @@ QListWidgetItem* ChannelSelectionView::getItemForChName(QListWidget* listWidget,
 
 //=============================================================================================================
 
-const QMap<QString, QPointF>& ChannelSelectionView::getLayoutMap()
+const std::map<std::string, QPointF>& ChannelSelectionView::getLayoutMap()
 {
     return m_layoutMap;
 }
@@ -320,7 +320,7 @@ QString ChannelSelectionView::getCurrentGroupFile()
 
 void ChannelSelectionView::setCurrentLayoutFile(const QString& currentLayoutFile)
 {
-    qDebug() << "setCurrentLayoutFile:" << currentLayoutFile;
+    mne::Log::debug("setCurrentLayoutFile: {}", currentLayoutFile.toStdString());
     const QSignalBlocker blocker(m_pUi->m_comboBox_layoutFile);
     m_pUi->m_comboBox_layoutFile->setCurrentText(currentLayoutFile);
 
@@ -332,7 +332,7 @@ void ChannelSelectionView::setCurrentLayoutFile(const QString& currentLayoutFile
 
 void ChannelSelectionView::updateBadChannels()
 {
-    QStringList badChannelMappedNames;
+    std::vector<std::string> badChannelMappedNames;
     const StringList badChannelList = m_pChannelInfoModel->getBadChannelList();
     if (m_pUi->m_checkBox_showBadChannelsAsRed->isChecked()) {
         for (int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
@@ -343,7 +343,7 @@ void ChannelSelectionView::updateBadChannels()
             QString origChName = m_pChannelInfoModel->data(digIndex, ChannelInfoModelRoles::GetOrigChName).toString();
 
             if (std::ranges::contains(badChannelList, origChName.toStdString())) {
-                badChannelMappedNames << mappedChName;
+                badChannelMappedNames.push_back(mappedChName.toStdString());
             }
         }
     }
@@ -367,19 +367,17 @@ void ChannelSelectionView::updateDataView()
         targetListWidget = m_pUi->m_listWidget_visibleChannels;
 
     //Create list of channels which are to be visible in the view
-    QStringList selectedChannels;
+    std::vector<std::string> selectedChannels;
 
     for (int i = 0; i < targetListWidget->count(); i++) {
-        QListWidgetItem* item = targetListWidget->item(i);
-        int indexTemp = m_pChannelInfoModel->getIndexFromMappedChName(item->text());
+        const std::string name = targetListWidget->item(i)->text().toStdString();
+        int indexTemp = m_pChannelInfoModel->getIndexFromMappedChName(name);
 
         if (indexTemp != -1) {
             QModelIndex mappedNameIndex = m_pChannelInfoModel->index(indexTemp, 1);
-            QString origChName = m_pChannelInfoModel->data(mappedNameIndex, ChannelInfoModelRoles::GetOrigChName).toString();
-
-            selectedChannels << origChName;
+            selectedChannels.push_back(m_pChannelInfoModel->data(mappedNameIndex, ChannelInfoModelRoles::GetOrigChName).toString().toStdString());
         } else
-            selectedChannels << item->text();
+            selectedChannels.push_back(name);
     }
 
     emit showSelectedChannelsOnly(selectedChannels);
@@ -390,12 +388,7 @@ void ChannelSelectionView::updateDataView()
     } else {
         //only return visible items (EEG or MEG channels)
         QList<QGraphicsItem*> visibleItemList = m_pSelectionScene->items();
-        QMutableListIterator<QGraphicsItem*> i(visibleItemList);
-        while (i.hasNext()) {
-            if (!i.next()->isVisible()) {
-                i.remove();
-            }
-        }
+        visibleItemList.removeIf([](const QGraphicsItem* item) { return !item->isVisible(); });
         emit selectionChanged(visibleItemList);
     }
 }
@@ -410,7 +403,7 @@ void ChannelSelectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    qInfo().noquote().nospace() << "saveSettings: " << getCurrentLayoutFile();
+    mne::Log::info("saveSettings: {}", getCurrentLayoutFile().toStdString());
 
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), getCurrentLayoutFile());
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), this->pos());
@@ -430,7 +423,7 @@ void ChannelSelectionView::loadSettings()
     setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "Vectorview-all.lout").toString());
     loadSelectionGroups(QCoreApplication::applicationDirPath() + settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), "mne_browse_raw_vv.sel").toString().prepend("/../resources/general/selectionGroups/"));
 
-    qDebug() << "loadSettings: " << getCurrentLayoutFile();
+    mne::Log::debug("loadSettings: {}", getCurrentLayoutFile().toStdString());
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100, 100)).toPoint();
 
@@ -470,18 +463,18 @@ void ChannelSelectionView::updateProcessingMode(ProcessingMode mode)
 
 bool ChannelSelectionView::loadLayout(const QString& path)
 {
-    qDebug() << "loadLayout:" << path;
+    mne::Log::debug("loadLayout: {}", path.toStdString());
     const std::optional<mne::MNELayout> layout = mne::MNELayout::read(path.toStdU16String());
     const bool state = layout.has_value();
     m_layoutMap.clear();
     if (state) {
         for (const auto& [name, position] : layout->channelPositions())
-            m_layoutMap.insert(QString::fromStdString(name), QPointF(position.x(), position.y()));
+            m_layoutMap.insert_or_assign(name, QPointF(position.x(), position.y()));
     }
 
     //if no layout for EEG is specified generate from digitizer points
     std::vector<Eigen::Vector3d> positions;
-    QStringList names;
+    std::vector<std::string> names;
 
     for (int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChannelInfoModel->index(i, 1);
@@ -495,7 +488,7 @@ bool ChannelSelectionView::loadLayout(const QString& path)
 
         if (kind == FIFFV_EEG_CH) {
             positions.emplace_back(channelDig.x(), channelDig.y(), channelDig.z());
-            names << chName;
+            names.push_back(chName.toStdString());
         }
     }
 
@@ -504,15 +497,14 @@ bool ChannelSelectionView::loadLayout(const QString& path)
         const auto corners = mne::LayoutMaker::make_layout(positions, {.radius = 60.0, .box_width = 5.0, .box_height = 4.0, .mirror_y = true});
         if (corners) {
             for (std::size_t i = 0; i < corners->size(); ++i) {
-                const QString& name = names.at(static_cast<qsizetype>(i));
+                const std::string& name = names.at(i);
                 if (!m_layoutMap.contains(name))
                     m_layoutMap[name] = QPointF((*corners)[i].x(), (*corners)[i].y());
             }
         }
     }
 
-    QStringList bad;
-    m_pSelectionScene->repaintItems(m_layoutMap, bad);
+    m_pSelectionScene->repaintItems(m_layoutMap, {});
     m_pSelectionScene->update();
     updateSceneItems();
 
@@ -537,7 +529,7 @@ QString ChannelSelectionView::resolveLayoutPath(const QString& layoutFile) const
         return QString();
     }
 
-    if (QFileInfo(layoutFile).isAbsolute()) {
+    if (mne::path_from_utf8(layoutFile.toStdString()).is_absolute()) {
         return layoutFile;
     }
 
@@ -574,10 +566,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     const bool state = groups.has_value();
     if (groups) {
         for (const ChannelSelection& group : *groups) {
-            QStringList channels;
-            for (const std::string& channel : group.channels)
-                channels << QString::fromStdString(channel);
-            m_selectionGroupsMap.insert(QString::fromStdString(group.name), channels);
+            m_selectionGroupsMap.emplace(group.name, group.channels);
         }
     }
 
@@ -586,9 +575,9 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     if (it != m_selectionGroupsMap.end()) {
         m_selectionGroupsMap.erase(it);
     }
-    m_selectionGroupsMap.insert("All", m_currentlyLoadedFiffChannels);
+    m_selectionGroupsMap.emplace("All", m_currentlyLoadedFiffChannels);
 
-    QStringList names;
+    std::vector<std::string> names;
     for (int i = 0; i < m_pChannelInfoModel->rowCount(); i++) {
         QModelIndex digIndex = m_pChannelInfoModel->index(i, 1);
         QString chName = m_pChannelInfoModel->data(digIndex, ChannelInfoModelRoles::GetOrigChName).toString();
@@ -597,7 +586,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
         int kind = m_pChannelInfoModel->data(digIndex, ChannelInfoModelRoles::GetChKind).toInt();
 
         if (kind == FIFFV_EEG_CH) //FIFFV_MEG_CH
-            names << chName;
+            names.push_back(chName.toStdString());
     }
 
     //Add 'Add EEG' group to selection groups
@@ -605,12 +594,12 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     if (it != m_selectionGroupsMap.end()) {
         m_selectionGroupsMap.erase(it);
     }
-    m_selectionGroupsMap.insert("All EEG", names);
+    m_selectionGroupsMap.emplace("All EEG", names);
 
     //Add selection groups to list widget
 
-    for (auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
-        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), i.key());
+    for (const auto& [name, channels] : m_selectionGroupsMap) {
+        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), QString::fromStdString(name));
     }
 
     //Update selection
@@ -619,7 +608,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     //Set group all as slected item
     m_pUi->m_listWidget_selectionGroups->setCurrentItem(getItemForChName(m_pUi->m_listWidget_selectionGroups, "All"), QItemSelectionModel::Select);
 
-    m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
+    m_pUi->m_lineEdit_loadedFile->setText(QString::fromStdString(mne::utf8_from_path(mne::path_from_utf8(path.toStdString()).filename())));
 
     if (m_bSetup) {
         saveSettings();
@@ -633,20 +622,9 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
 void ChannelSelectionView::cleanUpMEGChannels()
 {
     //Iterate through all loaded selection groups
-    for (auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
-        QStringList channelList = i.value();
-
-        //Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them
-        QMutableStringListIterator stringListIndex(channelList);
-        while (stringListIndex.hasNext()) {
-            stringListIndex.next();
-
-            if (!m_layoutMap.contains(stringListIndex.value()) && stringListIndex.value().contains("MEG"))
-                stringListIndex.remove();
-        }
-
-        //Overwrite old selection groups channels
-        m_selectionGroupsMap.insert(i.key(), channelList);
+    for (auto& [name, channels] : m_selectionGroupsMap) {
+        //Delete the MEG channels which are not in the currently loaded layout file
+        std::erase_if(channels, [this](const std::string& channel) { return !m_layoutMap.contains(channel) && channel.contains("MEG"); });
     }
 }
 
@@ -666,8 +644,10 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
 
     //update visible channel list widget
     m_pUi->m_listWidget_visibleChannels->clear();
-    auto items = m_selectionGroupsMap.find(current->text());
-    m_pUi->m_listWidget_visibleChannels->addItems(*items);
+    if (auto items = m_selectionGroupsMap.find(current->text().toStdString()); items != m_selectionGroupsMap.end()) {
+        for (const std::string& channel : items->second)
+            m_pUi->m_listWidget_visibleChannels->addItem(QString::fromStdString(channel));
+    }
 
     //update scene items based o nthe new selection group
     updateSceneItems();
@@ -682,10 +662,11 @@ void ChannelSelectionView::updateSelectionGroupsList(QListWidgetItem* current, Q
 
 void ChannelSelectionView::updateSceneItems()
 {
-    QStringList visibleItems;
+    std::vector<std::string> visibleItems;
+    visibleItems.reserve(static_cast<std::size_t>(m_pUi->m_listWidget_visibleChannels->count()));
 
     for (int i = 0; i < m_pUi->m_listWidget_visibleChannels->count(); i++)
-        visibleItems << m_pUi->m_listWidget_visibleChannels->item(i)->text();
+        visibleItems.push_back(m_pUi->m_listWidget_visibleChannels->item(i)->text().toStdString());
 
     m_pSelectionScene->hideItems(visibleItems);
 }
@@ -721,7 +702,7 @@ void ChannelSelectionView::onBtnLoadUserSelection()
         return;
 
     loadSelectionGroups(path);
-    m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
+    m_pUi->m_lineEdit_loadedFile->setText(QString::fromStdString(mne::utf8_from_path(mne::path_from_utf8(path.toStdString()).filename())));
 }
 
 //=============================================================================================================
@@ -734,17 +715,11 @@ void ChannelSelectionView::onBtnSaveUserSelection()
                                                 QString("../resources/general/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                 tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
-    QMultiMap<QString, QStringList> tempMap = m_selectionGroupsMap;
-    tempMap.remove("All");
-    tempMap.remove("All EEG");
-
     if (!path.isEmpty()) {
         std::vector<ChannelSelection> groups;
-        for (auto it = tempMap.constBegin(); it != tempMap.constEnd(); ++it) {
-            ChannelSelection group{it.key().toStdString(), {}};
-            for (const QString& channel : it.value())
-                group.channels.push_back(channel.toStdString());
-            groups.push_back(std::move(group));
+        for (const auto& [name, channels] : m_selectionGroupsMap) {
+            if (name != "All" && name != "All EEG")
+                groups.push_back(ChannelSelection{name, channels});
         }
         const std::filesystem::path file = mne::path_from_utf8(path.toStdString());
         if (path.contains(".sel"))
@@ -758,11 +733,12 @@ void ChannelSelectionView::onBtnSaveUserSelection()
 
 void ChannelSelectionView::onBtnAddToSelectionGroups()
 {
-    QStringList temp;
+    std::vector<std::string> temp;
+    temp.reserve(static_cast<std::size_t>(m_pUi->m_listWidget_userDefined->count()));
     for (int i = 0; i < m_pUi->m_listWidget_userDefined->count(); i++)
-        temp << m_pUi->m_listWidget_userDefined->item(i)->text();
+        temp.push_back(m_pUi->m_listWidget_userDefined->item(i)->text().toStdString());
 
-    m_selectionGroupsMap.insert(m_pUi->m_lineEdit_selectionGroupName->text(), temp);
+    m_selectionGroupsMap.emplace(m_pUi->m_lineEdit_selectionGroupName->text().toStdString(), temp);
     m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), m_pUi->m_lineEdit_selectionGroupName->text());
 }
 
@@ -811,7 +787,7 @@ bool ChannelSelectionView::eventFilter(QObject* obj, QEvent* event)
                 if (m_pUi->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All" &&
                     m_pUi->m_listWidget_selectionGroups->selectedItems().at(i)->text() != "All EEG") {
                     tempSelectedList.append(m_pUi->m_listWidget_selectionGroups->selectedItems().at(i));
-                    m_selectionGroupsMap.remove(m_pUi->m_listWidget_selectionGroups->selectedItems().at(i)->text());
+                    m_selectionGroupsMap.erase(m_pUi->m_listWidget_selectionGroups->selectedItems().at(i)->text().toStdString());
                 }
             }
 

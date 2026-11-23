@@ -30,12 +30,6 @@
 #include "abstractview.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QMap>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -93,7 +87,7 @@ public:
      *
      * @return Pointer to the current average colors.
      */
-    std::shared_ptr<QMap<QString, QColor>> getAverageColor() const;
+    std::shared_ptr<std::map<std::string, QColor>> getAverageColor() const;
 
     //=========================================================================================================
     /**
@@ -101,7 +95,7 @@ public:
      *
      * @return Pointer to the current average activations.
      */
-    std::shared_ptr<QMap<QString, bool>> getAverageActivation() const;
+    std::shared_ptr<std::map<std::string, bool>> getAverageActivation() const;
 
     //=========================================================================================================
     /**
@@ -109,7 +103,7 @@ public:
      *
      * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
-    void setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -117,7 +111,7 @@ public:
      *
      * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
-    void setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation);
+    void setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation);
 
     //=========================================================================================================
     /**
@@ -168,8 +162,8 @@ protected:
 
     int m_iMaxNumAverages;
 
-    std::shared_ptr<QMap<QString, QColor>> m_qMapAverageColor;    /**< Average colors. */
-    std::shared_ptr<QMap<QString, bool>> m_qMapAverageActivation; /**< Average activation status. */
+    std::shared_ptr<std::map<std::string, QColor>> m_qMapAverageColor;    /**< Average colors. */
+    std::shared_ptr<std::map<std::string, bool>> m_qMapAverageActivation; /**< Average activation status. */
 
 signals:
     //=========================================================================================================
@@ -178,7 +172,7 @@ signals:
      *
      * @param[in] qMapAverageColor     the average color map.
      */
-    void newAverageColorMap(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor);
+    void newAverageColorMap(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor);
 
     //=========================================================================================================
     /**
@@ -186,7 +180,7 @@ signals:
      *
      * @param[in] qMapAverageActivation     the average activation map.
      */
-    void newAverageActivationMap(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation);
+    void newAverageActivationMap(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation);
 };
 } // NAMESPACE
 

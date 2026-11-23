@@ -21,14 +21,22 @@
 
 #include "ui_minimumnormsettingsview.h"
 
+#include <mne/base/string_utils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QFileDialog>
-#include <QFileInfo>
 #include <QPushButton>
 #include <QSettings>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+#include <system_error>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -105,7 +113,7 @@ void MinimumNormSettingsView::saveSettings()
 
     QSettings settings("MNECPP");
     settings.setValue(m_sSettingsPath + QString("/MinimumNormSettingsView/modelCheckpoint"),
-                      m_sModelCheckpoint);
+                      QString::fromStdString(mne::utf8_from_path(m_sModelCheckpoint)));
 }
 
 //=============================================================================================================
@@ -121,7 +129,7 @@ void MinimumNormSettingsView::loadSettings()
                                            QString())
                                 .toString();
     if (!sStored.isEmpty()) {
-        setModelCheckpoint(sStored);
+        setModelCheckpoint(mne::path_from_utf8(sStored.toStdString()));
     }
 }
 
@@ -159,20 +167,20 @@ void MinimumNormSettingsView::onMethodChanged(const QString& method)
 
 //=============================================================================================================
 
-void MinimumNormSettingsView::setModelCheckpoint(const QString& sPath)
+void MinimumNormSettingsView::setModelCheckpoint(const std::filesystem::path& sPath)
 {
     if (m_sModelCheckpoint == sPath) {
         return;
     }
     m_sModelCheckpoint = sPath;
-    m_pUi->m_lineEdit_modelCheckpoint->setText(sPath);
+    m_pUi->m_lineEdit_modelCheckpoint->setText(QString::fromStdString(mne::utf8_from_path(sPath)));
     saveSettings();
     emit modelCheckpointChanged(sPath);
 }
 
 //=============================================================================================================
 
-QString MinimumNormSettingsView::getModelCheckpoint() const
+std::filesystem::path MinimumNormSettingsView::getModelCheckpoint() const
 {
     return m_sModelCheckpoint;
 }
@@ -191,14 +199,16 @@ void MinimumNormSettingsView::updateCmneWidgetVisibility(const QString& method)
 
 void MinimumNormSettingsView::onBrowseModelCheckpointClicked()
 {
-    const QString sStartDir = m_sModelCheckpoint.isEmpty() ? QString()
-                                                           : QFileInfo(m_sModelCheckpoint).absolutePath();
+    std::error_code error;
+    const QString sStartDir = m_sModelCheckpoint.empty()
+        ? QString()
+        : QString::fromStdString(mne::utf8_from_path(std::filesystem::absolute(m_sModelCheckpoint, error).parent_path()));
     const QString sFile = QFileDialog::getOpenFileName(this,
                                                        tr("Select CMNE model checkpoint"),
                                                        sStartDir,
                                                        tr("ONNX model (*.onnx);;All files (*)"));
     if (!sFile.isEmpty()) {
-        setModelCheckpoint(sFile);
+        setModelCheckpoint(mne::path_from_utf8(sFile.toStdString()));
     }
 }
 

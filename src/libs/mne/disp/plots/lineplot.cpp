@@ -80,7 +80,7 @@ LinePlot::LinePlot(QWidget* parent)
 
 //=============================================================================================================
 
-LinePlot::LinePlot(const QVector<double>& y,
+LinePlot::LinePlot(const std::vector<double>& y,
                    const QString& title,
                    QWidget* parent)
 : QWidget(parent)
@@ -98,8 +98,8 @@ LinePlot::LinePlot(const QVector<double>& y,
 
 //=============================================================================================================
 
-LinePlot::LinePlot(const QVector<double>& x,
-                   const QVector<double>& y,
+LinePlot::LinePlot(const std::vector<double>& x,
+                   const std::vector<double>& y,
                    const QString& title,
                    QWidget* parent)
 : QWidget(parent)
@@ -147,10 +147,10 @@ void LinePlot::setYLabel(const QString& p_sYLabel)
 
 //=============================================================================================================
 
-void LinePlot::updateData(const QVector<double>& y)
+void LinePlot::updateData(const std::vector<double>& y)
 {
-    QVector<double> x(y.size());
-    for (int i = 0; i < x.size(); ++i) {
+    std::vector<double> x(y.size());
+    for (int i = 0; i < std::ssize(x); ++i) {
         x[i] = static_cast<double>(i);
     }
     updateData(x, y);
@@ -158,8 +158,8 @@ void LinePlot::updateData(const QVector<double>& y)
 
 //=============================================================================================================
 
-void LinePlot::updateData(const QVector<double>& x,
-                          const QVector<double>& y)
+void LinePlot::updateData(const std::vector<double>& x,
+                          const std::vector<double>& y)
 {
     m_series.clear();
     addSeries(x, y);
@@ -167,14 +167,14 @@ void LinePlot::updateData(const QVector<double>& x,
 
 //=============================================================================================================
 
-void LinePlot::addSeries(const QVector<double>& x,
-                         const QVector<double>& y,
+void LinePlot::addSeries(const std::vector<double>& x,
+                         const std::vector<double>& y,
                          const QString& label,
                          const QColor& color,
                          Qt::PenStyle style)
 {
-    const int n = qMin(x.size(), y.size());
-    const bool empty = std::all_of(m_series.cbegin(), m_series.cend(), [](const Series& s) { return s.x.isEmpty(); });
+    const int n = static_cast<int>(std::min(x.size(), y.size()));
+    const bool empty = std::all_of(m_series.cbegin(), m_series.cend(), [](const Series& s) { return s.x.empty(); });
     for (int i = 0; i < n; ++i) {
         const bool first = empty && i == 0;
         m_dMinX = first ? x[i] : qMin(m_dMinX, x[i]);
@@ -192,7 +192,7 @@ void LinePlot::addSeries(const QVector<double>& x,
             }
         }
     }
-    m_series.append({x.mid(0, n), y.mid(0, n), label, lineColor, style});
+    m_series.push_back({std::vector<double>(x.begin(), x.begin() + n), std::vector<double>(y.begin(), y.begin() + n), label, lineColor, style});
 
     setWindowTitle(m_sTitle);
     QWidget::update();
@@ -202,7 +202,7 @@ void LinePlot::addSeries(const QVector<double>& x,
 
 int LinePlot::seriesCount() const
 {
-    return m_series.size();
+    return static_cast<int>(m_series.size());
 }
 
 //=============================================================================================================
@@ -225,8 +225,8 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
     maxY += padY == 0.0 ? 1.0 : padY;
     const double minX = m_dMinX;
     const double maxX = m_dMaxX > m_dMinX ? m_dMaxX : m_dMinX + 1.0;
-    const QVector<double> yTicks = niceTicks(minY, maxY, 6);
-    const QVector<double> xTicks = niceTicks(minX, maxX, 8);
+    const std::vector<double> yTicks = niceTicks(minY, maxY, 6);
+    const std::vector<double> xTicks = niceTicks(minX, maxX, 8);
 
     int tickWidth = 0;
     for (double v : yTicks) {
@@ -261,7 +261,7 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
     const QSizeF legendSize(labelWidth + 38, labelCount * (line + 2) + 10);
     QRectF legend;
     if (labelCount > 0) {
-        const QList<QRectF> corners = {
+        const std::array<QRectF, 4> corners = {
             QRectF(QPointF(area.right() - legendSize.width() - 8, area.top() + 8), legendSize),
             QRectF(QPointF(area.left() + 8, area.top() + 8), legendSize),
             QRectF(QPointF(area.right() - legendSize.width() - 8, area.bottom() - legendSize.height() - 8), legendSize),
@@ -319,12 +319,12 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
     painter.setClipRect(area);
     const qreal penWidth = m_series.size() > 20 ? 1.0 : 1.75;
     for (const Series& series : m_series) {
-        if (series.x.isEmpty()) {
+        if (series.x.empty()) {
             continue;
         }
         QPainterPath path;
         path.moveTo(toPixelX(series.x[0]), toPixelY(series.y[0]));
-        for (int i = 1; i < series.x.size(); ++i) {
+        for (int i = 1; i < std::ssize(series.x); ++i) {
             path.lineTo(toPixelX(series.x[i]), toPixelY(series.y[i]));
         }
         painter.setPen(QPen(series.color, penWidth, series.style, series.style == Qt::SolidLine ? Qt::RoundCap : Qt::FlatCap, Qt::RoundJoin));
@@ -363,7 +363,7 @@ double LinePlot::hiddenLength(const QRectF& rect,
 {
     double hidden = 0.0;
     for (const Series& series : m_series) {
-        for (int i = 1; i < series.x.size(); ++i) {
+        for (int i = 1; i < std::ssize(series.x); ++i) {
             const QPointF a(toPixelX(series.x[i - 1]), toPixelY(series.y[i - 1]));
             const QPointF b(toPixelX(series.x[i]), toPixelY(series.y[i]));
             const double length = QLineF(a, b).length();

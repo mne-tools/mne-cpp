@@ -22,6 +22,7 @@
 //=============================================================================================================
 
 #include "bidsview.h"
+#include <mne/base/log.h>
 #include "ui_bidsview.h"
 
 #include "helpers/bidsviewmodel.h"
@@ -32,7 +33,6 @@
 
 #include <QTreeView>
 #include <QStandardItemModel>
-#include <QDebug>
 #include <QMenu>
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -144,8 +144,8 @@ void BidsView::customMenuRequested(QPoint pos)
                 //Find all available subjects
                 for (int i = 0; i < pModel->rowCount(); i++) {
                     if (pModel->item(i)->index() != pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>()) {
-                        qDebug() << "Relative model index" << pModel->item(i)->index();
-                        qDebug() << "Relative item index" << pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>();
+                        mne::Log::debug("Relative model index {}", pModel->item(i)->index().row());
+                        mne::Log::debug("Relative item index {}", pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>().row());
                         QAction* pTargetAction = new QAction(pModel->item(i)->text());
                         connect(pTargetAction, &QAction::triggered, [=, this]() {
                             emit onMoveSession(pModel->item(i)->index(), pItem->index());
@@ -196,7 +196,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 break;
             }
             default: {
-                qDebug() << "DataManagerControlView::customMenuRequested - default";
+                mne::Log::debug("DataManagerControlView::customMenuRequested - default");
                 QMenu* menu = new QMenu(this);
                 menu->setAttribute(Qt::WA_DeleteOnClose);
 

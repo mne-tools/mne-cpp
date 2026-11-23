@@ -324,7 +324,7 @@ std::shared_ptr<mne::FiffInfo> FiffRawViewModel::getFiffInfo() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::setScaling(const QMap<qint32, float>& p_qMapChScaling)
+void FiffRawViewModel::setScaling(const std::map<int, float>& p_qMapChScaling)
 {
     beginResetModel();
     m_qMapChScaling = p_qMapChScaling;

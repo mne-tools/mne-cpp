@@ -286,7 +286,7 @@ void TestDisp3dViewState::testDefaultForIndex()
     // defaultForIndex should return valid SubView for each index
     for (int i = 0; i < 7; ++i) {
         SubView sv = SubView::defaultForIndex(i);
-        QVERIFY(!sv.surfaceType.isEmpty());
+        QVERIFY(!sv.surfaceType.empty());
         QVERIFY(sv.enabled);
     }
 
@@ -343,8 +343,7 @@ void TestDisp3dViewState::testMultiViewPresetNames()
 {
     // All 7 presets (0..6) should have non-empty names
     for (int i = 0; i <= 6; ++i) {
-        QString name = multiViewPresetName(i);
-        QVERIFY2(!name.isEmpty(), qPrintable(QString("Empty name for preset %1").arg(i)));
+        QVERIFY2(!multiViewPresetName(i).empty(), qPrintable(QString("Empty name for preset %1").arg(i)));
     }
 
     // Preset 1 should be "Perspective"
@@ -368,32 +367,32 @@ void TestDisp3dViewState::testMultiViewPresetIsPerspective()
 void TestDisp3dViewState::testSurfaceKeyConstants()
 {
     // Verify key string constants are non-empty and match expected prefixes
-    QCOMPARE(QString(mne::disp::surface_keys::kLhPrefix), QString("lh_"));
-    QCOMPARE(QString(mne::disp::surface_keys::kRhPrefix), QString("rh_"));
-    QCOMPARE(QString(mne::disp::surface_keys::kBemHead), QString("bem_head"));
-    QCOMPARE(QString(mne::disp::surface_keys::kBemPrefix), QString("bem_"));
-    QCOMPARE(QString(mne::disp::surface_keys::kSensPrefix), QString("sens_"));
-    QCOMPARE(QString(mne::disp::surface_keys::kDigPrefix), QString("dig_"));
-    QCOMPARE(QString(mne::disp::surface_keys::kDigCardinal), QString("dig_cardinal"));
-    QCOMPARE(QString(mne::disp::surface_keys::kDigHpi), QString("dig_hpi"));
-    QCOMPARE(QString(mne::disp::surface_keys::kDigEeg), QString("dig_eeg"));
-    QCOMPARE(QString(mne::disp::surface_keys::kDigExtra), QString("dig_extra"));
+    QCOMPARE(mne::disp::surface_keys::kLhPrefix, std::string_view("lh_"));
+    QCOMPARE(mne::disp::surface_keys::kRhPrefix, std::string_view("rh_"));
+    QCOMPARE(mne::disp::surface_keys::kBemHead, std::string_view("bem_head"));
+    QCOMPARE(mne::disp::surface_keys::kBemPrefix, std::string_view("bem_"));
+    QCOMPARE(mne::disp::surface_keys::kSensPrefix, std::string_view("sens_"));
+    QCOMPARE(mne::disp::surface_keys::kDigPrefix, std::string_view("dig_"));
+    QCOMPARE(mne::disp::surface_keys::kDigCardinal, std::string_view("dig_cardinal"));
+    QCOMPARE(mne::disp::surface_keys::kDigHpi, std::string_view("dig_hpi"));
+    QCOMPARE(mne::disp::surface_keys::kDigEeg, std::string_view("dig_eeg"));
+    QCOMPARE(mne::disp::surface_keys::kDigExtra, std::string_view("dig_extra"));
 }
 
 //=============================================================================================================
 
 void TestDisp3dViewState::testSensorTypeToObjectKey()
 {
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG"), QString("sens_meg"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Grad"), QString("sens_meg_grad"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Mag"), QString("sens_meg_mag"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("EEG"), QString("sens_eeg"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer"), QString("dig"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/Cardinal"), QString("dig_cardinal"));
-    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/HPI"), QString("dig_hpi"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG"), std::string("sens_meg"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Grad"), std::string("sens_meg_grad"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("MEG/Mag"), std::string("sens_meg_mag"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("EEG"), std::string("sens_eeg"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer"), std::string("dig"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/Cardinal"), std::string("dig_cardinal"));
+    QCOMPARE(mne::disp::surface_keys::sensorTypeToObjectKey("Digitizer/HPI"), std::string("dig_hpi"));
 
     // Unknown type should return empty string
-    QVERIFY(mne::disp::surface_keys::sensorTypeToObjectKey("Unknown").isEmpty());
+    QVERIFY(mne::disp::surface_keys::sensorTypeToObjectKey("Unknown").empty());
 }
 
 //=============================================================================================================

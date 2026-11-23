@@ -31,6 +31,14 @@
 #include "layoutscene.h"
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <map>
+#include <string>
+#include <vector>
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -74,8 +82,8 @@ public:
      * @param[in] layoutMap layout data map.
      * @param[in] badChannels Names of the bad channels.
      */
-    void repaintItems(const QMap<QString, QPointF>& layoutMap,
-                      QStringList badChannels);
+    void repaintItems(const std::map<std::string, QPointF>& layoutMap,
+                      const std::vector<std::string>& badChannels);
 
     //=========================================================================================================
     /**
@@ -83,7 +91,7 @@ public:
      *
      * @param[in] visibleItems string list with items name which are to be hidden.
      */
-    void hideItems(QStringList visibleItems);
+    void hideItems(const std::vector<std::string>& visibleItems);
 
     int m_iChannelTypeMode; /**< The channel type mode. */
 };

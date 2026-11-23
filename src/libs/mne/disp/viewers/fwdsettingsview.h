@@ -38,6 +38,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 
 //=============================================================================================================
@@ -226,7 +227,7 @@ signals:
      * @param[in] sDirPath              The path to the atlas.
      * @param[in] pAnnotationSet        The FsAnnotation set.
      */
-    void atlasDirChanged(const QString& sDirPath,
+    void atlasDirChanged(const std::filesystem::path& sDirPath,
                          const std::shared_ptr<mne::FsAnnotationSet>& pAnnotationSet);
 
     //=========================================================================================================

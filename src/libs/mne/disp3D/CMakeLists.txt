@@ -56,6 +56,7 @@ set(SOURCES
     view/brainview.cpp
     view/brainrenderer.cpp
     view/multiviewlayout.cpp
+    workers/periodictask.cpp
     workers/stcloadingworker.cpp
     workers/rtsourcedataworker.cpp
     workers/rtsourcedatacontroller.cpp
@@ -102,6 +103,7 @@ set(HEADERS
     view/brainview.h
     view/brainrenderer.h
     view/multiviewlayout.h
+    workers/periodictask.h
     workers/stcloadingworker.h
     workers/rtsourcedataworker.h
     workers/rtsourcedatacontroller.h

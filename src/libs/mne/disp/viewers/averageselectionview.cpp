@@ -17,6 +17,8 @@
 //=============================================================================================================
 
 #include "averageselectionview.h"
+#include "../detail/map_value.h"
+#include <mne/base/log.h>
 
 #include <mne/fiff/fiff_evoked_set.h>
 
@@ -29,7 +31,6 @@
 #include <QColorDialog>
 #include <QPalette>
 #include <QPushButton>
-#include <QDebug>
 #include <QSettings>
 #include <QPointer>
 
@@ -61,8 +62,8 @@ AverageSelectionView::AverageSelectionView(const QString& sSettingsPath,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_iMaxNumAverages(10)
-, m_qMapAverageColor(std::make_shared<QMap<QString, QColor>>())
-, m_qMapAverageActivation(std::make_shared<QMap<QString, bool>>())
+, m_qMapAverageColor(std::make_shared<std::map<std::string, QColor>>())
+, m_qMapAverageActivation(std::make_shared<std::map<std::string, bool>>())
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Average Selection");
@@ -82,21 +83,21 @@ AverageSelectionView::~AverageSelectionView()
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, QColor>> AverageSelectionView::getAverageColor() const
+std::shared_ptr<std::map<std::string, QColor>> AverageSelectionView::getAverageColor() const
 {
     return m_qMapAverageColor;
 }
 
 //=============================================================================================================
 
-std::shared_ptr<QMap<QString, bool>> AverageSelectionView::getAverageActivation() const
+std::shared_ptr<std::map<std::string, bool>> AverageSelectionView::getAverageActivation() const
 {
     return m_qMapAverageActivation;
 }
 
 //=============================================================================================================
 
-void AverageSelectionView::setAverageColor(const std::shared_ptr<QMap<QString, QColor>>& qMapAverageColor)
+void AverageSelectionView::setAverageColor(const std::shared_ptr<std::map<std::string, QColor>>& qMapAverageColor)
 {
     m_qMapAverageColor = qMapAverageColor;
     redrawGUI();
@@ -104,7 +105,7 @@ void AverageSelectionView::setAverageColor(const std::shared_ptr<QMap<QString, Q
 
 //=============================================================================================================
 
-void AverageSelectionView::setAverageActivation(const std::shared_ptr<QMap<QString, bool>>& qMapAverageActivation)
+void AverageSelectionView::setAverageActivation(const std::shared_ptr<std::map<std::string, bool>>& qMapAverageActivation)
 {
     m_qMapAverageActivation = qMapAverageActivation;
     redrawGUI();
@@ -121,17 +122,17 @@ void AverageSelectionView::saveSettings()
     QSettings settings("MNECPP");
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
-    QMap<QString, QColor>::const_iterator iColor = m_qMapAverageColor->constBegin();
-    while (iColor != m_qMapAverageColor->constEnd()) {
-        settings.setValue(iColor.key(), iColor.value());
+    std::map<std::string, QColor>::const_iterator iColor = m_qMapAverageColor->cbegin();
+    while (iColor != m_qMapAverageColor->cend()) {
+        settings.setValue(QString::fromStdString(iColor->first), iColor->second);
         ++iColor;
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
-    QMap<QString, bool>::const_iterator iActivation = m_qMapAverageActivation->constBegin();
-    while (iActivation != m_qMapAverageActivation->constEnd()) {
-        settings.setValue(iActivation.key(), iActivation.value());
+    std::map<std::string, bool>::const_iterator iActivation = m_qMapAverageActivation->cbegin();
+    while (iActivation != m_qMapAverageActivation->cend()) {
+        settings.setValue(QString::fromStdString(iActivation->first), iActivation->second);
         ++iActivation;
     }
     settings.endGroup();
@@ -148,16 +149,14 @@ void AverageSelectionView::loadSettings()
     QSettings settings("MNECPP");
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageColorMap"));
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
-        m_qMapAverageColor->insert(key, settings.value(key).value<QColor>());
+    for (const QString& key : settings.childKeys()) {
+        m_qMapAverageColor->insert_or_assign(key.toStdString(), settings.value(key).value<QColor>());
     }
     settings.endGroup();
 
     settings.beginGroup(m_sSettingsPath + QString("/AverageSelectionView/averageActivationMap"));
-    keys = settings.childKeys();
-    foreach (QString key, keys) {
-        m_qMapAverageActivation->insert(key, settings.value(key).toBool());
+    for (const QString& key : settings.childKeys()) {
+        m_qMapAverageActivation->insert_or_assign(key.toStdString(), settings.value(key).toBool());
     }
     settings.endGroup();
 }
@@ -191,7 +190,7 @@ void AverageSelectionView::updateProcessingMode(ProcessingMode mode)
 void AverageSelectionView::redrawGUI()
 {
     if (m_qMapAverageColor->size() != m_qMapAverageActivation->size()) {
-        qDebug() << "AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.";
+        mne::Log::debug("AverageSelectionView::update - m_qMapAverageColor and m_qMapAverageActivation do not match in size. Returning.");
         return;
     }
 
@@ -207,27 +206,25 @@ void AverageSelectionView::redrawGUI()
     }
 
     // Create new GUI elements
-    QMapIterator<QString, QColor> itr(*m_qMapAverageColor);
     int count = 0;
-    while (itr.hasNext()) {
+    for (const auto& [key, color] : *m_qMapAverageColor) {
         if (count >= m_iMaxNumAverages) {
             break;
         }
 
-        itr.next();
+        const QString name = QString::fromStdString(key);
 
         //Create average active checkbox
-        QPointer<QCheckBox> pCheckBox = new QCheckBox(itr.key());
-        pCheckBox->setChecked(m_qMapAverageActivation->value(itr.key()));
-        pCheckBox->setObjectName(itr.key());
+        QPointer<QCheckBox> pCheckBox = new QCheckBox(name);
+        pCheckBox->setChecked(detail::valueOr(*m_qMapAverageActivation, key));
+        pCheckBox->setObjectName(name);
         topLayout->addWidget(pCheckBox, count, 0);
         connect(pCheckBox.data(), &QCheckBox::clicked,
                 this, &AverageSelectionView::onAverageSelectionColorChanged);
 
         //Create average color pushbutton
-        QColor color = itr.value();
         QPointer<QPushButton> pButton = new QPushButton("Click to change");
-        pButton->setObjectName(itr.key());
+        pButton->setObjectName(name);
         pButton->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         topLayout->addWidget(pButton, count, 1);
         connect(pButton.data(), &QPushButton::clicked,
@@ -245,9 +242,9 @@ void AverageSelectionView::onAverageSelectionColorChanged()
 {
     //Change color for average
     if (QPointer<QPushButton> button = qobject_cast<QPushButton*>(sender())) {
-        QString sObjectName = button->objectName();
+        const std::string sObjectName = button->objectName().toStdString();
 
-        QColor color = QColorDialog::getColor(m_qMapAverageColor->value(sObjectName), this, "Set average color");
+        QColor color = QColorDialog::getColor(detail::valueOr(*m_qMapAverageColor, sObjectName), this, "Set average color");
         // Cancelled: getColor() returns an invalid colour
         if (!color.isValid()) {
             return;
@@ -262,16 +259,16 @@ void AverageSelectionView::onAverageSelectionColorChanged()
             button->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(color.red()).arg(color.green()).arg(color.blue()));
         }
 
-        m_qMapAverageColor->insert(sObjectName, color);
+        m_qMapAverageColor->insert_or_assign(sObjectName, color);
 
         emit newAverageColorMap(m_qMapAverageColor);
     }
 
     //Change color for average
     if (QPointer<QCheckBox> checkBox = qobject_cast<QCheckBox*>(sender())) {
-        QString sObjectName = checkBox->objectName();
+        const std::string sObjectName = checkBox->objectName().toStdString();
 
-        m_qMapAverageActivation->insert(sObjectName, checkBox->isChecked());
+        m_qMapAverageActivation->insert_or_assign(sObjectName, checkBox->isChecked());
 
         emit newAverageActivationMap(m_qMapAverageActivation);
     }

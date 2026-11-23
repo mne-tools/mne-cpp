@@ -366,7 +366,7 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
     QVERIFY(QTest::qWaitForWindowExposed(window));
     window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
     DataWindow* dataWindow = window->dataWindow();
-    QTRY_VERIFY_WITH_TIMEOUT(!dataWindow->stimEvents().isEmpty(), 10000);
+    QTRY_VERIFY_WITH_TIMEOUT(!dataWindow->stimEvents().empty(), 10000);
 
     // Markers of the trigger channel are drawn in the colours the event list shows
     EventModel* eventModel = window->eventWindow()->getEventModel();
@@ -374,7 +374,7 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
         QCOMPARE(marker.color, eventModel->getEventTypeColors().value(marker.type));
 
     // A colour picked in the event window recolours the markers of that type
-    const int type = dataWindow->stimEvents().first().type;
+    const int type = dataWindow->stimEvents().front().type;
     const QColor picked(12, 34, 56);
     eventModel->addNewEventType(QString::number(type), picked);
     dataWindow->updateDataTableViews();
@@ -670,7 +670,7 @@ void TestMneBrowseApp::managesVirtualChannelsThroughTheirDialogs()
     QVERIFY(warning.contains("at least two channels"));
 
     window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
-    QTRY_VERIFY_WITH_TIMEOUT(!window->dataWindow()->stimEvents().isEmpty(), 10000);
+    QTRY_VERIFY_WITH_TIMEOUT(!window->dataWindow()->stimEvents().empty(), 10000);
 
     // A reference set made of EEG001..EEG003 through the reference-set manager
     answerNextModal([](QWidget* pManage) {

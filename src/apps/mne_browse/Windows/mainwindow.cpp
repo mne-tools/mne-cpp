@@ -1339,7 +1339,7 @@ void MainWindow::setupWindowWidgets()
             this, &MainWindow::recomputeEvoked);
 
     auto refreshAnnotationOverlay = [this]() {
-        QVector<mne::disp::ChannelRhiView::AnnotationSpan> spans;
+        std::vector<mne::disp::ChannelRhiView::AnnotationSpan> spans;
         const QVector<AnnotationSpanData> modelSpans =
             m_pAnnotationWindow->getAnnotationModel()->getAnnotationSpans();
         spans.reserve(modelSpans.size());
@@ -1350,8 +1350,8 @@ void MainWindow::setupWindowWidgets()
             span.startSample = modelSpan.startSample;
             span.endSample = modelSpan.endSample;
             span.color = modelSpan.color;
-            span.label = modelSpan.label;
-            spans.append(span);
+            span.label = modelSpan.label.toStdString();
+            spans.push_back(span);
         }
         m_pDataWindow->setAnnotations(spans);
         setWindowStatus();
@@ -1370,10 +1370,10 @@ void MainWindow::setupWindowWidgets()
                 // Push epoch trigger positions to the signal view as dashed grid lines
                 if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
                     EpochModel* em = m_pEpochWindow->getEpochModel();
-                    QVector<int> triggers;
+                    std::vector<int> triggers;
                     triggers.reserve(em->rowCount());
                     for (int r = 0; r < em->rowCount(); ++r)
-                        triggers.append(em->sampleAt(r));
+                        triggers.push_back(em->sampleAt(r));
                     m_pDataWindow->getChannelDataView()->setEpochMarkers(triggers);
                 }
             });
@@ -3824,10 +3824,10 @@ bool MainWindow::runEvokedComputation(bool promptForSettings)
     // Push epoch grid lines to the signal view (signal was blocked above)
     if (m_pDataWindow && m_pDataWindow->getChannelDataView()) {
         EpochModel* em = m_pEpochWindow->getEpochModel();
-        QVector<int> triggers;
+        std::vector<int> triggers;
         triggers.reserve(em->rowCount());
         for (int r = 0; r < em->rowCount(); ++r)
-            triggers.append(em->sampleAt(r));
+            triggers.push_back(em->sampleAt(r));
         m_pDataWindow->getChannelDataView()->setEpochMarkers(triggers);
     }
 

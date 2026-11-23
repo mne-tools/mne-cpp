@@ -21,6 +21,8 @@
 //=============================================================================================================
 
 #include "channelinfomodel.h"
+#include "../../detail/map_value.h"
+#include <mne/base/log.h>
 
 #include "mneoperator.h"
 #include <mne/base/string_utils.h>
@@ -32,13 +34,15 @@
 //=============================================================================================================
 
 #include <QVector3D>
-#include <QRegularExpression>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cctype>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
 //=============================================================================================================
@@ -49,13 +53,6 @@ using namespace mne::disp;
 using namespace Eigen;
 using namespace mne;
 
-static QStringList toQStringList(const StringList& names)
-{
-    QStringList list;
-    for (const std::string& name : names)
-        list << QString::fromStdString(name);
-    return list;
-}
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -213,13 +210,13 @@ QVariant ChannelInfoModel::data(const QModelIndex& index, int role) const
 
             switch (role) {
                 case Qt::DisplayRole:
-                    if (index.row() < m_aliasNames.size())
-                        v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
+                    if (index.row() < std::ssize(m_aliasNames))
+                        v.setValue(QString::fromStdString(m_aliasNames.at(index.row())));
                     return v;
 
                 case ChannelInfoModelRoles::GetChAlias:
-                    if (index.row() < m_aliasNames.size())
-                        v.setValue(QString("%1").arg(m_aliasNames.at(index.row())));
+                    if (index.row() < std::ssize(m_aliasNames))
+                        v.setValue(QString::fromStdString(m_aliasNames.at(index.row())));
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -234,13 +231,13 @@ QVariant ChannelInfoModel::data(const QModelIndex& index, int role) const
 
             switch (role) {
                 case Qt::DisplayRole:
-                    if (index.row() < m_mappedLayoutChNames.size())
-                        v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    if (index.row() < std::ssize(m_mappedLayoutChNames))
+                        v.setValue(QString::fromStdString(m_mappedLayoutChNames.at(index.row())));
                     return v;
 
                 case ChannelInfoModelRoles::GetMappedLayoutChName:
-                    if (index.row() < m_mappedLayoutChNames.size())
-                        v.setValue(QString("%1").arg(m_mappedLayoutChNames.at(index.row())));
+                    if (index.row() < std::ssize(m_mappedLayoutChNames))
+                        v.setValue(QString::fromStdString(m_mappedLayoutChNames.at(index.row())));
                     return v;
 
                 case Qt::TextAlignmentRole:
@@ -318,7 +315,7 @@ QVariant ChannelInfoModel::data(const QModelIndex& index, int role) const
         if (index.column() == 7) {
             QVariant v;
 
-            QPointF point = m_layoutMap[m_mappedLayoutChNames.at(index.row())];
+            QPointF point = detail::valueOr(m_layoutMap, m_mappedLayoutChNames.at(index.row()));
 
             switch (role) {
                 case Qt::DisplayRole:
@@ -532,7 +529,7 @@ void ChannelInfoModel::setFiffInfo(std::shared_ptr<FiffInfo>& pFiffInfo)
     beginResetModel();
 
     m_pFiffInfo = pFiffInfo;
-    m_aliasNames = toQStringList(m_pFiffInfo->ch_names);
+    m_aliasNames = m_pFiffInfo->ch_names;
     m_mappedLayoutChNames = m_aliasNames;
 
     mapLayoutToChannels();
@@ -557,12 +554,12 @@ void ChannelInfoModel::assignedOperatorsChanged(const QMultiMap<int, std::shared
 
 //=============================================================================================================
 
-void ChannelInfoModel::layoutChanged(const QMap<QString, QPointF>& layoutMap)
+void ChannelInfoModel::layoutChanged(const std::map<std::string, QPointF>& layoutMap)
 {
     beginResetModel();
 
     m_layoutMap = layoutMap;
-    m_aliasNames = toQStringList(m_pFiffInfo->ch_names);
+    m_aliasNames = m_pFiffInfo->ch_names;
     m_mappedLayoutChNames = m_aliasNames;
 
     mapLayoutToChannels();
@@ -574,23 +571,23 @@ void ChannelInfoModel::layoutChanged(const QMap<QString, QPointF>& layoutMap)
 
 //=============================================================================================================
 
-const QStringList& ChannelInfoModel::getMappedChannelsList()
+const std::vector<std::string>& ChannelInfoModel::getMappedChannelsList()
 {
     return m_mappedLayoutChNames;
 }
 
 //=============================================================================================================
 
-int ChannelInfoModel::getIndexFromOrigChName(QString chName)
+int ChannelInfoModel::getIndexFromOrigChName(const std::string& chName)
 {
-    return mne::channel_index(m_pFiffInfo->ch_names, chName.toStdString());
+    return mne::channel_index(m_pFiffInfo->ch_names, chName);
 }
 
 //=============================================================================================================
 
-int ChannelInfoModel::getIndexFromMappedChName(QString chName)
+int ChannelInfoModel::getIndexFromMappedChName(const std::string& chName)
 {
-    return m_mappedLayoutChNames.indexOf(chName);
+    return mne::index_of(m_mappedLayoutChNames, chName);
 }
 
 //=============================================================================================================
@@ -602,6 +599,29 @@ StringList ChannelInfoModel::getBadChannelList()
 
 //=============================================================================================================
 
+namespace
+{
+
+/** Removes every @p kind and the characters - _ / | and whitespace from @p name in one left-to-right pass. */
+std::string layoutNumber(std::string_view name, std::string_view kind)
+{
+    std::string residual;
+    for (std::size_t i = 0; i < name.size();) {
+        if (name.substr(i, kind.size()) == kind) {
+            i += kind.size();
+        } else if (std::string_view("-_/|").find(name[i]) != std::string_view::npos || std::isspace(static_cast<unsigned char>(name[i]))) {
+            ++i;
+        } else {
+            residual += name[i++];
+        }
+    }
+    return residual;
+}
+
+} // namespace
+
+//=============================================================================================================
+
 void ChannelInfoModel::mapLayoutToChannels()
 {
     //Map channels to layout
@@ -609,30 +629,16 @@ void ChannelInfoModel::mapLayoutToChannels()
     for (int i = 0; i < std::ssize(channelList); i++) {
         //Get current channel information
         const FiffChInfo& chInfo = channelList[i];
-        QString chName = QString::fromStdString(chInfo.ch_name);
-        QRegularExpression regExpRemove;
-
         switch (chInfo.kind) {
             case FIFFV_MEG_CH:
-                //Scan for MEG string and other characters
-                regExpRemove = QRegularExpression("MEG|[-_/|\\s]");
-                chName.remove(regExpRemove);
-
-                //After cleaning the string try to convert the residual to an int number
-                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("MEG").arg(chName));
-
+                //Remove the MEG prefix and separators, keep the residual channel number
+                m_mappedLayoutChNames[i] = "MEG " + layoutNumber(chInfo.ch_name, "MEG");
                 break;
 
-            case FIFFV_EEG_CH: {
-                //Scan for EEG string and other characters
-                regExpRemove = QRegularExpression("EEG|[-_/|\\s]");
-                chName.remove(regExpRemove);
-
-                //After cleaning the string try to convert the residual to an int number
-                m_mappedLayoutChNames.replace(i, QString("%1 %2").arg("EEG").arg(chName));
-
+            case FIFFV_EEG_CH:
+                //Remove the EEG prefix and separators, keep the residual channel number
+                m_mappedLayoutChNames[i] = "EEG " + layoutNumber(chInfo.ch_name, "EEG");
                 break;
-            }
         }
     } //end fiff chs
 
@@ -652,5 +658,5 @@ void ChannelInfoModel::clearModel()
 
     endResetModel();
 
-    qDebug("ChannelInfoModel cleared.");
+    mne::Log::debug("ChannelInfoModel cleared.");
 }

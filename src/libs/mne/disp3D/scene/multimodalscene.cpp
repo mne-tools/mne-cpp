@@ -16,6 +16,8 @@
 
 #include "multimodalscene.h"
 
+#include <mne/base/log.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -27,7 +29,9 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cstddef>
 #include <limits>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,17 +54,17 @@ MultimodalScene::~MultimodalScene() = default;
 
 void MultimodalScene::addLayer(SceneLayer layer)
 {
-    if (layer.id.isEmpty()) {
-        qWarning("MultimodalScene::addLayer: refusing to add layer with empty id");
+    if (layer.id.empty()) {
+        mne::Log::warning("MultimodalScene::addLayer: refusing to add layer with empty id");
         return;
     }
 
-    const auto it = m_indexById.constFind(layer.id);
-    if (it != m_indexById.constEnd()) {
-        m_layers[*it] = std::move(layer);
+    const auto it = m_indexById.find(layer.id);
+    if (it != m_indexById.end()) {
+        m_layers[it->second] = std::move(layer);
     } else {
-        m_indexById.insert(layer.id, m_layers.size());
-        m_layers.append(std::move(layer));
+        m_indexById.insert_or_assign(layer.id, m_layers.size());
+        m_layers.push_back(std::move(layer));
     }
     rebuildOrder();
     emit layersChanged();
@@ -68,13 +72,13 @@ void MultimodalScene::addLayer(SceneLayer layer)
 
 //=============================================================================================================
 
-bool MultimodalScene::removeLayer(const QString& id)
+bool MultimodalScene::removeLayer(const std::string& id)
 {
-    const auto it = m_indexById.constFind(id);
-    if (it == m_indexById.constEnd()) {
+    const auto it = m_indexById.find(id);
+    if (it == m_indexById.end()) {
         return false;
     }
-    m_layers.removeAt(*it);
+    m_layers.erase(m_layers.begin() + static_cast<std::ptrdiff_t>(it->second));
     rebuildOrder();
     emit layersChanged();
     return true;
@@ -84,7 +88,7 @@ bool MultimodalScene::removeLayer(const QString& id)
 
 void MultimodalScene::clear()
 {
-    if (m_layers.isEmpty()) {
+    if (m_layers.empty()) {
         return;
     }
     m_layers.clear();
@@ -94,50 +98,50 @@ void MultimodalScene::clear()
 
 //=============================================================================================================
 
-QVector<SceneLayer> MultimodalScene::layers() const
+std::vector<SceneLayer> MultimodalScene::layers() const
 {
     return m_layers;
 }
 
 //=============================================================================================================
 
-const SceneLayer* MultimodalScene::findLayer(const QString& id) const
+const SceneLayer* MultimodalScene::findLayer(const std::string& id) const
 {
-    const auto it = m_indexById.constFind(id);
-    if (it == m_indexById.constEnd()) {
+    const auto it = m_indexById.find(id);
+    if (it == m_indexById.end()) {
         return nullptr;
     }
-    return &m_layers.at(*it);
+    return &m_layers.at(it->second);
 }
 
 //=============================================================================================================
 
-void MultimodalScene::setLayerVisible(const QString& id, bool visible)
+void MultimodalScene::setLayerVisible(const std::string& id, bool visible)
 {
-    const auto it = m_indexById.constFind(id);
-    if (it == m_indexById.constEnd()) {
+    const auto it = m_indexById.find(id);
+    if (it == m_indexById.end()) {
         return;
     }
-    if (m_layers[*it].visible == visible) {
+    if (m_layers[it->second].visible == visible) {
         return;
     }
-    m_layers[*it].visible = visible;
+    m_layers[it->second].visible = visible;
     emit layersChanged();
 }
 
 //=============================================================================================================
 
-void MultimodalScene::setLayerOpacity(const QString& id, float opacity)
+void MultimodalScene::setLayerOpacity(const std::string& id, float opacity)
 {
-    const auto it = m_indexById.constFind(id);
-    if (it == m_indexById.constEnd()) {
+    const auto it = m_indexById.find(id);
+    if (it == m_indexById.end()) {
         return;
     }
-    opacity = qBound(0.0f, opacity, 1.0f);
-    if (qFuzzyCompare(m_layers[*it].opacity + 1.0f, opacity + 1.0f)) {
+    opacity = std::clamp(opacity, 0.0f, 1.0f);
+    if (qFuzzyCompare(m_layers[it->second].opacity + 1.0f, opacity + 1.0f)) {
         return;
     }
-    m_layers[*it].opacity = opacity;
+    m_layers[it->second].opacity = opacity;
     emit layersChanged();
 }
 
@@ -251,13 +255,13 @@ void MultimodalScene::worldBounds(QVector3D& bbMin, QVector3D& bbMax) const
         if (!layer.visible) {
             continue;
         }
-        const auto it = m_boundsFns.constFind(static_cast<int>(layer.kind));
-        if (it == m_boundsFns.constEnd() || !*it) {
+        const auto it = m_boundsFns.find(static_cast<int>(layer.kind));
+        if (it == m_boundsFns.end() || !it->second) {
             continue;
         }
         QVector3D mn;
         QVector3D mx;
-        if (!(*it)(layer, mn, mx)) {
+        if (!it->second(layer, mn, mx)) {
             continue;
         }
         bbMin.setX(std::min(bbMin.x(), mn.x()));
@@ -279,7 +283,7 @@ void MultimodalScene::worldBounds(QVector3D& bbMin, QVector3D& bbMax) const
 
 void MultimodalScene::registerBoundsFn(SceneLayerKind kind, BoundsFn fn)
 {
-    m_boundsFns.insert(static_cast<int>(kind), std::move(fn));
+    m_boundsFns.insert_or_assign(static_cast<int>(kind), std::move(fn));
 }
 
 //=============================================================================================================
@@ -296,7 +300,7 @@ void MultimodalScene::rebuildOrder()
                      });
     m_indexById.clear();
     m_indexById.reserve(m_layers.size());
-    for (int i = 0; i < m_layers.size(); ++i) {
-        m_indexById.insert(m_layers.at(i).id, i);
+    for (std::size_t i = 0; i < m_layers.size(); ++i) {
+        m_indexById.insert_or_assign(m_layers[i].id, i);
     }
 }

@@ -31,9 +31,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
-#include <QMap>
-#include <QString>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -45,7 +42,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -100,9 +100,9 @@ public:
      * @param[in] surfaces    FsSurface map for target-surface validation.
      * @return true if streaming was started successfully.
      */
-    bool startStreaming(const QString& modality,
+    bool startStreaming(const std::string& modality,
                         const SensorFieldMapper& fieldMapper,
-                        const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces);
+                        const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces);
 
     /** Stop real-time sensor streaming. */
     void stopStreaming();
@@ -114,7 +114,7 @@ public:
     }
 
     /** @return the active modality ("MEG" or "EEG"), or empty. */
-    QString modality() const
+    std::string modality() const
     {
         return m_modality;
     }
@@ -156,7 +156,7 @@ public:
      *
      * @param[in] name   Colormap name (e.g. "MNE", "Jet").
      */
-    void setColormap(const QString& name);
+    void setColormap(const std::string& name);
 
 signals:
     //=========================================================================================================
@@ -167,13 +167,13 @@ signals:
      * @param[in] surfaceKey  Key of the target surface.
      * @param[in] colors      Per-vertex ABGR colour array.
      */
-    void colorsAvailable(const QString& surfaceKey,
-                         const QVector<uint32_t>& colors);
+    void colorsAvailable(const std::string& surfaceKey,
+                         const std::vector<uint32_t>& colors);
 
 private:
     std::unique_ptr<RtSensorDataController> m_controller; /**< Real-time sensor data controller. */
     bool m_isStreaming = false;                           /**< True while streaming is active. */
-    QString m_modality;                                   /**< Active modality: "MEG" or "EEG". */
+    std::string m_modality;                               /**< Active modality: "MEG" or "EEG". */
 };
 
 } // namespace mne::disp

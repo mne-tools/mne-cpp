@@ -235,11 +235,11 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
     while (i.hasNext()) {
         mne::disp::SelectionSceneItem* selectionSceneItemTemp = static_cast<mne::disp::SelectionSceneItem*>(i.next());
 
-        m_pSelectionItem->m_sChannelName.append(selectionSceneItemTemp->m_sChannelName);
-        m_pSelectionItem->m_iChannelNumber.append(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName));
-        m_pSelectionItem->m_iChannelKind.append(selectionSceneItemTemp->m_iChannelKind);
-        m_pSelectionItem->m_iChannelUnit.append(selectionSceneItemTemp->m_iChannelUnit);
-        m_pSelectionItem->m_qpChannelPosition.append(selectionSceneItemTemp->m_qpChannelPosition);
+        m_pSelectionItem->m_sChannelName.push_back(selectionSceneItemTemp->m_sChannelName.toStdString());
+        m_pSelectionItem->m_iChannelNumber.push_back(m_pChannelInfoModel->getIndexFromOrigChName(selectionSceneItemTemp->m_sChannelName.toStdString()));
+        m_pSelectionItem->m_iChannelKind.push_back(selectionSceneItemTemp->m_iChannelKind);
+        m_pSelectionItem->m_iChannelUnit.push_back(selectionSceneItemTemp->m_iChannelUnit);
+        m_pSelectionItem->m_qpChannelPosition.push_back(selectionSceneItemTemp->m_qpChannelPosition);
     }
 
     m_pSelectionItem->m_bShowAll = m_pChannelSelectionView->isSelectionEmpty();

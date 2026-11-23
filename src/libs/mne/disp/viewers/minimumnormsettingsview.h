@@ -33,6 +33,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <filesystem>
 #include <memory>
 
 //=============================================================================================================
@@ -102,7 +103,7 @@ public:
      *
      * @param[in] sPath  Absolute path to the model checkpoint file (e.g. .onnx).
      */
-    void setModelCheckpoint(const QString& sPath);
+    void setModelCheckpoint(const std::filesystem::path& sPath);
 
     //=========================================================================================================
     /**
@@ -110,7 +111,7 @@ public:
      *
      * @return Absolute path to the model checkpoint file, or an empty string if none is set.
      */
-    QString getModelCheckpoint() const;
+    std::filesystem::path getModelCheckpoint() const;
 
     //=========================================================================================================
     /**
@@ -185,7 +186,7 @@ protected:
 
     std::unique_ptr<Ui::MinimumNormSettingsViewWidget> m_pUi;
     QString m_sMethod;
-    QString m_sModelCheckpoint; /**< Persisted model-checkpoint path for CMNE. */
+    std::filesystem::path m_sModelCheckpoint; /**< Persisted model-checkpoint path for CMNE. */
 
 signals:
     //=========================================================================================================
@@ -218,7 +219,7 @@ signals:
      *
      * @param[in] sPath  The new model checkpoint path.
      */
-    void modelCheckpointChanged(const QString& sPath);
+    void modelCheckpointChanged(const std::filesystem::path& sPath);
 };
 } // NAMESPACE
 

@@ -34,10 +34,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QByteArray>
 #include <QColor>
-#include <QString>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,6 +47,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -102,7 +100,7 @@ public:
      *
      * @param[in] vecPoints     Points in scene coordinates, in order.
      */
-    void setPoints(const QVector<Eigen::Vector3f>& vecPoints);
+    void setPoints(const std::vector<Eigen::Vector3f>& vecPoints);
 
     //=========================================================================================================
     /**
@@ -219,11 +217,11 @@ private:
         float nx, ny, nz;
     };
 
-    QVector<Eigen::Vector3f> m_vecPoints; /**< Points of the polyline, in order. */
+    std::vector<Eigen::Vector3f> m_vecPoints; /**< Points of the polyline, in order. */
 
-    QByteArray m_vertexData;   /**< Unit segment vertices. */
-    QByteArray m_indexData;    /**< Unit segment indices. */
-    QByteArray m_instanceData; /**< Per-segment instance data. */
+    std::vector<std::byte> m_vertexData;   /**< Unit segment vertices. */
+    std::vector<std::byte> m_indexData;    /**< Unit segment indices. */
+    std::vector<std::byte> m_instanceData; /**< Per-segment instance data. */
 
     int m_iIndexCount;    /**< Index count of the unit segment. */
     int m_iInstanceCount; /**< Number of segments. */

@@ -313,9 +313,9 @@ void CoRegistration::onPickedFiducialChanged(const int iFiducial)
 
 //=============================================================================================================
 
-void CoRegistration::onDigitizersChanged(const QString& sFilePath)
+void CoRegistration::onDigitizersChanged(const std::filesystem::path& sFilePath)
 {
-    auto digSet = FiffDigPointSet::read(sFilePath.toStdU16String());
+    auto digSet = FiffDigPointSet::read(sFilePath);
     if (!digSet) {
         Log::warning("[CoRegistration::onDigitizersChanged] {}", digSet.error().what());
         return;
@@ -337,9 +337,9 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 
 //=============================================================================================================
 
-void CoRegistration::onFiducialsChanged(const QString& sFilePath)
+void CoRegistration::onFiducialsChanged(const std::filesystem::path& sFilePath)
 {
-    auto fiducials = FiffDigPointSet::read(sFilePath.toStdU16String());
+    auto fiducials = FiffDigPointSet::read(sFilePath);
     if (!fiducials) {
         Log::warning("[CoRegistration::onFiducialsChanged] {}", fiducials.error().what());
         return;
@@ -353,18 +353,18 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 
 //=============================================================================================================
 
-void CoRegistration::onStoreFiducials(const QString& sFilePath)
+void CoRegistration::onStoreFiducials(const std::filesystem::path& sFilePath)
 {
-    if (auto written = m_digFidMri.write(sFilePath.toStdU16String()); !written) {
+    if (auto written = m_digFidMri.write(sFilePath); !written) {
         Log::warning("[CoRegistration::onStoreFiducials] {}", written.error().what());
     }
 }
 
 //=============================================================================================================
 
-void CoRegistration::onLoadTrans(const QString& sFilePath)
+void CoRegistration::onLoadTrans(const std::filesystem::path& sFilePath)
 {
-    const auto read = FiffCoordTrans::read(sFilePath.toStdU16String());
+    const auto read = FiffCoordTrans::read(sFilePath);
     if (!read) {
         Log::warning("[CoRegistration::onLoadTrans] {}", read.error().what());
         return;
@@ -408,10 +408,10 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
 
 //=============================================================================================================
 
-void CoRegistration::onStoreTrans(const QString& sFilePath)
+void CoRegistration::onStoreTrans(const std::filesystem::path& sFilePath)
 {
     if (!m_transHeadMri.empty()) {
-        if (const auto written = m_transHeadMri.write(sFilePath.toStdU16String()); !written) {
+        if (const auto written = m_transHeadMri.write(sFilePath); !written) {
             Log::warning("[CoRegistration::onStoreTrans] {}", written.error().what());
         }
     }

@@ -50,6 +50,12 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <filesystem>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -324,7 +330,7 @@ void TestDispPlots::testLinePlotDefaultCtor()
 
 void TestDispPlots::testLinePlotWithYData()
 {
-    QVector<double> y = {1.0, 2.0, 3.0, 4.0, 5.0};
+    std::vector<double> y = {1.0, 2.0, 3.0, 4.0, 5.0};
     LinePlot plot(y, "Test Plot");
     QVERIFY(plot.minimumWidth() >= 200);
 }
@@ -333,8 +339,8 @@ void TestDispPlots::testLinePlotWithYData()
 
 void TestDispPlots::testLinePlotWithXYData()
 {
-    QVector<double> x = {0.0, 1.0, 2.0, 3.0};
-    QVector<double> y = {1.0, 4.0, 9.0, 16.0};
+    std::vector<double> x = {0.0, 1.0, 2.0, 3.0};
+    std::vector<double> y = {1.0, 4.0, 9.0, 16.0};
     LinePlot plot(x, y, "XY Plot");
     QVERIFY(plot.minimumWidth() >= 200);
 }
@@ -344,11 +350,11 @@ void TestDispPlots::testLinePlotWithXYData()
 void TestDispPlots::testLinePlotUpdateData()
 {
     LinePlot plot;
-    QVector<double> y1 = {1.0, 2.0, 3.0};
+    std::vector<double> y1 = {1.0, 2.0, 3.0};
     plot.updateData(y1);
 
-    QVector<double> x2 = {0.0, 1.0, 2.0, 3.0};
-    QVector<double> y2 = {0.0, 1.0, 4.0, 9.0};
+    std::vector<double> x2 = {0.0, 1.0, 2.0, 3.0};
+    std::vector<double> y2 = {0.0, 1.0, 4.0, 9.0};
     plot.updateData(x2, y2);
     QCOMPARE(plot.seriesCount(), 1);
 
@@ -398,7 +404,7 @@ void TestDispPlots::testLinePlotUpdateData()
     QVERIFY2(qAbs(extent.bottom() - mid - extent.height() * 4.0 / 9.0) <= 6, qPrintable(where + QString(", x = 2 at y %1").arg(mid)));
 
     // A constant series is drawn instead of dividing by a zero range
-    plot.updateData(QVector<double>{5.0, 5.0, 5.0});
+    plot.updateData(std::vector<double>{5.0, 5.0, 5.0});
     QVERIFY(!plot.grab().isNull());
 }
 
@@ -408,7 +414,7 @@ void TestDispPlots::testLinePlotSetLabels()
 {
     LinePlot plot;
     plot.resize(400, 300);
-    plot.updateData(QVector<double>{1.0, 2.0, 3.0});
+    plot.updateData(std::vector<double>{1.0, 2.0, 3.0});
     const QImage plain = plot.grab().toImage();
     plot.setTitle("My Title");
     plot.setXLabel("X Axis");
@@ -460,8 +466,8 @@ void TestDispPlots::testLinePlotAddSeries()
         }
         return -1;
     };
-    QVector<double> x(200);
-    QVector<double> zigzag(200);
+    std::vector<double> x(200);
+    std::vector<double> zigzag(200);
     for (int i = 0; i < 200; ++i) {
         x[i] = i;
         zigzag[i] = i % 2;
@@ -486,7 +492,7 @@ void TestDispPlots::testLinePlotAddSeries()
     dashed.addSeries({0.0, 1.0}, {1.0, 1.0}, QString(), QColor(70, 130, 180), Qt::DashLine);
     QVERIFY(count(dashed.grab().toImage(), qRgb(70, 130, 180)) < 1.8 * solidPixels);
 
-    plot.updateData(QVector<double>{1.0, 2.0});
+    plot.updateData(std::vector<double>{1.0, 2.0});
     QCOMPARE(plot.seriesCount(), 1);
 }
 
@@ -494,21 +500,21 @@ void TestDispPlots::testLinePlotAddSeries()
 
 void TestDispPlots::testFigureExporter()
 {
-    LinePlot plot(QVector<double>{0.0, 1.0}, QVector<double>{0.0, 1.0}, "ramp");
+    LinePlot plot(std::vector<double>{0.0, 1.0}, std::vector<double>{0.0, 1.0}, "ramp");
     qunsetenv("MNE_CPP_FIGURE_DIR");
-    QVERIFY(FigureExporter::save(plot, "ramp", "A ramp").isEmpty());
+    QVERIFY(FigureExporter::save(plot, "ramp", "A ramp").empty());
 
     QTemporaryDir dir;
     qputenv("MNE_CPP_FIGURE_DIR", QFile::encodeName(dir.filePath("figures")));
-    const QString first = FigureExporter::save(plot, "ramp", "A ramp \u00b5V", QSize(320, 200));
+    const std::filesystem::path first = FigureExporter::save(plot, "ramp", "A ramp \u00b5V", QSize(320, 200));
     QImage plain(10, 10, QImage::Format_RGB32);
     plain.fill(Qt::white);
-    const QString second = FigureExporter::save(plain, "a b/c", "Plain");
+    const std::filesystem::path second = FigureExporter::save(plain, "a b/c", "Plain");
     qunsetenv("MNE_CPP_FIGURE_DIR");
 
-    QCOMPARE(QFileInfo(first).fileName(), QString("01_ramp.png"));
-    QCOMPARE(QFileInfo(second).fileName(), QString("02_a_b_c.png"));
-    QImageReader reader(first);
+    QCOMPARE(first.filename(), std::filesystem::path("01_ramp.png"));
+    QCOMPARE(second.filename(), std::filesystem::path("02_a_b_c.png"));
+    QImageReader reader(QString::fromStdString(first.string()));
     QCOMPARE(reader.text("Description"), QString("A ramp \u00b5V"));
     const QImage image = reader.read();
     QCOMPARE(image.size(), QSize(640, 400));
@@ -636,13 +642,13 @@ void TestDispPlots::testImageScColorRangeAndExtent()
 
 void TestDispPlots::testNiceTicks()
 {
-    QCOMPARE(detail::niceTicks(0.0, 1.0, 5), QVector<double>({0.0, 0.2, 0.4, 0.6, 0.8, 1.0}));
-    QCOMPARE(detail::niceTicks(-200.0, 500.0, 8), QVector<double>({-200.0, -100.0, 0.0, 100.0, 200.0, 300.0, 400.0, 500.0}));
+    QCOMPARE(detail::niceTicks(0.0, 1.0, 5), std::vector<double>({0.0, 0.2, 0.4, 0.6, 0.8, 1.0}));
+    QCOMPARE(detail::niceTicks(-200.0, 500.0, 8), std::vector<double>({-200.0, -100.0, 0.0, 100.0, 200.0, 300.0, 400.0, 500.0}));
     // Index axes of a 3 x 3 image span [-0.5, 2.5]: whole numbers only
-    QCOMPARE(detail::niceTicks(-0.5, 2.5, 8, 1.0), QVector<double>({0.0, 1.0, 2.0}));
-    QVERIFY(detail::niceTicks(1.0, 1.0, 5).isEmpty());
+    QCOMPARE(detail::niceTicks(-0.5, 2.5, 8, 1.0), std::vector<double>({0.0, 1.0, 2.0}));
+    QVERIFY(detail::niceTicks(1.0, 1.0, 5).empty());
     // A step of 1 would put ticks closer than minStep: the next nice step up
-    QCOMPARE(detail::niceTicks(0.0, 10.0, 20, 1.43), QVector<double>({0.0, 2.0, 4.0, 6.0, 8.0, 10.0}));
+    QCOMPARE(detail::niceTicks(0.0, 10.0, 20, 1.43), std::vector<double>({0.0, 2.0, 4.0, 6.0, 8.0, 10.0}));
 }
 
 //=============================================================================================================
@@ -813,7 +819,7 @@ struct TFplotProbe : public TFplot
     {
         return m_matData;
     }
-    QVector<double> extent() const
+    std::vector<double> extent() const
     {
         return {m_dLeft, m_dRight, m_dBottom, m_dTop};
     }
@@ -830,7 +836,7 @@ void TestDispPlots::testTFplotConstruction()
     MatrixXd tfMatrix = MatrixXd::Random(10, 20).cwiseAbs();
     TFplotProbe tf(tfMatrix, 1000.0, ColorMaps::Jet);
     QCOMPARE(tf.data().rows(), 10);
-    QCOMPARE(tf.extent(), QVector<double>({0.0, 19 / 1000.0, 0.0, 9 * 1000.0 / 20}));
+    QCOMPARE(tf.extent(), std::vector<double>({0.0, 19 / 1000.0, 0.0, 9 * 1000.0 / 20}));
     QCOMPARE(tf.colorbarLabel(), QStringLiteral("Power (normalized)"));
     QVERIFY(!tf.grab().isNull());
 }
@@ -848,7 +854,7 @@ void TestDispPlots::testTFplotWithFreqRange()
     QCOMPARE(tf.data().row(0).minCoeff(), 1.0);
     QCOMPARE(tf.data().bottomRows(39).maxCoeff(), 0.0);
     // Times start at tmin; frequencies are the bin centres, not the requested bounds
-    QCOMPARE(tf.extent(), QVector<double>({-0.2, -0.2 + 99 / 100.0, 1.0, 40.0}));
+    QCOMPARE(tf.extent(), std::vector<double>({-0.2, -0.2 + 99 / 100.0, 1.0, 40.0}));
 
     // Odd sample count: bins are sfreq / N apart, not (sfreq / 2) / (N / 2)
     const double sfreq = 600.614990234375;
@@ -877,11 +883,11 @@ void TestDispPlots::testGetDefaultScalingValue()
 
 void TestDispPlots::testGetScalingValueFromMap()
 {
-    QMap<qint32, float> scaleMap;
+    std::map<int, float> scaleMap;
     // Use EEG (kind=2) and STIM (kind=3) — non-MEG kinds so the lookup
     // uses iChannelKind directly (MEG channels look up by unit instead).
-    scaleMap.insert(2, 42.0f);
-    scaleMap.insert(3, 84.0f);
+    scaleMap[2] = 42.0f;
+    scaleMap[3] = 84.0f;
 
     float val = getScalingValue(scaleMap, 2, 0);
     QCOMPARE(val, 42.0f);

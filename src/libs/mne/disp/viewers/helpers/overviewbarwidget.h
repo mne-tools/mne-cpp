@@ -35,6 +35,13 @@
 #include <QWidget>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <string>
+#include <vector>
+
+//=============================================================================================================
 // DEFINE NAMESPACE mne::disp
 //=============================================================================================================
 
@@ -72,8 +79,8 @@ public:
 
     void setViewport(float scrollSample, float visibleSamples);
 
-    void setEvents(const QVector<ChannelRhiView::EventMarker>& events);
-    void setAnnotations(const QVector<ChannelRhiView::AnnotationSpan>& annotations);
+    void setEvents(const std::vector<ChannelRhiView::EventMarker>& events);
+    void setAnnotations(const std::vector<ChannelRhiView::AnnotationSpan>& annotations);
 
     QSize sizeHint() const override;
     QSize minimumSizeHint() const override;
@@ -99,8 +106,8 @@ private:
     float m_scrollSample = 0.f;
     float m_visibleSamples = 0.f;
 
-    QVector<ChannelRhiView::EventMarker> m_events;
-    QVector<ChannelRhiView::AnnotationSpan> m_annotations;
+    std::vector<ChannelRhiView::EventMarker> m_events;
+    std::vector<ChannelRhiView::AnnotationSpan> m_annotations;
 
     QImage m_envelopeImage;
     bool m_envelopeDirty = true;

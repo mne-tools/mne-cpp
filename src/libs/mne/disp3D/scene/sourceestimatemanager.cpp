@@ -16,6 +16,8 @@
 
 #include "sourceestimatemanager.h"
 
+#include <mne/base/log.h>
+
 #include "../renderable/sourceestimateoverlay.h"
 #include "../renderable/brainsurface.h"
 #include "../workers/stcloadingworker.h"
@@ -23,18 +25,14 @@
 #include "../core/viewstate.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QThread>
-#include <QDebug>
-#include <QSet>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
+#include <set>
+#include <string>
+#include <vector>
 
 namespace mne::disp
 {
@@ -61,24 +59,24 @@ void SourceEstimateManager::cancelLoading()
 {
     if (m_stcWorker)
         m_stcWorker->requestCancel();
-    if (m_loadingThread) {
-        m_loadingThread->quit();
-        m_loadingThread->wait();
-    }
+    if (m_loadingThread.joinable())
+        m_loadingThread.join();
     // The worker is deleted here, once its thread has stopped, never by the thread itself:
-    // onStcLoadingFinished still reads it after the thread may have finished
+    // onStcLoadingFinished still reads it after the thread may have finished. A finished signal it
+    // already queued is dropped by the generation check in load().
     m_stcWorker.reset();
+    ++m_loadGeneration;
     m_isLoading = false;
 }
 
 //=============================================================================================================
 
-bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
-                                 const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                                 const QString& activeSurfaceType)
+bool SourceEstimateManager::load(const std::filesystem::path& lhPath, const std::filesystem::path& rhPath,
+                                 const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                                 const std::string& activeSurfaceType)
 {
     if (m_isLoading) {
-        qWarning() << "SourceEstimateManager: STC loading already in progress";
+        mne::Log::warning("SourceEstimateManager: STC loading already in progress");
         return false;
     }
 
@@ -86,55 +84,55 @@ bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
     BrainSurface* lhSurface = nullptr;
     BrainSurface* rhSurface = nullptr;
 
-    const QString lhKey = "lh_" + activeSurfaceType;
-    const QString rhKey = "rh_" + activeSurfaceType;
+    const std::string lhKey = "lh_" + activeSurfaceType;
+    const std::string rhKey = "rh_" + activeSurfaceType;
 
-    if (surfaces.contains(lhKey))
-        lhSurface = surfaces[lhKey].get();
-    if (surfaces.contains(rhKey))
-        rhSurface = surfaces[rhKey].get();
+    if (const auto it = surfaces.find(lhKey); it != surfaces.end())
+        lhSurface = it->second.get();
+    if (const auto it = surfaces.find(rhKey); it != surfaces.end())
+        rhSurface = it->second.get();
 
     // Fallback: search for any lh_*/rh_* brain surface
     if (!lhSurface || !rhSurface) {
-        for (auto it = surfaces.begin(); it != surfaces.end(); ++it) {
-            if (it.value() && it.value()->tissueType() == BrainSurface::TissueBrain) {
-                if (!lhSurface && it.key().startsWith("lh_")) {
-                    lhSurface = it.value().get();
-                    qDebug() << "SourceEstimateManager: Using fallback LH surface:" << it.key();
-                } else if (!rhSurface && it.key().startsWith("rh_")) {
-                    rhSurface = it.value().get();
-                    qDebug() << "SourceEstimateManager: Using fallback RH surface:" << it.key();
+        for (const auto& [key, surface] : surfaces) {
+            if (surface && surface->tissueType() == BrainSurface::TissueBrain) {
+                if (!lhSurface && key.starts_with("lh_")) {
+                    lhSurface = surface.get();
+                    mne::Log::debug("SourceEstimateManager: Using fallback LH surface: {}", key);
+                } else if (!rhSurface && key.starts_with("rh_")) {
+                    rhSurface = surface.get();
+                    mne::Log::debug("SourceEstimateManager: Using fallback RH surface: {}", key);
                 }
             }
         }
     }
 
     if (!lhSurface && !rhSurface) {
-        qWarning() << "SourceEstimateManager: No surfaces available for STC loading."
-                   << "Active surface type:" << activeSurfaceType
-                   << "Available keys:" << surfaces.keys();
+        std::string keys;
+        for (const auto& [key, surface] : surfaces)
+            keys += (keys.empty() ? "" : ", ") + key;
+        mne::Log::warning("SourceEstimateManager: No surfaces available for STC loading. Active surface type: {} Available keys: {}", activeSurfaceType, keys);
         return false;
     }
 
     // Clean up any previous loading thread and worker
     cancelLoading();
-    m_loadingThread.reset();
 
     // Create overlay for results
     m_overlay = std::make_unique<SourceEstimateOverlay>();
 
-    // Create worker and thread
-    m_loadingThread = std::make_unique<QThread>();
+    // The worker stays on the GUI thread; process() runs on the loading thread, so its signals arrive queued
     m_stcWorker = std::make_unique<StcLoadingWorker>(lhPath, rhPath, lhSurface, rhSurface);
-    m_stcWorker->moveToThread(m_loadingThread.get());
 
-    connect(m_loadingThread.get(), &QThread::started, m_stcWorker.get(), &StcLoadingWorker::process);
+    const std::uint64_t generation = m_loadGeneration;
     connect(m_stcWorker.get(), &StcLoadingWorker::progress, this, &SourceEstimateManager::loadingProgress);
-    connect(m_stcWorker.get(), &StcLoadingWorker::finished, this, &SourceEstimateManager::onStcLoadingFinished);
-    connect(m_stcWorker.get(), &StcLoadingWorker::finished, m_loadingThread.get(), &QThread::quit);
+    connect(m_stcWorker.get(), &StcLoadingWorker::finished, this, [this, generation](bool success) {
+        if (generation == m_loadGeneration)
+            onStcLoadingFinished(success);
+    });
 
     m_isLoading = true;
-    m_loadingThread->start();
+    m_loadingThread = std::jthread([worker = m_stcWorker.get()] { worker->process(); });
 
     return true;
 }
@@ -153,7 +151,7 @@ void SourceEstimateManager::onStcLoadingFinished(bool success)
     m_isLoading = false;
 
     if (!success || !m_stcWorker) {
-        qWarning() << "SourceEstimateManager: Async STC loading failed";
+        mne::Log::warning("SourceEstimateManager: Async STC loading failed");
         m_overlay.reset();
         return;
     }
@@ -186,26 +184,26 @@ void SourceEstimateManager::onStcLoadingFinished(bool success)
 //=============================================================================================================
 
 void SourceEstimateManager::setTimePoint(int index,
-                                         const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
+                                         const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
                                          const SubView& singleView,
-                                         const QVector<SubView>& subViews)
+                                         const std::vector<SubView>& subViews)
 {
     if (!m_overlay || !m_overlay->isLoaded())
         return;
 
-    m_currentTimePoint = qBound(0, index, m_overlay->numTimePoints() - 1);
+    m_currentTimePoint = std::clamp(index, 0, std::max(0, m_overlay->numTimePoints() - 1));
 
     // Collect all distinct surface types used across single + multi views
-    QSet<QString> activeTypes;
+    std::set<std::string> activeTypes;
     activeTypes.insert(singleView.surfaceType);
-    for (int i = 0; i < subViews.size(); ++i)
-        activeTypes.insert(subViews[i].surfaceType);
+    for (const SubView& subView : subViews)
+        activeTypes.insert(subView.surfaceType);
 
     // Apply source estimate to surfaces matching ANY active type
-    for (auto it = surfaces.begin(); it != surfaces.end(); ++it) {
-        for (const QString& type : activeTypes) {
-            if (it.key().endsWith(type)) {
-                m_overlay->applyToSurface(it.value().get(), m_currentTimePoint);
+    for (const auto& [key, surface] : surfaces) {
+        for (const std::string& type : activeTypes) {
+            if (key.ends_with(type)) {
+                m_overlay->applyToSurface(surface.get(), m_currentTimePoint);
                 break;
             }
         }
@@ -248,13 +246,13 @@ int SourceEstimateManager::closestIndex(float timeSec) const
     if (numPts <= 0 || dt <= 0.0f)
         return -1;
 
-    const int idx = qRound((timeSec - t0) / dt);
-    return qBound(0, idx, numPts - 1);
+    const int idx = static_cast<int>(std::lround((timeSec - t0) / dt));
+    return std::clamp(idx, 0, numPts - 1);
 }
 
 //=============================================================================================================
 
-void SourceEstimateManager::setColormap(const QString& name)
+void SourceEstimateManager::setColormap(const std::string& name)
 {
     if (m_overlay)
         m_overlay->setColormap(name);
@@ -273,21 +271,17 @@ void SourceEstimateManager::setThresholds(float min, float mid, float max)
 
 //=============================================================================================================
 
-void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                                           const SubView& singleView,
-                                           const QVector<SubView>& subViews)
+void SourceEstimateManager::startStreaming([[maybe_unused]] const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                                           [[maybe_unused]] const SubView& singleView,
+                                           [[maybe_unused]] const std::vector<SubView>& subViews)
 {
-    Q_UNUSED(surfaces)
-    Q_UNUSED(singleView)
-    Q_UNUSED(subViews)
-
     if (m_isStreaming) {
-        qDebug() << "SourceEstimateManager: Real-time streaming already active";
+        mne::Log::debug("SourceEstimateManager: Real-time streaming already active");
         return;
     }
 
     if (!m_overlay || !m_overlay->isLoaded()) {
-        qWarning() << "SourceEstimateManager: Cannot start streaming — no source estimate loaded";
+        mne::Log::warning("SourceEstimateManager: Cannot start streaming — no source estimate loaded");
         return;
     }
 
@@ -311,7 +305,7 @@ void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<B
 
     // Feed all STC time-points into the queue
     const int nTimePoints = m_overlay->numTimePoints();
-    qDebug() << "SourceEstimateManager: Feeding" << nTimePoints << "time points into real-time queue";
+    mne::Log::debug("SourceEstimateManager: Feeding {} time points into real-time queue", nTimePoints);
     m_rtController->clearData();
 
     for (int t = 0; t < nTimePoints; ++t) {
@@ -323,7 +317,7 @@ void SourceEstimateManager::startStreaming(const QMap<QString, std::shared_ptr<B
     m_rtController->setStreamingState(true);
     m_isStreaming = true;
 
-    qDebug() << "SourceEstimateManager: Real-time streaming started";
+    mne::Log::debug("SourceEstimateManager: Real-time streaming started");
 }
 
 //=============================================================================================================
@@ -337,7 +331,7 @@ void SourceEstimateManager::stopStreaming()
         m_rtController->setStreamingState(false);
 
     m_isStreaming = false;
-    qDebug() << "SourceEstimateManager: Real-time streaming stopped";
+    mne::Log::debug("SourceEstimateManager: Real-time streaming stopped");
 }
 
 //=============================================================================================================

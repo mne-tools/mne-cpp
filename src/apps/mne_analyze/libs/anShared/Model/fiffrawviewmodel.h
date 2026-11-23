@@ -45,6 +45,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -286,7 +287,7 @@ public:
      *
      * @return the current scaling.
      */
-    inline const QMap<qint32, float>& getScaling() const;
+    inline const std::map<int, float>& getScaling() const;
 
     //=========================================================================================================
     /**
@@ -330,7 +331,7 @@ public:
      *
      * @param[in] p_qMapChScaling    Map of scaling factors.
      */
-    void setScaling(const QMap<qint32, float>& p_qMapChScaling);
+    void setScaling(const std::map<int, float>& p_qMapChScaling);
 
     //=========================================================================================================
     /**
@@ -629,7 +630,7 @@ private:
     std::shared_ptr<mne::FiffInfo> m_pFiffInfo;     /**< Fiff info of whole fiff file. */
     std::vector<mne::FiffChInfo> m_ChannelInfoList; /**< List of FiffChInfo objects that holds the corresponding channels information. */
 
-    QMap<qint32, float> m_qMapChScaling; /**< Channel scaling map. */
+    std::map<int, float> m_qMapChScaling; /**< Channel scaling map. */
 
     QColor m_colBackground; /**< The background color.*/
 
@@ -732,7 +733,7 @@ inline double FiffRawViewModel::pixelDifference() const
 
 //=============================================================================================================
 
-inline const QMap<qint32, float>& FiffRawViewModel::getScaling() const
+inline const std::map<int, float>& FiffRawViewModel::getScaling() const
 {
     return m_qMapChScaling;
 }

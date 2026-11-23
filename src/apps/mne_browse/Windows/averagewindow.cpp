@@ -261,7 +261,7 @@ void AverageWindow::channelSelectionManagerChanged(const QList<QGraphicsItem*>& 
 void AverageWindow::scaleAveragedData(const QMap<QString, double>& scaleMap)
 {
     //Set the scale map received from the scale window
-    QMap<qint32, float> newScaleMapIdx;
+    std::map<int, float> newScaleMapIdx;
 
     newScaleMapIdx[FIFF_UNIT_T_M] = scaleMap["MEG_grad"];
     newScaleMapIdx[FIFF_UNIT_T] = scaleMap["MEG_mag"];
@@ -287,7 +287,7 @@ void AverageWindow::scaleAveragedData(const QMap<QString, double>& scaleMap)
 
 //*************************************************************************************************************
 
-void AverageWindow::setMappedChannelNames(QStringList mappedChannelNames)
+void AverageWindow::setMappedChannelNames(const std::vector<std::string>& mappedChannelNames)
 {
     m_mappedChannelNames = mappedChannelNames;
 }
@@ -509,7 +509,7 @@ void AverageWindow::initAverageSceneView()
     // (MAG=1e-12, GRAD=1e-15) are the unit amplitude, producing extreme
     // dScaleY values.  Here we use the same multiples that ScalingView
     // applies to its default slider positions.
-    QMap<qint32, float> defaultScaleMap;
+    std::map<int, float> defaultScaleMap;
     defaultScaleMap[FIFF_UNIT_T] = 1e-11f;   // MAG
     defaultScaleMap[FIFF_UNIT_T_M] = 1e-10f; // GRAD
     defaultScaleMap[FIFFV_EEG_CH] = 1e-4f;   // EEG
@@ -562,7 +562,7 @@ void AverageWindow::initAverageSceneView()
         layoutGrid->addLayout(scaleLayout, 2, 0, 1, 3);
 
         auto updateScales = [this]() {
-            QMap<qint32, float> scaleMap;
+            std::map<int, float> scaleMap;
             scaleMap[FIFF_UNIT_T] = static_cast<float>(m_pSpinMag->value() * 1e-11);
             scaleMap[FIFF_UNIT_T_M] = static_cast<float>(m_pSpinGrad->value() * 1e-10);
             scaleMap[FIFFV_EEG_CH] = static_cast<float>(m_pSpinEEG->value() * 1e-4);
@@ -736,8 +736,7 @@ void AverageWindow::refreshPlots()
                 ;
                 averageSceneItemTemp->m_iChannelNumber = channelNumber;
                 averageSceneItemTemp->m_iTotalNumberChannels = static_cast<int>(fiffInfo->ch_names.size());
-                averageSceneItemTemp->m_lAverageData.append(QPair<QString, RowVectorPair>(index.data(Qt::DisplayRole).toString(),
-                                                                                          averageData));
+                averageSceneItemTemp->m_lAverageData.emplace_back(index.data(Qt::DisplayRole).toString().toStdString(), averageData);
             }
         }
     }
@@ -766,7 +765,7 @@ void AverageWindow::refreshPlots()
         }
 
         // Set scale to ~1.4× the max to fill ~70% of item height
-        QMap<qint32, float> autoScale;
+        std::map<int, float> autoScale;
         autoScale[FIFF_UNIT_T_M] = maxGrad > 0 ? static_cast<float>(maxGrad * 1.4) : 1e-10f;
         autoScale[FIFF_UNIT_T] = maxMag > 0 ? static_cast<float>(maxMag * 1.4) : 1e-11f;
         autoScale[FIFFV_EEG_CH] = maxEEG > 0 ? static_cast<float>(maxEEG * 1.4) : 1e-4f;
@@ -954,15 +953,15 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
                 continue;
         }
 
-        selItem.m_sChannelName.append(QString::fromStdString(chInfo.ch_name));
-        selItem.m_iChannelNumber.append(ch);
-        selItem.m_iChannelKind.append(chInfo.kind);
-        selItem.m_iChannelUnit.append(chInfo.unit);
+        selItem.m_sChannelName.push_back(chInfo.ch_name);
+        selItem.m_iChannelNumber.push_back(ch);
+        selItem.m_iChannelKind.push_back(chInfo.kind);
+        selItem.m_iChannelUnit.push_back(chInfo.unit);
         // Project 3D coil/electrode position to 2D
-        selItem.m_qpChannelPosition.append(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
+        selItem.m_qpChannelPosition.push_back(QPointF(chInfo.chpos.r0(0), chInfo.chpos.r0(1)));
     }
 
-    if (selItem.m_qpChannelPosition.isEmpty())
+    if (selItem.m_qpChannelPosition.empty())
         return false;
 
     // ── Separate co-located channels (e.g. planar grad pairs, or
@@ -976,13 +975,13 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
     };
     QVector<ColocGroup> colocGroups;
     QVector<bool> handled(selItem.m_qpChannelPosition.size(), false);
-    for (int i = 0; i < selItem.m_qpChannelPosition.size(); ++i) {
+    for (int i = 0; i < std::ssize(selItem.m_qpChannelPosition); ++i) {
         if (handled[i])
             continue;
 
         ColocGroup group;
         group.indices.append(i);
-        for (int j = i + 1; j < selItem.m_qpChannelPosition.size(); ++j) {
+        for (int j = i + 1; j < std::ssize(selItem.m_qpChannelPosition); ++j) {
             if (handled[j])
                 continue;
             double dx = selItem.m_qpChannelPosition[j].x() - selItem.m_qpChannelPosition[i].x();
@@ -1032,7 +1031,7 @@ bool AverageWindow::populateLayoutFromEvoked(const QModelIndexList& selectedRows
         double scale = targetRange / maxRange;
         double xCenter = (xMin + xMax) / 2.0;
         double yCenter = (yMin + yMax) / 2.0;
-        for (int p = 0; p < selItem.m_qpChannelPosition.size(); ++p) {
+        for (int p = 0; p < std::ssize(selItem.m_qpChannelPosition); ++p) {
             QPointF& pt = selItem.m_qpChannelPosition[p];
             pt = QPointF((pt.x() - xCenter) * scale,
                          (pt.y() - yCenter) * scale);
@@ -1082,7 +1081,7 @@ void AverageWindow::exportAverageLayoutPlot()
         if (fileName.contains(".svg")) {
             mne::disp::SvgWriter svgGen;
 
-            svgGen.setFileName(fileName);
+            svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_pAverageScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
             //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
@@ -1120,7 +1119,7 @@ void AverageWindow::exportAverageButterflyPlot()
         if (fileName.contains(".svg")) {
             mne::disp::SvgWriter svgGen;
 
-            svgGen.setFileName(fileName);
+            svgGen.setFileName(fileName.toStdString());
             QRectF rect = m_pButterflyScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
             //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));

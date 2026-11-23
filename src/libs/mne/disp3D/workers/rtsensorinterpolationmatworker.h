@@ -33,10 +33,6 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QMutex>
-#include <QVector>
-#include <QString>
-#include <QMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -49,6 +45,9 @@
 //=============================================================================================================
 
 #include <memory>
+#include <mutex>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -124,7 +123,7 @@ public:
      * @param[in] normals       Vertex normals (nVerts x 3).
      * @param[in] triangles     Triangle indices (nTris x 3).
      */
-    void setMegSurface(const QString& surfaceKey,
+    void setMegSurface(const std::string& surfaceKey,
                        const Eigen::MatrixX3f& vertices,
                        const Eigen::MatrixX3f& normals,
                        const Eigen::MatrixX3i& triangles);
@@ -136,7 +135,7 @@ public:
      * @param[in] surfaceKey    The key identifying the surface.
      * @param[in] vertices      Vertex positions (nVerts x 3).
      */
-    void setEegSurface(const QString& surfaceKey,
+    void setEegSurface(const std::string& surfaceKey,
                        const Eigen::MatrixX3f& vertices);
 
     //=========================================================================================================
@@ -145,7 +144,7 @@ public:
      *
      * @param[in] bads           List of bad channel names.
      */
-    void setBadChannels(const QStringList& bads);
+    void setBadChannels(const std::vector<std::string>& bads);
 
 public slots:
     //=========================================================================================================
@@ -166,9 +165,9 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newMegMappingAvailable(const QString& surfaceKey,
+    void newMegMappingAvailable(const std::string& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int>& pick);
+                                const std::vector<int>& pick);
 
     //=========================================================================================================
     /**
@@ -178,12 +177,12 @@ signals:
      * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
      * @param[in] pick          Channel indices picked for this mapping.
      */
-    void newEegMappingAvailable(const QString& surfaceKey,
+    void newEegMappingAvailable(const std::string& surfaceKey,
                                 std::shared_ptr<Eigen::MatrixXf> mappingMat,
-                                const QVector<int>& pick);
+                                const std::vector<int>& pick);
 
 private:
-    mutable QMutex m_mutex; /**< Protects all data members. */
+    mutable std::mutex m_mutex; /**< Protects all data members. */
 
     mne::FiffEvoked m_evoked; /**< Evoked data with channel info. */
     bool m_hasEvoked = false; /**< Whether evoked data has been set. */
@@ -194,18 +193,18 @@ private:
     bool m_megOnHead = false; /**< Map MEG onto head vs helmet. */
 
     // MEG target surface
-    QString m_megSurfaceKey;         /**< Key of the MEG target surface. */
+    std::string m_megSurfaceKey;     /**< Key of the MEG target surface. */
     Eigen::MatrixX3f m_megVertices;  /**< MEG surface vertices. */
     Eigen::MatrixX3f m_megNormals;   /**< MEG surface normals. */
     Eigen::MatrixX3i m_megTriangles; /**< MEG surface triangles. */
     bool m_hasMegSurface = false;    /**< Whether MEG surface has been set. */
 
     // EEG target surface
-    QString m_eegSurfaceKey;        /**< Key of the EEG target surface. */
+    std::string m_eegSurfaceKey;    /**< Key of the EEG target surface. */
     Eigen::MatrixX3f m_eegVertices; /**< EEG surface vertices. */
     bool m_hasEegSurface = false;   /**< Whether EEG surface has been set. */
 
-    QStringList m_bads; /**< Current bad channel names. */
+    std::vector<std::string> m_bads; /**< Current bad channel names. */
 };
 
 } // namespace mne::disp

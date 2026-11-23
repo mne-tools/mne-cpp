@@ -105,8 +105,7 @@ QDockWidget* ControlManager::getControl()
     QScrollArea* wrappedScrollArea = new QScrollArea(pControlDock);
     QVBoxLayout* pLayout = new QVBoxLayout;
 
-    QStringList slControlFlags;
-    slControlFlags << "Data" << "View" << "Light";
+    const std::vector<std::string> slControlFlags{"Data", "View", "Light"};
 
     //Scaling
     mne::disp::ScalingView* pScalingWidget = new mne::disp::ScalingView("MNEANALYZE", wrappedScrollArea);
@@ -116,7 +115,6 @@ QDockWidget* ControlManager::getControl()
             this, &ControlManager::onScalingChanged, Qt::UniqueConnection);
 
     m_ScalingParameters.m_mScalingMap = pScalingWidget->getScaleMap();
-    m_ScalingParameters.m_mScalingMap.detach();
 
     //View Settings
     mne::disp::FiffRawViewSettings* pFiffViewSettings = new mne::disp::FiffRawViewSettings("MNEANALYZE", wrappedScrollArea);
@@ -220,12 +218,11 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void ControlManager::onScalingChanged(const QMap<qint32, float>& scalingMap)
+void ControlManager::onScalingChanged(const std::map<int, float>& scalingMap)
 {
     m_ScalingParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
     m_ScalingParameters.m_mScalingMap = scalingMap;
-    m_ScalingParameters.m_mScalingMap.detach();
 
     m_pCommu->publishEvent(EVENT_TYPE::SCALING_MAP_CHANGED, QVariant::fromValue(m_ScalingParameters));
 }

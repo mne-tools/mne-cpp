@@ -34,6 +34,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -123,20 +124,17 @@ void TriggerDetectionView::init(const std::shared_ptr<FiffInfo>& pFiffInfo)
 
 //=============================================================================================================
 
-void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const QMap<int, QList<QPair<int, double>>>& mapDetectedTriggers)
+void TriggerDetectionView::setNumberDetectedTriggersAndTypes(int numberDetections, const std::map<int, std::vector<std::pair<int, double>>>& mapDetectedTriggers)
 {
     //if(m_bTriggerDetection) {
     m_pUi->m_label_numberDetectedTriggers->setText(QString("%1").arg(numberDetections));
     //}
 
     //Set trigger types
-    QMapIterator<int, QList<QPair<int, double>>> i(mapDetectedTriggers);
-    while (i.hasNext()) {
-        i.next();
-
-        for (int j = 0; j < i.value().size(); ++j) {
-            if (m_pUi->m_comboBox_triggerColorType->findText(QString::number(i.value().at(j).second)) == -1) {
-                m_pUi->m_comboBox_triggerColorType->addItem(QString::number(i.value().at(j).second));
+    for (const auto& [channel, triggers] : mapDetectedTriggers) {
+        for (const auto& [sample, value] : triggers) {
+            if (m_pUi->m_comboBox_triggerColorType->findText(QString::number(value)) == -1) {
+                m_pUi->m_comboBox_triggerColorType->addItem(QString::number(value));
             }
         }
     }
@@ -158,9 +156,9 @@ void TriggerDetectionView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), m_pUi->m_spinBox_detectionThresholdSecond->value());
 
     settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
-    QMap<double, QColor>::const_iterator i = m_qMapTriggerColor.constBegin();
-    while (i != m_qMapTriggerColor.constEnd()) {
-        settings.setValue(QString::number(i.key()), i.value());
+    std::map<double, QColor>::const_iterator i = m_qMapTriggerColor.cbegin();
+    while (i != m_qMapTriggerColor.cend()) {
+        settings.setValue(QString::number(i->first), i->second);
         ++i;
     }
     settings.endGroup();
@@ -182,8 +180,7 @@ void TriggerDetectionView::loadSettings()
     m_pUi->m_spinBox_detectionThresholdSecond->setValue(settings.value(m_sSettingsPath + QString("/TriggerDetectionView/SecondThresholdValue"), -1).toInt());
 
     settings.beginGroup(m_sSettingsPath + QString("/TriggerDetectionView/Colors"));
-    QStringList keys = settings.childKeys();
-    foreach (QString key, keys) {
+    for (const QString& key : settings.childKeys()) {
         double dKey = key.toDouble();
         m_qMapTriggerColor[dKey] = settings.value(key).value<QColor>();
     }
@@ -238,7 +235,7 @@ void TriggerDetectionView::onTriggerInfoChanged()
 {
     emit triggerInfoChanged(m_qMapTriggerColor,
                             m_pUi->m_checkBox_activateTriggerDetection->isChecked(),
-                            m_pUi->m_comboBox_triggerChannels->currentText(),
+                            m_pUi->m_comboBox_triggerChannels->currentText().toStdString(),
                             m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 
     saveSettings();
@@ -297,15 +294,15 @@ void TriggerDetectionView::onDetectTriggers()
     if (m_pUi->m_comboBox_triggerChannels->currentText() == "") {
         return;
     }
-    emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText(),
+    emit detectTriggers(m_pUi->m_comboBox_triggerChannels->currentText().toStdString(),
                         m_pUi->m_doubleSpinBox_detectionThresholdFirst->value() * pow(10, m_pUi->m_spinBox_detectionThresholdSecond->value()));
 }
 
 //=============================================================================================================
 
-QString TriggerDetectionView::getSelectedStimChannel()
+std::string TriggerDetectionView::getSelectedStimChannel()
 {
-    return m_pUi->m_comboBox_triggerChannels->currentText();
+    return m_pUi->m_comboBox_triggerChannels->currentText().toStdString();
 }
 
 //=============================================================================================================

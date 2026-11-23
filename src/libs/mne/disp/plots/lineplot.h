@@ -13,7 +13,7 @@
  * @date     July 2018
  * @brief    Simple x/y line-series widget drawn with QPainter.
  *
- * LinePlot accepts one or several @c QVector<double> y-series (with an
+ * LinePlot accepts one or several @c std::vector<double> y-series (with an
  * optional matching x-series) and renders them as connected polylines
  * with auto-scaled axes, a title and x/y labels. It is intentionally
  * lightweight (no Qt Charts / OpenGL dependency) and is the fallback
@@ -37,7 +37,6 @@
 #include <QColor>
 #include <QRectF>
 #include <QWidget>
-#include <QVector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,6 +49,7 @@
 //=============================================================================================================
 
 #include <functional>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -71,7 +71,7 @@ namespace mne::disp
  * @brief Simple x / y line-series QWidget rendered with QPainter (no Qt Charts dependency).
  *
  * Supports multiple series, a settable title and x / y labels and
- * auto-ranging axes. Series are stored as @c QVector<double> pairs
+ * auto-ranging axes. Series are stored as @c std::vector<double> pairs
  * and re-drawn during @c paintEvent.
  *
  * @snippet ex_disp_plots/main.cpp line_plot_usage
@@ -97,7 +97,7 @@ public:
      * @param[in] title     Plot title.
      * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
-    LinePlot(const QVector<double>& y,
+    LinePlot(const std::vector<double>& y,
              const QString& title = "",
              QWidget* parent = nullptr);
 
@@ -110,8 +110,8 @@ public:
      * @param[in] title     Plot title.
      * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
-    LinePlot(const QVector<double>& x,
-             const QVector<double>& y,
+    LinePlot(const std::vector<double>& x,
+             const std::vector<double>& y,
              const QString& title = "",
              QWidget* parent = nullptr);
 
@@ -151,7 +151,7 @@ public:
      *
      * @param[in] y          The double data vector.
      */
-    void updateData(const QVector<double>& y);
+    void updateData(const std::vector<double>& y);
 
     //=========================================================================================================
     /**
@@ -160,8 +160,8 @@ public:
      * @param[in] x         X-Axis data to plot.
      * @param[in] y         Y-Axis data to plot.
      */
-    void updateData(const QVector<double>& x,
-                    const QVector<double>& y);
+    void updateData(const std::vector<double>& x,
+                    const std::vector<double>& y);
 
     //=========================================================================================================
     /**
@@ -173,8 +173,8 @@ public:
      * @param[in] color     Line colour; an invalid colour takes the first palette colour no other series uses.
      * @param[in] style     Line style, e.g. Qt::DashLine for a series that may coincide with another.
      */
-    void addSeries(const QVector<double>& x,
-                   const QVector<double>& y,
+    void addSeries(const std::vector<double>& x,
+                   const std::vector<double>& y,
                    const QString& label = QString(),
                    const QColor& color = QColor(),
                    Qt::PenStyle style = Qt::SolidLine);
@@ -214,21 +214,21 @@ private:
     /** One line of the plot. */
     struct Series
     {
-        QVector<double> x;  /**< X data points. */
-        QVector<double> y;  /**< Y data points. */
-        QString label;      /**< Legend entry. */
-        QColor color;       /**< Line colour. */
-        Qt::PenStyle style; /**< Line style. */
+        std::vector<double> x; /**< X data points. */
+        std::vector<double> y; /**< Y data points. */
+        QString label;         /**< Legend entry. */
+        QColor color;          /**< Line colour. */
+        Qt::PenStyle style;    /**< Line style. */
     };
 
-    QString m_sTitle;         /**< Title. */
-    QString m_sXLabel;        /**< X axis label. */
-    QString m_sYLabel;        /**< Y axis label. */
-    QVector<Series> m_series; /**< The plotted series. */
-    double m_dMinX;           /**< Minimum X value. */
-    double m_dMaxX;           /**< Maximum X value. */
-    double m_dMinY;           /**< Minimum Y value. */
-    double m_dMaxY;           /**< Maximum Y value. */
+    QString m_sTitle;             /**< Title. */
+    QString m_sXLabel;            /**< X axis label. */
+    QString m_sYLabel;            /**< Y axis label. */
+    std::vector<Series> m_series; /**< The plotted series. */
+    double m_dMinX;               /**< Minimum X value. */
+    double m_dMaxX;               /**< Maximum X value. */
+    double m_dMinY;               /**< Minimum Y value. */
+    double m_dMaxY;               /**< Maximum Y value. */
 };
 
 //=============================================================================================================

@@ -186,10 +186,10 @@ int main(int argc, char* argv[])
     MatrixXd dataSpectrum = Spectrogram::make_spectrogram(dataCol, raw.info.sfreq * 0.2);
     TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0));
 
-    FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
-    FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
-    FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));
-    if (!FigureExporter::directory().isEmpty()) {
+    FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to).toStdString());
+    FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]).toStdString());
+    FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]).toStdString());
+    if (!FigureExporter::directory().empty()) {
         return 0;
     }
     imagesc.show();

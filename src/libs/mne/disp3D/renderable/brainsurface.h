@@ -46,7 +46,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVector>
 #include <QVector3D>
 #include <QColor>
 
@@ -60,8 +59,11 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstdint>
+#include <filesystem>
 #include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -222,7 +224,7 @@ public:
      * @param[in] path       Path to the .annot file.
      * @return True if successful.
      */
-    bool loadAnnotation(const QString& path);
+    bool loadAnnotation(const std::filesystem::path& path);
 
     //=========================================================================================================
     /**
@@ -255,7 +257,7 @@ public:
      *
      * @param[in] colors     Vector of packed ABGR colors, one per vertex.
      */
-    void applySourceEstimateColors(const QVector<uint32_t>& colors);
+    void applySourceEstimateColors(const std::vector<uint32_t>& colors);
 
     /**
      * Clear source estimate overlay colors and restore curvature-based coloring.
@@ -297,7 +299,7 @@ public:
     }
     uint32_t vertexCount() const
     {
-        return m_vertexData.size();
+        return static_cast<uint32_t>(m_vertexData.size());
     }
 
     //=========================================================================================================
@@ -322,7 +324,7 @@ public:
      *
      * @return Copy of the index data, three vertex indices per triangle.
      */
-    QVector<uint32_t> triangleIndices() const
+    std::vector<uint32_t> triangleIndices() const
     {
         return m_indexData;
     }
@@ -330,7 +332,7 @@ public:
     /**
      * @return Current vertex geometry, valid while this surface lives.
      */
-    const QVector<VertexData>& vertexDataRef() const
+    const std::vector<VertexData>& vertexDataRef() const
     {
         return m_vertexData;
     }
@@ -338,7 +340,7 @@ public:
     /**
      * @return Per-vertex packed ABGR colours, valid while this surface lives.
      */
-    const QVector<uint32_t>& colorsRef() const
+    const std::vector<uint32_t>& colorsRef() const
     {
         return m_colors;
     }
@@ -346,7 +348,7 @@ public:
     /**
      * @return Per-vertex packed ABGR annotation colours, valid while this surface lives.
      */
-    const QVector<uint32_t>& annotationColorsRef() const
+    const std::vector<uint32_t>& annotationColorsRef() const
     {
         return m_annotationColors;
     }
@@ -398,7 +400,7 @@ public:
      * @param[in] vertexIdx  Index of the vertex.
      * @return FsLabel name.
      */
-    QString getAnnotationLabel(int vertexIdx) const;
+    std::string getAnnotationLabel(int vertexIdx) const;
     int getAnnotationLabelId(int vertexIdx) const;
 
     //=========================================================================================================
@@ -496,15 +498,15 @@ public:
 
 private:
     void updateVertexColors();
-    void setGeometry(QVector<VertexData> vertices, QVector<uint32_t> indices, const QColor& color);
+    void setGeometry(std::vector<VertexData> vertices, std::vector<uint32_t> indices, const QColor& color);
     void markGeometryDirty();
 
-    QVector<VertexData> m_vertexData;
-    QVector<VertexData> m_originalVertexData;
-    QVector<uint32_t> m_colors;
-    QVector<uint32_t> m_annotationColors;
-    QVector<int> m_vertexLabelIds;
-    QVector<uint32_t> m_indexData;
+    std::vector<VertexData> m_vertexData;
+    std::vector<VertexData> m_originalVertexData;
+    std::vector<uint32_t> m_colors;
+    std::vector<uint32_t> m_annotationColors;
+    std::vector<int> m_vertexLabelIds;
+    std::vector<uint32_t> m_indexData;
     uint32_t m_indexCount = 0;
 
     RenderKey m_renderKey;
@@ -519,8 +521,8 @@ private:
     mne::FsAnnotation m_annotation;
     bool m_hasAnnotation = false;
     VisualizationMode m_visMode = ModeSurface;
-    QVector<float> m_curvature;
-    QVector<uint32_t> m_stcColors;
+    std::vector<float> m_curvature;
+    std::vector<uint32_t> m_stcColors;
 
     bool m_visible = true;
     bool m_selected = false;

@@ -16,6 +16,8 @@
 
 #include "brainrenderer.h"
 
+#include <mne/base/log.h>
+
 #include <rhi/qrhi.h>
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
@@ -28,13 +30,13 @@
 using mne::disp::VideoOverlay;
 
 #include <QFile>
-#include <QDebug>
 #include <QImage>
 #include <QVector3D>
 #include <array>
 #include <limits>
 #include <cstring>
 #include <unordered_map>
+#include <vector>
 
 namespace mne::disp
 {
@@ -99,7 +101,7 @@ struct BrainRenderer::Impl
     // Whole bound block, not ubufAlignment(): that is 1 on GL, where slots would overlap
     int uniformSlotStride = 0;
     int currentUniformOffset = 0;
-    QByteArray uniformShadow; // The frame's per-draw uniforms, uploaded in one piece
+    std::vector<std::byte> uniformShadow; // The frame's per-draw uniforms, uploaded in one piece
     int flushedUniformBytes = 0;
     bool overflowReported = false; // Reset per frame so the log gets one line, not one per skipped draw
     bool passRecording = false;
@@ -158,9 +160,9 @@ struct BrainRenderer::Impl
     {
         std::unique_ptr<QRhiTexture> texture;
         QSize textureSize;
-        bool dirty = true;       // needs texture re-upload
-        bool visible = false;    // whether this slot has valid data
-        QVector<float> vertices; // 4 verts × (3 pos + 2 uv) = 20 floats
+        bool dirty = true;           // needs texture re-upload
+        bool visible = false;        // whether this slot has valid data
+        std::vector<float> vertices; // 4 verts × (3 pos + 2 uv) = 20 floats
         float opacity = 0.8f;
         float windowCenter = 0.5f;
         float windowWidth = 1.0f;
@@ -237,6 +239,13 @@ static QImage tightlyPackedRgba(const QImage& source)
 
 namespace
 {
+// Shaders are compiled into the Qt resource system, which only QFile can read
+QShader loadShader(const QString& resource)
+{
+    QFile file(resource);
+    return file.open(QIODevice::ReadOnly) ? QShader::fromSerialized(file.readAll()) : QShader();
+}
+
 // Uniform buffer sizing: grows by doubling up to the maximum number of draws per frame
 constexpr int kInitialUniformSlots = 256;
 constexpr int kMaxUniformSlots = 16384;
@@ -293,14 +302,14 @@ int BrainRenderer::Impl::claimUniformSlot(const char* caller)
     const qint64 capacity = passBegunThisFrame ? qint64(uniformBuffer->size()) : qint64(kMaxUniformSlots) * uniformSlotStride;
     if (offset + uniformSlotStride > capacity) {
         if (!overflowReported) {
-            qWarning("BrainRenderer: uniform buffer full at %s; further draws this frame are skipped", caller);
+            mne::Log::warning("BrainRenderer: uniform buffer full at {}; further draws this frame are skipped", caller);
             overflowReported = true;
         }
         return -1;
     }
     currentUniformOffset += uniformSlotStride;
-    if (uniformShadow.size() < currentUniformOffset)
-        uniformShadow.resize(currentUniformOffset);
+    if (std::ssize(uniformShadow) < currentUniformOffset)
+        uniformShadow.resize(static_cast<std::size_t>(currentUniformOffset));
     return offset;
 }
 
@@ -321,7 +330,7 @@ void BrainRenderer::Impl::flushUniforms(QRhiResourceUpdateBatch* u)
         flushedUniformBytes = 0;
     }
     u->updateDynamicBuffer(uniformBuffer.get(), quint32(flushedUniformBytes), quint32(currentUniformOffset - flushedUniformBytes),
-                           uniformShadow.constData() + flushedUniformBytes);
+                           uniformShadow.data() + flushedUniformBytes);
     flushedUniformBytes = currentUniformOffset;
 }
 
@@ -418,14 +427,9 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
         srb->create();
     }
 
-    // Shader Loader
-    auto getShader = [](const QString& name) {
-        QFile f(name);
-        return f.open(QIODevice::ReadOnly) ? QShader::fromSerialized(f.readAll()) : QShader();
-    };
 
     // List of modes to initialize
-    QList<ShaderMode> modes = {Standard, Holographic, Anatomical, Dipole, XRay, ShowNormals};
+    std::vector<ShaderMode> modes = {Standard, Holographic, Anatomical, Dipole, XRay, ShowNormals};
 
     for (ShaderMode mode : modes) {
         QString vert = (mode == Holographic || mode == XRay) ? ":/holographic.vert.qsb" : (mode == Anatomical) ? ":/anatomical.vert.qsb"
@@ -438,11 +442,11 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
             : (mode == ShowNormals)                                                                            ? ":/shownormals.frag.qsb"
                                                                                                                : ":/standard.frag.qsb";
 
-        QShader vS = getShader(vert);
-        QShader fS = getShader(frag);
+        QShader vS = loadShader(vert);
+        QShader fS = loadShader(frag);
 
         if (!vS.isValid() || !fS.isValid()) {
-            qWarning() << "BrainRenderer: Could not load shaders for mode" << mode << vert << frag;
+            mne::Log::warning("BrainRenderer: Could not load shaders for mode {} {} {}", static_cast<int>(mode), vert.toStdString(), frag.toStdString());
             continue;
         }
 
@@ -506,8 +510,8 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
     }
 
     // Electrodes: opaque and depth-written, unlike the translucent dipole glyphs
-    const QShader evS = getShader(QStringLiteral(":/electrode.vert.qsb"));
-    const QShader efS = getShader(QStringLiteral(":/electrode.frag.qsb"));
+    const QShader evS = loadShader(QStringLiteral(":/electrode.vert.qsb"));
+    const QShader efS = loadShader(QStringLiteral(":/electrode.frag.qsb"));
     electrodePipeline.reset();
     if (evS.isValid() && efS.isValid()) {
         electrodePipeline.reset(rhi->newGraphicsPipeline());
@@ -522,7 +526,7 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
         electrodePipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
         electrodePipeline->create();
     } else {
-        qWarning() << "BrainRenderer: Could not load the electrode shaders";
+        mne::Log::warning("BrainRenderer: Could not load the electrode shaders");
     }
 
     resourcesDirty = false;
@@ -626,7 +630,7 @@ void BrainRenderer::Impl::beginPass(QRhiCommandBuffer* cb, QRhiRenderTarget* rt,
 bool BrainRenderer::Impl::insidePass(const char* caller) const
 {
     if (passRecording)
-        qWarning("BrainRenderer: %s called inside a render pass; resource updates must precede beginFrame()", caller);
+        mne::Log::warning("BrainRenderer: {} called inside a render pass; resource updates must precede beginFrame()", caller);
     return passRecording;
 }
 
@@ -676,16 +680,10 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
     // ── Lazy resource creation ──────────────────────────────────────
     if (!k.initialized) {
         // Shaders
-        QFile vFile(QStringLiteral(":/video_overlay.vert.qsb"));
-        QFile fFile(QStringLiteral(":/video_overlay.frag.qsb"));
-        if (!vFile.open(QIODevice::ReadOnly) || !fFile.open(QIODevice::ReadOnly)) {
-            qWarning() << "BrainRenderer: failed to open video overlay shaders";
-            return;
-        }
-        QShader vShader = QShader::fromSerialized(vFile.readAll());
-        QShader fShader = QShader::fromSerialized(fFile.readAll());
+        const QShader vShader = loadShader(QStringLiteral(":/video_overlay.vert.qsb"));
+        const QShader fShader = loadShader(QStringLiteral(":/video_overlay.frag.qsb"));
         if (!vShader.isValid() || !fShader.isValid()) {
-            qWarning() << "BrainRenderer: invalid video overlay shaders";
+            mne::Log::warning("BrainRenderer: could not load video overlay shaders");
             return;
         }
 
@@ -756,16 +754,10 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
         k.pipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
         k.pipeline->create();
 
-        QFile dvFile(QStringLiteral(":/video_decal.vert.qsb"));
-        QFile dfFile(QStringLiteral(":/video_decal.frag.qsb"));
-        if (!dvFile.open(QIODevice::ReadOnly) || !dfFile.open(QIODevice::ReadOnly)) {
-            qWarning() << "BrainRenderer: failed to open video decal shaders";
-            return;
-        }
-        QShader dvShader = QShader::fromSerialized(dvFile.readAll());
-        QShader dfShader = QShader::fromSerialized(dfFile.readAll());
+        const QShader dvShader = loadShader(QStringLiteral(":/video_decal.vert.qsb"));
+        const QShader dfShader = loadShader(QStringLiteral(":/video_decal.frag.qsb"));
         if (!dvShader.isValid() || !dfShader.isValid()) {
-            qWarning() << "BrainRenderer: invalid video decal shaders";
+            mne::Log::warning("BrainRenderer: could not load video decal shaders");
             return;
         }
 
@@ -795,11 +787,9 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
 
     // ── Lazy depth-enhanced pipeline creation ───────────────────────
     if (overlay->isDepthEnabled() && !k.depthInitialized && k.initialized) {
-        QFile ddvFile(QStringLiteral(":/video_decal_depth.vert.qsb"));
-        QFile ddfFile(QStringLiteral(":/video_decal_depth.frag.qsb"));
-        if (ddvFile.open(QIODevice::ReadOnly) && ddfFile.open(QIODevice::ReadOnly)) {
-            QShader ddvShader = QShader::fromSerialized(ddvFile.readAll());
-            QShader ddfShader = QShader::fromSerialized(ddfFile.readAll());
+        {
+            const QShader ddvShader = loadShader(QStringLiteral(":/video_decal_depth.vert.qsb"));
+            const QShader ddfShader = loadShader(QStringLiteral(":/video_decal_depth.frag.qsb"));
             if (ddvShader.isValid() && ddfShader.isValid()) {
                 // Mipmap-enabled sampler for depth texture (vertex shader
                 // samples a high LOD for smooth displacement on sparse meshes)
@@ -1169,16 +1159,10 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
 
     // ── Lazy one-time resource creation ─────────────────────────────
     if (!k.initialized) {
-        QFile vFile(QStringLiteral(":/slice.vert.qsb"));
-        QFile fFile(QStringLiteral(":/slice.frag.qsb"));
-        if (!vFile.open(QIODevice::ReadOnly) || !fFile.open(QIODevice::ReadOnly)) {
-            qWarning() << "BrainRenderer: failed to open MRI slice shaders";
-            return;
-        }
-        QShader vShader = QShader::fromSerialized(vFile.readAll());
-        QShader fShader = QShader::fromSerialized(fFile.readAll());
+        const QShader vShader = loadShader(QStringLiteral(":/slice.vert.qsb"));
+        const QShader fShader = loadShader(QStringLiteral(":/slice.frag.qsb"));
         if (!vShader.isValid() || !fShader.isValid()) {
-            qWarning() << "BrainRenderer: invalid MRI slice shaders";
+            mne::Log::warning("BrainRenderer: could not load MRI slice shaders");
             return;
         }
 
@@ -1282,14 +1266,14 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
     // Upload texture — R8 needs tightly-packed row data
     {
         const qsizetype tightStride = qsizetype(gray.width());
-        QByteArray texData;
+        std::vector<std::byte> texData;
         texData.resize(gray.height() * tightStride);
         for (int y = 0; y < gray.height(); ++y) {
             memcpy(texData.data() + y * tightStride,
                    gray.constScanLine(y),
                    size_t(tightStride));
         }
-        QRhiTextureSubresourceUploadDescription sub(texData.constData(), texData.size());
+        QRhiTextureSubresourceUploadDescription sub(texData.data(), static_cast<uint32_t>(texData.size()));
         sub.setSourceSize(imgSize);
         QRhiTextureUploadDescription desc({0, 0, sub});
         u->uploadTexture(sliceSlot.texture.get(), desc);
@@ -1299,7 +1283,7 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
     slice->generateQuadVertices(sliceSlot.vertices);
     u->updateDynamicBuffer(k.vertexBuffer[slotIndex].get(), 0,
                            static_cast<quint32>(sliceSlot.vertices.size() * sizeof(float)),
-                           sliceSlot.vertices.constData());
+                           sliceSlot.vertices.data());
 
     sliceSlot.opacity = slice->opacity();
     sliceSlot.windowCenter = slice->windowCenter();

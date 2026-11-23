@@ -31,7 +31,13 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cctype>
+#include <format>
+#include <iterator>
 #include <limits>
+#include <string>
+#include <vector>
 
 namespace mne::disp
 {
@@ -77,28 +83,25 @@ bool RayPicker::unproject(const QPoint& screenPos,
 RayHit RayPicker::pick(const QVector3D& rayOrigin,
                        const QVector3D& rayDir,
                        const SubView& subView,
-                       const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces,
-                       const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
-                       const QMap<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap)
+                       const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces,
+                       const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                       const std::map<const QStandardItem*, std::shared_ptr<DipoleObject>>& itemDipoleMap)
 {
     RayHit result;
     float closestDist = std::numeric_limits<float>::max();
 
     // ── Test surfaces ──────────────────────────────────────────────────
-    for (auto it = surfaces.cbegin(); it != surfaces.cend(); ++it) {
-        const QString& key = it.key();
-        const auto& surf = it.value();
-
+    for (const auto& [key, surf] : surfaces) {
         if (!surf->isVisible())
             continue;
         if (!subView.shouldRenderSurface(key))
             continue;
-        if (key.startsWith("srcsp_"))
+        if (key.starts_with("srcsp_"))
             continue; // skip source space for picking
 
-        const bool isSensor = key.startsWith("sens_");
-        const bool isBem = key.startsWith("bem_");
-        const bool isDig = key.startsWith("dig_");
+        const bool isSensor = key.starts_with("sens_");
+        const bool isBem = key.starts_with("bem_");
+        const bool isDig = key.starts_with("dig_");
 
         // Brain surfaces: only pick if matching active surface type
         if (!isSensor && !isBem && !isDig) {
@@ -121,17 +124,18 @@ RayHit RayPicker::pick(const QVector3D& rayOrigin,
 
                 // Reverse lookup: find tree item for this surface
                 result.item = nullptr;
-                for (auto i = itemSurfaceMap.cbegin(); i != itemSurfaceMap.cend(); ++i) {
-                    if (i.value() == surf) {
-                        result.item = const_cast<QStandardItem*>(i.key());
+                for (const auto& [item, itemSurface] : itemSurfaceMap) {
+                    if (itemSurface == surf) {
+                        result.item = const_cast<QStandardItem*>(item);
                         break;
                     }
                 }
 
                 // FsAnnotation info
-                if (result.item && itemSurfaceMap.contains(result.item)) {
-                    result.regionName = itemSurfaceMap[result.item]->getAnnotationLabel(vertexIdx);
-                    result.regionId = itemSurfaceMap[result.item]->getAnnotationLabelId(vertexIdx);
+                const auto itemSurface = result.item ? itemSurfaceMap.find(result.item) : itemSurfaceMap.end();
+                if (itemSurface != itemSurfaceMap.end()) {
+                    result.regionName = itemSurface->second->getAnnotationLabel(vertexIdx);
+                    result.regionId = itemSurface->second->getAnnotationLabelId(vertexIdx);
                 } else {
                     result.regionName.clear();
                     result.regionId = -1;
@@ -141,20 +145,20 @@ RayHit RayPicker::pick(const QVector3D& rayOrigin,
     }
 
     // ── Test dipoles ───────────────────────────────────────────────────
-    for (auto it = itemDipoleMap.cbegin(); it != itemDipoleMap.cend(); ++it) {
+    for (const auto& [item, dipole] : itemDipoleMap) {
         if (!subView.visibility.dipoles)
             continue;
-        if (!it.value()->isVisible())
+        if (!dipole->isVisible())
             continue;
 
         float dist = 0.0f;
-        int dipIdx = it.value()->intersect(rayOrigin, rayDir, dist);
+        int dipIdx = dipole->intersect(rayOrigin, rayDir, dist);
         if (dipIdx != -1 && dist < closestDist) {
             closestDist = dist;
             result.hit = true;
             result.distance = dist;
             result.hitPoint = rayOrigin + dist * rayDir;
-            result.item = const_cast<QStandardItem*>(it.key());
+            result.item = const_cast<QStandardItem*>(item);
             result.surfaceKey.clear();
             result.vertexIndex = dipIdx;
             result.isDipole = true;
@@ -169,104 +173,94 @@ RayHit RayPicker::pick(const QVector3D& rayOrigin,
 
 //=============================================================================================================
 
-QString RayPicker::buildLabel(const RayHit& result,
-                              [[maybe_unused]] const QMap<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
-                              [[maybe_unused]] const QMap<QString, std::shared_ptr<BrainSurface>>& surfaces)
+std::string RayPicker::buildLabel(const RayHit& result,
+                                  [[maybe_unused]] const std::map<const QStandardItem*, std::shared_ptr<BrainSurface>>& itemSurfaceMap,
+                                  [[maybe_unused]] const std::map<std::string, std::shared_ptr<BrainSurface>>& surfaces)
 {
     if (!result.hit)
-        return QString();
+        return {};
 
-    const QString& key = result.surfaceKey;
+    const std::string& key = result.surfaceKey;
+    const std::string itemText = result.item ? result.item->text().toStdString() : std::string();
+    const auto capitalized = [](std::string text) {
+        if (!text.empty())
+            text[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(text[0])));
+        return text;
+    };
 
     // ── Brain surface with annotation ──────────────────────────────────
-    if (!result.regionName.isEmpty()) {
-        QString hemi;
-        if (key.startsWith("lh"))
-            hemi = "lh";
-        else if (key.startsWith("rh"))
-            hemi = "rh";
-
-        return hemi.isEmpty()
-            ? QString("Region: %1").arg(result.regionName)
-            : QString("Region: %1 (%2)").arg(result.regionName, hemi);
+    if (!result.regionName.empty()) {
+        return result.displayLabel();
     }
 
     // ── Dipole ─────────────────────────────────────────────────────────
     if (result.isDipole) {
-        QString name = result.item ? result.item->text() : QStringLiteral("Dipole");
-        return QString("%1 (Dipole %2)").arg(name).arg(result.dipoleIndex);
+        return std::format("{} (Dipole {})", result.item ? itemText : std::string("Dipole"), result.dipoleIndex);
     }
 
     // ── Sensor/BEM/Digitizer/Helmet ────────────────────────────────────
-    if (key.startsWith("sens_surface_meg")) {
-        return QStringLiteral("MEG Helmet");
+    if (key.starts_with("sens_surface_meg")) {
+        return "MEG Helmet";
     }
-    if (key.startsWith("sens_meg_")) {
-        return QString("MEG: %1").arg(result.item ? result.item->text() : key);
+    if (key.starts_with("sens_meg_")) {
+        return "MEG: " + (result.item ? itemText : key);
     }
-    if (key.startsWith("sens_eeg_")) {
-        return QString("EEG: %1").arg(result.item ? result.item->text() : key);
+    if (key.starts_with("sens_eeg_")) {
+        return "EEG: " + (result.item ? itemText : key);
     }
-    if (key.startsWith("dig_")) {
+    if (key.starts_with("dig_")) {
         // Resolve individual point from batched mesh
-        QString pointName;
+        std::string pointName;
         if (result.item && result.vertexIndex >= 0) {
             AbstractTreeItem* abs = dynamic_cast<AbstractTreeItem*>(result.item);
             if (abs && abs->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem)) {
                 auto* digItem = static_cast<DigitizerTreeItem*>(abs);
                 constexpr int vertsPerSphere = 42;
                 int ptIdx = result.vertexIndex / vertsPerSphere;
-                const QStringList& names = digItem->pointNames();
-                if (ptIdx >= 0 && ptIdx < names.size())
-                    pointName = names[ptIdx];
+                const std::vector<std::string>& names = digItem->pointNames();
+                if (ptIdx >= 0 && ptIdx < std::ssize(names))
+                    pointName = names[static_cast<std::size_t>(ptIdx)];
             }
         }
-        QString category = key.mid(4);
-        if (!category.isEmpty())
-            category[0] = category[0].toUpper();
-        return pointName.isEmpty()
-            ? QString("Digitizer (%1)").arg(category)
-            : QString("Digitizer: %1 (%2)").arg(pointName, category);
+        const std::string category = capitalized(key.substr(4));
+        return pointName.empty()
+            ? std::format("Digitizer ({})", category)
+            : std::format("Digitizer: {} ({})", pointName, category);
     }
-    if (key.startsWith("bem_")) {
-        QString compartment = key.mid(4);
-        if (!compartment.isEmpty())
-            compartment[0] = compartment[0].toUpper();
-        compartment.replace("_", " ");
-        return QString("BEM: %1").arg(compartment);
+    if (key.starts_with("bem_")) {
+        std::string compartment = capitalized(key.substr(4));
+        std::ranges::replace(compartment, '_', ' ');
+        return "BEM: " + compartment;
     }
 
     // ── Hemisphere fallback ────────────────────────────────────────────
-    if (key.startsWith("lh_"))
-        return QStringLiteral("Left Hemisphere");
-    if (key.startsWith("rh_"))
-        return QStringLiteral("Right Hemisphere");
+    if (key.starts_with("lh_"))
+        return "Left Hemisphere";
+    if (key.starts_with("rh_"))
+        return "Right Hemisphere";
 
-    return QString();
+    return {};
 }
 
 //=============================================================================================================
 
-QString RayHit::displayLabel() const
+std::string RayHit::displayLabel() const
 {
     // Delegated to the static builder in RayPicker; this method is a
     // convenience wrapper when the caller doesn't have the surface maps.
     if (!hit)
-        return QString();
+        return {};
 
-    if (!regionName.isEmpty()) {
-        QString hemi;
-        if (surfaceKey.startsWith("lh"))
-            hemi = "lh";
-        else if (surfaceKey.startsWith("rh"))
-            hemi = "rh";
-        return hemi.isEmpty()
-            ? QString("Region: %1").arg(regionName)
-            : QString("Region: %1 (%2)").arg(regionName, hemi);
+    if (!regionName.empty()) {
+        if (surfaceKey.starts_with("lh"))
+            return std::format("Region: {} (lh)", regionName);
+        if (surfaceKey.starts_with("rh"))
+            return std::format("Region: {} (rh)", regionName);
+        return "Region: " + regionName;
     }
 
     if (isDipole) {
-        return QString("Dipole %1").arg(dipoleIndex);
+        return std::format("Dipole {}", dipoleIndex);
     }
 
     return surfaceKey;

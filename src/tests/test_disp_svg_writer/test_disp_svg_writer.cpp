@@ -180,8 +180,8 @@ void TestDispSvgWriter::writesAndEscapesText()
     SvgWriter svg;
     svg.setOutputDevice(&buffer);
     svg.setSize(QSize(300, 50));
-    svg.setTitle(QStringLiteral("Title <&>"));
-    svg.setDescription(QStringLiteral("Description & more"));
+    svg.setTitle("Title <&>");
+    svg.setDescription("Description & more");
 
     QPainter painter(&svg);
     QFont font(QStringLiteral("Helvetica"));
@@ -278,8 +278,8 @@ void TestDispSvgWriter::writesFile()
     const QString fileName = dir.filePath(QStringLiteral("figure.svg"));
 
     SvgWriter svg;
-    svg.setFileName(fileName);
-    QCOMPARE(svg.fileName(), fileName);
+    svg.setFileName(fileName.toStdString());
+    QCOMPARE(svg.fileName(), fileName.toStdString());
     QVERIFY(!svg.outputDevice());
     svg.setSize(QSize(20, 20));
     {

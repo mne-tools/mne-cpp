@@ -80,8 +80,8 @@ void prepareFit(CoRegistration& plugin, AnalyzeData& data, CoregSettingsView* vi
     fids.apply_transform(FiffCoordTrans(sampleFile("MEG/sample/all-trans.fif").toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI));
     const QString fidPath = sDir + "/sample-fiducials.fif";
     QVERIFY(fids.write(fidPath.toStdString()));
-    emit view->digFileChanged(avePath);
-    emit view->fidFileChanged(fidPath);
+    emit view->digFileChanged(std::filesystem::path(QString(avePath).toStdU16String()));
+    emit view->fidFileChanged(std::filesystem::path(QString(fidPath).toStdU16String()));
     emit view->fitFiducials();
 }
 
@@ -110,7 +110,7 @@ FiffCoordTrans runIcp(CoRegistration& plugin, CoregSettingsView* view, const QSt
     if (!QTest::qWaitFor([pRmse] { return !pRmse->text().isEmpty(); }, 10000))
         return FiffCoordTrans();
     const QString transPath = sDir + "/icp-trans.fif";
-    emit view->storeTrans(transPath);
+    emit view->storeTrans(std::filesystem::path(QString(transPath).toStdU16String()));
     return FiffCoordTrans(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 }
 
@@ -166,11 +166,11 @@ void TestAnalyzeCoregistration::fitsFiducialsByIdentity()
     const QString fidPath = dir.filePath("sample-fiducials.fif");
     QVERIFY(reordered.write(fidPath.toStdString()));
 
-    emit view->digFileChanged(avePath);
-    emit view->fidFileChanged(fidPath);
+    emit view->digFileChanged(std::filesystem::path(QString(avePath).toStdU16String()));
+    emit view->fidFileChanged(std::filesystem::path(QString(fidPath).toStdU16String()));
     emit view->fitFiducials();
     const QString transPath = dir.filePath("fit-trans.fif");
-    emit view->storeTrans(transPath);
+    emit view->storeTrans(std::filesystem::path(QString(transPath).toStdU16String()));
 
     const FiffCoordTrans fitted(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     QVERIFY2((fitted.trans - reference.trans).cwiseAbs().maxCoeff() < 1e-4f,
@@ -182,16 +182,16 @@ void TestAnalyzeCoregistration::fitsFiducialsByIdentity()
     QVERIFY(notes.open(QIODevice::WriteOnly));
     notes.write("not a transform");
     notes.close();
-    emit view->digFileChanged(notTrans);
-    emit view->fidFileChanged(notTrans);
+    emit view->digFileChanged(std::filesystem::path(QString(notTrans).toStdU16String()));
+    emit view->fidFileChanged(std::filesystem::path(QString(notTrans).toStdU16String()));
     emit view->fitFiducials();
-    emit view->storeTrans(transPath);
+    emit view->storeTrans(std::filesystem::path(QString(transPath).toStdU16String()));
     QVERIFY(FiffCoordTrans(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI).trans.isApprox(fitted.trans));
 
     // Loading a file without a transform keeps the current one; the reference loads as stored
-    emit view->loadTrans(notTrans);
-    emit view->loadTrans(sampleFile("MEG/sample/all-trans.fif"));
-    emit view->storeTrans(transPath);
+    emit view->loadTrans(std::filesystem::path(QString(notTrans).toStdU16String()));
+    emit view->loadTrans(std::filesystem::path(QString(sampleFile("MEG/sample/all-trans.fif")).toStdU16String()));
+    emit view->storeTrans(std::filesystem::path(QString(transPath).toStdU16String()));
     const FiffCoordTrans loaded(transPath.toStdU16String(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     QVERIFY(loaded.trans.isApprox(reference.trans));
 }

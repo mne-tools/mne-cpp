@@ -17,6 +17,12 @@
 #include "sliceobject.h"
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -212,7 +218,7 @@ float SliceObject::opacity() const
 
 //=============================================================================================================
 
-void SliceObject::generateQuadVertices(QVector<float>& vertices) const
+void SliceObject::generateQuadVertices(std::vector<float>& vertices) const
 {
     // 4 vertices: pos(3) + uv(2) = 5 floats each  → 20 floats total
     vertices.resize(20);
@@ -249,7 +255,7 @@ void SliceObject::generateQuadVertices(QVector<float>& vertices) const
 
 //=============================================================================================================
 
-void SliceObject::generateQuadIndices(QVector<unsigned int>& indices)
+void SliceObject::generateQuadIndices(std::vector<unsigned int>& indices)
 {
     // Two triangles: (0,1,2) and (2,1,3)
     indices = {0, 1, 2, 2, 1, 3};

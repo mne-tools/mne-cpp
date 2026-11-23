@@ -18,27 +18,23 @@
 
 #include "geometryinfo.h"
 
+#include <mne/base/log.h>
 #include <mne/base/thread_pool.h>
 #include <mne/fiff/fiff_info.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QDebug>
-#include <QHash>
-#include <QSet>
-#include <QThread>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <cstdint>
 #include <fstream>
 #include <queue>
 #include <set>
+#include <thread>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -54,36 +50,36 @@ using namespace mne;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f& matVertices,
-                                            const std::vector<VectorXi>& vecNeighborVertices,
-                                            VectorXi& vecVertSubset,
-                                            double dCancelDist)
+std::shared_ptr<MatrixXd> GeometryInfo::scdc(const MatrixX3f& matVertices,
+                                             const std::vector<VectorXi>& vecNeighborVertices,
+                                             VectorXi& vecVertSubset,
+                                             double dCancelDist)
 {
     // create matrix and check for empty subset:
-    qint32 iCols = static_cast<qint32>(vecVertSubset.size());
+    std::int32_t iCols = static_cast<std::int32_t>(vecVertSubset.size());
     if (vecVertSubset.size() == 0) {
-        qDebug() << "[WARNING] SCDC received empty subset, calculating full distance table, make sure you have enough memory !";
+        mne::Log::warning("SCDC received empty subset, calculating full distance table, make sure you have enough memory !");
         vecVertSubset = VectorXi::LinSpaced(matVertices.rows(), 0, static_cast<int>(matVertices.rows()) - 1);
-        iCols = static_cast<qint32>(matVertices.rows());
+        iCols = static_cast<std::int32_t>(matVertices.rows());
     }
 
-    QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
+    std::shared_ptr<MatrixXd> returnMat = std::make_shared<MatrixXd>(matVertices.rows(), iCols);
 
     // distribute calculation on cores
-    int iCores = QThread::idealThreadCount();
+    int iCores = static_cast<int>(std::thread::hardware_concurrency());
     if (iCores <= 0) {
         iCores = 2;
     }
 #ifdef __EMSCRIPTEN__
     // Cap parallel threads to avoid exhausting the Emscripten pthread pool.
-    iCores = qMin(iCores, 2);
+    iCores = std::min(iCores, 2);
 #endif
 
-    qint32 iSubArraySize = static_cast<int>(static_cast<double>(vecVertSubset.size()) / static_cast<double>(iCores));
+    std::int32_t iSubArraySize = static_cast<int>(static_cast<double>(vecVertSubset.size()) / static_cast<double>(iCores));
     ThreadPool::global().parallel_for(0, static_cast<std::size_t>(iCores), [&](std::size_t i) {
-        const qint32 iBegin = static_cast<qint32>(i) * iSubArraySize;
-        const qint32 iEnd = (static_cast<int>(i) == iCores - 1) ? static_cast<qint32>(vecVertSubset.size())
-                                                                : iBegin + iSubArraySize;
+        const std::int32_t iBegin = static_cast<std::int32_t>(i) * iSubArraySize;
+        const std::int32_t iEnd = (static_cast<int>(i) == iCores - 1) ? static_cast<std::int32_t>(vecVertSubset.size())
+                                                                      : iBegin + iSubArraySize;
         iterativeDijkstra(returnMat, matVertices, vecNeighborVertices, vecVertSubset, iBegin, iEnd, dCancelDist);
     });
 
@@ -92,7 +88,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f& matVertices,
 
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
+std::shared_ptr<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     const MatrixX3f& matVertices,
     const std::vector<VectorXi>& vecNeighborVertices,
     const VectorXi& vecVertSubset,
@@ -101,17 +97,15 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     std::function<void(int, int)> progressCallback,
     const std::atomic<bool>* cancelledFlag)
 {
-    const qint32 nVerts = static_cast<qint32>(matVertices.rows());
-    const qint32 nSources = static_cast<qint32>(vecVertSubset.size());
-    const qint32 nAdj = static_cast<qint32>(vecNeighborVertices.size());
+    const std::int32_t nVerts = static_cast<std::int32_t>(matVertices.rows());
+    const std::int32_t nSources = static_cast<std::int32_t>(vecVertSubset.size());
+    const std::int32_t nAdj = static_cast<std::int32_t>(vecNeighborVertices.size());
 
     // Build a set of source vertex indices for O(1) lookup
     // (vertices that ARE source vertices get weight=1 on themselves)
-    QSet<qint32> sourceVertexSet;
-    QHash<qint32, qint32> vertexToSourceIdx;
-    for (qint32 s = 0; s < nSources; ++s) {
-        sourceVertexSet.insert(vecVertSubset[s]);
-        vertexToSourceIdx.insert(vecVertSubset[s], s);
+    std::unordered_map<std::int32_t, std::int32_t> vertexToSourceIdx;
+    for (std::int32_t s = 0; s < nSources; ++s) {
+        vertexToSourceIdx.insert_or_assign(vecVertSubset[s], s);
     }
 
     // For each source vertex, run Dijkstra from that source.
@@ -122,13 +116,13 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     // Thread-local storage: each chunk produces triplets
     struct VertexWeight
     {
-        qint32 sourceIdx;
+        std::int32_t sourceIdx;
         float dist;
     };
     struct WeightTriple
     {
-        qint32 vertex;
-        qint32 sourceIdx;
+        std::int32_t vertex;
+        std::int32_t sourceIdx;
         float dist;
     };
 
@@ -137,23 +131,23 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     // emits a flat list of (vertex, source, dist) triples. A final
     // single-threaded merge pass groups them per mesh vertex. This recovers
     // the multi-core scaling that the legacy scdc() path used to provide.
-    int iCores = QThread::idealThreadCount();
+    int iCores = static_cast<int>(std::thread::hardware_concurrency());
     if (iCores <= 0) {
         iCores = 2;
     }
 #ifdef __EMSCRIPTEN__
-    iCores = qMin(iCores, 2);
+    iCores = std::min(iCores, 2);
 #endif
-    iCores = qMin(iCores, qMax(1, static_cast<int>(nSources)));
+    iCores = std::min(iCores, std::max(1, static_cast<int>(nSources)));
 
     std::atomic<bool> internalCancel(false);
     const std::atomic<bool>* cancelView = cancelledFlag ? cancelledFlag : &internalCancel;
 
-    std::atomic<qint32> progressCounter(0);
+    std::atomic<std::int32_t> progressCounter(0);
 
     std::vector<std::vector<WeightTriple>> perThreadTriples(iCores);
 
-    auto worker = [&](int threadIdx, qint32 sBegin, qint32 sEnd) {
+    auto worker = [&](int threadIdx, std::int32_t sBegin, std::int32_t sEnd) {
         std::vector<WeightTriple>& out = perThreadTriples[threadIdx];
         // Heuristic reserve: average ~32 reachable vertices per source.
         out.reserve(static_cast<size_t>(sEnd - sBegin) * 32);
@@ -162,27 +156,27 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
         std::vector<float> vecMinDists(nAdj, FLOAT_INFINITY);
         // Track which entries we touched so we only have to reset those
         // between sources (avoids O(nVerts) fill() per source).
-        std::vector<qint32> touched;
+        std::vector<std::int32_t> touched;
         touched.reserve(1024);
 
         // Lazy-deletion priority queue: push (dist, vertex); skip stale entries
         // when popping. ~3-5x faster than std::set for Dijkstra.
-        using QueueEntry = std::pair<float, qint32>;
+        using QueueEntry = std::pair<float, std::int32_t>;
         std::priority_queue<QueueEntry, std::vector<QueueEntry>, std::greater<QueueEntry>> vertexQ;
 
         const float fCancelDist = static_cast<float>(dCancelDist);
 
-        for (qint32 s = sBegin; s < sEnd; ++s) {
+        for (std::int32_t s = sBegin; s < sEnd; ++s) {
             // Cooperative cancellation; only check every 16 sources to keep
             // the atomic load out of the hot inner loop.
             if (((s - sBegin) & 0xF) == 0 && cancelView->load(std::memory_order_relaxed)) {
                 return;
             }
 
-            const qint32 iRoot = vecVertSubset[s];
+            const std::int32_t iRoot = vecVertSubset[s];
 
             // Reset only previously-touched slots.
-            for (qint32 idx : touched)
+            for (std::int32_t idx : touched)
                 vecMinDists[idx] = FLOAT_INFINITY;
             touched.clear();
             while (!vertexQ.empty())
@@ -194,7 +188,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
 
             while (!vertexQ.empty()) {
                 const float fDist = vertexQ.top().first;
-                const qint32 u = vertexQ.top().second;
+                const std::int32_t u = vertexQ.top().second;
                 vertexQ.pop();
 
                 // Stale entry from lazy deletion?
@@ -209,7 +203,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
                 const float uz = matVertices(u, 2);
 
                 for (Eigen::Index ne = 0; ne < vecNeighbours.size(); ++ne) {
-                    const qint32 v = vecNeighbours[ne];
+                    const std::int32_t v = vecNeighbours[ne];
                     const float dx = ux - matVertices(v, 0);
                     const float dy = uy - matVertices(v, 1);
                     const float dz = uz - matVertices(v, 2);
@@ -226,7 +220,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
             }
 
             // Collect reachable vertices for this source.
-            for (qint32 idx : touched) {
+            for (std::int32_t idx : touched) {
                 const float d = vecMinDists[idx];
                 if (d < fCancelDist) {
                     out.push_back({idx, s, d});
@@ -234,7 +228,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
             }
 
             if (progressCallback) {
-                const qint32 done = progressCounter.fetch_add(1, std::memory_order_relaxed) + 1;
+                const std::int32_t done = progressCounter.fetch_add(1, std::memory_order_relaxed) + 1;
                 if ((done % 100) == 0) {
                     progressCallback(done, nSources);
                 }
@@ -245,17 +239,17 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
     if (iCores <= 1) {
         worker(0, 0, nSources);
     } else {
-        const qint32 chunk = nSources / iCores;
+        const std::int32_t chunk = nSources / iCores;
         ThreadPool::global().parallel_for(0, static_cast<std::size_t>(iCores), [&](std::size_t i) {
             const int t = static_cast<int>(i);
-            const qint32 sBegin = t * chunk;
-            const qint32 sEnd = (t == iCores - 1) ? nSources : (sBegin + chunk);
+            const std::int32_t sBegin = t * chunk;
+            const std::int32_t sEnd = (t == iCores - 1) ? nSources : (sBegin + chunk);
             worker(t, sBegin, sEnd);
         });
     }
 
     if (cancelView->load(std::memory_order_relaxed))
-        return QSharedPointer<SparseMatrix<float>>();
+        return std::shared_ptr<SparseMatrix<float>>();
 
     // Merge thread-local triples into the per-vertex list.
     std::vector<std::vector<VertexWeight>> perVertexWeights(nVerts);
@@ -266,7 +260,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
             for (const auto& t : chunk)
                 ++counts[t.vertex];
         }
-        for (qint32 v = 0; v < nVerts; ++v) {
+        for (std::int32_t v = 0; v < nVerts; ++v) {
             if (counts[v])
                 perVertexWeights[v].reserve(counts[v]);
         }
@@ -279,14 +273,14 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
 
     // Build the sparse interpolation matrix from the collected distances
 
-    QVector<Eigen::Triplet<float>> vecTriplets;
+    std::vector<Eigen::Triplet<float>> vecTriplets;
     // Estimate ~10-20 sources per vertex on average
     vecTriplets.reserve(nVerts * 10);
 
-    for (qint32 r = 0; r < nVerts; ++r) {
-        if (sourceVertexSet.contains(r)) {
+    for (std::int32_t r = 0; r < nVerts; ++r) {
+        if (const auto source = vertexToSourceIdx.find(r); source != vertexToSourceIdx.end()) {
             // Source vertex: identity mapping (weight = 1)
-            vecTriplets.push_back(Eigen::Triplet<float>(r, vertexToSourceIdx[r], 1.0f));
+            vecTriplets.push_back(Eigen::Triplet<float>(r, source->second, 1.0f));
         } else {
             const auto& weights = perVertexWeights[r];
             if (weights.empty())
@@ -294,13 +288,13 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
 
             // Apply interpolation function and normalize weights
             float dWeightsSum = 0.0f;
-            QVector<QPair<qint32, float>> vecBelowThresh;
-            vecBelowThresh.reserve(static_cast<int>(weights.size()));
+            std::vector<std::pair<std::int32_t, float>> vecBelowThresh;
+            vecBelowThresh.reserve(weights.size());
 
             for (const auto& w : weights) {
                 const float dValueWeight = std::fabs(1.0f / static_cast<float>(interpolationFunction(w.dist)));
                 dWeightsSum += dValueWeight;
-                vecBelowThresh.push_back(qMakePair(w.sourceIdx, dValueWeight));
+                vecBelowThresh.emplace_back(w.sourceIdx, dValueWeight);
             }
 
             for (const auto& qp : vecBelowThresh) {
@@ -309,7 +303,7 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
         }
     }
 
-    auto interpMat = QSharedPointer<SparseMatrix<float>>::create(nVerts, nSources);
+    auto interpMat = std::make_shared<SparseMatrix<float>>(nVerts, nSources);
     interpMat->setFromTriplets(vecTriplets.begin(), vecTriplets.end());
 
     return interpMat;
@@ -320,17 +314,17 @@ QSharedPointer<SparseMatrix<float>> GeometryInfo::scdcInterpolationMat(
 VectorXi GeometryInfo::projectSensors(const MatrixX3f& matVertices,
                                       const MatrixX3f& matSensorPositions)
 {
-    const qint32 iNumSensors = static_cast<qint32>(matSensorPositions.rows());
+    const std::int32_t iNumSensors = static_cast<std::int32_t>(matSensorPositions.rows());
 
-    qint32 iCores = QThread::idealThreadCount();
+    std::int32_t iCores = static_cast<int>(std::thread::hardware_concurrency());
     if (iCores <= 0) {
         iCores = 2;
     }
 #ifdef __EMSCRIPTEN__
-    iCores = qMin(iCores, 2);
+    iCores = std::min(iCores, 2);
 #endif
 
-    const qint32 iSubArraySize = static_cast<int>(static_cast<double>(iNumSensors) / static_cast<double>(iCores));
+    const std::int32_t iSubArraySize = static_cast<int>(static_cast<double>(iNumSensors) / static_cast<double>(iCores));
 
     if (iSubArraySize <= 1) {
         return nearestNeighbor(matVertices, matSensorPositions, 0, iNumSensors);
@@ -338,17 +332,17 @@ VectorXi GeometryInfo::projectSensors(const MatrixX3f& matVertices,
 
     std::vector<VectorXi> vecPartials(static_cast<std::size_t>(iCores));
     ThreadPool::global().parallel_for(0, vecPartials.size(), [&](std::size_t i) {
-        const qint32 iBeginOffset = static_cast<qint32>(i) * iSubArraySize;
-        const qint32 iEndOffset = (static_cast<qint32>(i) == iCores - 1) ? iNumSensors : iBeginOffset + iSubArraySize;
+        const std::int32_t iBeginOffset = static_cast<std::int32_t>(i) * iSubArraySize;
+        const std::int32_t iEndOffset = (static_cast<std::int32_t>(i) == iCores - 1) ? iNumSensors : iBeginOffset + iSubArraySize;
         vecPartials[i] = nearestNeighbor(matVertices, matSensorPositions, iBeginOffset, iEndOffset);
     });
 
     // concatenate partial results
     VectorXi vecOutputArray(iNumSensors);
-    qint32 iOffset = 0;
+    std::int32_t iOffset = 0;
     for (const VectorXi& partial : vecPartials) {
         vecOutputArray.segment(iOffset, partial.size()) = partial;
-        iOffset += static_cast<qint32>(partial.size());
+        iOffset += static_cast<std::int32_t>(partial.size());
     }
 
     return vecOutputArray;
@@ -358,15 +352,15 @@ VectorXi GeometryInfo::projectSensors(const MatrixX3f& matVertices,
 
 VectorXi GeometryInfo::nearestNeighbor(const MatrixX3f& matVertices,
                                        const MatrixX3f& matSensorPositions,
-                                       qint32 iBegin,
-                                       qint32 iEnd)
+                                       std::int32_t iBegin,
+                                       std::int32_t iEnd)
 {
     VectorXi vecMappedSensors(iEnd - iBegin);
 
-    for (qint32 s = iBegin; s < iEnd; ++s) {
-        qint32 iChampionId = 0;
+    for (std::int32_t s = iBegin; s < iEnd; ++s) {
+        std::int32_t iChampionId = 0;
         double iChampDist = std::numeric_limits<double>::max();
-        for (qint32 i = 0; i < matVertices.rows(); ++i) {
+        for (std::int32_t i = 0; i < matVertices.rows(); ++i) {
             double dDist = sqrt(squared(matVertices(i, 0) - matSensorPositions(s, 0)) + squared(matVertices(i, 1) - matSensorPositions(s, 1)) + squared(matVertices(i, 2) - matSensorPositions(s, 2)));
             if (dDist < iChampDist) {
                 iChampionId = i;
@@ -381,41 +375,41 @@ VectorXi GeometryInfo::nearestNeighbor(const MatrixX3f& matVertices,
 
 //=============================================================================================================
 
-void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatrix,
+void GeometryInfo::iterativeDijkstra(const std::shared_ptr<MatrixXd>& matOutputDistMatrix,
                                      const MatrixX3f& matVertices,
                                      const std::vector<VectorXi>& vecNeighborVertices,
                                      const VectorXi& vecVertSubset,
-                                     qint32 iBegin,
-                                     qint32 iEnd,
+                                     std::int32_t iBegin,
+                                     std::int32_t iEnd,
                                      double dCancelDistance)
 {
     const std::vector<VectorXi>& vecAdjacency = vecNeighborVertices;
-    qint32 n = static_cast<qint32>(vecAdjacency.size());
-    QVector<double> vecMinDists(n);
-    std::set<std::pair<double, qint32>> vertexQ;
+    std::int32_t n = static_cast<std::int32_t>(vecAdjacency.size());
+    std::vector<double> vecMinDists(n);
+    std::set<std::pair<double, std::int32_t>> vertexQ;
     const double INF = FLOAT_INFINITY;
 
-    for (qint32 i = iBegin; i < iEnd; ++i) {
+    for (std::int32_t i = iBegin; i < iEnd; ++i) {
         if ((i - iBegin) > 0 && (i - iBegin) % 100 == 0) {
-            qDebug() << "GeometryInfo::iterativeDijkstra progress:" << (i - iBegin) << "/" << (iEnd - iBegin) << " (Thread range:" << iBegin << "-" << iEnd << ")";
+            mne::Log::debug("GeometryInfo::iterativeDijkstra progress: {}/{} (Thread range: {}-{})", i - iBegin, iEnd - iBegin, iBegin, iEnd);
         }
 
-        qint32 iRoot = vecVertSubset[i];
+        std::int32_t iRoot = vecVertSubset[i];
         vertexQ.clear();
-        vecMinDists.fill(INF);
+        std::ranges::fill(vecMinDists, INF);
         vecMinDists[iRoot] = 0.0;
         vertexQ.insert(std::make_pair(vecMinDists[iRoot], iRoot));
 
         while (vertexQ.empty() == false) {
             const double dDist = vertexQ.begin()->first;
-            const qint32 u = vertexQ.begin()->second;
+            const std::int32_t u = vertexQ.begin()->second;
             vertexQ.erase(vertexQ.begin());
 
             if (dDist <= dCancelDistance) {
                 const VectorXi& vecNeighbours = vecAdjacency[u];
 
                 for (Eigen::Index ne = 0; ne < vecNeighbours.size(); ++ne) {
-                    qint32 v = vecNeighbours[ne];
+                    std::int32_t v = vecNeighbours[ne];
 
                     const double dDistX = matVertices(u, 0) - matVertices(v, 0);
                     const double dDistY = matVertices(u, 1) - matVertices(v, 1);
@@ -431,7 +425,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
             }
         }
 
-        for (qint32 m = 0; m < vecMinDists.size(); ++m) {
+        for (std::int32_t m = 0; m < static_cast<std::int32_t>(vecMinDists.size()); ++m) {
             matOutputDistMatrix->coeffRef(m, i) = vecMinDists[m];
         }
     }
@@ -439,12 +433,12 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 
 //=============================================================================================================
 
-VectorXi GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+VectorXi GeometryInfo::filterBadChannels(const std::shared_ptr<Eigen::MatrixXd>& matDistanceTable,
                                          const mne::FiffInfo& fiffInfo,
-                                         qint32 iSensorType)
+                                         std::int32_t iSensorType)
 {
     std::vector<int> vecBadColumns;
-    QVector<const FiffChInfo*> vecSensors;
+    std::vector<const FiffChInfo*> vecSensors;
     for (const FiffChInfo& s : fiffInfo.chs) {
         if (s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)) {
             vecSensors.push_back(&s);
@@ -452,7 +446,7 @@ VectorXi GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDist
     }
 
     for (const std::string& b : fiffInfo.bads) {
-        for (int col = 0; col < vecSensors.size(); ++col) {
+        for (int col = 0; col < static_cast<int>(vecSensors.size()); ++col) {
             if (vecSensors[col]->ch_name == b) {
                 vecBadColumns.push_back(col);
                 for (int row = 0; row < matDistanceTable->rows(); ++row) {

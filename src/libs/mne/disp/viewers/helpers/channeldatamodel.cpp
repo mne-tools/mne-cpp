@@ -22,19 +22,15 @@
 #include <mne/fiff/fiff_constants.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtMath>
-#include <QWriteLocker>
-#include <QReadLocker>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <cmath>
+#include <format>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -88,10 +84,10 @@ ChannelDataModel::ChannelDataModel(QObject* parent)
 
 void ChannelDataModel::init(const std::shared_ptr<FiffInfo>& pFiffInfo)
 {
-    QWriteLocker lk(&m_lock);
+    std::unique_lock lk(m_lock);
     m_pFiffInfo = pFiffInfo;
 
-    int nCh = (pFiffInfo ? pFiffInfo->nchan : 0) + m_virtualDisplayInfo.size();
+    int nCh = (pFiffInfo ? pFiffInfo->nchan : 0) + static_cast<int>(m_virtualDisplayInfo.size());
     m_channelData.resize(nCh);
     for (auto& ch : m_channelData)
         ch.clear();
@@ -109,7 +105,7 @@ void ChannelDataModel::setData(const MatrixXd& data, int firstSample)
     if (data.rows() == 0 || data.cols() == 0)
         return;
 
-    QWriteLocker lk(&m_lock);
+    std::unique_lock lk(m_lock);
     int nCh = static_cast<int>(data.rows());
     m_channelData.resize(nCh);
     for (int ch = 0; ch < nCh; ++ch) {
@@ -130,24 +126,24 @@ void ChannelDataModel::appendData(const MatrixXd& data)
     if (data.rows() == 0 || data.cols() == 0)
         return;
 
-    QWriteLocker lk(&m_lock);
+    std::unique_lock lk(m_lock);
     int nCh = static_cast<int>(data.rows());
     int nNew = static_cast<int>(data.cols());
 
-    if (m_channelData.size() != nCh)
+    if (std::ssize(m_channelData) != nCh)
         m_channelData.resize(nCh);
 
     for (int ch = 0; ch < nCh; ++ch) {
         auto& buf = m_channelData[ch];
-        int oldSize = buf.size();
+        const int oldSize = static_cast<int>(buf.size());
         buf.resize(oldSize + nNew);
         for (int s = 0; s < nNew; ++s)
             buf[oldSize + s] = static_cast<float>(data(ch, s));
 
         // Drop oldest samples when capacity exceeded
-        if (m_maxStoredSamples > 0 && buf.size() > m_maxStoredSamples) {
-            int drop = buf.size() - m_maxStoredSamples;
-            buf.remove(0, drop);
+        if (m_maxStoredSamples > 0 && std::ssize(buf) > m_maxStoredSamples) {
+            const int drop = static_cast<int>(buf.size()) - m_maxStoredSamples;
+            buf.erase(buf.begin(), buf.begin() + drop);
             if (ch == 0)
                 m_firstSample += drop;
         }
@@ -162,7 +158,7 @@ void ChannelDataModel::appendData(const MatrixXd& data)
 void ChannelDataModel::clearData()
 {
     {
-        QWriteLocker lk(&m_lock);
+        std::unique_lock lk(m_lock);
         for (auto& ch : m_channelData)
             ch.clear();
         m_firstSample = 0;
@@ -172,10 +168,10 @@ void ChannelDataModel::clearData()
 
 //=============================================================================================================
 
-void ChannelDataModel::setScaleMap(const QMap<qint32, float>& scaleMap)
+void ChannelDataModel::setScaleMap(const std::map<int, float>& scaleMap)
 {
     {
-        QWriteLocker lk(&m_lock);
+        std::unique_lock lk(m_lock);
         m_scaleMap = scaleMap;
     }
     rebuildDisplayInfo();
@@ -184,38 +180,35 @@ void ChannelDataModel::setScaleMap(const QMap<qint32, float>& scaleMap)
 
 //=============================================================================================================
 
-void ChannelDataModel::setScaleMapFromStrings(const QMap<QString, double>& scaleMap)
+void ChannelDataModel::setScaleMapFromStrings(const std::map<std::string, double>& scaleMap)
 {
-    QMap<qint32, float> intMap;
-    if (scaleMap.contains(QStringLiteral("MEG_grad")))
-        intMap[kMEGGradKind] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_grad")));
-    if (scaleMap.contains(QStringLiteral("MEG_mag")))
-        intMap[kMEGMagKind] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_mag")));
-    if (scaleMap.contains(QStringLiteral("MEG_EEG")))
-        intMap[FIFFV_EEG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EEG")));
-    if (scaleMap.contains(QStringLiteral("MEG_EOG")))
-        intMap[FIFFV_EOG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EOG")));
-    if (scaleMap.contains(QStringLiteral("MEG_EMG")))
-        intMap[FIFFV_EMG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_EMG")));
-    if (scaleMap.contains(QStringLiteral("MEG_ECG")))
-        intMap[FIFFV_ECG_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_ECG")));
-    if (scaleMap.contains(QStringLiteral("MEG_MISC")))
-        intMap[FIFFV_MISC_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_MISC")));
-    if (scaleMap.contains(QStringLiteral("MEG_STIM")))
-        intMap[FIFFV_STIM_CH] = static_cast<float>(scaleMap.value(QStringLiteral("MEG_STIM")));
+    std::map<int, float> intMap;
+    const auto copy = [&](const char* key, int kind) {
+        if (const auto it = scaleMap.find(key); it != scaleMap.end()) {
+            intMap[kind] = static_cast<float>(it->second);
+        }
+    };
+    copy("MEG_grad", kMEGGradKind);
+    copy("MEG_mag", kMEGMagKind);
+    copy("MEG_EEG", FIFFV_EEG_CH);
+    copy("MEG_EOG", FIFFV_EOG_CH);
+    copy("MEG_EMG", FIFFV_EMG_CH);
+    copy("MEG_ECG", FIFFV_ECG_CH);
+    copy("MEG_MISC", FIFFV_MISC_CH);
+    copy("MEG_STIM", FIFFV_STIM_CH);
     setScaleMap(intMap);
 }
 
 //=============================================================================================================
 
-void ChannelDataModel::setVirtualChannels(const QVector<ChannelDisplayInfo>& virtualChannels)
+void ChannelDataModel::setVirtualChannels(const std::vector<ChannelDisplayInfo>& virtualChannels)
 {
     {
-        QWriteLocker lk(&m_lock);
+        std::unique_lock lk(m_lock);
         m_virtualDisplayInfo = virtualChannels;
 
         const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
-        const int totalChannelCount = realChannelCount + m_virtualDisplayInfo.size();
+        const int totalChannelCount = realChannelCount + static_cast<int>(m_virtualDisplayInfo.size());
         m_channelData.resize(totalChannelCount);
     }
 
@@ -229,7 +222,7 @@ void ChannelDataModel::setVirtualChannels(const QVector<ChannelDisplayInfo>& vir
 void ChannelDataModel::setSignalColor(const QColor& color)
 {
     {
-        QWriteLocker lk(&m_lock);
+        std::unique_lock lk(m_lock);
         m_signalColor = color;
     }
     rebuildDisplayInfo();
@@ -240,7 +233,7 @@ void ChannelDataModel::setSignalColor(const QColor& color)
 
 void ChannelDataModel::setMaxStoredSamples(int n)
 {
-    QWriteLocker lk(&m_lock);
+    std::unique_lock lk(m_lock);
     m_maxStoredSamples = (n > 0) ? n : 0;
 }
 
@@ -256,7 +249,7 @@ void ChannelDataModel::setRemoveDC(bool remove)
 void ChannelDataModel::setDetrendMode(DetrendMode mode)
 {
     {
-        QWriteLocker lk(&m_lock);
+        std::unique_lock lk(m_lock);
         m_detrendMode = mode;
     }
     emit dataChanged();
@@ -266,8 +259,8 @@ void ChannelDataModel::setDetrendMode(DetrendMode mode)
 
 void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 {
-    QWriteLocker lk(&m_lock);
-    if (channelIdx >= 0 && channelIdx < m_displayInfo.size())
+    std::unique_lock lk(m_lock);
+    if (channelIdx >= 0 && channelIdx < std::ssize(m_displayInfo))
         m_displayInfo[channelIdx].bad = bad;
 
     if (m_pFiffInfo && channelIdx >= 0 && channelIdx < m_pFiffInfo->nchan) {
@@ -290,16 +283,16 @@ void ChannelDataModel::setChannelBad(int channelIdx, bool bad)
 
 int ChannelDataModel::channelCount() const
 {
-    QReadLocker lk(&m_lock);
+    std::shared_lock lk(m_lock);
     const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
-    return qMax(m_channelData.size(), realChannelCount + m_virtualDisplayInfo.size());
+    return std::max(static_cast<int>(m_channelData.size()), realChannelCount + static_cast<int>(m_virtualDisplayInfo.size()));
 }
 
 //=============================================================================================================
 
 int ChannelDataModel::firstSample() const
 {
-    QReadLocker lk(&m_lock);
+    std::shared_lock lk(m_lock);
     return m_firstSample;
 }
 
@@ -307,16 +300,16 @@ int ChannelDataModel::firstSample() const
 
 int ChannelDataModel::totalSamples() const
 {
-    QReadLocker lk(&m_lock);
-    return m_channelData.isEmpty() ? 0 : m_channelData[0].size();
+    std::shared_lock lk(m_lock);
+    return m_channelData.empty() ? 0 : static_cast<int>(m_channelData[0].size());
 }
 
 //=============================================================================================================
 
 ChannelDisplayInfo ChannelDataModel::channelInfo(int channelIdx) const
 {
-    QReadLocker lk(&m_lock);
-    if (channelIdx >= 0 && channelIdx < m_displayInfo.size())
+    std::shared_lock lk(m_lock);
+    if (channelIdx >= 0 && channelIdx < std::ssize(m_displayInfo))
         return m_displayInfo[channelIdx];
     return {};
 }
@@ -325,12 +318,12 @@ ChannelDisplayInfo ChannelDataModel::channelInfo(int channelIdx) const
 
 float ChannelDataModel::channelRms(int channelIdx, int first, int last) const
 {
-    QReadLocker lk(&m_lock);
-    if (channelIdx < 0 || channelIdx >= m_channelData.size())
+    std::shared_lock lk(m_lock);
+    if (channelIdx < 0 || channelIdx >= std::ssize(m_channelData))
         return 0.f;
-    const QVector<float>& src = m_channelData[channelIdx];
-    int bufFirst = qBound(0, first - m_firstSample, src.size());
-    int bufLast = qBound(0, last - m_firstSample, src.size());
+    const std::vector<float>& src = m_channelData[channelIdx];
+    int bufFirst = std::clamp(first - m_firstSample, 0, static_cast<int>(src.size()));
+    int bufLast = std::clamp(last - m_firstSample, 0, static_cast<int>(src.size()));
     if (bufLast <= bufFirst)
         return 0.f;
     // Cap at 1000 samples: use the last kMax samples of the window for speed
@@ -340,47 +333,47 @@ float ChannelDataModel::channelRms(int channelIdx, int first, int last) const
     double sum = 0.0;
     for (int i = bufFirst; i < bufLast; ++i)
         sum += static_cast<double>(src[i]) * src[i];
-    return static_cast<float>(qSqrt(sum / (bufLast - bufFirst)));
+    return static_cast<float>(std::sqrt(sum / (bufLast - bufFirst)));
 }
 
 //=============================================================================================================
 
 float ChannelDataModel::sampleValueAt(int channelIdx, int sample) const
 {
-    QReadLocker lk(&m_lock);
-    if (channelIdx < 0 || channelIdx >= m_channelData.size())
+    std::shared_lock lk(m_lock);
+    if (channelIdx < 0 || channelIdx >= std::ssize(m_channelData))
         return 0.f;
-    const QVector<float>& src = m_channelData[channelIdx];
+    const std::vector<float>& src = m_channelData[channelIdx];
     int bufIdx = sample - m_firstSample;
-    if (bufIdx < 0 || bufIdx >= src.size())
+    if (bufIdx < 0 || bufIdx >= std::ssize(src))
         return 0.f;
     return src[bufIdx];
 }
 
 //=============================================================================================================
 
-QVector<float> ChannelDataModel::decimatedVertices(int channelIdx,
-                                                   int firstSample,
-                                                   int lastSample,
-                                                   int pixelWidth,
-                                                   int& vboFirstSample) const
+std::vector<float> ChannelDataModel::decimatedVertices(int channelIdx,
+                                                       int firstSample,
+                                                       int lastSample,
+                                                       int pixelWidth,
+                                                       int& vboFirstSample) const
 {
-    QReadLocker lk(&m_lock);
+    std::shared_lock lk(m_lock);
 
     vboFirstSample = firstSample; // may be updated below after clamping
 
-    if (channelIdx < 0 || channelIdx >= m_channelData.size() || pixelWidth <= 0 || firstSample >= lastSample) {
+    if (channelIdx < 0 || channelIdx >= std::ssize(m_channelData) || pixelWidth <= 0 || firstSample >= lastSample) {
         return {};
     }
 
-    const QVector<float>& src = m_channelData[channelIdx];
+    const std::vector<float>& src = m_channelData[channelIdx];
     // Map absolute sample indices to buffer indices
     int bufFirst = firstSample - m_firstSample;
     int bufLast = lastSample - m_firstSample;
 
     // Clamp to available data
-    bufFirst = qBound(0, bufFirst, src.size());
-    bufLast = qBound(0, bufLast, src.size());
+    bufFirst = std::clamp(bufFirst, 0, static_cast<int>(src.size()));
+    bufLast = std::clamp(bufLast, 0, static_cast<int>(src.size()));
 
     // Update to the actual absolute sample index at vertex 0 after clamping.
     // When firstSample < m_firstSample (tile extends before buffer start),
@@ -425,14 +418,14 @@ QVector<float> ChannelDataModel::decimatedVertices(int channelIdx,
 
     if (nSamples <= pixelWidth * 2) {
         // ── Raw path: one vertex per sample ────────────────────────────
-        QVector<float> result;
+        std::vector<float> result;
         result.reserve(nSamples * 2);
         for (int i = 0; i < nSamples; ++i) {
             float trend = useMean ? dcOffset
                 : useLinear       ? (linearSlope * i + linearIntercept)
                                   : 0.f;
-            result.append(static_cast<float>(i));
-            result.append(src[bufFirst + i] - trend);
+            result.push_back(static_cast<float>(i));
+            result.push_back(src[bufFirst + i] - trend);
         }
         return result;
     }
@@ -442,7 +435,7 @@ QVector<float> ChannelDataModel::decimatedVertices(int channelIdx,
     // Connected as LINE_STRIP this draws: vertical spike at each column,
     // diagonals between columns — the classic oscilloscope envelope look.
 
-    QVector<float> result;
+    std::vector<float> result;
     result.reserve(pixelWidth * 4); // 2 vertices × 2 floats
 
     float spp = static_cast<float>(nSamples) / pixelWidth; // samples per pixel
@@ -474,10 +467,10 @@ QVector<float> ChannelDataModel::decimatedVertices(int channelIdx,
         float xOffset = px * spp;
 
         // Emit max first, then min: draws ascending spike first
-        result.append(xOffset);
-        result.append(maxV);
-        result.append(xOffset);
-        result.append(minV);
+        result.push_back(xOffset);
+        result.push_back(maxV);
+        result.push_back(xOffset);
+        result.push_back(minV);
     }
 
     return result;
@@ -489,17 +482,18 @@ QVector<float> ChannelDataModel::decimatedVertices(int channelIdx,
 
 void ChannelDataModel::rebuildDisplayInfo()
 {
-    QWriteLocker lk(&m_lock);
+    std::unique_lock lk(m_lock);
     const int realChannelCount = m_pFiffInfo ? m_pFiffInfo->nchan : 0;
-    const int nCh = qMax(m_channelData.size(), realChannelCount + m_virtualDisplayInfo.size());
+    const int nVirtual = static_cast<int>(m_virtualDisplayInfo.size());
+    const int nCh = std::max(static_cast<int>(m_channelData.size()), realChannelCount + nVirtual);
     m_displayInfo.resize(nCh);
     for (int ch = 0; ch < nCh; ++ch) {
-        if (ch >= realChannelCount && ch - realChannelCount < m_virtualDisplayInfo.size()) {
+        if (ch >= realChannelCount && ch - realChannelCount < nVirtual) {
             ChannelDisplayInfo info = m_virtualDisplayInfo.at(ch - realChannelCount);
-            if (info.name.isEmpty())
-                info.name = QString("Virtual %1").arg(ch - realChannelCount + 1);
-            if (info.typeLabel.isEmpty())
-                info.typeLabel = QStringLiteral("MISC");
+            if (info.name.empty())
+                info.name = std::format("Virtual {}", ch - realChannelCount + 1);
+            if (info.typeLabel.empty())
+                info.typeLabel = "MISC";
             if (!info.color.isValid())
                 info.color = m_signalColor;
             if (info.amplitudeMax <= 0.f)
@@ -512,12 +506,12 @@ void ChannelDataModel::rebuildDisplayInfo()
         m_displayInfo[ch].amplitudeMax = amplitudeMaxForChannel(ch);
         m_displayInfo[ch].color = colorForChannel(ch);
         if (m_pFiffInfo && ch < realChannelCount)
-            m_displayInfo[ch].name = QString::fromStdString(m_pFiffInfo->ch_names[ch]);
+            m_displayInfo[ch].name = m_pFiffInfo->ch_names[ch];
         else
-            m_displayInfo[ch].name = QString("CH %1").arg(ch + 1);
+            m_displayInfo[ch].name = std::format("CH {}", ch + 1);
         m_displayInfo[ch].typeLabel = typeLabelForChannel(ch);
         m_displayInfo[ch].bad = (m_pFiffInfo && ch < realChannelCount)
-            ? std::ranges::contains(m_pFiffInfo->bads, m_displayInfo[ch].name.toStdString())
+            ? std::ranges::contains(m_pFiffInfo->bads, m_displayInfo[ch].name)
             : false;
         m_displayInfo[ch].isVirtualChannel = false;
     }
@@ -532,18 +526,20 @@ float ChannelDataModel::amplitudeMaxForChannel(int ch) const
 
     const auto& info = m_pFiffInfo->chs[ch];
     qint32 kind = info.kind;
+    const auto scaleOr = [this](int key, float fallback) {
+        const auto it = m_scaleMap.find(key);
+        return it != m_scaleMap.end() ? it->second : fallback;
+    };
 
     // MEG: distinguish gradiometer vs. magnetometer by unit
     if (kind == FIFFV_MEG_CH) {
         if (info.unit == FIFF_UNIT_T_M)
-            return m_scaleMap.value(kMEGGradKind,
-                                    m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGGrad));
+            return scaleOr(kMEGGradKind, scaleOr(FIFFV_MEG_CH, kScaleMEGGrad));
         else
-            return m_scaleMap.value(kMEGMagKind,
-                                    m_scaleMap.value(FIFFV_MEG_CH, kScaleMEGMag));
+            return scaleOr(kMEGMagKind, scaleOr(FIFFV_MEG_CH, kScaleMEGMag));
     }
     if (m_scaleMap.contains(kind))
-        return m_scaleMap.value(kind);
+        return m_scaleMap.at(kind);
     return kScaleFallback;
 }
 
@@ -575,27 +571,27 @@ QColor ChannelDataModel::colorForChannel(int ch) const
 
 //=============================================================================================================
 
-QString ChannelDataModel::typeLabelForChannel(int ch) const
+std::string ChannelDataModel::typeLabelForChannel(int ch) const
 {
     if (!m_pFiffInfo || ch >= m_pFiffInfo->nchan)
-        return QStringLiteral("MISC");
+        return "MISC";
     switch (m_pFiffInfo->chs[ch].kind) {
         case FIFFV_MEG_CH:
             if (m_pFiffInfo->chs[ch].unit == FIFF_UNIT_T_M)
-                return QStringLiteral("MEG grad");
-            return QStringLiteral("MEG mag");
+                return "MEG grad";
+            return "MEG mag";
         case FIFFV_EEG_CH:
-            return QStringLiteral("EEG");
+            return "EEG";
         case FIFFV_EOG_CH:
-            return QStringLiteral("EOG");
+            return "EOG";
         case FIFFV_ECG_CH:
-            return QStringLiteral("ECG");
+            return "ECG";
         case FIFFV_EMG_CH:
-            return QStringLiteral("EMG");
+            return "EMG";
         case FIFFV_STIM_CH:
-            return QStringLiteral("STIM");
+            return "STIM";
         default:
-            return QStringLiteral("MISC");
+            return "MISC";
     }
 }
 
@@ -603,6 +599,6 @@ QString ChannelDataModel::typeLabelForChannel(int ch) const
 
 float ChannelDataModel::sfreq() const
 {
-    QReadLocker lk(&m_lock);
+    std::shared_lock lk(m_lock);
     return m_pFiffInfo ? static_cast<float>(m_pFiffInfo->sfreq) : 0.f;
 }
