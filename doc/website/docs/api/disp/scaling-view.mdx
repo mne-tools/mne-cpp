@@ -46,7 +46,7 @@ Constructs a [`ScalingView`](/docs/api/disp/scaling-view) which is a child of pa
 - **f** : *Qt::WindowFlags*
   Qt window flags passed to the QWidget constructor.
 
-- **lChannelsToShow** : *const QStringList &*
+- **lChannelsToShow** : *const std::vector&lt; std::string &gt; &*
   Channel types to show scaling controls for ("all" = every type).
 
 ---
@@ -63,7 +63,7 @@ Get the current scaling map.
 
 **Returns:**
 
-- *QMap&lt; qint32, float &gt;* — The current scaling map.
+- *std::map&lt; int, float &gt;* — The current scaling map.
 
 ---
 
@@ -75,7 +75,7 @@ This also recreates the GUI.
 
 **Parameters:**
 
-- **qMapChScaling** : *const QMap&lt; qint32, float &gt; &*
+- **qMapChScaling** : *const std::map&lt; int, float &gt; &*
   Map from FIFF channel kind/unit key to amplitude scale.
 
 ---

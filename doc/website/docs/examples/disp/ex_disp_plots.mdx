@@ -233,11 +233,11 @@ int main(int argc, char* argv[])
     ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its curve");
 
     //! [line_plot_usage]
-    QVector<double> x;
-    QVector<double> y;
+    std::vector<double> x;
+    std::vector<double> y;
     for (int i = 0; i <= 100; ++i) {
-        x.append(i / 100.0);
-        y.append(std::sin(2.0 * std::numbers::pi * x.last()));
+        x.push_back(i / 100.0);
+        y.push_back(std::sin(2.0 * std::numbers::pi * x.back()));
     }
     LinePlot line(x, y, "sin(2 pi t)");
     line.setXLabel("t [s]");

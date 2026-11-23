@@ -247,8 +247,8 @@ int main(int argc, char* argv[])
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
     // Time courses of the five sources with the largest peak
-    QVector<double> times(sourceEstimate.data.cols());
-    for (int s = 0; s < times.size(); ++s) {
+    std::vector<double> times(sourceEstimate.data.cols());
+    for (int s = 0; s < std::ssize(times); ++s) {
         times[s] = 1000.0 * (sourceEstimate.tmin + s * sourceEstimate.tstep);
     }
     VectorXd peaks = sourceEstimate.data.cwiseAbs().rowwise().maxCoeff();
@@ -263,9 +263,9 @@ int main(int argc, char* argv[])
         const VectorXd row = sourceEstimate.data.row(source).transpose();
         const QString hemi = sourceEstimate.nVerticesLh < 0 ? QString("source") : source < sourceEstimate.nVerticesLh ? QString("lh vertex")
                                                                                                                       : QString("rh vertex");
-        courses.addSeries(times, QVector<double>(row.data(), row.data() + row.size()), QString("%1 %2").arg(hemi).arg(sourceEstimate.vertices(source)));
+        courses.addSeries(times, std::vector<double>(row.data(), row.data() + row.size()), QString("%1 %2").arg(hemi).arg(sourceEstimate.vertices(source)));
     }
-    FigureExporter::save(courses, "time_courses", QString("%1 time courses of the five sources with the largest peak, SNR %2, baseline -200 to 0 ms.").arg(method).arg(snr));
+    FigureExporter::save(courses, "time_courses", QString("%1 time courses of the five sources with the largest peak, SNR %2, baseline -200 to 0 ms.").arg(method).arg(snr).toStdString());
 
     if (!t_sFileNameStc.isEmpty()) {
         const std::filesystem::path stcPath = t_sFileNameStc.toStdU16String();

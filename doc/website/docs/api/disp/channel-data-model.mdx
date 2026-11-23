@@ -82,7 +82,7 @@ Key = FIFF channel kind constant (e.g. FIFFV_MEG_CH), value = physical amplitude
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
   Map from FIFF kind to amplitude max.
 
 ---
@@ -93,7 +93,7 @@ Override the per-channel-type amplitude scale using channel-type names.
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; QString, double &gt; &*
+- **scaleMap** : *const std::map&lt; std::string, double &gt; &*
   Map from channel-type name (e.g. "MEG_grad") to amplitude max.
 
 ---
@@ -112,7 +112,7 @@ Set extra browser-level virtual channels appended after the FIFF channels.
 
 **Parameters:**
 
-- **virtualChannels** : *const QVector&lt; [ChannelDisplayInfo](/docs/api/disp/channel-display-info) &gt; &*
+- **virtualChannels** : *const std::vector&lt; [ChannelDisplayInfo](/docs/api/disp/channel-display-info) &gt; &*
   Display metadata for each appended virtual channel.
 
 ---
@@ -267,7 +267,7 @@ When samplesPerPixel &lt;= 1 (zoomed in), raw samples are returned. When samples
 
 **Returns:**
 
-- *QVector&lt; float &gt;* — Flat float array: [x0, y0, x1, y1, ...] where x is offset from vboFirstSample.
+- *std::vector&lt; float &gt;* — Flat float array: [x0, y0, x1, y1, ...] where x is offset from vboFirstSample.
 
 ---
 

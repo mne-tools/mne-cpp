@@ -17,7 +17,7 @@ class mne::disp::Plot
 
 MATLAB-style line plot for an Eigen vector, derived from [`Graph`](/docs/api/disp/graph).
 
-Owns a list of `QVector<QPointF>` trace paths and supports a `m_bHoldOn` flag for overlaying multiple curves. ``updateData()`` replaces the visible curve in place.
+Owns a list of `std::vector<QPointF>` trace paths and supports a `m_bHoldOn` flag for overlaying multiple curves. ``updateData()`` replaces the visible curve in place.
 
 ```cpp title="src/examples/ex_disp_plots/main.cpp"
 VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);

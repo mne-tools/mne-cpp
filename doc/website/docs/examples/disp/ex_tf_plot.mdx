@@ -163,8 +163,8 @@ int main(int argc, char* argv[])
 
     TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet, p_FiffEvoked.times(0));
     tfplot.setTitle(QString("%1, %2").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
-    FigureExporter::save(tfplot, "spectrogram", QString("Gaussian-window spectrogram (1-50 Hz) of %1 in the '%2' evoked response; time 0 is the stimulus.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
-    if (!FigureExporter::directory().isEmpty()) {
+    FigureExporter::save(tfplot, "spectrogram", QString("Gaussian-window spectrogram (1-50 Hz) of %1 in the '%2' evoked response; time 0 is the stimulus.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment).toStdString());
+    if (!FigureExporter::directory().empty()) {
         return 0;
     }
     tfplot.show();

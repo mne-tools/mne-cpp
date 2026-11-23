@@ -47,10 +47,10 @@ Constructs a [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) for a 
 - **kind** : *PointKind*
   The digitizer point category.
 
-- **positions** : *const QVector&lt; QVector3D &gt; &*
+- **positions** : *const std::vector&lt; QVector3D &gt; &*
   3D positions of all points in this category (in meters).
 
-- **names** : *const QStringList &*
+- **names** : *const std::vector&lt; std::string &gt; &*
   Display names for individual points (e.g. "Nasion", "LPA").
 
 - **color** : *const QColor &*
@@ -74,7 +74,7 @@ Returns all point positions in this category.
 
 **Returns:**
 
-- *const QVector&lt; QVector3D &gt; &* — Vector of 3D position vectors.
+- *const std::vector&lt; QVector3D &gt; &* — Vector of 3D position vectors.
 
 ---
 
@@ -84,7 +84,7 @@ Returns the display names for individual points.
 
 **Returns:**
 
-- *const QStringList &* — List of point names.
+- *const std::vector&lt; std::string &gt; &* — List of point names.
 
 ---
 

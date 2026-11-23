@@ -67,13 +67,13 @@ Cast a ray against all surfaces in the scene.
 - **subView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   Active [`SubView`](/docs/api/disp3-d/sub-view) (for visibility / surface type filtering).
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Map of surface key → [`BrainSurface`](/docs/api/disp3-d/brain-surface).
 
-- **itemSurfaceMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Map of tree item → [`BrainSurface`](/docs/api/disp3-d/brain-surface) (for reverse lookup).
 
-- **itemDipoleMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [DipoleObject](/docs/api/disp3-d/dipole-object) &gt; &gt; &*
+- **itemDipoleMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [DipoleObject](/docs/api/disp3-d/dipole-object) &gt; &gt; &*
   Map of tree item → [`DipoleObject`](/docs/api/disp3-d/dipole-object).
 
 **Returns:**
@@ -93,15 +93,15 @@ This examines the surface key, annotation data, and item type to produce a human
 - **result** : *const [RayHit](/docs/api/disp3-d/ray-hit) &*
   [`RayHit`](/docs/api/disp3-d/ray-hit) from `pick()`.
 
-- **itemSurfaceMap** : *const QMap&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **itemSurfaceMap** : *const std::map&lt; const QStandardItem *, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Map for reverse item → surface lookup.
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map for key-based lookup.
 
 **Returns:**
 
-- *QString* — Display label string.
+- *std::string* — Display label string.
 
 ---
 

@@ -415,8 +415,8 @@ int main(int argc, char* argv[])
                  "node 1: degree 2, thresholded degree 1, strength 1.1");
 
     // The first trial: channel 1 follows channel 0, channel 2 is unrelated noise
-    QVector<double> ms(kSamples / 2);
-    for (int t = 0; t < ms.size(); ++t) {
+    std::vector<double> ms(kSamples / 2);
+    for (int t = 0; t < std::ssize(ms); ++t) {
         ms[t] = 1000.0 * t / kSFreq;
     }
     LinePlot traces;
@@ -424,8 +424,8 @@ int main(int argc, char* argv[])
     traces.setXLabel("Time [ms]");
     traces.setYLabel("Amplitude");
     for (int ch = 0; ch < 3; ++ch) {
-        QVector<double> values(ms.size());
-        for (int t = 0; t < ms.size(); ++t) {
+        std::vector<double> values(ms.size());
+        for (int t = 0; t < std::ssize(ms); ++t) {
             values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
         }
         traces.addSeries(ms, values, QStringList{"0: 10 Hz sine + noise", "1: channel 0, 12 ms later, + noise", "2: noise"}[ch]);
@@ -437,24 +437,27 @@ int main(int argc, char* argv[])
         for (const NetworkEdge& edge : net.edges()) {
             if (edge.source() == start && edge.target() == end) {
                 const VectorXd w = edge.weights().col(0);
-                return QVector<double>(w.data(), w.data() + w.size());
+                return std::vector<double>(w.data(), w.data() + w.size());
             }
         }
-        return QVector<double>();
+        return std::vector<double>();
     };
-    const QVector<double> coherent = spectrum(coherence, 0, 1);
-    const QVector<double> independent = spectrum(coherence, 0, 2);
-    QVector<double> hz(coherent.size());
-    for (int k = 0; k < hz.size(); ++k) {
+    const std::vector<double> coherent = spectrum(coherence, 0, 1);
+    const std::vector<double> independent = spectrum(coherence, 0, 2);
+    std::vector<double> hz(coherent.size());
+    for (int k = 0; k < std::ssize(hz); ++k) {
         hz[k] = static_cast<double>(k) * kSFreq / kSamples;
     }
     const int shown = static_cast<int>(std::count_if(hz.cbegin(), hz.cend(), [](double f) { return f <= 40.0; }));
+    const auto mid = [](const std::vector<double>& v, int from, int count) {
+        return std::vector<double>(v.begin() + from, v.begin() + from + count);
+    };
     LinePlot coherenceSpectrum;
     coherenceSpectrum.setTitle("Coherence over 20 trials");
     coherenceSpectrum.setXLabel("Frequency [Hz]");
     coherenceSpectrum.setYLabel("Coherence");
-    coherenceSpectrum.addSeries(hz.mid(0, shown), coherent.mid(0, shown), "channels 0-1");
-    coherenceSpectrum.addSeries(hz.mid(0, shown), independent.mid(0, shown), "channels 0-2");
+    coherenceSpectrum.addSeries(mid(hz, 0, shown), mid(coherent, 0, shown), "channels 0-1");
+    coherenceSpectrum.addSeries(mid(hz, 0, shown), mid(independent, 0, shown), "channels 0-2");
     FigureExporter::save(coherenceSpectrum, "coherence", "Coherence::calculate: the coupled pair is coherent at every frequency, since channel 1 also carries the noise of channel 0, and most of all at the 10 Hz sine; the independent pair is not.");
 
     // Granger causality as a source x target matrix: only 0 -> 1 stands out

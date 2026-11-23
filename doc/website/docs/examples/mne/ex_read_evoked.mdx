@@ -150,8 +150,8 @@ namespace
 /** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
 void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
 {
-    QVector<double> times(evoked.times.size());
-    for (int s = 0; s < times.size(); ++s) {
+    std::vector<double> times(evoked.times.size());
+    for (int s = 0; s < std::ssize(times); ++s) {
         times[s] = 1000.0 * evoked.times(s);
     }
     LinePlot plot;
@@ -162,13 +162,13 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
         if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || std::ranges::contains(evoked.info.bads, evoked.info.ch_names[c])) {
             continue;
         }
-        QVector<double> values(times.size());
-        for (int s = 0; s < times.size(); ++s) {
+        std::vector<double> values(times.size());
+        for (int s = 0; s < std::ssize(times); ++s) {
             values[s] = scale * evoked.data(c, s);
         }
         plot.addSeries(times, values, QString(), color);
     }
-    FigureExporter::save(plot, name, QString("%1 of the '%2' response: one line per channel, baseline-corrected, bad channels excluded.").arg(yLabel.section(' ', 0, 0), evoked.comment));
+    FigureExporter::save(plot, name.toStdString(), QString("%1 of the '%2' response: one line per channel, baseline-corrected, bad channels excluded.").arg(yLabel.section(' ', 0, 0), evoked.comment).toStdString());
 }
 
 } // namespace

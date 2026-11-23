@@ -57,13 +57,13 @@ Reads mapping matrices, pick vectors, evoked data, and colourmap from the provid
 
 **Parameters:**
 
-- **modality** : *const QString &*
+- **modality** : *const std::string &*
   "MEG" or "EEG".
 
 - **fieldMapper** : *const [SensorFieldMapper](/docs/api/disp3-d/sensor-field-mapper) &*
   Sensor-field mapper with built mapping data.
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map for target-surface validation.
 
 **Returns:**
@@ -90,7 +90,7 @@ Stop real-time sensor streaming.
 
 **Returns:**
 
-- *QString* — the active modality ("MEG" or "EEG"), or empty.
+- *std::string* — the active modality ("MEG" or "EEG"), or empty.
 
 ---
 
@@ -144,7 +144,7 @@ Set the colormap used for colour mapping.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name (e.g. "MNE", "Jet").
 
 ---

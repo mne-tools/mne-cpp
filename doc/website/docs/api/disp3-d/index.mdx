@@ -183,7 +183,7 @@ Scene managers encapsulate domain-specific logic that would otherwise bloat `Bra
 
 ### Background Workers
 
-Workers implement the **Producer–Consumer pattern** on Qt's thread infrastructure. Each worker lives on a dedicated `QThread` and communicates with the main/render thread via queued signal–slot connections. This guarantees that heavy computation (interpolation matrix construction, per-vertex color mapping) never blocks the render loop.
+Workers implement the **Producer–Consumer pattern** on standard-library threads. The streaming cadence runs on a `PeriodicTask` (a `std::jthread`), interpolation-matrix recomputations run in request order on a single-thread `mne::ThreadPool`, and STC loading runs on its own `std::jthread`. The worker objects stay on the GUI thread; their results reach it through queued signal–slot connections, so heavy computation (interpolation matrix construction, per-vertex color mapping) never blocks the render loop. Worker state is guarded by `std::mutex`, and the controllers join their threads before the workers are destroyed.
 
 | Worker | Role |
 |--------|------|

@@ -36,10 +36,10 @@ Constructor.
 
 **Parameters:**
 
-- **lhPath** : *const QString &*
+- **lhPath** : *const std::filesystem::path &*
   Path to left hemisphere STC file.
 
-- **rhPath** : *const QString &*
+- **rhPath** : *const std::filesystem::path &*
   Path to right hemisphere STC file.
 
 - **lhSurface** : *[BrainSurface](/docs/api/disp3-d/brain-surface) **
@@ -88,7 +88,7 @@ Get the computed left hemisphere interpolation matrix.
 
 **Returns:**
 
-- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the interpolation matrix.
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the interpolation matrix.
 
 ---
 
@@ -98,7 +98,7 @@ Get the computed right hemisphere interpolation matrix.
 
 **Returns:**
 
-- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the interpolation matrix.
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the interpolation matrix.
 
 ---
 

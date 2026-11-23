@@ -67,7 +67,7 @@ used to create the group All.
 
 **Parameters:**
 
-- **mappedLayoutChNames** : *const QStringList &*
+- **mappedLayoutChNames** : *const std::vector&lt; std::string &gt; &*
   the currently to layout mapped channels.
 
 ---
@@ -89,7 +89,7 @@ Select channels This function selects channels which were selected outside this 
 
 **Parameters:**
 
-- **channelList** : *const QStringList &*
+- **channelList** : *const std::vector&lt; std::string &gt; &*
   channels which are be to set as selected.
 
 ---
@@ -100,7 +100,7 @@ Current selected channels This function returns the current channel selection.
 
 **Returns:**
 
-- *QStringList* — Names of the user-defined channels, or of the visible group channels if none were user-defined.
+- *std::vector&lt; std::string &gt;* — Names of the user-defined channels, or of the visible group channels if none were user-defined.
 
 ---
 
@@ -128,7 +128,7 @@ returns the current layout map.
 
 **Returns:**
 
-- *const QMap&lt; QString, QPointF &gt; &* — Map from channel name to its 2-D layout position.
+- *const std::map&lt; std::string, QPointF &gt; &* — Map from channel name to its 2-D layout position.
 
 ---
 

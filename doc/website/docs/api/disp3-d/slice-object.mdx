@@ -27,7 +27,7 @@ voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
 slice.setSlice(axial, mne::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
-QVector<float> quad; // 4 corners x (x, y, z, u, v)
+std::vector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);
 ```
 
@@ -164,7 +164,7 @@ Generate quad vertex buffer: 4 vertices × (3 pos + 2 UV) = 20 floats.
 
 **Parameters:**
 
-- **vertices** : *QVector&lt; float &gt; &*
+- **vertices** : *std::vector&lt; float &gt; &*
   Output vertex data.
 
 ---
@@ -177,7 +177,7 @@ Generate quad index buffer: 2 triangles = 6 indices.
 
 **Parameters:**
 
-- **indices** : *QVector&lt; unsigned int &gt; &*
+- **indices** : *std::vector&lt; unsigned int &gt; &*
   Output index data.
 
 ---
@@ -194,14 +194,14 @@ Generate quad index buffer: 2 triangles = 6 indices.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 148"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 150"
 axial.fill(128);
 Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
 voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
 slice.setSlice(axial, mne::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
-QVector<float> quad; // 4 corners x (x, y, z, u, v)
+std::vector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);
 ok &= expect(quad.size() == 20 && quad[0] == -128.0f && quad[1] == -128.0f && quad[2] == 0.0f && quad[15] == 128.0f && quad[16] == 128.0f && quad[17] == 0.0f && quad[18] == 1.0f && slice.windowWidth() == 200.0f,
              "SliceObject: the axial slice 128 spans [-128, 128] mm in x and y at z = 0");

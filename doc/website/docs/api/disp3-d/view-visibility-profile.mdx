@@ -31,7 +31,7 @@ Query visibility of a named object.
 
 **Parameters:**
 
-- **object** : *const QString &*
+- **object** : *std::string_view*
   Object key (e.g. "lh", "bem_head", "sens_meg").
 
 **Returns:**
@@ -46,7 +46,7 @@ Set visibility of a named object.
 
 **Parameters:**
 
-- **object** : *const QString &*
+- **object** : *std::string_view*
   Object key.
 
 - **visible** : *bool*

@@ -102,7 +102,7 @@ Set the interpolation matrix for the left hemisphere.
 
 **Parameters:**
 
-- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+- **mat** : *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
   Sparse interpolation matrix (nVerticesLH x nSourcesLH).
 
 ---
@@ -113,7 +113,7 @@ Set the interpolation matrix for the right hemisphere.
 
 **Parameters:**
 
-- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+- **mat** : *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
   Sparse interpolation matrix (nVerticesRH x nSourcesRH).
 
 ---
@@ -167,7 +167,7 @@ Set the colormap type.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
 
 ---
@@ -225,10 +225,10 @@ Sub-threshold vertices will display these colors (e.g., curvature or annotation 
 
 **Parameters:**
 
-- **baseColorsLh** : *const QVector&lt; uint32_t &gt; &*
+- **baseColorsLh** : *const std::vector&lt; uint32_t &gt; &*
   Per-vertex ABGR colors for the left hemisphere.
 
-- **baseColorsRh** : *const QVector&lt; uint32_t &gt; &*
+- **baseColorsRh** : *const std::vector&lt; uint32_t &gt; &*
   Per-vertex ABGR colors for the right hemisphere.
 
 ---
@@ -250,7 +250,7 @@ Set the interpolation function for on-the-fly matrix computation.
 
 **Parameters:**
 
-- **sInterpolationFunction** : *const QString &*
+- **sInterpolationFunction** : *const std::string &*
   Function name ("linear", "gaussian", "square", "cubic").
 
 ---

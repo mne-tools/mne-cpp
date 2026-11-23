@@ -257,11 +257,11 @@ int main(int argc, char* argv[])
     traces.setTitle(QString("Raw MEG from %1 s to %2 s").arg(from).arg(to));
     traces.setXLabel("Time [s]");
     traces.setYLabel("Gradiometers [fT/cm], offset");
-    const QVector<double> seconds(times.data(), times.data() + times.size());
+    const std::vector<double> seconds(times.data(), times.data() + times.size());
     for (int i = 0; i < grads.size(); ++i) {
         const int c = grads[i];
         const double mean = 1e13 * data.row(c).mean();
-        QVector<double> values(data.cols());
+        std::vector<double> values(data.cols());
         for (int s = 0; s < data.cols(); ++s) {
             values[s] = 1e13 * data(c, s) - mean - 6.0 * spread * i;
         }

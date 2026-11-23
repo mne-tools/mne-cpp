@@ -88,7 +88,7 @@ Remove a layer by id.
 
 **Parameters:**
 
-- **id** : *const QString &*
+- **id** : *const std::string &*
   Layer id supplied to `addLayer`.
 
 **Returns:**
@@ -107,7 +107,7 @@ Remove every layer.
 
 **Returns:**
 
-- *QVector&lt; [SceneLayer](/docs/api/disp3-d/scene-layer) &gt;* — All layers in current draw order (sorted by kind, then by drawOrder, then by insertion order).
+- *std::vector&lt; [SceneLayer](/docs/api/disp3-d/scene-layer) &gt;* — All layers in current draw order (sorted by kind, then by drawOrder, then by insertion order).
 
 ---
 
@@ -115,7 +115,7 @@ Remove every layer.
 
 **Parameters:**
 
-- **id** : *const QString &*
+- **id** : *const std::string &*
   Layer id.
 
 **Returns:**
@@ -132,7 +132,7 @@ No-op if the id is unknown.
 
 **Parameters:**
 
-- **id** : *const QString &*
+- **id** : *const std::string &*
   Layer id.
 
 - **visible** : *bool*
@@ -148,7 +148,7 @@ No-op if the id is unknown.
 
 **Parameters:**
 
-- **id** : *const QString &*
+- **id** : *const std::string &*
   Layer id.
 
 - **opacity** : *float*
@@ -306,7 +306,7 @@ Replaces any previously registered fn for that kind.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 174"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 176"
 MultimodalScene scene;
 scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
     const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());

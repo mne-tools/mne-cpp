@@ -389,7 +389,7 @@ int main(int argc, char* argv[])
     QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
         pBrainView->startRealtimeStreaming();
     });
-    pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
+    pBrainView->loadSourceEstimate(lhStcPath.toStdU16String(), rhStcPath.toStdU16String());
 
     if (!t_sFileNameStc.isEmpty()) {
         if (auto written = sourceEstimate.write(t_sFileNameStc.toStdU16String()); !written) {

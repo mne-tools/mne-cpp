@@ -147,8 +147,8 @@
       "missing_tests": []
     },
     "disp3D": {
-      "classes": 49,
-      "tested": 36,
+      "classes": 50,
+      "tested": 37,
       "untested": [
         "AbstractTreeItem",
         "ElectrodeObject",

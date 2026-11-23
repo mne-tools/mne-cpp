@@ -296,7 +296,7 @@ void drainInto(AcqReader& reader, std::size_t index, std::vector<float>& block, 
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 474"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 475"
 auto reader = device->stream().reader(AcqReader::ReadMode::Lossless);
 if (!reader) {
     return fail(reader.error().text());

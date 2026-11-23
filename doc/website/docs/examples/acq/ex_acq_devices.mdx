@@ -145,6 +145,7 @@ The documented classes this example uses most:
 #include <format>
 #include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
 //=============================================================================================================
@@ -662,11 +663,12 @@ private:
         if (added) {
             const auto width = static_cast<std::uint64_t>(m_width);
             std::erase_if(m_events, [&](const AcqEvent& e) { return e.sample + width < m_next; }); // overwritten
-            QVector<ChannelRhiView::EventMarker> markers;
+            std::vector<ChannelRhiView::EventMarker> markers;
+            markers.reserve(m_events.size() + 1);
             for (const AcqEvent& e : m_events) {
-                markers.append({static_cast<int>(e.sample % width), e.code, QColor(), QString::number(e.code)});
+                markers.push_back({static_cast<int>(e.sample % width), e.code, QColor(), std::to_string(e.code)});
             }
-            markers.append({static_cast<int>(m_next % width), 0, QColor(0, 110, 230), "now"});
+            markers.push_back({static_cast<int>(m_next % width), 0, QColor(0, 110, 230), "now"});
             std::sort(markers.begin(), markers.end(), [](const auto& a, const auto& b) { return a.sample < b.sample; });
             m_view->setData(m_sweep, 0);
             m_view->setEvents(markers);

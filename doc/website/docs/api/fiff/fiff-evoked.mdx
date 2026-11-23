@@ -279,8 +279,8 @@ Read an evoked data set from FIFF and print its measurement info and coordinate 
 /** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
 void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
 {
-    QVector<double> times(evoked.times.size());
-    for (int s = 0; s < times.size(); ++s) {
+    std::vector<double> times(evoked.times.size());
+    for (int s = 0; s < std::ssize(times); ++s) {
         times[s] = 1000.0 * evoked.times(s);
     }
     LinePlot plot;

@@ -74,7 +74,7 @@ Set total number of detected triggers and trigger types.
 - **totalNumberDetections** : *int*
   The numger of detected triggers.
 
-- **mapDetectedTriggers** : *const QMap&lt; int, QList&lt; QPair&lt; int, double &gt; &gt; &gt; &*
+- **mapDetectedTriggers** : *const std::map&lt; int, std::vector&lt; std::pair&lt; int, double &gt; &gt; &gt; &*
   The currently detected triggers.
 
 ---
@@ -85,7 +85,7 @@ Gets currently selected STIM channel in GUI.
 
 **Returns:**
 
-- *QString* — currently selected STIM channel.
+- *std::string* — currently selected STIM channel.
 
 ---
 

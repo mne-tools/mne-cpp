@@ -184,7 +184,7 @@ Keys should be FIFF channel kind constants (FIFFV_MEG_CH, FIFFV_EEG_CH, …).
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
   Map from FIFF kind to physical amplitude (e.g. 1.2e-12 for MEG).
 
 ---
@@ -216,7 +216,7 @@ Channels not in `names` are hidden immediately. Pass an empty list to restore al
 
 **Parameters:**
 
-- **names** : *const QStringList &*
+- **names** : *const std::vector&lt; std::string &gt; &*
   List of channel names to show (case-sensitive).
 
 ---
@@ -275,7 +275,7 @@ Pass an empty vector to clear all markers.
 
 **Parameters:**
 
-- **events** : *const QVector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::EventMarker &gt; &*
+- **events** : *const std::vector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::EventMarker &gt; &*
   List of EventMarker objects.
 
 ---
@@ -314,7 +314,7 @@ Set the list of persistent sample/reference markers shown in the time ruler.
 
 **Parameters:**
 
-- **markers** : *const QVector&lt; [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark) &gt; &*
+- **markers** : *const std::vector&lt; [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark) &gt; &*
   Reference markers to display in the ruler.
 
 ---
@@ -325,7 +325,7 @@ Set the list of annotation spans to display as translucent overlays.
 
 **Parameters:**
 
-- **annotations** : *const QVector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::AnnotationSpan &gt; &*
+- **annotations** : *const std::vector&lt; [ChannelRhiView](/docs/api/disp/channel-rhi-view)::AnnotationSpan &gt; &*
   List of AnnotationSpan objects.
 
 ---
@@ -554,7 +554,7 @@ Use for advanced configuration such as setMaxStoredSamples().
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 228"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 229"
 m_badge->setObjectName("badge");
 m_info = new QLabel;
 m_info->setObjectName("info");

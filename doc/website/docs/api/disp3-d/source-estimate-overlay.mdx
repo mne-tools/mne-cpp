@@ -51,7 +51,7 @@ Load a source estimate file (.stc) for a hemisphere.
 
 **Parameters:**
 
-- **path** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Path to the .stc file.
 
 - **hemi** : *int*
@@ -112,7 +112,7 @@ Set the colormap to use for visualization.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
 
 ---
@@ -123,7 +123,7 @@ Get the current colormap name.
 
 **Returns:**
 
-- *QString* — The colormap name.
+- *std::string* — The colormap name.
 
 ---
 
@@ -243,7 +243,7 @@ Set the interpolation matrix directly (used by async loader).
 
 **Parameters:**
 
-- **mat** : *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+- **mat** : *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
   The interpolation matrix.
 
 - **hemi** : *int*
@@ -263,7 +263,7 @@ Get the interpolation matrix for the left hemisphere.
 
 **Returns:**
 
-- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the LH interpolation matrix (may be null).
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the LH interpolation matrix (may be null).
 
 ---
 
@@ -273,7 +273,7 @@ Get the interpolation matrix for the right hemisphere.
 
 **Returns:**
 
-- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the RH interpolation matrix (may be null).
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Shared pointer to the RH interpolation matrix (may be null).
 
 ---
 
@@ -306,7 +306,7 @@ Used by the real-time streaming controller to feed data into the queue.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 238"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 240"
 // Source estimate on vertices 0 and 2 only; the others stay cortex grey
 MatrixXd activity(2, 1);
 activity << 1.0, 0.1;

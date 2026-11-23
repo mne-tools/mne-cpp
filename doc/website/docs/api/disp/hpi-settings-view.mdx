@@ -58,7 +58,7 @@ Updates the error related labels.
 
 **Parameters:**
 
-- **vError** : *const QVector&lt; double &gt; &*
+- **vError** : *const std::vector&lt; double &gt; &*
   the new error values.
 
 - **dMeanErrorDist** : *const double*
@@ -181,7 +181,7 @@ Replaces the coil presets, by default the Neuromag VectorView frequencies, with 
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
+- **sFilePath** : *const std::filesystem::path &*
   Path to the JSON file.
 
 **Returns:**

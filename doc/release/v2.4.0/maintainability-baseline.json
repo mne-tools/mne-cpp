@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "scripts/quality/audit_maintainability.py",
   "policy": "scripts/quality/maintainability_policy.json",
-  "scanned_files": 1605,
-  "scanned_lines": 414245,
+  "scanned_files": 1608,
+  "scanned_lines": 414709,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -64,11 +64,11 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 883,
-      "files": 98,
+      "total": 878,
+      "files": 96,
       "by_scope": {
         "apps": 781,
-        "libs": 102
+        "libs": 97
       },
       "suppressed": [
         "src/apps/mne_analyze_studio/core/backendchannel.cpp"
@@ -175,7 +175,7 @@
         "src/libs/mne/disp/viewers/helpers/bidsviewmodel.cpp": 5,
         "src/libs/mne/disp/viewers/helpers/filterplotscene.cpp": 1,
         "src/libs/mne/disp/viewers/helpers/scalecontrol.cpp": 2,
-        "src/libs/mne/disp/viewers/helpers/selectionscene.cpp": 2,
+        "src/libs/mne/disp/viewers/helpers/selectionscene.cpp": 1,
         "src/libs/mne/disp/viewers/hpisettingsview.cpp": 16,
         "src/libs/mne/disp/viewers/modalityselectionview.cpp": 2,
         "src/libs/mne/disp/viewers/projectorsview.cpp": 4,
@@ -186,9 +186,7 @@
         "src/libs/mne/disp/viewers/spectrumview.cpp": 1,
         "src/libs/mne/disp3D/core/dataloader.cpp": 2,
         "src/libs/mne/disp3D/model/braintreemodel.cpp": 10,
-        "src/libs/mne/disp3D/model/items/digitizersettreeitem.cpp": 4,
-        "src/libs/mne/disp3D/workers/rtsensordatacontroller.cpp": 2,
-        "src/libs/mne/disp3D/workers/rtsourcedatacontroller.cpp": 2
+        "src/libs/mne/disp3D/model/items/digitizersettreeitem.cpp": 4
       }
     }
   }

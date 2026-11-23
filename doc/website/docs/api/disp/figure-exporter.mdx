@@ -32,7 +32,7 @@ Returns the directory figures are written to.
 
 **Returns:**
 
-- *QString* — The value of `MNE_CPP_FIGURE_DIR`, or an empty string when figures are not written.
+- *std::filesystem::path* — The value of `MNE_CPP_FIGURE_DIR`, or an empty path when figures are not written.
 
 ---
 
@@ -45,10 +45,10 @@ Renders `widget` offscreen at `size` and writes it as the next figure.
 - **widget** : *QWidget &*
   The widget to render; it is resized and never shown on screen.
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   File name stem; characters other than letters, digits, '-' and '*' become '*'.
 
-- **caption** : *const QString &*
+- **caption** : *const std::string &*
   Caption shown below the figure.
 
 - **size** : *const QSize &*
@@ -56,7 +56,7 @@ Renders `widget` offscreen at `size` and writes it as the next figure.
 
 **Returns:**
 
-- *QString* — The path of the written PNG, or an empty string when figures are not written or writing failed.
+- *std::filesystem::path* — The path of the written PNG, or an empty path when figures are not written or writing failed.
 
 ---
 
@@ -69,15 +69,15 @@ Writes `image` as the next figure.
 - **image** : *const QImage &*
   The figure.
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   File name stem; characters other than letters, digits, '-' and '*' become '*'.
 
-- **caption** : *const QString &*
+- **caption** : *const std::string &*
   Caption shown below the figure.
 
 **Returns:**
 
-- *QString* — The path of the written PNG, or an empty string when figures are not written or writing failed.
+- *std::filesystem::path* — The path of the written PNG, or an empty path when figures are not written or writing failed.
 
 ---
 
@@ -107,10 +107,10 @@ FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
 ````cpp title="src/examples/ex_disp/main.cpp, line 189"
-FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
-FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
-FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));
-if (!FigureExporter::directory().isEmpty()) {
+FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to).toStdString());
+FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]).toStdString());
+FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]).toStdString());
+if (!FigureExporter::directory().empty()) {
     return 0;
 }
 imagesc.show();
@@ -126,7 +126,7 @@ Multitaper spectra, power spectral density and cross-spectral density of random 
 FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
 FigureExporter::save(plotPsd, "psd", "PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide.");
 FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains.");
-if (!FigureExporter::directory().isEmpty()) {
+if (!FigureExporter::directory().empty()) {
     return 0;
 }
 plotWindow.show();

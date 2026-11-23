@@ -183,7 +183,7 @@ Load annotation data from file.
 
 **Parameters:**
 
-- **path** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Path to the .annot file.
 
 **Returns:**
@@ -233,7 +233,7 @@ Apply source estimate colors to vertices.
 
 **Parameters:**
 
-- **colors** : *const QVector&lt; uint32_t &gt; &*
+- **colors** : *const std::vector&lt; uint32_t &gt; &*
   Vector of packed ABGR colors, one per vertex.
 
 ---
@@ -318,7 +318,7 @@ Get the triangle index buffer.
 
 **Returns:**
 
-- *QVector&lt; uint32_t &gt;* — Copy of the index data, three vertex indices per triangle.
+- *std::vector&lt; uint32_t &gt;* — Copy of the index data, three vertex indices per triangle.
 
 ---
 
@@ -326,7 +326,7 @@ Get the triangle index buffer.
 
 **Returns:**
 
-- *const QVector&lt; [VertexData](/docs/api/disp3-d/vertex-data) &gt; &* — Current vertex geometry, valid while this surface lives.
+- *const std::vector&lt; [VertexData](/docs/api/disp3-d/vertex-data) &gt; &* — Current vertex geometry, valid while this surface lives.
 
 ---
 
@@ -334,7 +334,7 @@ Get the triangle index buffer.
 
 **Returns:**
 
-- *const QVector&lt; uint32_t &gt; &* — Per-vertex packed ABGR colours, valid while this surface lives.
+- *const std::vector&lt; uint32_t &gt; &* — Per-vertex packed ABGR colours, valid while this surface lives.
 
 ---
 
@@ -342,7 +342,7 @@ Get the triangle index buffer.
 
 **Returns:**
 
-- *const QVector&lt; uint32_t &gt; &* — Per-vertex packed ABGR annotation colours, valid while this surface lives.
+- *const std::vector&lt; uint32_t &gt; &* — Per-vertex packed ABGR annotation colours, valid while this surface lives.
 
 ---
 
@@ -415,7 +415,7 @@ Get the annotation label name for a given vertex.
 
 **Returns:**
 
-- *QString* — [`FsLabel`](/docs/api/fs/fs-label) name.
+- *std::string* — [`FsLabel`](/docs/api/fs/fs-label) name.
 
 ---
 
@@ -565,7 +565,7 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 223"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 225"
 patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 0.02f, 0.0f;
 MatrixX3i patchTriangles(2, 3);
 patchTriangles << 0, 1, 2, 0, 2, 3;

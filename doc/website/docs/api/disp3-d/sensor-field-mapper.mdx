@@ -26,10 +26,10 @@ Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto corti
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 // Contour spacing for a field map spanning +-120 fT with about 10 lines
 const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
-QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;
-sceneSurfaces.insert("bem_inner_skull", std::make_shared<BrainSurface>());
-sceneSurfaces.insert("bem_head", std::make_shared<BrainSurface>());
-const QString headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+std::map<std::string, std::shared_ptr<BrainSurface>> sceneSurfaces;
+sceneSurfaces.emplace("bem_inner_skull", std::make_shared<BrainSurface>());
+sceneSurfaces.emplace("bem_head", std::make_shared<BrainSurface>());
+const std::string headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
 ```
 
 ---
@@ -103,7 +103,7 @@ Set the colormap name used when painting field values.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap identifier (e.g. "MNE", "hot", "RdBu_r").
 
 ---
@@ -175,7 +175,7 @@ Needs the caller's surface map to locate the helmet and/or head surface. Also ne
 
 **Parameters:**
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   All surfaces keyed by name.
 
 - **headToMriTrans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -198,13 +198,13 @@ Paints per-vertex colours onto the target surfaces and optionally generates iso-
 
 **Parameters:**
 
-- **surfaces** : *QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map (contour surfaces may be added).
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   The single-view [`SubView`](/docs/api/disp3-d/sub-view) for visibility flags.
 
-- **subViews** : *const QVector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
+- **subViews** : *const std::vector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
   The four multi-view SubViews.
 
 ---
@@ -213,7 +213,7 @@ Paints per-vertex colours onto the target surfaces and optionally generates iso-
 
 **Returns:**
 
-- *const QString &* — The surface key used for the MEG mapping target.
+- *const std::string &* — The surface key used for the MEG mapping target.
 
 ---
 
@@ -221,7 +221,7 @@ Paints per-vertex colours onto the target surfaces and optionally generates iso-
 
 **Returns:**
 
-- *const QString &* — The surface key used for the EEG mapping target.
+- *const std::string &* — The surface key used for the EEG mapping target.
 
 ---
 
@@ -247,12 +247,12 @@ Looks for "bem_head" first, then any BEM surface whose tissue type is `BrainSurf
 
 **Parameters:**
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Surface map keyed by surface name.
 
 **Returns:**
 
-- *QString* — Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
+- *std::string* — Head surface key, else the first BEM key, or an empty string if no BEM surface exists.
 
 ---
 
@@ -262,12 +262,12 @@ Find the MEG helmet surface key ("sens_surface_meg") if present.
 
 **Parameters:**
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Surface map keyed by surface name.
 
 **Returns:**
 
-- *QString* — "sens_surface_meg" if present, otherwise an empty string.
+- *std::string* — "sens_surface_meg" if present, otherwise an empty string.
 
 ---
 
@@ -324,13 +324,13 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 306"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 308"
 // Contour spacing for a field map spanning +-120 fT with about 10 lines
 const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
-QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;
-sceneSurfaces.insert("bem_inner_skull", std::make_shared<BrainSurface>());
-sceneSurfaces.insert("bem_head", std::make_shared<BrainSurface>());
-const QString headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+std::map<std::string, std::shared_ptr<BrainSurface>> sceneSurfaces;
+sceneSurfaces.emplace("bem_inner_skull", std::make_shared<BrainSurface>());
+sceneSurfaces.emplace("bem_head", std::make_shared<BrainSurface>());
+const std::string headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
 ok &= expect(std::abs(contourSpacing - 50e-15f) < 1e-20f && headKey == "bem_head", "SensorFieldMapper: 50 fT contours, EEG map on bem_head");
 ````
 

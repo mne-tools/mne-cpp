@@ -35,10 +35,10 @@ Load sensor channels, digitizer points and MEG helmet from a FIF file.
 
 **Parameters:**
 
-- **fifPath** : *const QString &*
+- **fifPath** : *const std::filesystem::path &*
   Path to the FIF file.
 
-- **megHelmetOverridePath** : *const QString &*
+- **megHelmetOverridePath** : *const std::filesystem::path &*
   Optional override for the helmet surface file.
 
 **Returns:**
@@ -53,7 +53,7 @@ Load a standalone MEG helmet surface from a BEM FIF file.
 
 **Parameters:**
 
-- **helmetFilePath** : *const QString &*
+- **helmetFilePath** : *const std::filesystem::path &*
   Path to the helmet BEM FIF file.
 
 - **devHeadTrans** : *const QMatrix4x4 &*
@@ -74,7 +74,7 @@ Load dipole set from a .dip file.
 
 **Parameters:**
 
-- **dipPath** : *const QString &*
+- **dipPath** : *const std::filesystem::path &*
   Path to the dipole file.
 
 **Returns:**
@@ -89,7 +89,7 @@ Load source space from a forward-solution FIF file.
 
 **Parameters:**
 
-- **fwdPath** : *const QString &*
+- **fwdPath** : *const std::filesystem::path &*
   Path to the FIF file with source space.
 
 **Returns:**
@@ -106,7 +106,7 @@ Other transforms in the file are ignored.
 
 **Parameters:**
 
-- **transPath** : *const QString &*
+- **transPath** : *const std::filesystem::path &*
   Path to the FIF file.
 
 - **trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -124,7 +124,7 @@ Load an [`FiffEvoked`](/docs/api/fiff/fiff-evoked) from a FIF file.
 
 **Parameters:**
 
-- **evokedPath** : *const QString &*
+- **evokedPath** : *const std::filesystem::path &*
   Path to the FIF file.
 
 - **aveIndex** : *int*
@@ -142,12 +142,12 @@ Probe a FIF file for the available evoked data sets.
 
 **Parameters:**
 
-- **evokedPath** : *const QString &*
+- **evokedPath** : *const std::filesystem::path &*
   Path to the FIF file.
 
 **Returns:**
 
-- *QStringList* — List of human-readable labels for each set.
+- *std::vector&lt; std::string &gt;* — List of human-readable labels for each set.
 
 ---
 

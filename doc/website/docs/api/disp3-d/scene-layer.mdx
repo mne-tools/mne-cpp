@@ -59,7 +59,7 @@ scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds func
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 174"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 176"
 MultimodalScene scene;
 scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
     const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());

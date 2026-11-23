@@ -191,7 +191,7 @@ Returns a map which conatins the channel idx and its corresponding selection sta
 
 **Returns:**
 
-- *const QMap&lt; qint32, qint32 &gt; &* — the channel idx to selection status.
+- *const std::map&lt; int, int &gt; &* — the channel idx to selection status.
 
 ---
 
@@ -201,7 +201,7 @@ Selects the given list of channel indeces and unselect all other channels.
 
 **Parameters:**
 
-- **selection** : *const QList&lt; qint32 &gt; &*
+- **selection** : *const std::vector&lt; int &gt; &*
   channel index list to select.
 
 ---

@@ -60,7 +60,7 @@ Get the current average colors.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+- *std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt;* — Pointer to the current average colors.
 
 ---
 
@@ -70,7 +70,7 @@ Get the current average activations.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+- *std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt;* — Pointer to the current average activations.
 
 ---
 
@@ -80,7 +80,7 @@ Set the average colors.
 
 **Parameters:**
 
-- **qMapAverageColor** : *const std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt; &*
+- **qMapAverageColor** : *const std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt; &*
   Pointer to the new average colors.
 
 ---
@@ -91,7 +91,7 @@ Set the average activations.
 
 **Parameters:**
 
-- **qMapAverageActivation** : *const std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt; &*
+- **qMapAverageActivation** : *const std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt; &*
   Pointer to the new average activations.
 
 ---

@@ -33,7 +33,7 @@ True when the brain-surface `key` matches this view's surfaceType (e.g.
 
 **Parameters:**
 
-- **key** : *const QString &*
+- **key** : *std::string_view*
   Surface map key to test.
 
 **Returns:**
@@ -48,7 +48,7 @@ True when the surface identified by `key` should be rendered according to this v
 
 **Parameters:**
 
-- **key** : *const QString &*
+- **key** : *std::string_view*
   Surface map key to test.
 
 **Returns:**
@@ -65,7 +65,7 @@ Non-brain surfaces are never touched.
 
 **Parameters:**
 
-- **surfaces** : *QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   Surface map keyed by surface name; matching surfaces get their visualization mode updated.
 
 ---
@@ -109,7 +109,7 @@ True when `key` identifies a brain-tissue surface (lh_/rh_) as opposed to BEM, s
 
 **Parameters:**
 
-- **key** : *const QString &*
+- **key** : *std::string_view*
   Surface map key to classify.
 
 **Returns:**

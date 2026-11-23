@@ -92,7 +92,7 @@ Add data to the view.
 
 **Parameters:**
 
-- **lMatData** : *const QList&lt; Eigen::MatrixXd &gt; &*
+- **lMatData** : *std::span&lt; const Eigen::MatrixXd &gt;*
   The new data.
 
 ---
@@ -150,7 +150,7 @@ Get the current scaling map.
 
 **Returns:**
 
-- *QMap&lt; qint32, float &gt;* — The current scaling map.
+- *std::map&lt; int, float &gt;* — The current scaling map.
 
 ---
 
@@ -160,7 +160,7 @@ Broadcast channel scaling.
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
   QMap with scaling values which is to be broadcasted to the model.
 
 ---
@@ -208,7 +208,7 @@ Only shows the channels defined in the QStringList selectedChannels.
 
 **Parameters:**
 
-- **selectedChannels** : *const QStringList &*
+- **selectedChannels** : *const std::vector&lt; std::string &gt; &*
   list of all channel names which are currently selected in the selection manager.
 
 ---
@@ -357,13 +357,13 @@ markChBad marks the selected channels as bad/good in m_chInfolist
 
 **Parameters:**
 
-- **colorMap** : *const QMap&lt; double, QColor &gt; &*
+- **colorMap** : *const std::map&lt; double, QColor &gt; &*
   color for each trigger channel.
 
 - **active** : *bool*
   real time trigger detection active.
 
-- **triggerCh** : *const QString &*
+- **triggerCh** : *const std::string &*
   current trigger channel to scan.
 
 - **threshold** : *double*

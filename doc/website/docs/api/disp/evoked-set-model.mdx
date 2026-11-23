@@ -188,7 +188,7 @@ Get the current average colors.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+- *std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt;* — Pointer to the current average colors.
 
 ---
 
@@ -198,7 +198,7 @@ Get the current average activations.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+- *std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt;* — Pointer to the current average activations.
 
 ---
 
@@ -208,7 +208,7 @@ Set the average colors.
 
 **Parameters:**
 
-- **qMapAverageColor** : *const std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt; &*
+- **qMapAverageColor** : *const std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt; &*
   Pointer to the new average colors.
 
 ---
@@ -219,7 +219,7 @@ Set the average activations.
 
 **Parameters:**
 
-- **qMapAverageActivation** : *const std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt; &*
+- **qMapAverageActivation** : *const std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt; &*
   Pointer to the new average activations.
 
 ---
@@ -290,7 +290,7 @@ Returns a map which conatins the channel idx and its corresponding selection sta
 
 **Returns:**
 
-- *const QMap&lt; qint32, qint32 &gt; &* — the channel idx to selection status.
+- *const std::map&lt; int, int &gt; &* — the channel idx to selection status.
 
 ---
 
@@ -310,7 +310,7 @@ Returns the current baseline information.
 
 **Returns:**
 
-- *QPair&lt; QVariant, QVariant &gt;* — the current baseline information as a from to QPair.
+- *std::pair&lt; float, float &gt;* — the current baseline information as a from to pair in seconds.
 
 ---
 
@@ -350,7 +350,7 @@ Selects the given list of channel indeces and unselect all other channels.
 
 **Parameters:**
 
-- **selection** : *const QList&lt; qint32 &gt; &*
+- **selection** : *const std::vector&lt; int &gt; &*
   channel index list to select.
 
 ---

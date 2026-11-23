@@ -257,8 +257,8 @@ int main(int argc, char* argv[])
     Log::info("{}", (QString("Averaged %1 epochs of event %2 over %3 channels and %4 samples.").arg(evoked.nave).arg(event).arg(evoked.data.rows()).arg(evoked.data.cols())).toStdString());
 
     // Butterfly plot of the gradiometers in fT/cm against time in ms
-    QVector<double> times(evoked.times.size());
-    for (int s = 0; s < times.size(); ++s) {
+    std::vector<double> times(evoked.times.size());
+    for (int s = 0; s < std::ssize(times); ++s) {
         times[s] = 1000.0 * evoked.times(s);
     }
     LinePlot butterfly;
@@ -267,14 +267,14 @@ int main(int argc, char* argv[])
     butterfly.setYLabel("Gradiometers [fT/cm]");
     for (int c = 0; c < evoked.data.rows(); ++c) {
         if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !std::ranges::contains(evoked.info.bads, evoked.info.ch_names[c])) {
-            QVector<double> values(times.size());
-            for (int s = 0; s < times.size(); ++s) {
+            std::vector<double> values(times.size());
+            for (int s = 0; s < std::ssize(times); ++s) {
                 values[s] = 1e13 * evoked.data(c, s);
             }
             butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
         }
     }
-    FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.").arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
+    FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.").arg(butterfly.seriesCount()).arg(evoked.nave).arg(event).toStdString());
 
     return 0;
 }

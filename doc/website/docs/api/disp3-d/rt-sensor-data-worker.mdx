@@ -72,7 +72,7 @@ This matrix is typically produced by `mne::FwdFieldMap::computeMegMapping()` or 
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   Key of the surface the matrix maps onto; colours are emitted for it.
 
 - **mat** : *std::shared_ptr&lt; Eigen::MatrixXf &gt;*
@@ -97,7 +97,7 @@ Set the colormap type used for color conversion.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
 
 ---

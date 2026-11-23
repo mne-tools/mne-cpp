@@ -137,12 +137,12 @@ int main(int argc, char* argv[])
     int iNfft = iNSamples;
 
     // Frequency of every FFT bin in Hz
-    QVector<double> freqs(iNfft / 2 + 1);
-    for (int k = 0; k < freqs.size(); ++k) {
+    std::vector<double> freqs(iNfft / 2 + 1);
+    for (int k = 0; k < std::ssize(freqs); ++k) {
         freqs[k] = k * dSampFreq / iNfft;
     }
     const auto toVector = [](const VectorXd& v) {
-        return QVector<double>(v.data(), v.data() + v.size());
+        return std::vector<double>(v.data(), v.data() + v.size());
     };
 
     //Plot hanning window
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
     FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
     FigureExporter::save(plotPsd, "psd", "PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide.");
     FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains.");
-    if (!FigureExporter::directory().isEmpty()) {
+    if (!FigureExporter::directory().empty()) {
         return 0;
     }
     plotWindow.show();

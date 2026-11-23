@@ -99,7 +99,7 @@ From [ex_acq_oddball](../../examples/acq/ex_acq_oddball.mdx).
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 300"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 301"
     auto parsed = AcqUri::parse(uri);
     if (!parsed) {
         return fail(parsed.error().text());

@@ -162,7 +162,7 @@ Adds multiple time points (QVector) for a channel set (VectorXd).
 
 **Parameters:**
 
-- **data** : *const QList&lt; Eigen::MatrixXd &gt; &*
+- **data** : *std::span&lt; const Eigen::MatrixXd &gt;*
   data to add (Time points of channel samples).
 
 ---
@@ -253,7 +253,7 @@ Returns a map which conatins the channel idx and its corresponding selection sta
 
 **Returns:**
 
-- *const QMap&lt; qint32, qint32 &gt; &* — the channel idx to selection status.
+- *const std::map&lt; int, int &gt; &* — the channel idx to selection status.
 
 ---
 
@@ -263,7 +263,7 @@ Selects the given list of channel indeces and unselect all other channels.
 
 **Parameters:**
 
-- **selection** : *const QList&lt; qint32 &gt; &*
+- **selection** : *const std::vector&lt; int &gt; &*
   channel index list to select.
 
 ---
@@ -274,7 +274,7 @@ Hides the given list of channel.
 
 **Parameters:**
 
-- **selection** : *const QList&lt; qint32 &gt; &*
+- **selection** : *const std::vector&lt; int &gt; &*
   channel index list to select.
 
 ---
@@ -302,7 +302,7 @@ Set scaling channel scaling.
 
 **Parameters:**
 
-- **p_qMapChScaling** : *const QMap&lt; qint32, float &gt; &*
+- **p_qMapChScaling** : *const std::map&lt; int, float &gt; &*
   Map of scaling factors.
 
 ---
@@ -346,7 +346,7 @@ Update the SPHARA operator.
 
 **Parameters:**
 
-- **sSytemType** : *const QString &*
+- **sSytemType** : *const std::string &*
   The current acquisition system type (VectorView, BabyMEG, EEG).
 
 - **nBaseFctsFirst** : *int*
@@ -363,7 +363,7 @@ Set new filter parameters.
 
 **Parameters:**
 
-- **filterData** : *QList&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt;*
+- **filterData** : *const std::vector&lt; [FilterKernel](/docs/api/dsp/filter-kernel) &gt; &*
   list of the new filter.
 
 ---
@@ -396,7 +396,7 @@ Sets the type of channel which are to be filtered.
 
 **Parameters:**
 
-- **channelType** : *const QString &*
+- **channelType** : *const std::string &*
   the channel type which is to be filtered (EEG, MEG, All).
 
 ---
@@ -435,13 +435,13 @@ markChBad marks the selected channels as bad/good in m_chInfolist
 
 **Parameters:**
 
-- **colorMap** : *const QMap&lt; double, QColor &gt; &*
+- **colorMap** : *const std::map&lt; double, QColor &gt; &*
   color for each trigger channel.
 
 - **active** : *bool*
   real time trigger detection active.
 
-- **triggerCh** : *QString*
+- **triggerCh** : *const std::string &*
   current trigger channel to scan.
 
 - **threshold** : *double*
@@ -492,7 +492,7 @@ Returns current scaling.
 
 **Returns:**
 
-- *const QMap&lt; qint32, float &gt; &* — the current scaling.
+- *const std::map&lt; int, float &gt; &* — the current scaling.
 
 ---
 
@@ -502,7 +502,7 @@ Returns current detected trigger flanks.
 
 **Returns:**
 
-- *QList&lt; QPair&lt; int, double &gt; &gt;* — the current detected trigger flanks.
+- *std::vector&lt; std::pair&lt; int, double &gt; &gt;* — the current detected trigger flanks.
 
 ---
 
@@ -512,7 +512,7 @@ Returns old detected trigger flanks.
 
 **Returns:**
 
-- *QList&lt; QPair&lt; int, double &gt; &gt;* — the old detected trigger flanks.
+- *std::vector&lt; std::pair&lt; int, double &gt; &gt;* — the old detected trigger flanks.
 
 ---
 
@@ -522,7 +522,7 @@ Returns current trigger color.
 
 **Returns:**
 
-- *QMap&lt; double, QColor &gt;* — the current trigger color map fpr each detected type.
+- *std::map&lt; double, QColor &gt;* — the current trigger color map fpr each detected type.
 
 ---
 
@@ -552,7 +552,7 @@ Returns the current trigger name.
 
 **Returns:**
 
-- *QString* — the current trigger name.
+- *std::string* — the current trigger name.
 
 ---
 

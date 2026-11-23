@@ -59,7 +59,7 @@ Each marker is drawn as a coloured vertical line spanning all channel rows, with
 
 **Parameters:**
 
-- **events** : *const QVector&lt; EventMarker &gt; &*
+- **events** : *const std::vector&lt; EventMarker &gt; &*
   List of `EventMarker` objects.
 
 ---
@@ -98,7 +98,7 @@ Set the list of time-span annotations to overlay on the traces.
 
 **Parameters:**
 
-- **annotations** : *const QVector&lt; AnnotationSpan &gt; &*
+- **annotations** : *const std::vector&lt; AnnotationSpan &gt; &*
   List of `AnnotationSpan` objects.
 
 ---
@@ -268,7 +268,7 @@ When `indices` is empty all channels in the model are shown (no filter). When se
 
 **Parameters:**
 
-- **indices** : *const QVector&lt; int &gt; &*
+- **indices** : *const std::vector&lt; int &gt; &*
   Ordered list of model channel indices to display. Pass an empty vector to clear the filter.
 
 ---
@@ -515,21 +515,21 @@ Toggle butterfly mode: all channels of the same type are overlaid in a single la
 
 Pick an acquisition device or its simulator, watch it, record it to FIFF and play the recording back.
 
-````cpp title="src/examples/ex_acq_devices/main.cpp, line 587"
+````cpp title="src/examples/ex_acq_devices/main.cpp, line 588"
     const auto width = static_cast<std::uint64_t>(m_width);
     std::erase_if(m_events, [&](const AcqEvent& e) { return e.sample + width < m_next; }); // overwritten
-    QVector<ChannelRhiView::EventMarker> markers;
+    std::vector<ChannelRhiView::EventMarker> markers;
+    markers.reserve(m_events.size() + 1);
     for (const AcqEvent& e : m_events) {
-        markers.append({static_cast<int>(e.sample % width), e.code, QColor(), QString::number(e.code)});
+        markers.push_back({static_cast<int>(e.sample % width), e.code, QColor(), std::to_string(e.code)});
     }
-    markers.append({static_cast<int>(m_next % width), 0, QColor(0, 110, 230), "now"});
+    markers.push_back({static_cast<int>(m_next % width), 0, QColor(0, 110, 230), "now"});
     std::sort(markers.begin(), markers.end(), [](const auto& a, const auto& b) { return a.sample < b.sample; });
     m_view->setData(m_sweep, 0);
     m_view->setEvents(markers);
     updateHeader();
 }
 if (ended) {
-    stop_source();
 ````
 
 ## Authors of this file

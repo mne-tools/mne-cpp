@@ -942,7 +942,8 @@ int main(int argc, char* argv[])
                                      .arg(shared.traces.size())
                                      .arg(title)
                                      .arg(shared.pulsesWrapped.load())
-                                     .arg(shared.pulsesScheduled.load()),
+                                     .arg(shared.pulsesScheduled.load())
+                                     .toStdString(),
                                  window.size());
             app.quit();
         });

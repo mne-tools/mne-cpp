@@ -733,7 +733,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp3-d/view-visibility-profile',
         'api/disp3-d/gpu-stream',
         'api/disp3-d/instanced-streams',
-        'api/disp3-d/render-key'
+        'api/disp3-d/render-key',
+        'api/disp3-d/periodic-task'
       ],
     },
     {

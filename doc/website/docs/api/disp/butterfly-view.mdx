@@ -94,7 +94,7 @@ Get the activation of the already created modality check boxes.
 
 **Returns:**
 
-- *QMap&lt; QString, bool &gt;* — The current modality map.
+- *std::map&lt; std::string, bool &gt;* — The current modality map.
 
 ---
 
@@ -104,7 +104,7 @@ Set the modality checkboxes.
 
 **Parameters:**
 
-- **modalityMap** : *const QMap&lt; QString, bool &gt; &*
+- **modalityMap** : *const std::map&lt; std::string, bool &gt; &*
   The modality map.
 
 ---
@@ -115,7 +115,7 @@ Sets the scale map to scaleMap.
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
   map with all channel types and their current scaling value.
 
 ---
@@ -126,7 +126,7 @@ Set the selected channels.
 
 **Parameters:**
 
-- **selectedChannels** : *const QList&lt; int &gt; &*
+- **selectedChannels** : *const std::vector&lt; int &gt; &*
   The new selected channels.
 
 ---
@@ -177,7 +177,7 @@ Get the current average colors.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt;* — Pointer to the current average colors.
+- *std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt;* — Pointer to the current average colors.
 
 ---
 
@@ -187,7 +187,7 @@ Get the current average activations.
 
 **Returns:**
 
-- *std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt;* — Pointer to the current average activations.
+- *std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt;* — Pointer to the current average activations.
 
 ---
 
@@ -197,7 +197,7 @@ Set the average colors.
 
 **Parameters:**
 
-- **qMapAverageColor** : *const std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt; &*
+- **qMapAverageColor** : *const std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt; &*
   Pointer to the new average colors.
 
 ---
@@ -219,7 +219,7 @@ Set the average activations.
 
 **Parameters:**
 
-- **qMapAverageActivation** : *const std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt; &*
+- **qMapAverageActivation** : *const std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt; &*
   Pointer to the new average activations.
 
 ---
@@ -241,7 +241,7 @@ Only shows the channels defined in the QStringList selectedChannels.
 
 **Parameters:**
 
-- **selectedChannels** : *const QStringList &*
+- **selectedChannels** : *const std::vector&lt; std::string &gt; &*
   list of all channel names which are currently selected in the selection manager.
 
 ---
@@ -252,7 +252,7 @@ Shows selected channels based on a list of selected channel indices.
 
 **Parameters:**
 
-- **selectedChannelsIndexes** : *const QList&lt; int &gt; &*
+- **selectedChannelsIndexes** : *const std::vector&lt; int &gt; &*
   list of indices of channels channels to be displayed.
 
 ---

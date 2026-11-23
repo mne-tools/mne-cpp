@@ -289,12 +289,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 582,
+      "public_api_units": 583,
       "exported_not_registered": 2,
       "example_eligible": 433,
       "eligible_backed_percent": 99.54,
       "snippets": 463,
-      "registered_test_percent": 44.83
+      "registered_test_percent": 44.92
     },
     "G4_screenshots": {
       "referenced_images": 19,
@@ -312,7 +312,7 @@
       "raw_delete": 0,
       "console_io": 0,
       "numeric_define": 0,
-      "qt_new_unparented": 883
+      "qt_new_unparented": 878
     },
     "G6_parity": {
       "reference": "1.11.0",

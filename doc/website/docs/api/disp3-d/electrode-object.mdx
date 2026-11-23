@@ -79,10 +79,10 @@ Contacts without a value keep the colour of their lead.
 
 **Parameters:**
 
-- **values** : *const QMap&lt; QString, float &gt; &*
+- **values** : *const std::map&lt; std::string, float &gt; &*
   Map of contact name -&gt; scalar value.
 
-- **colormap** : *const QString &*
+- **colormap** : *const std::string &*
   [`ColorMap`](/docs/api/disp/color-map) name.
 
 ---
@@ -109,7 +109,7 @@ ECoG contacts are first moved onto the surface; depth contacts are not.
 
 **Returns:**
 
-- *QVector&lt; uint32_t &gt;* — ABGR colour per vertex, transparent away from the contacts; empty without values.
+- *std::vector&lt; uint32_t &gt;* — ABGR colour per vertex, transparent away from the contacts; empty without values.
 
 ---
 
@@ -121,7 +121,7 @@ Clears the previous selection.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Contact name to select.
 
 ---
@@ -136,7 +136,7 @@ Clear the contact selection.
 
 **Returns:**
 
-- *QString* — Name of the currently selected contact, or empty string if none.
+- *std::string* — Name of the currently selected contact, or empty string if none.
 
 ---
 
@@ -202,7 +202,7 @@ Intersect a ray with the contact spheres.
 
 **Returns:**
 
-- *QString* — Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
+- *std::string* — Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
 
 ---
 
@@ -289,7 +289,7 @@ Intersect a ray with the contact spheres.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 137"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 139"
 ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
 electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");

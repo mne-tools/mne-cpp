@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
     }
 
     // Load source space from forward solution file for visualization
-    pBrainView->loadSourceSpace(parser.value(fwdFileOption));
+    pBrainView->loadSourceSpace(parser.value(fwdFileOption).toStdU16String());
 
     //Visualize result in 3D
     pBrainView->show();

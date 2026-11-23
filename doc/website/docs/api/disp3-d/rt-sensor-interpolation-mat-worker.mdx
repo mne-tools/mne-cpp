@@ -91,7 +91,7 @@ This must include vertex positions and normals (for MEG).
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   The key identifying the surface.
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -111,7 +111,7 @@ Set the surface geometry used for EEG field mapping.
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   The key identifying the surface.
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -127,7 +127,7 @@ Triggers recomputation if changed.
 
 **Parameters:**
 
-- **bads** : *const QStringList &*
+- **bads** : *const std::vector&lt; std::string &gt; &*
   List of bad channel names.
 
 ---

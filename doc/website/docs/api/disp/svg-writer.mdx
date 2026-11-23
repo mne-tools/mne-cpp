@@ -67,8 +67,8 @@ Writes the document to the file `fileName`; clears a previously set output devic
 
 **Parameters:**
 
-- **fileName** : *const QString &*
-  Path of the SVG file.
+- **fileName** : *const std::string &*
+  Path of the SVG file, UTF-8.
 
 ---
 
@@ -78,7 +78,7 @@ Returns the file the document is written to, or an empty string when an output d
 
 **Returns:**
 
-- *QString* — The file name.
+- *std::string* — The file name.
 
 ---
 
@@ -164,7 +164,7 @@ Sets the text of the document's title element.
 
 **Parameters:**
 
-- **title** : *const QString &*
+- **title** : *const std::string &*
   The title; no title element is written when it is empty.
 
 ---
@@ -175,7 +175,7 @@ Returns the title.
 
 **Returns:**
 
-- *QString* — The title.
+- *std::string* — The title.
 
 ---
 
@@ -185,7 +185,7 @@ Sets the text of the document's desc element.
 
 **Parameters:**
 
-- **description** : *const QString &*
+- **description** : *const std::string &*
   The description; no desc element is written when it is empty.
 
 ---
@@ -196,7 +196,7 @@ Returns the description.
 
 **Returns:**
 
-- *QString* — The description.
+- *std::string* — The description.
 
 ---
 

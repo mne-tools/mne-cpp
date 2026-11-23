@@ -43,7 +43,7 @@ Default constructor.
 - **parent** : *QWidget **
   The parent of the QObject.
 
-- **slFlags** : *const QStringList &*
+- **slFlags** : *const std::vector&lt; std::string &gt; &*
   The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
 
 - **type** : *Qt::WindowType*
@@ -63,7 +63,7 @@ Set the flags specifying which part of the GUI should be shown.
 
 **Parameters:**
 
-- **slFlags** : *const QStringList &*
+- **slFlags** : *const std::vector&lt; std::string &gt; &*
   flags.
 
 ---

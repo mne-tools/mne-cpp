@@ -109,7 +109,7 @@ Updates the layout map.
 
 **Parameters:**
 
-- **layoutMap** : *const QMap&lt; QString, QPointF &gt; &*
+- **layoutMap** : *const std::map&lt; std::string, QPointF &gt; &*
   the layout map with the 2D positions.
 
 ---
@@ -120,7 +120,7 @@ Updates the layout map.
 
 **Returns:**
 
-- *const QStringList &* — the current mapped channel list.
+- *const std::vector&lt; std::string &gt; &* — the current mapped channel list.
 
 ---
 
@@ -130,7 +130,7 @@ Returns the model index for the given input channel fro mthe original channel li
 
 **Parameters:**
 
-- **chName** : *QString*
+- **chName** : *const std::string &*
   the channel name for which the model index is needed.
 
 **Returns:**
@@ -145,7 +145,7 @@ Returns the model index for the given input channel fro mthe mapped channel list
 
 **Parameters:**
 
-- **chName** : *QString*
+- **chName** : *const std::string &*
   the channel name for which the model index is needed.
 
 **Returns:**

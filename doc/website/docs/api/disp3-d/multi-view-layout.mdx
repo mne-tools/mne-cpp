@@ -130,7 +130,7 @@ Given a cursor position and output size, determine which viewport index the curs
 - **pos** : *const QPoint &*
   Cursor position (widget coords).
 
-- **enabledViewports** : *const QVector&lt; int &gt; &*
+- **enabledViewports** : *const std::vector&lt; int &gt; &*
   Ordered list of enabled viewport indices.
 
 - **outputSize** : *const QSize &*
@@ -231,7 +231,7 @@ Return the Qt::CursorShape appropriate for a splitter hit.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 295"
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 297"
 MultiViewLayout layout;
 layout.setSplitX(0.25f);
 const QSize canvas(800, 600);

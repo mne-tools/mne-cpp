@@ -93,7 +93,7 @@ Size: (nVertices × nChannels).
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   Key of the surface the matrix maps onto; colours are emitted for it.
 
 - **mat** : *std::shared_ptr&lt; Eigen::MatrixXf &gt;*
@@ -150,7 +150,7 @@ Set the colormap type.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name ("MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue").
 
 ---
@@ -254,7 +254,7 @@ Set the MEG target surface geometry for on-the-fly mapping.
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   The key identifying the surface.
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -274,7 +274,7 @@ Set the EEG target surface geometry for on-the-fly mapping.
 
 **Parameters:**
 
-- **surfaceKey** : *const QString &*
+- **surfaceKey** : *const std::string &*
   The key identifying the surface.
 
 - **vertices** : *const Eigen::MatrixX3f &*
@@ -288,7 +288,7 @@ Set bad channels for the interpolation worker.
 
 **Parameters:**
 
-- **bads** : *const QStringList &*
+- **bads** : *const std::vector&lt; std::string &gt; &*
   List of bad channel names.
 
 ---

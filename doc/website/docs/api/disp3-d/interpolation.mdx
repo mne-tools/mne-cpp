@@ -20,8 +20,8 @@ This class holds methods for creating distance-based weight matrices and for int
 This class holds methods for creating distance-based weight matrices and for interpolating signals
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
-QSharedPointer<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
-const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                     // one value per sensor
+std::shared_ptr<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                      // one value per sensor
 ```
 
 ---
@@ -43,7 +43,7 @@ createInterpolationMat Calculates the weight matrix for interpolation.
 - **vecProjectedSensors** : *const Eigen::VectorXi &*
   Mesh vertex index of each sensor (one column per sensor).
 
-- **matDistanceTable** : *const QSharedPointer&lt;Eigen::MatrixXd&gt;*
+- **matDistanceTable** : *const std::shared_ptr&lt; Eigen::MatrixXd &gt; &*
   Distance table (nVertices x nSensors), e.g. from `GeometryInfo::scdc`.
 
 - **interpolationFunction** : *double(*)(double)*
@@ -57,7 +57,7 @@ createInterpolationMat Calculates the weight matrix for interpolation.
 
 **Returns:**
 
-- *QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Row-normalised sparse weight matrix (nVertices x nSensors), or an empty matrix if the table is empty.
+- *std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt;* — Row-normalised sparse weight matrix (nVertices x nSensors), or an empty matrix if the table is empty.
 
 ---
 
@@ -67,10 +67,10 @@ interpolateSignal Interpolates sensor data using the weight matrix (shared point
 
 **Parameters:**
 
-- **matInterpolationMatrix** : *const QSharedPointer&lt; Eigen::SparseMatrix&lt; float &gt; &gt;*
+- **matInterpolationMatrix** : *const std::shared_ptr&lt; Eigen::SparseMatrix&lt; float &gt; &gt; &*
   Weight matrix (nVertices x nSensors).
 
-- **vecMeasurementData** : *const QSharedPointer&lt;Eigen::VectorXf&gt; &*
+- **vecMeasurementData** : *const std::shared_ptr&lt; Eigen::VectorXf &gt; &*
   Sensor values (nSensors).
 
 **Returns:**
@@ -169,9 +169,9 @@ cubic Cubic hyperbola interpolation function.
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 124"
-QSharedPointer<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
-const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                     // one value per sensor
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 126"
+std::shared_ptr<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                      // one value per sensor
 // vertex 5: weights 1/2 and 1/4, normalised to 2/3 and 1/3 -> 1 * 2/3 + 4 * 1/3 = 2; vertex 3 is equidistant -> 2.5
 ok &= expect(std::fabs(atVertices(0) - 1.0f) < 1e-6f && std::fabs(atVertices(15) - 4.0f) < 1e-6f && std::fabs(atVertices(5) - 2.0f) < 1e-6f && std::fabs(atVertices(3) - 2.5f) < 1e-6f,
              std::format("Interpolation: sensors kept, vertex 5 = {:g}, vertex 3 = {:g}", atVertices(5), atVertices(3)));
@@ -184,10 +184,10 @@ Map evoked MEG values onto a surface mesh with surface-constrained distances (Ge
 ````cpp title="src/examples/ex_interpolation/main.cpp, line 136"
 //weight matrix
 qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
-QSharedPointer<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
-                                                                                                distanceMatrix,
-                                                                                                Interpolation::linear,
-                                                                                                FLOAT_INFINITY);
+std::shared_ptr<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
+                                                                                                 distanceMatrix,
+                                                                                                 Interpolation::linear,
+                                                                                                 FLOAT_INFINITY);
 std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat << " ms " << std::endl;
 ````
 

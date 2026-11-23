@@ -17,14 +17,14 @@ class mne::disp::LinePlot
 
 Simple x / y line-series QWidget rendered with QPainter (no Qt Charts dependency).
 
-Supports multiple series, a settable title and x / y labels and auto-ranging axes. Series are stored as `QVector<double>` pairs and re-drawn during `paintEvent`.
+Supports multiple series, a settable title and x / y labels and auto-ranging axes. Series are stored as `std::vector<double>` pairs and re-drawn during `paintEvent`.
 
 ```cpp title="src/examples/ex_disp_plots/main.cpp"
-QVector<double> x;
-QVector<double> y;
+std::vector<double> x;
+std::vector<double> y;
 for (int i = 0; i <= 100; ++i) {
-    x.append(i / 100.0);
-    y.append(std::sin(2.0 * std::numbers::pi * x.last()));
+    x.push_back(i / 100.0);
+    y.push_back(std::sin(2.0 * std::numbers::pi * x.back()));
 }
 LinePlot line(x, y, "sin(2 pi t)");
 line.setXLabel("t [s]");
@@ -59,7 +59,7 @@ Constructs a line series plot.
 
 **Parameters:**
 
-- **y** : *const QVector&lt; double &gt; &*
+- **y** : *const std::vector&lt; double &gt; &*
   The double data vector.
 
 - **title** : *const QString &*
@@ -76,10 +76,10 @@ Constructs a line series plot.
 
 **Parameters:**
 
-- **x** : *const QVector&lt; double &gt; &*
+- **x** : *const std::vector&lt; double &gt; &*
   X-Axis data to plot.
 
-- **y** : *const QVector&lt; double &gt; &*
+- **y** : *const std::vector&lt; double &gt; &*
   Y-Axis data to plot.
 
 - **title** : *const QString &*
@@ -135,7 +135,7 @@ Updates the plot using a given double vector without given X data.
 
 **Parameters:**
 
-- **y** : *const QVector&lt; double &gt; &*
+- **y** : *const std::vector&lt; double &gt; &*
   The double data vector.
 
 ---
@@ -146,10 +146,10 @@ Updates the plot using the given vectors.
 
 **Parameters:**
 
-- **x** : *const QVector&lt; double &gt; &*
+- **x** : *const std::vector&lt; double &gt; &*
   X-Axis data to plot.
 
-- **y** : *const QVector&lt; double &gt; &*
+- **y** : *const std::vector&lt; double &gt; &*
   Y-Axis data to plot.
 
 ---
@@ -160,10 +160,10 @@ Adds a series to the plot; the axes grow to include it and a legend lists the la
 
 **Parameters:**
 
-- **x** : *const QVector&lt; double &gt; &*
+- **x** : *const std::vector&lt; double &gt; &*
   X-Axis data to plot.
 
-- **y** : *const QVector&lt; double &gt; &*
+- **y** : *const std::vector&lt; double &gt; &*
   Y-Axis data to plot.
 
 - **label** : *const QString &*
@@ -237,8 +237,8 @@ traces.setTitle("First of 20 trials, channels offset by 4");
 traces.setXLabel("Time [ms]");
 traces.setYLabel("Amplitude");
 for (int ch = 0; ch < 3; ++ch) {
-    QVector<double> values(ms.size());
-    for (int t = 0; t < ms.size(); ++t) {
+    std::vector<double> values(ms.size());
+    for (int t = 0; t < std::ssize(ms); ++t) {
         values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
     }
     traces.addSeries(ms, values, QStringList{"0: 10 Hz sine + noise", "1: channel 0, 12 ms later, + noise", "2: noise"}[ch]);

@@ -227,27 +227,28 @@ int main(int argc, char* argv[])
     plot.setTitle("Two seconds of the recording, read back from FIFF");
     plot.setXLabel("Time [s]");
     plot.setYLabel("Amplitude [uV], offset per channel");
-    QVector<double> t(static_cast<int>(data.cols()));
-    for (int s = 0; s < t.size(); ++s) {
-        t[s] = times(0, s);
+    std::vector<double> t(static_cast<std::size_t>(data.cols()));
+    for (int s = 0; s < std::ssize(t); ++s) {
+        t[static_cast<std::size_t>(s)] = times(0, s);
     }
     for (int c = 0; c < 4; ++c) {
-        QVector<double> y(t.size());
-        for (int s = 0; s < y.size(); ++s) {
-            y[s] = data(c, s) * 1e6 - 40.0 * c;
+        std::vector<double> y(t.size());
+        for (int s = 0; s < std::ssize(y); ++s) {
+            y[static_cast<std::size_t>(s)] = data(c, s) * 1e6 - 40.0 * c;
         }
         plot.addSeries(t, y, QString::fromStdString(raw.info.ch_names[static_cast<std::size_t>(c)]));
     }
-    QVector<double> trigger(t.size());
-    for (int s = 0; s < trigger.size(); ++s) {
-        trigger[s] = data(raw.info.nchan - 1, s) * 10.0 - 200.0;
+    std::vector<double> trigger(t.size());
+    for (int s = 0; s < std::ssize(trigger); ++s) {
+        trigger[static_cast<std::size_t>(s)] = data(raw.info.nchan - 1, s) * 10.0 - 200.0;
     }
     plot.addSeries(t, trigger, QString("%1 x 10").arg(raw.info.ch_names.back()), QColor(), Qt::DashLine);
     FigureExporter::save(plot, "acq_record",
                          QString("The first EEG channels and the trigger channel of a 10 s simulated oddball session, as "
                                  "AcqRecorder stored them while the source ran (%1 samples, %2 events, none lost).")
                              .arg(stats.samples)
-                             .arg(stats.events));
+                             .arg(stats.events)
+                             .toStdString());
     return 0;
 }
 ````

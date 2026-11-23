@@ -55,16 +55,16 @@ Start async STC file loading on a background thread.
 
 **Parameters:**
 
-- **lhPath** : *const QString &*
+- **lhPath** : *const std::filesystem::path &*
   Path to left-hemisphere STC file.
 
-- **rhPath** : *const QString &*
+- **rhPath** : *const std::filesystem::path &*
   Path to right-hemisphere STC file.
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map for finding lh/rh brain surfaces.
 
-- **activeSurfaceType** : *const QString &*
+- **activeSurfaceType** : *const std::string &*
   Active surface type name (e.g. "pial").
 
 **Returns:**
@@ -104,13 +104,13 @@ Set the current STC time-point and apply colours to matching surfaces.
 - **index** : *int*
   Time-point index.
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map.
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   Single-view state (for active surface type).
 
-- **subViews** : *const QVector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
+- **subViews** : *const std::vector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
   Multi-view states.
 
 ---
@@ -166,7 +166,7 @@ Set the colormap used for source estimate visualisation.
 
 **Parameters:**
 
-- **name** : *const QString &*
+- **name** : *const std::string &*
   Colormap name (e.g. "Hot", "Jet").
 
 ---
@@ -196,13 +196,13 @@ Feeds all STC time-points into the streaming queue and begins the interpolation 
 
 **Parameters:**
 
-- **surfaces** : *const QMap&lt; QString, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
+- **surfaces** : *const std::map&lt; std::string, std::shared_ptr&lt; [BrainSurface](/docs/api/disp3-d/brain-surface) &gt; &gt; &*
   [`FsSurface`](/docs/api/fs/fs-surface) map (for colour application).
 
 - **singleView** : *const [SubView](/docs/api/disp3-d/sub-view) &*
   Single-view state.
 
-- **subViews** : *const QVector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
+- **subViews** : *const std::vector&lt; [SubView](/docs/api/disp3-d/sub-view) &gt; &*
   Multi-view states.
 
 ---

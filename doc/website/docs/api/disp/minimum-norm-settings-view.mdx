@@ -74,7 +74,7 @@ Sets the model checkpoint path shown in the read-only line edit.
 
 **Parameters:**
 
-- **sPath** : *const QString &*
+- **sPath** : *const std::filesystem::path &*
   Absolute path to the model checkpoint file (e.g. .onnx).
 
 ---
@@ -85,7 +85,7 @@ Returns the current model checkpoint path.
 
 **Returns:**
 
-- *QString* — Absolute path to the model checkpoint file, or an empty string if none is set.
+- *std::filesystem::path* — Absolute path to the model checkpoint file, or an empty string if none is set.
 
 ---
 

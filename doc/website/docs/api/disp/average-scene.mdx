@@ -51,7 +51,7 @@ Sets the scale map to scaleMap.
 
 **Parameters:**
 
-- **scaleMap** : *const QMap&lt; qint32, float &gt; &*
+- **scaleMap** : *const std::map&lt; int, float &gt; &*
   map with all channel types and their current scaling value.
 
 ---
@@ -90,7 +90,7 @@ Set the activation per average map information.
 
 **Parameters:**
 
-- **qMapActivationPerAverage** : *const std::shared_ptr&lt; QMap&lt; QString, bool &gt; &gt; &*
+- **qMapActivationPerAverage** : *const std::shared_ptr&lt; std::map&lt; std::string, bool &gt; &gt; &*
   The average activation information.
 
 ---
@@ -101,7 +101,7 @@ Set the color per average map information.
 
 **Parameters:**
 
-- **qMapAverageColor** : *const std::shared_ptr&lt; QMap&lt; QString, QColor &gt; &gt; &*
+- **qMapAverageColor** : *const std::shared_ptr&lt; std::map&lt; std::string, QColor &gt; &gt; &*
   The average color information.
 
 ---

@@ -158,8 +158,10 @@ The documented classes this example uses most:
 #include <cmath>
 #include <cstdlib>
 #include <format>
+#include <map>
 #include <memory>
 #include <print>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -216,18 +218,18 @@ int main(int argc, char* argv[])
 
     //! [geometry_info_usage]
     MatrixX3f sensors(2, 3);
-    sensors << -0.2f, 0.1f, 0.5f,                                                            // above vertex 0
-        3.1f, 2.9f, 0.4f;                                                                    // above vertex 15
-    VectorXi projected = GeometryInfo::projectSensors(vertices, sensors);                    // nearest vertex per sensor
-    QSharedPointer<MatrixXd> distances = GeometryInfo::scdc(vertices, neighbors, projected); // geodesic: n_vertices x n_sensors
+    sensors << -0.2f, 0.1f, 0.5f,                                                             // above vertex 0
+        3.1f, 2.9f, 0.4f;                                                                     // above vertex 15
+    VectorXi projected = GeometryInfo::projectSensors(vertices, sensors);                     // nearest vertex per sensor
+    std::shared_ptr<MatrixXd> distances = GeometryInfo::scdc(vertices, neighbors, projected); // geodesic: n_vertices x n_sensors
     //! [geometry_info_usage]
     // scipy.sparse.csgraph.dijkstra on the same graph: Manhattan distances to vertices 0 and 15
     ok &= expect(projected == Vector2i(0, 15) && distances->rows() == 16 && (*distances)(5, 0) == 2.0 && (*distances)(5, 1) == 4.0 && (*distances)(3, 0) == 3.0 && (*distances)(3, 1) == 3.0,
                  "GeometryInfo projects the sensors onto vertices 0 and 15; geodesic distances match scipy");
 
     //! [interpolation_usage]
-    QSharedPointer<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
-    const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                     // one value per sensor
+    std::shared_ptr<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+    const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                      // one value per sensor
     //! [interpolation_usage]
     // vertex 5: weights 1/2 and 1/4, normalised to 2/3 and 1/3 -> 1 * 2/3 + 4 * 1/3 = 2; vertex 3 is equidistant -> 2.5
     ok &= expect(std::fabs(atVertices(0) - 1.0f) < 1e-6f && std::fabs(atVertices(15) - 4.0f) < 1e-6f && std::fabs(atVertices(5) - 2.0f) < 1e-6f && std::fabs(atVertices(3) - 2.5f) < 1e-6f,
@@ -256,7 +258,7 @@ int main(int argc, char* argv[])
     SliceObject slice;
     slice.setSlice(axial, mne::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
     slice.setWindowLevel(100.0f, 200.0f);
-    QVector<float> quad; // 4 corners x (x, y, z, u, v)
+    std::vector<float> quad; // 4 corners x (x, y, z, u, v)
     slice.generateQuadVertices(quad);
     //! [slice_object_usage]
     ok &= expect(quad.size() == 20 && quad[0] == -128.0f && quad[1] == -128.0f && quad[2] == 0.0f && quad[15] == 128.0f && quad[16] == 128.0f && quad[17] == 0.0f && quad[18] == 1.0f && slice.windowWidth() == 200.0f,
@@ -410,10 +412,10 @@ int main(int argc, char* argv[])
     //! [sensor_field_mapper_usage]
     // Contour spacing for a field map spanning +-120 fT with about 10 lines
     const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
-    QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;
-    sceneSurfaces.insert("bem_inner_skull", std::make_shared<BrainSurface>());
-    sceneSurfaces.insert("bem_head", std::make_shared<BrainSurface>());
-    const QString headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+    std::map<std::string, std::shared_ptr<BrainSurface>> sceneSurfaces;
+    sceneSurfaces.emplace("bem_inner_skull", std::make_shared<BrainSurface>());
+    sceneSurfaces.emplace("bem_head", std::make_shared<BrainSurface>());
+    const std::string headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
     //! [sensor_field_mapper_usage]
     ok &= expect(std::abs(contourSpacing - 50e-15f) < 1e-20f && headKey == "bem_head", "SensorFieldMapper: 50 fT contours, EEG map on bem_head");
 
