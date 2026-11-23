@@ -198,7 +198,8 @@ public:
     //=========================================================================================================
     /**
      * Estimates the offset between the outlet host's clock and local_clock() from round trips to the outlet's
-     * service port, keeping the one with the shortest round-trip time.
+     * service port, keeping the one with the shortest round-trip time. It sends at least 8 probes and goes on,
+     * up to 64, until one returns within 1 ms, so a host that delays a burst of replies does not bias the result.
      *
      * @param[in] timeout   Maximum wait in seconds.
      *

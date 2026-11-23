@@ -16,6 +16,7 @@
 
 #include <mne/base/base_global.h>
 #include <mne/lsl/lsl.h>
+#include <mne/com/udp_socket.h>
 #include <mne/lsl/lsl_protocol.h>
 
 //=============================================================================================================
@@ -36,6 +37,9 @@
 #include <cstdint>
 #include <chrono>
 #include <span>
+#include <thread>
+#include <format>
+#include <atomic>
 #include <string>
 #include <string_view>
 
@@ -111,6 +115,7 @@ private slots:
 
     void testStreamInletOpenInvalidHost();
     void testStreamInletPullWithoutOpen();
+    void testTimeCorrectionOutlastsSlowReplies();
 
     //=========================================================================================================
     // End-to-end data flow tests
@@ -517,6 +522,56 @@ void TestLsl::testStreamInletPullWithoutOpen()
     // Pull without opening should return empty
     auto chunk = inlet.pull_chunk_float();
     QVERIFY(chunk.empty());
+}
+
+//=============================================================================================================
+
+void TestLsl::testTimeCorrectionOutlastsSlowReplies()
+{
+    // A stand-in outlet on this host (same clock, true correction 0) that holds its first replies back before
+    // stamping them, like an outlet whose thread is descheduled on a loaded machine: those replies take
+    // 20 ms one way only and claim a 10 ms offset. Later replies are prompt.
+    auto responder = mne::UdpSocket::bind("127.0.0.1", 0);
+    QVERIFY(responder);
+    constexpr int kSlowReplies = 12;
+    std::atomic<bool> stop{false};
+    std::atomic<int> sendErrors{0};
+    std::thread server([&] {
+        std::array<std::byte, 512> buffer{};
+        int answered = 0;
+        while (!stop.load()) {
+            const auto datagram = responder->receive_from(buffer, std::chrono::milliseconds(20));
+            if (!datagram) {
+                continue;
+            }
+            const std::string text(reinterpret_cast<const char*>(buffer.data()), datagram->size);
+            const std::size_t line = text.find("\r\n");
+            if (line == std::string::npos || !text.starts_with("LSL:timedata")) {
+                continue;
+            }
+            std::string request = text.substr(line + 2);
+            while (!request.empty() && (request.back() == '\n' || request.back() == '\r')) {
+                request.pop_back();
+            }
+            if (answered++ < kSlowReplies) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            }
+            const double now = mne::local_clock();
+            const std::string reply = std::format(" {} {:.17g} {:.17g}", request, now, now);
+            if (responder->send_to(std::as_bytes(std::span(reply)), datagram->address, datagram->port)) {
+                ++sendErrors;
+            }
+        }
+    });
+    stream_info info("Correction", "EEG", 1, 100.0);
+    info.set_data_host("127.0.0.1");
+    info.set_service_port(responder->port());
+    stream_inlet inlet(info);
+    const double correction = inlet.time_correction(5.0);
+    stop = true;
+    server.join();
+    QCOMPARE(sendErrors.load(), 0);
+    QVERIFY2(std::abs(correction) < 1e-3, qPrintable(QString("correction %1 ms").arg(correction * 1e3)));
 }
 
 //=============================================================================================================

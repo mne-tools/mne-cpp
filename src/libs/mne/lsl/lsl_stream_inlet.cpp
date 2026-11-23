@@ -229,12 +229,16 @@ public:
         if (!socket) {
             return std::numeric_limits<double>::quiet_NaN();
         }
-        constexpr int kProbes = 8;
+        // The estimate is off by at most half the round trip of the probe it uses. A loaded host can delay
+        // every reply of a short burst, so probing goes on past the first few until one returns promptly.
+        constexpr int kMinProbes = 8;
+        constexpr int kMaxProbes = 64;
+        constexpr double kPromptRtt = 1e-3;
         double bestRtt = std::numeric_limits<double>::infinity();
         double best = std::numeric_limits<double>::quiet_NaN();
         const Clock::time_point deadline = Clock::now() + std::chrono::duration_cast<Clock::duration>(std::chrono::duration<double>(timeout));
         std::array<std::byte, 512> buffer{};
-        for (int wave = 0; wave < kProbes && Clock::now() < deadline; ++wave) {
+        for (int wave = 0; wave < kMaxProbes && Clock::now() < deadline && (wave < kMinProbes || bestRtt > kPromptRtt); ++wave) {
             const double t0 = local_clock();
             const std::string probe = std::format("LSL:timedata\r\n{} {:.17g}\r\n", wave, t0);
             if (socket->send_to(bytes(probe), m_info.data_host(), static_cast<std::uint16_t>(port))) {
