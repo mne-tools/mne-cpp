@@ -221,8 +221,9 @@ def suite_forward(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]
     bem = SAMPLE / "subjects/sample/bem/sample-5120-5120-5120-bem-sol.fif"
     with tempfile.TemporaryDirectory() as tmp:
         fwd = Path(tmp) / "cpp-fwd.fif"
+        # MNE-Python uses the accurate coil definitions, the MNE-C style tool the normal ones unless asked
         command = [str(binary(build, "mne_forward_solution")), "--meas", str(raw), "--mri", str(trans), "--src", str(src),
-                   "--bem", str(bem), "--meg", "--eeg", "--mindist", "5", "--fwd", str(fwd)]
+                   "--bem", str(bem), "--meg", "--eeg", "--mindist", "5", "--accurate", "--fwd", str(fwd)]
         cpp = repeated(args.repeats, lambda: measured(command, tool_env(build))[0])
         series = [{"label": "MNE-CPP", "points": [{"x": "oct-6, MEG+EEG, 3-layer BEM", "y": cpp["median"]}]}]
         if args.python:
