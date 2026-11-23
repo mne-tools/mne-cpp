@@ -41,7 +41,7 @@
       "report",
       "sts"
     ],
-    "tokens": 6784,
+    "tokens": 6782,
     "gui_outside_design": []
   },
   "libraries": {
@@ -134,14 +134,14 @@
       "modules": []
     },
     "disp": {
-      "tokens": 5151,
+      "tokens": 5149,
       "by_category": {
         "containers": 33,
         "files": 99,
         "global": 1165,
         "gui": 947,
         "objects_signals": 531,
-        "other": 1520,
+        "other": 1518,
         "strings": 847,
         "time": 9
       },
