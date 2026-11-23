@@ -30,7 +30,14 @@ RESULTS = {
 
 class TestRenderCharts(unittest.TestCase):
     def test_nice_ceiling(self):
-        self.assertEqual([charts.nice_ceiling(v) for v in (0.7, 3, 7, 12, 99)], [1, 5, 10, 20, 100])
+        self.assertEqual([charts.nice_ceiling(v) for v in (0.7, 3, 7, 12, 20.6, 99)], [1, 5, 10, 20, 25, 100])
+
+    def test_reference_is_named_only_on_charts_that_compare_with_it(self):
+        own = {"id": "acq", "title": "Ring", "unit": "GB/s", "higher_is_better": True, "command": "mne_acq_bench",
+               "series": [{"label": "MNE-CPP", "points": [{"x": "64 channels", "y": 17.7}]}]}
+        svgs = charts.render({**RESULTS, "charts": [own, RESULTS["charts"][0]]})
+        self.assertNotIn("MNE-Python 1.11", svgs["acq.svg"])
+        self.assertIn("Reference: MNE-Python 1.11", svgs["forward.svg"])
 
     def test_chart_is_valid_svg_with_provenance(self):
         svg = charts.render(RESULTS)["forward.svg"]

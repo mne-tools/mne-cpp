@@ -33,11 +33,11 @@ PALETTE = ["#0b6ea8", "#e8833a", "#5aa05a", "#9467bd", "#8c564b"]
 
 
 def nice_ceiling(value: float) -> float:
-    """The smallest 1, 2 or 5 times a power of ten that is at least value."""
+    """The smallest 1, 2, 2.5 or 5 times a power of ten that is at least value."""
     if value <= 0:
         return 1.0
     power = 10 ** math.floor(math.log10(value))
-    for step in (1, 2, 5, 10):
+    for step in (1, 2, 2.5, 5, 10):
         if value <= step * power:
             return step * power
     return 10 * power
@@ -55,10 +55,15 @@ def format_value(value: float) -> str:
     return f"{value:.3g}"
 
 
-def footer(environment: dict[str, str], command: str, y: float) -> tuple[list[str], float]:
+def compares_with_reference(chart: dict[str, Any]) -> bool:
+    return any(series["label"].startswith("MNE-Python") for series in chart["series"])
+
+
+def footer(environment: dict[str, str], chart: dict[str, Any], y: float) -> tuple[list[str], float]:
+    command = chart["command"]
     lines = [f"{environment['machine']} · {environment['os']} · {environment['compiler']} · "
              f"commit {environment['commit']} · {environment['date']}"]
-    if environment.get("reference"):
+    if environment.get("reference") and compares_with_reference(chart):
         lines.append(f"Reference: {environment['reference']}")
     lines.append(f"Reproduce: {command}")
     out = [f'<text x="12" y="{y + 16 * (i + 1):.0f}" font-size="11" fill="#555" {FONT}>{escape(t)}</text>'
@@ -122,7 +127,7 @@ def bar_chart(chart: dict[str, Any], environment: dict[str, str]) -> str:
     for note in chart.get("notes", []):
         body.append(f'<text x="12" y="{y + 14:.0f}" font-size="11" fill="#b00020" {FONT}>{escape(note)}</text>')
         y += 16
-    notes, height = footer(environment, chart["command"], y)
+    notes, height = footer(environment, chart, y)
     return svg(chart, height, body + notes)
 
 
