@@ -72,14 +72,14 @@ void PluginManager::loadPlugins(const QString& dir)
                 if (pluginType == AbstractPlugin::_ISensor) {
                     if (AbstractSensor* pSensor = qobject_cast<AbstractSensor*>(pPlugin)) {
                         m_qVecSensorPlugins.push_back(pSensor);
-                        mne::Log::debug("Sensor {} loaded.", pSensor->getName());
+                        mne::Log::debug("Sensor {} loaded.", pSensor->getName().toStdString());
                     }
                 }
                 // AbstractAlgorithm
                 else if (pluginType == AbstractPlugin::_IAlgorithm) {
                     if (AbstractAlgorithm* pAlgorithm = qobject_cast<AbstractAlgorithm*>(pPlugin)) {
                         m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                        mne::Log::debug("RTAlgorithm {} loaded.", pAlgorithm->getName());
+                        mne::Log::debug("RTAlgorithm {} loaded.", pAlgorithm->getName().toStdString());
                     }
                 }
 
