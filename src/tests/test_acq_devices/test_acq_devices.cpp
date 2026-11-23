@@ -46,6 +46,7 @@
 
 #include <algorithm>
 #include <array>
+#include <limits>
 #include <atomic>
 #include <filesystem>
 #include <fstream>
@@ -3438,7 +3439,10 @@ void TestAcqDevices::testBrainFlowFileMatchesBrainFlow()
     for (std::size_t s = 0; s < samples; ++s) {
         for (std::size_t r = 0; r < 32; ++r) {
             const double expected = brainflow[r * samples + s] * info->channels[r].scale;
-            QVERIFY2(std::abs(recording.at(s, r) - expected) <= 5e-7 * info->channels[r].scale,
+            // Six decimals round by up to half a unit of the last digit; a value that BrainFlow printed from
+            // exactly half way ends that far off plus the rounding of the double itself.
+            const double tolerance = (5e-7 + 4 * std::numeric_limits<double>::epsilon() * std::abs(brainflow[r * samples + s])) * info->channels[r].scale;
+            QVERIFY2(std::abs(recording.at(s, r) - expected) <= tolerance,
                      qPrintable(QString("sample %1 row %2: %3 vs %4").arg(s).arg(r).arg(recording.at(s, r), 0, 'g', 17).arg(expected, 0, 'g', 17)));
         }
     }
