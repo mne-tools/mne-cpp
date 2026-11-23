@@ -187,7 +187,7 @@ private:
 
     // producer management
     QThread m_producerThread;
-    LSLAdapterProducer* m_pProducer;
+    std::unique_ptr<LSLAdapterProducer> m_pProducer; /**< Reads the stream on m_producerThread. */
 
 signals:
     //=========================================================================================================

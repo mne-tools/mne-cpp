@@ -63,7 +63,7 @@ LSLAdapter::LSLAdapter()
 , m_currentStream()
 , m_bHasValidStream(false)
 , m_producerThread()
-, m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
+, m_pProducer(std::make_unique<LSLAdapterProducer>(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
     qRegisterMetaType<mne::stream_info>();
@@ -74,10 +74,10 @@ LSLAdapter::LSLAdapter()
 
 LSLAdapter::~LSLAdapter()
 {
+    // The producer lives on m_producerThread; once that has finished, m_pProducer deletes it here.
     m_pProducer->stop();
+    m_producerThread.quit();
     m_producerThread.wait();
-    m_pProducer->deleteLater();
-    m_producerThread.deleteLater();
 }
 
 //=============================================================================================================
@@ -94,8 +94,8 @@ void LSLAdapter::init()
     // move producer to thread and connect a few synchronization points
     m_pProducer->moveToThread(&m_producerThread);
     connect(&m_producerThread, &QThread::started,
-            m_pProducer, &LSLAdapterProducer::readStream);
-    connect(m_pProducer, &LSLAdapterProducer::finished,
+            m_pProducer.get(), &LSLAdapterProducer::readStream);
+    connect(m_pProducer.get(), &LSLAdapterProducer::finished,
             &m_producerThread, &QThread::quit, Qt::DirectConnection); // apparently a direct connection is needed in order to avoid a crash upon 'stop'
 
     // make RTMSA accessible
@@ -114,9 +114,8 @@ void LSLAdapter::unload()
 {
     // stop producer
     m_pProducer->stop();
+    m_producerThread.quit();
     m_producerThread.wait();
-    m_pProducer->deleteLater();
-    m_producerThread.deleteLater();
 
     // save filtering settings etc.
 }

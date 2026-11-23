@@ -27,6 +27,7 @@
 #include <ftbuffer/ftbuffer.h>
 #include <gusbamp/gusbamp.h>
 #include <hpi/hpi.h>
+#include <lsladapter/lsladapter.h>
 #include <natus/natus.h>
 #include <neuromag/neuromag.h>
 #include <neuronalconnectivity/neuronalconnectivity.h>
@@ -110,6 +111,7 @@ private slots:
     void eegoImpedanceViewShowsTheMeasuredElectrodes();
     void tmsiImpedanceViewShowsTheMeasuredElectrodes();
     void mainWindowSwitchesStyle();
+    void lslAdapterUnloadsAndCloses();
 
 private:
     static void addPluginRows();
@@ -1062,5 +1064,20 @@ void TestMneScanPlugins::mainWindowSwitchesStyle()
 
 //=============================================================================================================
 
+void TestMneScanPlugins::lslAdapterUnloadsAndCloses()
+{
+    // MNE Scan unloads a plugin and then destroys it, with the event loop running in between
+    auto adapter = std::make_unique<LSLADAPTERPLUGIN::LSLAdapter>();
+    adapter->init();
+    adapter->unload();
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCoreApplication::processEvents();
+    adapter.reset();
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+}
+
+//=============================================================================================================
+
 QTEST_MAIN(TestMneScanPlugins)
+
 #include "test_mne_scan_plugins.moc"
