@@ -81,6 +81,19 @@ class CeilingTests(unittest.TestCase):
             self.assertEqual(audit.check_ceilings(audit.build_report(root, policy), policy),
                              ["acq: tokens 1 > ceiling 0"])
 
+    def test_a_category_cannot_grow_while_the_total_stays(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            make_repo(root, {"src/libs/mne/disp/CMakeLists.txt": "add_library(mne_disp a.cpp)\n",
+                             "src/libs/mne/disp/a.cpp": "QString a; QString b;\n"})
+            policy = copy.deepcopy(POLICY)
+            policy["ceilings"] = audit.current_ceilings(audit.build_report(root, policy))
+            self.assertEqual(policy["ceilings"]["disp"]["by_category"], {"strings": 2})
+
+            (root / "src/libs/mne/disp/a.cpp").write_text("QString a; QVector<int> b;\n", encoding="utf-8")
+            self.assertEqual(audit.check_ceilings(audit.build_report(root, policy), policy),
+                             ["disp: containers 1 > ceiling 0"])
+
     def test_new_module_and_new_library_fail(self) -> None:
         report = {"libraries": {"a": {"tokens": 1, "public_header_includes": 0, "modules": ["Core", "Gui"]},
                                 "b": {"tokens": 0, "public_header_includes": 0, "modules": []}}}

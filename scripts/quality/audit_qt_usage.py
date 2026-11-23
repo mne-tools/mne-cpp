@@ -172,6 +172,12 @@ def check_ceilings(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
         for metric in ("tokens", "public_header_includes"):
             if lib[metric] > limit[metric]:
                 failures.append(f"{name}: {metric} {lib[metric]} > ceiling {limit[metric]}")
+        # Per category too, so a std-replaceable type (containers, threads, files, ...) cannot come back while
+        # an equal number of other tokens goes.
+        if "by_category" in limit:
+            for group, count in lib["by_category"].items():
+                if count > limit["by_category"].get(group, 0):
+                    failures.append(f"{name}: {group} {count} > ceiling {limit['by_category'].get(group, 0)}")
         gained = sorted(set(lib["modules"]) - set(limit["modules"]))
         if gained:
             failures.append(f"{name}: links Qt {', '.join(gained)}, not allowed by its ceiling")
@@ -180,8 +186,13 @@ def check_ceilings(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
 
 def current_ceilings(report: dict[str, Any]) -> dict[str, Any]:
     """Ceilings equal to today's counts, for lowering the policy after Qt was removed."""
-    return {name: {"tokens": lib["tokens"], "public_header_includes": lib["public_header_includes"],
-                   "modules": lib["modules"]} for name, lib in report["libraries"].items()}
+    ceilings: dict[str, Any] = {}
+    for name, lib in report["libraries"].items():
+        ceilings[name] = {"tokens": lib["tokens"], "public_header_includes": lib["public_header_includes"],
+                          "modules": lib["modules"]}
+        if lib["tokens"]:
+            ceilings[name]["by_category"] = lib["by_category"]
+    return ceilings
 
 
 def render_markdown(report: dict[str, Any]) -> str:
