@@ -159,7 +159,7 @@ int DigitizerSetTreeItem::totalPointCount() const
     for (int i = 0; i < rowCount(); ++i) {
         DigitizerTreeItem* item = dynamic_cast<DigitizerTreeItem*>(child(i));
         if (item) {
-            count += item->positions().size();
+            count += static_cast<int>(item->positions().size());
         }
     }
     return count;
