@@ -828,11 +828,11 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
 
 //=============================================================================================================
 
-MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
-                                                     const StringList& exclude) const
+namespace
 {
-    MNEForwardSolution fwd(*this);
 
+MNEForwardSolution picked_channels(MNEForwardSolution fwd, const StringList& include, const StringList& exclude)
+{
     if (include.size() == 0 && exclude.size() == 0)
         return fwd;
 
@@ -852,7 +852,7 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
     for (int i = 0; i < nuse; ++i)
         newData.row(i) = fwd.sol.data.row(sel[i]);
 
-    fwd.sol.data = newData;
+    fwd.sol.data = std::move(newData);
     fwd.sol.nrow = nuse;
 
     StringList ch_names;
@@ -877,10 +877,10 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
     fwd.sol.row_names = std::move(ch_names);
 
     if (!fwd.sol_grad.empty()) {
-        newData.resize(nuse, fwd.sol_grad.data.cols());
+        newData = MatrixXd(nuse, fwd.sol_grad.data.cols());
         for (int i = 0; i < nuse; ++i)
             newData.row(i) = fwd.sol_grad.data.row(sel[i]);
-        fwd.sol_grad.data = newData;
+        fwd.sol_grad.data = std::move(newData);
         fwd.sol_grad.nrow = nuse;
         StringList row_names;
         for (std::int32_t i = 0; i < sel.cols(); ++i)
@@ -889,6 +889,16 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
     }
 
     return fwd;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+MNEForwardSolution MNEForwardSolution::pick_channels(const StringList& include,
+                                                     const StringList& exclude) const
+{
+    return picked_channels(*this, include, exclude);
 }
 
 //=============================================================================================================
@@ -1202,30 +1212,31 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     }
 
     Log::info("\tSource spaces transformed to the forward solution coordinate frame");
-    fwd.src = t_SourceSpace; //not new MNESourceSpaces(t_SourceSpace); for sake of speed
+    fwd.src = std::move(t_SourceSpace);
+    const MNESourceSpaces& spaces = fwd.src;
     //
     //   Handle the source locations and orientations
     //
     if (fwd.isFixedOrient() || options.force_fixed) {
         // Fixing a free solution uses the average patch normals when available (mne-python use_cps=True).
-        const bool patchNormals = !fwd.isFixedOrient() && t_SourceSpace.hemisphereAt(0) && t_SourceSpace.hemisphereAt(0)->patch_inds.size() > 0;
+        const bool patchNormals = !fwd.isFixedOrient() && spaces.hemisphereAt(0) && spaces.hemisphereAt(0)->patch_inds.size() > 0;
         nuse = 0;
         fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
         fwd.source_nn = MatrixXf::Zero(fwd.nsource, 3);
-        for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k) {
-            for (std::int32_t q = 0; q < t_SourceSpace[k].nuse; ++q) {
-                fwd.source_rr.row(nuse + q) = t_SourceSpace[k].rr.row(t_SourceSpace[k].vertno(q));
+        for (std::int32_t k = 0; k < spaces.size(); ++k) {
+            for (std::int32_t q = 0; q < spaces[k].nuse; ++q) {
+                fwd.source_rr.row(nuse + q) = spaces[k].rr.row(spaces[k].vertno(q));
                 if (patchNormals) {
-                    auto* hemi = t_SourceSpace.hemisphereAt(k);
+                    auto* hemi = spaces.hemisphereAt(k);
                     RowVector3f nn = RowVector3f::Zero();
                     for (int v : hemi->pinfo[hemi->patch_inds[q]])
-                        nn += t_SourceSpace[k].nn.row(v);
+                        nn += spaces[k].nn.row(v);
                     fwd.source_nn.row(nuse + q) = nn.normalized();
                 } else {
-                    fwd.source_nn.row(nuse + q) = t_SourceSpace[k].nn.row(t_SourceSpace[k].vertno(q));
+                    fwd.source_nn.row(nuse + q) = spaces[k].nn.row(spaces[k].vertno(q));
                 }
             }
-            nuse += t_SourceSpace[k].nuse;
+            nuse += spaces[k].nuse;
         }
         //
         //   Modify the forward solution for fixed source orientations
@@ -1257,11 +1268,11 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
         Log::info("\tCartesian source orientations...");
         nuse = 0;
         fwd.source_rr = MatrixXf::Zero(fwd.nsource, 3);
-        for (std::int32_t k = 0; k < t_SourceSpace.size(); ++k) {
-            for (std::int32_t q = 0; q < t_SourceSpace[k].nuse; ++q)
-                fwd.source_rr.block(q + nuse, 0, 1, 3) = t_SourceSpace[k].rr.block(t_SourceSpace[k].vertno(q), 0, 1, 3);
+        for (std::int32_t k = 0; k < spaces.size(); ++k) {
+            for (std::int32_t q = 0; q < spaces[k].nuse; ++q)
+                fwd.source_rr.block(q + nuse, 0, 1, 3) = spaces[k].rr.block(spaces[k].vertno(q), 0, 1, 3);
 
-            nuse += t_SourceSpace[k].nuse;
+            nuse += spaces[k].nuse;
         }
 
         MatrixXf t_ones = MatrixXf::Ones(fwd.nsource, 1);
@@ -1282,7 +1293,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     }
 
     fwd.surf_ori = options.surf_ori;
-    return fwd.pick_channels(options.include, exclude_bads);
+    return picked_channels(std::move(fwd), options.include, exclude_bads);
 }
 
 //=============================================================================================================
