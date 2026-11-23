@@ -22,6 +22,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <chrono>
 #include <span>
 #include <string>
@@ -37,9 +38,17 @@ using namespace mne::detail;
 namespace
 {
 
+/**
+ * Bytes handed to one send(). A non-blocking Winsock send() takes all of a large buffer at once, past the send
+ * buffer, so a write to a peer that never reads would neither block nor time out; in chunks, the system refuses
+ * the next one once its buffers are full, on every platform.
+ */
+constexpr std::size_t kMaxSend = std::size_t{64} << 10;
+
 /** @return The number of bytes of @p data the system took, or a negative number with the reason in last_error(). */
 auto send_some(Native s, std::span<const std::byte> data) noexcept
 {
+    data = data.first(std::min(data.size(), kMaxSend));
 #ifdef _WIN32
     return ::send(s, reinterpret_cast<const char*>(data.data()), static_cast<int>(data.size()), 0);
 #elif defined(MSG_NOSIGNAL)
