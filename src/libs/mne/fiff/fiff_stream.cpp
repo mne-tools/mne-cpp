@@ -2438,8 +2438,7 @@ fiff_long_t FiffStream::write_double(fiff_int_t kind, const double* data, fiff_i
     write(datasize);
     write(static_cast<std::int32_t>(FIFFV_NEXT_SEQ));
 
-    for (std::int32_t i = 0; i < nel; ++i)
-        write(data[i]);
+    write_values(data, static_cast<std::size_t>(nel));
 
     return pos;
 }
@@ -2457,8 +2456,7 @@ fiff_long_t FiffStream::write_float(fiff_int_t kind, const float* data, fiff_int
     write(datasize);
     write(static_cast<std::int32_t>(FIFFV_NEXT_SEQ));
 
-    for (std::int32_t i = 0; i < nel; ++i)
-        write(data[i]);
+    write_values(data, static_cast<std::size_t>(nel));
 
     return pos;
 }
@@ -2478,11 +2476,8 @@ fiff_long_t FiffStream::write_float_matrix(fiff_int_t kind, const MatrixXf& mat)
     write(static_cast<std::int32_t>(datasize));
     write(static_cast<std::int32_t>(FIFFV_NEXT_SEQ));
 
-    std::int32_t i, j;
-    // Storage order: row-major
-    for (i = 0; i < mat.rows(); ++i)
-        for (j = 0; j < mat.cols(); ++j)
-            write(mat(i, j));
+    write_row_major(mat);
+    std::int32_t i;
 
     std::int32_t dims[3];
     dims[0] = mat.cols();
@@ -2797,8 +2792,7 @@ fiff_long_t FiffStream::write_int(fiff_int_t kind, const fiff_int_t* data, fiff_
     write(static_cast<std::int32_t>(datasize));
     write(static_cast<std::int32_t>(next));
 
-    for (std::int32_t i = 0; i < nel; ++i)
-        write(data[i]);
+    write_values(data, static_cast<std::size_t>(nel));
 
     return pos;
 }
@@ -2821,11 +2815,8 @@ fiff_long_t FiffStream::write_int_matrix(fiff_int_t kind, const MatrixXi& mat)
     write(static_cast<std::int32_t>(datasize));
     write(static_cast<std::int32_t>(FIFFV_NEXT_SEQ));
 
-    std::int32_t i, j;
-    // Storage order: row-major
-    for (i = 0; i < mat.rows(); ++i)
-        for (j = 0; j < mat.cols(); ++j)
-            write(mat(i, j));
+    write_row_major(mat);
+    std::int32_t i;
 
     std::int32_t dims[3];
     dims[0] = mat.cols();

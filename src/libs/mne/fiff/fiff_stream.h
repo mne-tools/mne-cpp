@@ -56,6 +56,9 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <array>
+#include <cstddef>
 #include <expected>
 #include <filesystem>
 #include <memory>
@@ -979,6 +982,34 @@ private:
         if (m_littleEndian != (std::endian::native == std::endian::little))
             value = mne::byte_swap(value);
         m_bytes->write(&value, sizeof(T));
+    }
+
+    // Writes @p count values in the stream's byte order with as few writes as possible
+    template<mne::Swappable T>
+    void write_values(const T* values, std::size_t count)
+    {
+        if (m_littleEndian == (std::endian::native == std::endian::little)) {
+            m_bytes->write(values, count * sizeof(T));
+            return;
+        }
+        constexpr std::size_t kChunk = 4096;
+        std::array<T, kChunk> swapped;
+        for (std::size_t done = 0; done < count;) {
+            const std::size_t n = std::min(kChunk, count - done);
+            for (std::size_t i = 0; i < n; ++i)
+                swapped[i] = mne::byte_swap(values[done + i]);
+            m_bytes->write(swapped.data(), n * sizeof(T));
+            done += n;
+        }
+    }
+
+    // Writes the elements of @p mat row by row, as FIFF stores matrices
+    template<typename Derived>
+    void write_row_major(const Eigen::MatrixBase<Derived>& mat)
+    {
+        using Scalar = typename Derived::Scalar;
+        const Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> rows = mat;
+        write_values(rows.data(), static_cast<std::size_t>(rows.size()));
     }
 
 private:
