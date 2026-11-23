@@ -285,6 +285,59 @@ jobs:
     permissions:
       contents: read
 
+  # ── Performance page numbers, measured on a CI runner ───────────────────
+  # The website's numbers come from a quiet developer machine; this job
+  # measures the acquisition suite on every push so drifts show up, and keeps
+  # the results and charts as an artifact. Shared runners vary by tens of
+  # percent, so nothing is gated here; pull-request.yml gates regressions.
+  Benchmarks:
+    if: ${{ !inputs.release_only }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    # <print> needs libstdc++ 14; the runner defaults to GCC 13.
+    - name: Use GCC 14
+      run: |
+        echo "CC=gcc-14" >> "$GITHUB_ENV"
+        echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+    - name: Load external dependency versions
+      run: ./scripts/ci/load_external_deps.sh max
+
+    - name: Download Qt toolchain
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        ./scripts/ci/download_toolchain.sh --kind qt --version "$QT_BUILD_VERSION" --linkage dynamic \
+          --output-dir "$RUNNER_TEMP/qt"
+
+    - name: Build mne_acq_bench
+      run: |
+        cmake -S scripts/ci/acq_bench -B build-bench -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_PREFIX_PATH="$RUNNER_TEMP/qt" -DACQ_ROOT="$GITHUB_WORKSPACE"
+        cmake --build build-bench -j "$(nproc)"
+
+    - name: Measure and render
+      run: |
+        export LD_LIBRARY_PATH="$RUNNER_TEMP/qt/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+        python3 scripts/bench/run_benchmarks.py --build build-bench --suites acq --repeats 3 --python none \
+          --out bench/results.json
+        python3 scripts/bench/render_charts.py bench/results.json bench
+
+    - name: Upload results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: benchmarks
+        path: bench
+        if-no-files-found: ignore
+
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04

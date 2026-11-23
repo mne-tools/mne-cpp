@@ -201,6 +201,9 @@ aliases; replace the old spelling as below.
   writes the results JSON, renders SVG charts that name the machine, OS,
   compiler, commit and the command to reproduce them, and regenerates the
   page. A run that loses samples is reported on the chart, not hidden.
+  The forward comparison runs MNE-Python both serially and with one job per
+  core. On every push to staging, CI measures the acquisition suite and keeps
+  results and charts as the `benchmarks` artifact.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

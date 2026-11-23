@@ -115,7 +115,7 @@ def environment(build: Path, python: str | None) -> dict[str, str]:
 def tool_env(build: Path) -> dict[str, str]:
     """Environment for running the built tools (Qt frameworks next to the build on macOS)."""
     env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
-    qt_lib = REPO_ROOT / "src" / "external" / "qt" / "dynamic" / "lib"
+    qt_lib = REPO_ROOT / "src" / "3rdparty" / "qt" / "dynamic" / "lib"
     if qt_lib.exists():
         env["DYLD_FRAMEWORK_PATH"] = str(qt_lib)
         env["LD_LIBRARY_PATH"] = f"{qt_lib}:{env.get('LD_LIBRARY_PATH', '')}"
@@ -184,7 +184,7 @@ def suite_acq(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]:
         "id": "acq_throughput", "title": "Acquisition ring throughput", "unit": "GB/s", "higher_is_better": True,
         "subtitle": "int16 samples through the lock-free ring, producer and two readers, verified",
         "command": reproduce,
-        "series": [{"label": "MNE-CPP", "points": [{"x": f"{n} channels", "y": value(f"ring_int16_{n}_ch")}
+        "series": [{"label": "MNE-CPP", "points": [{"x": f"{n} channel{'s' if n > 1 else ''}", "y": value(f"ring_int16_{n}_ch")}
                                                   for n in (1, 64, 1024, 4096)]}]}, {
         "id": "acq_latency", "title": "Commit-to-wake latency", "unit": "µs", "higher_is_better": False,
         "subtitle": "time from a producer's commit until the reader runs, per percentile",
@@ -227,14 +227,16 @@ def suite_forward(build: Path, args: argparse.Namespace) -> list[dict[str, Any]]
         cpp = repeated(args.repeats, lambda: measured(command, tool_env(build))[0])
         series = [{"label": "MNE-CPP", "points": [{"x": "oct-6, MEG+EEG, 3-layer BEM", "y": cpp["median"]}]}]
         if args.python:
-            code = (f"import time, mne\nmne.set_log_level('ERROR')\nt=time.perf_counter()\n"
-                    f"f=mne.make_forward_solution(r'{raw}', trans=r'{trans}', src=r'{src}', bem=r'{bem}', meg=True, "
-                    f"eeg=True, mindist=5.0, n_jobs={args.jobs})\n"
-                    f"mne.write_forward_solution(r'{Path(tmp) / 'py-fwd.fif'}', f, overwrite=True)\n"
-                    f"print(time.perf_counter()-t)")
-            py = repeated(args.repeats, lambda: python_timed(args.python, code))
-            series.append({"label": f"MNE-Python (n_jobs={args.jobs})",
-                           "points": [{"x": "oct-6, MEG+EEG, 3-layer BEM", "y": py["median"]}]})
+            # MNE-CPP uses every core, so MNE-Python runs both serially and with one job per core
+            for jobs in dict.fromkeys(args.jobs or [1, os.cpu_count() or 1]):
+                code = (f"import time, mne\nmne.set_log_level('ERROR')\nt=time.perf_counter()\n"
+                        f"f=mne.make_forward_solution(r'{raw}', trans=r'{trans}', src=r'{src}', bem=r'{bem}', meg=True, "
+                        f"eeg=True, mindist=5.0, n_jobs={jobs})\n"
+                        f"mne.write_forward_solution(r'{Path(tmp) / 'py-fwd.fif'}', f, overwrite=True)\n"
+                        f"print(time.perf_counter()-t)")
+                py = repeated(args.repeats, lambda code=code: python_timed(args.python, code))
+                series.append({"label": f"MNE-Python (n_jobs={jobs})",
+                               "points": [{"x": "oct-6, MEG+EEG, 3-layer BEM", "y": py["median"]}]})
     return [{"id": "forward", "title": "Forward solution", "unit": "s", "higher_is_better": False,
              "subtitle": "MNE sample subject; read inputs, compute, write; median of runs",
              "command": "python3 scripts/bench/run_benchmarks.py --suites forward", "series": series}]
@@ -301,7 +303,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--build", type=Path, default=REPO_ROOT / "build" / "developer-dynamic")
     parser.add_argument("--suites", default=",".join(SUITES), help="comma-separated: " + ", ".join(SUITES))
     parser.add_argument("--repeats", type=int, default=3)
-    parser.add_argument("--jobs", type=int, default=1, help="MNE-Python n_jobs where it has one")
+    parser.add_argument("--jobs", type=int, action="append",
+                        help="MNE-Python n_jobs where it has one; repeatable (default: 1 and one per core)")
     parser.add_argument("--python", default=None, help="interpreter with MNE-Python; 'none' skips the comparison")
     parser.add_argument("--quick", action="store_true", help="short runs, for CI")
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "doc" / "website" / "static" / "bench" / "results.json")
