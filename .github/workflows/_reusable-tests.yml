@@ -162,12 +162,25 @@ jobs:
         pip install --upgrade pip==26.2.1
         pip install mne==1.11.0 numpy==2.2.6 scipy==1.15.3 scikit-learn==1.7.2 mne-bids==0.17.0 bids-validator-deno==3.0.2 pylsl==1.18.6 brainflow==5.23.0
 
+    # The sample data lives in the workspace: actions/cache restores a path outside it by where it was on the
+    # saving runner, so one cross-OS entry needs a workspace path. ~/mne_data points there for MNE-Python and
+    # the tests.
+    - name: Link the MNE sample data into the workspace
+      shell: bash
+      run: |
+        mkdir -p "$GITHUB_WORKSPACE/mne_data"
+        if [ "$RUNNER_OS" = "Windows" ]; then
+          cmd //c mklink /J "$(cygpath -w "$HOME/mne_data")" "$(cygpath -w "$GITHUB_WORKSPACE/mne_data")"
+        else
+          ln -sfn "$GITHUB_WORKSPACE/mne_data" "$HOME/mne_data"
+        fi
+
     - name: Cache MNE sample data
       id: cache-mne-data
       uses: actions/cache@v5
       with:
-        path: ~/mne_data/MNE-sample-data
-        key: mne-sample-data-v3
+        path: mne_data/MNE-sample-data
+        key: mne-sample-data-v4
         # One 1.6 GB entry for every OS instead of one per OS
         enableCrossOsArchive: true
 

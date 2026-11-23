@@ -83,6 +83,21 @@ class WorkflowContracts(unittest.TestCase):
                 majors.setdefault(action, set()).add(version)
         self.assertEqual({a: v for a, v in majors.items() if len(v) > 1}, {})
 
+    def test_cross_os_caches_hold_workspace_paths_only(self) -> None:
+        # actions/cache stores a path outside the workspace by where it was on the saving runner
+        # (/home/runner/...), so another OS restores it to the wrong place; a cross-OS cache must
+        # name paths inside the workspace.
+        offending = []
+        for name, text in _workflow_texts().items():
+            for step in re.split(r"\n\s*- (?=name:|uses:)", text):
+                if "actions/cache@" not in step or not re.search(r"enableCrossOsArchive:\s*true", step):
+                    continue
+                block = re.search(r"\bpath:\s*(\|[^\n]*\n(?:\s+\S[^\n]*\n)*|[^\n]+)", step + "\n")
+                paths = [p.strip() for p in (block.group(1) if block else "").lstrip("|").splitlines() if p.strip()]
+                offending += [f"{name}: {p}" for p in paths
+                              if p.startswith(("~", "/", "$HOME", "${{ runner")) or re.match(r"[A-Za-z]:", p) or ".." in p]
+        self.assertEqual([], offending)
+
     def test_coverage_floor_is_the_release_minimum(self) -> None:
         policy = json.loads((REPO_ROOT / "scripts" / "quality" / "coverage_policy.json").read_text(encoding="utf-8"))
         self.assertGreaterEqual(policy["line_floor_percent"],
