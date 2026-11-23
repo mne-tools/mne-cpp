@@ -135,7 +135,7 @@ public:
 
     bool begin(QPaintDevice* pdev) override;
     bool end() override;
-    void updateState(const QPaintEngineState& state) override;
+    void updateState(const QPaintEngineState& newState) override;
     void drawPath(const QPainterPath& path) override;
     void drawPolygon(const QPointF* points, int pointCount, PolygonDrawMode mode) override;
     void drawLines(const QLineF* lines, int lineCount) override;
@@ -295,35 +295,35 @@ bool SvgPaintEngine::end()
 
 //=============================================================================================================
 
-void SvgPaintEngine::updateState(const QPaintEngineState& state)
+void SvgPaintEngine::updateState(const QPaintEngineState& newState)
 {
-    const auto flags = state.state();
+    const auto flags = newState.state();
     if (flags & DirtyTransform) {
-        m_transform = state.transform();
+        m_transform = newState.transform();
         m_styleDirty = true;
     }
     if (flags & DirtyPen) {
-        m_pen = state.pen();
+        m_pen = newState.pen();
         m_styleDirty = true;
     }
     if (flags & DirtyBrush) {
-        m_brush = state.brush();
+        m_brush = newState.brush();
         m_styleDirty = true;
     }
     if (flags & DirtyOpacity) {
-        m_opacity = state.opacity();
+        m_opacity = newState.opacity();
         m_styleDirty = true;
     }
     if (flags & DirtyClipPath) {
-        applyClip(state.clipOperation(), state.transform().map(state.clipPath()));
+        applyClip(newState.clipOperation(), newState.transform().map(newState.clipPath()));
     }
     if (flags & DirtyClipRegion) {
         QPainterPath path;
-        path.addRegion(state.clipRegion());
-        applyClip(state.clipOperation(), state.transform().map(path));
+        path.addRegion(newState.clipRegion());
+        applyClip(newState.clipOperation(), newState.transform().map(path));
     }
     if (flags & DirtyClipEnabled) {
-        m_clipEnabled = state.isClipEnabled();
+        m_clipEnabled = newState.isClipEnabled();
         m_clipDirty = true;
     }
 }
