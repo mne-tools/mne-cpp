@@ -2190,22 +2190,35 @@ int MNESourceSpace::writeVolumeInfo(FiffStream& stream, bool selected_only) cons
             stream.write_coord_trans(*voxel_surf_RAS_t);
             stream.write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, vol_dims, 3);
         }
-        if (interpolator && !MRI_volume.empty()) {
-            stream.start_block(FIFFB_MNE_PARENT_MRI_FILE);
-            if (MRI_surf_RAS_RAS_t && !MRI_surf_RAS_RAS_t->empty())
-                stream.write_coord_trans(*MRI_surf_RAS_RAS_t);
-            if (MRI_voxel_surf_RAS_t && !MRI_voxel_surf_RAS_t->empty())
-                stream.write_coord_trans(*MRI_voxel_surf_RAS_t);
+        // Always a parent-MRI block, as MNE-Python writes and requires it. Without an MRI, the grid is the volume:
+        // its voxel transform, its dimensions, an identity surface-RAS to RAS transform and an empty interpolator.
+        const bool hasMri = interpolator && !MRI_volume.empty();
+        stream.start_block(FIFFB_MNE_PARENT_MRI_FILE);
+        if (MRI_surf_RAS_RAS_t && !MRI_surf_RAS_RAS_t->empty())
+            stream.write_coord_trans(*MRI_surf_RAS_RAS_t);
+        else
+            stream.write_coord_trans(FiffCoordTrans(FIFFV_COORD_MRI, FIFFV_MNE_COORD_RAS, Eigen::Matrix3f::Identity(),
+                                                    Eigen::Vector3f::Zero()));
+        if (hasMri && MRI_voxel_surf_RAS_t && !MRI_voxel_surf_RAS_t->empty())
+            stream.write_coord_trans(*MRI_voxel_surf_RAS_t);
+        else if (voxel_surf_RAS_t && !voxel_surf_RAS_t->empty())
+            stream.write_coord_trans(*voxel_surf_RAS_t);
+        if (hasMri)
             stream.write_string(FIFF_MNE_FILE_NAME, MRI_volume);
-            if (interpolator)
-                stream.write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, interpolator->eigen());
-            if (MRI_vol_dims[0] > 0 && MRI_vol_dims[1] > 0 && MRI_vol_dims[2] > 0) {
-                stream.write_int(FIFF_MRI_WIDTH, &MRI_vol_dims[0]);
-                stream.write_int(FIFF_MRI_HEIGHT, &MRI_vol_dims[1]);
-                stream.write_int(FIFF_MRI_DEPTH, &MRI_vol_dims[2]);
-            }
-            stream.end_block(FIFFB_MNE_PARENT_MRI_FILE);
+        const bool mriDims = hasMri && MRI_vol_dims[0] > 0 && MRI_vol_dims[1] > 0 && MRI_vol_dims[2] > 0;
+        const int* dims = mriDims ? MRI_vol_dims : vol_dims;
+        if (hasMri) {
+            stream.write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, interpolator->eigen());
+        } else {
+            const Eigen::SparseMatrix<float> none(static_cast<Eigen::Index>(dims[0]) * dims[1] * dims[2], np);
+            stream.write_float_sparse_rcs(FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, none);
         }
+        if (dims[0] > 0 && dims[1] > 0 && dims[2] > 0) {
+            stream.write_int(FIFF_MRI_WIDTH, &dims[0]);
+            stream.write_int(FIFF_MRI_HEIGHT, &dims[1]);
+            stream.write_int(FIFF_MRI_DEPTH, &dims[2]);
+        }
+        stream.end_block(FIFFB_MNE_PARENT_MRI_FILE);
     } else {
         if (interpolator && !MRI_volume.empty()) {
             stream.write_string(FIFF_MNE_SOURCE_SPACE_MRI_FILE, MRI_volume);

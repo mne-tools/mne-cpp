@@ -148,6 +148,7 @@ private slots:
     void hemisphere_volumeWithoutTrianglesGetsGeometry();
     void volumeSourceSpace_fromSurfaceWithoutTriangleData();
     void volumeSourceSpace_readKeepsItsType();
+    void volumeSourceSpace_writesItsParentMriBlock();
     void hemisphere_moveKeepsEverything();
 
     // ── InvSourceEstimate ──
@@ -591,6 +592,51 @@ void TestMneLibrary::volumeSourceSpace_readKeepsItsType()
     auto read = MNESourceSpaces::read(path);
     QVERIFY(read.has_value());
     QCOMPARE((*read)[0].type, FIFFV_MNE_SPACE_VOLUME);
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::volumeSourceSpace_writesItsParentMriBlock()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    // MNE-Python reads a volume source space only with a parent-MRI block holding the voxel and RAS transforms,
+    // also when the space was made from a surface alone
+    auto bem = MNESurface::read_bem_surface2(bemPath().toStdU16String(), -1, 1);
+    QVERIFY(bem != nullptr);
+    const auto space = MNESourceSpace::make_volume_source_space(*bem, 0.02f, 0.0f, 0.005f);
+    QVERIFY(space != nullptr);
+
+    QTemporaryDir dir;
+    const std::string path = dir.filePath("volume-src.fif").toStdString();
+    {
+        auto stream = FiffStream::start_file(path);
+        QVERIFY(stream != nullptr);
+        stream->start_block(FIFFB_MNE);
+        QVERIFY(space->writeToStream(*stream, false) != FIFF_FAIL);
+        stream->end_block(FIFFB_MNE);
+        stream->end_file();
+    }
+    auto stream = FiffStream::open(path);
+    QVERIFY(stream.has_value());
+    const auto parents = stream->dirtree()->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
+    QCOMPARE(parents.size(), std::size_t(1));
+    bool voxelToMri = false;
+    bool mriToRas = false;
+    for (const FiffDirEntry& entry : parents[0]->dir) {
+        if (entry.kind != FIFF_COORD_TRANS)
+            continue;
+        const auto tag = stream->read_tag(entry.pos);
+        QVERIFY(tag.has_value());
+        const FiffCoordTrans trans = tag->to_coord_trans();
+        voxelToMri |= trans.from == FIFFV_MNE_COORD_MRI_VOXEL && trans.to == FIFFV_COORD_MRI;
+        mriToRas |= trans.from == FIFFV_COORD_MRI && trans.to == FIFFV_MNE_COORD_RAS;
+    }
+    QVERIFY(voxelToMri);
+    QVERIFY(mriToRas);
+    for (const fiff_int_t kind : {FIFF_MRI_WIDTH, FIFF_MRI_HEIGHT, FIFF_MRI_DEPTH, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR})
+        QVERIFY2(parents[0]->has_tag(kind), qPrintable(QString::number(kind)));
 }
 
 //=============================================================================================================

@@ -268,6 +268,11 @@ aliases; replace the old spelling as below.
   space without it is a surface, as in MNE-Python.
 - `mne_volume_source_space` wrapped the source space in a second source-space
   block, so readers found an empty source space; it writes one block.
+- Volume source spaces are written with their parent-MRI block, as
+  MNE-Python writes and requires it; without an MRI it holds the grid's voxel
+  transform and dimensions and an empty interpolator. MNE-Python reads the
+  output of `mne_volume_source_space`, which matches MNE-C's
+  `volume-7mm-src.fif` point for point.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
