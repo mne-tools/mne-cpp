@@ -147,6 +147,7 @@ private slots:
     void hemisphere_copyComparesEqual();
     void hemisphere_volumeWithoutTrianglesGetsGeometry();
     void volumeSourceSpace_fromSurfaceWithoutTriangleData();
+    void volumeSourceSpace_readKeepsItsType();
     void hemisphere_moveKeepsEverything();
 
     // ── InvSourceEstimate ──
@@ -562,6 +563,34 @@ void TestMneLibrary::volumeSourceSpace_fromSurfaceWithoutTriangleData()
     const auto space = MNESourceSpace::make_volume_source_space(surf, 0.02f, 0.0f, 0.005f);
     QVERIFY(space != nullptr);
     QVERIFY(space->nuse > 0);
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::volumeSourceSpace_readKeepsItsType()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    auto bem = MNESurface::read_bem_surface2(bemPath().toStdU16String(), -1, 1);
+    QVERIFY(bem != nullptr);
+    const auto space = MNESourceSpace::make_volume_source_space(*bem, 0.02f, 0.0f, 0.005f);
+    QVERIFY(space != nullptr);
+    QCOMPARE(space->type, FIFFV_MNE_SPACE_VOLUME);
+
+    QTemporaryDir dir;
+    const std::string path = dir.filePath("volume-src.fif").toStdString();
+    {
+        auto stream = FiffStream::start_file(path);
+        QVERIFY(stream != nullptr);
+        stream->start_block(FIFFB_MNE);
+        QVERIFY(space->writeToStream(*stream, false) != FIFF_FAIL);
+        stream->end_block(FIFFB_MNE);
+        stream->end_file();
+    }
+    auto read = MNESourceSpaces::read(path);
+    QVERIFY(read.has_value());
+    QCOMPARE((*read)[0].type, FIFFV_MNE_SPACE_VOLUME);
 }
 
 //=============================================================================================================

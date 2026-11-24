@@ -63,6 +63,13 @@ Expected<MNEHemisphere> read_source_space(FiffStream& stream, const std::shared_
     std::optional<FiffTag> t_pTag;
 
     //=====================================================================
+    // Surface unless the file says otherwise, as in MNE-Python
+    if (t_pTag = p_Tree->find_tag(stream, FIFF_MNE_SOURCE_SPACE_TYPE); t_pTag)
+        p_Hemisphere.type = *t_pTag->to_int();
+    else
+        p_Hemisphere.type = FIFFV_MNE_SPACE_SURFACE;
+
+    //=====================================================================
     if (t_pTag = p_Tree->find_tag(stream, FIFF_MNE_SOURCE_SPACE_ID); !t_pTag)
         p_Hemisphere.id = FIFFV_MNE_SURF_UNKNOWN;
     else
