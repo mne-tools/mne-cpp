@@ -1,0 +1,51 @@
+---
+id: rgb
+title: "mne::Rgb"
+sidebar_label: Rgb
+sidebar_position: 93
+---
+
+# Rgb
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/raster_image.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/base/raster_image.h)
+
+`#include <mne/base/raster_image.h>`
+
+```cpp
+struct mne::Rgb
+```
+
+An 8-bit RGB colour.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QImage image(64, 48, QImage::Format_RGB32); QPainter p(&image); p.drawPolygon(...); image.save("frame.png");
+RasterImage frame(64, 48, {0, 0, 0});
+const std::array<PointF, 3> triangle = {{{4.0, 40.0}, {60.0, 40.0}, {32.0, 4.0}}};
+frame.fill_polygon(triangle, {255, 128, 0}); // anti-aliased edges
+frame.draw_text(2, 47, "t = 12.5 ms", {255, 255, 255});
+const std::vector<std::uint8_t> png = frame.encode_png(); // or frame.save_png(path)
+```
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 233"
+frame.draw_text(2, 47, "t = 12.5 ms", {255, 255, 255});
+const std::vector<std::uint8_t> png = frame.encode_png(); // or frame.save_png(path)
+ok &= expect(frame.pixel(32, 30) == Rgb{255, 128, 0} && png.size() > 8 && png[1] == 'P', "RasterImage filled a triangle and encoded a PNG");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

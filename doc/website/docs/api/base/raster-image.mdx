@@ -1,0 +1,208 @@
+---
+id: raster-image
+title: "mne::RasterImage"
+sidebar_label: RasterImage
+sidebar_position: 92
+---
+
+# RasterImage
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/raster_image.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libs/mne/base/raster_image.h)
+
+`#include <mne/base/raster_image.h>`
+
+```cpp
+class mne::RasterImage
+```
+
+An RGB image in memory that fills polygons, draws text and writes PNG files.
+
+Polygons are filled with the non-zero winding rule and anti-aliased by 4 x 4 supersampling, so their edges blend with what is underneath like QPainter's anti-aliased drawing.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QImage image(64, 48, QImage::Format_RGB32); QPainter p(&image); p.drawPolygon(...); image.save("frame.png");
+RasterImage frame(64, 48, {0, 0, 0});
+const std::array<PointF, 3> triangle = {{{4.0, 40.0}, {60.0, 40.0}, {32.0, 4.0}}};
+frame.fill_polygon(triangle, {255, 128, 0}); // anti-aliased edges
+frame.draw_text(2, 47, "t = 12.5 ms", {255, 255, 255});
+const std::vector<std::uint8_t> png = frame.encode_png(); // or frame.save_png(path)
+```
+
+---
+
+## Public Methods
+
+### RasterImage(width, height, background)
+
+Creates an image filled with one colour.
+
+**Parameters:**
+
+- **width** : *int*
+  Width in pixels; negative values count as 0.
+
+- **height** : *int*
+  Height in pixels; negative values count as 0.
+
+- **background** : *[Rgb](/docs/api/base/rgb)*
+  Colour of every pixel.
+
+---
+
+### width()
+
+**Returns:**
+
+- *int* — The width in pixels.
+
+---
+
+### height()
+
+**Returns:**
+
+- *int* — The height in pixels.
+
+---
+
+### pixel(x, y)
+
+**Parameters:**
+
+- **x** : *int*
+  Column, 0 to `width()` - 1.
+
+- **y** : *int*
+  Row, 0 to `height()` - 1.
+
+**Returns:**
+
+- *[Rgb](/docs/api/base/rgb)* — The colour of the pixel, or black outside the image.
+
+---
+
+### set_pixel(x, y, color)
+
+Sets one pixel; pixels outside the image are ignored.
+
+**Parameters:**
+
+- **x** : *int*
+  Column.
+
+- **y** : *int*
+  Row.
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  New colour.
+
+---
+
+### fill(color)
+
+Sets every pixel to `color`.
+
+**Parameters:**
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  New colour.
+
+---
+
+### fill_polygon(points, color)
+
+Fills a polygon, anti-aliased.
+
+Parts outside the image are clipped.
+
+**Parameters:**
+
+- **points** : *std::span&lt; const [PointF](/docs/api/base/point-f) &gt;*
+  Corners in order; fewer than three fill nothing.
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  Fill colour.
+
+---
+
+### draw_text(x, baseline, text, color, scale)
+
+Draws text with the built-in 5 x 7 pixel font, one pixel of spacing between characters.
+
+The font covers digits, letters (upper-case letters are drawn as lower-case ones) and the characters space . , : ; + - = / % ( ) _ ; other characters are drawn as a box.
+
+**Parameters:**
+
+- **x** : *int*
+  Left edge of the first character.
+
+- **baseline** : *int*
+  Row below the last row of the characters.
+
+- **text** : *std::string_view*
+  ASCII text.
+
+- **color** : *[Rgb](/docs/api/base/rgb)*
+  Text colour.
+
+- **scale** : *int*
+  Size of a font pixel in image pixels, at least 1.
+
+---
+
+### rgb()
+
+**Returns:**
+
+- *std::span&lt; const std::uint8_t &gt;* — The pixels row by row from the top, three bytes (red, green, blue) per pixel.
+
+---
+
+### save_png(path)
+
+Writes the image as an 8-bit RGB PNG file.
+
+**Parameters:**
+
+- **path** : *const std::filesystem::path &*
+  Output file.
+
+**Returns:**
+
+- *[Expected](/docs/api/base/expected)&lt; void &gt;* — Nothing, or an Io error if the file cannot be written.
+
+---
+
+### encode_png()
+
+**Returns:**
+
+- *std::vector&lt; std::uint8_t &gt;* — The image encoded as an 8-bit RGB PNG file.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 229"
+// Qt:   QImage image(64, 48, QImage::Format_RGB32); QPainter p(&image); p.drawPolygon(...); image.save("frame.png");
+RasterImage frame(64, 48, {0, 0, 0});
+const std::array<PointF, 3> triangle = {{{4.0, 40.0}, {60.0, 40.0}, {32.0, 4.0}}};
+frame.fill_polygon(triangle, {255, 128, 0}); // anti-aliased edges
+frame.draw_text(2, 47, "t = 12.5 ms", {255, 255, 255});
+const std::vector<std::uint8_t> png = frame.encode_png(); // or frame.save_png(path)
+ok &= expect(frame.pixel(32, 30) == Rgb{255, 128, 0} && png.size() > 8 && png[1] == 'P', "RasterImage filled a triangle and encoded a PNG");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

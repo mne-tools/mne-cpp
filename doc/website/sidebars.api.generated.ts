@@ -499,7 +499,10 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/process-result',
         'api/base/xml-element',
         'api/base/command-line-parser',
-        'api/base/command-line-option'
+        'api/base/command-line-option',
+        'api/base/raster-image',
+        'api/base/rgb',
+        'api/base/point-f'
       ],
     },
     {

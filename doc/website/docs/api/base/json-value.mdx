@@ -413,7 +413,7 @@ Pointers other than text would silently become booleans.
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 197"
+````cpp title="src/examples/ex_base/main.cpp, line 198"
 CborParseError cborError;
 const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
 const std::int64_t sfreq = decoded["sfreq"].to_integer();

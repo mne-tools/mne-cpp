@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 285,
+      "registered": 286,
       "conditional": 9,
       "unregistered": 3,
       "without_labels": 0,
@@ -52,6 +52,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -92,6 +93,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -132,6 +134,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -172,6 +175,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -212,6 +216,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -252,6 +257,7 @@
           "test_base_json",
           "test_base_logger",
           "test_base_process",
+          "test_base_raster_image",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -295,12 +301,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 585,
+      "public_api_units": 588,
       "exported_not_registered": 2,
-      "example_eligible": 435,
+      "example_eligible": 438,
       "eligible_backed_percent": 99.54,
-      "snippets": 465,
-      "registered_test_percent": 45.11
+      "snippets": 468,
+      "registered_test_percent": 45.39
     },
     "G4_screenshots": {
       "referenced_images": 19,

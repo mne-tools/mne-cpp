@@ -140,7 +140,7 @@ Calls `body(i)` for every i in [`begin`, `end`) and returns when all calls have 
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 130"
+````cpp title="src/examples/ex_base/main.cpp, line 131"
 const std::vector<int> channels = {0, 1, 2, 3};
 const std::vector<double> power = ThreadPool::global().parallel_map(channels, [](int ch) { return 0.5 * ch; }); // in order
 auto background = ThreadPool::global().submit([] { return 42; });

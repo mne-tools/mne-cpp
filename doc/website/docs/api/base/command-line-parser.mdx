@@ -220,7 +220,7 @@ Parses main()'s arguments like QCommandLineParser::process(): prints the help or
 
 Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 144"
+````cpp title="src/examples/ex_base/main.cpp, line 145"
 // Qt:   QCommandLineParser parser; parser.addOption({{"r", "repeats"}, "Runs.", "n", "3"}); parser.process(app);
 CommandLineParser parser("Averages the epochs of a raw file.");
 parser.add_help_option();

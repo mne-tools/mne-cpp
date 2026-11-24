@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 484,
+    "exported_classes": 485,
     "exported_free_functions": 214,
-    "registered_classes": 583,
+    "registered_classes": 586,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
-    "registered_header_only": 87,
+    "registered_header_only": 89,
     "registered_stale": 0,
-    "registered_with_test": 263,
+    "registered_with_test": 266,
     "registered_test_unresolved": 0,
-    "registered_with_example": 435,
+    "registered_with_example": 438,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 100,
     "registered_without_api_page": 0,
-    "with_snippet": 465,
-    "public_api_units": 585,
-    "example_eligible": 435,
+    "with_snippet": 468,
+    "public_api_units": 588,
+    "example_eligible": 438,
     "example_exempt": 150,
-    "eligible_backed_by_registry_example": 433,
-    "eligible_used_by_some_example": 375,
+    "eligible_backed_by_registry_example": 436,
+    "eligible_used_by_some_example": 378,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 51
     },
     "base": {
-      "public": 26,
-      "registered": 26,
-      "with_test": 26,
-      "eligible": 26,
-      "eligible_with_registry_example": 26,
-      "eligible_used_by_example": 24,
-      "with_snippet": 26
+      "public": 29,
+      "registered": 29,
+      "with_test": 29,
+      "eligible": 29,
+      "eligible_with_registry_example": 29,
+      "eligible_used_by_example": 27,
+      "with_snippet": 29
     },
     "bids": {
       "public": 14,
@@ -3304,6 +3304,81 @@
         "ex_base/main.cpp#process_usage"
       ],
       "api_page": "doc/website/docs/api/base/process-result.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "PointF",
+      "header": "base/raster_image.h",
+      "library": "base",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_raster_image",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/point-f.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "RasterImage",
+      "header": "base/raster_image.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_raster_image",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/raster-image.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Rgb",
+      "header": "base/raster_image.h",
+      "library": "base",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_raster_image",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage",
+        "ex_base/main.cpp#raster_image_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/rgb.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null
