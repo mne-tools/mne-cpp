@@ -216,6 +216,9 @@ aliases; replace the old spelling as below.
 - `mne::to_little_endian()`, `from_little_endian()` (`base/endian.h`) and
   `ByteStream::read_little_endian()` replace the byte-order code of six
   conversion tools.
+- `mne::RasterImage` (`base/raster_image.h`) fills anti-aliased polygons,
+  draws text in a built-in bitmap font and writes PNG files, without a window
+  system or Qt.
 - The inverse operator's decomposition of the whitened lead field uses Eigen's
   divide-and-conquer SVD, as MNE-Python uses LAPACK's: about 2.5 times less
   CPU time for the MNE sample data, with the same source estimates to single

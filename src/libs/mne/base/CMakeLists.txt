@@ -58,6 +58,7 @@ set(SOURCES
   xml.cpp
   log.cpp
   process.cpp
+  raster_image.cpp
   sha256.cpp
   string_utils.cpp
   thread_pool.cpp
@@ -76,6 +77,7 @@ set(HEADERS
   xml.h
   log.h
   process.h
+  raster_image.h
   sha256.h
   string_utils.h
   thread_pool.h

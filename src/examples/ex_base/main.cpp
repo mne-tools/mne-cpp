@@ -25,6 +25,7 @@
 #include <mne/base/json_stream_parser.h>
 #include <mne/base/log.h>
 #include <mne/base/process.h>
+#include <mne/base/raster_image.h>
 #include <mne/base/sha256.h>
 #include <mne/base/string_utils.h>
 #include <mne/base/thread_pool.h>
@@ -223,6 +224,16 @@ int main()
     //! [sha256_usage]
     ok &= expect(fingerprint == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" && incremental.digest() == Sha256::hash("abc"),
                  "Sha256 hashed a message in one call and incrementally");
+
+    //! [raster_image_usage]
+    // Qt:   QImage image(64, 48, QImage::Format_RGB32); QPainter p(&image); p.drawPolygon(...); image.save("frame.png");
+    RasterImage frame(64, 48, {0, 0, 0});
+    const std::array<PointF, 3> triangle = {{{4.0, 40.0}, {60.0, 40.0}, {32.0, 4.0}}};
+    frame.fill_polygon(triangle, {255, 128, 0}); // anti-aliased edges
+    frame.draw_text(2, 47, "t = 12.5 ms", {255, 255, 255});
+    const std::vector<std::uint8_t> png = frame.encode_png(); // or frame.save_png(path)
+    //! [raster_image_usage]
+    ok &= expect(frame.pixel(32, 30) == Rgb{255, 128, 0} && png.size() > 8 && png[1] == 'P', "RasterImage filled a triangle and encoded a PNG");
 
     //! [process_usage]
     // Qt:   QProcess p; p.start("python3", {"--version"}); p.waitForFinished(5000); p.readAllStandardOutput();
