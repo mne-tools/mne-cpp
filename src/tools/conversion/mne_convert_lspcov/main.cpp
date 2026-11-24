@@ -366,12 +366,12 @@ int main(int argc, char* argv[])
     //=========================================================================
     // Read measurement info for channel names
     //=========================================================================
-    FiffRawData raw(mne::path_from_utf8(measFile));
-    if (raw.info.empty()) {
+    auto raw = FiffRawData::read(mne::path_from_utf8(measFile));
+    if (!raw || raw->info.empty()) {
         Log::critical("Cannot read measurement info from: {}", measFile);
         return 1;
     }
-    const FiffInfo& info = raw.info;
+    const FiffInfo& info = raw->info;
 
     int nChan = info.nchan;
     Log::info("Measurement file: {} channels", nChan);

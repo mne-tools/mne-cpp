@@ -289,6 +289,11 @@ void TestToolExitCodes::unreadableInputFile_data()
         << "mne_make_scalp_surfaces"
         << QStringList{"--bem", "__MISSING__", "--out", "__MISSING_OUT__"};
 
+    // An unreadable --meas used to escape as an uncaught mne::Error and abort the tool
+    QTest::newRow("mne_convert_lspcov")
+        << "mne_convert_lspcov"
+        << QStringList{"--lspcov", "__MISSING__", "--meas", "__MISSING__", "--outasc", "__MISSING_OUT__"};
+
     QTest::newRow("mne_dipole_fit")
         << "mne_dipole_fit"
         << QStringList{"--meas", "__MISSING__", "--dip", "__MISSING_OUT__", "--meg"};

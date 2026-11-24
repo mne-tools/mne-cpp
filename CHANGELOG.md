@@ -273,6 +273,8 @@ aliases; replace the old spelling as below.
   transform and dimensions and an empty interpolator. MNE-Python reads the
   output of `mne_volume_source_space`, which matches MNE-C's
   `volume-7mm-src.fif` point for point.
+- `mne_convert_lspcov` aborted with an uncaught exception when `--meas`
+  could not be read; it reports the file and exits with 1.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
