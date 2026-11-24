@@ -137,11 +137,15 @@ int main(int argc, char* argv[])
         Log::critical("Cannot write output file: {}", outFile);
         return 1;
     }
+    // writeToStream opens the source space block itself
     outStream->start_block(FIFFB_MNE);
-    outStream->start_block(FIFFB_MNE_SOURCE_SPACE);
-    sp->writeToStream(*outStream, false);
-    outStream->end_block(FIFFB_MNE_SOURCE_SPACE);
+    const bool written = sp->writeToStream(*outStream, false) != FIFF_FAIL;
     outStream->end_block(FIFFB_MNE);
+    if (!written) {
+        outStream->close();
+        Log::critical("Cannot write the source space to {}", outFile);
+        return 1;
+    }
     outStream->end_file();
     Log::info("Written volume source space to: {}", outFile);
     return 0;

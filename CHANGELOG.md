@@ -266,6 +266,8 @@ aliases; replace the old spelling as below.
 - Reading a source space ignored its type, so volume and discrete source
   spaces came back as surfaces; `FIFF_MNE_SOURCE_SPACE_TYPE` is read, and a
   space without it is a surface, as in MNE-Python.
+- `mne_volume_source_space` wrapped the source space in a second source-space
+  block, so readers found an empty source space; it writes one block.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

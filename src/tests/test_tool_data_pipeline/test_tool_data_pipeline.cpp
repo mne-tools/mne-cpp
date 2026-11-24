@@ -16,6 +16,7 @@
 //=============================================================================================================
 
 #include <mne/inv/inv_source_estimate.h>
+#include <mne/mne/mne_source_spaces.h>
 #include <mne/inv/dipole_fit/inv_ecd_set.h>
 #include <mne/fiff/fiff_ch_name.h>
 #include <mne/fiff/fiff_cov.h>
@@ -1948,6 +1949,24 @@ private slots:
     //=========================================================================================================
     // mne_make_uniform_stc and mne_process_stc
     //=========================================================================================================
+
+    void testVolumeSourceSpaceIsReadable()
+    {
+        if (!toolExists("mne_volume_source_space"))
+            QSKIP("mne_volume_source_space not found");
+        const QString bemFile = m_sResourcePath + "subjects/sample/bem/sample-5120-bem.fif";
+        if (!QFile::exists(bemFile))
+            QSKIP("BEM not available");
+
+        // The source space must sit directly in the MNE block, where readers look for it
+        const QString outFile = m_tempDir.filePath("volume-src.fif");
+        QCOMPARE(runToolExitCode("mne_volume_source_space", {"--bem", bemFile, "--grid", "20", "--out", outFile}), 0);
+        auto spaces = mne::MNESourceSpaces::read(outFile.toStdString());
+        QVERIFY(spaces.has_value());
+        QCOMPARE(spaces->size(), 1);
+        QCOMPARE((*spaces)[0].type, FIFFV_MNE_SPACE_VOLUME);
+        QVERIFY((*spaces)[0].nuse > 0);
+    }
 
     void testMakeUniformStc()
     {
