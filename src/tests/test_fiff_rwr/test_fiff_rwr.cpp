@@ -131,6 +131,7 @@ private slots:
     void readsFromAByteStream();
     void opensAndStartsFilesByPath();
     void readsRawByPathAndStream();
+    void readsASegmentStartingOnTheLastSampleOfABuffer();
     void writersStable_data();
     void writersStable();
     void cleanupTestCase();
@@ -391,6 +392,28 @@ void TestFiffRWR::tagsRewriteByteIdentical()
     QCOMPARE(found->kind, first.kind);
     QVERIFY(!stream.dirtree()->find_tag(stream, FIFF_MNE_ENV_COMMAND_LINE));
     stream.close();
+}
+
+//=============================================================================================================
+
+void TestFiffRWR::readsASegmentStartingOnTheLastSampleOfABuffer()
+{
+    const QString path = testDataDir() + "/MEG/sample/sample_audvis_trunc_raw.fif";
+    const FiffRawData raw(path.toStdString());
+    QVERIFY(raw.rawdir.size() >= 2);
+    const FiffRawDir& buffer = raw.rawdir[0];
+    const fiff_int_t from = buffer.last;
+    const fiff_int_t to = from + 3;
+
+    MatrixXd wide, times, data;
+    QVERIFY(raw.read_raw_segment(wide, times, buffer.first, to));
+    const MatrixXd expected = wide.rightCols(to - from + 1);
+
+    QVERIFY(raw.read_raw_segment(data, times, from, to));
+    QVERIFY(data == expected);
+    SparseMatrix<double> mult;
+    QVERIFY(raw.read_raw_segment(data, times, mult, from, to));
+    QVERIFY(data == expected);
 }
 
 //=============================================================================================================

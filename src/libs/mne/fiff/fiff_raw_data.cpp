@@ -354,7 +354,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //
         //  Do we need this buffer
         //
-        if (thisRawDir.last > from) {
+        if (thisRawDir.last >= from) {
             if (thisRawDir.ent.kind == -1) {
                 //
                 //  Take the easy route: skip is translated to zeros
@@ -651,7 +651,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //
         //  Do we need this buffer
         //
-        if (thisRawDir.last > from) {
+        if (thisRawDir.last >= from) {
             if (thisRawDir.ent.kind == -1) {
                 //
                 //  Take the easy route: skip is translated to zeros

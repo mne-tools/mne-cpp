@@ -231,6 +231,9 @@ aliases; replace the old spelling as below.
 - Comparing two hemispheres (`==`) turned the sparse source-space distance
   matrix into a dense np x np matrix, which for a full cortical surface does
   not fit in memory. It compares the sparse matrices.
+- `FiffRawData::read_raw_segment()` skipped the buffer a segment starts in
+  when the segment starts on that buffer's last sample, and returned
+  uninitialised data for it.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
