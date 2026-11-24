@@ -228,6 +228,9 @@ aliases; replace the old spelling as below.
   MEG and EEG, three-layer BEM) takes 3.5 s instead of 19 s and 7 s of CPU
   time instead of 93 s; MNE-Python takes 13 s. With `--accurate`, the coil
   definitions MNE-Python uses, both agree to 2e-5; the benchmark passes it.
+- Comparing two hemispheres (`==`) turned the sparse source-space distance
+  matrix into a dense np x np matrix, which for a full cortical surface does
+  not fit in memory. It compares the sparse matrices.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and

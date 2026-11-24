@@ -142,6 +142,7 @@ private slots:
     void sourceSpaces_readWithGeometry();
     void sourceSpaces_filterAndTransform();
     void sourceSpaces_readAddGeom();
+    void hemisphere_copyComparesEqual();
 
     // ── InvSourceEstimate ──
     void sourceEstimate_fullLifecycle();
@@ -464,6 +465,21 @@ void TestMneLibrary::sourceSpaces_readAddGeom()
     std::vector<VectorXi> vertno = srcSpaces.get_vertno();
     QVERIFY(vertno.size() >= 2);
     QVERIFY(lh.neighbor_vert.size() > 0 || lh.np > 0);
+}
+
+//=============================================================================================================
+
+void TestMneLibrary::hemisphere_copyComparesEqual()
+{
+    if (!hasData())
+        QSKIP("No test data");
+
+    // The source space has patch statistics, so its sparse distance matrix is np x np
+    MNESourceSpaces srcSpaces(srcPath().toStdU16String());
+    const MNEHemisphere original(*srcSpaces.hemisphereAt(0));
+    QVERIFY(original.dist.eigen().rows() == original.np);
+    const MNEHemisphere copy(original);
+    QVERIFY(copy == original);
 }
 
 //=============================================================================================================

@@ -242,9 +242,12 @@ inline bool operator==(const MNEHemisphere& a, const MNEHemisphere& b)
             [&a, &b]() {
                 const auto& sa = a.dist.eigen();
                 const auto& sb = b.dist.eigen();
-                if (sa.rows() == 0 && sb.rows() == 0 && sa.cols() == 0 && sb.cols() == 0)
+                if (sa.rows() != sb.rows() || sa.cols() != sb.cols())
+                    return false;
+                if (sa.nonZeros() == 0 && sb.nonZeros() == 0)
                     return true;
-                return sa.toDense().isApprox(sb.toDense(), 0.0001f);
+                // Sparse, not dense: a full source space has np x np distances, which would not fit in memory
+                return sa.isApprox(sb, 0.0001f);
             }() &&
             a.tri_cent.isApprox(b.tri_cent, 0.0001) && a.tri_nn.isApprox(b.tri_nn, 0.0001) && a.tri_area.isApprox(b.tri_area, 0.0001) && a.use_tri_cent.isApprox(b.use_tri_cent, 0.0001) && a.use_tri_nn.isApprox(b.use_tri_nn, 0.0001) && a.use_tri_area.isApprox(b.use_tri_area, 0.0001) && [&a, &b]() {
                 if (a.neighbor_tri.size() != b.neighbor_tri.size())
