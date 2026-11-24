@@ -475,6 +475,9 @@ static int cmdPack(const std::string& inputDir, const std::string& outputPath, b
                 if (!rec.files.empty()) {
                     sess.recordings.push_back(std::move(rec));
                 }
+                if (!sess.recordings.empty()) {
+                    subj.sessions.push_back(std::move(sess));
+                }
             }
 
             if (!subj.sessions.empty()) {

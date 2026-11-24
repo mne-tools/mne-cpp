@@ -99,6 +99,7 @@ private slots:
     void testConverterHelp();
     void testConverterExtract();
     void testConverterPack();
+    void testConverterPackScansBidsTree();
     void testConverterConvert();
     void testConverterInvalidCommand();
 
@@ -698,6 +699,32 @@ void TestMnaBids::testConverterPack()
             for (const auto& rec : sess.recordings)
                 for (const auto& ref : rec.files)
                     QCOMPARE(ref.embedded, true);
+}
+
+void TestMnaBids::testConverterPackScansBidsTree()
+{
+    if (m_converterPath.isEmpty())
+        QSKIP("mne_mna_bids_converter not found");
+
+    // Without a project sidecar the converter scans sub-*/ses-*/<modality>/; it used to drop every session
+    const QString bidsDir = m_tempDir.filePath("cli_scan_bids");
+    createBidsTree(bidsDir);
+    const QString mnxPath = m_tempDir.filePath("cli_scanned.mnx");
+
+    QProcess proc;
+    proc.start(m_converterPath, QStringList() << "pack" << bidsDir << mnxPath);
+    QVERIFY(proc.waitForFinished(10000));
+    QCOMPARE(proc.exitCode(), 0);
+
+    MnaProject packed = read(mnxPath);
+    QCOMPARE(packed.subjects.size(), std::size_t(1));
+    QCOMPARE(packed.subjects[0].id, std::string("sample"));
+    QCOMPARE(packed.subjects[0].sessions.size(), std::size_t(1));
+    QCOMPARE(packed.subjects[0].sessions[0].id, std::string("01"));
+    std::size_t files = 0;
+    for (const auto& rec : packed.subjects[0].sessions[0].recordings)
+        files += rec.files.size();
+    QCOMPARE(files, std::size_t(5));
 }
 
 void TestMnaBids::testConverterConvert()

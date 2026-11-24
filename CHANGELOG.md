@@ -275,6 +275,9 @@ aliases; replace the old spelling as below.
   `volume-7mm-src.fif` point for point.
 - `mne_convert_lspcov` aborted with an uncaught exception when `--meas`
   could not be read; it reports the file and exits with 1.
+- `mne_mna_bids_converter pack` built every session it scanned in a BIDS
+  tree without a project sidecar but never added it to its subject, so the
+  packed project was empty.
 - Every object created with `new` has an owner: a Qt parent, an
   ownership-taking Qt call, or a `std::unique_ptr` that hands it over with
   `release()`. The maintainability audit counts raw `new`, raw `delete` and
