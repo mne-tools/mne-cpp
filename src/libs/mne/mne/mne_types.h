@@ -7,7 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2016
  * @brief    Legacy MNE-C constants and shared typedefs used across mne_mne structures.

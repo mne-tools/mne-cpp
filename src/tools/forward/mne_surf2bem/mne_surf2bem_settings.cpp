@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     mne_surf2bem_settings.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     February, 2026
+ * @date     2004
  * @brief    MNESurf2BemSettings class definition.
  *
  *           Command-line parsing replicates the original MNE C tool's behavior

@@ -4,7 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     mne_layout.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     March 2026
  * @brief    2-D plotter layout read from an MNE-C @c .lout file: viewports, channel matching and zoom.

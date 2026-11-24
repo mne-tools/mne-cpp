@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     watershedbem.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     February, 2026
+ * @date     2006
  * @brief    WatershedBem class declaration.
  *
  *           Ported from the original MNE shell script mne_watershed_bem
@@ -18,7 +19,7 @@
  *             3. mne_surf2bem — conversion of FreeSurfer surfaces to FIFF BEM
  *
  *           This C++ implementation:
- *             - Calls mri_watershed via QProcess
+ *             - Calls mri_watershed via mne::run_process
  *             - Reads surfaces using mne::FsSurface
  *             - Applies voxel-to-RAS transforms from MRI volumes (mne_mri)
  *             - Writes BEM FIFF files using mne::MNEBem/MNEBemSurface

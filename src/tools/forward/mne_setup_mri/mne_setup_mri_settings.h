@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     mne_setup_mri_settings.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     February, 2026
+ * @date     2006
  * @brief    MNESetupMriSettings class declaration.
  */
 

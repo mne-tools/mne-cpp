@@ -7,7 +7,8 @@
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Andreas Griesshammer <ag@fieldlineinc.com>
+ *           Andreas Griesshammer <ag@fieldlineinc.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     November 2014
  * @brief    Implementation of @ref mne::LayoutMaker — sphere fit, azimuthal projection and @c .lout writer.

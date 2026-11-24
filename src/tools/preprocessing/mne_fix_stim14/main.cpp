@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     main.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.2.0
- * @date     April, 2026
+ * @date     2001
  * @brief    Fixes the trigger channels of raw FIFF files in place, as MNE-C's mne_fix_stim14 does.
  *
  * By default STI 014 gets the range 1.0 and keeps only the low byte of its 16-bit samples; with --32 STI101

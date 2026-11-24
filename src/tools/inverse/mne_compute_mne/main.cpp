@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     February, 2026
+ * @date     2001
  * @brief    Implements mne_compute_mne application.
  *           Port of the original MNE-C mne_compute_mne by Matti Hamalainen.
  *

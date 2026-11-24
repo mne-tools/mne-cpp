@@ -8,7 +8,8 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Ruben Doerfel <doerfelruben@aol.com>;
  *           Andreas Griesshammer <ag@fieldlineinc.com>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2016
  * @brief    Human-readable names of FIFF tag kinds, block kinds, units, unit multipliers and channel kinds.

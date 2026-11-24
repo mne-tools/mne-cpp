@@ -7,7 +7,8 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
- *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Ordered list of @ref mne::MNEEpochData objects sharing a common @ref mne::FiffInfo.

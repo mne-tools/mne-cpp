@@ -7,7 +7,8 @@
  * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     November 2014
  * @brief    Generator that projects 3-D electrode positions onto a 2-D @c .lout topographic layout.

@@ -6,9 +6,10 @@
  * @file     fwd_thread_arg.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     March 2017
+ * @date     2001
  * @brief    Per-thread work packet (dipole range, coil set, output column) consumed by the parallel forward-solution dipole loop.
  *
  * Building the lead-field matrix G is embarrassingly parallel along the

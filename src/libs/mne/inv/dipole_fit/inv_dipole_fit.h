@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     inv_dipole_fit.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     March 2026
+ * @date     2005
  * @brief    High-level driver for sequential equivalent-current-dipole (ECD) fitting at every time point of an evoked or raw recording.
  *
  * @ref mne::InvDipoleFit orchestrates the full mne-c

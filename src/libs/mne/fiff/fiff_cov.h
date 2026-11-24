@@ -8,7 +8,8 @@
  *           Christof Pieloth <pieloth@labp.htwk-leipzig.de>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     October 2012
  * @brief    Noise / data covariance matrix as stored under FIFFB_MNE_COV, with channel names, kind, projector list and rank info.

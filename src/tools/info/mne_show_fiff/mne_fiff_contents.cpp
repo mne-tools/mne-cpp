@@ -5,8 +5,9 @@
  *
  * @file     mne_fiff_contents.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
- * @date     December, 2016
+ *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+ * @date     2006
  * @version  dev
  * @brief    Definition of the MNEFiffContents class.
  */

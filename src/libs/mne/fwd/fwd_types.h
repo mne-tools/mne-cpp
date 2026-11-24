@@ -6,9 +6,10 @@
  * @file     fwd_types.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Gabriel Motta <gabrielbenmotta@gmail.com>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     December 2016
+ * @date     2001
  * @brief    std::function aliases for the generic dipole field / potential / field-gradient callbacks driving the source-space loop.
  *
  * The compute_forward driver iterates over every dipole position in a

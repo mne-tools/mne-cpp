@@ -9,9 +9,10 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Johannes Behrens <behrens@neoscan-solutions.com>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
- *           Lars Debor <Lars.Debor@tu-ilmenau.de>
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     December 2016
+ * @date     2005
  * @brief    Implementation of the dipole-fit workspace setup, noise-covariance scaling and forward-function selection.
  *
  * Implements @c setup_dipole_fit_data (read forward model, channel

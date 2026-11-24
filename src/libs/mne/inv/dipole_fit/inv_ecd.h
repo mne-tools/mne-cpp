@@ -4,7 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     inv_ecd.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     March 2026
  * @brief    Single equivalent current dipole (ECD) with position, moment and per-fit goodness/χ² metrics.

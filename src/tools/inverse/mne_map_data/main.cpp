@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     main.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.2.0
- * @date     April, 2026
+ * @date     2004
  * @brief    Map evoked data between sensor arrays via forward/inverse operators.
  *
  *           Applies the inverse operator to source-localize the input evoked data,

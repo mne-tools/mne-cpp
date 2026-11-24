@@ -4,9 +4,10 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     inv_dipole_fit_settings.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
- * @date     March 2026
+ * @date     2005
  * @brief    Command-line and programmatic settings struct for the @c mne_dipole_fit driver.
  *
  * @ref mne::InvDipoleFitSettings collects every option that the

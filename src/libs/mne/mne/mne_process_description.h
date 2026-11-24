@@ -4,7 +4,8 @@
  * Copyright (c) 2026 MNE-CPP Authors
  *
  * @file     mne_process_description.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    2.0.0
  * @date     February 2026
  * @brief    Plain-old-data record describing one MNE-C @c .ave / @c .cov processing entry.
